@@ -1,0 +1,18 @@
+<plugin name='dao' version='0.1' grailsVersion='1.3.4 &gt; *'>
+  <author>Joshua Burnett</author>
+  <title>Dao plugin</title>
+  <description>\
+Enables a grails-app/dao directory to setup beans
+</description>
+  <documentation>http://grails.org/plugin/dao</documentation>
+  <resources>
+    <resource>BuildConfig</resource>
+    <resource>Config</resource>
+    <resource>DataSource</resource>
+    <resource>UrlMappings</resource>
+    <resource>testing.JumperDao</resource>
+    <resource>testing.Jumper</resource>
+  </resources>
+  <dependencies />
+  <behavior />
+</plugin>

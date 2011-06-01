@@ -1,0 +1,8 @@
+- update messages to be new defaults, and merge new ones in
+    -default.created.message
+    -ours default.save.failed.message
+    -default.updated.message
+- check checkFound and notFoundResult for sig
+- check all moved fields
+- nameOrId is now identify
+- removed boolean on failure messages

@@ -21,6 +21,12 @@ class GormDao {
 	public GormDao(Class clazz){
 		thisDomainClass = clazz
 	}
+	
+	static GormDao getBean(Class clazz){
+		def dao = AH.application.mainContext.getBean("gormDaoBean")
+		dao.domainClass = clazz
+		return dao
+	}
 
 	//override this to set the domain this dao is for
 	def getDomainClass(){ return thisDomainClass}

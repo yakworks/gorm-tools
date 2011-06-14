@@ -1,10 +1,11 @@
 <%=packageName ? "package ${packageName}\n" : ''%>
 import grails.plugin.dao.GormException
+import grails.plugin.dao.GormDao
 import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 
 class ${className}Controller {
 	//def daoFactory
-	def dao = AH.application.mainContext.getBean("daoFactory").getDao(${className}) 
+	def dao = GormDao.getBean(${className}) 
 	
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 

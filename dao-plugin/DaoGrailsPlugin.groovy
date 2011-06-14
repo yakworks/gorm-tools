@@ -23,7 +23,7 @@ class DaoGrailsPlugin {
 	static final def log = Logger.getLogger(DaoGrailsPlugin)
 	
     // the plugin version
-    def version = "0.1"
+    def version = "0.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -41,6 +41,7 @@ class DaoGrailsPlugin {
     def title = "Dao plugin"
     def description = '''\\
 Enables a grails-app/dao directory to setup beans
+see https://github.com/basejump/grails-dao
 '''
 
     // URL to the plugin's documentation

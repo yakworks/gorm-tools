@@ -34,10 +34,10 @@ class GormDao {
 	def setDomainClass(clazz){ thisDomainClass = clazz}
 
 	/**
-	* saves a domain entity and rewraps ValidationException with GormException on error
+	* saves a domain entity and rewraps ValidationException with GormDataException on error
 	*
 	* @param  params  the parameter map
-	* @throws GormException if a validation error happens
+	* @throws GormDataException if a validation error happens
 	*/
 	
 	def save(entity) {
@@ -46,10 +46,10 @@ class GormDao {
 			entity.save(flush:flushOnSave,failOnError:true)
 		}
 		catch (ValidationException e){
-			throw new GormException(DaoUtils.saveFailedMessage(entity), entity, e.errors)
+			throw new GormDataException(DaoUtils.saveFailedMessage(entity), entity, e.errors)
 		}
 		catch (DataAccessException dae) {
-			def ge = new GormException(DaoUtils.saveFailedMessage(entity), entity)
+			def ge = new GormDataException(DaoUtils.saveFailedMessage(entity), entity)
 			ge.dataAccessException = dae
 			throw ge
 		}
@@ -59,7 +59,7 @@ class GormDao {
 	* calls delete on the entity to remove it from the db
 	*
 	* @param  entity  the domain entity
-	* @throws GormException if a spring DataIntegrityViolationException is thrown
+	* @throws GormDataException if a spring DataIntegrityViolationException is thrown
 	*/
 	def delete(entity){
 		try {
@@ -68,7 +68,9 @@ class GormDao {
 		}
 		catch (DataIntegrityViolationException e) {
 			def ident = DaoUtils.badge(entity.id,entity)
-			throw new GormException(DaoUtils.deleteMessage(entity,ident,false), entity)
+			def ge = new GormDataException(DaoUtils.deleteMessage(entity,ident,false), entity)
+			ge.dataAccessException = e
+			throw ge
 		}
 	}
 
@@ -76,7 +78,7 @@ class GormDao {
 	* inserts and calls save for a new domain entity based with the data from params
 	*
 	* @param  params  the parameter map
-	* @throws GormException if a validation error happens
+	* @throws GormDataException if a validation error happens
 	*/
 	def insert(params) {
 		formatParams(params)
@@ -92,7 +94,7 @@ class GormDao {
 	* updates a new domain entity with the data from params
 	*
 	* @param  params  the parameter map
-	* @throws GormException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
+	* @throws GormDataException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
 	*/
 	def update(params){
 		def entity = domainClass.get(params.id.toLong())
@@ -112,7 +114,7 @@ class GormDao {
 	* deletes a new domain entity base on the id in the params
 	*
 	* @param  params  the parameter map that has the id for the domain entity to delete
-	* @throws GormException if its not found or if a DataIntegrityViolationException is thrown
+	* @throws GormDataException if its not found or if a DataIntegrityViolationException is thrown
 	*/
 	def remove(params){
 		def entity = domainClass.get(params.id.toLong())

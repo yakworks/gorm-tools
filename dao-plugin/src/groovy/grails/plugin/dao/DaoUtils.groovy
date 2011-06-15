@@ -23,7 +23,7 @@ class DaoUtils {
 	*
 	* @param  entity  the domain object the check
 	* @param  ver the version this used to be (entity will have the )
-	* @throws GormException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
+	* @throws GormDataException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
 	*/
 	//FIXME the message on the error  needs to fixed up here.
 	static void  checkVersion(entity,ver){
@@ -33,21 +33,21 @@ class DaoUtils {
 			def msg = "default.optimistic.locking.failure"
 			def msgMap = setupMessage(msg,[GrailsClassUtils.getShortName(entity.class.name)],"Another user has updated this ${GrailsClassUtils.getShortName(entity.class.name)} while you were editing")
 			entity.errors.rejectValue("version", msg, "Another user has updated this ${GrailsClassUtils.getShortName(entity.class.name)} while you were editing")
-			throw new GormException(msgMap, entity, entity.errors)
+			throw new GormDataException(msgMap, entity, entity.errors)
 		}
 	}
 
 	/**
-	* check that the passed in entity is not null and throws GormException setup with the notfound message
+	* check that the passed in entity is not null and throws GormDataException setup with the notfound message
 	*
 	* @param  entity  the domain object the check
 	* @param  params  the params map
 	* @param  domainClassName  the name of the domain
-	* @throws GormException if it not found
+	* @throws GormDataException if it not found
 	*/
 	static void checkFound(entity, Map params,String domainClassName){
 		if (!entity) {
-			throw new GormException(notFoundResult(domainClassName,params), null)
+			throw new GormDataException(notFoundResult(domainClassName,params), null)
 		}
 	}
 

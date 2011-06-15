@@ -5,7 +5,7 @@ import org.springframework.validation.Errors
 import grails.validation.ValidationException
 import grails.test.*
 
-class GormExceptionTests extends GrailsUnitTestCase {
+class GormDataExceptionTests extends GrailsUnitTestCase {
 
 	protected void setUp() {
 		super.setUp()
@@ -16,7 +16,7 @@ class GormExceptionTests extends GrailsUnitTestCase {
 	}
 
 	void testSimple(){
-		def e = new GormException("fubar",new EmptyErrors("blah"))
+		def e = new GormDataException("fubar",new EmptyErrors("blah"))
 		assertEquals "validationException",e.messageMap.code
 		def args = []
 		assertEquals args,e.messageMap.args
@@ -26,7 +26,7 @@ class GormExceptionTests extends GrailsUnitTestCase {
 	void testMessageMap(){
 		Map m = [code:"vtest",args:[0],defaultMessage:"defmsg"]
 		Map entity = [someEntity:"go cubs"]
-		def e = new GormException(m,entity,new EmptyErrors("blah"))
+		def e = new GormDataException(m,entity,new EmptyErrors("blah"))
 		assertEquals "vtest",e.messageMap.code
 		def args = [0]
 		assertEquals( args, e.messageMap.args)
@@ -37,7 +37,7 @@ class GormExceptionTests extends GrailsUnitTestCase {
 	void testNoErrors(){
 		Map m = [code:"vtest",args:[0],defaultMessage:"defmsg"]
 		Map entity = [someEntity:"go cubs"]
-		def e = new GormException(m,entity)
+		def e = new GormDataException(m,entity)
 		assertEquals "vtest",e.messageMap.code
 		def args = [0]
 		assertEquals( args, e.messageMap.args)

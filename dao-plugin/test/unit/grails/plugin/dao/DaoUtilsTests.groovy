@@ -24,7 +24,7 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 		try{
 			DaoUtils.checkVersion(mocke,0)
 			fail "should not have made it here"
-		}catch(GormException e){
+		}catch(GormDataException e){
 			assertEquals(mocke.id,e.entity.id)
 			//println e.entity.errors
 			assertEquals("default.optimistic.locking.failure",e.messageMap.code)
@@ -35,7 +35,7 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 		try{
 			DaoUtils.checkFound(null, [id:'99'],"xxx")
 			fail "should not have made it here"
-		}catch(GormException e){
+		}catch(GormDataException e){
 			//id
 			assertEquals('99',e.messageMap.args[1])
 			//domain name

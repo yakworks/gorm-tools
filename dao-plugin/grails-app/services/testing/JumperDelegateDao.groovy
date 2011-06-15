@@ -4,6 +4,7 @@ import org.springframework.beans.factory.InitializingBean
 import javax.annotation.PostConstruct
 
 //FIXME can't get delegate working
+//this is here to show that these will get picked up in the services directory too
 class JumperDelegateDao { 
 	//static transactional = false
 	

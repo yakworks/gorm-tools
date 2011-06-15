@@ -49,8 +49,8 @@ see https://github.com/basejump/grails-dao
 	
 	def loadAfter = ['hibernate']
 
-    def watchedResources = ["file:./grails-app/dao/**/*Dao.groovy",
-                            "file:./plugins/*/grails-app/dao/**/*Dao.groovy"]
+    def watchedResources = ["file:./grails-app/dao/**/*Dao.groovy","file:./grails-app/services/**/*Dao.groovy",
+                            "file:./plugins/*/grails-app/dao/**/*Dao.groovy","file:./plugins/*/grails-app/services/**/*Dao.groovy"]
 	
 	def artefacts = [new DaoArtefactHandler()]
 

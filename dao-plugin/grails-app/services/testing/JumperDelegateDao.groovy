@@ -12,7 +12,7 @@ class JumperDelegateDao {
 	def grailsApplication
 
 	//@Delegate 
-	GormDao dao //= GormDao.getBean(domainClass) 
+	GormDaoSupport dao //= GormDao.getBean(domainClass) 
 
 /*	public void afterPropertiesSet() {
 	        // do some initialization work

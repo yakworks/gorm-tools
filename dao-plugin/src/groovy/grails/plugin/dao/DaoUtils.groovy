@@ -9,14 +9,30 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.dao.DataAccessException
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
+import org.springframework.beans.BeansException
+
 import java.util.Locale
 
 /**
-* A bunch of statics to support the GormDao
+* A bunch of statics to support the GormDaoSupport.
+* this is also setup as daoUtilsBean so that it gets injected with the ApplicationContext once its setup
 */
-class DaoUtils {
+class DaoUtils implements ApplicationContextAware 
+{
 	
+	static ApplicationContext ctx
+	//static def sessionFactory
+	//static def messageSource
+	
+	//void setSessionFactory(s){ sessionFactory=s }
+	//void setMessageSource(m){ messageSource=m }
 
+	public void setApplicationContext(ApplicationContext ctx) throws BeansException { 
+		this.ctx = ctx
+	}
+	
 	/**
 	* checks the passed in version with the version on the entity (entity.version)
 	* make sure entity.version is not greater
@@ -25,14 +41,12 @@ class DaoUtils {
 	* @param  ver the version this used to be (entity will have the )
 	* @throws GormDataException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
 	*/
-	//FIXME the message on the error  needs to fixed up here.
 	static void  checkVersion(entity,ver){
 		if (ver == null) return
 		def version = ver.toLong()
 		if (entity.version > version) {
-			def msg = "default.optimistic.locking.failure"
-			def msgMap = setupMessage(msg,[GrailsClassUtils.getShortName(entity.class.name)],"Another user has updated this ${GrailsClassUtils.getShortName(entity.class.name)} while you were editing")
-			entity.errors.rejectValue("version", msg, "Another user has updated this ${GrailsClassUtils.getShortName(entity.class.name)} while you were editing")
+			def msgMap = optimisticLockingFailureMessage(entity)
+			entity.errors.rejectValue("version", msgMap.code, msgMap.args as Object[],msgMap.defaultMessage)
 			throw new GormDataException(msgMap, entity, entity.errors)
 		}
 	}
@@ -107,14 +121,20 @@ class DaoUtils {
 		}
 		return setupMessage("default.deleted.message",[domainLabel,ident],"${domainLabel} ${ident} deleted")
 	}
+	static Map optimisticLockingFailureMessage(entity){
+		def domainLabel = resolveDomainLabel(entity)
+		def msgMap = setupMessage("default.optimistic.locking.failure",[domainLabel],"Another user has updated the ${domainLabel} while you were editing")
+	}
 	
 	static String resolveDomainLabel(entity){
 		return resolveMessage("${propName(entity.class.name)}.label", "${GrailsClassUtils.getShortName(entity.class.name)}")
 	}
 	
 	static String resolveMessage(code,defaultMsg){
-		def ctx = AH.application.mainContext
-		def msg = ctx.getMessage(code, [] as Object[] , defaultMsg, defaultLocale())
+		//def ctx2 = AH.application.mainContext
+		//println "default locale is "+ defaultLocale()
+		//println "code  is "+ code
+		def msg = ctx.messageSource.getMessage(code, [] as Object[] ,defaultMsg,  defaultLocale())
 		return msg
 	}
 	
@@ -143,7 +163,7 @@ class DaoUtils {
 	}
 
 	//forces a rollback on the existing transaction
-	static def rollback(){
+	static void rollback(){
 		TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
 	}
 
@@ -187,16 +207,16 @@ class DaoUtils {
 	}
 
 	// Implemented this for a comman way to do our flush() and clear() methods to get to a clean states
-	static def flushAndClear(){
+	static void flushAndClear(){
 		flushSession()
 		clearSession()
 	}
 
-	static def flushSession(){
-		AH.application.mainContext.sessionFactory.currentSession.flush()
+	static void flushSession(){
+		ctx.sessionFactory.currentSession.flush()
 	}
-	static def clearSession(){
-		AH.application.mainContext.sessionFactory.currentSession.clear()
+	static void clearSession(){
+		ctx.sessionFactory.currentSession.clear()
 		DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 	}
 

@@ -2,9 +2,14 @@ import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
+import grails.validation.ValidationException
+
+import org.springframework.dao.DataAccessException
+import org.springframework.dao.DataIntegrityViolationException
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.commons.spring.TypeSpecifyableTransactionProxyFactoryBean
 import org.codehaus.groovy.grails.commons.GrailsServiceClass
 import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
@@ -58,9 +63,9 @@ see https://github.com/basejump/grails-dao
 		daoFactory(grails.plugin.dao.DaoFactory) {
 			grailsApplication = ref('grailsApplication')
 		}
-		gormDaoBeanNonTransactional(grails.plugin.dao.GormDao) { bean ->
+		gormDaoBeanNonTransactional(grails.plugin.dao.GormDaoSupport) { bean ->
 			bean.scope = "prototype"
-			grailsApplication = ref('grailsApplication')
+			//grailsApplication = ref('grailsApplication')
 		}
 		def props = new Properties()
         props."*" = "PROPAGATION_REQUIRED"
@@ -72,14 +77,18 @@ see https://github.com/basejump/grails-dao
             transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes:props)
             transactionManager = ref("transactionManager")
         }
+		daoUtilsBean(grails.plugin.dao.DaoUtils) //this is here just so the app ctx can get set on DaoUtils
 		
 		application.daoClasses.each {daoClass ->
             configureDaoBeans.delegate = delegate
             configureDaoBeans(daoClass)
         }
+
+		//DaoUtils.ctx = application.mainContext
     }
 
     def doWithDynamicMethods = { ctx ->
+		//DaoUtils.ctx = ctx
 		//force initialization of domain meta methods
 		forceInitGormMethods(application)
 		
@@ -159,25 +168,79 @@ see https://github.com/basejump/grails-dao
 	def modifyDomainsClasses(GrailsApplication application, ApplicationContext ctx){
 		for (GrailsDomainClass dc in application.domainClasses) {
             MetaClass mc = dc.metaClass
-			addBasicPersistenceMethods(dc,application,ctx)
+			addNewPersistenceMethods(dc,application,ctx)
 		}
 	}
 
-    def addBasicPersistenceMethods(GrailsDomainClass dc, GrailsApplication application, ApplicationContext ctx) {
-        def metaClass = dc.metaClass
+	def addNewPersistenceMethods(GrailsDomainClass dc, GrailsApplication application, ApplicationContext ctx) {
+		def metaClass = dc.metaClass
+		//def origSaveArgs = dc.clazz.metaClass.getMetaMethod('save', Map)
+		def dao = figureOutDao( dc, ctx)
 
-		def gormSave = dc.clazz.metaClass.getMetaMethod('save', Map) 
-
-        metaClass.persist = {Map args ->
+		//TODO refactor this out as its copy pasted code for each method
+		metaClass.persist = {Map args ->
 			args['failOnError'] = true
-			delegate.save args
-			//gormSave.invoke delegate, args 
-        }
+			dao.save(delegate,args)
+		}
 
-        metaClass.persist = {->
-			delegate.save(failOnError:true)
-			//gormSave.invoke delegate, [failOnError:true] 
-        }
+		metaClass.persist = {->
+			dao.save(delegate)
+		}
+
+		metaClass.remove = {->
+			dao.delete(delegate)
+		}
+
+		metaClass.static.insert = { Map params ->
+			dao.insert(params)
+		}
+
+		metaClass.static.update = { Map params ->
+			dao.update(params)
+		}
+
+		metaClass.static.remove = { Map params ->
+			dao.remove(params)
+		}
+		
+		metaClass.static.getDao = { ->
+			return dao
+		}
+
+
+	}
+	
+	def figureOutDao(GrailsDomainClass dc, ApplicationContext ctx){
+		def domainClass = dc.clazz
+		def daoName = "${dc.propertyName}Dao"
+		def daoType = GrailsClassUtils.getStaticPropertyValue(domainClass, "daoType")
+		def dao
+		//println "$daoType and $daoName for $domainClass"
+		if(!daoType) {
+			if(ctx.containsBean(daoName)){
+				println "found bean $daoName for $domainClass"
+				dao = ctx.getBean(daoName)
+			}else{
+				println "getInstance for $domainClass"
+				dao = GormDaoSupport.getInstance(domainClass)
+			}
+		}else{
+			if("transactional" == daoType){
+				println "setting transactional bean  for $domainClass"
+				dao = ctx.getBean("gormDaoBean")
+				dao.domainClass = domainClass
+			}
+			else if(ctx.containsBean(daoType)){
+				dao = ctx.getBean(daoType)
+			}
+		}
+		//if its still null then default it to the setup one
+		if(!dao){
+			log.error "something went wrong trying to setup dao for ${dc.fullName} maybe this is wrong ${daoProps}"
+			dao = GormDaoSupport.getInstance(dc.clazz)
+		} 
+		
+		return dao
 	}
 	
 	def forceInitGormMethods(application){

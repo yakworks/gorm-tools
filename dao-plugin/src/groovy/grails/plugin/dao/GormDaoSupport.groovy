@@ -3,74 +3,100 @@ package grails.plugin.dao
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
-class GormDao {
+class GormDaoSupport {
+	static def log = org.apache.log4j.Logger.getLogger(GormDaoSupport)
 	//injected bean
-	def grailsApplication
+	//def grailsApplication
 	
-	def flushOnSave = false
+	boolean flushOnSave = false
+	
+	boolean fireEvents = true
 
 	private Class thisDomainClass
 	
-	public GormDao(){}
 	
-	public GormDao(Class clazz){
+	
+	public GormDaoSupport(){}
+	
+	public GormDaoSupport(Class clazz){
 		thisDomainClass = clazz
 	}
 	
-	static GormDao getBean(Class clazz){
-		def dao = AH.application.mainContext.getBean("gormDaoBean")
+	public GormDaoSupport(Class clazz,boolean fireEvents){
+		thisDomainClass = clazz
+		this.fireEvents = fireEvents
+	}
+	
+	/**
+	 * returns an instance with fireEvents=false and flushOnSave=false
+	 * FIXME this should return a transactional instance
+	 */
+	static GormDaoSupport getInstance(Class clazz){
+/*		def dao = DaoUtils.ctx.getBean("gormDaoBean")
 		dao.domainClass = clazz
+		return dao*/
+		def dao = new GormDaoSupport(clazz,false)
 		return dao
 	}
 
 	//override this to set the domain this dao is for
-	def getDomainClass(){ return thisDomainClass}
+	Class getDomainClass(){ return thisDomainClass}
 	//set this is constructing a base dao by hand
-	def setDomainClass(clazz){ thisDomainClass = clazz}
+	void setDomainClass(Class clazz){ thisDomainClass = clazz}
 
 	/**
 	* saves a domain entity and rewraps ValidationException with GormDataException on error
 	*
-	* @param  params  the parameter map
-	* @throws GormDataException if a validation error happens
+	* @param  entity  the domain entity to call save on
+	* @throws GormDataException if a validation or DataAccessException error happens
 	*/
-	
 	def save(entity) {
+		save(entity,[flush:flushOnSave])		
+	}
+	
+	/**
+	* saves a domain entity with the passed in args and rewraps ValidationException with GormDataException on error
+	*
+	* @param  entity  the domain entity to call save on
+	* @param  args  the arguments to pass to save
+	* @throws GormDataException if a validation or DataAccessException error happens
+	*/
+	def save(entity, Map args) {
+		args['failOnError'] = true
 		try{
-			DaoUtils.triggerEvent(this,"beforeSave", entity,null)
-			entity.save(flush:flushOnSave,failOnError:true)
+			if(fireEvents) DaoUtils.triggerEvent(this,"beforeSave", entity,null)
+			entity.save(args)
 		}
-		catch (ValidationException e){
-			throw new GormDataException(DaoUtils.saveFailedMessage(entity), entity, e.errors)
+		catch (ValidationException ve){
+			if(ve instanceof GormDataException) throw ve
+			throw new GormDataException(DaoUtils.saveFailedMessage(entity), entity, ve.errors, ve)
 		}
 		catch (DataAccessException dae) {
-			def ge = new GormDataException(DaoUtils.saveFailedMessage(entity), entity)
-			ge.dataAccessException = dae
-			throw ge
+			log.error("dao save error on ${entity.id} of ${entity.class.name}",dae)
+			//TODO we can build a better message with optimisticLockingFailureMessage(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
+			throw new GormDataException(DaoUtils.saveFailedMessage(entity), entity, dae)
 		}
+		
 	}
 
 	/**
-	* calls delete on the entity to remove it from the db
+	* calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions 
 	*
 	* @param  entity  the domain entity
 	* @throws GormDataException if a spring DataIntegrityViolationException is thrown
 	*/
 	def delete(entity){
 		try {
-			DaoUtils.triggerEvent(this,"beforeDelete", entity,null)
-			entity.delete(flush:flushOnSave)
+			if(fireEvents) DaoUtils.triggerEvent(this,"beforeDelete", entity,null)
+			entity.delete(flush:true)
 		}
-		catch (DataIntegrityViolationException e) {
+		catch (DataIntegrityViolationException dae) {
 			def ident = DaoUtils.badge(entity.id,entity)
-			def ge = new GormDataException(DaoUtils.deleteMessage(entity,ident,false), entity)
-			ge.dataAccessException = e
-			throw ge
+			log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
+			throw new GormDataException(DaoUtils.deleteMessage(entity,ident,false), entity,dae)
 		}
 	}
 
@@ -80,11 +106,11 @@ class GormDao {
 	* @param  params  the parameter map
 	* @throws GormDataException if a validation error happens
 	*/
-	def insert(params) {
+	Map insert(Map params) {
 		formatParams(params)
 		def entity = domainClass.newInstance()
 		entity.properties = params
-		DaoUtils.triggerEvent(this,"beforeInsertSave", entity, params)
+		if(fireEvents) DaoUtils.triggerEvent(this,"beforeInsertSave", entity, params)
 		save(entity)
 		return [ok:true,entity: entity, message:DaoUtils.createMessage(entity)]
 	}
@@ -96,7 +122,7 @@ class GormDao {
 	* @param  params  the parameter map
 	* @throws GormDataException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
 	*/
-	def update(params){
+	Map update(Map params){
 		def entity = domainClass.get(params.id.toLong())
 		formatParams(params)
 
@@ -104,7 +130,7 @@ class GormDao {
 		DaoUtils.checkVersion(entity,params.version)
 
 		entity.properties = params
-		DaoUtils.triggerEvent(this,"beforeUpdateSave", entity,params)
+		if(fireEvents) DaoUtils.triggerEvent(this,"beforeUpdateSave", entity,params)
 		save(entity)
 		return [ ok:true, entity: entity,message:DaoUtils.updateMessage(entity)]
 
@@ -116,22 +142,23 @@ class GormDao {
 	* @param  params  the parameter map that has the id for the domain entity to delete
 	* @throws GormDataException if its not found or if a DataIntegrityViolationException is thrown
 	*/
-	def remove(params){
+	Map remove(Map params){
 		def entity = domainClass.get(params.id.toLong())
 		DaoUtils.checkFound(entity,params,domainClass.name)
-		DaoUtils.triggerEvent(this,"beforeRemoveSave", entity,params)
+		if(fireEvents) DaoUtils.triggerEvent(this,"beforeRemoveSave", entity,params)
 		def msg = DaoUtils.deleteMessage(entity,DaoUtils.badge(entity.id,entity),true)
 		delete(entity)
 		return [ok:true, id: params.id,message:msg]
 	}
 	
-	void formatParams(params){
+	//some our standard naming conventions on fields to clean up
+	void formatParams(Map params){
 		params.each{
 			if(it.key.toLowerCase().endsWith("amount") || it.key.toLowerCase().endsWith("amount2") || it.key.toLowerCase().endsWith("price")
 					|| it.key.toLowerCase().startsWith("unitprice")){
 				it.value = it.value.toString().replace('$', '').replace(',', '')
 			}
-			if(it.key.toLowerCase().endsWith("percent")){
+			if(it.key.toLowerCase().endsWith("percent") || it.key.toLowerCase().endsWith("pct")){
 				 it.value = it.value.toString().replace('%', '')
 			}
 			if(it.key.toLowerCase().equals("docdate") || it.key.toLowerCase().equals("discdate") || it.key.toLowerCase().equals("duedate") || it.key.toLowerCase().endsWith("duedate")) {

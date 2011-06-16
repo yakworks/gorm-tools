@@ -18,6 +18,9 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 	}
 
 	void testCheckVersion(){
+		DaoUtils.metaClass.'static'.resolveMessage = {code,defaultMsg ->
+			return defaultMsg
+		}
 		//should pass
 		DaoUtils.checkVersion(mocke,1)
 		//shold fail

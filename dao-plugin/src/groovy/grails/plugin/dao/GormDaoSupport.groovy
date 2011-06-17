@@ -32,7 +32,6 @@ class GormDaoSupport {
 	
 	/**
 	 * returns an instance with fireEvents=false and flushOnSave=false
-	 * FIXME this should return a transactional instance
 	 */
 	static GormDaoSupport getInstance(Class clazz){
 /*		def dao = DaoUtils.ctx.getBean("gormDaoBean")
@@ -48,21 +47,21 @@ class GormDaoSupport {
 	void setDomainClass(Class clazz){ thisDomainClass = clazz}
 
 	/**
-	* saves a domain entity and rewraps ValidationException with GormDataException on error
+	* saves a domain entity and rewraps ValidationException with DomainException on error
 	*
 	* @param  entity  the domain entity to call save on
-	* @throws GormDataException if a validation or DataAccessException error happens
+	* @throws DomainException if a validation or DataAccessException error happens
 	*/
 	def save(entity) {
 		save(entity,[flush:flushOnSave])		
 	}
 	
 	/**
-	* saves a domain entity with the passed in args and rewraps ValidationException with GormDataException on error
+	* saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error
 	*
 	* @param  entity  the domain entity to call save on
 	* @param  args  the arguments to pass to save
-	* @throws GormDataException if a validation or DataAccessException error happens
+	* @throws DomainException if a validation or DataAccessException error happens
 	*/
 	def save(entity, Map args) {
 		args['failOnError'] = true
@@ -71,13 +70,16 @@ class GormDaoSupport {
 			entity.save(args)
 		}
 		catch (ValidationException ve){
-			if(ve instanceof GormDataException) throw ve
-			throw new GormDataException(DaoUtils.saveFailedMessage(entity), entity, ve.errors, ve)
+			if(ve instanceof DomainException) throw ve //if this is already fired 
+			throw new DomainException(DaoUtils.saveFailedMessage(entity), entity, ve.errors, ve)
 		}
 		catch (DataAccessException dae) {
-			log.error("dao save error on ${entity.id} of ${entity.class.name}",dae)
+			log.error("unexpected dao save error on ${entity.id} of ${entity.class.name}",dae)
 			//TODO we can build a better message with optimisticLockingFailureMessage(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
-			throw new GormDataException(DaoUtils.saveFailedMessage(entity), entity, dae)
+			//TODO also, in the case of optimisticLocking, is that really un expected? shoud we log it?
+			//TODO we shold really chnage the message from the default saveFailedMessage as this is more of a critical low level error a
+			//and save the default saveFailedMessage for when a validation occurs like above
+			throw new DomainException(DaoUtils.saveFailedMessage(entity), entity, dae)
 		}
 		
 	}
@@ -86,7 +88,7 @@ class GormDaoSupport {
 	* calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions 
 	*
 	* @param  entity  the domain entity
-	* @throws GormDataException if a spring DataIntegrityViolationException is thrown
+	* @throws DomainException if a spring DataIntegrityViolationException is thrown
 	*/
 	def delete(entity){
 		try {
@@ -96,7 +98,7 @@ class GormDaoSupport {
 		catch (DataIntegrityViolationException dae) {
 			def ident = DaoUtils.badge(entity.id,entity)
 			log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
-			throw new GormDataException(DaoUtils.deleteMessage(entity,ident,false), entity,dae)
+			throw new DomainException(DaoUtils.deleteMessage(entity,ident,false), entity,dae)
 		}
 	}
 
@@ -104,7 +106,7 @@ class GormDaoSupport {
 	* inserts and calls save for a new domain entity based with the data from params
 	*
 	* @param  params  the parameter map
-	* @throws GormDataException if a validation error happens
+	* @throws DomainException if a validation error happens
 	*/
 	Map insert(Map params) {
 		formatParams(params)
@@ -120,7 +122,7 @@ class GormDaoSupport {
 	* updates a new domain entity with the data from params
 	*
 	* @param  params  the parameter map
-	* @throws GormDataException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
+	* @throws DomainException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
 	*/
 	Map update(Map params){
 		def entity = domainClass.get(params.id.toLong())
@@ -140,7 +142,7 @@ class GormDaoSupport {
 	* deletes a new domain entity base on the id in the params
 	*
 	* @param  params  the parameter map that has the id for the domain entity to delete
-	* @throws GormDataException if its not found or if a DataIntegrityViolationException is thrown
+	* @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
 	*/
 	Map remove(Map params){
 		def entity = domainClass.get(params.id.toLong())

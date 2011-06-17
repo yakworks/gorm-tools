@@ -39,7 +39,7 @@ class DaoUtils implements ApplicationContextAware
 	*
 	* @param  entity  the domain object the check
 	* @param  ver the version this used to be (entity will have the )
-	* @throws GormDataException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
+	* @throws DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
 	*/
 	static void  checkVersion(entity,ver){
 		if (ver == null) return
@@ -47,21 +47,21 @@ class DaoUtils implements ApplicationContextAware
 		if (entity.version > version) {
 			def msgMap = optimisticLockingFailureMessage(entity)
 			entity.errors.rejectValue("version", msgMap.code, msgMap.args as Object[],msgMap.defaultMessage)
-			throw new GormDataException(msgMap, entity, entity.errors)
+			throw new DomainException(msgMap, entity, entity.errors)
 		}
 	}
 
 	/**
-	* check that the passed in entity is not null and throws GormDataException setup with the notfound message
+	* check that the passed in entity is not null and throws DomainException setup with the notfound message
 	*
 	* @param  entity  the domain object the check
 	* @param  params  the params map
 	* @param  domainClassName  the name of the domain
-	* @throws GormDataException if it not found
+	* @throws DomainException if it not found
 	*/
 	static void checkFound(entity, Map params,String domainClassName){
 		if (!entity) {
-			throw new GormDataException(notFoundResult(domainClassName,params), null)
+			throw new DomainException(notFoundResult(domainClassName,params), null)
 		}
 	}
 

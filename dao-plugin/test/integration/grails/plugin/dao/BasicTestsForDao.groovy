@@ -28,7 +28,7 @@ class BasicTestsForDao extends GroovyTestCase {
 			DaoUtils.flushAndClear()
 			def dom2 = Jumper.findByName("testSave")
 			assert dom2
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
@@ -43,7 +43,7 @@ class BasicTestsForDao extends GroovyTestCase {
 			dao.delete(dom2)
 			def dom3 = Jumper.findByName("testDelete")
 			assertNull dom3
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
@@ -59,7 +59,7 @@ class BasicTestsForDao extends GroovyTestCase {
 			assertEquals "default.created.message", result.message.code
 			def dom2 = Jumper.findByName("testInsert")
 			assert dom2.name == "testInsert"
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
@@ -80,7 +80,7 @@ class BasicTestsForDao extends GroovyTestCase {
 			assertEquals "default.updated.message", result.message.code
 			def dom2 = Jumper.findByName("testUpdateXXX")
 			assert dom2.name == "testUpdateXXX"
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
@@ -99,7 +99,7 @@ class BasicTestsForDao extends GroovyTestCase {
 			assertEquals dup.id, result.id
 			assertEquals "default.deleted.message", result.message.code
 			assertNull Jumper.findByName("testRemove")
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}

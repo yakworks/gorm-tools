@@ -61,7 +61,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		try{
 			jump.persist()
 			fail "it was supposed to fail the save because of validationException"
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			assert e.cause instanceof ValidationException
 			assert e.entity == jump
 		}
@@ -76,7 +76,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 			jump.name='fukt'
 			jump.persist(flush:true)
 			fail "it was supposed to fail the save because of validationException"
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			assert e.cause instanceof DataAccessException
 			assert e.cause instanceof org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
 			assert e.entity == jump
@@ -90,7 +90,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		try{
 			jump.remove()
 			fail "it was supposed to fail because of a foreign key constraint"
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			assert e.cause instanceof DataIntegrityViolationException
 			assert e.entity == jump
 		}
@@ -106,7 +106,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 			assertEquals "default.created.message", result.message.code
 			def dom2 = Jumper.findByName("testInsert")
 			assert dom2.name == "testInsert"
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
@@ -122,7 +122,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 			assertEquals "default.updated.message", result.message.code
 			def dom2 = Jumper.findByName("testUpdateXXX")
 			assert dom2.name == "testUpdateXXX"
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
@@ -135,7 +135,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 			assertEquals stud.id, result.id
 			assertEquals "default.deleted.message", result.message.code
 			assertNull Student.findByName("student1")
-		}catch(GormDataException e){
+		}catch(DomainException e){
 			e.printStackTrace()
 			fail "Errors ${e.errors.allErrors[0]}"
 		}

@@ -234,7 +234,7 @@ see https://github.com/basejump/grails-dao
 				dao = ctx.getBean(daoType)
 			}
 		}
-		//if its still null then default it to the setup one
+		//if its still null then default it to a new instance
 		if(!dao){
 			log.error "something went wrong trying to setup dao for ${dc.fullName} maybe this is wrong ${daoProps}"
 			dao = GormDaoSupport.getInstance(dc.clazz)
@@ -244,7 +244,7 @@ see https://github.com/basejump/grails-dao
 	}
 	
 	def forceInitGormMethods(application){
-		//basically copied form GormLabs code
+		//basically copied from the GormLabs code
 		application.domainClasses*.clazz.each {
 			int methodPreCount = it.metaClass.methods.size()
 			boolean sawError = false

@@ -18,14 +18,14 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 	}
 
 	void testCheckVersion(){
-		DaoUtils.metaClass.'static'.resolveMessage = {code,defaultMsg ->
+		DaoMessage.metaClass.'static'.resolveMessage = {code,defaultMsg ->
 			return defaultMsg
 		}
 		//should pass
-		DaoUtils.checkVersion(mocke,1)
+		DaoUtil.checkVersion(mocke,1)
 		//shold fail
 		try{
-			DaoUtils.checkVersion(mocke,0)
+			DaoUtil.checkVersion(mocke,0)
 			fail "should not have made it here"
 		}catch(DomainException e){
 			assertEquals(mocke.id,e.entity.id)
@@ -36,7 +36,7 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 
 	void testCheckFound(){
 		try{
-			DaoUtils.checkFound(null, [id:'99'],"xxx")
+			DaoUtil.checkFound(null, [id:'99'],"xxx")
 			fail "should not have made it here"
 		}catch(DomainException e){
 			//id
@@ -48,25 +48,25 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 	}
 	
 	void testPropName(){
-		def propname = DaoUtils.propName('xxx.yyy.ArDoc')
+		def propname = DaoMessage.propName('xxx.yyy.ArDoc')
 		assert 'arDoc' == propname
 	}
 	
 	void testNotFound(){
-		def r = DaoUtils.notFoundResult("xxx.MockDomain",[id:"2"])
+		def r = DaoMessage.notFound("xxx.MockDomain",[id:"2"])
 		assertTrue r.code == "default.not.found.message"
 		assertTrue r.args == ["MockDomain","2"]
 		assertTrue r.defaultMessage == "MockDomain not found with id 2"
 	}
 	
 /*	void testCreateMessage(){
-		def msg = DaoUtils.createMessage(mocke,false)
+		def msg = DaoMessage.created(mocke,false)
 		assert 'arDoc' == msg.code
 		assert 'arDoc' == msg.args[0]
 	}*/
 	
 	void testDefaultLocale(){
-		def loc = DaoUtils.defaultLocale()
+		def loc = DaoMessage.defaultLocale()
 		assert Locale.ENGLISH == loc
 	}
 

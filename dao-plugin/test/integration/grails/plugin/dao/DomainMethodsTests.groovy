@@ -31,7 +31,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 			assert stud.persist()
 		}
 		//assert dom.persist()
-		DaoUtils.flushAndClear()
+		DaoUtil.flushAndClear()
 		assert Jumper.count() == 10
 		assert Student.count() == 10
 	}
@@ -45,7 +45,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		def dom = Student.findByName("student1")
 		assert dom.name == "student1"
 		dom.remove()
-		DaoUtils.flushAndClear()
+		DaoUtil.flushAndClear()
 		assertNull( Student.findByName("student1") )
 	}
 	
@@ -72,7 +72,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		
 		try{
 			Jumper.executeUpdate("update Jumper j set j.version=20 where j.name='jumper1'")
-			DaoUtils.flushSession()
+			DaoUtil.flush()
 			jump.name='fukt'
 			jump.persist(flush:true)
 			fail "it was supposed to fail the save because of validationException"
@@ -100,7 +100,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		println "testInsert"
 		try{
 			def result = Jumper.insert([name:"testInsert"])
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			assert result.entity 
 			assertEquals "testInsert", result.entity.name 
 			assertEquals "default.created.message", result.message.code
@@ -116,7 +116,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		assert jump
 		try{
 			def result = Jumper.update([id:jump.id,name:"testUpdateXXX"])
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			assertEquals "testUpdateXXX", result.entity.name 
 			assertEquals jump.id, result.entity.id 
 			assertEquals "default.updated.message", result.message.code
@@ -131,7 +131,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		def stud = Student.findByName("student1")
 		try{
 			def result = Student.remove([id:stud.id])
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			assertEquals stud.id, result.id
 			assertEquals "default.deleted.message", result.message.code
 			assertNull Student.findByName("student1")

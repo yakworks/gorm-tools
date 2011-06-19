@@ -34,7 +34,7 @@ class GormDaoSupport {
 	 * returns an instance with fireEvents=false and flushOnSave=false
 	 */
 	static GormDaoSupport getInstance(Class clazz){
-/*		def dao = DaoUtils.ctx.getBean("gormDaoBean")
+/*		def dao = DaoUtil.ctx.getBean("gormDaoBean")
 		dao.domainClass = clazz
 		return dao*/
 		def dao = new GormDaoSupport(clazz,false)
@@ -66,20 +66,20 @@ class GormDaoSupport {
 	def save(entity, Map args) {
 		args['failOnError'] = true
 		try{
-			if(fireEvents) DaoUtils.triggerEvent(this,"beforeSave", entity,null)
+			if(fireEvents) DaoUtil.triggerEvent(this,"beforeSave", entity,null)
 			entity.save(args)
 		}
 		catch (ValidationException ve){
 			if(ve instanceof DomainException) throw ve //if this is already fired 
-			throw new DomainException(DaoUtils.saveFailedMessage(entity), entity, ve.errors, ve)
+			throw new DomainException(DaoMessage.notSaved(entity), entity, ve.errors, ve)
 		}
 		catch (DataAccessException dae) {
 			log.error("unexpected dao save error on ${entity.id} of ${entity.class.name}",dae)
-			//TODO we can build a better message with optimisticLockingFailureMessage(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
+			//TODO we can build a better message with optimisticLockingFailure(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
 			//TODO also, in the case of optimisticLocking, is that really un expected? shoud we log it?
-			//TODO we shold really chnage the message from the default saveFailedMessage as this is more of a critical low level error a
-			//and save the default saveFailedMessage for when a validation occurs like above
-			throw new DomainException(DaoUtils.saveFailedMessage(entity), entity, dae)
+			//TODO we shold really chnage the message from the default notSaved as this is more of a critical low level error a
+			//and save the default notSaved for when a validation occurs like above
+			throw new DomainException(DaoMessage.notSaved(entity), entity, dae) //make a DaoMessage.notSavedDataAccess
 		}
 		
 	}
@@ -92,13 +92,13 @@ class GormDaoSupport {
 	*/
 	def delete(entity){
 		try {
-			if(fireEvents) DaoUtils.triggerEvent(this,"beforeDelete", entity,null)
+			if(fireEvents) DaoUtil.triggerEvent(this,"beforeDelete", entity,null)
 			entity.delete(flush:true)
 		}
 		catch (DataIntegrityViolationException dae) {
-			def ident = DaoUtils.badge(entity.id,entity)
+			def ident = DaoMessage.badge(entity.id,entity)
 			log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
-			throw new DomainException(DaoUtils.deleteMessage(entity,ident,false), entity,dae)
+			throw new DomainException(DaoMessage.notDeleted(entity,ident), entity,dae)
 		}
 	}
 
@@ -108,13 +108,13 @@ class GormDaoSupport {
 	* @param  params  the parameter map
 	* @throws DomainException if a validation error happens
 	*/
-	Map insert(Map params) {
+	Map insert( params) {
 		formatParams(params)
 		def entity = domainClass.newInstance()
 		entity.properties = params
-		if(fireEvents) DaoUtils.triggerEvent(this,"beforeInsertSave", entity, params)
+		if(fireEvents) DaoUtil.triggerEvent(this,"beforeInsertSave", entity, params)
 		save(entity)
-		return [ok:true,entity: entity, message:DaoUtils.createMessage(entity)]
+		return [ok:true,entity: entity, message:DaoMessage.created(entity)]
 	}
 
 
@@ -124,17 +124,17 @@ class GormDaoSupport {
 	* @param  params  the parameter map
 	* @throws DomainException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
 	*/
-	Map update(Map params){
+	Map update( params){
 		def entity = domainClass.get(params.id.toLong())
 		formatParams(params)
 
-		DaoUtils.checkFound(entity,params,domainClass.name)
-		DaoUtils.checkVersion(entity,params.version)
+		DaoUtil.checkFound(entity,params,domainClass.name)
+		DaoUtil.checkVersion(entity,params.version)
 
 		entity.properties = params
-		if(fireEvents) DaoUtils.triggerEvent(this,"beforeUpdateSave", entity,params)
+		if(fireEvents) DaoUtil.triggerEvent(this,"beforeUpdateSave", entity,params)
 		save(entity)
-		return [ ok:true, entity: entity,message:DaoUtils.updateMessage(entity)]
+		return [ ok:true, entity: entity,message:DaoMessage.updated(entity)]
 
 	}
 
@@ -144,17 +144,17 @@ class GormDaoSupport {
 	* @param  params  the parameter map that has the id for the domain entity to delete
 	* @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
 	*/
-	Map remove(Map params){
+	Map remove( params){
 		def entity = domainClass.get(params.id.toLong())
-		DaoUtils.checkFound(entity,params,domainClass.name)
-		if(fireEvents) DaoUtils.triggerEvent(this,"beforeRemoveSave", entity,params)
-		def msg = DaoUtils.deleteMessage(entity,DaoUtils.badge(entity.id,entity),true)
+		DaoUtil.checkFound(entity,params,domainClass.name)
+		if(fireEvents) DaoUtil.triggerEvent(this,"beforeRemoveSave", entity,params)
+		def msg = DaoMessage.deleted(entity,DaoMessage.badge(entity.id,entity))
 		delete(entity)
 		return [ok:true, id: params.id,message:msg]
 	}
 	
 	//some our standard naming conventions on fields to clean up
-	void formatParams(Map params){
+	void formatParams(params){
 		params.each{
 			if(it.key.toLowerCase().endsWith("amount") || it.key.toLowerCase().endsWith("amount2") || it.key.toLowerCase().endsWith("price")
 					|| it.key.toLowerCase().startsWith("unitprice")){

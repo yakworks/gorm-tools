@@ -25,7 +25,7 @@ class BasicTestsForDao extends GroovyTestCase {
 		def dom = new Jumper(name:"testSave")
 		try{
 			dao.save(dom)
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			def dom2 = Jumper.findByName("testSave")
 			assert dom2
 		}catch(DomainException e){
@@ -38,7 +38,7 @@ class BasicTestsForDao extends GroovyTestCase {
 		def dom = new Jumper(name:"testDelete")
 		try{
 			dao.save(dom)
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			def dom2 = Jumper.findByName("testDelete")
 			dao.delete(dom2)
 			def dom3 = Jumper.findByName("testDelete")
@@ -52,7 +52,7 @@ class BasicTestsForDao extends GroovyTestCase {
 		println "testInsert"
 		try{
 			def result = dao.insert([name:"testInsert"])
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			//println result
 			assertTrue result.ok
 			assertEquals "testInsert", result.entity.name 
@@ -68,11 +68,11 @@ class BasicTestsForDao extends GroovyTestCase {
 		println "testUpdate"
 		def dup = new Jumper(name:"testUpdate")
 		dup.save()
-		DaoUtils.flushAndClear()
+		DaoUtil.flushAndClear()
 		assert Jumper.findByName("testUpdate")
 		try{
 			def result = dao.update([id:dup.id,name:"testUpdateXXX"])
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			//println result
 			assertTrue result.ok
 			assertEquals "testUpdateXXX", result.entity.name 
@@ -89,11 +89,11 @@ class BasicTestsForDao extends GroovyTestCase {
 		println "testRemove"
 		def dup = new Jumper(name:"testRemove")
 		dup.save()
-		DaoUtils.flushAndClear()
+		DaoUtil.flushAndClear()
 		assert Jumper.findByName("testRemove")
 		try{
 			def result = dao.remove([id:dup.id])
-			DaoUtils.flushAndClear()
+			DaoUtil.flushAndClear()
 			//println result
 			assertTrue result.ok
 			assertEquals dup.id, result.id

@@ -77,7 +77,7 @@ see https://github.com/basejump/grails-dao
             transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes:props)
             transactionManager = ref("transactionManager")
         }
-		daoUtilsBean(grails.plugin.dao.DaoUtils) //this is here just so the app ctx can get set on DaoUtils
+		daoUtilsBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
 		
 		application.daoClasses.each {daoClass ->
             configureDaoBeans.delegate = delegate

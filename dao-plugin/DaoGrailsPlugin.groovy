@@ -28,7 +28,7 @@ class DaoGrailsPlugin {
 	static final def log = Logger.getLogger(DaoGrailsPlugin)
 	
     // the plugin version
-    def version = "0.3"
+    def version = "0.4"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -218,15 +218,15 @@ see https://github.com/basejump/grails-dao
 		//println "$daoType and $daoName for $domainClass"
 		if(!daoType) {
 			if(ctx.containsBean(daoName)){
-				println "found bean $daoName for $domainClass"
+				//println "found bean $daoName for $domainClass"
 				dao = ctx.getBean(daoName)
 			}else{
-				println "getInstance for $domainClass"
+				//println "getInstance for $domainClass"
 				dao = GormDaoSupport.getInstance(domainClass)
 			}
 		}else{
 			if("transactional" == daoType){
-				println "setting transactional bean  for $domainClass"
+				//println "setting transactional bean  for $domainClass"
 				dao = ctx.getBean("gormDaoBean")
 				dao.domainClass = domainClass
 			}

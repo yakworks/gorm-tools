@@ -28,7 +28,7 @@ class DaoGrailsPlugin {
 	static final def log = Logger.getLogger(DaoGrailsPlugin)
 	
     // the plugin version
-    def version = "0.4"
+    def version = "0.4.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -60,9 +60,6 @@ see https://github.com/basejump/grails-dao
 	def artefacts = [new DaoArtefactHandler()]
 
     def doWithSpring = {
-		daoFactory(grails.plugin.dao.DaoFactory) {
-			grailsApplication = ref('grailsApplication')
-		}
 		gormDaoBeanNonTransactional(grails.plugin.dao.GormDaoSupport) { bean ->
 			bean.scope = "prototype"
 			//grailsApplication = ref('grailsApplication')
@@ -77,7 +74,8 @@ see https://github.com/basejump/grails-dao
             transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes:props)
             transactionManager = ref("transactionManager")
         }
-		daoUtilsBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
+
+		daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
 		
 		application.daoClasses.each {daoClass ->
             configureDaoBeans.delegate = delegate

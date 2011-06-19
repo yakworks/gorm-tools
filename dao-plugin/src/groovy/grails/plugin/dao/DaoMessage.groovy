@@ -12,7 +12,6 @@ import java.util.Locale
 
 /**
 * A bunch of statics to support the GormDaoSupport.
-* this is also setup as daoUtilsBean so that it gets injected with the ApplicationContext once its setup
 */
 class DaoMessage {
 

@@ -28,7 +28,7 @@ class DaoGrailsPlugin {
 	static final def log = Logger.getLogger(DaoGrailsPlugin)
 	
     // the plugin version
-    def version = "0.4.1"
+    def version = "0.4.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.4 > *"
     // the other plugins this plugin depends on
@@ -52,7 +52,7 @@ see https://github.com/basejump/grails-dao
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/dao"
 	
-	def loadAfter = ['hibernate']
+	def loadAfter = ['hibernate','datasources']
 
     def watchedResources = ["file:./grails-app/dao/**/*Dao.groovy","file:./grails-app/services/**/*Dao.groovy",
                             "file:./plugins/*/grails-app/dao/**/*Dao.groovy","file:./plugins/*/grails-app/services/**/*Dao.groovy"]

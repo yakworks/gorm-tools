@@ -6,11 +6,12 @@ import testing.*
 
 class GormDaoSupportTests extends BasicTestsForDao {
 
-	def daoFactory
+	def grailsApplication
 	
 	protected void setUp() {
 		super.setUp()
-		dao = daoFactory.getDao(Jumper) //new GormDaoSupport(Jumper)
+		dao = grailsApplication.mainContext.gormDaoBean//new GormDaoSupport(Jumper)
+		dao.domainClass = Jumper
 		assert dao.domainClass == Jumper
 		//pop an item in just to have for things below
 	}

@@ -1,5 +1,5 @@
-Purpose
---------
+###Purpose
+
 
 To proved standardization across our apps for transactional saves with failOnError:true. 
 It also provides a clean standard way to abstract boiler plate code from the controller as well as proving Restful actions similiar to what is in the new 2.3 versions of grails. 
@@ -9,8 +9,8 @@ If you are using envers or cascade saves then we want the saves and updates to b
 
 **Example of the issue:** With the cascade save of an association where we were saving a Parent with new Child. The issue will kick when new Child saved and blew up but the Parent changes stay. We have a good example if this issue in the demo-app under test
 
-Keeping it dry
-============
+###Keeping it dry
+
 We were also seeing a lot of repetition in code that replaced the actions of a scaffolded controller. Especially the update action
 This is what the update action is in the default controller and there is now good way to reuse the core logic
 
@@ -70,8 +70,8 @@ Each domain gets injected with its own static dao object based on the GormDaoSup
 	}
 
 	
-Dynamic methods added to the domains
-========
+###Dynamic methods added to the domains
+
 
 **persist()**: calls the dao.save which in turn calls the domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist()
 
@@ -87,8 +87,8 @@ Dynamic methods added to the domains
 
 **dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
 
-DaoUtil and DaoMessage
-==============
+###DaoUtil and DaoMessage
+
 see TODO after code reorg
 
 

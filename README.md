@@ -41,7 +41,8 @@ This is what the update action is in the default controller and there is now goo
        }
    }
 
-With this plugin and a controller you can just do: 
+With this plugin and a controller you can just do:
+
     def update(){
         try{
 		    def result = YourDomainClass.update(p)

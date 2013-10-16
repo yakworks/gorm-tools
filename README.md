@@ -73,35 +73,32 @@ Each domain gets injected with its own static dao object based on the GormDaoSup
 Dynamic methods added to the domains
 ========
 
-Apple
-:   Pomaceous fruit of plants of the genus Malus in 
-    the family Rosaceae.
+**persist()**: calls the dao.save which in turn calls the domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist()
 
+**remove()**:  calls the dao.delete which in turn calls the domain.delete(flush:true) by defualt
 
-Restful controller
-======
+### Statics added to the domain
+
+**insert(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (esentially the persist()). **ex:** Book.insert([name:'xyz',isbn:'123'])
+
+**update(params)**:  calls the dao.update which does the bolier plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa'])
+
+**remove(params)**:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11])
+
+**dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
+
+DaoUtil and DaoMessage
+==============
+see TODO after code reorg
 
 
 More Examples
 =====
+...
 
-Setup a simple dao
-
-	class someDao extends GormDao{
-		def domainClass = YourDomainClass
-	}
-
-or inject the daoFactory where you want it
-
-	def daoFactory
-	....
-	def dao = daoFactory.getDao(YourDomainClass)
-
-
-GOTCHAS and TODOs
+TODOs
 --------
 
 * take a look at the code in the RestfulController in grails and see what we can do to keep thing similiar
-* 
+* move the docs to something other than a README
 
-[LinkThis]: http://www.greenbill.com

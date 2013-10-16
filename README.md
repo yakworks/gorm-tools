@@ -42,10 +42,9 @@ This is what the update action is in the default controller and there is now goo
    }
 
 With this plugin and a controller you can just do: 
-
     def update(){
-    	try{
-			def result = domainClass.update(p)
+        try{
+		    def result = YourDomainClass.update(p)
 			flash.message = result.message
 			redirect(action: 'show', id: result.entity.id)
 		}catch(DomainException e){

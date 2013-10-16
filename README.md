@@ -1,13 +1,18 @@
-A Very Rough Summary
+Purpose
 --------
-We wanted standardization across our apps with transactional saves and any overriden methods form the controller template. 
-We were setting up a bunch of services that looked like Dao's. We figured we should just call them that. 
 
-If you are using envers or cascade saves then we wanted the saves and updates to be in a transaction by default but want the
-A good example s a simple cascade save of an association where we were saving a Parent with new Child. The casacded kicked in and new Child saved and blew up saving Parent erroneously leaving the child.
+To proved standardization across our apps for transactional saves with failOnError:true. 
+It also provides a clean standard way to abstract boiler plate code from the controller as well as proving Restful actions similiar to what is in the new 2.3 versions of grails. 
+Since we were setting up a bunch of services that looked a lot like the old school Dao's. We figured we should just call them that. 
 
+If you are using envers or cascade saves then we want the saves and updates to be in a transaction by default and a proper thrown error to cause a roll back of all the changes. Not something you get with failOnError:false.
+
+**Example of the issue:** With the cascade save of an association where we were saving a Parent with new Child. The issue will kick when new Child saved and blew up but the Parent changes stay. We have a good example if this issue in the demo-app under test
+
+Keeping it dry
+============
 We were also seeing a lot of repetition in code that replaced the actions of a scaffolded controller. Especially the update action
-This is what the update action is in the default controller and there is now good way to reuse this or call super.insert()
+This is what the update action is in the default controller and there is now good way to reuse the core logic
 
 	def update = {
        def ${propertyName} = ${className}.get(params.id)
@@ -36,31 +41,24 @@ This is what the update action is in the default controller and there is now goo
        }
    }
 
-so now to add new stuff you just do
+With this plugin and a controller you can just do: 
 
-	def update = {
-		//easy to add custom code
-		try{
-			def result = dao.update(params)
-			flash.message = message(code: result.message.code, args: result.message.args, default:result.message.default)
-			redirect(action: "show", id: result.entity.id)
-		}catch(GormException e){
-			flash.message = message(code: e.messageMap.code, args: e.messageMap.args, default:e.messageMap.default) 
-			render(view: "edit", model: [${propertyName}: e.entity])
+    def update(){
+    	try{
+			def result = domainClass.update(p)
+			flash.message = result.message
+			redirect(action: 'show', id: result.entity.id)
+		}catch(DomainException e){
+			flash.message = e.messageMap
+			render(view: 'edit', model: [(domainInstanceName): e.entity])
 		}
-    }
-	
-Or better yet, setup your own dao like so and do the listing in your Dao service and leave the controller alone
-
-	class OrgController {
-		def scaffold = Org
-		def orgDao //your custom Org dao
-		def getDao(){ orgDao }
 	}
 	
-and customize the transactional doa
+Each domain gets injected with its own static dao object based on the GormDaoSupport service. If it finds a service that in the form of <<Domain Name>>Dao that is in any services or dao dir under grai-app then it will use that.
 
-	class OrgDao extends GormDao{ 
+**Example** You can setup your own dao for the domain like so and keep the logic in your Dao service and leave the controller alone as all the logic will flow over
+
+	class OrgDao extends GormDaoSupport{ 
 		def domainClass = Org
 		
 		def update(params){
@@ -70,18 +68,22 @@ and customize the transactional doa
 			return result
 		}
 	}
+
 	
-Setup and install
--------
-After installing the plugin you will be able to  create a directory called dao
+Dynamic methods added to the domains
+========
+
+Apple
+:   Pomaceous fruit of plants of the genus Malus in 
+    the family Rosaceae.
 
 
-Usage
-------
+Restful controller
+======
 
 
-Examples
---------
+More Examples
+=====
 
 Setup a simple dao
 
@@ -95,9 +97,11 @@ or inject the daoFactory where you want it
 	....
 	def dao = daoFactory.getDao(YourDomainClass)
 
+
 GOTCHAS and TODOs
 --------
 
+* take a look at the code in the RestfulController in grails and see what we can do to keep thing similiar
 * 
 
 [LinkThis]: http://www.greenbill.com

@@ -7,14 +7,10 @@ class DaoUtilsIntTests extends GroovyTestCase {
 
 	def mocke
 	
-	protected void setUp() {
+	void setUp() {
 		super.setUp()
 		//mocke = new MockIntDomain(id:100,version:1,name:"Billy")
 		//mocke.errors = new EmptyErrors("empty") 
-	}
-
-	protected void tearDown() {
-		super.tearDown()
 	}
 	
 	void testTodo() {

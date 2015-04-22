@@ -23,3 +23,5 @@ log4j = {
     warn   'org.mortbay.log'
 	debug 'org.springframework.transaction','org.hibernate.transaction','org.hibernate.SQL'
 }
+grails.views.default.codec="none" // none, html, base64
+grails.views.gsp.encoding="UTF-8"

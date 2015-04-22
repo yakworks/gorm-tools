@@ -28,9 +28,9 @@ class DaoGrailsPlugin {
 	static final def log = Logger.getLogger(DaoGrailsPlugin)
 	
     // the plugin version
-    def version = "0.4.2"
+    def version = "1.0.1"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.3.4 > *"
+    def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on
     def dependsOn = [:]
     // resources that are excluded from plugin packaging
@@ -54,8 +54,13 @@ see https://github.com/basejump/grails-dao
 	
 	def loadAfter = ['hibernate','datasources']
 
-    def watchedResources = ["file:./grails-app/dao/**/*Dao.groovy","file:./grails-app/services/**/*Dao.groovy",
-                            "file:./plugins/*/grails-app/dao/**/*Dao.groovy","file:./plugins/*/grails-app/services/**/*Dao.groovy"]
+    def watchedResources = [
+    	"file:./grails-app/dao/**/*Dao.groovy",
+    	"file:./grails-app/services/**/*Dao.groovy",
+    	"file:./grails-app/domain/**/*.groovy",
+        "file:./plugins/*/grails-app/dao/**/*Dao.groovy",
+        "file:./plugins/*/grails-app/services/**/*Dao.groovy"
+    ]
 	
 	def artefacts = [new DaoArtefactHandler()]
 
@@ -88,7 +93,7 @@ see https://github.com/basejump/grails-dao
     def doWithDynamicMethods = { ctx ->
 		//DaoUtils.ctx = ctx
 		//force initialization of domain meta methods
-		forceInitGormMethods(application)
+		//forceInitGormMethods(application)
 		
 		modifyDomainsClasses(application,ctx)
 
@@ -111,6 +116,9 @@ see https://github.com/basejump/grails-dao
 			def context = event.ctx
             context.registerBeanDefinition("${daoClass.fullName}DaoClass", beans.getBeanDefinition("${daoClass.fullName}DaoClass"))
             context.registerBeanDefinition("${daoClass.propertyName}", beans.getBeanDefinition("${daoClass.propertyName}"))
+        }
+        else if (application.isArtefactOfType(DomainClassArtefactHandler.TYPE, event.source)) {
+          addNewPersistenceMethods(event.source,application,event.ctx)
         }
     }
 
@@ -165,6 +173,7 @@ see https://github.com/basejump/grails-dao
 
 	def modifyDomainsClasses(GrailsApplication application, ApplicationContext ctx){
 		for (GrailsDomainClass dc in application.domainClasses) {
+		    //forceInitGormMethods(dc.clazz)
             MetaClass mc = dc.metaClass
 			addNewPersistenceMethods(dc,application,ctx)
 		}
@@ -241,29 +250,23 @@ see https://github.com/basejump/grails-dao
 		return dao
 	}
 	
-	def forceInitGormMethods(application){
-		//basically copied from the GormLabs code
-		application.domainClasses*.clazz.each {
-			int methodPreCount = it.metaClass.methods.size()
-			boolean sawError = false
+	//XXX is this even needed any more?
+	def forceInitGormMethods(domClass){
+/*      //basically copied from the GormLabs code
+        application.domainClasses*.clazz.each { domClass->*/
 			try {
-				it.thisIsATotallyBogusMethodPlacedHereJustToTriggerGORMHydration()
+				domClass.thisIsATotallyBogusMethodPlacedHereJustToTriggerDynamicGORMMethods()
 			} catch(MissingMethodException e) {
-				sawError = true
+				return
 			}
-			if(!sawError) log.warn("Looks like we could not initialize $it via static methodMissing")
-
-			sawError = false
+			//try on instance just in case if we get here
 			try {
-				it.newInstance().thisIsATotallyBogusMethodPlacedHereJustToTriggerGORMHydration()
+				domClass.newInstance().thisIsATotallyBogusMethodPlacedHereJustToTriggerGORMHydration()
 		  	} catch(MissingMethodException e) {
-				sawError = true
+				return
 			}
-			if(!sawError) log.warn("Looks like we could not initialize $it via instance methodMissing")
-
-			int methodPostCount = it.metaClass.methods.size()
-			if(!(methodPreCount < methodPostCount)) log.warn("Doesn't look like $it was hydrated")
-		}
+			log.warn("Looks like we could not initialize $domClass via static methodMissing")
+		//}
 	}
 	
 }

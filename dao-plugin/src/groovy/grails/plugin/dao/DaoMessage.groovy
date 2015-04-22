@@ -18,12 +18,16 @@ class DaoMessage {
 	/**
 	* returns a messageMap not.found.message for a not found error
 	*
-	* @param  id  the id of the object that was not found
+	* @param  params  must have a key named id of the object that was not found
 	*/
-	static Map notFound(domainClassName,params) {
+	static Map notFound(domainClassName,Map params) {
+	    notFound(domainClassName,params.id)
+	}
+	
+	static Map notFound(domainClassName,id) {
 		def domainLabel = GrailsClassUtils.getShortName(domainClassName)
-		return [code:"default.not.found.message",args:[domainLabel,params.id],
-			defaultMessage:"${domainLabel} not found with id ${params.id}"]
+		return [code:"default.not.found.message",args:[domainLabel,id],
+			defaultMessage:"${domainLabel} not found with id ${id}"]
 	}
 
 	/**

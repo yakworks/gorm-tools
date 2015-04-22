@@ -8,16 +8,12 @@ class GormDaoSupportTests extends BasicTestsForDao {
 
 	def grailsApplication
 	
-	protected void setUp() {
+	void setUp() {
 		super.setUp()
 		dao = grailsApplication.mainContext.gormDaoBean//new GormDaoSupport(Jumper)
 		dao.domainClass = Jumper
 		assert dao.domainClass == Jumper
 		//pop an item in just to have for things below
-	}
-
-	protected void tearDown() {
-		super.tearDown()
 	}
 
 

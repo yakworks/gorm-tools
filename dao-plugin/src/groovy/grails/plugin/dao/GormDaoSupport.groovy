@@ -3,6 +3,7 @@ package grails.plugin.dao
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 import grails.validation.ValidationException
+import grails.plugin.dao.DomainException
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -25,7 +26,7 @@ class GormDaoSupport {
 		thisDomainClass = clazz
 	}
 	
-	public GormDaoSupport(Class clazz,boolean fireEvents){
+	public GormDaoSupport(Class clazz, boolean fireEvents){
 		thisDomainClass = clazz
 		this.fireEvents = fireEvents
 	}

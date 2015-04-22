@@ -3,24 +3,22 @@ package grails.plugin.dao
 import org.springframework.validation.Errors
 import grails.test.*
 
-class DaoUtilsTests extends GrailsUnitTestCase {
+class DaoUtilsTests  {
 
 	def mocke
 	
-	protected void setUp() {
-		super.setUp()
+    void setUp() {
 		mocke = new MockDomain(id:100,version:1,name:"Billy")
 		mocke.errors = new EmptyErrors("empty") 
 	}
 
-	protected void tearDown() {
-		super.tearDown()
-	}
-
+	@Test
 	void testCheckVersion(){
 		DaoMessage.metaClass.'static'.resolveMessage = {code,defaultMsg ->
 			return defaultMsg
 		}
+		mocke = new MockDomain(id:100,version:1,name:"Billy")
+		mocke.errors = new EmptyErrors("empty") 
 		//should pass
 		DaoUtil.checkVersion(mocke,1)
 		//shold fail
@@ -34,6 +32,7 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 		}
 	}
 
+	@Test
 	void testCheckFound(){
 		try{
 			DaoUtil.checkFound(null, [id:'99'],"xxx")
@@ -47,11 +46,13 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 		}
 	}
 	
+	@Test
 	void testPropName(){
 		def propname = DaoMessage.propName('xxx.yyy.ArDoc')
 		assert 'arDoc' == propname
 	}
 	
+	@Test
 	void testNotFound(){
 		def r = DaoMessage.notFound("xxx.MockDomain",[id:"2"])
 		assertTrue r.code == "default.not.found.message"
@@ -65,6 +66,7 @@ class DaoUtilsTests extends GrailsUnitTestCase {
 		assert 'arDoc' == msg.args[0]
 	}*/
 	
+	@Test
 	void testDefaultLocale(){
 		def loc = DaoMessage.defaultLocale()
 		assert Locale.ENGLISH == loc

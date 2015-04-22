@@ -3,7 +3,6 @@ package grails.plugin.dao
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 import grails.validation.ValidationException
-import org.codehaus.groovy.grails.commons.ApplicationHolder as AH
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.dao.DataAccessException

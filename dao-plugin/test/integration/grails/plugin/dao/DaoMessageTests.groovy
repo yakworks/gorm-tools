@@ -13,10 +13,6 @@ class DaoMessageTests extends GroovyTestCase {
 		mocke.errors = new EmptyErrors("empty") 
 	}
 
-	protected void tearDown() {
-		super.tearDown()
-	}
-	
 	void testDefaultLocale(){
 		def loc = DaoMessage.defaultLocale()
 		assert Locale.ENGLISH == loc

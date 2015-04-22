@@ -7,17 +7,20 @@ import testing.*
 import grails.validation.ValidationException
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+import org.junit.*
+
 
 //tests the persist and remove methods
 class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao 
 {
 	//static transactional = false
+	static dataInit = false
 
-	protected void setUp() {
+	void setUp() {
 		//super.setUp()
 		//dao = jumperDelegateDao
 		//assert dao.domainClass == Jumper
-		initData()
+		if(!dataInit) initData()
 	}
 	
 	void initData(){
@@ -34,6 +37,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		DaoUtil.flushAndClear()
 		assert Jumper.count() == 10
 		assert Student.count() == 10
+		dataInit = true
 	}
 	
 	void testPersist(){
@@ -143,7 +147,9 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 	
 	void testGetDaoSetup(){
 		assertTrue Jumper.dao.class.name.contains("testing.JumperDao")
-		assertTrue Student.dao.class.name.contains("GormDaoSupport\$\$EnhancerByCGLIB")
+		println Student.dao.class.name
+		// grails.plugin.dao.GormDaoSupport$$EnhancerBySpringCGLIB$$27f04eca
+		assertTrue Student.dao.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
 		assertEquals "grails.plugin.dao.GormDaoSupport",DropZone.dao.class.name
 	}
 

@@ -5,16 +5,9 @@ import org.springframework.validation.Errors
 import grails.validation.ValidationException
 import grails.test.*
 
-class DomainExceptionTests extends GrailsUnitTestCase {
+class DomainExceptionTests {
 
-	protected void setUp() {
-		super.setUp()
-	}
-
-	protected void tearDown() {
-		super.tearDown()
-	}
-
+	@Test
 	void testSimple(){
 		def e = new DomainException("fubar",new EmptyErrors("blah"))
 		assertEquals "validationException",e.messageMap.code
@@ -23,6 +16,7 @@ class DomainExceptionTests extends GrailsUnitTestCase {
 		assertEquals "fubar",e.messageMap.defaultMessage
 	}
 
+	@Test
 	void testMessageMap(){
 		Map m = [code:"vtest",args:[0],defaultMessage:"defmsg"]
 		Map entity = [someEntity:"go cubs"]
@@ -34,6 +28,7 @@ class DomainExceptionTests extends GrailsUnitTestCase {
 		assertEquals entity,e.entity
 	}
 
+	@Test
 	void testNoErrors(){
 		Map m = [code:"vtest",args:[0],defaultMessage:"defmsg"]
 		Map entity = [someEntity:"go cubs"]

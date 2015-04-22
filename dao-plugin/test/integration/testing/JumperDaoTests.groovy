@@ -10,7 +10,7 @@ class JumperDaoTests extends BasicTestsForDao {
 	
 	def jumperDao
 	
-	protected void setUp() {
+	void setUp() {
 		super.setUp()
 		dao = jumperDao
 		assert dao.domainClass == Jumper

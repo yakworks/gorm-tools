@@ -72,10 +72,11 @@ Each domain gets injected with its own static dao object based on the GormDaoSup
 	
 ###Dynamic methods added to the domains
 
+Every domain gets a dao which is either setup for you or setup by extending GormDaoSupport. See https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/GormDaoSupport.groovy
 
-**persist()**: calls the dao.save which in turn calls the domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist()
+**persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a DomainException if anything goes wrong https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy
 
-**remove()**:  calls the dao.delete which in turn calls the domain.delete(flush:true) by defualt
+**remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by defualt Throws a DomainException if anything goes wrong https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy
 
 ### Statics added to the domain
 

@@ -7,7 +7,7 @@ Since we were setting up a bunch of services that looked a lot like the old scho
 
 If you are using envers or cascade saves then we want the saves and updates to be in a transaction by default and a proper thrown error to cause a roll back of all the changes. Not something you get with failOnError:false.
 
-**Example of the issue:** With the cascade save of an association where we were saving a Parent with new Child. The issue will kick when new Child saved and blew up but the Parent changes stay. We have a good example if this issue in the demo-app under test
+**Example of the issue:** With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in  when new Child saved and blew up and the Parent changes stay. We have a good example if this issue in the demo-app under test
 
 ###Keeping it dry
 
@@ -43,48 +43,54 @@ This is what the update action is in the default controller and there is now goo
 
 With this plugin and a controller you can just do:
 
-    def update(){
-        try{
-		    def result = YourDomainClass.update(p)
-			flash.message = result.message
-			redirect(action: 'show', id: result.entity.id)
-		}catch(DomainException e){
-			flash.message = e.messageMap
-			render(view: 'edit', model: [(domainInstanceName): e.entity])
-		}
-	}
+```
+def update(){
+  try{
+    def result = YourDomainClass.update(p)
+      flash.message = result.message
+      redirect(action: 'show', id: result.entity.id)
+  }catch(DomainException e){
+    flash.message = e.messageMap
+    render(view: 'edit', model: [(domainInstanceName): e.entity])
+  }
+}
+```
 	
 Each domain gets injected with its own static dao object based on the GormDaoSupport service. If it finds a service that in the form of <<Domain Name>>Dao that is in any services or dao dir under grai-app then it will use that.
 
 **Example** You can setup your own dao for the domain like so and keep the logic in your Dao service and leave the controller alone as all the logic will flow over
 
-	class OrgDao extends GormDaoSupport{ 
-		def domainClass = Org
-		
-		def update(params){
-			... do some stuff to the params
-			def result = super.update(params)
-			... do something like log history or send emai with result.entity which is the saved org
-			return result
-		}
+See (GormDaoSupport)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/GormDaoSupport.groovy]
+
+```
+class OrgDao extends GormDaoSupport{ 
+	def domainClass = Org
+	
+	def update(params){
+		... do some stuff to the params
+		def result = super.update(params)
+		... do something like log history or send emai with result.entity which is the saved org
+		return result
 	}
+}
+```
 
 	
 ###Dynamic methods added to the domains
 
-Every domain gets a dao which is either setup for you or setup by extending GormDaoSupport. See https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/GormDaoSupport.groovy
+Every domain gets a dao which is either setup for you or setup by extending (GormDaoSupport)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/GormDaoSupport.groovy]. Each method is transactional to prevent incomplete cascading saves as exaplained above.
 
-**persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a DomainException if anything goes wrong https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy
+**persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a (DomainException)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
 
-**remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by defualt Throws a DomainException if anything goes wrong https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy
+**remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by defualt. Throws a (DomainException)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
 
 ### Statics added to the domain
 
-**insert(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (esentially the persist()). **ex:** Book.insert([name:'xyz',isbn:'123'])
+**insert(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (esentially the persist()). **ex:** Book.insert([name:'xyz',isbn:'123']) Throws a (DomainException)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
 
-**update(params)**:  calls the dao.update which does the bolier plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa'])
+**update(params)**:  calls the dao.update which does the bolier plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a (DomainException)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
 
-**remove(params)**:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11])
+**remove(params)**:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a (DomainException)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
 
 **dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
 
@@ -100,6 +106,6 @@ More Examples
 TODOs
 --------
 
-* take a look at the code in the RestfulController in grails and see what we can do to keep thing similiar
-* move the docs to something other than a README
+* take a look at the code in the new RestfulController in grails and see what we can do to keep thing similiar
+
 

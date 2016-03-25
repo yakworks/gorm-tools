@@ -1,17 +1,12 @@
 package grails.plugin.dao
 
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.springframework.transaction.interceptor.TransactionAspectSupport
 import grails.validation.ValidationException
-import grails.plugin.dao.DomainException
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
 class GormDaoSupport {
 	static def log = org.apache.log4j.Logger.getLogger(GormDaoSupport)
-	//injected bean
-	//def grailsApplication
-	
+
 	boolean flushOnSave = false
 	
 	boolean fireEvents = true
@@ -110,7 +105,6 @@ class GormDaoSupport {
 	* @throws DomainException if a validation error happens
 	*/
 	Map insert( params) {
-		formatParams(params)
 		def entity = domainClass.newInstance()
 		entity.properties = params
 		if(fireEvents) DaoUtil.triggerEvent(this,"beforeInsertSave", entity, params)
@@ -127,7 +121,6 @@ class GormDaoSupport {
 	*/
 	Map update( params){
 		def entity = domainClass.get(params.id.toLong())
-		formatParams(params)
 
 		DaoUtil.checkFound(entity,params,domainClass.name)
 		DaoUtil.checkVersion(entity,params.version)
@@ -154,23 +147,7 @@ class GormDaoSupport {
 		return [ok:true, id: params.id,message:msg]
 	}
 	
-	//some our standard naming conventions on fields to clean up
-	void formatParams(params){
-		params.each{
-			if(it.key.toLowerCase().endsWith("amount") || it.key.toLowerCase().endsWith("amount2") || it.key.toLowerCase().endsWith("price")
-					|| it.key.toLowerCase().startsWith("unitprice")){
-				it.value = it.value.toString().replace('$', '').replace(',', '')
-			}
-			if(it.key.toLowerCase().endsWith("percent") || it.key.toLowerCase().endsWith("pct")){
-				 it.value = it.value.toString().replace('%', '')
-			}
-			if(it.key.toLowerCase().equals("docdate") || it.key.toLowerCase().equals("discdate") || it.key.toLowerCase().equals("duedate") || it.key.toLowerCase().endsWith("duedate")) {
-				if(it.value && it.value instanceof String){
-					it.value = new Date(it.value)
-				}
-			}
-		}
-	}
+
 
 }
 

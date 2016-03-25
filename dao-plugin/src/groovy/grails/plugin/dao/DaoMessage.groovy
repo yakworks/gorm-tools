@@ -1,14 +1,9 @@
 package grails.plugin.dao
 
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.springframework.transaction.interceptor.TransactionAspectSupport
-import grails.validation.ValidationException
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.springframework.dao.DataAccessException
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
-
-import java.util.Locale
 
 /**
 * A bunch of statics to support the GormDaoSupport.

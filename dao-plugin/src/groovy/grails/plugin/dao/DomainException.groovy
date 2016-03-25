@@ -1,10 +1,7 @@
 package grails.plugin.dao
 
-import org.codehaus.groovy.grails.exceptions.GrailsException
-import org.springframework.validation.Errors
 import grails.validation.ValidationException
-import org.springframework.dao.DataAccessException
-import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.validation.Errors
 
 /**
 * an extension of the default ValidationException so you can pass the entity and the message map

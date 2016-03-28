@@ -39,6 +39,12 @@ class DaoGrailsPlugin {
 Enables a grails-app/dao directory to setup beans
 see https://github.com/basejump/grails-dao
 '''
+	def license = "APACHE"
+	def organization = [ name: "9ci", url: "http://www.9ci.com/" ]
+	def developers = [ [ name: "Joshua Burnet", email: "joshua@greenbill.com" ]]
+	def issueManagement = [ system: "github", url: "https://github.com/9ci/grails-dao/issues" ]
+	def scm = [ url: "https://github.com/9ci/grails-dao" ]
+	def documentation = "https://github.com/9ci/grails-dao"
 
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/dao"
@@ -241,7 +247,7 @@ see https://github.com/basejump/grails-dao
 		return dao
 	}
 	
-	//XXX is this even needed any more?
+	//XXX this not even needed any more?
 	def forceInitGormMethods(domClass){
 /*      //basically copied from the GormLabs code
         application.domainClasses*.clazz.each { domClass->*/

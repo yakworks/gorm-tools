@@ -1,34 +1,25 @@
+import grails.plugin.dao.DaoArtefactHandler
+import grails.plugin.dao.GormDaoSupport
+import grails.plugin.dao.GrailsDaoClass
+import org.apache.log4j.Logger
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.commons.spring.TypeSpecifyableTransactionProxyFactoryBean
+import org.codehaus.groovy.grails.orm.support.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
+import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.transaction.interceptor.TransactionProxyFactoryBean;
-import grails.validation.ValidationException
-
-import org.springframework.dao.DataAccessException
-import org.springframework.dao.DataIntegrityViolationException
-
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.codehaus.groovy.grails.commons.spring.TypeSpecifyableTransactionProxyFactoryBean
-import org.codehaus.groovy.grails.commons.GrailsServiceClass
-import org.codehaus.groovy.grails.commons.ServiceArtefactHandler
-import org.codehaus.groovy.grails.orm.support.GroovyAwareNamedTransactionAttributeSource
-
-import org.springframework.context.ApplicationContext
-import org.apache.log4j.Logger
-
-import grails.util.GrailsUtil
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 import java.lang.reflect.Method
-
-import grails.plugin.dao.*
 
 class DaoGrailsPlugin {
 	static final def log = Logger.getLogger(DaoGrailsPlugin)
 	
     // the plugin version
-    def version = "1.0.1"
+    def version = "1.0.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "1.3.7 > *"
     // the other plugins this plugin depends on

@@ -45,9 +45,6 @@ see https://github.com/basejump/grails-dao
 	def issueManagement = [ system: "github", url: "https://github.com/9ci/grails-dao/issues" ]
 	def scm = [ url: "https://github.com/9ci/grails-dao" ]
 	def documentation = "https://github.com/9ci/grails-dao"
-
-    // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/dao"
 	
 	def loadAfter = ['hibernate','datasources']
 
@@ -81,7 +78,7 @@ see https://github.com/basejump/grails-dao
 		
 		application.daoClasses.each {daoClass ->
             configureDaoBeans.delegate = delegate
-            configureDaoBeans(daoClass)
+            configureDaoBeans(daoClass,application)
         }
 
 		//DaoUtils.ctx = application.mainContext
@@ -119,21 +116,32 @@ see https://github.com/basejump/grails-dao
         }
     }
 
-    def configureDaoBeans = {GrailsDaoClass daoClass ->
+    //Copied much of this from grails source ServicesGrailsPlugin
+    def configureDaoBeans = {GrailsDaoClass daoClass, application ->
 		def scope = daoClass.getPropertyValue("scope")
 		
+		def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
+
 		"${daoClass.fullName}DaoClass"(MethodInvokingFactoryBean) { bean ->
-            bean.lazyInit = true
+            bean.lazyInit = lazyInit
             targetObject = ref("grailsApplication", true)
             targetMethod = "getArtefact"
             arguments = [DaoArtefactHandler.TYPE, daoClass.fullName]
         }
+
 		if (shouldCreateTransactionalProxy(daoClass)) {
             def props = new Properties()
-            props."*" = "PROPAGATION_REQUIRED"
+            String attributes = 'PROPAGATION_REQUIRED'
+            String datasourceName = daoClass.datasource
+            String suffix = datasourceName == GrailsDaoClass.DEFAULT_DATA_SOURCE ? '' : "_$datasourceName"
+            if (application.config["dataSource$suffix"].readOnly) {
+                attributes += ',readOnly'
+            }
+            props."*" = attributes
+
             "${daoClass.propertyName}"(TypeSpecifyableTransactionProxyFactoryBean, daoClass.clazz) { bean ->
                 if (scope) bean.scope = scope
-                bean.lazyInit = true
+                bean.lazyInit = lazyInit
                 target = { innerBean ->
                     innerBean.lazyInit = true
                     innerBean.factoryBean = "${daoClass.fullName}DaoClass"
@@ -149,19 +157,21 @@ see https://github.com/basejump/grails-dao
         else {
             "${daoClass.propertyName}"(daoClass.getClazz()) { bean ->
                 bean.autowire =  true
-                bean.lazyInit = true
+                bean.lazyInit = lazyInit
                 if (scope) bean.scope = scope
             }
         }
     }
 
-    def shouldCreateTransactionalProxy(GrailsDaoClass daoClass) {
+    boolean shouldCreateTransactionalProxy(GrailsDaoClass daoClass) {
         Class javaClass = daoClass.clazz
 
         try {
             daoClass.transactional &&
+              !AnnotationUtils.findAnnotation(javaClass, grails.transaction.Transactional) &&
               !AnnotationUtils.findAnnotation(javaClass, Transactional) &&
-                 !javaClass.methods.any { Method m -> AnnotationUtils.findAnnotation(m, Transactional)!=null }
+                 !javaClass.methods.any { Method m -> AnnotationUtils.findAnnotation(m, Transactional) != null ||
+                                                        AnnotationUtils.findAnnotation(m, grails.transaction.Transactional) != null}
         }
         catch (e) {
             return false
@@ -171,7 +181,7 @@ see https://github.com/basejump/grails-dao
 	def modifyDomainsClasses(GrailsApplication application, ApplicationContext ctx){
 		for (GrailsDomainClass dc in application.domainClasses) {
 		    //forceInitGormMethods(dc.clazz)
-            MetaClass mc = dc.metaClass
+            //MetaClass mc = dc.metaClass
 			addNewPersistenceMethods(dc,application,ctx)
 		}
 	}
@@ -217,27 +227,29 @@ see https://github.com/basejump/grails-dao
 	def figureOutDao(GrailsDomainClass dc, ApplicationContext ctx){
 		def domainClass = dc.clazz
 		def daoName = "${dc.propertyName}Dao"
-		def daoType = GrailsClassUtils.getStaticPropertyValue(domainClass, "daoType")
+		//def daoType = GrailsClassUtils.getStaticPropertyValue(domainClass, "daoType")
 		def dao
 		//println "$daoType and $daoName for $domainClass"
-		if(!daoType) {
+		//if(!daoType) {
 			if(ctx.containsBean(daoName)){
 				//println "found bean $daoName for $domainClass"
 				dao = ctx.getBean(daoName)
 			}else{
 				//println "getInstance for $domainClass"
-				dao = GormDaoSupport.getInstance(domainClass)
+				//dao = GormDaoSupport.getInstance(domainClass)
+                dao = ctx.getBean("gormDaoBean")
+                dao.domainClass = domainClass
 			}
-		}else{
-			if("transactional" == daoType){
-				//println "setting transactional bean  for $domainClass"
-				dao = ctx.getBean("gormDaoBean")
-				dao.domainClass = domainClass
-			}
-			else if(ctx.containsBean(daoType)){
-				dao = ctx.getBean(daoType)
-			}
-		}
+		// }else{
+		// 	if("transactional" == daoType){
+		// 		//println "setting transactional bean  for $domainClass"
+		// 		dao = ctx.getBean("gormDaoBean")
+		// 		dao.domainClass = domainClass
+		// 	}
+		// 	else if(ctx.containsBean(daoType)){
+		// 		dao = ctx.getBean(daoType)
+		// 	}
+		// }
 		//if its still null then default it to a new instance
 		if(!dao){
 			log.error "something went wrong trying to setup dao for ${dc.fullName} maybe this is wrong ${daoProps}"

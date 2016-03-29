@@ -70,7 +70,7 @@ class GormDaoSupport {
 			throw new DomainException(DaoMessage.notSaved(entity), entity, ve.errors, ve)
 		}
 		catch (DataAccessException dae) {
-			log.error("unexpected dao save error on ${entity.id} of ${entity.class.name}",dae)
+			//log.error("unexpected dao save error on ${entity.id} of ${entity.class.name}",dae)
 			//TODO we can build a better message with optimisticLockingFailure(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
 			//TODO also, in the case of optimisticLocking, is that really un expected? shoud we log it?
 			//TODO we shold really chnage the message from the default notSaved as this is more of a critical low level error a
@@ -93,7 +93,7 @@ class GormDaoSupport {
 		}
 		catch (DataIntegrityViolationException dae) {
 			def ident = DaoMessage.badge(entity.id,entity)
-			log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
+			//log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
 			throw new DomainException(DaoMessage.notDeleted(entity,ident), entity,dae)
 		}
 	}

@@ -19,6 +19,7 @@ import org.codehaus.groovy.grails.commons.AbstractInjectableGrailsClass;
 
 /**
  * @author Joshua Burnett
+ * based on the grails source DefaultGrailsServiceClass
  */
 public class DefaultGrailsDaoClass extends AbstractInjectableGrailsClass implements GrailsDaoClass {
 
@@ -26,6 +27,7 @@ public class DefaultGrailsDaoClass extends AbstractInjectableGrailsClass impleme
     private static final String TRANSACTIONAL = "transactional";
 
     private boolean transactional = true;
+    private String datasourceName;
 
     public DefaultGrailsDaoClass(Class<?> clazz) {
         super(clazz, DAO);
@@ -36,5 +38,26 @@ public class DefaultGrailsDaoClass extends AbstractInjectableGrailsClass impleme
 
     public boolean isTransactional() {
         return transactional;
+    }
+
+    public String getDatasource() {
+        if (datasourceName == null) {
+            if (isTransactional()) {
+                CharSequence name = getStaticPropertyValue(DATA_SOURCE, CharSequence.class);
+                datasourceName = name == null ? null : name.toString();
+                if (datasourceName == null) {
+                    datasourceName = DEFAULT_DATA_SOURCE;
+                }
+            }
+            else {
+                datasourceName = "";
+            }
+        }
+
+        return datasourceName;
+    }
+
+    public boolean usesDatasource(final String name) {
+        return getDatasource().equals(name);
     }
 }

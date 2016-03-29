@@ -22,6 +22,7 @@ import org.codehaus.groovy.grails.commons.ArtefactHandlerAdapter;
  * Grails artefact handler for dao classes
  *
  * @author Joshua Burnett 
+ * based on the grails source ServiceArtefactHandler
  */
 public class DaoArtefactHandler extends ArtefactHandlerAdapter {
 

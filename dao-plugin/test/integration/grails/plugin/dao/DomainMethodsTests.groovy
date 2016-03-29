@@ -149,8 +149,9 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 		assertTrue Jumper.dao.class.name.contains("testing.JumperDao")
 		println Student.dao.class.name
 		// grails.plugin.dao.GormDaoSupport$$EnhancerBySpringCGLIB$$27f04eca
-		assertTrue Student.dao.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
-		assertEquals "grails.plugin.dao.GormDaoSupport",DropZone.dao.class.name
+		assert Student.dao.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
+		assert DropZone.dao.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
+		//assertEquals "grails.plugin.dao.GormDaoSupport",DropZone.dao.class.name
 	}
 
 

@@ -1,7 +1,10 @@
 package grails.plugin.dao
 
+import org.junit.Test
 import org.springframework.validation.Errors
 import grails.test.*
+
+import static org.junit.Assert.*
 
 class DaoUtilsTests  {
 
@@ -35,11 +38,11 @@ class DaoUtilsTests  {
 	@Test
 	void testCheckFound(){
 		try{
-			DaoUtil.checkFound(null, [id:'99'],"xxx")
+			DaoUtil.checkFound(null, [id:99],"xxx")
 			fail "should not have made it here"
 		}catch(DomainException e){
 			//id
-			assertEquals('99',e.messageMap.args[1])
+			assertEquals(99,e.messageMap.args[1])
 			//domain name
 			assertEquals('xxx',e.messageMap.args[0])
 			assertEquals("default.not.found.message",e.messageMap.code)
@@ -54,12 +57,20 @@ class DaoUtilsTests  {
 	
 	@Test
 	void testNotFound(){
-		def r = DaoMessage.notFound("xxx.MockDomain",[id:"2"])
+		def r = DaoMessage.notFound("xxx.MockDomain",[id:2])
 		assertTrue r.code == "default.not.found.message"
-		assertTrue r.args == ["MockDomain","2"]
+		assertTrue r.args == ["MockDomain",2]
 		assertTrue r.defaultMessage == "MockDomain not found with id 2"
 	}
-	
+
+	@Test
+	void testNotFoundNullId(){
+		def r = DaoMessage.notFound("xxx.MockDomain",[id: null])
+		assertTrue r.code == "default.not.found.message"
+		assertTrue r.args == ["MockDomain", null]
+		assertTrue r.defaultMessage == "MockDomain not found with id null"
+	}
+
 /*	void testCreateMessage(){
 		def msg = DaoMessage.created(mocke,false)
 		assert 'arDoc' == msg.code

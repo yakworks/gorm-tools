@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
@@ -15,12 +16,12 @@ class DaoMessage {
 	*
 	* @param  params  must have a key named id of the object that was not found
 	*/
-	static Map notFound(domainClassName,Map params) {
-	    notFound(domainClassName,params.id)
+	static Map notFound(String domainClassName, Map params) {
+	    notFound(domainClassName, (Long)params.id)
 	}
 	
-	static Map notFound(domainClassName,id) {
-		def domainLabel = GrailsClassUtils.getShortName(domainClassName)
+	static Map notFound(String domainClassName, Long id) {
+		def domainLabel = GrailsNameUtils.getShortName(domainClassName)
 		return [code:"default.not.found.message",args:[domainLabel,id],
 			defaultMessage:"${domainLabel} not found with id ${id}"]
 	}

@@ -82,7 +82,7 @@ class DomainMethodsTests extends GroovyTestCase //FIXME extends BasicTestsForDao
 			fail "it was supposed to fail the save because of validationException"
 		}catch(DomainException e){
 			assert e.cause instanceof DataAccessException
-			assert e.cause instanceof org.springframework.orm.hibernate3.HibernateOptimisticLockingFailureException
+			assert e.cause instanceof org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException
 			assert e.entity == jump
 			assert e.messageMap.code == 'default.not.saved.message'
 		}

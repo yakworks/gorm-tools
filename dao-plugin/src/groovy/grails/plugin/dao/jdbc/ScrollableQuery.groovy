@@ -14,12 +14,10 @@ import java.sql.Statement
 @CompileStatic
 class ScrollableQuery {
 
-	private String query
 	private DataSource dataSource
 	private RowMapper rowMapper
 
-	public ScrollableQuery(String query, RowMapper mapper, DataSource dataSource) {
-		this.query = query
+	public ScrollableQuery(RowMapper mapper, DataSource dataSource) {
 		this.dataSource = dataSource
 		this.rowMapper = mapper
 	}
@@ -28,7 +26,7 @@ class ScrollableQuery {
 	 * Executes the query, and calls the closure for each row.
 	 * @param Closure cl
 	 */
-	public void eachRow(Closure cl) {
+	public void eachRow(String query, Closure cl) {
 		Sql sql = prepareSql()
 		int index = 1
 
@@ -45,9 +43,9 @@ class ScrollableQuery {
 	 * Executes the query, and calls the closure for each batch.
 	 * @param int batchSize
 	 */
-	public void eachBatch(int batchSize, Closure cl) {
+	public void eachBatch(String query, int batchSize, Closure cl) {
 		List batch = []
-		this.eachRow { def row ->
+		this.eachRow(query) { def row ->
 			batch.add(row)
 			if((batch.size() == batchSize)) {
 				cl.call(batch)
@@ -65,10 +63,10 @@ class ScrollableQuery {
 	 *
 	 * @return List
 	 */
-	public List rows() {
+	public List rows(String query) {
 		List result = []
 
-		this.eachRow {def row ->
+		this.eachRow(query) {def row ->
 			result.add(row)
 		}
 

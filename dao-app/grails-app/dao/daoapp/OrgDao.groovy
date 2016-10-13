@@ -1,13 +1,16 @@
-package testing
-import grails.plugin.dao.*
+package daoapp
+import grails.plugin.dao.GormDaoSupport
 
-class OrgDao extends GormDao{ 
-	def domainClass = Org
+class OrgDao extends GormDaoSupport{
+	Class domainClass = Org
 	
-	def insert(params){
+	Map insert(params){
 		def madeNameDefault
 		if(!params.name){
 			params.name = "default"
+		}
+		if (params.name){
+			params.name += " from Dao"
 		}
 		super.insert(params)
 	}

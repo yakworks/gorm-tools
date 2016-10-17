@@ -1,16 +1,20 @@
 package grails.plugin.dao
 
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.springframework.validation.Errors
 import grails.test.*
+import spock.lang.Specification
 import testing.*
 
-class GormDaoSupportTests extends BasicTestsForDao {
+@Integration
+@Rollback
+class GormDaoSupportTests extends Specification {
 
 	def grailsApplication
 	
-	void setUp() {
-		super.setUp()
-		dao = grailsApplication.mainContext.gormDaoBean//new GormDaoSupport(Jumper)
+	void setup() {
+		def dao = grailsApplication.mainContext.gormDaoBean//new GormDaoSupport(Jumper)
 		dao.domainClass = Jumper
 		assert dao.domainClass == Jumper
 		//pop an item in just to have for things below

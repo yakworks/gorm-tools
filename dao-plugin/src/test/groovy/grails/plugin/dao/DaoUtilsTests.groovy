@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import org.junit.Test
 import org.springframework.validation.Errors
 import grails.test.*
 
@@ -26,9 +27,8 @@ class DaoUtilsTests  {
 			DaoUtil.checkVersion(mocke,0)
 			fail "should not have made it here"
 		}catch(DomainException e){
-			assertEquals(mocke.id,e.entity.id)
-			//println e.entity.errors
-			assertEquals("default.optimistic.locking.failure",e.messageMap.code)
+			mocke.id == e.entity.id
+			"default.optimistic.locking.failure" == e.messageMap.code
 		}
 	}
 
@@ -39,10 +39,10 @@ class DaoUtilsTests  {
 			fail "should not have made it here"
 		}catch(DomainException e){
 			//id
-			assertEquals('99',e.messageMap.args[1])
+			'99' == e.messageMap.args[1]
 			//domain name
-			assertEquals('xxx',e.messageMap.args[0])
-			assertEquals("default.not.found.message",e.messageMap.code)
+			'xxx' == e.messageMap.args[0]
+			"default.not.found.message" == e.messageMap.code
 		}
 	}
 	
@@ -55,9 +55,9 @@ class DaoUtilsTests  {
 	@Test
 	void testNotFound(){
 		def r = DaoMessage.notFound("xxx.MockDomain",[id:"2"])
-		assertTrue r.code == "default.not.found.message"
-		assertTrue r.args == ["MockDomain","2"]
-		assertTrue r.defaultMessage == "MockDomain not found with id 2"
+		r.code == "default.not.found.message"
+		r.args == ["MockDomain","2"]
+		r.defaultMessage == "MockDomain not found with id 2"
 	}
 	
 /*	void testCreateMessage(){
@@ -69,7 +69,7 @@ class DaoUtilsTests  {
 	@Test
 	void testDefaultLocale(){
 		def loc = DaoMessage.defaultLocale()
-		assert Locale.ENGLISH == loc
+		Locale.ENGLISH == loc
 	}
 
 }

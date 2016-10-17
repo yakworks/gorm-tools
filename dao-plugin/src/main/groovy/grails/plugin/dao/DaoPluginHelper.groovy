@@ -1,17 +1,17 @@
 package grails.plugin.dao
+
+import grails.core.GrailsApplication
+import grails.core.GrailsDomainClass
 import grails.plugin.dao.DaoArtefactHandler
 import grails.plugin.dao.GormDaoSupport
 import grails.plugin.dao.GrailsDaoClass
 import grails.transaction.Transactional
-import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.spring.TypeSpecifyableTransactionProxyFactoryBean
-import org.codehaus.groovy.grails.orm.support.GroovyAwareNamedTransactionAttributeSource
+import org.apache.catalina.core.ApplicationContext
+import org.grails.core.artefact.DomainClassArtefactHandler
+import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
+import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
-import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
-import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 import java.lang.reflect.Method
 
@@ -38,7 +38,7 @@ class DaoPluginHelper {
 
 		application.daoClasses.each {daoClass ->
 			configureDaoBeans.delegate = delegate
-			configureDaoBeans(daoClass,application)
+			configureDaoBeans(daoClass,grailsApplication)
 		}
 
 		//DaoUtils.ctx = application.mainContext
@@ -49,7 +49,7 @@ class DaoPluginHelper {
 		//force initialization of domain meta methods
 		//forceInitGormMethods(application)
 
-		modifyDomainsClasses(application,ctx)
+		modifyDomainsClasses(grailsApplication,ctx)
 
 	}
 
@@ -58,9 +58,9 @@ class DaoPluginHelper {
 		if (!event.source || !event.ctx) {
 			return
 		}
-		if (application.isArtefactOfType(DaoArtefactHandler.TYPE, event.source)) {
+		if (grailsApplication.isArtefactOfType(DaoArtefactHandler.TYPE, event.source)) {
 
-			def daoClass = application.addArtefact(DaoArtefactHandler.TYPE, event.source)
+			def daoClass = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, event.source)
 
 			def beans = beans {
 				configureDaoBeans.delegate = delegate
@@ -71,13 +71,13 @@ class DaoPluginHelper {
 			context.registerBeanDefinition("${daoClass.fullName}DaoClass", beans.getBeanDefinition("${daoClass.fullName}DaoClass"))
 			context.registerBeanDefinition("${daoClass.propertyName}", beans.getBeanDefinition("${daoClass.propertyName}"))
 		}
-		else if (application.isArtefactOfType(DomainClassArtefactHandler.TYPE, event.source)) {
-			addNewPersistenceMethods(event.source,application,event.ctx)
+		else if (grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, event.source)) {
+			addNewPersistenceMethods(event.source,grailsApplication,event.ctx)
 		}
 	}
 
 	//Copied much of this from grails source ServicesGrailsPlugin
-	static def configureDaoBeans = {GrailsDaoClass daoClass, application ->
+	static def configureDaoBeans = {GrailsDaoClass daoClass, grailsApplication ->
 		def scope = daoClass.getPropertyValue("scope")
 
 		def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
@@ -94,7 +94,7 @@ class DaoPluginHelper {
 			String attributes = 'PROPAGATION_REQUIRED'
 			String datasourceName = daoClass.datasource
 			String suffix = datasourceName == GrailsDaoClass.DEFAULT_DATA_SOURCE ? '' : "_$datasourceName"
-			if (application.config["dataSource$suffix"].readOnly) {
+			if (grailsApplication.config["dataSource$suffix"].readOnly) {
 				attributes += ',readOnly'
 			}
 			props."*" = attributes
@@ -138,15 +138,15 @@ class DaoPluginHelper {
 		}
 	}
 
-	static def modifyDomainsClasses(GrailsApplication application, ApplicationContext ctx){
-		for (GrailsDomainClass dc in application.domainClasses) {
+	static def modifyDomainsClasses(GrailsApplication grailsApplication, ApplicationContext ctx){
+		for (GrailsDomainClass dc in grailsApplication.domainClasses) {
 			//forceInitGormMethods(dc.clazz)
 			//MetaClass mc = dc.metaClass
-			addNewPersistenceMethods(dc,application,ctx)
+			addNewPersistenceMethods(dc,grailsApplication,ctx)
 		}
 	}
 
-	static def addNewPersistenceMethods(GrailsDomainClass dc, GrailsApplication application, ApplicationContext ctx) {
+	static def addNewPersistenceMethods(GrailsDomainClass dc, GrailsApplication grailsApplication, ApplicationContext ctx) {
 		def metaClass = dc.metaClass
 		//def origSaveArgs = dc.clazz.metaClass.getMetaMethod('save', Map)
 		def dao = figureOutDao( dc, ctx)

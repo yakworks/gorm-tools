@@ -1,13 +1,9 @@
+package grails.plugin.dao
 import grails.plugin.dao.DaoArtefactHandler
 import grails.plugin.dao.DaoPluginHelper
 import grails.plugin.dao.GormDaoSupport
 import grails.plugin.dao.GrailsDaoClass
-import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.spring.TypeSpecifyableTransactionProxyFactoryBean
-import org.codehaus.groovy.grails.orm.support.GroovyAwareNamedTransactionAttributeSource
+import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
@@ -16,37 +12,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 import java.lang.reflect.Method
 
-class DaoGrailsPlugin {
-	static final def log = Logger.getLogger(DaoGrailsPlugin)
-	
-    // the plugin version
-    def version = "1.0.3"
-    // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.5.0 > *"
-    // the other plugins this plugin depends on
-    def dependsOn = [:]
-    // resources that are excluded from plugin packaging
-    def pluginExcludes = [
-		"grails-app/views/error.gsp",
-		"grails-app/**/*",
-		"web-app/**/*"
-    ]
-
-    // TODO Fill in these fields
-    def author = "Joshua Burnett"
-    def authorEmail = ""
-    def title = "Dao plugin"
-    def description = '''\\
-Enables a grails-app/dao directory to setup beans
-see https://github.com/basejump/grails-dao
-'''
-	def license = "APACHE"
-	def organization = [ name: "9ci", url: "http://www.9ci.com/" ]
-	def developers = [ [ name: "Joshua Burnet", email: "joshua@greenbill.com" ]]
-	def issueManagement = [ system: "github", url: "https://github.com/9ci/grails-dao/issues" ]
-	def scm = [ url: "https://github.com/9ci/grails-dao" ]
-	def documentation = "https://github.com/9ci/grails-dao"
-	
+class DaoGrailsPlugin extends grails.plugins.Plugin{
 	def loadAfter = ['hibernate','datasources']
 
     def watchedResources = [

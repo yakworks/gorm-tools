@@ -1,11 +1,16 @@
 package testing
 
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.springframework.validation.Errors
 import grails.test.*
 import org.junit.*
 import grails.plugin.dao.*
+import spock.lang.Specification
 
-class JumperDelegateDaoTests //FIXME extends BasicTestsForDao 
+@Integration
+@Rollback
+class JumperDelegateDaoTests extends Specification //FIXME extends BasicTestsForDao
 {
 
 	static transactional = false
@@ -18,7 +23,6 @@ class JumperDelegateDaoTests //FIXME extends BasicTestsForDao
 	// 	//assert dao.domainClass == Jumper
 	// }
 	
-	@Test
 	void testNonTranDao(){
 		println "testSave"
 		def dom = new Jumper(name:"testSave")

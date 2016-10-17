@@ -1,5 +1,7 @@
 package grails.plugin.dao;
-import org.codehaus.groovy.grails.commons.InjectableGrailsClass;
+
+import grails.core.InjectableGrailsClass;
+
 /**
  * @author Joshua Burnett
  * based on the grails source GrailsServiceClass

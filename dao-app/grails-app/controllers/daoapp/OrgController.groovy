@@ -2,7 +2,7 @@ package daoapp
 
 class OrgController {
 	def scaffold = Org
-	def orgDao
+	OrgDao orgDao
     //def index = { }
 
 	def save(){

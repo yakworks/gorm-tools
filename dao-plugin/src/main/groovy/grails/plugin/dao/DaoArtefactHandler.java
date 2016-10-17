@@ -16,7 +16,8 @@
 
 package grails.plugin.dao;
 
-import org.codehaus.groovy.grails.commons.ArtefactHandlerAdapter;
+
+import grails.core.ArtefactHandlerAdapter;
 
 /**
  * Grails artefact handler for dao classes
@@ -40,7 +41,6 @@ public ServiceArtefactHandler() {
 }
 */
 
-    @Override
     public String getPluginName() {
         return PLUGIN_NAME;
     }

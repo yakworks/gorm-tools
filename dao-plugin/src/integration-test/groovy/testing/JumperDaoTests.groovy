@@ -4,11 +4,12 @@ import org.springframework.validation.Errors
 import grails.test.*
 import grails.plugin.dao.*
 
+
 class JumperDaoTests extends BasicTestsForDao {
 
 	static transactional = false
 	
-	def jumperDao
+	JumperDao jumperDao
 	
 	void setUp() {
 		super.setUp()

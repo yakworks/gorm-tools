@@ -57,18 +57,18 @@ grails.project.dependency.resolution = {
 
     plugins {
         // plugins for the build system only
-        build ":tomcat:7.0.55.3" // or ":tomcat:8.0.22"
-        compile ":view-tools:0.3-grails2"
+        build (":tomcat:7.0.55.3") { export = false }// or ":tomcat:8.0.22"
+        compile (":view-tools:0.3-grails2"){ export = false }
         // plugins for the compile step
-        compile ":scaffolding:2.1.2"
-        compile ':cache:1.1.8'
+        compile (":scaffolding:2.1.2"){ export = false }
+        compile (':cache:1.1.8'){ export = false }
         // asset-pipeline 2.0+ requires Java 7, use version 1.9.x with Java 6
-        compile ":asset-pipeline:2.5.7"
+        compile (":asset-pipeline:2.5.7"){ export = false }
 
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate4:4.3.10" // or ":hibernate:3.6.10.18"
-        runtime ":database-migration:1.4.0"
-        runtime ":jquery:1.11.1"
+        runtime (":hibernate4:4.3.10"){ export = false } // or ":hibernate:3.6.10.18"
+        runtime (":database-migration:1.4.0"){ export = false }
+        runtime (":jquery:1.11.1") { export = false }
 
         // Uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.9.0"

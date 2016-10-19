@@ -3,6 +3,7 @@ import grails.plugin.dao.DaoArtefactHandler
 import grails.plugin.dao.GormDaoSupport
 import grails.plugin.dao.GrailsDaoClass
 import grails.transaction.Transactional
+import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
@@ -16,6 +17,8 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 import java.lang.reflect.Method
 
 class DaoPluginHelper {
+	static final def log = Logger.getLogger(DaoPluginHelper)
+
 	static def artefacts = [new DaoArtefactHandler()]
 
 	static def doWithSpring = {
@@ -234,7 +237,7 @@ class DaoPluginHelper {
 		} catch(MissingMethodException e) {
 			return
 		}
-		//log.warn("Looks like we could not initialize $domClass via static methodMissing")
+		log.warn("Looks like we could not initialize $domClass via static methodMissing")
 		//}
 	}
 }

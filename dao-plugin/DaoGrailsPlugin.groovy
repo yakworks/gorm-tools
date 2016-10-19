@@ -1,20 +1,8 @@
-import grails.plugin.dao.DaoArtefactHandler
 import grails.plugin.dao.DaoPluginHelper
 import grails.plugin.dao.GormDaoSupport
-import grails.plugin.dao.GrailsDaoClass
 import org.apache.log4j.Logger
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.commons.spring.TypeSpecifyableTransactionProxyFactoryBean
 import org.codehaus.groovy.grails.orm.support.GroovyAwareNamedTransactionAttributeSource
-import org.springframework.beans.factory.config.MethodInvokingFactoryBean
-import org.springframework.context.ApplicationContext
-import org.springframework.core.annotation.AnnotationUtils
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
-
-import java.lang.reflect.Method
 
 class DaoGrailsPlugin {
 	static final def log = Logger.getLogger(DaoGrailsPlugin)

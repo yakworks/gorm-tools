@@ -1,4 +1,4 @@
-rootProject.name = 'dao-plugin'
+rootProject.name = 'daotesting-plugin'
 
 //sorted this out from here https://discuss.gradle.org/t/multi-module-project-with-relative-paths-to-sub-projects/4581
 //include ':foobar-plugin',':test-projects:app'

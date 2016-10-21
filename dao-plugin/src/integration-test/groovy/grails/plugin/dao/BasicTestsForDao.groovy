@@ -3,10 +3,9 @@ package grails.plugin.dao
 import org.springframework.validation.Errors
 import grails.test.*
 import grails.plugin.dao.*
-import spock.lang.Specification
 import testing.*
 
-class BasicTestsForDao extends Specification {
+class BasicTestsForDao extends GroovyTestCase {
 
 	def dao
 	

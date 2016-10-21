@@ -6,12 +6,11 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.1"
-        classpath "org.grails.plugins:hibernate5:6.0.0"
     }
 }
 
 version "1.0"
-group "dao.app"
+group "daoapp"
 
 apply plugin:"eclipse"
 apply plugin:"idea"
@@ -42,16 +41,15 @@ dependencies {
     compile "org.grails:grails-web-boot"
     compile "org.grails.plugins:cache"
     compile "org.grails.plugins:scaffolding"
-    compile "org.grails.plugins:hibernate5"
-    compile "org.hibernate:hibernate-core:5.1.1.Final"
-    compile "org.hibernate:hibernate-ehcache:5.1.1.Final"
-    compile project(':../dao-plugin')
+    compile "org.grails.plugins:hibernate4"
+    compile "org.hibernate:hibernate-core:4.3.10.Final"
+    compile "org.hibernate:hibernate-ehcache:4.3.10.Final"
+    compile project(':../daotesting-plugin')
     console "org.grails:grails-console"
     profile "org.grails.profiles:web"
-    provided "org.codehaus.groovy:groovy-ant"
     runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.11.1"
     runtime "com.h2database:h2"
-    testCompile "org.grails:grails-plugin-testing"
+    testCompile "org.grails:grails-plugin-testing1"
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"

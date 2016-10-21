@@ -2,15 +2,12 @@ package grails.plugin.dao
 
 import grails.core.GrailsApplication
 import grails.core.GrailsDomainClass
-import grails.plugin.dao.DaoArtefactHandler
-import grails.plugin.dao.GormDaoSupport
-import grails.plugin.dao.GrailsDaoClass
 import grails.transaction.Transactional
-import org.apache.catalina.core.ApplicationContext
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
 import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
+import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
 
 import java.lang.reflect.Method
@@ -18,7 +15,7 @@ import java.lang.reflect.Method
 class DaoPluginHelper {
 	static def artefacts = [new DaoArtefactHandler()]
 
-	static def doWithSpring = {
+	static Closure doWithSpring = {
 		gormDaoBeanNonTransactional(grails.plugin.dao.GormDaoSupport) { bean ->
 			bean.scope = "prototype"
 			//grailsApplication = ref('grailsApplication')
@@ -44,7 +41,7 @@ class DaoPluginHelper {
 		//DaoUtils.ctx = application.mainContext
 	}
 
-	static def doWithDynamicMethods = { ctx ->
+	static def doWithDynamicMethods(grailsApplication, ctx) {
 		//DaoUtils.ctx = ctx
 		//force initialization of domain meta methods
 		//forceInitGormMethods(application)
@@ -54,7 +51,7 @@ class DaoPluginHelper {
 	}
 
 
-	static def onChange = { event ->
+	static void onChange(event, grailsApplication){
 		if (!event.source || !event.ctx) {
 			return
 		}
@@ -72,12 +69,12 @@ class DaoPluginHelper {
 			context.registerBeanDefinition("${daoClass.propertyName}", beans.getBeanDefinition("${daoClass.propertyName}"))
 		}
 		else if (grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, event.source)) {
-			addNewPersistenceMethods(event.source,grailsApplication,event.ctx)
+			addNewPersistenceMethods(event.source,event.ctx)
 		}
 	}
 
 	//Copied much of this from grails source ServicesGrailsPlugin
-	static def configureDaoBeans = {GrailsDaoClass daoClass, grailsApplication ->
+	static Closure configureDaoBeans = {GrailsDaoClass daoClass, grailsApplication ->
 		def scope = daoClass.getPropertyValue("scope")
 
 		def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
@@ -142,11 +139,11 @@ class DaoPluginHelper {
 		for (GrailsDomainClass dc in grailsApplication.domainClasses) {
 			//forceInitGormMethods(dc.clazz)
 			//MetaClass mc = dc.metaClass
-			addNewPersistenceMethods(dc,grailsApplication,ctx)
+			addNewPersistenceMethods(dc, ctx)
 		}
 	}
 
-	static def addNewPersistenceMethods(GrailsDomainClass dc, GrailsApplication grailsApplication, ApplicationContext ctx) {
+	static def addNewPersistenceMethods(GrailsDomainClass dc, ApplicationContext ctx) {
 		def metaClass = dc.metaClass
 		//def origSaveArgs = dc.clazz.metaClass.getMetaMethod('save', Map)
 		def dao = figureOutDao( dc, ctx)
@@ -184,7 +181,7 @@ class DaoPluginHelper {
 
 	}
 
-	static def figureOutDao(GrailsDomainClass dc, ApplicationContext ctx){
+	static def figureOutDao(GrailsDomainClass dc, ctx){
 		def domainClass = dc.clazz
 		def daoName = "${dc.propertyName}Dao"
 		//def daoType = GrailsClassUtils.getStaticPropertyValue(domainClass, "daoType")
@@ -196,23 +193,23 @@ class DaoPluginHelper {
 			dao = ctx.getBean(daoName)
 		}else{
 			//println "getInstance for $domainClass"
-			//dao = GormDaoSupport.getInstance(domainClass)
+			//daotesting = GormDaoSupport.getInstance(domainClass)
 			dao = ctx.getBean("gormDaoBean")
 			dao.domainClass = domainClass
 		}
 		// }else{
 		// 	if("transactional" == daoType){
 		// 		//println "setting transactional bean  for $domainClass"
-		// 		dao = ctx.getBean("gormDaoBean")
-		// 		dao.domainClass = domainClass
+		// 		daotesting = ctx.getBean("gormDaoBean")
+		// 		daotesting.domainClass = domainClass
 		// 	}
 		// 	else if(ctx.containsBean(daoType)){
-		// 		dao = ctx.getBean(daoType)
+		// 		daotesting = ctx.getBean(daoType)
 		// 	}
 		// }
 		//if its still null then default it to a new instance
 		if(!dao){
-			//log.error "something went wrong trying to setup dao for ${dc.fullName} maybe this is wrong ${daoProps}"
+			//log.error "something went wrong trying to setup daotesting for ${dc.fullName} maybe this is wrong ${daoProps}"
 			dao = GormDaoSupport.getInstance(dc.clazz)
 		}
 

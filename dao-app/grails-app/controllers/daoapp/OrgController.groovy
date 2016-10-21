@@ -2,10 +2,11 @@ package daoapp
 
 class OrgController {
 	def scaffold = Org
-	OrgDao orgDao
+	def orgDao
     //def index = { }
 
 	def save(){
+		new Org(params).persist()
 		def result = orgDao.insert(params)
 		redirect(action: "show",id: result.entity.id)
 	}

@@ -51,34 +51,41 @@ class DomainMethodsTests extends Specification //FIXME extends BasicTestsForDao
 	}
 	
 	void testRemove(){
+		when:
 		def dom = Student.findByName("student1")
 		assert dom.name == "student1"
 		dom.remove()
 		DaoUtil.flushAndClear()
-		assertNull( Student.findByName("student1") )
+		then:
+		Student.findByName("student1") == null
 	}
 	
 	void testPersistArgs(){
+		when:
 		assert new Jumper(name:"jumpargs").persist(flush:true)
 
 		def check = Jumper.findByName("jumpargs")
-		assert check.name == "jumpargs"
+		then:
+		check.name == "jumpargs"
 	}
 	
 	void testPersistFailValidation(){
+		when:
 		def jump = new Jumper()
+		then:
 		try{
 			jump.persist()
 			fail "it was supposed to fail the save because of validationException"
 		}catch(DomainException e){
-			assert e.cause instanceof ValidationException
-			assert e.entity == jump
+			e.cause instanceof ValidationException
+			e.entity == jump
 		}
 	}
 	
 	void testPersistFailDataAccess(){
+		when:
 		def jump = Jumper.findByName("jumper1")
-		
+		then:
 		try{
 			Jumper.executeUpdate("update Jumper j set j.version=20 where j.name='jumper1'")
 			DaoUtil.flush()
@@ -86,27 +93,31 @@ class DomainMethodsTests extends Specification //FIXME extends BasicTestsForDao
 			jump.persist(flush:true)
 			fail "it was supposed to fail the save because of validationException"
 		}catch(DomainException e){
-			assert e.cause instanceof DataAccessException
+			e.cause instanceof DataAccessException
 			//assert e.cause instanceof org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException
-			assert e.entity == jump
-			assert e.messageMap.code == 'default.not.saved.message'
+			e.entity == jump
+			e.messageMap.code == 'default.not.saved.message'
 		}
 	}
 	
 	void testRemoveFail(){
+		when:
 		def jump = Jumper.findByName("jumper1")
 		assert jump
+		then:
 		try{
 			jump.remove()
 			fail "it was supposed to fail because of a foreign key constraint"
 		}catch(DomainException e){
-			assert e.cause instanceof DataIntegrityViolationException
-			assert e.entity == jump
+			e.cause instanceof DataIntegrityViolationException
+			e.entity == jump
 		}
 	}
 	
 	void testInsert(){
+		when:
 		println "testInsert"
+		then:
 		try{
 			def result = Jumper.insert([name:"testInsert"])
 			DaoUtil.flushAndClear()
@@ -121,7 +132,9 @@ class DomainMethodsTests extends Specification //FIXME extends BasicTestsForDao
 	}
 	
 	void testUpdate(){
+		when:
 		def jump = Jumper.findByName("jumper1")
+		then:
 		assert jump
 		try{
 			def result = Jumper.update([id:jump.id,name:"testUpdateXXX"])
@@ -137,7 +150,9 @@ class DomainMethodsTests extends Specification //FIXME extends BasicTestsForDao
 	}
 	
 	void testRemoveParams(){
+		when:
 		def stud = Student.findByName("student1")
+		then:
 		try{
 			def result = Student.remove([id:stud.id])
 			DaoUtil.flushAndClear()

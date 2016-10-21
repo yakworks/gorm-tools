@@ -2,7 +2,7 @@
 grails:
     profile: web
     codegen:
-        defaultPackage: dao.app
+        defaultPackage: daoapp
     spring:
         transactionManagement:
             proxies: false

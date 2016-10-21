@@ -1,3 +1,10 @@
+.grails/
+/.gradle
+/build
+/plugin.xml
+grails-*.zip
+web-app/WEB-INF
 target/
+target-eclipse/
+.link_to_grails_plugins/
 stacktrace.log
-.idea/

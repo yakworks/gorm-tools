@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import grails.core.GrailsApplication
 import org.grails.plugins.domain.DomainClassGrailsPlugin
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext

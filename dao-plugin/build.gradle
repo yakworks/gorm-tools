@@ -48,7 +48,7 @@ dependencies {
 	compile "org.hibernate:hibernate-core:4.3.10.Final"
 	compile "org.hibernate:hibernate-ehcache:4.3.10.Final"
 	provided "org.codehaus.groovy:groovy-ant"
-	testCompile "org.grails:grails-plugin-testing1"
+	testCompile "org.grails:grails-plugin-testing"
 	testCompile "org.grails.plugins:geb"
 }
 

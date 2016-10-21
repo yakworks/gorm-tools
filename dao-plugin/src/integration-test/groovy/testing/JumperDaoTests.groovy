@@ -5,10 +5,11 @@ import grails.transaction.Rollback
 import org.springframework.validation.Errors
 import grails.test.*
 import grails.plugin.dao.*
+import spock.lang.Specification
 
 @Integration
 @Rollback
-class JumperDaoTests extends BasicTestsForDao {
+class JumperDaoTests extends Specification {
 
 	static transactional = false
 	

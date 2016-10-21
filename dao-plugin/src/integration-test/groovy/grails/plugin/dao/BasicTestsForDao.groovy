@@ -3,9 +3,10 @@ package grails.plugin.dao
 import org.springframework.validation.Errors
 import grails.test.*
 import grails.plugin.dao.*
+import spock.lang.Specification
 import testing.*
 
-class BasicTestsForDao extends GroovyTestCase {
+class BasicTestsForDao extends Specification {
 
 	def dao
 	
@@ -42,7 +43,7 @@ class BasicTestsForDao extends GroovyTestCase {
 			def dom2 = Jumper.findByName("testDelete")
 			dao.delete(dom2)
 			def dom3 = Jumper.findByName("testDelete")
-			assertNull dom3
+			dom3 == null
 		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}

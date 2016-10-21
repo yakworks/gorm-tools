@@ -121,11 +121,10 @@ class DaoUtil implements ApplicationContextAware
 	}
 	
 	/** 
-	* clears the session cache and the DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+	* clears the session cache
 	*/
 	static void clear(){
 		ctx.sessionFactory.currentSession.clear()
-		DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP.get().clear()
 	}
 
 }

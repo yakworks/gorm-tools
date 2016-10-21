@@ -1,4 +1,4 @@
-package testing1
+package testing
 
 import grails.plugin.dao.GormDaoSupport
 

@@ -9,6 +9,7 @@ import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
+import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 import java.lang.reflect.Method
 
@@ -32,13 +33,15 @@ class DaoPluginHelper {
 		}
 
 		daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
-
 		application.daoClasses.each {daoClass ->
-			configureDaoBeans.delegate = delegate
-			configureDaoBeans(daoClass,grailsApplication)
+
+			Closure closure = configureDaoBeans
+			closure.delegate = delegate
+			closure.call(daoClass, grailsApplication)
+
 		}
 
-		//DaoUtils.ctx = application.mainContext
+		//DaoUtils.ctx = application.mainContext*/
 	}
 
 	static def doWithDynamicMethods(grailsApplication, ctx) {
@@ -60,8 +63,9 @@ class DaoPluginHelper {
 			def daoClass = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, event.source)
 
 			def beans = beans {
-				configureDaoBeans.delegate = delegate
-				configureDaoBeans(daoClass)
+				Closure closure = configureDaoBeans
+				closure.delegate = delegate
+				closure.call(daoClass, grailsApplication)
 			}
 
 			def context = event.ctx
@@ -81,7 +85,7 @@ class DaoPluginHelper {
 
 		"${daoClass.fullName}DaoClass"(MethodInvokingFactoryBean) { bean ->
 			bean.lazyInit = lazyInit
-			targetObject = ref("grailsApplication", true)
+			targetObject = grailsApplication
 			targetMethod = "getArtefact"
 			arguments = [DaoArtefactHandler.TYPE, daoClass.fullName]
 		}
@@ -110,8 +114,7 @@ class DaoPluginHelper {
 				transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes:props)
 				transactionManager = ref("transactionManager")
 			}
-		}
-		else {
+		} else {
 			"${daoClass.propertyName}"(daoClass.getClazz()) { bean ->
 				bean.autowire =  true
 				bean.lazyInit = lazyInit

@@ -50,7 +50,7 @@ environments:
 grails:
     profile: plugin
     codegen:
-        defaultPackage: grails.plugin.daotesting
+        defaultPackage: grails.plugin.dao
     spring:
         transactionManagement:
             proxies: false

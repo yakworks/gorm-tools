@@ -53,11 +53,11 @@ dependencies {
 }
 
 grailsPublish {
-	desc = 'Enables a grails-app/daotesting directory to setup beans see https://github.com/basejump/grails-daotesting'
+	desc = 'Enables a grails-app/dao directory to setup beans see https://github.com/basejump/grails-daotesting'
 	developers = [joshuaB: 'Joshua B']
-	githubSlug = '9ci/grails-daotesting'
-	issueTrackerUrl = 'https://github.com/9ci/grails-daotesting/issues'
-	vcsUrl = 'https://github.com/9ci/grails-daotesting'
+	githubSlug = '9ci/grails-dao'
+	issueTrackerUrl = 'https://github.com/9ci/grails-dao/issues'
+	vcsUrl = 'https://github.com/9ci/grails-dao'
 	license {
 		name = 'Apache-2.0'
 	}

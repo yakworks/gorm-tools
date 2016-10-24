@@ -20,7 +20,7 @@ package grails.plugin.dao;
 import grails.core.ArtefactHandlerAdapter;
 
 /**
- * Grails artefact handler for daotesting classes
+ * Grails artefact handler for dao classes
  *
  * @author Joshua Burnett
  * based on the grails source ServiceArtefactHandler
@@ -28,7 +28,7 @@ import grails.core.ArtefactHandlerAdapter;
 public class DaoArtefactHandler extends ArtefactHandlerAdapter {
 
 	public static final String TYPE = "Dao";
-	public static final String PLUGIN_NAME = "daotesting";
+	public static final String PLUGIN_NAME = "dao";
 
 	public DaoArtefactHandler() {
 		super(TYPE, GrailsDaoClass.class, DefaultGrailsDaoClass.class,

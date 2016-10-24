@@ -196,23 +196,23 @@ class DaoPluginHelper {
 			dao = ctx.getBean(daoName)
 		}else{
 			//println "getInstance for $domainClass"
-			//daotesting = GormDaoSupport.getInstance(domainClass)
+			//dao = GormDaoSupport.getInstance(domainClass)
 			dao = ctx.getBean("gormDaoBean")
 			dao.domainClass = domainClass
 		}
 		// }else{
 		// 	if("transactional" == daoType){
 		// 		//println "setting transactional bean  for $domainClass"
-		// 		daotesting = ctx.getBean("gormDaoBean")
-		// 		daotesting.domainClass = domainClass
+		// 		dao = ctx.getBean("gormDaoBean")
+		// 		dao.domainClass = domainClass
 		// 	}
 		// 	else if(ctx.containsBean(daoType)){
-		// 		daotesting = ctx.getBean(daoType)
+		// 		dao = ctx.getBean(daoType)
 		// 	}
 		// }
 		//if its still null then default it to a new instance
 		if(!dao){
-			//log.error "something went wrong trying to setup daotesting for ${dc.fullName} maybe this is wrong ${daoProps}"
+			//log.error "something went wrong trying to setup dao for ${dc.fullName} maybe this is wrong ${daoProps}"
 			dao = GormDaoSupport.getInstance(dc.clazz)
 		}
 

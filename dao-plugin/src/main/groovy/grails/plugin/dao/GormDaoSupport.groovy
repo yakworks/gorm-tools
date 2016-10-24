@@ -30,16 +30,16 @@ class GormDaoSupport {
 	 * returns an instance with fireEvents=false and flushOnSave=false
 	 */
 	static GormDaoSupport getInstance(Class clazz){
-/*		def daotesting = DaoUtil.ctx.getBean("gormDaoBean")
-		daotesting.domainClass = clazz
-		return daotesting*/
+/*		def dao = DaoUtil.ctx.getBean("gormDaoBean")
+		dao.domainClass = clazz
+		return dao*/
 		def dao = new GormDaoSupport(clazz,false)
 		return dao
 	}
 
-	//override this to set the domain this daotesting is for
+	//override this to set the domain this dao is for
 	Class getDomainClass(){ return thisDomainClass}
-	//set this is constructing a base daotesting by hand
+	//set this is constructing a base dao by hand
 	void setDomainClass(Class clazz){ thisDomainClass = clazz}
 
 	/**
@@ -70,8 +70,8 @@ class GormDaoSupport {
 			throw new DomainException(DaoMessage.notSaved(entity), entity, ve.errors, ve)
 		}
 		catch (DataAccessException dae) {
-			//log.error("unexpected daotesting save error on ${entity.id} of ${entity.class.name}",dae)
-			//TODO we can build a better message with optimisticLockingFailure(entity) if dae.cause instanceof org.springframework.daotesting.OptimisticLockingFailureException
+			//log.error("unexpected dao save error on ${entity.id} of ${entity.class.name}",dae)
+			//TODO we can build a better message with optimisticLockingFailure(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
 			//TODO also, in the case of optimisticLocking, is that really un expected? shoud we log it?
 			//TODO we shold really chnage the message from the default notSaved as this is more of a critical low level error a
 			//and save the default notSaved for when a validation occurs like above
@@ -93,7 +93,7 @@ class GormDaoSupport {
 		}
 		catch (DataIntegrityViolationException dae) {
 			def ident = DaoMessage.badge(entity.id,entity)
-			//log.error("daotesting delete error on ${entity.id} of ${entity.class.name}",dae)
+			//log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
 			throw new DomainException(DaoMessage.notDeleted(entity,ident), entity,dae)
 		}
 	}

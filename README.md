@@ -1,49 +1,53 @@
-###Purpose
+##Purpose
 
+* To provide [GitHub](http://github.com) standardization across our apps for transactional saves with failOnError:true. 
+* A clean standard way to abstract boiler plate business logic from the controller for binding with json and maps into a service bean. 
+* proving Restful actions similiar to what is in 2.3 versions of grails. 
 
-To proved [GitHub](http://github.com) standardization across our apps for transactional saves with failOnError:true. 
-It also provides a clean standard way to abstract boiler plate code from the controller as well as proving Restful actions similiar to what is in the new 2.3 versions of grails. 
 Since we were setting up a bunch of services that looked a lot like the old school Dao's. We figured we should just call them that. 
 
 If you are using envers or cascade saves then we want the saves and updates to be in a transaction by default and a proper thrown error to cause a roll back of all the changes. Not something you get with failOnError:false.
 
-**Example of the issue:** With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in  when new Child saved and blew up and the Parent changes stay. We have a good example if this issue in the demo-app under test
+**Example of the issue:** With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in  when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
 
-###Keeping it dry
+###To keep it dry
 
 We were also seeing a lot of repetition in code that replaced the actions of a scaffolded controller. Especially the update action
 This is what the update action is in the default controller and there is now good way to reuse the core logic
 
-	def update = {
-       def ${propertyName} = ${className}.get(params.id)
-       if (${propertyName}) {
-           if (params.version) {
-               def version = params.version.toLong()
-               if (${propertyName}.version > version) {
-                   <% def lowerCaseName = grails.util.GrailsNameUtils.getPropertyName(className) %>
-                   ${propertyName}.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: '${domainClass.propertyName}.label', default: '${className}')] as Object[], "Another user has updated this ${className} while you were editing")
-                   render(view: "edit", model: [${propertyName}: ${propertyName}])
-                   return
-               }
-           }
-           ${propertyName}.properties = params
-           if (!${propertyName}.hasErrors() && ${propertyName}.save(flush: true)) {
-               flash.message = "\${message(code: 'default.updated.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-               redirect(action: "show", id: ${propertyName}.id)
-           }
-           else {
-               render(view: "edit", model: [${propertyName}: ${propertyName}])
-           }
-       }
-       else {
-           flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-           redirect(action: "list")
-       }
+```groovy
+def update = {
+  def ${propertyName} = ${className}.get(params.id)
+     if (${propertyName}) {
+         if (params.version) {
+             def version = params.version.toLong()
+             if (${propertyName}.version > version) {
+                 <% def lowerCaseName = grails.util.GrailsNameUtils.getPropertyName(className) %>
+                 ${propertyName}.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: '${domainClass.propertyName}.label', default: '${className}')] as Object[], "Another user has updated this ${className} while you were editing")
+                 render(view: "edit", model: [${propertyName}: ${propertyName}])
+                 return
+             }
+         }
+         ${propertyName}.properties = params
+         if (!${propertyName}.hasErrors() && ${propertyName}.save(flush: true)) {
+             flash.message = "\${message(code: 'default.updated.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
+             redirect(action: "show", id: ${propertyName}.id)
+         }
+         else {
+             render(view: "edit", model: [${propertyName}: ${propertyName}])
+         }
+     }
+     else {
+         flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
+         redirect(action: "list")
+     }
    }
+}
+```
 
 With this plugin and a controller you can just do:
 
-```
+```groovy
 def update(){
   try{
     def result = YourDomainClass.update(p)

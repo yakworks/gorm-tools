@@ -1,0 +1,49 @@
+[
+  ["like","refnum","123%"],
+  ["eq","customer.id",101],
+  ["in","status.id",[1,2,3]]
+  ["or",[
+  ]
+    "isNull":"closed",
+    "eq":{"closed":0}
+  },
+  "order":{"id":"ASC"}
+]
+
+"status":{"id":[1,2,3]}
+
+{
+  "ponum":"abc", /* if its a single value eq is default */
+  "reconciled":true, /* boolean */
+  "tranDate":"2012-04-23T00:00:00.000Z", /* date */
+  "customer.id":101, 
+  "customerId":101, /* or like this should work */
+  "customer":{"id":101}, /* or object way */
+  "customer":{
+    "or":{
+      "name":["ilike()","wal%"],
+      "num":["ilike()","wal%"]
+    }
+  }, 
+  "or":{
+    "customer.name":["ilike()","wal%"],
+    "customer.num":["ilike()","wal%"]
+  },
+  "customer":{"id":101}, /* shortcut above for  */
+  "docType":["PA","CM"], /* an array means it will use in/inList */
+  "docType":"PA,CM", /* this should work too */
+  "docType":["in()",["PA","CM"]], /* the above ins would be a short cut for this*/
+  "tranType.id":["not in()",[1,2,3]],/* will translate to "not{ in("tranType.id",[1,2,3])]" */
+  "refnum":["ilike()","123%"], /* pass object if its a different criteria */
+  "amount":["between()",0,100], /* between value */
+  "oldAmount":["gt()","origAmount"], /* greater than value */
+  "amount":["ne()",50], /*not equal*/
+  "status.id":[1,2,3], /* an array means it will use in/inList */
+  "status":[{"id":1},{"id":2},{"id":3}], /* an array means it will use in/inList */
+  "or":{
+    "closed[0]":["isNull()"], /* translates to isNull*/
+    "closed[1]":0
+  },
+  "order()":{"id":"ASC"},
+  "order()":{"id":"ASC"}
+}

@@ -28,6 +28,7 @@ public interface GrailsDaoClass extends InjectableGrailsClass {
     /**
      * Check if the service class can use the named DataSource.
      * @param name the name
+     * @return true if uses
      */
     boolean usesDatasource(String name);
 

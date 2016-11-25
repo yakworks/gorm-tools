@@ -15,7 +15,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
 
-class RestDaoController<T> extends RestfulController<T> {
+abstract class RestDaoController<T> extends RestfulController<T> {
     //Responce formats, json - by default
     static responseFormats = ['json', 'xml']
 
@@ -123,14 +123,8 @@ class RestDaoController<T> extends RestfulController<T> {
         }
 
         deleteResource(params)
+        respond instance, [status: OK]
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [classMessageArg, instance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT } // NO CONTENT STATUS CODE
-        }
     }
 
     /**

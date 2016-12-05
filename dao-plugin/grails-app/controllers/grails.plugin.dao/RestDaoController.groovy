@@ -36,6 +36,34 @@ abstract class RestDaoController<T> extends RestfulController<T> {
     }
 
     /**
+     * Lists all resources with paging
+     *
+     * @param max The maximum
+     * @return A list of resources
+     */
+    def index(Integer max) {
+        params.max = max
+        Pager pager = new Pager(params)
+        def json = pager.setupData(listAllResources(params)).jsonData
+        respond json
+    }
+
+
+    /**
+     * List all of resource based on parameters
+     *
+     * @return List of resources or empty if it doesn't exist
+     */
+    protected List<T> listAllResources(Map params) {
+        def crit = domainClass.createCriteria()
+        def pager = new Pager(params)
+        def datalist = crit.list(max: pager.max, offset: pager.offset) {
+            if (params.sort)
+                order(params.sort, params.order)
+        }
+        return datalist
+    }
+    /**
      * Saves a resource
      */
     @Override

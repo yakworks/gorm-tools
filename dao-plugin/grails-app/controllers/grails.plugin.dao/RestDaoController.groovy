@@ -18,6 +18,8 @@ import static org.springframework.http.HttpStatus.OK
 abstract class RestDaoController<T> extends RestfulController<T> {
     //Responce formats, json - by default
     static responseFormats = ['json', 'xml']
+	ErrorMessageService errorMessageService
+    TemplateEngine templateEngine
 
     RestDaoController(Class<T> domainClass) {
         this(domainClass, false)
@@ -63,36 +65,53 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         }
         return datalist
     }
+
+	def saveOrUpdate() {
+		if(handleReadOnly()) {
+			return
+		}
+		def result
+		try {
+			result = params.id ? updateDomain() : insertDomain()
+            request.withFormat {
+                '*' {
+                    response.addHeader(HttpHeaders.LOCATION,
+                            grailsLinkGenerator.link( resource: this.controllerName, action: 'show',id: result.entity.id, absolute: true,
+                                    namespace: hasProperty('namespace') ? this.namespace : null ))
+                    respond result.entity, [status: (params.id ? CREATED: OK)]
+                }
+            }
+
+		} catch (Exception e){
+			log.error("saveOrUpdate with error: $e.message", e)
+			def errResponse = errorMessageService.buildErrorResponse(e)
+			response.status = errResponse.code
+			def obj
+			if (errResponse.code == 422){
+				obj = errResponse.errors
+			}
+
+			request.withFormat {
+				'*' {
+					respond obj, model: [text: e.message, errors: errResponse.errors], status: errResponse.code
+				}
+			}
+		}
+	}
+
+	def insertDomain(){
+		dao.insert(request.JSON)
+	}
+
+	def updateDomain(){
+		dao.update(fullParams(params, request))
+	}
     /**
      * Saves a resource
      */
     @Override
     def save() {
-        if(handleReadOnly()) {
-            return
-        }
-        def result
-        try {
-            result = dao.insert(request.JSON)
-        } catch (DomainException de) {
-            respond de.errors, view:'create'
-            return
-        }
-
-        T instance = result.entity
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [classMessageArg, instance.id])
-                redirect instance
-            }
-            '*' {
-                response.addHeader(HttpHeaders.LOCATION,
-                        grailsLinkGenerator.link( resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: CREATED, view:'show']
-            }
-        }
+        saveOrUpdate()
     }
 
     /**
@@ -101,37 +120,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
      */
     @Override
     def update() {
-        if(handleReadOnly()) {
-            return
-        }
-
-        T instance = queryForResource(params.id)
-
-        if (instance == null) {
-            notFound()
-            return
-        }
-        def result
-        try {
-            result = dao.update(fullParams(params, request))
-        } catch (DomainException de) {
-            respond de.errors, view:'edit'
-            return
-        }
-
-        instance = result.entity
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [classMessageArg, instance.id])
-                redirect instance
-            }
-            '*'{
-                response.addHeader(HttpHeaders.LOCATION,
-                        grailsLinkGenerator.link( resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: OK]
-            }
-        }
+        saveOrUpdate()
     }
 
     /**
@@ -166,9 +155,13 @@ abstract class RestDaoController<T> extends RestfulController<T> {
     }
 
 
-    def  fullParams(params, request) {
+    def fullParams(params, request) {
         def p = new HashMap(JSON.parse(request))
         p.id = params.id
         p
+    }
+
+    protected renderNotFound(String template) {
+        render view: "../dao/notFound", model: [message: e.message]
     }
 }

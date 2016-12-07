@@ -49,7 +49,7 @@ class DaoUtil implements ApplicationContextAware
 	*/
 	static void checkFound(entity, Map params,String domainClassName){
 		if (!entity) {
-			throw new DomainException(DaoMessage.notFound(domainClassName,params), null)
+			throw new DomainNotFoundException(DaoMessage.notFound(domainClassName,params))
 		}
 	}
 

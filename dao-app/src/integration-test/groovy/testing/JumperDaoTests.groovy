@@ -2,9 +2,6 @@ package testing
 
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import org.springframework.validation.Errors
-import grails.test.*
-import grails.plugin.dao.*
 import spock.lang.Specification
 
 @Integration
@@ -21,9 +18,11 @@ class JumperDaoTests extends Specification {
 	}
 	
 	void testNonTranDao(){
-		println "testSave"
+		when:
 		def dom = new Jumper(name:"testSave")
-		assert dom.persist()
+		then:
+		dom.persist([flush: true])
+		dom.id != null
 	}
 
 

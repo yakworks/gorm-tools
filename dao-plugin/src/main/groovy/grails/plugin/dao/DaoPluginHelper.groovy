@@ -44,16 +44,6 @@ class DaoPluginHelper {
 		//DaoUtils.ctx = application.mainContext*/
 	}
 
-	static def doWithDynamicMethods(grailsApplication, ctx) {
-		//DaoUtils.ctx = ctx
-		//force initialization of domain meta methods
-		//forceInitGormMethods(application)
-
-		modifyDomainsClasses(grailsApplication,ctx)
-
-	}
-
-
 	static void onChange(event, grailsApplication){
 		if (!event.source || !event.ctx) {
 			return
@@ -71,9 +61,6 @@ class DaoPluginHelper {
 			def context = event.ctx
 			context.registerBeanDefinition("${daoClass.fullName}DaoClass", beans.getBeanDefinition("${daoClass.fullName}DaoClass"))
 			context.registerBeanDefinition("${daoClass.propertyName}", beans.getBeanDefinition("${daoClass.propertyName}"))
-		}
-		else if (grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, event.source)) {
-			addNewPersistenceMethods(event.source,event.ctx)
 		}
 	}
 
@@ -138,51 +125,6 @@ class DaoPluginHelper {
 		}
 	}
 
-	static def modifyDomainsClasses(GrailsApplication grailsApplication, ApplicationContext ctx){
-		for (GrailsDomainClass dc in grailsApplication.domainClasses) {
-			//forceInitGormMethods(dc.clazz)
-			//MetaClass mc = dc.metaClass
-			addNewPersistenceMethods(dc, ctx)
-		}
-	}
-
-	static def addNewPersistenceMethods(GrailsDomainClass dc, ApplicationContext ctx) {
-		def metaClass = dc.metaClass
-		//def origSaveArgs = dc.clazz.metaClass.getMetaMethod('save', Map)
-		def dao = figureOutDao( dc, ctx)
-
-		//TODO refactor this out as its copy pasted code for each method
-		metaClass.persist = {Map args ->
-			args['failOnError'] = true
-			dao.save(delegate,args)
-		}
-
-		metaClass.persist = {->
-			dao.save(delegate)
-		}
-
-		metaClass.remove = {->
-			dao.delete(delegate)
-		}
-
-		metaClass.static.insert = { Map params ->
-			dao.insert(params)
-		}
-
-		metaClass.static.update = { Map params ->
-			dao.update(params)
-		}
-
-		metaClass.static.remove = { Map params ->
-			dao.remove(params)
-		}
-
-		metaClass.static.getDao = { ->
-			return dao
-		}
-
-
-	}
 
 	static def figureOutDao(GrailsDomainClass dc, ctx){
 		def domainClass = dc.clazz

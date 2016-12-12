@@ -25,11 +25,6 @@ class DaoGrailsPlugin extends grails.plugins.Plugin {
 		closure.call()
 	}}
 
-	@Override
-	void doWithDynamicMethods(){
-		DaoPluginHelper.doWithDynamicMethods(grailsApplication, getApplicationContext())
-	}
-    //def doWithDynamicMethods = DaoPluginHelper.doWithDynamicMethods
 
 	@Override
     void onChange(Map<String,Object> event) {

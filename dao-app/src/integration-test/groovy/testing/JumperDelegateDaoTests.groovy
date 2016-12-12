@@ -2,10 +2,6 @@ package testing
 
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import org.springframework.validation.Errors
-import grails.test.*
-import org.junit.*
-import grails.plugin.dao.*
 import spock.lang.Specification
 
 @Integration

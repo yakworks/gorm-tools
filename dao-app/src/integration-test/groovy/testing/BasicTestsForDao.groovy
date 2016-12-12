@@ -1,10 +1,8 @@
-package grails.plugin.dao
+package testing
 
-import org.springframework.validation.Errors
-import grails.test.*
-import grails.plugin.dao.*
+import grails.plugin.dao.DaoUtil
+import grails.plugin.dao.DomainException
 import spock.lang.Specification
-import testing.*
 
 class BasicTestsForDao extends Specification {
 

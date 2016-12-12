@@ -25,10 +25,7 @@ class ErrorMessageService {
 	 */
 	Map buildErrorResponse(e) {
 		int code = 500
-		if (e instanceof DomainNotFoundException){
-			code = 404
-		}
-		if (code != 404 && (e instanceof ValidationException || e instanceof ConstraintViolationException)) {
+		if (e instanceof ValidationException || e instanceof ConstraintViolationException) {
 			code = 422
 		}
 
@@ -46,7 +43,31 @@ class ErrorMessageService {
 				"messageCode": e.hasProperty('messageMap') ? e.messageMap.code : 0,
 				"errors": [:]
 		]
-		errMap.errors = e.errors
+		if (e.hasProperty('errors') && e.hasProperty("entity") && e.entity?.errors) {
+			errMap.errors = e.entity.errors.fieldErrors.groupBy {
+				GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+			}.each {
+				it.value = it.value.collectEntries {
+					[(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+				}
+			}
+		} else if (e.hasProperty('errors') && !e.hasProperty("entity") ) {
+			errMap.errors = e.errors.fieldErrors.groupBy {
+				GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+			}.each {
+				it.value = it.value.collectEntries {
+					[(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+				}
+			}
+		}
+		if (e.hasProperty('entity')) {
+			BatchUpdateException core = causes.find { it instanceof BatchUpdateException }
+			def num = e.entity.hasProperty('num') ? e.entity.num : null
+			if (core && core.message.startsWith('Duplicate entry') && num && core.message.contains(num)) {
+				errMap.errors = errMap.errors ?: [:]
+				errMap.errors.num = 'Duplicate entry'
+			}
+		}
 		return errMap
 	}
 

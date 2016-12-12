@@ -1,4 +1,4 @@
-package grails.plugin.dao
+package testing
 
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback

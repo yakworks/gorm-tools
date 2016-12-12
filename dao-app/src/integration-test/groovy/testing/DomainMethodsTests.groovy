@@ -1,18 +1,12 @@
-package grails.plugin.dao
+package testing
 
+import grails.plugin.dao.DaoUtil
+import grails.plugin.dao.DomainException
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import org.springframework.dao.InvalidDataAccessApiUsageException
-import org.springframework.validation.Errors
-import grails.test.*
-import grails.plugin.dao.*
-import spock.lang.Specification
-import testing.*
 import grails.validation.ValidationException
 import org.springframework.dao.DataAccessException
-import org.springframework.dao.DataIntegrityViolationException
-import org.junit.*
-
+import spock.lang.Specification
 
 //tests the persist and remove methods
 @Integration
@@ -46,8 +40,12 @@ class DomainMethodsTests extends Specification //FIXME extends BasicTestsForDao
 	}
 	
 	void testPersist(){
+		setup:
+		initData()
+		when:
 		def check = Jumper.findByName("jumper1")
-		assert check.name == "jumper1"
+		then:
+		check.name == "jumper1"
 	}
 	
 	void testRemove(){
@@ -123,7 +121,7 @@ class DomainMethodsTests extends Specification //FIXME extends BasicTestsForDao
 		println "testInsert"
 		then:
 		try{
-			def result = Jumper.insert([name:"testInsert"])
+			def result = Jumper.insertAndSave([name:"testInsert"])
 			DaoUtil.flushAndClear()
 			assert result.entity 
 			"testInsert" == result.entity.name

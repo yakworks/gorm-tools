@@ -19,7 +19,6 @@ abstract class RestDaoController<T> extends RestfulController<T> {
     //Responce formats, json - by default
     static responseFormats = ['json', 'xml']
 	ErrorMessageService errorMessageService
-    TemplateEngine templateEngine
 
     RestDaoController(Class<T> domainClass) {
         this(domainClass, false)
@@ -70,9 +69,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
 		if(handleReadOnly()) {
 			return
 		}
-		def result
-		try {
-			result = params.id ? updateDomain() : insertDomain()
+		Map result = params.id ? updateDomain() : insertDomain()
             request.withFormat {
                 '*' {
                     response.addHeader(HttpHeaders.LOCATION,
@@ -81,22 +78,6 @@ abstract class RestDaoController<T> extends RestfulController<T> {
                     respond result.entity, [status: (params.id ? CREATED: OK)]
                 }
             }
-
-		} catch (Exception e){
-			log.error("saveOrUpdate with error: $e.message", e)
-			def errResponse = errorMessageService.buildErrorResponse(e)
-			response.status = errResponse.code
-			def obj
-			if (errResponse.code == 422){
-				obj = errResponse.errors
-			}
-
-			request.withFormat {
-				'*' {
-					respond obj, model: [text: e.message, errors: errResponse.errors], status: errResponse.code
-				}
-			}
-		}
 	}
 
 	def insertDomain(){
@@ -161,7 +142,16 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         p
     }
 
-    protected renderNotFound(String template) {
-        render view: "../dao/notFound", model: [message: e.message]
+    def handleDomainNotFoundException(DomainNotFoundException e){
+		render view: "../dao/notFound.gson", [text: e.message]
+	}
+
+    def handleException(Exception e){
+        def ent = e.entity
+        def errResponse = errorMessageService.buildErrorResponse(e)
+        response.status = errResponse.code
+        request.withFormat {
+            '*' {respond ent, model: [errors: errResponse.errors], status: errResponse.code}
+        }
     }
 }

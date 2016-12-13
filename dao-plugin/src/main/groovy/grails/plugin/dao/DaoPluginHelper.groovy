@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsDomainClass
 import grails.transaction.Transactional
@@ -14,7 +15,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 import java.lang.reflect.Method
 
 class DaoPluginHelper {
-	static def artefacts = [new DaoArtefactHandler()]
+	static List<ArtefactHandler> artefacts = [new DaoArtefactHandler()]
 
 	static Closure doWithSpring = {
 		gormDaoBeanNonTransactional(grails.plugin.dao.GormDaoSupport) { bean ->

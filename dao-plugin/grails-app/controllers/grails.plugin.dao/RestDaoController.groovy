@@ -75,7 +75,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
                     response.addHeader(HttpHeaders.LOCATION,
                             grailsLinkGenerator.link( resource: this.controllerName, action: 'show',id: result.entity.id, absolute: true,
                                     namespace: hasProperty('namespace') ? this.namespace : null ))
-                    respond result.entity, [status: (params.id ? CREATED: OK)]
+                    respond result.entity, [status: (params.id ? OK: CREATED)]
                 }
             }
 	}
@@ -142,16 +142,5 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         p
     }
 
-    def handleDomainNotFoundException(DomainNotFoundException e){
-		render view: "../dao/notFound.gson", [text: e.message]
-	}
 
-    def handleException(Exception e){
-        def ent = e.entity
-        def errResponse = errorMessageService.buildErrorResponse(e)
-        response.status = errResponse.code
-        request.withFormat {
-            '*' {respond ent, model: [errors: errResponse.errors], status: errResponse.code}
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import grails.core.ArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
 import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
@@ -16,8 +17,8 @@ class DaoGrailsPlugin extends grails.plugins.Plugin {
         "file:./plugins/*/grails-app/dao/**/*Dao.groovy",
         "file:./plugins/*/grails-app/services/**/*Dao.groovy"
     ]
-	
-	def artefacts = DaoPluginHelper.artefacts
+
+	List<ArtefactHandler> artefacts = DaoPluginHelper.artefacts
 
     Closure doWithSpring() {{->
 		Closure closure = DaoPluginHelper.doWithSpring

@@ -1,7 +1,6 @@
 package daoapp
 
 class OrgController {
-	def scaffold = Org
 	def orgDao
     //def index = { }
 

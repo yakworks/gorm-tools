@@ -98,6 +98,11 @@ Every domain gets a dao which is either setup for you or setup by extending e [G
 
 see TODO after code reorg
 
+###Grails 3:
+Dynamic methods were implemented with trait instead of meta programing, so now `@CompileStatic` can be used.
+Due to this changes static method `insert` for domain objects was renamed to `insertAndSave`, because domain class instances
+already have `insert` method and we can't have both static and instance methods with same list of args.
+
 
 More Examples
 =====

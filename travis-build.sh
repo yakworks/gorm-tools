@@ -4,6 +4,8 @@ echo "### Running tests"
 
 cd dao-app && ./gradlew test
 
+echo "### Running publishing"
+
 if [[ $TRAVIS_BRANCH == 'grails3' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
 	echo "### publishing plugin to bintray"
 	gradle bintrayUpload

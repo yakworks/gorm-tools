@@ -68,7 +68,7 @@ grailsPublish {
 	repo = 'grails-plugins' //the repository you setup in bintray
 	bintray {
 		//override plufin only if it is snapshot
-		override = rootProject.version.endsWith("SNAPSHOT")
+		override = rootProject.version.endsWith("SNAPSHOT1")
 	}
 	//user = 'user' <- pulled from either BINTRAY_USER sys prop or project.bintrayUser which can be in ~/.gradle/gradle.properties
 	//key = 'key' <- pulled from either BINTRAY_KEY sys prop or project.bintrayKey which can be in ~/.gradle/gradle.properties

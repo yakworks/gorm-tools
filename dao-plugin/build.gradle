@@ -6,6 +6,7 @@ buildscript {
 	dependencies {
 		classpath "org.grails:grails-gradle-plugin:$grailsVersion"
 		classpath "org.grails.plugins:views-gradle:1.2.0.M2"
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
 	}
 }
 
@@ -65,6 +66,10 @@ grailsPublish {
 	title = 'Dao plugin'
 	userOrg = '9ci' //the Org to publish this under in
 	repo = 'grails-plugins' //the repository you setup in bintray
+	bintray {
+		//override plufin only if it is snapshot
+		override = rootProject.version.endsWith("SNAPSHOT")
+	}
 	//user = 'user' <- pulled from either BINTRAY_USER sys prop or project.bintrayUser which can be in ~/.gradle/gradle.properties
 	//key = 'key' <- pulled from either BINTRAY_KEY sys prop or project.bintrayKey which can be in ~/.gradle/gradle.properties
 }

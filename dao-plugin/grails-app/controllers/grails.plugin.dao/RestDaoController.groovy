@@ -114,12 +114,6 @@ abstract class RestDaoController<T> extends RestfulController<T> {
             return
         }
 
-        def instance = queryForResource(params.id)
-        if (instance == null) {
-            notFound()
-            return
-        }
-
         deleteResource(params)
         respond instance, [status: OK]
 

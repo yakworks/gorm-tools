@@ -2,14 +2,17 @@ language: groovy
 
 jdk:
   - oraclejdk8
+  
 sudo: false
 
 cache:
   directories:
-  - $HOME/.m2
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "$HOME/.m2/"
 
 
 before_script:
- - rm -rf dao-app/.gradle
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 
 script: "./travis-build.sh"

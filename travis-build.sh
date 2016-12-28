@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 echo "### Running tests"
 
 cd dao-app && ./gradlew test

@@ -1,20 +1,25 @@
 package grails.plugin.dao
 
+import grails.core.GrailsApplication
 import grails.util.GrailsNameUtils
 import grails.util.Holders
+import groovy.transform.CompileStatic
+import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.gorm.GormEntity
 
-trait DaoDomainTrait {
-	static def getDao() {
-		def grailsApplication = Holders.grailsApplication
-		def domainName = this.name
-		Class domainClass = grailsApplication.getDomainClass(domainName).clazz
-		def daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
-		def dao
+@CompileStatic
+trait DaoDomainTrait<D extends GormEntity> {
+
+	static GormDaoSupport<D> getDao() {
+		GrailsApplication grailsApplication = Holders.grailsApplication
+		String domainName = this.name
+		Class domainClass = grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domainName).clazz
+		String daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
+		GormDaoSupport<D> dao
 		if(grailsApplication.mainContext.containsBean(daoName)){
-			dao = grailsApplication.mainContext.getBean(daoName)
+			dao = (GormDaoSupport<D>)grailsApplication.mainContext.getBean(daoName)
 		}else{
-			dao = grailsApplication.mainContext.getBean("gormDaoBean")
+			dao = (GormDaoSupport)grailsApplication.mainContext.getBean("gormDaoBean")
 			dao.domainClass = domainClass
 		}
 		if(!dao){
@@ -23,28 +28,28 @@ trait DaoDomainTrait {
 		return dao
 	}
 
-	def persist(Map args){
+	D persist(Map args){
 		args['failOnError'] = true
-		dao.save(this, args)
+		getDao().save((D)this, args)
 	}
 
-	def persist(){
-		dao.save(this)
+	D persist(){
+		getDao().save((D)this)
 	}
 
-	def remove(){
-		dao.delete(this)
+	void remove(){
+		getDao().delete((D)this)
 	}
 
-	static def insertAndSave(Map params){
-		dao.insert(params)
+	static Map<String, Object> insertAndSave(Map params){
+		getDao().insert(params)
 	}
 
-	static def update(Map params){
-		dao.update(params)
+	static Map<String, Object> update(Map params){
+		getDao().update(params)
 	}
 
-	static def remove(Map params){
-		dao.remove(params)
+	static Map<String, Object> remove(Map params){
+		getDao().remove(params)
 	}
 }

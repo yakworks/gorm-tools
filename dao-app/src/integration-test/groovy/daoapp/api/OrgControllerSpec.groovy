@@ -1,7 +1,5 @@
 package daoapp.api
 
-import daoapp.Org
-import grails.plugin.dao.DaoUtil
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
 import grails.test.mixin.integration.Integration
@@ -11,12 +9,6 @@ import spock.lang.Specification
 
 @Integration
 class OrgControllerSpec extends Specification {
-
-    def setup() {
-    }
-
-    def cleanup() {
-    }
 
     @Shared
     RestBuilder rest = new RestBuilder()

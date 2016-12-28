@@ -1,13 +1,18 @@
 package daoapp
 
+import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.GormDaoSupport
 import grails.transaction.Transactional
+import groovy.transform.CompileDynamic
 
 @Transactional
-class OrgDao extends GormDaoSupport{
+@GrailsCompileStatic
+class OrgDao extends GormDaoSupport<Org> {
 	Class domainClass = Org
-	
-	Map insert(params){
+
+	@CompileDynamic
+	@Override
+	Map insert(Map params){
 		def madeNameDefault
 		if(!params.name){
 			params.name = "default"

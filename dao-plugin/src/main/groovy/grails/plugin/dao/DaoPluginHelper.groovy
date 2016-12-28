@@ -2,6 +2,7 @@ package grails.plugin.dao
 
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
+import grails.core.GrailsClass
 import grails.core.GrailsDomainClass
 import grails.transaction.Transactional
 import org.grails.core.artefact.DomainClassArtefactHandler
@@ -45,13 +46,13 @@ class DaoPluginHelper {
 		//DaoUtils.ctx = application.mainContext*/
 	}
 
-	static void onChange(event, grailsApplication){
+	static void onChange(event, GrailsApplication grailsApplication){
 		if (!event.source || !event.ctx) {
 			return
 		}
 		if (grailsApplication.isArtefactOfType(DaoArtefactHandler.TYPE, event.source)) {
 
-			def daoClass = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, event.source)
+			GrailsClass daoClass = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, event.source)
 
 			def beans = beans {
 				Closure closure = configureDaoBeans
@@ -66,7 +67,7 @@ class DaoPluginHelper {
 	}
 
 	//Copied much of this from grails source ServicesGrailsPlugin
-	static Closure configureDaoBeans = {GrailsDaoClass daoClass, grailsApplication ->
+	static Closure configureDaoBeans = {GrailsDaoClass daoClass, GrailsApplication grailsApplication ->
 		def scope = daoClass.getPropertyValue("scope")
 
 		def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
@@ -79,7 +80,7 @@ class DaoPluginHelper {
 		}
 
 		if (shouldCreateTransactionalProxy(daoClass)) {
-			def props = new Properties()
+			Properties props = new Properties()
 			String attributes = 'PROPAGATION_REQUIRED'
 			String datasourceName = daoClass.datasource
 			String suffix = datasourceName == GrailsDaoClass.DEFAULT_DATA_SOURCE ? '' : "_$datasourceName"

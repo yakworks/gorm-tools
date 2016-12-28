@@ -17,7 +17,8 @@
 package grails.plugin.dao;
 
 
-import grails.core.ArtefactHandlerAdapter;
+import grails.core.ArtefactHandlerAdapter
+import groovy.transform.CompileStatic;
 
 /**
  * Grails artefact handler for dao classes
@@ -25,23 +26,17 @@ import grails.core.ArtefactHandlerAdapter;
  * @author Joshua Burnett
  * based on the grails source ServiceArtefactHandler
  */
+@CompileStatic
 public class DaoArtefactHandler extends ArtefactHandlerAdapter {
 
 	public static final String TYPE = "Dao";
 	public static final String PLUGIN_NAME = "dao";
 
-	public DaoArtefactHandler() {
-		super(TYPE, GrailsDaoClass.class, DefaultGrailsDaoClass.class,
-				DefaultGrailsDaoClass.DAO, false);
+	DaoArtefactHandler() {
+		super(TYPE, GrailsDaoClass.class, DefaultGrailsDaoClass.class, DefaultGrailsDaoClass.DAO, false)
 	}
-/*
-public ServiceArtefactHandler() {
-    super(TYPE, GrailsServiceClass.class, DefaultGrailsServiceClass.class,
-            DefaultGrailsServiceClass.SERVICE, false);
-}
-*/
 
-	public String getPluginName() {
+	String getPluginName() {
 		return PLUGIN_NAME;
 	}
 

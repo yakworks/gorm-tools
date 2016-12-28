@@ -1,11 +1,6 @@
 package grails.plugin.dao
 
 import grails.core.ArtefactHandler
-import org.grails.core.artefact.DomainClassArtefactHandler
-import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
-import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
-import org.springframework.beans.factory.config.MethodInvokingFactoryBean
-import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 class DaoGrailsPlugin extends grails.plugins.Plugin {
 	def loadAfter = ['hibernate','datasources']

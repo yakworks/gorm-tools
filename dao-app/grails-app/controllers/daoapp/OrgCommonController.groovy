@@ -1,6 +1,6 @@
 package daoapp
 
-class OrgController {
+class OrgCommonController {
 	def orgDao
     //def index = { }
 

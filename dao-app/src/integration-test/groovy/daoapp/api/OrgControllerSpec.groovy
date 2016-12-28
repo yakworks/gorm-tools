@@ -119,6 +119,8 @@ class OrgControllerSpec extends Specification {
 
         then:
         response.status == 200
+        JSONElement json = response.json
+        json.id == 1
     }
 
 }

@@ -113,7 +113,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         if(handleReadOnly()) {
             return
         }
-
+        T instance = queryForResource(params.id)
         deleteResource(params)
         respond instance, [status: OK]
 

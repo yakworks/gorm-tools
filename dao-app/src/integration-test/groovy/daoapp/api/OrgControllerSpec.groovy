@@ -11,7 +11,7 @@ import spock.lang.Specification
 class OrgControllerSpec extends Specification {
 
     @Shared
-    RestBuilder rest = new RestBuilder()
+    RestBuilder rest = new RestBuilder(new org.springframework.web.client.RestTemplate())
 
     def getBaseUrl(){"http://localhost:${serverPort}/api"}
 

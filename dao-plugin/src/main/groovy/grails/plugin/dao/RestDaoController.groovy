@@ -1,20 +1,14 @@
 package grails.plugin.dao
 
+import grails.artefact.Artefact
 import grails.converters.JSON
-import grails.plugin.dao.DaoUtil
-import grails.plugin.dao.DomainException
 import grails.rest.RestfulController
-import grails.transaction.Transactional
-import grails.util.GrailsNameUtils
 import grails.web.http.HttpHeaders
-import grails.web.servlet.mvc.GrailsParameterMap
-import org.springframework.http.HttpStatus
 
 import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.NOT_FOUND
-import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
 
+@Artefact("Controller")
 abstract class RestDaoController<T> extends RestfulController<T> {
     //Responce formats, json - by default
     static responseFormats = ['json', 'xml']

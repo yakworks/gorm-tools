@@ -11,8 +11,7 @@ import spock.lang.Specification
 //tests the persist and remove methods
 @Integration
 @Rollback
-class DomainMethodsTests extends Specification //FIXME extends BasicTestsForDao
-{
+class DomainMethodsTests extends Specification {
 	//static transactional = false
 	static dataInit = false
 

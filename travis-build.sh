@@ -4,13 +4,13 @@ set -e
 
 echo "### Running tests"
 
-cd dao-app && ./gradlew test
+cd dao-app && ./gradlew check
 
 echo "### Running publishing"
 
 if [[ $TRAVIS_BRANCH == 'grails3' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
 	echo "### publishing plugin to bintray"
-	cd ../dao-plugin && ./gradlew bintrayUpload
+	cd ../dao-plugin && ./gradlew assemble check bintrayUpload
 
 else
   echo "TRAVIS_BRANCH: $TRAVIS_BRANCH"

@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/9ci/grails-dao.svg?branch=grails3)](https://travis-ci.org/9ci/grails-dao)
 ###Purpose
 
 
@@ -78,7 +79,7 @@ class OrgDao extends GormDaoSupport{
 	
 ###Dynamic methods added to the domains
 
-Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
+Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
 
 **persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a [DomainException](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
 
@@ -86,7 +87,7 @@ Every domain gets a dao which is either setup for you or setup by extending e [G
 
 ### Statics added to the domain
 
-**insert(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (esentially the persist()). **ex:** Book.insert([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
+**insertAndSave(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (esentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
 **update(params)**:  calls the dao.update which does the bolier plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a (DomainException)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
 
@@ -96,21 +97,55 @@ Every domain gets a dao which is either setup for you or setup by extending e [G
 
 ###DaoUtil and DaoMessage
 
-see TODO after code reorg
+See [DaoUtil](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy)
+
+####DaoUtil:
+
+**checkFound(entity, Map params,String domainClassName)** checks does the entity exists, if not throws DomainNotFoundException with human readable error text
+
+**checkVersion(entity,ver)** checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws DomainException
+
+**flush()** flushes the session
+
+**clear()** clears session cache
+
+**flushAndClear()** flushes the session and clears the session cache
+
+####DaoMessage contains bunch of help methods for creating text messages
+
+See [DaoMessage](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/DaoMessage.groovy)
 
 ###Grails 3:
 Dynamic methods were implemented with trait instead of meta programing, so now `@CompileStatic` can be used.
 Due to this changes static method `insert` for domain objects was renamed to `insertAndSave`, because domain class instances
 already have `insert` method and we can't have both static and instance methods with same list of args.
 
+###RestDaoController
+The plugin contains abstract RestDaoController that extends default Grails RestfulController and uses dao methods.
+
+**Example** To be able to use advantages of the dao plugin for REST apps, extend controller from RestDaoController:
+
+See [RestDaoController](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/RestDaoController.groovy)
+
+```
+class OrgController extends RestDaoController<Org> {
+	static responseFormats = ['json']
+	static namespace = "api"
+
+	OrgController() {
+		super(Org)
+	}
+}
+```
+
+If controller is extended for RestDaoController then methods will use dao services for current domain. For example
+POST action will call dao insert method for Org domain.
+
+
 
 More Examples
 =====
 ...
 
-TODOs
---------
-
-* take a look at the code in the new RestfulController in grails and see what we can do to keep thing similiar
 
 

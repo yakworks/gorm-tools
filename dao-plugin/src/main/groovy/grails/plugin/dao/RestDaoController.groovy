@@ -31,6 +31,20 @@ abstract class RestDaoController<T> extends RestfulController<T> {
     }
 
     /**
+     * Queries for a resource for the given id
+     *
+     * @param id The id
+     * @return The resource or null if it doesn't exist
+     */
+    @Override
+    protected T queryForResource(Serializable id) {
+        T entity = resource.get(id)
+        DaoUtil.checkFound(entity, [id: id], resource.name)
+        entity
+
+    }
+
+    /**
      * Lists all resources with paging
      *
      * @param max The maximum
@@ -69,7 +83,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
                     response.addHeader(HttpHeaders.LOCATION,
                             grailsLinkGenerator.link( resource: this.controllerName, action: 'show',id: result.entity.id, absolute: true,
                                     namespace: hasProperty('namespace') ? this.namespace : null ))
-                    respond result.entity, [status: (params.id ? OK: CREATED)]
+                    respond result.entity, [status: (params.id ? OK : CREATED)]
                 }
             }
 	}
@@ -130,5 +144,17 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         p
     }
 
+    def handleDomainNotFoundException(DomainNotFoundException e){
+        response.status = 404
+        render([error: e.message] as JSON)
+    }
 
+    def handleException(Exception e){
+        def ent = e.entity
+        def errResponse = errorMessageService.buildErrorResponse(e)
+        response.status = errResponse.code
+        request.withFormat {
+            '*' {respond ent, model: [errors: errResponse.errors], status: errResponse.code}
+        }
+    }
 }

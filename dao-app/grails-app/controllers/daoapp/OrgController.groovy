@@ -1,8 +1,8 @@
 package daoapp
 
-class OrgCommonController {
+class OrgController {
+	static scaffold = Org
 	def orgDao
-    //def index = { }
 
 	def save(){
 		new Org(params).persist()

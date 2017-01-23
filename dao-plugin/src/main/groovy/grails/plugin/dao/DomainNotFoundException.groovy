@@ -13,4 +13,8 @@ class DomainNotFoundException extends DomainException {
 	public DomainNotFoundException(Map msgMap) {
 		super(msgMap, null,null,null)
 	}
+
+	//Override it for performence improvment, because filling in the stack trace is quit expensive
+	@Override
+	public synchronized Throwable fillInStackTrace(){}
 }

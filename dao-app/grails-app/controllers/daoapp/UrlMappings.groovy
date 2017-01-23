@@ -9,7 +9,7 @@ class UrlMappings {
             }
         }
 
-        "/"(controller: "orgCommon", action: "index")
+        "/"(controller: "org", action: "index")
         "500"(view:'/error')
         "404"(view:'/notFound')
         "/api/org"(resources: "org", namespace: "api")

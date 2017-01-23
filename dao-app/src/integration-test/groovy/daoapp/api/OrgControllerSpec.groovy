@@ -72,6 +72,17 @@ class OrgControllerSpec extends Specification {
         json.name == "Org#0"
     }
 
+    void "check GET for not found"() {
+        when:
+        RestResponse response = rest.get("${baseUrl}/org/500")
+
+        then:
+        response.status == 404
+        response.json != null
+        JSONElement json = response.json
+        json.error == "Org not found with id 500:\n"
+    }
+
     void "check POST request"() {
         when:
         RestResponse response = rest.post("${baseUrl}/org"){
@@ -87,7 +98,20 @@ class OrgControllerSpec extends Specification {
         json.name == "Test contact from Dao"
     }
 
+    void "check POST without name"() {
+        when:
+        RestResponse response = rest.post("${baseUrl}/org"){
+            json([
+                    lastName: "Test contact"
+            ])
+        }
 
+        then:
+        response.status == 201
+        response.json != null
+        JSONElement json = response.json
+        json.name == "default from Dao"
+    }
 
     void "check PUT request"() {
         when:
@@ -105,6 +129,21 @@ class OrgControllerSpec extends Specification {
         json.name == "new Test contact"
     }
 
+    void "check PUT for not exist"() {
+        when:
+        RestResponse response = rest.put("${baseUrl}/org/500"){
+            json([
+                    name: "new Test contact"
+            ])
+        }
+
+        then:
+        response.status == 404
+        response.json != null
+        JSONElement json = response.json
+        json.error == "Org not found with id 500:\n"
+    }
+
     void "check DELETE request"() {
         when:
         RestResponse response = rest.delete("${baseUrl}/org/1")
@@ -113,6 +152,17 @@ class OrgControllerSpec extends Specification {
         response.status == 200
         JSONElement json = response.json
         json.id == 1
+    }
+
+    void "check DELETE for not exist"() {
+        when:
+        RestResponse response = rest.delete("${baseUrl}/org/500")
+
+        then:
+        response.status == 404
+        response.json != null
+        JSONElement json = response.json
+        json.error == "Org not found with id 500:\n"
     }
 
 }

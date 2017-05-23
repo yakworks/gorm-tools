@@ -31,6 +31,8 @@ dependencyManagement {
 	applyMavenExclusions false
 }
 
+bootRepackage.enabled = false
+
 dependencies {
 	compile "org.springframework.boot:spring-boot-starter-logging"
 	compile "org.springframework.boot:spring-boot-autoconfigure"

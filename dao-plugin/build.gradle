@@ -10,7 +10,7 @@ buildscript {
 	}
 }
 
-version '3.0.2.SNAPSHOT'
+version '3.0.3.SNAPSHOT'
 group "org.grails.plugin"
 
 apply plugin: "eclipse"
@@ -24,11 +24,9 @@ repositories {
 	maven { url "https://repo.grails.org/grails/core" }
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.grails:grails-bom:$grailsVersion"
-	}
-	applyMavenExclusions false
+bootRun {
+	jvmArgs('-Dspring.output.ansi.enabled=always')
+	addResources = true
 }
 
 bootRepackage.enabled = false
@@ -38,7 +36,7 @@ dependencies {
 	compile "org.springframework.boot:spring-boot-autoconfigure"
 	compile "org.grails:grails-core"
 	compile "org.springframework.boot:spring-boot-starter-actuator"
-	compile "org.springframework.boot:spring-boot-starter-tomcat"
+	provided "org.springframework.boot:spring-boot-starter-tomcat"
 	compile "org.grails:grails-dependencies"
 	compile "org.grails:grails-web-boot"
 	compile "org.grails.plugins:cache"
@@ -75,3 +73,5 @@ grailsPublish {
 	//user = 'user' <- pulled from either BINTRAY_USER sys prop or project.bintrayUser which can be in ~/.gradle/gradle.properties
 	//key = 'key' <- pulled from either BINTRAY_KEY sys prop or project.bintrayKey which can be in ~/.gradle/gradle.properties
 }
+
+//javadoc.enabled = false

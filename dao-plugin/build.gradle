@@ -50,7 +50,7 @@ dependencies {
 	compile "org.grails.plugins:views-json:1.2.0.M2"
 	compile "org.grails.plugins:views-json-templates:1.2.0.M2"
 	provided "org.codehaus.groovy:groovy-ant"
-	testCompile "org.grails:grails-plugin-testing"
+	compile "org.grails:grails-plugin-testing"
 	testCompile "org.grails.plugins:geb"
 }
 

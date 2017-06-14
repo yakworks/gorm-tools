@@ -6,8 +6,12 @@ import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+import grails.transaction.Transactional
+import groovy.util.logging.Slf4j
 
 @GrailsCompileStatic
+@Transactional
+@Slf4j
 class GormDaoSupport<T extends GormEntity> {
 
 	boolean flushOnSave = false

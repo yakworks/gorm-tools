@@ -10,7 +10,7 @@ buildscript {
 	}
 }
 
-version '3.0.3.SNAPSHOT'
+version '3.0.3-SNAPSHOT'
 group "org.grails.plugin"
 
 apply plugin: "eclipse"
@@ -75,3 +75,15 @@ grailsPublish {
 }
 
 //javadoc.enabled = false
+
+publishing {
+    repositories {
+        maven {
+            url "http://repo.9ci.com/artifactory/grails-plugins"
+            credentials {
+                username "$artifactoryUsername"
+                password  "$artifactoryPassword"
+            }
+        }
+    }
+}

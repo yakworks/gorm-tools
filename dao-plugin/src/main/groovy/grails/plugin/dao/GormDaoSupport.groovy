@@ -11,7 +11,6 @@ import groovy.util.logging.Slf4j
 
 @GrailsCompileStatic
 @Transactional
-@Slf4j
 class GormDaoSupport<T extends GormEntity> {
 
 	boolean flushOnSave = false

@@ -1,17 +1,18 @@
 package grails.plugin.dao
 
 import grails.compiler.GrailsCompileStatic
+import grails.gorm.transactions.Transactional
+import grails.transaction.Transactional
 import grails.validation.ValidationException
+import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
-import grails.transaction.Transactional
-import groovy.util.logging.Slf4j
 
 @GrailsCompileStatic
 @Transactional
-class GormDaoSupport<T extends GormEntity> {
+class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	boolean flushOnSave = false
 	boolean fireEvents = true
@@ -63,13 +64,17 @@ class GormDaoSupport<T extends GormEntity> {
 	* @throws DomainException if a validation or DataAccessException error happens
 	*/
 	T save(T entity, Map args) {
+		return doSave(entity, args)
+	}
+
+	protected final T doSave(T entity, Map args) {
 		args['failOnError'] = true
 		try{
 			if(fireEvents) beforeSave(entity)
-			entity.save(args)
+			return entity.save(args)
 		}
 		catch (ValidationException ve){
-			if(ve instanceof DomainException) throw ve //if this is already fired 
+			if(ve instanceof DomainException) throw ve //if this is already fired
 			throw new DomainException(DaoMessage.notSaved(entity), entity, ve.errors, ve)
 		}
 		catch (DataAccessException dae) {
@@ -80,7 +85,6 @@ class GormDaoSupport<T extends GormEntity> {
 			//and save the default notSaved for when a validation occurs like above
 			throw new DomainException(DaoMessage.notSaved(entity), entity, dae) //make a DaoMessage.notSavedDataAccess
 		}
-		
 	}
 
 	/**
@@ -90,6 +94,10 @@ class GormDaoSupport<T extends GormEntity> {
 	* @throws DomainException if a spring DataIntegrityViolationException is thrown
 	*/
 	void delete(T entity){
+		doDelete(entity)
+	}
+
+	protected final void doDelete(T entity){
 		try {
 			if(fireEvents) beforeDelete(entity)
 			entity.delete(flush:true)
@@ -108,6 +116,10 @@ class GormDaoSupport<T extends GormEntity> {
 	* @throws DomainException if a validation error happens
 	*/
 	Map<String, Object> insert(Map params) {
+		return doInsert(params)
+	}
+
+	protected final Map<String, Object> doInsert(Map params) {
 		T entity = domainClass.newInstance()
 		entity.properties = params
 		if(fireEvents) beforeInsertSave(entity, params)
@@ -123,6 +135,10 @@ class GormDaoSupport<T extends GormEntity> {
 	* @throws DomainException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
 	*/
 	Map<String, Object> update(Map params){
+		return doUpdate(params)
+	}
+
+	protected final Map<String, Object> doUpdate(Map params){
 		T entity = load(params.id as Long)
 
 		DaoUtil.checkFound(entity, params, domainClass.name)
@@ -132,8 +148,8 @@ class GormDaoSupport<T extends GormEntity> {
 		if(fireEvents) beforeUpdateSave(entity, params)
 		save(entity)
 		return [ ok:true, entity: entity,message:DaoMessage.updated(entity)]
-
 	}
+
 
 	/**
 	* deletes a new domain entity base on the id in the params
@@ -142,6 +158,10 @@ class GormDaoSupport<T extends GormEntity> {
 	* @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
 	*/
 	Map remove(Map params){
+		return doRemove(params)
+	}
+
+	protected final Map doRemove(Map params){
 		T entity = load(params.id as Long)
 		DaoUtil.checkFound(entity, params, domainClass.name)
 		if(fireEvents) beforeRemoveSave(entity, params)
@@ -149,6 +169,7 @@ class GormDaoSupport<T extends GormEntity> {
 		delete(entity)
 		return [ok:true, id: params.id,message:msg]
 	}
+
 
 	@CompileDynamic
 	private T load(Long id) {

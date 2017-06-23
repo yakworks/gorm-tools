@@ -16,7 +16,7 @@ class OrgDelegateDao extends GormDaoSupport<Org>{
 		if(!params.name){
 			params.name = "default"
 		}
-		super.insert(params)
+		super.doInsert(params)
 	}
 }
 

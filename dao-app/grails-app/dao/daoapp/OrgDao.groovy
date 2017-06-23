@@ -20,7 +20,7 @@ class OrgDao extends GormDaoSupport<Org> {
 		if (params.name){
 			params.name += " from Dao"
 		}
-		super.insert(params)
+		super.doInsert(params)
 	}
 }
 

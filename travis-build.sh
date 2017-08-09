@@ -8,7 +8,7 @@ cd dao-app && ./gradlew check
 
 echo "### Running publishing"
 
-if [[ $TRAVIS_BRANCH == 'grails3' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
+if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
 	echo "### publishing plugin to bintray"
 	cd ../dao-plugin && ./gradlew assemble check bintrayUpload
 

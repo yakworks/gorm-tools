@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/9ci/grails-dao.svg?branch=grails3)](https://travis-ci.org/9ci/grails-dao)
+[![Build Status](https://travis-ci.org/9ci/grails-dao.svg?branch=master)](https://travis-ci.org/9ci/grails-dao)
 
 ### Purpose
 

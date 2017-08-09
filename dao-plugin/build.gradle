@@ -10,7 +10,7 @@ buildscript {
 	}
 }
 
-version '3.0.3-SNAPSHOT'
+version '3.0.3'
 group "org.grails.plugin"
 
 apply plugin: "eclipse"
@@ -78,6 +78,7 @@ grailsPublish {
 
 //javadoc.enabled = false
 
+/*
 publishing {
     repositories {
         maven {
@@ -89,3 +90,4 @@ publishing {
         }
     }
 }
+*/

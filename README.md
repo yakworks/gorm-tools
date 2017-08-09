@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/9ci/grails-dao.svg?branch=grails3)](https://travis-ci.org/9ci/grails-dao)
-###Purpose
+
+### Purpose
 
 * To provide [GitHub](http://github.com) standardization across our apps for transactional saves with failOnError:true.
 * A clean standard way to abstract boiler plate business logic from the controller for binding with json and maps into a service bean.
@@ -11,7 +12,7 @@ If you are using envers or cascade saves then we want the saves and updates to b
 
 **Example of the issue:** With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in  when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
 
-###To keep it dry
+### To keep it dry
 
 We were also seeing a lot of repetition in code that replaced the actions of a scaffolded controller. Especially the update action
 This is what the update action is in the default controller and there is now good way to reuse the core logic
@@ -81,7 +82,7 @@ class OrgDao extends GormDaoSupport{
 ```
 
 	
-###Dynamic methods added to the domains
+### Dynamic methods added to the domains
 
 Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
 
@@ -99,11 +100,11 @@ Every domain gets a dao which is either setup for you or setup by extending e [G
 
 **dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
 
-###DaoUtil and DaoMessage
+### DaoUtil and DaoMessage
 
 See [DaoUtil](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy)
 
-####DaoUtil:
+#### DaoUtil:
 
 **checkFound(entity, Map params,String domainClassName)** checks does the entity exists, if not throws DomainNotFoundException with human readable error text
 
@@ -115,17 +116,15 @@ See [DaoUtil](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main
 
 **flushAndClear()** flushes the session and clears the session cache
 
-####DaoMessage contains bunch of help methods for creating text messages
+#### DaoMessage contains bunch of help methods for creating text messages
 
 See [DaoMessage](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/DaoMessage.groovy)
 
-###Grails 3:
+### Grails 3:
 Dynamic methods were implemented with trait instead of meta programing, so now `@CompileStatic` can be used.
 Due to this changes static method `insert` for domain objects was renamed to `insertAndSave`, because domain class instances
 already have `insert` method and we can't have both static and instance methods with same list of args.
 
-###RestDaoController
-The plugin contains abstract RestDaoController that extends default Grails RestfulController and uses dao methods.
 
 **Example** To be able to use advantages of the dao plugin for REST apps, extend controller from RestDaoController:
 

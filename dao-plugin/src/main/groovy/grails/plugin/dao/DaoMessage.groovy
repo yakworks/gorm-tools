@@ -1,9 +1,11 @@
 package grails.plugin.dao
 
-import org.codehaus.groovy.grails.commons.GrailsClassUtils
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import grails.util.GrailsClassUtils
+import grails.util.GrailsNameUtils
+import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
+
 
 /**
 * A bunch of statics to support the GormDaoSupport.
@@ -20,7 +22,7 @@ class DaoMessage {
 	}
 	
 	static Map notFound(domainClassName,id) {
-		def domainLabel = GrailsClassUtils.getShortName(domainClassName)
+		def domainLabel = GrailsNameUtils.getShortName(domainClassName)
 		return [code:"default.not.found.message",args:[domainLabel,id],
 			defaultMessage:"${domainLabel} not found with id ${id}"]
 	}
@@ -87,7 +89,7 @@ class DaoMessage {
 	}
 	
 	static String resolveDomainLabel(entity){
-		return resolveMessage("${propName(entity.class.name)}.label", "${GrailsClassUtils.getShortName(entity.class.name)}")
+		return resolveMessage("${propName(entity.class.name)}.label", "${GrailsNameUtils.getShortName(entity.class.name)}")
 	}
 	
 	static String resolveMessage(code,defaultMsg){
@@ -106,7 +108,7 @@ class DaoMessage {
 	}
 
 	static String propName(String prop){
-		def cname = GrailsClassUtils.getShortName(prop)
+		def cname = GrailsNameUtils.getShortName(prop)
 		def firstCharString = cname.charAt(0).toLowerCase().toString()
 		cname = firstCharString + cname.substring(1)
 		return GrailsClassUtils.getPropertyForGetter(cname)?:cname

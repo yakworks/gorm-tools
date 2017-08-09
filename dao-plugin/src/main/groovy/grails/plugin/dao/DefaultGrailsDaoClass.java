@@ -15,7 +15,7 @@
  */
 package grails.plugin.dao;
 
-import org.codehaus.groovy.grails.commons.AbstractInjectableGrailsClass;
+import org.grails.core.AbstractInjectableGrailsClass;
 
 /**
  * @author Joshua Burnett

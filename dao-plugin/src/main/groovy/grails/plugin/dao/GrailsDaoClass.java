@@ -1,5 +1,7 @@
 package grails.plugin.dao;
-import org.codehaus.groovy.grails.commons.InjectableGrailsClass;
+
+import grails.core.InjectableGrailsClass;
+
 /**
  * @author Joshua Burnett
  * based on the grails source GrailsServiceClass
@@ -26,6 +28,7 @@ public interface GrailsDaoClass extends InjectableGrailsClass {
     /**
      * Check if the service class can use the named DataSource.
      * @param name the name
+     * @return true if uses
      */
     boolean usesDatasource(String name);
 

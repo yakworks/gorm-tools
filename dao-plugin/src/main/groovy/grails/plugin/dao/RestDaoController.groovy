@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import gorm.tools.Pager
 import grails.artefact.Artefact
 import grails.converters.JSON
 import grails.rest.RestfulController

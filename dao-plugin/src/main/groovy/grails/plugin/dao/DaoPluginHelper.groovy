@@ -43,6 +43,7 @@ class DaoPluginHelper {
 			closure.call(daoClass, grailsApplication)
 
 		}
+		DbDialectService.dialectName = application.config.hibernate.dialect
 
 		//DaoUtils.ctx = application.mainContext*/
 	}

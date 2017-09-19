@@ -1,4 +1,4 @@
-package grails.plugin.dao
+package gorm.tools
 
 import grails.core.GrailsApplication
 import grails.util.Holders

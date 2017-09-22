@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import gorm.tools.DbDialectService
 
 import java.lang.reflect.Method
 

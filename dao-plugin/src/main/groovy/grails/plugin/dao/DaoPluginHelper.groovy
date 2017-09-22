@@ -12,6 +12,7 @@ import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import gorm.tools.DbDialectService
 
 import java.lang.reflect.Method
 
@@ -35,6 +36,7 @@ class DaoPluginHelper {
 		}
 
 		daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
+
 		application.daoClasses.each {daoClass ->
 
 			Closure closure = configureDaoBeans
@@ -42,6 +44,7 @@ class DaoPluginHelper {
 			closure.call(daoClass, grailsApplication)
 
 		}
+		DbDialectService.dialectName = application.config.hibernate.dialect
 
 		//DaoUtils.ctx = application.mainContext*/
 	}
@@ -79,6 +82,11 @@ class DaoPluginHelper {
 			arguments = [DaoArtefactHandler.TYPE, daoClass.fullName]
 		}
 
+		//FIXME can't we get rid of this now? GRails doesn't do it in the services right?
+		//ALSO see here for how they do it
+		// https://github.com/grails/grails-data-mapping/blob/1b14ecf85b221fc78d363001ea960728d7902b45/grails-datastore-gorm-plugin-support/src/main/groovy/org/grails/datastore/gorm/plugin/support/SpringConfigurer.groovy#L102-L102
+        //Also see http://docs.grails.org/latest/guide/single.html#upgrading under "Spring Proxies for Services No Longer Supported"
+		//What does that mean for this here?
 		if (shouldCreateTransactionalProxy(daoClass)) {
 			Properties props = new Properties()
 			String attributes = 'PROPAGATION_REQUIRED'
@@ -134,51 +142,16 @@ class DaoPluginHelper {
 		//def daoType = GrailsClassUtils.getStaticPropertyValue(domainClass, "daoType")
 		def dao
 		//println "$daoType and $daoName for $domainClass"
-		//if(!daoType) {
 		if(ctx.containsBean(daoName)){
 			//println "found bean $daoName for $domainClass"
 			dao = ctx.getBean(daoName)
 		}else{
 			//println "getInstance for $domainClass"
-			//dao = GormDaoSupport.getInstance(domainClass)
 			dao = ctx.getBean("gormDaoBean")
 			dao.domainClass = domainClass
-		}
-		// }else{
-		// 	if("transactional" == daoType){
-		// 		//println "setting transactional bean  for $domainClass"
-		// 		dao = ctx.getBean("gormDaoBean")
-		// 		dao.domainClass = domainClass
-		// 	}
-		// 	else if(ctx.containsBean(daoType)){
-		// 		dao = ctx.getBean(daoType)
-		// 	}
-		// }
-		//if its still null then default it to a new instance
-		if(!dao){
-			//log.error "something went wrong trying to setup dao for ${dc.fullName} maybe this is wrong ${daoProps}"
-			dao = GormDaoSupport.getInstance(dc.clazz)
 		}
 
 		return dao
 	}
 
-	//XXX this not even needed any more?
-	static def forceInitGormMethods(domClass){
-/*      //basically copied from the GormLabs code
-        application.domainClasses*.clazz.each { domClass->*/
-		try {
-			domClass.thisIsATotallyBogusMethodPlacedHereJustToTriggerDynamicGORMMethods()
-		} catch(MissingMethodException e) {
-			return
-		}
-		//try on instance just in case if we get here
-		try {
-			domClass.newInstance().thisIsATotallyBogusMethodPlacedHereJustToTriggerGORMHydration()
-		} catch(MissingMethodException e) {
-			return
-		}
-		//log.warn("Looks like we could not initialize $domClass via static methodMissing")
-		//}
-	}
 }

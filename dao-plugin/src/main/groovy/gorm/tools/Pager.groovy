@@ -1,6 +1,9 @@
-package grails.plugin.dao
+package gorm.tools
 
+import gorm.tools.beans.BeanPathTools
 import grails.gorm.PagedResultList
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.grails.datastore.mapping.query.Query
@@ -10,6 +13,7 @@ import org.hibernate.internal.CriteriaImpl
 /**
  * a holder object for paged data
  */
+//@CompileStatic
 class Pager {
     private Log log = LogFactory.getLog(getClass())
     //the page we are on
@@ -27,25 +31,30 @@ class Pager {
 
     public Pager() {}
 
-    public Pager(params) {
+    public Pager(Map params) {
         setParams(params)
     }
 
-    static Integer max(p, defaultMax = 100) {
-        def defmin = p.max ? p.max.toInteger() : 10
+    static Integer max(Map p, defaultMax = 100) {
+        Integer defmin = p.max ? toInteger(p.max) : 10
         p.max = Math.min(defmin, defaultMax)
         return p.max
     }
 
-    static Integer page(p) {
-        p.page = p.page ? p.page.toInteger() : 1
+    static Integer page(Map p) {
+        p.page = p.page ? toInteger(p.page) : 1
         return p.page
     }
 
-    def setParams(params) {
-        page = params.page = params.page ? params.page.toInteger() : 1
-        max = params.max = Math.min(params.max ? params.max.toInteger() : 10, allowedMax)
+    def setParams(Map params) {
+        page = params.page = params.page ? toInteger(params.page) : 1
+        max = params.max = Math.min(params.max ? toInteger(params.max) : 10, allowedMax)
         this.params = params
+    }
+
+    @CompileDynamic
+    static Integer toInteger(Object v){
+        return v.toInteger()
     }
 
     def getOffset() {
@@ -83,18 +92,18 @@ class Pager {
         //records is the total # of records we have
         //rows are the data
         return [
-                page: this.page,
-                total: this.getPageCount(),
-                records: this.recordCount,
-                rows: data
+            page: this.page,
+            total: this.getPageCount(),
+            records: this.recordCount,
+            rows: data
         ]
     }
 
-    def setupData(dlist) {
+    def setupData(dlist, fieldList = null) {
         setData(dlist)
         if (dlist?.size() > 0) {
             if (dlist.hasProperty('totalCount')) {
-                setRecordCount(dlist.totalCount)
+                setRecordCount(dlist.getProperties().totalCount)
             } else if (dlist instanceof PagedResultList) {
                 setRecordCount(loadTotalFromDb(dlist))
             } else {
@@ -103,9 +112,15 @@ class Pager {
             }
         }
 
+        if (fieldList) {
+            this.data = dlist.collect { obj ->
+                return BeanPathTools.buildMapFromPaths(obj, fieldList, true)
+            }
+        }
         return this
     }
 
+    @CompileDynamic
     int loadTotalFromDb(PagedResultList src) {
         int pageSize = src.size() //we _NEED_ this call, to make sure that data is already fetched,
         //before we changed original query

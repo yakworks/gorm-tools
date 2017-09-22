@@ -5,17 +5,17 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
 @TestMixin(GrailsUnitTestMixin)
-class StringUtilTests extends Specification {
+class ListParseUtilTests extends Specification {
 
 	void testSanitizeNameListForSql() {
 		expect:
-		"'a','b','c'" == StringUtil.sanitizeNameListForSql("a,b,c")
-		"'a','b','c'" == StringUtil.sanitizeNameListForSql("a,b,c,")
-		"'a','b','c'" == StringUtil.sanitizeNameListForSql(",a,b,c")
-		"'a','b','c'" == StringUtil.sanitizeNameListForSql(",a,b,c,")
-		"'a','b','c'" == StringUtil.sanitizeNameListForSql(" a , b , c ")
-		"'a','b','c'" == StringUtil.sanitizeNameListForSql("'a','b','c'")
-		"'a b','b c','c d'" == StringUtil.sanitizeNameListForSql("a b,b c,c d")
+		"'a','b','c'" == ListParseUtil.sanitizeNameListForSql("a,b,c")
+		"'a','b','c'" == ListParseUtil.sanitizeNameListForSql("a,b,c,")
+		"'a','b','c'" == ListParseUtil.sanitizeNameListForSql(",a,b,c")
+		"'a','b','c'" == ListParseUtil.sanitizeNameListForSql(",a,b,c,")
+		"'a','b','c'" == ListParseUtil.sanitizeNameListForSql(" a , b , c ")
+		"'a','b','c'" == ListParseUtil.sanitizeNameListForSql("'a','b','c'")
+		"'a b','b c','c d'" == ListParseUtil.sanitizeNameListForSql("a b,b c,c d")
 	}
 
 
@@ -24,10 +24,10 @@ class StringUtilTests extends Specification {
 		def RESULT = [1,2,3,4]
 
 		expect:
-		RESULT == StringUtil.parseLongList('1,2,3,4')
-		RESULT == StringUtil.parseLongList('1 ,2, 3, 4')
-		RESULT == StringUtil.parseLongList(',1,2,3,4,')
-		RESULT != StringUtil.parseLongList('4,3,2,1')
+		RESULT == ListParseUtil.parseLongList('1,2,3,4')
+		RESULT == ListParseUtil.parseLongList('1 ,2, 3, 4')
+		RESULT == ListParseUtil.parseLongList(',1,2,3,4,')
+		RESULT != ListParseUtil.parseLongList('4,3,2,1')
 	}
 
 }

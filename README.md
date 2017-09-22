@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/9ci/grails-dao.svg?branch=master)](https://travis-ci.org/9ci/grails-dao)
+[![Build Status](https://travis-ci.org/9ci/gorm-tools.svg?branch=master)](https://travis-ci.org/9ci/gorm-tools)
 
 ### Purpose
 

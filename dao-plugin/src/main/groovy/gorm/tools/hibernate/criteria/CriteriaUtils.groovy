@@ -1,4 +1,4 @@
-package gorm.tools.criteria
+package gorm.tools.hibernate.criteria
 
 import org.hibernate.criterion.CriteriaSpecification
 

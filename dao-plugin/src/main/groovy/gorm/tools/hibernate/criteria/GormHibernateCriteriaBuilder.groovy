@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package gorm.tools.criteria
+package gorm.tools.hibernate.criteria
 
 import grails.orm.HibernateCriteriaBuilder
 import org.grails.datastore.mapping.query.Query
@@ -39,7 +39,7 @@ import org.hibernate.SessionFactory
 class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
 
     GormHibernateCriteriaBuilder(Class arg1, SessionFactory arg2) {
-      super(arg1, arg2)
+        super(arg1, arg2)
     }
 
     /**
@@ -49,7 +49,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      * @return A Order instance
      */
     Criteria order(String propertyName) {
-      return order(propertyName, "asc")
+        return order(propertyName, "asc")
     }
 
     /**
@@ -70,18 +70,18 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      * @return A Order instance
      */
     Criteria order(String propertyName, String direction, boolean forceSuper = false) {
-      if(forceSuper || !propertyName.contains('.')) {
-        return super.order(propertyName, direction)
-      } else {
-        def props = propertyName.split(/\./) as List
-        def last = props.pop()
-        Closure toDo = { order(last, direction) }
-        Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
-          { -> "$prop"(acc) }
+        if(forceSuper || !propertyName.contains('.')) {
+            return super.order(propertyName, direction)
+        } else {
+            def props = propertyName.split(/\./) as List
+            def last = props.pop()
+            Closure toDo = { order(last, direction) }
+            Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
+                { -> "$prop"(acc) }
+            }
+            newOrderBy.call()
+            return this
         }
-        newOrderBy.call()
-        return this
-      }
     }
 
     /**
@@ -92,15 +92,15 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      * @return A Criterion instance
      */
     public Criteria like(String propertyName, Object propertyValue) {
-      nestedPathPropCall(propertyName, propertyValue,"like")
+        nestedPathPropCall(propertyName, propertyValue,"like")
     }
 
     public Criteria ilike(String propertyName, Object propertyValue) {
-      nestedPathPropCall(propertyName, propertyValue,"ilike")
+        nestedPathPropCall(propertyName, propertyValue,"ilike")
     }
 
     public Criteria eq(String propertyName, Object propertyValue) {
-      nestedPathPropCall(propertyName, propertyValue,"eq")
+        nestedPathPropCall(propertyName, propertyValue,"eq")
     }
 
     public org.grails.datastore.mapping.query.api.Criteria inList(String propertyName, Collection values) {
@@ -116,35 +116,35 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
 
 
     public Criteria nestedPathPropCall(String propertyName, Object propertyValue, String critName){
-      if(!propertyName.contains('.')) {
-        return super."$critName"(propertyName, propertyValue)
-      } else {
-        def props = propertyName.split(/\./) as List
-        def last = props.pop()
-        Closure toDo = { "$critName"(last, propertyValue) }
-        Closure newCall = props.reverse().inject(toDo) { acc, prop ->
-          { -> "$prop"(acc) }
+        if(!propertyName.contains('.')) {
+            return super."$critName"(propertyName, propertyValue)
+        } else {
+            def props = propertyName.split(/\./) as List
+            def last = props.pop()
+            Closure toDo = { "$critName"(last, propertyValue) }
+            Closure newCall = props.reverse().inject(toDo) { acc, prop ->
+                { -> "$prop"(acc) }
+            }
+            newCall.call()
+            return this
         }
-        newCall.call()
-        return this
-      }
     }
 
     /**
-    * Dynamic method dispatch fail!
-    */
+     * Dynamic method dispatch fail!
+     */
     def methodMissing(String name, args) {
 //		println "hibernate $name with $args"
-		return super.invokeMethod(name, args)
+        return super.invokeMethod(name, args)
     }
 
 }
 
 /**
-* This class exists solely to circumvent the "protected" visibility of the org.hibernate.criterion.Order class constructor.
-*/
+ * This class exists solely to circumvent the "protected" visibility of the org.hibernate.criterion.Order class constructor.
+ */
 class OrderCheater extends Query.Order {
-  OrderCheater(String propertyName, boolean ascending) {
-    super(propertyName, ascending)
-  }
+    OrderCheater(String propertyName, boolean ascending) {
+        super(propertyName, ascending)
+    }
 }

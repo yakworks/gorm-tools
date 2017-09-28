@@ -11,6 +11,7 @@ import java.sql.Statement
 /**
  * Groovy Sql wrapper for running scrollable/streaming queries.
  */
+@SuppressWarnings(['NoDef', 'JdbcResultSetReference', 'JdbcStatementReference'])
 @CompileStatic
 class ScrollableQuery {
 
@@ -33,7 +34,7 @@ class ScrollableQuery {
 		int index = 1
 
 		sql.query(query) { ResultSet r ->
-			while(r.next()) {
+			while (r.next()) {
 				index++
 				def row = rowMapper.mapRow(r, index)
 				cl.call(row)
@@ -49,13 +50,13 @@ class ScrollableQuery {
 		List batch = []
 		this.eachRow(query) { def row ->
 			batch.add(row)
-			if((batch.size() == batchSize)) {
+			if ((batch.size() == batchSize)) {
 				cl.call(batch)
 				batch = []
 			}
 		}
 		//there could be remaning rows
-		if(batch.size() > 0) cl.call(batch)
+		if (batch.size() > 0) cl.call(batch)
 	}
 
 	/**
@@ -68,7 +69,7 @@ class ScrollableQuery {
 	public List rows(String query) {
 		List result = []
 
-		this.eachRow(query) {def row ->
+		this.eachRow(query) { def row ->
 			result.add(row)
 		}
 

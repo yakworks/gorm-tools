@@ -1,5 +1,6 @@
 package gorm.tools.query
 
+@SuppressWarnings(['NoDef', 'ReturnsNullInsteadOfEmptyCollection'])
 public class ListParseUtil {
 	/** Accepts a comma separated list as a string, and converts it for safe use as a single-quoted comma separated list.
 	 * The intent is to convert anything that might be typed into a parameter table by a user into something that we can
@@ -8,11 +9,11 @@ public class ListParseUtil {
 	 * are unintential errors and removes them.  However spaces in the middle of an individual value are preserved.
 	 */
 	static String sanitizeNameListForSql(String orig) {
-		if(orig == null) return null
-		def noQuotes=orig.replaceAll(/["']/,'').replaceAll("'",'').trim()
-		def noSpaces=noQuotes.replaceAll(', *',',').replaceAll(' *,',',') // removes "outer" spaces, not inner
-		def noLeadingTrailingCommas = noSpaces.replaceAll('^,*','').replaceAll(',*$','')
-		def innerQuotes = noLeadingTrailingCommas.replaceAll(',',"','")
+		if (orig == null) return null
+		def noQuotes = orig.replaceAll(/["']/, '').replaceAll("'", '').trim()
+		def noSpaces = noQuotes.replaceAll(', *', ',').replaceAll(' *,', ',') // removes "outer" spaces, not inner
+		def noLeadingTrailingCommas = noSpaces.replaceAll('^,*', '').replaceAll(',*$', '')
+		def innerQuotes = noLeadingTrailingCommas.replaceAll(',', "','")
 		def quoted = "'${innerQuotes}'"
 	}
 
@@ -22,12 +23,13 @@ public class ListParseUtil {
 		strings.each { longs.add it.toLong() }
 		return longs
 	}
+
 	static List<String> parseStringList(String orig) {
-		if(orig == null) return null
-		def noQuotes=orig.replaceAll(/["']/,'').replaceAll("'",'').trim()
-		def noSpaces=noQuotes.replaceAll(', *',',').replaceAll(' *,',',') // removes "outer" spaces, not inner
-		def noLeadingTrailingCommas = noSpaces.replaceAll('^,*','').replaceAll(',*$','')
+		if (orig == null) return null
+		def noQuotes = orig.replaceAll(/["']/, '').replaceAll("'", '').trim()
+		def noSpaces = noQuotes.replaceAll(', *', ',').replaceAll(' *,', ',') // removes "outer" spaces, not inner
+		def noLeadingTrailingCommas = noSpaces.replaceAll('^,*', '').replaceAll(',*$', '')
 		def strings = noLeadingTrailingCommas.split(',')
-		return strings;
+		return strings
 	}
 }

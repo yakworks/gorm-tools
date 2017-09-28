@@ -11,7 +11,7 @@ class LocalDateJsonConverter implements JsonConverter {
 
     @Override
     Closure<? extends CharSequence> getConverter() {
-        {LocalDate date ->
+        { LocalDate date ->
             "\"${DateTimeFormatter.ISO_LOCAL_DATE.format((LocalDate)date)}\""
         }
     }

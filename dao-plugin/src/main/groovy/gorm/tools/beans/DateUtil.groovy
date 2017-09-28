@@ -10,6 +10,7 @@ import java.util.regex.Pattern
 import java.text.ParseException
 import org.apache.commons.lang.Validate
 
+@SuppressWarnings(['NoDef', 'MethodCount', 'ImplementationAsType'])
 class DateUtil {
 
     static Pattern GMT_MILLIS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
@@ -54,55 +55,55 @@ class DateUtil {
         return dateFormat.format(date)
     }
 
-    public static Date stringToDate(String strDt){
-        Date date = convertStringToDateTime(strDt,"yyyy-MM-dd")
+    public static Date stringToDate(String strDt) {
+        Date date = convertStringToDateTime(strDt, "yyyy-MM-dd")
         return date
     }
 
-    public static String dateToString(Date date){
-        DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
-        String dtStr = '';
+    public static String dateToString(Date date) {
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss")
+        String dtStr = ''
         try {
-            dtStr = df.format(date);
+            dtStr = df.format(date)
         } catch (ParseException e) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
-        return dtStr;
+        return dtStr
     }
 
-    public static String dateToString(Date date, String format){
-        DateFormat df = new SimpleDateFormat(format);
-        String dtStr = '';
+    public static String dateToString(Date date, String format) {
+        DateFormat df = new SimpleDateFormat(format)
+        String dtStr = ''
         try {
-            dtStr = df.format(date);
+            dtStr = df.format(date)
         } catch (ParseException e) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
-        return dtStr;
+        return dtStr
     }
 
-    def static Date getPreviousMonth(){
+    def static Date getPreviousMonth() {
         Calendar previousMonth = getCurrentCalendarInstance()
         previousMonth.set(Calendar.DATE, 1)
         previousMonth.add(Calendar.MONTH, -1)
         return previousMonth.getTime()
     }
 
-    def static getTwoMonthsBack(){
+    def static getTwoMonthsBack() {
         Calendar previousMonth = getCurrentCalendarInstance()
         previousMonth.set(Calendar.DATE, 1)
         previousMonth.add(Calendar.MONTH, -2)
         return previousMonth.getTime()
     }
 
-    def static getThreeMonthsBack(){
+    def static getThreeMonthsBack() {
         Calendar previousMonth = getCurrentCalendarInstance()
         previousMonth.set(Calendar.DATE, 1)
         previousMonth.add(Calendar.MONTH, -3)
         return previousMonth.getTime()
     }
 
-    def static getFourMonthsBack(){
+    def static getFourMonthsBack() {
         Calendar previousMonth = getCurrentCalendarInstance()
         previousMonth.set(Calendar.DATE, 1)
         previousMonth.add(Calendar.MONTH, -4)
@@ -121,119 +122,118 @@ class DateUtil {
         use(TimeCategory) {
             result = date + number.months
         }
-        return  result
+        return result
     }
 
-
-    static Date getNextMonth(){
+    static Date getNextMonth() {
         Calendar nextMonth = getCurrentCalendarInstance()
         nextMonth.set(Calendar.DATE, 1)
         nextMonth.add(Calendar.MONTH, 1)
         return nextMonth.getTime()
     }
 
-    static Date getFirstDateOfMonth(){
+    static Date getFirstDateOfMonth() {
         Calendar startDate = getCurrentCalendarInstance()
         startDate.set(Calendar.DATE, 1)
         return setTimeAsOfMidnight(startDate).getTime()
     }
 
-    static Date getFirstDayOfWeek(){
+    static Date getFirstDayOfWeek() {
         Calendar startDate = getCurrentCalendarInstance()
         int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        while (dayOfWeek  != Calendar.MONDAY) {
+        while (dayOfWeek != Calendar.MONDAY) {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
         return setTimeAsOfMidnight(startDate).getTime()
     }
 
-    def static getLastDayOfWeek(){
+    def static getLastDayOfWeek() {
         Calendar endDate = getCurrentCalendarInstance()
         int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        while(dayOfWeek  != Calendar.SUNDAY) {
+        while (dayOfWeek != Calendar.SUNDAY) {
             endDate.add(Calendar.DATE, 1)
             dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
         }
         return setTimeBeforeMidnight(endDate).getTime()
     }
 
-    def static getLastWeekEndDate(){
+    def static getLastWeekEndDate() {
         Calendar endDate = getCurrentCalendarInstance()
         int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        while(dayOfWeek  != Calendar.SUNDAY) {
+        while (dayOfWeek != Calendar.SUNDAY) {
             endDate.add(Calendar.DATE, -1)
             dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
         }
         return setTimeBeforeMidnight(endDate).getTime()
     }
 
-    def static getLastWeekStartDate(){
+    def static getLastWeekStartDate() {
         Calendar startDate = getCurrentCalendarInstance()
         int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        while(dayOfWeek  != Calendar.SUNDAY) {
+        while (dayOfWeek != Calendar.SUNDAY) {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
-        while(dayOfWeek != Calendar.MONDAY) {
+        while (dayOfWeek != Calendar.MONDAY) {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
     }
 
-    def static Calendar getCurrentCalendarInstance(){
+    def static Calendar getCurrentCalendarInstance() {
         Calendar currentDate = Calendar.getInstance()
         currentDate.setTime(new Date())
         return currentDate
     }
 
-    def static Calendar getCalendarInstance_ByDate(Date date){
+    def static Calendar getCalendarInstance_ByDate(Date date) {
         Calendar calendarDate = Calendar.getInstance()
         calendarDate.setTime(date)
         return calendarDate
     }
 
-    def static getMonthLetter(String periodToPost){
-        String twoNumbers=""
-        twoNumbers=periodToPost?.substring(4,6)
-        String monthLetter=twoNumbers
-        switch(twoNumbers){
+    def static getMonthLetter(String periodToPost) {
+        String twoNumbers = ""
+        twoNumbers = periodToPost?.substring(4, 6)
+        String monthLetter = twoNumbers
+        switch (twoNumbers) {
             case '01': monthLetter = 'J'
-                break;
+                break
             case '02': monthLetter = 'F'
-                break;
+                break
             case '03': monthLetter = 'M'
-                break;
+                break
             case '04': monthLetter = 'A'
-                break;
+                break
             case '05': monthLetter = 'M'
-                break;
+                break
             case '06': monthLetter = 'J'
-                break;
+                break
             case '07': monthLetter = 'J'
-                break;
+                break
             case '08': monthLetter = 'A'
-                break;
+                break
             case '09': monthLetter = 'S'
-                break;
+                break
             case '10': monthLetter = 'O'
-                break;
+                break
             case '11': monthLetter = 'N'
-                break;
+                break
             case '12': monthLetter = 'D'
-                break;
+                break
             default: monthLetter = '?'
         }
         return monthLetter
 
     }
 
-    public static Date stringToDateTime(String strDt){
-        Date date = convertStringToDateTime(strDt,"yyyy-MM-dd'T'HH:mm:ss")
+    public static Date stringToDateTime(String strDt) {
+        Date date = convertStringToDateTime(strDt, "yyyy-MM-dd'T'HH:mm:ss")
         return date
     }
 
-    def static convertStringToDateTime(String strDt, String format){
+    def static convertStringToDateTime(String strDt, String format) {
         DateFormat df = new SimpleDateFormat(format)
         Date dtTmp = null
         try {
@@ -247,13 +247,13 @@ class DateUtil {
     /**
      * Returns the year of the date specified.
      */
-    public static int getYearOf (Date date) {
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(date);
-        return gc.get(GregorianCalendar.YEAR);
+    public static int getYearOf(Date date) {
+        GregorianCalendar gc = new GregorianCalendar()
+        gc.setTime(date)
+        return gc.get(GregorianCalendar.YEAR)
     }
 
-    public static long getDateDifference_inHours(Date date){
+    public static long getDateDifference_inHours(Date date) {
         def lastModifiedDateCalendar = getCalendarInstance_ByDate(date)
         def diff = getCurrentCalendarInstance().getTimeInMillis() - lastModifiedDateCalendar.getTimeInMillis()
         def diffHours = diff / (60 * 60 * 1000)
@@ -261,25 +261,25 @@ class DateUtil {
     }
 
     public static Date setToMidnight(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
+        Calendar cal = Calendar.getInstance()
+        cal.setTime(date)
         setTimeAsOfMidnight(cal)
-        return cal.getTime();
+        return cal.getTime()
     }
 
-    public static Calendar setTimeAsOfMidnight(Calendar cal){
-        cal.set(Calendar.HOUR_OF_DAY, 0);            // set hour to midnight
-        cal.set(Calendar.MINUTE, 0);                 // set minute in hour
-        cal.set(Calendar.SECOND, 0);                 // set second in minute
-        cal.set(Calendar.MILLISECOND, 0);
+    public static Calendar setTimeAsOfMidnight(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 0)            // set hour to midnight
+        cal.set(Calendar.MINUTE, 0)                 // set minute in hour
+        cal.set(Calendar.SECOND, 0)                 // set second in minute
+        cal.set(Calendar.MILLISECOND, 0)
         return cal
     }
 
-    public static Calendar setTimeBeforeMidnight(Calendar cal){
-        cal.set(Calendar.HOUR_OF_DAY, 23);            // set hour to midnight
-        cal.set(Calendar.MINUTE, 59);                 // set minute in hour
-        cal.set(Calendar.SECOND, 59);                 // set second in minute
-        cal.set(Calendar.MILLISECOND, 0);
+    public static Calendar setTimeBeforeMidnight(Calendar cal) {
+        cal.set(Calendar.HOUR_OF_DAY, 23)            // set hour to midnight
+        cal.set(Calendar.MINUTE, 59)                 // set minute in hour
+        cal.set(Calendar.SECOND, 59)                 // set second in minute
+        cal.set(Calendar.MILLISECOND, 0)
         return cal
     }
 
@@ -294,14 +294,14 @@ class DateUtil {
     }
 
     /**
-     * @period daily, weekly or monthly
-     * @dayInPeriod  1-30 for monthly, 1-7 for weekly (1 is Sunday)
+     * @period daily , weekly or monthly
+     * @dayInPeriod 1-30 for monthly, 1-7 for weekly (1 is Sunday)
      * @return is today the date for a specified period and dayInPeriod
      */
     public static boolean isTodayTheDate(String period, int dayInPeriod) {
         def dayOfMonth = new Date().getAt(Calendar.DAY_OF_MONTH)
         def dayOfWeek = new Date().getAt(Calendar.DAY_OF_WEEK)
-        switch ( period.toLowerCase() ) {
+        switch (period.toLowerCase()) {
             case "daily":
                 return true
             case "weekly":
@@ -332,8 +332,8 @@ class DateUtil {
         Calendar end = Calendar.getInstance()
         end.setTime(two)
 
-        int diffYear = end.get(Calendar.YEAR) - start.get(Calendar.YEAR);
-        int diffMonth = diffYear * 12 + end.get(Calendar.MONTH) - start.get(Calendar.MONTH);
+        int diffYear = end.get(Calendar.YEAR) - start.get(Calendar.YEAR)
+        int diffMonth = diffYear * 12 + end.get(Calendar.MONTH) - start.get(Calendar.MONTH)
         return diffMonth
     }
 
@@ -353,7 +353,7 @@ class DateUtil {
 
         int days
 
-        use(groovy.time.TimeCategory) {
+        use(TimeCategory) {
             TimeDuration duration = (start - end)
             days = duration.days
         }

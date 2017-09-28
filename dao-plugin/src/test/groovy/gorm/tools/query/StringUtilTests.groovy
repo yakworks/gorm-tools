@@ -4,6 +4,7 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
+@SuppressWarnings(['ClassNameSameAsFilename'])
 @TestMixin(GrailsUnitTestMixin)
 class ListParseUtilTests extends Specification {
 
@@ -18,10 +19,9 @@ class ListParseUtilTests extends Specification {
 		"'a b','b c','c d'" == ListParseUtil.sanitizeNameListForSql("a b,b c,c d")
 	}
 
-
 	void testParseLongList() {
 		given:
-		def RESULT = [1,2,3,4]
+		def RESULT = [1, 2, 3, 4]
 
 		expect:
 		RESULT == ListParseUtil.parseLongList('1,2,3,4')

@@ -12,11 +12,10 @@ import org.hibernate.Hibernate
 import org.hibernate.UnresolvableObjectException
 import org.hibernate.ObjectNotFoundException
 
-
-
 //import org.apache.commons.logging.*
 
 //XXX add tests for this
+@SuppressWarnings(['NoDef', 'ReturnsNullInsteadOfEmptyCollection', 'ThrowRuntimeException'])
 class BeanPathTools {
     static Log log = LogFactory.getLog(getClass())
     static def grailsApplication = Holders.grailsApplication
@@ -53,12 +52,12 @@ class BeanPathTools {
      * returns the depest nested bean
      * */
     static getNestedBean(Object bean, String path) {
-        int i = path.lastIndexOf(".");
+        int i = path.lastIndexOf(".")
         if (i > -1) {
-            path = path.substring(0, i);
+            path = path.substring(0, i)
             path.split('\\.').each { bean = bean?."$it" }
         }
-        return bean;
+        return bean
     }
 
     public static List getFields(Object domain) {
@@ -77,12 +76,12 @@ class BeanPathTools {
 
     //XXX add test for this
     static Map buildMapFromPaths(def obj, List propList, boolean useDelegatingBean = false) {
-        if(useDelegatingBean) {
+        if (useDelegatingBean) {
             Class delegatingBean = GrailsClassUtils.getStaticFieldValue(obj.getClass(), "delegatingBean")
-            if(delegatingBean == null && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, obj.getClass())) {
+            if (delegatingBean == null && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, obj.getClass())) {
                 delegatingBean = DaoDelegatingBean
             }
-            if(delegatingBean != null) obj = delegatingBean.newInstance(obj)
+            if (delegatingBean != null) obj = delegatingBean.newInstance(obj)
         }
         //FIXME we should look into do something like LazyMetaPropertyMap in grails-core that wraps the object and delegates
         //the map key lookups to the objects
@@ -90,27 +89,27 @@ class BeanPathTools {
         propList.each { key ->
             propsToMap(obj, key, rowMap)
         }
-        if(log.debugEnabled) log.debug rowMap
+        if (log.debugEnabled) log.debug rowMap
         return rowMap
 
     }
 
     static Map propsToMap(Object obj, String propertyPath, Map currentMap) {
-        if(obj == null) return
+        if (obj == null) return
         final int nestedIndex = propertyPath.indexOf('.')
         //no idex then its just a property or its the *
         if (nestedIndex == -1) {
             if (propertyPath == '*') {
-                if(log.debugEnabled) log.debug("obj:$obj propertyPath:$propertyPath currentMap:$currentMap" )
+                if (log.debugEnabled) log.debug("obj:$obj propertyPath:$propertyPath currentMap:$currentMap")
                 //just get the persistentProperties
                 def domain = (obj instanceof DelegatingBean) ? obj.target : obj
                 GrailsDomainClass domainClass = (GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, Hibernate.getClass(domain).name)
-                if(domainClass == null) {
+                if (domainClass == null) {
                     throw new RuntimeException("${obj.getClass().name} is not a domain class")
                 }
                 def pprops = domainClass.persistentProperties
                 //filter out the associations. need to explicitely add those to be included
-                pprops = pprops.findAll{ p -> !p.isAssociation() }
+                pprops = pprops.findAll { p -> !p.isAssociation() }
                 //force the the id to be included
                 def id = domainClass.getIdentifier().name
                 currentMap[id] = obj?."$id"
@@ -129,12 +128,11 @@ class BeanPathTools {
             }
 
             return null
-        }
-        else{
+        } else {
             // We have at least one sub-key, so extract the first element
             // of the nested key as the prfix. In other words, if we have
             // 'nestedKey' == "a.b.c", the prefix is "a".
-            String nestedPrefix = propertyPath.substring(0, nestedIndex);
+            String nestedPrefix = propertyPath.substring(0, nestedIndex)
             if (!currentMap.containsKey(nestedPrefix)) {
                 currentMap[nestedPrefix] = [:]
             }
@@ -150,7 +148,7 @@ class BeanPathTools {
             } catch (Exception e) {
                 log.error("Cannot set value for $nestedPrefix from $obj", e)
             }
-            String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length());
+            String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())
             //recursive call
             if (nestedObj instanceof Collection) {
                 List l = []
@@ -168,7 +166,6 @@ class BeanPathTools {
 
     }
 
-
     /**
      * takes a request and an optional map.
      * call the MapFlattener and returns a GrailsParameterMap to be used for binding
@@ -176,17 +173,17 @@ class BeanPathTools {
      */
     //XXX add test for this in your spec?
     //XXX Why do we need this ? Grails3 should be able to handle deep maps just fine.
-    static GrailsParameterMap flattenMap(request, jsonMap = null){
+    static GrailsParameterMap flattenMap(request, jsonMap = null) {
         def p = new MapFlattener().flatten(jsonMap ?: request.JSON)
         //XXX a hack to remove the edited/created fields. not sure why they are being binded
-        p.each{ entry ->
+        p.each { entry ->
             def key = entry.key
-            if (entry.key.endsWith('createdDate') || entry.key.endsWith('editedDate')){
+            if (entry.key.endsWith('createdDate') || entry.key.endsWith('editedDate')) {
                 entry.value = null
             }
         }
         //println "flat map $p"
-        def gpm =  new GrailsParameterMap(p,request)
+        def gpm = new GrailsParameterMap(p, request)
         gpm.updateNestedKeys(p)
         return gpm
     }

@@ -7,6 +7,7 @@ import org.springframework.context.MessageSource
 
 import java.sql.BatchUpdateException
 
+@SuppressWarnings(['NoDef', 'AbcMetric'])
 class ErrorMessageService {
 	static transactional = false
 
@@ -77,5 +78,3 @@ class ErrorMessageService {
 		return messageSource.getMessage(msgMap.code, args, msgMap.defaultMessage, DaoMessage.defaultLocale())
 	}
 }
-
-

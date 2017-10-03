@@ -98,7 +98,6 @@ class BeanPathToolsSpec {
         'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', baz:null], [id: 2, bar: null, foo: 'val 2', baz: null]]]
     }
 
-
     class TestClazzA {
         Long id
         Long version

@@ -7,6 +7,7 @@ import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.grails.core.artefact.DomainClassArtefactHandler
 
+@SuppressWarnings(['NoDef', 'ClosureAsLastMethodParameter'])
 class GormUtils {
 
     final static List<String> IGNORED_PROPERTIES = ["id", "version", "createdBy", "createdDate", "editedBy", "editedDate", "num"]
@@ -30,27 +31,26 @@ class GormUtils {
      */
 
     public static def copyDomain(def copy, def old, Map override = [:], boolean ignoreAssociations = true) {
-        if(copy == null) throw new IllegalArgumentException("Copy is null")
-        if(old == null) return null
+        if (copy == null) throw new IllegalArgumentException("Copy is null")
+        if (old == null) return null
 
         getDomainClass(old.class).persistentProperties.each { GrailsDomainClassProperty dp ->
-            if(IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
-            if(ignoreAssociations && dp.isAssociation()) return
+            if (IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
+            if (ignoreAssociations && dp.isAssociation()) return
 
             String name = dp.name
             copy[name] = old[name]
         }
 
-       if(override) {
-           copy.properties = override
-       }
+        if (override) {
+            copy.properties = override
+        }
 
         return copy
     }
-    
 
     public static GrailsDomainClass getDomainClass(Class domain) {
-        if(!Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, domain)) {
+        if (!Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, domain)) {
             throw new IllegalArgumentException(domain.name + " is not a domain class")
         } else {
             return Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.name)
@@ -69,9 +69,12 @@ class GormUtils {
      */
     public static void copyProperties(def source, def target, boolean copyOnlyIfNull, String... propNames) {
 
-        for(String prop: propNames) {
-            if(copyOnlyIfNull && (target[prop] != null)) {  continue }
-            else { target[prop] = source[prop] }
+        for (String prop : propNames) {
+            if (copyOnlyIfNull && (target[prop] != null)) {
+                continue
+            } else {
+                target[prop] = source[prop]
+            }
         }
 
     }
@@ -90,9 +93,9 @@ class GormUtils {
         Validate.notNull(source)
         Validate.notEmpty(property)
 
-        def result = property.tokenize('.').inject(source, {def obj, String prop ->
+        def result = property.tokenize('.').inject(source, { def obj, String prop ->
             def value = null
-            if(obj != null) value = obj[prop]
+            if (obj != null) value = obj[prop]
             return value
         })
 

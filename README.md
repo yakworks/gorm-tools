@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/9ci/gorm-tools.svg?branch=master)](https://travis-ci.org/9ci/gorm-tools)
+[![Build Status](https://travis-ci.org/yakworks/gorm-tools.svg?branch=master)](https://travis-ci.org/yakworks/gorm-tools)
 
 ### Purpose
 

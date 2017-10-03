@@ -4,7 +4,8 @@ set -e
 
 echo "### Running tests"
 
-cd dao-app && ./gradlew check
+cd dao-app && ./gradlew :check
+cd dao-plugin && ./gradlew :check
 
 echo "### Running publishing"
 

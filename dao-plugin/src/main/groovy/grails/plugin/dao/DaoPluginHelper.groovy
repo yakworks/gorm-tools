@@ -1,18 +1,19 @@
 package grails.plugin.dao
 
+import gorm.tools.DbDialectService
+import gorm.tools.idgen.BatchIdGenerator
+import gorm.tools.idgen.IdGeneratorHolder
+import gorm.tools.idgen.JdbcIdGenerator
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsDomainClass
 import grails.transaction.Transactional
-import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
 import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
-import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
-import gorm.tools.DbDialectService
 
 import java.lang.reflect.Method
 
@@ -20,6 +21,22 @@ class DaoPluginHelper {
 	static List<ArtefactHandler> artefacts = [new DaoArtefactHandler()]
 
 	static Closure doWithSpring = {
+		jdbcTemplate(org.springframework.jdbc.core.JdbcTemplate, ref("dataSource"))
+
+		jdbcIdGenerator(JdbcIdGenerator){
+			jdbcTemplate = ref("jdbcTemplate")
+			table = "NewObjectId"
+			keyColumn="KeyName"
+			idColumn="NextId"
+		}
+		idGenerator(BatchIdGenerator){
+			generator = ref("jdbcIdGenerator")
+		}
+		idGeneratorHolder(IdGeneratorHolder){
+			idGenerator = ref("idGenerator")
+		}
+
+
 		gormDaoBeanNonTransactional(grails.plugin.dao.GormDaoSupport) { bean ->
 			bean.scope = "prototype"
 			//grailsApplication = ref('grailsApplication')

@@ -59,9 +59,9 @@ dependencies {
 grailsPublish {
 	desc = 'Enables a grails-app/dao directory to setup beans see https://github.com/basejump/grails-daotesting'
 	developers = [joshuaB: 'Joshua B']
-	githubSlug = '9ci/grails-dao'
-	issueTrackerUrl = 'https://github.com/9ci/grails-dao/issues'
-	vcsUrl = 'https://github.com/9ci/grails-dao'
+	githubSlug = 'yakworks/gorm-tools'
+	issueTrackerUrl = 'https://github.com/yakworks/gorm-tools/issues'
+	vcsUrl = 'https://github.com/yakworks/gorm-tools'
 	license {
 		name = 'Apache-2.0'
 	}

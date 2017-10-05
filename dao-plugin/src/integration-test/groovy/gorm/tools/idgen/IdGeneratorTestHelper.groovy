@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 class IdGeneratorTestHelper {
 
 	static void createTables(JdbcTemplate jdbcTemplate) {
-		createNewObjectIdTable(jdbcTemplate)
+		//createNewObjectIdTable(jdbcTemplate)
 		createCustomTable(jdbcTemplate)
 	}
 

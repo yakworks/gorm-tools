@@ -1,4 +1,4 @@
-package gorm.tools.idgen;
+package gorm.tools.idgen
 
 public interface IdGenerator {
 
@@ -8,7 +8,7 @@ public interface IdGenerator {
 	 * @param keyName the key value of the id. usually of form "table.id"
 	 * @return
 	 */
-	public long getNextId(String keyName);
+	public long getNextId(String keyName)
 
 	/**
 	 * 
@@ -18,5 +18,5 @@ public interface IdGenerator {
 	 * 	ids from 10 to 109. The next request by your thread or any others to this method will return 110.
 	 * @return
 	 */
-	public long getNextId(String keyName, long increment);
+	public long getNextId(String keyName, long increment)
 }

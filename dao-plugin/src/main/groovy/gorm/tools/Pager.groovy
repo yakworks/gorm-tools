@@ -13,7 +13,7 @@ import org.hibernate.internal.CriteriaImpl
 /**
  * a holder object for paged data
  */
-//@CompileStatic
+@CompileStatic
 class Pager {
     private Log log = LogFactory.getLog(getClass())
     //the page we are on
@@ -26,8 +26,7 @@ class Pager {
     Integer recordCount = 0
     Integer offset
     List data
-    def params
-
+    Map params
 
     public Pager() {}
 
@@ -35,15 +34,15 @@ class Pager {
         setParams(params)
     }
 
-    static Integer max(Map p, defaultMax = 100) {
+    static Integer max(Map p, Integer defaultMax = 100) {
         Integer defmin = p.max ? toInteger(p.max) : 10
         p.max = Math.min(defmin, defaultMax)
-        return p.max
+        return p.max as Integer
     }
 
     static Integer page(Map p) {
         p.page = p.page ? toInteger(p.page) : 1
-        return p.page
+        return p.page as Integer
     }
 
     def setParams(Map params) {
@@ -57,7 +56,7 @@ class Pager {
         return v.toInteger()
     }
 
-    def getOffset() {
+    Integer getOffset() {
         if (!offset) {
             return (max * (page - 1))
         } else {
@@ -65,7 +64,7 @@ class Pager {
         }
     }
 
-    def getPageCount() {
+    Integer getPageCount() {
         return Math.ceil(recordCount / max).intValue()
     }
 
@@ -73,7 +72,7 @@ class Pager {
         if(pageCount < 1) return
         log.debug "eachPage total pages : pageCount"
 
-        (1..pageCount).each {Long pageNum ->
+        (1..pageCount).each {Integer pageNum ->
             page = pageNum
             offset = (max * (page - 1))
             try {
@@ -99,11 +98,11 @@ class Pager {
         ]
     }
 
-    def setupData(dlist, fieldList = null) {
+    Pager setupData(List dlist, List fieldList = null) {
         setData(dlist)
         if (dlist?.size() > 0) {
             if (dlist.hasProperty('totalCount')) {
-                setRecordCount(dlist.getProperties().totalCount)
+                setRecordCount(dlist.getProperties().totalCount as Integer)
             } else if (dlist instanceof PagedResultList) {
                 setRecordCount(loadTotalFromDb(dlist))
             } else {

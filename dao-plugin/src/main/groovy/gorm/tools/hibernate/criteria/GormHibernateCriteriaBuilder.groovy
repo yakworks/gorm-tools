@@ -70,10 +70,10 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      * @return A Order instance
      */
     Criteria order(String propertyName, String direction, boolean forceSuper = false) {
-        if(forceSuper || !propertyName.contains('.')) {
+        if (forceSuper || !propertyName.contains('.')) {
             return super.order(propertyName, direction)
         } else {
-            def props = propertyName.split(/\./) as List
+            List props = propertyName.split(/\./) as List
             def last = props.pop()
             Closure toDo = { order(last, direction) }
             Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
@@ -92,34 +92,30 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      * @return A Criterion instance
      */
     public Criteria like(String propertyName, Object propertyValue) {
-        nestedPathPropCall(propertyName, propertyValue,"like")
+        nestedPathPropCall(propertyName, propertyValue, "like")
     }
 
     public Criteria ilike(String propertyName, Object propertyValue) {
-        nestedPathPropCall(propertyName, propertyValue,"ilike")
+        nestedPathPropCall(propertyName, propertyValue, "ilike")
     }
 
     public Criteria eq(String propertyName, Object propertyValue) {
-        nestedPathPropCall(propertyName, propertyValue,"eq")
+        nestedPathPropCall(propertyName, propertyValue, "eq")
     }
 
-    public org.grails.datastore.mapping.query.api.Criteria inList(String propertyName, Collection values) {
-        nestedPathPropCall(propertyName, values,"in")
+    public Criteria inList(String propertyName, Collection values) {
+        nestedPathPropCall(propertyName, values, "in")
     }
 
-    public org.grails.datastore.mapping.query.api.Criteria inList(String propertyName, Object[] values) {
-        nestedPathPropCall(propertyName, values,"in")
+    public Criteria inList(String propertyName, Object[] values) {
+        nestedPathPropCall(propertyName, values, "in")
     }
 
-
-
-
-
-    public Criteria nestedPathPropCall(String propertyName, Object propertyValue, String critName){
-        if(!propertyName.contains('.')) {
+    public Criteria nestedPathPropCall(String propertyName, Object propertyValue, String critName) {
+        if (!propertyName.contains('.')) {
             return super."$critName"(propertyName, propertyValue)
         } else {
-            def props = propertyName.split(/\./) as List
+            List props = propertyName.split(/\./) as List
             def last = props.pop()
             Closure toDo = { "$critName"(last, propertyValue) }
             Closure newCall = props.reverse().inject(toDo) { acc, prop ->

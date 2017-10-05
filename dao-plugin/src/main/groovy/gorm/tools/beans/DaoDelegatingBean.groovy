@@ -21,8 +21,11 @@ class DaoDelegatingBean extends DelegatingBean {
             return super.propertyMissing(name)
         }catch (MissingPropertyException e) {
             String method
-            if(name.startsWith("has") || name.startsWith("is")) method = name
-            else method = "get" + name.capitalize()
+            if (name.startsWith("has") || name.startsWith("is")) {
+                method = name
+            } else {
+                method = "get" + name.capitalize()
+            }
 
             try {
                 return dao.invokeMethod(method, target)

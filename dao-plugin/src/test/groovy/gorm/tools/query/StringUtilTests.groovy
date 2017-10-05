@@ -18,10 +18,9 @@ class ListParseUtilTests extends Specification {
 		"'a b','b c','c d'" == ListParseUtil.sanitizeNameListForSql("a b,b c,c d")
 	}
 
-
 	void testParseLongList() {
 		given:
-		def RESULT = [1,2,3,4]
+		def RESULT = [1, 2, 3, 4]
 
 		expect:
 		RESULT == ListParseUtil.parseLongList('1,2,3,4')

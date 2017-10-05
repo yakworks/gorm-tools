@@ -2,6 +2,7 @@ package grails.plugin.dao
 
 import grails.core.ArtefactHandler
 
+@SuppressWarnings(['NoDef'])
 class DaoGrailsPlugin extends grails.plugins.Plugin {
 	def loadAfter = ['hibernate','datasources']
 
@@ -21,12 +22,9 @@ class DaoGrailsPlugin extends grails.plugins.Plugin {
 		closure.call()
 	}}
 
-
 	@Override
     void onChange(Map<String,Object> event) {
 		DaoPluginHelper.onChange(event, grailsApplication)
 	}
 
-
-	
 }

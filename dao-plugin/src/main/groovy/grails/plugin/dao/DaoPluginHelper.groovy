@@ -36,25 +36,24 @@ class DaoPluginHelper {
 			idGenerator = ref("idGenerator")
 		}
 
-
 		gormDaoBeanNonTransactional(grails.plugin.dao.GormDaoSupport) { bean ->
 			bean.scope = "prototype"
 			//grailsApplication = ref('grailsApplication')
 		}
-		def props = new Properties()
+		Properties props = new Properties()
 		props."*" = "PROPAGATION_REQUIRED"
 		gormDaoBean(TransactionProxyFactoryBean) { bean ->
 			bean.scope = "prototype"
 			bean.lazyInit = true
 			target = ref('gormDaoBeanNonTransactional')
 			proxyTargetClass = true
-			transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes:props)
+			transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes: props)
 			transactionManager = ref("transactionManager")
 		}
 
 		daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
 
-		application.daoClasses.each {daoClass ->
+		application.daoClasses.each { daoClass ->
 
 			Closure closure = configureDaoBeans
 			closure.delegate = delegate
@@ -66,7 +65,7 @@ class DaoPluginHelper {
 		//DaoUtils.ctx = application.mainContext*/
 	}
 
-	static void onChange(event, GrailsApplication grailsApplication){
+	static void onChange(event, GrailsApplication grailsApplication) {
 		if (!event.source || !event.ctx) {
 			return
 		}
@@ -87,7 +86,7 @@ class DaoPluginHelper {
 	}
 
 	//Copied much of this from grails source ServicesGrailsPlugin
-	static Closure configureDaoBeans = {GrailsDaoClass daoClass, GrailsApplication grailsApplication ->
+	static Closure configureDaoBeans = { GrailsDaoClass daoClass, GrailsApplication grailsApplication ->
 		def scope = daoClass.getPropertyValue("scope")
 
 		def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
@@ -102,7 +101,7 @@ class DaoPluginHelper {
 		//FIXME can't we get rid of this now? GRails doesn't do it in the services right?
 		//ALSO see here for how they do it
 		// https://github.com/grails/grails-data-mapping/blob/1b14ecf85b221fc78d363001ea960728d7902b45/grails-datastore-gorm-plugin-support/src/main/groovy/org/grails/datastore/gorm/plugin/support/SpringConfigurer.groovy#L102-L102
-        //Also see http://docs.grails.org/latest/guide/single.html#upgrading under "Spring Proxies for Services No Longer Supported"
+		//Also see http://docs.grails.org/latest/guide/single.html#upgrading under "Spring Proxies for Services No Longer Supported"
 		//What does that mean for this here?
 		if (shouldCreateTransactionalProxy(daoClass)) {
 			Properties props = new Properties()
@@ -125,12 +124,12 @@ class DaoPluginHelper {
 					if (scope) innerBean.scope = scope
 				}
 				proxyTargetClass = true
-				transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes:props)
+				transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes: props)
 				transactionManager = ref("transactionManager")
 			}
 		} else {
 			"${daoClass.propertyName}"(daoClass.getClazz()) { bean ->
-				bean.autowire =  true
+				bean.autowire = true
 				bean.lazyInit = lazyInit
 				if (scope) bean.scope = scope
 			}
@@ -152,17 +151,16 @@ class DaoPluginHelper {
 		}
 	}
 
-
-	static def figureOutDao(GrailsDomainClass dc, ctx){
+	static def figureOutDao(GrailsDomainClass dc, ctx) {
 		def domainClass = dc.clazz
-		def daoName = "${dc.propertyName}Dao"
+		String daoName = "${dc.propertyName}Dao"
 		//def daoType = GrailsClassUtils.getStaticPropertyValue(domainClass, "daoType")
 		def dao
 		//println "$daoType and $daoName for $domainClass"
-		if(ctx.containsBean(daoName)){
+		if (ctx.containsBean(daoName)) {
 			//println "found bean $daoName for $domainClass"
 			dao = ctx.getBean(daoName)
-		}else{
+		} else {
 			//println "getInstance for $domainClass"
 			dao = ctx.getBean("gormDaoBean")
 			dao.domainClass = domainClass

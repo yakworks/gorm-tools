@@ -1,4 +1,5 @@
 package gorm.tools.beans
+
 import groovy.json.JsonSlurper
 import org.apache.log4j.Logger
 
@@ -22,8 +23,7 @@ import org.apache.log4j.Logger
  *  limitations under the License.
  */
 
-
- /**
+/**
  * The primary use of this is to convert a net json tree to a flat map that
  * can eb used with the old grails parser
  */
@@ -31,8 +31,7 @@ class MapFlattener {
 
     private static final def Logger LOG = Logger.getLogger(MapFlattener.class)
     private final def KeyVersion _keyVersion = new KeyVersion()
-    public boolean convertEmptyStringsToNull = true
-
+    boolean convertEmptyStringsToNull = true
 
     /**
      * Groovy transforms JSON to either a Map or List based on the root node.
@@ -40,25 +39,19 @@ class MapFlattener {
      * @param groovyJsonObject
      * @return A Map of String,String
      */
-    def Map<String,String> flatten(Map groovyJsonObject) {
+    def Map<String, String> flatten(Map groovyJsonObject) {
 
-        def keyValues = new HashMap<String,String>()
+        def keyValues = new HashMap<String, String>()
 
-        if ( groovyJsonObject == null )
-        {
+        if (groovyJsonObject == null) {
             return keyValues
         }
 
-        if ( groovyJsonObject instanceof Map )
-        {
+        if (groovyJsonObject instanceof Map) {
             keyValues.putAll(transformGroovyJsonMap(groovyJsonObject, ""))
-        }
-        else if ( groovyJsonObject instanceof List )
-        {
+        } else if (groovyJsonObject instanceof List) {
             keyValues.putAll(transformJsonArray(groovyJsonObject, ""))
-        }
-        else
-        {
+        } else {
             // todo "foo": "bar"
         }
 
@@ -73,57 +66,45 @@ class MapFlattener {
      * @param currentName
      * @return
      */
-    def Map<String,String> transformGroovyJsonMap(Map jsonMap, String currentName) {
+    def Map<String, String> transformGroovyJsonMap(Map jsonMap, String currentName) {
 
-        if ( jsonMap == null || jsonMap.isEmpty() )
-        {
-            return new HashMap<String,String>()
+        if (jsonMap == null || jsonMap.isEmpty()) {
+            return new HashMap<String, String>()
         }
 
-        def keyValues = new HashMap<String,String>()
+        def keyValues = new HashMap<String, String>()
 
         jsonMap.each { entry ->
 
             def key = entry.key
-            if ( currentName != null && !currentName.empty )
-            {
+            if (currentName != null && !currentName.empty) {
                 key = currentName + "." + key
             }
             //println("entry : ${entry.value.toString()}")
-            if ( entry == null)
-            {
+            if (entry == null) {
                 //entry.value = ""
                 //println("Null Entry Or Entry Value")
             }
 
             //if it is an association id, then set value to 'null' to set the association to null
-            else if((key && key.toString().endsWith(".id")) && (entry.value == null || entry.value.toString() == 'null' || entry.value.toString().trim() == "")) {
+            else if ((key && key.toString().endsWith(".id")) && (entry.value == null || entry.value.toString() == 'null' || entry.value.toString().trim() == "")) {
                 _keyVersion.updateMapWithKeyValue(keyValues, key, "null")
-            }
-
-            else if (entry.value == null || entry.value?.toString() == 'null') {
+            } else if (entry.value == null || entry.value?.toString() == 'null') {
                 _keyVersion.updateMapWithKeyValue(keyValues, key, null)
-            }
-
-            else if ( entry.value instanceof List )
-            {
+            } else if (entry.value instanceof List) {
                 def jsonListKeyValues = transformJsonArray(entry.value, key)
                 keyValues.putAll(jsonListKeyValues)
-            }
-            else if ( entry.value instanceof Map)
-            {
+            } else if (entry.value instanceof Map) {
                 def jsonMapKeyValues = transformGroovyJsonMap(entry.value, key)
                 keyValues.putAll(jsonMapKeyValues)
-            }
-            else
-            {
+            } else {
                 def value = String.valueOf(entry.value)
 
-                if(value != null) {
+                if (value != null) {
                     value = value.trim() //trim strings - same as grails.databinding.trimStrings
                 }
                 //convert empty strings to null - same behavior as grails.databinding.convertEmptyStringsToNull
-                if("".equals(value) && convertEmptyStringsToNull) {
+                if ("".equals(value) && convertEmptyStringsToNull) {
                     value = null
                 }
 
@@ -146,36 +127,28 @@ class MapFlattener {
      * @param currentName
      * @return A map of String,String
      */
-    def Map<String,String> transformJsonArray(List jsonArray, String currentName) {
+    def Map<String, String> transformJsonArray(List jsonArray, String currentName) {
 
-        if ( jsonArray == null || jsonArray.empty )
-        {
+        if (jsonArray == null || jsonArray.empty) {
             return new HashMap<String, String>()
         }
 
-        def keyValues = new HashMap<String,String>()
+        def keyValues = new HashMap<String, String>()
         keyValues.put(currentName, jsonArray)
 
         int index = 0
 
         jsonArray.each { jsonElement ->
             String arrayName = [currentName, index++].join('.')
-            if ( jsonElement == null )
-            {
+            if (jsonElement == null) {
                 keyValues.put(arrayName, null)
-            }
-            else if ( jsonElement instanceof Map)
-            {
+            } else if (jsonElement instanceof Map) {
                 def jsonMapKeyValues = transformGroovyJsonMap(jsonElement, arrayName)
                 _keyVersion.updateMapWithKeyValues(keyValues, jsonMapKeyValues)
-            }
-            else if ( jsonElement instanceof List )
-            {
+            } else if (jsonElement instanceof List) {
                 def jsonArrayKeyValues = transformJsonArray(jsonElement, arrayName)
                 _keyVersion.updateMapWithKeyValues(keyValues, jsonArrayKeyValues)
-            }
-            else
-            {
+            } else {
                 def value = String.valueOf(jsonElement)
                 _keyVersion.updateMapWithKeyValue(keyValues, arrayName, value)
             }
@@ -184,14 +157,13 @@ class MapFlattener {
         return keyValues
     }
 
-
 }
 
 class KeyVersion {
 
-    private def keyVersionCount = new HashMap<String,Integer>()
+    private def keyVersionCount = new HashMap<String, Integer>()
 
-    def updateMapWithKeyValue(Map<String,String> originalMap, String key, String value) {
+    def updateMapWithKeyValue(Map<String, String> originalMap, String key, String value) {
 
         // if ( key == null || value == null )
         // {
@@ -199,30 +171,23 @@ class KeyVersion {
         // }
 
         //def downcaseKey = key.toLowerCase()
-        if ( keyVersionCount.containsKey(key) )
-        {
+        if (keyVersionCount.containsKey(key)) {
             def indexedKey = buildIndexedKeyAndUpdateKeyCount(key)
             originalMap.put(indexedKey, value)
-        }
-        else
-        {
+        } else {
             originalMap.put(key, value)
         }
     }
 
-
-    def updateMapWithKeyValues(Map<String,String> originalMap, Map<String,String> additionalMap) {
+    def updateMapWithKeyValues(Map<String, String> originalMap, Map<String, String> additionalMap) {
 
         additionalMap.entrySet().each { entry ->
 
             def downcaseKey = entry.key
-            if ( originalMap.containsKey(downcaseKey) )
-            {
+            if (originalMap.containsKey(downcaseKey)) {
                 def indexedKey = buildIndexedKeyAndUpdateKeyCount(downcaseKey)
                 originalMap.put(indexedKey, entry.value)
-            }
-            else
-            {
+            } else {
                 originalMap.put(downcaseKey, entry.value)
             }
         }
@@ -237,20 +202,16 @@ class KeyVersion {
         return combinedMap
     }
 
-
     private def String buildIndexedKeyAndUpdateKeyCount(String key) {
 
         def downcaseKey = key
         def indexedKey = key
 
-        if ( keyVersionCount.containsKey(key) )
-        {
+        if (keyVersionCount.containsKey(key)) {
             def keyIndex = keyVersionCount.get(downcaseKey) + 1
             indexedKey = key + "." + keyIndex
             keyVersionCount.put(downcaseKey, keyIndex)
-        }
-        else
-        {
+        } else {
             indexedKey = downcaseKey + "." + 1
             keyVersionCount.put(downcaseKey, 1)
         }

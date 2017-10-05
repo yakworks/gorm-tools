@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package grails.plugin.dao;
-
+package grails.plugin.dao
 
 import grails.core.ArtefactHandlerAdapter
-import groovy.transform.CompileStatic;
+import groovy.transform.CompileStatic
 
 /**
  * Grails artefact handler for dao classes
@@ -29,15 +27,15 @@ import groovy.transform.CompileStatic;
 @CompileStatic
 public class DaoArtefactHandler extends ArtefactHandlerAdapter {
 
-	public static final String TYPE = "Dao";
-	public static final String PLUGIN_NAME = "dao";
+	public static final String TYPE = "Dao"
+	public static final String PLUGIN_NAME = "dao"
 
 	DaoArtefactHandler() {
 		super(TYPE, GrailsDaoClass.class, DefaultGrailsDaoClass.class, DefaultGrailsDaoClass.DAO, false)
 	}
 
 	String getPluginName() {
-		return PLUGIN_NAME;
+		return PLUGIN_NAME
 	}
 
 }

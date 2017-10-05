@@ -9,8 +9,8 @@ public class CriteriaUtils {
 
     /** This is a convenience method to redirect all the types of filters from a single map. */
     static def filterGroup(Map groups) {
-        ['filterBoolean','filterDate', 'filterDomain', 'filterMoney', 'filterLong', 'filterText', 'filterSimple'].each { command ->
-            if(groups[command])   "${command}"   (groups.map, groups.delegate, groups[command])
+        ['filterBoolean', 'filterDate', 'filterDomain', 'filterMoney', 'filterLong', 'filterText', 'filterSimple'].each { command ->
+            if (groups[command]) "${command}"(groups.map, groups.delegate, groups[command])
         }
     }
 
@@ -31,10 +31,10 @@ public class CriteriaUtils {
      * @param delegate The delegate from the createCriteria().list() structure or similar.
      * @param keys The list of attribute names to search on.  Matches the attribute name of the domain object.
      */
-    static def filterLong(Map params, delegate, List keys) { filterEqIn(params, delegate, { it as Long }, keys ) }
+    static def filterLong(Map params, delegate, List keys) { filterEqIn(params, delegate, { it as Long }, keys) }
 
     /** Inserts an 'eq' or 'in' clause depending on whether the value is a List.
-     * @param  params The search criteria
+     * @param params The search criteria
      * @param delegate The delegate from the createCriteria().list() structure or similar.
      * @param cast A Closure that converts the values to a type matching the domain type.  Defaults to no change.
      * @param keys The list of attribute names to search on.  Matches the attribute name of the domain object.
@@ -42,17 +42,17 @@ public class CriteriaUtils {
     static def filterEqIn(Map params, delegate, Closure cast = { it }, List keys) {
         def result = {
             keys.each { key ->
-                if(params[key]) {
-                    if(params[key] instanceof List) {
-                        'in' (key, params[key].collect { cast(it) } )
+                if (params[key]) {
+                    if (params[key] instanceof List) {
+                        'in'(key, params[key].collect { cast(it) })
                     } else {
-                        eq(key, cast( params[key] ) )
+                        eq(key, cast(params[key]))
                     }
                 }
             }
         }
         result.delegate = delegate
-        return result();
+        return result()
     }
 
     /** Adds a filterRange criteria with a Date cast.  See filterRange for details. */
@@ -85,19 +85,19 @@ public class CriteriaUtils {
     static def filterRange(Map params, delegate, Closure cast, List keys) {
         def result = {
             keys.each { key ->  // spin through each key
-                if(params[key]) {   // don't do anything if there's no value
+                if (params[key]) {   // don't do anything if there's no value
                     def base = params[key]  // get a localalized map for this key
-                    if(base.minop) {  // check for 'minimum' stuff.
-                        if(!['eq','ne','gt','ge'].contains(base.minop)) {
+                    if (base.minop) {  // check for 'minimum' stuff.
+                        if (!['eq', 'ne', 'gt', 'ge'].contains(base.minop)) {
                             throw new IllegalArgumentException("Invalid value '${base.minop}' for ${key}.minop value")
                         }
-                        "${base.minop}" (key, cast(base.minval) )
+                        "${base.minop}"(key, cast(base.minval))
                     }
-                    if(base.maxop) {  // check for 'maximum' stuff.
-                        if(!['lt','le'].contains(base.maxop)) {
+                    if (base.maxop) {  // check for 'maximum' stuff.
+                        if (!['lt', 'le'].contains(base.maxop)) {
                             throw new IllegalArgumentException("Invalid value '${base.maxop}' for ${key}.maxop value")
                         }
-                        "${base.maxop}" (key, cast(base.maxval) )
+                        "${base.maxop}"(key, cast(base.maxval))
                     }
                 }
             }
@@ -115,12 +115,12 @@ public class CriteriaUtils {
     static def filterDomain(Map params, delegate, List keys) {
         def result = {
             keys.each { key ->
-                if(params[key]) {
+                if (params[key]) {
                     "${key}" {
-                        if(params[key]?.size() && params[key][0] instanceof Map) {
-                            'in' ('id', params[key].collect { it.id as Long })
+                        if (params[key]?.size() && params[key][0] instanceof Map) {
+                            'in'('id', params[key].collect { it.id as Long })
                         } else {
-                            'in' ('id', params[key].collect { it })
+                            'in'('id', params[key].collect { it })
                         }
                     }
                 }
@@ -139,12 +139,15 @@ public class CriteriaUtils {
     static def filterText(params, delegate, keys) {
         def result = {
             keys.each { key ->
-                if(params[key]) {
-                    if(params[key] instanceof List) {
-                        'in' (key, params[key])
+                if (params[key]) {
+                    if (params[key] instanceof List) {
+                        'in'(key, params[key])
                     } else {
-                        if(params[key].contains('%')) like key, params[key]
-                        else                          eq   key, params[key]
+                        if (params[key].contains('%')) {
+                            like key, params[key]
+                        } else {
+                            eq key, params[key]
+                        }
                     }
                 }
             }
@@ -153,7 +156,7 @@ public class CriteriaUtils {
         return result()
     }
 
-     /**
+    /**
      * applies sorting for several columns
      * free-jqgrid that is used on frontend side has feature for multi row sorting
      * By default free-jqrid prepared sorting properties with next pattern

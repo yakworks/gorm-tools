@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 class IdGeneratorTestHelper {
 
 	static void createTables(JdbcTemplate jdbcTemplate) {
-		createNewObjectIdTable(jdbcTemplate)
+		//createNewObjectIdTable(jdbcTemplate)
 		createCustomTable(jdbcTemplate)
 	}
 

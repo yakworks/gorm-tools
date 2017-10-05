@@ -2,6 +2,7 @@ package gorm.tools.idgen
 
 import org.apache.log4j.Category
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
 import grails.transaction.Transactional
@@ -74,6 +75,14 @@ public class JdbcIdGenerator implements IdGenerator {
 				oid = createRow( table, keyColumn,  idColumn,  name);
 				//throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
 			}
+			catch(BadSqlGrammarException bge) {
+				log.error("Looks like the idgen table is not found. This will do a dirty setup for the table for the JdbcIdGenerator for testing apps \
+					but its STRONGLY suggested you set it up properly with something like db-migration \
+					or another tools as not indexes or optimization are taken into account", bge)
+				createTable( table, keyColumn,  idColumn);
+				oid = createRow( table, keyColumn,  idColumn,  name);
+				//throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
+			}
 			if (oid>0) { //found it
 				if(oid < seedValue) {
 					oid = seedValue;
@@ -103,6 +112,18 @@ public class JdbcIdGenerator implements IdGenerator {
 		}
 		jdbcTemplate.update("insert into "+table+" ("+keyColumn+"," + idColumn + ") "+ "Values('" +name+"'," + maxId + ")" );
 		return maxId;
+	}
+
+	private void createTable(String table,String keyColumn, String idColumn){
+		String query = """
+			create table $table
+				(
+					$keyColumn varchar(255) not null,
+					$idColumn bigint not null
+				)
+				"""
+
+		jdbcTemplate.execute(query)
 	}
 
 	public String getKeyColumn() {

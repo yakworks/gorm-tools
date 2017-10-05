@@ -1,0 +1,70 @@
+# Project information
+site_name: Gorm Tools
+site_description: Helpers for gorm
+site_author: Joshua Burnett
+site_url: http://yakworks.github.io/gorm-tools/
+copyright: 'Copyright &copy; 2017 9ci Inc'
+
+# Page tree
+pages:
+  - Overview: index.md
+
+## edit link settings
+repo_name: yakworks/gorm-tools
+repo_url: https://github.com/yakworks/gorm-rest-api
+edit_uri: edit/master/docs/
+
+# Config
+docs_dir: 'docs'
+theme: material-components
+
+# Options
+extra:
+
+  # adds <meta name="robots" content="noindex,nofollow"> to keep search engines from indexing this
+  # noindex: true
+  feature:
+    tabs: false
+  palette:
+    primary: 'light green'
+    accent: indigo
+  # social:
+  #   - type: globe
+  #     link: http://struct.cc
+  #   - type: github-alt
+  #     link: https://github.com/9ci
+  #   - type: twitter
+  #     link: https://twitter.com/9ci
+  #   - type: linkedin
+  #     link: https://de.linkedin.com/in/basejump
+
+# Extensions
+markdown_extensions:
+  - pymdownx.extra # replacement for markdown.extensions.extra see https://facelessuser.github.io/pymdown-extensions/extensions/extra/
+  - markdown.extensions.admonition
+  - markdown.extensions.codehilite(guess_lang=false)
+  - markdown.extensions.def_list
+  - markdown.extensions.footnotes
+  - markdown.extensions.meta
+  - markdown.extensions.toc(permalink=true)
+  - markdown_include.include:
+      base_path: 'docs'
+  - pymdownx.arithmatex
+  - pymdownx.betterem(smart_enable=all)
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.emoji:
+      #emoji_generator: !!python/name:pymdownx.emoji.to_svg
+      emoji_index: !!python/name:pymdownx.emoji.gemoji
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist(custom_checkbox=true)
+  - pymdownx.tilde
+
+# Google Analytics
+# google_analytics:
+#   - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
+#   - auto

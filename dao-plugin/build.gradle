@@ -18,6 +18,7 @@ apply plugin: "idea"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-plugin-publish"
 apply plugin:"org.grails.plugins.views-json"
+apply plugin: 'codenarc'
 
 repositories {
 	mavenLocal()
@@ -53,7 +54,16 @@ dependencies {
 	compile "org.grails.plugins:views-json-templates:1.2.0.M2"
 	provided "org.codehaus.groovy:groovy-ant"
 	compile "org.grails:grails-plugin-testing"
+	codenarc 'org.codenarc:CodeNarc:0.25.2'
 	testCompile "org.grails.plugins:geb"
+}
+
+codenarc {
+	toolVersion = '0.25.2'
+	configFile = file("${projectDir}/config/codenarc/rules.groovy")
+	maxPriority1Violations = 0
+	maxPriority2Violations = 2
+	maxPriority3Violations = 8
 }
 
 grailsPublish {

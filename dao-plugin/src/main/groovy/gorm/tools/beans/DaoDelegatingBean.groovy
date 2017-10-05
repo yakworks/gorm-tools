@@ -19,14 +19,11 @@ class DaoDelegatingBean extends DelegatingBean {
     def propertyMissing(String name) {
         try {
             return super.propertyMissing(name)
-        }catch (MissingPropertyException e) {
-            String method
-            if(name.startsWith("has") || name.startsWith("is")) method = name
-            else method = "get" + name.capitalize()
-
+        } catch (MissingPropertyException e) {
+            String method = (name.startsWith("has") || name.startsWith("is")) ? name : "get" + name.capitalize()
             try {
                 return dao.invokeMethod(method, target)
-            }catch (MissingMethodException me) {
+            } catch (MissingMethodException me) {
                 //dao does not have that method either, so throw back original MissingPropertyException exception
                 throw e
             }
@@ -36,10 +33,10 @@ class DaoDelegatingBean extends DelegatingBean {
     def methodMissing(String name, args) {
         try {
             return target.invokeMethod(name, args)
-        }catch (MissingMethodException e) {
+        } catch (MissingMethodException e) {
             try {
                 dao.invokeMethod(name, args)
-            }catch (MissingMethodException me) {
+            } catch (MissingMethodException me) {
                 //if dao does not have the method either, throw back original exception
                 throw e
             }

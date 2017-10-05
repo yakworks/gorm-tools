@@ -13,32 +13,32 @@ class DomainException extends ValidationException {
 	Map meta //any meta that can be set and passed up the chain for an error
 	Map messageMap //map with message info code,orgs and defaultMessage
 	def otherEntity //another entity on which error occurred
-	
+
 	public DomainException(String msg) {
-		super(msg,new EmptyErrors("empty"))
-		//messageMap = [code:"validationException",args:[],defaultMessage:msg]
+		super(msg, new EmptyErrors("empty"))
+		//messageMap = [code:"validationException", args:[], defaultMessage:msg]
 	}
 
 	public DomainException(String msg, Errors e) {
-		this(msg,e,null)
+		this(msg, e, null)
 	}
 
-	public DomainException(String msg, Errors e,Throwable cause) {
-		super(msg,e)
+	public DomainException(String msg, Errors e, Throwable cause) {
+		super(msg, e)
 		initCause(cause)
-		messageMap = [code:"validationException",args:[],defaultMessage:msg]
+		messageMap = [code:"validationException", args:[], defaultMessage:msg]
 	}
-	
+
 	public DomainException(Map msgMap, entity, Errors errors) {
 		this(msgMap, entity, errors, null)
 	}
 
 	public DomainException(Map msgMap, entity) {
-		this(msgMap, entity,null,null)
+		this(msgMap, entity, null, null)
 	}
 
 	public DomainException(Map msgMap, entity, Throwable cause) {
-		this(msgMap, entity,null,cause)
+		this(msgMap, entity, null, cause)
 	}
 
 	public DomainException(Map msgMap, entity, Errors errors, Throwable cause) {

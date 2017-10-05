@@ -14,6 +14,7 @@ import org.hibernate.internal.CriteriaImpl
  * a holder object for paged data
  */
 //@CompileStatic
+@SuppressWarnings(['NoDef'])
 class Pager {
     private Log log = LogFactory.getLog(getClass())
     //the page we are on
@@ -28,8 +29,7 @@ class Pager {
     List data
     def params
 
-
-    public Pager() {}
+    public Pager() { }
 
     public Pager(Map params) {
         setParams(params)
@@ -53,16 +53,12 @@ class Pager {
     }
 
     @CompileDynamic
-    static Integer toInteger(Object v){
+    static Integer toInteger(Object v) {
         return v.toInteger()
     }
 
     def getOffset() {
-        if (!offset) {
-            return (max * (page - 1))
-        } else {
-            return offset
-        }
+        return offset ?: (max * (page - 1))
     }
 
     def getPageCount() {
@@ -70,16 +66,16 @@ class Pager {
     }
 
     def eachPage(Closure c) {
-        if(pageCount < 1) return
+        if (pageCount < 1) return
         log.debug "eachPage total pages : pageCount"
 
-        (1..pageCount).each {Long pageNum ->
+        (1..pageCount).each { Long pageNum ->
             page = pageNum
             offset = (max * (page - 1))
             try {
                 log.debug "Executing eachPage closer with [max:$max, offset:$offset]"
                 c.call(max, offset)
-            }catch (Exception e) {
+            } catch (Exception e) {
                 log.error "Error encountered while calling closure in eachPage [max:$max, offset:$offset]}]", e
                 throw e
             }

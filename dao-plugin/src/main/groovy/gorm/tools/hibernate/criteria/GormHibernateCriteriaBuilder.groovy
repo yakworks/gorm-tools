@@ -74,7 +74,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
             return super.order(propertyName, direction)
         } else {
             List props = propertyName.split(/\./) as List
-            def last = props.pop()
+            String last = props.pop()
             Closure toDo = { order(last, direction) }
             Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
                 { -> "$prop"(acc) }
@@ -116,7 +116,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
             return super."$critName"(propertyName, propertyValue)
         } else {
             List props = propertyName.split(/\./) as List
-            def last = props.pop()
+            String last = props.pop()
             Closure toDo = { "$critName"(last, propertyValue) }
             Closure newCall = props.reverse().inject(toDo) { acc, prop ->
                 { -> "$prop"(acc) }
@@ -129,7 +129,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
     /**
      * Dynamic method dispatch fail!
      */
-    def methodMissing(String name, args) {
+    Object methodMissing(String name, args) {
 //		println "hibernate $name with $args"
         return super.invokeMethod(name, args)
     }

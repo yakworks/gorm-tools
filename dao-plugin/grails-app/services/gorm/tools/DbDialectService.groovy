@@ -121,7 +121,7 @@ class DbDialectService {
 		top
 	}
 
-	def updateOrDateFormat() {
+	void updateOrDateFormat() {
 		if (dialect == ORACLE) {
 			String alterOrDateFormat = "alter session set nls_date_format = 'YYYY-MM-dd hh24:mi:ss'"
 

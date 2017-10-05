@@ -35,7 +35,7 @@ class ScrollableQuery {
 		sql.query(query) { ResultSet r ->
 			while (r.next()) {
 				index++
-				def row = rowMapper.mapRow(r, index)
+				Object row = rowMapper.mapRow(r, index)
 				cl.call(row)
 			}
 		}
@@ -47,7 +47,7 @@ class ScrollableQuery {
 	 */
 	public void eachBatch(String query, int batchSize, Closure cl) {
 		List batch = []
-		this.eachRow(query) { def row ->
+		this.eachRow(query) { Object row ->
 			batch.add(row)
 			if ((batch.size() == batchSize)) {
 				cl.call(batch)
@@ -68,7 +68,7 @@ class ScrollableQuery {
 	public List rows(String query) {
 		List result = []
 
-		this.eachRow(query) { def row ->
+		this.eachRow(query) { Object row ->
 			result.add(row)
 		}
 

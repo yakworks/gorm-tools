@@ -46,7 +46,7 @@ class DaoMessage {
 	 */
 	@CompileDynamic
 	static Map buildMessageParams(entity) {
-		def ident = badge(entity.id, entity)
+		String ident = badge(entity.id, entity)
 		String domainLabel = resolveDomainLabel(entity)
 		List args = [domainLabel, ident]
 		return [ident: ident, domainLabel: domainLabel, args: args]
@@ -78,18 +78,18 @@ class DaoMessage {
 	}
 
 	static Map deleted(entity, ident) {
-		def domainLabel = resolveDomainLabel(entity)
+		String domainLabel = resolveDomainLabel(entity)
 		return setup("default.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} deleted")
 	}
 
 	static Map notDeleted(entity, ident) {
-		def domainLabel = resolveDomainLabel(entity)
+		String domainLabel = resolveDomainLabel(entity)
 		return setup("default.not.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} could not be deleted")
 	}
 
 	static Map optimisticLockingFailure(entity) {
-		def domainLabel = resolveDomainLabel(entity)
-		def msgMap = setup("default.optimistic.locking.failure", [domainLabel], "Another user has updated the ${domainLabel} while you were editing")
+		String domainLabel = resolveDomainLabel(entity)
+		return setup("default.optimistic.locking.failure", [domainLabel], "Another user has updated the ${domainLabel} while you were editing")
 	}
 
 	static String resolveDomainLabel(entity) {
@@ -121,8 +121,8 @@ class DaoMessage {
 
 	//used for messages, if the entity has a name field then use that other wise fall back on the id and return that
 	@CompileDynamic
-	static def badge(id, entity) {
-		def hasName = entity?.metaClass.hasProperty(entity, 'name')
+	static String badge(id, entity) {
+		boolean hasName = entity?.metaClass.hasProperty(entity, 'name')
 		return ((hasName && entity) ? entity.name : id)
 	}
 

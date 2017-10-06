@@ -62,7 +62,7 @@ class ErrorMessageService {
 		}
 		if (e.hasProperty('entity')) {
 			BatchUpdateException core = causes.find { it instanceof BatchUpdateException }
-			def num = e.entity.hasProperty('num') ? e.entity.num : null
+			String num = e.entity.hasProperty('num') ? e.entity.num : null
 			if (core && core.message.startsWith('Duplicate entry') && num && core.message.contains(num)) {
 				errMap.errors = errMap.errors ?: [:]
 				errMap.errors.num = 'Duplicate entry'

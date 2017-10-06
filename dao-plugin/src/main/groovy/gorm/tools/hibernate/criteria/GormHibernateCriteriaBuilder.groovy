@@ -19,6 +19,8 @@ import grails.orm.HibernateCriteriaBuilder
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.SessionFactory
+import grails.compiler.GrailsCompileStatic
+import groovy.transform.CompileDynamic
 
 /**
  * This is here to make it easier to uild cirteria with domain bean paths
@@ -36,6 +38,7 @@ import org.hibernate.SessionFactory
  *
  * ilike('invoice.customer.name', 'foo')
  */
+@GrailsCompileStatic
 class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
 
     GormHibernateCriteriaBuilder(Class arg1, SessionFactory arg2) {
@@ -69,6 +72,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      *
      * @return A Order instance
      */
+    @CompileDynamic
     Criteria order(String propertyName, String direction, boolean forceSuper = false) {
         if (forceSuper || !propertyName.contains('.')) {
             return super.order(propertyName, direction)
@@ -111,6 +115,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
         nestedPathPropCall(propertyName, values, "in")
     }
 
+    @CompileDynamic
     public Criteria nestedPathPropCall(String propertyName, Object propertyValue, String critName) {
         if (!propertyName.contains('.')) {
             return super."$critName"(propertyName, propertyValue)

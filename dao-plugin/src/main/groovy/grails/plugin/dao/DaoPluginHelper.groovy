@@ -17,6 +17,7 @@ import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 
 import java.lang.reflect.Method
 
+@SuppressWarnings(['NoDef'])
 class DaoPluginHelper {
 	static List<ArtefactHandler> artefacts = [new DaoArtefactHandler()]
 

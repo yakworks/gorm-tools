@@ -80,8 +80,8 @@ public class JdbcIdGenerator implements IdGenerator {
 				log.error("Looks like the idgen table is not found. This will do a dirty setup for the table for the JdbcIdGenerator for testing apps \
 					but its STRONGLY suggested you set it up properly with something like db-migration \
 					or another tools as not indexes or optimization are taken into account", bge)
-				createTable( table, keyColumn,  idColumn);
-				oid = createRow( table, keyColumn,  idColumn,  name);
+				createTable( table, keyColumn,  idColumn)
+				oid = createRow( table, keyColumn,  idColumn,  name)
 				//throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
 			}
 			if (oid>0) { //found it

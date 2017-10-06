@@ -9,10 +9,10 @@ import org.springframework.validation.Errors
 */
 @CompileStatic
 class DomainException extends ValidationException {
-	def entity //the entity that the error occured on
+	Object entity //the entity that the error occured on
 	Map meta //any meta that can be set and passed up the chain for an error
 	Map messageMap //map with message info code,orgs and defaultMessage
-	def otherEntity //another entity on which error occurred
+	Object otherEntity //another entity on which error occurred
 
 	public DomainException(String msg) {
 		super(msg, new EmptyErrors("empty"))

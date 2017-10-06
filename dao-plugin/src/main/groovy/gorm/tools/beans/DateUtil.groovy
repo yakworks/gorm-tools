@@ -170,10 +170,10 @@ class DateUtil {
         return setTimeBeforeMidnight(endDate).getTime()
     }
 
-    def static getLastWeekStartDate(){
+    static int getLastWeekStartDate(){
         Calendar startDate = getCurrentCalendarInstance()
         int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        while(dayOfWeek  != Calendar.SUNDAY) {
+        while(dayOfWeek != Calendar.SUNDAY) {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
@@ -181,6 +181,7 @@ class DateUtil {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
+        return dayOfWeek
     }
 
     static Calendar getCurrentCalendarInstance(){

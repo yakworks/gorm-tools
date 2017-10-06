@@ -34,7 +34,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * returns an instance with fireEvents=false and flushOnSave=false
 	 */
 //	static GormDaoSupport<T> getInstance(Class<T> clazz) {
-///*		def dao = DaoUtil.ctx.getBean("gormDaoBean")
+///*		GormDaoSupport dao = DaoUtil.ctx.getBean("gormDaoBean")
 //		dao.domainClass = clazz
 //		return dao*/
 //		return new GormDaoSupport(clazz, false)
@@ -103,7 +103,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 			entity.delete(flush: true)
 		}
 		catch (DataIntegrityViolationException dae) {
-			def ident = DaoMessage.badge(entity.ident(), entity)
+			String ident = DaoMessage.badge(entity.ident(), entity)
 			//log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
 			throw new DomainException(DaoMessage.notDeleted(entity, ident), entity, dae)
 		}

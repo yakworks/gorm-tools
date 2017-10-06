@@ -19,17 +19,17 @@ import groovy.transform.TypeCheckingMode
 
 @CompileStatic
 class DelegatingBean {
-    def target
+    Object target
 
     DelegatingBean(target) {
         this.target = target
     }
 
-    def propertyMissing(String name) {
+    Object propertyMissing(String name) {
         return target[name]
     }
 
-    def methodMissing(String name, args) {
+    Object methodMissing(String name, args) {
         return target.invokeMethod(name, args)
     }
 }

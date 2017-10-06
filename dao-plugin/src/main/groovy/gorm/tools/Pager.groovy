@@ -45,7 +45,7 @@ class Pager {
         return p.page as Integer
     }
 
-    def setParams(Map params) {
+    void setParams(Map params) {
         page = params.page = params.page ? toInteger(params.page) : 1
         max = params.max = Math.min(params.max ? toInteger(params.max) : 10, allowedMax)
         this.params = params
@@ -68,7 +68,7 @@ class Pager {
         return Math.ceil(recordCount / max).intValue()
     }
 
-    def eachPage(Closure c) {
+    void eachPage(Closure c) {
         if(pageCount < 1) return
         log.debug "eachPage total pages : pageCount"
 
@@ -130,13 +130,13 @@ class Pager {
 
         //get original query and modify it to get count of records. sadly, we cannot clone it
         Query q = src.query
-        def criteriaField = q.class.declaredFields.find { it.name == 'criteria' }
+        Object criteriaField = q.class.declaredFields.find { it.name == 'criteria' }
         criteriaField.setAccessible(true)
         CriteriaImpl realCriteria = criteriaField.get(q)
         realCriteria.setProjection(Projections.rowCount()) // count(*)
 
         //now we need to remove ORDER BY, because MS SQL cannot execute count(*) query with ORDER BY
-        def currentOrder = realCriteria.class.declaredFields.find { it.name == 'orderEntries' }
+        Object currentOrder = realCriteria.class.declaredFields.find { it.name == 'orderEntries' }
         currentOrder.setAccessible(true)
         currentOrder.get(realCriteria).clear()
 

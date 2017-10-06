@@ -50,12 +50,12 @@ class GormUtils {
         return copy
     }
 
-    @CompileDynamic
+    //@CompileDynamic
     public static GrailsDomainClass getDomainClass(Class domain) {
         if (!Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, domain)) {
             throw new IllegalArgumentException(domain.name + " is not a domain class")
         } else {
-            return Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.name)
+            return (GrailsDomainClass) Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.name)
         }
     }
 

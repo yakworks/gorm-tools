@@ -33,13 +33,13 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	/**
 	 * returns an instance with fireEvents=false and flushOnSave=false
 	 */
-	static GormDaoSupport<T> getInstance(Class<T> clazz) {
-/*		def dao = DaoUtil.ctx.getBean("gormDaoBean")
-		dao.domainClass = clazz
-		return dao*/
-		return new GormDaoSupport(clazz, false)
-
-	}
+//	static GormDaoSupport<T> getInstance(Class<T> clazz) {
+///*		def dao = DaoUtil.ctx.getBean("gormDaoBean")
+//		dao.domainClass = clazz
+//		return dao*/
+//		return new GormDaoSupport(clazz, false)
+//
+//	}
 
 	//override this to set the domain this dao is for
 	Class<T> getDomainClass() { return thisDomainClass }
@@ -138,7 +138,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	protected final Map<String, Object> doUpdate(Map params) {
-		T entity = load(params.id as Long)
+		T entity = get(params.id as Serializable)
 
 		DaoUtil.checkFound(entity, params, domainClass.name)
 		DaoUtil.checkVersion(entity, params.version)
@@ -160,7 +160,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	protected final Map doRemove(Map params) {
-		T entity = load(params.id as Long)
+		T entity = get(params.id as Serializable)
 		DaoUtil.checkFound(entity, params, domainClass.name)
 		if (fireEvents) beforeRemoveSave(entity, params)
 		Map msg = DaoMessage.deleted(entity, DaoMessage.badge(entity.ident(), entity))
@@ -169,8 +169,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	@CompileDynamic
-	private T load(Long id) {
-		if (id == null) throw new NullPointerException("Id is null")
+	protected T get(Serializable id) {
 		return domainClass.get(id)
 	}
 

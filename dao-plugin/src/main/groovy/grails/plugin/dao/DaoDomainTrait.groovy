@@ -9,23 +9,15 @@ import org.grails.datastore.gorm.GormEntity
 
 @CompileStatic
 trait DaoDomainTrait<D extends GormEntity> {
+	static GormDaoSupport DAO_BEAN
 
-	static GormDaoSupport<D> getDao() {
-		GrailsApplication grailsApplication = Holders.grailsApplication
-		String domainName = this.name
-		Class domainClass = grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domainName).clazz
-		String daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
-		GormDaoSupport<D> dao
-		if (grailsApplication.mainContext.containsBean(daoName)) {
-			dao = (GormDaoSupport<D>) grailsApplication.mainContext.getBean(daoName)
-		} else {
-			dao = (GormDaoSupport) grailsApplication.mainContext.getBean("gormDaoBean")
-			dao.domainClass = domainClass
-		}
-		if (!dao) {
-			dao = GormDaoSupport.getInstance(domainClass)
-		}
-		return dao
+	/**
+	 * Looks up or creates and caches a dao bean
+	 * @return The dao
+	 */
+	static GormDaoSupport getDao() {
+		if(!DAO_BEAN) DAO_BEAN = DaoUtil.getDao(this)
+		return DAO_BEAN
 	}
 
 	D persist(Map args) {
@@ -41,7 +33,16 @@ trait DaoDomainTrait<D extends GormEntity> {
 		getDao().delete((D) this)
 	}
 
+	@Deprecated
 	static Map<String, Object> insertAndSave(Map params) {
+		getDao().insert(params)
+	}
+
+	/**
+	 * Creates, binds and persists and instance
+	 * @return The created instance
+	 */
+	static Map<String, Object> create(Map params) {
 		getDao().insert(params)
 	}
 

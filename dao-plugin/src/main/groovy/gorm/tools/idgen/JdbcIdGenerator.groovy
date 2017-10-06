@@ -20,7 +20,6 @@ import groovy.transform.CompileStatic
  * @author Josh
  *
  */
-//FIXME Sud - do we need tests here
 @CompileStatic
 public class JdbcIdGenerator implements IdGenerator {
 	private static Category log = Category.getInstance(JdbcIdGenerator.class)

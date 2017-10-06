@@ -4,8 +4,12 @@ import grails.core.GrailsApplication
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
 import grails.util.GrailsClassUtils
+import grails.util.GrailsNameUtils
 import grails.util.Holders
 import grails.web.servlet.mvc.GrailsParameterMap
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.apache.juli.logging.Log
 import org.apache.juli.logging.LogFactory
 import org.grails.core.artefact.DomainClassArtefactHandler
@@ -13,11 +17,15 @@ import org.hibernate.Hibernate
 import org.hibernate.UnresolvableObjectException
 import org.hibernate.ObjectNotFoundException
 
+import javax.servlet.http.HttpServletRequest
+
 //import org.apache.commons.logging.*
 
 //XXX add tests for this
+@Slf4j
+@CompileStatic
 class BeanPathTools {
-    static Log log = LogFactory.getLog(getClass())
+    //static Log log = LogFactory.getLog(getClass())
     static GrailsApplication grailsApplication = Holders.grailsApplication
     private static Map excludes = [hasMany: true, belongsTo: true, searchable: true, __timeStamp: true,
                                    constraints: true, version: true, metaClass: true]
@@ -26,31 +34,36 @@ class BeanPathTools {
         throw new AssertionError()
     }
 
-    public static Object getNestedValue(Object domain, String field) {
-        String[] subProps = field.split("\\.")
-
-        int i = 0
-        Object lastProp
-        for (prop in subProps) {
-            if (i == 0) {
-                lastProp = domain."$prop"
-            } else {
-                lastProp = lastProp."$prop"
-            }
-            i += 1
-        }
-
-        return lastProp
+    //@CompileDynamic
+    public static Object getNestedValue(domain, String field) {
+//        String[] subProps = field.split("\\.")
+//
+//        int i = 0
+//        Object lastProp
+//        for (prop in subProps) {
+//            if (i == 0) {
+//                lastProp = domain."$prop"
+//            } else {
+//                lastProp = lastProp."$prop"
+//            }
+//            i += 1
+//        }
+//
+//        return lastProp
+        GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain,field)
     }
 
+    @CompileDynamic
+    //XXX Is this used? whats it for? how is it different than getNestedValue?
     public static Object getFieldValue(Object domain, String field) {
         Object bean = getNestedBean(domain, field)
-        field = GrailsClassUtils.getShortName(field)
+        field = GrailsNameUtils.getShortName(field)
         return bean?."$field"
     }
     /**
      * returns the depest nested bean
      * */
+    @CompileDynamic
     static getNestedBean(Object bean, String path) {
         int i = path.lastIndexOf(".")
         if (i > -1) {
@@ -60,6 +73,7 @@ class BeanPathTools {
         return bean
     }
 
+    @CompileDynamic
     public static List getFields(Object domain) {
         List props = []
 
@@ -75,6 +89,7 @@ class BeanPathTools {
     }
 
     //XXX add test for this
+    @CompileDynamic
     static Map buildMapFromPaths(Object obj, List propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {
             Class delegatingBean = GrailsClassUtils.getStaticFieldValue(obj.getClass(), "delegatingBean")
@@ -89,11 +104,12 @@ class BeanPathTools {
         propList.each { key ->
             propsToMap(obj, key, rowMap)
         }
-        if (log.debugEnabled) log.debug rowMap
+        if (log.debugEnabled) log.debug(rowMap.toMapString())
         return rowMap
 
     }
 
+    @CompileDynamic
     static Map propsToMap(Object obj, String propertyPath, Map currentMap) {
         if (obj == null) return
         final int nestedIndex = propertyPath.indexOf('.')
@@ -102,8 +118,10 @@ class BeanPathTools {
             if (propertyPath == '*') {
                 if (log.debugEnabled) log.debug("obj:$obj propertyPath:$propertyPath currentMap:$currentMap")
                 //just get the persistentProperties
-                Object domain = (obj instanceof DelegatingBean) ? obj.target : obj
+                Object domain = (obj instanceof DelegatingBean) ? ((DelegatingBean)obj).target : obj
+                //FIXME this makes it really hard to test, fix it so its easier to mock
                 GrailsDomainClass domainClass = (GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, Hibernate.getClass(domain).name)
+                //GrailsDomainClass domainClass = domain.domainClass
                 if (domainClass == null) {
                     throw new RuntimeException("${obj.getClass().name} is not a domain class")
                 }
@@ -114,7 +132,7 @@ class BeanPathTools {
                 String id = domainClass.getIdentifier().name
                 currentMap[id] = obj?."$id"
                 //spin through and add them to the map
-                pprops.each {
+                pprops.each { Map it ->
                     currentMap[it.name] = obj?."$it.name"
                 }
             } else {
@@ -159,7 +177,7 @@ class BeanPathTools {
                 }
                 currentMap[nestedPrefix] = l
             } else {
-                propsToMap(nestedObj, remainderOfKey, currentMap[nestedPrefix])
+                propsToMap(nestedObj, remainderOfKey, (Map) currentMap[nestedPrefix])
             }
             return null
         }
@@ -171,18 +189,14 @@ class BeanPathTools {
      * call the MapFlattener and returns a GrailsParameterMap to be used for binding
      * example: [xxx:[yyy:123]] will turn into a GrailsParameterMap with ["xxx.yyy":123]
      */
-    //XXX add test for this in your spec?
-    //XXX Why do we need this ? Grails3 should be able to handle deep maps just fine.
-    static GrailsParameterMap flattenMap(request, jsonMap = null) {
-        def p = new MapFlattener().flatten(jsonMap ?: request.JSON)
-        //XXX a hack to remove the edited/created fields. not sure why they are being binded
-        p.each { entry ->
-            def key = entry.key
-            if (entry.key.endsWith('createdDate') || entry.key.endsWith('editedDate')) {
-                entry.value = null
-            }
-        }
-        //println "flat map $p"
+    //XXX add test for these
+    static GrailsParameterMap flattenMap(HttpServletRequest request, Map jsonMap = null) {
+        Map p = new MapFlattener().flatten(jsonMap ?: (Map) request.JSON)
+        return getGrailsParameterMap(p, request)
+    }
+
+    @CompileDynamic
+    static GrailsParameterMap getGrailsParameterMap(Map p, HttpServletRequest request){
         GrailsParameterMap gpm = new GrailsParameterMap(p, request)
         gpm.updateNestedKeys(p)
         return gpm

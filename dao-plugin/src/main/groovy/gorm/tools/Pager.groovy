@@ -104,7 +104,7 @@ class Pager {
             if (dlist.hasProperty('totalCount')) {
                 setRecordCount(dlist.getProperties().totalCount as Integer)
             } else if (dlist instanceof PagedResultList) {
-                setRecordCount(loadTotalFromDb(dlist))
+                setRecordCount(loadTotalFromDb((PagedResultList)dlist))
             } else {
                 log.warn("Cannot get totalCount for ${dlist.class}")
                 setRecordCount(dlist.size())

@@ -1,6 +1,11 @@
 package grails.plugin.dao
 
 import grails.core.GrailsApplication
+import grails.util.GrailsNameUtils
+import grails.util.Holders
+import grails.web.databinding.WebDataBinding
+import org.grails.core.artefact.DomainClassArtefactHandler
+import org.grails.datastore.gorm.GormEntity
 import org.grails.plugins.domain.DomainClassGrailsPlugin
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
@@ -84,6 +89,24 @@ class DaoUtil implements ApplicationContextAware {
 	@CompileDynamic
 	static void clear() {
 		ctx.sessionFactory.currentSession.clear()
+	}
+
+	static GormDaoSupport getDao(Class entity) {
+		String domainName = entity.simpleName
+
+		String daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
+		GormDaoSupport dao
+		if (ctx.containsBean(daoName)) {
+			println "found $daoName"
+			println entity
+			dao = ctx.getBean(daoName) as GormDaoSupport
+		} else {
+			println "NOT found $daoName"
+			println entity
+			dao = (GormDaoSupport) ctx.getBean("gormDaoBean")
+			dao.domainClass = entity
+		}
+		return dao
 	}
 
 }

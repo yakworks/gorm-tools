@@ -23,7 +23,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         super(domainClass, readOnly)
     }
 
-    Class getDomainClass() {
+    Class<T> getDomainClass() {
         resource
     }
 
@@ -148,12 +148,13 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         render([error: e.message] as JSON)
     }
 
-    def handleException(Exception e) {
-        def ent = e.entity
-        def errResponse = errorMessageService.buildErrorResponse(e)
-        response.status = errResponse.code
-        request.withFormat {
-            '*' { respond ent, model: [errors: errResponse.errors], status: errResponse.code }
-        }
-    }
+//    def handleException(Exception e) {
+//        def ent
+//        if(e.hasProperty("entity")) ent = e.entity
+//        def errResponse = errorMessageService.buildErrorResponse(e)
+//        response.status = errResponse.code
+//        request.withFormat {
+//            '*' { respond ent, model: [errors: errResponse.errors], status: errResponse.code }
+//        }
+//    }
 }

@@ -11,7 +11,7 @@ import groovy.transform.CompileDynamic
 /**
  * A bunch of statics to support the GormDaoSupport.
  */
-@CompileStatic
+//@CompileStatic
 class DaoMessage {
 
 	/**
@@ -96,7 +96,7 @@ class DaoMessage {
 		return resolveMessage("${propName(entity.class.name)}.label", "${GrailsNameUtils.getShortName(entity.class.name)}")
 	}
 
-	@CompileDynamic
+	//@CompileDynamic
 	static String resolveMessage(code, defaultMsg) {
 		return DaoUtil.ctx.messageSource.getMessage(code, [] as Object[], defaultMsg, defaultLocale())
 	}

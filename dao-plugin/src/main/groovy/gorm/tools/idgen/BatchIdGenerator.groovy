@@ -1,5 +1,7 @@
 package gorm.tools.idgen
 
+import groovy.transform.CompileStatic
+
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 import org.apache.log4j.Category
@@ -13,7 +15,7 @@ import org.apache.log4j.Category
  * @author josh
  *
  */
-//FIXME Sud - we need tests here?
+@CompileStatic
 public class BatchIdGenerator implements IdGenerator {
 	private static Category log = Category.getInstance(BatchIdGenerator.class)
 

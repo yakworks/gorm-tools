@@ -10,6 +10,7 @@ import org.grails.datastore.mapping.query.api.Criteria
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 
+@SuppressWarnings('AbstractClassWithoutAbstractMethod')
 @Artefact("Controller")
 abstract class RestDaoController<T> extends RestfulController<T> {
     //Responce formats, json - by default

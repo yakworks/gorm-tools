@@ -2,7 +2,6 @@ package grails.plugin.dao
 
 import grails.core.ArtefactHandler
 
-@SuppressWarnings(['NoDef'])
 class DaoGrailsPlugin extends grails.plugins.Plugin {
 	def loadAfter = ['hibernate', 'datasources']
 

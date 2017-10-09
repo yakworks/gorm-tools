@@ -42,23 +42,28 @@ class ErrorMessageService {
 				"messageCode": e.hasProperty('messageMap') ? e.messageMap.code : 0,
 				"errors": [:]
 		]
-		if (e.hasProperty('errors') && e.hasProperty("entity") && e.entity?.errors) {
-			errMap.errors = e.entity.errors.fieldErrors.groupBy {
-				GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
-			}.each {
-				it.value = it.value.collectEntries {
-					[(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+
+		if (e.hasProperty('errors')) {
+			if (e.hasProperty("entity") && e.entity?.errors) {
+				errMap.errors = e.entity.errors.fieldErrors.groupBy {
+					GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+				}.each {
+					it.value = it.value.collectEntries {
+						[(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+					}
 				}
 			}
-		} else if (e.hasProperty('errors') && !e.hasProperty("entity") ) {
-			errMap.errors = e.errors.fieldErrors.groupBy {
-				GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
-			}.each {
-				it.value = it.value.collectEntries {
-					[(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+			else if (!e.hasProperty("entity") ) {
+				errMap.errors = e.errors.fieldErrors.groupBy {
+					GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+				}.each {
+					it.value = it.value.collectEntries {
+						[(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+					}
 				}
 			}
 		}
+
 		if (e.hasProperty('entity')) {
 			BatchUpdateException core = causes.find { it instanceof BatchUpdateException }
 			String num = e.entity.hasProperty('num') ? e.entity.num : null

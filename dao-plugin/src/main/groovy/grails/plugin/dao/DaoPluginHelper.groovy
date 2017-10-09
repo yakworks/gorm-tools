@@ -8,12 +8,13 @@ import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsDomainClass
-import grails.transaction.Transactional
+
 import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
 import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
+import org.springframework.jdbc.core.JdbcTemplate
 
 import java.lang.reflect.Method
 
@@ -22,7 +23,7 @@ class DaoPluginHelper {
 	static List<ArtefactHandler> artefacts = [new DaoArtefactHandler()]
 
 	static Closure doWithSpring = {
-		jdbcTemplate(org.springframework.jdbc.core.JdbcTemplate, ref("dataSource"))
+		jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
 		jdbcIdGenerator(JdbcIdGenerator){
 			jdbcTemplate = ref("jdbcTemplate")
@@ -143,9 +144,9 @@ class DaoPluginHelper {
 		try {
 			daoClass.transactional &&
 					!AnnotationUtils.findAnnotation(javaClass, grails.transaction.Transactional) &&
-					!AnnotationUtils.findAnnotation(javaClass, Transactional) &&
+					!AnnotationUtils.findAnnotation(javaClass, org.springframework.transaction.annotation.Transactional) &&
 					!javaClass.methods.any { Method m ->
-						AnnotationUtils.findAnnotation(m, Transactional) != null ||
+						AnnotationUtils.findAnnotation(m, org.springframework.transaction.annotation.Transactional) != null ||
 						AnnotationUtils.findAnnotation(m, grails.transaction.Transactional) != null
 					}
 		}

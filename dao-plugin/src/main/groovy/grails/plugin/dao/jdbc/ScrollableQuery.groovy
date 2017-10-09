@@ -11,6 +11,7 @@ import java.sql.Statement
 /**
  * Groovy Sql wrapper for running scrollable/streaming queries.
  */
+@SuppressWarnings(['JdbcResultSetReference', 'JdbcStatementReference'])
 @CompileStatic
 class ScrollableQuery {
 

@@ -15,14 +15,12 @@ import org.apache.commons.lang.Validate
 import org.apache.juli.logging.Log
 import org.apache.juli.logging.LogFactory
 import org.grails.core.artefact.DomainClassArtefactHandler
-import org.hibernate.Hibernate
-import org.hibernate.UnresolvableObjectException
 
 import javax.servlet.http.HttpServletRequest
 
 //import org.apache.commons.logging.*
 
-//XXX add tests for this
+//XXX add better tests for this
 @Slf4j
 @CompileStatic
 class BeanPathTools {
@@ -111,12 +109,13 @@ class BeanPathTools {
     }
 
     /**
-     *
-     * @param obj
+     * XXX add solid javadoc here and rename obj to what its supposed to be
+     * @param obj TODO Descibe me
      * @param propertyPath
      * @param currentMap
      * @return
      */
+    @SuppressWarnings(['VariableName', 'ReturnsNullInsteadOfEmptyCollection', 'CatchException', 'UnnecessaryElseStatement'])
     @CompileDynamic
     static Map propsToMap(Object obj, String propertyPath, Map currentMap) {
         if (obj == null) return null
@@ -128,11 +127,12 @@ class BeanPathTools {
 
                 //just get the persistentProperties
                 Object domain = (obj instanceof DelegatingBean) ? ((DelegatingBean)obj).target : obj
-                //FIXME this makes it really hard to test, fix it so its easier to mock
-                //GrailsDomainClass domainClass = (GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, Hibernate.getClass(domain).name)
+                //FIXME this makes it hard to test, fix it so its easier to mock
                 GrailsDomainClass domainClass = GormUtils.getDomainClass(domain)
+                //FIXME why do we require a domainClass? I don't think we should
                 Validate.notNull( domainClass, "${obj.getClass().name} is not a domain class")
 
+                //FIXME why only persistentProperties, seems we should allow any of them no?
                 GrailsDomainClassProperty[] pprops = domainClass.persistentProperties
                 //filter out the associations. need to explicitely add those to be included
                 pprops = pprops.findAll { p -> !p.isAssociation() }
@@ -147,8 +147,8 @@ class BeanPathTools {
                 try {
                     currentMap[propertyPath] = obj?."$propertyPath"
                 } catch (Exception e) {
-                    //FIXME this smells funny. do we really want to be logging and error?
-                    //comment here as to why we want to just move on under and error circumstance.
+                    //XXX this smells funny. do we really want to be logging the error?
+                    //add a comment here as to why we would want to just continue under all error conditions.
                     log.error("Cannot set value for $propertyPath from $obj", e)
                 }
             }
@@ -169,9 +169,9 @@ class BeanPathTools {
             Object nestedObj = null
             try {
                 nestedObj = obj."$nestedPrefix"
-            } catch (UnresolvableObjectException e) {
-                log.error("Cannot set value for $nestedPrefix ($e.entityName, id $e.identifier). $e.message")
             } catch (Exception e) {
+                //XXX this smells funny. do we really want to be logging the error?
+                //add a comment here as to why we would want to just continue under all error conditions.
                 log.error("Cannot set value for $nestedPrefix from $obj", e)
             }
             String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())

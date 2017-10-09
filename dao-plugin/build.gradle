@@ -45,26 +45,38 @@ dependencies {
 	//console "org.grails:grails-console"
 	provided "org.grails:grails-plugin-services"
 	provided "org.grails:grails-plugin-domain-class"
-	
+
 	provided "org.grails.plugins:hibernate4"
 	provided "org.hibernate:hibernate-core:4.3.10.Final"
 	provided "org.hibernate:hibernate-ehcache:4.3.10.Final"
-	
+
 	compile "org.grails.plugins:views-json:1.2.0.M2"
 	compile "org.grails.plugins:views-json-templates:1.2.0.M2"
 	provided "org.codehaus.groovy:groovy-ant"
 	compile "org.grails:grails-plugin-testing"
-	codenarc 'org.codenarc:CodeNarc:0.25.2'
+
+	codenarc 'org.codenarc:CodeNarc:0.27.0'
+
 	testCompile "org.grails.plugins:geb"
 	testCompile "org.grails:grails-plugin-testing"
 }
 
 codenarc {
-	toolVersion = '0.25.2'
-	configFile = file("${projectDir}/config/codenarc/rules.groovy")
-	maxPriority1Violations = 0
-	maxPriority2Violations = 2
-	maxPriority3Violations = 8
+	toolVersion = '0.27.0'
+    configFile = file("${projectDir}/config/codenarc/rules.groovy")
+	//configFile = file("${rootProject.projectDir}/config/codenarc/rules.groovy") // <3>
+	reportFormat = 'html'
+	ignoreFailures = true
+
+	//maxPriority1Violations = 0
+	//maxPriority2Violations = 2
+	//maxPriority3Violations = 8
+}
+codenarcMain {
+	exclude '**/GormScalars.groovy'
+}
+codenarcTest {
+	ignoreFailures = true
 }
 
 grailsPublish {

@@ -5,15 +5,15 @@ import org.grails.datastore.gorm.GormEntity
 
 @CompileStatic
 trait DaoDomainTrait<D extends GormEntity> {
-	static GormDaoSupport DAO_BEAN
+	static GormDaoSupport daoBean
 
 	/**
 	 * Looks up or creates and caches a dao bean
 	 * @return The dao
 	 */
 	static GormDaoSupport getDao() {
-		if(!DAO_BEAN) DAO_BEAN = DaoUtil.getDao(this)
-		return DAO_BEAN
+		if(!daoBean) daoBean = DaoUtil.getDao(this)
+		return daoBean
 	}
 
 	D persist(Map args) {

@@ -8,6 +8,7 @@ import org.grails.datastore.mapping.query.api.Criteria
 /**
  * For consistently searching across data types.
  */
+@SuppressWarnings(["NestedBlockDepth", "ExplicitCallToAndMethod", "ExplicitCallToOrMethod"])
 @GrailsCompileStatic
 class CriteriaUtils {
 

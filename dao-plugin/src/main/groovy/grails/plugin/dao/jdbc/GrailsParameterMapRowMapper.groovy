@@ -14,6 +14,7 @@ import java.sql.SQLException
 /**
  * Row mapper which converts the resultset to grails parameter map, which can be used for databinding
  */
+@SuppressWarnings('JdbcResultSetReference')
 @CompileStatic
 class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
 

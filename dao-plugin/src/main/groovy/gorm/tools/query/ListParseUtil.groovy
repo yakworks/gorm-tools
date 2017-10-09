@@ -4,7 +4,9 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 class ListParseUtil {
-	/** Accepts a comma separated list as a string, and converts it for safe use as a single-quoted comma separated list.
+
+	/**
+	 * Accepts a comma separated list as a string, and converts it for safe use as a single-quoted comma separated list.
 	 * The intent is to convert anything that might be typed into a parameter table by a user into something that we can
 	 * use in a select.  It corrects most of the ham-handedness we have seen in the past.
 	 * This method is not compatible with values that are supposed to begin or end in a space.  It assumes all such things
@@ -27,7 +29,7 @@ class ListParseUtil {
 	}
 
 	static List<String> parseStringList(String orig) {
-		if (orig == null) return null
+		if (!orig) return []
 		String noQuotes = orig.replaceAll(/["']/, '').replaceAll("'", '').trim()
 		String noSpaces = noQuotes.replaceAll(', *', ',').replaceAll(' *,', ',') // removes "outer" spaces, not inner
 		String noLeadingTrailingCommas = noSpaces.replaceAll('^,*', '').replaceAll(',*$', '')

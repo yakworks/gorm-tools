@@ -87,7 +87,7 @@ ruleset {
     IfStatementCouldBeTernary
     InvertedIfElse
     LongLiteralWithLowerCaseL
-    'NoDef' doNotApplyToFilesMatching: '.*Spec.groovy, .*Controller.groovy,'
+    'NoDef' doNotApplyToFilesMatching: '.*Spec.groovy|.*Controller.groovy|.*GrailsPlugin.groovy'
     //ParameterReassignment
     TernaryCouldBeElvis
     VectorIsObsolete

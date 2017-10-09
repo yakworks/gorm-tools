@@ -8,7 +8,6 @@ import org.springframework.context.MessageSource
 import java.sql.BatchUpdateException
 
 class ErrorMessageService {
-	static transactional = false
 
 	MessageSource messageSource
 

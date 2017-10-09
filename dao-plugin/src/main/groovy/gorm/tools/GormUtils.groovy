@@ -1,11 +1,8 @@
 package gorm.tools
 
-import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
-import grails.util.Holders
 import grails.compiler.GrailsCompileStatic
 import org.apache.commons.lang.Validate
-import org.grails.core.artefact.DomainClassArtefactHandler
 
 @GrailsCompileStatic
 class GormUtils {
@@ -18,7 +15,7 @@ class GormUtils {
      * @param override - properties to override after copying
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
-    public static <T> T copyDomain(Class<T> domainClass, Object old, Map override = [:], boolean ignoreAssociations = true) {
+    static <T> T copyDomain(Class<T> domainClass, Object old, Map override = [:], boolean ignoreAssociations = true) {
         T copy = domainClass.newInstance()
         return copyDomain(copy, old, override, ignoreAssociations) as T
     }
@@ -30,11 +27,11 @@ class GormUtils {
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
 
-    public static Object copyDomain(Object copy, Object old, Map override = [:], boolean ignoreAssociations = true) {
+    static Object copyDomain(Object copy, Object old, Map override = [:], boolean ignoreAssociations = true) {
         if (copy == null) throw new IllegalArgumentException("Copy is null")
         if (old == null) return null
 
-        getDomainClass(old.class).persistentProperties.each { GrailsDomainClassProperty dp ->
+        GormMetaUtils.getDomainClass(old.class).persistentProperties.each { GrailsDomainClassProperty dp ->
             if (IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
             if (ignoreAssociations && dp.isAssociation()) return
 
@@ -49,15 +46,7 @@ class GormUtils {
         return copy
     }
 
-    public static GrailsDomainClass getDomainClass(Class domain) {
-        if (!Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, domain)) {
-            throw new IllegalArgumentException(domain.name + " is not a domain class")
-        } else {
-            return (GrailsDomainClass) Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.name)
-        }
-    }
-
-    public static void copyProperties(Object source, Object target, String... propNames) {
+    static void copyProperties(Object source, Object target, String... propNames) {
         copyProperties(source, target, true, propNames)
     }
 
@@ -67,7 +56,7 @@ class GormUtils {
      * @param target
      * @param propNames
      */
-    public static void copyProperties(Object source, Object target, boolean copyOnlyIfNull, String... propNames) {
+    static void copyProperties(Object source, Object target, boolean copyOnlyIfNull, String... propNames) {
 
         for (String prop : propNames) {
             if (copyOnlyIfNull && (target[prop] != null)) {
@@ -92,11 +81,11 @@ class GormUtils {
         Validate.notNull(source)
         Validate.notEmpty(property)
 
-        Object result = property.tokenize('.').inject(source, { Object obj, String prop ->
+        Object result = property.tokenize('.').inject(source){ Object obj, String prop ->
             Object value = null
             if (obj != null) value = obj[prop]
             return value
-        })
+        }
 
         return result
     }

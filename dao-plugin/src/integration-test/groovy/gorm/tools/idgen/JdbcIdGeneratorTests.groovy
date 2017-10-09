@@ -27,8 +27,8 @@ public class JdbcIdGeneratorTests extends GroovyTestCase {
 		int i1 = jdbcIdGenerator.getNextId(TABLE_KEY)
 		int i2 = jdbcIdGenerator.getNextId(TABLE_KEY)
 		int i3 = jdbcIdGenerator.getNextId(TABLE_KEY)
-		assertEquals(i1+1, i2)
-		assertEquals(i1+2, i3)
+		assert i1+1 == i2
+		assert i1+2 == i3
 		nextIdEndVal = i3
 	}
 
@@ -38,8 +38,8 @@ public class JdbcIdGeneratorTests extends GroovyTestCase {
 		int i1 = jdbcIdGenerator.getNextId(TABLE_KEY, 50)
 		int i2 = jdbcIdGenerator.getNextId(TABLE_KEY, 5)
 		int i3 = jdbcIdGenerator.getNextId(TABLE_KEY, 1)
-		assertEquals(i1+50, i2)
-		assertEquals(i1+55, i3)
+		assert i1+50 ==  i2
+		assert i1+55 == i3
 		nextIdSIEndVal = i3
 	}
 
@@ -48,7 +48,7 @@ public class JdbcIdGeneratorTests extends GroovyTestCase {
 		println "WARNING!"
 		println "This test must run last in every test run."
 
-		assertEquals(startVal + 3, nextIdEndVal)
-		assertEquals(startVal + 59, nextIdSIEndVal)
+		assert startVal + 3 == nextIdEndVal
+		assert startVal + 59 == nextIdSIEndVal
 	}
 }

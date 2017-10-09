@@ -8,6 +8,7 @@ import groovy.transform.CompileDynamic
 
 import java.sql.SQLException
 
+@SuppressWarnings(['NonFinalPublicField'])
 @CompileStatic
 class DbDialectService {
 
@@ -16,14 +17,14 @@ class DbDialectService {
 	private static final int MYSQL   = 2
 	private static final int ORACLE  = 3
 
-	GrailsApplication grailsApplication
+	//GrailsApplication grailsApplication
 	JdbcTemplate jdbcTemplate
 
-	public static String dialectName
+	static String dialectName
 
-    //need this static so that it can be accessed from doWithSpring in rally plugin
+    //need this static so that getGlobalVariables can be accessed from doWithSpring in rally plugin
 	@CompileDynamic
-    private static int _getDialect() {
+    private static int setupDialect() {
         int result = UNKNOWN
 		if(!dialectName) dialectName = Holders.grailsApplication.config.hibernate.dialect	// just to make the stuff below easier to read.
         if(dialectName.contains("SQLServerDialect"))         result = MSSQL
@@ -35,25 +36,21 @@ class DbDialectService {
     }
 
 	int getDialect() {
-		return _getDialect()
+		return setupDialect()
 	}
 
-	public String getCurrentDate() {
+    String getCurrentDate() {
 		String date
 		switch (dialect) {
 			case MSSQL: date = "getdate()"; break
 			case MYSQL: date = "now()"; break
 			case ORACLE: date = "SYSDATE"; break
-		// case ORACLE:
-		// 	String orDate = new Date().format("yyyy-MM-dd HH:mm:ss")
-		// 	date = "'$orDate'"
-		//  	break;
 			default: date = "now()"
 		}
 		date
 	}
 
-	public String getIfNull() {
+    String getIfNull() {
 		String ifnull
 		switch (dialect) {
 			case MSSQL: ifnull = "isnull"; break
@@ -65,7 +62,7 @@ class DbDialectService {
 	}
 
 	//concatenation operater
-	public String getConcat() {
+	String getConcat() {
 		String concat
 		switch (dialect) {
 			case MSSQL: concat = "+"; break
@@ -76,7 +73,7 @@ class DbDialectService {
 		concat
 	}
 	//CHAR/CHR Function
-	public String getCharFn() {
+	String getCharFn() {
 		String charFn
 		switch (dialect) {
 			case MSSQL: charFn = "CHAR"; break
@@ -88,7 +85,7 @@ class DbDialectService {
 	}
 
 	//SUBSTRING Function
-	public String getSubstringFn() {
+	String getSubstringFn() {
 		String substringFn
 		switch (dialect) {
 			case MSSQL: substringFn = "SUBSTRING"; break
@@ -99,7 +96,7 @@ class DbDialectService {
 		substringFn
 	}
 
-	public String getDialectName() {
+    String getDialectName() {
 		String dialectName
 		switch (dialect) {
 			case MSSQL: dialectName = "dialect_mssql"; break
@@ -110,7 +107,7 @@ class DbDialectService {
 		dialectName
 	}
 
-	public String getTop(num) {
+    String getTop(num) {
 		String top
 		switch (dialect) {
 			case MSSQL: top = "TOP ${num}"; break
@@ -131,7 +128,7 @@ class DbDialectService {
 
 	/** hack for Oracle date formats **/
 	@CompileDynamic
-	public String getDateFormatForDialect( myDate) {
+    String getDateFormatForDialect(myDate) {
      	if (getDialect() == ORACLE) {
      		Date dateobj
      		if (myDate instanceof String) {
@@ -142,14 +139,14 @@ class DbDialectService {
      		}
 			String formattedDate = dateobj.format("yyyy-MM-dd hh:mm:ss")
 			return " to_date (\' $formattedDate \', \'YYYY-MM-dd hh24:mi:ss\')"
-		} else {
-			return myDate
 		}
+        //do nothing for all the others
+        return myDate
 	}
 
-	public static Map getGlobalVariables() {
+    static Map getGlobalVariables() {
 		Map result = [:]
-		int dialect = _getDialect()
+		int dialect = setupDialect()
 		if (dialect == MYSQL) {
 			result.concat = "FN9_CONCAT"
 		} else if (dialect == MSSQL) {
@@ -161,11 +158,11 @@ class DbDialectService {
 		return result
 	}
 
-	public boolean isMySql() {
+    boolean isMySql() {
 		return dialect == MYSQL
 	}
 
-	public boolean isMsSql() {
+    boolean isMsSql() {
 		return dialect == MSSQL
 	}
 

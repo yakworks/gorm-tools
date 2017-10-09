@@ -1,5 +1,6 @@
 package gorm.tools.beans
 
+import gorm.tools.GormUtils
 import grails.core.GrailsApplication
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
@@ -10,6 +11,7 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+import org.apache.commons.lang.Validate
 import org.apache.juli.logging.Log
 import org.apache.juli.logging.LogFactory
 import org.grails.core.artefact.DomainClassArtefactHandler
@@ -35,7 +37,7 @@ class BeanPathTools {
     }
 
     //@CompileDynamic
-    public static Object getNestedValue(domain, String field) {
+    static Object getNestedValue(domain, String field) {
 //        String[] subProps = field.split("\\.")
 //
 //        int i = 0
@@ -55,7 +57,7 @@ class BeanPathTools {
 
     @CompileDynamic
     //XXX Is this used? whats it for? how is it different than getNestedValue?
-    public static Object getFieldValue(Object domain, String field) {
+    static Object getFieldValue(Object domain, String field) {
         Object bean = getNestedBean(domain, field)
         field = GrailsNameUtils.getShortName(field)
         return bean?."$field"
@@ -74,7 +76,7 @@ class BeanPathTools {
     }
 
     @CompileDynamic
-    public static List getFields(Object domain) {
+    static List getFields(Object domain) {
         List props = []
 
         domain?.class?.properties?.declaredFields.each { field ->
@@ -88,7 +90,7 @@ class BeanPathTools {
         return props
     }
 
-    //XXX add test for this
+    //XXX add tests for this and make sure delegatingBean is working properly
     @CompileDynamic
     static Map buildMapFromPaths(Object obj, List propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {
@@ -109,22 +111,29 @@ class BeanPathTools {
 
     }
 
+    /**
+     *
+     * @param obj
+     * @param propertyPath
+     * @param currentMap
+     * @return
+     */
     @CompileDynamic
     static Map propsToMap(Object obj, String propertyPath, Map currentMap) {
-        if (obj == null) return
+        if (obj == null) return null
         final int nestedIndex = propertyPath.indexOf('.')
         //no idex then its just a property or its the *
         if (nestedIndex == -1) {
             if (propertyPath == '*') {
                 if (log.debugEnabled) log.debug("obj:$obj propertyPath:$propertyPath currentMap:$currentMap")
+
                 //just get the persistentProperties
                 Object domain = (obj instanceof DelegatingBean) ? ((DelegatingBean)obj).target : obj
                 //FIXME this makes it really hard to test, fix it so its easier to mock
-                GrailsDomainClass domainClass = (GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, Hibernate.getClass(domain).name)
-                //GrailsDomainClass domainClass = domain.domainClass
-                if (domainClass == null) {
-                    throw new RuntimeException("${obj.getClass().name} is not a domain class")
-                }
+                //GrailsDomainClass domainClass = (GrailsDomainClass) grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, Hibernate.getClass(domain).name)
+                GrailsDomainClass domainClass = GormUtils.getDomainClass(domain)
+                Validate.notNull( domainClass, "${obj.getClass().name} is not a domain class")
+
                 GrailsDomainClassProperty[] pprops = domainClass.persistentProperties
                 //filter out the associations. need to explicitely add those to be included
                 pprops = pprops.findAll { p -> !p.isAssociation() }
@@ -138,9 +147,9 @@ class BeanPathTools {
             } else {
                 try {
                     currentMap[propertyPath] = obj?."$propertyPath"
-                } catch (UnresolvableObjectException e) {
-                    log.error("Cannot set value for $propertyPath ($e.entityName, id $e.identifier). $e.message")
                 } catch (Exception e) {
+                    //FIXME this smells funny. do we really want to be logging and error?
+                    //comment here as to why we want to just move on under and error circumstance.
                     log.error("Cannot set value for $propertyPath from $obj", e)
                 }
             }

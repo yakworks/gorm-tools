@@ -11,12 +11,13 @@ import java.util.regex.Pattern
 import java.text.ParseException
 import org.apache.commons.lang.Validate
 
+@SuppressWarnings(['MethodCount', 'EmptyCatchBlock', 'ExplicitCallToGetAtMethod'])
 @CompileStatic
 class DateUtil {
 
-    static Pattern GMT_MILLIS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
-    static Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
-    static Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
+    static final Pattern GMT_MILLIS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
+    static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+    static final Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
 
     /**
      * Parse date sent by client (in a JSON).
@@ -57,7 +58,7 @@ class DateUtil {
     }
 
     public static Date stringToDate(String strDt){
-        Date date = convertStringToDateTime(strDt,"yyyy-MM-dd")
+        Date date = convertStringToDateTime(strDt, "yyyy-MM-dd")
         return date
     }
 
@@ -67,7 +68,7 @@ class DateUtil {
         try {
             dtStr = df.format(date)
         } catch (ParseException e) {
-            e.printStackTrace()
+            //e.printStackTrace()
         }
         return dtStr
     }
@@ -78,7 +79,7 @@ class DateUtil {
         try {
             dtStr = df.format(date)
         } catch (ParseException e) {
-            e.printStackTrace()
+            //e.printStackTrace()
         }
         return dtStr
     }
@@ -198,7 +199,7 @@ class DateUtil {
 
     static String getMonthLetter(String periodToPost){
         String twoNumbers=""
-        twoNumbers=periodToPost?.substring(4,6)
+        twoNumbers=periodToPost?.substring(4, 6)
         String monthLetter=twoNumbers
         switch(twoNumbers){
             case '01': monthLetter = 'J'
@@ -231,7 +232,7 @@ class DateUtil {
     }
 
     public static Date stringToDateTime(String strDt){
-        Date date = convertStringToDateTime(strDt,"yyyy-MM-dd'T'HH:mm:ss")
+        Date date = convertStringToDateTime(strDt, "yyyy-MM-dd'T'HH:mm:ss")
         return date
     }
 
@@ -241,7 +242,7 @@ class DateUtil {
         try {
             dtTmp = df.parse(strDt)
         } catch (ParseException e) {
-            e.printStackTrace()
+            //e.printStackTrace()
         }
         return dtTmp
     }
@@ -250,9 +251,9 @@ class DateUtil {
      * Returns the year of the date specified.
      */
     public static int getYearOf (Date date) {
-        GregorianCalendar gc = new GregorianCalendar()
+        Calendar gc = new GregorianCalendar()
         gc.setTime(date)
-        return gc.get(GregorianCalendar.YEAR)
+        return gc.get(Calendar.YEAR)
     }
 
     public static long getDateDifference_inHours(Date date){
@@ -354,7 +355,7 @@ class DateUtil {
 
         int days
 
-        use(groovy.time.TimeCategory) {
+        use(TimeCategory) {
             TimeDuration duration = (start - end)
             days = duration.days
         }

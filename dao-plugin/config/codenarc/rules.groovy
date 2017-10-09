@@ -1,3 +1,4 @@
+
 ruleset {
 
     // rulesets/basic.xml
@@ -21,12 +22,12 @@ ruleset {
     DuplicateSetValue
     EmptyCatchBlock
     'EmptyClass' doNotApplyToFilesMatching: '.*Spec.groovy'
-    //EmptyElseBlock
+    EmptyElseBlock
     EmptyFinallyBlock
     EmptyForStatement
-    //EmptyIfStatement
+    EmptyIfStatement
     EmptyInstanceInitializer
-    //EmptyMethod
+    EmptyMethod
     EmptyStaticInitializer
     EmptySwitchStatement
     EmptySynchronizedStatement
@@ -62,7 +63,7 @@ ruleset {
     StaticDateFormatField
     StaticMatcherField
     StaticSimpleDateFormatField
-    //SynchronizedMethod
+    SynchronizedMethod
     SynchronizedOnBoxedPrimitive
     SynchronizedOnGetClass
     SynchronizedOnReentrantLock
@@ -84,16 +85,16 @@ ruleset {
     //CouldBeElvis
     HashtableIsObsolete
     IfStatementCouldBeTernary
-    //InvertedIfElse
+    InvertedIfElse
     LongLiteralWithLowerCaseL
-    'NoDef' doNotApplyToFilesMatching: '.*(Spec|Tests|Test).groovy'
+    'NoDef' doNotApplyToFilesMatching: '.*Spec.groovy, .*Controller.groovy,'
     //ParameterReassignment
     TernaryCouldBeElvis
     VectorIsObsolete
 
     // rulesets/design.xml
     'AbstractClassWithPublicConstructor' enabled: false
-    //AbstractClassWithoutAbstractMethod
+    AbstractClassWithoutAbstractMethod
     BooleanMethodReturnsNull
     //BuilderMethodWithSideEffects
     CloneableWithoutClone
@@ -102,14 +103,14 @@ ruleset {
     ConstantsOnlyInterface
     EmptyMethodInAbstractClass
     FinalClassWithProtectedMember
-    //ImplementationAsType
+    ImplementationAsType
     'Instanceof' enabled: false
     LocaleSetDefault
     //NestedForLoop
     'PrivateFieldCouldBeFinal' enabled: false
     PublicInstanceField
     ReturnsNullInsteadOfEmptyArray
-    //ReturnsNullInsteadOfEmptyCollection
+    ReturnsNullInsteadOfEmptyCollection
     //SimpleDateFormatMissingLocale
     StatelessSingleton
     ToStringReturnsNull
@@ -128,7 +129,7 @@ ruleset {
     // rulesets/exceptions.xml
     CatchArrayIndexOutOfBoundsException
     CatchError
-    //CatchException
+    CatchException
     CatchIllegalMonitorStateException
     CatchIndexOutOfBoundsException
     CatchNullPointerException
@@ -143,8 +144,8 @@ ruleset {
     SwallowThreadDeath
     ThrowError
     ThrowException
-    //ThrowNullPointerException
-    //ThrowRuntimeException
+    ThrowNullPointerException
+    ThrowRuntimeException
     ThrowThrowable
 
     // rulesets/formatting.xml
@@ -155,24 +156,24 @@ ruleset {
     BracesForMethod
     BracesForTryCatchFinally
     //ClassJavadoc
-    //ClosureStatementOnOpeningLineOfMultipleLineClosure
+    ClosureStatementOnOpeningLineOfMultipleLineClosure
     ConsecutiveBlankLines
     //FileEndsWithoutNewline
     //'LineLength' doNotApplyToFilesMatching: '*Spec.groovy'
     MissingBlankLineAfterImports
     MissingBlankLineAfterPackage
     //SpaceAfterCatch
-    //SpaceAfterClosingBrace
-    //SpaceAfterComma
     //SpaceAfterFor
     //SpaceAfterIf
-    //SpaceAfterOpeningBrace
-    //SpaceAfterSemicolon
     //SpaceAfterSwitch
     //SpaceAfterWhile
     //SpaceAroundClosureArrow
     //SpaceAroundMapEntryColon
     //SpaceAroundOperator
+    //SpaceAfterClosingBrace
+    SpaceAfterComma
+    //SpaceAfterOpeningBrace
+    SpaceAfterSemicolon
     //SpaceBeforeClosingBrace
     //SpaceBeforeOpeningBrace
     //TrailingWhitespace
@@ -191,25 +192,25 @@ ruleset {
     // rulesets/groovyism.xml
     AssignCollectionSort
     AssignCollectionUnique
-    //ClosureAsLastMethodParameter
+    ClosureAsLastMethodParameter
     CollectAllIsDeprecated
     ConfusingMultipleReturns
     ExplicitArrayListInstantiation
-    //ExplicitCallToAndMethod
+    ExplicitCallToAndMethod
     ExplicitCallToCompareToMethod
     ExplicitCallToDivMethod
-    //ExplicitCallToEqualsMethod
-    //ExplicitCallToGetAtMethod
+    ExplicitCallToEqualsMethod
+    ExplicitCallToGetAtMethod
     ExplicitCallToLeftShiftMethod
     ExplicitCallToMinusMethod
     ExplicitCallToModMethod
     ExplicitCallToMultiplyMethod
-    //ExplicitCallToOrMethod
+    ExplicitCallToOrMethod
     ExplicitCallToPlusMethod
     ExplicitCallToPowerMethod
     ExplicitCallToRightShiftMethod
     ExplicitCallToXorMethod
-    //ExplicitHashMapInstantiation
+    ExplicitHashMapInstantiation
     ExplicitHashSetInstantiation
     ExplicitLinkedHashMapInstantiation
     ExplicitLinkedListInstantiation
@@ -229,13 +230,13 @@ ruleset {
     //MisorderedStaticImports
     //'NoWildcardImports' doNotApplyToFilesMatching: '.*Spec.groovy'
     UnnecessaryGroovyImport
-    //UnusedImport
+    UnusedImport
 
     // rulesets/jdbc.xml
     DirectConnectionManagement
     JdbcConnectionReference
-    //JdbcResultSetReference
-    //JdbcStatementReference
+    JdbcResultSetReference
+    JdbcStatementReference
 
     // rulesets/junit.xml
     ChainedTest
@@ -243,14 +244,14 @@ ruleset {
     JUnitAssertAlwaysFails
     JUnitAssertAlwaysSucceeds
     JUnitFailWithoutMessage
-    //JUnitLostTest
+    JUnitLostTest
     JUnitPublicField
     JUnitPublicNonTestMethod
     //JUnitPublicProperty
-    //JUnitSetUpCallsSuper
-    //JUnitStyleAssertions
+    JUnitSetUpCallsSuper
+    JUnitStyleAssertions
     JUnitTearDownCallsSuper
-    //JUnitTestMethodWithoutAssert
+    JUnitTestMethodWithoutAssert
     JUnitUnnecessarySetUp
     JUnitUnnecessaryTearDown
     JUnitUnnecessaryThrowsException
@@ -265,10 +266,10 @@ ruleset {
 
     // rulesets/logging.xml
     LoggerForDifferentClass
-    //LoggerWithWrongModifiers
-    //LoggingSwallowsStacktrace
+    LoggerWithWrongModifiers
+    LoggingSwallowsStacktrace
     MultipleLoggers
-    //PrintStackTrace
+    PrintStackTrace
     //Println
     SystemErrPrint
     SystemOutPrint
@@ -276,24 +277,24 @@ ruleset {
     // rulesets/naming.xml
     AbstractClassName
     ClassName
-    //ClassNameSameAsFilename
+    ClassNameSameAsFilename
     //ConfusingMethodName
     //'FactoryMethodName' doNotApplyToFilesMatching: '.*Spec.groovy'
-    //FieldName
-    //InterfaceName
-    //'MethodName' doNotApplyToFilesMatching: '.*Spec.groovy'
+    FieldName
+    InterfaceName
+    'MethodName' doNotApplyToFilesMatching: '.*Spec.groovy'
     ObjectOverrideMisspelledMethodName
     PackageName
     PackageNameMatchesFilePath
-    //ParameterName
-    //PropertyName
-    //VariableName
+    ParameterName
+    PropertyName
+    VariableName
 
     // rulesets/security.xml
     FileCreateTempFile
     InsecureRandom
     'JavaIoPackageAccess' enabled: false
-    //NonFinalPublicField
+    NonFinalPublicField
     NonFinalSubclassOfSensitiveInterface
     ObjectFinalize
     PublicFinalizeMethod
@@ -308,13 +309,13 @@ ruleset {
 
     // rulesets/size.xml
     AbcComplexity   // DEPRECATED: Use the AbcMetric rule instead. Requires the GMetrics jar
-    //'AbcMetric' doNotApplyToFilesMatching: '.*Spec.groovy'   // Requires the GMetrics jar
+    'AbcMetric' doNotApplyToFilesMatching: '.*Spec.groovy'   // Requires the GMetrics jar
     ClassSize
     CrapMetric   // Requires the GMetrics jar and a Cobertura coverage file
     //CyclomaticComplexity
-    //MethodCount
+    MethodCount
     'MethodSize' doNotApplyToFilesMatching: '.*Spec.groovy'
-    //NestedBlockDepth
+    NestedBlockDepth
     //'ParameterCount' maxParameters: 6
 
     // rulesets/unnecessary.xml
@@ -331,13 +332,13 @@ ruleset {
     UnnecessaryCatchBlock
     UnnecessaryCollectCall
     UnnecessaryCollectionCall
-    //UnnecessaryConstructor
-    //UnnecessaryDefInFieldDeclaration
+    UnnecessaryConstructor
+    UnnecessaryDefInFieldDeclaration
     //UnnecessaryDefInMethodDeclaration
     UnnecessaryDefInVariableDeclaration
     //UnnecessaryDotClass
     UnnecessaryDoubleInstantiation
-    //UnnecessaryElseStatement
+    UnnecessaryElseStatement
     UnnecessaryFinalOnPrivateMethod
     UnnecessaryFloatInstantiation
     //UnnecessaryGString
@@ -352,7 +353,7 @@ ruleset {
     UnnecessaryNullCheckBeforeInstanceOf
     'UnnecessaryObjectReferences' doNotApplyToFilesMatching: '.*Spec.groovy'
     UnnecessaryOverridingMethod
-    //UnnecessaryPackageReference
+    UnnecessaryPackageReference
     UnnecessaryParenthesesForMethodCallWithClosure
     //UnnecessaryPublicModifier
     //UnnecessaryReturnKeyword
@@ -369,7 +370,7 @@ ruleset {
     UnusedArray
     'UnusedMethodParameter' enabled: false
     UnusedObject
-    //UnusedPrivateField
+    UnusedPrivateField
     UnusedPrivateMethod
     UnusedPrivateMethodParameter
     //UnusedVariable

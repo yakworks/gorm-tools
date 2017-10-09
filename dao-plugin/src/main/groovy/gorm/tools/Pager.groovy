@@ -4,8 +4,7 @@ import gorm.tools.beans.BeanPathTools
 import grails.gorm.PagedResultList
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
+import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.query.Query
 import org.hibernate.criterion.Projections
 import org.hibernate.internal.CriteriaImpl
@@ -13,9 +12,9 @@ import org.hibernate.internal.CriteriaImpl
 /**
  * a holder object for paged data
  */
+@Slf4j
 @CompileStatic
 class Pager {
-    private Log log = LogFactory.getLog(getClass())
     //the page we are on
     Integer page = 1
     //max rows to show
@@ -59,9 +58,8 @@ class Pager {
     Integer getOffset() {
         if (!offset) {
             return (max * (page - 1))
-        } else {
-            return offset
         }
+        return offset
     }
 
     Integer getPageCount() {
@@ -78,7 +76,7 @@ class Pager {
             try {
                 log.debug "Executing eachPage closer with [max:$max, offset:$offset]"
                 c.call(max, offset)
-            }catch (Exception e) {
+            }catch (e) {
                 log.error "Error encountered while calling closure in eachPage [max:$max, offset:$offset]}]", e
                 throw e
             }

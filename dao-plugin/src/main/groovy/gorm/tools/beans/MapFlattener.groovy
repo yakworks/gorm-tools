@@ -31,8 +31,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class MapFlattener {
 
-    private static final Logger LOG = Logger.getLogger(MapFlattener.class)
-    private final KeyVersion _keyVersion = new KeyVersion()
+    private final KeyVersion keyVersion = new KeyVersion()
     boolean convertEmptyStringsToNull = true
 
     /**
@@ -41,20 +40,18 @@ class MapFlattener {
      * @param groovyJsonObject
      * @return A Map of String,String
      */
-    Map<String, String> flatten(Map groovyJsonObject) {
+    Map<String, String> flatten(groovyJsonObject) {
 
-        Map<String, String> keyValues = new HashMap<String, String>()
+        Map<String, String> keyValues = [:]
 
         if (groovyJsonObject == null) {
             return keyValues
         }
 
         if (groovyJsonObject instanceof Map) {
-            keyValues.putAll(transformGroovyJsonMap(groovyJsonObject, ""))
+            keyValues.putAll(transformGroovyJsonMap((Map)groovyJsonObject, ""))
         } else if (groovyJsonObject instanceof List) {
-            keyValues.putAll(transformJsonArray(groovyJsonObject, ""))
-        } else {
-            // todo "foo": "bar"
+            keyValues.putAll(transformJsonArray((List)groovyJsonObject, ""))
         }
 
         return keyValues
@@ -71,10 +68,10 @@ class MapFlattener {
     Map<String, String> transformGroovyJsonMap(Map jsonMap, String currentName) {
 
         if (jsonMap == null || jsonMap.isEmpty()) {
-            return new HashMap<String, String>()
+            return [:]
         }
 
-        Map<String, String> keyValues = new HashMap<String, String>()
+        Map<String, String> keyValues = [:]
 
         jsonMap.each { entry ->
 
@@ -82,17 +79,11 @@ class MapFlattener {
             if (currentName != null && !currentName.empty) {
                 key = currentName + "." + key
             }
-            //println("entry : ${entry.value.toString()}")
-            if (entry == null) {
-                //entry.value = ""
-                //println("Null Entry Or Entry Value")
-            }
-
             //if it is an association id, then set value to 'null' to set the association to null
-            else if ((key && key.toString().endsWith(".id")) && (entry.value == null || entry.value.toString() == 'null' || entry.value.toString().trim() == "")) {
-                _keyVersion.updateMapWithKeyValue(keyValues, key, "null")
+            if ((key && key.toString().endsWith(".id")) && (entry.value == null || entry.value.toString() == 'null' || entry.value.toString().trim() == "")) {
+                keyVersion.updateMapWithKeyValue(keyValues, key, "null")
             } else if (entry.value == null || entry.value?.toString() == 'null') {
-                _keyVersion.updateMapWithKeyValue(keyValues, key, null)
+                keyVersion.updateMapWithKeyValue(keyValues, key, null)
             } else if (entry.value instanceof List) {
                 Map<String, String> jsonListKeyValues = transformJsonArray(entry.value as List, key)
                 keyValues.putAll(jsonListKeyValues)
@@ -106,7 +97,7 @@ class MapFlattener {
                     value = value.trim() //trim strings - same as grails.databinding.trimStrings
                 }
                 //convert empty strings to null - same behavior as grails.databinding.convertEmptyStringsToNull
-                if ("".equals(value) && convertEmptyStringsToNull) {
+                if ("" == value && convertEmptyStringsToNull) {
                     value = null
                 }
 
@@ -115,7 +106,7 @@ class MapFlattener {
                     //XXX why did we use default format with trimmed time?
                     value = DateUtil.parseJsonDate(value).format("yyyy-MM-dd'T'hh:mm:ss'Z'")
                 }
-                _keyVersion.updateMapWithKeyValue(keyValues, key, value)
+                keyVersion.updateMapWithKeyValue(keyValues, key, value)
             }
         }
 
@@ -132,7 +123,7 @@ class MapFlattener {
     Map<String, String> transformJsonArray(List jsonArray, String currentName) {
 
         if (jsonArray == null || jsonArray.empty) {
-            return new HashMap<String, String>()
+            return [:]
         }
 
         Map keyValues = [:]
@@ -146,13 +137,13 @@ class MapFlattener {
                 keyValues.put(arrayName, null)
             } else if (jsonElement instanceof Map) {
                 Map<String, String> jsonMapKeyValues = transformGroovyJsonMap(jsonElement as Map, arrayName)
-                _keyVersion.updateMapWithKeyValues(keyValues, jsonMapKeyValues)
+                keyVersion.updateMapWithKeyValues(keyValues, jsonMapKeyValues)
             } else if (jsonElement instanceof List) {
                 Map<String, String> jsonArrayKeyValues = transformJsonArray(jsonElement as List, arrayName)
-                _keyVersion.updateMapWithKeyValues(keyValues, jsonArrayKeyValues)
+                keyVersion.updateMapWithKeyValues(keyValues, jsonArrayKeyValues)
             } else {
                 String value = String.valueOf(jsonElement)
-                _keyVersion.updateMapWithKeyValue(keyValues, arrayName, value)
+                keyVersion.updateMapWithKeyValue(keyValues, arrayName, value)
             }
         }
 
@@ -164,7 +155,7 @@ class MapFlattener {
 @CompileStatic
 class KeyVersion {
 
-    private Map<String, Integer> keyVersionCount = new HashMap<String, Integer>()
+    private Map<String, Integer> keyVersionCount = [:]
 
     void updateMapWithKeyValue(Map<String, String> originalMap, String key, String value) {
 
@@ -198,7 +189,7 @@ class KeyVersion {
 
     Map buildMapFromOriginal(Map original, Map additional) {
 
-        Map combinedMap = new HashMap()
+        Map combinedMap = [:]
         combinedMap.putAll(original)
         updateMapWithKeyValues(combinedMap, additional)
 
@@ -222,4 +213,3 @@ class KeyVersion {
         return indexedKey
     }
 }
-

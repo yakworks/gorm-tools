@@ -1,5 +1,6 @@
 package gorm.tools.idgen
 
+import org.apache.commons.lang.Validate
 import org.apache.log4j.Category
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
@@ -62,11 +63,11 @@ public class JdbcIdGenerator implements IdGenerator {
 			}
 			return 0
 		}else{
-			if(idColumn == null) throw new NullPointerException("Can't get a new row ID because the identity column name is not set!")
-			if(table == null) throw new NullPointerException("Can't get a new row ID because the identity table is not set!")
-			if(keyColumn == null) throw new NullPointerException("Can't get a new row ID because the key column is not set!")
-			if(name==null) throw new NullPointerException("Can't get a new row ID because the requesting object's table name is not set!")
-			if(name.length() == 0) throw new IllegalArgumentException("Can't get a row ID because the requesting object's table name has zero length!")
+			Validate.notNull( idColumn, "The idColumn is undefined")
+			Validate.notNull( keyColumn, "The keyColumn is undefined")
+			Validate.notNull( table, "The table is undefined")
+			Validate.notNull( name, "The name is undefined")
+			Validate.notEmpty( name, "The name is empty")
 
 			String query = "Select " + idColumn + " from " + table + " where "+keyColumn+" ='" + name + "'"
 			long oid = 0

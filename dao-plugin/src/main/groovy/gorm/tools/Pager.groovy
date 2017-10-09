@@ -27,9 +27,9 @@ class Pager {
     List data
     Map params
 
-    public Pager() {}
+    Pager() {}
 
-    public Pager(Map params) {
+    Pager(Map params) {
         setParams(params)
     }
 

@@ -52,7 +52,7 @@ class BatchIdGenerator implements IdGenerator {
 			long newAllocationSize =increment>allocationSize?increment:allocationSize
 			IdRow idrow
 
-			idrow = findOrCreate(keyName,increment)
+			idrow = findOrCreate(keyName, increment)
 
 			long current = idrow.getNextId(increment)
 			if(current >= idrow.max || idrow.nextId.get() > idrow.max  ) {
@@ -108,7 +108,7 @@ class BatchIdGenerator implements IdGenerator {
 	}
 
 	// MARKER holder class for cached id info
-	class IdRow{
+	class IdRow {
 		IdRow(String keyname) {
 			this.keyName = keyname
 			log.debug("Creating a BatchIDGenerator for " + keyName)

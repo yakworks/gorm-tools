@@ -22,7 +22,7 @@ import groovy.transform.CompileStatic
  *
  */
 @CompileStatic
-public class JdbcIdGenerator implements IdGenerator {
+class JdbcIdGenerator implements IdGenerator {
 	private static Category log = Category.getInstance(JdbcIdGenerator.class)
 	JdbcTemplate jdbcTemplate
 
@@ -31,17 +31,17 @@ public class JdbcIdGenerator implements IdGenerator {
 	private String keyColumn = "KeyName"
 	private String idColumn = "NextId"
 
-	public JdbcIdGenerator() {
+	JdbcIdGenerator() {
 	}
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public long getNextId(String keyName){
+	long getNextId(String keyName){
 		return getNextId(keyName, 1)
 	}
 
 	@Transactional(propagation=Propagation.REQUIRES_NEW)
-	public synchronized long getNextId(String keyName, long increment){
-		long oid = updateIncrement(keyName,increment)
+	synchronized long getNextId(String keyName, long increment){
+		long oid = updateIncrement(keyName, increment)
 		// if (oid==0) { //no rows exist so create it
 		// 	oid = seedValue;
 		// 	long futureId = seedValue+increment;
@@ -53,7 +53,7 @@ public class JdbcIdGenerator implements IdGenerator {
 
 	// Transactional!  The annotation only works on public methods, so this method should only be called by transactional
 	// methods.
-	private long updateIncrement(String name,long increment){
+	private long updateIncrement(String name, long increment){
 		if(name==null || name.length()==0){
 			if(log.isDebugEnabled()) {
 //				log.debug("Returning empty ID for empty key!");
@@ -100,7 +100,7 @@ public class JdbcIdGenerator implements IdGenerator {
 		}
 	}
 
-	private long createRow(String table,String keyColumn, String idColumn, String name){
+	private long createRow(String table, String keyColumn, String idColumn, String name){
 		Long maxId= seedValue
 		String[] tableInfo  = name.split("\\.")
 		if(tableInfo.length>1){
@@ -117,7 +117,7 @@ public class JdbcIdGenerator implements IdGenerator {
 		return maxId
 	}
 
-	private void createTable(String table,String keyColumn, String idColumn){
+	private void createTable(String table, String keyColumn, String idColumn){
 		String query = """
 			create table $table
 				(
@@ -129,39 +129,39 @@ public class JdbcIdGenerator implements IdGenerator {
 		jdbcTemplate.execute(query)
 	}
 
-	public String getKeyColumn() {
+	String getKeyColumn() {
 		return keyColumn
 	}
 
-	public void setKeyColumn(String keyColumn) {
+	void setKeyColumn(String keyColumn) {
 		this.keyColumn = keyColumn
 	}
 
-	public long getSeedValue() {
+	long getSeedValue() {
 		return seedValue
 	}
 
-	public void setSeedValue(long seedValue) {
+	void setSeedValue(long seedValue) {
 		this.seedValue = seedValue
 	}
 
-	public String getTable() {
+	String getTable() {
 		return table
 	}
 
-	public void setTable(String table) {
+	void setTable(String table) {
 		this.table = table
 	}
 
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+	void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate
 	}
 
-	public String getIdColumn() {
+	String getIdColumn() {
 		return idColumn
 	}
 
-	public void setIdColumn(String idColumn) {
+	void setIdColumn(String idColumn) {
 		this.idColumn = idColumn
 	}
 

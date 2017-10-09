@@ -1,6 +1,6 @@
 package gorm.tools.idgen
 
-public interface StringIdGenerator {
+interface StringIdGenerator {
 
 	String getNewId(String tranTypeName)
 

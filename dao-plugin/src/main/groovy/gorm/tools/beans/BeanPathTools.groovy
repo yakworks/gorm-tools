@@ -17,7 +17,6 @@ import org.apache.juli.logging.LogFactory
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.hibernate.Hibernate
 import org.hibernate.UnresolvableObjectException
-import org.hibernate.ObjectNotFoundException
 
 import javax.servlet.http.HttpServletRequest
 
@@ -52,7 +51,7 @@ class BeanPathTools {
 //        }
 //
 //        return lastProp
-        GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain,field)
+        GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, field)
     }
 
     @CompileDynamic

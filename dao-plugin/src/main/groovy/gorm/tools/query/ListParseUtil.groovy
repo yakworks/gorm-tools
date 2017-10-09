@@ -3,7 +3,7 @@ package gorm.tools.query
 import groovy.transform.CompileStatic
 
 @CompileStatic
-public class ListParseUtil {
+class ListParseUtil {
 	/** Accepts a comma separated list as a string, and converts it for safe use as a single-quoted comma separated list.
 	 * The intent is to convert anything that might be typed into a parameter table by a user into something that we can
 	 * use in a select.  It corrects most of the ham-handedness we have seen in the past.

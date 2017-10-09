@@ -4,7 +4,7 @@ import grails.core.ArtefactHandler
 
 @SuppressWarnings(['NoDef'])
 class DaoGrailsPlugin extends grails.plugins.Plugin {
-	def loadAfter = ['hibernate','datasources']
+	def loadAfter = ['hibernate', 'datasources']
 
     def watchedResources = [
     	"file:./grails-app/dao/**/*Dao.groovy",

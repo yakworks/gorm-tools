@@ -57,12 +57,12 @@ class DateUtil {
         return dateFormat.format(date)
     }
 
-    public static Date stringToDate(String strDt){
+    static Date stringToDate(String strDt){
         Date date = convertStringToDateTime(strDt, "yyyy-MM-dd")
         return date
     }
 
-    public static String dateToString(Date date){
+    static String dateToString(Date date){
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss")
         String dtStr = ''
         try {
@@ -73,7 +73,7 @@ class DateUtil {
         return dtStr
     }
 
-    public static String dateToString(Date date, String format){
+    static String dateToString(Date date, String format){
         DateFormat df = new SimpleDateFormat(format)
         String dtStr = ''
         try {
@@ -231,12 +231,12 @@ class DateUtil {
         return monthLetter
     }
 
-    public static Date stringToDateTime(String strDt){
+    static Date stringToDateTime(String strDt) {
         Date date = convertStringToDateTime(strDt, "yyyy-MM-dd'T'HH:mm:ss")
         return date
     }
 
-    static Date convertStringToDateTime(String strDt, String format){
+    static Date convertStringToDateTime(String strDt, String format) {
         DateFormat df = new SimpleDateFormat(format)
         Date dtTmp = null
         try {
@@ -250,26 +250,26 @@ class DateUtil {
     /**
      * Returns the year of the date specified.
      */
-    public static int getYearOf (Date date) {
+    static int getYearOf (Date date) {
         Calendar gc = new GregorianCalendar()
         gc.setTime(date)
         return gc.get(Calendar.YEAR)
     }
 
-    public static long getDateDifference_inHours(Date date){
+    static long getDateDifference_inHours(Date date) {
         Calendar lastModifiedDateCalendar = getCalendarInstance_ByDate(date)
         long diff = getCurrentCalendarInstance().getTimeInMillis() - lastModifiedDateCalendar.getTimeInMillis()
         return diff / (60 * 60 * 1000) as long
     }
 
-    public static Date setToMidnight(Date date) {
+    static Date setToMidnight(Date date) {
         Calendar cal = Calendar.getInstance()
         cal.setTime(date)
         setTimeAsOfMidnight(cal)
         return cal.getTime()
     }
 
-    public static Calendar setTimeAsOfMidnight(Calendar cal){
+    static Calendar setTimeAsOfMidnight(Calendar cal) {
         cal.set(Calendar.HOUR_OF_DAY, 0)            // set hour to midnight
         cal.set(Calendar.MINUTE, 0)                 // set minute in hour
         cal.set(Calendar.SECOND, 0)                 // set second in minute
@@ -277,7 +277,7 @@ class DateUtil {
         return cal
     }
 
-    public static Calendar setTimeBeforeMidnight(Calendar cal){
+    static Calendar setTimeBeforeMidnight(Calendar cal){
         cal.set(Calendar.HOUR_OF_DAY, 23)            // set hour to midnight
         cal.set(Calendar.MINUTE, 59)                 // set minute in hour
         cal.set(Calendar.SECOND, 59)                 // set second in minute
@@ -285,7 +285,7 @@ class DateUtil {
         return cal
     }
 
-    public static Date getLastDayOfMonth(Date orig) {
+    static Date getLastDayOfMonth(Date orig) {
         Calendar calendar = Calendar.instance
         calendar.setTime(orig)
         int year = calendar.get(Calendar.YEAR)
@@ -300,7 +300,7 @@ class DateUtil {
      * @dayInPeriod  1-30 for monthly, 1-7 for weekly (1 is Sunday)
      * @return is today the date for a specified period and dayInPeriod
      */
-    public static boolean isTodayTheDate(String period, int dayInPeriod) {
+    static boolean isTodayTheDate(String period, int dayInPeriod) {
         int dayOfMonth = new Date().getAt(Calendar.DAY_OF_MONTH)
         int dayOfWeek = new Date().getAt(Calendar.DAY_OF_WEEK)
         switch ( period.toLowerCase() ) {
@@ -327,7 +327,7 @@ class DateUtil {
      * @param two
      * @return
      */
-    public static int getMonthDiff(Date one, Date two) {
+    static int getMonthDiff(Date one, Date two) {
         Calendar start = Calendar.getInstance()
         start.setTime(one)
         Calendar end = Calendar.getInstance()
@@ -349,7 +349,7 @@ class DateUtil {
      * @return int number of days
      */
     @CompileDynamic
-    public static int getDaysBetween(Date start, Date end) {
+    static int getDaysBetween(Date start, Date end) {
         Validate.notNull(start, "Start date is null")
         Validate.notNull(end, "End date is null")
 

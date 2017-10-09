@@ -13,25 +13,25 @@ import org.springframework.beans.factory.annotation.Configurable
 @Configurable
 @Slf4j
 @CompileStatic
-public class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
+class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
 	// Property names for configure() params.
-	public static final String PROP_ENTITY="entity_name"
-	public static final String PROP_TABLE="target_table"
-	public static final String PROP_ID_TABLE="identity_tables"
-	public static final String PROP_COLUMN="target_column"
+	static final String PROP_ENTITY = "entity_name"
+	static final String PROP_TABLE = "target_table"
+	static final String PROP_ID_TABLE = "identity_tables"
+	static final String PROP_COLUMN = "target_column"
 
 	/**
 	 * The configuration parameter holding the table name for the
 	 * generated id
 	 */
-	public static final String TABLE = "target_table"
+	static final String TABLE = "target_table"
 
 	private String segment_value
 	
-	public SpringIdGenerator() {
+	SpringIdGenerator() {
 	}
 
-	public void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
+	void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
 		//this.params = params;
 		segment_value = params.getProperty( TABLE ) + ".id "
 		showProperties("SpringIdGenerator configure ")
@@ -43,7 +43,7 @@ public class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.
 		}
 	}
 
-	public synchronized Serializable generate(final SessionImplementor session, Object obj) {
+	synchronized Serializable generate(final SessionImplementor session, Object obj) {
 		showProperties("SpringIdGenerator.generate ")
 		return (Long) IdGeneratorHolder.idGenerator.getNextId(segment_value)
 	}

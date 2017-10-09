@@ -33,15 +33,15 @@ class DomainException extends ValidationException {
 		this(msgMap, entity, errors, null)
 	}
 
-	public DomainException(Map msgMap, entity) {
+	DomainException(Map msgMap, entity) {
 		this(msgMap, entity, null, null)
 	}
 
-	public DomainException(Map msgMap, entity, Throwable cause) {
+	DomainException(Map msgMap, entity, Throwable cause) {
 		this(msgMap, entity, null, cause)
 	}
 
-	public DomainException(Map msgMap, entity, Errors errors, Throwable cause) {
+	DomainException(Map msgMap, entity, Errors errors, Throwable cause) {
 		super(msgMap.defaultMessage?.toString() ?: "Save or Validation Error(s) occurred", errors ?: new EmptyErrors("empty"))
 		initCause(cause)
 		this.messageMap = msgMap

@@ -1,12 +1,6 @@
 package grails.plugin.dao
 
-import grails.core.GrailsApplication
 import grails.util.GrailsNameUtils
-import grails.util.Holders
-import grails.web.databinding.WebDataBinding
-import org.grails.core.artefact.DomainClassArtefactHandler
-import org.grails.datastore.gorm.GormEntity
-import org.grails.plugins.domain.DomainClassGrailsPlugin
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -23,7 +17,7 @@ class DaoUtil implements ApplicationContextAware {
 
 	static ApplicationContext ctx
 
-	public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+	void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx
 	}
 

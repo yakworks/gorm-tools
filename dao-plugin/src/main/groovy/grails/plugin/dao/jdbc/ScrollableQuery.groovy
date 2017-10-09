@@ -18,7 +18,7 @@ class ScrollableQuery {
 	private RowMapper rowMapper
 	private int fetchSize
 
-	public ScrollableQuery(RowMapper mapper, DataSource dataSource, int fetchSize = Integer.MIN_VALUE) {
+	ScrollableQuery(RowMapper mapper, DataSource dataSource, int fetchSize = Integer.MIN_VALUE) {
 		this.dataSource = dataSource
 		this.rowMapper = mapper
 		this.fetchSize = fetchSize
@@ -28,7 +28,7 @@ class ScrollableQuery {
 	 * Executes the query, and calls the closure for each row.
 	 * @param Closure cl
 	 */
-	public void eachRow(String query, Closure cl) {
+	void eachRow(String query, Closure cl) {
 		Sql sql = prepareSql()
 		int index = 1
 
@@ -45,7 +45,7 @@ class ScrollableQuery {
 	 * Executes the query, and calls the closure for each batch.
 	 * @param int batchSize
 	 */
-	public void eachBatch(String query, int batchSize, Closure cl) {
+	void eachBatch(String query, int batchSize, Closure cl) {
 		List batch = []
 		this.eachRow(query) { Object row ->
 			batch.add(row)
@@ -65,7 +65,7 @@ class ScrollableQuery {
 	 *
 	 * @return List
 	 */
-	public List rows(String query) {
+	List rows(String query) {
 		List result = []
 
 		this.eachRow(query) { Object row ->

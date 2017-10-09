@@ -9,7 +9,7 @@ import org.grails.datastore.mapping.query.api.Criteria
  * For consistently searching across data types.
  */
 @GrailsCompileStatic
-public class CriteriaUtils {
+class CriteriaUtils {
 
     /** This is a convenience method to redirect all the types of filters from a single map. */
     @CompileDynamic

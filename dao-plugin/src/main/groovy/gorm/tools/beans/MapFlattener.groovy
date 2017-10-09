@@ -1,7 +1,5 @@
 package gorm.tools.beans
 
-import groovy.json.JsonSlurper
-import org.apache.log4j.Logger
 import groovy.transform.CompileStatic
 
 /**

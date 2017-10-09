@@ -144,8 +144,10 @@ class DaoPluginHelper {
 			daoClass.transactional &&
 					!AnnotationUtils.findAnnotation(javaClass, grails.transaction.Transactional) &&
 					!AnnotationUtils.findAnnotation(javaClass, Transactional) &&
-					!javaClass.methods.any { Method m -> AnnotationUtils.findAnnotation(m, Transactional) != null ||
-							AnnotationUtils.findAnnotation(m, grails.transaction.Transactional) != null}
+					!javaClass.methods.any { Method m ->
+						AnnotationUtils.findAnnotation(m, Transactional) != null ||
+						AnnotationUtils.findAnnotation(m, grails.transaction.Transactional) != null
+					}
 		}
 		catch (e) {
 			return false

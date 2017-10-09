@@ -76,16 +76,15 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
     Criteria order(String propertyName, String direction, boolean forceSuper = false) {
         if (forceSuper || !propertyName.contains('.')) {
             return super.order(propertyName, direction)
-        } else {
-            List props = propertyName.split(/\./) as List
-            String last = props.pop()
-            Closure toDo = { order(last, direction) }
-            Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
-                { -> "$prop"(acc) }
-            }
-            newOrderBy.call()
-            return this
         }
+        List props = propertyName.split(/\./) as List
+        String last = props.pop()
+        Closure toDo = { order(last, direction) }
+        Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
+            { -> "$prop"(acc) }
+        }
+        newOrderBy.call()
+        return this
     }
 
     /**
@@ -119,16 +118,15 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
     public Criteria nestedPathPropCall(String propertyName, Object propertyValue, String critName) {
         if (!propertyName.contains('.')) {
             return super."$critName"(propertyName, propertyValue)
-        } else {
-            List props = propertyName.split(/\./) as List
-            String last = props.pop()
-            Closure toDo = { "$critName"(last, propertyValue) }
-            Closure newCall = props.reverse().inject(toDo) { acc, prop ->
-                { -> "$prop"(acc) }
-            }
-            newCall.call()
-            return this
         }
+        List props = propertyName.split(/\./) as List
+        String last = props.pop()
+        Closure toDo = { "$critName"(last, propertyValue) }
+        Closure newCall = props.reverse().inject(toDo) { acc, prop ->
+            { -> "$prop"(acc) }
+        }
+        newCall.call()
+        return this
     }
 
     /**

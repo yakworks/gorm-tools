@@ -9,6 +9,8 @@ import org.grails.datastore.mapping.query.Query
 import org.hibernate.criterion.Projections
 import org.hibernate.internal.CriteriaImpl
 
+import java.lang.reflect.Field
+
 /**
  * a holder object for paged data
  */
@@ -128,13 +130,13 @@ class Pager {
 
         //get original query and modify it to get count of records. sadly, we cannot clone it
         Query q = src.query
-        Object criteriaField = q.class.declaredFields.find { it.name == 'criteria' }
+        Field criteriaField = q.class.declaredFields.find { it.name == 'criteria' }
         criteriaField.setAccessible(true)
         CriteriaImpl realCriteria = criteriaField.get(q)
         realCriteria.setProjection(Projections.rowCount()) // count(*)
 
         //now we need to remove ORDER BY, because MS SQL cannot execute count(*) query with ORDER BY
-        Object currentOrder = realCriteria.class.declaredFields.find { it.name == 'orderEntries' }
+        Field currentOrder = realCriteria.class.declaredFields.find { it.name == 'orderEntries' }
         currentOrder.setAccessible(true)
         currentOrder.get(realCriteria).clear()
 

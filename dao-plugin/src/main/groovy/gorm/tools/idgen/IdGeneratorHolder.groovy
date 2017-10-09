@@ -2,8 +2,9 @@ package gorm.tools.idgen
 
 import groovy.transform.CompileStatic
 
+@SuppressWarnings(['NonFinalPublicField'])
 @CompileStatic
-public class IdGeneratorHolder {
+class IdGeneratorHolder {
 	public static IdGenerator idGenerator
 
 	public IdGenerator getIdGenerator() {

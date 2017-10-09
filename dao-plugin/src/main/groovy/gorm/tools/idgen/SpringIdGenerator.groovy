@@ -26,26 +26,24 @@ class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configu
 	 */
 	static final String TABLE = "target_table"
 
-	private String segment_value
-	
-	SpringIdGenerator() {
-	}
+	private String segmentValue
 
 	void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
 		//this.params = params;
-		segment_value = params.getProperty( TABLE ) + ".id "
+		segmentValue = params.getProperty( TABLE ) + ".id "
 		showProperties("SpringIdGenerator configure ")
 	}
 	
 	private void showProperties(String prefix) {
 		if(log.isDebugEnabled()) {
-			log.debug(prefix + segment_value + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator==null?"null! ":"not null. "))
+			log.debug(prefix + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator==null?"null! ":"not null. "))
 		}
 	}
 
+	@SuppressWarnings('SynchronizedMethod')
 	synchronized Serializable generate(final SessionImplementor session, Object obj) {
 		showProperties("SpringIdGenerator.generate ")
-		return (Long) IdGeneratorHolder.idGenerator.getNextId(segment_value)
+		return (Long) IdGeneratorHolder.idGenerator.getNextId(segmentValue)
 	}
 
 }

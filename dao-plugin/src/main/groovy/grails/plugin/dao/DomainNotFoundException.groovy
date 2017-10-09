@@ -13,6 +13,7 @@ class DomainNotFoundException extends DomainException {
 	}
 
 	//Override it for performance improvement, because filling in the stack trace is quit expensive
+	@SuppressWarnings(['SynchronizedMethod'])
 	@Override
 	synchronized Throwable fillInStackTrace() { }
 }

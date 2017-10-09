@@ -40,6 +40,7 @@ class BatchIdGenerator implements IdGenerator {
 		return getNextId(name, 1)
 	}
 
+	@SuppressWarnings(['SynchronizedMethod'])
     synchronized long getNextId(String keyName, long increment){
 		long r
 		if(keyName == null) {
@@ -80,15 +81,13 @@ class BatchIdGenerator implements IdGenerator {
 			//make sure again that its not there in case another thread finished adding it since the containsKey check right above
 			if (entries.containsKey(name)) {
 				return entries.get(name)
-			}else{
-				long current = getGenerator().getNextId(name, increment>allocationSize?increment:allocationSize)
-				IdRow idrow = new IdRow(name)
-				idrow.max = current+allocationSize
-				idrow.nextId.set(current)
-				entries.put(name, idrow)
-				return idrow
 			}
-
+			long current = getGenerator().getNextId(name, increment>allocationSize?increment:allocationSize)
+			IdRow idrow = new IdRow(name)
+			idrow.max = current+allocationSize
+			idrow.nextId.set(current)
+			entries.put(name, idrow)
+			return idrow
 		}
 	}
 

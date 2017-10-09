@@ -10,6 +10,7 @@ import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
+@SuppressWarnings(['EmptyMethod'])
 @GrailsCompileStatic
 @Transactional
 class GormDaoSupport<T extends GormEntity & WebDataBinding> {

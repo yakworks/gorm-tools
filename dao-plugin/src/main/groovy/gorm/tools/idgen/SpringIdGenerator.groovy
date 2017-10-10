@@ -14,36 +14,36 @@ import org.springframework.beans.factory.annotation.Configurable
 @Slf4j
 @CompileStatic
 class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
-	// Property names for configure() params.
-	static final String PROP_ENTITY = "entity_name"
-	static final String PROP_TABLE = "target_table"
-	static final String PROP_ID_TABLE = "identity_tables"
-	static final String PROP_COLUMN = "target_column"
+    // Property names for configure() params.
+    static final String PROP_ENTITY = "entity_name"
+    static final String PROP_TABLE = "target_table"
+    static final String PROP_ID_TABLE = "identity_tables"
+    static final String PROP_COLUMN = "target_column"
 
-	/**
-	 * The configuration parameter holding the table name for the
-	 * generated id
-	 */
-	static final String TABLE = "target_table"
+    /**
+     * The configuration parameter holding the table name for the
+     * generated id
+     */
+    static final String TABLE = "target_table"
 
-	private String segmentValue
+    private String segmentValue
 
-	void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
-		//this.params = params;
-		segmentValue = params.getProperty( TABLE ) + ".id "
-		showProperties("SpringIdGenerator configure ")
-	}
-	
-	private void showProperties(String prefix) {
-		if(log.isDebugEnabled()) {
-			log.debug(prefix + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator==null?"null! ":"not null. "))
-		}
-	}
+    void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
+        //this.params = params;
+        segmentValue = params.getProperty( TABLE ) + ".id "
+        showProperties("SpringIdGenerator configure ")
+    }
 
-	@SuppressWarnings('SynchronizedMethod')
-	synchronized Serializable generate(final SessionImplementor session, Object obj) {
-		showProperties("SpringIdGenerator.generate ")
-		return (Long) IdGeneratorHolder.idGenerator.getNextId(segmentValue)
-	}
+    private void showProperties(String prefix) {
+        if(log.isDebugEnabled()) {
+            log.debug(prefix + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator==null?"null! ":"not null. "))
+        }
+    }
+
+    @SuppressWarnings('SynchronizedMethod')
+    synchronized Serializable generate(final SessionImplementor session, Object obj) {
+        showProperties("SpringIdGenerator.generate ")
+        return (Long) IdGeneratorHolder.idGenerator.getNextId(segmentValue)
+    }
 
 }

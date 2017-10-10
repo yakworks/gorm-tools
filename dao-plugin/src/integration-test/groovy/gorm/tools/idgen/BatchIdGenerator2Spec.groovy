@@ -6,8 +6,9 @@ import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 
 @Integration
-@Rollback
+//@Rollback
 public class BatchIdGenerator2Spec extends Specification {
+
 	JdbcTemplate jdbcTemplate
 	private static final String TABLE_KEY = "Custom1.id"
 	IdGenerator idGenerator
@@ -15,7 +16,15 @@ public class BatchIdGenerator2Spec extends Specification {
 	static int nextIdEndVal
 	static int nextIdSIEndVal
 
-	public void testGetNextIdString() {
+
+    def setup() {
+        //GrailsWebEnvironment.bindRequestIfNull()
+    }
+
+    def cleanup() {
+    }
+
+	void "test getNextId" () {
 		setup:
 		IdGeneratorTestHelper.createTables(jdbcTemplate)
 

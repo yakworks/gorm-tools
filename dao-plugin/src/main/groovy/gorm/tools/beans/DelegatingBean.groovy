@@ -1,7 +1,6 @@
 package gorm.tools.beans
 
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 
 /**
  * Used mainly by BeanPathTools
@@ -13,23 +12,23 @@ import groovy.transform.TypeCheckingMode
  * Delegating bean helps keeping the domain clean by not stuffing every property/method in the domain class itself
  * Just to generate the list screen
  *
- * Example: customre list screen needs customer.calcs - calcs can be customer cals or branch calcs based on branch login
+ * Example: customer list screen needs customer.calcs - calcs can be customer cals or branch calcs based on branch login
  * DelegatingBean can be used to keep customer clean of this stuff by defining getCals() in delegating bean or customer dao.
  */
 
 @CompileStatic
 class DelegatingBean {
-    def target
+    Object target
 
     DelegatingBean(target) {
         this.target = target
     }
 
-    def propertyMissing(String name) {
+    Object propertyMissing(String name) {
         return target[name]
     }
 
-    def methodMissing(String name, args) {
+    Object methodMissing(String name, args) {
         return target.invokeMethod(name, args)
     }
 }

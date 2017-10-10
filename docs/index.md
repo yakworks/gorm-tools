@@ -19,39 +19,6 @@ If you are using envers or cascade saves then we want the saves and updates to b
 
 With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in  when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
 
-We were also seeing a lot of repetition in code that replaced the actions of a scaffolded controller. Especially the update action
-This is what the update action is in the default controller and there is now good way to reuse the core logic
-
-```groovy
-def update = {
-  def ${propertyName} = ${className}.get(params.id)
-     if (${propertyName}) {
-         if (params.version) {
-             def version = params.version.toLong()
-             if (${propertyName}.version > version) {
-                 <% def lowerCaseName = grails.util.GrailsNameUtils.getPropertyName(className) %>
-                 ${propertyName}.errors.rejectValue("version", "default.optimistic.locking.failure", [message(code: '${domainClass.propertyName}.label', default: '${className}')] as Object[], "Another user has updated this ${className} while you were editing")
-                 render(view: "edit", model: [${propertyName}: ${propertyName}])
-                 return
-             }
-         }
-         ${propertyName}.properties = params
-         if (!${propertyName}.hasErrors() && ${propertyName}.save(flush: true)) {
-             flash.message = "\${message(code: 'default.updated.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), ${propertyName}.id])}"
-             redirect(action: "show", id: ${propertyName}.id)
-         }
-         else {
-             render(view: "edit", model: [${propertyName}: ${propertyName}])
-         }
-     }
-     else {
-         flash.message = "\${message(code: 'default.not.found.message', args: [message(code: '${domainClass.propertyName}.label', default: '${className}'), params.id])}"
-         redirect(action: "list")
-     }
-   }
-}
-```
-
 With this plugin and a controller you can just do:
 
 ```groovy

@@ -1,17 +1,21 @@
-package gorm.tools.idgen;
+package gorm.tools.idgen
 
-public class IdGeneratorHolder {
-	public static IdGenerator idGenerator;
+import groovy.transform.CompileStatic
 
-	public IdGenerator getIdGenerator() {
-		return idGenerator;
-	}
+@SuppressWarnings(['NonFinalPublicField'])
+@CompileStatic
+class IdGeneratorHolder {
+    public static IdGenerator idGenerator
 
-	public void setIdGenerator(IdGenerator idGenerator) {
-		if(IdGeneratorHolder.idGenerator == null) {
-			IdGeneratorHolder.idGenerator = idGenerator;
-		} // else {
-		// 			throw new IllegalArgumentException("There is already a generator set!");
-		// 		}
-	}
+    public IdGenerator getIdGenerator() {
+        return idGenerator
+    }
+
+    public void setIdGenerator(IdGenerator idGenerator) {
+        if(IdGeneratorHolder.idGenerator == null) {
+            IdGeneratorHolder.idGenerator = idGenerator
+        } // else {
+        // 			throw new IllegalArgumentException("There is already a generator set!")
+        // 		}
+    }
 }

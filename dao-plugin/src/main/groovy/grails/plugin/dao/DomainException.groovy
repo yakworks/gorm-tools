@@ -9,39 +9,39 @@ import org.springframework.validation.Errors
 */
 @CompileStatic
 class DomainException extends ValidationException {
-	def entity //the entity that the error occured on
+	Object entity //the entity that the error occured on
 	Map meta //any meta that can be set and passed up the chain for an error
 	Map messageMap //map with message info code,orgs and defaultMessage
-	def otherEntity //another entity on which error occurred
-	
+	Object otherEntity //another entity on which error occurred
+
 	public DomainException(String msg) {
-		super(msg,new EmptyErrors("empty"))
-		//messageMap = [code:"validationException",args:[],defaultMessage:msg]
+		super(msg, new EmptyErrors("empty"))
+		//messageMap = [code:"validationException", args:[], defaultMessage:msg]
 	}
 
 	public DomainException(String msg, Errors e) {
-		this(msg,e,null)
+		this(msg, e, null)
 	}
 
-	public DomainException(String msg, Errors e,Throwable cause) {
-		super(msg,e)
+	public DomainException(String msg, Errors e, Throwable cause) {
+		super(msg, e)
 		initCause(cause)
-		messageMap = [code:"validationException",args:[],defaultMessage:msg]
+		messageMap = [code:"validationException", args:[], defaultMessage:msg]
 	}
-	
+
 	public DomainException(Map msgMap, entity, Errors errors) {
 		this(msgMap, entity, errors, null)
 	}
 
-	public DomainException(Map msgMap, entity) {
-		this(msgMap, entity,null,null)
+	DomainException(Map msgMap, entity) {
+		this(msgMap, entity, null, null)
 	}
 
-	public DomainException(Map msgMap, entity, Throwable cause) {
-		this(msgMap, entity,null,cause)
+	DomainException(Map msgMap, entity, Throwable cause) {
+		this(msgMap, entity, null, cause)
 	}
 
-	public DomainException(Map msgMap, entity, Errors errors, Throwable cause) {
+	DomainException(Map msgMap, entity, Errors errors, Throwable cause) {
 		super(msgMap.defaultMessage?.toString() ?: "Save or Validation Error(s) occurred", errors ?: new EmptyErrors("empty"))
 		initCause(cause)
 		this.messageMap = msgMap

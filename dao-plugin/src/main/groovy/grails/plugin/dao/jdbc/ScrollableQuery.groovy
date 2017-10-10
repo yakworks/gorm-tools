@@ -11,6 +11,7 @@ import java.sql.Statement
 /**
  * Groovy Sql wrapper for running scrollable/streaming queries.
  */
+@SuppressWarnings(['JdbcResultSetReference', 'JdbcStatementReference'])
 @CompileStatic
 class ScrollableQuery {
 
@@ -18,7 +19,7 @@ class ScrollableQuery {
 	private RowMapper rowMapper
 	private int fetchSize
 
-	public ScrollableQuery(RowMapper mapper, DataSource dataSource, int fetchSize = Integer.MIN_VALUE) {
+	ScrollableQuery(RowMapper mapper, DataSource dataSource, int fetchSize = Integer.MIN_VALUE) {
 		this.dataSource = dataSource
 		this.rowMapper = mapper
 		this.fetchSize = fetchSize
@@ -28,14 +29,14 @@ class ScrollableQuery {
 	 * Executes the query, and calls the closure for each row.
 	 * @param Closure cl
 	 */
-	public void eachRow(String query, Closure cl) {
+	void eachRow(String query, Closure cl) {
 		Sql sql = prepareSql()
 		int index = 1
 
 		sql.query(query) { ResultSet r ->
-			while(r.next()) {
+			while (r.next()) {
 				index++
-				def row = rowMapper.mapRow(r, index)
+				Object row = rowMapper.mapRow(r, index)
 				cl.call(row)
 			}
 		}
@@ -45,17 +46,17 @@ class ScrollableQuery {
 	 * Executes the query, and calls the closure for each batch.
 	 * @param int batchSize
 	 */
-	public void eachBatch(String query, int batchSize, Closure cl) {
+	void eachBatch(String query, int batchSize, Closure cl) {
 		List batch = []
-		this.eachRow(query) { def row ->
+		this.eachRow(query) { Object row ->
 			batch.add(row)
-			if((batch.size() == batchSize)) {
+			if ((batch.size() == batchSize)) {
 				cl.call(batch)
 				batch = []
 			}
 		}
 		//there could be remaning rows
-		if(batch.size() > 0) cl.call(batch)
+		if (batch.size() > 0) cl.call(batch)
 	}
 
 	/**
@@ -65,10 +66,10 @@ class ScrollableQuery {
 	 *
 	 * @return List
 	 */
-	public List rows(String query) {
+	List rows(String query) {
 		List result = []
 
-		this.eachRow(query) {def row ->
+		this.eachRow(query) { Object row ->
 			result.add(row)
 		}
 

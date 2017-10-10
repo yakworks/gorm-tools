@@ -3,11 +3,12 @@ package gorm.tools.beans
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEntity
+import grails.plugin.dao.GormDaoSupport
 
 //Delegates missing properties as method calls to the dao for the domain class
 @CompileStatic
 class DaoDelegatingBean extends DelegatingBean {
-    def dao
+    GormDaoSupport dao
 
     @CompileStatic(TypeCheckingMode.SKIP)
     DaoDelegatingBean(GormEntity target) {
@@ -16,13 +17,16 @@ class DaoDelegatingBean extends DelegatingBean {
     }
 
     //first try if target bean has property, if not, check if dao has the method
-    def propertyMissing(String name) {
+    Object propertyMissing(String name) {
         try {
             return super.propertyMissing(name)
         }catch (MissingPropertyException e) {
             String method
-            if(name.startsWith("has") || name.startsWith("is")) method = name
-            else method = "get" + name.capitalize()
+            if (name.startsWith("has") || name.startsWith("is")) {
+                method = name
+            } else {
+                method = "get" + name.capitalize()
+            }
 
             try {
                 return dao.invokeMethod(method, target)
@@ -33,7 +37,7 @@ class DaoDelegatingBean extends DelegatingBean {
         }
     }
 
-    def methodMissing(String name, args) {
+    Object methodMissing(String name, args) {
         try {
             return target.invokeMethod(name, args)
         }catch (MissingMethodException e) {

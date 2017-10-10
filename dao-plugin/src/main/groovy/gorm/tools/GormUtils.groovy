@@ -1,12 +1,10 @@
 package gorm.tools
 
-import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
-import grails.util.Holders
-import groovy.transform.CompileStatic
+import grails.compiler.GrailsCompileStatic
 import org.apache.commons.lang.Validate
-import org.grails.core.artefact.DomainClassArtefactHandler
 
+@GrailsCompileStatic
 class GormUtils {
 
     final static List<String> IGNORED_PROPERTIES = ["id", "version", "createdBy", "createdDate", "editedBy", "editedDate", "num"]
@@ -17,9 +15,9 @@ class GormUtils {
      * @param override - properties to override after copying
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
-    public static <T> T copyDomain(Class<T> domainClass, def old, Map override = [:], boolean ignoreAssociations = true) {
-        def copy = domainClass.newInstance()
-        return copyDomain(copy, old, override, ignoreAssociations)
+    static <T> T copyDomain(Class<T> domainClass, Object old, Map override = [:], boolean ignoreAssociations = true) {
+        T copy = domainClass.newInstance()
+        return copyDomain(copy, old, override, ignoreAssociations) as T
     }
 
     /**
@@ -29,35 +27,26 @@ class GormUtils {
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
 
-    public static def copyDomain(def copy, def old, Map override = [:], boolean ignoreAssociations = true) {
-        if(copy == null) throw new IllegalArgumentException("Copy is null")
-        if(old == null) return null
+    static Object copyDomain(Object copy, Object old, Map override = [:], boolean ignoreAssociations = true) {
+        if (copy == null) throw new IllegalArgumentException("Copy is null")
+        if (old == null) return null
 
-        getDomainClass(old.class).persistentProperties.each { GrailsDomainClassProperty dp ->
-            if(IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
-            if(ignoreAssociations && dp.isAssociation()) return
+        GormMetaUtils.getDomainClass(old.class).persistentProperties.each { GrailsDomainClassProperty dp ->
+            if (IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
+            if (ignoreAssociations && dp.isAssociation()) return
 
             String name = dp.name
             copy[name] = old[name]
         }
 
-       if(override) {
-           copy.properties = override
-       }
+        if (override) {
+            copy.properties = override
+        }
 
         return copy
     }
-    
 
-    public static GrailsDomainClass getDomainClass(Class domain) {
-        if(!Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, domain)) {
-            throw new IllegalArgumentException(domain.name + " is not a domain class")
-        } else {
-            return Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domain.name)
-        }
-    }
-
-    public static void copyProperties(def source, def target, String... propNames) {
+    static void copyProperties(Object source, Object target, String... propNames) {
         copyProperties(source, target, true, propNames)
     }
 
@@ -67,11 +56,14 @@ class GormUtils {
      * @param target
      * @param propNames
      */
-    public static void copyProperties(def source, def target, boolean copyOnlyIfNull, String... propNames) {
+    static void copyProperties(Object source, Object target, boolean copyOnlyIfNull, String... propNames) {
 
-        for(String prop: propNames) {
-            if(copyOnlyIfNull && (target[prop] != null)) {  continue }
-            else { target[prop] = source[prop] }
+        for (String prop : propNames) {
+            if (copyOnlyIfNull && (target[prop] != null)) {
+                continue
+            } else {
+                target[prop] = source[prop]
+            }
         }
 
     }
@@ -85,16 +77,15 @@ class GormUtils {
      * @param property - the property
      * @return value of the specified property or null if any of the intermediate objects are null
      */
-    @CompileStatic
-    static def getPropertyValue(def source, String property) {
+    static Object getPropertyValue(Object source, String property) {
         Validate.notNull(source)
         Validate.notEmpty(property)
 
-        def result = property.tokenize('.').inject(source, {def obj, String prop ->
-            def value = null
-            if(obj != null) value = obj[prop]
+        Object result = property.tokenize('.').inject(source){ Object obj, String prop ->
+            Object value = null
+            if (obj != null) value = obj[prop]
             return value
-        })
+        }
 
         return result
     }

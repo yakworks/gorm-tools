@@ -2,10 +2,10 @@ package gorm.tools.idgen
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.hibernate.MappingException;
-import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.id.IdentifierGenerator;
+import org.hibernate.MappingException
+import org.hibernate.dialect.Dialect
+import org.hibernate.engine.spi.SessionImplementor
+import org.hibernate.id.IdentifierGenerator
 import org.hibernate.type.Type
 import org.springframework.beans.factory.annotation.Configurable
 
@@ -13,39 +13,37 @@ import org.springframework.beans.factory.annotation.Configurable
 @Configurable
 @Slf4j
 @CompileStatic
-public class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
-	// Property names for configure() params.
-	public static final String PROP_ENTITY="entity_name";
-	public static final String PROP_TABLE="target_table";
-	public static final String PROP_ID_TABLE="identity_tables";
-	public static final String PROP_COLUMN="target_column";
+class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
+    // Property names for configure() params.
+    static final String PROP_ENTITY = "entity_name"
+    static final String PROP_TABLE = "target_table"
+    static final String PROP_ID_TABLE = "identity_tables"
+    static final String PROP_COLUMN = "target_column"
 
-	/**
-	 * The configuration parameter holding the table name for the
-	 * generated id
-	 */
-	public static final String TABLE = "target_table";
+    /**
+     * The configuration parameter holding the table name for the
+     * generated id
+     */
+    static final String TABLE = "target_table"
 
-	private String segment_value;
-	
-	public SpringIdGenerator() {
-	}
+    private String segmentValue
 
-	public void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
-		//this.params = params;
-		segment_value = params.getProperty( TABLE ) + ".id ";
-		showProperties("SpringIdGenerator configure ");
-	}
-	
-	private void showProperties(String prefix) {
-		if(log.isDebugEnabled()) {
-			log.debug(prefix + segment_value + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator==null?"null! ":"not null. "));
-		}
-	}
+    void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
+        //this.params = params;
+        segmentValue = params.getProperty( TABLE ) + ".id "
+        showProperties("SpringIdGenerator configure ")
+    }
 
-	public synchronized Serializable generate(final SessionImplementor session, Object obj) {
-		showProperties("SpringIdGenerator.generate ");
-		return (Long) IdGeneratorHolder.idGenerator.getNextId(segment_value);
-	}
+    private void showProperties(String prefix) {
+        if(log.isDebugEnabled()) {
+            log.debug(prefix + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator==null?"null! ":"not null. "))
+        }
+    }
+
+    @SuppressWarnings('SynchronizedMethod')
+    synchronized Serializable generate(final SessionImplementor session, Object obj) {
+        showProperties("SpringIdGenerator.generate ")
+        return (Long) IdGeneratorHolder.idGenerator.getNextId(segmentValue)
+    }
 
 }

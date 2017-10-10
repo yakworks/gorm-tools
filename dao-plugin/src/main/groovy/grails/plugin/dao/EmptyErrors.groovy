@@ -10,11 +10,11 @@ class EmptyErrors extends org.springframework.validation.AbstractBindingResult {
 		super(objectName)
 	}
 
-	String getActualFieldValue(String d){
+	String getActualFieldValue(String d) {
 		return getObjectName()
 	}
 
-	String getTarget(){
+	String getTarget() {
 		return getObjectName()
 	}
 }

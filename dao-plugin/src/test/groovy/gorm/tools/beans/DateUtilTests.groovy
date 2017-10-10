@@ -1,13 +1,7 @@
 package gorm.tools.beans
 
-import org.junit.Test
-
 import java.text.SimpleDateFormat
-
-import org.junit.Test
 import spock.lang.Specification
-
-import java.text.SimpleDateFormat
 
 class DateUtilTests extends Specification {
 
@@ -30,7 +24,6 @@ class DateUtilTests extends Specification {
         '2013-11-01 23:00:00 GMT' == tester.format(date)
     }
 
-
     void testGetLastDayOfMonth() {
         when:
         SimpleDateFormat format = new SimpleDateFormat('yyyy-MM-dd')
@@ -40,7 +33,6 @@ class DateUtilTests extends Specification {
         then:
         format.parse('2011-09-30').format('yyyy-MM-dd') == result.format('yyyy-MM-dd')
     }
-
 
     void testIsTodayTheDate() {
         when:

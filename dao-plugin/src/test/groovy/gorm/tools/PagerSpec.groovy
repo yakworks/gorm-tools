@@ -15,7 +15,7 @@ class PagerSpec {
         List pages = []
 
         when:
-        paginator.eachPage {def max, def offset ->
+        paginator.eachPage { def max, def offset ->
             pages << [max:max, offset:offset]
         }
 

@@ -9,11 +9,11 @@ import org.springframework.core.annotation.Order
 @CompileStatic
 class MultiFormatDateConverter implements ValueConverter {
     /**
-     * allowEmpty = true(default) empty string will get set to null, 
-     * if false then empty string throws IllegalArgumentException gets thrown in that case. 
+     * allowEmpty = true(default) empty string will get set to null,
+     * if false then empty string throws IllegalArgumentException gets thrown in that case.
      */
     boolean allowEmpty = true
-    
+
     //DateUtils.parseDate will do these in order
     String[] formats = ['MM/dd/yy', 'yyyy-MM-dd'] //, 'MM/dd/yy HH:mm', 'yyyy-MM-dd HH:mm' ]
 
@@ -25,15 +25,13 @@ class MultiFormatDateConverter implements ValueConverter {
     @Override
     Object convert(Object value) {
         Date dateValue = null
-        if(value instanceof String) {
-            String input = (String)value
-            if(this.allowEmpty && !input) return dateValue
-            else {
-                if (DateUtil.GMT_MILLIS.matcher(input).matches() || DateUtil.GMT_SECONDS.matcher(input).matches() || DateUtil.TZ_LESS.matcher(input).matches()) {
-                   dateValue = DateUtil.parseJsonDate(input)
-                } else {
-                    dateValue = DateUtils.parseDate(input, formats)
-                }
+        if (value instanceof String) {
+            String input = (String) value
+            if (this.allowEmpty && !input) return dateValue
+            if (DateUtil.GMT_MILLIS.matcher(input).matches() || DateUtil.GMT_SECONDS.matcher(input).matches() || DateUtil.TZ_LESS.matcher(input).matches()) {
+                dateValue = DateUtil.parseJsonDate(input)
+            } else {
+                dateValue = DateUtils.parseDate(input, formats)
             }
         }
 

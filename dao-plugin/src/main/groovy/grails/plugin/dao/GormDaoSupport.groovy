@@ -1,7 +1,7 @@
 package grails.plugin.dao
 
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.transactions.Transactional
+//import grails.gorm.transactions.Transactional
 import grails.transaction.Transactional
 import grails.validation.ValidationException
 import grails.web.databinding.WebDataBinding
@@ -9,6 +9,8 @@ import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+
+import org.springframework.core.GenericTypeResolver
 
 @SuppressWarnings(['EmptyMethod'])
 @GrailsCompileStatic
@@ -20,7 +22,9 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	private Class<T> thisDomainClass
 
-	GormDaoSupport() { }
+	GormDaoSupport() {
+		this.thisDomainClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDaoSupport.class);
+	}
 
 	GormDaoSupport(Class<T> clazz) {
 		thisDomainClass = clazz

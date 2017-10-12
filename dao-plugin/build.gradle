@@ -17,7 +17,7 @@ apply plugin: "eclipse"
 apply plugin: "idea"
 apply plugin: "org.grails.grails-plugin"
 apply plugin: "org.grails.grails-plugin-publish"
-apply plugin:"org.grails.plugins.views-json"
+apply plugin: "org.grails.plugins.views-json"
 apply plugin: 'codenarc'
 
 repositories {
@@ -38,6 +38,7 @@ dependencies {
 	compile "org.grails:grails-core"
 	compile "org.springframework.boot:spring-boot-starter-actuator"
 	provided "org.springframework.boot:spring-boot-starter-tomcat"
+    //provided 'org.springframework.boot:spring-boot-starter-data-rest'
 	provided "org.grails:grails-dependencies"
 	compile "org.grails:grails-web-boot"
 	compile "org.grails.plugins:cache"
@@ -52,6 +53,10 @@ dependencies {
 
 	compile "org.grails.plugins:views-json:1.2.0.M2"
 	compile "org.grails.plugins:views-json-templates:1.2.0.M2"
+
+    compile "org.springframework.data:spring-data-commons" //:1.12.10.RELEASE
+
+
 	provided "org.codehaus.groovy:groovy-ant"
 	compile "org.grails:grails-plugin-testing"
 

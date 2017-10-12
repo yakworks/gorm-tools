@@ -24,6 +24,7 @@ public class JdbcIdGeneratorTests extends GroovyTestCase {
 
 	@Test
 	public void testAGetNextId_String() {
+		IdGeneratorTestHelper.createTables(jdbcTemplate)
 		startVal = jdbcIdGenerator.getNextId(TABLE_KEY)
 		int i1 = jdbcIdGenerator.getNextId(TABLE_KEY)
 		int i2 = jdbcIdGenerator.getNextId(TABLE_KEY)

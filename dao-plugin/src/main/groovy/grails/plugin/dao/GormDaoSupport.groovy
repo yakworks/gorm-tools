@@ -23,7 +23,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	private Class<T> thisDomainClass
 
 	GormDaoSupport() {
-		this.thisDomainClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDaoSupport.class);
+		this.thisDomainClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDaoSupport.class)
 	}
 
 	GormDaoSupport(Class<T> clazz) {

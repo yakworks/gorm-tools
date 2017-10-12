@@ -16,14 +16,6 @@ public class BatchIdGenerator2Spec extends Specification {
 	static int nextIdEndVal
 	static int nextIdSIEndVal
 
-
-    def setup() {
-        //GrailsWebEnvironment.bindRequestIfNull()
-    }
-
-    def cleanup() {
-    }
-
 	void "test getNextId" () {
 		setup:
 		IdGeneratorTestHelper.createTables(jdbcTemplate)

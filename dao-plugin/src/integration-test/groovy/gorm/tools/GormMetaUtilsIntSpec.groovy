@@ -1,15 +1,9 @@
 package gorm.tools
 
 import grails.persistence.Entity
-import grails.test.hibernate.HibernateSpec
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
-import grails.test.mixin.hibernate.HibernateTestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
-
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+
 //import grails.gorm.annotation.Entity
 
 @Integration
@@ -23,7 +17,6 @@ class GormMetaUtilsIntSpec extends Specification {
         expect:
         GormMetaUtils.getDomainClass(Orgify)
     }
-
 
     def "GetDomainClass string"() {
         expect:
@@ -77,5 +70,4 @@ class Orgify {
         name blank: false, inList: ['Joe']
     }
 }
-
 

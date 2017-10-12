@@ -26,7 +26,6 @@ interface GormRepository<T, ID> extends PagingAndSortingRepository<T, ID>, CrudR
      */
     void delete(T entity, Map params)
 
-
     /**
      * creates entity using the data from params and calls save for a new domain entity
      *

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import grails.plugin.dao.DomainException
 
+@SuppressWarnings(['EmptyMethod', 'ReturnsNullInsteadOfEmptyCollection'])
 @CompileStatic
 class DefaultGormRepository<T, ID extends Serializable> implements GormRepository<T, ID> {
 
@@ -153,7 +154,6 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
     Page<T> findAll(Pageable pageable) {
         return null
     }
-
 
     /**
      * Retrieves an entity by its id.

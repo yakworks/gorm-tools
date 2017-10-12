@@ -6,12 +6,13 @@ import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runners.MethodSorters
 import org.springframework.jdbc.core.JdbcTemplate
+import grails.plugin.dao.Application
 
 import javax.annotation.Resource
 
-@Integration
 @Rollback
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@Integration(applicationClass = Application.class)
 public class JdbcIdGeneratorTests extends GroovyTestCase {
 	private static final String TABLE_KEY = "Custom1.id"
 	@Resource IdGenerator jdbcIdGenerator

@@ -5,8 +5,9 @@ import spock.lang.Specification
 import grails.test.mixin.integration.Integration
 
 //import grails.gorm.annotation.Entity
+import grails.plugin.dao.Application
 
-@Integration
+@Integration(applicationClass = Application.class)
 class GormMetaUtilsIntSpec extends Specification {
 
     static doWithSpring = {

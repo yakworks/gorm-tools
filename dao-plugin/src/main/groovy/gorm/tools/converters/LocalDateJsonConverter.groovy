@@ -6,7 +6,6 @@ import groovy.transform.CompileStatic
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-//XXX add tests for these, I don't see them anywhere
 @CompileStatic
 class LocalDateJsonConverter implements JsonConverter {
 

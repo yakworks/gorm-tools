@@ -1,20 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
-echo "### Running tests"
+rm -rf ./build
 
-cd dao-app && ./gradlew :check
-cd dao-plugin && ./gradlew :check
+echo "### Running build for branch $TRAVIS_BRANCH ###"
+./gradlew --no-daemon check --stacktrace
+./travis-publish.sh
 
-echo "### Running publishing"
-
-if [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_PULL_REQUEST == 'false' ]]; then
-	echo "### publishing plugin to bintray"
-	cd ../dao-plugin && ./gradlew assemble check bintrayUpload
-
-else
-  echo "TRAVIS_BRANCH: $TRAVIS_BRANCH"
-  echo "TRAVIS_REPO_SLUG: $TRAVIS_REPO_SLUG"
-  echo "TRAVIS_PULL_REQUEST: $TRAVIS_PULL_REQUEST"
-fi

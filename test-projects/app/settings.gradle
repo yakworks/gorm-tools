@@ -1,4 +1,0 @@
-rootProject.name = 'dao-app'
-
-include ':dao'
-project(':dao').projectDir = new File(settingsDir, '../dao-plugin')

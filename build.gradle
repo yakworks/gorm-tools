@@ -1,0 +1,65 @@
+buildscript {
+	repositories {
+		mavenLocal()
+		maven { url "https://repo.grails.org/grails/core" }
+	}
+	dependencies {
+		classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+		classpath "org.grails:grails-docs:$grailsVersion"
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+		classpath 'io.github.groovylang.groovydoc:groovydoc-gradle-plugin:1.0.1'
+		classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.8.2"
+	}
+}
+
+apply plugin: 'idea'
+apply plugin:'groovy'
+
+repositories {
+	mavenLocal()
+	maven { url "https://repo.grails.org/grails/core" }
+}
+
+//Root project and view-tools plugin uses same version.
+version project.projectVersion
+
+project(':dao') {
+	version = project.projectVersion
+}
+
+ext {
+	commonBuild = "https://raw.githubusercontent.com/yakworks/grails-common-build/master"
+	grailsApps = ['test-app']
+	grailsPlugins = ['dao']
+}
+
+
+subprojects {
+
+	boolean isGrailsApp = grailsApps.contains(project.name)
+	boolean isGrailsPlugin = grailsPlugins.contains(project.name)
+	boolean isGrailsProject = isGrailsApp || isGrailsPlugin
+	boolean isBuildSnapshot = version.toString().endsWith("-SNAPSHOT")
+
+	println project.name + ":" + version.toString()
+
+	ext {
+		userOrg = "grails"
+		set "tomcat.version", "8.5.5"
+		isSnapshot = isBuildSnapshot
+	}
+
+	apply from:"$commonBuild/common.gradle"
+
+	if (isGrailsPlugin) {
+		apply from: "${commonBuild}/common-plugin.gradle"
+		apply from: "${commonBuild}/common-publishing.gradle"
+		group "org.grails.plugins"
+	}
+
+	if (isGrailsApp) {
+		apply from: "${commonBuild}/common-project.gradle"
+		group "org.grails"
+	}
+
+}

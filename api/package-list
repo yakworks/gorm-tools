@@ -1,0 +1,9 @@
+gorm.tools
+gorm.tools.beans
+gorm.tools.converters
+gorm.tools.dao
+gorm.tools.hibernate.criteria
+gorm.tools.idgen
+gorm.tools.jdbc
+gorm.tools.query
+grails.plugin.dao

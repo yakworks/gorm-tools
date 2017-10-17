@@ -5,7 +5,7 @@ import grails.plugin.dao.GormDaoSupport
 
 
 @GrailsCompileStatic
-class JumperDao extends GormDaoSupport {
-	Class domainClass = Jumper
+class JumperDao extends GormDaoSupport<Jumper> {
+	//Class domainClass = Jumper
 }
 

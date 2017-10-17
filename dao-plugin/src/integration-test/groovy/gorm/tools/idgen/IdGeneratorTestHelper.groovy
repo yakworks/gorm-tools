@@ -25,7 +25,7 @@ class IdGeneratorTestHelper {
 
 	static void createCustomTable(JdbcTemplate template) {
 		String query = """
-			create table Custom1
+			create table if not exists Custom1
 				(
 					id int not null,
 					version int null

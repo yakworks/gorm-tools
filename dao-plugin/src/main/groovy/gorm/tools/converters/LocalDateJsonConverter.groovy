@@ -1,4 +1,4 @@
-package grails.plugin.dao.converters
+package gorm.tools.converters
 
 import grails.plugin.json.builder.JsonConverter
 import groovy.transform.CompileStatic

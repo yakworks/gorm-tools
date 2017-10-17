@@ -1,4 +1,4 @@
-package grails.plugin.dao.jdbc
+package gorm.tools.jdbc
 
 import groovy.transform.CompileStatic
 import grails.web.servlet.mvc.GrailsParameterMap

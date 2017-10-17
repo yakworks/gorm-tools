@@ -1,4 +1,3 @@
-
 ruleset {
 
     // rulesets/basic.xml
@@ -122,9 +121,9 @@ ruleset {
 //    DuplicateStringLiteral
 
     // rulesets/enhanced.xml
-    CloneWithoutCloneable
-    JUnitAssertEqualsConstantActualValue
-    UnsafeImplementationAsMap
+    //CloneWithoutCloneable
+    //JUnitAssertEqualsConstantActualValue
+    //UnsafeImplementationAsMap
 
     // rulesets/exceptions.xml
     CatchArrayIndexOutOfBoundsException
@@ -311,7 +310,7 @@ ruleset {
     AbcComplexity   // DEPRECATED: Use the AbcMetric rule instead. Requires the GMetrics jar
     'AbcMetric' doNotApplyToFilesMatching: '.*Spec.groovy'   // Requires the GMetrics jar
     ClassSize
-    CrapMetric   // Requires the GMetrics jar and a Cobertura coverage file
+    //CrapMetric   // Requires the GMetrics jar and a Cobertura coverage file
     //CyclomaticComplexity
     MethodCount
     'MethodSize' doNotApplyToFilesMatching: '.*Spec.groovy'

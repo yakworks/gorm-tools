@@ -8,7 +8,7 @@ import groovy.transform.CompileDynamic
 @Transactional
 @GrailsCompileStatic
 class OrgDao extends GormDaoSupport<Org> {
-	Class domainClass = Org
+	//Class domainClass = Org
 
 	@CompileDynamic
 	@Override

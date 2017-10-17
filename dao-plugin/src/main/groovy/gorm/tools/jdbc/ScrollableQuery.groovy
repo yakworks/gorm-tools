@@ -1,4 +1,4 @@
-package grails.plugin.dao.jdbc
+package gorm.tools.jdbc
 
 import groovy.sql.Sql
 import groovy.transform.CompileStatic

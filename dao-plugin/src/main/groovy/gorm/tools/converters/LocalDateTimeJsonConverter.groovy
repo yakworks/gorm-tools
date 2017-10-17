@@ -1,23 +1,23 @@
-package grails.plugin.dao.converters
+package gorm.tools.converters
 
 import grails.plugin.json.builder.JsonConverter
 import groovy.transform.CompileStatic
 
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @CompileStatic
-class ZonedDateTimeJsonConverter implements JsonConverter {
+class LocalDateTimeJsonConverter implements JsonConverter {
 
 	@Override
 	Closure<? extends CharSequence> getConverter() {
-		{ ZonedDateTime date ->
-			"\"${DateTimeFormatter.ISO_ZONED_DATE_TIME.format((ZonedDateTime) date)}\""
+		{ LocalDateTime date ->
+			"\"${DateTimeFormatter.ISO_LOCAL_DATE_TIME.format((LocalDateTime) date)}\""
 		}
 	}
 
 	@Override
 	Class getType() {
-		ZonedDateTime
+		LocalDateTime
 	}
 }

@@ -4,8 +4,9 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
+import grails.plugin.dao.Application
 
-@Integration
+@Integration(applicationClass = Application.class)
 //@Rollback
 public class BatchIdGenerator2Spec extends Specification {
 
@@ -15,14 +16,6 @@ public class BatchIdGenerator2Spec extends Specification {
 	static int startVal
 	static int nextIdEndVal
 	static int nextIdSIEndVal
-
-
-    def setup() {
-        //GrailsWebEnvironment.bindRequestIfNull()
-    }
-
-    def cleanup() {
-    }
 
 	void "test getNextId" () {
 		setup:

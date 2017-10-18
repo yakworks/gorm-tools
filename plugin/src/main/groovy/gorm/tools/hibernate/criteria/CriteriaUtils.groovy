@@ -290,13 +290,25 @@ class CriteriaUtils {
                             }
                         }
                         break
-                    case (Long):
+                    case (boolean):
+                    case (Boolean):
                         if (val instanceof List) {
-                            'in'(key, val.collect { it.toLong() })
+                            'in'(key, val.collect { it.toBoolean() })
                         } else {
-                            eq(key, val.toLong())
+                            eq(key, val.toBoolean())
                         }
                         break
+                    case (Long):
+                    case (Date):
+                    case (BigDecimal):
+                        if (val instanceof List) {
+                            'in'(key, val.collect { it.asType(type) })
+                        } else {
+                            eq(key, val.asType(type))
+                        }
+                        break
+
+
 
                 }
             }

@@ -90,5 +90,36 @@ class CriteriaUtilsSpec extends Specification {
         list[10].address.id == 30
     }
 
+    def "Filter by boolean"() {
+        when:
+        List list = CriteriaUtils.search2([isActive: "true"], Org)
+        then:
+        list.size() == 51
+    }
 
+    def "Filter by boolean in list"() {
+        when:
+        List list = CriteriaUtils.search2([isActive: ["false"]], Org)
+        then:
+        list.size() == 50
+        list[0].isActive == false
+        list[1].isActive == false
+    }
+
+    def "Filter by BigDecimal"() {
+        when:
+        List list = CriteriaUtils.search2([revenue: "200"], Org)
+        then:
+        list.size() == 1
+        list[0].name == "Org#2"
+    }
+
+    def "Filter by BigDecimal in list"() {
+        when:
+        List list = CriteriaUtils.search2([revenue: ["200", "500"]], Org)
+        then:
+        list.size() == 2
+        list[0].name == "Org#2"
+        list[1].name == "Org#5"
+    }
 }

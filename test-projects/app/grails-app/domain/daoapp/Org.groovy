@@ -4,6 +4,8 @@ class Org {
 	String name
     Address address
     Date testDate
+    boolean isActive=true
+    BigDecimal revenue = 0
     static constraints = {
 		name blank:false
         address nullable: true

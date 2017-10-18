@@ -2,11 +2,14 @@ package gorm.tools.beans
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.test.mixin.hibernate.HibernateTestMixin
 import org.grails.core.DefaultGrailsDomainClass
-import spock.lang.Ignore
 import spock.lang.Specification
+import grails.test.mixin.gorm.Domain
+import grails.gorm.annotation.Entity
 
-@TestMixin(GrailsUnitTestMixin)
+@Domain([TestClazzA, TestClazzB, TestClazzC])
+@TestMixin(HibernateTestMixin)
 class BeanPathToolsSpec extends Specification {
 
     def "Can get property value for a basic class"() {
@@ -54,8 +57,6 @@ class BeanPathToolsSpec extends Specification {
         4           | 'right.right.bar'
     }
 
-    //XXX fix these ignored tests
-    @Ignore
     def "Get properties by path"() {
         setup:
         def obj = new TestClazzB(
@@ -78,7 +79,7 @@ class BeanPathToolsSpec extends Specification {
         )
         expect:
         Map act = [:]
-        null == BeanPathTools.propsToMap(obj, path, act)
+        exp == BeanPathTools.propsToMap(obj, path, act)
         exp == act
         where:
         path                    | exp
@@ -90,7 +91,6 @@ class BeanPathToolsSpec extends Specification {
         'right.*'               | [right: [id: 6, value: 0]]
     }
 
-    @Ignore
     def "Property returns list of domains"() {
         setup:
         def obj = new TestClazzC(
@@ -99,7 +99,7 @@ class BeanPathToolsSpec extends Specification {
         )
         expect:
         Map act = [:]
-        null == BeanPathTools.propsToMap(obj, path, act)
+        exp == BeanPathTools.propsToMap(obj, path, act)
         exp == act
         where:
         path                    | exp
@@ -107,48 +107,82 @@ class BeanPathToolsSpec extends Specification {
         'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', baz:null], [id: 2, bar: null, foo: 'val 2', baz: null]]]
     }
 
-    class TestClazzA {
-        Long id
-        Long version
+    def "test buildMapFromPaths for a single field"() {
+        setup:
+        TestClazzA object = new TestClazzA(foo: 'foo', bar: 10.00, baz: null)
+        List fields = ['foo']
 
-        String foo
-        BigDecimal bar
-        List<String> baz
+        when:
+        Map result = BeanPathTools.buildMapFromPaths(object, fields)
 
-        def getDomainClass() {
-            new DefaultGrailsDomainClass(TestClazzA)
-        }
+        then:
+        null != result
+        result.size() == 1
+        result.foo == 'foo'
+
     }
 
-    class TestClazzB {
-        Long id
-        Long version
+    def "test buildMapFromPaths for all fields"() {
+        setup:
+        TestClazzA object = new TestClazzA(foo: '1111', bar: 10.00, baz: null)
+        List fields = ['*']
 
-        def left
-        def right
-        int value
+        when:
+        Map result = BeanPathTools.buildMapFromPaths(object, fields)
 
-        def getDomainClass() {
-            new DefaultGrailsDomainClass(TestClazzB)
-        }
+        then:
+        null != result
+        result.foo == '1111'
+        result.bar == 10.00
+        result.baz == null
+
     }
 
-    class TestClazzC {
-        Long id
-        Long version
+}
 
-        int value
+@Entity
+class TestClazzA {
+    Long id
+    Long version
 
-        List getFooValues() {
-            [
-                    new TestClazzA(id: 1, version: 0, foo: 'val 1'),
-                    new TestClazzA(id: 2, version: 0, foo: 'val 2')
-            ]
-        }
+    String foo
+    BigDecimal bar
+    List<String> baz
 
-        def getDomainClass() {
-            new DefaultGrailsDomainClass(TestClazzB)
-        }
+    def getDomainClass() {
+        new DefaultGrailsDomainClass(TestClazzA)
+    }
+}
+
+@Entity
+class TestClazzB {
+    Long id
+    Long version
+
+    def left
+    def right
+    int value
+
+    def getDomainClass() {
+        new DefaultGrailsDomainClass(TestClazzB)
+    }
+}
+
+@Entity
+class TestClazzC {
+    Long id
+    Long version
+
+    int value
+
+    List getFooValues() {
+        [
+                new TestClazzA(id: 1, version: 0, foo: 'val 1'),
+                new TestClazzA(id: 2, version: 0, foo: 'val 2')
+        ]
     }
 
+    def getDomainClass() {
+        new DefaultGrailsDomainClass(TestClazzB)
+    }
 }

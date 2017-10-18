@@ -7,12 +7,15 @@ import org.grails.core.DefaultGrailsDomainClass
 import spock.lang.Specification
 import grails.test.mixin.gorm.Domain
 import grails.gorm.annotation.Entity
+import grails.web.servlet.mvc.GrailsParameterMap
+import org.springframework.mock.web.MockHttpServletRequest
+import grails.plugin.dao.GormDaoSupport
 
 @Domain([TestClazzA, TestClazzB, TestClazzC])
 @TestMixin(HibernateTestMixin)
 class BeanPathToolsSpec extends Specification {
 
-    def "Can get property value for a basic class"() {
+    void "Can get property value for a basic class"() {
         setup:
         def obj = new TestClazzA(
                 foo: '1111',
@@ -28,7 +31,7 @@ class BeanPathToolsSpec extends Specification {
         null        | 'baz'
     }
 
-    def "Can get property value for a class hierarchy"() {
+    void "Can get property value for a class hierarchy"() {
         setup:
         def obj = new TestClazzB(
                 left: new TestClazzA(
@@ -57,7 +60,7 @@ class BeanPathToolsSpec extends Specification {
         4           | 'right.right.bar'
     }
 
-    def "Get properties by path"() {
+    void "Get properties by path"() {
         setup:
         def obj = new TestClazzB(
                 left: new TestClazzA(
@@ -91,7 +94,7 @@ class BeanPathToolsSpec extends Specification {
         'right.*'               | [right: [id: 6, value: 0]]
     }
 
-    def "Property returns list of domains"() {
+    void "Property returns list of domains"() {
         setup:
         def obj = new TestClazzC(
                 id: 9,
@@ -107,35 +110,60 @@ class BeanPathToolsSpec extends Specification {
         'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', baz:null], [id: 2, bar: null, foo: 'val 2', baz: null]]]
     }
 
-    def "test buildMapFromPaths for a single field"() {
+    void "test buildMapFromPaths"() {
         setup:
-        TestClazzA object = new TestClazzA(foo: 'foo', bar: 10.00, baz: null)
-        List fields = ['foo']
+        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00, baz: null)
 
-        when:
-        Map result = BeanPathTools.buildMapFromPaths(object, fields)
+        expect:
+        result == BeanPathTools.buildMapFromPaths(object, fields)
 
-        then:
-        null != result
-        result.size() == 1
-        result.foo == 'foo'
-
+        where:
+        fields   | result
+        ['foo']  | [foo: 'foo']
+        ['*']    | [foo: 'foo', bar: 10.00, baz: null, id: 0L]
     }
 
-    def "test buildMapFromPaths for all fields"() {
+    void "test buildMapFromPaths for all fields using delegating bean"() {
         setup:
-        TestClazzA object = new TestClazzA(foo: '1111', bar: 10.00, baz: null)
+        TestClazzA object = new TestClazzA(foo: 'foo', bar: 50.0, baz: null)
         List fields = ['*']
 
         when:
-        Map result = BeanPathTools.buildMapFromPaths(object, fields)
+        Map result = BeanPathTools.buildMapFromPaths(object, fields, true)
 
         then:
         null != result
-        result.foo == '1111'
-        result.bar == 10.00
+        result.foo == 'foo'
+        result.bar == 50.0
         result.baz == null
+    }
 
+    void "test flattenMap"() {
+        setup:
+        String json = """
+        {
+            param1: 'value1',
+            param2: {
+                param3: 'value3',
+                param4: {
+                    param5: 'value5'
+                }
+
+            }
+        }
+        """
+        MockHttpServletRequest request = new MockHttpServletRequest()
+        request.setContentType('application/json')
+        request.setContent(json.getBytes())
+
+        when:
+        GrailsParameterMap result = BeanPathTools.flattenMap(request)
+
+        then:
+        result != null
+        result.param1 == 'value1'
+        result.'param2.param3' == 'value3'
+        result.'param2.param4.param5' == 'value5'
     }
 
 }
@@ -148,6 +176,10 @@ class TestClazzA {
     String foo
     BigDecimal bar
     List<String> baz
+
+    def getDao() {
+        new GormDaoSupport()
+    }
 
     def getDomainClass() {
         new DefaultGrailsDomainClass(TestClazzA)

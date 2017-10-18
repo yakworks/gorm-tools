@@ -54,13 +54,16 @@ class BeanPathTools {
 
     @CompileDynamic
     //XXX Is this used? whats it for? how is it different than getNestedValue?
+    //didn't find any usage of this method, so marked it as deprecated
+    @Deprecated
     static Object getFieldValue(Object domain, String field) {
         Object bean = getNestedBean(domain, field)
         field = GrailsNameUtils.getShortName(field)
         return bean?."$field"
     }
+
     /**
-     * returns the depest nested bean
+     * returns the deepest nested bean
      * */
     @CompileDynamic
     static getNestedBean(Object bean, String path) {
@@ -95,12 +98,11 @@ class BeanPathTools {
      * @param useDelegatingBean
      * @return a map which is based on object properties
      */
-    //XXX add tests for this and make sure delegatingBean is working properly
     @CompileDynamic
     static Map buildMapFromPaths(Object source, List<String> propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {
             Class delegatingBean = GrailsClassUtils.getStaticFieldValue(source.getClass(), "delegatingBean")
-            if (delegatingBean == null && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, source.getClass())) {
+            if (!delegatingBean && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, source.getClass())) {
                 delegatingBean = DaoDelegatingBean
             }
             if (delegatingBean != null) source = delegatingBean.newInstance(source)
@@ -177,10 +179,7 @@ class BeanPathTools {
             // of the nested key as the prefix. In other words, if we have
             // 'nestedKey' == "a.b.c", the prefix is "a".
             String nestedPrefix = propertyPath.substring(0, nestedIndex)
-            if (!currentMap.containsKey(nestedPrefix)) {
-                currentMap[nestedPrefix] = [:]
-            }
-            if (!(currentMap[nestedPrefix] instanceof Map)) {
+            if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
                 currentMap[nestedPrefix] = [:]
             }
 
@@ -215,7 +214,6 @@ class BeanPathTools {
      * call the MapFlattener and returns a GrailsParameterMap to be used for binding
      * example: [xxx:[yyy:123]] will turn into a GrailsParameterMap with ["xxx.yyy":123]
      */
-    //XXX add test for these
     static GrailsParameterMap flattenMap(HttpServletRequest request, Map jsonMap = null) {
         Map p = new MapFlattener().flatten(jsonMap ?: (Map) request.JSON)
         return getGrailsParameterMap(p, request)

@@ -1,9 +1,15 @@
 package gorm.tools.hibernate.criteria
 
+import gorm.tools.GormMetaUtils
+import gorm.tools.beans.BeanPathTools
+import grails.core.GrailsDomainClass
+import grails.core.GrailsDomainClassProperty
 import org.hibernate.criterion.CriteriaSpecification
 import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.query.api.Criteria
+
+import javax.servlet.http.HttpServletRequest
 
 /**
  * For consistently searching across data types.
@@ -230,4 +236,103 @@ class CriteriaUtils {
         result.delegate = delegate  // this is the line that makes it all work within the criteria.
         return result.call()
     }
+
+    //TODO: add comments
+
+    @CompileDynamic
+    static Map typedParams(Map map, String domainName) {
+        Map result = [:]
+        GrailsDomainClass domainClass = GormMetaUtils.findDomainClass(domainName)
+        flattenMap(map).each { k, v ->
+            try {
+                GrailsDomainClassProperty property = domainClass.getPropertyByName(k.toString())
+                result[k] = property.type
+            } catch (e) {
+                println e
+            }
+
+        }
+        result
+    }
+
+    @CompileDynamic
+    static Map flattenMap(Map map, prefix = '') {
+        map.inject([:]) { object, v ->
+            if (v.value instanceof Map) object += flattenMap(v.value, v.key)
+            else object["${prefix ? prefix + "." : ""}$v.key"] = v.value
+            object
+        }
+    }
+
+    @CompileDynamic
+    //TODO: rename
+    static search2(Map map, domain) {
+        String domainName = domain.name
+
+        Map typedParams = typedParams(map, domainName)
+        Map flattened = flattenMap(map)
+
+
+        Criteria criteria = domain.createCriteria()
+        criteria.list() {
+
+            // TODO: move it outside
+            Closure restriction = { key, val, type ->
+                switch (type) {
+                    case (String):
+                        if (val instanceof List) {
+                            'in'(key, val)
+                        } else {
+                            if (val.contains('%')) {
+                                like key, val
+                            } else {
+                                eq key, val
+                            }
+                        }
+                        break
+                    case (Long):
+                        if (val instanceof List) {
+                            'in'(key, val.collect { it.toLong() })
+                        } else {
+                            eq(key, val.toLong())
+                        }
+                        break
+
+                }
+            }
+
+            //Used to handle nested properties, if key has ".", for example org.address.id
+            //will execute closure address{eq "id", 1}
+            Closure nested
+            nested = { String key, Closure closure ->
+                if (key.contains(".")) {
+                    List splited = key.split("[.]")
+                    "${splited[0]}" {
+                        nested(splited.tail().join("."), closure)
+                    }
+                } else {
+                    closure.call(key) // calls closure with last key in path `id` for iur example
+                }
+
+
+            }
+
+            Closure result = {
+                typedParams.each { key, type ->
+                    nested.call(key,
+                            { lastKey -> // from nested closure
+                                restriction.delegate = delegate
+                                restriction.call(lastKey, flattened[key], type)
+                            }
+                    )
+
+                }
+            }
+            result.delegate = delegate  // this is the line that makes it all work within the criteria.
+            return result.call()
+
+        }
+    }
+
 }
+

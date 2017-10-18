@@ -124,6 +124,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		return doInsert(params)
 	}
 
+	//See at the bottom why we need this doXX methods
 	protected final Map<String, Object> doInsert(Map params) {
 		T entity = domainClass.newInstance()
 		entity.properties = params
@@ -191,3 +192,11 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 }
 
+/*
+ We had to add doInsert, doSave, doUpdate etc methods to GormDaoSupport to circumvent this issue: https://github.com/grails/grails-core/issues/10681
+ When extending a Generic base class which is Transactional. If child classes overrides any of the base class methods, and tries to call the super class method from it.
+ eg super.save() it results in StackOverflowError.
+
+ Many of our daos override the methods from GormDaoSupport and from the overriden method it calls the superclass version of the method, resulting in StackOverflow.
+ the doXX methods are provided, so that, child classes can call the super.doX version of the method from overriden method rather then calling super.insert.
+ */

@@ -34,6 +34,11 @@ hr {
     background-color: rgba(152,223,255,.1);
 }*/
 
+.admonition pre, .admonition code,
+.md-typeset__table pre, .md-typeset__table code{
+  font-size: 100%
+}
+
 /*****Icons*******/
 em.icon{
   font-family: Material Icons;
@@ -216,12 +221,6 @@ blockquote.float-right :last-child, blockquote.float-left :last-child {
   border-left: none;
 }
 
-/** don't give padding if its a code block **/
-.callout.highlight
-{
-  margin: -1rem 0px -1rem 0px;
-}
-
 /********** overrides *********/
 
 /*.admonition.tip {
@@ -283,7 +282,7 @@ div.pct80,.card.pct80,img.pct80 { width:80% !important}
   display: flex;
   flex-direction: row;
 }
-.row > .highlight{
+.row > .codehilite{
   margin-top: 0;
 }
 .row > div, .row > blockquote {

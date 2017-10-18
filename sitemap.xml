@@ -4,7 +4,15 @@
     
     <url>
      <loc>http://yakworks.github.io/gorm-tools//</loc>
-     <lastmod>2017-10-17</lastmod>
+     <lastmod>2017-10-18</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://yakworks.github.io/gorm-tools//id-generation/</loc>
+     <lastmod>2017-10-18</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

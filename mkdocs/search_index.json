@@ -54,6 +54,31 @@
             "location": "/#grails-3",
             "text": "Dynamic methods were implemented with trait instead of meta programing, so now  @CompileStatic  can be used.\nDue to this changes static method  insert  for domain objects was renamed to  insertAndSave , because domain class instances\nalready have  insert  method and we can't have both static and instance methods with same list of args.  Example  To be able to use advantages of the dao plugin for REST apps, extend controller from RestDaoController:  See  RestDaoController  class OrgController extends RestDaoController Org  {\n    static responseFormats = [ json ]\n    static namespace =  api \n\n    OrgController() {\n        super(Org)\n    }\n}  If controller is extended for RestDaoController then methods will use dao services for current domain. For example\nPOST action will call dao insert method for Org domain.",
             "title": "Grails 3:"
+        },
+        {
+            "location": "/id-generation/",
+            "text": "Database ID Generator\n\n\nDao plugin comes with an implementation of hibernate identity generator which uses a central table for incremental identity generation.\n\n\nNewObjectId table\n\n\nIn order to use identity generator provided by plugin, you need to create NewObjectId table as shown below.\n\n\ncreate\n \ntable\n \nNewObjectId\n\n\n(\n\n    \nKeyName\n \nvarchar\n(\n255\n)\n \nnot\n \nnull\n \nprimary\n \nkey\n,\n\n    \nNextId\n \nbigint\n \nnot\n \nnull\n\n\n)\n\n\n;\n\n\n\n\n\nHere key name will be the name of the tables and NextId is the next id to return for the given table.\n\n\nConfigure Identity generator globally.\n\n\nThe identity generator can be configured globally in application.groovy as shown below.\n\n\ngrails\n \n{\n\n\n    \ngorm\n.\ndefault\n.\nmapping\n \n=\n \n{\n\n        \nid\n \ncolumn:\n \nid\n,\n \ngenerator:\ngorm.tools.idgen.SpringIdGenerator\n\n    \n}\n\n\n}\n\n\n\n\n\nThis will use the SpringIdGenerator for all domains in the application. However it can be done per domain too if required.\n\n\nUsing IdGenerator programmatically\n\n\nPlugin defines a bean with name idGenerator that can be used to programmatically generate new Ids.\nHere is an example domain class.\n\n\nclass\n \nBook\n \n{\n\n    \ntransient\n \nidGenerator\n\n\n    \ndef\n \nbeforeInsert\n()\n \n{\n\n        \nif\n(!\nid\n)\n \nid\n \n=\n \nidGenerator\n.\ngetNextId\n(\nBook.id\n)\n\n    \n}\n\n\n}\n\n\n\n\n\nIdentity generator will check in NewObjectId table for keyName \nBook\n If it exists, it will return the value of NextId or else it will insert a new row in NewObjectId table.",
+            "title": "Id Generation"
+        },
+        {
+            "location": "/id-generation/#database-id-generator",
+            "text": "Dao plugin comes with an implementation of hibernate identity generator which uses a central table for incremental identity generation.",
+            "title": "Database ID Generator"
+        },
+        {
+            "location": "/id-generation/#newobjectid-table",
+            "text": "In order to use identity generator provided by plugin, you need to create NewObjectId table as shown below.  create   table   NewObjectId  ( \n     KeyName   varchar ( 255 )   not   null   primary   key , \n     NextId   bigint   not   null  )  ;   Here key name will be the name of the tables and NextId is the next id to return for the given table.",
+            "title": "NewObjectId table"
+        },
+        {
+            "location": "/id-generation/#configure-identity-generator-globally",
+            "text": "The identity generator can be configured globally in application.groovy as shown below.  grails   { \n\n     gorm . default . mapping   =   { \n         id   column:   id ,   generator: gorm.tools.idgen.SpringIdGenerator \n     }  }   This will use the SpringIdGenerator for all domains in the application. However it can be done per domain too if required.",
+            "title": "Configure Identity generator globally."
+        },
+        {
+            "location": "/id-generation/#using-idgenerator-programmatically",
+            "text": "Plugin defines a bean with name idGenerator that can be used to programmatically generate new Ids.\nHere is an example domain class.  class   Book   { \n     transient   idGenerator \n\n     def   beforeInsert ()   { \n         if (! id )   id   =   idGenerator . getNextId ( Book.id ) \n     }  }   Identity generator will check in NewObjectId table for keyName  Book  If it exists, it will return the value of NextId or else it will insert a new row in NewObjectId table.",
+            "title": "Using IdGenerator programmatically"
         }
     ]
 }

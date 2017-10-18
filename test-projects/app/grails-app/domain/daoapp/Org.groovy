@@ -7,5 +7,6 @@ class Org {
     static constraints = {
 		name blank:false
         address nullable: true
+        testDate nullable: true
     }
 }

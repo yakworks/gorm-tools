@@ -12,8 +12,8 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.orm.hibernate.cfg.Mapping
 
 /**
- * A bbunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
- * Usefull methods to find the PersistentEntity and the mapping and meta fields.
+ * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
+ * Useful methods to find the PersistentEntity and the mapping and meta fields.
  */
 @CompileStatic
 class GormMetaUtils {

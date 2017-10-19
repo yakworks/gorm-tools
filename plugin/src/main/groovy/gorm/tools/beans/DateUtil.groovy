@@ -11,6 +11,10 @@ import java.util.regex.Pattern
 import java.text.ParseException
 import org.apache.commons.lang.Validate
 
+/**
+ * Provides a set of methods for parsing/formatting and making custom manipulations with dates.
+ * (e.g. to get a number of days between dates or to get last day of month, etc)
+ */
 @SuppressWarnings(['MethodCount', 'EmptyCatchBlock', 'ExplicitCallToGetAtMethod'])
 @CompileStatic
 class DateUtil {
@@ -52,6 +56,9 @@ class DateUtil {
         return dateFormat.parse(date)
     }
 
+    /**
+     * Returns a date in the format 'yyyy-MM-dd'T'HH:mm:ss.SSSZ'.
+     */
     static String dateToJsonString(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
         return dateFormat.format(date)
@@ -84,32 +91,41 @@ class DateUtil {
         return dtStr
     }
 
+    static Date getNextMonth(){
+        return shiftCurrentDateByMonths(1)
+    }
+
     static Date getPreviousMonth(){
-        Calendar previousMonth = getCurrentCalendarInstance()
-        previousMonth.set(Calendar.DATE, 1)
-        previousMonth.add(Calendar.MONTH, -1)
-        return previousMonth.getTime()
+        return shiftCurrentDateByMonths(-1)
     }
 
+    @Deprecated
     static Date getTwoMonthsBack(){
-        Calendar previousMonth = getCurrentCalendarInstance()
-        previousMonth.set(Calendar.DATE, 1)
-        previousMonth.add(Calendar.MONTH, -2)
-        return previousMonth.getTime()
+        return shiftCurrentDateByMonths(-2)
     }
 
+    @Deprecated
     static Date getThreeMonthsBack(){
-        Calendar previousMonth = getCurrentCalendarInstance()
-        previousMonth.set(Calendar.DATE, 1)
-        previousMonth.add(Calendar.MONTH, -3)
-        return previousMonth.getTime()
+        return shiftCurrentDateByMonths(-3)
     }
 
+    @Deprecated
     static Date getFourMonthsBack(){
-        Calendar previousMonth = getCurrentCalendarInstance()
-        previousMonth.set(Calendar.DATE, 1)
-        previousMonth.add(Calendar.MONTH, -4)
-        return previousMonth.getTime()
+        return shiftCurrentDateByMonths(-4)
+    }
+
+    /**
+     * Shifts the current date by specified number of months
+     * and sets current day of month to 1.
+     *
+     * @param months  number of months to shift
+     * @return a date which shifted on specified number of months from now
+     */
+    static Date shiftCurrentDateByMonths(int months){
+        Calendar month = getCurrentCalendarInstance()
+        month.set(Calendar.DATE, 1)
+        month.add(Calendar.MONTH, months)
+        return month.getTime()
     }
 
     /**
@@ -128,19 +144,18 @@ class DateUtil {
         return  result
     }
 
-    static Date getNextMonth(){
-        Calendar nextMonth = getCurrentCalendarInstance()
-        nextMonth.set(Calendar.DATE, 1)
-        nextMonth.add(Calendar.MONTH, 1)
-        return nextMonth.getTime()
-    }
-
-    static Date getFirstDateOfMonth(){
+    /**
+     * Returns the first day of the current month and sets time to midnight.
+     */
+    static Date getFirstDateOfMonth() {
         Calendar startDate = getCurrentCalendarInstance()
         startDate.set(Calendar.DATE, 1)
         return setTimeAsOfMidnight(startDate).getTime()
     }
 
+    /**
+     * Returns the first day of the current week and sets time to midnight.
+     */
     static Date getFirstDayOfWeek(){
         Calendar startDate = getCurrentCalendarInstance()
         int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
@@ -151,6 +166,9 @@ class DateUtil {
         return setTimeAsOfMidnight(startDate).getTime()
     }
 
+    /**
+     * Returns the last day of the current week and sets time to before midnight (23:59:59).
+     */
     static Date getLastDayOfWeek(){
         Calendar endDate = getCurrentCalendarInstance()
         int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
@@ -236,6 +254,13 @@ class DateUtil {
         return date
     }
 
+    /**
+     * Converts a date to a specified format.
+     *
+     * @param strDt a date as a string
+     * @param format a format
+     * @return a date
+     */
     static Date convertStringToDateTime(String strDt, String format) {
         DateFormat df = new SimpleDateFormat(format)
         Date dtTmp = null
@@ -256,10 +281,16 @@ class DateUtil {
         return gc.get(Calendar.YEAR)
     }
 
+    /**
+     * Calculates a number of hours between now and the specified date.
+     *
+     * @param date a date for which to calculate the difference
+     * @return a number of hours between now and the specified date.
+     */
     static long getDateDifference_inHours(Date date) {
         Calendar lastModifiedDateCalendar = getCalendarInstance_ByDate(date)
         long diff = getCurrentCalendarInstance().getTimeInMillis() - lastModifiedDateCalendar.getTimeInMillis()
-        return diff / (60 * 60 * 1000) as long
+        return Math.abs(diff) / (60 * 60 * 1000) as long
     }
 
     static Date setToMidnight(Date date) {
@@ -270,46 +301,40 @@ class DateUtil {
     }
 
     static Calendar setTimeAsOfMidnight(Calendar cal) {
-        cal.set(Calendar.HOUR_OF_DAY, 0)            // set hour to midnight
-        cal.set(Calendar.MINUTE, 0)                 // set minute in hour
-        cal.set(Calendar.SECOND, 0)                 // set second in minute
-        cal.set(Calendar.MILLISECOND, 0)
-        return cal
+        return setTime(cal, 0, 0, 0)
     }
 
     static Calendar setTimeBeforeMidnight(Calendar cal){
-        cal.set(Calendar.HOUR_OF_DAY, 23)            // set hour to midnight
-        cal.set(Calendar.MINUTE, 59)                 // set minute in hour
-        cal.set(Calendar.SECOND, 59)                 // set second in minute
-        cal.set(Calendar.MILLISECOND, 0)
+        return setTime(cal, 23, 59, 59)
+    }
+
+    static Calendar setTime(Calendar cal, int hours = 0, int minutes = 0,
+                            int seconds = 0, int milliseconds = 0) {
+        cal.set(Calendar.HOUR_OF_DAY, hours)
+        cal.set(Calendar.MINUTE, minutes)
+        cal.set(Calendar.SECOND, seconds)
+        cal.set(Calendar.MILLISECOND, milliseconds)
         return cal
     }
 
-    static Date getLastDayOfMonth(Date orig) {
-        Calendar calendar = Calendar.instance
-        calendar.setTime(orig)
-        int year = calendar.get(Calendar.YEAR)
-        int month = calendar.get(Calendar.MONTH) + 1
-        int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        SimpleDateFormat format = new SimpleDateFormat('yyyy-MM-dd')
-        return format.parse("${year}-${month}-${day}".toString())
-    }
-
     /**
-     * @period daily, weekly or monthly
-     * @dayInPeriod  1-30 for monthly, 1-7 for weekly (1 is Sunday)
+     * Checks if the current day number is equal to specified day number.
+     * It is possible to specify day number of a month or week.
+     *
+     * @period     daily, weekly or monthly
+     * @dayNumber  1-30 for monthly, 1-7 for weekly (1 is Sunday)
      * @return is today the date for a specified period and dayInPeriod
      */
-    static boolean isTodayTheDate(String period, int dayInPeriod) {
+    static boolean isTodayTheDate(String period, int dayNumber) {
         int dayOfMonth = new Date().getAt(Calendar.DAY_OF_MONTH)
         int dayOfWeek = new Date().getAt(Calendar.DAY_OF_WEEK)
         switch ( period.toLowerCase() ) {
             case "daily":
                 return true
             case "weekly":
-                return dayInPeriod == dayOfWeek
+                return dayNumber == dayOfWeek
             case "monthly":
-                return dayInPeriod == dayOfMonth
+                return dayNumber == dayOfMonth
             default:
                 return false
         }
@@ -364,11 +389,13 @@ class DateUtil {
     }
 
     /*
-    * Returns last day of month
-    * @date date the last da of month should be returnd
-    * @addMonth to move the month for wich is last day is displayed, if 0 - then for the month of the date
+    * Returns the last day of month for the specified date.
+    *
+    * @date date the last day of month should be returned
+    * @addMonth to move the month for which is the last day is displayed, if 0 - then for the month of the date
+    * @return a date which represents the last day of month
     */
-    static Date getLastDayOfMonth(Date date, int addMonth) {
+    static Date getLastDayOfMonth(Date date, int addMonth = 0) {
         Calendar c = Calendar.getInstance()
         c.setTime(date)
         c.add(Calendar.MONTH, addMonth)
@@ -376,6 +403,13 @@ class DateUtil {
         c.getTime().clearTime()
     }
 
+    /*
+    * Returns the first day of month for the specified date.
+    *
+    * @date date the first day of month should be returned
+    * @addMonth to move the month for which is the first day is displayed, if 0 - then for the month of the date
+    * @return a date which represents the first day of month
+    */
     static Date getFirstDayOfMonth(Date date, int addMonth = 0) {
         Calendar c = Calendar.getInstance()
         c.setTime(date)

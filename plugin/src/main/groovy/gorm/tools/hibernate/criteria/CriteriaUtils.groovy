@@ -290,8 +290,13 @@ class CriteriaUtils {
         println typedParams
         Map flattened = flattenMap(map)
         Criteria criteria = domain.createCriteria()
-        criteria.list() {
 
+        criteria.list() {
+            /*try {
+                Statements.BETWEEN.restrict(delegate, [id:["1", "10"]])
+            } catch(e){
+                println e.cause
+            }*/
             // TODO: move it outside
             Closure restriction = { key, val, type ->
                 switch (type) {
@@ -323,10 +328,7 @@ class CriteriaUtils {
                             eq(key, val.asType(type))
                         }
                         break
-
-
-
-                }
+                    }
             }
 
             //Used to handle nested properties, if key has ".", for example org.address.id
@@ -375,4 +377,55 @@ class CriteriaUtils {
     }
 
 }
+
+enum Statements {
+    INLIST(["in()", "inList()"]) {
+        public void restrict(delegate, Map params) {
+            delegate.inList params.key, params.value
+        }
+    },
+    BETWEEN(["between()"]){
+        public void restrict(delegate, Map params){
+            delegate.gte params.key, params.value[0]
+            delegate.lte params.key, params.value[1]
+        }
+    }
+
+    final List<String> statements
+
+    abstract void restrict(delegate, Map params)
+
+    Statements(List<String> statements) {
+        this.statements = statements
+    }
+
+    public static Statements findStatement(String statementsValue) {
+        for (Statements statement : values()) {
+            if (statement.getStatementsValue().contains(statementsValue.toLowerCase()))
+                return statement
+        }
+        return null
+    }
+
+
+    public static List<String> getStatementsList() {
+        List<String> statementsList = []
+        for (Statements statements : values()) {
+            statementsList += statements.statements
+        }
+        return statementsList
+    }
+
+
+    void restrict(delegate, List paramsList){
+        println paramsList
+    }
+
+
+    public String getStatementsValue() {
+        return statements
+    }
+
+}
+
 

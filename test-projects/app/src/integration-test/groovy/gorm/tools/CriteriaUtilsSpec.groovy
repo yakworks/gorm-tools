@@ -60,6 +60,15 @@ class CriteriaUtilsSpec extends Specification {
         list[0].address.id == 2
     }
 
+    def "Filter by nestedId"() {
+        when: "eq"
+        List list = CriteriaUtils.search2([addressId: 2], Org)
+        then:
+        list.size() == 1
+        list[0].name == "Org#1"
+        list[0].address.id == 2
+    }
+
     def "Filter by nested id inList"() {
         when:
         List list = CriteriaUtils.search2([address:[id: ["24", "25", "26"]]], Org)
@@ -121,5 +130,67 @@ class CriteriaUtilsSpec extends Specification {
         list.size() == 2
         list[0].name == "Org#2"
         list[1].name == "Org#5"
+    }
+
+    def "Filter by Date"() {
+        when:
+        List list = CriteriaUtils.search2([testDate: (new Date() +1).clearTime()], Org)
+        then:
+        list.size() == 1
+        list[0].name == "Org#1"
+    }
+
+    def "Filter by xxxId 1"() {
+        when: "xxxId in domain"
+        List list = CriteriaUtils.search2([refId: "200"], Org)
+        then:
+        list.size() == 1
+        list[0].name == "Org#1"
+    }
+    def "Filter by xxxId 2"() {
+
+        when: "xxxId in nested domain"
+        List list = CriteriaUtils.search2(["address.testId": "9"], Org)
+        then:
+        list.size() == 1
+        list[0].name == "Org#3"
+    }
+
+
+    def "Filter by xxxId 3"(){
+        when: "xxxId in nested domain2"
+        List list = CriteriaUtils.search2([address:[testId: "3"]], Org)
+        then:
+        list.size() == 1
+        list[0].name == "Org#1"
+    }
+
+    def "Filter by xxxId 4"() {
+
+        when: "xxxId in nested domain"
+        List list = CriteriaUtils.search2(["address.testId": ["9", "12"]], Org)
+        then:
+        list.size() == 2
+        list[0].name == "Org#3"
+    }
+
+
+    def "Filter with `or`"(){
+        when:
+        List list = CriteriaUtils.search2([or: ["name": "Org#1", "address.id": "4" ]], Org)
+        then:
+        list.size() == 2
+        list[0].name == "Org#1"
+        list[1].name == "Org#3"
+    }
+
+    def "Filter with `or` with like"(){
+        when:
+        List list = CriteriaUtils.search2([or: ["name": "Org#2%", "address.id": "4" ]], Org).sort{it.id}
+        then:
+        list.size() == 12
+        list[0].name == "Org#2"
+        list[1].name == "Org#3"
+        list[2].name == "Org#20"
     }
 }

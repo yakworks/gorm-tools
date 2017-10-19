@@ -6,6 +6,7 @@ class Org {
     Date testDate
     boolean isActive=true
     BigDecimal revenue = 0
+    Long refId = 0L
     static constraints = {
 		name blank:false
         address nullable: true

@@ -238,14 +238,21 @@ class CriteriaUtils {
     }
 
     //TODO: add comments
-
     @CompileDynamic
     static Map typedParams(Map map, String domainName) {
+        println map
         Map result = [:]
         GrailsDomainClass domainClass = GormMetaUtils.findDomainClass(domainName)
-        flattenMap(map).each { k, v ->
+        flattenMap(map).each {String k, v ->
             try {
-                GrailsDomainClassProperty property = domainClass.getPropertyByName(k.toString())
+                if (k == "or"){
+                    result["or"] = [:]
+                    v.each {String  k1, v1->
+                        GrailsDomainClassProperty property = domainClass.getPropertyByName(k1)
+                        result["or"][k1] = property.type
+                    }
+                }
+                GrailsDomainClassProperty property = domainClass.getPropertyByName(k)
                 result[k] = property.type
             } catch (e) {
                 println e
@@ -258,8 +265,19 @@ class CriteriaUtils {
     @CompileDynamic
     static Map flattenMap(Map map, prefix = '') {
         map.inject([:]) { object, v ->
-            if (v.value instanceof Map) object += flattenMap(v.value, v.key)
-            else object["${prefix ? prefix + "." : ""}$v.key"] = v.value
+            if (v.value instanceof Map) {
+                if (v.key == "or"){
+                    object += [or: flattenMap(v.value, "")]
+                } else {
+                    object += flattenMap(v.value, v.key)
+                }
+            } else {
+                if (v.key.matches(".*[^.]Id")){
+                    object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id")?v.key.replaceAll("Id\$", ".id").toString():v.key }"] = v.value
+
+                }
+                object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
+            }
             object
         }
     }
@@ -268,11 +286,9 @@ class CriteriaUtils {
     //TODO: rename
     static search2(Map map, domain) {
         String domainName = domain.name
-
         Map typedParams = typedParams(map, domainName)
+        println typedParams
         Map flattened = flattenMap(map)
-
-
         Criteria criteria = domain.createCriteria()
         criteria.list() {
 
@@ -292,14 +308,14 @@ class CriteriaUtils {
                         break
                     case (boolean):
                     case (Boolean):
-                        if (val instanceof List) {
+                        if (val instanceof List) { //just to handle cases if we get ["true"]
                             'in'(key, val.collect { it.toBoolean() })
                         } else {
-                            eq(key, val.toBoolean())
+                            eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
                         }
                         break
                     case (Long):
-                    case (Date):
+                    case (Date): //TODO: add date parsing
                     case (BigDecimal):
                         if (val instanceof List) {
                             'in'(key, val.collect { it.asType(type) })
@@ -331,6 +347,18 @@ class CriteriaUtils {
 
             Closure result = {
                 typedParams.each { key, type ->
+                    if (key == "or"){
+                        or {
+                            type.each { k, t ->
+                                nested.call(k,
+                                        { lastKey -> // from nested closure
+                                            restriction.delegate = delegate
+                                            restriction.call(lastKey, flattened["or"][k], t)
+                                        }
+                                )
+                            }
+                        }
+                    }
                     nested.call(key,
                             { lastKey -> // from nested closure
                                 restriction.delegate = delegate

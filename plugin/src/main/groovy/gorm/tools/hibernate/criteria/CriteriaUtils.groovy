@@ -261,6 +261,15 @@ class CriteriaUtils {
         result
     }
 
+    /**
+     * Recorsive method that flattens map [customer:[id: 1]] -> [customer.id: 1]
+     * Specific for criteriaUtils to handle [customerId: 1]  -> [customer.id: 1]
+     * And doesnt flatten  `or` key, so we can use it in criteria
+     *
+     * @param map map of params
+     * @param prefix used in recursion to join keys
+     * @return flattened map
+     */
     @CompileDynamic
     static Map flattenMap(Map map, prefix = '') {
         map.inject([:]) { object, v ->
@@ -281,6 +290,9 @@ class CriteriaUtils {
         }
     }
 
+    /**
+     * Closure that runs criteria restrictions for sertain types
+     */
     static Closure restriction = { key, val, type ->
         switch (type) {
             case (String):
@@ -314,6 +326,13 @@ class CriteriaUtils {
         }
     }
 
+    /**
+     * Core method that runs search
+     *
+     * @param map map of properties to search on
+     * @param domain domain class that should be used for search
+     * @return list of entities
+     */
     @CompileDynamic
     //TODO: rename
     static search2(Map map, domain) {
@@ -369,6 +388,9 @@ class CriteriaUtils {
 
     //TODO: implements as Enum, currently fails with:
     // Caused by NoClassDefFoundError: Could not initialize class gorm.tools.hibernate.criteria.Statement
+    /**
+     * List of statements that can be used in search
+     */
     private static List statements = [
             [statements: ["in()", "inList()"], restriction:
                     { delegate, Map params ->
@@ -424,10 +446,21 @@ class CriteriaUtils {
                     }
             ]
     ]
+    /**
+     * Get list of all alloweded statements
+     *
+     * @return list with all statements
+     */
     @CompileDynamic
     static List<String> listAllowedStatements() {
         statements.collect { it.statements}.flatten()
     }
+    /**
+     * Returns closure that should be executed for statement
+     *
+     * @param statement statement name
+     * @return closure that should be executed for statement
+     */
     @CompileDynamic
     static Closure findRestriction(String statement){
         statements.find{it.statements.contains(statement)}.restriction

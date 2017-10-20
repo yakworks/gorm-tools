@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest
  * For consistently searching across data types.
  */
 @SuppressWarnings(["NestedBlockDepth", "ExplicitCallToAndMethod", "ExplicitCallToOrMethod"])
-@GrailsCompileStatic
 class CriteriaUtils {
 
     /** This is a convenience method to redirect all the types of filters from a single map. */
@@ -240,7 +239,6 @@ class CriteriaUtils {
     //TODO: add comments
     @CompileDynamic
     static Map typedParams(Map map, String domainName) {
-        println map
         Map result = [:]
         GrailsDomainClass domainClass = GormMetaUtils.findDomainClass(domainName)
         flattenMap(map).each {String k, v ->
@@ -287,22 +285,16 @@ class CriteriaUtils {
     static search2(Map map, domain) {
         String domainName = domain.name
         Map typedParams = typedParams(map, domainName)
-        println typedParams
         Map flattened = flattenMap(map)
         Criteria criteria = domain.createCriteria()
 
         criteria.list() {
-            /*try {
-                Statements.BETWEEN.restrict(delegate, [id:["1", "10"]])
-            } catch(e){
-                println e.cause
-            }*/
             // TODO: move it outside
             Closure restriction = { key, val, type ->
                 switch (type) {
                     case (String):
                         if (val instanceof List) {
-                            'in'(key, val)
+                            restrictList(delegate, key, val, type)
                         } else {
                             if (val.contains('%')) {
                                 like key, val
@@ -323,7 +315,7 @@ class CriteriaUtils {
                     case (Date): //TODO: add date parsing
                     case (BigDecimal):
                         if (val instanceof List) {
-                            'in'(key, val.collect { it.asType(type) })
+                            restrictList(delegate, key, val, type)
                         } else {
                             eq(key, val.asType(type))
                         }
@@ -349,7 +341,7 @@ class CriteriaUtils {
 
             Closure result = {
                 typedParams.each { key, type ->
-                    if (key == "or"){
+                    if (key == "or"){ //TODO: think how to refactor
                         or {
                             type.each { k, t ->
                                 nested.call(k,
@@ -370,62 +362,88 @@ class CriteriaUtils {
 
                 }
             }
+
             result.delegate = delegate  // this is the line that makes it all work within the criteria.
             return result.call()
 
         }
     }
 
+    //TODO: implements as Enum, currently fails with:
+    // Caused by NoClassDefFoundError: Could not initialize class gorm.tools.hibernate.criteria.Statement
+    private static List statements = [
+            [statements: ["in()", "inList()"], restriction:
+                    { delegate, Map params ->
+                        delegate.in params.keySet()[0], params.values()[0]
+                    }
+            ],
+            [statements: ["not in()"], restriction:
+                    { delegate, Map params ->
+                        delegate.not {
+                            delegate.in params.keySet()[0], params.values()[0]
+                        }
+                    }
+            ],
+            [statements: ["between()"], restriction:
+                    { delegate, Map params ->
+                        delegate.gte params.keySet()[0], params.values()[0][0]
+                        delegate.lte params.keySet()[0], params.values()[0][1]
+                    }
+            ],
+            [statements: ["ilike()"], restriction:
+                    { delegate, Map params ->
+                        delegate.ilike params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["gt()"], restriction:
+                    { delegate, Map params ->
+                        delegate.gt params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["gte()"], restriction:
+                    { delegate, Map params ->
+                        delegate.gte params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["lt()"], restriction:
+                    { delegate, Map params ->
+                        delegate.lt params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["lte()"], restriction:
+                    { delegate, Map params ->
+                        delegate.lte params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["ne()"], restriction:
+                    { delegate, Map params ->
+                        delegate.ne params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["isNull()"], restriction:
+                    { delegate, Map params ->
+                        delegate.isNull params.keySet()[0], params.values()[0][0]
+                    }
+            ]
+    ]
+    @CompileDynamic
+    static List<String> listAllowedStatements() {
+        statements.collect { it.statements}.flatten()
+    }
+    @CompileDynamic
+    static Closure findRestriction(String statement){
+        statements.find{it.statements.contains(statement)}.restriction
+    }
+
+    @CompileDynamic
+    static private restrictList(delegate, key, list, type){
+        if (listAllowedStatements().contains(list[0])){
+            findRestriction(list[0]).call(delegate, ["$key": list.tail().collect{type ? it.asType(type): it}])
+        } else {
+            delegate.inList(key, list.collect { type ? it.asType(type): it })
+        }
+    }
 }
 
-enum Statements {
-    INLIST(["in()", "inList()"]) {
-        public void restrict(delegate, Map params) {
-            delegate.inList params.key, params.value
-        }
-    },
-    BETWEEN(["between()"]){
-        public void restrict(delegate, Map params){
-            delegate.gte params.key, params.value[0]
-            delegate.lte params.key, params.value[1]
-        }
-    }
-
-    final List<String> statements
-
-    abstract void restrict(delegate, Map params)
-
-    Statements(List<String> statements) {
-        this.statements = statements
-    }
-
-    public static Statements findStatement(String statementsValue) {
-        for (Statements statement : values()) {
-            if (statement.getStatementsValue().contains(statementsValue.toLowerCase()))
-                return statement
-        }
-        return null
-    }
-
-
-    public static List<String> getStatementsList() {
-        List<String> statementsList = []
-        for (Statements statements : values()) {
-            statementsList += statements.statements
-        }
-        return statementsList
-    }
-
-
-    void restrict(delegate, List paramsList){
-        println paramsList
-    }
-
-
-    public String getStatementsValue() {
-        return statements
-    }
-
-}
 
 

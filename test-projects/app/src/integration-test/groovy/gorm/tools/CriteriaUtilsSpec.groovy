@@ -193,4 +193,79 @@ class CriteriaUtilsSpec extends Specification {
         list[1].name == "Org#3"
         list[2].name == "Org#20"
     }
+
+    def "Filter with `between()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["between()", 2,10]], Org).sort{it.id}
+        then:
+        list.size() == 9
+        list[0].name == "Org#1"
+        list[1].name == "Org#2"
+        list[-1].name == "Org#9"
+    }
+
+    def "Filter with `in()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["in()", "24", "25"]], Org).sort{it.id}
+        then:
+        list.size() == 2
+        list[0].name == "Org#23"
+    }
+    def "Filter with `inList()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["inList()", "24", "25"]], Org).sort{it.id}
+        then:
+        list.size() == 2
+        list[0].name == "Org#23"
+    }
+    def "Filter by Name ilike()"() {
+        when: "eq"
+        List list = CriteriaUtils.search2([name:["ilike()", "Org#2%"]], Org)
+        then:
+        list.size() == 11
+        list[0].name == "Org#2"
+        list[1].name == "Org#20"
+        list[10].name == "Org#29"
+    }
+    def "Filter with `gt()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["gt()", "95"]], Org).sort{it.id}
+        then:
+        list.size() == 7
+        list[0].name == "Org#95"
+    }
+    def "Filter with `gte()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["gte()", "95"]], Org).sort{it.id}
+        then:
+        list.size() == 8
+        list[0].name == "Org#94"
+    }
+    def "Filter with `lt()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["lt()", "5"]], Org).sort{it.id}
+        then:
+        list.size() == 3
+        list[0].name == "Org#1"
+    }
+    def "Filter with `lte()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["lte()", "5"]], Org).sort{it.id}
+        then:
+        list.size() == 4
+        list[0].name == "Org#1"
+    }
+
+    def "Filter with `ne()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["ne()", "5"]], Org).sort{it.id}
+        then:
+        list.size() == Org.list().size() -1
+    }
+    def "Filter with `not in()`"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["not in()",2,3,4,5]], Org).sort{it.id}
+        then:
+        list.size() == Org.list().size() - 4
+    }
 }

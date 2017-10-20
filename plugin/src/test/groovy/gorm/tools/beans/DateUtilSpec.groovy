@@ -145,6 +145,32 @@ class DateUtilSpec extends Specification {
         "2017-10-19T11:50:10" | "yyyy-MM-dd'T'HH:mm:ss"
     }
 
+    void "test convertStringToDateTime"() {
+        setup:
+        String format = "MM/dd/yyyy hh:mm:ss"
+        String stringDate = "10/19/2017 11:50:10"
+        SimpleDateFormat formatter = new SimpleDateFormat(format)
+        Date expectedDate = formatter.parse(stringDate)
+
+        when:
+        Date result = DateUtil.convertStringToDateTime(stringDate, format)
+
+        then:
+        result == expectedDate
+    }
+
+    void "test dateToJsonString"() {
+        setup:
+        SimpleDateFormat formatter = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
+        Date date = formatter.parse('2017-10-20 22:00:00')
+
+        when:
+        String result = DateUtil.dateToJsonString(date)
+
+        then:
+        result == date.format("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    }
+
     void "test getYearOf"() {
         expect:
         year == DateUtil.getYearOf(new SimpleDateFormat(dateFormat).parse(date))
@@ -160,13 +186,135 @@ class DateUtilSpec extends Specification {
         setup:
         Calendar calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, 1)
-        calendar.add(Calendar.MONTH, 1)
+        calendar.add(Calendar.MONTH, 2)
 
         when:
-        Date date = DateUtil.shiftCurrentDateByMonths(1)
+        Date monthAfterNow = DateUtil.shiftCurrentDateByMonths(2)
 
         then:
-        date.format("yyyy-MM-dd") == calendar.getTime().format("yyyy-MM-dd")
+        monthAfterNow.format("yyyy-MM-dd") == calendar.getTime().format("yyyy-MM-dd")
+
+        when:
+        //changing expected date, so now it 2 month before now
+        calendar.add(Calendar.MONTH, -4)
+        Date monthBeforeNow = DateUtil.shiftCurrentDateByMonths(-2)
+
+        then:
+        monthBeforeNow.format("yyyy-MM-dd") == calendar.getTime().format("yyyy-MM-dd")
+    }
+
+    void "test getMonthLetter"() {
+        expect:
+        monthLetter == DateUtil.getMonthLetter(date)
+
+        where:
+        monthLetter   | date
+        "J"           | "201701"
+        "F"           | "201702"
+        "M"           | "201703"
+        "A"           | "201704"
+        "M"           | "201705"
+        "J"           | "201706"
+        "J"           | "201707"
+        "A"           | "201708"
+        "S"           | "201709"
+        "O"           | "201710"
+        "N"           | "201711"
+        "D"           | "201712"
+        "?"           | "201713"
+        "?"           | ""
+    }
+
+    void "test getMonthLetterByNum"() {
+        expect:
+        monthLetter == DateUtil.getMonthLetterByNum(monthNumber)
+
+        where:
+        monthLetter   | monthNumber
+        "J"           | 1
+        "F"           | 2
+        "M"           | 3
+        "A"           | 4
+        "M"           | 5
+        "J"           | 6
+        "J"           | 7
+        "A"           | 8
+        "S"           | 9
+        "O"           | 10
+        "N"           | 11
+        "D"           | 12
+        "?"           | 13
+        "?"           | -1
+    }
+
+    void "test setTime"() {
+        setup:
+        String dateFormat = "MM/dd/yyyy HH:mm:ss.SSS"
+        Date date = new SimpleDateFormat(dateFormat).parse("10/19/2017 11:40:00.500")
+        Calendar calendarDate = Calendar.getInstance()
+        calendarDate.setTime(date)
+
+        when:
+        DateUtil.setTime(calendarDate, 10, 15)
+
+        then:
+        calendarDate.getTime().format(dateFormat) == "10/19/2017 10:15:00.000"
+
+        when:
+        DateUtil.setTime(calendarDate, 9, 30, 25, 123)
+
+        then:
+        calendarDate.getTime().format(dateFormat) == "10/19/2017 09:30:25.123"
+
+        when:
+        DateUtil.setTime(calendarDate, 23)
+
+        then:
+        calendarDate.getTime().format(dateFormat) == "10/19/2017 23:00:00.000"
+
+        when:
+        DateUtil.setTime(calendarDate, 0)
+
+        then:
+        calendarDate.getTime().format(dateFormat) == "10/19/2017 00:00:00.000"
+    }
+
+    void "test setTimeAsOfMidnight"() {
+        setup:
+        String dateFormat = "MM/dd/yyyy HH:mm:ss.SSS"
+        Date date = new SimpleDateFormat(dateFormat).parse("10/19/2017 11:40:00.500")
+        Calendar calendarDate = Calendar.getInstance()
+        calendarDate.setTime(date)
+
+        when:
+        DateUtil.setTimeAsOfMidnight(calendarDate)
+
+        then:
+        calendarDate.getTime().format(dateFormat) == "10/19/2017 00:00:00.000"
+    }
+
+    void "test getCalendarInstanceByDate"() {
+        setup:
+        String dateFormat = "MM/dd/yyyy HH:mm:ss"
+        Date date = new SimpleDateFormat(dateFormat).parse("10/19/2017 11:40:00")
+
+        when:
+        Calendar result = DateUtil.getCalendarInstanceByDate(date)
+
+        then:
+        result.getTime().format(dateFormat) == "10/19/2017 11:40:00"
+    }
+
+    void "test getCurrentCalendarInstance"() {
+        setup:
+        String dateFormat = "MM/dd/yyyy HH:mm:ss"
+        Date date = new Date()
+
+        when:
+        Calendar result = DateUtil.getCurrentCalendarInstance()
+
+        then:
+        result.getTime().format(dateFormat) == date.format(dateFormat)
     }
 
 }

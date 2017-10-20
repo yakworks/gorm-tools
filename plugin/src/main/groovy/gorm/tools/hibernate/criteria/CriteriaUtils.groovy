@@ -4,6 +4,7 @@ import gorm.tools.GormMetaUtils
 import gorm.tools.beans.BeanPathTools
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
+import groovy.transform.CompileStatic
 import org.hibernate.criterion.CriteriaSpecification
 import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileDynamic
@@ -280,6 +281,39 @@ class CriteriaUtils {
         }
     }
 
+    static Closure restriction = { key, val, type ->
+        switch (type) {
+            case (String):
+                if (val instanceof List) {
+                    restrictList(delegate, key, val, type)
+                } else {
+                    if (val.contains('%')) {
+                        like key, val
+                    } else {
+                        eq key, val
+                    }
+                }
+                break
+            case (boolean):
+            case (Boolean):
+                if (val instanceof List) { //just to handle cases if we get ["true"]
+                    'in'(key, val.collect { it.toBoolean() })
+                } else {
+                    eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
+                }
+                break
+            case (Long):
+            case (Date): //TODO: add date parsing
+            case (BigDecimal):
+                if (val instanceof List) {
+                    restrictList(delegate, key, val, type)
+                } else {
+                    eq(key, val.asType(type))
+                }
+                break
+        }
+    }
+
     @CompileDynamic
     //TODO: rename
     static search2(Map map, domain) {
@@ -289,40 +323,6 @@ class CriteriaUtils {
         Criteria criteria = domain.createCriteria()
 
         criteria.list() {
-            // TODO: move it outside
-            Closure restriction = { key, val, type ->
-                switch (type) {
-                    case (String):
-                        if (val instanceof List) {
-                            restrictList(delegate, key, val, type)
-                        } else {
-                            if (val.contains('%')) {
-                                like key, val
-                            } else {
-                                eq key, val
-                            }
-                        }
-                        break
-                    case (boolean):
-                    case (Boolean):
-                        if (val instanceof List) { //just to handle cases if we get ["true"]
-                            'in'(key, val.collect { it.toBoolean() })
-                        } else {
-                            eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
-                        }
-                        break
-                    case (Long):
-                    case (Date): //TODO: add date parsing
-                    case (BigDecimal):
-                        if (val instanceof List) {
-                            restrictList(delegate, key, val, type)
-                        } else {
-                            eq(key, val.asType(type))
-                        }
-                        break
-                    }
-            }
-
             //Used to handle nested properties, if key has ".", for example org.address.id
             //will execute closure address{eq "id", 1}
             Closure nested
@@ -333,10 +333,8 @@ class CriteriaUtils {
                         nested(splited.tail().join("."), closure)
                     }
                 } else {
-                    closure.call(key) // calls closure with last key in path `id` for iur example
+                    closure.call(key) // calls closure with last key in path `id` for our example
                 }
-
-
             }
 
             Closure result = {
@@ -438,7 +436,8 @@ class CriteriaUtils {
     @CompileDynamic
     static private restrictList(delegate, key, list, type){
         if (listAllowedStatements().contains(list[0])){
-            findRestriction(list[0]).call(delegate, ["$key": list.tail().collect{type ? it.asType(type): it}])
+            List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()
+            findRestriction(list[0]).call(delegate, ["$key":  listParams.collect{type ? it.asType(type): it}])
         } else {
             delegate.inList(key, list.collect { type ? it.asType(type): it })
         }

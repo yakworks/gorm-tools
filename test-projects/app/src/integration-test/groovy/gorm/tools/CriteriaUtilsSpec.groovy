@@ -268,4 +268,10 @@ class CriteriaUtilsSpec extends Specification {
         then:
         list.size() == Org.list().size() - 4
     }
+    def "Filter with `not in()` with ids in array"(){
+        when:
+        List list = CriteriaUtils.search2([id: ["not in()",[2,3,4,5]]], Org).sort{it.id}
+        then:
+        list.size() == Org.list().size() - 4
+    }
 }

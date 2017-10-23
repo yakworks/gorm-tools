@@ -1,7 +1,9 @@
 package grails.plugin.dao
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import gorm.tools.hibernate.criteria.CriteriaUtils
 
 @CompileStatic
 trait DaoDomainTrait<D extends GormEntity> {
@@ -27,6 +29,18 @@ trait DaoDomainTrait<D extends GormEntity> {
 
 	void remove() {
 		getDao().delete((D) this)
+	}
+
+	@CompileDynamic
+	static List list( Map params){
+		println(this)
+		println(this.getClass())
+		CriteriaUtils.list(params.filters?:[:] as Map, this, params as Map)
+	}
+
+	@CompileDynamic
+	static List list( Map filters, Map params){
+		CriteriaUtils.list(filters as Map, this, params as Map)
 	}
 
 	@Deprecated

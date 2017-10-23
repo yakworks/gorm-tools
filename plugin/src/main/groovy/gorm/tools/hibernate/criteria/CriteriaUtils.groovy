@@ -2,6 +2,8 @@ package gorm.tools.hibernate.criteria
 
 import gorm.tools.GormMetaUtils
 import gorm.tools.beans.BeanPathTools
+import gorm.tools.Pager
+import gorm.tools.beans.DateUtil
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
 import groovy.transform.CompileStatic
@@ -19,13 +21,14 @@ import javax.servlet.http.HttpServletRequest
 class CriteriaUtils {
 
     /** This is a convenience method to redirect all the types of filters from a single map. */
+    @Deprecated
     @CompileDynamic
     static Criteria filterGroup(Map groups) {
         ['filterBoolean', 'filterDate', 'filterDomain', 'filterMoney', 'filterLong', 'filterText', 'filterSimple'].each { command ->
             if (groups[command]) "${command}"(groups.map, groups.delegate, groups[command])
         }
     }
-
+    @Deprecated
     static Criteria filterBoolean(Map params, delegate, List keys) {
         filterEqIn(params, delegate, { it as Boolean }, keys)
     }
@@ -36,6 +39,7 @@ class CriteriaUtils {
      * @param delegate The delegate from the createCriteria().list() structure or similar.
      * @param keys The list of attribute names to search on.  Matches the attribute name of the domain object.
      */
+    @Deprecated
     static Criteria filterSimple(Map params, delegate, List keys) { filterEqIn(params, delegate, keys) }
 
     /** Filters using 'eq' or 'in' as appropriate, a value which needs to be cast from the json type to Long.
@@ -43,6 +47,7 @@ class CriteriaUtils {
      * @param delegate The delegate from the createCriteria().list() structure or similar.
      * @param keys The list of attribute names to search on.  Matches the attribute name of the domain object.
      */
+    @Deprecated
     static Criteria filterLong(Map params, delegate, List keys) { filterEqIn(params, delegate, { it as Long }, keys) }
 
     /** Inserts an 'eq' or 'in' clause depending on whether the value is a List.
@@ -51,6 +56,7 @@ class CriteriaUtils {
      * @param cast A Closure that converts the values to a type matching the domain type.  Defaults to no change.
      * @param keys The list of attribute names to search on.  Matches the attribute name of the domain object.
      */
+    @Deprecated
     @CompileDynamic
     static Criteria filterEqIn(Map params, delegate, Closure cast = { it }, List keys) {
         Closure result = {
@@ -69,11 +75,13 @@ class CriteriaUtils {
     }
 
     /** Adds a filterRange criteria with a Date cast.  See filterRange for details. */
+    @Deprecated
     static Criteria filterDate(Map params, delegate, List keys) {
         return filterRange(params, delegate, { it as Date }, keys)
     }
 
     /** Adds a filterRange criteria with a BigDecimal cast.  See filterRange for details. */
+    @Deprecated
     static Criteria filterMoney(Map params, delegate, List keys) {
         return filterRange(params, delegate, { it as BigDecimal }, keys)
     }
@@ -95,6 +103,7 @@ class CriteriaUtils {
      * The params[key] value needs to have either the min* pair or the max* pair, or both, or the method
      * will have no effect on the query.
      */
+    @Deprecated
     @CompileDynamic
     static Criteria filterRange(Map params, delegate, Closure cast, List keys) {
         Closure result = {
@@ -126,6 +135,7 @@ class CriteriaUtils {
      * @param delegate The delegate from within the createCriteria().list() structure.
      * @param keys the list of domain attribute names
      */
+    @Deprecated
     @CompileDynamic
     static Criteria filterDomain(Map params, delegate, List keys) {
         Closure result = {
@@ -151,6 +161,7 @@ class CriteriaUtils {
      * @param delegate The delegate from within the createCriteria().list() structure.
      * @param keys the list of domain attribute names
      */
+    @Deprecated
     @CompileDynamic
     static Criteria filterText(Map params, delegate, keys) {
         Closure result = {
@@ -237,7 +248,14 @@ class CriteriaUtils {
         return result.call()
     }
 
-    //TODO: add comments
+    /**
+     * To be able to make search we need to know types for each filter parameter,
+     * the method flattens filters, and instead of values returns type
+     *
+     * @param map filters for search
+     * @param domainName name of the domain class
+     * @return map where key - is path to variable and value - its type
+     */
     @CompileDynamic
     static Map typedParams(Map map, String domainName) {
         Map result = [:]
@@ -329,19 +347,19 @@ class CriteriaUtils {
     /**
      * Core method that runs search
      *
-     * @param map map of properties to search on
+     * @param filters map of properties to search on
      * @param domain domain class that should be used for search
      * @return list of entities
      */
     @CompileDynamic
-    //TODO: rename
-    static search2(Map map, domain) {
+    static List list(Map filters, Class domain, Map params = [:]) {
+        println domain
         String domainName = domain.name
-        Map typedParams = typedParams(map, domainName)
-        Map flattened = flattenMap(map)
+        Map typedParams = typedParams(filters, domainName)
+        Map flattened = flattenMap(filters)
         Criteria criteria = domain.createCriteria()
-
-        criteria.list() {
+        Pager pager = new Pager(params)
+        criteria.list(max: pager.max, offset: pager.offset) {
             //Used to handle nested properties, if key has ".", for example org.address.id
             //will execute closure address{eq "id", 1}
             Closure nested
@@ -376,6 +394,17 @@ class CriteriaUtils {
                                 restriction.call(lastKey, flattened[key], type)
                             }
                     )
+
+                }
+
+                if (params.order){
+                    if (params.hasProperty("sort") && params.hasProperty("order")){
+                        applyOrder(params, delegate)
+                    } else {
+                        (params.order instanceof String ? Eval.me(params.order) : params.order).each {k,v->
+                            order(k, v)
+                        }
+                    }
 
                 }
             }
@@ -466,6 +495,14 @@ class CriteriaUtils {
         statements.find{it.statements.contains(statement)}.restriction
     }
 
+    /**
+     * Applies statements to criteria form list.
+     *
+     * @param delegate criteria delegate
+     * @param key path to variable
+     * @param list list of filters, first element could be restriction method name
+     * @param type variable type
+     */
     @CompileDynamic
     static private restrictList(delegate, key, list, type){
         if (listAllowedStatements().contains(list[0])){

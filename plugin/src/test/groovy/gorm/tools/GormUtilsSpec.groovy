@@ -12,12 +12,34 @@ class GormUtilsSpec extends Specification {
 
     void "test copyDomain"() {
         setup:
-        Address address = new Address(street: 'street', city: 'city1').save()
-        Person person = new Person(name: 'Joey', age: 35, address: address).save()
-        Person person2 = new Person().save()
+        Address address = new Address(street: 'street1', city: 'city1').save()
+        Person person = new Person(id: 0, version: 0, createdBy: 'test0', createdDate:'10-22-2017',
+                editedBy: 'test0', editedDate: '10-22-2017', num:'000', name: 'Joey', age: 35, address: address).save()
+        Person person2 = new Person(id: 1, version: 1, createdBy: 'test1', createdDate: '10-23-2017',
+                editedBy: 'test1', editedDate: '10-23-2017', num:'111').save()
 
         when:
         Person copy = GormUtils.copyDomain(person2, person)
+
+        then:
+        copy.name == person.name
+        copy.age == person.age
+        copy.id != person.id
+        copy.version != person.version
+        copy.num != person.num
+        copy.createdBy != person.createdBy
+        copy.createdDate != person.createdDate
+        copy.editedBy != person.editedBy
+        copy.editedDate != person.editedDate
+    }
+
+    void "test copyDomain specifying a domain class as a target"() {
+        setup:
+        Address address = new Address(street: 'street1', city: 'city1').save()
+        Person person = new Person(name: 'Joey', age: 35, address: address).save()
+
+        when:
+        Person copy = GormUtils.copyDomain(Person, person)
 
         then:
         copy.name == person.name
@@ -84,12 +106,24 @@ class GormUtilsSpec extends Specification {
 class Person {
     String name
     int age
+    String num
     Address address
+
+    String createdBy
+    String createdDate
+    String editedBy
+    String editedDate
 
     static constraints = {
         name blank: true, nullable: true
         age blank: true, nullable: true
         address nullable: true
+
+        num blank: true, nullable: true
+        createdBy blank: true, nullable: true
+        createdDate blank: true, nullable: true
+        editedBy blank: true, nullable: true
+        editedDate blank: true, nullable: true
     }
 }
 

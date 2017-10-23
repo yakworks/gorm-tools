@@ -12,6 +12,12 @@ import org.springframework.dao.DataIntegrityViolationException
 
 import org.springframework.core.GenericTypeResolver
 
+/**
+ * GormDaoSupport represents a super class for all DAO services.
+ * It provides basic functionality for CRUD operations on domains.
+ *
+ * @param <T> a domain class
+ */
 @SuppressWarnings(['EmptyMethod'])
 @GrailsCompileStatic
 @Transactional
@@ -52,7 +58,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	void setDomainClass(Class<T> clazz) { thisDomainClass = clazz }
 
 	/**
-	 * saves a domain entity and rewraps ValidationException with DomainException on error
+	 * Saves a domain entity and rewraps ValidationException with DomainException on error.
 	 *
 	 * @param entity the domain entity to call save on
 	 * @throws DomainException if a validation or DataAccessException error happens
@@ -62,7 +68,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	/**
-	 * saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error
+	 * Saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error.
 	 *
 	 * @param entity the domain entity to call save on
 	 * @param args the arguments to pass to save
@@ -93,7 +99,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	/**
-	 * calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions
+	 * Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
 	 *
 	 * @param entity the domain entity
 	 * @throws DomainException if a spring DataIntegrityViolationException is thrown
@@ -115,7 +121,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	/**
-	 * inserts and calls save for a new domain entity based with the data from params
+	 * Inserts and calls save for a new domain entity based with the data from params.
 	 *
 	 * @param params the parameter map
 	 * @throws DomainException if a validation error happens
@@ -134,10 +140,11 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	/**
-	 * updates a new domain entity with the data from params
+	 * Updates a new domain entity with the data from params.
 	 *
 	 * @param params the parameter map
-	 * @throws DomainException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
+	 * @throws DomainException if a validation error happens or its not found with the params.id
+	 *                         or the version is off and someone else edited it
 	 */
 	Map<String, Object> update(Map params) {
 		return doUpdate(params)
@@ -156,7 +163,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	}
 
 	/**
-	 * deletes a new domain entity base on the id in the params
+	 * Deletes a new domain entity base on the id in the params.
 	 *
 	 * @param params the parameter map that has the id for the domain entity to delete
 	 * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown

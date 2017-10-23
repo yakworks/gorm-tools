@@ -20,7 +20,12 @@ import javax.servlet.http.HttpServletRequest
 
 //import org.apache.commons.logging.*
 
-//XXX add better tests for this
+/**
+ * BeanPathTools contains a set of static helpers, which provides a convenient way
+ * for manipulating with object's properties.
+ *
+ * For example, it allows to retrieve object's properties using filters and place them in a map.
+ */
 @Slf4j
 @CompileStatic
 class BeanPathTools {
@@ -63,8 +68,8 @@ class BeanPathTools {
     }
 
     /**
-     * returns the deepest nested bean
-     * */
+     * Returns the deepest nested bean
+     */
     @CompileDynamic
     static getNestedBean(Object bean, String path) {
         int i = path.lastIndexOf(".")
@@ -92,6 +97,9 @@ class BeanPathTools {
 
     /**
      * Provides an ability to retrieve object's fields into a map.
+     * It is possible to specify a list of fields which should be picked up.
+     *
+     * Note: propList = ['*'] represents all fields.
      *
      * @param source            a source object
      * @param propList          a list of properties to include to a map

@@ -5,7 +5,7 @@ import grails.compiler.GrailsCompileStatic
 import org.apache.commons.lang.Validate
 
 /**
- * Provides a set of statics helpers for working with domain classes.
+ * Provides a set of static helpers for working with domain classes.
  */
 @GrailsCompileStatic
 class GormUtils {
@@ -56,7 +56,8 @@ class GormUtils {
     }
 
     /**
-     * Copy all given property values from source to target.
+     * Copy all given property values from source to target
+     * if and only if target's properties are null.
      *
      * @param source    a source object
      * @param target    a target object
@@ -68,10 +69,11 @@ class GormUtils {
 
     /**
      * Copy all given property values from source to target.
+     * It can be specified whether to copy values or not in case target's properties are not null.
      *
      * @param source         a source object
      * @param target         a target object
-     * @param copyOnlyIfNull
+     * @param copyOnlyIfNull if 'true' then it will copy a value only if target's property is null
      * @param propNames      an array of property names which should be copied
      */
     static void copyProperties(Object source, Object target, boolean copyOnlyIfNull, String... propNames) {

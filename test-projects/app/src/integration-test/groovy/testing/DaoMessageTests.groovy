@@ -77,6 +77,26 @@ class DaoMessageTests extends Specification {
 		assert 'Billy' == msg.args[1]
 	}
 
+	void testNotFound() {
+		when: "Id is null"
+		Map params = [id:null]
+		Map m = DaoMessage.notFound("Test", params)
+
+		then:
+		noExceptionThrown()
+		m.code == "default.not.found.message"
+		m.defaultMessage == "Test not found with id null"
+
+		when: "Id is not null"
+		m = DaoMessage.notFound("Test", [id:1])
+
+		then:
+		noExceptionThrown()
+		m.code == "default.not.found.message"
+		m.defaultMessage == "Test not found with id 1"
+
+	}
+
 }
 
 class MockIntDomain{

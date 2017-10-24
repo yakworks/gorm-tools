@@ -10,6 +10,11 @@ import spock.lang.Specification
 @Integration
 class OrgSpec extends Specification {
 
+    def "Check list"() {
+        expect:
+        Org.list().size() == Org.list([:], [max: 150]).size()
+    }
+
     def "Filter by Name eq"() {
         when:
         List list = Org.list([name: "Org#23"], [max: 150])
@@ -241,6 +246,7 @@ class OrgSpec extends Specification {
         list.size() == 3
         list[0].name == "Org#1"
     }
+
     def "Filter with `lte()`"(){
         when:
         List list = Org.list([id: ["lte()", "5"]], [max: 150]).sort{it.id}
@@ -250,6 +256,20 @@ class OrgSpec extends Specification {
     }
 
 
+    def "Filter with `not in()`"(){
+        when:
+        List list = Org.list([id: ["not in()", 2, 3, 4, 5]], [max: 150])
+        then:
+        list.size() == Org.list().size() - 4
+    }
+
+
+    def "Filter with `not in()` with ids in array"(){
+        when:
+        List list = Org.list([id: ["not in()", [2, 3, 4, 5]]], [max: 150])
+        then:
+        list.size() == Org.list().size() - 4
+    }
 
     def "test paging, defaults"(){
         when:

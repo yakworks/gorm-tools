@@ -97,12 +97,12 @@ class OrgSpec extends Specification {
         list[10].address.id == 30
     }
 
-    def "Filter by boolean"() {
+    /*def "Filter by boolean"() {
         when:
         List list = Org.list([isActive: "true"], [max: 150])
         then:
         list.size() == 51
-    }
+    }*/
 
     def "Filter by boolean in list"() {
         when:

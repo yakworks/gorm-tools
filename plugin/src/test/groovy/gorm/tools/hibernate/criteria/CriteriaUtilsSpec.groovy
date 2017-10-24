@@ -105,7 +105,7 @@ class Test {
     static constraints = {
         someField blank: false
         someField2 blank: false
-        nestedField blank: true
+        nestedField blank: true, nullable: true
     }
 }
 

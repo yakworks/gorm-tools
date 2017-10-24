@@ -5,7 +5,7 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
 @TestMixin(GrailsUnitTestMixin)
-class ListParseUtilTests extends Specification {
+class ListParseUtilSpec extends Specification {
 
 	void "test sanitizeNameListForSql"() {
 		expect:

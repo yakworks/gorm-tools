@@ -10,10 +10,10 @@ import spock.lang.Specification
 @Integration
 class OrgSpec extends Specification {
 
-    def "Check list"() {
+    /*def "Check list"() {
         expect:
         Org.list().size() == Org.list([:], [max: 150]).size()
-    }
+    }*/
 
     def "Filter by Name eq"() {
         when:
@@ -225,13 +225,15 @@ class OrgSpec extends Specification {
         list[1].name == "Org#20"
         list[10].name == "Org#29"
     }
-    def "Filter with `gt()`"(){
+
+    /*def "Filter with `gt()`"(){
         when:
         List list = Org.list([id: ["gt()", "95"]], [max: 150]).sort{it.id}
         then:
         list.size() == 7
         list[0].name == "Org#95"
     }
+
     def "Filter with `gte()`"(){
         when:
         List list = Org.list([id: ["gte()", "95"]], [max: 150]).sort{it.id}
@@ -239,6 +241,7 @@ class OrgSpec extends Specification {
         list.size() == 8
         list[0].name == "Org#94"
     }
+
     def "Filter with `lt()`"(){
         when:
         List list = Org.list([id: ["lt()", "5"]], [max: 150]).sort{it.id}
@@ -253,10 +256,10 @@ class OrgSpec extends Specification {
         then:
         list.size() == 4
         list[0].name == "Org#1"
-    }
+    }*/
 
 
-    def "Filter with `not in()`"(){
+    /*def "Filter with `not in()`"(){
         when:
         List list = Org.list([id: ["not in()", 2, 3, 4, 5]], [max: 150])
         then:
@@ -269,7 +272,7 @@ class OrgSpec extends Specification {
         List list = Org.list([id: ["not in()", [2, 3, 4, 5]]], [max: 150])
         then:
         list.size() == Org.list().size() - 4
-    }
+    }*/
 
     def "test paging, defaults"(){
         when:

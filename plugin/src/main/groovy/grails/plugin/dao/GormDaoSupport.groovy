@@ -38,13 +38,15 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	/**
 	 * returns an instance with fireEvents=false and flushOnSave=false
 	 */
-//	static GormDaoSupport<T> getInstance(Class<T> clazz) {
-///*		GormDaoSupport dao = DaoUtil.ctx.getBean("gormDaoBean")
-//		dao.domainClass = clazz
-//		return dao*/
-//		return new GormDaoSupport(clazz, false)
-//
-//	}
+	//TODO: investigate why it doesnt work without it
+	@CompileDynamic
+	static GormDaoSupport<T> getInstance(Class<T> clazz) {
+		GormDaoSupport dao = grails.plugin.dao.DaoUtil.ctx.getBean("gormDaoBean")
+		dao.domainClass = clazz
+		return dao
+		return new GormDaoSupport(clazz, false)
+
+	}
 
 	//override this to set the domain this dao is for
 	Class<T> getDomainClass() { return thisDomainClass }

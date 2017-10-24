@@ -312,6 +312,7 @@ class CriteriaUtils {
      * Closure that runs criteria restrictions for sertain types
      */
     static Closure restriction = { key, val, type ->
+        if (val != "")
         switch (type) {
             case (String):
                 if (val instanceof List) {
@@ -345,7 +346,7 @@ class CriteriaUtils {
     }
 
     /**
-     * Core method that runs search
+     * Core list method that runs search
      *
      * @param filters map of properties to search on
      * @param domain domain class that should be used for search
@@ -354,66 +355,93 @@ class CriteriaUtils {
     @CompileDynamic
     static List list(Map filters, Class domain, Map params = [:]) {
         println domain
-        String domainName = domain.name
-        Map typedParams = typedParams(filters, domainName)
-        Map flattened = flattenMap(filters)
+
         Criteria criteria = domain.createCriteria()
         Pager pager = new Pager(params)
         criteria.list(max: pager.max, offset: pager.offset) {
-            //Used to handle nested properties, if key has ".", for example org.address.id
-            //will execute closure address{eq "id", 1}
-            Closure nested
-            nested = { String key, Closure closure ->
-                if (key.contains(".")) {
-                    List splited = key.split("[.]")
-                    "${splited[0]}" {
-                        nested(splited.tail().join("."), closure)
-                    }
-                } else {
-                    closure.call(key) // calls closure with last key in path `id` for our example
-                }
-            }
-
-            Closure result = {
-                typedParams.each { key, type ->
-                    if (key == "or"){ //TODO: think how to refactor
-                        or {
-                            type.each { k, t ->
-                                nested.call(k,
-                                        { lastKey -> // from nested closure
-                                            restriction.delegate = delegate
-                                            restriction.call(lastKey, flattened["or"][k], t)
-                                        }
-                                )
-                            }
-                        }
-                    }
-                    nested.call(key,
-                            { lastKey -> // from nested closure
-                                restriction.delegate = delegate
-                                restriction.call(lastKey, flattened[key], type)
-                            }
-                    )
-
-                }
-
-                if (params.order){
-                    if (params.hasProperty("sort") && params.hasProperty("order")){
-                        applyOrder(params, delegate)
-                    } else {
-                        (params.order instanceof String ? Eval.me(params.order) : params.order).each {k,v->
-                            order(k, v)
-                        }
-                    }
-
-                }
-            }
-
-            result.delegate = delegate  // this is the line that makes it all work within the criteria.
-            return result.call()
-
+            criterias.delegate = delegate
+            criterias.call(filters, domain, params)
         }
     }
+
+
+    /**
+     * Core get that runs search
+     *
+     * @param filters map of properties to search on
+     * @param domain domain class that should be used for search
+     * @return result
+     */
+    @CompileDynamic
+    static def get(Map filters, Class domain, Map params = [:], Closure closure) {
+
+        Criteria criteria = domain.createCriteria()
+        criteria.get() {
+            criterias.delegate = delegate
+            criterias.call(filters, domain, params)
+            closure.delegate = delegate
+            closure.call()
+        }
+    }
+
+    static Closure criterias = {Map filters, Class domain, Map params = [:] ->
+        String domainName = domain.name
+        Map typedParams = typedParams(filters, domainName)
+        Map flattened = flattenMap(filters)
+        //Used to handle nested properties, if key has ".", for example org.address.id
+        //will execute closure address{eq "id", 1}
+        Closure nested
+        nested = { String key, Closure closure ->
+            if (key.contains(".")) {
+                List splited = key.split("[.]")
+                "${splited[0]}" {
+                    nested(splited.tail().join("."), closure)
+                }
+            } else {
+                closure.call(key) // calls closure with last key in path `id` for our example
+            }
+        }
+
+        Closure result = {
+            typedParams.each { key, type ->
+                if (key == "or"){ //TODO: think how to refactor
+                    or {
+                        type.each { k, t ->
+                            nested.call(k,
+                                    { lastKey -> // from nested closure
+                                        restriction.delegate = delegate
+                                        restriction.call(lastKey, flattened["or"][k], t)
+                                    }
+                            )
+                        }
+                    }
+                }
+                nested.call(key,
+                        { lastKey -> // from nested closure
+                            restriction.delegate = delegate
+                            restriction.call(lastKey, flattened[key], type)
+                        }
+                )
+
+            }
+
+            if (params.order){
+                if (params.sort && params.order){
+                    applyOrder(params, delegate)
+                } else {
+                    (params.order instanceof String ? Eval.me(params.order) : params.order).each {k,v->
+                        order(k, v)
+                    }
+                }
+
+            }
+        }
+
+        result.delegate = delegate  // this is the line that makes it all work within the criteria.
+        return result.call()
+    }
+
+
 
     //TODO: implements as Enum, currently fails with:
     // Caused by NoClassDefFoundError: Could not initialize class gorm.tools.hibernate.criteria.Statement

@@ -5,7 +5,8 @@ import grails.compiler.GrailsCompileStatic
 import org.apache.commons.lang.Validate
 
 /**
- * Provides a set of static helpers for working with domain classes.
+ * GormUtils provides a set of static helpers for working with domain classes.
+ * It allows to copy domain instances, to copy separate properties of an object, etc.
  */
 @GrailsCompileStatic
 class GormUtils {

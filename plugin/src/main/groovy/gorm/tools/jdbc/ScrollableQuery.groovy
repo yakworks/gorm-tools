@@ -10,6 +10,7 @@ import java.sql.Statement
 
 /**
  * Groovy Sql wrapper for running scrollable/streaming queries.
+ * It provides a convenient way for iterating over records which correspond to a given sql query.
  */
 @SuppressWarnings(['JdbcResultSetReference', 'JdbcStatementReference'])
 @CompileStatic
@@ -19,6 +20,13 @@ class ScrollableQuery {
 	private RowMapper rowMapper
 	private int fetchSize
 
+	/**
+	 * Creates a ScrollableQuery instance with given parameters.
+	 *
+	 * @param mapper     a row mapper
+	 * @param dataSource a datasource
+	 * @param fetchSize  the number of result set rows
+     */
 	ScrollableQuery(RowMapper mapper, DataSource dataSource, int fetchSize = Integer.MIN_VALUE) {
 		this.dataSource = dataSource
 		this.rowMapper = mapper
@@ -26,10 +34,12 @@ class ScrollableQuery {
 	}
 
 	/**
-	 * Executes the query, and calls the closure for each row.
-	 * @param Closure cl
+	 * Executes the query and calls the closure for each row.
+	 *
+	 * @param query   an sql query which represents records
+	 * @param closure a closure which is called for each row
 	 */
-	void eachRow(String query, Closure cl) {
+	void eachRow(String query, Closure closure) {
 		Sql sql = prepareSql()
 		int index = 1
 
@@ -37,14 +47,23 @@ class ScrollableQuery {
 			while (r.next()) {
 				index++
 				Object row = rowMapper.mapRow(r, index)
-				cl.call(row)
+				closure.call(row)
 			}
 		}
 	}
 
 	/**
-	 * Executes the query, and calls the closure for each batch.
-	 * @param int batchSize
+	 * Executes the query and calls the closure for each batch of records.
+	 *
+	 * For example, the next snippet of code prints records in batch and its size for every 10 records:
+	 *  eachBatch(sqlQuery, 10) { List batch ->
+	 *      println batch
+	 *      println batch.size()
+	 *  }
+	 *
+	 * @param query     an sql query which represents records
+	 * @param batchSize number of records in a single batch
+	 * @param closure   a closure which is called for each batch
 	 */
 	void eachBatch(String query, int batchSize, Closure cl) {
 		List batch = []
@@ -64,7 +83,8 @@ class ScrollableQuery {
 	 * This method holds all rows in memory, so this should not be used if there is going to be large number of rows.
 	 * instead use the eachRow, eachBatch which works with the scrollable resultset
 	 *
-	 * @return List
+	 * @param query an sql query which represents records
+	 * @return a list of records which correspond to the given query
 	 */
 	List rows(String query) {
 		List result = []

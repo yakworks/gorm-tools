@@ -12,12 +12,21 @@ import java.sql.ResultSetMetaData
 import java.sql.SQLException
 
 /**
- * Row mapper which converts the resultset to grails parameter map, which can be used for databinding
+ * Row mapper which allows to convert data from a given ResultSet instance
+ * to a grails parameter map, which can be used for databinding.
  */
 @SuppressWarnings('JdbcResultSetReference')
 @CompileStatic
 class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
 
+	/**
+	 * Returns a GrailsParameterMap instance which is build from records in a given ResultSet.
+	 *
+	 * @param rs     the ResultSet
+	 * @param rowNum number of records to include to the map
+	 * @return the map which is build from records in the given ResultSet
+	 * @throws SQLException
+     */
 	@Override
 	Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
 		ResultSetMetaData rsmd = rs.getMetaData()
@@ -35,6 +44,9 @@ class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
 		return mapOfColValues
 	}
 
+	/**
+	 * Returns a GrailsParameterMap instance.
+     */
 	@Override
 	protected Map<String, Object> createColumnMap(int columnCount) {
 		HttpServletRequest request = new MockHttpServletRequest()

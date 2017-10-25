@@ -9,10 +9,11 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 pages:
   - Overview: index.md
   - Id Generation: id-generation.md
+  - BeanPathTools: beanPathTools.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools
-repo_url: https://github.com/yakworks/gorm-rest-api
+repo_url: https://github.com/yakworks/gorm-tools
 edit_uri: edit/master/docs/
 
 # Config

@@ -22,12 +22,12 @@ With the cascade save of an association where we were saving a Parent with new C
 With this plugin and a controller you can just do:
 
 ```groovy
-def update(){
+def update() {
   try{
     def result = YourDomainClass.update(p)
       flash.message = result.message
       redirect(action: 'show', id: result.entity.id)
-  }catch(DomainException e){
+  } catch(DomainException e) {
     flash.message = e.messageMap
     render(view: 'edit', model: [(domainInstanceName): e.entity])
   }
@@ -40,14 +40,14 @@ Each domain gets injected with its own static dao object based on the GormDaoSup
 
 See [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy)
 
-```
-class OrgDao extends GormDaoSupport{ 
+```groovy
+class OrgDao extends GormDaoSupport {
     def domainClass = Org
     
     def update(params){
-        ... do some stuff to the params
+        // ... do some stuff to the params
         def result = super.update(params)
-        ... do something like log history or send emai with result.entity which is the saved org
+        // ... do something like log history or send email with result.entity which is the saved org
         return result
     }
 }
@@ -107,7 +107,7 @@ already have `insert` method and we can't have both static and instance methods 
 
 See [RestDaoController](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/RestDaoController.groovy)
 
-```
+```groovy
 class OrgController extends RestDaoController<Org> {
     static responseFormats = ['json']
     static namespace = "api"

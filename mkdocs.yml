@@ -10,6 +10,7 @@ pages:
   - Overview: index.md
   - Id Generation: id-generation.md
   - BeanPathTools: beanPathTools.md
+  - GormUtils: gormUtils.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

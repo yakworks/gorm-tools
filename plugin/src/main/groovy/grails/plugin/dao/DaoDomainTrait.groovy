@@ -62,6 +62,13 @@ trait DaoDomainTrait<D extends GormEntity> {
 
 	@CompileDynamic
 	@Override
+	static List<D> list(Map params, Closure closure){
+		println params
+		CriteriaUtils.list(params.filters?:[:] as Map, this, params as Map, closure)
+	}
+
+	@CompileDynamic
+	@Override
 	static List<D> list(Map params){
 		println params
 		CriteriaUtils.list(params.filters?:[:] as Map, this, params as Map)
@@ -69,9 +76,9 @@ trait DaoDomainTrait<D extends GormEntity> {
 
 	@CompileDynamic
 	@Override
-	static List<D> list(Map filters, Map params){
+	static List<D> list(Map filters, Map params, Closure closure = null){
 		println params
-		CriteriaUtils.list(filters as Map, this, params as Map)
+		CriteriaUtils.list(filters as Map, this, params as Map, closure)
 	}
 
 	@Deprecated

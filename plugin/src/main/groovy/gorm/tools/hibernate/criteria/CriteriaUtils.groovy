@@ -290,12 +290,13 @@ class CriteriaUtils {
      */
     @CompileDynamic
     static Map flattenMap(Map map, prefix = '') {
+        println map
         map.inject([:]) { object, v ->
             if (v.value instanceof Map) {
                 if (v.key == "or"){
                     object += [or: flattenMap(v.value, "")]
                 } else {
-                    object += flattenMap(v.value, v.key)
+                    object += flattenMap(v.value, "${prefix ? "${prefix}." : ""}$v.key")
                 }
             } else {
                 if (v.key.matches(".*[^.]Id")){
@@ -333,6 +334,9 @@ class CriteriaUtils {
                     eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
                 }
                 break
+            case (Integer):
+            case (int):
+            case (long):
             case (Long):
             case (Date): //TODO: add date parsing
             case (BigDecimal):
@@ -353,12 +357,15 @@ class CriteriaUtils {
      * @return list of entities
      */
     @CompileDynamic
-    static List list(Map filters, Class domain, Map params = [:]) {
-        println domain
+    static List list(Map filters, Class domain, Map params = [:], Closure closure=null) {
 
         Criteria criteria = domain.createCriteria()
         Pager pager = new Pager(params)
         criteria.list(max: pager.max, offset: pager.offset) {
+            if (closure) {
+                closure.delegate = delegate
+                closure.call()
+            }
             criterias.delegate = delegate
             criterias.call(filters, domain, params)
         }
@@ -537,7 +544,7 @@ class CriteriaUtils {
             List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()
             findRestriction(list[0]).call(delegate, ["$key":  listParams.collect{type ? it.asType(type): it}])
         } else {
-            delegate.inList(key, list.collect { type ? it.asType(type): it })
+            if (!list.isEmpty()) delegate.inList(key, list.collect { type ? it.asType(type): it })
         }
     }
 }

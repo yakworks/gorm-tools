@@ -287,4 +287,15 @@ class OrgSpec extends Specification {
         list.size() == 20
     }
 
+    def "test closure"(){
+        when:
+        List list = Org.list([:], [max:20]){
+            or {
+                delegate.eq "id", 2L
+            }
+        }
+        then:
+        list.size() == 1
+    }
+
 }

@@ -289,4 +289,11 @@ class CriteriaUtilsSpec extends Specification {
         then:
         list.size() == 20
     }
+
+    def "test map flatten"(){
+        when:
+        Map map = CriteriaUtils.flattenMap([dispute:[reason:[id: 1]]])
+        then:
+        map == ["dispute.reason.id": 1]
+    }
 }

@@ -121,5 +121,62 @@ class OrgController extends RestDaoController<Org> {
 If controller is extended for RestDaoController then methods will use dao services for current domain. For example
 POST action will call dao insert method for Org domain.
 
+## Intelligent search 
+
+`search(params, closure)` method was added to GormDaoSupport service. It allows to get list of entities restricted by
+properties. 
+
+**Example**
+
+```
+Org.dao.search([criteria: [name: "Nam%", type: "New"], max: 20]) {gt "id", 5}
+```
+
+The same result can be reached with criteria:
+
+```
+Criteria criteria = Org.createCriteria()
+criteria.list(max: 20) {
+    like "name", "Nam%"
+    eq "type", "New"
+    gt "id", 5
+}
+```
+
+So we can specify just parameters in criteria block, and if any specific restriction is needed it can be added
+with closure
+
+Bellow will be a list of supported syntax for params in json format, which is supported:
+
+{
+    criteria: {
+      "ponum":"abc", /* if its a single value eq is default, if it contains % then it uses ilike */
+      "reconciled":true, /* boolean */
+      "tranDate":"2012-04-23T00:00:00.000Z", /* date */
+      "customer.id":101, 
+      "customerId":101, /*works in the same way as `customer.id":101` */
+      "customer":{"id":101}, /* or object way */
+      "or":{ /*TODO: works only if it is one in `criteria`, and currently only on first level*/
+        "customer.name":["ilike()","wal%"],
+        "customer.num":["ilike()","wal%"]
+      },
+      "docType":["PA","CM"], /* an array means it will use in/inList */  
+      "docType":["in()",["PA","CM"]], /* the above ins would be a short cut for this*/
+      "tranType.id":["not in()",[1,2,3]],/* will translate to "not{ in("tranType.id",[1,2,3])]" */
+      "refnum":["ilike()","123%"], /* a case-insensitive 'like' expression */
+      "refnum":["like()","123%"], /* equivalent to SQL like expression */
+      "amount":["between()",0,100], /* between value */
+      "oldAmount":["gt()","origAmount"], /* greater than value */
+      "oldAmount":["ge()","origAmount"], /* greater or equal than value */"
+      oldAmount":["lt()","origAmount"], /* less than value */
+      "oldAmount":["le()","origAmount"], /* less or equal than value */
+      "amount":["ne()",50], /*not equal*/
+      "status.id":[1,2,3], /* an array means it will use in/inList */
+      "status":[{"id":1},{"id":2},{"id":3}], /* an array means it will use in/inList */
+      "status":["isNull()"], /* translates to isNull*/
+    },
+  "order":[{"tranDate":"ASC"},{"customer.name","desc"}]
+}
+
 
 

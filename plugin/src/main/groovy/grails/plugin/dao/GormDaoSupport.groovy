@@ -1,6 +1,8 @@
 package grails.plugin.dao
 
 import grails.compiler.GrailsCompileStatic
+import grails.converters.JSON
+
 //import grails.gorm.transactions.Transactional
 import grails.transaction.Transactional
 import grails.validation.ValidationException
@@ -11,6 +13,7 @@ import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
 import org.springframework.core.GenericTypeResolver
+import gorm.tools.hibernate.criteria.CriteriaUtils
 
 @SuppressWarnings(['EmptyMethod'])
 @GrailsCompileStatic
@@ -143,6 +146,24 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 */
 	Map<String, Object> update(Map params) {
 		return doUpdate(params)
+	}
+
+	/**
+	 *
+	 *
+	 * @param params
+	 * @param closure
+	 * @return
+	 */
+	@CompileDynamic
+	List<T> search(Map params = [:], Closure closure = null) {
+		Map criteria
+		if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+			criteria = JSON.parse(params['criteria']) as Map
+		} else {
+			criteria = params['criteria'] as Map ?: [:]
+		}
+		CriteriaUtils.list(criteria, this.thisDomainClass, params as Map, closure)
 	}
 
 	protected final Map<String, Object> doUpdate(Map params) {

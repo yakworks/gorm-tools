@@ -236,11 +236,12 @@ class CriteriaUtilsSpec extends Specification {
     }
     def "Filter with `gte()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["gte()", "95"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["ge()", "95"]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 8
         list[0].name == "Org#94"
     }
+
     def "Filter with `lt()`"(){
         when:
         List list = CriteriaUtils.list([id: ["lt()", "5"]], Org, [max: 150]).sort{it.id}
@@ -248,9 +249,10 @@ class CriteriaUtilsSpec extends Specification {
         list.size() == 3
         list[0].name == "Org#1"
     }
+
     def "Filter with `lte()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["lte()", "5"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["le()", "5"]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 4
         list[0].name == "Org#1"

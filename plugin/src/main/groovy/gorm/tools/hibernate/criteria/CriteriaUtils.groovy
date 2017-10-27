@@ -4,6 +4,7 @@ import gorm.tools.GormMetaUtils
 import gorm.tools.beans.BeanPathTools
 import gorm.tools.Pager
 import gorm.tools.beans.DateUtil
+import grails.converters.JSON
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
 import groovy.transform.CompileStatic
@@ -11,6 +12,7 @@ import org.hibernate.criterion.CriteriaSpecification
 import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.query.api.Criteria
+import gorm.tools.hibernate.criteria.Statements
 
 import javax.servlet.http.HttpServletRequest
 
@@ -290,7 +292,6 @@ class CriteriaUtils {
      */
     @CompileDynamic
     static Map flattenMap(Map map, prefix = '') {
-        println map
         map.inject([:]) { object, v ->
             if (v.value instanceof Map) {
                 if (v.key == "or"){
@@ -301,7 +302,6 @@ class CriteriaUtils {
             } else {
                 if (v.key.matches(".*[^.]Id")){
                     object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id")?v.key.replaceAll("Id\$", ".id").toString():v.key }"] = v.value
-
                 }
                 object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
             }
@@ -334,11 +334,17 @@ class CriteriaUtils {
                     eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
                 }
                 break
+            case (Date):
+                if (val instanceof List) {
+                    restrictList(delegate, key, toDate(val), type)
+                } else {
+                    eq(key, toDate(val))
+                }
+                break
             case (Integer):
             case (int):
             case (long):
             case (Long):
-            case (Date): //TODO: add date parsing
             case (BigDecimal):
                 if (val instanceof List) {
                     restrictList(delegate, key, val, type)
@@ -346,6 +352,14 @@ class CriteriaUtils {
                     eq(key, val.asType(type))
                 }
                 break
+        }
+    }
+
+    static Date toDate(val){
+        if (val instanceof String) {
+            DateUtil.parseJsonDate(val)
+        } else {
+            val
         }
     }
 
@@ -358,7 +372,6 @@ class CriteriaUtils {
      */
     @CompileDynamic
     static List list(Map filters, Class domain, Map params = [:], Closure closure=null) {
-
         Criteria criteria = domain.createCriteria()
         Pager pager = new Pager(params)
         criteria.list(max: pager.max, offset: pager.offset) {
@@ -371,6 +384,10 @@ class CriteriaUtils {
         }
     }
 
+    @CompileDynamic
+    static List list(String filters, Class domain, Map params = [:], Closure closure=null) {
+        list(JSON.parse(filters) as Map, domain, params, closure)
+    }
 
     /**
      * Core get that runs search
@@ -448,88 +465,6 @@ class CriteriaUtils {
         return result.call()
     }
 
-
-
-    //TODO: implements as Enum, currently fails with:
-    // Caused by NoClassDefFoundError: Could not initialize class gorm.tools.hibernate.criteria.Statement
-    /**
-     * List of statements that can be used in search
-     */
-    private static List statements = [
-            [statements: ["in()", "inList()"], restriction:
-                    { delegate, Map params ->
-                        delegate.in params.keySet()[0], params.values()[0]
-                    }
-            ],
-            [statements: ["not in()"], restriction:
-                    { delegate, Map params ->
-                        delegate.not {
-                            delegate.in params.keySet()[0], params.values()[0]
-                        }
-                    }
-            ],
-            [statements: ["between()"], restriction:
-                    { delegate, Map params ->
-                        delegate.gte params.keySet()[0], params.values()[0][0]
-                        delegate.lte params.keySet()[0], params.values()[0][1]
-                    }
-            ],
-            [statements: ["ilike()"], restriction:
-                    { delegate, Map params ->
-                        delegate.ilike params.keySet()[0], params.values()[0][0]
-                    }
-            ],
-            [statements: ["gt()"], restriction:
-                    { delegate, Map params ->
-                        delegate.gt params.keySet()[0], params.values()[0][0]
-                    }
-            ],
-            [statements: ["gte()"], restriction:
-                    { delegate, Map params ->
-                        delegate.gte params.keySet()[0], params.values()[0][0]
-                    }
-            ],
-            [statements: ["lt()"], restriction:
-                    { delegate, Map params ->
-                        delegate.lt params.keySet()[0], params.values()[0][0]
-                    }
-            ],
-            [statements: ["lte()"], restriction:
-                    { delegate, Map params ->
-                        delegate.lte params.keySet()[0], params.values()[0][0]
-                    }
-            ],
-            [statements: ["ne()"], restriction:
-                    { delegate, Map params ->
-                        delegate.ne params.keySet()[0], params.values()[0][0]
-                    }
-            ],
-            [statements: ["isNull()"], restriction:
-                    { delegate, Map params ->
-                        delegate.isNull params.keySet()[0], params.values()[0][0]
-                    }
-            ]
-    ]
-    /**
-     * Get list of all alloweded statements
-     *
-     * @return list with all statements
-     */
-    @CompileDynamic
-    static List<String> listAllowedStatements() {
-        statements.collect { it.statements}.flatten()
-    }
-    /**
-     * Returns closure that should be executed for statement
-     *
-     * @param statement statement name
-     * @return closure that should be executed for statement
-     */
-    @CompileDynamic
-    static Closure findRestriction(String statement){
-        statements.find{it.statements.contains(statement)}.restriction
-    }
-
     /**
      * Applies statements to criteria form list.
      *
@@ -540,9 +475,9 @@ class CriteriaUtils {
      */
     @CompileDynamic
     static private restrictList(delegate, key, list, type){
-        if (listAllowedStatements().contains(list[0])){
+        if (Statements.listAllowedStatements().contains(list[0])){
             List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()
-            findRestriction(list[0]).call(delegate, ["$key":  listParams.collect{type ? it.asType(type): it}])
+            Statements.findRestriction(list[0]).call(delegate, ["$key":  listParams.collect{type ? it.asType(type): it}])
         } else {
             if (!list.isEmpty()) delegate.inList(key, list.collect { type ? it.asType(type): it })
         }

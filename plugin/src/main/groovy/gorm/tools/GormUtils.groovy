@@ -4,60 +4,80 @@ import grails.core.GrailsDomainClassProperty
 import grails.compiler.GrailsCompileStatic
 import org.apache.commons.lang.Validate
 
+/**
+ * GormUtils provides a set of static helpers for working with domain classes.
+ * It allows to copy domain instances, to copy separate properties of an object, etc.
+ */
 @GrailsCompileStatic
 class GormUtils {
 
+    /**
+     * The list of domain properties which are ignored during copying.
+     */
     final static List<String> IGNORED_PROPERTIES = ["id", "version", "createdBy", "createdDate", "editedBy", "editedDate", "num"]
 
     /**
+     * Creates an instance of a given domain class and copies properties from source object.
+     *
      * @param domainClass Domain class
-     * @param old - domain class to copy properties from
+     * @param source - domain class to copy properties from
      * @param override - properties to override after copying
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
-    static <T> T copyDomain(Class<T> domainClass, Object old, Map override = [:], boolean ignoreAssociations = true) {
+    static <T> T copyDomain(Class<T> domainClass, Object source, Map override = [:], boolean ignoreAssociations = true) {
         T copy = domainClass.newInstance()
-        return copyDomain(copy, old, override, ignoreAssociations) as T
+        return copyDomain(copy, source, override, ignoreAssociations) as T
     }
 
     /**
-     * @param copy domain instance to copy properties to
-     * @param old - domain class to copy properties from
+     * Copies properties from source to target object.
+     *
+     * @param target domain instance to copy properties to
+     * @param source - domain class to copy properties from
      * @param override - properties to override after copying
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
+    static Object copyDomain(Object target, Object source, Map override = [:], boolean ignoreAssociations = true) {
+        if (target == null) throw new IllegalArgumentException("Target is null")
+        if (source == null) return null
 
-    static Object copyDomain(Object copy, Object old, Map override = [:], boolean ignoreAssociations = true) {
-        if (copy == null) throw new IllegalArgumentException("Copy is null")
-        if (old == null) return null
-
-        GormMetaUtils.getDomainClass(old.class).persistentProperties.each { GrailsDomainClassProperty dp ->
+        GormMetaUtils.getDomainClass(source.class).persistentProperties.each { GrailsDomainClassProperty dp ->
             if (IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
             if (ignoreAssociations && dp.isAssociation()) return
 
             String name = dp.name
-            copy[name] = old[name]
+            target[name] = source[name]
         }
 
         if (override) {
-            copy.properties = override
+            target.properties = override
         }
 
-        return copy
+        return target
     }
 
+    /**
+     * Copy all given property values from source to target
+     * if and only if target's properties are null.
+     *
+     * @param source    a source object
+     * @param target    a target object
+     * @param propNames array of property names which should be copied
+     */
     static void copyProperties(Object source, Object target, String... propNames) {
         copyProperties(source, target, true, propNames)
     }
 
     /**
-     * Copy all  given property values from source to target.
-     * @param source
-     * @param target
-     * @param propNames
+     * Copy all given property values from source to target.
+     * It can be specified whether to copy values or not in case target's properties are not null.
+     *
+     * @param source         a source object
+     * @param target         a target object
+     * @param copyOnlyIfNull if 'true' then it will copy a value only if target's property is null
+     * @param propNames      an array of property names which should be copied
      */
     static void copyProperties(Object source, Object target, boolean copyOnlyIfNull, String... propNames) {
-
         for (String prop : propNames) {
             if (copyOnlyIfNull && (target[prop] != null)) {
                 continue

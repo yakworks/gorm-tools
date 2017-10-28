@@ -1,6 +1,6 @@
 package gorm.tools.beans
 
-import gorm.tools.GormUtils
+import gorm.tools.GormMetaUtils
 import grails.core.GrailsApplication
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
@@ -20,7 +20,12 @@ import javax.servlet.http.HttpServletRequest
 
 //import org.apache.commons.logging.*
 
-//XXX add better tests for this
+/**
+ * BeanPathTools contains a set of static helpers, which provides a convenient way
+ * for manipulating with object's properties.
+ *
+ * For example, it allows to retrieve object's properties using filters and place them in a map.
+ */
 @Slf4j
 @CompileStatic
 class BeanPathTools {
@@ -53,15 +58,17 @@ class BeanPathTools {
     }
 
     @CompileDynamic
-    //XXX Is this used? whats it for? how is it different than getNestedValue?
+    //didn't find any usage of this method, so marked it as deprecated
+    @Deprecated
     static Object getFieldValue(Object domain, String field) {
         Object bean = getNestedBean(domain, field)
         field = GrailsNameUtils.getShortName(field)
         return bean?."$field"
     }
+
     /**
-     * returns the depest nested bean
-     * */
+     * Returns the deepest nested bean
+     */
     @CompileDynamic
     static getNestedBean(Object bean, String path) {
         int i = path.lastIndexOf(".")
@@ -87,21 +94,31 @@ class BeanPathTools {
         return props
     }
 
-    //XXX add tests for this and make sure delegatingBean is working properly
+    /**
+     * Provides an ability to retrieve object's fields into a map.
+     * It is possible to specify a list of fields which should be picked up.
+     *
+     * Note: propList = ['*'] represents all fields.
+     *
+     * @param source            a source object
+     * @param propList          a list of properties to include to a map
+     * @param useDelegatingBean
+     * @return a map which is based on object properties
+     */
     @CompileDynamic
-    static Map buildMapFromPaths(Object obj, List propList, boolean useDelegatingBean = false) {
+    static Map buildMapFromPaths(Object source, List<String> propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {
-            Class delegatingBean = GrailsClassUtils.getStaticFieldValue(obj.getClass(), "delegatingBean")
-            if (delegatingBean == null && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, obj.getClass())) {
+            Class delegatingBean = GrailsClassUtils.getStaticFieldValue(source.getClass(), "delegatingBean")
+            if (!delegatingBean && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, source.getClass())) {
                 delegatingBean = DaoDelegatingBean
             }
-            if (delegatingBean != null) obj = delegatingBean.newInstance(obj)
+            if (delegatingBean != null) source = delegatingBean.newInstance(source)
         }
         //FIXME we should look into do something like LazyMetaPropertyMap in grails-core that wraps the object and delegates
         //the map key lookups to the objects
         Map rowMap = [:]
-        propList.each { key ->
-            propsToMap(obj, key, rowMap)
+        propList.each { String key ->
+            propsToMap(source, key, rowMap)
         }
         if (log.debugEnabled) log.debug(rowMap.toMapString())
         return rowMap
@@ -109,28 +126,40 @@ class BeanPathTools {
     }
 
     /**
-     * XXX add solid javadoc here and rename obj to what its supposed to be
-     * @param obj TODO Descibe me
-     * @param propertyPath
-     * @param currentMap
-     * @return
+     * Provides an ability to retrieve a property of a source object and add it to a map.
+     * In case if 'propertyPath' is set to '*', it will extract all properties from a source object.
+     * It is possible to extract a nested property by using the '.' symbol, e.g. 'property.nestedProperty'
+     *
+     * For example:
+     *   object = new Test(id: 1, value: 10, nested: new Test1(foo: '1'))
+     *
+     *   results of propsToMap for the object will be:
+     *   propsToMap(object, '*', map)                // [id: 1, value: 10, nested: [foo: 1]]
+     *   propsToMap(object, 'id', map)               // [id: 1]
+     *   propsToMap(object, 'nested.foo', map)       // [nested: [foo: 1]]
+     *
+     *
+     * @param source        a source object
+     * @param propertyPath  a property name, e.g. 'someField', 'someField.nestedField', '*' (for all properties)
+     * @param currentMap    a destination map
+     * @return a map which contains an object's property (properties)
      */
-    @SuppressWarnings(['VariableName', 'ReturnsNullInsteadOfEmptyCollection', 'CatchException', 'UnnecessaryElseStatement'])
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CatchException'])
     @CompileDynamic
-    static Map propsToMap(Object obj, String propertyPath, Map currentMap) {
-        if (obj == null) return null
-        final int nestedIndex = propertyPath.indexOf('.')
-        //no idex then its just a property or its the *
+    static Map propsToMap(Object source, String propertyPath, Map currentMap) {
+        if (source == null) return null
+        Integer nestedIndex = propertyPath.indexOf('.')
+        //no index then its just a property or its the *
         if (nestedIndex == -1) {
             if (propertyPath == '*') {
-                if (log.debugEnabled) log.debug("obj:$obj propertyPath:$propertyPath currentMap:$currentMap")
+                if (log.debugEnabled) log.debug("source:$source propertyPath:$propertyPath currentMap:$currentMap")
 
                 //just get the persistentProperties
-                Object domain = (obj instanceof DelegatingBean) ? ((DelegatingBean)obj).target : obj
+                Object object = (source instanceof DelegatingBean) ? ((DelegatingBean)source).target : source
                 //FIXME this makes it hard to test, fix it so its easier to mock
-                GrailsDomainClass domainClass = GormUtils.getDomainClass(domain)
+                GrailsDomainClass domainClass = GormMetaUtils.getDomainClass(object)
                 //FIXME why do we require a domainClass? I don't think we should
-                Validate.notNull( domainClass, "${obj.getClass().name} is not a domain class")
+                Validate.notNull( domainClass, "${source.getClass().name} is not a domain class")
 
                 //FIXME why only persistentProperties, seems we should allow any of them no?
                 GrailsDomainClassProperty[] pprops = domainClass.persistentProperties
@@ -138,58 +167,45 @@ class BeanPathTools {
                 pprops = pprops.findAll { p -> !p.isAssociation() }
                 //force the the id to be included
                 String id = domainClass.getIdentifier().name
-                currentMap[id] = obj?."$id"
+                currentMap[id] = source?."$id"
                 //spin through and add them to the map
-                pprops.each { Map it ->
-                    currentMap[it.name] = obj?."$it.name"
+                pprops.each { property ->
+                    currentMap[property.name] = source?."$property.name"
                 }
-            } else {
-                try {
-                    currentMap[propertyPath] = obj?."$propertyPath"
-                } catch (Exception e) {
-                    //XXX this smells funny. do we really want to be logging the error?
-                    //add a comment here as to why we would want to just continue under all error conditions.
-                    log.error("Cannot set value for $propertyPath from $obj", e)
-                }
-            }
 
-            return null
+            // I think it would be enough to check if a property exists.
+            // So it's the same as catching MissingPropertyException and do nothing if there is no property
+            } else if (source?.hasProperty(propertyPath)) {
+                currentMap[propertyPath] = source."$propertyPath"
+            }
         } else {
             // We have at least one sub-key, so extract the first element
-            // of the nested key as the prfix. In other words, if we have
+            // of the nested key as the prefix. In other words, if we have
             // 'nestedKey' == "a.b.c", the prefix is "a".
             String nestedPrefix = propertyPath.substring(0, nestedIndex)
-            if (!currentMap.containsKey(nestedPrefix)) {
-                currentMap[nestedPrefix] = [:]
-            }
-            if (!(currentMap[nestedPrefix] instanceof Map)) {
-                currentMap[nestedPrefix] = [:]
-            }
 
-            Object nestedObj = null
-            try {
-                nestedObj = obj."$nestedPrefix"
-            } catch (Exception e) {
-                //XXX this smells funny. do we really want to be logging the error?
-                //add a comment here as to why we would want to just continue under all error conditions.
-                log.error("Cannot set value for $nestedPrefix from $obj", e)
-            }
-            String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())
-            //recursive call
-            if (nestedObj instanceof Collection) {
-                List l = []
-                nestedObj.each { nestedObjItem ->
-                    Map justForItem = [:]
-                    propsToMap(nestedObjItem, remainderOfKey, justForItem)
-                    l << justForItem
+            if (source?.hasProperty(nestedPrefix)) {
+                if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
+                    currentMap[nestedPrefix] = [:]
                 }
-                currentMap[nestedPrefix] = l
-            } else {
-                propsToMap(nestedObj, remainderOfKey, (Map) currentMap[nestedPrefix])
+                Object nestedObj = source."$nestedPrefix"
+                String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())
+                //recursive call
+                if (nestedObj instanceof Collection) {
+                    List l = []
+                    nestedObj.each { nestedObjItem ->
+                        Map justForItem = [:]
+                        propsToMap(nestedObjItem, remainderOfKey, justForItem)
+                        l << justForItem
+                    }
+                    currentMap[nestedPrefix] = l
+                } else {
+                    propsToMap(nestedObj, remainderOfKey, (Map) currentMap[nestedPrefix])
+                }
             }
-            return null
         }
 
+        return currentMap
     }
 
     /**
@@ -197,7 +213,6 @@ class BeanPathTools {
      * call the MapFlattener and returns a GrailsParameterMap to be used for binding
      * example: [xxx:[yyy:123]] will turn into a GrailsParameterMap with ["xxx.yyy":123]
      */
-    //XXX add test for these
     static GrailsParameterMap flattenMap(HttpServletRequest request, Map jsonMap = null) {
         Map p = new MapFlattener().flatten(jsonMap ?: (Map) request.JSON)
         return getGrailsParameterMap(p, request)

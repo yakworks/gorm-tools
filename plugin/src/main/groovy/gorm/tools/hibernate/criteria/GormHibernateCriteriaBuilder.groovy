@@ -23,7 +23,7 @@ import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileDynamic
 
 /**
- * This is here to make it easier to uild cirteria with domain bean paths
+ * This is here to make it easier to build criteria with domain bean paths
  * allows
  * order('invoice.customer.name')
  *
@@ -57,7 +57,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
 
     /**
      * Orders by the specified property name and direction
-     * takes invoice.customer.name and builds a closure that looke like
+     * takes invoice.customer.name and builds a closure that looks like
      *
      * invoice {
      *    customer {

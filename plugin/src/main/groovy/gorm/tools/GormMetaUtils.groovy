@@ -12,16 +12,16 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.orm.hibernate.cfg.Mapping
 
 /**
- * A bbunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
- * Usefull methods to find the PersistentEntity and the mapping and meta fields.
+ * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
+ * Useful methods to find the PersistentEntity and the mapping and meta fields.
  */
 @CompileStatic
 class GormMetaUtils {
 
     /**
-     * get using the class
+     * Returns a persistent entity using the class.
      *
-     * @param cls the domain classs
+     * @param cls the domain class
      * @return The entity or null
      */
     static PersistentEntity getPersistentEntity(Class cls) {
@@ -29,9 +29,10 @@ class GormMetaUtils {
     }
 
     /**
-     * get using the entity with fully qualified name such as "com.foo.Product"
+     * Returns a persistent entity using a fully qualified name
+     * with package such as "com.foo.Product".
      *
-     * @param name including package
+     * @param name an entity name which includes package
      * @return The entity or null
      */
     static PersistentEntity getPersistentEntity(String fullName) {
@@ -39,7 +40,9 @@ class GormMetaUtils {
     }
 
     /**
-     * shortcut for getPersistentEntity(instance.class.name)
+     * Returns a persistent entity using a domain instance.
+     *
+     * Note: shortcut for getPersistentEntity(instance.class.name)
      *
      * @param instance the domain instance
      * @return The entity or null
@@ -52,7 +55,7 @@ class GormMetaUtils {
      * finds domain using either a simple name like "Product" or fully qualified name "com.foo.Product"
      * name can start with either a lower or upper case
      *
-     * @param name to search for
+     * @param name an entity name to search for
      * @return The entity or null
      */
     static PersistentEntity findPersistentEntity(String name){
@@ -74,10 +77,10 @@ class GormMetaUtils {
     }
 
     /**
-     * the mapping for the entity to DB
+     * Returns the mapping for the entity to DB.
      *
      * @param pe the PersistentEntity can found using the loolup statics above
-     * @return
+     * @return the mapping for the entity to DB
      */
     @CompileDynamic
     Mapping getMapping(PersistentEntity pe) {
@@ -101,7 +104,7 @@ class GormMetaUtils {
     /**
      * finds domain using either a simple name like "Product" or fully qualified name "com.foo.Product"
      *
-     * @param name
+     * @param name a name of a domain class
      * @return The entity or null
      */
     @CompileDynamic
@@ -113,7 +116,6 @@ class GormMetaUtils {
             }
         }
         return getDomainClass(name)
-        //return Holders.grailsApplication.getDomainClass(name)
     }
 
 }

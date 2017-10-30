@@ -8,7 +8,7 @@ import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsDomainClass
-
+import grails.plugins.Plugin
 import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
 import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
 import org.springframework.beans.factory.config.MethodInvokingFactoryBean
@@ -67,7 +67,7 @@ class DaoPluginHelper {
 		//DaoUtils.ctx = application.mainContext*/
 	}
 
-	static void onChange(event, GrailsApplication grailsApplication) {
+	static void onChange(event, GrailsApplication grailsApplication, Plugin plugin) {
 		if (!event.source || !event.ctx) {
 			return
 		}
@@ -75,15 +75,11 @@ class DaoPluginHelper {
 
 			GrailsClass daoClass = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, event.source)
 
-			def beans = beans {
+			plugin.beans {
 				Closure closure = configureDaoBeans
 				closure.delegate = delegate
-				closure.call(daoClass, grailsApplication)
+				return closure.call(daoClass, grailsApplication)
 			}
-
-			def context = event.ctx
-			context.registerBeanDefinition("${daoClass.fullName}DaoClass", beans.getBeanDefinition("${daoClass.fullName}DaoClass"))
-			context.registerBeanDefinition("${daoClass.propertyName}", beans.getBeanDefinition("${daoClass.propertyName}"))
 		}
 	}
 

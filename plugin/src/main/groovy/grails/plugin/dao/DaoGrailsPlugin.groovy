@@ -23,7 +23,7 @@ class DaoGrailsPlugin extends grails.plugins.Plugin {
 
     @Override
     void onChange(Map<String,Object> event) {
-        DaoPluginHelper.onChange(event, grailsApplication)
+        DaoPluginHelper.onChange(event, grailsApplication, this)
     }
 
 }

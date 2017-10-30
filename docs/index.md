@@ -178,5 +178,35 @@ Bellow will be a list of supported syntax for params in json format, which is su
   "order":[{"tranDate":"ASC"},{"customer.name","desc"}]
 }
 
+**Quick Search**
 
+Quick search - ability to search by one string in criteria filters against several domain fields.
+The list of fields are specified in static property `quickSearchFields`, see bellow:
 
+```groovy
+class Org {
+	String name
+    Address address
+
+    static quickSearchFields = ["name", "address.city"]
+    ...
+
+```
+So intelligent search will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
+for each field in `quickSearchFields`.
+
+```groovy
+Org.dao.search([criteria: [quickSearch: "abc"], max: 20])
+
+```
+```groovy
+Criteria criteria = Org.createCriteria()
+criteria.list(max: 20) {
+    or {
+        ilike "name", "abc%"
+        ilike "address.city", "abc%"
+    }
+}
+```
+Keep in mind that quickSearch has higher priority then regular search fields, and if params are 
+`[criteria: [quickSearch: "abc", id: 5]]`, then `id` restriction will be ignored

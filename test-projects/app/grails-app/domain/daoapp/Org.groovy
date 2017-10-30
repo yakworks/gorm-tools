@@ -7,6 +7,8 @@ class Org {
     boolean isActive=true
     BigDecimal revenue = 0
     Long refId = 0L
+
+    static quickSearchFields = ["name", "address.city"]
     static constraints = {
 		name blank:false
         address nullable: true

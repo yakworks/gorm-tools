@@ -382,7 +382,7 @@ class CriteriaUtils {
             if (filters.quickSearch && domain.quickSearchFields){
                 criterias.delegate = delegate
                 String searchValue = filters.quickSearch.contains("%") ? filters.quickSearch : filters.quickSearch+"%"
-                criterias.call([or: domain.quickSearchFields.collect{["$it":["ilike()", searchValue]]}], domain, params)
+                criterias.call([or: domain.quickSearchFields.collect{["$it":["ilike()", searchValue]]}[0]], domain, params)
                 return
             }
             criterias.delegate = delegate

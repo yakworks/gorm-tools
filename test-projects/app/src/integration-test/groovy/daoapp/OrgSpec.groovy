@@ -321,17 +321,17 @@ class OrgSpec extends Specification {
 
     def "test quick search"(){
         when:
-        List list = Org.dao.search([criteria:[quickSearch: "Or"], max: 150])
+        List list = Org.dao.search([criteria:[quickSearch: "Org#2"], max: 150])
         then:
-        list.size() == 101
+        list.size() == 11
 
     }
 
     def "test quick search is higher priority then other filters"(){
         when:
-        List list = Org.dao.search([criteria:[quickSearch: "Cit", id: 123], max: 150])
+        List list = Org.dao.search([criteria:[quickSearch: "Org-num#1", id: 123], max: 150])
         then:
-        list.size() == 101
+        list.size() == 11
 
     }
 

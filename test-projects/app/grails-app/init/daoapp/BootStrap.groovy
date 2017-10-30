@@ -5,6 +5,7 @@ class BootStrap {
     def init = { servletContext ->
         100.times {
             new Org(name: "Org#$it",
+                    num: "Org-num#$it",
                     revenue: 100*it,
                     isActive: (it%2 == 0),
                     refId: it*200 as Long,

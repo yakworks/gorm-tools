@@ -58,7 +58,6 @@ class BeanPathTools {
     }
 
     @CompileDynamic
-    //XXX Is this used? whats it for? how is it different than getNestedValue?
     //didn't find any usage of this method, so marked it as deprecated
     @Deprecated
     static Object getFieldValue(Object domain, String field) {
@@ -173,44 +172,36 @@ class BeanPathTools {
                 pprops.each { property ->
                     currentMap[property.name] = source?."$property.name"
                 }
-            } else {
-                try {
-                    currentMap[propertyPath] = source?."$propertyPath"
-                } catch (Exception e) {
-                    //XXX this smells funny. do we really want to be logging the error?
-                    //add a comment here as to why we would want to just continue under all error conditions.
-                    log.error("Cannot set value for $propertyPath from $source", e)
-                }
+
+            // I think it would be enough to check if a property exists.
+            // So it's the same as catching MissingPropertyException and do nothing if there is no property
+            } else if (source?.hasProperty(propertyPath)) {
+                currentMap[propertyPath] = source."$propertyPath"
             }
         } else {
             // We have at least one sub-key, so extract the first element
             // of the nested key as the prefix. In other words, if we have
             // 'nestedKey' == "a.b.c", the prefix is "a".
             String nestedPrefix = propertyPath.substring(0, nestedIndex)
-            if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
-                currentMap[nestedPrefix] = [:]
-            }
 
-            Object nestedObj = null
-            try {
-                nestedObj = source."$nestedPrefix"
-            } catch (Exception e) {
-                //XXX this smells funny. do we really want to be logging the error?
-                //add a comment here as to why we would want to just continue under all error conditions.
-                log.error("Cannot set value for $nestedPrefix from $source", e)
-            }
-            String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())
-            //recursive call
-            if (nestedObj instanceof Collection) {
-                List l = []
-                nestedObj.each { nestedObjItem ->
-                    Map justForItem = [:]
-                    propsToMap(nestedObjItem, remainderOfKey, justForItem)
-                    l << justForItem
+            if (source?.hasProperty(nestedPrefix)) {
+                if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
+                    currentMap[nestedPrefix] = [:]
                 }
-                currentMap[nestedPrefix] = l
-            } else {
-                propsToMap(nestedObj, remainderOfKey, (Map) currentMap[nestedPrefix])
+                Object nestedObj = source."$nestedPrefix"
+                String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())
+                //recursive call
+                if (nestedObj instanceof Collection) {
+                    List l = []
+                    nestedObj.each { nestedObjItem ->
+                        Map justForItem = [:]
+                        propsToMap(nestedObjItem, remainderOfKey, justForItem)
+                        l << justForItem
+                    }
+                    currentMap[nestedPrefix] = l
+                } else {
+                    propsToMap(nestedObj, remainderOfKey, (Map) currentMap[nestedPrefix])
+                }
             }
         }
 

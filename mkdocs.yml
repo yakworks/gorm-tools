@@ -11,6 +11,7 @@ pages:
   - Id Generation: id-generation.md
   - BeanPathTools: beanPathTools.md
   - GormUtils: gormUtils.md
+  - Itearating over records: scrollableQuery.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

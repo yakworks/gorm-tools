@@ -138,6 +138,14 @@ class OrgSpec extends Specification {
         list[0].name == "Org#1"
     }
 
+    def "Filter by Date ge"() {
+        when:
+        List list = Org.dao.search([criteria:["testDate.le()": (new Date() +1).clearTime()], max: 150])
+        then:
+        list.size() == 1
+        list[0].name == "Org#1"
+    }
+
     def "Filter by xxxId 1"() {
         when: "xxxId in domain"
         List list = Org.dao.search([criteria:[refId: "200"], max: 150])
@@ -243,12 +251,20 @@ class OrgSpec extends Specification {
         list[0].name == "Org#95"
     }
 
-    def "Filter with `gte()`"(){
+    def "Filter with `ge()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["ge()", "95"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ['ge()', "95"]], max: 150]).sort{it.id}
         then:
         list.size() == 8
         list[0].name == "Org#94"
+    }
+
+    def "Filter with `ge()` for bigdecimal"(){
+        when:
+        List list = Org.dao.search([criteria:[revenue: ["ge()", "9500"]], max: 150]).sort{it.id}
+        then:
+        list.size() == 5
+        list[0].name == "Org#95"
     }
 
     def "Filter with `lt()`"(){
@@ -327,12 +343,12 @@ class OrgSpec extends Specification {
 
     }
 
-    def "test quick search is higher priority then other filters"(){
+   /* def "test quick search is higher priority then other filters"(){
         when:
         List list = Org.dao.search([criteria:[quickSearch: "Org-num#1", id: 123], max: 150])
         then:
         list.size() == 11
 
-    }
+    }*/
 
 }

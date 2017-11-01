@@ -271,7 +271,11 @@ class CriteriaUtils {
                         result["or"][k1] = property.type
                     }
                 }
-                GrailsDomainClassProperty property = domainClass.getPropertyByName(k)
+                String checkedKey = k
+                if (k.matches(/.*[.]\d*$/)){
+                    checkedKey = checkedKey.split("[.]")[0..-2].join(".")
+                }
+                GrailsDomainClassProperty property = domainClass.getPropertyByName(checkedKey)
                 result[k] = property.type
             } catch (e) {
                 println e
@@ -286,27 +290,38 @@ class CriteriaUtils {
      * Specific for criteriaUtils to handle [customerId: 1]  -> [customer.id: 1]
      * And doesnt flatten  `or` key, so we can use it in criteria
      *
-     * @param map map of params
-     * @param prefix used in recursion to join keys
+     * @param params map of params
      * @return flattened map
      */
     @CompileDynamic
-    static Map flattenMap(Map map, prefix = '') {
-        map.inject([:]) { object, v ->
-            if (v.value instanceof Map) {
-                if (v.key == "or"){
-                    object += [or: flattenMap(v.value, "")]
+    static Map flattenMap(Map params) {
+        Closure flatMap
+        flatMap = { map, prefix='' ->
+            map.inject([:]) { object, v ->
+                if (v.value instanceof Map) {
+                    if (v.key == "or"){
+                        object += [or: flatMap(v.value, "")]
+                    } else {
+                        object += flatMap(v.value, "${prefix ? "${prefix}." : ""}$v.key")
+                    }
                 } else {
-                    object += flattenMap(v.value, "${prefix ? "${prefix}." : ""}$v.key")
+                    if (v.key.matches(".*[^.]Id")){
+                        object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id")?v.key.replaceAll("Id\$", ".id").toString():v.key }"] = v.value
+                    }
+                    object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
                 }
-            } else {
-                if (v.key.matches(".*[^.]Id")){
-                    object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id")?v.key.replaceAll("Id\$", ".id").toString():v.key }"] = v.value
-                }
-                object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
+                object
             }
-            object
         }
+        Map res = [:]
+        flatMap(params).each{ k, v->
+            if (k.split("[.]")[-1] && gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(k.split("[.]")[-1])){
+               res[k.split("[.]")[0..-2].join(".")] = [k.split("[.]")[-1], v]
+            } else {
+                res[k] = v
+            }
+        }
+        res
     }
 
     /**
@@ -319,7 +334,7 @@ class CriteriaUtils {
                 if (val instanceof List) {
                     restrictList(delegate, key, val, type)
                 } else {
-                    if (val.contains('%')) {
+                    if (val && val.contains('%')) {
                         like key, val
                     } else {
                         eq key, val
@@ -336,7 +351,7 @@ class CriteriaUtils {
                 break
             case (Date):
                 if (val instanceof List) {
-                    restrictList(delegate, key, toDate(val), type)
+                    restrictList(delegate, key, val, type)
                 } else {
                     eq(key, toDate(val))
                 }
@@ -344,9 +359,13 @@ class CriteriaUtils {
             case (Integer):
             case (int):
             case (long):
+            case (double):
+            case (Double):
+            case (float):
+            case (Float):
             case (Long):
             case (BigDecimal):
-                if (val instanceof List) {
+                if (val instanceof List || (val instanceof String && val.matches(/\[.*\]/))) {
                     restrictList(delegate, key, val, type)
                 } else {
                     eq(key, val.asType(type))
@@ -404,7 +423,6 @@ class CriteriaUtils {
      */
     @CompileDynamic
     static def get(Map filters, Class domain, Map params = [:], Closure closure) {
-
         Criteria criteria = domain.createCriteria()
         criteria.get() {
             criterias.delegate = delegate
@@ -422,8 +440,8 @@ class CriteriaUtils {
         //will execute closure address{eq "id", 1}
         Closure nested
         nested = { String key, Closure closure ->
-            if (key.contains(".")) {
-                List splited = key.split("[.]")
+            List splited = key.split("[.]")
+            if (splited.size() > 1 && !splited[1].matches(/\d*$/)) {
                 "${splited[0]}" {
                     nested(splited.tail().join("."), closure)
                 }
@@ -434,6 +452,7 @@ class CriteriaUtils {
 
         Closure result = {
             typedParams.each { key, type ->
+                if (flattened[key] == [] || flattened[key] == "[]") return
                 if (key == "or"){ //TODO: think how to refactor
                     or {
                         type.each { k, t ->
@@ -481,11 +500,19 @@ class CriteriaUtils {
      */
     @CompileDynamic
     static private restrictList(delegate, key, list, type){
+        if (list instanceof String) list = Eval.me(list)
+        println(list)
+        if (key.matches(/.*[.]\d*$/)) key = key.split("[.]")[0..-2].join(".")
+        println(key)
         if (Statements.listAllowedStatements().contains(list[0])){
+            println "Statements: ${list[0]} "
             List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()
-            Statements.findRestriction(list[0]).call(delegate, ["$key":  listParams.collect{type ? it.asType(type): it}])
+            if (listParams[0] && listParams[0]!="")
+            Statements.findRestriction(list[0]).call(delegate, ["$key":  listParams.collect{ type == Date ? toDate(it) :it.asType(type)}])
         } else {
-            if (!list.isEmpty()) delegate.inList(key, list.collect { type ? it.asType(type): it })
+            if (!list.isEmpty()) {
+                delegate.inList(key, list.collect { type?.getClass() == Date ? toDate(it) :it.asType(type)})
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
 GormUtils provides a set of static helpers for working with domains.
+See [GormUtils](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/GormUtils.groovy)
+
 
 ## Coping properties from source to target domain instance
 

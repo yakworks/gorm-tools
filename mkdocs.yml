@@ -12,6 +12,7 @@ pages:
   - BeanPathTools: beanPathTools.md
   - GormUtils: gormUtils.md
   - Itearating over records: scrollableQuery.md
+  - Working with dates: working-with-dates.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

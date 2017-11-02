@@ -296,6 +296,7 @@ class CriteriaUtils {
     @CompileDynamic
     static Map flattenMap(Map params) {
         Closure flatMap
+        println "1891891919191991919191919191919919191"
         flatMap = { map, prefix='' ->
             map.inject([:]) { object, v ->
                 if (v.value instanceof Map) {
@@ -314,7 +315,7 @@ class CriteriaUtils {
             }
         }
         Map res = [:]
-        flatMap(params).each{ k, v->
+                flatMap(params).each{ k, v->
             if (k.split("[.]")[-1] && gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(k.split("[.]")[-1])){
                res[k.split("[.]")[0..-2].join(".")] = [k.split("[.]")[-1], v]
             } else {
@@ -401,7 +402,7 @@ class CriteriaUtils {
             if (filters.quickSearch && domain.quickSearchFields){
                 criterias.delegate = delegate
                 String searchValue = filters.quickSearch.contains("%") ? filters.quickSearch : filters.quickSearch+"%"
-                criterias.call([or: domain.quickSearchFields.collect{["$it":["ilike()", searchValue]]}[0]], domain, params)
+                criterias.call([or: domain.quickSearchFields.collectEntries{["$it":["ilike()", searchValue]]}], domain, params)
                 return
             }
             criterias.delegate = delegate

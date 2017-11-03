@@ -1,12 +1,11 @@
-## Gorm-tools provides a set of static utils which allow us to manipulate with dates much easier.
+Gorm-tools provides a set of static utils which allow us to manipulate with dates much easier.
 
 See [DateUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/DateUtil.groovy)
 
 
 ### Parsing a date in a string
 
-
-**stringToDate** expects a string with date in the simple format "yyyy-MM-dd" and returns Date instance:
+```stringToDate``` expects a string with date in the simple format ```yyyy-MM-dd``` and returns Date instance:
 
 ```groovy
      Date date = DateUtil.stringToDate("2017-10-19")
@@ -27,7 +26,7 @@ it's a shortcut for **convertStringToDateTime**
 
 ### Converting Date instance to a string
 
-**dateToJsonString** converts a date to the format "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+```dateToJsonString``` converts a date to the format ```yyyy-MM-dd'T'HH:mm:ss.SSSZ```
 
 ```groovy
     Date date = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss').parse('2017-10-20 22:00:00')

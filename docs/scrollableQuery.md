@@ -1,6 +1,7 @@
-## Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL request.
+Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL request.
 See [ScrollableQuery](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy)
 
+### Execute a closure for each record
 
 As you can see in the example below, we can specify the SQL query and provide the closure which is called for each record:
 
@@ -12,9 +13,11 @@ As you can see in the example below, we can specify the SQL query and provide th
     }
 ```
 
-There is another useful feature. Using **eachBatch** we can execute the closure for a batch of records.
-The closure is called for a specified number of records. For example, code below prints size of each batch
-(which is equal to 5) to console:
+### Execute a closure for each batch of records
+
+Using ```eachBatch``` we can execute a closure for a batch of records.
+This closure is called for a specified number of records. For example, code below prints size of each batch
+(which is 5) to console:
 
 ```groovy
 
@@ -24,7 +27,7 @@ The closure is called for a specified number of records. For example, code below
 
 ```
 
-Also it possible to fetch a list of all records:
+### Fetching a list of all records:
 
 > NOTE: This method holds all rows in memory, so this should not be used if there is going to be large number of rows.
 

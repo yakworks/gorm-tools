@@ -9,8 +9,8 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 pages:
   - Overview: index.md
   - Id Generation: id-generation.md
-  - BeanPathTools: beanPathTools.md
-  - GormUtils: gormUtils.md
+  - Gorm utils: gorm-utils.md
+  - Working with object's fields: beanPathTools.md
   - Itearating over records: scrollableQuery.md
   - Working with dates: working-with-dates.md
 

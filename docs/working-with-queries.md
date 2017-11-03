@@ -1,4 +1,6 @@
-Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL request.
+Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL query.
+
+## ScrollableQuery
 See [ScrollableQuery](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy)
 
 ### Execute a closure for each record
@@ -36,3 +38,10 @@ This closure is called for a specified number of records. For example, code belo
     List values = scrollableQuery.rows("select * from ScrollableQueryTest where value='test'")
 
 ```
+
+## GrailsParameterMapRowMapper
+
+See [GrailsParameterMapRowMapper](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/GrailsParameterMapRowMapper.groovy)
+
+Row mapper which allows to convert data from a given ResultSet instance
+to a grails parameter map, which can be used for databinding.

@@ -11,8 +11,10 @@ pages:
   - Id Generation: id-generation.md
   - Gorm utils: gorm-utils.md
   - Working with object's fields: beanPathTools.md
-  - Itearating over records: scrollableQuery.md
+  - Working with queries: working-with-queries.md
   - Working with dates: working-with-dates.md
+  - Building response messages: building-response-messages.md
+  - Handling errors: error-handling.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

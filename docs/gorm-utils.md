@@ -53,10 +53,7 @@ As you can see we can specify nested properties simply by adding a ( ``` . ``` )
 or with existing object
 
 ```groovy
-    User user = new User(firstName: 'John', lastName: 'Doe' age: 30)
-    User user2 = new User()
-
-    User copy = GormUtils.copyDomain(user2, user)
+    User copy = GormUtils.copyDomain(new User(), user)
     assert copy.firstName == 'John'
     assert copy.lastName == 'Doe'
     assert copy.age == 30
@@ -67,12 +64,26 @@ or with existing object
 ### Getting a domain class
 
 ```groovy
-    // using a class
-    GormMetaUtils.getDomainClass(Org)
-
     // using a fully qualified name with package
     GormMetaUtils.getDomainClass("gorm.tools.Org")
 
     // using a domain instance
     GormMetaUtils.getDomainClass(new Org())
+
+    // using a class
+    GormMetaUtils.getDomainClass(Org)
+
+```
+
+### Getting a persistent entity
+
+```groovy
+    // using a fully qualified name with package
+    GormMetaUtils.getPersistentEntity("gorm.tools.Org")
+
+    // using a domain instance
+    GormMetaUtils.getPersistentEntity(new Org())
+
+    // using a class
+    GormMetaUtils.getPersistentEntity(Org)
 ```

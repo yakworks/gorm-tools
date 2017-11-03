@@ -1,7 +1,8 @@
 Gorm-tools provides a set of static utils which allow us to manipulate with dates much easier.
 
-See [DateUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/DateUtil.groovy)
+## DateUtil
 
+See [DateUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/DateUtil.groovy)
 
 ### Parsing a date in a string
 
@@ -79,4 +80,20 @@ or number of days
     assert 0 == DateUtil.getDaysBetween(now, now)
     assert -10 == DateUtil.getDaysBetween(now - 10, now)
     assert  10 == DateUtil.getDaysBetween(now + 10, now)
+```
+
+## MultiFormatDateConverter
+
+See [MultiFormatDateConverter](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/MultiFormatDateConverter.groovy)
+
+### Using a universal date converter
+
+```groovy
+
+    MultiFormatDateConverter converter = new MultiFormatDateConverter()
+
+    Date date = converter.convert("2017-10-13")          // passing date in format yyyy-MM-dd
+    Date date = converter.convert("10/13/2017")          // passing date in format MM/dd/yy
+    Date date = converter.convert("2017-10-13T10:00:00") // passing date in format yyyy-MM-dd'T'HH:mm:ss
+
 ```

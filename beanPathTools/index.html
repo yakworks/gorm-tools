@@ -11,7 +11,7 @@
         <meta name="description" content="Helpers for gorm">
       
       
-        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/id-generation/">
+        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/beanPathTools/">
       
       
         <meta name="author" content="Joshua Burnett">
@@ -23,7 +23,7 @@
     
     
       
-        <title>Id Generation - Gorm Tools</title>
+        <title>Working with object's fields - Gorm Tools</title>
       
     
     
@@ -121,7 +121,7 @@
             
               
             
-            Id Generation
+            Working with object's fields
           
         </span>
       </div>
@@ -243,64 +243,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Id Generation
-      </label>
-    
-    <a href="./" title="Id Generation" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../id-generation/" title="Id Generation" class="md-nav__link">
       Id Generation
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#database-id-generator" title="Database ID Generator" class="md-nav__link">
-    Database ID Generator
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#newobjectid-table" title="NewObjectId table" class="md-nav__link">
-    NewObjectId table
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configure-identity-generator-globally" title="Configure Identity generator globally." class="md-nav__link">
-    Configure Identity generator globally.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-idgenerator-programmatically" title="Using IdGenerator programmatically" class="md-nav__link">
-    Using IdGenerator programmatically
-  </a>
-  
-</li>
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -320,11 +267,57 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../beanPathTools/" title="Working with object's fields" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Working with object's fields
+      </label>
+    
+    <a href="./" title="Working with object's fields" class="md-nav__link md-nav__link--active">
       Working with object's fields
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-specified-objects-properties-to-a-map" title="Getting specified object's properties to a map" class="md-nav__link">
+    Getting specified object's properties to a map
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-nested-properties" title="Getting nested properties:" class="md-nav__link">
+    Getting nested properties:
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-all-objects-properties-to-a-map" title="Getting all object's properties to a map" class="md-nav__link">
+    Getting all object's properties to a map
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -395,29 +388,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#database-id-generator" title="Database ID Generator" class="md-nav__link">
-    Database ID Generator
+  <a href="#getting-specified-objects-properties-to-a-map" title="Getting specified object's properties to a map" class="md-nav__link">
+    Getting specified object's properties to a map
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#newobjectid-table" title="NewObjectId table" class="md-nav__link">
-    NewObjectId table
+  <a href="#getting-nested-properties" title="Getting nested properties:" class="md-nav__link">
+    Getting nested properties:
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configure-identity-generator-globally" title="Configure Identity generator globally." class="md-nav__link">
-    Configure Identity generator globally.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-idgenerator-programmatically" title="Using IdGenerator programmatically" class="md-nav__link">
-    Using IdGenerator programmatically
+  <a href="#getting-all-objects-properties-to-a-map" title="Getting all object's properties to a map" class="md-nav__link">
+    Getting all object's properties to a map
   </a>
   
 </li>
@@ -436,49 +422,45 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/id-generation.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/beanPathTools.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Id Generation</h1>
+                  <h1>Working with object's fields</h1>
                 
                 
-                <h3 id="database-id-generator">Database ID Generator<a class="headerlink" href="#database-id-generator" title="Permanent link">&para;</a></h3>
-<p>Dao plugin comes with an implementation of hibernate identity generator which uses a central table for incremental identity generation.</p>
-<h3 id="newobjectid-table">NewObjectId table<a class="headerlink" href="#newobjectid-table" title="Permanent link">&para;</a></h3>
-<p>In order to use identity generator provided by plugin, you need to create NewObjectId table as shown below.</p>
-<div class="codehilite"><pre><span></span><span class="k">create</span> <span class="k">table</span> <span class="n">NewObjectId</span>
-<span class="p">(</span>
-    <span class="n">KeyName</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span>
-    <span class="n">NextId</span> <span class="nb">bigint</span> <span class="k">not</span> <span class="k">null</span>
-<span class="p">)</span>
-<span class="p">;</span>
+                <p>Gorm-tools comes with BeanPathTools util which provides a convenient way for manipulating with object's properties.
+See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/BeanPathTools.groovy">BeanPathTools</a></p>
+<h3 id="getting-specified-objects-properties-to-a-map">Getting specified object's properties to a map<a class="headerlink" href="#getting-specified-objects-properties-to-a-map" title="Permanent link">&para;</a></h3>
+<p>In order to retrieve properties from an object and place them to a map we can use <code>buildMapFromPaths</code>
+We can possible to specify fields which should be added to the resulting map
+by providing a list with property names as the second argument.</p>
+<div class="codehilite"><pre><span></span>    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">firstName:</span> <span class="s1">&#39;John&#39;</span><span class="o">,</span> <span class="nl">lastName:</span> <span class="s1">&#39;Doe&#39;</span> <span class="nl">age:</span> <span class="mi">30</span><span class="o">)</span>
+
+    <span class="n">Map</span> <span class="n">userName</span> <span class="o">=</span> <span class="n">BeanPathTools</span><span class="o">.</span><span class="na">buildMapFromPaths</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="o">[</span><span class="s1">&#39;firstName&#39;</span><span class="o">,</span> <span class="s1">&#39;lastName&#39;</span><span class="o">])</span>
+    <span class="k">assert</span> <span class="n">userName</span> <span class="o">==</span> <span class="o">[</span><span class="nl">firstName:</span> <span class="s1">&#39;John&#39;</span><span class="o">,</span> <span class="nl">lastName:</span> <span class="s1">&#39;Doe&#39;</span><span class="o">]</span>
 </pre></div>
 
-<p>Here key name will be the name of the tables and NextId is the next id to return for the given table.</p>
-<h3 id="configure-identity-generator-globally">Configure Identity generator globally.<a class="headerlink" href="#configure-identity-generator-globally" title="Permanent link">&para;</a></h3>
-<p>The identity generator can be configured globally in application.groovy as shown below.</p>
-<div class="codehilite"><pre><span></span><span class="n">grails</span> <span class="o">{</span>
+<h3 id="getting-nested-properties">Getting nested properties:<a class="headerlink" href="#getting-nested-properties" title="Permanent link">&para;</a></h3>
+<p>It is also works well with nested properties. To get a nested property we need to specify
+a full path including parent field names divided with the ( <code>.</code> ) sign. See example below:</p>
+<div class="codehilite"><pre><span></span>    <span class="n">Address</span> <span class="n">address</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Address</span><span class="o">(</span><span class="nl">street1:</span> <span class="s1">&#39;street1&#39;</span><span class="o">,</span> <span class="nl">street2:</span> <span class="s1">&#39;street2&#39;</span> <span class="nl">zip:</span> <span class="s1">&#39;123456&#39;</span><span class="o">,</span> <span class="nl">city:</span> <span class="s1">&#39;city&#39;</span><span class="o">)</span>
+    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">firstName:</span> <span class="s1">&#39;John&#39;</span><span class="o">,</span> <span class="nl">lastName:</span> <span class="s1">&#39;Doe&#39;</span> <span class="nl">age:</span> <span class="mi">30</span><span class="o">,</span> <span class="nl">address:</span> <span class="n">address</span><span class="o">)</span>
 
-    <span class="n">gorm</span><span class="o">.</span><span class="na">default</span><span class="o">.</span><span class="na">mapping</span> <span class="o">=</span> <span class="o">{</span>
-        <span class="n">id</span> <span class="nl">column:</span> <span class="s1">&#39;id&#39;</span><span class="o">,</span> <span class="nl">generator:</span><span class="s1">&#39;gorm.tools.idgen.SpringIdGenerator&#39;</span>
-    <span class="o">}</span>
-<span class="o">}</span>
+    <span class="n">Map</span> <span class="n">street</span> <span class="o">=</span> <span class="n">BeanPathTools</span><span class="o">.</span><span class="na">buildMapFromPaths</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="o">[</span><span class="s1">&#39;address.street1&#39;</span><span class="o">,</span> <span class="s1">&#39;address.street2&#39;</span><span class="o">])</span>
+    <span class="k">assert</span> <span class="n">street</span> <span class="o">==</span> <span class="o">[</span><span class="nl">address:</span> <span class="o">[</span><span class="nl">street1:</span> <span class="s1">&#39;street1&#39;</span><span class="o">,</span> <span class="nl">street2:</span> <span class="s1">&#39;street2&#39;</span><span class="o">]]</span>
+
+    <span class="n">Map</span> <span class="n">fullAddress</span> <span class="o">=</span> <span class="n">BeanPathTools</span><span class="o">.</span><span class="na">buildMapFromPaths</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="o">[</span><span class="s1">&#39;address.*&#39;</span><span class="o">])</span>
+    <span class="k">assert</span> <span class="n">fullAddress</span> <span class="o">==</span> <span class="o">[</span><span class="nl">address:</span> <span class="o">[</span><span class="nl">street1:</span> <span class="s1">&#39;street1&#39;</span><span class="o">,</span> <span class="nl">street2:</span> <span class="s1">&#39;street2&#39;</span> <span class="nl">zip:</span> <span class="s1">&#39;123456&#39;</span><span class="o">,</span> <span class="nl">city:</span> <span class="s1">&#39;city&#39;</span><span class="o">]]</span>
 </pre></div>
 
-<p>This will use the SpringIdGenerator for all domains in the application. However it can be done per domain too if required.</p>
-<h3 id="using-idgenerator-programmatically">Using IdGenerator programmatically<a class="headerlink" href="#using-idgenerator-programmatically" title="Permanent link">&para;</a></h3>
-<p>Plugin defines a bean with name idGenerator that can be used to programmatically generate new Ids.
-Here is an example domain class.</p>
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
-    <span class="kd">transient</span> <span class="n">idGenerator</span>
-
-    <span class="kt">def</span> <span class="nf">beforeInsert</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">if</span><span class="o">(!</span><span class="n">id</span><span class="o">)</span> <span class="n">id</span> <span class="o">=</span> <span class="n">idGenerator</span><span class="o">.</span><span class="na">getNextId</span><span class="o">(</span><span class="s1">&#39;Book.id&#39;</span><span class="o">)</span>
-    <span class="o">}</span>
-<span class="o">}</span>
+<h3 id="getting-all-objects-properties-to-a-map">Getting all object's properties to a map<a class="headerlink" href="#getting-all-objects-properties-to-a-map" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>NOTE: in case of a domain instance the method looks only for persistent properties</p>
+</blockquote>
+<p>The ( <code>*</code> )  sign represents all properties. Thus in order to get all fields we can use it as shown below:</p>
+<div class="codehilite"><pre><span></span>    <span class="n">Map</span> <span class="n">userMap</span> <span class="o">=</span> <span class="n">BeanPathTools</span><span class="o">.</span><span class="na">buildMapFromPaths</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="o">[</span><span class="s1">&#39;*&#39;</span><span class="o">])</span>
+    <span class="k">assert</span> <span class="n">userMap</span> <span class="o">==</span> <span class="o">[</span><span class="nl">firstName:</span> <span class="s1">&#39;John&#39;</span><span class="o">,</span> <span class="nl">lastName:</span> <span class="s1">&#39;Doe&#39;</span> <span class="nl">age:</span> <span class="mi">30</span><span class="o">]</span>
 </pre></div>
-
-<p>Identity generator will check in NewObjectId table for keyName <code>Book</code> If it exists, it will return the value of NextId or else it will insert a new row in NewObjectId table.</p>
                 
                   
                 
@@ -497,7 +479,7 @@ Here is an example domain class.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href=".." title="Overview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../gorm-utils/" title="Gorm utils" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -506,19 +488,19 @@ Here is an example domain class.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Overview
+                Gorm utils
               </span>
             </div>
           </a>
         
         
-          <a href="../gorm-utils/" title="Gorm utils" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../working-with-queries/" title="Working with queries" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Gorm utils
+                Working with queries
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

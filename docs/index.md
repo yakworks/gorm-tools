@@ -11,23 +11,23 @@ Since we were setting up a bunch of services that looked a lot like the old scho
 * Problems with doing more advanced persistence that you can in beforeInsert, beforeUpdate, etc with the build in GORM. As mentioned in the gorm docs
 > Do not attempt to flush the session within an event (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError."
 
-    * we ran into a number of problems, as many do, with session managment here. A dao service creates simple centraolized contract for how to do this without suffering from the session limitations in hibernate/gorm
+    * we ran into a number of problems, as many do, with session management here. A dao service creates simple centralized contract for how to do this without suffering from the session limitations in hibernate/gorm
 
 If you are using envers or cascade saves then we want the saves and updates to be in a transaction by default and a proper thrown error to cause a roll back of all the changes. Not something you get with failOnError:false.
 
-**Example of the transaction propogation issue:** 
+**Example of the transaction propagation issue:**
 
-With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in  when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
+With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
 
 With this plugin and a controller you can just do:
 
 ```groovy
-def update(){
+def update() {
   try{
     def result = YourDomainClass.update(p)
       flash.message = result.message
       redirect(action: 'show', id: result.entity.id)
-  }catch(DomainException e){
+  } catch(DomainException e) {
     flash.message = e.messageMap
     render(view: 'edit', model: [(domainInstanceName): e.entity])
   }
@@ -38,16 +38,16 @@ Each domain gets injected with its own static dao object based on the GormDaoSup
 
 **Example** You can setup your own dao for the domain like so and keep the logic in your Dao service and leave the controller alone as all the logic will flow over
 
-See [GormDaoSupport](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/GormDaoSupport.groovy)
+See [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy)
 
-```
-class OrgDao extends GormDaoSupport{ 
+```groovy
+class OrgDao extends GormDaoSupport {
     def domainClass = Org
     
     def update(params){
-        ... do some stuff to the params
+        // ... do some stuff to the params
         def result = super.update(params)
-        ... do something like log history or send emai with result.entity which is the saved org
+        // ... do something like log history or send email with result.entity which is the saved org
         return result
     }
 }
@@ -61,25 +61,25 @@ class OrgDao extends GormDaoSupport{
     
 ### Dynamic methods added to the domains
 
-Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
+Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
 
-**persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a [DomainException](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
+**persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-**remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by defualt. Throws a [DomainException](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
+**remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by default. Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
 ### Statics added to the domain
 
-**insertAndSave(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (esentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
+**insertAndSave(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (essentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-**update(params)**:  calls the dao.update which does the bolier plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a (DomainException)[https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
+**update(params)**:  calls the dao.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-**remove(params)**:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a [DomainException](https://github.com/9ci/grails-dao/blob/master/dao-plugin/src/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong 
+**remove(params)**:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
 **dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
 
 ## DaoUtil and DaoMessage
 
-See [DaoUtil](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy)
+See [DaoUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy)
 
 #### DaoUtil:
 
@@ -95,7 +95,7 @@ See [DaoUtil](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main
 
 #### DaoMessage contains bunch of help methods for creating text messages
 
-See [DaoMessage](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/DaoMessage.groovy)
+See [DaoMessage](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoMessage.groovy)
 
 ## Grails 3:
 Dynamic methods were implemented with trait instead of meta programing, so now `@CompileStatic` can be used.
@@ -105,9 +105,9 @@ already have `insert` method and we can't have both static and instance methods 
 
 **Example** To be able to use advantages of the dao plugin for REST apps, extend controller from RestDaoController:
 
-See [RestDaoController](https://github.com/9ci/grails-dao/blob/grails3/dao-plugin/src/main/groovy/grails/plugin/dao/RestDaoController.groovy)
+See [RestDaoController](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/RestDaoController.groovy)
 
-```
+```groovy
 class OrgController extends RestDaoController<Org> {
     static responseFormats = ['json']
     static namespace = "api"

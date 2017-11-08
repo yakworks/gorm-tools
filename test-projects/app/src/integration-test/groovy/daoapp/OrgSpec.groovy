@@ -143,8 +143,7 @@ class OrgSpec extends Specification {
         List list = Org.dao.search([criteria:["testDate.le()": (new Date() +1).clearTime()], max: 150])
         then:
         list.size() == Org.createCriteria().list(){le "testDate", (new Date() +1).clearTime()}.size()
-        println(list*.name)
-        list[0].name == "Org#1"
+        list[0].name == Org.createCriteria().list(){le "testDate", (new Date() +1).clearTime()}[0].name
     }
 
     def "Filter by xxxId 1"() {
@@ -248,8 +247,8 @@ class OrgSpec extends Specification {
         when:
         List list = Org.dao.search([criteria:[id: ["gt()", "95"]], max: 150]).sort{it.id}
         then:
-        list.size() == 7
-        list[0].name == "Org#95"
+        list.size() == Org.createCriteria().list(){gt "id", 95L}.size()
+        list[0].name == Org.createCriteria().list(){gt "id", 95L}[0].name
     }
 
     def "Filter with `ge()`"(){
@@ -264,24 +263,24 @@ class OrgSpec extends Specification {
         when:
         List list = Org.dao.search([criteria:[revenue: ["ge()", "9500"]], max: 150]).sort{it.id}
         then:
-        list.size() == 5
-        list[0].name == "Org#95"
+        list.size() == Org.createCriteria().list(){ge "revenue", new BigDecimal("9500")}.size()
+        list[0].name == Org.createCriteria().list(){ge "revenue", new BigDecimal("9500")}[0].name
     }
 
     def "Filter with `lt()`"(){
         when:
         List list = Org.dao.search([criteria:[id: ["lt()", "5"]], max: 150]).sort{it.id}
         then:
-        list.size() == 3
-        list[0].name == "Org#1"
+        list.size() == Org.createCriteria().list(){lt "id", 5L}.size()
+        list[0].name == Org.createCriteria().list(){lt "id", 5L}[0].name
     }
 
-    def "Filter with `lte()`"(){
+    def "Filter with `le()`"(){
         when:
         List list = Org.dao.search([criteria:[id: ["le()", "5"]], max: 150]).sort{it.id}
         then:
-        list.size() == 4
-        list[0].name == "Org#1"
+        list.size() == Org.createCriteria().list(){le "id", 5L}.size()
+        list[0].name == Org.createCriteria().list(){le "id", 5L}[0].name
     }
 
 
@@ -289,7 +288,7 @@ class OrgSpec extends Specification {
         when:
         List list = Org.dao.search([criteria:[id: ["not in()", 2, 3, 4, 5]], max: 150])
         then:
-        list.size() == 97
+        list.size() == Org.createCriteria().list(){not{ inList "id", [2L, 3L, 4L, 5L]}}.size()
     }
 
 
@@ -297,7 +296,7 @@ class OrgSpec extends Specification {
         when:
         List list = Org.dao.search([criteria:[id: ["not in()", [2, 3, 4, 5]]], max: 150])
         then:
-        list.size() == 97
+        list.size() == Org.createCriteria().list(){not{ inList "id", [2L, 3L, 4L, 5L]}}.size()
     }
 
     def "test paging, defaults"(){

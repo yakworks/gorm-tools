@@ -255,8 +255,8 @@ class OrgSpec extends Specification {
         when:
         List list = Org.dao.search([criteria:[id: ['ge()', "95"]], max: 150]).sort{it.id}
         then:
-        list.size() == 8
-        list[0].name == "Org#94"
+        list.size() == Org.createCriteria().list(){ge "id", 95L}.size()
+        list[0].name == Org.createCriteria().list(){ge "id", 95L}[0].name
     }
 
     def "Filter with `ge()` for bigdecimal"(){

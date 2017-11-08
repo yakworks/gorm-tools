@@ -9,10 +9,16 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 pages:
   - Overview: index.md
   - Id Generation: id-generation.md
+  - Gorm utils: gorm-utils.md
+  - Working with object's fields: beanPathTools.md
+  - Working with queries: working-with-queries.md
+  - Working with dates: working-with-dates.md
+  - Building response messages: building-response-messages.md
+  - Handling errors: error-handling.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools
-repo_url: https://github.com/yakworks/gorm-rest-api
+repo_url: https://github.com/yakworks/gorm-tools
 edit_uri: edit/master/docs/
 
 # Config

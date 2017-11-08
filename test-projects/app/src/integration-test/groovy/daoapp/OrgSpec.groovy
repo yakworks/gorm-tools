@@ -143,6 +143,7 @@ class OrgSpec extends Specification {
         List list = Org.dao.search([criteria:["testDate.le()": (new Date() +1).clearTime()], max: 150])
         then:
         list.size() == Org.createCriteria().list(){le "testDate", (new Date() +1).clearTime()}.size()
+        println(list*.name)
         list[0].name == "Org#1"
     }
 

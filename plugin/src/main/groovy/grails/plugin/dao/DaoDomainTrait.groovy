@@ -1,7 +1,14 @@
 package grails.plugin.dao
 
+import grails.core.GrailsApplication
+import grails.util.GrailsNameUtils
+import grails.util.Holders
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.gorm.GormEntity
+import gorm.tools.hibernate.criteria.CriteriaUtils
+import grails.plugin.dao.*
 
 @CompileStatic
 trait DaoDomainTrait<D extends GormEntity> {
@@ -10,10 +17,34 @@ trait DaoDomainTrait<D extends GormEntity> {
 	/**
 	 * Looks up or creates and caches a dao bean
 	 * @return The dao
-	 */
+	 *//*
 	static GormDaoSupport getDao() {
 		if(!daoBean) daoBean = DaoUtil.getDao(this)
 		return daoBean
+	}*/
+
+
+	//TODO: investigate why it doesnt work without it
+	/**
+	 * Looks up or creates and caches a dao bean
+	 * @return The dao
+	 */
+	static GormDaoSupport<D> getDao() {
+		GrailsApplication grailsApplication = Holders.grailsApplication
+		String domainName = this.name
+		Class domainClass = grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domainName).clazz
+		String daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
+		GormDaoSupport<D> dao
+		if(grailsApplication.mainContext.containsBean(daoName)){
+			dao = (GormDaoSupport<D>)grailsApplication.mainContext.getBean(daoName)
+		}else{
+			dao = (GormDaoSupport<D>)grailsApplication.mainContext.getBean("gormDaoBean")
+			dao.domainClass = domainClass
+		}
+		if(!dao){
+			dao = GormDaoSupport.getInstance(domainClass)
+		}
+		return dao
 	}
 
 	D persist(Map args) {

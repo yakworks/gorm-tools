@@ -66,13 +66,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
      * @return List of resources or empty if it doesn't exist
      */
     protected List<T> listAllResources(Map params) {
-        Criteria crit = domainClass.createCriteria()
-        Pager pager = new Pager(params)
-        List datalist = crit.list(max: pager.max, offset: pager.offset) {
-            if (params.sort)
-                order(params.sort, params.order)
-        }
-        return datalist
+        dao.search(params)
     }
 
     def saveOrUpdate() {

@@ -138,11 +138,11 @@ class OrgSpec extends Specification {
         list[0].name == "Org#1"
     }
 
-    def "Filter by Date ge"() {
+    def "Filter by Date le"() {
         when:
         List list = Org.dao.search([criteria:["testDate.le()": (new Date() +1).clearTime()], max: 150])
         then:
-        list.size() == 1
+        list.size() == Org.createCriteria().list(){le "testDate", (new Date() +1).clearTime()}.size()
         list[0].name == "Org#1"
     }
 

@@ -168,6 +168,19 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		}
 		CriteriaUtils.list(criteria, this.thisDomainClass, params as Map, closure)
 	}
+	@CompileDynamic
+	List countTotals(Map params = [:], Closure closure = null) {
+			Map criteria
+			if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+				println "String criteria:  ${params['criteria']}"
+				JSON.use('deep')
+				criteria = JSON.parse(params['criteria']) as Map
+			} else {
+				println "Not String criteria:  ${params['criteria']}"
+				criteria = params['criteria'] as Map ?: [:]
+			}
+			CriteriaUtils.countTotals(criteria, this.thisDomainClass, params as Map, closure)
+	}
 
 	protected final Map<String, Object> doUpdate(Map params) {
 		T entity = get(params.id as Serializable)

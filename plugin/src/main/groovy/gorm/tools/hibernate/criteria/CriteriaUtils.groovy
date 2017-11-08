@@ -296,7 +296,6 @@ class CriteriaUtils {
     @CompileDynamic
     static Map flattenMap(Map params) {
         Closure flatMap
-        println "1891891919191991919191919191919919191"
         flatMap = { map, prefix='' ->
             map.inject([:]) { object, v ->
                 if (v.value instanceof Map) {
@@ -315,7 +314,7 @@ class CriteriaUtils {
             }
         }
         Map res = [:]
-                flatMap(params).each{ k, v->
+        flatMap(params).each{ k, v->
             if (k.split("[.]")[-1] && gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(k.split("[.]")[-1])){
                res[k.split("[.]")[0..-2].join(".")] = [k.split("[.]")[-1], v]
             } else {
@@ -326,7 +325,7 @@ class CriteriaUtils {
     }
 
     /**
-     * Closure that runs criteria restrictions for sertain types
+     * Closure that runs criteria restrictions for certain types
      */
     static Closure restriction = { key, val, type ->
         if (val != "")
@@ -342,8 +341,7 @@ class CriteriaUtils {
                     }
                 }
                 break
-            case (boolean):
-            case (Boolean):
+            case [Boolean, boolean]:
                 if (val instanceof List) { //just to handle cases if we get ["true"]
                     'in'(key, val.collect { it.toBoolean() })
                 } else {
@@ -357,15 +355,7 @@ class CriteriaUtils {
                     eq(key, toDate(val))
                 }
                 break
-            case (Integer):
-            case (int):
-            case (long):
-            case (double):
-            case (Double):
-            case (float):
-            case (Float):
-            case (Long):
-            case (BigDecimal):
+            case [Integer, int, long, double, Double, float, Float, Long, BigDecimal]:
                 if (val instanceof List || (val instanceof String && val.matches(/\[.*\]/))) {
                     restrictList(delegate, key, val, type)
                 } else {
@@ -379,8 +369,38 @@ class CriteriaUtils {
         if (val instanceof String) {
             DateUtil.parseJsonDate(val)
         } else {
-            val
+            val instanceof Date ? val : new Date(val) //for case when miliseconds are passed
         }
+    }
+
+    @CompileDynamic
+    static toType(val, type) {
+        if (val instanceof List) {
+            println "To type List: $val"
+            return val.collect {
+                gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(it) ? it : toType(it, type)
+            }
+        }
+        switch (type) {
+            case String:
+                val
+                break
+            case [Boolean, boolean]:
+                 val.toBoolean()// we cant use "asType" because 'false'.asType(Boolean) == true
+                break
+            case (Date):
+                toDate(val)
+                break
+            case [Integer, int, long, double, Double, float, Float, Long, BigDecimal]:
+                val.asType(type)
+                break
+        }
+    }
+
+    @CompileDynamic
+    static getType(val){
+        if (val instanceof List) return val[0].getClass()
+        val.getClass()
     }
 
     /**
@@ -399,10 +419,10 @@ class CriteriaUtils {
                 closure.delegate = delegate
                 closure.call()
             }
-            if (filters.quickSearch && domain.quickSearchFields){
+            if ((filters.quickSearch || filters.q) && domain.quickSearchFields){
+                String quickParams = filters.quickSearch ?: filters.q
                 criterias.delegate = delegate
-                String searchValue = filters.quickSearch.contains("%") ? filters.quickSearch : filters.quickSearch+"%"
-                criterias.call([or: domain.quickSearchFields.collectEntries{["$it":["ilike()", searchValue]]}], domain, params)
+                criterias.call([or: domain.quickSearchFields.collectEntries{["$it":["quickSearch()", quickParams]]}], domain, params)
                 return
             }
             criterias.delegate = delegate
@@ -423,11 +443,18 @@ class CriteriaUtils {
      * @return result
      */
     @CompileDynamic
-    static def get(Map filters, Class domain, Map params = [:], Closure closure) {
+    static List countTotals(Map filters, Class domain, Map params = [:], Closure closure) {
         Criteria criteria = domain.createCriteria()
         criteria.get() {
             criterias.delegate = delegate
             criterias.call(filters, domain, params)
+            if ((filters.quickSearch || filters.q) && domain.quickSearchFields){
+                String quickParams = filters.quickSearch ?: filters.q
+                criterias.delegate = delegate
+                String searchValue = quickParams.contains("%") ? quickParams : quickParams+"%"
+                criterias.call([or: domain.quickSearchFields.collectEntries{["$it":["quickSearch()", searchValue]]}], domain, params)
+                return
+            }
             closure.delegate = delegate
             closure.call()
         }
@@ -502,9 +529,7 @@ class CriteriaUtils {
     @CompileDynamic
     static private restrictList(delegate, key, list, type){
         if (list instanceof String) list = Eval.me(list)
-        println(list)
         if (key.matches(/.*[.]\d*$/)) key = key.split("[.]")[0..-2].join(".")
-        println(key)
         if (Statements.listAllowedStatements().contains(list[0])){
             println "Statements: ${list[0]} "
             List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()

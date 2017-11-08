@@ -31,6 +31,16 @@ class Statements {
                         delegate.ilike params.keySet()[0], params.values()[0][0]
                     }
             ],
+            [statements: ["quickSearch()"], restriction:
+                    { delegate, Map params ->
+                        if (params.values()[0][0] instanceof String){
+                            delegate.ilike params.keySet()[0], (params.values()[0][0].contains("%")?params.values()[0][0]:(params.values()[0][0]+"%"))
+                        } else {
+                            delegate.eq params.keySet()[0], params.values()[0][0]
+                        }
+
+                    }
+            ],
             [statements: ["like()"], restriction:
                     { delegate, Map params ->
                         delegate.like params.keySet()[0], params.values()[0][0]
@@ -43,6 +53,7 @@ class Statements {
             ],
             [statements: ["ge()"], restriction:
                     { delegate, Map params ->
+                        println "ge ${params.keySet()[0]}, ${params.values()[0][0]}"
                         delegate.ge params.keySet()[0], params.values()[0][0]
                     }
             ],

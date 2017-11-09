@@ -11,7 +11,7 @@
         <meta name="description" content="Helpers for gorm">
       
       
-        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/id-generation/">
+        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/mapql/">
       
       
         <meta name="author" content="Joshua Burnett">
@@ -23,7 +23,7 @@
     
     
       
-        <title>Id Generation - Gorm Tools</title>
+        <title>Criteria MapQL - Gorm Tools</title>
       
     
     
@@ -121,7 +121,7 @@
             
               
             
-            Id Generation
+            Criteria MapQL
           
         </span>
       </div>
@@ -243,64 +243,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Id Generation
-      </label>
-    
-    <a href="./" title="Id Generation" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../id-generation/" title="Id Generation" class="md-nav__link">
       Id Generation
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#database-id-generator" title="Database ID Generator" class="md-nav__link">
-    Database ID Generator
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#newobjectid-table" title="NewObjectId table" class="md-nav__link">
-    NewObjectId table
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configure-identity-generator-globally" title="Configure Identity generator globally." class="md-nav__link">
-    Configure Identity generator globally.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-idgenerator-programmatically" title="Using IdGenerator programmatically" class="md-nav__link">
-    Using IdGenerator programmatically
-  </a>
-  
-</li>
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -380,11 +327,18 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../mapql/" title="Criteria MapQL" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+    <a href="./" title="Criteria MapQL" class="md-nav__link md-nav__link--active">
       Criteria MapQL
     </a>
+    
   </li>
 
     
@@ -403,41 +357,6 @@
   
   
   
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#database-id-generator" title="Database ID Generator" class="md-nav__link">
-    Database ID Generator
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#newobjectid-table" title="NewObjectId table" class="md-nav__link">
-    NewObjectId table
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configure-identity-generator-globally" title="Configure Identity generator globally." class="md-nav__link">
-    Configure Identity generator globally.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-idgenerator-programmatically" title="Using IdGenerator programmatically" class="md-nav__link">
-    Using IdGenerator programmatically
-  </a>
-  
-</li>
-      
-      
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -448,49 +367,91 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/id-generation.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/mapql.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Id Generation</h1>
+                  <h1>Criteria MapQL</h1>
                 
                 
-                <h3 id="database-id-generator">Database ID Generator<a class="headerlink" href="#database-id-generator" title="Permanent link">&para;</a></h3>
-<p>Dao plugin comes with an implementation of hibernate identity generator which uses a central table for incremental identity generation.</p>
-<h3 id="newobjectid-table">NewObjectId table<a class="headerlink" href="#newobjectid-table" title="Permanent link">&para;</a></h3>
-<p>In order to use identity generator provided by plugin, you need to create NewObjectId table as shown below.</p>
-<div class="codehilite"><pre><span></span><span class="k">create</span> <span class="k">table</span> <span class="n">NewObjectId</span>
-<span class="p">(</span>
-    <span class="n">KeyName</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span>
-    <span class="n">NextId</span> <span class="nb">bigint</span> <span class="k">not</span> <span class="k">null</span>
-<span class="p">)</span>
-<span class="p">;</span>
+                <p>Gorm-tools adds <code>search(params, closure)</code> method to domains. It allows to get list of entities restricted by
+properties. Params could be passed as JSON string or Map. All restrictions should be under <code>criteria</code> keyword, see example 
+bellow.</p>
+<p><strong>Example</strong></p>
+<div class="codehilite"><pre><span></span>Org.dao.search([criteria: [name: &quot;Nam%&quot;, type: &quot;New&quot;], max: 20]) {gt &quot;id&quot;, 5}
 </pre></div>
 
-<p>Here key name will be the name of the tables and NextId is the next id to return for the given table.</p>
-<h3 id="configure-identity-generator-globally">Configure Identity generator globally.<a class="headerlink" href="#configure-identity-generator-globally" title="Permanent link">&para;</a></h3>
-<p>The identity generator can be configured globally in application.groovy as shown below.</p>
-<div class="codehilite"><pre><span></span><span class="n">grails</span> <span class="o">{</span>
+<p>The same result can be reached with criteria:</p>
+<div class="codehilite"><pre><span></span>Criteria criteria = Org.createCriteria()
+criteria.list(max: 20) {
+    like &quot;name&quot;, &quot;Nam%&quot;
+    eq &quot;type&quot;, &quot;New&quot;
+    gt &quot;id&quot;, 5
+}
+</pre></div>
 
-    <span class="n">gorm</span><span class="o">.</span><span class="na">default</span><span class="o">.</span><span class="na">mapping</span> <span class="o">=</span> <span class="o">{</span>
-        <span class="n">id</span> <span class="nl">column:</span> <span class="s1">&#39;id&#39;</span><span class="o">,</span> <span class="nl">generator:</span><span class="s1">&#39;gorm.tools.idgen.SpringIdGenerator&#39;</span>
+<p>So we can specify just parameters in criteria block, and if any specific restriction is needed it can be added
+with closure</p>
+<p>Bellow will be a list of supported syntax for params in json format, which is supported:</p>
+<p><div class="codehilite"><pre><span></span><span class="p">{</span>
+    <span class="err">criteria:</span> <span class="err">{</span>
+      <span class="nt">&quot;ponum&quot;</span><span class="p">:</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="err">/*</span> <span class="err">if</span> <span class="err">its</span> <span class="err">a</span> <span class="err">single</span> <span class="err">value</span> <span class="err">eq</span> <span class="err">is</span> <span class="err">default,</span> <span class="err">if</span> <span class="err">it</span> <span class="err">contains</span> <span class="err">%</span> <span class="err">then</span> <span class="err">it</span> <span class="err">uses</span> <span class="err">ilike</span> <span class="err">*/</span>
+      <span class="nt">&quot;reconciled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="err">/*</span> <span class="err">boolean</span> <span class="err">*/</span>
+      <span class="nt">&quot;tranDate&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-04-23T00:00:00.000Z&quot;</span><span class="p">,</span> <span class="err">/*</span> <span class="err">date</span> <span class="err">*/</span>
+      <span class="nt">&quot;customer.id&quot;</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span> 
+      <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span> <span class="err">/*works</span> <span class="err">in</span> <span class="err">the</span> <span class="err">same</span> <span class="err">way</span> <span class="err">as</span> <span class="err">`customer.id</span><span class="nt">&quot;:101` */</span>
+<span class="nt">      &quot;</span><span class="err">customer</span><span class="s2">&quot;:{&quot;</span><span class="err">id</span><span class="s2">&quot;:101}, /* or object way */</span>
+<span class="s2">      &quot;</span><span class="err">or</span><span class="s2">&quot;:{ /*TODO: works only if it is one in `criteria`, and currently only on first level*/</span>
+<span class="s2">        &quot;</span><span class="err">customer.name</span><span class="s2">&quot;:[&quot;</span><span class="err">ilike()</span><span class="s2">&quot;,&quot;</span><span class="err">wal%</span><span class="s2">&quot;],</span>
+<span class="s2">        &quot;</span><span class="err">customer.num</span><span class="s2">&quot;:[&quot;</span><span class="err">ilike()</span><span class="s2">&quot;,&quot;</span><span class="err">wal%</span><span class="s2">&quot;]</span>
+<span class="s2">      },</span>
+<span class="s2">      &quot;</span><span class="err">docType</span><span class="s2">&quot;: [&quot;</span><span class="err">PA</span><span class="s2">&quot;,&quot;</span><span class="err">CM</span><span class="s2">&quot;], /* an array means it will use in/inList */  </span>
+<span class="s2">      &quot;</span><span class="err">docType</span><span class="s2">&quot;: [&quot;</span><span class="err">in()</span><span class="s2">&quot;,[&quot;</span><span class="err">PA</span><span class="s2">&quot;,&quot;</span><span class="err">CM</span><span class="s2">&quot;]], /* the above ins would be a short cut for this*/</span>
+<span class="s2">      &quot;</span><span class="err">docType</span><span class="s2">&quot;: [&quot;</span><span class="err">in()</span><span class="s2">&quot;, &quot;</span><span class="err">PA</span><span class="s2">&quot; ,&quot;</span><span class="err">CM</span><span class="s2">&quot;], /* the above ins would be a short cut for this*/</span>
+<span class="s2">      &quot;</span><span class="err">tranType.id</span><span class="s2">&quot;: [&quot;</span><span class="err">not</span> <span class="err">in()</span><span class="s2">&quot;,[1,2,3]],/* will translate to &quot;</span><span class="err">not</span><span class="p">{</span> <span class="err">in(</span><span class="nt">&quot;tranType.id&quot;</span><span class="p">,</span><span class="err">[1,2,3])]</span><span class="nt">&quot; */</span>
+<span class="nt">      &quot;</span><span class="err">refnum</span><span class="s2">&quot;: [&quot;</span><span class="err">ilike()</span><span class="s2">&quot;,&quot;</span><span class="mi">123</span><span class="err">%</span><span class="s2">&quot;], /* a case-insensitive &#39;like&#39; expression */</span>
+<span class="s2">      &quot;</span><span class="err">refnum</span><span class="s2">&quot;: [&quot;</span><span class="err">like()</span><span class="s2">&quot;,&quot;</span><span class="mi">123</span><span class="err">%</span><span class="s2">&quot;], /* equivalent to SQL like expression */</span>
+<span class="s2">      &quot;</span><span class="err">amount</span><span class="s2">&quot;: [&quot;</span><span class="err">between()</span><span class="s2">&quot;,0,100], /* between value */</span>
+<span class="s2">      &quot;</span><span class="err">oldAmount.gt()</span><span class="s2">&quot;: &quot;</span><span class="err">origAmount</span><span class="s2">&quot;/* greater than value, the same as bellow*/</span>
+<span class="s2">      &quot;</span><span class="err">oldAmount</span><span class="s2">&quot;: [&quot;</span><span class="err">gt()</span><span class="s2">&quot;,&quot;</span><span class="err">origAmount</span><span class="s2">&quot;], /* greater than value */</span>
+<span class="s2">      &quot;</span><span class="err">oldAmount</span><span class="s2">&quot;: [&quot;</span><span class="err">ge()</span><span class="s2">&quot;,&quot;</span><span class="err">origAmount</span><span class="s2">&quot;], /* greater or equal than value */&quot;</span>
+      <span class="err">oldAmount</span><span class="s2">&quot;: [&quot;</span><span class="err">lt()</span><span class="s2">&quot;,&quot;</span><span class="err">origAmount</span><span class="s2">&quot;], /* less than value */</span>
+<span class="s2">      &quot;</span><span class="err">oldAmount</span><span class="s2">&quot;: [&quot;</span><span class="err">le()</span><span class="s2">&quot;,&quot;</span><span class="err">origAmount</span><span class="s2">&quot;], /* less or equal than value */</span>
+<span class="s2">      &quot;</span><span class="err">amount</span><span class="s2">&quot;: [&quot;</span><span class="err">ne()</span><span class="s2">&quot;,50], /*not equal*/</span>
+<span class="s2">      &quot;</span><span class="err">status.id</span><span class="s2">&quot;: [1,2,3], /* an array means it will use in/inList */</span>
+<span class="s2">      &quot;</span><span class="err">status</span><span class="s2">&quot;: [{&quot;</span><span class="err">id</span><span class="s2">&quot;:1},{&quot;</span><span class="err">id</span><span class="s2">&quot;:2},{&quot;</span><span class="err">id</span><span class="s2">&quot;:3}], /* an array means it will use in/inList */</span>
+<span class="s2">      &quot;</span><span class="err">status</span><span class="s2">&quot;: [&quot;</span><span class="err">isNull()</span><span class="s2">&quot;], /* translates to isNull*/</span>
+<span class="s2">    },</span>
+<span class="s2">  &quot;</span><span class="err">order</span><span class="s2">&quot;:[{&quot;</span><span class="err">tranDate</span><span class="s2">&quot;:&quot;</span><span class="err">ASC</span><span class="s2">&quot;},{&quot;</span><span class="err">customer.name</span><span class="s2">&quot;,&quot;</span><span class="err">desc&quot;</span><span class="p">}</span><span class="err">]</span>
+<span class="p">}</span>
+</pre></div>
+<strong>Quick Search</strong></p>
+<p>Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
+search can be passed in <code>quickSearch</code> or <code>q</code> keywords. The list of fields should be specified in static property <code>quickSearchFields</code>, see bellow:</p>
+<p><div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Org</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">name</span>
+    <span class="n">Address</span> <span class="n">address</span>
+
+    <span class="kd">static</span> <span class="n">quickSearchFields</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">,</span> <span class="s2">&quot;address.city&quot;</span><span class="o">]</span>
+    <span class="o">...</span>
+</pre></div>
+So intelligent search will add <code>%</code> automatically for cases when searchable property is String, if quick search string doesn't have it and will apply <code>ilike</code> statement
+for each field in <code>quickSearchFields</code>.</p>
+<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">search</span><span class="o">([</span><span class="nl">criteria:</span> <span class="o">[</span><span class="nl">quickSearch:</span> <span class="s2">&quot;abc&quot;</span><span class="o">],</span> <span class="nl">max:</span> <span class="mi">20</span><span class="o">])</span>
+</pre></div>
+
+<p><div class="codehilite"><pre><span></span><span class="n">Criteria</span> <span class="n">criteria</span> <span class="o">=</span> <span class="n">Org</span><span class="o">.</span><span class="na">createCriteria</span><span class="o">()</span>
+<span class="n">criteria</span><span class="o">.</span><span class="na">list</span><span class="o">(</span><span class="nl">max:</span> <span class="mi">20</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">or</span> <span class="o">{</span>
+        <span class="n">ilike</span> <span class="s2">&quot;name&quot;</span><span class="o">,</span> <span class="s2">&quot;abc%&quot;</span>
+        <span class="n">ilike</span> <span class="s2">&quot;address.city&quot;</span><span class="o">,</span> <span class="s2">&quot;abc%&quot;</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
-
-<p>This will use the SpringIdGenerator for all domains in the application. However it can be done per domain too if required.</p>
-<h3 id="using-idgenerator-programmatically">Using IdGenerator programmatically<a class="headerlink" href="#using-idgenerator-programmatically" title="Permanent link">&para;</a></h3>
-<p>Plugin defines a bean with name idGenerator that can be used to programmatically generate new Ids.
-Here is an example domain class.</p>
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
-    <span class="kd">transient</span> <span class="n">idGenerator</span>
-
-    <span class="kt">def</span> <span class="nf">beforeInsert</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">if</span><span class="o">(!</span><span class="n">id</span><span class="o">)</span> <span class="n">id</span> <span class="o">=</span> <span class="n">idGenerator</span><span class="o">.</span><span class="na">getNextId</span><span class="o">(</span><span class="s1">&#39;Book.id&#39;</span><span class="o">)</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-<p>Identity generator will check in NewObjectId table for keyName <code>Book</code> If it exists, it will return the value of NextId or else it will insert a new row in NewObjectId table.</p>
+Keep in mind that quickSearch has higher priority then regular search fields, and if params are 
+<code>[criteria: [quickSearch: &quot;abc&quot;, id: 5]]</code>, then <code>id</code> restriction will be ignored, but criteria that is passed to search
+as closure will be executed in any case</p>
+<p><strong>Count totals</strong>
+TODO: add count totals that should work in the same way as search</p>
                 
                   
                 
@@ -509,7 +470,7 @@ Here is an example domain class.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href=".." title="Overview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../error-handling/" title="Handling errors" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -518,25 +479,11 @@ Here is an example domain class.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Overview
+                Handling errors
               </span>
             </div>
           </a>
         
-        
-          <a href="../gorm-utils/" title="Gorm utils" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Gorm utils
-              </span>
-            </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
         
       </nav>
     </div>

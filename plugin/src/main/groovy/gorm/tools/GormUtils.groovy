@@ -41,7 +41,7 @@ class GormUtils {
         if (target == null) throw new IllegalArgumentException("Target is null")
         if (source == null) return null
 
-        GormMetaUtils.getDomainClass(source.class).persistentProperties.each { GrailsDomainClassProperty dp ->
+        GormMetaUtils.getDomainClass(target.class).persistentProperties.each { GrailsDomainClassProperty dp ->
             if (IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
             if (ignoreAssociations && dp.isAssociation()) return
 

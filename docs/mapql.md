@@ -80,11 +80,23 @@ amount: {
       "tranDate": "2012-04-23T00:00:00.000Z", /* date */
       "customer.id": 101,
       "customerId": 101, /*works in the same way as `customer.id:101` */
-      "customer":{"id":101}, /* or object way */
-      "or":{ /*TODO: works only if it is one in `criteria`, and currently only on first level*/
+      "customer":{"id":101}, /* object way */
+      "$or":{ /*TODO: works only if it is one in `criteria`, and currently only on first level*/
         "customer.name":["$ilike": "wal"],
         "customer.num":["$like": "wal%"]
       },
+     "$and": [{ //multiple ors would need to look like this in here. I think we need to look here
+                //https://github.com/2do2go/json-sql/blob/master/tests/1_select.js#L1228 and see the conditions they use
+						$or: {
+							name: 'John',
+							age: 12
+						}
+					}, {
+						$or: {
+							name: 'Mark',
+							age: 14
+						}
+					}]
       "docType": ["PA","CM"], /* an array means it will use in/inList */  
       "docType": ["$in": ["PA","CM"]], /* the above ins would be a short cut for this*/
       //deprecate "docType": ["$in""PA" ,"CM"], /* the above ins would be a short cut for this*/

@@ -14,7 +14,7 @@ with inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
 ```
 Org.dao.list([
   criteria: [name: "Virgin%", type: "New"],
-  order: {name:1},
+  order: {name:"asc"}, // As for me "asc"/"desc" is better then 1/-1 //TODO: Josh, what do you think?
   max: 20
 ]){
   gt "id", 5
@@ -29,6 +29,7 @@ criteria.list(max: 20) {
     like "name", "Nam%"
     eq "type", "New"
     gt "id", 5
+    order("name", "asc")
 }
 ```
 
@@ -45,32 +46,25 @@ criteria.list(max: 20) {
 
 ## Comparison
 
+//We can several syntax from mongo and grails for example $gte or $ge //TODO: Josh, what do you think?
+
 |     Op     |                       Description                       |                    Example                     |
 | ---------- | ------------------------------------------------------- | ---------------------------------------------- |
 | $gt        | >                                                       | `"salary": {"$gt": 10000}`                     |
-| $gte       | >=                                                      | `"salary": {"$gte": 10000}`                    |
+| $gte or $ge| >=                                                      | `"salary": {"$gte": 10000}`                    |
 | $lt        | <                                                       | `"salary": {"$lt": 10000}`                     |
-| $lte       | <=                                                      | `"salary": {"$lte": 10000}`                    |
+| $lte or $le| <=                                                      | `"salary": {"$lte": 10000}`                    |
 | $between   | Where the property value is between two distinct values | `"age": {"$between": [18, 35]}`                |
 | $like      | Equivalent to SQL like expression                       | `"name": {"$like": "Joh%"}`                    |
-| $ilike     | A case-insensitive 'like' expression, auto appends `%`  | `"name": {"$ilike": "Joh"}`                    |
+| $ilike     | A case-insensitive 'like' expression                    | `"name": {"$ilike": "Joh"}`                    |
 | $ne        | not equal, !=, <>                                       | `"age" : {"$ne" : 12}}`                        |
 | $in        | Match any value in array                                | `{"field" : {"$in" : [value1, value2, ...]}`   |
 | $nin       | Not match any value in array                            | `{"field" : {"$nin" : [value1, value2, ...]}}` |
-| $isNull    |                                                         |                                                |
-| $isNotNull |                                                         |                                                |
+| $isNull    | Value is null                                           | `"name": ["$isNull"]                           |
+| $isNotNull |                                                         | `"name": ["$isNotNull"]                        |
 
 Bellow will be a list of supported syntax for params in json format, which is supported:
 
-something like this should work too when combining
-
-```
-amount: {
-	$gt: 5.0,
-	$lt: 15.50,
-	$ne: 9.99
-}
-```
 
 ```json
 {
@@ -79,7 +73,7 @@ amount: {
       "reconciled": true, /* boolean */
       "tranDate": "2012-04-23T00:00:00.000Z", /* date */
       "customer.id": 101,
-      "customerId": 101, /*works in the same way as `customer.id:101` */
+      "customerId": 101, /*check if domain has `customerId` property, if not then uses `customer.id:101` */
       "customer":{"id":101}, /* object way */
       "$or":{ /*TODO: works only if it is one in `criteria`, and currently only on first level*/
         "customer.name":["$ilike": "wal"],
@@ -97,6 +91,20 @@ amount: {
 							age: 14
 						}
 					}]
+					
+	  "$or": [ // I think the best syntax is one $or, if it is map then use it like is, if it 
+	          // is array then transform to several `or` statements //TODO: Josh, what do you think?
+	                        {
+        							name: 'John',
+        							age: 12
+        						}
+        					}, {
+        						$or: {
+        							name: 'Mark',
+        							age: 14
+        						}
+        					}
+	  ]
       "docType": ["PA","CM"], /* an array means it will use in/inList */  
       "docType": ["$in": ["PA","CM"]], /* the above ins would be a short cut for this*/
       //deprecate "docType": ["$in""PA" ,"CM"], /* the above ins would be a short cut for this*/
@@ -105,15 +113,20 @@ amount: {
       "refnum": ["$ilike": "123"], /* a case-insensitive 'like' expression append the % */
       "refnum": ["$like": "123%"], /* equivalent to SQL like expression */
       "amount": ["$between":[0,100]], /* between value */
-      "oldAmount.gt()": "origAmount"/* greater than value, the same as bellow*/
-      "oldAmount": ["gt()","origAmount"], /* greater than value */
-      "oldAmount": ["ge()","origAmount"], /* greater or equal than value */"
-      oldAmount": ["lt()","origAmount"], /* less than value */
-      "oldAmount": ["le()","origAmount"], /* less or equal than value */
-      "amount": ["ne()",50], /*not equal*/
+      "oldAmount.$gt": "origAmount"/* greater than value, the same as bellow*/
+      "oldAmount": ["$gt","origAmount"], /* greater than value */
+      "oldAmount": ["$ge","origAmount"], /* greater or equal than value */"
+      "amount": { /*will translate into {gt "amount", 5.0; lt "amount",15.50; not{ eq "amount", 9.99}}*/
+      	"$gt": 5.0,
+      	"$lt": 15.50,
+      	"$ne": 9.99
+      },
+      oldAmount": ["$lt","origAmount"], /* less than value */
+      "oldAmount": ["$le","origAmount"], /* less or equal than value */
+      "amount": ["$ne",50], /*not equal*/
       "status.id": [1,2,3], /* an array means it will use in/inList */
       "status": [{"id":1},{"id":2},{"id":3}], /* an array means it will use in/inList */
-      "status": ["isNull()"], /* translates to isNull*/
+      "status": ["$isNull"], /* translates to isNull*/
     },
   "sort":[{"tranDate":"ASC"},{"customer.name","desc"}]
 }
@@ -121,7 +134,8 @@ amount: {
 **Quick Search**
 
 Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
-search can be passed in `quickSearch` or `q` keywords. The list of fields should be specified in static property `quickSearchFields`, see bellow:
+search can be passed in `quickSearch` or `q` keywords. The list of fields should be specified in static property `quickSearchFields`
+as list of strings, see bellow:
 
 ```groovy
 class Org {
@@ -132,8 +146,8 @@ class Org {
     ...
 
 ```
-So intelligent search will add `%` automatically for cases when searchable property is String, if quick search string doesn't have it and will apply `ilike` statement
-for each field in `quickSearchFields`.
+So mapQL will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
+for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
 Org.dao.search([criteria: [quickSearch: "abc"], max: 20])

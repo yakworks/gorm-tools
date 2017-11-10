@@ -8,30 +8,30 @@ class Statements {
      * List of statements that can be used in search
      */ //TODO: maybe should be able to extended from config
     private static List statements = [
-            [statements: ["in()", "inList()"], restriction:
+            [statements: ["\$in", "\$inList"], restriction:
                     { delegate, Map params ->
                         delegate.in params.keySet()[0], params.values()[0]
                     }
             ],
-            [statements: ["not in()"], restriction:
+            [statements: ["\$nin"], restriction:
                     { delegate, Map params ->
                         delegate.not {
                             delegate.in params.keySet()[0], params.values()[0]
                         }
                     }
             ],
-            [statements: ["between()"], restriction:
+            [statements: ["\$between"], restriction:
                     { delegate, Map params ->
                         delegate.gte params.keySet()[0], params.values()[0][0]
                         delegate.lte params.keySet()[0], params.values()[0][1]
                     }
             ],
-            [statements: ["ilike()"], restriction:
+            [statements: ["\$ilike"], restriction:
                     { delegate, Map params ->
                         delegate.ilike params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["quickSearch()"], restriction:
+            [statements: ["\$quickSearch"], restriction:
                     { delegate, Map params ->
                         if (params.values()[0][0] instanceof String){
                             delegate.ilike params.keySet()[0], (params.values()[0][0].contains("%")?params.values()[0][0]:(params.values()[0][0]+"%"))
@@ -41,38 +41,38 @@ class Statements {
 
                     }
             ],
-            [statements: ["like()"], restriction:
+            [statements: ["\$like"], restriction:
                     { delegate, Map params ->
                         delegate.like params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["gt()"], restriction:
+            [statements: ["\$gt"], restriction:
                     { delegate, Map params ->
                         delegate.gt params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["ge()"], restriction:
+            [statements: ["\$ge"], restriction:
                     { delegate, Map params ->
                         println "ge ${params.keySet()[0]}, ${params.values()[0][0]}"
                         delegate.ge params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["lt()"], restriction:
+            [statements: ["\$lt"], restriction:
                     { delegate, Map params ->
                         delegate.lt params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["le()"], restriction:
+            [statements: ["\$le"], restriction:
                     { delegate, Map params ->
                         delegate.le params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["ne()"], restriction:
+            [statements: ["\$ne"], restriction:
                     { delegate, Map params ->
                         delegate.ne params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["isNull()"], restriction:
+            [statements: ["\$isNull"], restriction:
                     { delegate, Map params ->
                         delegate.isNull params.keySet()[0], params.values()[0][0]
                     }

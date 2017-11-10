@@ -140,7 +140,7 @@ class OrgSpec extends Specification {
 
     def "Filter by Date le"() {
         when:
-        List list = Org.dao.search([criteria:["testDate.le()": (new Date() +1).clearTime()], max: 150])
+        List list = Org.dao.search([criteria:["testDate.\$le": (new Date() +1).clearTime()], max: 150])
         then:
         list.size() == Org.createCriteria().list(){le "testDate", (new Date() +1).clearTime()}.size()
         list[0].name == Org.createCriteria().list(){le "testDate", (new Date() +1).clearTime()}[0].name
@@ -190,18 +190,35 @@ class OrgSpec extends Specification {
     }
 
 
-    def "Filter with `or`"(){
+    def "Filter with `or` "(){
         when:
-        List list = Org.dao.search([criteria:[or: ["name": "Org#1", "address.id": "4" ]], max: 150])
+        List list = Org.dao.search([criteria:["\$or": ["name": "Org#1", "address.id": "4" ]], max: 150])
         then:
         list.size() == 2
         list[0].name == "Org#1"
         list[1].name == "Org#3"
     }
 
+    def "Filter with `or` on low level"(){
+        when:
+        List list = Org.dao.search([criteria:[address: ["\$or":["city": "City#1", "id": "4" ]]], max: 150])
+        then:
+        list.size() == 2
+        list[0].name == "Org#1"
+        list[1].name == "Org#3"
+    }
+
+    def "Filter with several `or` on one level"(){
+        when:
+        List list = Org.dao.search([criteria:["\$or": [["address.id": "5" ], ["name": "Org#1", "address.id": "4" ]]], max: 150])
+        then:
+        list.size() == 2
+        list[1].name == "Org#3"
+    }
+
     def "Filter with `or` with like"(){
         when:
-        List list = Org.dao.search([criteria:[or: ["name": "Org#2%", "address.id": "4" ]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:["\$or": ["name": "Org#2%", "address.id": "4" ]], max: 150]).sort{it.id}
         then:
         list.size() == 12
         list[0].name == "Org#2"
@@ -211,7 +228,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `between()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["between()", 2, 10]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ["\$between", 2, 10]], max: 150]).sort{it.id}
         then:
         list.size() == 9
         list[0].name == "Org#1"
@@ -221,21 +238,21 @@ class OrgSpec extends Specification {
 
     def "Filter with `in()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["in()", "24", "25"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ["\$in", "24", "25"]], max: 150]).sort{it.id}
         then:
         list.size() == 2
         list[0].name == "Org#23"
     }
     def "Filter with `inList()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["inList()", "24", "25"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ["\$inList", "24", "25"]], max: 150]).sort{it.id}
         then:
         list.size() == 2
         list[0].name == "Org#23"
     }
     def "Filter by Name ilike()"() {
         when:
-        List list = Org.dao.search([criteria:[name:["ilike()", "Org#2%"]], max: 150])
+        List list = Org.dao.search([criteria:[name:["\$ilike", "Org#2%"]], max: 150])
         then:
         list.size() == 11
         list[0].name == "Org#2"
@@ -245,7 +262,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `gt()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["gt()", "95"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ["\$gt", "95"]], max: 150]).sort{it.id}
         then:
         list.size() == Org.createCriteria().list(){gt "id", 95L}.size()
         list[0].name == Org.createCriteria().list(){gt "id", 95L}[0].name
@@ -253,7 +270,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `ge()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ['ge()', "95"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ['\$ge', "95"]], max: 150]).sort{it.id}
         then:
         list.size() == Org.createCriteria().list(){ge "id", 95L}.size()
         list[0].name == Org.createCriteria().list(){ge "id", 95L}[0].name
@@ -261,7 +278,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `ge()` for bigdecimal"(){
         when:
-        List list = Org.dao.search([criteria:[revenue: ["ge()", "9500"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[revenue: ["\$ge", "9500"]], max: 150]).sort{it.id}
         then:
         list.size() == Org.createCriteria().list(){ge "revenue", new BigDecimal("9500")}.size()
         list[0].name == Org.createCriteria().list(){ge "revenue", new BigDecimal("9500")}[0].name
@@ -269,7 +286,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `lt()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["lt()", "5"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ["\$lt", "5"]], max: 150]).sort{it.id}
         then:
         list.size() == Org.createCriteria().list(){lt "id", 5L}.size()
         list[0].name == Org.createCriteria().list(){lt "id", 5L}[0].name
@@ -277,7 +294,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `le()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["le()", "5"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[id: ["\$le", "5"]], max: 150]).sort{it.id}
         then:
         list.size() == Org.createCriteria().list(){le "id", 5L}.size()
         list[0].name == Org.createCriteria().list(){le "id", 5L}[0].name
@@ -286,7 +303,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `not in()`"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["not in()", 2, 3, 4, 5]], max: 150])
+        List list = Org.dao.search([criteria:[id: ["\$nin", 2, 3, 4, 5]], max: 150])
         then:
         list.size() == Org.createCriteria().list(){not{ inList "id", [2L, 3L, 4L, 5L]}}.size()
     }
@@ -294,7 +311,7 @@ class OrgSpec extends Specification {
 
     def "Filter with `not in()` with ids in array"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["not in()", [2, 3, 4, 5]]], max: 150])
+        List list = Org.dao.search([criteria:[id: ["\$nin", [2, 3, 4, 5]]], max: 150])
         then:
         list.size() == Org.createCriteria().list(){not{ inList "id", [2L, 3L, 4L, 5L]}}.size()
     }
@@ -325,7 +342,7 @@ class OrgSpec extends Specification {
 
     def "test closure with params"(){
         when:
-        List list = Org.dao.search([criteria:[id: ["in()", "24", "25", "18", "19"]], max: 150]) {
+        List list = Org.dao.search([criteria:[id: ["\$in", "24", "25", "18", "19"]], max: 150]) {
             gt "id", 19L
         }
         then:
@@ -337,18 +354,18 @@ class OrgSpec extends Specification {
 
     def "test quick search"(){
         when:
-        List list = Org.dao.search([criteria:[quickSearch: "Org#2"], max: 150])
+        List list = Org.dao.search([criteria:["quickSearch": "Org#2"], max: 150])
         then:
         list.size() == 11
 
     }
 
-   /* def "test quick search is higher priority then other filters"(){
+    def "test quick search is higher priority then other filters"(){
         when:
-        List list = Org.dao.search([criteria:[quickSearch: "Org-num#1", id: 123], max: 150])
+        List list = Org.dao.search([criteria:["quickSearch": "Org-num#1", id: 123], max: 150])
         then:
         list.size() == 11
 
-    }*/
+    }
 
 }

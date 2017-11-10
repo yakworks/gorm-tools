@@ -264,19 +264,16 @@ class CriteriaUtils {
         GrailsDomainClass domainClass = GormMetaUtils.findDomainClass(domainName)
         flattenMap(map).each {String k, v ->
             try {
-                if (k == "or"){
-                    result["or"] = [:]
-                    v.each {String  k1, v1->
-                        GrailsDomainClassProperty property = domainClass.getPropertyByName(k1)
-                        result["or"][k1] = property.type
-                    }
-                }
                 String checkedKey = k
+                if (k.contains("\$or")){
+                    checkedKey = k.split("[.]").findAll{!it.startsWith("\$or")}.join(".")
+                }
+
                 if (k.matches(/.*[.]\d*$/)){
                     checkedKey = checkedKey.split("[.]")[0..-2].join(".")
                 }
                 GrailsDomainClassProperty property = domainClass.getPropertyByName(checkedKey)
-                result[k] = property.type
+                result[k] = toType(v, property.type)
             } catch (e) {
                 println e
             }
@@ -288,7 +285,7 @@ class CriteriaUtils {
     /**
      * Recorsive method that flattens map [customer:[id: 1]] -> [customer.id: 1]
      * Specific for criteriaUtils to handle [customerId: 1]  -> [customer.id: 1]
-     * And doesnt flatten  `or` key, so we can use it in criteria
+     * And doesnt flatten  `or` key, so we can use it in criteria //TODO: fix comment
      *
      * @param params map of params
      * @return flattened map
@@ -298,17 +295,23 @@ class CriteriaUtils {
         Closure flatMap
         flatMap = { map, prefix='' ->
             map.inject([:]) { object, v ->
-                if (v.value instanceof Map) {
-                    if (v.key == "or"){
-                        object += [or: flatMap(v.value, "")]
-                    } else {
-                        object += flatMap(v.value, "${prefix ? "${prefix}." : ""}$v.key")
+                println "isssss  ${["\$or", "\$and"].contains(v.key)}      and      ${v.value instanceof List}"
+                if (["\$or", "\$and"].contains(v.key) && v.value instanceof List){
+                    v.value.each{Map listV->
+                        println listV
+                        object += flatMap(listV, "${prefix ? "${prefix}." : ""}${v.key}")
+                        println object
                     }
+
                 } else {
-                    if (v.key.matches(".*[^.]Id")){
-                        object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id")?v.key.replaceAll("Id\$", ".id").toString():v.key }"] = v.value
+                    if (v.value instanceof Map) {
+                        object += flatMap(v.value, "${prefix ? "${prefix}." : ""}$v.key")
+                    } else {
+                        if (v.key.matches(".*[^.]Id")) {
+                            object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id") ? v.key.replaceAll("Id\$", ".id").toString() : v.key}"] = v.value
+                        }
+                        object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
                     }
-                    object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
                 }
                 object
             }
@@ -321,6 +324,8 @@ class CriteriaUtils {
                 res[k] = v
             }
         }
+
+        println "::: $res"
         res
     }
 
@@ -359,7 +364,7 @@ class CriteriaUtils {
                 if (val instanceof List || (val instanceof String && val.matches(/\[.*\]/))) {
                     restrictList(delegate, key, val, type)
                 } else {
-                    eq(key, val.asType(type))
+                    eq(key, val)
                 }
                 break
         }
@@ -376,7 +381,6 @@ class CriteriaUtils {
     @CompileDynamic
     static toType(val, type) {
         if (val instanceof List) {
-            println "To type List: $val"
             return val.collect {
                 gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(it) ? it : toType(it, type)
             }
@@ -422,7 +426,7 @@ class CriteriaUtils {
             if ((filters.quickSearch || filters.q) && domain.quickSearchFields){
                 String quickParams = filters.quickSearch ?: filters.q
                 criterias.delegate = delegate
-                criterias.call([or: domain.quickSearchFields.collectEntries{["$it":["quickSearch()", quickParams]]}], domain, params)
+                criterias.call(["\$or": domain.quickSearchFields.collectEntries{["$it":["\$quickSearch", quickParams]]}], domain, params)
                 return
             }
             criterias.delegate = delegate
@@ -479,7 +483,27 @@ class CriteriaUtils {
         }
 
         Closure result = {
-            typedParams.each { key, type ->
+
+            Closure run
+            run = { map, Closure closure ->
+                map.keySet().each { k ->
+                    if (map[k] instanceof Map) {
+                        "${k == "\$or" ? "or" : k}" {
+                            run(map[k], closure)
+                        }
+                    } else {
+                        closure.call(k, map[k])
+                    }
+
+                }
+            }
+
+            run.call(toNestedMap(typedParams), { lastKey, val -> // from nested closure
+                restriction.delegate = delegate
+                restriction.call(lastKey, val, getType(val))
+            })
+
+            /*typedParams.each { key, val ->
                 if (flattened[key] == [] || flattened[key] == "[]") return
                 if (key == "or"){ //TODO: think how to refactor
                     or {
@@ -487,7 +511,7 @@ class CriteriaUtils {
                             nested.call(k,
                                     { lastKey -> // from nested closure
                                         restriction.delegate = delegate
-                                        restriction.call(lastKey, flattened["or"][k], t)
+                                        restriction.call(lastKey, flattened["\$or"][k], t)
                                     }
                             )
                         }
@@ -496,11 +520,11 @@ class CriteriaUtils {
                 nested.call(key,
                         { lastKey -> // from nested closure
                             restriction.delegate = delegate
-                            restriction.call(lastKey, flattened[key], type)
+                            restriction.call(lastKey, val, getType(val))
                         }
                 )
 
-            }
+            }*/
 
             if (params.order){
                 if (params.sort && params.order){
@@ -531,17 +555,36 @@ class CriteriaUtils {
         if (list instanceof String) list = Eval.me(list)
         if (key.matches(/.*[.]\d*$/)) key = key.split("[.]")[0..-2].join(".")
         if (Statements.listAllowedStatements().contains(list[0])){
-            println "Statements: ${list[0]} "
             List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()
             if (listParams[0] && listParams[0]!="")
-            Statements.findRestriction(list[0]).call(delegate, ["$key":  listParams.collect{ type == Date ? toDate(it) :it.asType(type)}])
+            Statements.findRestriction(list[0]).call(delegate, ["$key":  listParams])
         } else {
             if (!list.isEmpty()) {
-                delegate.inList(key, list.collect { type?.getClass() == Date ? toDate(it) :it.asType(type)})
+                delegate.inList(key, list)
             }
         }
     }
-}
 
+
+    static private Map toNestedMap(Map flattenedMap){
+        Closure putNestedValue
+        putNestedValue = {Map res,String key, val->
+            if (key.contains(".")){
+                String newKey = key.split("[.]")[0]
+                if (!res[newKey]) res[newKey] = [:]
+                putNestedValue( res[newKey],  key.split("[.]").tail().join("."), val)
+            } else {
+                if (!res[key]) res[key] = [:]
+                res[key] = val
+            }
+        }
+
+        Map res = [:]
+        flattenedMap.each {k,v->
+            putNestedValue(res,k,v)
+        }
+        res
+    }
+}
 
 

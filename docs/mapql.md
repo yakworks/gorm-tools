@@ -1,7 +1,7 @@
 ## Overview
 
 The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
-The gorm dao's come with a `list(criteriaMap, closure)` method. It allows to get list of entities restricted by
+The gorm dao's come with a `list(cusefulMap, closure)` method. It allows to get list of entities restricted by
 the properties in the `criteriaMap`. The map could be passed as JSON string or Map. All restrictions should be under `criteria` keyword by default, see example
 bellow.
 
@@ -87,7 +87,7 @@ Assume we are running these on star trek characters http://stapi.co/api/v1/rest/
 }
 ```
 
-This would produce in a round about way with criteria bbuilders a where clause like this
+This would produce in a round about way with criteria builders a where clause like this
 
 ```sql
   .. name like "Kira%" AND gender="F" AND placeOfBirth like "bajor%" AND hologram = true
@@ -124,7 +124,7 @@ This would produce in a round about way with criteria bbuilders a where clause l
     //the 3 above are different ways to do this
     "customer.id": {"$in": [101,102,103]},
 
-    "customer.id": {"$nin": [101,102,103]}, /* an array means it will use in/inList */
+    "customer.id": {"$nin": [101,102,103]}, /* an array means it will use not { in/inList }*/
   }
 }
 ```
@@ -133,9 +133,8 @@ This would produce in a round about way with criteria bbuilders a where clause l
 **Comparison Examples**
 ```js
   "amount": {"$ne": 50}, /*not equal*/
-  //FIXME I don't think we need this do we? if so explain use case here in the docs
-  "amount.$gt": 100 /* greater than value, the same as bellow*/
   "amount": {"$gt": 100}, /* greater than value */
+  "amount.$gt": 100 /* another form of the above one, can be useful when json is build, for example from angular model, where  you can't right in object form*/
   "amount": {"$ge": 100}, /* greater or equal than value */
 
   "amount": {"$lt": "$origAmount"}, /* less than value of another field*/
@@ -149,15 +148,17 @@ This would produce in a round about way with criteria bbuilders a where clause l
 
   "amount": {"$between": [0,100]}, /* between value */
 
-  "status": ["$isNull"], /* translates to isNull*/
+  "status": "$isNull", /* translates to isNull*/
+  "status": {"$isNull": true}, /* translates to isNull*/
+  "status": {"$isNull": false}, /* translates to not{ isNull}*/
 
 ```
 
 **Logical**
 ```js
     "$or": { // if a single or then it can be done like this
-      "customer.name":["$ilike": "wal"],
-      "customer.num":["$ilike": "wal"]
+      "customer.name":{"$ilike": "wal"},
+      "customer.num":{"$ilike": "wal"}
     },
     "$and":[ // multiple ors would need to look like this in an array. only one and can be present too
       {
@@ -172,15 +173,15 @@ This would produce in a round about way with criteria bbuilders a where clause l
           "customer.name": "Marc"
         }
       }
-    ], /* this would end up generating `.... and ( (customer.name = 'john' or customer.name = 'jon')
-          AND (customer.name = 'mark' or customer.name = 'mark') ) ....` */
+    ], /* this would end up generating `.... and ( (customer.name = 'John' or customer.name = 'Jon')
+          AND (customer.name = 'Mark' or customer.name = 'Mark') ) ....` */
 
     "$or":[ // again you can only have one of these
       { // the and is default and optional and this accomplishes the same thing as example sbelow
         "customer.name": "Mark",
         "$or": {
           "customer.sales": {"$lt": 10},
-          "customer.sales": ["$isNull"]
+          "customer.sales": "$isNull"
         }
       },
       {

@@ -7,8 +7,9 @@ bellow.
 
 Anything in the optional closure will be passed into Gorm/Hibernate criteria closure
 
-The query language is largely based on [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
-with inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
+The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/) and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax) with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
+
+>Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.
 
 **Example**
 
@@ -123,6 +124,9 @@ This would produce in a round about way with criteria bbuilders a where clause l
     "customer.id": [101,102,103], /* an array means it will use in/inList */
     //the 3 above are different ways to do this
     "customer.id": {"$in": [101,102,103]},
+    "customer": {
+      "id": {"$in": [101,102,103]}
+    },
 
     "customer.id": {"$nin": [101,102,103]}, /* an array means it will use in/inList */
   }
@@ -149,15 +153,15 @@ This would produce in a round about way with criteria bbuilders a where clause l
 
   "amount": {"$between": [0,100]}, /* between value */
 
-  "status": ["$isNull"], /* translates to isNull*/
-
+  "status": "$isNull" /* translates to isNull*/
+  "status": null /* translates to isNull*/
 ```
 
 **Logical**
 ```js
     "$or": { // if a single or then it can be done like this
-      "customer.name":["$ilike": "wal"],
-      "customer.num":["$ilike": "wal"]
+      "customer.name":{"$ilike": "wal"},
+      "customer.num":{"$ilike": "wal"}
     },
     "$and":[ // multiple ors would need to look like this in an array. only one and can be present too
       {
@@ -180,7 +184,7 @@ This would produce in a round about way with criteria bbuilders a where clause l
         "customer.name": "Mark",
         "$or": {
           "customer.sales": {"$lt": 10},
-          "customer.sales": ["$isNull"]
+          "customer.sales": "$isNull"
         }
       },
       {
@@ -193,7 +197,7 @@ This would produce in a round about way with criteria bbuilders a where clause l
         ....
         AND
         (
-          (customer.name = 'mark' and ( customer.sales < 10 or customer.sales is Null))
+          (customer.name = 'mark' and ( customer.sales < 10 or customer.sales IS NULL))
           OR
           (customer.name = 'jim' and customer.sales < 15 )
         )

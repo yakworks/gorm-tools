@@ -273,6 +273,8 @@ class CriteriaUtils {
                     checkedKey = checkedKey.split("[.]")[0..-2].join(".")
                 }
                 GrailsDomainClassProperty property = domainClass.getPropertyByName(checkedKey)
+                println ">>>>>>>>>>>>>>> $k"
+                println "---->>>>>>>>>>>>>>> $v"
                 result[k] = toType(v, property.type)
             } catch (e) {
                 println e
@@ -381,6 +383,10 @@ class CriteriaUtils {
     @CompileDynamic
     static toType(val, type) {
         if (val instanceof List) {
+            if (["\$ltef"].contains(val[0])){
+                    println "-----------------------333333333"
+                return val //TODO:
+            }
             return val.collect {
                 gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(it) ? it : toType(it, type)
             }
@@ -467,21 +473,7 @@ class CriteriaUtils {
     static Closure criterias = {Map filters, Class domain, Map params = [:] ->
         String domainName = domain.name
         Map typedParams = typedParams(filters, domainName)
-        Map flattened = flattenMap(filters)
-        //Used to handle nested properties, if key has ".", for example org.address.id
-        //will execute closure address{eq "id", 1}
-        Closure nested
-        nested = { String key, Closure closure ->
-            List splited = key.split("[.]")
-            if (splited.size() > 1 && !splited[1].matches(/\d*$/)) {
-                "${splited[0]}" {
-                    nested(splited.tail().join("."), closure)
-                }
-            } else {
-                closure.call(key) // calls closure with last key in path `id` for our example
-            }
-        }
-
+        println "Typed params :            $typedParams"
         Closure result = {
 
             Closure run
@@ -502,29 +494,6 @@ class CriteriaUtils {
                 restriction.delegate = delegate
                 restriction.call(lastKey, val, getType(val))
             })
-
-            /*typedParams.each { key, val ->
-                if (flattened[key] == [] || flattened[key] == "[]") return
-                if (key == "or"){ //TODO: think how to refactor
-                    or {
-                        type.each { k, t ->
-                            nested.call(k,
-                                    { lastKey -> // from nested closure
-                                        restriction.delegate = delegate
-                                        restriction.call(lastKey, flattened["\$or"][k], t)
-                                    }
-                            )
-                        }
-                    }
-                }
-                nested.call(key,
-                        { lastKey -> // from nested closure
-                            restriction.delegate = delegate
-                            restriction.call(lastKey, val, getType(val))
-                        }
-                )
-
-            }*/
 
             if (params.order){
                 if (params.sort && params.order){
@@ -556,8 +525,9 @@ class CriteriaUtils {
         if (key.matches(/.*[.]\d*$/)) key = key.split("[.]")[0..-2].join(".")
         if (Statements.listAllowedStatements().contains(list[0])){
             List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()
-            if (listParams[0] && listParams[0]!="")
-            Statements.findRestriction(list[0]).call(delegate, ["$key":  listParams])
+            if ((listParams[0] && listParams[0]!="") | list[0] == "\$isNull") {
+                Statements.findRestriction(list[0]).call(delegate, ["$key": listParams])
+            }
         } else {
             if (!list.isEmpty()) {
                 delegate.inList(key, list)

@@ -7,6 +7,7 @@ class Org {
     Date testDate
     boolean isActive=true
     BigDecimal revenue = 0
+    BigDecimal credit
     Long refId = 0L
 
     static quickSearchFields = ["name", "num"]
@@ -15,5 +16,6 @@ class Org {
 		num nullable: true
         address nullable: true
         testDate nullable: true
+        credit nullable: true
     }
 }

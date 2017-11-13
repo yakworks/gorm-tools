@@ -51,7 +51,7 @@ class Statements {
                         delegate.gt params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$ge"], restriction:
+            [statements: ["\$gte"], restriction:
                     { delegate, Map params ->
                         println "ge ${params.keySet()[0]}, ${params.values()[0][0]}"
                         delegate.ge params.keySet()[0], params.values()[0][0]
@@ -62,19 +62,43 @@ class Statements {
                         delegate.lt params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$le"], restriction:
+            [statements: ["\$lte"], restriction:
                     { delegate, Map params ->
                         delegate.le params.keySet()[0], params.values()[0][0]
                     }
             ],
+            [statements: ["\$gtf"], restriction:
+                    { delegate, Map params ->
+                        delegate.gtProperty params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["\$gtef"], restriction:
+                    { delegate, Map params ->
+                        println "ge ${params.keySet()[0]}, ${params.values()[0][0]}"
+                        delegate.geProperty params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["\$ltf"], restriction:
+                    { delegate, Map params ->
+                        delegate.ltProperty params.keySet()[0], params.values()[0][0]
+                    }
+            ],
+            [statements: ["\$ltef"], restriction:
+                    { delegate, Map params ->
+                        println "\$ltef      k: ${params.keySet()[0]}   val: ${params.values()[0][0]}"
+                        delegate.leProperty(params.keySet()[0], params.values()[0][0])
+                    }
+            ],
             [statements: ["\$ne"], restriction:
                     { delegate, Map params ->
-                        delegate.ne params.keySet()[0], params.values()[0][0]
+                        delegate.not {
+                            delegate.eq params.keySet()[0], params.values()[0][0]
+                        }
                     }
             ],
             [statements: ["\$isNull"], restriction:
                     { delegate, Map params ->
-                        delegate.isNull params.keySet()[0], params.values()[0][0]
+                        delegate.isNull params.keySet()[0]
                     }
             ]
     ]

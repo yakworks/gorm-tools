@@ -125,7 +125,7 @@ class CriteriaUtilsSpec extends Specification {
 
     def "Filter by BigDecimal in list"() {
         when:
-        List list = CriteriaUtils.list([revenue: ["200", "500"]], Org, [max: 150])
+        List list = CriteriaUtils.list([revenue: ["200" , "500"]], Org, [max: 150])
         then:
         list.size() == 2
         list[0].name == "Org#2"
@@ -196,7 +196,7 @@ class CriteriaUtilsSpec extends Specification {
 
     def "Filter with `between()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$between", 2, 10]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$between" : [2, 10]]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 9
         list[0].name == "Org#1"
@@ -206,21 +206,21 @@ class CriteriaUtilsSpec extends Specification {
 
     def "Filter with `in()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$in", "24", "25"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$in" : ["24", "25"]]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 2
         list[0].name == "Org#23"
     }
     def "Filter with `inList()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$inList", "24", "25"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$inList": ["24", "25"]]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 2
         list[0].name == "Org#23"
     }
     def "Filter by Name ilike()"() {
         when: "eq"
-        List list = CriteriaUtils.list([name:["\$ilike", "Org#2%"]], Org, [max: 150])
+        List list = CriteriaUtils.list([name:["\$ilike" : "Org#2%"]], Org, [max: 150])
         then:
         list.size() == 11
         list[0].name == "Org#2"
@@ -229,14 +229,14 @@ class CriteriaUtilsSpec extends Specification {
     }
     def "Filter with `gt()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$gt", "95"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$gt" : "95"]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 7
         list[0].name == "Org#95"
     }
     def "Filter with `gte()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$ge", "95"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$gte" : "95"]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 8
         list[0].name == "Org#94"
@@ -244,7 +244,7 @@ class CriteriaUtilsSpec extends Specification {
 
     def "Filter with `lt()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$lt", "5"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$lt" : "5"]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 3
         list[0].name == "Org#1"
@@ -252,7 +252,7 @@ class CriteriaUtilsSpec extends Specification {
 
     def "Filter with `lte()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$le", "5"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$lte" : "5"]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == 4
         list[0].name == "Org#1"
@@ -260,19 +260,19 @@ class CriteriaUtilsSpec extends Specification {
 
     def "Filter with `ne()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$ne", "5"]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$ne": "5"]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == Org.list().size() -1
     }
     def "Filter with `not in()`"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$nin", 2, 3, 4, 5]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$nin" : [2, 3, 4, 5]]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == Org.list().size() - 4
     }
     def "Filter with `not in()` with ids in array"(){
         when:
-        List list = CriteriaUtils.list([id: ["\$nin", [2, 3, 4, 5]]], Org, [max: 150]).sort{it.id}
+        List list = CriteriaUtils.list([id: ["\$nin" : [2, 3, 4, 5]]], Org, [max: 150]).sort{it.id}
         then:
         list.size() == Org.list().size() - 4
     }

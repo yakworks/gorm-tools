@@ -1,6 +1,7 @@
 package gorm.tools.hibernate.criteria
 
 import grails.gorm.annotation.Entity
+import grails.persistence.Entity
 import grails.test.mixin.hibernate.HibernateTestMixin
 import grails.test.mixin.TestMixin
 import grails.test.mixin.gorm.Domain

@@ -65,8 +65,8 @@ starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
 | $ne         | not equal, !=, <>                | `"age" : {"$ne" : 12}}`                      |
 | $in         | Match any value in array         | `"field" : {"$in" : [value1, value2, ...]`   |
 | $nin        | Not match any value in array     | `"field" : {"$nin" : [value1, value2, ...]}` |
-| $isNull     | Value is null                    | `"name": ["$isNull"]                         |
-| $isNotNull  |                                  | `"name": ["$isNotNull"]                      |
+| $isNull     | Value is null                    | `"name": "$isNull"                           |
+| $isNotNull  |                                  | `"name": "$isNotNull"                        |
 
 ## Examples
 

@@ -373,14 +373,21 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#comparison" title="Comparison" class="md-nav__link">
+    Comparison
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#comparison" title="Comparison" class="md-nav__link">
-    Comparison
+  <a href="#examples" title="Examples" class="md-nav__link">
+    Examples
   </a>
   
 </li>
@@ -434,14 +441,21 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#comparison" title="Comparison" class="md-nav__link">
+    Comparison
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#comparison" title="Comparison" class="md-nav__link">
-    Comparison
+  <a href="#examples" title="Examples" class="md-nav__link">
+    Examples
   </a>
   
 </li>
@@ -467,33 +481,36 @@
                 
                 
                 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>The gorm dao's come with a <code>list(criteriaMap, closure)</code> method. It allows to get list of entities restricted by
+<p>The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
+The gorm dao's come with a <code>list(criteriaMap, closure)</code> method. It allows to get list of entities restricted by
 the properties in the <code>criteriaMap</code>. The map could be passed as JSON string or Map. All restrictions should be under <code>criteria</code> keyword by default, see example
 bellow.</p>
 <p>Anything in the optional closure will be passed into Gorm/Hibernate criteria closure</p>
 <p>The query language is largely based on <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a>
 with inspiration from <a href="https://github.com/2do2go/json-sql/">json-sql</a> as well</p>
 <p><strong>Example</strong></p>
-<div class="codehilite"><pre><span></span>Org.dao.list([
-  criteria: [name: &quot;Virgin%&quot;, type: &quot;New&quot;],
-  order: {name:&quot;asc&quot;}, // As for me &quot;asc&quot;/&quot;desc&quot; is better then 1/-1 //TODO: Josh, what do you think?
-  max: 20
-]){
-  gt &quot;id&quot;, 5
-}
+<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">list</span><span class="o">([</span>
+  <span class="n">criteria</span><span class="o">:</span> <span class="o">[</span><span class="n">name</span><span class="o">:</span> <span class="s">&quot;Virgin%&quot;</span><span class="o">,</span> <span class="n">type</span><span class="o">:</span> <span class="s">&quot;New&quot;</span><span class="o">],</span>
+  <span class="n">order</span><span class="o">:</span> <span class="o">{</span><span class="n">name</span><span class="o">:</span><span class="s">&quot;asc&quot;</span><span class="o">},</span>
+  <span class="n">max</span><span class="o">:</span> <span class="mi">20</span>
+<span class="o">]){</span>
+  <span class="n">gt</span> <span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="mi">5</span>
+<span class="o">}</span>
 </pre></div>
 
 <p>The same result can be reached with criteria:</p>
-<div class="codehilite"><pre><span></span>Criteria criteria = Org.createCriteria()
-criteria.list(max: 20) {
-    like &quot;name&quot;, &quot;Nam%&quot;
-    eq &quot;type&quot;, &quot;New&quot;
-    gt &quot;id&quot;, 5
-    order(&quot;name&quot;, &quot;asc&quot;)
-}
+<div class="codehilite"><pre><span></span><span class="nx">Criteria</span> <span class="nx">criteria</span> <span class="o">=</span> <span class="nx">Org</span><span class="p">.</span><span class="nx">createCriteria</span><span class="p">()</span>
+<span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="nx">max</span><span class="o">:</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">like</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Nam%&quot;</span>
+    <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
+    <span class="nx">gt</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="mi">5</span>
+    <span class="nx">order</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">)</span>
+<span class="p">}</span>
 </pre></div>
 
 <h2 id="criteria-options">Criteria options<a class="headerlink" href="#criteria-options" title="Permanent link">&para;</a></h2>
+<p>for examples well assume we are querying a domain model that looks like the
+starwars api here <a href="http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279">http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279</a></p>
 <h3 id="logical">Logical<a class="headerlink" href="#logical" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -506,28 +523,27 @@ criteria.list(max: 20) {
 <tbody>
 <tr>
 <td>$and</td>
-<td>only needed for special conditions</td>
-<td><code>$and: [ {name: 'John'}, {age: 12} ]</code> <br> same as <code>name: 'John', age: 12</code></td>
+<td>default</td>
+<td><code>$and: [ {&quot;name&quot;: &quot;Belak&quot;}, {&quot;status&quot;: &quot;D&quot;} ]</code> <br> equivalent to <code>&quot;name&quot;: &quot;Belak&quot;, &quot;status&quot;: &quot;D&quot;</code></td>
 </tr>
 <tr>
 <td>$or</td>
 <td>"ors" them all</td>
-<td><code>$or: [ {name: 'John'}, {age: 12} ]</code> <br> <code>$or: {name: 'John', age: 12 }</code></td>
+<td><code>$or: [ {&quot;name&quot;: &quot;Belak&quot;}, {&quot;fork&quot;: true} ]</code> <br> <code>$or: {&quot;name&quot;: &quot;Belak&quot;, &quot;fork&quot;: true }</code></td>
 </tr>
 <tr>
 <td>$not</td>
 <td>ALL not equal, !=, &lt;&gt;</td>
-<td><code>$not:{ name: 'John', age: 12</code>}</td>
+<td><code>$not:{ &quot;status&quot;: &quot;Destroyed&quot;, &quot;dateStatus&quot;: &quot;2371&quot; }</code></td>
 </tr>
 <tr>
 <td>$nor</td>
-<td>ANY not equal</td>
-<td><code>$nor:{ name: 'John', age: 12</code>}</td>
+<td>ANY one is not equal</td>
+<td><code>$nor:{ &quot;name&quot;: &quot;Romulan&quot;, &quot;fork&quot;: 12</code>}</td>
 </tr>
 </tbody>
 </table>
-<h2 id="comparison">Comparison<a class="headerlink" href="#comparison" title="Permanent link">&para;</a></h2>
-<p>//We can several syntax from mongo and grails for example $gte or $ge //TODO: Josh, what do you think?</p>
+<h3 id="comparison">Comparison<a class="headerlink" href="#comparison" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -539,38 +555,43 @@ criteria.list(max: 20) {
 <tbody>
 <tr>
 <td>$gt</td>
-<td>&gt;</td>
-<td><code>&quot;salary&quot;: {&quot;$gt&quot;: 10000}</code></td>
+<td>&gt;  greater than</td>
+<td><code>&quot;cargo&quot;: {&quot;$gt&quot;: 10000}</code></td>
 </tr>
 <tr>
-<td>$gte or $ge</td>
-<td>&gt;=</td>
-<td><code>&quot;salary&quot;: {&quot;$gte&quot;: 10000}</code></td>
+<td>$gte | $ge</td>
+<td>&gt;= greater than or equal</td>
+<td><code>&quot;cargo&quot;: {&quot;$gte&quot;: 10000}</code></td>
 </tr>
 <tr>
 <td>$lt</td>
-<td>&lt;</td>
-<td><code>&quot;salary&quot;: {&quot;$lt&quot;: 10000}</code></td>
+<td>&lt;  less than</td>
+<td><code>&quot;cargo&quot;: {&quot;$lt&quot;: 10000}</code></td>
 </tr>
 <tr>
-<td>$lte or $le</td>
-<td>&lt;=</td>
-<td><code>&quot;salary&quot;: {&quot;$lte&quot;: 10000}</code></td>
+<td>$lte | $le</td>
+<td>&lt;= less than or equal</td>
+<td><code>&quot;cargo&quot;: {&quot;$lte&quot;: 10000}</code></td>
 </tr>
 <tr>
 <td>$between</td>
-<td>Where the property value is between two distinct values</td>
-<td><code>&quot;age&quot;: {&quot;$between&quot;: [18, 35]}</code></td>
+<td>between two distinct values</td>
+<td><code>&quot;dateStatus&quot;: {&quot;$between&quot;: [2300, 2400]}</code></td>
 </tr>
 <tr>
 <td>$like</td>
-<td>Equivalent to SQL like expression</td>
-<td><code>&quot;name&quot;: {&quot;$like&quot;: &quot;Joh%&quot;}</code></td>
+<td>like expression</td>
+<td><code>&quot;name&quot;: {&quot;$like&quot;: &quot;Rom%&quot;}</code></td>
 </tr>
 <tr>
 <td>$ilike</td>
-<td>A case-insensitive 'like' expression</td>
-<td><code>&quot;name&quot;: {&quot;$ilike&quot;: &quot;Joh&quot;}</code></td>
+<td>like auto-append %</td>
+<td><code>&quot;name&quot;: {&quot;$ilike&quot;: &quot;rom&quot;}</code></td>
+</tr>
+<tr>
+<td>$eq</td>
+<td>= equal, concieince for builders</td>
+<td><code>&quot;salary&quot;: {&quot;$eq&quot;: 10}</code> | <code>&quot;salary&quot;: 10</code></td>
 </tr>
 <tr>
 <td>$ne</td>
@@ -580,12 +601,12 @@ criteria.list(max: 20) {
 <tr>
 <td>$in</td>
 <td>Match any value in array</td>
-<td><code>{&quot;field&quot; : {&quot;$in&quot; : [value1, value2, ...]}</code></td>
+<td><code>&quot;field&quot; : {&quot;$in&quot; : [value1, value2, ...]</code></td>
 </tr>
 <tr>
 <td>$nin</td>
 <td>Not match any value in array</td>
-<td><code>{&quot;field&quot; : {&quot;$nin&quot; : [value1, value2, ...]}}</code></td>
+<td><code>&quot;field&quot; : {&quot;$nin&quot; : [value1, value2, ...]}</code></td>
 </tr>
 <tr>
 <td>$isNull</td>
@@ -599,69 +620,123 @@ criteria.list(max: 20) {
 </tr>
 </tbody>
 </table>
-<p>Bellow will be a list of supported syntax for params in json format, which is supported:</p>
-<p><div class="codehilite"><pre><span></span><span class="p">{</span>
-    <span class="nt">&quot;criteria&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="nt">&quot;ponum&quot;</span><span class="p">:</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="err">/*</span> <span class="err">if</span> <span class="err">its</span> <span class="err">a</span> <span class="err">single</span> <span class="err">value</span> <span class="err">eq</span> <span class="err">is</span> <span class="err">default,</span> <span class="err">if</span> <span class="err">it</span> <span class="err">contains</span> <span class="err">%</span> <span class="err">then</span> <span class="err">it</span> <span class="err">uses</span> <span class="err">ilike</span> <span class="err">*/</span>
-      <span class="nt">&quot;reconciled&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="err">/*</span> <span class="err">boolean</span> <span class="err">*/</span>
-      <span class="nt">&quot;tranDate&quot;</span><span class="p">:</span> <span class="s2">&quot;2012-04-23T00:00:00.000Z&quot;</span><span class="p">,</span> <span class="err">/*</span> <span class="err">date</span> <span class="err">*/</span>
-      <span class="nt">&quot;customer.id&quot;</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span>
-      <span class="nt">&quot;customerId&quot;</span><span class="p">:</span> <span class="mi">101</span><span class="p">,</span> <span class="err">/*check</span> <span class="err">if</span> <span class="err">domain</span> <span class="err">has</span> <span class="err">`customerId`</span> <span class="err">property,</span> <span class="err">if</span> <span class="err">not</span> <span class="err">then</span> <span class="err">uses</span> <span class="err">`customer.id:101`</span> <span class="err">*/</span>
-      <span class="nt">&quot;customer&quot;</span><span class="p">:{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="mi">101</span><span class="p">},</span> <span class="err">/*</span> <span class="err">object</span> <span class="err">way</span> <span class="err">*/</span>
-      <span class="nt">&quot;$or&quot;</span><span class="p">:{</span> <span class="err">/*TODO:</span> <span class="err">works</span> <span class="err">only</span> <span class="err">if</span> <span class="err">it</span> <span class="err">is</span> <span class="err">one</span> <span class="err">in</span> <span class="err">`criteria`,</span> <span class="err">and</span> <span class="err">currently</span> <span class="err">only</span> <span class="err">on</span> <span class="err">first</span> <span class="err">level*/</span>
-        <span class="nt">&quot;customer.name&quot;</span><span class="p">:[</span><span class="s2">&quot;$ilike&quot;</span><span class="err">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">],</span>
-        <span class="nt">&quot;customer.num&quot;</span><span class="p">:[</span><span class="s2">&quot;$like&quot;</span><span class="err">:</span> <span class="s2">&quot;wal%&quot;</span><span class="p">]</span>
-      <span class="p">},</span>
-     <span class="nt">&quot;$and&quot;</span><span class="p">:</span> <span class="p">[{</span> <span class="err">//multiple</span> <span class="err">ors</span> <span class="err">would</span> <span class="err">need</span> <span class="err">to</span> <span class="err">look</span> <span class="err">like</span> <span class="err">this</span> <span class="err">in</span> <span class="err">here.</span> <span class="err">I</span> <span class="err">think</span> <span class="err">we</span> <span class="err">need</span> <span class="err">to</span> <span class="err">look</span> <span class="err">here</span>
-                <span class="err">//https://github.com/2do2go/json-sql/blob/master/tests/1_select.js#L1228</span> <span class="err">and</span> <span class="err">see</span> <span class="err">the</span> <span class="err">conditions</span> <span class="err">they</span> <span class="err">use</span>
-                        <span class="err">$or:</span> <span class="err">{</span>
-                            <span class="err">name:</span> <span class="err">&#39;John&#39;,</span>
-                            <span class="err">age:</span> <span class="err">12</span>
-                        <span class="p">}</span>
-                    <span class="err">}</span><span class="p">,</span> <span class="p">{</span>
-                        <span class="err">$or:</span> <span class="err">{</span>
-                            <span class="err">name:</span> <span class="err">&#39;Mark&#39;,</span>
-                            <span class="err">age:</span> <span class="err">14</span>
-                        <span class="p">}</span>
-                    <span class="err">}</span><span class="p">]</span>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p>Bellow will be a list of supported syntax for params in json format, which is supported:
+Assume we are running these on star trek characters <a href="http://stapi.co/api/v1/rest/character?uid=CHMA0000128908">http://stapi.co/api/v1/rest/character?uid=CHMA0000128908</a></p>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Kira%&quot;</span><span class="p">,</span> <span class="cm">/* if it ends with % then it will us an ilike */</span>
+    <span class="s2">&quot;gender&quot;</span><span class="o">:</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="c1">//no % its straight up</span>
+    <span class="s2">&quot;placeOfBirth&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;bajor%&quot;</span><span class="p">},</span> <span class="cm">/* a case-insensitive &#39;like&#39; expression appends the % */</span>
+    <span class="s2">&quot;hologram&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="cm">/* boolean */</span>
+    <span class="s2">&quot;createdDate&quot;</span><span class="o">:</span> <span class="s2">&quot;1993-05-16T00:00:00.000Z&quot;</span><span class="p">,</span> <span class="c1">// dates</span>
+    <span class="s2">&quot;dateOfBirth&quot;</span><span class="o">:</span> <span class="s2">&quot;1957-07-26&quot;</span> <span class="c1">// dates</span>
+    <span class="s2">&quot;placeOfBirth&quot;</span><span class="o">:</span> <span class="s2">&quot;$placeOfDeath&quot;</span> <span class="c1">//equals another field in set</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;sort&quot;</span><span class="o">:</span><span class="s2">&quot;name&quot;</span>
+<span class="p">}</span>
+</pre></div>
 
-      <span class="s2">&quot;$or&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="err">//</span> <span class="err">I</span> <span class="err">think</span> <span class="err">the</span> <span class="err">best</span> <span class="err">syntax</span> <span class="err">is</span> <span class="err">one</span> <span class="err">$or</span><span class="p">,</span> <span class="err">if</span> <span class="err">it</span> <span class="err">is</span> <span class="err">map</span> <span class="err">then</span> <span class="err">use</span> <span class="err">it</span> <span class="err">like</span> <span class="err">is</span><span class="p">,</span> <span class="err">if</span> <span class="err">it</span> 
-              <span class="err">//</span> <span class="err">is</span> <span class="err">array</span> <span class="err">then</span> <span class="err">transform</span> <span class="err">to</span> <span class="err">several</span> <span class="err">`or`</span> <span class="err">statements</span> <span class="err">//TODO:</span> <span class="err">Josh</span><span class="p">,</span> <span class="err">what</span> <span class="err">do</span> <span class="err">you</span> <span class="err">think?</span>
-                            <span class="p">{</span>
-                                    <span class="err">name:</span> <span class="err">&#39;John&#39;,</span>
-                                    <span class="err">age:</span> <span class="err">12</span>
-                                <span class="p">}</span>
-                            <span class="err">}</span><span class="p">,</span> <span class="p">{</span>
-                                <span class="err">$or:</span> <span class="err">{</span>
-                                    <span class="err">name:</span> <span class="err">&#39;Mark&#39;,</span>
-                                    <span class="err">age:</span> <span class="err">14</span>
-                                <span class="p">}</span>
-                            <span class="err">}</span>
-      <span class="p">]</span>
-      <span class="s2">&quot;docType&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;PA&quot;</span><span class="p">,</span><span class="s2">&quot;CM&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">an</span> <span class="err">array</span> <span class="err">means</span> <span class="err">it</span> <span class="err">will</span> <span class="err">use</span> <span class="err">in/inList</span> <span class="err">*/</span>  
-      <span class="nt">&quot;docType&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$in&quot;</span><span class="err">:</span> <span class="p">[</span><span class="s2">&quot;PA&quot;</span><span class="p">,</span><span class="s2">&quot;CM&quot;</span><span class="p">]],</span> <span class="err">/*</span> <span class="err">the</span> <span class="err">above</span> <span class="err">ins</span> <span class="err">would</span> <span class="err">be</span> <span class="err">a</span> <span class="err">short</span> <span class="err">cut</span> <span class="err">for</span> <span class="err">this*/</span>
-      <span class="err">//deprecate</span> <span class="nt">&quot;docType&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$in&quot;&quot;PA&quot;</span> <span class="p">,</span><span class="s2">&quot;CM&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">the</span> <span class="err">above</span> <span class="err">ins</span> <span class="err">would</span> <span class="err">be</span> <span class="err">a</span> <span class="err">short</span> <span class="err">cut</span> <span class="err">for</span> <span class="err">this*/</span>
-      <span class="nt">&quot;tranType.id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$nin&quot;</span><span class="err">:</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]],</span><span class="err">/*</span> <span class="err">will</span> <span class="err">translate</span> <span class="err">to</span> <span class="nt">&quot;not{ in(&quot;</span><span class="err">tranType.id</span><span class="s2">&quot;,[1,2,3])]&quot;</span> <span class="err">*/</span>
-      <span class="s2">&quot;tranType.id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$not in&quot;</span><span class="err">:</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]],</span><span class="err">/*</span> <span class="err">will</span> <span class="err">translate</span> <span class="err">to</span> <span class="nt">&quot;not{ in(&quot;</span><span class="err">tranType.id</span><span class="s2">&quot;,[1,2,3])]&quot;</span> <span class="err">*/</span>
-      <span class="s2">&quot;refnum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$ilike&quot;</span><span class="err">:</span> <span class="s2">&quot;123&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">a</span> <span class="err">case-insensitive</span> <span class="err">&#39;like&#39;</span> <span class="err">expression</span> <span class="err">append</span> <span class="err">the</span> <span class="err">%</span> <span class="err">*/</span>
-      <span class="nt">&quot;refnum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$like&quot;</span><span class="err">:</span> <span class="s2">&quot;123%&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">equivalent</span> <span class="err">to</span> <span class="err">SQL</span> <span class="err">like</span> <span class="err">expression</span> <span class="err">*/</span>
-      <span class="nt">&quot;amount&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$between&quot;</span><span class="err">:</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">]],</span> <span class="err">/*</span> <span class="err">between</span> <span class="err">value</span> <span class="err">*/</span>
-      <span class="nt">&quot;oldAmount.$gt&quot;</span><span class="p">:</span> <span class="s2">&quot;origAmount&quot;</span><span class="err">/*</span> <span class="err">greater</span> <span class="err">than</span> <span class="err">value</span><span class="p">,</span> <span class="err">the</span> <span class="err">same</span> <span class="err">as</span> <span class="err">bellow*/</span>
-      <span class="nt">&quot;oldAmount&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$gt&quot;</span><span class="p">,</span><span class="s2">&quot;origAmount&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">greater</span> <span class="err">than</span> <span class="err">value</span> <span class="err">*/</span>
-      <span class="nt">&quot;oldAmount&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$ge&quot;</span><span class="p">,</span><span class="s2">&quot;origAmount&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">greater</span> <span class="err">or</span> <span class="err">equal</span> <span class="err">than</span> <span class="err">value</span> <span class="err">*/</span><span class="nt">&quot;</span>
-<span class="nt">      &quot;</span><span class="err">amount</span><span class="s2">&quot;: { /*will translate into {gt &quot;</span><span class="err">amount</span><span class="s2">&quot;, 5.0; lt &quot;</span><span class="err">amount</span><span class="s2">&quot;,15.50; not{ eq &quot;</span><span class="err">amount</span><span class="s2">&quot;, 9.99}}*/</span>
-<span class="s2">        &quot;</span><span class="err">$gt</span><span class="s2">&quot;: 5.0,</span>
-<span class="s2">        &quot;</span><span class="err">$lt</span><span class="s2">&quot;: 15.50,</span>
-<span class="s2">        &quot;</span><span class="err">$ne</span><span class="s2">&quot;: 9.99</span>
-<span class="s2">      },</span>
-<span class="s2">      oldAmount&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$lt&quot;</span><span class="p">,</span><span class="s2">&quot;origAmount&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">less</span> <span class="err">than</span> <span class="err">value</span> <span class="err">*/</span>
-      <span class="nt">&quot;oldAmount&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$le&quot;</span><span class="p">,</span><span class="s2">&quot;origAmount&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">less</span> <span class="err">or</span> <span class="err">equal</span> <span class="err">than</span> <span class="err">value</span> <span class="err">*/</span>
-      <span class="nt">&quot;amount&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$ne&quot;</span><span class="p">,</span><span class="mi">50</span><span class="p">],</span> <span class="err">/*not</span> <span class="err">equal*/</span>
-      <span class="nt">&quot;status.id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="err">/*</span> <span class="err">an</span> <span class="err">array</span> <span class="err">means</span> <span class="err">it</span> <span class="err">will</span> <span class="err">use</span> <span class="err">in/inList</span> <span class="err">*/</span>
-      <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="mi">1</span><span class="p">},{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="mi">2</span><span class="p">},{</span><span class="nt">&quot;id&quot;</span><span class="p">:</span><span class="mi">3</span><span class="p">}],</span> <span class="err">/*</span> <span class="err">an</span> <span class="err">array</span> <span class="err">means</span> <span class="err">it</span> <span class="err">will</span> <span class="err">use</span> <span class="err">in/inList</span> <span class="err">*/</span>
-      <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;$isNull&quot;</span><span class="p">],</span> <span class="err">/*</span> <span class="err">translates</span> <span class="err">to</span> <span class="err">isNull*/</span>
+<p>This would produce in a round about way with criteria bbuilders a where clause like this</p>
+<div class="codehilite"><pre><span></span>  <span class="p">..</span> <span class="n">name</span> <span class="k">like</span> <span class="ss">&quot;Kira%&quot;</span> <span class="k">AND</span> <span class="n">gender</span><span class="o">=</span><span class="ss">&quot;F&quot;</span> <span class="k">AND</span> <span class="n">placeOfBirth</span> <span class="k">like</span> <span class="ss">&quot;bajor%&quot;</span> <span class="k">AND</span> <span class="n">hologram</span> <span class="o">=</span> <span class="k">true</span>
+  <span class="k">AND</span> <span class="n">createdDate</span> <span class="o">=</span> <span class="o">???</span> <span class="k">AND</span> <span class="n">dateOfBirth</span> <span class="o">=</span> <span class="o">???</span> <span class="k">AND</span> <span class="n">placeOfBirth</span> <span class="o">=</span> <span class="n">placeOfDeath</span>
+  <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">name</span> <span class="k">ASC</span><span class="p">,</span> <span class="n">dateOfBirth</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
+
+<p><strong>associations</strong>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span>
+    <span class="s2">&quot;customerId&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span> <span class="cm">/* check if domain has customerId property, if not then uses customer.id 101 above */</span>
+    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="cm">/* nested object way */</span>
+      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Wal%&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="s2">&quot;sort&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;asc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tranDate&quot;</span><span class="o">:</span> <span class="s2">&quot;desc&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div></p>
+<p><strong>IN Clause</strong>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
+    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">101</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">102</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">103</span><span class="p">}],</span> <span class="c1">//can be in summarized object form as well</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
+    <span class="c1">//the 3 above are different ways to do this</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span>
+
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span> <span class="cm">/* an array means it will use in/inList */</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div></p>
+<p><strong>Comparison Examples</strong>
+<div class="codehilite"><pre><span></span>  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ne&quot;</span><span class="o">:</span> <span class="mi">50</span><span class="p">},</span> <span class="cm">/*not equal*/</span>
+  <span class="c1">//FIXME I don&#39;t think we need this do we? if so explain use case here in the docs</span>
+  <span class="s2">&quot;amount.$gt&quot;</span><span class="o">:</span> <span class="mi">100</span> <span class="cm">/* greater than value, the same as bellow*/</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mi">100</span><span class="p">},</span> <span class="cm">/* greater than value */</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ge&quot;</span><span class="o">:</span> <span class="mi">100</span><span class="p">},</span> <span class="cm">/* greater or equal than value */</span>
+
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="s2">&quot;$origAmount&quot;</span><span class="p">},</span> <span class="cm">/* less than value of another field*/</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$le&quot;</span><span class="o">:</span> <span class="s2">&quot;$origAmount&quot;</span><span class="p">},</span> <span class="cm">/* less or equal than value */</span>
+
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span><span class="p">{</span> <span class="c1">//all these will get anded together</span>
+    <span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mf">5.0</span><span class="p">,</span>
+    <span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mf">15.50</span><span class="p">,</span>
+    <span class="s2">&quot;$ne&quot;</span><span class="o">:</span> <span class="mf">9.99</span>
+  <span class="p">},</span>
+
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$between&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">]},</span> <span class="cm">/* between value */</span>
+
+  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;$isNull&quot;</span><span class="p">],</span> <span class="cm">/* translates to isNull*/</span>
+</pre></div></p>
+<p><strong>Logical</strong>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// if a single or then it can be done like this</span>
+      <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">],</span>
+      <span class="s2">&quot;customer.num&quot;</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">]</span>
     <span class="p">},</span>
-  <span class="nt">&quot;sort&quot;</span><span class="p">:[{</span><span class="nt">&quot;tranDate&quot;</span><span class="p">:</span><span class="s2">&quot;ASC&quot;</span><span class="p">},{</span><span class="nt">&quot;customer.name&quot;</span><span class="p">,</span><span class="nt">&quot;desc&quot;</span><span class="p">}]</span>
+    <span class="s2">&quot;$and&quot;</span><span class="o">:</span><span class="p">[</span> <span class="c1">// multiple ors would need to look like this in an array. only one and can be present too</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Jon&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Mark&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Marc&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">],</span> <span class="cm">/* this would end up generating `.... and ( (customer.name = &#39;john&#39; or customer.name = &#39;jon&#39;)</span>
+<span class="cm">          AND (customer.name = &#39;mark&#39; or customer.name = &#39;mark&#39;) ) ....` */</span>
+
+    <span class="s2">&quot;$or&quot;</span><span class="o">:</span><span class="p">[</span> <span class="c1">// again you can only have one of these</span>
+      <span class="p">{</span> <span class="c1">// the and is default and optional and this accomplishes the same thing as example sbelow</span>
+        <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Mark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">},</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;$isNull&quot;</span><span class="p">]</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;$and&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="c1">//the and can be explicitly specified too if you wish</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Jim&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mi">15</span><span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+    <span class="p">],</span> <span class="cm">/* this would end up generating</span>
+<span class="cm">        ....</span>
+<span class="cm">        AND</span>
+<span class="cm">        (</span>
+<span class="cm">          (customer.name = &#39;mark&#39; and ( customer.sales &lt; 10 or customer.sales is Null))</span>
+<span class="cm">          OR</span>
+<span class="cm">          (customer.name = &#39;jim&#39; and customer.sales &lt; 15 )</span>
+<span class="cm">        )</span>
+<span class="cm">        .... */</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 <strong>Quick Search</strong></p>

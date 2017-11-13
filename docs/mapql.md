@@ -1,29 +1,32 @@
 ## Overview
 
+The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
 The gorm dao's come with a `list(criteriaMap, closure)` method. It allows to get list of entities restricted by
 the properties in the `criteriaMap`. The map could be passed as JSON string or Map. All restrictions should be under `criteria` keyword by default, see example
 bellow.
 
 Anything in the optional closure will be passed into Gorm/Hibernate criteria closure
 
-The query language is largely based on [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
-with inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
+The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/) and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax) with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
+
+>Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.
 
 **Example**
 
-```
+``` java
 Org.dao.list([
   criteria: [name: "Virgin%", type: "New"],
-  order: {name:"asc"}, // As for me "asc"/"desc" is better then 1/-1 //TODO: Josh, what do you think?
+  order: {name:"asc"},
   max: 20
 ]){
   gt "id", 5
 }
+
 ```
 
 The same result can be reached with criteria:
 
-```
+```javascript
 Criteria criteria = Org.createCriteria()
 criteria.list(max: 20) {
     like "name", "Nam%"
@@ -35,101 +38,173 @@ criteria.list(max: 20) {
 
 ## Criteria options
 
+for examples well assume we are querying a domain model that looks like the
+starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
+
 ### Logical
 
-|  Op  |            Description             |                                  Examples                                  |
-| ---- | ---------------------------------- | -------------------------------------------------------------------------- |
-| $and | only needed for special conditions | `$and: [ {name: 'John'}, {age: 12} ]` <br> same as `name: 'John', age: 12` |
-| $or  | "ors" them all                     | `$or: [ {name: 'John'}, {age: 12} ]` <br> `$or: {name: 'John', age: 12 }`  |
-| $not | ALL not equal, !=, <>              | `$not:{ name: 'John', age: 12`}                                            |
-| $nor | ANY not equal                      | `$nor:{ name: 'John', age: 12`}                                            |
+|  Op  |      Description      |                                              Examples                                              |
+| ---- | --------------------- | -------------------------------------------------------------------------------------------------- |
+| $and | default               | `$and: [ {"name": "Belak"}, {"status": "D"} ]` <br> equivalent to `"name": "Belak", "status": "D"` |
+| $or  | "ors" them all        | `$or: [ {"name": "Belak"}, {"fork": true} ]` <br> `$or: {"name": "Belak", "fork": true }`          |
+| $not | ALL not equal, !=, <> | `$not:{ "status": "Destroyed", "dateStatus": "2371" }`                                             |
+| $nor | ANY one is not equal  | `$nor:{ "name": "Romulan", "fork": 12`}                                                               |
 
-## Comparison
+### Comparison
 
-//We can several syntax from mongo and grails for example $gte or $ge //TODO: Josh, what do you think?
+|     Op      |           Description            |                   Example                    |
+| ----------- | -------------------------------- | -------------------------------------------- |
+| $gt         | >  greater than                  | `"cargo": {"$gt": 10000}`                    |
+| $gte \| $ge | >= greater than or equal         | `"cargo": {"$gte": 10000}`                   |
+| $lt         | <  less than                     | `"cargo": {"$lt": 10000}`                    |
+| $lte \| $le | <= less than or equal            | `"cargo": {"$lte": 10000}`                   |
+| $between    | between two distinct values      | `"dateStatus": {"$between": [2300, 2400]}`   |
+| $like       | like expression                  | `"name": {"$like": "Rom%"}`                  |
+| $ilike      | like auto-append %               | `"name": {"$ilike": "rom"}`                  |
+| $eq         | = equal, concieince for builders | `"salary": {"$eq": 10}` \| `"salary": 10`    |
+| $ne         | not equal, !=, <>                | `"age" : {"$ne" : 12}}`                      |
+| $in         | Match any value in array         | `"field" : {"$in" : [value1, value2, ...]`   |
+| $nin        | Not match any value in array     | `"field" : {"$nin" : [value1, value2, ...]}` |
+| $isNull     | Value is null                    | `"name": ["$isNull"]                         |
+| $isNotNull  |                                  | `"name": ["$isNotNull"]                      |
 
-|     Op     |                       Description                       |                    Example                     |
-| ---------- | ------------------------------------------------------- | ---------------------------------------------- |
-| $gt        | >                                                       | `"salary": {"$gt": 10000}`                     |
-| $gte or $ge| >=                                                      | `"salary": {"$gte": 10000}`                    |
-| $lt        | <                                                       | `"salary": {"$lt": 10000}`                     |
-| $lte or $le| <=                                                      | `"salary": {"$lte": 10000}`                    |
-| $between   | Where the property value is between two distinct values | `"age": {"$between": [18, 35]}`                |
-| $like      | Equivalent to SQL like expression                       | `"name": {"$like": "Joh%"}`                    |
-| $ilike     | A case-insensitive 'like' expression                    | `"name": {"$ilike": "Joh"}`                    |
-| $ne        | not equal, !=, <>                                       | `"age" : {"$ne" : 12}}`                        |
-| $in        | Match any value in array                                | `{"field" : {"$in" : [value1, value2, ...]}`   |
-| $nin       | Not match any value in array                            | `{"field" : {"$nin" : [value1, value2, ...]}}` |
-| $isNull    | Value is null                                           | `"name": ["$isNull"]                           |
-| $isNotNull |                                                         | `"name": ["$isNotNull"]                        |
+## Examples
 
 Bellow will be a list of supported syntax for params in json format, which is supported:
+Assume we are running these on star trek characters http://stapi.co/api/v1/rest/character?uid=CHMA0000128908
 
-
-```json
+``` js
 {
-    "criteria": {
-      "ponum":"abc", /* if its a single value eq is default, if it contains % then it uses ilike */
-      "reconciled": true, /* boolean */
-      "tranDate": "2012-04-23T00:00:00.000Z", /* date */
-      "customer.id": 101,
-      "customerId": 101, /*check if domain has `customerId` property, if not then uses `customer.id:101` */
-      "customer":{"id":101}, /* object way */
-      "$or":{ /*TODO: works only if it is one in `criteria`, and currently only on first level*/
-        "customer.name":["$ilike": "wal"],
-        "customer.num":["$like": "wal%"]
-      },
-     "$and": [{ //multiple ors would need to look like this in here. I think we need to look here
-                //https://github.com/2do2go/json-sql/blob/master/tests/1_select.js#L1228 and see the conditions they use
-						$or: {
-							name: 'John',
-							age: 12
-						}
-					}, {
-						$or: {
-							name: 'Mark',
-							age: 14
-						}
-					}]
-					
-	  "$or": [ // I think the best syntax is one $or, if it is map then use it like is, if it 
-	          // is array then transform to several `or` statements //TODO: Josh, what do you think?
-	                        {
-        							name: 'John',
-        							age: 12
-        						}
-        					}, {
-        						$or: {
-        							name: 'Mark',
-        							age: 14
-        						}
-        					}
-	  ]
-      "docType": ["PA","CM"], /* an array means it will use in/inList */  
-      "docType": ["$in": ["PA","CM"]], /* the above ins would be a short cut for this*/
-      //deprecate "docType": ["$in""PA" ,"CM"], /* the above ins would be a short cut for this*/
-      "tranType.id": ["$nin":[1,2,3]],/* will translate to "not{ in("tranType.id",[1,2,3])]" */
-      "tranType.id": ["$not in":[1,2,3]],/* will translate to "not{ in("tranType.id",[1,2,3])]" */
-      "refnum": ["$ilike": "123"], /* a case-insensitive 'like' expression append the % */
-      "refnum": ["$like": "123%"], /* equivalent to SQL like expression */
-      "amount": ["$between":[0,100]], /* between value */
-      "oldAmount.$gt": "origAmount"/* greater than value, the same as bellow*/
-      "oldAmount": ["$gt","origAmount"], /* greater than value */
-      "oldAmount": ["$ge","origAmount"], /* greater or equal than value */"
-      "amount": { /*will translate into {gt "amount", 5.0; lt "amount",15.50; not{ eq "amount", 9.99}}*/
-      	"$gt": 5.0,
-      	"$lt": 15.50,
-      	"$ne": 9.99
-      },
-      oldAmount": ["$lt","origAmount"], /* less than value */
-      "oldAmount": ["$le","origAmount"], /* less or equal than value */
-      "amount": ["$ne",50], /*not equal*/
-      "status.id": [1,2,3], /* an array means it will use in/inList */
-      "status": [{"id":1},{"id":2},{"id":3}], /* an array means it will use in/inList */
-      "status": ["$isNull"], /* translates to isNull*/
-    },
-  "sort":[{"tranDate":"ASC"},{"customer.name","desc"}]
+  "criteria": {
+    "name": "Kira%", /* if it ends with % then it will us an ilike */
+    "gender": "F", //no % its straight up
+    "placeOfBirth": {"$ilike": "bajor%"}, /* a case-insensitive 'like' expression appends the % */
+    "hologram": true, /* boolean */
+    "createdDate": "1993-05-16T00:00:00.000Z", // dates
+    "dateOfBirth": "1957-07-26" // dates
+    "placeOfBirth": "$placeOfDeath" //equals another field in set
+  },
+  "sort":"name"
 }
+```
+
+This would produce in a round about way with criteria bbuilders a where clause like this
+
+```sql
+  .. name like "Kira%" AND gender="F" AND placeOfBirth like "bajor%" AND hologram = true
+  AND createdDate = ??? AND dateOfBirth = ??? AND placeOfBirth = placeOfDeath
+  ORDER BY name ASC, dateOfBirth DESC;
+```
+
+
+**associations**
+```js
+{
+  "criteria": {
+    "customer.id": 101,
+    "customerId": 101, /* check if domain has customerId property, if not then uses customer.id 101 above */
+    "customer": { /* nested object way */
+      "id": 101,
+      "name": "Wal%"
+    }
+  }
+  "sort": {
+    "customer.name": "asc",
+    "tranDate": "desc"
+  }
+}
+```
+
+**IN Clause**
+```js
+{
+  "criteria": {
+    "customer.id": [101,102,103], /* an array means it will use in/inList */
+    "customer": [{"id":101},{"id":102},{"id":103}], //can be in summarized object form as well
+    "customer.id": [101,102,103], /* an array means it will use in/inList */
+    //the 3 above are different ways to do this
+    "customer.id": {"$in": [101,102,103]},
+    "customer": {
+      "id": {"$in": [101,102,103]}
+    },
+
+    "customer.id": {"$nin": [101,102,103]}, /* an array means it will use in/inList */
+  }
+}
+```
+
+
+**Comparison Examples**
+```js
+  "amount": {"$ne": 50}, /*not equal*/
+  //FIXME I don't think we need this do we? if so explain use case here in the docs
+  "amount.$gt": 100 /* greater than value, the same as bellow*/
+  "amount": {"$gt": 100}, /* greater than value */
+  "amount": {"$ge": 100}, /* greater or equal than value */
+
+  "amount": {"$lt": "$origAmount"}, /* less than value of another field*/
+  "amount": {"$le": "$origAmount"}, /* less or equal than value */
+
+  "amount":{ //all these will get anded together
+    "$gt": 5.0,
+    "$lt": 15.50,
+    "$ne": 9.99
+  },
+
+  "amount": {"$between": [0,100]}, /* between value */
+
+  "status": "$isNull" /* translates to isNull*/
+  "status": null /* translates to isNull*/
+```
+
+**Logical**
+```js
+    "$or": { // if a single or then it can be done like this
+      "customer.name":{"$ilike": "wal"},
+      "customer.num":{"$ilike": "wal"}
+    },
+    "$and":[ // multiple ors would need to look like this in an array. only one and can be present too
+      {
+        "$or": {
+          "customer.name": "John",
+          "customer.name": "Jon"
+        }
+      },
+      {
+        "$or": {
+          "customer.name": "Mark",
+          "customer.name": "Marc"
+        }
+      }
+    ], /* this would end up generating `.... and ( (customer.name = 'john' or customer.name = 'jon')
+          AND (customer.name = 'mark' or customer.name = 'mark') ) ....` */
+
+    "$or":[ // again you can only have one of these
+      { // the and is default and optional and this accomplishes the same thing as example sbelow
+        "customer.name": "Mark",
+        "$or": {
+          "customer.sales": {"$lt": 10},
+          "customer.sales": "$isNull"
+        }
+      },
+      {
+        "$and": { //the and can be explicitly specified too if you wish
+          "customer.name": "Jim",
+          "customer.sales": {"$lt": 15}
+        }
+      },
+    ], /* this would end up generating
+        ....
+        AND
+        (
+          (customer.name = 'mark' and ( customer.sales < 10 or customer.sales IS NULL))
+          OR
+          (customer.name = 'jim' and customer.sales < 15 )
+        )
+        .... */
+  }
+}
+
 ```
 **Quick Search**
 

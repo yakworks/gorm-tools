@@ -561,7 +561,7 @@ starwars api here <a href="http://stapi.co/api/v1/rest/spacecraft?uid=SRMA000000
 <td><code>&quot;cargo&quot;: {&quot;$gt&quot;: 10000}</code></td>
 </tr>
 <tr>
-<td>$gte | $ge</td>
+<td>$gte</td>
 <td>&gt;= greater than or equal</td>
 <td><code>&quot;cargo&quot;: {&quot;$gte&quot;: 10000}</code></td>
 </tr>
@@ -571,7 +571,7 @@ starwars api here <a href="http://stapi.co/api/v1/rest/spacecraft?uid=SRMA000000
 <td><code>&quot;cargo&quot;: {&quot;$lt&quot;: 10000}</code></td>
 </tr>
 <tr>
-<td>$lte | $le</td>
+<td>$lte</td>
 <td>&lt;= less than or equal</td>
 <td><code>&quot;cargo&quot;: {&quot;$lte&quot;: 10000}</code></td>
 </tr>
@@ -613,12 +613,54 @@ starwars api here <a href="http://stapi.co/api/v1/rest/spacecraft?uid=SRMA000000
 <tr>
 <td>$isNull</td>
 <td>Value is null</td>
-<td>`"name": "$isNull"</td>
+<td><code>&quot;name&quot;: &quot;$isNull&quot; \|</code>"name": null</td>
 </tr>
 <tr>
 <td>$isNotNull</td>
 <td></td>
-<td>`"name": "$isNotNull"</td>
+<td><code>&quot;name&quot;: &quot;$isNotNull&quot; \|</code>"name":{$ne: null}</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fields</strong></p>
+<table>
+<thead>
+<tr>
+<th>Op</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$gtf</td>
+<td>&gt;  another field</td>
+<td><code>&quot;cargo&quot;: {&quot;$gtf&quot;: &quot;maxCargo&quot;}</code></td>
+</tr>
+<tr>
+<td>$gtef</td>
+<td>&gt;= field</td>
+<td><code>&quot;cargo&quot;: {&quot;$gtef&quot;: &quot;maxCargo&quot;}</code></td>
+</tr>
+<tr>
+<td>$ltf</td>
+<td>&lt;  field</td>
+<td><code>&quot;cargo&quot;: {&quot;$ltf&quot;: &quot;maxCargo&quot;}</code></td>
+</tr>
+<tr>
+<td>$ltef</td>
+<td>&lt;= field</td>
+<td><code>&quot;cargo&quot;: {&quot;$ltef&quot;: &quot;maxCargo&quot;}</code></td>
+</tr>
+<tr>
+<td>$eqf</td>
+<td>= field</td>
+<td><code>&quot;cargo&quot;: {&quot;$eqf&quot;: &quot;controlTotal&quot;}</code></td>
+</tr>
+<tr>
+<td>$nef</td>
+<td>not equal, !=, &lt;&gt;</td>
+<td><code>&quot;cargo&quot; : {&quot;$nef&quot; : &quot;controlTotal&quot;}}</code></td>
 </tr>
 </tbody>
 </table>
@@ -633,7 +675,7 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
     <span class="s2">&quot;hologram&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="cm">/* boolean */</span>
     <span class="s2">&quot;createdDate&quot;</span><span class="o">:</span> <span class="s2">&quot;1993-05-16T00:00:00.000Z&quot;</span><span class="p">,</span> <span class="c1">// dates</span>
     <span class="s2">&quot;dateOfBirth&quot;</span><span class="o">:</span> <span class="s2">&quot;1957-07-26&quot;</span> <span class="c1">// dates</span>
-    <span class="s2">&quot;placeOfBirth&quot;</span><span class="o">:</span> <span class="s2">&quot;$placeOfDeath&quot;</span> <span class="c1">//equals another field in set</span>
+    <span class="s2">&quot;placeOfBirth&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$eqf&quot;</span><span class="o">:</span> <span class="s2">&quot;$placeOfDeath&quot;</span><span class="p">}</span> <span class="c1">//equals another field in set</span>
   <span class="p">},</span>
   <span class="s2">&quot;sort&quot;</span><span class="o">:</span><span class="s2">&quot;name&quot;</span>
 <span class="p">}</span>

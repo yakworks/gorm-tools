@@ -486,8 +486,10 @@ The gorm dao's come with a <code>list(criteriaMap, closure)</code> method. It al
 the properties in the <code>criteriaMap</code>. The map could be passed as JSON string or Map. All restrictions should be under <code>criteria</code> keyword by default, see example
 bellow.</p>
 <p>Anything in the optional closure will be passed into Gorm/Hibernate criteria closure</p>
-<p>The query language is largely based on <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a>
-with inspiration from <a href="https://github.com/2do2go/json-sql/">json-sql</a> as well</p>
+<p>The query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a> and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a> with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sql</a> as well</p>
+<blockquote>
+<p>Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
+</blockquote>
 <p><strong>Example</strong></p>
 <div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">list</span><span class="o">([</span>
   <span class="n">criteria</span><span class="o">:</span> <span class="o">[</span><span class="n">name</span><span class="o">:</span> <span class="s">&quot;Virgin%&quot;</span><span class="o">,</span> <span class="n">type</span><span class="o">:</span> <span class="s">&quot;New&quot;</span><span class="o">],</span>
@@ -667,6 +669,9 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
     <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
     <span class="c1">//the 3 above are different ways to do this</span>
     <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span>
+    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]}</span>
+    <span class="p">},</span>
 
     <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span> <span class="cm">/* an array means it will use in/inList */</span>
   <span class="p">}</span>
@@ -690,12 +695,13 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
 
   <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$between&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">]},</span> <span class="cm">/* between value */</span>
 
-  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;$isNull&quot;</span><span class="p">],</span> <span class="cm">/* translates to isNull*/</span>
+  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="s2">&quot;$isNull&quot;</span> <span class="cm">/* translates to isNull*/</span>
+  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="kc">null</span> <span class="cm">/* translates to isNull*/</span>
 </pre></div></p>
 <p><strong>Logical</strong>
 <div class="codehilite"><pre><span></span>    <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// if a single or then it can be done like this</span>
-      <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">],</span>
-      <span class="s2">&quot;customer.num&quot;</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">]</span>
+      <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">},</span>
+      <span class="s2">&quot;customer.num&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">}</span>
     <span class="p">},</span>
     <span class="s2">&quot;$and&quot;</span><span class="o">:</span><span class="p">[</span> <span class="c1">// multiple ors would need to look like this in an array. only one and can be present too</span>
       <span class="p">{</span>
@@ -718,7 +724,7 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
         <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Mark&quot;</span><span class="p">,</span>
         <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
           <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">},</span>
-          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;$isNull&quot;</span><span class="p">]</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="s2">&quot;$isNull&quot;</span>
         <span class="p">}</span>
       <span class="p">},</span>
       <span class="p">{</span>
@@ -731,7 +737,7 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
 <span class="cm">        ....</span>
 <span class="cm">        AND</span>
 <span class="cm">        (</span>
-<span class="cm">          (customer.name = &#39;mark&#39; and ( customer.sales &lt; 10 or customer.sales is Null))</span>
+<span class="cm">          (customer.name = &#39;mark&#39; and ( customer.sales &lt; 10 or customer.sales IS NULL))</span>
 <span class="cm">          OR</span>
 <span class="cm">          (customer.name = &#39;jim&#39; and customer.sales &lt; 15 )</span>
 <span class="cm">        )</span>

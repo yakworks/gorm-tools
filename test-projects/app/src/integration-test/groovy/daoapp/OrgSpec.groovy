@@ -97,12 +97,12 @@ class OrgSpec extends Specification {
         list[10].address.id == 30
     }
 
-    /*def "Filter by boolean"() {
+    def "Filter by boolean"() {
         when:
-        List list = Org.dao.search([[criteria:isActive: "true"], max: 150])
+        List list = Org.dao.search([criteria:[isActive: "true"], max: 150])
         then:
-        list.size() == 51
-    }*/
+        list.size() ==  Org.createCriteria().list(){eq "isActive", true}.size()
+    }
 
     def "Filter by boolean in list"() {
         when:

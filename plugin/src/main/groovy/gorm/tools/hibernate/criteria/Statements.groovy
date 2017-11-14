@@ -51,9 +51,8 @@ class Statements {
                         delegate.gt params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$gte"], restriction:
+            [statements: ["\$gte", "\$ge"], restriction:
                     { delegate, Map params ->
-                        println "ge ${params.keySet()[0]}, ${params.values()[0][0]}"
                         delegate.ge params.keySet()[0], params.values()[0][0]
                     }
             ],
@@ -62,28 +61,27 @@ class Statements {
                         delegate.lt params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$lte"], restriction:
+            [statements: ["\$lte","\$le"], restriction:
                     { delegate, Map params ->
                         delegate.le params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$gtf"], restriction:
+            [statements: ["\$gtf"], type:StatementsType.PROPERTY, restriction:
                     { delegate, Map params ->
                         delegate.gtProperty params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$gtef"], restriction:
+            [statements: ["\$gtef"], type:StatementsType.PROPERTY, restriction:
                     { delegate, Map params ->
-                        println "ge ${params.keySet()[0]}, ${params.values()[0][0]}"
                         delegate.geProperty params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$ltf"], restriction:
+            [statements: ["\$ltf"], type:StatementsType.PROPERTY, restriction:
                     { delegate, Map params ->
                         delegate.ltProperty params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$ltef"], restriction:
+            [statements: ["\$ltef"], type:StatementsType.PROPERTY, restriction:
                     { delegate, Map params ->
                         println "\$ltef      k: ${params.keySet()[0]}   val: ${params.values()[0][0]}"
                         delegate.leProperty(params.keySet()[0], params.values()[0][0])
@@ -96,11 +94,12 @@ class Statements {
                         }
                     }
             ],
-            [statements: ["\$isNull"], restriction:
+            [statements: ["\$isNull", "null"], type:StatementsType.UNARY, restriction:
                     { delegate, Map params ->
                         delegate.isNull params.keySet()[0]
                     }
-            ]
+            ],
+            [statements: ["\$or", "\$and"], type: StatementsType.OPERATORS]
     ]
     /**
      * Get list of all alloweded statements
@@ -110,6 +109,16 @@ class Statements {
     @CompileDynamic
     static List<String> listAllowedStatements() {
         statements.collect { it.statements}.flatten()
+    }
+
+    /**
+     * Get list of allowed statements with specific type
+     *
+     * @return list with statements with specific type
+     */
+    @CompileDynamic
+    static List<String> listAllowedStatements(StatementsType type) {
+        statements.findAll{it.type == type}.collect { it.statements}.flatten()
     }
     /**
      * Returns closure that should be executed for statement
@@ -121,6 +130,7 @@ class Statements {
     static Closure findRestriction(String statement){
         statements.find{it.statements.contains(statement)}.restriction
     }
-
-
+}
+enum StatementsType{
+    PROPERTY, UNARY, OPERATORS
 }

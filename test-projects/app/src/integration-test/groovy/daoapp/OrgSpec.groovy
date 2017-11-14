@@ -284,12 +284,36 @@ class OrgSpec extends Specification {
         list[0].name == Org.createCriteria().list(){ge "revenue", new BigDecimal("9500")}[0].name
     }
 
-    def "Filter with `lte()` less then another value"(){
+    def "Filter with `lte()` then another value"(){
         when:
         List list = Org.dao.search([criteria:[revenue: ["\$ltef": "credit"]], max: 150]).sort{it.id}
         then:
         list.size() == Org.createCriteria().list(){leProperty "revenue", "credit"}.size()
         list[0].name == Org.createCriteria().list(){leProperty "revenue", "credit"}[0].name
+    }
+
+    def "Filter with `gte()` then another value"(){
+        when:
+        List list = Org.dao.search([criteria:[revenue: ["\$gtef": "credit"]], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){geProperty "revenue", "credit"}.size()
+        list[0].name == Org.createCriteria().list(){geProperty "revenue", "credit"}[0].name
+    }
+
+    def "Filter with `gt()` then another value"(){
+        when:
+        List list = Org.dao.search([criteria:[revenue: ["\$gtf": "credit"]], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){gtProperty "revenue", "credit"}.size()
+        list[0].name == Org.createCriteria().list(){gtProperty "revenue", "credit"}[0].name
+    }
+
+    def "Filter with `lt()` then another value"(){
+        when:
+        List list = Org.dao.search([criteria:[revenue: ["\$ltf": "credit"]], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){ltProperty "revenue", "credit"}.size()
+        list[0].name == Org.createCriteria().list(){ltProperty "revenue", "credit"}[0].name
     }
 
     def "Filter with `lt()`"(){
@@ -308,9 +332,29 @@ class OrgSpec extends Specification {
         list[0].name == Org.createCriteria().list(){le "id", 5L}[0].name
     }
 
-    def "Filter with `isNull`"(){
+    def "Filter with `isNull` object"(){
         when:
-        List list = Org.dao.search([criteria:[credit: ["\$isNull"]], max: 150]).sort{it.id}
+        List list = Org.dao.search([criteria:[credit: ["\$isNull": true]], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){isNull "credit"}.size()
+    }
+
+    def "Filter with `isNull` when val"(){
+        when:
+        List list = Org.dao.search([criteria:[credit: "\$isNull"], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){isNull "credit"}.size()
+    }
+
+    def "Filter with `isNull` when just 'null'"(){
+        when:
+        List list = Org.dao.search([criteria:[credit: 'null'], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){isNull "credit"}.size()
+    }
+    def "Filter with `isNull` when just null"(){
+        when:
+        List list = Org.dao.search([criteria:[credit: null], max: 150]).sort{it.id}
         then:
         list.size() == Org.createCriteria().list(){isNull "credit"}.size()
     }
@@ -380,7 +424,13 @@ class OrgSpec extends Specification {
         List list = Org.dao.search([criteria:["quickSearch": "Org-num#1", id: 123], max: 150])
         then:
         list.size() == 11
+    }
 
+    def "test quick search is higher priority then other filters with nested"(){
+        when:
+        List list = Org.dao.search([criteria:["quickSearch": "City#1", id: 123], max: 150])
+        then:
+        list.size() == 11
     }
 
 }

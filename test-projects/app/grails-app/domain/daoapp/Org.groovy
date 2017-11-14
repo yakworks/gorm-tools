@@ -10,7 +10,7 @@ class Org {
     BigDecimal credit
     Long refId = 0L
 
-    static quickSearchFields = ["name", "num"]
+    static quickSearchFields = ["name", "num", "address.city"]
     static constraints = {
 		name blank:false
 		num nullable: true

@@ -30,6 +30,7 @@ class CriteriaUtils {
             if (groups[command]) "${command}"(groups.map, groups.delegate, groups[command])
         }
     }
+
     @Deprecated
     static Criteria filterBoolean(Map params, delegate, List keys) {
         filterEqIn(params, delegate, { it as Boolean }, keys)
@@ -262,19 +263,14 @@ class CriteriaUtils {
     static Map typedParams(Map map, String domainName) {
         Map result = [:]
         GrailsDomainClass domainClass = GormMetaUtils.findDomainClass(domainName)
-        flattenMap(map).each {String k, v ->
+        flattenMap(map).each { String k, v ->
             try {
                 String checkedKey = k
-                if (k.contains("\$or")){
-                    checkedKey = k.split("[.]").findAll{!it.startsWith("\$or")}.join(".")
-                }
-
-                if (k.matches(/.*[.]\d*$/)){
-                    checkedKey = checkedKey.split("[.]")[0..-2].join(".")
+                List <String> splited = k.split("[.]")
+                if (splited.intersect(gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS))) {
+                    checkedKey = splited.findAll { !gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS).contains(it) }.join(".")
                 }
                 GrailsDomainClassProperty property = domainClass.getPropertyByName(checkedKey)
-                println ">>>>>>>>>>>>>>> $k"
-                println "---->>>>>>>>>>>>>>> $v"
                 result[k] = toType(v, property.type)
             } catch (e) {
                 println e
@@ -287,7 +283,6 @@ class CriteriaUtils {
     /**
      * Recorsive method that flattens map [customer:[id: 1]] -> [customer.id: 1]
      * Specific for criteriaUtils to handle [customerId: 1]  -> [customer.id: 1]
-     * And doesnt flatten  `or` key, so we can use it in criteria //TODO: fix comment
      *
      * @param params map of params
      * @return flattened map
@@ -295,39 +290,40 @@ class CriteriaUtils {
     @CompileDynamic
     static Map flattenMap(Map params) {
         Closure flatMap
-        flatMap = { map, prefix='' ->
+        flatMap = { map, prefix = '' ->
             map.inject([:]) { object, v ->
-                println "isssss  ${["\$or", "\$and"].contains(v.key)}      and      ${v.value instanceof List}"
-                if (["\$or", "\$and"].contains(v.key) && v.value instanceof List){
-                    v.value.each{Map listV->
-                        println listV
+                if (gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS).contains(v.key) && v.value instanceof List) {
+                    v.value.each { Map listV ->
                         object += flatMap(listV, "${prefix ? "${prefix}." : ""}${v.key}")
-                        println object
                     }
-
                 } else {
                     if (v.value instanceof Map) {
                         object += flatMap(v.value, "${prefix ? "${prefix}." : ""}$v.key")
                     } else {
-                        if (v.key.matches(".*[^.]Id")) {
-                            object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id") ? v.key.replaceAll("Id\$", ".id").toString() : v.key}"] = v.value
+                        // mostly for handling 'isNull' it could be as value {credit: "$isNull"} and key {credit: {$isNull: true}}
+                        if (gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.UNARY).intersect([v.value.toString()])) {
+                            object["${prefix ? "${prefix}." : ""}$v.key"] = [v.value.toString()]
+                        } else if (gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.UNARY).intersect([v.key])) {
+                            object["${prefix ? "${prefix}." : ""}$v.key"] = [v.key]
+                        } else {
+                            if (v.key.matches(".*[^.]Id")) {
+                                object["${prefix ? "${prefix}." : ""}${v.key.matches(".*[^.]Id") ? v.key.replaceAll("Id\$", ".id").toString() : v.key}"] = v.value
+                            }
+                            object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
                         }
-                        object["${prefix ? "${prefix}." : ""}$v.key"] = v.value
                     }
                 }
                 object
             }
         }
         Map res = [:]
-        flatMap(params).each{ k, v->
-            if (k.split("[.]")[-1] && gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(k.split("[.]")[-1])){
-               res[k.split("[.]")[0..-2].join(".")] = [k.split("[.]")[-1], v]
+        flatMap(params).each { k, v ->
+            if (k.split("[.]")[-1] && gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(k.split("[.]")[-1])) {
+                res[k.split("[.]")[0..-2].join(".")] = [k.split("[.]")[-1], v]
             } else {
                 res[k] = v
             }
         }
-
-        println "::: $res"
         res
     }
 
@@ -336,43 +332,43 @@ class CriteriaUtils {
      */
     static Closure restriction = { key, val, type ->
         if (val != "")
-        switch (type) {
-            case (String):
-                if (val instanceof List) {
-                    restrictList(delegate, key, val, type)
-                } else {
-                    if (val && val.contains('%')) {
-                        like key, val
+            switch (type) {
+                case (String):
+                    if (val instanceof List) {
+                        restrictList(delegate, key, val)
                     } else {
-                        eq key, val
+                        if (val && val.contains('%')) {
+                            like key, val
+                        } else {
+                            eq key, val
+                        }
                     }
-                }
-                break
-            case [Boolean, boolean]:
-                if (val instanceof List) { //just to handle cases if we get ["true"]
-                    'in'(key, val.collect { it.toBoolean() })
-                } else {
-                    eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
-                }
-                break
-            case (Date):
-                if (val instanceof List) {
-                    restrictList(delegate, key, val, type)
-                } else {
-                    eq(key, toDate(val))
-                }
-                break
-            case [Integer, int, long, double, Double, float, Float, Long, BigDecimal]:
-                if (val instanceof List || (val instanceof String && val.matches(/\[.*\]/))) {
-                    restrictList(delegate, key, val, type)
-                } else {
-                    eq(key, val)
-                }
-                break
-        }
+                    break
+                case [Boolean, boolean]:
+                    if (val instanceof List) { //just to handle cases if we get ["true"]
+                        'in'(key, val.collect { it.toBoolean() })
+                    } else {
+                        eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
+                    }
+                    break
+                case (Date):
+                    if (val instanceof List) {
+                        restrictList(delegate, key, val)
+                    } else {
+                        eq(key, toDate(val))
+                    }
+                    break
+                case [Integer, int, long, double, Double, float, Float, Long, BigDecimal]:
+                    if (val instanceof List || (val instanceof String && val.matches(/\[.*\]/))) {
+                        restrictList(delegate, key, val)
+                    } else {
+                        eq(key, val)
+                    }
+                    break
+            }
     }
 
-    static Date toDate(val){
+    static Date toDate(val) {
         if (val instanceof String) {
             DateUtil.parseJsonDate(val)
         } else {
@@ -382,21 +378,23 @@ class CriteriaUtils {
 
     @CompileDynamic
     static toType(val, type) {
+
         if (val instanceof List) {
-            if (["\$ltef"].contains(val[0])){
-                    println "-----------------------333333333"
-                return val //TODO:
+            //For property statements we shoudnt transform property name to specific type
+            if (gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.PROPERTY).contains(val[0])) {
+                return val
             }
             return val.collect {
                 gorm.tools.hibernate.criteria.Statements.listAllowedStatements().contains(it) ? it : toType(it, type)
             }
         }
+
         switch (type) {
             case String:
                 val
                 break
             case [Boolean, boolean]:
-                 val.toBoolean()// we cant use "asType" because 'false'.asType(Boolean) == true
+                val.toBoolean()// we cant use "asType" because 'false'.asType(Boolean) == true
                 break
             case (Date):
                 toDate(val)
@@ -408,7 +406,7 @@ class CriteriaUtils {
     }
 
     @CompileDynamic
-    static getType(val){
+    static getType(val) {
         if (val instanceof List) return val[0].getClass()
         val.getClass()
     }
@@ -421,7 +419,7 @@ class CriteriaUtils {
      * @return list of entities
      */
     @CompileDynamic
-    static List list(Map filters, Class domain, Map params = [:], Closure closure=null) {
+    static List list(Map filters, Class domain, Map params = [:], Closure closure = null) {
         Criteria criteria = domain.createCriteria()
         Pager pager = new Pager(params)
         criteria.list(max: pager.max, offset: pager.offset) {
@@ -429,10 +427,12 @@ class CriteriaUtils {
                 closure.delegate = delegate
                 closure.call()
             }
-            if ((filters.quickSearch || filters.q) && domain.quickSearchFields){
+            if ((filters.quickSearch || filters.q) && domain.quickSearchFields) {
                 String quickParams = filters.quickSearch ?: filters.q
                 criterias.delegate = delegate
-                criterias.call(["\$or": domain.quickSearchFields.collectEntries{["$it":["\$quickSearch", quickParams]]}], domain, params)
+                criterias.call(["\$or": domain.quickSearchFields.collectEntries {
+                    ["$it": ["\$quickSearch", quickParams]]
+                }], domain, params)
                 return
             }
             criterias.delegate = delegate
@@ -441,7 +441,7 @@ class CriteriaUtils {
     }
 
     @CompileDynamic
-    static List list(String filters, Class domain, Map params = [:], Closure closure=null) {
+    static List list(String filters, Class domain, Map params = [:], Closure closure = null) {
         list(JSON.parse(filters) as Map, domain, params, closure)
     }
 
@@ -458,11 +458,13 @@ class CriteriaUtils {
         criteria.get() {
             criterias.delegate = delegate
             criterias.call(filters, domain, params)
-            if ((filters.quickSearch || filters.q) && domain.quickSearchFields){
+            if ((filters.quickSearch || filters.q) && domain.quickSearchFields) {
                 String quickParams = filters.quickSearch ?: filters.q
                 criterias.delegate = delegate
-                String searchValue = quickParams.contains("%") ? quickParams : quickParams+"%"
-                criterias.call([or: domain.quickSearchFields.collectEntries{["$it":["quickSearch()", searchValue]]}], domain, params)
+                String searchValue = quickParams.contains("%") ? quickParams : quickParams + "%"
+                criterias.call([or: domain.quickSearchFields.collectEntries {
+                    ["$it": ["quickSearch()", searchValue]]
+                }], domain, params)
                 return
             }
             closure.delegate = delegate
@@ -470,17 +472,16 @@ class CriteriaUtils {
         }
     }
 
-    static Closure criterias = {Map filters, Class domain, Map params = [:] ->
+    static Closure criterias = { Map filters, Class domain, Map params = [:] ->
         String domainName = domain.name
         Map typedParams = typedParams(filters, domainName)
-        println "Typed params :            $typedParams"
         Closure result = {
 
             Closure run
             run = { map, Closure closure ->
                 map.keySet().each { k ->
                     if (map[k] instanceof Map) {
-                        "${k == "\$or" ? "or" : k}" {
+                        "${gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS).contains(k) ? k[1..-1] : k}" {
                             run(map[k], closure)
                         }
                     } else {
@@ -495,11 +496,11 @@ class CriteriaUtils {
                 restriction.call(lastKey, val, getType(val))
             })
 
-            if (params.order){
-                if (params.sort && params.order){
+            if (params.order) {
+                if (params.sort && params.order) {
                     applyOrder(params, delegate)
                 } else {
-                    (params.order instanceof String ? Eval.me(params.order) : params.order).each {k,v->
+                    (params.order instanceof String ? Eval.me(params.order) : params.order).each { k, v ->
                         order(k, v)
                     }
                 }
@@ -520,12 +521,11 @@ class CriteriaUtils {
      * @param type variable type
      */
     @CompileDynamic
-    static private restrictList(delegate, key, list, type){
+    static private restrictList(delegate, key, list) {
         if (list instanceof String) list = Eval.me(list)
-        if (key.matches(/.*[.]\d*$/)) key = key.split("[.]")[0..-2].join(".")
-        if (Statements.listAllowedStatements().contains(list[0])){
-            List listParams = (list[1] instanceof List) ? list.tail()[0] as List: list.tail()
-            if ((listParams[0] && listParams[0]!="") | list[0] == "\$isNull") {
+        if (Statements.listAllowedStatements().contains(list[0])) {
+            List listParams = (list[1] instanceof List) ? list.tail()[0] as List : list.tail()
+            if ((listParams[0] && listParams[0] != "") | gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.UNARY).contains(list[0])) {
                 Statements.findRestriction(list[0]).call(delegate, ["$key": listParams])
             }
         } else {
@@ -536,13 +536,13 @@ class CriteriaUtils {
     }
 
 
-    static private Map toNestedMap(Map flattenedMap){
+    static private Map toNestedMap(Map flattenedMap) {
         Closure putNestedValue
-        putNestedValue = {Map res,String key, val->
-            if (key.contains(".")){
+        putNestedValue = { Map res, String key, val ->
+            if (key.contains(".")) {
                 String newKey = key.split("[.]")[0]
                 if (!res[newKey]) res[newKey] = [:]
-                putNestedValue( res[newKey],  key.split("[.]").tail().join("."), val)
+                putNestedValue(res[newKey], key.split("[.]").tail().join("."), val)
             } else {
                 if (!res[key]) res[key] = [:]
                 res[key] = val
@@ -550,8 +550,8 @@ class CriteriaUtils {
         }
 
         Map res = [:]
-        flattenedMap.each {k,v->
-            putNestedValue(res,k,v)
+        flattenedMap.each { k, v ->
+            putNestedValue(res, k, v)
         }
         res
     }

@@ -210,10 +210,41 @@ class OrgSpec extends Specification {
 
     def "Filter with several `or` on one level"(){
         when:
+        println "Filter with several `or` on one level"
         List list = Org.dao.search([criteria:["\$or": [["address.id": "5" ], ["name": "Org#1", "address.id": "4" ]]], max: 150])
         then:
+        list.size() == Org.createCriteria().list() {
+            or {
+                address {
+                    eq "id", 5L
+                }
+                and {
+                    eq "name", "Org#1"
+                    address {
+                        eq "id", 4L
+                    }
+                }
+            }
+        }.size()
+        list[0].name == "Org#4"
+    }
+
+    def "Filter with several `or` on one level2"(){
+        when:
+        List list = Org.dao.search([criteria:["\$or": [["address.id": "5" ], [ "address.id": "4" ]]], max: 150])
+        then:
+        list.size() == Org.createCriteria().list() {
+            or {
+                address {
+                    eq "id", 5L
+                }
+                address { eq "id", 4L
+
+                }
+            }
+        }.size()
         list.size() == 2
-        list[1].name == "Org#3"
+        list[1].name == "Org#4"
     }
 
     def "Filter with `or` with like"(){

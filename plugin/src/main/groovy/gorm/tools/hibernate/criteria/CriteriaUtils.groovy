@@ -267,8 +267,8 @@ class CriteriaUtils {
             try {
                 String checkedKey = k
                 List <String> splited = k.split("[.]")
-                if (splited.intersect(gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS))) {
-                    checkedKey = splited.findAll { !gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS).contains(it) }.join(".")
+                if (splited.find{it.matches(/\$(or|and)(,\d*)?$/)}) {
+                    checkedKey = splited.findAll { !it.matches(/\$(or|and)(,\d*)?$/) }.join(".")
                 }
                 GrailsDomainClassProperty property = domainClass.getPropertyByName(checkedKey)
                 result[k] = toType(v, property.type)
@@ -291,10 +291,12 @@ class CriteriaUtils {
     static Map flattenMap(Map params) {
         Closure flatMap
         flatMap = { map, prefix = '' ->
+            int i= 0
             map.inject([:]) { object, v ->
                 if (gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS).contains(v.key) && v.value instanceof List) {
+                    int j = 0
                     v.value.each { Map listV ->
-                        object += flatMap(listV, "${prefix ? "${prefix}." : ""}${v.key}")
+                        object += flatMap(listV, "${prefix ? "${prefix}." : ""}${v.key},${i}.\$and,${j++}")
                     }
                 } else {
                     if (v.value instanceof Map) {
@@ -313,6 +315,7 @@ class CriteriaUtils {
                         }
                     }
                 }
+                i++
                 object
             }
         }
@@ -481,7 +484,7 @@ class CriteriaUtils {
             run = { map, Closure closure ->
                 map.keySet().each { k ->
                     if (map[k] instanceof Map) {
-                        "${gorm.tools.hibernate.criteria.Statements.listAllowedStatements(gorm.tools.hibernate.criteria.StatementsType.OPERATORS).contains(k) ? k[1..-1] : k}" {
+                        "${k.matches(/\$(or|and)(,\d*)?$/) ? k[1..-1].split(",")[0] : k}" {
                             run(map[k], closure)
                         }
                     } else {
@@ -490,7 +493,6 @@ class CriteriaUtils {
 
                 }
             }
-
             run.call(toNestedMap(typedParams), { lastKey, val -> // from nested closure
                 restriction.delegate = delegate
                 restriction.call(lastKey, val, getType(val))

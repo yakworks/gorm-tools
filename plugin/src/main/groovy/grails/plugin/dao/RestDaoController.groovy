@@ -66,7 +66,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
      * @return List of resources or empty if it doesn't exist
      */
     protected List<T> listAllResources(Map params) {
-        dao.search(params)
+        dao.list(params)
     }
 
     def saveOrUpdate() {

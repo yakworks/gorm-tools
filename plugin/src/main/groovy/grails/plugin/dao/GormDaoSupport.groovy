@@ -163,7 +163,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @return
 	 */
 	@CompileDynamic
-	List<T> search(Map params = [:], Closure closure = null) {
+	List<T> list(Map params = [:], Closure closure = null) {
 		Map criteria
 		if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
 			JSON.use('deep')

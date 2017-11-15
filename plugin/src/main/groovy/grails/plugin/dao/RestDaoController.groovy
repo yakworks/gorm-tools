@@ -54,7 +54,6 @@ abstract class RestDaoController<T> extends RestfulController<T> {
      * @return A list of resources
      */
     def index(Integer max) {
-        params.max = max
         Pager pager = new Pager(params)
         Map json = pager.setupData(listAllResources(params as Map)).jsonData
         respond json
@@ -65,8 +64,8 @@ abstract class RestDaoController<T> extends RestfulController<T> {
      *
      * @return List of resources or empty if it doesn't exist
      */
-    protected List<T> listAllResources(Map params) {
-        dao.list(params)
+    protected List<T> listAllResources() {
+        List q = dao.list(params)
     }
 
     def saveOrUpdate() {

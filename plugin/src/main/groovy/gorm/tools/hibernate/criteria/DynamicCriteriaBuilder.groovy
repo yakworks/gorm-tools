@@ -14,7 +14,7 @@ public class DynamicCriteriaBuilder {
         this.gdc = new GrDetachedCriteria(domain)
     }
 
-    GrDetachedCriteria getCriteria(key, val) {
+    GrDetachedCriteria addCriteria(key, val) {
         switch (val.getClass()) {
             case (String):
                 gdc = gdc.build { like(key, val + "%") }
@@ -29,7 +29,7 @@ public class DynamicCriteriaBuilder {
 
     public List list(Map params) {
         params.each { k, v ->
-            getCriteria(k, v)
+            addCriteria(k, v)
         }
         gdc.list()
     }

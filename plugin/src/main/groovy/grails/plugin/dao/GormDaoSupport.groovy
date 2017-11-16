@@ -141,7 +141,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		entity.properties = params
 		if (fireEvents) beforeInsertSave(entity, params)
 		save(entity)
-		return [ok: true, entity: entity, message: DaoMessage.created(entity)]
+		return [ok: true, entity: entity, message: null]
 	}
 
 	/**
@@ -198,7 +198,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		entity.properties = params
 		if (fireEvents) beforeUpdateSave(entity, params)
 		save(entity)
-		return [ok: true, entity: entity, message: DaoMessage.updated(entity)]
+		return [ok: true, entity: entity, message: null]
 	}
 
 	/**
@@ -215,7 +215,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		T entity = get(params.id as Serializable)
 		DaoUtil.checkFound(entity, params, domainClass.name)
 		if (fireEvents) beforeRemoveSave(entity, params)
-		Map msg = DaoMessage.deleted(entity, DaoMessage.badge(entity.ident(), entity))
+		Map msg =null // DaoMessage.deleted(entity, DaoMessage.badge(entity.ident(), entity))
 		delete(entity)
 		return [ok: true, id: params.id, message: msg]
 	}

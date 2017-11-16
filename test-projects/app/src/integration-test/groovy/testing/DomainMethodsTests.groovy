@@ -21,7 +21,7 @@ class DomainMethodsTests extends Specification {
 		//assert dao.domainClass == Jumper
 		initData()
 	}
-	
+
 	void initData(){
 		println "testSave"
 		(1..10).each{
@@ -37,7 +37,7 @@ class DomainMethodsTests extends Specification {
 		assert Student.count() == 10
 		dataInit = true
 	}
-	
+
 	void testPersist(){
 		setup:
 		initData()
@@ -46,7 +46,7 @@ class DomainMethodsTests extends Specification {
 		then:
 		check.name == "jumper1"
 	}
-	
+
 	void testRemove(){
 		setup:
 		initData()
@@ -58,7 +58,7 @@ class DomainMethodsTests extends Specification {
 		then:
 		Student.findByName("student1") == null
 	}
-	
+
 	void testPersistArgs(){
 		when:
 		assert new Jumper(name:"jumpargs").persist(flush:true)
@@ -67,7 +67,7 @@ class DomainMethodsTests extends Specification {
 		then:
 		check.name == "jumpargs"
 	}
-	
+
 	void testPersistFailValidation(){
 		when:
 		def jump = new Jumper()
@@ -80,7 +80,7 @@ class DomainMethodsTests extends Specification {
 			e.entity == jump
 		}
 	}
-	
+
 	void testPersistFailDataAccess(){
 		setup:
 		initData()
@@ -114,7 +114,7 @@ class DomainMethodsTests extends Specification {
 			e.entity == jump
 		}
 	}*/
-	
+
 	void testInsert(){
 		when:
 		println "testInsert"
@@ -122,16 +122,16 @@ class DomainMethodsTests extends Specification {
 		try{
 			def result = Jumper.insertAndSave([name:"testInsert"])
 			DaoUtil.flushAndClear()
-			assert result.entity 
+			assert result.entity
 			"testInsert" == result.entity.name
-			 "default.created.message" == result.message.code
+			// "default.created.message" == result.message.code
 			def dom2 = Jumper.findByName("testInsert")
 			assert dom2.name == "testInsert"
 		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
-	
+
 	void testUpdate(){
 		when:
 		initData()
@@ -143,14 +143,14 @@ class DomainMethodsTests extends Specification {
 			DaoUtil.flushAndClear()
 			"testUpdateXXX" == result.entity.name
 			jump.id == result.entity.id
-			"default.updated.message" == result.message.code
+			//"default.updated.message" == result.message.code
 			def dom2 = Jumper.findByName("testUpdateXXX")
 			assert dom2.name == "testUpdateXXX"
 		}catch(DomainException e){
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
-	
+
 	void testRemoveParams(){
 		setup:
 		initData()
@@ -161,14 +161,14 @@ class DomainMethodsTests extends Specification {
 			def result = Student.remove([id:stud.id])
 			DaoUtil.flushAndClear()
 			stud.id ==  result.id
-			"default.deleted.message" == result.message.code
+			//"default.deleted.message" == result.message.code
 			Student.findByName("student1") == null
 		}catch(DomainException e){
 			e.printStackTrace()
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
-	
+
 	void testGetDaoSetup(){
 		assertTrue Jumper.dao.class.name.contains("testing.JumperDao")
 		println Student.dao.class.name

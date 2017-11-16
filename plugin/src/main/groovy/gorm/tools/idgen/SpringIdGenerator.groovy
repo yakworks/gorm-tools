@@ -6,6 +6,7 @@ import org.hibernate.MappingException
 import org.hibernate.dialect.Dialect
 import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.id.IdentifierGenerator
+import org.hibernate.service.ServiceRegistry
 import org.hibernate.type.Type
 import org.springframework.beans.factory.annotation.Configurable
 
@@ -28,7 +29,8 @@ class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configu
 
     private String segmentValue
 
-    void configure(Type type, Properties params, Dialect dialect)  throws MappingException {
+    @Override
+    void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
         //this.params = params;
         segmentValue = params.getProperty( TABLE ) + ".id "
         showProperties("SpringIdGenerator configure ")

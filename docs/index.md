@@ -120,6 +120,3 @@ class OrgController extends RestDaoController<Org> {
 
 If controller is extended for RestDaoController then methods will use dao services for current domain. For example
 POST action will call dao insert method for Org domain.
-
-
-

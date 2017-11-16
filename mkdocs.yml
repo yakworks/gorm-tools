@@ -15,6 +15,7 @@ pages:
   - Working with dates: working-with-dates.md
   - Building response messages: building-response-messages.md
   - Handling errors: error-handling.md
+  - Criteria MapQL: mapql.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

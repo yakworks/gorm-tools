@@ -5,7 +5,6 @@ import grails.artefact.Artefact
 import grails.converters.JSON
 import grails.rest.RestfulController
 import grails.web.http.HttpHeaders
-import org.grails.datastore.mapping.query.api.Criteria
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK

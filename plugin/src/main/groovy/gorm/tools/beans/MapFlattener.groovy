@@ -64,6 +64,7 @@ class MapFlattener {
      * @param currentName
      * @return
      */
+    @SuppressWarnings(['EmptyCatchBlock'])
     Map<String, String> transformGroovyJsonMap(Map jsonMap, String currentName) {
 
         if (jsonMap == null || jsonMap.isEmpty()) {

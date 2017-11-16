@@ -11,7 +11,6 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.apache.commons.lang.Validate
 import org.apache.juli.logging.Log
 import org.apache.juli.logging.LogFactory
 import org.grails.core.artefact.DomainClassArtefactHandler
@@ -173,7 +172,8 @@ class BeanPathTools {
                         currentMap[property.name] = source?."$property.name"
                     }
                 } else {
-                    Closure notConvert = { it instanceof Map || it instanceof Collection ||
+                    Closure notConvert = {
+                        it instanceof Map || it instanceof Collection ||
                         it instanceof Number || it?.class in [String, Boolean, Character]
                     }
                     Map props = object.properties.findAll { it.key != 'class' }

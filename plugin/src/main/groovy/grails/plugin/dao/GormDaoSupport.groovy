@@ -53,8 +53,8 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		GormDaoSupport dao = grails.plugin.dao.DaoUtil.ctx.getBean("gormDaoBean")
 		dao.domainClass = clazz
 		return dao
-		return new GormDaoSupport(clazz, false)
-
+        //codenarc rules violation (DeadCode)
+		//return new GormDaoSupport(clazz, false)
 	}
 
 	//override this to set the domain this dao is for

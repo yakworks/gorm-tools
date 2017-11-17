@@ -52,21 +52,32 @@ starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
 
 ### Comparison
 
-|     Op      |           Description            |                   Example                    |
-| ----------- | -------------------------------- | -------------------------------------------- |
-| $gt         | >  greater than                  | `"cargo": {"$gt": 10000}`                    |
-| $gte \| $ge | >= greater than or equal         | `"cargo": {"$gte": 10000}`                   |
-| $lt         | <  less than                     | `"cargo": {"$lt": 10000}`                    |
-| $lte \| $le | <= less than or equal            | `"cargo": {"$lte": 10000}`                   |
-| $between    | between two distinct values      | `"dateStatus": {"$between": [2300, 2400]}`   |
-| $like       | like expression                  | `"name": {"$like": "Rom%"}`                  |
-| $ilike      | like auto-append %               | `"name": {"$ilike": "rom"}`                  |
-| $eq         | = equal, concieince for builders | `"salary": {"$eq": 10}` \| `"salary": 10`    |
-| $ne         | not equal, !=, <>                | `"age" : {"$ne" : 12}}`                      |
-| $in         | Match any value in array         | `"field" : {"$in" : [value1, value2, ...]`   |
-| $nin        | Not match any value in array     | `"field" : {"$nin" : [value1, value2, ...]}` |
-| $isNull     | Value is null                    | `"name": ["$isNull"]                         |
-| $isNotNull  |                                  | `"name": ["$isNotNull"]                      |
+|     Op     |           Description            |                   Example                    |
+| ---------- | -------------------------------- | -------------------------------------------- |
+| $gt        | >  greater than                  | `"cargo": {"$gt": 10000}`                    |
+| $gte       | >= greater than or equal         | `"cargo": {"$gte": 10000}`                   |
+| $lt        | <  less than                     | `"cargo": {"$lt": 10000}`                    |
+| $lte       | <= less than or equal            | `"cargo": {"$lte": 10000}`                   |
+| $between   | between two distinct values      | `"dateStatus": {"$between": [2300, 2400]}`   |
+| $like      | like expression                  | `"name": {"$like": "Rom%"}`                  |
+| $ilike     | like auto-append %               | `"name": {"$ilike": "rom"}`                  |
+| $eq        | = equal, concieince for builders | `"salary": {"$eq": 10}` \| `"salary": 10`    |
+| $ne        | not equal, !=, <>                | `"age" : {"$ne" : 12}}`                      |
+| $in        | Match any value in array         | `"field" : {"$in" : [value1, value2, ...]`   |
+| $nin       | Not match any value in array     | `"field" : {"$nin" : [value1, value2, ...]}` |
+| $isNull    | Value is null                    | `"name": "$isNull" \|  `"name": null         |
+| $isNotNull |                                  | `"name": "$isNotNull" \| `"name":{$ne: null} | 
+
+**Fields**
+
+|  Op   |    Description    |                Example                 |
+| ----- | ----------------- | -------------------------------------- |
+| $gtf  | >  another field  | `"cargo": {"$gtf": "maxCargo"}`        |
+| $gtef | >= field          | `"cargo": {"$gtef": "maxCargo"}`       |
+| $ltf  | <  field          | `"cargo": {"$ltf": "maxCargo"}`        |
+| $ltef | <= field          | `"cargo": {"$ltef": "maxCargo"}`       |
+| $eqf  | = field           | `"cargo": {"$eqf": "controlTotal"}`    |
+| $nef  | not equal, !=, <> | `"cargo" : {"$nef" : "controlTotal"}}` |
 
 ## Examples
 
@@ -82,13 +93,13 @@ Assume we are running these on star trek characters http://stapi.co/api/v1/rest/
     "hologram": true, /* boolean */
     "createdDate": "1993-05-16T00:00:00.000Z", // dates
     "dateOfBirth": "1957-07-26" // dates
-    "placeOfBirth": "$placeOfDeath" //equals another field in set
+    "placeOfBirth": {"$eqf": "$placeOfDeath"} //equals another field in set
   },
   "sort":"name"
 }
 ```
 
-This would produce in a round about way with criteria bbuilders a where clause like this
+This would produce in a round about way with criteria builders a where clause like this
 
 ```sql
   .. name like "Kira%" AND gender="F" AND placeOfBirth like "bajor%" AND hologram = true
@@ -128,7 +139,7 @@ This would produce in a round about way with criteria bbuilders a where clause l
       "id": {"$in": [101,102,103]}
     },
 
-    "customer.id": {"$nin": [101,102,103]}, /* an array means it will use in/inList */
+    "customer.id": {"$nin": [101,102,103]}, /* an array means it will use not { in/inList }*/
   }
 }
 ```
@@ -137,9 +148,8 @@ This would produce in a round about way with criteria bbuilders a where clause l
 **Comparison Examples**
 ```js
   "amount": {"$ne": 50}, /*not equal*/
-  //FIXME I don't think we need this do we? if so explain use case here in the docs
-  "amount.$gt": 100 /* greater than value, the same as bellow*/
   "amount": {"$gt": 100}, /* greater than value */
+  "amount.$gt": 100 /* another form of the above one, can be useful when json is build, for example from angular model, where  you can't right in object form*/
   "amount": {"$ge": 100}, /* greater or equal than value */
 
   "amount": {"$lt": "$origAmount"}, /* less than value of another field*/
@@ -154,6 +164,8 @@ This would produce in a round about way with criteria bbuilders a where clause l
   "amount": {"$between": [0,100]}, /* between value */
 
   "status": "$isNull" /* translates to isNull*/
+  "status": {"$isNull": true}, /* translates to isNull*/
+  "status": {"$isNull": false}, /* translates to not{ isNull}*/
   "status": null /* translates to isNull*/
 ```
 
@@ -176,8 +188,8 @@ This would produce in a round about way with criteria bbuilders a where clause l
           "customer.name": "Marc"
         }
       }
-    ], /* this would end up generating `.... and ( (customer.name = 'john' or customer.name = 'jon')
-          AND (customer.name = 'mark' or customer.name = 'mark') ) ....` */
+    ], /* this would end up generating `.... and ( (customer.name = 'John' or customer.name = 'Jon')
+          AND (customer.name = 'Mark' or customer.name = 'Mark') ) ....` */
 
     "$or":[ // again you can only have one of these
       { // the and is default and optional and this accomplishes the same thing as example sbelow

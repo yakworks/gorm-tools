@@ -1,20 +1,14 @@
 package gorm.tools.hibernate.criteria
 
 import gorm.tools.GormMetaUtils
-import gorm.tools.beans.BeanPathTools
 import gorm.tools.Pager
 import gorm.tools.beans.DateUtil
 import grails.converters.JSON
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
-import groovy.transform.CompileStatic
 import org.hibernate.criterion.CriteriaSpecification
-import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.query.api.Criteria
-import gorm.tools.hibernate.criteria.Statements
-
-import javax.servlet.http.HttpServletRequest
 
 /**
  * For consistently searching across data types.
@@ -506,7 +500,7 @@ class CriteriaUtils {
                 if (params.sort && params.order){
                     applyOrder(params, delegate)
                 } else {
-                    (params.order instanceof String ? Eval.me(params.order) : params.order).each {k,v->
+                    (params.order instanceof String ? Eval.me(params.order) : params.order).each {k, v->
                         order(k, v)
                     }
                 }
@@ -542,6 +536,4 @@ class CriteriaUtils {
         }
     }
 }
-
-
 

@@ -1,6 +1,7 @@
 package gorm.tools.beans
 
 import groovy.transform.CompileStatic
+import java.text.ParseException
 
 /**
  * MapFlattener taken from here https://github.com/dmillett/jConfigMap
@@ -24,7 +25,7 @@ import groovy.transform.CompileStatic
 
 /**
  * The primary use of this is to convert a net json tree to a flat map that
- * can eb used with the old grails parser
+ * can be used with the old grails parser
  */
 @CompileStatic
 class MapFlattener {
@@ -63,6 +64,7 @@ class MapFlattener {
      * @param currentName
      * @return
      */
+    @SuppressWarnings(['EmptyCatchBlock'])
     Map<String, String> transformGroovyJsonMap(Map jsonMap, String currentName) {
 
         if (jsonMap == null || jsonMap.isEmpty()) {
@@ -91,19 +93,20 @@ class MapFlattener {
             } else {
                 String value = String.valueOf(entry.value)
 
-                if (value != null) {
+                if (value) {
                     value = value.trim() //trim strings - same as grails.databinding.trimStrings
+                    try {
+                        Date date = DateUtil.parseJsonDate(value)
+                        value = DateUtil.dateToJsonString(date)
+                    } catch (ParseException e) {
+                        // it cannot recognize a date format, so do nothing
+                    }
                 }
                 //convert empty strings to null - same behavior as grails.databinding.convertEmptyStringsToNull
                 if ("" == value && convertEmptyStringsToNull) {
                     value = null
                 }
 
-                if (value != null && DateUtil.GMT_SECONDS.matcher(value).matches()) {
-                    //FIXME dirty hack!!!
-                    //XXX why did we use default format with trimmed time?
-                    value = DateUtil.parseJsonDate(value).format("yyyy-MM-dd'T'hh:mm:ss'Z'")
-                }
                 keyVersion.updateMapWithKeyValue(keyValues, key, value)
             }
         }

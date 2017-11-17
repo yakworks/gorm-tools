@@ -1,7 +1,6 @@
 package gorm.tools.hibernate.criteria
 
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 
 class Statements {
     /**
@@ -97,6 +96,5 @@ class Statements {
     static Closure findRestriction(String statement){
         statements.find{it.statements.contains(statement)}.restriction
     }
-
 
 }

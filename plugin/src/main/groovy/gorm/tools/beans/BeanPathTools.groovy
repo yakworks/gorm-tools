@@ -11,10 +11,10 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.apache.commons.lang.Validate
 import org.apache.juli.logging.Log
 import org.apache.juli.logging.LogFactory
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.grails.datastore.gorm.GormEntity
 
 import javax.servlet.http.HttpServletRequest
 
@@ -156,21 +156,35 @@ class BeanPathTools {
 
                 //just get the persistentProperties
                 Object object = (source instanceof DelegatingBean) ? ((DelegatingBean)source).target : source
-                //FIXME this makes it hard to test, fix it so its easier to mock
-                GrailsDomainClass domainClass = GormMetaUtils.getDomainClass(object)
-                //FIXME why do we require a domainClass? I don't think we should
-                Validate.notNull( domainClass, "${source.getClass().name} is not a domain class")
 
-                //FIXME why only persistentProperties, seems we should allow any of them no?
-                GrailsDomainClassProperty[] pprops = domainClass.persistentProperties
-                //filter out the associations. need to explicitely add those to be included
-                pprops = pprops.findAll { p -> !p.isAssociation() }
-                //force the the id to be included
-                String id = domainClass.getIdentifier().name
-                currentMap[id] = source?."$id"
-                //spin through and add them to the map
-                pprops.each { property ->
-                    currentMap[property.name] = source?."$property.name"
+                if (object instanceof GormEntity) {
+                    //FIXME this makes it hard to test, fix it so its easier to mock
+                    GrailsDomainClass domainClass = GormMetaUtils.getDomainClass(object)
+                    //FIXME why only persistentProperties, seems we should allow any of them no?
+                    GrailsDomainClassProperty[] pprops = domainClass.persistentProperties
+                    //filter out the associations. need to explicitly add those to be included
+                    pprops = pprops.findAll { p -> !p.isAssociation() }
+                    //force the the id to be included
+                    String id = domainClass.getIdentifier().name
+                    currentMap[id] = source?."$id"
+                    //spin through and add them to the map
+                    pprops.each { property ->
+                        currentMap[property.name] = source?."$property.name"
+                    }
+                } else {
+                    Closure notConvert = {
+                        it instanceof Map || it instanceof Collection ||
+                        it instanceof Number || it?.class in [String, Boolean, Character]
+                    }
+                    Map props = object.properties.findAll { it.key != 'class' }
+                    props.each { String name, Object value ->
+                        if (!value || notConvert(value)) {
+                            currentMap[name] = value
+                        } else {
+                            currentMap[name] = [:]
+                            propsToMap(value, '*', (Map) currentMap[name])
+                        }
+                    }
                 }
 
             // I think it would be enough to check if a property exists.

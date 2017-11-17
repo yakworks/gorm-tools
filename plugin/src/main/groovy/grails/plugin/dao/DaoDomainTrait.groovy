@@ -3,12 +3,9 @@ package grails.plugin.dao
 import grails.core.GrailsApplication
 import grails.util.GrailsNameUtils
 import grails.util.Holders
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.gorm.GormEntity
-import gorm.tools.hibernate.criteria.CriteriaUtils
-import grails.plugin.dao.*
 
 @CompileStatic
 trait DaoDomainTrait<D extends GormEntity> {
@@ -22,7 +19,6 @@ trait DaoDomainTrait<D extends GormEntity> {
 		if(!daoBean) daoBean = DaoUtil.getDao(this)
 		return daoBean
 	}*/
-
 
 	//TODO: investigate why it doesnt work without it
 	/**

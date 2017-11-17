@@ -79,8 +79,8 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
             //TODO check if its a date field and parse
             eq(field,fieldVal)
         }
-        else if(fieldVal instanceof Map){
-            //could be 1 or more
+        else if(fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
+            //could be 1 or more too
             //for example field=amount and fieldVal=['$lt': 100, '$gt':200]
             for (String key : fieldVal.keySet()) {
                 //everything has to either be either a junction op or condition
@@ -94,13 +94,12 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
                 }
                 String cond = compareOps[key]
                 if(cond){
-                    //normalizer should have ensured all ops have a List for a value
                     "$cond"(field, opArg)
                     continue;
                 }
                 //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
                 // see methodMissing for how this could be done.
-                
+
             }
         }
 

@@ -7,7 +7,9 @@ bellow.
 
 Anything in the optional closure will be passed into Gorm/Hibernate criteria closure
 
-The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/) and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax) with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
+The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/) 
+and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax) 
+with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
 
 >Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.
 

@@ -139,7 +139,7 @@ class BeanPathToolsSpec extends Specification {
         'nested.nested.field'   | [nested: [nested: [field: "test3"]]]
     }
 
-    void "test propsToMap for a non domain"() {
+    void "test propsToMap for a non domain2"() {
         setup:
         PropsToMapTest nested = new PropsToMapTest(field: "test2", field2: 2L,
                 nested: new PropsToMapTest(field: "some_text"))

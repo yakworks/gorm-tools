@@ -3,7 +3,6 @@ package gorm.tools.idgen
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.hibernate.MappingException
-import org.hibernate.dialect.Dialect
 import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.id.IdentifierGenerator
 import org.hibernate.service.ServiceRegistry

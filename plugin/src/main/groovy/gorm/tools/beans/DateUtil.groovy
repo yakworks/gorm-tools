@@ -30,6 +30,7 @@ class DateUtil {
      *
      * @param date formatted date
      * @return parsed date
+     * @throws ParseException if it cannot recognize a date format
      */
     static Date parseJsonDate(String date) {
         if (date == null) {

@@ -90,12 +90,12 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
                 if(op){
                     //normalizer should have ensured all ops have a List for a value
                     "$op"((List) opArg)
-                    continue;
+                    continue
                 }
                 String cond = compareOps[key]
                 if(cond){
                     "$cond"(field, opArg)
-                    continue;
+                    continue
                 }
                 //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
                 // see methodMissing for how this could be done.
@@ -110,7 +110,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    MangoCriteria<T> and( List list ) {
+    MangoCriteria<T> and( List andList ) {
         junctions << new Query.Conjunction()
         handleJunction(andList)
         return this
@@ -121,9 +121,9 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    MangoCriteria<T> or( List list ) {
+    MangoCriteria<T> or( List orList ) {
         junctions << new Query.Disjunction()
-        handleJunction(andList)
+        handleJunction(orList)
         return this
     }
 

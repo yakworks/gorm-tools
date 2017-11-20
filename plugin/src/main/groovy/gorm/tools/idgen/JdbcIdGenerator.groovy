@@ -1,15 +1,15 @@
 package gorm.tools.idgen
 
+import grails.gorm.transactions.Transactional
+import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.apache.log4j.Category
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
-import grails.gorm.transactions.Transactional
-//import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
 
+//import grails.gorm.transactions.Transactional
 /**
  * A Jdbc implementation of the IdGenerator. Will query a central table for new ids.
  * defaults to the following but can be set accordingly:

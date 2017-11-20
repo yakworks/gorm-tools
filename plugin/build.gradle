@@ -6,7 +6,7 @@ buildscript {
 	}
 	dependencies {
 		classpath "org.grails.plugins:views-gradle:1.2.0.M2"
-        classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
+		classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
 	}
 }
 
@@ -30,9 +30,6 @@ configurations.all {
 
 dependencies {
 
-	//provided "org.grails.plugins:hibernate4"
-	//provided "org.hibernate:hibernate-core:4.3.10.Final"
-	//provided "org.hibernate:hibernate-ehcache:4.3.10.Final"
     compile "org.grails.plugins:hibernate5"
     compile "org.hibernate:hibernate-core:5.1.5.Final"
 

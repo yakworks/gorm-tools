@@ -1,20 +1,18 @@
 package grails.plugin.dao
 
 import gorm.tools.GormUtils
+import gorm.tools.hibernate.criteria.CriteriaUtils
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-//import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEntity
+import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
-
-import org.springframework.core.GenericTypeResolver
-import gorm.tools.hibernate.criteria.CriteriaUtils
 
 /**
  * GormDaoSupport represents a super class for all DAO services.

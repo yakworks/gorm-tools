@@ -1,10 +1,9 @@
 package gorm.tools
 
-import grails.core.GrailsApplication
 import grails.util.Holders
-import org.springframework.jdbc.core.JdbcTemplate
-import groovy.transform.CompileStatic
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import org.springframework.jdbc.core.JdbcTemplate
 
 import java.sql.SQLException
 

@@ -6,7 +6,7 @@ buildscript {
 	dependencies {
 		classpath "org.grails:grails-gradle-plugin:$grailsVersion"
 		classpath "org.grails:grails-docs:$grailsVersion"
-		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+		//classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
 		classpath 'io.github.groovylang.groovydoc:groovydoc-gradle-plugin:1.0.1'
 	}
 }

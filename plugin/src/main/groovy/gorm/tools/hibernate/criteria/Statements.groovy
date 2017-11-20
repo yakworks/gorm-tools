@@ -1,7 +1,6 @@
 package gorm.tools.hibernate.criteria
 
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 
 class Statements {
     /**
@@ -61,7 +60,7 @@ class Statements {
                         delegate.lt params.keySet()[0], params.values()[0][0]
                     }
             ],
-            [statements: ["\$lte","\$le"], restriction:
+            [statements: ["\$lte", "\$le"], restriction:
                     { delegate, Map params ->
                         delegate.le params.keySet()[0], params.values()[0][0]
                     }
@@ -108,7 +107,7 @@ class Statements {
      */
     @CompileDynamic
     static List<String> listAllowedStatements() {
-        statements.collect { it.statements}.flatten()
+        statements*.statements.flatten()
     }
 
     /**
@@ -118,7 +117,7 @@ class Statements {
      */
     @CompileDynamic
     static List<String> listAllowedStatements(StatementsType type) {
-        statements.findAll{it.type == type}.collect { it.statements}.flatten()
+        statements.findAll{it.type == type}*.statements.flatten()
     }
     /**
      * Returns closure that should be executed for statement

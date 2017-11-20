@@ -9,6 +9,7 @@ import org.grails.datastore.mapping.query.api.Criteria
  * can be seen in DynamicFinder.applyDetachedCriteria which is called in DetachedCriteria.withPopulatedQuery
  * @param <T>
  */
+@SuppressWarnings(['PropertyName'])
 class MangoCriteria<T> extends DetachedCriteria<T>{
 
     static final Map<String,String> compareOps = [
@@ -77,7 +78,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
     protected void applyField(String field, Object fieldVal) {
         if(fieldVal instanceof String || fieldVal instanceof Number){
             //TODO check if its a date field and parse
-            eq(field,fieldVal)
+            eq(field, fieldVal)
         }
         else if(fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
             //could be 1 or more too

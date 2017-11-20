@@ -1,20 +1,14 @@
 package gorm.tools.hibernate.criteria
 
 import gorm.tools.GormMetaUtils
-import gorm.tools.beans.BeanPathTools
 import gorm.tools.Pager
 import gorm.tools.beans.DateUtil
 import grails.converters.JSON
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
-import groovy.transform.CompileStatic
 import org.hibernate.criterion.CriteriaSpecification
-import grails.compiler.GrailsCompileStatic
 import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.query.api.Criteria
-import gorm.tools.hibernate.criteria.Statements
-
-import javax.servlet.http.HttpServletRequest
 
 /**
  * For consistently searching across data types.
@@ -287,6 +281,7 @@ class CriteriaUtils {
      * @param params map of params
      * @return flattened map
      */
+    @SuppressWarnings(["AbcMetric"])
     @CompileDynamic
     static Map flattenMap(Map params) {
         Closure flatMap
@@ -349,7 +344,7 @@ class CriteriaUtils {
                     break
                 case [Boolean, boolean]:
                     if (val instanceof List) { //just to handle cases if we get ["true"]
-                        'in'(key, val.collect { it.toBoolean() })
+                        'in'(key, val*.toBoolean())
                     } else {
                         eq(key, val.toBoolean()) // we cant use "asType" because 'false'.asType(Boolean) == true
                     }
@@ -421,6 +416,7 @@ class CriteriaUtils {
      * @param domain domain class that should be used for search
      * @return list of entities
      */
+    @SuppressWarnings(['GStringAsMapKey'])
     @CompileDynamic
     static List list(Map filters, Class domain, Map params = [:], Closure closure = null) {
         Criteria criteria = domain.createCriteria()
@@ -455,10 +451,11 @@ class CriteriaUtils {
      * @param domain domain class that should be used for search
      * @return result
      */
+    @SuppressWarnings(['GStringAsMapKey'])
     @CompileDynamic
     static List countTotals(Map filters, Class domain, Map params = [:], Closure closure) {
         Criteria criteria = domain.createCriteria()
-        criteria.get() {
+        criteria.get {
             criterias.delegate = delegate
             criterias.call(filters, domain, params)
             if ((filters.quickSearch || filters.q) && domain.quickSearchFields) {
@@ -493,10 +490,10 @@ class CriteriaUtils {
 
                 }
             }
-            run.call(toNestedMap(typedParams), { lastKey, val -> // from nested closure
+            run.call(toNestedMap(typedParams)) { lastKey, val -> // from nested closure
                 restriction.delegate = delegate
                 restriction.call(lastKey, val, getType(val))
-            })
+            }
 
             if (params.order) {
                 if (params.sort && params.order) {
@@ -537,7 +534,6 @@ class CriteriaUtils {
         }
     }
 
-
     static private Map toNestedMap(Map flattenedMap) {
         Closure putNestedValue
         putNestedValue = { Map res, String key, val ->
@@ -558,5 +554,4 @@ class CriteriaUtils {
         res
     }
 }
-
 

@@ -54,7 +54,7 @@ class DaoPluginHelper {
             String daoName = "${dc.propertyName}Dao"
             def hasDao = daoClasses.find { it.propertyName ==  daoName}
             if(!hasDao){
-                println "${daoName}"
+                //println "${daoName}"
                 "${daoName}"(grails.plugin.dao.GormDaoSupport, domainClass) { bean ->
                     bean.autowire = true
                     bean.lazyInit = true

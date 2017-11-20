@@ -28,14 +28,9 @@ trait DaoDomainTrait<D extends GormEntity> {
 	 */
 	static GormDaoSupport<D> getDao() {
 		GrailsApplication grailsApplication = Holders.grailsApplication
-		String domainName = GormEnhancer.findStaticApi(this.getClass()).getGormPersistentEntity()
-		//Class domainClass = grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, domainName).clazz
+		String domainName = GrailsNameUtils.getPropertyName(this.name)
 		String daoName = "${domainName}Dao"
         (GormDaoSupport<D>)grailsApplication.mainContext.getBean(daoName)
-//		if(grailsApplication.mainContext.containsBean(daoName)){
-//			dao = (GormDaoSupport<D>)grailsApplication.mainContext.getBean(daoName)
-//		}
-//		return dao
 	}
 
 	D persist(Map args) {

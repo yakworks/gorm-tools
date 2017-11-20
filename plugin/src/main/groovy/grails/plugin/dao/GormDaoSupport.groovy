@@ -1,10 +1,11 @@
 package grails.plugin.dao
 
+import gorm.tools.GormUtils
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 
+import grails.gorm.transactions.Transactional
 //import grails.gorm.transactions.Transactional
-import grails.transaction.Transactional
 import grails.validation.ValidationException
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
@@ -28,6 +29,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	boolean flushOnSave = false
 	boolean fireEvents = true
+    String defaultDataBinder = 'grails' //use the stock GrailsWebDataBinder
 
 	private Class<T> thisDomainClass
 
@@ -143,6 +145,47 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		save(entity)
 		return [ok: true, entity: entity, message: null]
 	}
+
+    T bind(T entity, Map row, Map args = [:]){
+        String dataBinder = args?.containsKey("dataBinder") ? args.dataBinder : defaultDataBinder
+        if(dataBinder == 'grails'){
+            entity.properties = row
+        }
+        else if(dataBinder == 'fast'){
+            GormUtils.bindFast(entity, row)
+        }
+        else {
+            //fall back to just setting the props
+            GormUtils.bindFast(entity, row)
+        }
+        return entity
+    }
+
+    @CompileDynamic
+    def callBinderMethod(String method, T entity, Map data, Map args = [:]){
+        "${method}"(entity, data, args)
+    }
+
+    void bindCreate(T entity, Map data, Map args = [:]){
+        bind(entity, data, args)
+    }
+
+    T createNew(Map data, Map args = [:]) {
+        T entity = domainClass.newInstance()
+        String bindMethod = args?.containsKey("bindMethod") ? args.bindMethod : "bindCreate"
+        if(bindMethod == "bindCreate"){
+            bindCreate(entity, data, args)
+        } else {
+            callBinderMethod(bindMethod, entity, data, args)
+        }
+        return entity
+    }
+
+    T create(Map data, Map args = [:]) {
+        T entity = createNew(data, args)
+        save(entity, args)
+        return entity
+    }
 
 	/**
 	 * Updates a new domain entity with the data from params.

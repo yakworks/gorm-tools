@@ -1,6 +1,10 @@
 package gorm.tools.mango
 
 import grails.gorm.DetachedCriteria
+import groovy.transform.CompileDynamic
+import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
+import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
+import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.Criteria
 
@@ -12,8 +16,13 @@ import org.grails.datastore.mapping.query.api.Criteria
 class MangoCriteria<T> extends DetachedCriteria<T>{
 
     static final Map<String,String> compareOps = [
-        '$gt': 'gt',
-        '$eq': 'eq'
+        '$gt' : 'gt',
+        '$eq' : 'eq',
+        '$gte': 'ge',
+        '$lt' : 'lt',
+        '$lte': 'le',
+        '$ilike': 'ilike',
+        '$like': 'like'
     ]
 
     static final Map<String,String> junctionOps = [
@@ -37,9 +46,15 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @return A new criteria instance
      */
     DetachedCriteria<T> build(Map mangoMap) {
-        DetachedCriteria<T> newCriteria = this.clone()
+        println "build with $mangoMap"
+        MangoCriteria<T> newCriteria = this.clone()
         newCriteria.applyMap(mangoMap)
         return newCriteria
+    }
+
+    @Override
+    protected DetachedCriteria newInstance() {
+        new MangoCriteria(targetClass, alias)
     }
 
     protected void applyMapOrList(mapOrList) {
@@ -47,7 +62,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
             applyMap(mapOrList)
         }
         else if (mapOrList instanceof List){
-            for (String item : mapOrList) {
+            for (Object item : mapOrList) {
                 applyMap(item)
             }
         } else{
@@ -60,22 +75,21 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @param mangoMap
      */
     protected void applyMap(Map mangoMap) {
-
-        for (String key : map.keySet()) {
-            String op = logicalOps[key]
+        for (String key : mangoMap.keySet()) {
+            String op = compareOps[key]
             if(op){
                 //normalizer should have ensured all ops have a List for a value
                 "$op"((List) mangoMap[key])
-                continue;
+                continue
             }
             else { //it must be a field then
-                applyField( key, fieldVal)
+                applyField( key, mangoMap[key])
             }
         }
     }
 
     protected void applyField(String field, Object fieldVal) {
-        if(fieldVal instanceof String || fieldVal instanceof Number){
+        if(fieldVal instanceof String || fieldVal instanceof Number || fieldVal instanceof Boolean){
             //TODO check if its a date field and parse
             eq(field,fieldVal)
         }
@@ -98,8 +112,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
                     continue
                 }
                 //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
-                // see methodMissing for how this could be done.
-
+                "$field"({applyMap(fieldVal as Map)})
             }
         }
 

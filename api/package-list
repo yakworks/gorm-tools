@@ -5,5 +5,6 @@ gorm.tools.dao
 gorm.tools.hibernate.criteria
 gorm.tools.idgen
 gorm.tools.jdbc
+gorm.tools.mango
 gorm.tools.query
 grails.plugin.dao

@@ -54,7 +54,7 @@ codenarc {
 	toolVersion = '0.27.0'
 	config = project.resources.text.fromString("${commonBuild}/codenarc/rules.groovy".toURL().text)
 	reportFormat = 'html'
-	ignoreFailures = true
+	//ignoreFailures = true
 
 	maxPriority1Violations = 0
 	maxPriority2Violations = 4

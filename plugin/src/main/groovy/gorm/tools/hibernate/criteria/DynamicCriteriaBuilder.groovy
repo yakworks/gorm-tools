@@ -1,7 +1,6 @@
 package gorm.tools.hibernate.criteria
 
 import grails.gorm.DetachedCriteria as GrDetachedCriteria
-import org.hibernate.criterion.Criterion
 
 class DynamicCriteriaBuilder {
     private Class domain

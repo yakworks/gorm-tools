@@ -4,8 +4,6 @@ import grails.core.GrailsApplication
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.transform.CompileStatic
-import org.grails.core.artefact.DomainClassArtefactHandler
-import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 
 @CompileStatic

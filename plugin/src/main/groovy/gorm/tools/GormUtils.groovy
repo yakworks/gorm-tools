@@ -69,7 +69,7 @@ class GormUtils {
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
     @CompileStatic
-    static Object bindFast(Object target, Map<String,Object>  source, Map<String,Object> override = [:], boolean ignoreAssociations = false) {
+    static Object bindFast(Object target, Map<String, Object>  source, Map<String,Object> override = [:], boolean ignoreAssociations = false) {
         if (target == null) throw new IllegalArgumentException("Target is null")
         if (source == null) return null
 
@@ -79,14 +79,13 @@ class GormUtils {
             if(!source.containsKey(prop.name)) {
                 continue
             }
-            def sval = source[prop.name]
+            Object sval = source[prop.name]
             if (prop instanceof Association && sval['id']) {
                 if(ignoreAssociations) continue
-                def asocProp = (Association)prop
+                Association asocProp = (Association)prop
                 def asc = GormEnhancer.findStaticApi(asocProp.associatedEntity.javaClass).load(sval['id'] as Long)
                 target[prop.name] = asc
-            }
-            else{
+            } else {
                 target[prop.name] = sval
             }
             //println prop

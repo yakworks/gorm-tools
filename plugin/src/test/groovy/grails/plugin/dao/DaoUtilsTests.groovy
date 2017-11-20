@@ -27,8 +27,8 @@ class DaoUtilsTests {
 			DaoUtil.checkVersion(mocke, 0)
 			fail "should not have made it here"
 		} catch (DomainException e) {
-			mocke.id == e.entity.id
-			"default.optimistic.locking.failure" == e.messageMap.code
+			assert mocke.id == e.entity.id
+            assert "default.optimistic.locking.failure" == e.messageMap.code
 		}
 	}
 
@@ -39,10 +39,10 @@ class DaoUtilsTests {
 			fail "should not have made it here"
 		} catch (DomainException e) {
 			//id
-			'99' == e.messageMap.args[1]
+            assert '99' == e.messageMap.args[1]
 			//domain name
-			'xxx' == e.messageMap.args[0]
-			"default.not.found.message" == e.messageMap.code
+            assert 'xxx' == e.messageMap.args[0]
+            assert "default.not.found.message" == e.messageMap.code
 		}
 	}
 
@@ -55,9 +55,9 @@ class DaoUtilsTests {
 	@Test
 	void testNotFound() {
 		def r = DaoMessage.notFound("xxx.MockDomain", [id: "2"])
-		r.code == "default.not.found.message"
-		r.args == ["MockDomain", "2"]
-		r.defaultMessage == "MockDomain not found with id 2"
+        assert r.code == "default.not.found.message"
+        assert r.args == ["MockDomain", "2"]
+        assert r.defaultMessage == "MockDomain not found with id 2"
 	}
 
 /*	void testCreateMessage(){
@@ -69,7 +69,7 @@ class DaoUtilsTests {
 	@Test
 	void testDefaultLocale() {
 		def loc = DaoMessage.defaultLocale()
-		Locale.ENGLISH == loc
+        assert Locale.ENGLISH == loc
 	}
 
 }

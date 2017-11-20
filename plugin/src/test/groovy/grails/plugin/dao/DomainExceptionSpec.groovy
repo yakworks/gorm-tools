@@ -1,26 +1,30 @@
 package grails.plugin.dao
 
-import org.junit.Test
-import org.springframework.validation.Errors
-import grails.validation.ValidationException
+import spock.lang.Specification
 import grails.test.*
 
-class DomainExceptionTests {
+class DomainExceptionSpec extends Specification {
 
-	@Test
 	void testSimple() {
+        when:
 		def e = new DomainException("fubar", new EmptyErrors("blah"))
+
+        then:
 		"validationException" == e.messageMap.code
 		def args = []
 		args == e.messageMap.args
 		"fubar" == e.messageMap.defaultMessage
 	}
 
-	@Test
 	void testMessageMap() {
+        setup:
 		Map m = [code: "vtest", args: [0], defaultMessage: "defmsg"]
 		Map entity = [someEntity: "go cubs"]
+
+        when:
 		def e = new DomainException(m, entity, new EmptyErrors("blah"))
+
+        then:
 		"vtest" == e.messageMap.code
 		def args = [0]
 		args == e.messageMap.args
@@ -28,11 +32,15 @@ class DomainExceptionTests {
 		entity == e.entity
 	}
 
-	@Test
 	void testNoErrors() {
+        setup:
 		Map m = [code: "vtest", args: [0], defaultMessage: "defmsg"]
 		Map entity = [someEntity: "go cubs"]
+
+        when:
 		def e = new DomainException(m, entity)
+
+        then:
 		"vtest" == e.messageMap.code
 		def args = [0]
 		args == e.messageMap.args

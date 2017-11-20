@@ -39,7 +39,8 @@ class DaoPluginHelper {
 
 		daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
 
-		application.daoClasses.each { daoClass ->
+        def daoClasses = application.daoClasses
+		daoClasses.each { daoClass ->
 
 			Closure closure = configureDaoBeans
 			closure.delegate = delegate
@@ -48,6 +49,18 @@ class DaoPluginHelper {
 		}
 		DbDialectService.dialectName = application.config.hibernate.dialect
 
+        application.domainClasses.each { GrailsDomainClass dc ->
+            Class domainClass = dc.clazz
+            String daoName = "${dc.propertyName}Dao"
+            def hasDao = daoClasses.find { it.propertyName ==  daoName}
+            if(!hasDao){
+                println "${daoName}"
+                "${daoName}"(grails.plugin.dao.GormDaoSupport, domainClass) { bean ->
+                    bean.autowire = true
+                    bean.lazyInit = true
+                }
+            }
+        }
 		//DaoUtils.ctx = application.mainContext*/
 	}
 

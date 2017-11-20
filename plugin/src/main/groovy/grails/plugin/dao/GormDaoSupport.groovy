@@ -3,7 +3,7 @@ package grails.plugin.dao
 import gorm.tools.GormUtils
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
-
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 //import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
@@ -24,7 +24,6 @@ import gorm.tools.hibernate.criteria.CriteriaUtils
  */
 @SuppressWarnings(['EmptyMethod'])
 @GrailsCompileStatic
-@Transactional
 class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	boolean flushOnSave = false
@@ -70,6 +69,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param entity the domain entity to call save on
 	 * @throws DomainException if a validation or DataAccessException error happens
 	 */
+    @Transactional
 	T save(T entity) {
 		save(entity, [flush: flushOnSave])
 	}
@@ -81,6 +81,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param args the arguments to pass to save
 	 * @throws DomainException if a validation or DataAccessException error happens
 	 */
+    @Transactional
 	T save(T entity, Map args) {
 		return doSave(entity, args)
 	}
@@ -111,6 +112,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param entity the domain entity
 	 * @throws DomainException if a spring DataIntegrityViolationException is thrown
 	 */
+    @Transactional
 	void delete(T entity) {
 		doDelete(entity)
 	}
@@ -133,6 +135,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param params the parameter map
 	 * @throws DomainException if a validation error happens
 	 */
+    @Transactional
 	Map<String, Object> insert(Map params) {
 		return doInsert(params)
 	}
@@ -146,6 +149,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		return [ok: true, entity: entity, message: null]
 	}
 
+    @NotTransactional
     T bind(T entity, Map row, Map args = [:]){
         String dataBinder = args?.containsKey("dataBinder") ? args.dataBinder : defaultDataBinder
         if(dataBinder == 'grails'){
@@ -166,6 +170,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
         "${method}"(entity, data, args)
     }
 
+    @NotTransactional
     void bindCreate(T entity, Map data, Map args = [:]){
         bind(entity, data, args)
     }
@@ -181,6 +186,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
         return entity
     }
 
+    @Transactional
     T create(Map data, Map args = [:]) {
         T entity = createNew(data, args)
         save(entity, args)
@@ -194,6 +200,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @throws DomainException if a validation error happens or its not found with the params.id
 	 *                         or the version is off and someone else edited it
 	 */
+    @Transactional
 	Map<String, Object> update(Map params) {
 		return doUpdate(params)
 	}
@@ -246,6 +253,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param params the parameter map that has the id for the domain entity to delete
 	 * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
 	 */
+    @Transactional
 	Map remove(Map params) {
 		return doRemove(params)
 	}

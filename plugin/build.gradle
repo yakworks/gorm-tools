@@ -24,6 +24,10 @@ bootRun {
 
 bootRepackage.enabled = false
 
+configurations.all {
+    exclude module:'grails-datastore-simple'
+}
+
 dependencies {
 
 	//provided "org.grails.plugins:hibernate4"
@@ -44,6 +48,7 @@ dependencies {
 	codenarc 'org.codenarc:CodeNarc:0.27.0'
 
 	testCompile "org.grails.plugins:geb"
+    //testCompile "org.grails:grails-gorm-testing-support"
 	testCompile "org.grails:grails-plugin-testing"
 }
 

@@ -110,7 +110,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    MangoCriteria<T> and( List list ) {
+    MangoCriteria<T> and( List andList ) {
         junctions << new Query.Conjunction()
         handleJunction(andList)
         return this
@@ -121,9 +121,9 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    MangoCriteria<T> or( List list ) {
+    MangoCriteria<T> or( List orList ) {
         junctions << new Query.Disjunction()
-        handleJunction(andList)
+        handleJunction(orList)
         return this
     }
 

@@ -2,7 +2,7 @@ package daoapp
 
 import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.GormDaoSupport
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 import groovy.transform.CompileDynamic
 
 @Transactional

@@ -50,7 +50,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
      * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
      */
     @Override
-    public <S extends T> S save(S entity, Map args) {
+    <S extends T> S save(S entity, Map args) {
         return doSave(entity, args)
     }
 
@@ -62,7 +62,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
      * @return the saved entity
      */
     @Override
-    public <S extends T> S save(S entity) {
+    <S extends T> S save(S entity) {
         save(entity, [:])
     }
 
@@ -94,7 +94,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
      * @throws IllegalArgumentException in case the given entity is {@literal null}.
      */
     @Override
-    public <S extends T> Iterable<S> save(Iterable<S> entities) {
+    <S extends T> Iterable<S> save(Iterable<S> entities) {
         return null
     }
 
@@ -226,7 +226,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
      */
     @CompileDynamic
     @Override
-    public void delete(ID id) {
+    void delete(ID id) {
         delete((T)domainClass.load(id))
     }
 
@@ -237,7 +237,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
     @Override
-    public void delete(T entity) {
+    void delete(T entity) {
         doDelete(entity, [:])
     }
 

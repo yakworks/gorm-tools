@@ -3,7 +3,7 @@ package testing
 import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.DomainException
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import grails.validation.ValidationException
 import org.springframework.dao.DataAccessException
 import spock.lang.Specification

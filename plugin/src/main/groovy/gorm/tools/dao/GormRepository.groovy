@@ -19,7 +19,7 @@ interface GormRepository<T, ID> extends PagingAndSortingRepository<T, ID>, CrudR
      * @return the saved entity
      * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
      */
-    public <S extends T> S save(S entity, Map args)
+    def <S extends T> S save(S entity, Map args)
 
     /**
      * Deletes an instance from the datastore

@@ -1,14 +1,14 @@
 package gorm.tools.idgen
 
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 import grails.plugin.dao.Application
 
 @Integration(applicationClass = Application.class)
 //@Rollback
-public class BatchIdGenerator2Spec extends Specification {
+class BatchIdGenerator2Spec extends Specification {
 
 	JdbcTemplate jdbcTemplate
 	private static final String TABLE_KEY = "Custom1.id"

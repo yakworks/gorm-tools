@@ -94,28 +94,28 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      *
      * @return A Criterion instance
      */
-    public Criteria like(String propertyName, Object propertyValue) {
+    Criteria like(String propertyName, Object propertyValue) {
         nestedPathPropCall(propertyName, propertyValue, "like")
     }
 
-    public Criteria ilike(String propertyName, Object propertyValue) {
+    Criteria ilike(String propertyName, Object propertyValue) {
         nestedPathPropCall(propertyName, propertyValue, "ilike")
     }
 
-    public Criteria eq(String propertyName, Object propertyValue) {
+    Criteria eq(String propertyName, Object propertyValue) {
         nestedPathPropCall(propertyName, propertyValue, "eq")
     }
 
-    public Criteria inList(String propertyName, Collection values) {
+    Criteria inList(String propertyName, Collection values) {
         nestedPathPropCall(propertyName, values, "in")
     }
 
-    public Criteria inList(String propertyName, Object[] values) {
+    Criteria inList(String propertyName, Object[] values) {
         nestedPathPropCall(propertyName, values, "in")
     }
 
     @CompileDynamic
-    public Criteria nestedPathPropCall(String propertyName, Object propertyValue, String critName) {
+    Criteria nestedPathPropCall(String propertyName, Object propertyValue, String critName) {
         if (!propertyName.contains('.')) {
             return super."$critName"(propertyName, propertyValue)
         }

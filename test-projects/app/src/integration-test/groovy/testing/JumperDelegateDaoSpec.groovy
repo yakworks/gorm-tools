@@ -1,7 +1,7 @@
 package testing
 
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 
 @Integration

@@ -6,7 +6,7 @@ import daoapp.Org
 import gorm.tools.hibernate.criteria.CriteriaUtils
 
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 
 @Integration
 @Rollback

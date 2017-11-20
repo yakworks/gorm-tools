@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class EmptyErrors extends org.springframework.validation.AbstractBindingResult {
 
-	public EmptyErrors(String objectName) {
+	EmptyErrors(String objectName) {
 		super(objectName)
 	}
 

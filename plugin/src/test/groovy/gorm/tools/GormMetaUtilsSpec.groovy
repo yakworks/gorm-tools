@@ -8,7 +8,7 @@ import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import grails.gorm.annotation.Entity
 
 //@TestMixin(GrailsUnitTestMixin)

@@ -2,7 +2,11 @@ package gorm.tools
 
 import grails.core.GrailsDomainClassProperty
 import grails.compiler.GrailsCompileStatic
+import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -51,6 +55,50 @@ class GormUtils {
 
         if (override) {
             target.properties = override
+        }
+
+        return target
+    }
+
+    /**
+     * Faster, simplier binder. Copies properties from source to target object.
+     *
+     * @param target domain instance to copy properties to
+     * @param source - domain class to copy properties from
+     * @param override - properties to override after copying
+     * @param ignoreAssociations - should associations be copied ? - ignored by default
+     */
+    @CompileStatic
+    static Object bindFast(Object target, Map<String,Object>  source, Map<String,Object> override = [:], boolean ignoreAssociations = false) {
+        if (target == null) throw new IllegalArgumentException("Target is null")
+        if (source == null) return null
+
+        def sapi = GormEnhancer.findStaticApi(target.getClass())
+        def properties = sapi.gormPersistentEntity.getPersistentProperties()
+        for (PersistentProperty prop : properties){
+            if(!source.containsKey(prop.name)) {
+                continue
+            }
+            def sval = source[prop.name]
+            if (prop instanceof Association && sval['id']) {
+                if(ignoreAssociations) continue
+                def asocProp = (Association)prop
+                def asc = GormEnhancer.findStaticApi(asocProp.associatedEntity.javaClass).load(sval['id'] as Long)
+                target[prop.name] = asc
+            }
+            else{
+                target[prop.name] = sval
+            }
+            //println prop
+            //println "${prop.name}: ${obj[prop.name]} -> region:${obj.region}"
+        }
+
+        if (override) {
+            override.each{String key, val ->
+                if(target.hasProperty(key)){
+                    target[key] = val
+                }
+            }
         }
 
         return target

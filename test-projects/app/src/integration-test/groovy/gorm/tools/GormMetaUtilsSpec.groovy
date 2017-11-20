@@ -5,7 +5,7 @@ import testing.Jumper
 import daoapp.Org
 
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 
 @Integration
 @Rollback

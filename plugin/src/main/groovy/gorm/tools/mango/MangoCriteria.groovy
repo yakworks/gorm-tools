@@ -66,7 +66,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
             if(op){
                 //normalizer should have ensured all ops have a List for a value
                 "$op"((List) mangoMap[key])
-                continue;
+                continue
             }
             else { //it must be a field then
                 applyField( key, fieldVal)
@@ -90,12 +90,12 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
                 if(op){
                     //normalizer should have ensured all ops have a List for a value
                     "$op"((List) opArg)
-                    continue;
+                    continue
                 }
                 String cond = compareOps[key]
                 if(cond){
                     "$cond"(field, opArg)
-                    continue;
+                    continue
                 }
                 //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
                 // see methodMissing for how this could be done.

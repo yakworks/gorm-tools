@@ -7,11 +7,11 @@ import groovy.transform.CompileStatic
 class IdGeneratorHolder {
     public static IdGenerator idGenerator
 
-    public IdGenerator getIdGenerator() {
+    IdGenerator getIdGenerator() {
         return idGenerator
     }
 
-    public void setIdGenerator(IdGenerator idGenerator) {
+    void setIdGenerator(IdGenerator idGenerator) {
         if(IdGeneratorHolder.idGenerator == null) {
             IdGeneratorHolder.idGenerator = idGenerator
         } // else {

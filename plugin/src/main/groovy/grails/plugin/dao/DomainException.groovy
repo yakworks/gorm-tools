@@ -14,22 +14,22 @@ class DomainException extends ValidationException {
 	Map messageMap //map with message info code,orgs and defaultMessage
 	Object otherEntity //another entity on which error occurred
 
-	public DomainException(String msg) {
+    DomainException(String msg) {
 		super(msg, new EmptyErrors("empty"))
 		//messageMap = [code:"validationException", args:[], defaultMessage:msg]
 	}
 
-	public DomainException(String msg, Errors e) {
+    DomainException(String msg, Errors e) {
 		this(msg, e, null)
 	}
 
-	public DomainException(String msg, Errors e, Throwable cause) {
+    DomainException(String msg, Errors e, Throwable cause) {
 		super(msg, e)
 		initCause(cause)
 		messageMap = [code:"validationException", args:[], defaultMessage:msg]
 	}
 
-	public DomainException(Map msgMap, entity, Errors errors) {
+    DomainException(Map msgMap, entity, Errors errors) {
 		this(msgMap, entity, errors, null)
 	}
 

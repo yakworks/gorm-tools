@@ -3,13 +3,13 @@ package gorm.tools.hibernate.criteria
 import grails.gorm.DetachedCriteria as GrDetachedCriteria
 import org.hibernate.criterion.Criterion
 
-public class DynamicCriteriaBuilder {
+class DynamicCriteriaBuilder {
     private Class domain
     private List<Closure> criteriaClosures
     private GrDetachedCriteria gdc
 
-    public DynamicCriteriaBuilder(Class domain) {
-        this.domain = domain;
+    DynamicCriteriaBuilder(Class domain) {
+        this.domain = domain
         criteriaClosures = new ArrayList<Closure>(10)
         this.gdc = new GrDetachedCriteria(domain)
     }
@@ -27,7 +27,7 @@ public class DynamicCriteriaBuilder {
         }
     }
 
-    public List list(Map params) {
+    List list(Map params) {
         params.each { k, v ->
             addCriteria(k, v)
         }

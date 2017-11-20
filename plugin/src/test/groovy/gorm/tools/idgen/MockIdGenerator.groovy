@@ -1,7 +1,7 @@
 package gorm.tools.idgen
 
 import org.springframework.transaction.annotation.Propagation
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
 
 /**
  *  This is mocked out like so
@@ -9,21 +9,21 @@ import grails.transaction.Transactional
  *  -----------|--------
  *  table.id   |1
  *  table1.id  |99
- *  
+ *
  *  table3.id does not exist
  */
-public class MockIdGenerator implements IdGenerator {
+class MockIdGenerator implements IdGenerator {
 
 	private long seedValue = 1000 //the Id to start with if it does not exist in the table
 	public Map<String,Integer> table = new HashMap<String,Integer>()
 
-	public MockIdGenerator() {
+    MockIdGenerator() {
 		table.put("table.id", 1)
 		table.put("table1.id", 99)
 	}
 
 	@Transactional
-	public long getNextId(String keyName, long increment){
+    long getNextId(String keyName, long increment){
 		return internalGetNextId(keyName, increment)
 	}
 
@@ -38,12 +38,12 @@ public class MockIdGenerator implements IdGenerator {
 			oid = seedValue
 			long futureId = seedValue+increment
 			table.put(keyName,futureId)
-		} 
+		}
 		return oid
 	}
 
 	@Transactional
-	public long getNextId(String keyName){
+    long getNextId(String keyName){
 		return internalGetNextId(keyName, 1)
 	}
 }

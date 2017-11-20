@@ -6,7 +6,8 @@ import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
-import grails.transaction.Transactional
+import grails.gorm.transactions.Transactional
+//import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
 /**
@@ -45,6 +46,7 @@ class JdbcIdGenerator implements IdGenerator {
     // Transactional!  The annotation only works on public methods, so this method should only be called by transactional
     // methods.
     private long updateIncrement(String name, long increment){
+        //println "updateIncrement $name $increment"
         Validate.notNull( idColumn, "The idColumn is undefined")
         Validate.notNull( keyColumn, "The keyColumn is undefined")
         Validate.notNull( table, "The table is undefined")

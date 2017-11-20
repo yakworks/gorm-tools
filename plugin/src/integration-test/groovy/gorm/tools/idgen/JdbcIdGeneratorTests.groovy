@@ -1,7 +1,7 @@
 package gorm.tools.idgen
 
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runners.MethodSorters
@@ -13,7 +13,7 @@ import javax.annotation.Resource
 @Rollback
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @Integration(applicationClass = Application.class)
-public class JdbcIdGeneratorTests extends GroovyTestCase {
+class JdbcIdGeneratorTests extends GroovyTestCase {
 	private static final String TABLE_KEY = "Custom1.id"
 	@Resource IdGenerator jdbcIdGenerator
 	JdbcTemplate jdbcTemplate
@@ -23,7 +23,7 @@ public class JdbcIdGeneratorTests extends GroovyTestCase {
 	static boolean transactional=true
 
 	@Test
-	public void testAGetNextId_String() {
+    void testAGetNextId_String() {
 		IdGeneratorTestHelper.createTables(jdbcTemplate)
 		startVal = jdbcIdGenerator.getNextId(TABLE_KEY)
 		int i1 = jdbcIdGenerator.getNextId(TABLE_KEY)
@@ -35,7 +35,7 @@ public class JdbcIdGeneratorTests extends GroovyTestCase {
 	}
 
 	@Test
-	public void testBGetNextId_String_Int() {
+    void testBGetNextId_String_Int() {
 		int resultCode= jdbcTemplate.update("update Custom1 set Version=20")
 		int i1 = jdbcIdGenerator.getNextId(TABLE_KEY, 50)
 		int i2 = jdbcIdGenerator.getNextId(TABLE_KEY, 5)
@@ -46,7 +46,7 @@ public class JdbcIdGeneratorTests extends GroovyTestCase {
 	}
 
 	@Test
-	public void testCTransactionalBehavior() {
+    void testCTransactionalBehavior() {
 		println "WARNING!"
 		println "This test must run last in every test run."
 

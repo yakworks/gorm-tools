@@ -1,7 +1,7 @@
 package testing
 
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 
 @Integration
@@ -9,14 +9,14 @@ import spock.lang.Specification
 class JumperDaoSpec extends Specification {
 
 	static transactional = false
-	
+
 	JumperDao jumperDao
-	
+
 	def "verify domainClass"() {
 		expect:
 		jumperDao.domainClass == Jumper
 	}
-	
+
 	void testNonTranDao(){
 
 		when:

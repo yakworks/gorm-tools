@@ -7,7 +7,7 @@ import spock.lang.Specification
 class BasicTestsForDao extends Specification {
 
 	def dao
-	
+
 /*	protected void setUp() {
 		super.setUp()
 		dao = jumperDao
@@ -31,7 +31,7 @@ class BasicTestsForDao extends Specification {
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
-	
+
 	void testDelete(){
 		println "testDelete"
 		def dom = new Jumper(name:"testDelete")
@@ -46,7 +46,7 @@ class BasicTestsForDao extends Specification {
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
-	
+
 	void testInsert(){
 		println "testInsert"
 		try{
@@ -54,7 +54,7 @@ class BasicTestsForDao extends Specification {
 			DaoUtil.flushAndClear()
 			//println result
 			assertTrue result.ok
-			assertEquals "testInsert", result.entity.name 
+			assertEquals "testInsert", result.entity.name
 			assertEquals "default.created.message", result.message.code
 			def dom2 = Jumper.findByName("testInsert")
 			assert dom2.name == "testInsert"
@@ -62,7 +62,23 @@ class BasicTestsForDao extends Specification {
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
-	
+
+    void testCreate(){
+        println "testInsert"
+        try{
+            def result = dao.create([name:"testInsert"])
+            DaoUtil.flushAndClear()
+            //println result
+            assertTrue result.ok
+            assertEquals "testInsert", result.entity.name
+            assertEquals "default.created.message", result.message.code
+            def dom2 = Jumper.findByName("testInsert")
+            assert dom2.name == "testInsert"
+        }catch(DomainException e){
+            fail "Errors ${e.errors.allErrors[0]}"
+        }
+    }
+
 	void testUpdate(){
 		println "testUpdate"
 		def dup = new Jumper(name:"testUpdate")
@@ -74,8 +90,8 @@ class BasicTestsForDao extends Specification {
 			DaoUtil.flushAndClear()
 			//println result
 			assertTrue result.ok
-			assertEquals "testUpdateXXX", result.entity.name 
-			assertEquals dup.id, result.entity.id 
+			assertEquals "testUpdateXXX", result.entity.name
+			assertEquals dup.id, result.entity.id
 			assertEquals "default.updated.message", result.message.code
 			def dom2 = Jumper.findByName("testUpdateXXX")
 			assert dom2.name == "testUpdateXXX"
@@ -83,7 +99,7 @@ class BasicTestsForDao extends Specification {
 			fail "Errors ${e.errors.allErrors[0]}"
 		}
 	}
-	
+
 	void testRemove(){
 		println "testRemove"
 		def dup = new Jumper(name:"testRemove")

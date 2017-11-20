@@ -3,7 +3,7 @@ package gorm.tools.jdbc
 import spock.lang.Specification
 import grails.test.mixin.integration.Integration
 import grails.plugin.dao.Application
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import javax.sql.DataSource
 import groovy.sql.Sql
 import java.sql.ResultSet

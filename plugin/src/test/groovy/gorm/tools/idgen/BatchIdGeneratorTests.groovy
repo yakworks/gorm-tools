@@ -10,17 +10,17 @@ import org.junit.BeforeClass
 import org.junit.Test
 
 @TestMixin(DomainClassUnitTestMixin)
-public class BatchIdGeneratorTests {
+class BatchIdGeneratorTests {
 
 	MockIdGenerator mockdbgen
 	BatchIdGenerator batchgen
 
 	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
+    static void setUpBeforeClass() throws Exception {
 	}
 
 	@Before
-	public void setUp() throws Exception {
+    void setUp() throws Exception {
 		mockdbgen =  new MockIdGenerator()
 		batchgen = new BatchIdGenerator(mockdbgen)
 		mockdbgen.transactionManager = getTransactionManager()
@@ -29,7 +29,7 @@ public class BatchIdGeneratorTests {
 	}
 
 	@Test
-	public void testGetNextIdStringInt() {
+    void testGetNextIdStringInt() {
 		//the id waiting will be 1 and this will increment to 3
 		assertTrue(1==batchgen.  getNextId("table.id",2))
 		//so this following should get 3 back and set the next avail id to 3+2=5
@@ -50,7 +50,7 @@ public class BatchIdGeneratorTests {
 	}
 	
 	@Test
-	public void testGetIncrementPastBatchSize() {
+    void testGetIncrementPastBatchSize() {
 		//positon the next Id to 5
 		assertTrue(1==batchgen.getNextId("table.id", 3))
 		assertEquals(new Long(6),mockdbgen.table.get("table.id")) //should be 6
@@ -63,7 +63,7 @@ public class BatchIdGeneratorTests {
 	}
 	
 	@Test
-	public void testGetIncrementInsideBatchSize() {
+    void testGetIncrementInsideBatchSize() {
 		//positon the next Id to 4
 		assertTrue(1==batchgen.getNextId("table.id", 3))
 		assertEquals(new Long(6), mockdbgen.table.get("table.id")) //should be 6
@@ -78,7 +78,7 @@ public class BatchIdGeneratorTests {
 	}
 
 	@Test
-	public void testGetNextIdString() {
+    void testGetNextIdString() {
 
 		for (int i = 1; i < 10; i++) {
 			assertEquals(new Long(i), new Long(batchgen.getNextId("table.id")))

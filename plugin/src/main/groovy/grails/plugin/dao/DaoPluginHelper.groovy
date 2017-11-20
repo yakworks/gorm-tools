@@ -9,14 +9,7 @@ import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsDomainClass
 import grails.plugins.Plugin
-import org.grails.spring.TypeSpecifyableTransactionProxyFactoryBean
-import org.grails.transaction.GroovyAwareNamedTransactionAttributeSource
-import org.springframework.beans.factory.config.MethodInvokingFactoryBean
-import org.springframework.core.annotation.AnnotationUtils
-import org.springframework.transaction.interceptor.TransactionProxyFactoryBean
 import org.springframework.jdbc.core.JdbcTemplate
-
-import java.lang.reflect.Method
 
 @SuppressWarnings(['NoDef'])
 class DaoPluginHelper {
@@ -34,23 +27,14 @@ class DaoPluginHelper {
 		idGenerator(BatchIdGenerator){
 			generator = ref("jdbcIdGenerator")
 		}
+        //here to set the static in the holder for use in SpringIdGenerator
 		idGeneratorHolder(IdGeneratorHolder){
 			idGenerator = ref("idGenerator")
 		}
 
-		gormDaoBeanNonTransactional(grails.plugin.dao.GormDaoSupport) { bean ->
+        gormDaoBean(grails.plugin.dao.GormDaoSupport) { bean ->
 			bean.scope = "prototype"
 			//grailsApplication = ref('grailsApplication')
-		}
-		Properties props = new Properties()
-		props."*" = "PROPAGATION_REQUIRED"
-		gormDaoBean(TransactionProxyFactoryBean) { bean ->
-			bean.scope = "prototype"
-			bean.lazyInit = true
-			target = ref('gormDaoBeanNonTransactional')
-			proxyTargetClass = true
-			transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes: props)
-			transactionManager = ref("transactionManager")
 		}
 
 		daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
@@ -88,67 +72,19 @@ class DaoPluginHelper {
 		def scope = daoClass.getPropertyValue("scope")
 
 		def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
+//
+//		"${daoClass.fullName}DaoClass"(MethodInvokingFactoryBean) { bean ->
+//			bean.lazyInit = lazyInit
+//			targetObject = grailsApplication
+//			targetMethod = "getArtefact"
+//			arguments = [DaoArtefactHandler.TYPE, daoClass.fullName]
+//		}
 
-		"${daoClass.fullName}DaoClass"(MethodInvokingFactoryBean) { bean ->
-			bean.lazyInit = lazyInit
-			targetObject = grailsApplication
-			targetMethod = "getArtefact"
-			arguments = [DaoArtefactHandler.TYPE, daoClass.fullName]
-		}
-
-		//FIXME can't we get rid of this now? GRails doesn't do it in the services right?
-		//ALSO see here for how they do it
-		// https://github.com/grails/grails-data-mapping/blob/1b14ecf85b221fc78d363001ea960728d7902b45/grails-datastore-gorm-plugin-support/src/main/groovy/org/grails/datastore/gorm/plugin/support/SpringConfigurer.groovy#L102-L102
-		//Also see http://docs.grails.org/latest/guide/single.html#upgrading under "Spring Proxies for Services No Longer Supported"
-		//What does that mean for this here?
-		if (shouldCreateTransactionalProxy(daoClass)) {
-			Properties props = new Properties()
-			String attributes = 'PROPAGATION_REQUIRED'
-			String datasourceName = daoClass.datasource
-			String suffix = datasourceName == GrailsDaoClass.DEFAULT_DATA_SOURCE ? '' : "_$datasourceName"
-			if (grailsApplication.config["dataSource$suffix"].readOnly) {
-				attributes += ',readOnly'
-			}
-			props."*" = attributes
-
-			"${daoClass.propertyName}"(TypeSpecifyableTransactionProxyFactoryBean, daoClass.clazz) { bean ->
-				if (scope) bean.scope = scope
-				bean.lazyInit = lazyInit
-				target = { innerBean ->
-					innerBean.lazyInit = true
-					innerBean.factoryBean = "${daoClass.fullName}DaoClass"
-					innerBean.factoryMethod = "newInstance"
-					innerBean.autowire = "byName"
-					if (scope) innerBean.scope = scope
-				}
-				proxyTargetClass = true
-				transactionAttributeSource = new GroovyAwareNamedTransactionAttributeSource(transactionalAttributes: props)
-				transactionManager = ref("transactionManager")
-			}
-		} else {
-			"${daoClass.propertyName}"(daoClass.getClazz()) { bean ->
-				bean.autowire = true
-				bean.lazyInit = lazyInit
-				if (scope) bean.scope = scope
-			}
-		}
-	}
-
-	static boolean shouldCreateTransactionalProxy(GrailsDaoClass daoClass) {
-		Class javaClass = daoClass.clazz
-
-		try {
-			daoClass.transactional &&
-					!AnnotationUtils.findAnnotation(javaClass, grails.transaction.Transactional) &&
-					!AnnotationUtils.findAnnotation(javaClass, org.springframework.transaction.annotation.Transactional) &&
-					!javaClass.methods.any { Method m ->
-						AnnotationUtils.findAnnotation(m, org.springframework.transaction.annotation.Transactional) != null ||
-						AnnotationUtils.findAnnotation(m, grails.transaction.Transactional) != null
-					}
-		}
-		catch (e) {
-			return false
-		}
+        "${daoClass.propertyName}"(daoClass.getClazz()) { bean ->
+            bean.autowire = true
+            bean.lazyInit = lazyInit
+            if (scope) bean.scope = scope
+        }
 	}
 
 	static def figureOutDao(GrailsDomainClass dc, ctx) {

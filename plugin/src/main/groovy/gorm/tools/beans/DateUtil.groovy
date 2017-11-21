@@ -24,6 +24,11 @@ class DateUtil {
     static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
     static final Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
 
+	private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
+	private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+	private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+	private static final String TZ_LESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
+
     /**
      * Parse date sent by client (in a JSON).
      * Expected format: 2000-03-30T22:00:00.000Z or 2000-03-30T22:00:00Z
@@ -37,19 +42,19 @@ class DateUtil {
         date = date.trim()
 		if (date.length() == 0) return null
 
-		DateFormat dateFormat = new SimpleDateFormat('yyyy-MM-dd')
+		DateFormat dateFormat = new SimpleDateFormat(DEFAULT_FORMAT)
 
         switch (date) {
             case GMT_MILLIS:
                 date = date.replaceFirst('Z$', '-0000')
-                dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+                dateFormat = new SimpleDateFormat(GMT_MILLIS_FORMAT)
                 break
             case GMT_SECONDS:
                 date = date.replaceFirst('Z$', '-0000')
-                dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                dateFormat = new SimpleDateFormat(GMT_SECONDS_FORMAT)
                 break
             case TZ_LESS:
-                dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                dateFormat = new SimpleDateFormat(TZ_LESS_FORMAT)
                 break
         }
 

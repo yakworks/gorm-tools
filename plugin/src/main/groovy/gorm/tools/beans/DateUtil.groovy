@@ -68,7 +68,7 @@ class DateUtil {
      * @return a string representation of a given date
      */
     static String dateToJsonString(Date date) {
-        dateToString(date, "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+        dateToString(date, GMT_MILLIS_FORMAT)
     }
 
     /**
@@ -79,7 +79,7 @@ class DateUtil {
      * @return a date instance
      */
     static Date stringToDate(String date) {
-        convertStringToDateTime(date, "yyyy-MM-dd")
+        convertStringToDateTime(date, DEFAULT_FORMAT)
     }
 
     /**
@@ -282,7 +282,7 @@ class DateUtil {
     //didn't find any usage
     @Deprecated
     static Date stringToDateTime(String strDt) {
-        convertStringToDateTime(strDt, "yyyy-MM-dd'T'HH:mm:ss")
+        convertStringToDateTime(strDt, TZ_LESS_FORMAT)
     }
 
     /**

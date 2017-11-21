@@ -9,6 +9,11 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.springframework.beans.factory.annotation.Autowired
 
+/**
+ * Faster data binder. Copies properties from source to target object.
+ * Explicitely checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
+ *
+ */
 @CompileStatic
 class FastBinder {
 	private static final String ID_PROP = "id"

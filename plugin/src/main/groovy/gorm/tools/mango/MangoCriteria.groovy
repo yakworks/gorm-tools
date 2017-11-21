@@ -2,7 +2,6 @@ package gorm.tools.mango
 
 import grails.gorm.DetachedCriteria
 import org.grails.datastore.mapping.query.Query
-import org.grails.datastore.mapping.query.api.Criteria
 
 /**
  * Builds DetachedCriteria from a map. Everything essentially gets put into 3 lists; criteria, projections and orders.

@@ -1,17 +1,13 @@
 package gorm.tools
 
-import gorm.tools.beans.DateUtil
-import grails.core.GrailsDomainClassProperty
+import gorm.tools.databinding.FastBinder
 import grails.compiler.GrailsCompileStatic
+import grails.core.GrailsDomainClassProperty
 import grails.databinding.converters.ValueConverter
 import grails.util.Holders
 import grails.web.databinding.GrailsWebDataBinder
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormStaticApi
-import org.grails.datastore.mapping.model.PersistentProperty
-import org.grails.datastore.mapping.model.types.Association
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -75,48 +71,8 @@ class GormUtils {
      */
     @CompileStatic
     static Object bindFast(Object target, Map<String, Object>  source, Map<String,Object> override = [:], boolean ignoreAssociations = false) {
-        if (target == null) throw new IllegalArgumentException("Target is null")
-        if (source == null) return null
-
-        GormStaticApi sapi = GormEnhancer.findStaticApi(target.getClass())
-        List<PersistentProperty>  properties = sapi.gormPersistentEntity.getPersistentProperties()
-        for (PersistentProperty prop : properties){
-            if(!source.containsKey(prop.name)) {
-                continue
-            }
-            Object sval = source[prop.name]
-            Object valToAssisgn = sval
-            Class typeToConvertTo = prop.getType()
-            if (prop instanceof Association && sval['id']) {
-                if(ignoreAssociations) continue
-                Association asocProp = (Association)prop
-                GormStaticApi asc = GormEnhancer.findStaticApi(asocProp.associatedEntity.javaClass).load(sval['id'] as Long)
-                target[prop.name] = asc
-            }
-            else if (sval instanceof String) {
-                if(Number.isAssignableFrom(typeToConvertTo)){
-                    valToAssisgn = (sval as String).asType(typeToConvertTo)
-                }
-                else if(Date.isAssignableFrom(typeToConvertTo)){
-                    //valToAssisgn = dateFormat.parse(sval as String)
-                    valToAssisgn = DateUtil.parseJsonDate(sval as String)
-                    //println "converted $sval to ${valToAssisgn} for $prop.name with DateUtil.parseJsonDate"
-                }
-                else if(hasConverter(typeToConvertTo)){
-                    ValueConverter converter = getConverter(typeToConvertTo, sval)
-                    if (converter) {
-                        valToAssisgn= converter.convert(sval)
-                        //println new Date()
-                        //println "converted $sval to ${valToAssisgn} for $prop.name with ${converter.class.name}"
-                    }
-                }
-            }
-
-            target[prop.name] = valToAssisgn
-
-            //println prop
-            //println "${prop.name}: ${obj[prop.name]} -> region:${obj.region}"
-        }
+       FastBinder binder = (FastBinder) Holders.applicationContext.getBean("fastBinder")
+		binder.bind(target, source)
 
         if (override) {
             override.each{String key, val ->

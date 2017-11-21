@@ -1,6 +1,7 @@
 package gorm.tools.beans
 
 import groovy.transform.CompileStatic
+
 import java.text.ParseException
 
 /**

@@ -2,15 +2,15 @@ package gorm.tools.beans
 
 import groovy.time.TimeCategory
 import groovy.time.TimeDuration
-import groovy.transform.CompileStatic
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import org.apache.commons.lang.Validate
 
 import java.text.DateFormat
+import java.text.DateFormatSymbols
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
-import java.text.ParseException
-import java.text.DateFormatSymbols
-import org.apache.commons.lang.Validate
 
 /**
  * Provides a set of methods for parsing/formatting and making custom manipulations with dates.
@@ -33,14 +33,12 @@ class DateUtil {
      * @throws ParseException if it cannot recognize a date format
      */
     static Date parseJsonDate(String date) {
-        if (date == null) {
-            return null
-        }
+        if (date == null) return null
         date = date.trim()
-        if (date.length() == 0) {
-            return null
-        }
-        DateFormat dateFormat = new SimpleDateFormat('yyyy-MM-dd')
+		if (date.length() == 0) return null
+
+		DateFormat dateFormat = new SimpleDateFormat('yyyy-MM-dd')
+
         switch (date) {
             case GMT_MILLIS:
                 date = date.replaceFirst('Z$', '-0000')

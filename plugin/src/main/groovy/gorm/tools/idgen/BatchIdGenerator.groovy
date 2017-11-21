@@ -2,10 +2,10 @@ package gorm.tools.idgen
 
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
+import org.apache.log4j.Category
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
-import org.apache.log4j.Category
 
 /**
  * An Thread safe implementation that caches a range of values in memory by the key name (ie: "tablename.id")

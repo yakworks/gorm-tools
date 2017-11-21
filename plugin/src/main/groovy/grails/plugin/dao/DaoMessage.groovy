@@ -2,11 +2,10 @@ package grails.plugin.dao
 
 import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
+import groovy.transform.CompileDynamic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
-import groovy.transform.CompileStatic
-import groovy.transform.CompileDynamic
 
 /**
  * A bunch of statics to support the GormDaoSupport.

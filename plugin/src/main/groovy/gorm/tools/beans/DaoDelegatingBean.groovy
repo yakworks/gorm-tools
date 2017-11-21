@@ -1,9 +1,9 @@
 package gorm.tools.beans
 
+import grails.plugin.dao.GormDaoSupport
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEntity
-import grails.plugin.dao.GormDaoSupport
 
 /**
  * Delegates missing properties as method calls to the dao for the domain class.

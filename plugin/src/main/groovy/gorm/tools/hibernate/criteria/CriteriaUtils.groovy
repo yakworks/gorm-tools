@@ -6,9 +6,9 @@ import gorm.tools.beans.DateUtil
 import grails.converters.JSON
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
-import org.hibernate.criterion.CriteriaSpecification
 import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.query.api.Criteria
+import org.hibernate.criterion.CriteriaSpecification
 
 /**
  * For consistently searching across data types.

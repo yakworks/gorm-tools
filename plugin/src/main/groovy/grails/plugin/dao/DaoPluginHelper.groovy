@@ -1,6 +1,7 @@
 package grails.plugin.dao
 
 import gorm.tools.DbDialectService
+import gorm.tools.databinding.FastBinder
 import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
@@ -18,6 +19,8 @@ class DaoPluginHelper {
 	static Closure doWithSpring = {
 		jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
+		fastBinder(FastBinder)
+
 		jdbcIdGenerator(JdbcIdGenerator){
 			jdbcTemplate = ref("jdbcTemplate")
 			table = "NewObjectId"
@@ -34,6 +37,7 @@ class DaoPluginHelper {
 
         gormDaoBean(grails.plugin.dao.GormDaoSupport) { bean ->
 			bean.scope = "prototype"
+			fastBinder = ref("fastBinder")
 			//grailsApplication = ref('grailsApplication')
 		}
 

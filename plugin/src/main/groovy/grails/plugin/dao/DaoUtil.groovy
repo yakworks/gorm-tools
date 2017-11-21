@@ -1,12 +1,12 @@
 package grails.plugin.dao
 
 import grails.util.GrailsNameUtils
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.transaction.interceptor.TransactionAspectSupport
-import groovy.transform.CompileStatic
-import groovy.transform.CompileDynamic
 
 /**
  * A bunch of statics to support the GormDaoSupport.

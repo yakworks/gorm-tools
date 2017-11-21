@@ -1,6 +1,7 @@
 package gorm.tools.dao
 
 import grails.plugin.dao.DaoMessage
+import grails.plugin.dao.DomainException
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -12,7 +13,6 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
-import grails.plugin.dao.DomainException
 
 @SuppressWarnings(['EmptyMethod', 'ReturnsNullInsteadOfEmptyCollection'])
 @CompileStatic

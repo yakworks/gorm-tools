@@ -1,7 +1,7 @@
 package gorm.tools.jdbc
 
-import groovy.transform.CompileStatic
 import grails.web.servlet.mvc.GrailsParameterMap
+import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.support.JdbcUtils
 import org.springframework.mock.web.MockHttpServletRequest

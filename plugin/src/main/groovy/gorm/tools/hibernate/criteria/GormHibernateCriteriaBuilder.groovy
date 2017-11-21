@@ -15,12 +15,12 @@
  */
 package gorm.tools.hibernate.criteria
 
+import grails.compiler.GrailsCompileStatic
 import grails.orm.HibernateCriteriaBuilder
+import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.SessionFactory
-import grails.compiler.GrailsCompileStatic
-import groovy.transform.CompileDynamic
 
 /**
  * This is here to make it easier to build criteria with domain bean paths

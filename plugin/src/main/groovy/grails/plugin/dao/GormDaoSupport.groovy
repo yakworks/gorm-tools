@@ -1,6 +1,6 @@
 package grails.plugin.dao
 
-import gorm.tools.GormUtils
+import gorm.tools.databinding.FastBinder
 import gorm.tools.hibernate.criteria.CriteriaUtils
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
@@ -29,6 +29,8 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
     String defaultDataBinder = 'grails' //use the stock GrailsWebDataBinder
 
 	private Class<T> thisDomainClass
+
+	FastBinder fastBinder
 
 	GormDaoSupport() {
 		this.thisDomainClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDaoSupport.class)
@@ -153,13 +155,11 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
         if(dataBinder == 'grails'){
             entity.properties = row
         }
-        else if(dataBinder == 'fast'){
-            GormUtils.bindFast(entity, row)
-        }
+
         else {
-            //fall back to just setting the props
-            GormUtils.bindFast(entity, row)
+            fastBinder.bind(entity, row)
         }
+
         return entity
     }
 

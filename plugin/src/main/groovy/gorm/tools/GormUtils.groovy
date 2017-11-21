@@ -3,9 +3,7 @@ package gorm.tools
 import gorm.tools.databinding.FastBinder
 import grails.compiler.GrailsCompileStatic
 import grails.core.GrailsDomainClassProperty
-import grails.databinding.converters.ValueConverter
 import grails.util.Holders
-import grails.web.databinding.GrailsWebDataBinder
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 
@@ -84,7 +82,7 @@ class GormUtils {
 
         return target
     }
-	
+
     /**
      * Copy all given property values from source to target
      * if and only if target's properties are null.

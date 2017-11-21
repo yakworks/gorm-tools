@@ -1,33 +1,48 @@
 package gorm.tools.mango
 
 import grails.gorm.DetachedCriteria
-import groovy.transform.CompileDynamic
-import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
-import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
-import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.Criteria
+import org.grails.datastore.mapping.query.api.QueryableCriteria
 
 /**
  * Builds DetachedCriteria from a map. Everything essentially gets put into 3 lists; criteria, projections and orders.
  * can be seen in DynamicFinder.applyDetachedCriteria which is called in DetachedCriteria.withPopulatedQuery
- * @param <T>
+ * @param < T >
  */
-class MangoCriteria<T> extends DetachedCriteria<T>{
+class MangoCriteria<T> extends DetachedCriteria<T> {
 
-    static final Map<String,String> compareOps = [
-        '$gt' : 'gt',
-        '$eq' : 'eq',
-        '$gte': 'ge',
-        '$lt' : 'lt',
-        '$lte': 'le',
-        '$ilike': 'ilike',
-        '$like': 'like'
+    static final Map<String, String> compareOps = [
+            '$gt'     : 'gt',
+            '$eq'     : 'eq',
+            '$gte'    : 'ge',
+            '$lt'     : 'lt',
+            '$lte'    : 'le',
+            '$ne'     : 'ne',
+            '$not'    : 'not',
+            '$ilike'  : 'ilike',
+            '$like'   : 'like',
+            '$in'     : 'in',
+            '$inList' : 'inList',
+            '$nin'    : 'notIn',
+            '$between': 'between',
+            '$gtf'    : 'gtProperty',
+            '$gtef'   : 'geProperty',
+            '$ltf'    : 'ltProperty',
+            '$ltef'   : 'leProperty',
+            '$eqf'    : 'eqProperty',
+            '$nef'    : 'neProperty'
     ]
 
-    static final Map<String,String> junctionOps = [
-        '$and': 'and',
-        '$or': 'or'
+    static final Map<String, String> junctionOps = [
+            '$and': 'and',
+            '$or' : 'or',
+            '$not': 'not'
+    ]
+
+    static final Map<String, String> existOps = [
+            '$isNull'   : 'isNull',
+            '$isNotNull': 'isNotNull'
     ]
 
     /**
@@ -46,7 +61,6 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @return A new criteria instance
      */
     DetachedCriteria<T> build(Map mangoMap) {
-        println "build with $mangoMap"
         MangoCriteria<T> newCriteria = this.clone()
         newCriteria.applyMap(mangoMap)
         return newCriteria
@@ -57,15 +71,15 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
         new MangoCriteria(targetClass, alias)
     }
 
+
     protected void applyMapOrList(mapOrList) {
-        if(mapOrList instanceof Map){
+        if (mapOrList instanceof Map) {
             applyMap(mapOrList)
-        }
-        else if (mapOrList instanceof List){
+        } else if (mapOrList instanceof List) {
             for (Object item : mapOrList) {
                 applyMap(item)
             }
-        } else{
+        } else {
             //pitch an error?
         }
     }
@@ -76,24 +90,22 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      */
     protected void applyMap(Map mangoMap) {
         for (String key : mangoMap.keySet()) {
-            String op = compareOps[key]
-            if(op){
+            String op = junctionOps[key]
+            if (op) {
                 //normalizer should have ensured all ops have a List for a value
                 "$op"((List) mangoMap[key])
                 continue
-            }
-            else { //it must be a field then
-                applyField( key, mangoMap[key])
+            } else { //it must be a field then
+                applyField(key, mangoMap[key])
             }
         }
     }
 
     protected void applyField(String field, Object fieldVal) {
-        if(fieldVal instanceof String || fieldVal instanceof Number || fieldVal instanceof Boolean){
+        if (fieldVal instanceof String || fieldVal instanceof Number || fieldVal instanceof Boolean) {
             //TODO check if its a date field and parse
-            eq(field,fieldVal)
-        }
-        else if(fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
+            eq(field, fieldVal)
+        } else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
             //could be 1 or more too
             //for example field=amount and fieldVal=['$lt': 100, '$gt':200]
             for (String key : fieldVal.keySet()) {
@@ -101,21 +113,37 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
                 String op = junctionOps[key]
                 def opArg = fieldVal[key]
 
-                if(op){
+                if (op) {
                     //normalizer should have ensured all ops have a List for a value
                     "$op"((List) opArg)
                     continue
                 }
                 String cond = compareOps[key]
-                if(cond){
+                if (cond) {
                     "$cond"(field, opArg)
                     continue
                 }
+
+                String ex = existOps[key]
+                if (ex) {
+                    "$ex"(field)
+                    continue
+                }
                 //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
-                "$field"({applyMap(fieldVal as Map)})
+                "$field"({ applyMap(fieldVal as Map) })
             }
         }
 
+    }
+
+    MangoCriteria<T> between(String propertyName, List params) {
+        return (MangoCriteria<T>) super.between(propertyName, params[0], params[1])
+    }
+
+    MangoCriteria<T> notIn(String propertyName, List params) {
+        Map val = [:]
+        val[propertyName] = ['$in': params]
+        return (MangoCriteria<T>) super.notIn(propertyName, (new MangoCriteria(targetClass).build(val)."$propertyName") as QueryableCriteria)
     }
 
     /**
@@ -123,7 +151,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    MangoCriteria<T> and( List andList ) {
+    MangoCriteria<T> and(List andList) {
         junctions << new Query.Conjunction()
         handleJunction(andList)
         return this
@@ -134,9 +162,20 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    MangoCriteria<T> or( List orList ) {
+    MangoCriteria<T> or(List orList) {
         junctions << new Query.Disjunction()
         handleJunction(orList)
+        return this
+    }
+
+    /**
+     * Handles a disjunction
+     * @param list junctions list of condition maps
+     * @return This criterion
+     */
+    Criteria not(List notList) {
+        junctions << new Query.Negation()
+        handleJunction(notList)
         return this
     }
 
@@ -150,7 +189,7 @@ class MangoCriteria<T> extends DetachedCriteria<T>{
             applyMapOrList(list)
         }
         finally {
-            def lastJunction = junctions.remove(junctions.size() - 1)
+            Query.Junction lastJunction = junctions.remove(junctions.size() - 1)
             add lastJunction
         }
     }

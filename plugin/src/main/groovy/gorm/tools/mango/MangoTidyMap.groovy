@@ -42,6 +42,11 @@ class MangoTidyMap {
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
+
+            if (['$or', '$and'].contains(key) && val instanceof Map){
+                result[key]= val.collect{k,v-> toMangoOperator(["$k": v])}
+                return
+            }
             if (val instanceof Map) {
                 toMangoOperator(val, result[key] as Map)
             } else {
@@ -58,7 +63,11 @@ class MangoTidyMap {
                     result[key]['$ilike'] = val
                     return
                 }
-                result[key]['$eq'] = val
+                if(['$isNull', '$isNotNull'].contains(val)) {
+                    result[key][val] = true
+                } else {
+                    result[key]['$eq'] = val
+                }
             }
 
         }

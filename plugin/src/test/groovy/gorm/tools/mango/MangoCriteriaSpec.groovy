@@ -8,7 +8,7 @@ import grails.test.mixin.gorm.Domain
 import grails.test.mixin.hibernate.HibernateTestMixin
 import spock.lang.Specification
 
-@Domain([Org])
+@Domain([Org, Location])
 @TestMixin(HibernateTestMixin)
 class MangoCriteriaSpec extends Specification {
 
@@ -22,7 +22,10 @@ class MangoCriteriaSpec extends Specification {
             new Org(id: index,
                     name: value,
                     isActive: (index % 2 == 0 ),
-                    amount: index*1.34,
+                    amount: (index-1)*1.34,
+                    amount2: (index-1)*(index-1)*0.3,
+                    date: new Date().clearTime() + index,
+                    secondName: index % 2 == 0 ? null :  "Name2#" + index,
                     location: (new Location(city: "City#$index").save())
             ).save(failOnError: true)
         }
@@ -74,6 +77,22 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 1
     }
 
+    def "test detached Date"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([date: new Date().clearTime() + 2])).list()
+
+        then:
+        res.size() == 1
+
+        when:
+        res = dcb.build(MangoTidyMap.tidy([date: ['$gt': new Date().clearTime() + 7]])).list()
+
+        then:
+        res.size() == 3
+    }
+
     def "test gt"() {
         when:
 
@@ -84,7 +103,17 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 6
     }
 
-    def "test nested gt"() {
+    def "test ne"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([id: ['$ne':4]])).list()
+
+        then:
+        res.size() == 9
+    }
+
+    def "test nested"() {
         when:
         MangoCriteria dcb = new MangoCriteria(Org)
         List res = dcb.build(MangoTidyMap.tidy(["location.id": ['$eq':6]])).list()
@@ -93,18 +122,110 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 1
     }
 
+   /* def "test nestedId"() {
+        when:
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy(["locationId": ['$eq':6]])).list()
+
+        then:
+        res.size() == 1
+    }*/
+
     def "test or"() {
         when:
         MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy('$or':[[id:5], [id:2]])).list()
+        List res = dcb.build(MangoTidyMap.tidy('$or':[[name: "Name#7"], [id:2]])).list()
 
         then:
         res.size() == 2
     }
 
-    List<Class> getDomainClasses() {
-        return [Org]
+    def "test not in list"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([amount: ['$nin':[1*1.34, 2*1.34, 3*1.34, 4*1.34]]])).list()
+
+        then:
+        res.size() == 6
     }
+
+    def "test not"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy(['$not': [[id:['$eq':1]]]])).list()
+
+        then:
+        res.size() == 9
+    }
+
+
+    def "test between"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([amount: ['$between':[1*1.34, 4*1.34]]])).list()
+
+        then:
+        res.size() == 4
+    }
+
+    def "test isNull/ isNotNull"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([secondName: ['$isNull': true]])).list()
+
+        then:
+        res.size() == 5
+
+        when:
+
+        res = dcb.build(MangoTidyMap.tidy([secondName: '$isNull'])).list()
+
+        then:
+        res.size() == 5
+    }
+
+    def "test fields comparison"() {
+        when:
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([amount: ['$gtef':"amount2"]])).list()
+            Org.createCriteria()
+        then:
+        res.size() == 5
+
+        when:
+        res = dcb.build(MangoTidyMap.tidy([amount: ['$gtf':"amount2"]])).list()
+
+        then:
+        res.size() == 4
+
+        when:
+        res = dcb.build(MangoTidyMap.tidy([amount: ['$ltf':"amount2"]])).list()
+
+        then:
+        res.size() == 5
+
+        when:
+        res = dcb.build(MangoTidyMap.tidy([amount: ['$eqf':"amount2"]])).list()
+
+        then:
+        res.size() == 1
+
+        when:
+        res = dcb.build(MangoTidyMap.tidy([amount: ['$nef':"amount2"]])).list()
+
+        then:
+        res.size() == 9
+    }
+
+    List<Class> getDomainClasses() {
+        return [Org,Location]
+    }
+
+
 }
 
 @Entity
@@ -113,12 +234,16 @@ class Org {
     String name
     Boolean isActive = false
     BigDecimal amount
+    BigDecimal amount2
     Location location
+    String secondName
+    Date date
 
     static constraints = {
         name blank: true, nullable: true
         isActive nullable: true
         amount nullable: true
+        secondName nullable: true
     }
 }
 

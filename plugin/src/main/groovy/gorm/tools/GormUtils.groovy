@@ -84,20 +84,7 @@ class GormUtils {
 
         return target
     }
-    //FIXME THIS IS BAD AND SLOW, NEEDS TO BE MOVED TO BEAN
-    static boolean hasConverter(Class typeToConvertTo) {
-        GrailsWebDataBinder grailsWebDataBinder = (GrailsWebDataBinder)Holders.applicationContext.getBean('grailsWebDataBinder')
-        return grailsWebDataBinder.conversionHelpers.containsKey(typeToConvertTo)
-    }
-
-    static ValueConverter getConverter(Class typeToConvertTo, value) {
-        GrailsWebDataBinder grailsWebDataBinder = (GrailsWebDataBinder)Holders.applicationContext.getBean('grailsWebDataBinder')
-        if(grailsWebDataBinder.conversionHelpers.containsKey(typeToConvertTo)) {
-            List converters = grailsWebDataBinder.conversionHelpers.get(typeToConvertTo)
-            converters?.find { ValueConverter c -> c.canConvert(value) }
-        }
-    }
-
+	
     /**
      * Copy all given property values from source to target
      * if and only if target's properties are null.

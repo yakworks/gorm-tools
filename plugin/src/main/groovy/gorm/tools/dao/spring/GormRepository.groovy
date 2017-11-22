@@ -1,4 +1,4 @@
-package gorm.tools.dao
+package gorm.tools.dao.spring
 
 import grails.plugin.dao.DomainException
 import groovy.transform.CompileStatic

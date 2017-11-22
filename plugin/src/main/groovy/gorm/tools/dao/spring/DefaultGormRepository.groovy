@@ -1,4 +1,4 @@
-package gorm.tools.dao
+package gorm.tools.dao.spring
 
 import grails.plugin.dao.DaoMessage
 import grails.validation.ValidationException

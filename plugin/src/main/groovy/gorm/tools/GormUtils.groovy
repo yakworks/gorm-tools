@@ -120,7 +120,7 @@ class GormUtils {
 
         if (override) {
             override.each{String key, val ->
-                if(target.hasProperty(key)){
+                if(target.hasProperty(GormStaticApikey)){
                     target[key] = val
                 }
             }

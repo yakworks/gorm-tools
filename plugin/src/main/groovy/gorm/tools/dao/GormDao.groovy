@@ -21,7 +21,7 @@ import org.springframework.dao.DataIntegrityViolationException
  * @author Joshua Burnett
  */
 @GrailsCompileStatic
-trait GormDao<D extends GormEntity & WebDataBinding> {
+trait GormDao<D extends GormEntity<D> & WebDataBinding> {
 
 	String defaultDataBinder = 'grails'
 
@@ -84,7 +84,7 @@ trait GormDao<D extends GormEntity & WebDataBinding> {
     }
 
     D createNew(Map data, Map args = [:]) {
-        D entity = domainClass.newInstance()
+        D entity = (D)domainClass.newInstance()
         String bindMethod = args?.containsKey("bindMethod") ? args.bindMethod : "bindCreate"
         if(bindMethod == "bindCreate"){
             bindCreate(entity, data, args)
@@ -181,6 +181,7 @@ trait GormDao<D extends GormEntity & WebDataBinding> {
         return entity
     }
 
+	@CompileDynamic
     D get(Serializable id) {
         return domainClass.get(id)
     }

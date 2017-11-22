@@ -4,8 +4,10 @@ import grails.core.GrailsApplication
 import grails.plugin.dao.GormDaoSupport
 import grails.util.GrailsNameUtils
 import grails.util.Holders
+import grails.web.databinding.WebDataBinding
+import org.grails.datastore.gorm.GormEntity
 
-trait DaoEntity<D> {
+trait DaoEntity<D extends GormEntity<D> & WebDataBinding> {
 
     private static GormDaoSupport daoBean
 

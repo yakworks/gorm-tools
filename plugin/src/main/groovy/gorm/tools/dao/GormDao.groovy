@@ -1,16 +1,16 @@
 package gorm.tools.dao
 
 import gorm.tools.GormUtils
-import gorm.tools.hibernate.criteria.CriteriaUtils
 import gorm.tools.mango.MangoCriteria
-import grails.converters.JSON
-import grails.gorm.transactions.NotTransactional
+import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
-import grails.plugin.dao.DaoMessage
 import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.DomainException
 import grails.validation.ValidationException
+import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -20,7 +20,10 @@ import org.springframework.dao.DataIntegrityViolationException
  *
  * @author Joshua Burnett
  */
-trait GormDao<D> {
+@GrailsCompileStatic
+trait GormDao<D extends GormEntity & WebDataBinding> {
+
+	String defaultDataBinder = 'grails'
 
     Class<D> thisDomainClass // the domain class this is for
 
@@ -35,7 +38,7 @@ trait GormDao<D> {
      * @param args the arguments to pass to save
      * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
      */
-    @Transactional
+    //@Transactional
     D save(D entity, Map args = [:]) {
         return doSave(entity, args)
     }
@@ -46,14 +49,16 @@ trait GormDao<D> {
         try {
             beforeSave(entity)
             entity.save(args)
-            afterSave(entity)
+            //afterSave(entity)
             return entity
         }
         catch (ValidationException ve) {
             fireSaveError(entity, ve)
+			null
         }
         catch (DataAccessException dae) {
             fireSaveError(entity, dae)
+			null
         }
     }
 
@@ -63,7 +68,7 @@ trait GormDao<D> {
      * @param entity the domain entity
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
-    @Transactional
+    //@Transactional
     void delete(D entity) {
         doDelete(entity)
     }
@@ -106,7 +111,7 @@ trait GormDao<D> {
      * @throws DomainException if a validation error happens or its not found with the params.id
      *                         or the version is off and someone else edited it
      */
-    @Transactional
+    //@Transactional
     D update(Map params) {
         return doUpdate(params)
     }
@@ -118,19 +123,12 @@ trait GormDao<D> {
         DaoUtil.checkVersion(entity, params.version)
 
         entity.properties = params
-        if (fireEvents) beforeUpdateSave(entity, params)
+        beforeUpdateSave(entity, params)
         save(entity)
-        return [ok: true, entity: entity, message: null]
+        return entity
     }
 
-    /**
-     * Uses
-     *
-     * @param params
-     * @param closure
-     * @return
-     */
-    @Transactional(readOnly = true)
+    //@Transactional(readOnly = true)
     List<D> query(Map params) {
         Map criteria = params['criteria']
         MangoCriteria mangoCriteria = new MangoCriteria(D)
@@ -151,16 +149,15 @@ trait GormDao<D> {
      * @param params the parameter map that has the id for the domain entity to delete
      * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
-    @Transactional
+   // @Transactional
     void remove(Serializable id) {
         doRemove(id)
     }
 
     void doRemove(Serializable id) {
         D entity = get(id)
-        DaoUtil.checkFound(entity, params, domainClass.name)
-        beforeRemoveSave(entity, params)
-        Map msg =null // DaoMessage.deleted(entity, DaoMessage.badge(entity.ident(), entity))
+        //DaoUtil.checkFound(entity, params, domainClass.name)
+        beforeRemove(entity)
         delete(entity)
     }
 
@@ -188,6 +185,14 @@ trait GormDao<D> {
         return domainClass.get(id)
     }
 
-    void fireEvent(String event, D entity) { }
+	//event templates
+	 void beforeSave(D entity) { }
+	 void beforeDelete(D entity) { }
+	 void beforeInsertSave(D entity, Map params) { }
+	 void beforeUpdateSave(D entity, Map params) { }
+	 void beforeRemove(D entity) { }
+
+	void fireSaveError(D entity, Exception e) {}
+	void fireDeleteError(D entity, Exception dae) {}
 
 }

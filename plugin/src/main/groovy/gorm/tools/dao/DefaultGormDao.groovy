@@ -9,7 +9,7 @@ class DefaultGormDao implements GormDao {
 
 
 	@Override
-	void fireEvent(DaoEventType eventType, Object... args) {
+	final void fireEvent(DaoEventType eventType, Object... args) {
 		daoEventInvoker.invokeEvent(eventType, this, args)
 	}
 }

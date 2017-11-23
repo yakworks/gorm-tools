@@ -3,14 +3,13 @@ package gorm.tools.dao
 import gorm.tools.GormUtils
 import gorm.tools.mango.MangoCriteria
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.transactions.Transactional
 import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.DomainException
 import grails.validation.ValidationException
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.engine.event.EventType
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -21,11 +20,11 @@ import org.springframework.dao.DataIntegrityViolationException
  * @author Joshua Burnett
  */
 @GrailsCompileStatic
-trait GormDao<D extends GormEntity<D> & WebDataBinding> {
+trait GormDao<D extends DaoEntity<D>> {
 
 	String defaultDataBinder = 'grails'
 
-    Class<D> thisDomainClass // the domain class this is for
+    private Class<D> thisDomainClass // the domain class this is for
 
     Class<D> getDomainClass() { return thisDomainClass }
     //set this is constructing a base dao by hand
@@ -39,47 +38,23 @@ trait GormDao<D extends GormEntity<D> & WebDataBinding> {
      * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
      */
     //@Transactional
-    D save(D entity, Map args = [:]) {
-        return doSave(entity, args)
+    D persist(D entity, Map args = [:]) {
+        return doPersist(entity, args)
     }
 
-    D doSave(D entity, Map args) {
-        //force fail on error
-        args['failOnError'] = true
+    D doPersist(D entity, Map args = [:]) {
+
         try {
-            beforeSave(entity)
+            fireEvent(DaoEventType.BeforeSave, entity)
+
+            args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             entity.save(args)
-            //afterSave(entity)
+
+            fireEvent(DaoEventType.AfterSave, entity)
             return entity
         }
-        catch (ValidationException ve) {
-            fireSaveError(entity, ve)
-			null
-        }
-        catch (DataAccessException dae) {
-            fireSaveError(entity, dae)
-			null
-        }
-    }
-
-    /**
-     * Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
-     *
-     * @param entity the domain entity
-     * @throws DomainException if a spring DataIntegrityViolationException is thrown
-     */
-    //@Transactional
-    void delete(D entity) {
-        doDelete(entity)
-    }
-
-    void doDelete(D entity) {
-        try {
-            beforeDelete(entity)
-            entity.delete(flush: true)
-        }
-        catch (DataIntegrityViolationException dae) {
-            fireDeleteError(entity, dae)
+        catch (ValidationException | DataAccessException ex) {
+            handleException(entity, ex)
         }
     }
 
@@ -149,17 +124,33 @@ trait GormDao<D extends GormEntity<D> & WebDataBinding> {
      * @param params the parameter map that has the id for the domain entity to delete
      * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
-   // @Transactional
-    void remove(Serializable id) {
-        doRemove(id)
+    void removeById(Serializable id) {
+        D entity = get(id)
+        remove(entity)
     }
 
-    void doRemove(Serializable id) {
-        D entity = get(id)
-        //DaoUtil.checkFound(entity, params, domainClass.name)
-        beforeRemove(entity)
-        delete(entity)
+    /**
+     * Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
+     *
+     * @param entity the domain entity
+     * @throws DomainException if a spring DataIntegrityViolationException is thrown
+     */
+    //@Transactional
+    void remove(D entity) {
+        doRemove(entity)
     }
+
+    void doRemove(D entity) {
+        try {
+            fireEvent(DaoEventType.BeforeRemove, entity)
+            entity.delete()
+            fireEvent(DaoEventType.AfterRemove, entity)
+        }
+        catch (DataIntegrityViolationException dae) {
+            handleException(entity, dae)
+        }
+    }
+
 
     @CompileDynamic
     def callBinderMethod(String method, D entity, Map data, Map args = [:]){
@@ -181,19 +172,22 @@ trait GormDao<D extends GormEntity<D> & WebDataBinding> {
         return entity
     }
 
-	@CompileDynamic
     D get(Serializable id) {
-        return domainClass.get(id)
+        D entity = domainClass.get(id)
+        DaoUtil.checkFound(entity, [id: id], domainClass.name)
+        return entity
     }
 
-	//event templates
-	 void beforeSave(D entity) { }
-	 void beforeDelete(D entity) { }
-	 void beforeInsertSave(D entity, Map params) { }
-	 void beforeUpdateSave(D entity, Map params) { }
-	 void beforeRemove(D entity) { }
+    void fireEvent(String eventKey, D entity) {
 
-	void fireSaveError(D entity, Exception e) {}
-	void fireDeleteError(D entity, Exception dae) {}
+    }
+
+    void fireEventWithParams(String eventKey, Map entity) {
+
+    }
+
+    void handleException(D entity, RuntimeException e) throws DataAccessException{
+
+    }
 
 }

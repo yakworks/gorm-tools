@@ -13,30 +13,26 @@ trait DaoEntity<D extends GormEntity<D>> {
 
     private static GormDao daoBean
 
+	/**
+	 * Looks up and caches a dao bean
+	 * @return The dao
+	 */
+	static GormDao<D> getDao() {
+		if(!daoBean) {
+			GrailsApplication grailsApplication = Holders.grailsApplication
+			String domainName = GrailsNameUtils.getPropertyName(this.name)
+			String daoName = "${domainName}Dao"
+			daoBean = (GormDao<D>) grailsApplication.mainContext.getBean(daoName)
+		}
+		return daoBean
+	}
+
+	static void setDao(GormDao<D> dao) {
+		daoBean = dao
+	}
+
     D persist(Map args = [:]) {
         getDao().persist((D) this, args)
-    }
-
-    void remove() {
-        getDao().remove((D) this)
-    }
-
-    /**
-     * Looks up and caches a dao bean
-     * @return The dao
-     */
-    static GormDao<D> getDao() {
-        if(!daoBean) {
-            GrailsApplication grailsApplication = Holders.grailsApplication
-            String domainName = GrailsNameUtils.getPropertyName(this.name)
-            String daoName = "${domainName}Dao"
-            daoBean = (GormDao<D>) grailsApplication.mainContext.getBean(daoName)
-        }
-        return daoBean
-    }
-
-    static void setDao(GormDao<D> dao) {
-        daoBean = dao
     }
 
     /**
@@ -50,6 +46,10 @@ trait DaoEntity<D extends GormEntity<D>> {
     static D update(Map params) {
         getDao().update(params)
     }
+
+	void remove() {
+		getDao().remove((D) this)
+	}
 
     static void remove(Serializable id) {
         getDao().removeById(id)

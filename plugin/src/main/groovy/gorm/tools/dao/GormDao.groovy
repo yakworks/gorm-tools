@@ -88,9 +88,9 @@ trait GormDao<D> {
 
 		entity.properties = params
 
-		fireEventWithParams(DaoEventType.BeforeUpdate, entity, params)
+		fireEvent(DaoEventType.BeforeUpdate, entity, params)
         persist(entity)
-		fireEventWithParams(DaoEventType.AfterUpdate, entity, params)
+		fireEvent(DaoEventType.AfterUpdate, entity, params)
         return entity
     }
 
@@ -159,13 +159,8 @@ trait GormDao<D> {
         return entity
     }
 
-    void fireEvent(DaoEventType eventType, D entity) {
+    void fireEvent(DaoEventType eventType, Object... args) { }
 
-    }
-
-    void fireEventWithParams(DaoEventType eventType, D entity, Map params) {
-
-    }
 
     void handleException(D entity, RuntimeException e) throws DataAccessException {
 

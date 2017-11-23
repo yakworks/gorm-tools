@@ -19,8 +19,8 @@ import org.springframework.dao.DataIntegrityViolationException
  *
  * @author Joshua Burnett
  */
-//@GrailsCompileStatic calling save, delete etc on entity fails to compile because we dont do <D extends GormEntity>
-trait GormDao<D> {
+@GrailsCompileStatic
+trait GormDao<D extends GormEntity> {
 
 	String defaultDataBinder = 'grails'
 
@@ -54,7 +54,14 @@ trait GormDao<D> {
         }
     }
 
-    D createNew(Map data, Map args = [:]) {
+    /**
+     * Creates a new instance and domain and binds the data using the bindCreate method.
+     *
+     * @param data
+     * @param args
+     * @return
+     */
+    D instance(Map data, Map args = [:]) {
         D entity = (D)domainClass.newInstance()
         String bindMethod = args?.containsKey("bindMethod") ? args.bindMethod : "bindCreate"
         if(bindMethod == "bindCreate"){

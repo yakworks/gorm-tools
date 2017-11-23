@@ -1,5 +1,8 @@
 package gorm.tools.mango
 
+import grails.converters.JSON
+import org.grails.web.json.JSONObject
+
 class MangoTidyMap {
 
     static Map tidy(Map map) {
@@ -7,7 +10,13 @@ class MangoTidyMap {
         map.each { String k, Object v ->
             pathToMap(k, v, nested)
         }
-        toMangoOperator(nested)
+        toMangoOperator(nested) as JSONObject
+    }
+
+    static Map tidyQuickSearch(Class domain, String val) {
+        tidy(['$or': domain.quickSearchFields.collectEntries {
+            ["$it": val] //TODO: probably should check type and add `%` for strings
+        }])
     }
 
     /**

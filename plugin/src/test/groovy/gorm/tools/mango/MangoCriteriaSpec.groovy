@@ -2,6 +2,7 @@ package gorm.tools.mango
 
 import gorm.tools.Address
 import gorm.tools.hibernate.criteria.DynamicCriteriaBuilder
+import grails.core.GrailsDomainClassProperty
 import grails.persistence.Entity
 import grails.test.mixin.TestMixin
 import grails.test.mixin.gorm.Domain
@@ -26,7 +27,7 @@ class MangoCriteriaSpec extends Specification {
                     amount2: (index-1)*(index-1)*0.3,
                     date: new Date().clearTime() + index,
                     secondName: index % 2 == 0 ? null :  "Name2#" + index,
-                    location: (new Location(city: "City#$index").save())
+                    location: (new Location(city: "City#$index", nested: new Nested(name: "Nested#${2*index}", value: index)).save())
             ).save(failOnError: true)
         }
         when:
@@ -75,6 +76,12 @@ class MangoCriteriaSpec extends Specification {
 
         then:
         res.size() == 1
+
+        when:
+        res = dcb.build(MangoTidyMap.tidy([amount: ['$gt':6.0]])).list()
+
+        then:
+        res.size() == 5
     }
 
     def "test detached Date"() {
@@ -122,6 +129,15 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 1
     }
 
+    def "test nested String"() {
+        when:
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy(["location.city": "City#4"])).list()
+
+        then:
+        res.size() == 1
+    }
+
    /* def "test nestedId"() {
         when:
         MangoCriteria dcb = new MangoCriteria(Org)
@@ -148,6 +164,16 @@ class MangoCriteriaSpec extends Specification {
 
         then:
         res.size() == 6
+    }
+
+    def "test in list"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([id: [1,2,3,4]])).list()
+
+        then:
+        res.size() == 4
     }
 
     def "test not"() {
@@ -221,6 +247,50 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 9
     }
 
+    def "test quickSearch"() {
+        when:
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy(['$quickSearch': "Name#%"])).list()
+
+        then:
+        res.size() == 10
+
+        when:
+
+        res = dcb.build(MangoTidyMap.tidy(['$quickSearch': "Name#3"])).list()
+
+        then:
+        res.size() == 1
+
+        when:
+        res = dcb.build(MangoTidyMap.tidy(['$quickSearch': "Name#%", isActive: true])).list()
+
+        then:
+        res.size() == 5
+
+
+    }
+
+    def "test with closure"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy([name: "Name#%"])){gt "id", 5}.list()
+
+        then:
+        res.size() == 5
+    }
+
+    def "test with deep nested"() {
+        when:
+
+        MangoCriteria dcb = new MangoCriteria(Org)
+        List res = dcb.build(MangoTidyMap.tidy(["location.nested.name": "Nested#4"])).list()
+
+        then:
+        res.size() == 1
+    }
+
     List<Class> getDomainClasses() {
         return [Org,Location]
     }
@@ -239,6 +309,8 @@ class Org {
     String secondName
     Date date
 
+    static List quickSearchFields = ["name"]
+
     static constraints = {
         name blank: true, nullable: true
         isActive nullable: true
@@ -251,5 +323,16 @@ class Org {
 class Location{
     int id
     String city
+    Nested nested
+}
+@Entity
+class Nested{
+    String name
+    BigDecimal value
+
+    static constraints = {
+        name blank: true, nullable: true
+        value nullable: true
+    }
 }
 

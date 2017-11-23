@@ -1,9 +1,17 @@
 package gorm.tools.mango
 
+import gorm.tools.beans.DateUtil
 import grails.gorm.DetachedCriteria
+import groovy.transform.CompileDynamic
+import org.grails.datastore.gorm.finders.FinderMethod
+import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
+import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
+import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
+import org.grails.datastore.mapping.query.Restrictions
 import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
+import org.grails.orm.hibernate.query.AbstractHibernateCriteriaBuilder
 
 /**
  * Builds DetachedCriteria from a map. Everything essentially gets put into 3 lists; criteria, projections and orders.
@@ -45,6 +53,11 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
             '$isNotNull': 'isNotNull'
     ]
 
+    static final Map<String, String> quickSearchOps = [
+            '$quickSearch'   : 'quickSearch',
+            '$q': 'quickSearch'
+    ]
+
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
      * @param targetClass The target class
@@ -60,9 +73,10 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
      * @param mangoMap The map with the mongo mango like language
      * @return A new criteria instance
      */
-    DetachedCriteria<T> build(Map mangoMap) {
+    DetachedCriteria<T> build(Map mangoMap, Closure callable = null) {
         MangoCriteria<T> newCriteria = this.clone()
         newCriteria.applyMap(mangoMap)
+        if (callable) newCriteria.with callable
         return newCriteria
     }
 
@@ -89,6 +103,7 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
      * @param mangoMap
      */
     protected void applyMap(Map mangoMap) {
+        println "applyMap >>>>>>>>>>>>> $mangoMap"
         for (String key : mangoMap.keySet()) {
             String op = junctionOps[key]
             if (op) {
@@ -102,6 +117,11 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
     }
 
     protected void applyField(String field, Object fieldVal) {
+        String qs = quickSearchOps[field]
+        if (qs) {
+            "$qs"(fieldVal)
+            return
+        }
         if (fieldVal instanceof String || fieldVal instanceof Number || fieldVal instanceof Boolean) {
             //TODO check if its a date field and parse
             eq(field, fieldVal)
@@ -130,14 +150,84 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
                     continue
                 }
                 //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
-                "$field"({ applyMap(fieldVal as Map) })
+                //missing method creates alias for nested property, but if key doesnt contain it looks in "parent" domain
+                //"$field"(field, {add new MangoCriteria(targetClass, field).build(fieldVal as Map) as Query.Criterion })
+                "$field"(field, {applyMap(fieldVal.collectEntries{ Map res = [:]; res["$field.${it.key}"] =it.value; res})})
             }
         }
 
     }
 
+   /* @CompileDynamic
+    static toType(val, type) {
+        switch (type) {
+            case String:
+                val
+                break
+            case [Boolean, boolean]:
+                val.toBoolean()// we cant use "asType" because 'false'.asType(Boolean) == true
+                break
+            case (Date):
+                toDate(val)
+                break
+            case [Integer, int, long, double, Double, float, Float, Long, BigDecimal]:
+                val.asType(type)
+                break
+            default:
+                val
+        }
+    }
+
+
+    @Override
+    DetachedCriteria<T> "in"(String propertyName, Object[] values) {
+        println "in List"
+        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1]).type)})
+        return this
+    }
+
+    @Override
+    DetachedCriteria<T> inList(String propertyName, Object[] values) {
+        println "inList"
+        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type)})
+        return this    }
+
+    @Override
+    DetachedCriteria<T> "in"(String propertyName, Collection values) {
+        println "in List2"
+        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type)})
+        return this
+    }
+
+    @Override
+    DetachedCriteria<T> inList(String propertyName, Collection values) {
+        println "inList2"
+        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type)})
+        return this
+    }
+
+    static Date toDate(val) {
+        AbstractHibernateCriteriaBuilder
+        if (val instanceof String) {
+            DateUtil.parseJsonDate(val)
+        } else {
+            val instanceof Date ? val : new Date(val) //for case when miliseconds are passed
+        }
+    }
+
+
+    @Override
+    MangoCriteria<T> eq(String propertyName, Object propertyValue) {
+        println "EEEEEEQQQQQQQQQQQQQQQQ"
+        return (MangoCriteria<T>)super.eq(propertyName, toType(propertyValue, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type))
+    }*/
+
     MangoCriteria<T> between(String propertyName, List params) {
         return (MangoCriteria<T>) super.between(propertyName, params[0], params[1])
+    }
+
+    MangoCriteria<T> quickSearch(String value) {
+        return (MangoCriteria<T>) applyMap(MangoTidyMap.tidyQuickSearch(targetClass, value))
     }
 
     MangoCriteria<T> notIn(String propertyName, List params) {

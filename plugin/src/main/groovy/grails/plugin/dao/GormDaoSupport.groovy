@@ -1,5 +1,8 @@
 package grails.plugin.dao
 
+import gorm.tools.Pager
+import gorm.tools.mango.MangoCriteria
+import gorm.tools.mango.MangoTidyMap
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 
@@ -164,15 +167,19 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 */
 	@CompileDynamic
 	List<T> list(Map params = [:], Closure closure = null) {
-		Map criteria
-		if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
-			JSON.use('deep')
-			criteria = JSON.parse(params['criteria']) as Map
-		} else {
-			criteria = params['criteria'] as Map ?: [:]
-		}
-		CriteriaUtils.list(criteria, this.thisDomainClass, params as Map, closure)
+        Map criteria
+        if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+            JSON.use('deep')
+            criteria = JSON.parse(params['criteria']) as Map
+        } else {
+            criteria = params['criteria'] as Map ?: [:]
+        }
+		Pager pager = new Pager(params)
+		MangoCriteria mangoCriteria = new MangoCriteria(this.thisDomainClass).build(MangoTidyMap.tidy(criteria), closure)
+		mangoCriteria.list(max: pager.max, offset: pager.offset)
 	}
+
+
 	@CompileDynamic
 	List countTotals(Map params = [:], Closure closure = null) {
 			Map criteria

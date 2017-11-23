@@ -5,18 +5,20 @@ import grails.plugin.dao.GormDaoSupport
 import grails.util.GrailsNameUtils
 import grails.util.Holders
 import grails.web.databinding.WebDataBinding
+import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
-trait DaoEntity<D extends GormEntity<D> & WebDataBinding> {
+@CompileStatic
+trait DaoEntity<D extends GormEntity<D>> {
 
-    private static GormDaoSupport daoBean
+    private static GormDao daoBean
 
     D persist(Map args = [:]) {
-        getDao().save((D) this, args)
+        getDao().persist((D) this, args)
     }
 
     void remove() {
-        getDao().delete((D) this)
+        getDao().remove((D) this)
     }
 
     /**
@@ -28,7 +30,7 @@ trait DaoEntity<D extends GormEntity<D> & WebDataBinding> {
             GrailsApplication grailsApplication = Holders.grailsApplication
             String domainName = GrailsNameUtils.getPropertyName(this.name)
             String daoName = "${domainName}Dao"
-            daoBean = (GormDaoSupport<D>) grailsApplication.mainContext.getBean(daoName)
+            daoBean = (GormDao<D>) grailsApplication.mainContext.getBean(daoName)
         }
         return daoBean
     }
@@ -50,6 +52,6 @@ trait DaoEntity<D extends GormEntity<D> & WebDataBinding> {
     }
 
     static void remove(Serializable id) {
-        getDao().remove(id)
+        getDao().removeById(id)
     }
 }

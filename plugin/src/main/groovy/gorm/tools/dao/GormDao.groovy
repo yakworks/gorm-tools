@@ -19,8 +19,8 @@ import org.springframework.dao.DataIntegrityViolationException
  *
  * @author Joshua Burnett
  */
-@GrailsCompileStatic
-trait GormDao<D extends DaoEntity<D>> {
+//@GrailsCompileStatic calling save, delete etc on entity fails to compile because we dont do <D extends GormEntity>
+trait GormDao<D> {
 
 	String defaultDataBinder = 'grails'
 
@@ -37,19 +37,15 @@ trait GormDao<D extends DaoEntity<D>> {
      * @param args the arguments to pass to save
      * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
      */
-    //@Transactional
     D persist(D entity, Map args = [:]) {
         return doPersist(entity, args)
     }
 
     D doPersist(D entity, Map args = [:]) {
-
         try {
             fireEvent(DaoEventType.BeforeSave, entity)
-
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             entity.save(args)
-
             fireEvent(DaoEventType.AfterSave, entity)
             return entity
         }
@@ -71,7 +67,7 @@ trait GormDao<D extends DaoEntity<D>> {
 
     D create(Map data, Map args = [:]) {
         D entity = createNew(data, args)
-        save(entity, args)
+        persist(entity, args)
         return entity
     }
 
@@ -79,14 +75,7 @@ trait GormDao<D extends DaoEntity<D>> {
         bind(entity, data, args)
     }
 
-    /**
-     * Updates a new domain entity with the data from params.
-     *
-     * @param params the parameter map
-     * @throws DomainException if a validation error happens or its not found with the params.id
-     *                         or the version is off and someone else edited it
-     */
-    //@Transactional
+
     D update(Map params) {
         return doUpdate(params)
     }
@@ -97,25 +86,20 @@ trait GormDao<D extends DaoEntity<D>> {
         DaoUtil.checkFound(entity, params, domainClass.name)
         DaoUtil.checkVersion(entity, params.version)
 
-        entity.properties = params
-        beforeUpdateSave(entity, params)
-        save(entity)
+		entity.properties = params
+
+		fireEventWithParams(DaoEventType.BeforeUpdate, entity, params)
+        persist(entity)
+		fireEventWithParams(DaoEventType.AfterUpdate, entity, params)
         return entity
     }
 
-    //@Transactional(readOnly = true)
+
     List<D> query(Map params) {
         Map criteria = params['criteria']
         MangoCriteria mangoCriteria = new MangoCriteria(D)
         mangoCriteria.build(criteria)
         return mangoCriteria.list(params)
-//        if (criteria instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
-//            JSON.use('deep')
-//            criteria = JSON.parse(params['criteria']) as Map
-//        } else {
-//            criteria = params['criteria'] as Map ?: [:]
-//        }
-        //CriteriaUtils.list(criteria, this.thisDomainClass, params as Map, closure)
     }
 
     /**
@@ -143,7 +127,7 @@ trait GormDao<D extends DaoEntity<D>> {
     void doRemove(D entity) {
         try {
             fireEvent(DaoEventType.BeforeRemove, entity)
-            entity.delete()
+            entity.delete(flush:true)
             fireEvent(DaoEventType.AfterRemove, entity)
         }
         catch (DataIntegrityViolationException dae) {
@@ -162,13 +146,10 @@ trait GormDao<D extends DaoEntity<D>> {
         if(dataBinder == 'grails'){
             entity.properties = row
         }
-        else if(dataBinder == 'fast'){
-            GormUtils.bindFast(entity, row)
-        }
         else {
-            //fall back to just setting the props
             GormUtils.bindFast(entity, row)
         }
+
         return entity
     }
 
@@ -178,15 +159,15 @@ trait GormDao<D extends DaoEntity<D>> {
         return entity
     }
 
-    void fireEvent(String eventKey, D entity) {
+    void fireEvent(DaoEventType eventType, D entity) {
 
     }
 
-    void fireEventWithParams(String eventKey, Map entity) {
+    void fireEventWithParams(DaoEventType eventType, D entity, Map params) {
 
     }
 
-    void handleException(D entity, RuntimeException e) throws DataAccessException{
+    void handleException(D entity, RuntimeException e) throws DataAccessException {
 
     }
 

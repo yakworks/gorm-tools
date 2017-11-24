@@ -12,13 +12,7 @@ class MangoTidyMap {
         }
         toMangoOperator(nested) as JSONObject
     }
-
-    static Map tidyQuickSearch(Class domain, String val) {
-        tidy(['$or': domain.quickSearchFields.collectEntries {
-            ["$it": val] //TODO: probably should check type and add `%` for strings
-        }])
-    }
-
+    
     /**
      * Extends the map with nested value by specific path
      * so pathToMap("a.b.c", 1, [:]) -> [a:[b:[c:1]]]

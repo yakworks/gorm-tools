@@ -1,6 +1,8 @@
 package gorm.tools.mango
 
+import gorm.tools.GormMetaUtils
 import gorm.tools.beans.DateUtil
+import grails.core.GrailsDomainClass
 import grails.gorm.DetachedCriteria
 import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.finders.FinderMethod
@@ -8,10 +10,9 @@ import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
 import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
-import org.grails.datastore.mapping.query.Restrictions
 import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
-import org.grails.orm.hibernate.query.AbstractHibernateCriteriaBuilder
+
 
 /**
  * Builds DetachedCriteria from a map. Everything essentially gets put into 3 lists; criteria, projections and orders.
@@ -20,6 +21,7 @@ import org.grails.orm.hibernate.query.AbstractHibernateCriteriaBuilder
  */
 class MangoCriteria<T> extends DetachedCriteria<T> {
 
+    protected GrailsDomainClass domainClass
     static final Map<String, String> compareOps = [
             '$gt'     : 'gt',
             '$eq'     : 'eq',
@@ -54,8 +56,8 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
     ]
 
     static final Map<String, String> quickSearchOps = [
-            '$quickSearch'   : 'quickSearch',
-            '$q': 'quickSearch'
+            '$quickSearch': 'quickSearch',
+            '$q'          : 'quickSearch'
     ]
 
     /**
@@ -65,6 +67,7 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
      */
     MangoCriteria(Class<T> targetClass, String alias = null) {
         super(targetClass, alias)
+        domainClass = GormMetaUtils.findDomainClass(targetClass.name)
     }
 
     /**
@@ -122,7 +125,10 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
             "$qs"(fieldVal)
             return
         }
-        if (fieldVal instanceof String || fieldVal instanceof Number || fieldVal instanceof Boolean) {
+        if(field.matches(/.*[^.]Id/) && persistentEntity.properties.persistentPropertyNames.contains(field.replaceAll("Id\$", ""))){
+            applyField(field.replaceAll("Id\$", ""), ['id': fieldVal])
+        }
+        else if (fieldVal instanceof String || fieldVal instanceof Number || fieldVal instanceof Boolean) {
             //TODO check if its a date field and parse
             eq(field, fieldVal)
         } else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
@@ -140,7 +146,7 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
                 }
                 String cond = compareOps[key]
                 if (cond) {
-                    "$cond"(field, opArg)
+                    "$cond"(field, toType(field,opArg))
                     continue
                 }
 
@@ -151,89 +157,53 @@ class MangoCriteria<T> extends DetachedCriteria<T> {
                 }
                 //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
                 //missing method creates alias for nested property, but if key doesnt contain it looks in "parent" domain
-                //"$field"(field, {add new MangoCriteria(targetClass, field).build(fieldVal as Map) as Query.Criterion })
-                "$field"(field, {applyMap(fieldVal.collectEntries{ Map res = [:]; res["$field.${it.key}"] =it.value; res})})
+                "${field}"(field, {
+                    applyMap(fieldVal.collectEntries { Map res = [:]; res["$field.${it.key}"] = it.value; res })
+                })
             }
         }
-
-    }
-
-   /* @CompileDynamic
-    static toType(val, type) {
-        switch (type) {
-            case String:
-                val
-                break
-            case [Boolean, boolean]:
-                val.toBoolean()// we cant use "asType" because 'false'.asType(Boolean) == true
-                break
-            case (Date):
-                toDate(val)
-                break
-            case [Integer, int, long, double, Double, float, Float, Long, BigDecimal]:
-                val.asType(type)
-                break
-            default:
-                val
-        }
     }
 
 
-    @Override
-    DetachedCriteria<T> "in"(String propertyName, Object[] values) {
-        println "in List"
-        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1]).type)})
-        return this
-    }
-
-    @Override
-    DetachedCriteria<T> inList(String propertyName, Object[] values) {
-        println "inList"
-        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type)})
-        return this    }
-
-    @Override
-    DetachedCriteria<T> "in"(String propertyName, Collection values) {
-        println "in List2"
-        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type)})
-        return this
-    }
-
-    @Override
-    DetachedCriteria<T> inList(String propertyName, Collection values) {
-        println "inList2"
-        add Restrictions.in(propertyName, values.collect{toType(it, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type)})
-        return this
-    }
-
-    static Date toDate(val) {
-        AbstractHibernateCriteriaBuilder
-        if (val instanceof String) {
-            DateUtil.parseJsonDate(val)
-        } else {
-            val instanceof Date ? val : new Date(val) //for case when miliseconds are passed
-        }
-    }
-
-
-    @Override
-    MangoCriteria<T> eq(String propertyName, Object propertyValue) {
-        println "EEEEEEQQQQQQQQQQQQQQQQ"
-        return (MangoCriteria<T>)super.eq(propertyName, toType(propertyValue, persistentEntity.getPropertyByName(propertyName.split("[.]")[-1])?.type))
-    }*/
 
     MangoCriteria<T> between(String propertyName, List params) {
         return (MangoCriteria<T>) super.between(propertyName, params[0], params[1])
     }
 
     MangoCriteria<T> quickSearch(String value) {
-        return (MangoCriteria<T>) applyMap(MangoTidyMap.tidyQuickSearch(targetClass, value))
+        Map result = MangoTidyMap.tidy(['$or': targetClass.quickSearchFields.collectEntries {
+            ["$it": value] //TODO: probably should check type and add `%` for strings
+        }])
+
+        return (MangoCriteria<T>) applyMap(result)
     }
 
     MangoCriteria<T> notIn(String propertyName, List params) {
         Map val = [:]
         val[propertyName] = ['$in': params]
         return (MangoCriteria<T>) super.notIn(propertyName, (new MangoCriteria(targetClass).build(val)."$propertyName") as QueryableCriteria)
+    }
+
+    Object toType(String propertyName, Object value) {
+        if (value instanceof String && domainClass.getPropertyByName(propertyName))
+            return value
+        def valueToAssign = value
+        if (value instanceof List){
+            return value.collect{toType(propertyName, it)}
+        }
+        def prop = domainClass.getPropertyByName(propertyName)
+         if (value instanceof String && !domainClass.getPropertyByName(propertyName)) {
+            Class typeToConvertTo = prop.getType()
+            if (Number.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = (value as String).asType(typeToConvertTo)
+            } else if (Date.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = DateUtil.parseJsonDate(value as String)
+            }
+        } else {
+             valueToAssign = valueToAssign.asType(prop.type)
+         }
+        valueToAssign
+
     }
 
     /**

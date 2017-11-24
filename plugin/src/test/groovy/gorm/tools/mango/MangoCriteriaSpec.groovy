@@ -9,7 +9,7 @@ import grails.test.mixin.gorm.Domain
 import grails.test.mixin.hibernate.HibernateTestMixin
 import spock.lang.Specification
 
-@Domain([Org, Location])
+@Domain([Org,Location,Nested])
 @TestMixin(HibernateTestMixin)
 class MangoCriteriaSpec extends Specification {
 
@@ -138,14 +138,16 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 1
     }
 
-   /* def "test nestedId"() {
+
+ def "test nestedId"() {
         when:
         MangoCriteria dcb = new MangoCriteria(Org)
         List res = dcb.build(MangoTidyMap.tidy(["locationId": ['$eq':6]])).list()
 
         then:
         res.size() == 1
-    }*/
+    }
+
 
     def "test or"() {
         when:
@@ -218,7 +220,7 @@ class MangoCriteriaSpec extends Specification {
         when:
         MangoCriteria dcb = new MangoCriteria(Org)
         List res = dcb.build(MangoTidyMap.tidy([amount: ['$gtef':"amount2"]])).list()
-            Org.createCriteria()
+
         then:
         res.size() == 5
 
@@ -281,6 +283,7 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 5
     }
 
+
     def "test with deep nested"() {
         when:
 
@@ -291,8 +294,9 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 1
     }
 
+
     List<Class> getDomainClasses() {
-        return [Org,Location]
+        return [Org,Location,Nested]
     }
 
 

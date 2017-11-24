@@ -1,15 +1,13 @@
 package gorm.tools.dao
 
-import gorm.tools.GormUtils
+import gorm.tools.databinding.FastBinder
 import gorm.tools.mango.MangoCriteria
-import grails.compiler.GrailsCompileStatic
 import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.DomainException
 import grails.validation.ValidationException
-import grails.web.databinding.WebDataBinding
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.engine.event.EventType
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -19,10 +17,10 @@ import org.springframework.dao.DataIntegrityViolationException
  *
  * @author Joshua Burnett
  */
-@GrailsCompileStatic
+@CompileStatic
 trait GormDao<D extends GormEntity> {
 
-	String defaultDataBinder = 'grails'
+	FastBinder fastBinder
 
     private Class<D> thisDomainClass // the domain class this is for
 
@@ -38,75 +36,47 @@ trait GormDao<D extends GormEntity> {
      * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
      */
     D persist(D entity, Map args = [:]) {
-        return doPersist(entity, args)
+        withTransaction {
+            return doPersist(entity, args)
+        }
     }
 
     D doPersist(D entity, Map args = [:]) {
         try {
-            fireEvent(DaoEventType.BeforeSave, entity)
+            DaoUtil.fireEvent(DaoEventType.BeforePersist, entity)
+
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             entity.save(args)
-            fireEvent(DaoEventType.AfterSave, entity)
+
+            DaoUtil.fireEvent(DaoEventType.AfterPersist, entity)
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
-            handleException(entity, ex)
+            throw handleException(entity, ex)
         }
     }
 
-    /**
-     * Creates a new instance and domain and binds the data using the bindCreate method.
-     *
-     * @param data
-     * @param args
-     * @return
-     */
-    D instance(Map data, Map args = [:]) {
+    D create(Map params, Map saveArgs = [:]) {
         D entity = (D)domainClass.newInstance()
-        String bindMethod = args?.containsKey("bindMethod") ? args.bindMethod : "bindCreate"
-        if(bindMethod == "bindCreate"){
-            bindCreate(entity, data, args)
-        } else {
-            callBinderMethod(bindMethod, entity, data, args)
+        withTransaction {
+            return bindAndSave("Create", entity, params, saveArgs)
         }
+
+    }
+
+    D update(Map params, Map saveArgs = [:]) {
+        D entity = get(params)
+        withTransaction {
+            return bindAndSave("Update", entity, params, saveArgs)
+        }
+    }
+
+    D bindAndSave(String bindMethod, D entity, Map params, Map saveArgs) {
+        DaoUtil.fireEvent(DaoEventType.valueOf("Before$bindMethod"), entity, params)
+        bind(bindMethod, entity, params)
+        persist(entity, saveArgs)
+        DaoUtil.fireEvent(DaoEventType.valueOf("After$bindMethod"), entity, params)
         return entity
-    }
-
-    D create(Map data, Map args = [:]) {
-        D entity = createNew(data, args)
-        persist(entity, args)
-        return entity
-    }
-
-    void bindCreate(D entity, Map data, Map args = [:]){
-        bind(entity, data, args)
-    }
-
-
-    D update(Map params) {
-        return doUpdate(params)
-    }
-
-    D doUpdate(Map params) {
-        D entity = get(params.id as Serializable)
-
-        DaoUtil.checkFound(entity, params, domainClass.name)
-        DaoUtil.checkVersion(entity, params.version)
-
-		entity.properties = params
-
-		fireEvent(DaoEventType.BeforeUpdate, entity, params)
-        persist(entity)
-		fireEvent(DaoEventType.AfterUpdate, entity, params)
-        return entity
-    }
-
-
-    List<D> query(Map params) {
-        Map criteria = params['criteria']
-        MangoCriteria mangoCriteria = new MangoCriteria(D)
-        mangoCriteria.build(criteria)
-        return mangoCriteria.list(params)
     }
 
     /**
@@ -126,51 +96,52 @@ trait GormDao<D extends GormEntity> {
      * @param entity the domain entity
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
-    //@Transactional
     void remove(D entity) {
-        doRemove(entity)
+        withTransaction {
+            doRemove(entity)
+        }
     }
 
     void doRemove(D entity) {
         try {
-            fireEvent(DaoEventType.BeforeRemove, entity)
+            DaoUtil.fireEvent(DaoEventType.BeforeRemove, entity)
             entity.delete(flush:true)
-            fireEvent(DaoEventType.AfterRemove, entity)
+            DaoUtil.fireEvent(DaoEventType.AfterRemove, entity)
         }
         catch (DataIntegrityViolationException dae) {
             handleException(entity, dae)
         }
     }
 
-
-    @CompileDynamic
-    def callBinderMethod(String method, D entity, Map data, Map args = [:]){
-        "${method}"(entity, data, args)
+    D bind(String method, D entity, Map row){
+        //TODO pass the bind type into fast binder
+        (D) fastBinder.bind(method, entity, row)
     }
 
-    D bind(D entity, Map row, Map args = [:]){
-        String dataBinder = args?.containsKey("dataBinder") ? args.dataBinder : defaultDataBinder
-        if(dataBinder == 'grails'){
-            entity.properties = row
-        }
-        else {
-            GormUtils.bindFast(entity, row)
-        }
-
-        return entity
-    }
-
-    D get(Serializable id) {
-        D entity = domainClass.get(id)
+    D get(Serializable id, Long version = null) {
+        D entity = GormEnhancer.findStaticApi(domainClass).get(id)
         DaoUtil.checkFound(entity, [id: id], domainClass.name)
+        if(version != null) DaoUtil.checkVersion(entity, version)
         return entity
     }
 
-    void fireEvent(DaoEventType eventType, Object... args) { }
+    D get(Map params) {
+        return get(params.id as Serializable, params.version as Long)
+    }
 
+    List<D> query(Map params) {
+        Map criteria = params['criteria']
+        MangoCriteria mangoCriteria = new MangoCriteria(D)
+        mangoCriteria.build(criteria)
+        return mangoCriteria.list(params)
+    }
 
-    void handleException(D entity, RuntimeException e) throws DataAccessException {
+    DataAccessException handleException(D entity, RuntimeException e) throws DataAccessException {
+        return DaoUtil.handleException(entity, e)
+    }
 
+    public <T> T withTransaction(Closure<T> callable) {
+        GormEnhancer.findStaticApi(domainClass).withTransaction callable
     }
 
 }

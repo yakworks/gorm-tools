@@ -8,9 +8,12 @@ import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
+import javax.persistence.Transient
+
 @CompileStatic
 trait DaoEntity<D extends GormEntity<D>> {
 
+    @Transient
     private static GormDao daoBean
 
 	/**

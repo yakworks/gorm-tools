@@ -48,8 +48,8 @@ class DaoEventInvoker {
 		findAndCacheEvents(DaoEventType.AfterUpdate, daoClass, events)
 		findAndCacheEvents(DaoEventType.BeforeRemove, daoClass, events)
 		findAndCacheEvents(DaoEventType.AfterRemove, daoClass, events)
-		findAndCacheEvents(DaoEventType.BeforeSave, daoClass, events)
-		findAndCacheEvents(DaoEventType.AfterSave, daoClass, events)
+		findAndCacheEvents(DaoEventType.BeforePersist, daoClass, events)
+		findAndCacheEvents(DaoEventType.AfterPersist, daoClass, events)
 	}
 
 	private void findAndCacheEvents(DaoEventType event, Class daoClass, Map<DaoEventType, Method> events) {

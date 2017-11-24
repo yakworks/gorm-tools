@@ -7,6 +7,6 @@ public enum DaoEventType {
     AfterRemove,
     AfterCreate,
     AfterUpdate,
-    BeforeSave,
-    AfterSave
+    BeforePersist,
+    AfterPersist
 }

@@ -3,13 +3,9 @@ package gorm.tools.dao
 import grails.gorm.transactions.Transactional
 
 @Transactional
-class DefaultGormDao implements GormDao {
+class DefaultGormDao<D> implements GormDao<D> {
 
-	DaoEventInvoker daoEventInvoker
-
-
-	@Override
-	final void fireEvent(DaoEventType eventType, Object... args) {
-		daoEventInvoker.invokeEvent(eventType, this, args)
-	}
+    DefaultGormDao(Class<D> clazz){
+        setDomainClass(clazz)
+    }
 }

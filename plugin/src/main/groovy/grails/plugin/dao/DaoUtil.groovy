@@ -1,11 +1,19 @@
 package grails.plugin.dao
 
+import gorm.tools.dao.DaoEventInvoker
+import gorm.tools.dao.DaoEventType
+import grails.plugin.dao.DaoMessage
+import grails.plugin.dao.DomainException
+import grails.plugin.dao.DomainNotFoundException
+import grails.plugin.dao.GormDaoSupport
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.dao.DataAccessException
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 /**
@@ -16,6 +24,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 class DaoUtil implements ApplicationContextAware {
 
 	static ApplicationContext ctx
+    static DaoEventInvoker daoEventInvoker
 
 	void setApplicationContext(ApplicationContext ctx) throws BeansException {
 		this.ctx = ctx
@@ -27,7 +36,7 @@ class DaoUtil implements ApplicationContextAware {
 	 *
 	 * @param entity the domain object the check
 	 * @param ver the version this used to be (entity will have the )
-	 * @throws DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
+	 * @throws grails.plugin.dao.DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
 	 */
 	@CompileDynamic
 	static void checkVersion(entity, ver) {
@@ -85,23 +94,28 @@ class DaoUtil implements ApplicationContextAware {
 		ctx.sessionFactory.currentSession.clear()
 	}
 
-	static GormDaoSupport getDao(Class entity) {
-		String domainName = entity.simpleName
+    static void fireEvent(DaoEventType eventType, Object... args) { }
+    static DataAccessException handleException(GormEntity entity, RuntimeException e) throws DataAccessException {
+        return
+    }
 
-		String daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
-		GormDaoSupport dao
-		if (ctx.containsBean(daoName)) {
-			println "found $daoName"
-			println entity
-			dao = ctx.getBean(daoName) as GormDaoSupport
-		} else {
-			println "NOT found $daoName"
-			println entity
-			dao = (GormDaoSupport) ctx.getBean("gormDaoBean")
-			dao.domainClass = entity
-		}
-		return dao
-	}
+//	static GormDaoSupport getDao(Class entity) {
+//		String domainName = entity.simpleName
+//
+//		String daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
+//		GormDaoSupport dao
+//		if (ctx.containsBean(daoName)) {
+//			println "found $daoName"
+//			println entity
+//			dao = ctx.getBean(daoName) as GormDaoSupport
+//		} else {
+//			println "NOT found $daoName"
+//			println entity
+//			dao = (GormDaoSupport) ctx.getBean("gormDaoBean")
+//			dao.domainClass = entity
+//		}
+//		return dao
+//	}
 
 }
 

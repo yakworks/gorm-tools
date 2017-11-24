@@ -20,6 +20,12 @@ class FastBinder {
 
 	protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
+    def bind(String method, Object target, Map<String, Object> source, boolean ignoreAssociations = false) {
+        //TODO will implement ediffernt logic based on if its a new isntance or an update. Method can be "Create" or
+        "Update"
+        bind(target, source, ignoreAssociations)
+    }
+
 	def bind(Object target, Map<String, Object> source, boolean ignoreAssociations = false) {
 		Objects.requireNonNull(target, "Target is null")
 		if(!source) return

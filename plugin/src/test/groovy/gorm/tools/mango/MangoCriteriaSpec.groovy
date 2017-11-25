@@ -284,15 +284,15 @@ class MangoCriteriaSpec extends Specification {
     }
 
 
-    def "test with deep nested"() {
-        when:
-
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy(["location.nested.name": "Nested#4"])).list()
-
-        then:
-        res.size() == 1
-    }
+//    def "test with deep nested"() {
+//        when:
+//
+//        MangoCriteria dcb = new MangoCriteria(Org)
+//        List res = dcb.build(MangoTidyMap.tidy(["location.nested.name": "Nested#4"])).list()
+//
+//        then:
+//        res.size() == 1
+//    }
 
 
     List<Class> getDomainClasses() {

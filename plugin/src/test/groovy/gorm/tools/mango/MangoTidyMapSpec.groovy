@@ -108,6 +108,21 @@ class MangoTidyMapSpec extends Specification {
         flatten(mmap) == flatten([customer: [id: ['$eq': 101],name: ['$ilike': 'Wal%']]])
 
     }
+    
+    void "test \$or"() {
+        when:
+        def mmap = tidy([
+                '$or': [
+                    "id": 101,
+                    "name": "Wal%"
+                ]
+        ])
+
+        then:
+
+        mmap == ['$or': [[id: ['$eq': 101]] ,[name: ['$ilike': 'Wal%']]]]
+
+    }
 
     void "test if map has Mango method "() {
         when:

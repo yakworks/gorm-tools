@@ -1,5 +1,8 @@
 package gorm.tools.mango
 
+import grails.converters.JSON
+import org.grails.web.json.JSONObject
+
 class MangoTidyMap {
 
     static Map tidy(Map map) {
@@ -7,9 +10,9 @@ class MangoTidyMap {
         map.each { String k, Object v ->
             pathToMap(k, v, nested)
         }
-        toMangoOperator(nested)
+        toMangoOperator(nested) as JSONObject
     }
-
+    
     /**
      * Extends the map with nested value by specific path
      * so pathToMap("a.b.c", 1, [:]) -> [a:[b:[c:1]]]
@@ -42,6 +45,11 @@ class MangoTidyMap {
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
+
+            if (['$or', '$and'].contains(key) && val instanceof Map){
+                result[key]= val.collect{k,v-> toMangoOperator(["$k": v])}
+                return
+            }
             if (val instanceof Map) {
                 toMangoOperator(val, result[key] as Map)
             } else {
@@ -58,7 +66,11 @@ class MangoTidyMap {
                     result[key]['$ilike'] = val
                     return
                 }
-                result[key]['$eq'] = val
+                if(['$isNull', '$isNotNull'].contains(val)) {
+                    result[key][val] = true
+                } else {
+                    result[key]['$eq'] = val
+                }
             }
 
         }

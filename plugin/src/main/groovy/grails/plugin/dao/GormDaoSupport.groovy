@@ -1,18 +1,22 @@
 package grails.plugin.dao
 
-import gorm.tools.databinding.FastBinder
-import gorm.tools.hibernate.criteria.CriteriaUtils
+import gorm.tools.Pager
+import gorm.tools.mango.MangoCriteria
+import gorm.tools.mango.MangoTidyMap
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
-import grails.gorm.transactions.NotTransactional
-import grails.gorm.transactions.Transactional
+
+//import grails.gorm.transactions.Transactional
+import grails.transaction.Transactional
 import grails.validation.ValidationException
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+
+import org.springframework.core.GenericTypeResolver
+import gorm.tools.hibernate.criteria.CriteriaUtils
 
 /**
  * GormDaoSupport represents a super class for all DAO services.
@@ -22,15 +26,13 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 @SuppressWarnings(['EmptyMethod'])
 @GrailsCompileStatic
+@Transactional
 class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	boolean flushOnSave = false
 	boolean fireEvents = true
-    String defaultDataBinder = 'grails' //use the stock GrailsWebDataBinder
 
 	private Class<T> thisDomainClass
-
-	FastBinder fastBinder
 
 	GormDaoSupport() {
 		this.thisDomainClass = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDaoSupport.class)
@@ -69,7 +71,6 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param entity the domain entity to call save on
 	 * @throws DomainException if a validation or DataAccessException error happens
 	 */
-    @Transactional
 	T save(T entity) {
 		save(entity, [flush: flushOnSave])
 	}
@@ -81,7 +82,6 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param args the arguments to pass to save
 	 * @throws DomainException if a validation or DataAccessException error happens
 	 */
-    @Transactional
 	T save(T entity, Map args) {
 		return doSave(entity, args)
 	}
@@ -112,7 +112,6 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param entity the domain entity
 	 * @throws DomainException if a spring DataIntegrityViolationException is thrown
 	 */
-    @Transactional
 	void delete(T entity) {
 		doDelete(entity)
 	}
@@ -135,7 +134,6 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param params the parameter map
 	 * @throws DomainException if a validation error happens
 	 */
-    @Transactional
 	Map<String, Object> insert(Map params) {
 		return doInsert(params)
 	}
@@ -149,48 +147,6 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		return [ok: true, entity: entity, message: null]
 	}
 
-    @NotTransactional
-    T bind(T entity, Map row, Map args = [:]){
-        String dataBinder = args?.containsKey("dataBinder") ? args.dataBinder : defaultDataBinder
-        if(dataBinder == 'grails'){
-            entity.properties = row
-        }
-
-        else {
-            fastBinder.bind(entity, row)
-        }
-
-        return entity
-    }
-
-    @CompileDynamic
-    def callBinderMethod(String method, T entity, Map data, Map args = [:]){
-        "${method}"(entity, data, args)
-    }
-
-    @NotTransactional
-    void bindCreate(T entity, Map data, Map args = [:]){
-        bind(entity, data, args)
-    }
-
-    T createNew(Map data, Map args = [:]) {
-        T entity = domainClass.newInstance()
-        String bindMethod = args?.containsKey("bindMethod") ? args.bindMethod : "bindCreate"
-        if(bindMethod == "bindCreate"){
-            bindCreate(entity, data, args)
-        } else {
-            callBinderMethod(bindMethod, entity, data, args)
-        }
-        return entity
-    }
-
-    @Transactional
-    T create(Map data, Map args = [:]) {
-        T entity = createNew(data, args)
-        save(entity, args)
-        return entity
-    }
-
 	/**
 	 * Updates a new domain entity with the data from params.
 	 *
@@ -198,7 +154,6 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @throws DomainException if a validation error happens or its not found with the params.id
 	 *                         or the version is off and someone else edited it
 	 */
-    @Transactional
 	Map<String, Object> update(Map params) {
 		return doUpdate(params)
 	}
@@ -212,15 +167,19 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 */
 	@CompileDynamic
 	List<T> list(Map params = [:], Closure closure = null) {
-		Map criteria
-		if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
-			JSON.use('deep')
-			criteria = JSON.parse(params['criteria']) as Map
-		} else {
-			criteria = params['criteria'] as Map ?: [:]
-		}
-		CriteriaUtils.list(criteria, this.thisDomainClass, params as Map, closure)
+        Map criteria
+        if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+            JSON.use('deep')
+            criteria = JSON.parse(params['criteria']) as Map
+        } else {
+            criteria = params['criteria'] as Map ?: [:]
+        }
+		Pager pager = new Pager(params)
+		MangoCriteria mangoCriteria = new MangoCriteria(this.thisDomainClass).build(MangoTidyMap.tidy(criteria), closure)
+		mangoCriteria.list(max: pager.max, offset: pager.offset)
 	}
+
+
 	@CompileDynamic
 	List countTotals(Map params = [:], Closure closure = null) {
 			Map criteria
@@ -251,7 +210,6 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * @param params the parameter map that has the id for the domain entity to delete
 	 * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
 	 */
-    @Transactional
 	Map remove(Map params) {
 		return doRemove(params)
 	}

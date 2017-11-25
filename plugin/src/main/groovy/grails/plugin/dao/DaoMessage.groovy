@@ -3,7 +3,9 @@ package grails.plugin.dao
 import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
+import org.springframework.context.MessageSource
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
 
@@ -19,10 +21,10 @@ class DaoMessage {
 	 * @param params must have a key named id of the object that was not found
 	 */
 	static Map notFound(String domainClassName, Map params) {
-		notFound(domainClassName, params.id)
+		notFoundId(domainClassName, params.id as Serializable)
 	}
 
-	static Map notFound(String domainClassName, def id) {
+	static Map notFoundId(String domainClassName, Serializable id) {
 		String domainLabel = GrailsNameUtils.getShortName(domainClassName)
 		return [code: "default.not.found.message", args: [domainLabel, id],
 				defaultMessage: "${domainLabel} not found with id ${id}"]
@@ -97,7 +99,7 @@ class DaoMessage {
 
 	//@CompileDynamic
 	static String resolveMessage(code, defaultMsg) {
-		return DaoUtil.ctx.messageSource.getMessage(code, [] as Object[], defaultMsg, defaultLocale())
+		return (DaoUtil.ctx.getBean("messageSource") as MessageSource).getMessage(code, [] as Object[], defaultMsg, defaultLocale())
 	}
 
 	static Locale defaultLocale() {

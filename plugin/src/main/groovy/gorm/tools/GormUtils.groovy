@@ -6,6 +6,7 @@ import grails.core.GrailsDomainClassProperty
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
+import org.grails.datastore.gorm.GormEntity
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -17,7 +18,8 @@ class GormUtils {
     /**
      * The list of domain properties which are ignored during copying.
      */
-    final static List<String> IGNORED_PROPERTIES = ["id", "version", "createdBy", "createdDate", "editedBy", "editedDate", "num"]
+    final
+    static List<String> IGNORED_PROPERTIES = ["id", "version", "createdBy", "createdDate", "editedBy", "editedDate", "num"]
 
     /**
      * Creates an instance of a given domain class and copies properties from source object.
@@ -68,13 +70,13 @@ class GormUtils {
      * @param ignoreAssociations - should associations be copied ? - ignored by default
      */
     @CompileStatic
-    static Object bindFast(Object target, Map<String, Object>  source, Map<String,Object> override = [:], boolean ignoreAssociations = false) {
-       FastBinder binder = (FastBinder) Holders.applicationContext.getBean("fastBinder")
-		binder.bind(target, source)
+    static <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, Map<String, Object> override = [:], boolean ignoreAssociations = false) {
+        FastBinder binder = (FastBinder) Holders.applicationContext.getBean("fastBinder")
+        binder.bind(target, source)
 
         if (override) {
-            override.each{String key, val ->
-                if(target.hasProperty(key)){
+            override.each { String key, val ->
+                if (target.hasProperty(key)) {
                     target[key] = val
                 }
             }
@@ -87,8 +89,8 @@ class GormUtils {
      * Copy all given property values from source to target
      * if and only if target's properties are null.
      *
-     * @param source    a source object
-     * @param target    a target object
+     * @param source a source object
+     * @param target a target object
      * @param propNames array of property names which should be copied
      */
     static void copyProperties(Object source, Object target, String... propNames) {
@@ -99,10 +101,10 @@ class GormUtils {
      * Copy all given property values from source to target.
      * It can be specified whether to copy values or not in case target's properties are not null.
      *
-     * @param source         a source object
-     * @param target         a target object
+     * @param source a source object
+     * @param target a target object
      * @param copyOnlyIfNull if 'true' then it will copy a value only if target's property is null
-     * @param propNames      an array of property names which should be copied
+     * @param propNames an array of property names which should be copied
      */
     static void copyProperties(Object source, Object target, boolean copyOnlyIfNull, String... propNames) {
         for (String prop : propNames) {
@@ -128,7 +130,7 @@ class GormUtils {
         Validate.notNull(source)
         Validate.notEmpty(property)
 
-        Object result = property.tokenize('.').inject(source){ Object obj, String prop ->
+        Object result = property.tokenize('.').inject(source) { Object obj, String prop ->
             Object value = null
             if (obj != null) value = obj[prop]
             return value

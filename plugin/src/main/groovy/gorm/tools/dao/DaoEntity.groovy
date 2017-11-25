@@ -1,10 +1,8 @@
 package gorm.tools.dao
 
 import grails.core.GrailsApplication
-import grails.plugin.dao.GormDaoSupport
 import grails.util.GrailsNameUtils
 import grails.util.Holders
-import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 

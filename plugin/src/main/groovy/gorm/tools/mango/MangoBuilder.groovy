@@ -11,7 +11,7 @@ import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
 @SuppressWarnings(['PropertyName'])
-//@CompileStatic
+@CompileStatic
 @Slf4j
 class MangoBuilder {
     //DetachedCriteria criteria
@@ -65,6 +65,7 @@ class MangoBuilder {
         return build(detachedCriteria, mangoMap, callable)
     }
 
+    @CompileDynamic
     static DetachedCriteria build(DetachedCriteria criteria, Map mangoMap, Closure callable = null) {
         DetachedCriteria newCriteria = (DetachedCriteria)criteria.clone()
         applyMapOrList(newCriteria, MangoTidyMap.tidy(mangoMap))
@@ -76,7 +77,7 @@ class MangoBuilder {
         if (mapOrList instanceof Map) {
             applyMap(criteria, mapOrList)
         } else if (mapOrList instanceof List<Map>) {
-            for (Map item : mapOrList) {
+            for (Map item : mapOrList as List<Map>) {
                 applyMap(criteria, item)
             }
         } else {
@@ -88,13 +89,14 @@ class MangoBuilder {
      * applies the map just like running a closure.call on this.
      * @param mangoMap
      */
+    @CompileDynamic
     static void applyMap(DetachedCriteria criteria, Map mangoMap) {
         log.debug "applyMap $mangoMap"
         for (String key : mangoMap.keySet()) {
             String op = junctionOps[key]
             if (op) {
                 //normalizer should have ensured all ops have a List for a value
-                this."$op"(criteria, (List) mangoMap[key])
+                "$op"(criteria, (List) mangoMap[key])
                 continue
             } else { //it must be a field then
                 applyField(criteria, key, mangoMap[key])
@@ -111,16 +113,18 @@ class MangoBuilder {
         }
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
-        if(prop instanceof Association){
+        //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
+        if(prop instanceof Association) {
             criteria."${field}" {
-                //println "$criteria -> $delegate -> $field -> $fieldVal"
-                applyMapOrList((DetachedCriteria)delegate, fieldVal)
+                //the delegate is the DetachedAssocationCriteria. See methodMissing in AbstractDetachedCriteria
+                applyMapOrList((DetachedCriteria) delegate, fieldVal)
             }
         }
+        // if field ends in Id then try removing prefix and see if its a property
         else if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))){
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
         }
-        else if (!(fieldVal instanceof Map)) {
+        else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List)) {
             //TODO check if its a date field and parse
             criteria.eq(field, toType(criteria, field, fieldVal))
         }
@@ -162,8 +166,8 @@ class MangoBuilder {
                     continue
                 }
             }
-
         }
+        //FIXME TODO what happens if none of the ifs get picked up and it falls through to here? we silently skip it?
     }
 
     static DetachedCriteria between(DetachedCriteria criteria, String propertyName, List params) {
@@ -185,7 +189,6 @@ class MangoBuilder {
         Map val = [:]
         val[propertyName] = ['$in': params]
         return criteria.notIn(propertyName, ( MangoBuilder.build(criteria.targetClass, val)."$propertyName") as QueryableCriteria)
-        //return criteria.notIn(propertyName, (new DetachedCriteria(criteria.targetClass).build(val)."$propertyName") as QueryableCriteria)
     }
 
     /**
@@ -247,7 +250,7 @@ class MangoBuilder {
         PersistentProperty prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
         Class typeToConvertTo = prop?.getType()
 
-        println "$criteria -> $prop -> $propertyName -> ${prop.type} -> $value"
+        //println "$criteria -> $prop -> $propertyName -> ${prop.type} -> $value"
 
         Object valueToAssign = value
 

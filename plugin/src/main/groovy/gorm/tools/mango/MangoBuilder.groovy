@@ -2,14 +2,16 @@ package gorm.tools.mango
 
 import gorm.tools.beans.DateUtil
 import grails.gorm.DetachedCriteria
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.query.criteria.DetachedAssociationCriteria
+import groovy.util.logging.Slf4j
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
-import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
 //@CompileStatic
+@Slf4j
 class MangoBuilder {
     //DetachedCriteria criteria
 
@@ -24,7 +26,10 @@ class MangoBuilder {
         '$ilike'  : 'ilike',
         '$like'   : 'like',
         '$in'     : 'in',
-        '$inList' : 'inList',
+        '$inList' : 'inList'
+    ]
+
+    static final Map<String, String> propertyOps = [
         '$gtf'    : 'gtProperty',
         '$gtef'   : 'geProperty',
         '$ltf'    : 'ltProperty',
@@ -60,7 +65,7 @@ class MangoBuilder {
     }
 
     static DetachedCriteria build(DetachedCriteria criteria, Map mangoMap, Closure callable = null) {
-        DetachedCriteria newCriteria = criteria.clone()
+        DetachedCriteria newCriteria = (DetachedCriteria)criteria.clone()
         applyMapOrList(newCriteria, MangoTidyMap.tidy(mangoMap))
         if (callable) newCriteria.with callable
         return newCriteria
@@ -83,7 +88,7 @@ class MangoBuilder {
      * @param mangoMap
      */
     static void applyMap(DetachedCriteria criteria, Map mangoMap) {
-        println "applyMap >>>>>>>>>>>>> $mangoMap"
+        log.debug "applyMap $mangoMap"
         for (String key : mangoMap.keySet()) {
             String op = junctionOps[key]
             if (op) {
@@ -96,62 +101,67 @@ class MangoBuilder {
         }
     }
 
+    @CompileDynamic
     static void applyField(DetachedCriteria criteria, String field, Object fieldVal) {
         String qs = quickSearchOps[field]
         if (qs) {
             this."$qs"(criteria, fieldVal)
             return
         }
-        if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.properties.persistentPropertyNames.contains(field.replaceAll("Id\$", ""))){
+
+        PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
+        if(prop instanceof Association){
+            criteria."${field}"({
+                //println "$criteria -> $delegate -> $field -> $fieldVal"
+                applyMapOrList((DetachedCriteria)delegate, fieldVal)
+            })
+        }
+        else if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))){
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
         }
-        else if (fieldVal instanceof String || fieldVal instanceof Number || fieldVal instanceof Boolean) {
+        else if (!(fieldVal instanceof Map)) {
             //TODO check if its a date field and parse
-            criteria.eq(field, fieldVal)
-        } else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
+            criteria.eq(field, toType(criteria, field, fieldVal))
+        }
+        else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
             //could be 1 or more too
             //for example field=amount and fieldVal=['$lt': 100, '$gt':200]
-            Boolean isAssoc = (criteria.getPersistentEntity().getPropertyByName(field) instanceof Association)
-            if(isAssoc){
-                criteria."${field}"({
-                    //println "$criteria -> $delegate -> $field -> $fieldVal"
-                    this.applyMapOrList(delegate, fieldVal)
-                    //this.applyMap(criteria, fieldVal.collectEntries { Map res = [:]; res["$field.${it.key}"] = it.value; res })
-                })
-            }else {
-                for (String key : (fieldVal as Map).keySet()) {
-                    //everything has to either be either a junction op or condition
-                    String junctionOp = junctionOps[key]
-                    def opArg = fieldVal[key]
+            for (String key : (fieldVal as Map).keySet()) {
+                //everything has to either be either a junction op or condition
+                def opArg = fieldVal[key]
 
-                    if (junctionOp) {
-                        //normalizer should have ensured all ops have a List for a value
-                        this."$junctionOp"(criteria, (List) opArg)
-                        continue
-                    }
+                String op = junctionOps[key]
+                if (op) {
+                    //normalizer should have ensured all ops have a List for a value
+                    this."$op"(criteria, (List) opArg)
+                    continue
+                }
 
-                    String ovops = overrideOps[key]
-                    if (ovops) {
-                        this."$ovops"(criteria, field, toType(criteria, field, opArg))
-                        continue
-                    }
+                op = overrideOps[key]
+                if (op) {
+                    this."$op"(criteria, field, toType(criteria, field, opArg))
+                    continue
+                }
 
-                    String cond = compareOps[key]
-                    if (cond) {
-                        criteria."$cond"(field, toType(criteria, field, opArg))
-                        continue
-                    }
+                op = compareOps[key]
+                if (op) {
+                    criteria."$op"(field, toType(criteria, field, opArg))
+                    continue
+                }
 
-                    String ex = existOps[key]
-                    if (ex) {
-                        criteria."$ex"(field)
-                        continue
-                    }
-                    //consider it a property then and we may be looking at this field=customer and fieldVal=['num': 100, 'name':'foo']
-                    //missing method creates alias for nested property, but if key doesnt contain it looks in "parent" domain
+                op = propertyOps[key]
+                if (op) {
+                    criteria."$op"(field, opArg)
+                    continue
+                }
 
+                op = existOps[key]
+                if (op) {
+                    criteria."$op"(field)
+                    continue
                 }
             }
+
         }
     }
 
@@ -160,6 +170,7 @@ class MangoBuilder {
         return criteria.between(propertyName, params[0], params[1])
     }
 
+    @CompileDynamic
     static DetachedCriteria quickSearch(DetachedCriteria criteria, String value) {
         Map result = MangoTidyMap.tidy(['$or': criteria.targetClass.quickSearchFields.collectEntries {
             ["$it": value] //TODO: probably should check type and add `%` for strings
@@ -168,6 +179,7 @@ class MangoBuilder {
         return applyMap(criteria, result)
     }
 
+    @CompileDynamic
     static DetachedCriteria notIn(DetachedCriteria criteria, String propertyName, List params) {
         Map val = [:]
         val[propertyName] = ['$in': params]
@@ -180,6 +192,7 @@ class MangoBuilder {
      * @param list junctions list of condition maps
      * @return This criterion
      */
+    @CompileDynamic
     static DetachedCriteria and(DetachedCriteria criteria, List andList) {
         criteria.junctions << new Query.Conjunction()
         handleJunction(criteria, andList)
@@ -191,6 +204,7 @@ class MangoBuilder {
      * @param list junctions list of condition maps
      * @return This criterion
      */
+    @CompileDynamic
     static DetachedCriteria or(DetachedCriteria criteria, List orList) {
         criteria.junctions << new Query.Disjunction()
         handleJunction(criteria, orList)
@@ -202,6 +216,7 @@ class MangoBuilder {
      * @param list junctions list of condition maps
      * @return This criterion
      */
+    @CompileDynamic
     static DetachedCriteria not(DetachedCriteria criteria, List notList) {
         criteria.junctions << new Query.Negation()
         handleJunction(criteria, notList)
@@ -213,6 +228,7 @@ class MangoBuilder {
      * The add method checks to see if there is an active junction we are in.
      * @param mangoMap
      */
+    @CompileDynamic
     static void handleJunction(DetachedCriteria criteria, List list) {
         try {
             applyMapOrList(criteria, list)
@@ -224,32 +240,28 @@ class MangoBuilder {
     }
 
     static Object toType(DetachedCriteria criteria, String propertyName, Object value) {
-        def prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
-//        if(criteria instanceof DetachedAssociationCriteria){
-//            def detCriteria = (DetachedAssociationCriteria)criteria
-//            println "${detCriteria.association}"
-//        }
-//        println "$criteria -> $prop -> $propertyName -> $value"
-
-        if (value instanceof String && prop){
-            return value
-        }
-
-        def valueToAssign = value
-
         if (value instanceof List){
             return value.collect{toType(criteria, propertyName, it)}
         }
+        def prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
+        Class typeToConvertTo = prop?.getType()
 
-        if (value instanceof String && !criteria.persistentEntity.getPropertyByName(propertyName)) {
-            Class typeToConvertTo = prop.getType()
-            if (Number.isAssignableFrom(typeToConvertTo)) {
+        println "$criteria -> $prop -> $propertyName -> ${prop.type} -> $value"
+
+        def valueToAssign = value
+
+        if (valueToAssign instanceof String){
+            if(String.isAssignableFrom(typeToConvertTo)){
+                valueToAssign = value
+            }
+            else if (Number.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = (value as String).asType(typeToConvertTo)
             } else if (Date.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = DateUtil.parseJsonDate(value as String)
             }
-        } else {
-            valueToAssign = valueToAssign.asType(prop.type)
+        }
+        else {
+            valueToAssign = valueToAssign.asType(typeToConvertTo)
         }
 
         valueToAssign

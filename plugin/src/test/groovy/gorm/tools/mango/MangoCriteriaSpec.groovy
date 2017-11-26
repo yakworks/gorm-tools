@@ -140,11 +140,11 @@ class MangoCriteriaSpec extends Specification {
         when:
 
         List res = build(([
-            location:[
-                '$or':[
+            location: [
+                '$or': [
                     city: "City#4",
-                    id: 4
-                   ]
+                    id  : 4
+                ]
             ]
         ])).list()
 

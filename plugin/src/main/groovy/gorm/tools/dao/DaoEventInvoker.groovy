@@ -38,7 +38,7 @@ class DaoEventInvoker {
 	}
 
 	private void cacheEvents(Class daoClass) {
-		final ConcurrentHashMap<DaoEventType, Method> events = new ConcurrentHashMap<>()
+        Map<DaoEventType, Method> events = new ConcurrentHashMap<>()
 		eventsCache.put(daoClass.simpleName, events)
 
 		findAndCacheEvents(DaoEventType.BeforeCreate, daoClass, events)
@@ -52,7 +52,7 @@ class DaoEventInvoker {
 	}
 
 	private void findAndCacheEvents(DaoEventType event, Class daoClass, Map<DaoEventType, Method> events) {
-		final Method method = ReflectionUtils.findMethod(daoClass, GrailsNameUtils.getPropertyNameRepresentation(event.name()))
+        Method method = ReflectionUtils.findMethod(daoClass, GrailsNameUtils.getPropertyNameRepresentation(event.name()))
 		if(method != null) events[event] = method
 	}
 }

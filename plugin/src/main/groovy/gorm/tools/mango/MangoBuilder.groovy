@@ -10,6 +10,7 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
+@SuppressWarnings(['PropertyName'])
 //@CompileStatic
 @Slf4j
 class MangoBuilder {
@@ -79,7 +80,7 @@ class MangoBuilder {
                 applyMap(criteria, item)
             }
         } else {
-            //pitch an error?
+            throw new IllegalArgumentException("Must be a map or a list")
         }
     }
 
@@ -111,10 +112,10 @@ class MangoBuilder {
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
         if(prop instanceof Association){
-            criteria."${field}"({
+            criteria."${field}" {
                 //println "$criteria -> $delegate -> $field -> $fieldVal"
                 applyMapOrList((DetachedCriteria)delegate, fieldVal)
-            })
+            }
         }
         else if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))){
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
@@ -128,7 +129,7 @@ class MangoBuilder {
             //for example field=amount and fieldVal=['$lt': 100, '$gt':200]
             for (String key : (fieldVal as Map).keySet()) {
                 //everything has to either be either a junction op or condition
-                def opArg = fieldVal[key]
+                Object opArg = fieldVal[key]
 
                 String op = junctionOps[key]
                 if (op) {
@@ -173,7 +174,7 @@ class MangoBuilder {
     @CompileDynamic
     static DetachedCriteria quickSearch(DetachedCriteria criteria, String value) {
         Map result = MangoTidyMap.tidy(['$or': criteria.targetClass.quickSearchFields.collectEntries {
-            ["$it": value] //TODO: probably should check type and add `%` for strings
+            [(it.toString()): value] //TODO: probably should check type and add `%` for strings
         }])
 
         return applyMap(criteria, result)
@@ -243,12 +244,12 @@ class MangoBuilder {
         if (value instanceof List){
             return value.collect{toType(criteria, propertyName, it)}
         }
-        def prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
+        PersistentProperty prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
         Class typeToConvertTo = prop?.getType()
 
         println "$criteria -> $prop -> $propertyName -> ${prop.type} -> $value"
 
-        def valueToAssign = value
+        Object valueToAssign = value
 
         if (valueToAssign instanceof String){
             if(String.isAssignableFrom(typeToConvertTo)){

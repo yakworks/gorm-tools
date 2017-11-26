@@ -2,6 +2,7 @@ gorm.tools
 gorm.tools.beans
 gorm.tools.converters
 gorm.tools.dao
+gorm.tools.dao.spring
 gorm.tools.databinding
 gorm.tools.hibernate.criteria
 gorm.tools.idgen

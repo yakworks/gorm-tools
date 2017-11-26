@@ -1,7 +1,10 @@
 package gorm.tools.dao
 
+import gorm.tools.Pager
 import gorm.tools.databinding.FastBinder
-import gorm.tools.mango.MangoCriteria
+import gorm.tools.mango.MangoBuilder
+import grails.converters.JSON
+import grails.gorm.DetachedCriteria
 import grails.plugin.dao.DaoUtil
 import grails.plugin.dao.DomainException
 import grails.validation.ValidationException
@@ -130,10 +133,16 @@ trait GormDao<D extends GormEntity> {
     }
 
     List<D> query(Map params) {
-        Map criteria = params['criteria']
-        MangoCriteria mangoCriteria = new MangoCriteria(D)
-        mangoCriteria.build(criteria)
-        return mangoCriteria.list(params)
+        Map criteria
+        if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+            JSON.use('deep')
+            criteria = JSON.parse(params['criteria'] as String) as Map
+        } else {
+            criteria = params['criteria'] as Map ?: [:]
+        }
+        Pager pager = new Pager(params)
+        DetachedCriteria mangoCriteria =  MangoBuilder.build(this.getDomainClass(), criteria)
+        mangoCriteria.list(max: pager.max, offset: pager.offset)
     }
 
     DataAccessException handleException(D entity, RuntimeException e) throws DataAccessException {

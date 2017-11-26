@@ -1,10 +1,10 @@
 package grails.plugin.dao
 
 import gorm.tools.Pager
-import gorm.tools.mango.MangoCriteria
-import gorm.tools.mango.MangoTidyMap
+import gorm.tools.mango.MangoBuilder
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
+import grails.gorm.DetachedCriteria
 
 //import grails.gorm.transactions.Transactional
 import grails.transaction.Transactional
@@ -175,7 +175,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
             criteria = params['criteria'] as Map ?: [:]
         }
 		Pager pager = new Pager(params)
-		MangoCriteria mangoCriteria = new MangoCriteria(this.thisDomainClass).build(MangoTidyMap.tidy(criteria), closure)
+		DetachedCriteria mangoCriteria =  MangoBuilder.build(this.thisDomainClass, criteria, closure)
 		mangoCriteria.list(max: pager.max, offset: pager.offset)
 	}
 

@@ -1,8 +1,6 @@
 package gorm.tools.mango
 
-import gorm.tools.Address
-import gorm.tools.hibernate.criteria.DynamicCriteriaBuilder
-import grails.core.GrailsDomainClassProperty
+import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 import grails.test.mixin.TestMixin
 import grails.test.mixin.gorm.Domain
@@ -14,6 +12,11 @@ import spock.lang.Specification
 class MangoCriteriaSpec extends Specification {
 
     def setup() {
+    }
+
+    static DetachedCriteria build(map){
+        //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
+        return MangoBuilder.build(Org, map)
     }
 
     def "test detached isActive"() {
@@ -31,8 +34,7 @@ class MangoCriteriaSpec extends Specification {
             ).save(failOnError: true)
         }
         when:
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([isActive:true])).list()
+        List res = build([isActive:true]).list()
 
         then:
         res.size() == 5
@@ -40,9 +42,7 @@ class MangoCriteriaSpec extends Specification {
 
     def "test detached string"() {
         when:
-
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([name: "Name#1"])).list()
+        List res = build([name: "Name#1"]).list()
 
         then:
         res.size() == 1
@@ -51,8 +51,7 @@ class MangoCriteriaSpec extends Specification {
     def "test detached like"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([name: "Name#%"])).list()
+        List res = build([name: "Name#%"]).list()
 
         then:
         res.size() == 10
@@ -61,8 +60,7 @@ class MangoCriteriaSpec extends Specification {
     def "test combined"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([amount: [1*1.34, 2*1.34, 3*1.34, 4*1.34], isActive:true])).list()
+        List res = build(([amount: [1*1.34, 2*1.34, 3*1.34, 4*1.34], isActive:true])).list()
 
         then:
         res.size() == 2
@@ -71,14 +69,14 @@ class MangoCriteriaSpec extends Specification {
     def "test detached BigDecimal"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([amount: 1.34])).list()
+
+        List res = build(([amount: 1.34])).list()
 
         then:
         res.size() == 1
 
         when:
-        res = dcb.build(MangoTidyMap.tidy([amount: ['$gt':6.0]])).list()
+        res = build(([amount: ['$gt':6.0]])).list()
 
         then:
         res.size() == 5
@@ -87,14 +85,14 @@ class MangoCriteriaSpec extends Specification {
     def "test detached Date"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([date: new Date().clearTime() + 2])).list()
+
+        List res = build(([date: new Date().clearTime() + 2])).list()
 
         then:
         res.size() == 1
 
         when:
-        res = dcb.build(MangoTidyMap.tidy([date: ['$gt': new Date().clearTime() + 7]])).list()
+        res = build(([date: ['$gt': new Date().clearTime() + 7]])).list()
 
         then:
         res.size() == 3
@@ -103,8 +101,8 @@ class MangoCriteriaSpec extends Specification {
     def "test gt"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([id: ['$gt':4]])).list()
+
+        List res = build(([id: ['$gt':4]])).list()
 
         then:
         res.size() == 6
@@ -113,8 +111,8 @@ class MangoCriteriaSpec extends Specification {
     def "test ne"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([id: ['$ne':4]])).list()
+
+        List res = build(([id: ['$ne':4]])).list()
 
         then:
         res.size() == 9
@@ -122,8 +120,8 @@ class MangoCriteriaSpec extends Specification {
 
     def "test nested"() {
         when:
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy(["location.id": ['$eq':6]])).list()
+
+        List res = build((["location.id": ['$eq':6]])).list()
 
         then:
         res.size() == 1
@@ -131,18 +129,34 @@ class MangoCriteriaSpec extends Specification {
 
     def "test nested String"() {
         when:
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy(["location.city": "City#4"])).list()
+
+        List res = build((["location.city": "City#4"])).list()
+
+        then:
+        res.size() == 1
+    }
+
+    def "test nested location city"() {
+        when:
+
+        List res = build(([
+            location:[
+                '$or':[
+                    city: "City#4",
+                    id: 4
+                   ]
+            ]
+        ])).list()
 
         then:
         res.size() == 1
     }
 
 
- def "test nestedId"() {
+    def "test nestedId"() {
         when:
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy(["locationId": ['$eq':6]])).list()
+
+        List res = build((["locationId": ['$eq':6]])).list()
 
         then:
         res.size() == 1
@@ -151,8 +165,13 @@ class MangoCriteriaSpec extends Specification {
 
     def "test or"() {
         when:
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy('$or':[[name: "Name#7"], [id:2]])).list()
+
+        List res = build([
+            '$or':[
+                [name: "Name#7"],
+                [id:2]
+            ]
+        ]).list()
 
         then:
         res.size() == 2
@@ -161,8 +180,8 @@ class MangoCriteriaSpec extends Specification {
     def "test not in list"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([amount: ['$nin':[1*1.34, 2*1.34, 3*1.34, 4*1.34]]])).list()
+
+        List res = build(([amount: ['$nin':[1*1.34, 2*1.34, 3*1.34, 4*1.34]]])).list()
 
         then:
         res.size() == 6
@@ -171,8 +190,8 @@ class MangoCriteriaSpec extends Specification {
     def "test in list"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([id: [1,2,3,4]])).list()
+
+        List res = build(([id: [1,2,3,4]])).list()
 
         then:
         res.size() == 4
@@ -181,8 +200,8 @@ class MangoCriteriaSpec extends Specification {
     def "test not"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy(['$not': [[id:['$eq':1]]]])).list()
+
+        List res = build((['$not': [[id:['$eq':1]]]])).list()
 
         then:
         res.size() == 9
@@ -192,8 +211,8 @@ class MangoCriteriaSpec extends Specification {
     def "test between"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([amount: ['$between':[1*1.34, 4*1.34]]])).list()
+
+        List res = build(([amount: ['$between':[1*1.34, 4*1.34]]])).list()
 
         then:
         res.size() == 4
@@ -202,15 +221,15 @@ class MangoCriteriaSpec extends Specification {
     def "test isNull/ isNotNull"() {
         when:
 
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([secondName: ['$isNull': true]])).list()
+
+        List res = build(([secondName: ['$isNull': true]])).list()
 
         then:
         res.size() == 5
 
         when:
 
-        res = dcb.build(MangoTidyMap.tidy([secondName: '$isNull'])).list()
+        res = build(([secondName: '$isNull'])).list()
 
         then:
         res.size() == 5
@@ -218,32 +237,32 @@ class MangoCriteriaSpec extends Specification {
 
     def "test fields comparison"() {
         when:
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([amount: ['$gtef':"amount2"]])).list()
+
+        List res = build(([amount: ['$gtef':"amount2"]])).list()
 
         then:
         res.size() == 5
 
         when:
-        res = dcb.build(MangoTidyMap.tidy([amount: ['$gtf':"amount2"]])).list()
+        res = build(([amount: ['$gtf':"amount2"]])).list()
 
         then:
         res.size() == 4
 
         when:
-        res = dcb.build(MangoTidyMap.tidy([amount: ['$ltf':"amount2"]])).list()
+        res = build(([amount: ['$ltf':"amount2"]])).list()
 
         then:
         res.size() == 5
 
         when:
-        res = dcb.build(MangoTidyMap.tidy([amount: ['$eqf':"amount2"]])).list()
+        res = build(([amount: ['$eqf':"amount2"]])).list()
 
         then:
         res.size() == 1
 
         when:
-        res = dcb.build(MangoTidyMap.tidy([amount: ['$nef':"amount2"]])).list()
+        res = build(([amount: ['$nef':"amount2"]])).list()
 
         then:
         res.size() == 9
@@ -251,21 +270,21 @@ class MangoCriteriaSpec extends Specification {
 
     def "test quickSearch"() {
         when:
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy(['$quickSearch': "Name#%"])).list()
+
+        List res = build((['$quickSearch': "Name#%"])).list()
 
         then:
         res.size() == 10
 
         when:
 
-        res = dcb.build(MangoTidyMap.tidy(['$quickSearch': "Name#3"])).list()
+        res = build((['$quickSearch': "Name#3"])).list()
 
         then:
         res.size() == 1
 
         when:
-        res = dcb.build(MangoTidyMap.tidy(['$quickSearch': "Name#%", isActive: true])).list()
+        res = build((['$quickSearch': "Name#%", isActive: true])).list()
 
         then:
         res.size() == 5
@@ -273,26 +292,26 @@ class MangoCriteriaSpec extends Specification {
 
     }
 
-    def "test with closure"() {
-        when:
-
-        MangoCriteria dcb = new MangoCriteria(Org)
-        List res = dcb.build(MangoTidyMap.tidy([name: "Name#%"])){gt "id", 5}.list()
-
-        then:
-        res.size() == 5
-    }
-
-
-//    def "test with deep nested"() {
+//    def "test with closure"() {
 //        when:
 //
-//        MangoCriteria dcb = new MangoCriteria(Org)
-//        List res = dcb.build(MangoTidyMap.tidy(["location.nested.name": "Nested#4"])).list()
+//
+//        List res = build([name: "Name#%"]){gt "id", 5}.list()
 //
 //        then:
-//        res.size() == 1
+//        res.size() == 5
 //    }
+
+
+    def "test with deep nested"() {
+        when:
+
+
+        List res = build((["location.nested.name": "Nested#4"])).list()
+
+        then:
+        res.size() == 1
+    }
 
 
     List<Class> getDomainClasses() {

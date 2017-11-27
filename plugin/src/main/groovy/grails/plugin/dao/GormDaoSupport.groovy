@@ -1,6 +1,8 @@
 package grails.plugin.dao
 
 import gorm.tools.Pager
+import gorm.tools.dao.DaoEventType
+import gorm.tools.databinding.FastBinder
 import gorm.tools.mango.MangoBuilder
 import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
@@ -31,6 +33,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	boolean flushOnSave = false
 	boolean fireEvents = true
+    FastBinder fastBinder
 
 	private Class<T> thisDomainClass
 
@@ -157,6 +160,24 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	Map<String, Object> update(Map params) {
 		return doUpdate(params)
 	}
+
+    T create(Map params, Map saveArgs = [:]) {
+        T entity = (T)domainClass.newInstance()
+        return bindAndSave("Create", entity, params, saveArgs)
+    }
+
+    T bindAndSave(String bindMethod, T entity, Map params, Map saveArgs) {
+        //DaoUtil.fireEvent(DaoEventType.valueOf("Before$bindMethod"), entity, params)
+        bind(bindMethod, entity, params)
+        save(entity, saveArgs)
+        //DaoUtil.fireEvent(DaoEventType.valueOf("After$bindMethod"), entity, params)
+        return entity
+    }
+
+    T bind(String method, T entity, Map row){
+        //TODO pass the bind type into fast binder
+        (T) fastBinder.bind(method, entity, row)
+    }
 
 	/**
 	 *

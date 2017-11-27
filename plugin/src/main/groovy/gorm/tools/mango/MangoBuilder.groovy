@@ -60,15 +60,15 @@ class MangoBuilder {
         '$q'          : 'quickSearch'
     ]
 
-    static DetachedCriteria build(Class clazz, Map mangoMap, Closure callable = null) {
+    static DetachedCriteria build(Class clazz, Map map, Closure callable = null) {
         DetachedCriteria detachedCriteria = new DetachedCriteria(clazz)
-        return build(detachedCriteria, mangoMap, callable)
+        return build(detachedCriteria, map, callable)
     }
 
     @CompileDynamic
-    static DetachedCriteria build(DetachedCriteria criteria, Map mangoMap, Closure callable = null) {
+    static DetachedCriteria build(DetachedCriteria criteria, Map map, Closure callable = null) {
         DetachedCriteria newCriteria = (DetachedCriteria)criteria.clone()
-        applyMapOrList(newCriteria, MangoTidyMap.tidy(mangoMap))
+        applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
         if (callable) newCriteria.with callable
         return newCriteria
     }
@@ -118,14 +118,15 @@ class MangoBuilder {
             criteria."${field}" {
                 //the delegate is the DetachedAssocationCriteria. See methodMissing in AbstractDetachedCriteria
                 applyMapOrList((DetachedCriteria) delegate, fieldVal)
+                return
             }
+
         }
         // if field ends in Id then try removing prefix and see if its a property
         else if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))){
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
         }
         else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List)) {
-            //TODO check if its a date field and parse
             criteria.eq(field, toType(criteria, field, fieldVal))
         }
         else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
@@ -150,6 +151,10 @@ class MangoBuilder {
 
                 op = compareOps[key]
                 if (op) {
+                        if (opArg == null){
+                            criteria.isNull(field)
+                            continue
+                        }
                     criteria."$op"(field, toType(criteria, field, opArg))
                     continue
                 }
@@ -167,12 +172,14 @@ class MangoBuilder {
                 }
             }
         }
-        //FIXME TODO what happens if none of the ifs get picked up and it falls through to here? we silently skip it?
+        //I think we should not blow up an error if some field isnt in domain, just add message to log
+        log.info "MangoBuilder applyField domain ${criteria.targetClass.name} doesnt contains field $field"
+
     }
 
     static DetachedCriteria between(DetachedCriteria criteria, String propertyName, List params) {
-        //  List p = toType(criteria, propertyName, params)
-        return criteria.between(propertyName, params[0], params[1])
+        List p = toType(criteria, propertyName, params) as List
+        return criteria.between(propertyName, p[0], p[1])
     }
 
     @CompileDynamic

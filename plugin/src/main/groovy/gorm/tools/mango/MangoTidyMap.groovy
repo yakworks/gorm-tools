@@ -12,7 +12,7 @@ class MangoTidyMap {
         }
         toMangoOperator(nested) as JSONObject
     }
-    
+
     /**
      * Extends the map with nested value by specific path
      * so pathToMap("a.b.c", 1, [:]) -> [a:[b:[c:1]]]
@@ -46,9 +46,16 @@ class MangoTidyMap {
         map.each { key, val ->
             result[key] = [:]
 
-            if (['$or', '$and'].contains(key) && val instanceof Map){
-                result[key]= val.collect{k,v-> toMangoOperator(["$k": v])}
-                return
+            if (['$or', '$and'].contains(key)) {
+                if (val instanceof Map) {
+                    result[key] = val.collect { k, v -> tidy([(k.toString()): v]) }
+                    return
+                }
+
+                if (val instanceof List) {
+                    result[key] = val.collect { v -> tidy(['$and':v]) }
+                    return
+                }
             }
             if (val instanceof Map) {
                 toMangoOperator(val, result[key] as Map)

@@ -14,9 +14,9 @@ class MangoCriteriaSpec extends Specification {
     def setup() {
     }
 
-    static DetachedCriteria build(map){
+    static DetachedCriteria build(map, Closure closure = null){
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
-        return MangoBuilder.build(Org, map)
+        return MangoBuilder.build(Org, map, closure)
     }
 
     def "test detached isActive"() {
@@ -292,22 +292,28 @@ class MangoCriteriaSpec extends Specification {
 
     }
 
-//    def "test with closure"() {
-//        when:
-//
-//
-//        List res = build([name: "Name#%"]){gt "id", 5}.list()
-//
-//        then:
-//        res.size() == 5
-//    }
+    def "test with closure"() {
+        when:
+
+
+        List res = build([name: "Name#%"]){gt "id", 5}.list()
+
+        then:
+        res.size() == 5
+    }
 
 
     def "test with deep nested"() {
         when:
-
-
         List res = build((["location.nested.name": "Nested#4"])).list()
+
+        then:
+        res.size() == 1
+    }
+
+    def "test with `or` on one level"() {
+        when:
+        List res = build((['$or': [["location.id": 5 ], ["name": "Name#1", "location.id": 4 ]]])).list()
 
         then:
         res.size() == 1

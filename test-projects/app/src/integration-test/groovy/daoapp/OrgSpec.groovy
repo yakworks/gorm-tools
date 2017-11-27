@@ -179,15 +179,15 @@ class OrgSpec extends Specification {
         list[0].name == "Org#3"
     }
 
-//    def "Filter by xxxId 4 criteria as JSON"() {
-//        when:
-//        Map params = [max: 150]
-//        params.criteria = (["address.testId": [9, 12]] as grails.converters.JSON)
-//        List list = Org.dao.list(params)
-//        then:
-//        list.size() == 2
-//        list[0].name == "Org#3"
-//    }
+    def "Filter by xxxId 4 criteria as JSON"() {
+        when:
+        Map params = [max: 150]
+        params.criteria = (["address.testId": [9, 12]] as grails.converters.JSON).toString()
+        List list = Org.dao.list(params)
+        then:
+        list.size() == 2
+        list[0].name == "Org#3"
+    }
 
 
     def "Filter with `or` "(){
@@ -208,44 +208,44 @@ class OrgSpec extends Specification {
         list[1].name == "Org#3"
     }
 
-//    def "Filter with several `or` on one level"(){
-//        when:
-//        println "Filter with several `or` on one level"
-//        List list = Org.dao.list([criteria:['$or': [["address.id": 5 ], ["name": "Org#1", "address.id": 4 ]]], max: 150])
-//        then:
-//        list.size() == Org.createCriteria().list() {
-//            or {
-//                address {
-//                    eq "id", 5L
-//                }
-//                and {
-//                    eq "name", "Org#1"
-//                    address {
-//                        eq "id", 4L
-//                    }
-//                }
-//            }
-//        }.size()
-//        list[0].name == "Org#4"
-//    }
+    def "Filter with several `or` on one level"(){
+        when:
+        println "Filter with several `or` on one level"
+        List list = Org.dao.list([criteria:['$or': [["address.id": 5 ], ["name": "Org#1", "address.id": 4 ]]], max: 150])
+        then:
+        list.size() == Org.createCriteria().list() {
+            or {
+                address {
+                    eq "id", 5L
+                }
+                and {
+                    eq "name", "Org#1"
+                    address {
+                        eq "id", 4L
+                    }
+                }
+            }
+        }.size()
+        list[0].name == "Org#4"
+    }
 
-//    def "Filter with several `or` on one level2"(){
-//        when:
-//        List list = Org.dao.list([criteria:["\$or": [["address.id": 5 ], [ "address.id": 4 ]]], max: 150])
-//        then:
-//        list.size() == Org.createCriteria().list() {
-//            or {
-//                address {
-//                    eq "id", 5L
-//                }
-//                address { eq "id", 4L
-//
-//                }
-//            }
-//        }.size()
-//        list.size() == 2
-//        list[1].name == "Org#4"
-//    }
+    def "Filter with several `or` on one level2"(){
+        when:
+        List list = Org.dao.list([criteria:["\$or": [["address.id": 5 ], [ "address.id": 4 ]]], max: 150])
+        then:
+        list.size() == Org.createCriteria().list() {
+            or {
+                address {
+                    eq "id", 5L
+                }
+                address { eq "id", 4L
+
+                }
+            }
+        }.size()
+        list.size() == 2
+        list[1].name == "Org#4"
+    }
 
     def "Filter with `or` with like"(){
         when:
@@ -377,19 +377,19 @@ class OrgSpec extends Specification {
         list.size() == Org.createCriteria().list(){isNull "credit"}.size()
     }
 
-//    def "Filter with `isNull` when just 'null'"(){
-//        when:
-//        List list = Org.dao.list([criteria:[credit: null], max: 150]).sort{it.id}
-//        then:
-//        list.size() == Org.createCriteria().list(){isNull "credit"}.size()
-//    }
+    def "Filter with `isNull` when just 'null'"(){
+        when:
+        List list = Org.dao.list([criteria:[credit: null], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){isNull "credit"}.size()
+    }
 
-//    def "Filter with `isNull` when just null"(){
-//        when:
-//        List list = Org.dao.list([criteria:[credit: null], max: 150]).sort{it.id}
-//        then:
-//        list.size() == Org.createCriteria().list(){isNull "credit"}.size()
-//    }
+    def "Filter with `isNull` when just null"(){
+        when:
+        List list = Org.dao.list([criteria:[credit: null], max: 150]).sort{it.id}
+        then:
+        list.size() == Org.createCriteria().list(){isNull "credit"}.size()
+    }
 
 
     def "Filter with `not in()`"(){
@@ -452,14 +452,14 @@ class OrgSpec extends Specification {
 
     }
 
-//    def "test quick search is higher priority then other filters"(){
-//        when:
-//        List list = Org.dao.list([criteria:['$quickSearch': "Org-num#1%", id: 123], max: 150])
-//        then:
-//        list.size() == 11
-//    }
+   /* def "test quick search is higher priority then other filters"(){
+        when:
+        List list = Org.dao.list([criteria:['$quickSearch': "Org-num#1%", id: 123], max: 150])
+        then:
+        list.size() == 11
+    }
 
-    /*def "test quick search is higher priority then other filters with nested"(){
+    def "test quick search is higher priority then other filters with nested"(){
         when:
         List list = Org.dao.list([criteria:['$quickSearch': "City#1", id: 123], max: 150])
         then:

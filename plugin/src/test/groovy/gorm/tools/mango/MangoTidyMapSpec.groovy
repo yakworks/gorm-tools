@@ -124,25 +124,28 @@ class MangoTidyMapSpec extends Specification {
 
     }
 
-//    void "test \$or with and"() {
-//        when:
-//        def mmap = tidy(['$or': [["address.id": 5 ], ["name": "Org#1", "address.id": 4 ]]])
-//
-//        then:
-//        mmap == [
-//            '$or': [
-//                address: [
-//                    id: ['$eq': 5]
-//                ],
-//                '$and': [
-//                    name: ['$eq': "Org#1"],
-//                    address: [
-//                        id: ['$eq': 4]
-//                    ]
-//                ]
-//            ]
-//        ]
-//    }
+    void "test \$or with and"() {
+        when:
+        def mmap = tidy(['$or': [["address.id": 5 ], ["name": "Org#1", "address.id": 4 ]]])
+
+        then:
+
+        flatten(mmap) == flatten([
+                '$or': [
+                        [
+                        '$and': [[address: [
+                                id: ['$eq': 5]
+                        ]]]],
+                        ['$and': [
+                                         [name   : ['$eq': "Org#1"]],
+                                         [address: [
+                                                 id: ['$eq': 4]
+                                         ]]
+                                 ]
+                ]]
+        ]
+        )
+    }
 
 
     void "test if map has Mango method "() {

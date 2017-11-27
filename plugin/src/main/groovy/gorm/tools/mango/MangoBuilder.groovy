@@ -151,10 +151,10 @@ class MangoBuilder {
 
                 op = compareOps[key]
                 if (op) {
-                        if (opArg == null){
-                            criteria.isNull(field)
-                            continue
-                        }
+                    if (opArg == null){
+                        criteria.isNull(field)
+                        continue
+                    }
                     criteria."$op"(field, toType(criteria, field, opArg))
                     continue
                 }

@@ -185,7 +185,7 @@ class MangoBuilder {
     @CompileDynamic
     static DetachedCriteria quickSearch(DetachedCriteria criteria, String value) {
         Map result = MangoTidyMap.tidy(['$or': criteria.targetClass.quickSearchFields.collectEntries {
-            [(it.toString()): value] //TODO: probably should check type and add `%` for strings
+            [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value+"%" : value)]
         }])
 
         return applyMap(criteria, result)

@@ -252,9 +252,17 @@ criteria.list(max: 20) {
     }
 }
 ```
-Keep in mind that quickSearch has higher priority then regular search fields, and if params are
-`[criteria: [quickSearch: "abc", id: 5]]`, then `id` restriction will be ignored, but criteria that is passed to search
-as closure will be executed in any case
+
+**Configuration**
+
+The default `criteria` word for the restrictions can be changed in config:
+```yml
+dao:
+    mango:
+        criteria: filters
+```
+
+With such configuration restrictions for Mango criteria should be under `filters` keyword.
 
 **Count totals**
 TODO: add count totals that should work in the same way as search

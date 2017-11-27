@@ -76,6 +76,9 @@ grails:
 endpoints:
     jmx:
         unique-names: true
+dao:
+    mango:
+        criteria: criteria
 
 ---
 hibernate:

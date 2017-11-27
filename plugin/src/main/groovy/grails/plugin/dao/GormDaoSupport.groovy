@@ -14,6 +14,7 @@ import grails.validation.ValidationException
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEntity
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -34,6 +35,8 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	boolean flushOnSave = false
 	boolean fireEvents = true
 	FastBinder fastBinder
+    @Value('${dao.mango.criteria:criteria}') //gets criteria keyword from config, if there is no, then uses 'criteria'
+    String criteriaName
 
 	private Class<T> thisDomainClass
 
@@ -188,12 +191,13 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 */
 	@CompileDynamic
 	List<T> list(Map params = [:], Closure closure = null) {
+        println(criteriaName)
 		Map criteria
-		if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+		if (params[criteriaName] instanceof String) {
 			JSON.use('deep')
-			criteria = JSON.parse(params['criteria']) as Map
+			criteria = JSON.parse(params[criteriaName]) as Map
 		} else {
-			criteria = params['criteria'] as Map ?: [:]
+			criteria = params[criteriaName] as Map ?: [:]
 		}
 		Pager pager = new Pager(params)
 		DetachedCriteria mangoCriteria =  MangoBuilder.build(this.thisDomainClass, criteria, closure)
@@ -204,11 +208,11 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	@CompileDynamic
 	List countTotals(Map params = [:], Closure closure = null) {
 			Map criteria
-			if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+			if (params[criteriaName] instanceof String) {
 				JSON.use('deep')
-				criteria = JSON.parse(params['criteria']) as Map
+				criteria = JSON.parse(params[criteriaName]) as Map
 			} else {
-				criteria = params['criteria'] as Map ?: [:]
+				criteria = params[criteriaName] as Map ?: [:]
 			}
 			CriteriaUtils.countTotals(criteria, this.thisDomainClass, params as Map, closure)
 	}

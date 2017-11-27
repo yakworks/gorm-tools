@@ -14,44 +14,44 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 @SuppressWarnings(['NoDef'])
 class DaoPluginHelper {
-	static List<ArtefactHandler> artefacts = [new DaoArtefactHandler()]
+    static List<ArtefactHandler> artefacts = [new DaoArtefactHandler()]
 
-	static Closure doWithSpring = {
-		jdbcTemplate(JdbcTemplate, ref("dataSource"))
+    static Closure doWithSpring = {
+        jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
-		fastBinder(FastBinder)
+        fastBinder(FastBinder)
 
-		jdbcIdGenerator(JdbcIdGenerator){
-			jdbcTemplate = ref("jdbcTemplate")
-			table = "NewObjectId"
-			keyColumn="KeyName"
-			idColumn="NextId"
-		}
-		idGenerator(BatchIdGenerator){
-			generator = ref("jdbcIdGenerator")
-		}
+        jdbcIdGenerator(JdbcIdGenerator){
+            jdbcTemplate = ref("jdbcTemplate")
+            table = "NewObjectId"
+            keyColumn="KeyName"
+            idColumn="NextId"
+        }
+        idGenerator(BatchIdGenerator){
+            generator = ref("jdbcIdGenerator")
+        }
         //here to set the static in the holder for use in SpringIdGenerator
-		idGeneratorHolder(IdGeneratorHolder){
-			idGenerator = ref("idGenerator")
-		}
+        idGeneratorHolder(IdGeneratorHolder){
+            idGenerator = ref("idGenerator")
+        }
 
         gormDaoBean(grails.plugin.dao.GormDaoSupport) { bean ->
-			bean.scope = "prototype"
-			fastBinder = ref("fastBinder")
-			//grailsApplication = ref('grailsApplication')
-		}
+            bean.scope = "prototype"
+            fastBinder = ref("fastBinder")
+            //grailsApplication = ref('grailsApplication')
+        }
 
-		daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
+        daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
 
         def daoClasses = application.daoClasses
-		daoClasses.each { daoClass ->
+        daoClasses.each { daoClass ->
 
-			Closure closure = configureDaoBeans
-			closure.delegate = delegate
-			closure.call(daoClass, grailsApplication)
+            Closure closure = configureDaoBeans
+            closure.delegate = delegate
+            closure.call(daoClass, grailsApplication)
 
-		}
-		DbDialectService.dialectName = application.config.hibernate.dialect
+        }
+        DbDialectService.dialectName = application.config.hibernate.dialect
 
         application.domainClasses.each { GrailsDomainClass dc ->
             Class domainClass = dc.clazz
@@ -65,61 +65,36 @@ class DaoPluginHelper {
                 }
             }
         }
-		//DaoUtils.ctx = application.mainContext*/
-	}
+        //DaoUtils.ctx = application.mainContext*/
+    }
 
-	static void onChange(event, GrailsApplication grailsApplication, Plugin plugin) {
-		if (!event.source || !event.ctx) {
-			return
-		}
-		if (grailsApplication.isArtefactOfType(DaoArtefactHandler.TYPE, event.source)) {
+    static void onChange(event, GrailsApplication grailsApplication, Plugin plugin) {
+        if (!event.source || !event.ctx) {
+            return
+        }
+        if (grailsApplication.isArtefactOfType(DaoArtefactHandler.TYPE, event.source)) {
 
-			GrailsClass daoClass = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, event.source)
+            GrailsClass daoClass = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, event.source)
 
-			plugin.beans {
-				Closure closure = configureDaoBeans
-				closure.delegate = delegate
-				return closure.call(daoClass, grailsApplication)
-			}
-		}
-	}
+            plugin.beans {
+                Closure closure = configureDaoBeans
+                closure.delegate = delegate
+                return closure.call(daoClass, grailsApplication)
+            }
+        }
+    }
 
-	//Copied much of this from grails source ServicesGrailsPlugin
-	static Closure configureDaoBeans = { GrailsDaoClass daoClass, GrailsApplication grailsApplication ->
-		def scope = daoClass.getPropertyValue("scope")
+    //Copied much of this from grails source ServicesGrailsPlugin
+    static Closure configureDaoBeans = { GrailsDaoClass daoClass, GrailsApplication grailsApplication ->
+        def scope = daoClass.getPropertyValue("scope")
 
-		def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
-//
-//		"${daoClass.fullName}DaoClass"(MethodInvokingFactoryBean) { bean ->
-//			bean.lazyInit = lazyInit
-//			targetObject = grailsApplication
-//			targetMethod = "getArtefact"
-//			arguments = [DaoArtefactHandler.TYPE, daoClass.fullName]
-//		}
+        def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
 
         "${daoClass.propertyName}"(daoClass.getClazz()) { bean ->
             bean.autowire = true
             bean.lazyInit = lazyInit
             if (scope) bean.scope = scope
         }
-	}
-
-	static def figureOutDao(GrailsDomainClass dc, ctx) {
-		def domainClass = dc.clazz
-		String daoName = "${dc.propertyName}Dao"
-		//def daoType = GrailsClassUtils.getStaticPropertyValue(domainClass, "daoType")
-		def dao
-		//println "$daoType and $daoName for $domainClass"
-		if (ctx.containsBean(daoName)) {
-			//println "found bean $daoName for $domainClass"
-			dao = ctx.getBean(daoName)
-		} else {
-			//println "getInstance for $domainClass"
-			dao = ctx.getBean("gormDaoBean")
-			dao.domainClass = domainClass
-		}
-
-		return dao
-	}
+    }
 
 }

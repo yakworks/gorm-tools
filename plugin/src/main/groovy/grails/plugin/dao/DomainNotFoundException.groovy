@@ -8,12 +8,12 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class DomainNotFoundException extends DomainException {
 
-	DomainNotFoundException(Map msgMap) {
-		super(msgMap, null, null, null)
-	}
+    DomainNotFoundException(Map msgMap) {
+        super(msgMap, null, null, null)
+    }
 
-	//Override it for performance improvement, because filling in the stack trace is quit expensive
-	@SuppressWarnings(['SynchronizedMethod'])
-	@Override
-	synchronized Throwable fillInStackTrace() { }
+    //Override it for performance improvement, because filling in the stack trace is quit expensive
+    @SuppressWarnings(['SynchronizedMethod'])
+    @Override
+    synchronized Throwable fillInStackTrace() { }
 }

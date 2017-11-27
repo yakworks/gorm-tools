@@ -23,7 +23,7 @@ import org.springframework.dao.DataIntegrityViolationException
 @CompileStatic
 trait GormDao<D extends GormEntity> {
 
-	FastBinder fastBinder
+    FastBinder fastBinder
 
     private Class<D> thisDomainClass // the domain class this is for
 

@@ -33,7 +33,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	boolean flushOnSave = false
 	boolean fireEvents = true
-    FastBinder fastBinder
+	FastBinder fastBinder
 
 	private Class<T> thisDomainClass
 
@@ -59,7 +59,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		GormDaoSupport dao = grails.plugin.dao.DaoUtil.ctx.getBean("gormDaoBean")
 		dao.domainClass = clazz
 		return dao
-        //codenarc rules violation (DeadCode)
+		//codenarc rules violation (DeadCode)
 		//return new GormDaoSupport(clazz, false)
 	}
 
@@ -161,23 +161,23 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		return doUpdate(params)
 	}
 
-    T create(Map params, Map saveArgs = [:]) {
-        T entity = (T)domainClass.newInstance()
-        return bindAndSave("Create", entity, params, saveArgs)
-    }
+	T create(Map params, Map saveArgs = [:]) {
+		T entity = (T)domainClass.newInstance()
+		return bindAndSave("Create", entity, params, saveArgs)
+	}
 
-    T bindAndSave(String bindMethod, T entity, Map params, Map saveArgs) {
-        //DaoUtil.fireEvent(DaoEventType.valueOf("Before$bindMethod"), entity, params)
-        bind(bindMethod, entity, params)
-        save(entity, saveArgs)
-        //DaoUtil.fireEvent(DaoEventType.valueOf("After$bindMethod"), entity, params)
-        return entity
-    }
+	T bindAndSave(String bindMethod, T entity, Map params, Map saveArgs) {
+		//DaoUtil.fireEvent(DaoEventType.valueOf("Before$bindMethod"), entity, params)
+		bind(bindMethod, entity, params)
+		save(entity, saveArgs)
+		//DaoUtil.fireEvent(DaoEventType.valueOf("After$bindMethod"), entity, params)
+		return entity
+	}
 
-    T bind(String method, T entity, Map row){
-        //TODO pass the bind type into fast binder
-        (T) fastBinder.bind(method, entity, row)
-    }
+	T bind(String method, T entity, Map row){
+		//TODO pass the bind type into fast binder
+		(T) fastBinder.bind(method, entity, row)
+	}
 
 	/**
 	 *
@@ -188,13 +188,13 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 */
 	@CompileDynamic
 	List<T> list(Map params = [:], Closure closure = null) {
-        Map criteria
-        if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
-            JSON.use('deep')
-            criteria = JSON.parse(params['criteria']) as Map
-        } else {
-            criteria = params['criteria'] as Map ?: [:]
-        }
+		Map criteria
+		if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+			JSON.use('deep')
+			criteria = JSON.parse(params['criteria']) as Map
+		} else {
+			criteria = params['criteria'] as Map ?: [:]
+		}
 		Pager pager = new Pager(params)
 		DetachedCriteria mangoCriteria =  MangoBuilder.build(this.thisDomainClass, criteria, closure)
 		mangoCriteria.list(max: pager.max, offset: pager.offset)

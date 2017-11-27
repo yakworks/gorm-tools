@@ -24,10 +24,10 @@ class DateUtil {
     static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
     static final Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
 
-	private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
-	private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-	private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
-	private static final String TZ_LESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
+    private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
+    private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+    private static final String TZ_LESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
 
     /**
      * Parse date sent by client (in a JSON).
@@ -40,9 +40,9 @@ class DateUtil {
     static Date parseJsonDate(String date) {
         if (date == null) return null
         date = date.trim()
-		if (date.length() == 0) return null
+        if (date.length() == 0) return null
 
-		DateFormat dateFormat = new SimpleDateFormat(DEFAULT_FORMAT)
+        DateFormat dateFormat = new SimpleDateFormat(DEFAULT_FORMAT)
 
         switch (date) {
             case GMT_MILLIS:

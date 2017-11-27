@@ -6,15 +6,15 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class EmptyErrors extends org.springframework.validation.AbstractBindingResult {
 
-	EmptyErrors(String objectName) {
-		super(objectName)
-	}
+    EmptyErrors(String objectName) {
+        super(objectName)
+    }
 
-	String getActualFieldValue(String d) {
-		return getObjectName()
-	}
+    String getActualFieldValue(String d) {
+        return getObjectName()
+    }
 
-	String getTarget() {
-		return getObjectName()
-	}
+    String getTarget() {
+        return getObjectName()
+    }
 }

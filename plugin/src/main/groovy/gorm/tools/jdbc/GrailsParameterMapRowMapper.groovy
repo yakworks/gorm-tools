@@ -19,38 +19,38 @@ import java.sql.SQLException
 @CompileStatic
 class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
 
-	/**
-	 * Returns a GrailsParameterMap instance which is build from records in a given ResultSet.
-	 *
-	 * @param rs     the ResultSet
-	 * @param rowNum number of records to include to the map
-	 * @return the map which is build from records in the given ResultSet
-	 * @throws SQLException
+    /**
+     * Returns a GrailsParameterMap instance which is build from records in a given ResultSet.
+     *
+     * @param rs     the ResultSet
+     * @param rowNum number of records to include to the map
+     * @return the map which is build from records in the given ResultSet
+     * @throws SQLException
      */
-	@Override
-	Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
-		ResultSetMetaData rsmd = rs.getMetaData()
-		int columnCount = rsmd.getColumnCount()
-		Map mapOfColValues = this.createColumnMap(columnCount)
+    @Override
+    Map<String, Object> mapRow(ResultSet rs, int rowNum) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData()
+        int columnCount = rsmd.getColumnCount()
+        Map mapOfColValues = this.createColumnMap(columnCount)
 
-		for (int i = 1; i <= columnCount; ++i) {
-			String key = this.getColumnKey(JdbcUtils.lookupColumnName(rsmd, i))
-			Object obj = this.getColumnValue(rs, i)
-			if (obj != null) {
-				mapOfColValues.put(key, obj)
-			}
-		}
+        for (int i = 1; i <= columnCount; ++i) {
+            String key = this.getColumnKey(JdbcUtils.lookupColumnName(rsmd, i))
+            Object obj = this.getColumnValue(rs, i)
+            if (obj != null) {
+                mapOfColValues.put(key, obj)
+            }
+        }
 
-		return mapOfColValues
-	}
+        return mapOfColValues
+    }
 
-	/**
-	 * Returns a GrailsParameterMap instance.
+    /**
+     * Returns a GrailsParameterMap instance.
      */
-	@Override
-	protected Map<String, Object> createColumnMap(int columnCount) {
-		HttpServletRequest request = new MockHttpServletRequest()
-		return new GrailsParameterMap(request)
-	}
+    @Override
+    protected Map<String, Object> createColumnMap(int columnCount) {
+        HttpServletRequest request = new MockHttpServletRequest()
+        return new GrailsParameterMap(request)
+    }
 
 }

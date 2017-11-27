@@ -28,7 +28,7 @@ trait DaoDomainTrait<D extends GormEntity> {
 		GrailsApplication grailsApplication = Holders.grailsApplication
 		String domainName = GrailsNameUtils.getPropertyName(this.name)
 		String daoName = "${domainName}Dao"
-        (GormDaoSupport<D>)grailsApplication.mainContext.getBean(daoName)
+		(GormDaoSupport<D>)grailsApplication.mainContext.getBean(daoName)
 	}
 
 	D persist(Map args) {

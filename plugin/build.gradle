@@ -5,7 +5,7 @@ buildscript {
 		maven { url "https://repo.grails.org/grails/core" }
 	}
 	dependencies {
-		classpath "org.grails.plugins:views-gradle:1.2.0.M2"
+		//classpath "org.grails.plugins:views-gradle:1.2.5"
 		classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
 	}
 }
@@ -13,7 +13,7 @@ buildscript {
 
 
 apply plugin: "eclipse"
-apply plugin: "org.grails.plugins.views-json"
+//apply plugin: "org.grails.plugins.views-json"
 apply plugin: 'codenarc'
 
 
@@ -34,8 +34,8 @@ dependencies {
     compile "org.hibernate:hibernate-core:5.1.5.Final"
     compile "org.hibernate:hibernate-ehcache"
 
-	compile "org.grails.plugins:views-json:1.2.0.M2"
-	compile "org.grails.plugins:views-json-templates:1.2.0.M2"
+	compile "org.grails.plugins:views-json:1.2.5"
+	compile "org.grails.plugins:views-json-templates:1.2.5"
 
  	compile "org.springframework:spring-test"
     compile "org.springframework.data:spring-data-commons" //:1.12.10.RELEASE

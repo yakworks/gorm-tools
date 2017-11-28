@@ -181,7 +181,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 
 	T bind(String method, T entity, Map row){
 		//TODO pass the bind type into fast binder
-		(T) fastBinder.bind(method, entity, row)
+		(T) fastBinder.bind(entity, row, method)
 	}
 
 	/**

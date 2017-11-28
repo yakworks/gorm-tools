@@ -45,12 +45,12 @@ trait GormDao<D extends GormEntity> {
 
     D doPersist(D entity, Map args = [:]) {
         try {
-            DaoUtil.fireEvent(DaoEventType.BeforePersist, entity)
+            DaoUtil.fireEvent(this, DaoEventType.BeforePersist, entity)
 
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             entity.save(args)
 
-            DaoUtil.fireEvent(DaoEventType.AfterPersist, entity)
+            DaoUtil.fireEvent(this, DaoEventType.AfterPersist, entity)
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
@@ -114,9 +114,9 @@ trait GormDao<D extends GormEntity> {
 
     void doRemove(D entity) {
         try {
-            DaoUtil.fireEvent(DaoEventType.BeforeRemove, entity)
+            DaoUtil.fireEvent(this, DaoEventType.BeforeRemove, entity)
             entity.delete(flush:true)
-            DaoUtil.fireEvent(DaoEventType.AfterRemove, entity)
+            DaoUtil.fireEvent(this, DaoEventType.AfterRemove, entity)
         }
         catch (DataIntegrityViolationException dae) {
             handleException(entity, dae)

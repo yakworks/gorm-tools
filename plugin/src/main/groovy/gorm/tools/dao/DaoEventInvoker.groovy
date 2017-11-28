@@ -27,7 +27,7 @@ class DaoEventInvoker {
         }
     }
 
-    public void invokeEvent(DaoEventType eventType, GormDao dao, Object... args) {
+    public void invokeEvent(GormDao dao, DaoEventType eventType, Object... args) {
         Map<DaoEventType, Method> events = eventsCache.get(dao.class.simpleName)
         if(!events) return
 

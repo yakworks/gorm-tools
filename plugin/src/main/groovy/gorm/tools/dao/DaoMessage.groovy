@@ -1,9 +1,9 @@
-package grails.plugin.dao
+package gorm.tools.dao
 
+import gorm.tools.dao.DaoUtil
 import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.context.MessageSource
 import org.springframework.web.context.request.RequestContextHolder

@@ -5,8 +5,7 @@ import gorm.tools.databinding.FastBinder
 import gorm.tools.mango.MangoBuilder
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
-import grails.plugin.dao.DaoUtil
-import grails.plugin.dao.DomainException
+import gorm.tools.dao.errors.DomainException
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
@@ -36,7 +35,7 @@ trait GormDao<D extends GormEntity> {
      *
      * @param entity the domain entity to call save on
      * @param args the arguments to pass to save
-     * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
+     * @throws DomainException if a validation or DataAccessException error happens
      */
     D persist(D entity, Map args = [:]) {
         withTransaction {
@@ -59,26 +58,34 @@ trait GormDao<D extends GormEntity> {
         }
     }
 
-    D create(Map params, Map saveArgs = [:]) {
+    D create(Map params) {
         D entity = (D)domainClass.newInstance()
         withTransaction {
-            return bindAndSave("Create", entity, params, saveArgs)
+            return bindCreate(entity, params)
         }
 
     }
 
-    D update(Map params, Map saveArgs = [:]) {
+    D update(Map params) {
         D entity = get(params)
         withTransaction {
-            return bindAndSave("Update", entity, params, saveArgs)
+            return bindUpdate(entity, params)
         }
     }
 
-    D bindAndSave(String bindMethod, D entity, Map params, Map saveArgs) {
-        DaoUtil.fireEvent(DaoEventType.valueOf("Before$bindMethod"), entity, params)
-        bind(bindMethod, entity, params)
-        persist(entity, saveArgs)
-        DaoUtil.fireEvent(DaoEventType.valueOf("After$bindMethod"), entity, params)
+    D bindCreate(D entity, Map params) {
+        bindAndSave(entity, params, "Create")
+    }
+
+    D bindUpdate(D entity, Map params) {
+        bindAndSave(entity, params, "Update")
+    }
+
+    D bindAndSave(D entity, Map params, String bindMethod) {
+        DaoUtil.fireEvent(this, DaoEventType.valueOf("Before$bindMethod"),entity, params)
+        bind(entity, params, bindMethod)
+        persist(entity)
+        DaoUtil.fireEvent(this, DaoEventType.valueOf("After$bindMethod"),entity, params)
         return entity
     }
 
@@ -116,9 +123,9 @@ trait GormDao<D extends GormEntity> {
         }
     }
 
-    D bind(String method, D entity, Map row){
+    D bind(D entity, Map row, String strategy = "Create"){
         //TODO pass the bind type into fast binder
-        (D) fastBinder.bind(method, entity, row)
+        (D) fastBinder.bind(entity, row, strategy)
     }
 
     D get(Serializable id, Long version = null) {

@@ -1,7 +1,9 @@
 package grails.plugin.dao
 
 import gorm.tools.Pager
-import gorm.tools.dao.DaoEventType
+import gorm.tools.dao.DaoMessage
+import gorm.tools.dao.DaoUtil
+import gorm.tools.dao.errors.DomainException
 import gorm.tools.databinding.FastBinder
 import gorm.tools.mango.MangoBuilder
 import grails.compiler.GrailsCompileStatic
@@ -59,7 +61,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	//TODO: investigate why it doesnt work without it
 	@CompileDynamic
 	static GormDaoSupport<T> getInstance(Class<T> clazz) {
-		GormDaoSupport dao = grails.plugin.dao.DaoUtil.ctx.getBean("gormDaoBean")
+		GormDaoSupport dao = DaoUtil.ctx.getBean("gormDaoBean")
 		dao.domainClass = clazz
 		return dao
 		//codenarc rules violation (DeadCode)
@@ -75,7 +77,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 * Saves a domain entity and rewraps ValidationException with DomainException on error.
 	 *
 	 * @param entity the domain entity to call save on
-	 * @throws DomainException if a validation or DataAccessException error happens
+	 * @throws gorm.tools.dao.errors.DomainException if a validation or DataAccessException error happens
 	 */
 	T save(T entity) {
 		save(entity, [flush: flushOnSave])
@@ -86,7 +88,7 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 	 *
 	 * @param entity the domain entity to call save on
 	 * @param args the arguments to pass to save
-	 * @throws DomainException if a validation or DataAccessException error happens
+	 * @throws gorm.tools.dao.errors.DomainException if a validation or DataAccessException error happens
 	 */
 	T save(T entity, Map args) {
 		return doSave(entity, args)

@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import gorm.tools.dao.DaoEntity
 import grails.compiler.traits.TraitInjector
 import groovy.transform.CompileStatic
 import org.grails.core.artefact.DomainClassArtefactHandler
@@ -9,7 +10,7 @@ class DaoDomainClassTraitInjector implements TraitInjector {
 
 	@Override
 	Class getTrait() {
-		DaoDomainTrait
+		DaoEntity
 	}
 
 	@Override

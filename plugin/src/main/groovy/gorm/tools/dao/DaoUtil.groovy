@@ -1,12 +1,7 @@
-package grails.plugin.dao
+package gorm.tools.dao
 
-import gorm.tools.dao.DaoEventInvoker
-import gorm.tools.dao.DaoEventType
-import grails.plugin.dao.DaoMessage
-import grails.plugin.dao.DomainException
-import grails.plugin.dao.DomainNotFoundException
-import grails.plugin.dao.GormDaoSupport
-import grails.util.GrailsNameUtils
+import gorm.tools.dao.errors.DomainException
+import gorm.tools.dao.errors.DomainNotFoundException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
@@ -36,7 +31,7 @@ class DaoUtil implements ApplicationContextAware {
      *
      * @param entity the domain object the check
      * @param ver the version this used to be (entity will have the )
-     * @throws grails.plugin.dao.DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
+     * @throws DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
      */
     @CompileDynamic
     static void checkVersion(entity, ver) {
@@ -94,7 +89,10 @@ class DaoUtil implements ApplicationContextAware {
         ctx.sessionFactory.currentSession.clear()
     }
 
-    static void fireEvent(DaoEventType eventType, Object... args) { }
+    static void fireEvent(GormDao dao, DaoEventType eventType, Object... args) {
+        daoEventInvoker.invokeEvent(dao, eventType, args)
+    }
+
     static DataAccessException handleException(GormEntity entity, RuntimeException e) throws DataAccessException {
         return
     }

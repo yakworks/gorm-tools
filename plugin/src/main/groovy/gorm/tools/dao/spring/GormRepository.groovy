@@ -1,6 +1,6 @@
 package gorm.tools.dao.spring
 
-import grails.plugin.dao.DomainException
+import gorm.tools.dao.errors.DomainException
 import groovy.transform.CompileStatic
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
@@ -17,7 +17,7 @@ interface GormRepository<T, ID> extends PagingAndSortingRepository<T, ID>, CrudR
      * @param entity the domain entity instance to call save on
      * @param args the arguments to pass to the Gorm Domain.save(args)
      * @return the saved entity
-     * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
+     * @throws DomainException if a validation or DataAccessException error happens
      */
     public <S extends T> S save(S entity, Map args)
 

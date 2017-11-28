@@ -21,13 +21,7 @@ class FastBinder {
 
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
-    public <T> GormEntity<T> bind(String method, GormEntity<T> target, Map<String, Object> source, boolean ignoreAssociations = false) {
-        //TODO will implement ediffernt logic based on if its a new isntance or an update. Method can be "Create" or
-        "Update"
-        bind(target, source, ignoreAssociations)
-    }
-
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, boolean ignoreAssociations = false) {
+    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod = "Create") {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
 
@@ -39,7 +33,7 @@ class FastBinder {
             Object value = source[prop.name]
             Object valueToAssign = value
 
-            if (prop instanceof Association && !ignoreAssociations && value[ID_PROP]) {
+            if (prop instanceof Association && value[ID_PROP]) {
                 valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(value[ID_PROP] as Long)
             } else if (value instanceof String) {
                 Class typeToConvertTo = prop.getType()

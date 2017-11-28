@@ -1,8 +1,9 @@
-package grails.plugin.dao
+package gorm.tools.dao
 
+import gorm.tools.dao.errors.DomainException
+import gorm.tools.dao.errors.EmptyErrors
 import org.junit.Test
 import org.springframework.validation.Errors
-import grails.test.*
 
 class DaoUtilsTests {
 

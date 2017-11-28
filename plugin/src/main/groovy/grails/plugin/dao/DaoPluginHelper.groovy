@@ -1,6 +1,8 @@
 package grails.plugin.dao
 
 import gorm.tools.DbDialectService
+import gorm.tools.dao.DaoUtil
+import gorm.tools.dao.DefaultGormDao
 import gorm.tools.databinding.FastBinder
 import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
@@ -35,13 +37,13 @@ class DaoPluginHelper {
             idGenerator = ref("idGenerator")
         }
 
-        gormDaoBean(grails.plugin.dao.GormDaoSupport) { bean ->
-            bean.scope = "prototype"
-            fastBinder = ref("fastBinder")
-            //grailsApplication = ref('grailsApplication')
-        }
+//        gormDaoBean(grails.plugin.dao.GormDaoSupport) { bean ->
+//            bean.scope = "prototype"
+//            fastBinder = ref("fastBinder")
+//            //grailsApplication = ref('grailsApplication')
+//        }
 
-        daoUtilBean(grails.plugin.dao.DaoUtil) //this is here just so the app ctx can get set on DaoUtils
+        daoUtilBean(DaoUtil) //this is here just so the app ctx can get set on DaoUtils
 
         def daoClasses = application.daoClasses
         daoClasses.each { daoClass ->
@@ -53,13 +55,14 @@ class DaoPluginHelper {
         }
         DbDialectService.dialectName = application.config.hibernate.dialect
 
+        //make sure each domain has a dao
         application.domainClasses.each { GrailsDomainClass dc ->
             Class domainClass = dc.clazz
             String daoName = "${dc.propertyName}Dao"
             def hasDao = daoClasses.find { it.propertyName ==  daoName}
             if(!hasDao){
                 //println "${daoName}"
-                "${daoName}"(grails.plugin.dao.GormDaoSupport, domainClass) { bean ->
+                "${daoName}"(DefaultGormDao, domainClass) { bean ->
                     bean.autowire = true
                     bean.lazyInit = true
                 }

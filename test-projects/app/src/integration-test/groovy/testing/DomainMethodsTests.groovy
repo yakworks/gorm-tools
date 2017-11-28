@@ -1,7 +1,7 @@
 package testing
 
-import grails.plugin.dao.DaoUtil
-import grails.plugin.dao.DomainException
+import gorm.tools.dao.DaoUtil
+import gorm.tools.dao.errors.DomainException
 import grails.test.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import grails.validation.ValidationException

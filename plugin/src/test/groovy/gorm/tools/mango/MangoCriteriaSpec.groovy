@@ -1,11 +1,13 @@
 package gorm.tools.mango
 
 import grails.gorm.DetachedCriteria
-import grails.persistence.Entity
 import grails.test.mixin.TestMixin
 import grails.test.mixin.gorm.Domain
 import grails.test.mixin.hibernate.HibernateTestMixin
 import spock.lang.Specification
+import testing.Location
+import testing.Nested
+import testing.Org
 
 @Domain([Org,Location,Nested])
 @TestMixin(HibernateTestMixin)
@@ -327,41 +329,5 @@ class MangoCriteriaSpec extends Specification {
 
 }
 
-@Entity
-class Org {
-    int id
-    String name
-    Boolean isActive = false
-    BigDecimal amount
-    BigDecimal amount2
-    Location location
-    String secondName
-    Date date
 
-    static List quickSearchFields = ["name"]
-
-    static constraints = {
-        name blank: true, nullable: true
-        isActive nullable: true
-        amount nullable: true
-        secondName nullable: true
-    }
-}
-
-@Entity
-class Location{
-    int id
-    String city
-    Nested nested
-}
-@Entity
-class Nested{
-    String name
-    BigDecimal value
-
-    static constraints = {
-        name blank: true, nullable: true
-        value nullable: true
-    }
-}
 

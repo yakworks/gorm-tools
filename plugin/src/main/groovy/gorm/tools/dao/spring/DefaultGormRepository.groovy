@@ -1,7 +1,7 @@
 package gorm.tools.dao.spring
 
-import grails.plugin.dao.DaoMessage
-import grails.plugin.dao.DomainException
+import gorm.tools.dao.DaoMessage
+import gorm.tools.dao.errors.DomainException
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -47,7 +47,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
      * @param entity the domain entity instance to call save on
      * @param args the arguments to pass to the Gorm Domain.save(args)
      * @return the saved entity
-     * @throws grails.plugin.dao.DomainException if a validation or DataAccessException error happens
+     * @throws DomainException if a validation or DataAccessException error happens
      */
     @Override
     <S extends T> S save(S entity, Map args) {

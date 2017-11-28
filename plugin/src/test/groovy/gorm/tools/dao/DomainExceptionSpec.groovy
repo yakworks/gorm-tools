@@ -1,7 +1,8 @@
-package grails.plugin.dao
+package gorm.tools.dao
 
+import gorm.tools.dao.errors.DomainException
+import gorm.tools.dao.errors.EmptyErrors
 import spock.lang.Specification
-import grails.test.*
 
 class DomainExceptionSpec extends Specification {
 

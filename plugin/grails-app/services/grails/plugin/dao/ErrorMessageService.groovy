@@ -1,5 +1,6 @@
 package grails.plugin.dao
 
+import gorm.tools.dao.DaoMessage
 import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import org.hibernate.exception.ConstraintViolationException

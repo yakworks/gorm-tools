@@ -1,6 +1,8 @@
 package grails.plugin.dao
 
 import gorm.tools.Pager
+import gorm.tools.dao.DaoUtil
+import gorm.tools.dao.errors.DomainNotFoundException
 import grails.artefact.Artefact
 import grails.converters.JSON
 import grails.rest.RestfulController

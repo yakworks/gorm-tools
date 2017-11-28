@@ -1,4 +1,4 @@
-package grails.plugin.dao
+package gorm.tools.dao.errors
 
 import groovy.transform.CompileStatic
 

@@ -1,16 +1,22 @@
 package gorm.tools.mango
 
-import grails.converters.JSON
-import org.grails.web.json.JSONObject
-
+/**
+ * Utils to normalizes params map to transform it to mango language
+ */
 class MangoTidyMap {
 
+    /**
+     * Transforms passed params map to normalized mango criteria map
+     *
+     * @param map params that should be transformed to mango language
+     * @return normalized mango map
+     */
     static Map tidy(Map map) {
         Map nested = [:]
         map.each { String k, Object v ->
             pathToMap(k, v, nested)
         }
-        toMangoOperator(nested) as JSONObject
+        toMangoOperator(nested)
     }
 
     /**
@@ -30,11 +36,11 @@ class MangoTidyMap {
             pathToMap(path.split("[.]").tail().join("."), val, map[newKey] as Map)
         } else {
             if (!map[path]) map[path] = [:]
+            //we should check if nested values have composed keys("customer.address.id")
             if (val instanceof Map) {
                 val.each { k, v ->
                     pathToMap(k as String, v, map[path] as Map)
                 }
-
             } else {
                 map[path] = val
             }
@@ -42,11 +48,17 @@ class MangoTidyMap {
         map
     }
 
+    /**
+     * Adds mango operators based on values types
+     *
+     * @param map params that should be extended with mango operators
+     * @param result map that should contain mango results
+     * @return map with mango criteria params
+     */
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
-
-            if (['$or', '$and'].contains(key)) {
+            if (MangoBuilder.junctionOps.keySet().contains(key)) {
                 if (val instanceof Map) {
                     result[key] = val.collect { k, v -> tidy([(k.toString()): v]) }
                     return
@@ -62,6 +74,7 @@ class MangoTidyMap {
             } else {
                 if (key.toString().startsWith('$')) {result[key] = val; return} //if we already have Mango method
                 if (val instanceof List) {
+                    // for handling case {customer: [{id:1}, {id:2}]}, transforms to {customer:{id:{'$in': [1,2]}}}
                     if (val[0] instanceof Map) {
                         result[key]["${val[0].keySet()[0]}"] = ['$in': val.collect { it.values()[0] }]
                         return
@@ -73,13 +86,12 @@ class MangoTidyMap {
                     result[key]['$ilike'] = val
                     return
                 }
-                if(['$isNull', '$isNotNull'].contains(val)) {
+                if(MangoBuilder.existOps.keySet().contains(val)) {
                     result[key][val] = true
                 } else {
                     result[key]['$eq'] = val
                 }
             }
-
         }
         result
 

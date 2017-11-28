@@ -182,39 +182,62 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
 		(T) fastBinder.bind(method, entity, row)
 	}
 
+    /**
+     * Builds detached criteria for dao's domain based on mango criteria language and additional criteria
+     *
+     * @param params mango language criteria map
+     * @param closure additional restriction for criteria
+     * @return Detached criteria build based on mango language params and criteria closure
+     */
+    @CompileDynamic
+    DetachedCriteria buildCriteria(Map params = [:], Closure closure = null){
+        Map criteria
+        if (params[criteriaName] instanceof String) {
+            JSON.use('deep')
+            criteria = JSON.parse(params[criteriaName]) as Map
+        } else {
+            criteria = params[criteriaName] as Map ?: [:]
+        }
+        MangoBuilder.build(this.thisDomainClass, criteria, closure)
+    }
+
 	/**
+	 * List of entities restricted by mango map and criteria closure
 	 *
-	 *
-	 * @param params
-	 * @param closure
-	 * @return
+	 * @param params mango language criteria map
+	 * @param closure additional restriction for criteria
+	 * @return list of entities restricted by mango params
 	 */
 	@CompileDynamic
 	List<T> list(Map params = [:], Closure closure = null) {
-        println(criteriaName)
-		Map criteria
-		if (params[criteriaName] instanceof String) {
-			JSON.use('deep')
-			criteria = JSON.parse(params[criteriaName]) as Map
-		} else {
-			criteria = params[criteriaName] as Map ?: [:]
-		}
 		Pager pager = new Pager(params)
-		DetachedCriteria mangoCriteria =  MangoBuilder.build(this.thisDomainClass, criteria, closure)
+		DetachedCriteria mangoCriteria =  buildCriteria(params, closure)
 		mangoCriteria.list(max: pager.max, offset: pager.offset)
 	}
 
-
+    /**
+     *  Calculates sums for specified properties in enities list restricted by mango criteria
+     *
+     * @param params mango language criteria map
+     * @param sums list of properties names that sums should be calculated for
+     * @param closure additional restriction for criteria
+     * @return map where keys are names of fields and value - sum for restricted entities
+     */
 	@CompileDynamic
-	List countTotals(Map params = [:], Closure closure = null) {
-			Map criteria
-			if (params[criteriaName] instanceof String) {
-				JSON.use('deep')
-				criteria = JSON.parse(params[criteriaName]) as Map
-			} else {
-				criteria = params[criteriaName] as Map ?: [:]
-			}
-			CriteriaUtils.countTotals(criteria, this.thisDomainClass, params as Map, closure)
+	Map countTotals(Map params = [:], List<String> sums,  Closure closure = null) {
+        DetachedCriteria mangoCriteria =  buildCriteria(params, closure)
+        List totals = mangoCriteria.list {
+            projections {
+                sums.each{
+                    owner.sum(it)
+                }
+            }
+        }
+        Map result = [:]
+        sums.eachWithIndex{String name, i->
+            result[name] = totals[0][i]
+        }
+        result
 	}
 
 	protected final Map<String, Object> doUpdate(Map params) {

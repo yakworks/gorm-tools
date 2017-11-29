@@ -69,7 +69,7 @@ class MangoTidyMap {
                     return
                 }
             }
-            if (val instanceof Map) {
+            if (val instanceof Map && !MangoBuilder.sortOps.keySet().contains(key)) {
                 toMangoOperator(val, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {result[key] = val; return} //if we already have Mango method

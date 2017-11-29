@@ -198,6 +198,9 @@ class GormDaoSupport<T extends GormEntity & WebDataBinding> {
         } else {
             criteria = params[criteriaName] as Map ?: [:]
         }
+		if (params.containsKey('sort')){
+			criteria['$sort'] = params['sort']
+		}
         MangoBuilder.build(this.thisDomainClass, criteria, closure)
     }
 

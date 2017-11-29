@@ -822,8 +822,18 @@ for each field in <code>quickSearchFields</code>. If domain field is not string 
         criteria: filters
 </pre></div></p>
 <p>With such configuration restrictions for Mango criteria should be under <code>filters</code> keyword.</p>
-<p><strong>Count totals</strong>
-TODO: add count totals that should work in the same way as search</p>
+<p><strong>Count totals</strong></p>
+<p>If one needs to compute totals for some fields, dao has <code>countTotals</code> method restrictions are 
+working in the same way as for list, so it can be specified with params map and criteria closure.
+To specify what fields sums should be computed for, the list with fields name should be passed.
+See example:
+<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">countTotals</span><span class="o">([</span>
+  <span class="nl">criteria:</span> <span class="o">[</span><span class="nl">name:</span> <span class="s2">&quot;Virgin%&quot;</span><span class="o">,</span> <span class="nl">type:</span> <span class="s2">&quot;New&quot;</span><span class="o">]</span>
+<span class="o">],</span> <span class="o">[</span><span class="s2">&quot;amount&quot;</span><span class="o">,</span> <span class="n">credit</span><span class="o">]){</span>
+  <span class="n">gt</span> <span class="s2">&quot;id&quot;</span><span class="o">,</span> <span class="mi">5</span>
+<span class="o">}</span>
+</pre></div>
+Result will be look like: <code>[amount: 1500, credit: 440]</code>.</p>
                 
                   
                 

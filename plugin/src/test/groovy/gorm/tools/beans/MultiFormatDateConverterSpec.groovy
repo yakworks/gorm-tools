@@ -1,11 +1,8 @@
 package gorm.tools.beans
 
 import java.text.SimpleDateFormat
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
 class MultiFormatDateConverterSpec extends Specification {
 
     MultiFormatDateConverter converter

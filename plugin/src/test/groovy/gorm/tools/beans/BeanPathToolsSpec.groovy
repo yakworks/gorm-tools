@@ -1,9 +1,9 @@
 package gorm.tools.beans
 
 import gorm.tools.dao.DefaultGormDao
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.test.mixin.hibernate.HibernateTestMixin
+import grails.test.hibernate.HibernateSpec
+import grails.testing.gorm.DataTest
+import grails.testing.spring.AutowiredTest
 import org.grails.core.DefaultGrailsDomainClass
 import spock.lang.Specification
 import grails.test.mixin.gorm.Domain
@@ -11,9 +11,14 @@ import grails.gorm.annotation.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
 
-@Domain([TestClazzA, TestClazzB, TestClazzC])
-@TestMixin(HibernateTestMixin)
-class BeanPathToolsSpec extends Specification {
+class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest{
+
+    void setupSpec() {
+        //mockDomain Person
+        mockDomains TestClazzA, TestClazzB, TestClazzC
+    }
+
+    //List<Class> getDomainClasses() { [TestClazzA, TestClazzB, TestClazzC] }
 
     void "Can get property value for a basic class"() {
         setup:
@@ -268,9 +273,9 @@ class TestClazzB {
     TestClazzB right
     int value
 
-    def getDomainClass() {
-        new DefaultGrailsDomainClass(TestClazzB)
-    }
+//    def getDomainClass() {
+//        new DefaultGrailsDomainClass(TestClazzB)
+//    }
 }
 
 @Entity
@@ -287,9 +292,9 @@ class TestClazzC {
         ]
     }
 
-    def getDomainClass() {
-        new DefaultGrailsDomainClass(TestClazzB)
-    }
+//    def getDomainClass() {
+//        new DefaultGrailsDomainClass(TestClazzB)
+//    }
 }
 
 class PropsToMapTest {

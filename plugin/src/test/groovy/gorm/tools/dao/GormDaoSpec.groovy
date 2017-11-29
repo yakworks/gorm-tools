@@ -2,16 +2,14 @@ package gorm.tools.dao
 
 import gorm.tools.databinding.FastBinder
 import grails.test.hibernate.HibernateSpec
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 import testing.Location
 import testing.Nested
 import testing.Org
 import testing.OrgDao
 
-@TestMixin(GrailsUnitTestMixin)
-class GormDaoSpec extends HibernateSpec {
+class GormDaoSpec extends HibernateSpec implements AutowiredTest {
 
     def doWithSpring = {
         orgDao(OrgDao) { bean ->

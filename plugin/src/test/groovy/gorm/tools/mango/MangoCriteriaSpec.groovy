@@ -1,40 +1,40 @@
 package gorm.tools.mango
 
 import grails.gorm.DetachedCriteria
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
-import grails.test.mixin.hibernate.HibernateTestMixin
+import grails.test.hibernate.HibernateSpec
+import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 import testing.Location
 import testing.Nested
 import testing.Org
 
-@Domain([Org,Location,Nested])
-@TestMixin(HibernateTestMixin)
-class MangoCriteriaSpec extends Specification {
+class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
 
-    def setup() {
-    }
+    List<Class> getDomainClasses() { [Org,Location,Nested]}
 
     static DetachedCriteria build(map, Closure closure = null){
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
         return MangoBuilder.build(Org, map, closure)
     }
 
-    def "test detached isActive"() {
-        setup:
-        (1..10).each { index ->
-            String value = "Name#" + index
-            new Org(id: index,
+    void setupSpec() {
+        Org.withTransaction {
+            (1..10).each { index ->
+                String value = "Name#" + index
+                new Org(id: index,
                     name: value,
-                    isActive: (index % 2 == 0 ),
-                    amount: (index-1)*1.34,
-                    amount2: (index-1)*(index-1)*0.3,
+                    isActive: (index % 2 == 0),
+                    amount: (index - 1) * 1.34,
+                    amount2: (index - 1) * (index - 1) * 0.3,
                     date: new Date().clearTime() + index,
-                    secondName: index % 2 == 0 ? null :  "Name2#" + index,
-                    location: (new Location(city: "City#$index", nested: new Nested(name: "Nested#${2*index}", value: index)).save())
-            ).save(failOnError: true)
+                    secondName: index % 2 == 0 ? null : "Name2#" + index,
+                    location: (new Location(city: "City#$index", nested: new Nested(name: "Nested#${2 * index}", value: index)).save())
+                ).save(failOnError: true)
+            }
         }
+    }
+
+    def "test detached isActive"() {
         when:
         List res = build([isActive:true]).list()
 
@@ -329,12 +329,6 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 4
         res[0].id == 4
     }
-
-
-    List<Class> getDomainClasses() {
-        return [Org,Location,Nested]
-    }
-
 
 }
 

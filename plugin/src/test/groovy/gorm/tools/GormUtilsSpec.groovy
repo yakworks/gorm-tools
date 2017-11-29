@@ -1,14 +1,17 @@
 package gorm.tools
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
-import grails.test.mixin.hibernate.HibernateTestMixin
-import spock.lang.Specification
+import grails.test.hibernate.HibernateSpec
 import grails.gorm.annotation.Entity
+import grails.testing.gorm.DataTest
+import grails.testing.gorm.DomainUnitTest
+import spock.lang.Specification
 
-@Domain([Person, Address])
-@TestMixin(HibernateTestMixin)
-class GormUtilsSpec extends Specification {
+class GormUtilsSpec extends Specification implements DataTest{
+
+    void setupSpec() {
+        //mockDomain Person
+        mockDomains Person, Address
+    }
 
     void "test copyDomain"() {
         setup:
@@ -97,9 +100,6 @@ class GormUtilsSpec extends Specification {
         street == address.street
     }
 
-    List<Class> getDomainClasses() {
-        return [Person]
-    }
 }
 
 @Entity

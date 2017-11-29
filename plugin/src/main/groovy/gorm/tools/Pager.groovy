@@ -65,7 +65,7 @@ class Pager {
     }
 
     Integer getPageCount() {
-        return Math.ceil(recordCount / max).intValue()
+        return Math.ceil((Double)(recordCount / max)).intValue()
     }
 
     void eachPage(Closure c) {

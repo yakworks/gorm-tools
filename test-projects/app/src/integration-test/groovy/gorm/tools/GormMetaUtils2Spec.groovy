@@ -1,15 +1,15 @@
 package gorm.tools
 
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import testing.Jumper
 import daoapp.Org
 
-import grails.test.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 
 @Integration
 @Rollback
-class GormMetaUtilsSpec extends Specification {
+class GormMetaUtils2Spec extends Specification {
 
     def "GetDomainClass"() {
         expect:

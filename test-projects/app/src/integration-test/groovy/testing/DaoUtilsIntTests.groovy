@@ -1,7 +1,7 @@
 package grails.plugin.dao
 
-import grails.test.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.springframework.validation.Errors
 import grails.test.*
 import spock.lang.Specification

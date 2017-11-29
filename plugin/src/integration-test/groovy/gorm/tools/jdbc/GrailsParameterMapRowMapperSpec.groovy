@@ -1,7 +1,7 @@
 package gorm.tools.jdbc
 
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import grails.test.mixin.integration.Integration
 import grails.plugin.dao.Application
 import grails.gorm.transactions.Rollback
 import javax.sql.DataSource

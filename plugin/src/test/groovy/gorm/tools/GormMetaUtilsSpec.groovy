@@ -1,20 +1,12 @@
 package gorm.tools
 
 import grails.test.hibernate.HibernateSpec
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
-import grails.test.mixin.hibernate.HibernateTestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import spock.lang.Specification
-
-import grails.test.mixin.integration.Integration
-import grails.gorm.transactions.Rollback
 import grails.gorm.annotation.Entity
+import grails.testing.gorm.DomainUnitTest
 
-//@TestMixin(GrailsUnitTestMixin)
-@Domain([Org])
-@TestMixin(HibernateTestMixin)
-class GormMetaUtilsSpec extends Specification {
+class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
+
+    List<Class> getDomainClasses() { [Org] }
 
     static doWithSpring = {
 
@@ -68,9 +60,6 @@ class GormMetaUtilsSpec extends Specification {
 
     }
 
-    List<Class> getDomainClasses() {
-        return [Org]
-    }
 }
 
 @Entity

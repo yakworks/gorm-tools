@@ -1,11 +1,11 @@
 package gorm.tools
 
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import testing.Jumper
 import daoapp.Org
 import gorm.tools.hibernate.criteria.CriteriaUtils
 
-import grails.test.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 
 @Integration

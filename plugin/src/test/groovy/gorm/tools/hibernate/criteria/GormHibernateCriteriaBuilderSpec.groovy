@@ -1,20 +1,24 @@
 package gorm.tools.hibernate.criteria
 
+import grails.test.hibernate.HibernateSpec
+import grails.testing.gorm.DataTest
+import grails.testing.spring.AutowiredTest
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import spock.lang.Specification
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
-import grails.test.mixin.hibernate.HibernateTestMixin
 
-@Domain([Test])
-@TestMixin(HibernateTestMixin)
-class GormHibernateCriteriaBuilderSpec extends Specification {
+class GormHibernateCriteriaBuilderSpec extends HibernateSpec { //c DataTest {//implements DataTest{
+
+//    void setupSpec() {
+//        mockDomain Test
+//    }
+
+    List<Class> getDomainClasses() { [Test] }
 
     private GormHibernateCriteriaBuilder builder
 
     void setup() {
-        SessionFactory sessionFactory = Holders.grailsApplication.mainContext.sessionFactory
+        //SessionFactory sessionFactory = Holders.grailsApplication.mainContext.sessionFactory
         builder = new GormHibernateCriteriaBuilder(Test.class, sessionFactory)
     }
 
@@ -68,6 +72,7 @@ class GormHibernateCriteriaBuilderSpec extends Specification {
         result[1].someField == "aBc"
 
         cleanup:
+
         Test.executeUpdate('delete from Test')
     }
 
@@ -118,7 +123,4 @@ class GormHibernateCriteriaBuilderSpec extends Specification {
         result[0].nestedField.someField == "456"
     }
 
-    List<Class> getDomainClasses() {
-        return [Test]
-    }
 }

@@ -53,7 +53,7 @@ class DaoEventInvoker {
     }
 
     private void findAndCacheEvents(DaoEventType event, Class daoClass, Map<DaoEventType, Method> events) {
-        Method method = ReflectionUtils.findMethod(daoClass, GrailsNameUtils.getPropertyNameRepresentation(event.name()))
+        Method method = ReflectionUtils.findMethod(daoClass, GrailsNameUtils.getPropertyNameRepresentation(event.name()), null)
         if(method != null) events[event] = method
     }
 }

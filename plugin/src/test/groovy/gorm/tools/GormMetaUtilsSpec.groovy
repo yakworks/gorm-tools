@@ -1,24 +1,15 @@
 package gorm.tools
 
-import grails.test.hibernate.HibernateSpec
+import grails.gorm.annotation.Entity
 import grails.test.mixin.TestMixin
 import grails.test.mixin.gorm.Domain
 import grails.test.mixin.hibernate.HibernateTestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
-
-import grails.test.mixin.integration.Integration
-import grails.gorm.transactions.Rollback
-import grails.gorm.annotation.Entity
 
 //@TestMixin(GrailsUnitTestMixin)
 @Domain([Org])
 @TestMixin(HibernateTestMixin)
 class GormMetaUtilsSpec extends Specification {
-
-    static doWithSpring = {
-
-    }
 
     def "GetDomainClass"() {
         expect:

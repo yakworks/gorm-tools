@@ -14,6 +14,5 @@ class BootStrap {
                     address: new Address(city: "City#$it", testId: it*3).persist()).persist()
         }
     }
-    def destroy = {
-    }
+
 }

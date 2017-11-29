@@ -3,11 +3,13 @@ package gorm.tools.databinding
 import gorm.tools.beans.DateUtil
 import grails.databinding.converters.ValueConverter
 import groovy.transform.CompileStatic
+import org.grails.databinding.converters.ConversionService
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.web.databinding.SpringConversionServiceAdapter
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired
 class FastBinder {
     private static final String ID_PROP = "id"
 
+	ConversionService conversionService = new SpringConversionServiceAdapter()
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
     public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod = "Create") {
@@ -48,6 +51,9 @@ class FastBinder {
                         valueToAssign = converter.convert(value)
                     }
                 }
+				else if (conversionService?.canConvert(value.getClass(), typeToConvertTo)) {
+					valueToAssign = conversionService.convert(value, typeToConvertTo)
+				}
             }
 
             target[prop.name] = valueToAssign

@@ -1,6 +1,5 @@
 gorm.tools
 gorm.tools.beans
-gorm.tools.converters
 gorm.tools.dao
 gorm.tools.dao.errors
 gorm.tools.dao.spring

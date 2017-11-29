@@ -12,6 +12,7 @@ class Org {
     Location location
     String secondName
     Date date
+    String nameFromDao
 
     static List quickSearchFields = ["name"]
 
@@ -19,6 +20,9 @@ class Org {
         name blank: true, nullable: true
         isActive nullable: true
         amount nullable: true
+        amount2 nullable: true
+        date nullable: true
         secondName nullable: true
+        nameFromDao nullable: true
     }
 }

@@ -1,11 +1,10 @@
 package testing
 
+import gorm.tools.dao.DefaultGormDao
 import grails.compiler.GrailsCompileStatic
-import grails.plugin.dao.GormDaoSupport
-
 
 @GrailsCompileStatic
-class JumperDao extends GormDaoSupport<Jumper> {
-	//Class domainClass = Jumper
+class JumperDao extends DefaultGormDao<Jumper> {
+	//Class domainClas  s = Jumper
 }
 

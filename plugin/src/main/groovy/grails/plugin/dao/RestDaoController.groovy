@@ -2,8 +2,10 @@ package grails.plugin.dao
 
 import gorm.tools.Pager
 import gorm.tools.dao.DaoUtil
+import gorm.tools.dao.GormDao
 import gorm.tools.dao.errors.DomainNotFoundException
 import grails.artefact.Artefact
+import grails.compiler.GrailsCompileStatic
 import grails.converters.JSON
 import grails.rest.RestfulController
 import grails.web.http.HttpHeaders
@@ -13,6 +15,7 @@ import static org.springframework.http.HttpStatus.OK
 
 @SuppressWarnings('AbstractClassWithoutAbstractMethod')
 @Artefact("Controller")
+//@GrailsCompileStatic
 abstract class RestDaoController<T> extends RestfulController<T> {
     //Responce formats, json - by default
     static responseFormats = ['json', 'xml']
@@ -30,7 +33,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
         resource
     }
 
-    protected GormDaoSupport getDao() {
+    protected GormDao getDao() {
         resource.dao
     }
 
@@ -85,7 +88,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
     }
 
     Map insertDomain() {
-        dao.insert(request.JSON)
+        dao.create(request.JSON)
     }
 
     Map updateDomain() {
@@ -130,7 +133,7 @@ abstract class RestDaoController<T> extends RestfulController<T> {
      */
     @Override
     protected void deleteResource(p) {
-        dao.remove(p)
+        dao.remove(p.id)
     }
 
     def fullParams(params, request) {

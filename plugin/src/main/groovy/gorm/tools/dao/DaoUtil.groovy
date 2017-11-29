@@ -23,6 +23,7 @@ class DaoUtil implements ApplicationContextAware {
 
     void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = ctx
+        daoEventInvoker = (DaoEventInvoker)ctx.getBean("daoEventInvoker")
     }
 
     /**

@@ -1,6 +1,7 @@
 package grails.plugin.dao
 
 import gorm.tools.DbDialectService
+import gorm.tools.dao.DaoEventInvoker
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.databinding.FastBinder
@@ -42,6 +43,10 @@ class DaoPluginHelper {
 //            fastBinder = ref("fastBinder")
 //            //grailsApplication = ref('grailsApplication')
 //        }
+
+        daoEventInvoker(DaoEventInvoker){ bean ->
+            bean.autowire = true
+        }
 
         daoUtilBean(DaoUtil) //this is here just so the app ctx can get set on DaoUtils
 

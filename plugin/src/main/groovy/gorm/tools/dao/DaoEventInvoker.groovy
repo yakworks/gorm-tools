@@ -7,6 +7,7 @@ import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
 import org.springframework.util.ReflectionUtils
 
+import javax.annotation.PostConstruct
 import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 
@@ -19,8 +20,8 @@ class DaoEventInvoker {
 
     private final Map<String, Map<DaoEventType, Method>> eventsCache = new ConcurrentHashMap<>()
 
-    DaoEventInvoker(GrailsApplication app) {
-        this.grailsApplication = app
+    @PostConstruct
+    void init(){
         GrailsClass[] daoClasses = grailsApplication.getArtefacts(DaoArtefactHandler.TYPE)
         for(GrailsClass daoClass : daoClasses) {
             cacheEvents(daoClass.clazz)

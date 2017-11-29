@@ -24,11 +24,11 @@ trait GormDao<D extends GormEntity> {
 
     FastBinder fastBinder
 
-    private Class<D> thisDomainClass // the domain class this is for
+    private Class<D> _domainClass // the domain class this is for
 
-    Class<D> getDomainClass() { return thisDomainClass }
+    Class<D> getDomainClass() { return _domainClass }
     //set this is constructing a base dao by hand
-    void setDomainClass(Class<D> clazz) { thisDomainClass = clazz }
+    void setDomainClass(Class<D> clazz) { _domainClass = clazz }
 
     /**
      * Saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error.
@@ -54,7 +54,7 @@ trait GormDao<D extends GormEntity> {
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
-            throw handleException(entity, ex)
+            throw ex //handleException(entity, ex)
         }
     }
 
@@ -107,7 +107,7 @@ trait GormDao<D extends GormEntity> {
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity) {
-        withTransaction {
+        withTransaction([:]) {
             doRemove(entity)
         }
     }
@@ -139,7 +139,8 @@ trait GormDao<D extends GormEntity> {
         return get(params.id as Serializable, params.version as Long)
     }
 
-    List<D> query(Map params) {
+    List<D> list(Map params) {
+
         Map criteria
         if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
             JSON.use('deep')
@@ -148,16 +149,23 @@ trait GormDao<D extends GormEntity> {
             criteria = params['criteria'] as Map ?: [:]
         }
         Pager pager = new Pager(params)
-        DetachedCriteria mangoCriteria =  MangoBuilder.build(this.getDomainClass(), criteria)
-        mangoCriteria.list(max: pager.max, offset: pager.offset)
+        DetachedCriteria mangoCriteria = MangoBuilder.build(getDomainClass(), criteria)
+
+        withTransaction([readOnly:true]) {
+            return mangoCriteria.list(max: pager.max, offset: pager.offset)
+        }
     }
 
     DataAccessException handleException(D entity, RuntimeException e) throws DataAccessException {
         return DaoUtil.handleException(entity, e)
     }
 
+    public <T> T withTransaction(Map transProps, Closure<T> callable) {
+        GormEnhancer.findStaticApi(domainClass).withTransaction(transProps, callable)
+    }
+
     public <T> T withTransaction(Closure<T> callable) {
-        GormEnhancer.findStaticApi(domainClass).withTransaction callable
+        GormEnhancer.findStaticApi(domainClass).withTransaction(callable)
     }
 
 }

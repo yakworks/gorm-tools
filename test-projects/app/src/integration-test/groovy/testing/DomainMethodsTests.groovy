@@ -173,7 +173,7 @@ class DomainMethodsTests extends Specification {
 		assertTrue Jumper.dao.class.name.contains("testing.JumperDao")
 		println Student.dao.class.name
 		// grails.plugin.dao.GormDaoSupport$$EnhancerBySpringCGLIB$$27f04eca
-		assert Student.dao.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
+		assert Student.dao.class.name == ("DefaultGormDao")
 		assert DropZone.dao.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
 		//assertEquals "grails.plugin.dao.GormDaoSupport",DropZone.dao.class.name
 	}

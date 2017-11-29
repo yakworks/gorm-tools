@@ -1,5 +1,6 @@
 package gorm.tools.beans
 
+import gorm.tools.dao.DefaultGormDao
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.test.mixin.hibernate.HibernateTestMixin
@@ -9,7 +10,6 @@ import grails.test.mixin.gorm.Domain
 import grails.gorm.annotation.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
-import grails.plugin.dao.GormDaoSupport
 
 @Domain([TestClazzA, TestClazzB, TestClazzC])
 @TestMixin(HibernateTestMixin)
@@ -251,7 +251,7 @@ class TestClazzA {
     List<String> baz
 
     def getDao() {
-        new GormDaoSupport()
+        new DefaultGormDao(TestClazzA)
     }
 
     def getDomainClass() {

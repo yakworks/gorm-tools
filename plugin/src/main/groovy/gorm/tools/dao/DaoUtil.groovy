@@ -2,6 +2,7 @@ package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
+import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
@@ -9,6 +10,7 @@ import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 /**
@@ -94,8 +96,27 @@ class DaoUtil implements ApplicationContextAware {
         daoEventInvoker.invokeEvent(dao, eventType, args)
     }
 
-    static DataAccessException handleException(GormEntity entity, RuntimeException e) throws DataAccessException {
-        return
+    static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {
+        if (ex instanceof ValidationException) {
+            if (ex instanceof DomainException) return (DomainException)ex //if this is already fired
+
+            ValidationException ve = (ValidationException)ex
+            return new DomainException(DaoMessage.notSaved(entity), entity, ve.errors, ve)
+        }
+        else if (ex instanceof DataIntegrityViolationException) {
+            String ident = DaoMessage.badge(entity.ident(), entity)
+            //log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
+            return new DomainException(DaoMessage.notDeleted(entity, ident), entity, ex)
+        }
+        else if (ex instanceof DataAccessException ) {
+            //log.error("unexpected dao save error on ${entity.id} of ${entity.class.name}",dae)
+            //TODO we can build a better message with optimisticLockingFailure(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
+            //TODO also, in the case of optimisticLocking, is that really un expected? shoud we log it?
+            //TODO we shold really chnage the message from the default notSaved as this is more of a critical low level error a
+            //and save the default notSaved for when a validation occurs like above
+            return new DomainException(DaoMessage.notSaved(entity), entity, ex) //make a DaoMessage.notSavedDataAccess
+        }
+
     }
 
 //  static GormDaoSupport getDao(Class entity) {

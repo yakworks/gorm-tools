@@ -54,7 +54,7 @@ trait GormDao<D extends GormEntity> {
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
-            throw ex //handleException(entity, ex)
+            throw handleException(entity, ex)
         }
     }
 
@@ -119,7 +119,7 @@ trait GormDao<D extends GormEntity> {
             DaoUtil.fireEvent(this, DaoEventType.AfterRemove, entity)
         }
         catch (DataIntegrityViolationException dae) {
-            handleException(entity, dae)
+            throw handleException(entity, dae)
         }
     }
 
@@ -155,7 +155,7 @@ trait GormDao<D extends GormEntity> {
         }
     }
 
-    DataAccessException handleException(D entity, RuntimeException e) throws DataAccessException {
+    DomainException handleException(D entity, RuntimeException e) {
         return DaoUtil.handleException(entity, e)
     }
 

@@ -1,17 +1,18 @@
 package gorm.tools.databinding
 
 import gorm.tools.beans.DateUtil
-import grails.artefact.Artefact
 import grails.databinding.converters.ValueConverter
-import grails.test.hibernate.HibernateSpec
+import grails.gorm.annotation.Entity
+import grails.test.mixin.TestMixin
 import grails.test.mixin.gorm.Domain
+import grails.test.mixin.hibernate.HibernateTestMixin
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
-
-import java.time.LocalDate
+import spock.lang.Specification
 
 @Domain([TestDomain])
-class FastBinderUnitSpec extends HibernateSpec {
+@TestMixin(HibernateTestMixin)
+class FastBinderUnitSpec extends Specification {
 
 	void "should bind numbers without going through converters"() {
 		setup:
@@ -85,7 +86,7 @@ class FastBinderUnitSpec extends HibernateSpec {
 }
 
 
-@Artefact("Domain")
+@Entity
 class TestDomain {
 	String name
 	Long age

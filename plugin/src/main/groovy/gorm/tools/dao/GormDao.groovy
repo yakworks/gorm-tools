@@ -96,7 +96,7 @@ trait GormDao<D extends GormEntity> {
      * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id) {
-        D entity = get(id)
+        D entity = get(id, null)
         remove(entity)
     }
 
@@ -128,7 +128,7 @@ trait GormDao<D extends GormEntity> {
         (D) fastBinder.bind(entity, row, strategy)
     }
 
-    D get(Serializable id, Long version = null) {
+    D get(Serializable id, Long version) {
         D entity = GormEnhancer.findStaticApi(domainClass).get(id)
         DaoUtil.checkFound(entity, [id: id], domainClass.name)
         if(version != null) DaoUtil.checkVersion(entity, version)
@@ -139,8 +139,7 @@ trait GormDao<D extends GormEntity> {
         return get(params.id as Serializable, params.version as Long)
     }
 
-    List<D> list(Map params) {
-
+    List<D> list(Map params = [:], Closure closure = null) {
         Map criteria
         if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
             JSON.use('deep')
@@ -148,10 +147,10 @@ trait GormDao<D extends GormEntity> {
         } else {
             criteria = params['criteria'] as Map ?: [:]
         }
-        Pager pager = new Pager(params)
-        DetachedCriteria mangoCriteria = MangoBuilder.build(getDomainClass(), criteria)
 
         withTransaction([readOnly:true]) {
+            Pager pager = new Pager(params)
+            DetachedCriteria mangoCriteria = MangoBuilder.build(getDomainClass(), criteria, closure)
             return mangoCriteria.list(max: pager.max, offset: pager.offset)
         }
     }

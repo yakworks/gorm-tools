@@ -118,37 +118,29 @@ class DomainMethodsTests extends Specification {
 	void testInsert(){
 		when:
 		println "testInsert"
-		then:
-		try{
-			def result = Jumper.insertAndSave([name:"testInsert"])
+
+        then:
+			def jumper = Jumper.create([name:"testInsert"])
+            assert jumper
 			DaoUtil.flushAndClear()
-			assert result.entity
-			"testInsert" == result.entity.name
-			// "default.created.message" == result.message.code
 			def dom2 = Jumper.findByName("testInsert")
-			assert dom2.name == "testInsert"
-		}catch(DomainException e){
-			fail "Errors ${e.errors.allErrors[0]}"
-		}
+			assert dom2.id == jumper.id
 	}
 
 	void testUpdate(){
 		when:
 		initData()
 		def jump = Jumper.findByName("jumper1")
-		then:
+
+        then:
+
 		assert jump
-		try{
-			def result = Jumper.update([id:jump.id,name:"testUpdateXXX"])
-			DaoUtil.flushAndClear()
-			"testUpdateXXX" == result.entity.name
-			jump.id == result.entity.id
-			//"default.updated.message" == result.message.code
-			def dom2 = Jumper.findByName("testUpdateXXX")
-			assert dom2.name == "testUpdateXXX"
-		}catch(DomainException e){
-			fail "Errors ${e.errors.allErrors[0]}"
-		}
+        def j2 = Jumper.update([id:jump.id, name:"testUpdateXXX"])
+        DaoUtil.flushAndClear()
+        "testUpdateXXX" == j2.name
+        jump.id == j2.id
+        def dom2 = Jumper.findByName("testUpdateXXX")
+        dom2
 	}
 
 	void testRemoveParams(){
@@ -156,17 +148,11 @@ class DomainMethodsTests extends Specification {
 		initData()
 		when:
 		def stud = Student.findByName("student1")
-		then:
-		try{
-			def result = Student.remove([id:stud.id])
-			DaoUtil.flushAndClear()
-			stud.id ==  result.id
-			//"default.deleted.message" == result.message.code
-			Student.findByName("student1") == null
-		}catch(DomainException e){
-			e.printStackTrace()
-			fail "Errors ${e.errors.allErrors[0]}"
-		}
+
+        then:
+        Student.remove(stud.id)
+        DaoUtil.flushAndClear()
+        Student.findByName("student1") == null
 	}
 
 	void testGetDaoSetup(){

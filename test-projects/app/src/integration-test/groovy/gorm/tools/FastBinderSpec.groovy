@@ -3,7 +3,7 @@ package gorm.tools
 import gorm.tools.beans.DateUtil
 import gorm.tools.databinding.FastBinder
 import grails.gorm.transactions.Rollback
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import daoapp.Org
 import daoapp.Address

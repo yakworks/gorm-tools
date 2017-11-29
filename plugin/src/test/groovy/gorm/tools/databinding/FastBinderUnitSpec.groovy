@@ -3,19 +3,15 @@ package gorm.tools.databinding
 import gorm.tools.beans.DateUtil
 import grails.databinding.converters.ValueConverter
 import grails.gorm.annotation.Entity
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
-import grails.test.mixin.hibernate.HibernateTestMixin
+import grails.testing.gorm.DomainUnitTest
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Specification
 
-@Domain([TestDomain])
-@TestMixin(HibernateTestMixin)
-class FastBinderUnitSpec extends Specification {
+class FastBinderUnitSpec extends Specification implements DomainUnitTest<TestDomain> {
 
 	void "should bind numbers without going through converters"() {
-		setup:
+		setup:  
 		FastBinder binder = new FastBinder()
 		ValueConverter longConverter = Mock(ValueConverter)
 		binder.conversionHelpers.put(Long, [longConverter])

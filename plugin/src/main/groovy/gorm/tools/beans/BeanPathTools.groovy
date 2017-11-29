@@ -2,8 +2,6 @@ package gorm.tools.beans
 
 import gorm.tools.GormMetaUtils
 import grails.core.GrailsApplication
-import grails.core.GrailsDomainClass
-import grails.core.GrailsDomainClassProperty
 import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
 import grails.util.Holders
@@ -13,6 +11,9 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
 
 import javax.servlet.http.HttpServletRequest
 
@@ -157,13 +158,14 @@ class BeanPathTools {
 
                 if (object instanceof GormEntity) {
                     //FIXME this makes it hard to test, fix it so its easier to mock
-                    GrailsDomainClass domainClass = GormMetaUtils.getDomainClass(object)
+                    PersistentEntity domainClass = GormMetaUtils.getPersistentEntity(object)
                     //FIXME why only persistentProperties, seems we should allow any of them no?
-                    GrailsDomainClassProperty[] pprops = domainClass.persistentProperties
+                    PersistentProperty[] pprops = domainClass.persistentProperties
+
                     //filter out the associations. need to explicitly add those to be included
-                    pprops = pprops.findAll { p -> !p.isAssociation() }
+                    pprops = pprops.findAll { p -> !(p instanceof Association) && p.name != 'version'}
                     //force the the id to be included
-                    String id = domainClass.getIdentifier().name
+                    String id = domainClass.identity.name
                     currentMap[id] = source?."$id"
                     //spin through and add them to the map
                     pprops.each { property ->

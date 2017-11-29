@@ -13,28 +13,28 @@ class GormMetaUtils2Spec extends Specification {
 
     def "GetDomainClass"() {
         expect:
-        GormMetaUtils.getDomainClass(Org)
+        GormMetaUtils.getPersistentEntity(Org)
     }
 
     def "GetDomainClass string"() {
         expect:
-        GormMetaUtils.getDomainClass("daoapp.Org")
+        GormMetaUtils.getPersistentEntity("daoapp.Org")
     }
 
     def "GetDomainClass instance"() {
         expect:
         def o = Org.get(100)
         assert o.dao
-        GormMetaUtils.getDomainClass(o)
+        GormMetaUtils.getPersistentEntity(o)
     }
 
     def "findDomainClass"() {
         expect:
-        GormMetaUtils.findDomainClass("Org")
-        GormMetaUtils.findDomainClass("org")
-        GormMetaUtils.findDomainClass("daoapp.Org")
-        GormMetaUtils.findDomainClass("dropZone")
-        GormMetaUtils.findDomainClass("DropZone")
+        GormMetaUtils.findPersistentEntity("Org")
+        GormMetaUtils.findPersistentEntity("org")
+        GormMetaUtils.findPersistentEntity("daoapp.Org")
+        GormMetaUtils.findPersistentEntity("dropZone")
+        GormMetaUtils.findPersistentEntity("DropZone")
         //GormMetaUtils.findDomainClass("dropzone")
     }
 

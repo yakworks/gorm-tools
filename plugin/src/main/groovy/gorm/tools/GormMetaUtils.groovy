@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.core.artefact.DomainClassArtefactHandler
+//import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -89,17 +89,17 @@ class GormMetaUtils {
 
     /****** Older deprecated way with GrailsDomainClass *******/
 
-    static GrailsDomainClass getDomainClass(Class cls) {
-        return getDomainClass(cls.name)
-    }
-
-    static GrailsDomainClass getDomainClass(String fullName) {
-        return (GrailsDomainClass) Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, fullName)
-    }
-
-    static GrailsDomainClass getDomainClass(GormEntity instance) {
-        return getDomainClass(instance.getClass().getName())
-    }
+//    static GrailsDomainClass getDomainClass(Class cls) {
+//        return getDomainClass(cls.name)
+//    }
+//
+//    static GrailsDomainClass getDomainClass(String fullName) {
+//        return (GrailsDomainClass) Holders.grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, fullName)
+//    }
+//
+//    static GrailsDomainClass getDomainClass(GormEntity instance) {
+//        return getDomainClass(instance.getClass().getName())
+//    }
 
     /**
      * finds domain using either a simple name like "Product" or fully qualified name "com.foo.Product"
@@ -107,15 +107,15 @@ class GormMetaUtils {
      * @param name a name of a domain class
      * @return The entity or null
      */
-    @CompileDynamic
-    static GrailsDomainClass findDomainClass(String name){
-        if(name.indexOf('.') == -1){
-            String propertyName = GrailsNameUtils.getPropertyName(name)
-            return Holders.grailsApplication.domainClasses.find { GrailsDomainClass dom ->
-                dom.propertyName == propertyName
-            }
-        }
-        return getDomainClass(name)
-    }
+    //@CompileDynamic
+//    static GrailsDomainClass findDomainClass(String name){
+//        if(name.indexOf('.') == -1){
+//            String propertyName = GrailsNameUtils.getPropertyName(name)
+//            return Holders.grailsApplication.domainClasses.find { GrailsDomainClass dom ->
+//                dom.propertyName == propertyName
+//            }
+//        }
+//        return getDomainClass(name)
+//    }
 
 }

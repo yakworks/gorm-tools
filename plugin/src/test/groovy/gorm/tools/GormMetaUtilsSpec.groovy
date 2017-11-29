@@ -12,31 +12,6 @@ class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
 
     }
 
-    def "GetDomainClass"() {
-        expect:
-        GormMetaUtils.getDomainClass(Org)
-    }
-
-
-    def "GetDomainClass string"() {
-        expect:
-        GormMetaUtils.getDomainClass("gorm.tools.Org")
-    }
-
-    def "GetDomainClass instance"() {
-        expect:
-        def o = new Org()
-        //assert o.
-        GormMetaUtils.getDomainClass(o)
-    }
-
-    def "findDomainClass"() {
-        expect:
-        GormMetaUtils.findDomainClass("Org")
-        GormMetaUtils.findDomainClass("org")
-        GormMetaUtils.findDomainClass("gorm.tools.Org")
-    }
-
     def "GetPersistentEntity name string"() {
         expect:
         GormMetaUtils.getPersistentEntity("gorm.tools.Org")

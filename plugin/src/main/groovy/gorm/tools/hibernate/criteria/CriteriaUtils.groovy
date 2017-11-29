@@ -7,6 +7,8 @@ import grails.converters.JSON
 import grails.core.GrailsDomainClass
 import grails.core.GrailsDomainClassProperty
 import groovy.transform.CompileDynamic
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.query.api.Criteria
 import org.hibernate.criterion.CriteriaSpecification
 
@@ -256,7 +258,7 @@ class CriteriaUtils {
     @CompileDynamic
     static Map typedParams(Map map, String domainName) {
         Map result = [:]
-        GrailsDomainClass domainClass = GormMetaUtils.findDomainClass(domainName)
+        PersistentEntity domainClass = GormMetaUtils.findPersistentEntity(domainName)
         flattenMap(map).each { String k, v ->
             try {
                 String checkedKey = k
@@ -264,7 +266,7 @@ class CriteriaUtils {
                 if (splited.find{it.matches(/\$(or|and)(,\d*)?$/)}) {
                     checkedKey = splited.findAll { !it.matches(/\$(or|and)(,\d*)?$/) }.join(".")
                 }
-                GrailsDomainClassProperty property = domainClass.getPropertyByName(checkedKey)
+                PersistentProperty property = domainClass.getPropertyByName(checkedKey)
                 result[k] = toType(v, property.type)
             } catch (e) {
                 println e

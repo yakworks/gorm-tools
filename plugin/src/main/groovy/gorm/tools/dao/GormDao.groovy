@@ -7,9 +7,11 @@ import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import gorm.tools.dao.errors.DomainException
 import grails.validation.ValidationException
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -23,6 +25,8 @@ import org.springframework.dao.DataIntegrityViolationException
 trait GormDao<D extends GormEntity> {
 
     FastBinder fastBinder
+    @Value('${dao.mango.criteria:criteria}') //gets criteria keyword from config, if there is no, then uses 'criteria'
+    String criteriaName
 
     private Class<D> _domainClass // the domain class this is for
 
@@ -139,20 +143,85 @@ trait GormDao<D extends GormEntity> {
         return get(params.id as Serializable, params.version as Long)
     }
 
-    List<D> list(Map params = [:], Closure closure = null) {
-        Map criteria
-        if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
-            JSON.use('deep')
-            criteria = JSON.parse(params['criteria'] as String) as Map
-        } else {
-            criteria = params['criteria'] as Map ?: [:]
-        }
+//    List<D> list(Map params = [:], Closure closure = null) {
+//        Map criteria
+//        if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
+//            JSON.use('deep')
+//            criteria = JSON.parse(params['criteria'] as String) as Map
+//        } else {
+//            criteria = params['criteria'] as Map ?: [:]
+//        }
+//
+//        withTransaction([readOnly:true]) {
+//            Pager pager = new Pager(params)
+//            DetachedCriteria mangoCriteria = MangoBuilder.build(getDomainClass(), criteria, closure)
+//            return mangoCriteria.list(max: pager.max, offset: pager.offset)
+//        }
+//    }
 
+    /**
+     * Builds detached criteria for dao's domain based on mango criteria language and additional criteria
+     *
+     * @param params mango language criteria map
+     * @param closure additional restriction for criteria
+     * @return Detached criteria build based on mango language params and criteria closure
+     */
+    @CompileDynamic
+    DetachedCriteria buildCriteria(Map params = [:], Closure closure = null){
+        Map criteria
+        if (params[criteriaName] instanceof String) {
+            JSON.use('deep')
+            criteria = JSON.parse(params[criteriaName]) as Map
+        } else {
+            criteria = params[criteriaName] as Map ?: [:]
+        }
+        MangoBuilder.build(getDomainClass(), criteria, closure)
+    }
+
+    /**
+     * List of entities restricted by mango map and criteria closure
+     *
+     * @param params mango language criteria map
+     * @param closure additional restriction for criteria
+     * @return list of entities restricted by mango params
+     */
+    @CompileDynamic
+    List<D> list(Map params = [:], Closure closure = null) {
         withTransaction([readOnly:true]) {
             Pager pager = new Pager(params)
-            DetachedCriteria mangoCriteria = MangoBuilder.build(getDomainClass(), criteria, closure)
-            return mangoCriteria.list(max: pager.max, offset: pager.offset)
+            DetachedCriteria mangoCriteria =  buildCriteria(params, closure)
+            mangoCriteria.list(max: pager.max, offset: pager.offset)
         }
+    }
+
+    /**
+     *  Calculates sums for specified properties in enities list restricted by mango criteria
+     *
+     * @param params mango language criteria map
+     * @param sums list of properties names that sums should be calculated for
+     * @param closure additional restriction for criteria
+     * @return map where keys are names of fields and value - sum for restricted entities
+     */
+    @CompileDynamic
+    Map countTotals(Map params = [:], List<String> sums,  Closure closure = null) {
+        DetachedCriteria mangoCriteria =  buildCriteria(params, closure)
+
+        List totalList
+        withTransaction([readOnly:true]) {
+            totalList = mangoCriteria.list{
+                projections {
+                    for(String sumField: sums){
+                        sum(sumField)
+                    }
+                }
+            }
+        }
+
+        Map result = [:]
+        sums.eachWithIndex{String name, i->
+            result[name] = totalList[0][i]
+        }
+        return result
     }
 
     DomainException handleException(D entity, RuntimeException e) {

@@ -265,4 +265,16 @@ dao:
 With such configuration restrictions for Mango criteria should be under `filters` keyword.
 
 **Count totals**
-TODO: add count totals that should work in the same way as search
+
+If one needs to compute totals for some fields, dao has `countTotals` method restrictions are 
+working in the same way as for list, so it can be specified with params map and criteria closure.
+To specify what fields sums should be computed for, the list with fields name should be passed.
+See example:
+```groovy
+Org.dao.countTotals([
+  criteria: [name: "Virgin%", type: "New"]
+], ["amount", credit]){
+  gt "id", 5
+}
+```
+Result will be look like: `[amount: 1500, credit: 440]`.

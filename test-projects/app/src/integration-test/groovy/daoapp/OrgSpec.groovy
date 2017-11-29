@@ -452,18 +452,18 @@ class OrgSpec extends Specification {
 
     }
 
-   /* def "test quick search is higher priority then other filters"(){
+    def "test count totals"(){
         when:
-        List list = Org.dao.list([criteria:['$quickSearch': "Org-num#1%", id: 123], max: 150])
+        Map totals = Org.dao.countTotals([:],['credit', 'id'])
         then:
-        list.size() == 11
-    }
+        totals.id == Org.createCriteria().get{projections{sum('id')}}
+        totals.credit == Org.createCriteria().get{projections{sum('credit')}}
 
-    def "test quick search is higher priority then other filters with nested"(){
         when:
-        List list = Org.dao.list([criteria:['$quickSearch': "City#1", id: 123], max: 150])
+        totals = Org.dao.countTotals([criteria:[id:4]],['credit', 'id'])
         then:
-        list.size() == 11
-    }*/
+        totals.id == 4
+        totals.credit == 5000
+    }
 
 }

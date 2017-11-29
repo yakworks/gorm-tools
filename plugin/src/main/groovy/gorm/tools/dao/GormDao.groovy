@@ -175,6 +175,9 @@ trait GormDao<D extends GormEntity> {
         } else {
             criteria = params[criteriaName] as Map ?: [:]
         }
+        if (params.containsKey('sort')){
+            criteria['$sort'] = params['sort']
+        }
         MangoBuilder.build(getDomainClass(), criteria, closure)
     }
 

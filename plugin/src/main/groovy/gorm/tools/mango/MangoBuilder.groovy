@@ -60,6 +60,10 @@ class MangoBuilder {
         '$q'          : 'quickSearch'
     ]
 
+    static final Map<String, String> sortOps = [
+        '$sort': 'order'
+    ]
+
     static DetachedCriteria build(Class clazz, Map map, Closure callable = null) {
         DetachedCriteria detachedCriteria = new DetachedCriteria(clazz)
         return build(detachedCriteria, map, callable)
@@ -110,6 +114,11 @@ class MangoBuilder {
         if (qs) {
             this."$qs"(criteria, fieldVal)
             return
+        }
+
+        String sort = sortOps[field]
+        if (sort) {
+            order(criteria, fieldVal)
         }
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
@@ -180,6 +189,15 @@ class MangoBuilder {
     static DetachedCriteria between(DetachedCriteria criteria, String propertyName, List params) {
         List p = toType(criteria, propertyName, params) as List
         return criteria.between(propertyName, p[0], p[1])
+    }
+
+    static DetachedCriteria order(DetachedCriteria criteria, Object sort) {
+        if (sort instanceof String) return criteria.order(sort as String)
+        DetachedCriteria result
+        (sort as Map).each {k, v->
+            result = criteria.order(k.toString(), v.toString())
+        }
+        return result
     }
 
     @CompileDynamic

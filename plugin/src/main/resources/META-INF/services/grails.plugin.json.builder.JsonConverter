@@ -1,6 +1,0 @@
-gorm.tools.converters.LocalDateJsonConverter
-gorm.tools.converters.LocalTimeJsonConverter
-gorm.tools.converters.LocalDateTimeJsonConverter
-gorm.tools.converters.OffsetTimeJsonConverter
-gorm.tools.converters.OffsetDateTimeJsonConverter
-gorm.tools.converters.ZonedDateTimeJsonConverter

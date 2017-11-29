@@ -321,6 +321,15 @@ class MangoCriteriaSpec extends Specification {
         res.size() == 1
     }
 
+    def "test order"() {
+        when:
+        List res = build(([id: [1,2,3,4], '$sort':[id: "desc"]])).list()
+
+        then:
+        res.size() == 4
+        res[0].id == 4
+    }
+
 
     List<Class> getDomainClasses() {
         return [Org,Location,Nested]

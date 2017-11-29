@@ -118,4 +118,27 @@ subprojects {
 		group "org.grails"
 	}
 
+    // Added to be able to see failed tests and the cause in console on test run
+    integrationTest {
+        //Allows to set options related to which test events are logged to the console, and on which detail level.
+        // For example, to show more information about exceptions use
+        // for more information take a look https://docs.gradle.org/current/dsl/org.gradle.api.tasks.testing.logging.TestLoggingContainer.html
+        testLogging {
+            exceptionFormat = 'full'
+            events "failed"//, "passed", "skipped", "standardOut", "standardError"
+        }
+
+        // Uncomment line bellow to show in console all tests that were executed in next format:
+            //:test-app:integrationTest
+            //-- Test Check list(daoapp.OrgSpec)
+            //-- Test Filter by Name eq(daoapp.OrgSpec)
+
+        //beforeTest { descriptor -> logger.quiet " -- $descriptor" }
+    }
+
+    test {
+        testLogging.showStandardStreams = true
+        testLogging.exceptionFormat = 'full'
+    }
+
 }

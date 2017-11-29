@@ -1,39 +1,15 @@
 package gorm.tools
 
+import grails.test.hibernate.HibernateSpec
 import grails.gorm.annotation.Entity
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
-import grails.test.mixin.hibernate.HibernateTestMixin
-import spock.lang.Specification
+import grails.testing.gorm.DomainUnitTest
 
-//@TestMixin(GrailsUnitTestMixin)
-@Domain([Org])
-@TestMixin(HibernateTestMixin)
-class GormMetaUtilsSpec extends Specification {
+class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
 
-    def "GetDomainClass"() {
-        expect:
-        GormMetaUtils.getDomainClass(Org)
-    }
+    List<Class> getDomainClasses() { [Org] }
 
+    static doWithSpring = {
 
-    def "GetDomainClass string"() {
-        expect:
-        GormMetaUtils.getDomainClass("gorm.tools.Org")
-    }
-
-    def "GetDomainClass instance"() {
-        expect:
-        def o = new Org()
-        //assert o.
-        GormMetaUtils.getDomainClass(o)
-    }
-
-    def "findDomainClass"() {
-        expect:
-        GormMetaUtils.findDomainClass("Org")
-        GormMetaUtils.findDomainClass("org")
-        GormMetaUtils.findDomainClass("gorm.tools.Org")
     }
 
     def "GetPersistentEntity name string"() {
@@ -59,9 +35,6 @@ class GormMetaUtilsSpec extends Specification {
 
     }
 
-    List<Class> getDomainClasses() {
-        return [Org]
-    }
 }
 
 @Entity

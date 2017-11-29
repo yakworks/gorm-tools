@@ -2,8 +2,8 @@ package grails.plugin.dao
 
 import gorm.tools.dao.DaoMessage
 import gorm.tools.dao.errors.EmptyErrors
-import grails.test.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.springframework.validation.Errors
 import spock.lang.Specification
 

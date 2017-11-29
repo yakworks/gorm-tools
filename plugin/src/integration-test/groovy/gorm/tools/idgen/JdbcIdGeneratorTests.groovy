@@ -1,7 +1,7 @@
 package gorm.tools.idgen
 
-import grails.test.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runners.MethodSorters

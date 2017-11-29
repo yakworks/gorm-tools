@@ -1,10 +1,7 @@
 package gorm.tools.query
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
 import spock.lang.Specification
 
-@TestMixin(GrailsUnitTestMixin)
 class ListParseUtilSpec extends Specification {
 
 	void "test sanitizeNameListForSql"() {

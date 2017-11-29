@@ -2,14 +2,12 @@ package gorm.tools.hibernate.criteria
 
 import grails.gorm.annotation.Entity
 import grails.persistence.Entity
-import grails.test.mixin.hibernate.HibernateTestMixin
-import grails.test.mixin.TestMixin
-import grails.test.mixin.gorm.Domain
+import grails.test.hibernate.HibernateSpec
 import spock.lang.Specification
 
-@Domain([Test, Test2])
-@TestMixin(HibernateTestMixin)
-class CriteriaUtilsSpec extends Specification {
+class CriteriaUtilsSpec extends HibernateSpec {
+
+    List<Class> getDomainClasses() { [Test, Test2] }
 
     def setup() {
         (1..3).each { index ->
@@ -91,10 +89,6 @@ class CriteriaUtilsSpec extends Specification {
         assert res.size() == Test.list().size()
     }
 
-
-    List<Class> getDomainClasses() {
-        return [Test]
-    }
 }
 
 @Entity

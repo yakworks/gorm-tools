@@ -1,26 +1,15 @@
 package gorm.tools.idgen
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
+import grails.test.hibernate.HibernateSpec
+import spock.lang.Shared
 
-import static org.junit.Assert.*
 
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+class BatchIdGeneratorTests extends HibernateSpec{
 
-@TestMixin(DomainClassUnitTestMixin)
-class BatchIdGeneratorTests {
+	@Shared MockIdGenerator mockdbgen
+    @Shared BatchIdGenerator batchgen
 
-	MockIdGenerator mockdbgen
-	BatchIdGenerator batchgen
-
-	@BeforeClass
-    static void setUpBeforeClass() throws Exception {
-	}
-
-	@Before
-    void setUp() throws Exception {
+    void setup(){
 		mockdbgen =  new MockIdGenerator()
 		batchgen = new BatchIdGenerator(mockdbgen)
 		mockdbgen.transactionManager = getTransactionManager()
@@ -28,7 +17,6 @@ class BatchIdGeneratorTests {
 
 	}
 
-	@Test
     void testGetNextIdStringInt() {
 		//the id waiting will be 1 and this will increment to 3
 		assertTrue(1==batchgen.  getNextId("table.id",2))
@@ -46,10 +34,9 @@ class BatchIdGeneratorTests {
 		assertEquals(new Long(111),new Long(batchgen.getNextId("table.id")))
 		//which would trigger  increment of 5
 		assertEquals(new Long(116),mockdbgen.table.get("table.id"))
-		
+
 	}
-	
-	@Test
+
     void testGetIncrementPastBatchSize() {
 		//positon the next Id to 5
 		assertTrue(1==batchgen.getNextId("table.id", 3))
@@ -61,23 +48,21 @@ class BatchIdGeneratorTests {
 		assertTrue(50==batchgen.getNextId("table.id", 100)) //so now we can use 6 to 105
 		assertEquals(new Long(150), mockdbgen.table.get("table.id"))
 	}
-	
-	@Test
+
     void testGetIncrementInsideBatchSize() {
 		//positon the next Id to 4
 		assertTrue(1==batchgen.getNextId("table.id", 3))
 		assertEquals(new Long(6), mockdbgen.table.get("table.id")) //should be 6
-		
+
 		//positon the next Id to 4 so the next call should tell us that we have 4 and 5 to use.
 		assertEquals(new Long(4), new Long( batchgen.getNextId("table.id",2)))
 		assertEquals(new Long(6), mockdbgen.table.get("table.id")) //still be 6
-		
+
 		//and boom the next call should trigger a new batch grab and set db to 12
 		assertEquals(new Long(6), new Long(batchgen.getNextId("table.id")))
 		assertEquals(new Long(11), mockdbgen.table.get("table.id"))
 	}
 
-	@Test
     void testGetNextIdString() {
 
 		for (int i = 1; i < 10; i++) {
@@ -87,11 +72,11 @@ class BatchIdGeneratorTests {
 			}else{
 				assertEquals(new Long(11), mockdbgen.table.get("table.id"))
 			}
-			
+
 		}
 		assertTrue(1000==batchgen.getNextId("xxx.id"))//default seed size
 		assertEquals(new Long(1005), mockdbgen.table.get("xxx.id"))
-		
+
 		assertTrue(1001==batchgen.getNextId("xxx.id"))//default seed size
 		assertEquals(new Long(1005), mockdbgen.table.get("xxx.id"))
 	}

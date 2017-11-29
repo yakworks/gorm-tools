@@ -2,7 +2,7 @@ package daoapp
 
 import grails.plugins.rest.client.RestBuilder
 import grails.plugins.rest.client.RestResponse
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import org.grails.web.json.JSONElement
 import spock.lang.Shared
 import spock.lang.Specification

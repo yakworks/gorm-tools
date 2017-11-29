@@ -7,6 +7,9 @@ import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.Identity
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -46,9 +49,9 @@ class GormUtils {
         if (target == null) throw new IllegalArgumentException("Target is null")
         if (source == null) return null
 
-        GormMetaUtils.getDomainClass(target.class).persistentProperties.each { GrailsDomainClassProperty dp ->
-            if (IGNORED_PROPERTIES.contains(dp.name) || dp.identity) return
-            if (ignoreAssociations && dp.isAssociation()) return
+        GormMetaUtils.getPersistentEntity(target.class).persistentProperties.each { PersistentProperty dp ->
+            if (IGNORED_PROPERTIES.contains(dp.name) || dp instanceof Identity) return
+            if (ignoreAssociations && dp instanceof Association) return
 
             String name = dp.name
             target[name] = source[name]

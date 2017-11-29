@@ -38,11 +38,3 @@ grails {
     }
 }
 
-integrationTest {
-    testLogging {
-        exceptionFormat = 'full'
-        events 'failed'
-    }
-
-    beforeTest { descriptor -> logger.quiet " -- $descriptor" }
-}

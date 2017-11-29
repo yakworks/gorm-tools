@@ -93,6 +93,7 @@ subprojects {
 
 		//apply from: "${commonBuild}/common-plugin.gradle"
 		//apply from: "${commonBuild}/common-publishing.gradle"
+        apply from: "../publish.gradle"
 		group "org.grails.plugins"
 	}
 

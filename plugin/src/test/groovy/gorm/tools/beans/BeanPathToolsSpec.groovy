@@ -95,8 +95,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         'right.right.value'     | [right: [right: [value: 2]]]
         'right.left.value1'     | [right: [left: [:]]]
         'right.left.bar'        | [right: [left: [bar: 4]]]
-        'right.left.*'          | [right: [left: [bar: 4, foo: '3', id: 5]]]//, baz:null]]] FIXME
-        'right.*'               | [right: [id: 6, value: 0]]
+        'right.left.*'          | [right: [left: [bar: 4, foo: '3', id: 5, version: 0]]]
+        'right.*'               | [right: [id: 6, value: 0, version: null]]
     }
 
     void "Property returns list of domains"() {
@@ -112,8 +112,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         where:
         path                    | exp
         'value'                 | [value: 10]
-        'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1'], [id: 2, bar: null, foo: 'val 2']]]
-        // FIXME 'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', baz:null], [id: 2, bar: null, foo: 'val 2', baz: null]]]
+        'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: 0], [id: 2, bar: null, foo: 'val 2', version: 0]]]
     }
 
     void "test propsToMap for a non domain"() {
@@ -188,7 +187,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
 
     void "test buildMapFromPaths"() {
         setup:
-        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00, baz: null)
+        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00 )
+        object.addToBaz(new TestClazzC(id: 5, version: 0, value: 23))
 
         expect:
         result == BeanPathTools.buildMapFromPaths(object, fields)
@@ -196,7 +196,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         where:
         fields   | result
         ['foo']  | [foo: 'foo']
-        ['*']    | [foo: 'foo', bar: 10.00, id: 0L] // FIXME , baz: null
+        ['*']    | [foo: 'foo', bar: 10.00, id: 0L, version:0]
+        ['*', 'baz.id']    | [foo: 'foo', bar: 10.00, id: 0L, version:0, baz:[[id:5]]]
     }
 
     void "test buildMapFromPaths for all fields using delegating bean"() {
@@ -247,11 +248,12 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
 @Entity
 class TestClazzA {
     Long id
-    Long version
+    Long version=0
 
     String foo
     BigDecimal bar
-    List<String> baz
+
+    static hasMany = [baz: TestClazzC] //baz as just collection is redundant, but makes sense if it is relation
 
     def getDao() {
         new DefaultGormDao(TestClazzA)

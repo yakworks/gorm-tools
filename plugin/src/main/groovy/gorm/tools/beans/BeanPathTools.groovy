@@ -137,7 +137,7 @@ class BeanPathTools {
                     PersistentProperty[] pprops = domainClass.persistentProperties
 
                     //filter out the associations. need to explicitly add those to be included
-                    pprops = pprops.findAll { p -> !(p instanceof Association) && p.name != 'version'}
+                    pprops = pprops.findAll { p -> !(p instanceof Association)}
                     //force the the id to be included
                     String id = domainClass.identity.name
                     currentMap[id] = source?."$id"

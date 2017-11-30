@@ -1,12 +1,9 @@
 package gorm.tools.beans
 
 import gorm.tools.dao.DefaultGormDao
-import grails.test.hibernate.HibernateSpec
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
-import org.grails.core.DefaultGrailsDomainClass
 import spock.lang.Specification
-import grails.test.mixin.gorm.Domain
 import grails.gorm.annotation.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
@@ -28,7 +25,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
                 baz: null
         )
         expect:
-        exp == BeanPathTools.getNestedValue(obj, path)
+        exp == BeanPathTools.getFieldValue(obj, path)
         where:
         exp         | path
         '1111'      | 'foo'
@@ -55,7 +52,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         )
 
         expect:
-        exp == BeanPathTools.getNestedValue(obj, path)
+        exp == BeanPathTools.getFieldValue(obj, path)
 
         where:
         exp         | path

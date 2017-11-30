@@ -3,7 +3,6 @@ package gorm.tools.beans
 import gorm.tools.GormMetaUtils
 import grails.core.GrailsApplication
 import grails.util.GrailsClassUtils
-import grails.util.GrailsNameUtils
 import grails.util.Holders
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileDynamic
@@ -38,31 +37,8 @@ class BeanPathTools {
     }
 
     //@CompileDynamic
-    static Object getNestedValue(domain, String field) {
-//        String[] subProps = field.split("\\.")
-//
-//        int i = 0
-//        Object lastProp
-//        for (prop in subProps) {
-//            if (i == 0) {
-//                lastProp = domain."$prop"
-//            } else {
-//                lastProp = lastProp."$prop"
-//            }
-//            i += 1
-//        }
-//
-//        return lastProp
+    static Object getFieldValue(domain, String field) {
         GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, field)
-    }
-
-    @CompileDynamic
-    //didn't find any usage of this method, so marked it as deprecated
-    @Deprecated
-    static Object getFieldValue(Object domain, String field) {
-        Object bean = getNestedBean(domain, field)
-        field = GrailsNameUtils.getShortName(field)
-        return bean?."$field"
     }
 
     /**
@@ -95,12 +71,12 @@ class BeanPathTools {
 
     /**
      * Provides an ability to retrieve object's fields into a map.
-     * It is possible to specify a list of fields which should be picked up.
+     * It is possible to specify a query of fields which should be picked up.
      *
      * Note: propList = ['*'] represents all fields.
      *
      * @param source            a source object
-     * @param propList          a list of properties to include to a map
+     * @param propList          a query of properties to include to a map
      * @param useDelegatingBean
      * @return a map which is based on object properties
      */
@@ -157,9 +133,7 @@ class BeanPathTools {
                 Object object = (source instanceof DelegatingBean) ? ((DelegatingBean)source).target : source
 
                 if (object instanceof GormEntity) {
-                    //FIXME this makes it hard to test, fix it so its easier to mock
                     PersistentEntity domainClass = GormMetaUtils.getPersistentEntity(object)
-                    //FIXME why only persistentProperties, seems we should allow any of them no?
                     PersistentProperty[] pprops = domainClass.persistentProperties
 
                     //filter out the associations. need to explicitly add those to be included

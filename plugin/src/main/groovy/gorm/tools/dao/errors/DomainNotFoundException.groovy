@@ -1,6 +1,5 @@
 package gorm.tools.dao.errors
 
-import gorm.tools.dao.errors.DomainException
 import groovy.transform.CompileStatic
 
 /**

@@ -1,6 +1,7 @@
 package gorm.tools.dao
 
 import gorm.tools.Pager
+import gorm.tools.dao.errors.DomainNotFoundException
 import gorm.tools.databinding.FastBinder
 import gorm.tools.mango.MangoBuilder
 import grails.converters.JSON
@@ -11,6 +12,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
@@ -24,15 +26,17 @@ import org.springframework.dao.DataIntegrityViolationException
 @CompileStatic
 trait GormDao<D extends GormEntity> {
 
-    FastBinder fastBinder
-    @Value('${dao.mango.criteria:criteria}') //gets criteria keyword from config, if there is no, then uses 'criteria'
-    String criteriaName
+    @Autowired
+    FastBinder dataBinder
 
-    private Class<D> _domainClass // the domain class this is for
+    @Value('${gorm.tools.mango.criteriaKeyName:criteria}') //gets criteria keyword from config, if there is no, then uses 'criteria'
+    String criteriaKeyName
 
-    Class<D> getDomainClass() { return _domainClass }
-    //set this is constructing a base dao by hand
-    void setDomainClass(Class<D> clazz) { _domainClass = clazz }
+    //use getters when accessing domainClass so implementing class can override the property if desired
+    Class<D> domainClass // the domain class this is for
+
+//    Class<D> getDomainClass() { return _domainClass }
+//    void setDomainClass(Class<D> clazz) { _domainClass = clazz }
 
     /**
      * Saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error.
@@ -63,9 +67,10 @@ trait GormDao<D extends GormEntity> {
     }
 
     D create(Map params) {
-        D entity = (D)domainClass.newInstance()
+        //watch for the http://docs.groovy-lang.org/next/html/documentation/core-traits.html#_inheritance_of_state_gotchas, use getters
+        D entity = (D)getDomainClass().newInstance()
         withTransaction {
-            return bindCreate(entity, params)
+            return bindAndSave(entity, params, "Create")
         }
 
     }
@@ -73,24 +78,21 @@ trait GormDao<D extends GormEntity> {
     D update(Map params) {
         D entity = get(params)
         withTransaction {
-            return bindUpdate(entity, params)
+            return bindAndSave(entity, params, "Update")
         }
     }
 
-    D bindCreate(D entity, Map params) {
-        bindAndSave(entity, params, "Create")
-    }
-
-    D bindUpdate(D entity, Map params) {
-        bindAndSave(entity, params, "Update")
-    }
-
     D bindAndSave(D entity, Map params, String bindMethod) {
-        DaoUtil.fireEvent(this, DaoEventType.valueOf("Before$bindMethod"),entity, params)
+        DaoUtil.fireEvent(this, DaoEventType.valueOf("Before$bindMethod"), entity, params)
         bind(entity, params, bindMethod)
         persist(entity)
-        DaoUtil.fireEvent(this, DaoEventType.valueOf("After$bindMethod"),entity, params)
+        DaoUtil.fireEvent(this, DaoEventType.valueOf("After$bindMethod"), entity, params)
         return entity
+    }
+
+
+    D bind(D entity, Map row, String bindMethod){
+        (D) getDataBinder().bind(entity, row, bindMethod)
     }
 
     /**
@@ -111,7 +113,7 @@ trait GormDao<D extends GormEntity> {
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity) {
-        withTransaction([:]) {
+        withTransaction {
             doRemove(entity)
         }
     }
@@ -127,37 +129,32 @@ trait GormDao<D extends GormEntity> {
         }
     }
 
-    D bind(D entity, Map row, String strategy = "Create"){
-        //TODO pass the bind type into fast binder
-        (D) fastBinder.bind(entity, row, strategy)
-    }
-
-    D get(Serializable id, Long version) {
-        D entity = GormEnhancer.findStaticApi(domainClass).get(id)
-        DaoUtil.checkFound(entity, [id: id], domainClass.name)
+    /**
+     * gets and verfiies that the enity can eb retireved and version matches.
+     *
+     * @param id required, the id to get
+     * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
+     * @return the retrieved entity. Will always be an entity as this throws an error if not
+     *
+     * @throws DomainNotFoundException if its not found
+     * @throws DomainException if the versions mismatch
+     */
+    D get(Serializable id, Long version) throws DomainNotFoundException, DomainException {
+        D entity = GormEnhancer.findStaticApi(getDomainClass()).get(id)
+        DaoUtil.checkFound(entity, [id: id], getDomainClass().name)
         if(version != null) DaoUtil.checkVersion(entity, version)
         return entity
     }
 
+    /**
+     * calls {@link #get(Serializable id, Long version)}
+     *
+     * @param params expects a Map with an id key and optionally a version
+     * @return
+     */
     D get(Map params) {
         return get(params.id as Serializable, params.version as Long)
     }
-
-//    List<D> list(Map params = [:], Closure closure = null) {
-//        Map criteria
-//        if (params['criteria'] instanceof String) { //TODO: keyWord `criteria` probably should be driven from config
-//            JSON.use('deep')
-//            criteria = JSON.parse(params['criteria'] as String) as Map
-//        } else {
-//            criteria = params['criteria'] as Map ?: [:]
-//        }
-//
-//        withTransaction([readOnly:true]) {
-//            Pager pager = new Pager(params)
-//            DetachedCriteria mangoCriteria = MangoBuilder.build(getDomainClass(), criteria, closure)
-//            return mangoCriteria.list(max: pager.max, offset: pager.offset)
-//        }
-//    }
 
     /**
      * Builds detached criteria for dao's domain based on mango criteria language and additional criteria
@@ -169,11 +166,11 @@ trait GormDao<D extends GormEntity> {
     @CompileDynamic
     DetachedCriteria buildCriteria(Map params = [:], Closure closure = null){
         Map criteria
-        if (params[criteriaName] instanceof String) {
+        if (params[criteriaKeyName] instanceof String) {
             JSON.use('deep')
-            criteria = JSON.parse(params[criteriaName]) as Map
+            criteria = JSON.parse(params[criteriaKeyName]) as Map
         } else {
-            criteria = params[criteriaName] as Map ?: [:]
+            criteria = params[criteriaKeyName] as Map ?: [:]
         }
         if (params.containsKey('sort')){
             criteria['$sort'] = params['sort']
@@ -186,11 +183,11 @@ trait GormDao<D extends GormEntity> {
      *
      * @param params mango language criteria map
      * @param closure additional restriction for criteria
-     * @return list of entities restricted by mango params
+     * @return query of entities restricted by mango params
      */
     @CompileDynamic
-    List<D> list(Map params = [:], Closure closure = null) {
-        withTransaction([readOnly:true]) {
+    List<D> query(Map params = [:], Closure closure = null) {
+        withTransaction(readOnly: true) {
             Pager pager = new Pager(params)
             DetachedCriteria mangoCriteria =  buildCriteria(params, closure)
             mangoCriteria.list(max: pager.max, offset: pager.offset)
@@ -198,10 +195,10 @@ trait GormDao<D extends GormEntity> {
     }
 
     /**
-     *  Calculates sums for specified properties in enities list restricted by mango criteria
+     *  Calculates sums for specified properties in enities query restricted by mango criteria
      *
      * @param params mango language criteria map
-     * @param sums list of properties names that sums should be calculated for
+     * @param sums query of properties names that sums should be calculated for
      * @param closure additional restriction for criteria
      * @return map where keys are names of fields and value - sum for restricted entities
      */
@@ -210,7 +207,7 @@ trait GormDao<D extends GormEntity> {
         DetachedCriteria mangoCriteria =  buildCriteria(params, closure)
 
         List totalList
-        withTransaction([readOnly:true]) {
+        withTransaction(readOnly: true) {
             totalList = mangoCriteria.list{
                 projections {
                     for(String sumField: sums){
@@ -231,12 +228,12 @@ trait GormDao<D extends GormEntity> {
         return DaoUtil.handleException(entity, e)
     }
 
-    public <T> T withTransaction(Map transProps, Closure<T> callable) {
-        GormEnhancer.findStaticApi(domainClass).withTransaction(transProps, callable)
+    public <T> T withTransaction(Map transProps = [:], Closure<T> callable) {
+        GormEnhancer.findStaticApi(getDomainClass()).withTransaction(transProps, callable)
     }
 
-    public <T> T withTransaction(Closure<T> callable) {
-        GormEnhancer.findStaticApi(domainClass).withTransaction(callable)
-    }
+//    public <T> T withTransaction(Closure<T> callable) {
+//        GormEnhancer.findStaticApi(getDomainClass()).withTransaction(callable)
+//    }
 
 }

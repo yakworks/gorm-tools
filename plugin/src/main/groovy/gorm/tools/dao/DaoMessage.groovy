@@ -1,6 +1,5 @@
 package gorm.tools.dao
 
-import gorm.tools.dao.DaoUtil
 import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic

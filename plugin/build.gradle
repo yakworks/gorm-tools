@@ -3,23 +3,23 @@
 apply plugin: 'codenarc'
 
 
-bootRun {
-	jvmArgs('-Dspring.output.ansi.enabled=always')
-	addResources = true
-}
+//bootRun {
+//	jvmArgs('-Dspring.output.ansi.enabled=always')
+//	addResources = true
+//}
 
-bootRepackage.enabled = false
+//bootRepackage.enabled = false
 
-configurations.all {
-    exclude module:'grails-datastore-simple'
-}
+//configurations.all {
+//    exclude module:'grails-datastore-simple'
+//}
 
 dependencies {
 
- 	compile "org.springframework:spring-test"
-    compile "org.springframework.data:spring-data-commons" //:1.12.10.RELEASE
-	provided "org.codehaus.groovy:groovy-ant"
-	codenarc 'org.codenarc:CodeNarc:0.27.0'
+    compileOnly "org.springframework:spring-test" //this is for GrailsParameterMapRowMapper that uses the MockHttpServletRequest
+    compileOnly "org.springframework.data:spring-data-commons" //:1.12.10.RELEASE
+
+    codenarc 'org.codenarc:CodeNarc:0.27.0'
 
 	//testCompile "org.grails.plugins:geb"
     //testCompile "org.grails:grails-gorm-testing-support"

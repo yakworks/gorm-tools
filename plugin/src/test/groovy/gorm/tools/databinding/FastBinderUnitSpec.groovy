@@ -11,7 +11,7 @@ import spock.lang.Specification
 class FastBinderUnitSpec extends Specification implements DomainUnitTest<TestDomain> {
 
 	void "should bind numbers without going through converters"() {
-		setup:  
+		setup:
 		FastBinder binder = new FastBinder()
 		ValueConverter longConverter = Mock(ValueConverter)
 		binder.conversionHelpers.put(Long, [longConverter])

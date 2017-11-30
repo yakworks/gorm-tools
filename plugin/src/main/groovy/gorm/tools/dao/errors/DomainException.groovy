@@ -1,6 +1,5 @@
 package gorm.tools.dao.errors
 
-import gorm.tools.dao.errors.EmptyErrors
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
 import org.springframework.validation.Errors

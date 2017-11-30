@@ -14,6 +14,8 @@ class Org {
     Date date
     String nameFromDao
 
+	String event
+
     static List quickSearchFields = ["name"]
 
     static constraints = {
@@ -24,5 +26,6 @@ class Org {
         date nullable: true
         secondName nullable: true
         nameFromDao nullable: true
+		event nullable: true, blank: false
     }
 }

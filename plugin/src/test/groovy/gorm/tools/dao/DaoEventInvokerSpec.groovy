@@ -1,6 +1,7 @@
 package gorm.tools.dao
 
 import gorm.tools.databinding.FastBinder
+import gorm.tools.testing.DaoDataTest
 import grails.artefact.Artefact
 import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
@@ -8,30 +9,18 @@ import grails.testing.spring.AutowiredTest
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-class DaoEventInvokerSpec extends Specification implements AutowiredTest, DataTest {
+class DaoEventInvokerSpec extends Specification implements AutowiredTest, DaoDataTest {
 
 	void setup() {
 		mockDomain(City)
-		daoEventInvoker.cacheEvents(CityDao)
+		mockDao(CityDao)
 	}
 
-	Closure doWithSpring() {{ ->
-		daoEventInvoker(DaoEventInvoker) { bean ->
-			bean.autowire = true
-		}
-		fastBinder(FastBinder)
-		daoUtilBean(DaoUtil)
-		cityDao(CityDao) { bean ->
-			bean.autowire = true
-		}
-
-	}}
-
 	DaoEventInvoker daoEventInvoker
-	CityDao cityDao
 
 	void testEventsFired() {
 		given:
+		CityDao cityDao = City.dao
 		Map params = [id:1, name: "test"]
 
 		when:
@@ -51,6 +40,7 @@ class DaoEventInvokerSpec extends Specification implements AutowiredTest, DataTe
 
 	void testInvokeEvent() {
 		given:
+		CityDao cityDao = City.dao
 		City city = new City()
 		Map params = [name: "test"]
 
@@ -82,6 +72,7 @@ class DaoEventInvokerSpec extends Specification implements AutowiredTest, DataTe
 
 
 @Entity
+@Artefact("Domain")
 class City {
 	String name
 	String region

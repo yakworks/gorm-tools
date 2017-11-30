@@ -38,7 +38,7 @@ class DaoEventInvoker {
         ReflectionUtils.invokeMethod(method, dao, args)
     }
 
-    private void cacheEvents(Class daoClass) {
+	void cacheEvents(Class daoClass) {
         Map<DaoEventType, Method> events = new ConcurrentHashMap<>()
         eventsCache.put(daoClass.simpleName, events)
 

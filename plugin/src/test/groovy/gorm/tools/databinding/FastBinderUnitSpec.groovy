@@ -3,16 +3,24 @@ package gorm.tools.databinding
 import gorm.tools.beans.DateUtil
 import grails.databinding.converters.ValueConverter
 import grails.gorm.annotation.Entity
-import grails.testing.gorm.DomainUnitTest
+import grails.testing.gorm.DataTest
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Specification
 
-class FastBinderUnitSpec extends Specification implements DomainUnitTest<TestDomain> {
+class FastBinderUnitSpec extends Specification implements DataTest {
+	FastBinder binder
+
+	void setup() {
+		binder = new FastBinder()
+	}
+
+	Class[] getDomainClassesToMock() {
+		[TestDomain, AnotherDomain]
+	}
 
 	void "should bind numbers without going through converters"() {
 		setup:
-		FastBinder binder = new FastBinder()
 		ValueConverter longConverter = Mock(ValueConverter)
 		binder.conversionHelpers.put(Long, [longConverter])
 		binder.conversionService = Mock(ConversionService)
@@ -30,7 +38,6 @@ class FastBinderUnitSpec extends Specification implements DomainUnitTest<TestDom
 
 	void "should bind date without going through converters"() {
 		setup:
-		FastBinder binder = new FastBinder()
 		DateConversionHelper dateConverter = Mock(DateConversionHelper)
 		binder.conversionHelpers.put(Date, [dateConverter])
 
@@ -47,7 +54,6 @@ class FastBinderUnitSpec extends Specification implements DomainUnitTest<TestDom
 
 	void "should fallback to conversion helpers"() {
 		setup:
-		FastBinder binder = new FastBinder()
 		ValueConverter currencyConverter = Mock(ValueConverter)
 		binder.conversionHelpers.put(Currency, [currencyConverter])
 
@@ -65,7 +71,6 @@ class FastBinderUnitSpec extends Specification implements DomainUnitTest<TestDom
 
 	void "should fallback to conversion service if no converversion helpers found"() {
 		setup:
-		FastBinder binder = new FastBinder()
 		ConversionService conversionService = Mock(ConversionService)
 		binder.conversionService = conversionService
 		TestDomain domain = new TestDomain()
@@ -79,6 +84,44 @@ class FastBinderUnitSpec extends Specification implements DomainUnitTest<TestDom
 
 		domain.currency == Currency.getInstance("INR")
 	}
+
+	void "bind association"() {
+		setup:
+		TestDomain domain = new TestDomain()
+		AnotherDomain assoc = new AnotherDomain(id:1, name:"test").save(failOnError:true, flush:true)
+		Map params = ["anotherDomain":[id:1]]
+		when:
+		binder.bind(domain, params)
+
+		then:
+		domain.anotherDomain == assoc
+	}
+
+	void "test bind boolean"() {
+		TestDomain testDomain = new TestDomain()
+		Map params = [active: "true"]
+
+		when:
+		binder.bind(testDomain, params)
+
+		then:
+		testDomain.active == true
+
+		when:
+		params = [active: "false"]
+		binder.bind(testDomain, params)
+
+		then:
+		testDomain.active == false
+
+		when:
+		params = [active: "on"]
+		binder.bind(testDomain, params)
+
+		then:
+		testDomain.active == true
+	}
+
 }
 
 
@@ -88,4 +131,12 @@ class TestDomain {
 	Long age
 	Date dob
 	Currency currency
+	Boolean active
+
+	AnotherDomain anotherDomain
+}
+
+@Entity
+class AnotherDomain {
+	String name
 }

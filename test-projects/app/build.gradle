@@ -30,7 +30,7 @@ bootRun {
 grails {
     exploded = true
     plugins {
-        println "Inside grails: $rootProject.name"
+        //println "Inside grails: $rootProject.name"
         compile project(':dao')
     }
 }

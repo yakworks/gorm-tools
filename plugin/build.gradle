@@ -3,12 +3,12 @@
 apply plugin: 'codenarc'
 
 
-//bootRun {
-//	jvmArgs('-Dspring.output.ansi.enabled=always')
-//	addResources = true
-//}
+bootRun {
+	jvmArgs('-Dspring.output.ansi.enabled=always')
+	addResources = true
+}
 
-//bootRepackage.enabled = false
+bootRepackage.enabled = false
 
 //configurations.all {
 //    exclude module:'grails-datastore-simple'

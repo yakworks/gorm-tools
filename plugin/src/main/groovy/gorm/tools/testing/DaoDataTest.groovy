@@ -10,6 +10,7 @@ import grails.testing.spring.AutowiredTest
 import grails.util.GrailsNameUtils
 import org.springframework.util.ClassUtils
 
+@SuppressWarnings(['JUnitPublicNonTestMethod'])
 trait DaoDataTest implements DataTest, AutowiredTest {
 
     /**
@@ -25,10 +26,10 @@ trait DaoDataTest implements DataTest, AutowiredTest {
         domainClassesToMock.each { Class domainClass ->
             String daoClassName = "${domainClass.name}Dao"
             if(ClassUtils.isPresent(daoClassName, grailsApplication.classLoader)){
-                Class daoClass = Class.forName(daoClassName)
-                final daoArtefact = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)
+                Class daoClass = ClassUtils.forName(daoClassName)// Class.forName(daoClassName)
+                registerGormDaoClass(daoClass)
                 daoBeans = daoBeans << {
-                    "${daoArtefact.propertyName}"(daoClass) { bean -> bean.autowire = true }
+                    "${GrailsNameUtils.getPropertyName(daoClass.name)}"(daoClass) { bean -> bean.autowire = true }
                 }
             } else{
                 String daoName = "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
@@ -45,22 +46,8 @@ trait DaoDataTest implements DataTest, AutowiredTest {
         })
     }
 
-    void mockDao(Class daoClass) {
-        //println "mocking dao $daoClass"
-        final daoArtefact = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)
-        registerBeanIfRequired(daoArtefact.propertyName, daoClass)
+    private void registerGormDaoClass(Class daoClass) {
+        grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)
     }
-
-    void registerBeanIfRequired(String name, Class clazz, autowire = true) {
-        if(!applicationContext.containsBean(name)) {
-            defineBeans({
-                "$name"(clazz) {bean ->
-                    bean.autowire = autowire
-                }
-            })
-        }
-    }
-
-
 
 }

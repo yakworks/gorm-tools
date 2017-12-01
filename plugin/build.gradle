@@ -19,6 +19,10 @@ dependencies {
     compileOnly "org.springframework:spring-test" //this is for GrailsParameterMapRowMapper that uses the MockHttpServletRequest
     compileOnly "org.springframework.data:spring-data-commons" //:1.12.10.RELEASE
 
+    //used for bundled Test traits
+    compileOnly "org.grails:grails-gorm-testing-support"
+    compileOnly "org.grails:grails-web-testing-support"
+
     codenarc 'org.codenarc:CodeNarc:0.27.0'
 
 	//testCompile "org.grails.plugins:geb"

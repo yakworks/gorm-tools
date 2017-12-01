@@ -1,12 +1,7 @@
 package gorm.tools.dao
 
-import gorm.tools.databinding.FastBinder
 import gorm.tools.testing.DaoDataTest
-import grails.artefact.Artefact
 import grails.persistence.Entity
-import grails.testing.gorm.DataTest
-import grails.testing.spring.AutowiredTest
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 class DaoEventInvokerSpec extends Specification implements DaoDataTest {

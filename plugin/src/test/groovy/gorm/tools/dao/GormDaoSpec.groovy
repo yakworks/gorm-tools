@@ -1,6 +1,7 @@
 package gorm.tools.dao
 
 import gorm.tools.databinding.FastBinder
+import gorm.tools.testing.DaoHibernateSpec
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
 import org.grails.testing.GrailsUnitTest
@@ -10,34 +11,15 @@ import testing.Nested
 import testing.Org
 import testing.OrgDao
 
-class GormDaoSpec extends HibernateSpec implements AutowiredTest, GrailsUnitTest {
+class GormDaoSpec extends DaoHibernateSpec implements AutowiredTest {
 
     DaoEventInvoker daoEventInvoker
-
-    Closure doWithSpring() {
-        { ->
-            orgDao(OrgDao) { bean ->
-                bean.autowire = true
-            }
-            locationDao(DefaultGormDao, Location) { bean ->
-                bean.autowire = true
-            }
-            nestedDao(DefaultGormDao, Nested) { bean ->
-                bean.autowire = true
-            }
-            daoEventInvoker(DaoEventInvoker) { bean ->
-                bean.autowire = true
-            }
-            daoUtilBean(DaoUtil)
-            fastBinder(FastBinder)
-        }
-    }
 
     List<Class> getDomainClasses() { [Org,Location,Nested] }
 
     void setup() {
         //have to do this because when daoInvoker is registered dao artefacts are not available, TODO find better way
-        daoEventInvoker.cacheEvents(OrgDao)
+        //daoEventInvoker.cacheEvents(OrgDao)
     }
 
 

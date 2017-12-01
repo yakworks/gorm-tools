@@ -1,14 +1,14 @@
 buildscript {
-	repositories {
-		mavenLocal()
-		maven { url "https://repo.grails.org/grails/core" }
-	}
-	dependencies {
-		classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-		classpath "org.grails:grails-docs:$grailsVersion"
-		classpath 'io.github.groovylang.groovydoc:groovydoc-gradle-plugin:1.0.1'
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath "org.grails:grails-docs:$grailsVersion"
+        classpath 'io.github.groovylang.groovydoc:groovydoc-gradle-plugin:1.0.1'
         classpath "gradle.plugin.com.energizedwork:idea-gradle-plugins:1.4"
-	}
+    }
 }
 
 apply plugin: 'idea'
@@ -16,8 +16,8 @@ apply plugin: 'groovy'
 apply plugin: "com.energizedwork.idea-project-components"
 
 repositories {
-	mavenLocal()
-	maven { url "https://repo.grails.org/grails/core" }
+    mavenLocal()
+    maven { url "https://repo.grails.org/grails/core" }
 }
 
 
@@ -26,30 +26,30 @@ repositories {
 version project.projectVersion
 
 project(':dao') {
-	version = project.projectVersion
+    version = project.projectVersion
 }
 
 ext {
-	commonBuild = "https://raw.githubusercontent.com/yakworks/grails-common-build/master"
-	grailsApps = ['test-app']
-	grailsPlugins = ['dao']
+    commonBuild = "https://raw.githubusercontent.com/yakworks/grails-common-build/master"
+    grailsApps = ['test-app']
+    grailsPlugins = ['dao']
 }
 
 
 subprojects {
 
-	boolean isGrailsApp = grailsApps.contains(project.name)
-	boolean isGrailsPlugin = grailsPlugins.contains(project.name)
-	boolean isGrailsProject = isGrailsApp || isGrailsPlugin
-	boolean isBuildSnapshot = version.toString().endsWith("-SNAPSHOT")
+    boolean isGrailsApp = grailsApps.contains(project.name)
+    boolean isGrailsPlugin = grailsPlugins.contains(project.name)
+    boolean isGrailsProject = isGrailsApp || isGrailsPlugin
+    boolean isBuildSnapshot = version.toString().endsWith("-SNAPSHOT")
 
-	println project.name + ":" + version.toString()
+    println project.name + ":" + version.toString()
 
-	ext {
-		userOrg = "grails"
-		set "tomcat.version", "8.5.5"
-		isSnapshot = isBuildSnapshot
-	}
+    ext {
+        userOrg = "grails"
+        set "tomcat.version", "8.5.5"
+        isSnapshot = isBuildSnapshot
+    }
 
     repositories {
         mavenLocal()
@@ -107,10 +107,10 @@ subprojects {
         testRuntime "org.seleniumhq.selenium:selenium-remote-driver:3.6.0"
         testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
     }
-	//apply from:"$commonBuild/common.gradle"
+    //apply from:"$commonBuild/common.gradle"
 
 
-	if (isGrailsPlugin) {
+    if (isGrailsPlugin) {
         apply plugin:"org.grails.grails-plugin"
         apply plugin:"org.grails.grails-gsp"
 
@@ -122,13 +122,13 @@ subprojects {
             console "org.grails:grails-console"
         }
 
-		//apply from: "${commonBuild}/common-plugin.gradle"
-		//apply from: "${commonBuild}/common-publishing.gradle"
+        //apply from: "${commonBuild}/common-plugin.gradle"
+        //apply from: "${commonBuild}/common-publishing.gradle"
         apply from: "../publish.gradle"
-		group "org.grails.plugins"
-	}
+        group "org.grails.plugins"
+    }
 
-	if (isGrailsApp) {
+    if (isGrailsApp) {
         apply plugin:"org.grails.grails-web"
         apply plugin:"war"
         apply plugin:"org.grails.grails-gsp"
@@ -145,9 +145,9 @@ subprojects {
             jvmArgs('-Dspring.output.ansi.enabled=always')
             addResources = true
         }
-		//apply from: "${commonBuild}/common-project.gradle"
-		group "org.grails"
-	}
+        //apply from: "${commonBuild}/common-project.gradle"
+        group "org.grails"
+    }
 
     // Added to be able to see failed tests and the cause in console on test run
     integrationTest {
@@ -160,9 +160,9 @@ subprojects {
         }
 
         // Uncomment line bellow to show in console all tests that were executed in next format:
-            //:test-app:integrationTest
-            //-- Test Check list(daoapp.OrgSpec)
-            //-- Test Filter by Name eq(daoapp.OrgSpec)
+        //:test-app:integrationTest
+        //-- Test Check list(daoapp.OrgSpec)
+        //-- Test Filter by Name eq(daoapp.OrgSpec)
 
         //beforeTest { descriptor -> logger.quiet " -- $descriptor" }
     }

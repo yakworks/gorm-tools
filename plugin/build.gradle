@@ -25,27 +25,27 @@ dependencies {
 
     codenarc 'org.codenarc:CodeNarc:0.27.0'
 
-	//testCompile "org.grails.plugins:geb"
+    //testCompile "org.grails.plugins:geb"
     //testCompile "org.grails:grails-gorm-testing-support"
-	//testCompile "org.grails:grails-plugin-testing"
+    //testCompile "org.grails:grails-plugin-testing"
 }
 
 codenarc {
-	toolVersion = '0.27.0'
-	config = project.resources.text.fromString("${commonBuild}/codenarc/rules.groovy".toURL().text)
-	reportFormat = 'html'
-	//ignoreFailures = true
+    toolVersion = '0.27.0'
+    config = project.resources.text.fromString("${commonBuild}/codenarc/rules.groovy".toURL().text)
+    reportFormat = 'html'
+    //ignoreFailures = true
 
-	maxPriority1Violations = 0
-	maxPriority2Violations = 4
-	maxPriority3Violations = 8
+    maxPriority1Violations = 0
+    maxPriority2Violations = 4
+    maxPriority3Violations = 8
 }
 
 codenarcMain {
-	exclude '**/GormScalars.groovy'
+    exclude '**/GormScalars.groovy'
 }
 
 codenarcTest {
-	ignoreFailures = true
+    ignoreFailures = true
 }
 

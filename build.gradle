@@ -149,7 +149,8 @@ subprojects {
         group "org.grails"
     }
 
-    // Added to be able to see failed tests and the cause in console on test run
+    // Added to be able to see failed tests and the cause in console on test run.
+    // This really helpful and needed when viewing on Travis CI or others.
     integrationTest {
         //Allows to set options related to which test events are logged to the console, and on which detail level.
         // For example, to show more information about exceptions use

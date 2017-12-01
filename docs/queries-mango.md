@@ -1,4 +1,6 @@
-## Overview
+Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL query.
+
+## Mango Overview
 
 The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
 The gorm dao's come with a `list(criteriaMap, closure)` method. It allows to get list of entities restricted by
@@ -7,8 +9,8 @@ bellow.
 
 Anything in the optional closure will be passed into Gorm/Hibernate criteria closure
 
-The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/) 
-and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax) 
+The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
+and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax)
 with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
 
 >Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.
@@ -38,12 +40,12 @@ criteria.list(max: 20) {
 }
 ```
 
-## Criteria options
+### Criteria options
 
 for examples well assume we are querying a domain model that looks like the
 starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
 
-### Logical
+#### Logical
 
 |  Op  |      Description      |                                              Examples                                              |
 | ---- | --------------------- | -------------------------------------------------------------------------------------------------- |
@@ -52,7 +54,7 @@ starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
 | $not | ALL not equal, !=, <> | `$not:{ "status": "Destroyed", "dateStatus": "2371" }`                                             |
 | $nor | ANY one is not equal  | `$nor:{ "name": "Romulan", "fork": 12`}                                                               |
 
-### Comparison
+#### Comparison
 
 |     Op     |           Description            |                   Example                    |
 | ---------- | -------------------------------- | -------------------------------------------- |
@@ -68,7 +70,7 @@ starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
 | $in        | Match any value in array         | `"field" : {"$in" : [value1, value2, ...]`   |
 | $nin       | Not match any value in array     | `"field" : {"$nin" : [value1, value2, ...]}` |
 | $isNull    | Value is null                    | `"name": "$isNull" \|  `"name": null         |
-| $isNotNull |                                  | `"name": "$isNotNull" \| `"name":{$ne: null} | 
+| $isNotNull |                                  | `"name": "$isNotNull" \| `"name":{$ne: null} |
 
 **Fields**
 
@@ -81,7 +83,7 @@ starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
 | $eqf  | = field           | `"cargo": {"$eqf": "controlTotal"}`    |
 | $nef  | not equal, !=, <> | `"cargo" : {"$nef" : "controlTotal"}}` |
 
-## Examples
+### Examples
 
 Bellow will be a list of supported syntax for params in json format, which is supported:
 Assume we are running these on star trek characters http://stapi.co/api/v1/rest/character?uid=CHMA0000128908
@@ -266,7 +268,7 @@ With such configuration restrictions for Mango criteria should be under `filters
 
 **Count totals**
 
-If one needs to compute totals for some fields, dao has `countTotals` method restrictions are 
+If one needs to compute totals for some fields, dao has `countTotals` method restrictions are
 working in the same way as for list, so it can be specified with params map and criteria closure.
 To specify what fields sums should be computed for, the list with fields name should be passed.
 See example:
@@ -278,3 +280,49 @@ Org.dao.countTotals([
 }
 ```
 Result will be look like: `[amount: 1500, credit: 440]`.
+
+## ScrollableQuery
+See [ScrollableQuery](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy)
+
+### Execute a closure for each record
+
+As you can see in the example below, we can specify the SQL query and provide the closure which is called for each record:
+
+```groovy
+    ScrollableQuery scrollableQuery = new ScrollableQuery(new ColumnMapRowMapper(), dataSource, 50)
+
+    scrollableQuery.eachRow("select * from ScrollableQueryTest") { Object row ->
+        println row
+    }
+```
+
+### Execute a closure for each batch of records
+
+Using ```eachBatch``` we can execute a closure for a batch of records.
+This closure is called for a specified number of records. For example, code below prints size of each batch
+(which is 5) to console:
+
+```groovy
+
+    scrollableQuery.eachBatch("select * from ScrollableQueryTest", 5) { List batch ->
+        println "batchSize=${batch.size()}"
+    }
+
+```
+
+### Fetching a list of all records:
+
+> NOTE: This method holds all rows in memory, so this should not be used if there is going to be large number of rows.
+
+```groovy
+
+    List values = scrollableQuery.rows("select * from ScrollableQueryTest where value='test'")
+
+```
+
+## GrailsParameterMapRowMapper
+
+See [GrailsParameterMapRowMapper](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/GrailsParameterMapRowMapper.groovy)
+
+Row mapper which allows to convert data from a given ResultSet instance
+to a grails parameter map, which can be used for databinding.

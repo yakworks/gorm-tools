@@ -8,14 +8,12 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 # Page tree
 pages:
   - Overview: index.md
+  - Mango & Queries: queries-mango.md
+  - DAO: dao.md
   - Id Generation: id-generation.md
-  - Gorm utils: gorm-utils.md
-  - Working with object's fields: beanPathTools.md
-  - Working with queries: working-with-queries.md
-  - Working with dates: working-with-dates.md
-  - Building response messages: building-response-messages.md
-  - Handling errors: error-handling.md
-  - Criteria MapQL: mapql.md
+  - Gorm Utils: gorm-utils.md
+  - Bean Path Tools: beanPathTools.md
+  - Date Utils: working-with-dates.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

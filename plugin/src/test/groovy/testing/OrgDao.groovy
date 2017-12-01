@@ -12,13 +12,13 @@ class OrgDao implements GormDao<Org> {
         domainClass = Org
     }
 
-	void beforeCreate(Org org, Map params) {
-		org.event = "beforeCreate"
-	}
+    void beforeCreate(Org org, Map params) {
+        org.event = "beforeCreate"
+    }
 
-	void beforeUpdate(Org org, Map params) {
-		org.event = "beforeUpdate"
-	}
+    void beforeUpdate(Org org, Map params) {
+        org.event = "beforeUpdate"
+    }
 
     void insertTestData(){
         (1..10).each { index ->

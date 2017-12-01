@@ -12,32 +12,32 @@ import testing.OrgDao
 
 class GormDaoSpec extends HibernateSpec implements AutowiredTest, GrailsUnitTest {
 
-	DaoEventInvoker daoEventInvoker
+    DaoEventInvoker daoEventInvoker
 
-	Closure doWithSpring() {
-		{ ->
-			orgDao(OrgDao) { bean ->
-				bean.autowire = true
-			}
-			locationDao(DefaultGormDao, Location) { bean ->
-				bean.autowire = true
-			}
-			nestedDao(DefaultGormDao, Nested) { bean ->
-				bean.autowire = true
-			}
-			daoEventInvoker(DaoEventInvoker) { bean ->
-				bean.autowire = true
-			}
-			daoUtilBean(DaoUtil)
-			fastBinder(FastBinder)
-		}
-	}
+    Closure doWithSpring() {
+        { ->
+            orgDao(OrgDao) { bean ->
+                bean.autowire = true
+            }
+            locationDao(DefaultGormDao, Location) { bean ->
+                bean.autowire = true
+            }
+            nestedDao(DefaultGormDao, Nested) { bean ->
+                bean.autowire = true
+            }
+            daoEventInvoker(DaoEventInvoker) { bean ->
+                bean.autowire = true
+            }
+            daoUtilBean(DaoUtil)
+            fastBinder(FastBinder)
+        }
+    }
 
     List<Class> getDomainClasses() { [Org,Location,Nested] }
 
     void setup() {
-		//have to do this because when daoInvoker is registered dao artefacts are not available, TODO find better way
-		daoEventInvoker.cacheEvents(OrgDao)
+        //have to do this because when daoInvoker is registered dao artefacts are not available, TODO find better way
+        daoEventInvoker.cacheEvents(OrgDao)
     }
 
 
@@ -50,28 +50,28 @@ class GormDaoSpec extends HibernateSpec implements AutowiredTest, GrailsUnitTest
         then:
         org.name == "foo"
 
-		and: "Event should have been fired on dao"
-		org.event == "beforeCreate"
+        and: "Event should have been fired on dao"
+        org.event == "beforeCreate"
     }
 
 
-	def "test update"() {
-		given:
-		Org org = new Org(name:"test")
-		org.location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
-		org.persist()
+    def "test update"() {
+        given:
+        Org org = new Org(name:"test")
+        org.location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
+        org.persist()
 
-		expect:
-		org.id != null
+        expect:
+        org.id != null
 
-		when:
-		Map p = [name:'foo', id:org.id]
-		org = Org.dao.update(p)
+        when:
+        Map p = [name:'foo', id:org.id]
+        org = Org.dao.update(p)
 
-		then:
-		org.name == "foo"
+        then:
+        org.name == "foo"
 
-		and: "Event should have been fired on dao"
-		org.event == "beforeUpdate"
-	}
+        and: "Event should have been fired on dao"
+        org.event == "beforeUpdate"
+    }
 }

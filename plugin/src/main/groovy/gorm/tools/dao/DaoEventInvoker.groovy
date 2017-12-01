@@ -5,6 +5,7 @@ import grails.core.GrailsClass
 import grails.plugin.dao.DaoArtefactHandler
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.ReflectionUtils
 
 import javax.annotation.PostConstruct
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
  */
 @CompileStatic
 class DaoEventInvoker {
+    @Autowired
     GrailsApplication grailsApplication
 
     private final Map<String, Map<DaoEventType, Method>> eventsCache = new ConcurrentHashMap<>()
@@ -38,7 +40,7 @@ class DaoEventInvoker {
         ReflectionUtils.invokeMethod(method, dao, args)
     }
 
-	void cacheEvents(Class daoClass) {
+    void cacheEvents(Class daoClass) {
         Map<DaoEventType, Method> events = new ConcurrentHashMap<>()
         eventsCache.put(daoClass.simpleName, events)
 

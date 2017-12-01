@@ -14,6 +14,7 @@ import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -35,7 +36,10 @@ trait GormDao<D extends GormEntity> {
     //use getters when accessing domainClass so implementing class can override the property if desired
     Class<D> domainClass // the domain class this is for
 
-//    Class<D> getDomainClass() { return _domainClass }
+    Class<D> getDomainClass() {
+        if(!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDao.class)
+        return domainClass
+    }
 //    void setDomainClass(Class<D> clazz) { _domainClass = clazz }
 
     /**

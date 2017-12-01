@@ -3,103 +3,102 @@ package gorm.tools.dao
 import gorm.tools.databinding.FastBinder
 import gorm.tools.testing.DaoDataTest
 import grails.artefact.Artefact
-import grails.gorm.annotation.Entity
+import grails.persistence.Entity
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-class DaoEventInvokerSpec extends Specification implements AutowiredTest, DaoDataTest {
+class DaoEventInvokerSpec extends Specification implements DaoDataTest {
 
-	void setup() {
-		mockDomain(City)
-		mockDao(CityDao)
-	}
+    void setup() {
+        mockDomain(City)
+    }
 
-	DaoEventInvoker daoEventInvoker
+    DaoEventInvoker daoEventInvoker
 
-	void testEventsFired() {
-		given:
-		CityDao cityDao = City.dao
-		Map params = [id:1, name: "test"]
+    void testEventsFired() {
+        given:
+        //CityDao cityDao = City.dao
+        Map params = [id:1, name: "test"]
 
-		when:
-		City city = cityDao.create(params)
+        when:
+        City city = City.create(params)
 
-		then:
-		city != null
-		city.region == "beforeCreate"
+        then:
+        city != null
+        println city
+        city.region == "beforeCreate"
+        //city.region == "fffd"
 
-		when:
-		city = cityDao.update(params)
+        when:
+        city = City.update(params)
 
-		then:
-		city != null
-		city.region == "afterUpdate"
-	}
+        then:
+        city != null
+        city.region == "afterUpdate"
+    }
 
-	void testInvokeEvent() {
-		given:
-		CityDao cityDao = City.dao
-		City city = new City()
-		Map params = [name: "test"]
+    void testInvokeEvent() {
+        given:
+        //CityDao cityDao = City.dao
+        City city = new City()
+        Map params = [name: "test"]
 
-		when:
-		daoEventInvoker.invokeEvent(cityDao, DaoEventType.BeforeUpdate, city, params)
+        when:
+        daoEventInvoker.invokeEvent(City.dao, DaoEventType.BeforeUpdate, city, params)
 
-		then:
-		city.region == "beforeUpdate"
+        then:
+        city.region == "beforeUpdate"
 
-		when:
-		daoEventInvoker.invokeEvent(cityDao, DaoEventType.AfterUpdate, city, params)
+        when:
+        daoEventInvoker.invokeEvent(cityDao, DaoEventType.AfterUpdate, city, params)
 
-		then:
-		city.region == "afterUpdate"
+        then:
+        city.region == "afterUpdate"
 
-		when:
-		daoEventInvoker.invokeEvent(cityDao, DaoEventType.BeforeRemove, city, params)
+        when:
+        daoEventInvoker.invokeEvent(cityDao, DaoEventType.BeforeRemove, city, params)
 
-		then:
-		city.region == "beforeRemove"
+        then:
+        city.region == "beforeRemove"
 
-		when:
-		daoEventInvoker.invokeEvent(cityDao, DaoEventType.AfterRemove, city, params)
+        when:
+        daoEventInvoker.invokeEvent(cityDao, DaoEventType.AfterRemove, city, params)
 
-		then:
-		city.region == "afterRemove"
-	}
+        then:
+        city.region == "afterRemove"
+    }
 }
 
 
 @Entity
-@Artefact("Domain")
 class City {
-	String name
-	String region
+    String name
+    String region
 }
 
-@Artefact("Dao")
-class CityDao extends DefaultGormDao<City> {
+class CityDao implements GormDao<City> {
 
-	void beforeCreate(City city, Map params) {
-		city.region = "beforeCreate"
-	}
+    void beforeCreate(City city, Map params) {
+        city.region = "beforeCreate"
+    }
 
-	void beforeUpdate(City city, Map params) {
-		city.region = "beforeUpdate"
-	}
+    void beforeUpdate(City city, Map params) {
+        city.region = "beforeUpdate"
+    }
 
-	void afterUpdate(City city, Map params) {
-		city.region = "afterUpdate"
-	}
+    void afterUpdate(City city, Map params) {
+        city.region = "afterUpdate"
+    }
 
-	void beforeRemove(City city, Map params) {
-		city.region = "beforeRemove"
-	}
+    void beforeRemove(City city, Map params) {
+        city.region = "beforeRemove"
+    }
 
-	void afterRemove(City city, Map params) {
-		city.region = "afterRemove"
-	}
+    void afterRemove(City city, Map params) {
+        city.region = "afterRemove"
+    }
 
 }
 

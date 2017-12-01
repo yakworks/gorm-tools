@@ -14,7 +14,7 @@ class Org {
     Date date
     String nameFromDao
 
-	String event
+    String event
 
     static List quickSearchFields = ["name"]
 
@@ -26,6 +26,6 @@ class Org {
         date nullable: true
         secondName nullable: true
         nameFromDao nullable: true
-		event nullable: true, blank: false
+        event nullable: true, blank: false
     }
 }

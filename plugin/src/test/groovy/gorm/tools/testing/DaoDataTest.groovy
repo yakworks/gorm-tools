@@ -21,24 +21,25 @@ trait DaoDataTest implements DataTest, AutowiredTest {
     void mockDomains(Class<?>... domainClassesToMock) {
         DataTest.super.mockDomains(domainClassesToMock)
 
-        registerBeanIfRequired("fastBinder", FastBinder)
-
+        Closure daoBeans = {}
         domainClassesToMock.each { Class domainClass ->
             String daoClassName = "${domainClass.name}Dao"
-            println daoClassName
             if(ClassUtils.isPresent(daoClassName, grailsApplication.classLoader)){
-                mockDao(Class.forName(daoClassName))
+                Class daoClass = Class.forName(daoClassName)
+                final daoArtefact = grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)
+                daoBeans = daoBeans << {
+                    "${daoArtefact.propertyName}"(daoClass) { bean -> bean.autowire = true }
+                }
             } else{
                 String daoName = "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
-                defineBeans({
-                    "${daoName}"(DefaultGormDao, domainClass) { bean ->
-                        bean.autowire = true
-                        bean.lazyInit = true
-                    }
-                })
+                daoBeans = daoBeans << {
+                    "${daoName}"(DefaultGormDao, domainClass) { bean -> bean.autowire = true }
+                }
             }
         }
-        defineBeans({
+
+        defineBeans(daoBeans << {
+            fastBinder(FastBinder)
             daoEventInvoker(DaoEventInvoker)
             daoUtilBean(DaoUtil)
         })

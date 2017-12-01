@@ -40,7 +40,6 @@ trait GormDao<D extends GormEntity> {
         if(!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDao.class)
         return domainClass
     }
-//    void setDomainClass(Class<D> clazz) { _domainClass = clazz }
 
     /**
      * Saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error.
@@ -93,7 +92,6 @@ trait GormDao<D extends GormEntity> {
         DaoUtil.fireEvent(this, DaoEventType.valueOf("After$bindMethod"), entity, params)
         return entity
     }
-
 
     D bind(D entity, Map row, String bindMethod){
         (D) getDataBinder().bind(entity, row, bindMethod)

@@ -27,9 +27,7 @@ class DaoEventInvokerSpec extends Specification implements DaoDataTest {
 
         then:
         city != null
-        println city
         city.region == "beforeCreate"
-        //city.region == "fffd"
 
         when:
         city = City.update(params)
@@ -52,19 +50,19 @@ class DaoEventInvokerSpec extends Specification implements DaoDataTest {
         city.region == "beforeUpdate"
 
         when:
-        daoEventInvoker.invokeEvent(cityDao, DaoEventType.AfterUpdate, city, params)
+        daoEventInvoker.invokeEvent(City.dao, DaoEventType.AfterUpdate, city, params)
 
         then:
         city.region == "afterUpdate"
 
         when:
-        daoEventInvoker.invokeEvent(cityDao, DaoEventType.BeforeRemove, city, params)
+        daoEventInvoker.invokeEvent(City.dao, DaoEventType.BeforeRemove, city, params)
 
         then:
         city.region == "beforeRemove"
 
         when:
-        daoEventInvoker.invokeEvent(cityDao, DaoEventType.AfterRemove, city, params)
+        daoEventInvoker.invokeEvent(City.dao    , DaoEventType.AfterRemove, city, params)
 
         then:
         city.region == "afterRemove"

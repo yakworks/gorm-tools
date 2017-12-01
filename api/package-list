@@ -9,4 +9,5 @@ gorm.tools.idgen
 gorm.tools.jdbc
 gorm.tools.mango
 gorm.tools.query
+gorm.tools.testing
 grails.plugin.dao

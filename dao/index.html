@@ -11,7 +11,7 @@
         <meta name="description" content="Helpers for gorm">
       
       
-        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/id-generation/">
+        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/dao/">
       
       
         <meta name="author" content="Joshua Burnett">
@@ -23,7 +23,7 @@
     
     
       
-        <title>Id Generation - Gorm Tools</title>
+        <title>DAO - Gorm Tools</title>
       
     
     
@@ -121,7 +121,7 @@
             
               
             
-            Id Generation
+            DAO
           
         </span>
       </div>
@@ -255,18 +255,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../dao/" title="DAO" class="md-nav__link">
-      DAO
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -276,11 +264,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        Id Generation
+        DAO
       </label>
     
-    <a href="./" title="Id Generation" class="md-nav__link md-nav__link--active">
-      Id Generation
+    <a href="./" title="DAO" class="md-nav__link md-nav__link--active">
+      DAO
     </a>
     
       
@@ -292,29 +280,97 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#database-id-generator" title="Database ID Generator" class="md-nav__link">
-    Database ID Generator
+  <a href="#domain-traits" title="Domain Traits" class="md-nav__link">
+    Domain Traits
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-methods-added-to-the-domains" title="Dynamic methods added to the domains" class="md-nav__link">
+    Dynamic methods added to the domains
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statics-added-to-the-domain" title="Statics added to the domain" class="md-nav__link">
+    Statics added to the domain
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#daoutil-and-daomessage" title="DaoUtil and DaoMessage" class="md-nav__link">
+    DaoUtil and DaoMessage
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#daoutil" title="DaoUtil:" class="md-nav__link">
+    DaoUtil:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#daomessage-contains-bunch-of-help-methods-for-creating-text-messages" title="DaoMessage contains bunch of help methods for creating text messages" class="md-nav__link">
+    DaoMessage contains bunch of help methods for creating text messages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grails-3" title="Grails 3:" class="md-nav__link">
+    Grails 3:
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#newobjectid-table" title="NewObjectId table" class="md-nav__link">
-    NewObjectId table
+  <a href="#dao-message" title="DAO Message" class="md-nav__link">
+    DAO Message
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configure-identity-generator-globally" title="Configure Identity generator globally." class="md-nav__link">
-    Configure Identity generator globally.
+  <a href="#saved-and-no-saved-messages" title="Saved and no saved messages" class="md-nav__link">
+    Saved and no saved messages
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-idgenerator-programmatically" title="Using IdGenerator programmatically" class="md-nav__link">
-    Using IdGenerator programmatically
+  <a href="#list-of-available-messages" title="List of available messages" class="md-nav__link">
+    List of available messages
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domainexception" title="DomainException" class="md-nav__link">
+    DomainException
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domainnotfoundexception" title="DomainNotFoundException" class="md-nav__link">
+    DomainNotFoundException
   </a>
   
 </li>
@@ -325,6 +381,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../id-generation/" title="Id Generation" class="md-nav__link">
+      Id Generation
+    </a>
   </li>
 
     
@@ -383,29 +451,97 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#database-id-generator" title="Database ID Generator" class="md-nav__link">
-    Database ID Generator
+  <a href="#domain-traits" title="Domain Traits" class="md-nav__link">
+    Domain Traits
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dynamic-methods-added-to-the-domains" title="Dynamic methods added to the domains" class="md-nav__link">
+    Dynamic methods added to the domains
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statics-added-to-the-domain" title="Statics added to the domain" class="md-nav__link">
+    Statics added to the domain
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#daoutil-and-daomessage" title="DaoUtil and DaoMessage" class="md-nav__link">
+    DaoUtil and DaoMessage
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#daoutil" title="DaoUtil:" class="md-nav__link">
+    DaoUtil:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#daomessage-contains-bunch-of-help-methods-for-creating-text-messages" title="DaoMessage contains bunch of help methods for creating text messages" class="md-nav__link">
+    DaoMessage contains bunch of help methods for creating text messages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grails-3" title="Grails 3:" class="md-nav__link">
+    Grails 3:
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#newobjectid-table" title="NewObjectId table" class="md-nav__link">
-    NewObjectId table
+  <a href="#dao-message" title="DAO Message" class="md-nav__link">
+    DAO Message
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#configure-identity-generator-globally" title="Configure Identity generator globally." class="md-nav__link">
-    Configure Identity generator globally.
+  <a href="#saved-and-no-saved-messages" title="Saved and no saved messages" class="md-nav__link">
+    Saved and no saved messages
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-idgenerator-programmatically" title="Using IdGenerator programmatically" class="md-nav__link">
-    Using IdGenerator programmatically
+  <a href="#list-of-available-messages" title="List of available messages" class="md-nav__link">
+    List of available messages
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domainexception" title="DomainException" class="md-nav__link">
+    DomainException
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domainnotfoundexception" title="DomainNotFoundException" class="md-nav__link">
+    DomainNotFoundException
   </a>
   
 </li>
@@ -424,49 +560,67 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/id-generation.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/dao.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Id Generation</h1>
+                  <h1>DAO</h1>
                 
                 
-                <h3 id="database-id-generator">Database ID Generator<a class="headerlink" href="#database-id-generator" title="Permanent link">&para;</a></h3>
-<p>Dao plugin comes with an implementation of hibernate identity generator which uses a central table for incremental identity generation.</p>
-<h3 id="newobjectid-table">NewObjectId table<a class="headerlink" href="#newobjectid-table" title="Permanent link">&para;</a></h3>
-<p>In order to use identity generator provided by plugin, you need to create NewObjectId table as shown below.</p>
-<div class="codehilite"><pre><span></span><span class="k">create</span> <span class="k">table</span> <span class="n">NewObjectId</span>
-<span class="p">(</span>
-    <span class="n">KeyName</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">not</span> <span class="k">null</span> <span class="k">primary</span> <span class="k">key</span><span class="p">,</span>
-    <span class="n">NextId</span> <span class="nb">bigint</span> <span class="k">not</span> <span class="k">null</span>
-<span class="p">)</span>
-<span class="p">;</span>
+                <h2 id="domain-traits">Domain Traits<a class="headerlink" href="#domain-traits" title="Permanent link">&para;</a></h2>
+<h3 id="dynamic-methods-added-to-the-domains">Dynamic methods added to the domains<a class="headerlink" href="#dynamic-methods-added-to-the-domains" title="Permanent link">&para;</a></h3>
+<p>Every domain gets a dao which is either setup for you or setup by extending e <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy">GormDaoSupport</a>. Each method is transactional to prevent incomplete cascading saves as exaplained above.</p>
+<p><strong>persist()</strong>: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy">DomainException</a> if anything goes wrong</p>
+<p><strong>remove()</strong>:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by default. Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy">DomainException</a> if anything goes wrong</p>
+<h3 id="statics-added-to-the-domain">Statics added to the domain<a class="headerlink" href="#statics-added-to-the-domain" title="Permanent link">&para;</a></h3>
+<p><strong>insertAndSave(params)</strong>:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (essentially the persist()). <strong>ex:</strong> Book.insertAndSave([name:'xyz',isbn:'123']) Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy">DomainException</a> if anything goes wrong</p>
+<p><strong>update(params)</strong>:  calls the dao.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. <strong>ex:</strong> Book.update([id:11,name:'aaa']) Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy">DomainException</a> if anything goes wrong</p>
+<p><strong>remove(params)</strong>:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. <strong>ex:</strong> Book.remove([id:11]) Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy">DomainException</a> if anything goes wrong</p>
+<p><strong>dao</strong>: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.</p>
+<h2 id="daoutil-and-daomessage">DaoUtil and DaoMessage<a class="headerlink" href="#daoutil-and-daomessage" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy">DaoUtil</a></p>
+<h4 id="daoutil">DaoUtil:<a class="headerlink" href="#daoutil" title="Permanent link">&para;</a></h4>
+<p><strong>checkFound(entity, Map params,String domainClassName)</strong> checks does the entity exists, if not throws DomainNotFoundException with human readable error text</p>
+<p><strong>checkVersion(entity,ver)</strong> checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws DomainException</p>
+<p><strong>flush()</strong> flushes the session</p>
+<p><strong>clear()</strong> clears session cache</p>
+<p><strong>flushAndClear()</strong> flushes the session and clears the session cache</p>
+<h4 id="daomessage-contains-bunch-of-help-methods-for-creating-text-messages">DaoMessage contains bunch of help methods for creating text messages<a class="headerlink" href="#daomessage-contains-bunch-of-help-methods-for-creating-text-messages" title="Permanent link">&para;</a></h4>
+<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoMessage.groovy">DaoMessage</a></p>
+<h2 id="grails-3">Grails 3:<a class="headerlink" href="#grails-3" title="Permanent link">&para;</a></h2>
+<p>Dynamic methods were implemented with trait instead of meta programing, so now <code>@CompileStatic</code> can be used.
+Due to this changes static method <code>insert</code> for domain objects was renamed to <code>insertAndSave</code>, because domain class instances
+already have <code>insert</code> method and we can't have both static and instance methods with same list of args.</p>
+<h2 id="dao-message">DAO Message<a class="headerlink" href="#dao-message" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoMessage.groovy">DaoMessage</a></p>
+<p>Gorm-tools provides a way to build message maps with information about a status of a domain instance.
+Uses i18n messages.</p>
+<h2 id="saved-and-no-saved-messages">Saved and no saved messages<a class="headerlink" href="#saved-and-no-saved-messages" title="Permanent link">&para;</a></h2>
+<p>The example below shows how to build <code>saved</code> message for a domain:</p>
+<div class="codehilite"><pre><span></span>    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">id:</span><span class="mi">100</span><span class="o">,</span><span class="nl">version:</span><span class="mi">1</span><span class="o">)</span>
+
+    <span class="n">Map</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">DaoMessage</span><span class="o">.</span><span class="na">saved</span><span class="o">(</span><span class="n">user</span><span class="o">)</span>
+    <span class="k">assert</span> <span class="s1">&#39;default.saved.message&#39;</span> <span class="o">==</span> <span class="n">msg</span><span class="o">.</span><span class="na">code</span> <span class="c1">//i18 code</span>
+    <span class="k">assert</span> <span class="mi">100</span> <span class="o">==</span> <span class="n">msg</span><span class="o">.</span><span class="na">args</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
 </pre></div>
 
-<p>Here key name will be the name of the tables and NextId is the next id to return for the given table.</p>
-<h3 id="configure-identity-generator-globally">Configure Identity generator globally.<a class="headerlink" href="#configure-identity-generator-globally" title="Permanent link">&para;</a></h3>
-<p>The identity generator can be configured globally in application.groovy as shown below.</p>
-<div class="codehilite"><pre><span></span><span class="n">grails</span> <span class="o">{</span>
-
-    <span class="n">gorm</span><span class="o">.</span><span class="na">default</span><span class="o">.</span><span class="na">mapping</span> <span class="o">=</span> <span class="o">{</span>
-        <span class="n">id</span> <span class="nl">column:</span> <span class="s1">&#39;id&#39;</span><span class="o">,</span> <span class="nl">generator:</span><span class="s1">&#39;gorm.tools.idgen.SpringIdGenerator&#39;</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-<p>This will use the SpringIdGenerator for all domains in the application. However it can be done per domain too if required.</p>
-<h3 id="using-idgenerator-programmatically">Using IdGenerator programmatically<a class="headerlink" href="#using-idgenerator-programmatically" title="Permanent link">&para;</a></h3>
-<p>Plugin defines a bean with name idGenerator that can be used to programmatically generate new Ids.
-Here is an example domain class.</p>
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
-    <span class="kd">transient</span> <span class="n">idGenerator</span>
-
-    <span class="kt">def</span> <span class="nf">beforeInsert</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">if</span><span class="o">(!</span><span class="n">id</span><span class="o">)</span> <span class="n">id</span> <span class="o">=</span> <span class="n">idGenerator</span><span class="o">.</span><span class="na">getNextId</span><span class="o">(</span><span class="s1">&#39;Book.id&#39;</span><span class="o">)</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-<p>Identity generator will check in NewObjectId table for keyName <code>Book</code> If it exists, it will return the value of NextId or else it will insert a new row in NewObjectId table.</p>
+<h2 id="list-of-available-messages">List of available messages<a class="headerlink" href="#list-of-available-messages" title="Permanent link">&para;</a></h2>
+<ul>
+<li>saved</li>
+<li>not saved</li>
+<li>updated</li>
+<li>not updated</li>
+<li>deleted</li>
+<li>not deleted</li>
+<li>notFound</li>
+<li>optimisticLockingFailure - Another user has updated the resource while you were editing</li>
+</ul>
+<p>Gorm-tools provides its own types of exceptions to handle errors which relate to domains.</p>
+<h2 id="domainexception">DomainException<a class="headerlink" href="#domainexception" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy">DomainException</a></p>
+<p>An extension of the default ValidationException. It is possible to pass the entity and the message map.</p>
+<h2 id="domainnotfoundexception">DomainNotFoundException<a class="headerlink" href="#domainnotfoundexception" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainNotFoundException.groovy">DomainNotFoundException</a></p>
+<p>An extension of the DomainException to be able to handle rest request which should respond with 404 error.</p>
                 
                   
                 
@@ -485,7 +639,7 @@ Here is an example domain class.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../dao/" title="DAO" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../queries-mango/" title="Mango & Queries" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -494,19 +648,19 @@ Here is an example domain class.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                DAO
+                Mango & Queries
               </span>
             </div>
           </a>
         
         
-          <a href="../gorm-utils/" title="Gorm Utils" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../id-generation/" title="Id Generation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Gorm Utils
+                Id Generation
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

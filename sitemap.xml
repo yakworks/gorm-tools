@@ -4,7 +4,23 @@
     
     <url>
      <loc>http://yakworks.github.io/gorm-tools//</loc>
-     <lastmod>2017-11-29</lastmod>
+     <lastmod>2017-12-01</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://yakworks.github.io/gorm-tools//queries-mango/</loc>
+     <lastmod>2017-12-01</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+    <url>
+     <loc>http://yakworks.github.io/gorm-tools//dao/</loc>
+     <lastmod>2017-12-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -12,7 +28,7 @@
     
     <url>
      <loc>http://yakworks.github.io/gorm-tools//id-generation/</loc>
-     <lastmod>2017-11-29</lastmod>
+     <lastmod>2017-12-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -20,7 +36,7 @@
     
     <url>
      <loc>http://yakworks.github.io/gorm-tools//gorm-utils/</loc>
-     <lastmod>2017-11-29</lastmod>
+     <lastmod>2017-12-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -28,15 +44,7 @@
     
     <url>
      <loc>http://yakworks.github.io/gorm-tools//beanPathTools/</loc>
-     <lastmod>2017-11-29</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    
-
-    
-    <url>
-     <loc>http://yakworks.github.io/gorm-tools//working-with-queries/</loc>
-     <lastmod>2017-11-29</lastmod>
+     <lastmod>2017-12-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
     
@@ -44,31 +52,7 @@
     
     <url>
      <loc>http://yakworks.github.io/gorm-tools//working-with-dates/</loc>
-     <lastmod>2017-11-29</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    
-
-    
-    <url>
-     <loc>http://yakworks.github.io/gorm-tools//building-response-messages/</loc>
-     <lastmod>2017-11-29</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    
-
-    
-    <url>
-     <loc>http://yakworks.github.io/gorm-tools//error-handling/</loc>
-     <lastmod>2017-11-29</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-    
-
-    
-    <url>
-     <loc>http://yakworks.github.io/gorm-tools//mapql/</loc>
-     <lastmod>2017-11-29</lastmod>
+     <lastmod>2017-12-01</lastmod>
      <changefreq>daily</changefreq>
     </url>
     

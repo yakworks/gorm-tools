@@ -26,6 +26,7 @@ class DaoHibernateSpec extends HibernateSpec implements  GrailsUnitTest {
 
         if (!domainClasses) {
             Set<Class> daoClasses = scanDaoClasses(packageName)
+            //TODO figureout alternative to find entities if possible.
             new ClasspathEntityScanner().scan(packageToScan).each { Class domainClass ->
                 Class daoClass = daoClasses.find({ it.simpleName == "${domainClass.simpleName}Dao"}) ?: DefaultGormDao
                 beans = beans << registerDao(domainClass, daoClass)

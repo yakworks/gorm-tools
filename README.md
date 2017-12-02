@@ -1,6 +1,22 @@
 [![Build Status](https://travis-ci.org/yakworks/gorm-tools.svg?branch=master)](https://travis-ci.org/yakworks/gorm-tools)
 
+<pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
+      ________                                           _.-````'-,_
+     /  _____/  ___________  _____                   ,-'`           `'-.,_
+    /   \  ___ /  _ \_  __ \/     \          /)     (\       9ci's       '``-.
+    \    \_\  (  <_> )  | \/  Y Y  \        ( ( .,-') )    Yak Works         ```
+     \______  /\____/|__|  |__|_|  /         \ '   (_/                         !!
+            \/                   \/           |       /)           '           !!!
+  ___________           .__                   `\    ^'            '     !    !!!!
+  \__    ___/___   ____ |  |   ______           !      _/! , !   !  ! !  !   !!!
+    |    | /  _ \ /  _ \|  |  /  ___/            \Y,   |!!!  !  ! !!  !! !!!!!!!
+    |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
+    |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
+                                  \/               /_(      /_(/_(    /_(  /_(   
+         Version: 3.3.1-SNAPSHOT
+         
+</pre>
 
 Documentation 
 -----

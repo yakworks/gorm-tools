@@ -1,9 +1,9 @@
 
 ### Database ID Generator
-Dao plugin comes with an implementation of hibernate identity generator which uses a central table for incremental identity generation.
+Dao plugin comes with an implementation of hibernate identity generator for a cross database and NoSQL way to assign Long ids from an in memory incrementor. It uses a central table to track the last used id for each table. This helps a lot when dealing with associations and relationships. It also increases the performance of batch inserts.
 
 ### NewObjectId table
-In order to use identity generator provided by plugin, you need to create NewObjectId table as shown below.
+The table name is configurable and will get created if it does not exist. You can also create the table as shown below and add indexes if desired.
 
 ```sql
 create table NewObjectId
@@ -40,12 +40,19 @@ Here is an example domain class.
 ```groovy
 class Book {
     transient idGenerator
-    
+
     def beforeInsert() {
-        if(!id) id = idGenerator.getNextId('Book.id')
+        if(!id) id = idGenerator.getNextId('Book.id') // or idGenerator.getNextId(this)
     }
 }
 
 ```
 
 Identity generator will check in NewObjectId table for keyName ```Book``` If it exists, it will return the value of NextId or else it will insert a new row in NewObjectId table.
+
+### How it works
+
+By default the following beans are enabled.
+TODO
+
+TODO Describe the BatchIdGenerator and how to configure.

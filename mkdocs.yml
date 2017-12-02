@@ -8,8 +8,8 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 # Page tree
 pages:
   - Overview: index.md
+  - DAO Services: dao.md
   - Mango & Queries: queries-mango.md
-  - DAO: dao.md
   - Id Generation: id-generation.md
   - Gorm Utils: gorm-utils.md
   - Bean Path Tools: beanPathTools.md
@@ -26,7 +26,7 @@ theme: material-components
 
 # Options
 extra:
-
+  version: 3.3.1-SNAPSHOT
   # adds <meta name="robots" content="noindex,nofollow"> to keep search engines from indexing this
   # noindex: true
   feature:

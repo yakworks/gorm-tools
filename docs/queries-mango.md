@@ -33,12 +33,15 @@ The same result can be reached with criteria:
 ```javascript
 Criteria criteria = Org.createCriteria()
 criteria.list(max: 20) {
-    like "name", "Nam%"
+    ilike "name", "Bill%"
     eq "type", "New"
-    gt "id", 5
+    gt "age", 5
     order("name", "asc")
 }
 ```
+### Restful API query
+
+see the docs here for more examples and info https://yakworks.github.io/gorm-rest-api/
 
 ### Criteria options
 

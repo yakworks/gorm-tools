@@ -1,5 +1,44 @@
+
+**Example of the transaction propagation issue:**
+
+With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
+
+With this plugin and a controller you can just do:
+
+```groovy
+def update() {
+  try{
+    def result = YourDomainClass.update(p)
+      flash.message = result.message
+      redirect(action: 'show', id: result.entity.id)
+  } catch(DomainException e) {
+    flash.message = e.messageMap
+    render(view: 'edit', model: [(domainInstanceName): e.entity])
+  }
+}
+```
+
+Each domain gets injected with its own static dao object based on the GormDaoSupport service. If it finds a service that in the form of <<Domain Name>>Dao that is in any services or dao dir under grai-app then it will use that.
+
+**Example** You can setup your own dao for the domain like so and keep the logic in your Dao service and leave the controller alone as all the logic will flow over
+
+See [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy)
+
+```groovy
+class OrgDao extends GormDaoSupport {
+    def domainClass = Org
+
+    def update(params){
+        // ... do some stuff to the params
+        def result = super.update(params)
+        // ... do something like log history or send email with result.entity which is the saved org
+        return result
+    }
+}
+```
+
 ## Domain Traits
-    
+
 ### Dynamic methods added to the domains
 
 Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.

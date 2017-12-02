@@ -243,6 +243,18 @@
       
       
 
+
+  <li class="md-nav__item">
+    <a href="../dao/" title="DAO Services" class="md-nav__link">
+      DAO Services
+    </a>
+  </li>
+
+    
+      
+      
+      
+
   
 
 
@@ -274,6 +286,13 @@
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restful-api-query" title="Restful API query" class="md-nav__link">
+    Restful API query
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#criteria-options" title="Criteria options" class="md-nav__link">
@@ -370,18 +389,6 @@
 
 
   <li class="md-nav__item">
-    <a href="../dao/" title="DAO" class="md-nav__link">
-      DAO
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
     <a href="../id-generation/" title="Id Generation" class="md-nav__link">
       Id Generation
     </a>
@@ -449,6 +456,13 @@
   
     <nav class="md-nav">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restful-api-query" title="Restful API query" class="md-nav__link">
+    Restful API query
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#criteria-options" title="Criteria options" class="md-nav__link">
@@ -576,13 +590,15 @@ with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sq
 <p>The same result can be reached with criteria:</p>
 <div class="codehilite"><pre><span></span><span class="nx">Criteria</span> <span class="nx">criteria</span> <span class="o">=</span> <span class="nx">Org</span><span class="p">.</span><span class="nx">createCriteria</span><span class="p">()</span>
 <span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="nx">max</span><span class="o">:</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">like</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Nam%&quot;</span>
+    <span class="nx">ilike</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill%&quot;</span>
     <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
-    <span class="nx">gt</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="mi">5</span>
+    <span class="nx">gt</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="mi">5</span>
     <span class="nx">order</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
 
+<h3 id="restful-api-query">Restful API query<a class="headerlink" href="#restful-api-query" title="Permanent link">&para;</a></h3>
+<p>see the docs here for more examples and info <a href="https://yakworks.github.io/gorm-rest-api/">https://yakworks.github.io/gorm-rest-api/</a></p>
 <h3 id="criteria-options">Criteria options<a class="headerlink" href="#criteria-options" title="Permanent link">&para;</a></h3>
 <p>for examples well assume we are querying a domain model that looks like the
 starwars api here <a href="http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279">http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279</a></p>
@@ -954,7 +970,7 @@ to a grails parameter map, which can be used for databinding.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href=".." title="Overview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../dao/" title="DAO Services" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -963,19 +979,19 @@ to a grails parameter map, which can be used for databinding.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Overview
+                DAO Services
               </span>
             </div>
           </a>
         
         
-          <a href="../dao/" title="DAO" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../id-generation/" title="Id Generation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                DAO
+                Id Generation
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

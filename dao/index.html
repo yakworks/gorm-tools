@@ -23,7 +23,7 @@
     
     
       
-        <title>DAO - Gorm Tools</title>
+        <title>DAO Services - Gorm Tools</title>
       
     
     
@@ -121,7 +121,7 @@
             
               
             
-            DAO
+            DAO Services
           
         </span>
       </div>
@@ -243,18 +243,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../queries-mango/" title="Mango & Queries" class="md-nav__link">
-      Mango & Queries
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -264,11 +252,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        DAO
+        DAO Services
       </label>
     
-    <a href="./" title="DAO" class="md-nav__link md-nav__link--active">
-      DAO
+    <a href="./" title="DAO Services" class="md-nav__link md-nav__link--active">
+      DAO Services
     </a>
     
       
@@ -381,6 +369,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../queries-mango/" title="Mango & Queries" class="md-nav__link">
+      Mango & Queries
+    </a>
   </li>
 
     
@@ -563,10 +563,40 @@
                   <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/dao.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>DAO</h1>
+                  <h1>DAO Services</h1>
                 
                 
-                <h2 id="domain-traits">Domain Traits<a class="headerlink" href="#domain-traits" title="Permanent link">&para;</a></h2>
+                <p><strong>Example of the transaction propagation issue:</strong></p>
+<p>With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test</p>
+<p>With this plugin and a controller you can just do:</p>
+<div class="codehilite"><pre><span></span><span class="kt">def</span> <span class="nf">update</span><span class="o">()</span> <span class="o">{</span>
+  <span class="k">try</span><span class="o">{</span>
+    <span class="kt">def</span> <span class="n">result</span> <span class="o">=</span> <span class="n">YourDomainClass</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">p</span><span class="o">)</span>
+      <span class="n">flash</span><span class="o">.</span><span class="na">message</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="na">message</span>
+      <span class="n">redirect</span><span class="o">(</span><span class="nl">action:</span> <span class="s1">&#39;show&#39;</span><span class="o">,</span> <span class="nl">id:</span> <span class="n">result</span><span class="o">.</span><span class="na">entity</span><span class="o">.</span><span class="na">id</span><span class="o">)</span>
+  <span class="o">}</span> <span class="k">catch</span><span class="o">(</span><span class="n">DomainException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">flash</span><span class="o">.</span><span class="na">message</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="na">messageMap</span>
+    <span class="n">render</span><span class="o">(</span><span class="nl">view:</span> <span class="s1">&#39;edit&#39;</span><span class="o">,</span> <span class="nl">model:</span> <span class="o">[(</span><span class="n">domainInstanceName</span><span class="o">):</span> <span class="n">e</span><span class="o">.</span><span class="na">entity</span><span class="o">])</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>Each domain gets injected with its own static dao object based on the GormDaoSupport service. If it finds a service that in the form of &lt;<Domain Name>&gt;Dao that is in any services or dao dir under grai-app then it will use that.</p>
+<p><strong>Example</strong> You can setup your own dao for the domain like so and keep the logic in your Dao service and leave the controller alone as all the logic will flow over</p>
+<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy">GormDaoSupport</a></p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgDao</span> <span class="kd">extends</span> <span class="n">GormDaoSupport</span> <span class="o">{</span>
+    <span class="kt">def</span> <span class="n">domainClass</span> <span class="o">=</span> <span class="n">Org</span>
+
+    <span class="kt">def</span> <span class="nf">update</span><span class="o">(</span><span class="n">params</span><span class="o">){</span>
+        <span class="c1">// ... do some stuff to the params</span>
+        <span class="kt">def</span> <span class="n">result</span> <span class="o">=</span> <span class="kd">super</span><span class="o">.</span><span class="na">update</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
+        <span class="c1">// ... do something like log history or send email with result.entity which is the saved org</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<h2 id="domain-traits">Domain Traits<a class="headerlink" href="#domain-traits" title="Permanent link">&para;</a></h2>
 <h3 id="dynamic-methods-added-to-the-domains">Dynamic methods added to the domains<a class="headerlink" href="#dynamic-methods-added-to-the-domains" title="Permanent link">&para;</a></h3>
 <p>Every domain gets a dao which is either setup for you or setup by extending e <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy">GormDaoSupport</a>. Each method is transactional to prevent incomplete cascading saves as exaplained above.</p>
 <p><strong>persist()</strong>: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy">DomainException</a> if anything goes wrong</p>
@@ -639,7 +669,7 @@ Uses i18n messages.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../queries-mango/" title="Mango & Queries" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href=".." title="Overview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -648,19 +678,19 @@ Uses i18n messages.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Mango & Queries
+                Overview
               </span>
             </div>
           </a>
         
         
-          <a href="../id-generation/" title="Id Generation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../queries-mango/" title="Mango & Queries" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Id Generation
+                Mango & Queries
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

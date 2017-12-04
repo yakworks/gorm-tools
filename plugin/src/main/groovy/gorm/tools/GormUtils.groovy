@@ -2,7 +2,6 @@ package gorm.tools
 
 import gorm.tools.databinding.FastBinder
 import grails.compiler.GrailsCompileStatic
-import grails.core.GrailsDomainClassProperty
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate

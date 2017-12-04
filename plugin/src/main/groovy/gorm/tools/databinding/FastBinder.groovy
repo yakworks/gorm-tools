@@ -22,6 +22,7 @@ class FastBinder {
     private static final String ID_PROP = "id"
 
 	ConversionService conversionService = new SpringConversionServiceAdapter()
+
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
     public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod = "Create") {

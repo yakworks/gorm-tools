@@ -1,122 +1,79 @@
-## Introduction
+<pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
-Since we were setting up a bunch of services that looked a lot like the old school Dao's. We figured we would just call them that instead of data services, repository, etc...
+      ________                                           _.-````'-,_
+     /  _____/  ___________  _____                   ,-'`           `'-.,_
+    /   \  ___ /  _ \_  __ \/     \          /)     (\       9ci's       '``-.
+    \    \_\  (  <_> )  | \/  Y Y  \        ( ( .,-') )    Yak Works         ```
+     \______  /\____/|__|  |__|_|  /         \ '   (_/                         !!
+            \/                   \/           |       /)           '           !!!
+  ___________           .__                   `\    ^'            '     !    !!!!
+  \__    ___/___   ____ |  |   ______           !      _/! , !   !  ! !  !   !!!
+    |    | /  _ \ /  _ \|  |  /  ___/            \Y,   |!!!  !  ! !!  !! !!!!!!!
+    |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
+    |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
+                                  \/               /_(      /_(/_(    /_(  /_(   
+            v3.3.1-SNAPSHOT
 
-**Purpose**
+</pre>
 
-* To provide standardization across our apps for transactional saves using failOnError:true to throw a Runtime Exception without changing config. see persist() method.
-* ensure that each call to persist() will create a Transaction if its not already inside of one. See more about the problems that can occur in example below.
-* A clean standard way to abstract boiler plate business logic from the controller into a this dao service for databinding maps and JSON. Works somewhat like gorm's new data services. 
-* easily allows validation outside of constraints to persistence without needing to modify the domain source. For example, if I have a `Thing` domain in my things plugin and I need to customize the validation logic for an insert in my Fancy-Thing app or perhaps implement events, I can simply create a ThingDao in the Fancy-Thing that overrides the one in the Thing plugin. 
-* Problems with doing more advanced persistence that you can in beforeInsert, beforeUpdate, etc with the build in GORM. As mentioned in the gorm docs
-> Do not attempt to flush the session within an event (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError."
+This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.io/gorm-rest-api/). There are 2 primary patterns this library enables as detailed below for DAO's and Mango ( A mongo query like way to get data with a Map)
 
-    * we ran into a number of problems, as many do, with session management here. A dao service creates simple centralized contract for how to do this without suffering from the session limitations in hibernate/gorm
 
-If you are using envers or cascade saves then we want the saves and updates to be in a transaction by default and a proper thrown error to cause a roll back of all the changes. Not something you get with failOnError:false.
 
-**Example of the transaction propagation issue:**
+## DAO Services
+<small>[jump to docs](dao)</small>
 
-With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
+A DAO, Data Access Object, is a data service bean for logic to validate, bind, persist and query data that resides in a database or  (via GORM usually of course).
+The design here is similiar to [Spring's Repository pattern](https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/) and Grails GORM's new [Data Services](http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices) pattern.
 
-With this plugin and a controller you can just do:
+We found our selves setting up a bunch of services that looked a lot like the old school Dao's (or Repositories in DDD language). We figured we would just call them that instead of data services, repository, etc... to prevent confusion with spring and now gorm.
 
-```groovy
-def update() {
-  try{
-    def result = YourDomainClass.update(p)
-      flash.message = result.message
-      redirect(action: 'show', id: result.entity.id)
-  } catch(DomainException e) {
-    flash.message = e.messageMap
-    render(view: 'edit', model: [(domainInstanceName): e.entity])
-  }
+### Goals
+
+* **Standardization**: a clean common pattern across our apps for service layer logic that reduces boiler plate in both services as well as controllers.
+* **Transactional Saves**: every save() or persist() is wrapped in a transaction if one doesn't already exist. This is critical when there are cascading saves and updates.
+* **RuntimeException Rollback**: saves or `persist()` always occur with failOnError:true so a RuntimeException is thrown for both DataAccessExceptions as well a validation exceptions.
+This is critical for deeply nested domain logic dealing with saving multiple domains chains.
+* **Data Binding Service**: databinding maps and therefore JSON is a first class citizen where it belongs in the data service layer. Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.
+* **Events & Validation**: the DAO service allows a central place to do events such as beforeSave, beforeValidate, etc so as not to pollute the domain class. This pattern makes it easier to keeps the special logic in a transaction as well. Allows validation outside of constraints to persistence without needing to modify the domain source.
+* **Events with Flushing**: As mentioned in the Gorm docs, "Do not attempt to flush the session within an event (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.". Putting the event business logic in the DAO keeps it all in a normal transaction and a flush is perfectly fine.  
+* **Override Plugin's Domain Logic**: Since the DAO is a service this also easily allows default logic in a provided plugin to be overriden in an application. For example, I can have a CustomerDao in a plugin that deals with common logic to validate address. I can then easily override and implement that CustomerDao in
+
+
+## Mango Queries
+
+The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
+The DAO Service's and RestApiController come with a `query(criteriaMap, closure)` method. It allows yout get a paginated list of entities restricted by
+the properties in the `criteriaMap`.
+The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
+and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax)
+with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
+
+>Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.
+
+**Example**
+for example, sending a JSON search param that looks like this
+``` js
+{
+  "name": "Bill%",
+  "type": "New",
+  "age": {"$gt": 65}
 }
 ```
-    
-Each domain gets injected with its own static dao object based on the GormDaoSupport service. If it finds a service that in the form of <<Domain Name>>Dao that is in any services or dao dir under grai-app then it will use that.
+would get converted to the equivalent criteria
 
-**Example** You can setup your own dao for the domain like so and keep the logic in your Dao service and leave the controller alone as all the logic will flow over
-
-See [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy)
-
-```groovy
-class OrgDao extends GormDaoSupport {
-    def domainClass = Org
-    
-    def update(params){
-        // ... do some stuff to the params
-        def result = super.update(params)
-        // ... do something like log history or send email with result.entity which is the saved org
-        return result
-    }
-}
-```
-
-## Installation
-
-## Getting Started
-
-## Domain Traits
-    
-### Dynamic methods added to the domains
-
-Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
-
-**persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
-
-**remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by default. Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
-
-### Statics added to the domain
-
-**insertAndSave(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (essentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
-
-**update(params)**:  calls the dao.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
-
-**remove(params)**:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
-
-**dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
-
-## DaoUtil and DaoMessage
-
-See [DaoUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy)
-
-#### DaoUtil:
-
-**checkFound(entity, Map params,String domainClassName)** checks does the entity exists, if not throws DomainNotFoundException with human readable error text
-
-**checkVersion(entity,ver)** checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws DomainException
-
-**flush()** flushes the session
-
-**clear()** clears session cache
-
-**flushAndClear()** flushes the session and clears the session cache
-
-#### DaoMessage contains bunch of help methods for creating text messages
-
-See [DaoMessage](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoMessage.groovy)
-
-## Grails 3:
-Dynamic methods were implemented with trait instead of meta programing, so now `@CompileStatic` can be used.
-Due to this changes static method `insert` for domain objects was renamed to `insertAndSave`, because domain class instances
-already have `insert` method and we can't have both static and instance methods with same list of args.
-
-
-**Example** To be able to use advantages of the dao plugin for REST apps, extend controller from RestDaoController:
-
-See [RestDaoController](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/RestDaoController.groovy)
-
-```groovy
-class OrgController extends RestDaoController<Org> {
-    static responseFormats = ['json']
-    static namespace = "api"
-
-    OrgController() {
-        super(Org)
-    }
+```javascript
+criteria.list {
+    ilike "name", "Bill%"
+    eq "type", "New"
+    gt "age", 65
 }
 ```
 
-If controller is extended for RestDaoController then methods will use dao services for current domain. For example
-POST action will call dao insert method for Org domain.
+## Install Dependency
+
+To use the Gorm-Tools you should add a dependency on the plugin to your build.gradle file:
+
+```
+runtime "org.grails.plugins:gorm-tools:@VERSION@"
+```

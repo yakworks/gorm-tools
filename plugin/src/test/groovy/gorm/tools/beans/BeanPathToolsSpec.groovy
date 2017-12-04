@@ -22,22 +22,27 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         def obj = new TestClazzA(
                 foo: '1111',
                 bar: -12.52,
-                baz: null
+                baz: null,
+                bazList: ["1", "test", "foo"],
+                bazMap: ["testKey": 1, "oneMore": 2]
         )
         expect:
         exp == BeanPathTools.getFieldValue(obj, path)
         where:
-        exp         | path
-        '1111'      | 'foo'
-        -12.52      | 'bar'
-        null        | 'baz'
+        exp                             | path
+        '1111'                          | 'foo'
+        -12.52                          | 'bar'
+        null                            | 'baz'
+        ["1", "test", "foo"]            | 'bazList'
+        ["testKey": 1, "oneMore": 2]    | 'bazMap'
     }
 
     void "Can get property value for a class hierarchy"() {
         setup:
         def obj = new TestClazzB(
                 left: new TestClazzA(
-                        foo: '1'
+                        foo: '1',
+                        bazList: ["foo"]
                 ),
                 right: new TestClazzB(
                         right: new TestClazzB(
@@ -45,7 +50,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
                         ),
                         left: new TestClazzA(
                                 foo: '3',
-                                bar: 4
+                                bar: 4,
+                                bazMap: ["test": 1]
                         )
                 ),
                 value: 5
@@ -58,8 +64,11 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         exp         | path
         5           | 'value'
         '1'         | 'left.foo'
+        ["foo"]     | 'left.bazList'
         2           | 'right.right.value'
         4           | 'right.left.bar'
+        ["test": 1] | 'right.left.bazMap'
+        null        | 'right.left.bazList'
     }
 
     void "Get properties by path"() {
@@ -95,7 +104,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         'right.right.value'     | [right: [right: [value: 2]]]
         'right.left.value1'     | [right: [left: [:]]]
         'right.left.bar'        | [right: [left: [bar: 4]]]
-        'right.left.*'          | [right: [left: [bar: 4, foo: '3', id: 5, version: 0]]]
+        'right.left.*'          | [right: [left: [bar: 4, foo: '3', id: 5, version: 0, bazMap:null, bazList: null]]]
         'right.*'               | [right: [id: 6, value: 0, version: null]]
     }
 
@@ -112,7 +121,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         where:
         path                    | exp
         'value'                 | [value: 10]
-        'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: 0], [id: 2, bar: null, foo: 'val 2', version: 0]]]
+        'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: 0, bazMap:null, bazList: null], [id: 2, bar: null, foo: 'val 2', version: 0, bazMap:null, bazList: null]]]
     }
 
     void "test propsToMap for a non domain"() {
@@ -187,7 +196,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
 
     void "test buildMapFromPaths"() {
         setup:
-        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00 )
+        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2] )
         object.addToBaz(new TestClazzC(id: 5, version: 0, value: 23))
 
         expect:
@@ -196,8 +205,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         where:
         fields   | result
         ['foo']  | [foo: 'foo']
-        ['*']    | [foo: 'foo', bar: 10.00, id: 0L, version:0]
-        ['*', 'baz.id']    | [foo: 'foo', bar: 10.00, id: 0L, version:0, baz:[[id:5]]]
+        ['*']    | [foo: 'foo', bar: 10.00, id: 0L, version:0, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+        ['*', 'baz.id']    | [foo: 'foo', bar: 10.00, id: 0L, version:0, baz:[[id:5]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
     }
 
     void "test buildMapFromPaths for all fields using delegating bean"() {
@@ -253,7 +262,14 @@ class TestClazzA {
     String foo
     BigDecimal bar
 
-    static hasMany = [baz: TestClazzC] //baz as just collection is redundant, but makes sense if it is relation
+    //See https://sysgears.com/articles/advanced-gorm-features-inheritance-embedded-data-maps-and-lists-storing/
+    List<String> bazList
+
+    Map bazMap
+
+    static hasMany = [baz: TestClazzC, bazList: String]
+
+
 
     def getDao() {
         new DefaultGormDao(TestClazzA)

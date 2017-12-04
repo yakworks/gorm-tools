@@ -8,6 +8,7 @@ import gorm.tools.databinding.FastBinder
 import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
+import gorm.tools.mango.MangoQuery
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -23,6 +24,7 @@ class DaoPluginHelper {
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
         fastBinder(FastBinder)
+        mangoQuery(MangoQuery)
 
         jdbcIdGenerator(JdbcIdGenerator){
             jdbcTemplate = ref("jdbcTemplate")

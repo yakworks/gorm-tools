@@ -4,6 +4,7 @@ import gorm.tools.dao.DaoEventInvoker
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.databinding.FastBinder
+import gorm.tools.mango.MangoQuery
 import grails.plugin.dao.DaoArtefactHandler
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
@@ -40,6 +41,7 @@ trait DaoDataTest implements DataTest, AutowiredTest {
         }
 
         defineBeans(daoBeans << {
+            mangoQuery(MangoQuery)
             fastBinder(FastBinder)
             daoEventInvoker(DaoEventInvoker)
             daoUtilBean(DaoUtil)

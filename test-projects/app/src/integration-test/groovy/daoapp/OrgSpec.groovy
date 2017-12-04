@@ -447,19 +447,4 @@ class OrgSpec extends Specification {
         list.size() == 11
 
     }
-
-    def "test count totals"(){
-        when:
-        Map totals = Org.dao.countTotals([:],['credit', 'id'])
-        then:
-        totals.id == Org.createCriteria().get{projections{sum('id')}}
-        totals.credit == Org.createCriteria().get{projections{sum('credit')}}
-
-        when:
-        totals = Org.dao.countTotals([criteria:[id:4]],['credit', 'id'])
-        then:
-        totals.id == 4
-        totals.credit == 5000
-    }
-
 }

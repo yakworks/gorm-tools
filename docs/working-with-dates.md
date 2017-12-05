@@ -84,16 +84,9 @@ or number of days
 
 ## MultiFormatDateConverter
 
-See [MultiFormatDateConverter](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/MultiFormatDateConverter.groovy)
+MultiFormatDateConverter extends general type conversion system for dates. It is used to date formatted string to date.
 
-### Using a universal date converter
+Under the hood it uses DateUtil and supports next formats "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ss.SSSZ", "yyyy-MM-dd'T'HH:mm:ssZ",
+"yyyy-MM-dd'T'HH:mm:ss", "MM/dd/yy"
 
-```groovy
-
-    MultiFormatDateConverter converter = new MultiFormatDateConverter()
-
-    Date date = converter.convert("2017-10-13")          // passing date in format yyyy-MM-dd
-    Date date = converter.convert("10/13/2017")          // passing date in format MM/dd/yy
-    Date date = converter.convert("2017-10-13T10:00:00") // passing date in format yyyy-MM-dd'T'HH:mm:ss
-
-```
+To apply it to application add a spring bean for it. The bean name could be any

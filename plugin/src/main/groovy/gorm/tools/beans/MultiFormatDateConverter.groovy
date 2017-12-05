@@ -5,6 +5,13 @@ import groovy.transform.CompileStatic
 import org.apache.commons.lang.time.DateUtils
 import org.springframework.core.annotation.Order
 
+/**
+ * Used for binding date properties from string
+ *
+ * So if property is Date and the value that should be bind to it is string, then it will be converted by default before
+ * binding
+ *
+ */
 @Order(value = 1)
 @CompileStatic
 class MultiFormatDateConverter implements ValueConverter {
@@ -15,13 +22,19 @@ class MultiFormatDateConverter implements ValueConverter {
     boolean allowEmpty = true
 
     //DateUtils.parseDate will do these in order
-    String[] formats = ['MM/dd/yy', 'yyyy-MM-dd'] //, 'MM/dd/yy HH:mm', 'yyyy-MM-dd HH:mm' ]
+    String[] formats = ['MM/dd/yy', 'yyyy-MM-dd']
 
     @Override
     boolean canConvert(Object value) {
         return (value instanceof String)
     }
 
+    /**
+     * Converts input string to date format based on formats
+     *
+     * @param value date value
+     * @return parsed date if value is string, value in other case
+     */
     @Override
     Object convert(Object value) {
         Date dateValue = null
@@ -39,6 +52,11 @@ class MultiFormatDateConverter implements ValueConverter {
 
     }
 
+    /**
+     * The type converter should be applied to
+     *
+     * @return Date
+     */
     @Override
     Class<?> getTargetType() {
         return Date

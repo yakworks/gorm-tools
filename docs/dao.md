@@ -146,3 +146,60 @@ An extension of the default ValidationException. It is possible to pass the enti
 See [DomainNotFoundException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainNotFoundException.groovy)
 
 An extension of the DomainException to be able to handle rest request which should respond with 404 error.
+
+
+## Testing support
+Plugin provides [DaoDataTest](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/DaoDataTest.groovy) and [DaoHibernateSpec](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/DaoHibernateSpec.groovy)
+To make it easy to write tests which utilizes dao.
+
+**Writing unit tests using DaoDataTest**  
+DaoDataTest extends grails DataTest and configures a dao bean for every mock domain. The Dao class must exist in same package as the domain class, or else, it will configure DefaultGormDao as the dao for the given domain.
+  
+```groovy
+
+class CitySpec extends Specification implements DaoDataTest {
+   
+   void setup() {
+        mockDomain(City)
+   }
+   
+   void "test create"() {
+     given:
+     Map params = [name:"Chicago"]
+     
+     when:
+     City city = City.create(params)
+     //or City.dao.create(params)
+     
+     then:
+     city.name == "Chicago"
+   }
+}
+```  
+
+**DaoHibernateSpec**  
+DaoHibernateSpec extends HibernateSpec and setups dao beans for domains. Can be used to unit test with full hibernate support with inmemory database.
+
+
+```groovy
+
+class CitySpec extends DaoHibernateSpec {
+   
+  List<Class> getDomainClasses() { [City] }
+   
+   void "test create"() {
+     given:
+     Map params = [name:"Chicago"]
+     
+     when:
+     City city = City.create(params)
+     //or City.dao.create(params)
+     
+     then:
+     city.name == "Chicago"
+   }
+}
+```  
+
+When ```getDomainClasses()``` is overridden DaoHibernateSpec will try to find the dao in the same package as domain class. Alternatively if ```getPackageToScan()``` is provided, it will find all the dao from the given package and below it. 
+

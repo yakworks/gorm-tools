@@ -1,15 +1,10 @@
 package gorm.tools.dao
 
-import gorm.tools.databinding.FastBinder
 import gorm.tools.testing.DaoHibernateSpec
-import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
-import org.grails.testing.GrailsUnitTest
-import spock.lang.Specification
 import testing.Location
 import testing.Nested
 import testing.Org
-import testing.OrgDao
 
 class GormDaoSpec extends DaoHibernateSpec implements AutowiredTest {
 

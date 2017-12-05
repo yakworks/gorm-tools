@@ -17,6 +17,10 @@ class GormDaoSpec extends DaoHibernateSpec implements AutowiredTest {
         //daoEventInvoker.cacheEvents(OrgDao)
     }
 
+    Closure doWithConfig() {{ config ->
+        config.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
+    }}
+
 
     def "test create"() {
         when:
@@ -50,5 +54,13 @@ class GormDaoSpec extends DaoHibernateSpec implements AutowiredTest {
 
         and: "Event should have been fired on dao"
         org.event == "beforeUpdate"
+    }
+
+    def "test criteria name config"(){
+        when:
+        Org org = new Org(name:"test")
+
+        then:
+        org.dao.mangoQuery.criteriaKeyName == "testCriteriaName"
     }
 }

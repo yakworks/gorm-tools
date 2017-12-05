@@ -76,10 +76,10 @@ grails:
 endpoints:
     jmx:
         unique-names: true
-dao:
-    mango:
-        criteria: criteria
-
+gorm:
+    tools:
+        mango:
+            criteriaKeyName: criteria
 ---
 hibernate:
     cache:

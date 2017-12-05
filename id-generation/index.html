@@ -482,9 +482,22 @@ Here is an example domain class.</p>
 
 <p>Identity generator will check in NewObjectId table for keyName <code>Book</code> If it exists, it will return the value of NextId or else it will insert a new row in NewObjectId table.</p>
 <h3 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
-<p>By default the following beans are enabled.
-TODO</p>
-<p>TODO Describe the BatchIdGenerator and how to configure.</p>
+<p>By default the following beans are enabled.</p>
+<p><strong>jdbcIdGenerator</strong><br />
+A Jdbc implementation of the IdGenerator, it uses NewObjectId central table to query the new ids.</p>
+<p><strong>idGenerator(BatchIdGenerator)</strong><br />
+Idgenerator implementation that caches a range of values in memory by the key name. It caches a batch of id for each key and increments in memory thus provides better performance.
+Internally it uses jdbcIdGenerator to query for next batch of ids.</p>
+<p>BatchIdGenerator by default uses allocationSize size of 100. Which can be changed by overriding the spring bean as shown below.</p>
+<div class="codehilite"><pre><span></span> <span class="n">idGenerator</span><span class="o">(</span><span class="n">BatchIdGenerator</span><span class="o">){</span>
+    <span class="n">generator</span> <span class="o">=</span> <span class="n">ref</span><span class="o">(</span><span class="s2">&quot;jdbcIdGenerator&quot;</span><span class="o">)</span>
+    <span class="n">allocationSize</span> <span class="o">=</span> <span class="mi">50</span>
+  <span class="o">}</span>
+</pre></div>
+
+<p>Dao plugin by default configures the BatchIdGenerator as default idgenerator. If you need to use another idgenerator or provide a custom implementation, you can override the <strong>idGenerator</strong> spring bean.</p>
+<p><strong>jdbcTemplate</strong>
+Dao plugin also configures JdbcTemplate which can be used for low level jdbc access. It uses TransactionAwareDataSourceProxy so the queries run through the jdbcTemplate will be part of the current transaction.</p>
                 
                   
                 

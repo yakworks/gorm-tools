@@ -24,7 +24,6 @@ class MultiFormatDateConverter implements ValueConverter {
     //DateUtils.parseDate will do these in order
     String[] formats = ['MM/dd/yy', 'yyyy-MM-dd']
 
-
     @Override
     boolean canConvert(Object value) {
         return (value instanceof String)

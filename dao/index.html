@@ -377,6 +377,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#testing-support" title="Testing support" class="md-nav__link">
+    Testing support
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -574,6 +581,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#testing-support" title="Testing support" class="md-nav__link">
+    Testing support
+  </a>
+  
+</li>
+      
       
       
     </ul>
@@ -692,6 +706,52 @@ Uses i18n messages.</p>
 <h2 id="domainnotfoundexception">DomainNotFoundException<a class="headerlink" href="#domainnotfoundexception" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainNotFoundException.groovy">DomainNotFoundException</a></p>
 <p>An extension of the DomainException to be able to handle rest request which should respond with 404 error.</p>
+<h2 id="testing-support">Testing support<a class="headerlink" href="#testing-support" title="Permanent link">&para;</a></h2>
+<p>Plugin provides <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/DaoDataTest.groovy">DaoDataTest</a> and <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/DaoHibernateSpec.groovy">DaoHibernateSpec</a>
+To make it easy to write tests which utilizes dao.</p>
+<p><strong>Writing unit tests using DaoDataTest</strong><br />
+DaoDataTest extends grails DataTest and configures a dao bean for every mock domain. The Dao class must exist in same package as the domain class, or else, it will configure DefaultGormDao as the dao for the given domain.</p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CitySpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">DaoDataTest</span> <span class="o">{</span>
+
+   <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">mockDomain</span><span class="o">(</span><span class="n">City</span><span class="o">)</span>
+   <span class="o">}</span>
+
+   <span class="kt">void</span> <span class="s2">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
+     <span class="nl">given:</span>
+     <span class="n">Map</span> <span class="n">params</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Chicago&quot;</span><span class="o">]</span>
+
+     <span class="nl">when:</span>
+     <span class="n">City</span> <span class="n">city</span> <span class="o">=</span> <span class="n">City</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
+     <span class="c1">//or City.dao.create(params)</span>
+
+     <span class="nl">then:</span>
+     <span class="n">city</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="s2">&quot;Chicago&quot;</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p><strong>DaoHibernateSpec</strong><br />
+DaoHibernateSpec extends HibernateSpec and setups dao beans for domains. Can be used to unit test with full hibernate support with inmemory database.</p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CitySpec</span> <span class="kd">extends</span> <span class="n">DaoHibernateSpec</span> <span class="o">{</span>
+
+  <span class="n">List</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&gt;</span> <span class="n">getDomainClasses</span><span class="o">()</span> <span class="o">{</span> <span class="o">[</span><span class="n">City</span><span class="o">]</span> <span class="o">}</span>
+
+   <span class="kt">void</span> <span class="s2">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
+     <span class="nl">given:</span>
+     <span class="n">Map</span> <span class="n">params</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Chicago&quot;</span><span class="o">]</span>
+
+     <span class="nl">when:</span>
+     <span class="n">City</span> <span class="n">city</span> <span class="o">=</span> <span class="n">City</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
+     <span class="c1">//or City.dao.create(params)</span>
+
+     <span class="nl">then:</span>
+     <span class="n">city</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="s2">&quot;Chicago&quot;</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>When <code>getDomainClasses()</code> is overridden DaoHibernateSpec will try to find the dao in the same package as domain class. Alternatively if <code>getPackageToScan()</code> is provided, it will find all the dao from the given package and below it. </p>
                 
                   
                 

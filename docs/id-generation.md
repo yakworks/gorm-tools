@@ -73,8 +73,5 @@ BatchIdGenerator by default uses allocationSize size of 100. Which can be change
 
 Dao plugin by default configures the BatchIdGenerator as default idgenerator. If you need to use another idgenerator or provide a custom implementation, you can override the **idGenerator** spring bean.
 
-
-
-
 **jdbcTemplate**
 Dao plugin also configures JdbcTemplate which can be used for low level jdbc access. It uses TransactionAwareDataSourceProxy so the queries run through the jdbcTemplate will be part of the current transaction.

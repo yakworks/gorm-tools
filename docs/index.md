@@ -70,10 +70,16 @@ criteria.list {
 }
 ```
 
-## Install Dependency
+## Getting started
 
-To use the Gorm-Tools you should add a dependency on the plugin to your build.gradle file:
+To use the Gorm-Tools add the dependency on the plugin to your build.gradle file:
 
 ```
-runtime "org.grails.plugins:gorm-tools:@VERSION@"
+runtime "org.grails.plugins:dao:@VERSION@"
 ```
+
+And you can start using the plugin by calling the dao methods on domain classes. 
+The plugin adds several persistence methods to domain classes. Which delegates to dao classes. This includes persist(), create(params), update(update), remove()
+
+See [DAO Services](dao.md) for more details
+

@@ -1,4 +1,29 @@
 
+Dao Artefacts
+---
+Plugin adds a new artefact type **Dao**. One dao bean is configured for each domain.   
+[DefaultGormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/DefaultGormDao.groovy) is configured, If no explicit dao class exists for a domain.
+
+Reference to a dao for given domain class can be easily obtained by calling ```DomainClass.dao``` static method.
+
+**Creating Dao classes**  
+Dao classes are put inside grails-app/dao and named as ```DomainNameDao``` (eg ```OrgDao```). 
+Plugin will automatically lookup all dao classes and configure them as spring beans.
+
+Dao must either implement [GormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/GormDao.groovy) Trait. Or Extend [DefaultGormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/DefaultGormDao.groovy)
+ 
+Example:
+ 
+ ```groovy
+ class OrgDao extends DefaultGormDao<Org> {
+     
+     void beforeCreate(Org org, Map params) {
+        //do some thing before create
+      }
+      
+ }
+ ```
+
 **Example of the transaction propagation issue:**
 
 With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
@@ -18,30 +43,12 @@ def update() {
 }
 ```
 
-Each domain gets injected with its own static dao object based on the GormDaoSupport service. If it finds a service that in the form of <<Domain Name>>Dao that is in any services or dao dir under grai-app then it will use that.
-
-**Example** You can setup your own dao for the domain like so and keep the logic in your Dao service and leave the controller alone as all the logic will flow over
-
-See [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy)
-
-```groovy
-class OrgDao extends GormDaoSupport {
-    def domainClass = Org
-
-    def update(params){
-        // ... do some stuff to the params
-        def result = super.update(params)
-        // ... do something like log history or send email with result.entity which is the saved org
-        return result
-    }
-}
-```
 
 ## Domain Traits
 
-### Dynamic methods added to the domains
+### Methods added to the domains
 
-Every domain gets a dao which is either setup for you or setup by extending e [GormDaoSupport](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/GormDaoSupport.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
+Every domain gets a dao which is either setup for you or setup by implementing  [GormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/GormDao.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
 
 **persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
@@ -49,13 +56,26 @@ Every domain gets a dao which is either setup for you or setup by extending e [G
 
 ### Statics added to the domain
 
-**insertAndSave(params)**:  calls the dao.insert which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (essentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
+**create(params)**:  calls the dao.create which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (essentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
 **update(params)**:  calls the dao.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-**remove(params)**:  calls the dao.delete gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
+**remove(id)**:  calls the dao.removeById gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
 **dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
+
+
+## Dao events
+Each of the dao can implement any of the methods listed below and they will get called during persistence operation.
+ 
+**beforeCreate(T instance)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.
+**afterCreate(T instance, Map params)** - Called after the new instance is saved.
+**beforeRemove(T instance)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.
+**afterRemove(T instance)** - After an instance is removed.
+**beforeUpdate(T instance, Map params)** - Called before an instance is updated
+**afterUpdate(T instance, Map params)** - Called after an instance is updated
+**beforePersist(T instance)** - Called every time before an instance is saved.
+**afterPersist(T instance)** - Called every time after an instance is saved.
 
 ## DaoUtil and DaoMessage
 

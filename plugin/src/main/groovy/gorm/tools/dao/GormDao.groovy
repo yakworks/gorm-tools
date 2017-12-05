@@ -2,7 +2,7 @@ package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainNotFoundException
 import gorm.tools.databinding.FastBinder
-import gorm.tools.mango.MangoQueryApi
+import gorm.tools.mango.DaoQuery
 import gorm.tools.dao.errors.DomainException
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
@@ -20,7 +20,7 @@ import org.springframework.dao.DataIntegrityViolationException
  * @author Joshua Burnett
  */
 @CompileStatic
-trait GormDao<D extends GormEntity> implements MangoQueryApi{
+trait GormDao<D extends GormEntity> implements DaoQuery{
 
     @Autowired
     FastBinder dataBinder

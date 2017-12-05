@@ -283,8 +283,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install-dependency" title="Install Dependency" class="md-nav__link">
-    Install Dependency
+  <a href="#getting-started" title="Getting started" class="md-nav__link">
+    Getting started
   </a>
   
 </li>
@@ -416,8 +416,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install-dependency" title="Install Dependency" class="md-nav__link">
-    Install Dependency
+  <a href="#getting-started" title="Getting started" class="md-nav__link">
+    Getting started
   </a>
   
 </li>
@@ -505,10 +505,14 @@ would get converted to the equivalent criteria</p>
 <span class="p">}</span>
 </pre></div>
 
-<h2 id="install-dependency">Install Dependency<a class="headerlink" href="#install-dependency" title="Permanent link">&para;</a></h2>
-<p>To use the Gorm-Tools you should add a dependency on the plugin to your build.gradle file:</p>
-<div class="codehilite"><pre><span></span>runtime &quot;org.grails.plugins:gorm-tools:@VERSION@&quot;
+<h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
+<p>To use the Gorm-Tools add the dependency on the plugin to your build.gradle file:</p>
+<div class="codehilite"><pre><span></span>runtime &quot;org.grails.plugins:dao:@VERSION@&quot;
 </pre></div>
+
+<p>And you can start using the plugin by calling the dao methods on domain classes. 
+The plugin adds several persistence methods to domain classes. Which delegates to dao classes. This includes persist(), create(params), update(update), remove()</p>
+<p>See <a href="dao/">DAO Services</a> for more details</p>
                 
                   
                 

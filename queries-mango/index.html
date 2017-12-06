@@ -328,6 +328,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#quick-search" title="Quick Search" class="md-nav__link">
+    Quick Search
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" title="Configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#count-totals" title="Count totals" class="md-nav__link">
+    Count totals
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -498,6 +519,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#quick-search" title="Quick Search" class="md-nav__link">
+    Quick Search
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" title="Configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#count-totals" title="Count totals" class="md-nav__link">
+    Count totals
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -567,7 +609,7 @@
                 <p>Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL query.</p>
 <h2 id="mango-overview">Mango Overview<a class="headerlink" href="#mango-overview" title="Permanent link">&para;</a></h2>
 <p>The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
-The gorm dao's come with a <code>list(criteriaMap, closure)</code> method. It allows to get list of entities restricted by
+The gorm dao's come with a <code>query(criteriaMap, closure)</code> method. It allows to get list of entities restricted by
 the properties in the <code>criteriaMap</code>. The map could be passed as JSON string or Map. All restrictions should be under <code>criteria</code> keyword by default, see example
 bellow.</p>
 <p>Anything in the optional closure will be passed into Gorm/Hibernate criteria closure</p>
@@ -579,8 +621,8 @@ with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sq
 </blockquote>
 <p><strong>Example</strong></p>
 <div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">list</span><span class="o">([</span>
-  <span class="n">criteria</span><span class="o">:</span> <span class="o">[</span><span class="n">name</span><span class="o">:</span> <span class="s">&quot;Virgin%&quot;</span><span class="o">,</span> <span class="n">type</span><span class="o">:</span> <span class="s">&quot;New&quot;</span><span class="o">],</span>
-  <span class="n">order</span><span class="o">:</span> <span class="o">{</span><span class="n">name</span><span class="o">:</span><span class="s">&quot;asc&quot;</span><span class="o">},</span>
+  <span class="n">criteria</span><span class="o">:</span> <span class="o">[</span><span class="n">name</span><span class="o">:</span> <span class="s">&quot;Bill%&quot;</span><span class="o">,</span> <span class="n">type</span><span class="o">:</span> <span class="s">&quot;New&quot;</span><span class="o">],</span>
+  <span class="n">sort</span><span class="o">:</span> <span class="o">{</span><span class="n">name</span><span class="o">:</span><span class="s">&quot;asc&quot;</span><span class="o">},</span>
   <span class="n">max</span><span class="o">:</span> <span class="mi">20</span>
 <span class="o">]){</span>
   <span class="n">gt</span> <span class="s">&quot;id&quot;</span><span class="o">,</span> <span class="mi">5</span>
@@ -592,16 +634,17 @@ with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sq
 <span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="nx">max</span><span class="o">:</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">ilike</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill%&quot;</span>
     <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
-    <span class="nx">gt</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="mi">5</span>
+    <span class="nx">gt</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="mi">5</span>
     <span class="nx">order</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
 
 <h3 id="restful-api-query">Restful API query<a class="headerlink" href="#restful-api-query" title="Permanent link">&para;</a></h3>
-<p>see the docs here for more examples and info <a href="https://yakworks.github.io/gorm-rest-api/">https://yakworks.github.io/gorm-rest-api/</a></p>
+<p>See the docs here for more examples and info <a href="https://yakworks.github.io/gorm-rest-api/">https://yakworks.github.io/gorm-rest-api/</a></p>
 <h3 id="criteria-options">Criteria options<a class="headerlink" href="#criteria-options" title="Permanent link">&para;</a></h3>
-<p>for examples well assume we are querying a domain model that looks like the
+<p>For examples well assume we are querying a domain model that looks like the
 starwars api here <a href="http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279">http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279</a></p>
+<p>Bellow are listed all supported options.</p>
 <h4 id="logical">Logical<a class="headerlink" href="#logical" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -706,7 +749,7 @@ starwars api here <a href="http://stapi.co/api/v1/rest/spacecraft?uid=SRMA000000
 </tr>
 <tr>
 <td>$isNotNull</td>
-<td></td>
+<td>Value is not null</td>
 <td><code>&quot;name&quot;: &quot;$isNotNull&quot; \|</code>"name":{$ne: null}</td>
 </tr>
 </tbody>
@@ -766,7 +809,7 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
     <span class="s2">&quot;dateOfBirth&quot;</span><span class="o">:</span> <span class="s2">&quot;1957-07-26&quot;</span> <span class="c1">// dates</span>
     <span class="s2">&quot;placeOfBirth&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$eqf&quot;</span><span class="o">:</span> <span class="s2">&quot;$placeOfDeath&quot;</span><span class="p">}</span> <span class="c1">//equals another field in set</span>
   <span class="p">},</span>
-  <span class="s2">&quot;sort&quot;</span><span class="o">:</span><span class="s2">&quot;name&quot;</span>
+  <span class="s2">&quot;sort&quot;</span><span class="o">:</span><span class="s2">&quot;name&quot;</span> <span class="c1">// asc by default</span>
 <span class="p">}</span>
 </pre></div>
 
@@ -776,7 +819,7 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
   <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">name</span> <span class="k">ASC</span><span class="p">,</span> <span class="n">dateOfBirth</span> <span class="k">DESC</span><span class="p">;</span>
 </pre></div>
 
-<p><strong>associations</strong>
+<p><strong>Associations</strong>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
     <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span>
@@ -804,7 +847,7 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
       <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]}</span>
     <span class="p">},</span>
 
-    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span> <span class="cm">/* an array means it will use not { in/inList }*/</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span> <span class="cm">/* an array means it will use `not { in/inList }`*/</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div></p>
@@ -876,10 +919,10 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
 <span class="cm">        .... */</span>
   <span class="p">}</span>
 <span class="p">}</span>
-</pre></div>
-<strong>Quick Search</strong></p>
+</pre></div></p>
+<h3 id="quick-search">Quick Search<a class="headerlink" href="#quick-search" title="Permanent link">&para;</a></h3>
 <p>Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
-search can be passed in <code>quickSearch</code> or <code>q</code> keywords. The list of fields should be specified in static property <code>quickSearchFields</code>
+search can be passed in <code>$quickSearch</code> or <code>$q</code> keywords. The list of fields should be specified in static property <code>quickSearchFields</code>
 as list of strings, see bellow:</p>
 <p><div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Org</span> <span class="o">{</span>
     <span class="n">String</span> <span class="n">name</span>
@@ -890,9 +933,9 @@ as list of strings, see bellow:</p>
 </pre></div>
 So mapQL will add <code>%</code> automatically, if quick search string doesn't have it and will apply <code>ilike</code> statement
 for each field in <code>quickSearchFields</code>. If domain field is not string type, then <code>eq</code> statement will be used.</p>
-<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">search</span><span class="o">([</span><span class="nl">criteria:</span> <span class="o">[</span><span class="nl">quickSearch:</span> <span class="s2">&quot;abc&quot;</span><span class="o">],</span> <span class="nl">max:</span> <span class="mi">20</span><span class="o">])</span>
+<p><div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">search</span><span class="o">([</span><span class="nl">criteria:</span> <span class="o">[</span><span class="n">$quickSearch</span><span class="o">:</span> <span class="s2">&quot;abc&quot;</span><span class="o">],</span> <span class="nl">max:</span> <span class="mi">20</span><span class="o">])</span>
 </pre></div>
-
+So it is the same as:</p>
 <div class="codehilite"><pre><span></span><span class="n">Criteria</span> <span class="n">criteria</span> <span class="o">=</span> <span class="n">Org</span><span class="o">.</span><span class="na">createCriteria</span><span class="o">()</span>
 <span class="n">criteria</span><span class="o">.</span><span class="na">list</span><span class="o">(</span><span class="nl">max:</span> <span class="mi">20</span><span class="o">)</span> <span class="o">{</span>
     <span class="n">or</span> <span class="o">{</span>
@@ -902,25 +945,27 @@ for each field in <code>quickSearchFields</code>. If domain field is not string 
 <span class="o">}</span>
 </pre></div>
 
-<p><strong>Configuration</strong></p>
-<p>The default <code>criteria</code> word for the restrictions can be changed in config:
-<div class="codehilite"><pre><span></span>dao:
-    mango:
-        criteria: filters
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<p>The default <code>criteria</code> keyword for the restriction map can be changed in config:
+<div class="codehilite"><pre><span></span>gorm:
+    tools:
+        mango:
+            criteriaKeyName: filters
 </pre></div></p>
 <p>With such configuration restrictions for Mango criteria should be under <code>filters</code> keyword.</p>
-<p><strong>Count totals</strong></p>
-<p>If one needs to compute totals for some fields, dao has <code>countTotals</code> method restrictions are
+<h3 id="count-totals">Count totals<a class="headerlink" href="#count-totals" title="Permanent link">&para;</a></h3>
+<p>If one needs to compute totals for some fields, MangoQuery has <code>countTotals</code> method restrictions is
 working in the same way as for list, so it can be specified with params map and criteria closure.
+But Dao doesn't contain this method, so one can call it on mangoQuery bean.
 To specify what fields sums should be computed for, the list with fields name should be passed.
 See example:
-<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">countTotals</span><span class="o">([</span>
+<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">mangoQuery</span><span class="o">.</span><span class="na">countTotals</span><span class="o">(</span><span class="n">domainClass</span><span class="o">,</span> <span class="o">[</span>
   <span class="nl">criteria:</span> <span class="o">[</span><span class="nl">name:</span> <span class="s2">&quot;Virgin%&quot;</span><span class="o">,</span> <span class="nl">type:</span> <span class="s2">&quot;New&quot;</span><span class="o">]</span>
 <span class="o">],</span> <span class="o">[</span><span class="s2">&quot;amount&quot;</span><span class="o">,</span> <span class="n">credit</span><span class="o">]){</span>
   <span class="n">gt</span> <span class="s2">&quot;id&quot;</span><span class="o">,</span> <span class="mi">5</span>
 <span class="o">}</span>
 </pre></div>
-Result will be look like: <code>[amount: 1500, credit: 440]</code>.</p>
+Result will be look like: <code>[amount: 1500, credit: 440]</code>, it doesn't take into account pagination.</p>
 <h2 id="scrollablequery">ScrollableQuery<a class="headerlink" href="#scrollablequery" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy">ScrollableQuery</a></p>
 <h3 id="execute-a-closure-for-each-record">Execute a closure for each record<a class="headerlink" href="#execute-a-closure-for-each-record" title="Permanent link">&para;</a></h3>

@@ -7,7 +7,9 @@ import gorm.tools.dao.events.DaoEventType
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
@@ -98,8 +100,17 @@ class DaoUtil implements ApplicationContextAware {
         ctx.sessionFactory.currentSession.clear()
     }
 
+    @CompileDynamic
     static void fireEvent(GormDao dao, DaoEventType eventType, Object... args) {
-        AbstractPersistenceEvent event = eventType.eventClass.newInstance(args)
+        GormEntity entity = (GormEntity)args[0]
+
+        Datastore datastore = GormEnhancer.findInstanceApi(entity.class).datastore
+
+        List<Object> constructorAgs = [datastore]
+        constructorAgs << args
+        constructorAgs = constructorAgs.flatten()
+
+        AbstractPersistenceEvent event = eventType.eventClass.newInstance(constructorAgs as Object[])
         applicationEventPublisher.publishEvent(event)
         //daoEventInvoker.invokeEvent(dao, eventType, args)
     }

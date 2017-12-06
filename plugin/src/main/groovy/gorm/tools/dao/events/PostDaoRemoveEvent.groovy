@@ -11,12 +11,12 @@ import org.grails.datastore.mapping.model.PersistentEntity
  */
 class PostDaoRemoveEvent extends AbstractPersistenceEvent {
 
-    protected PostDaoRemoveEvent() {
-        super(null, null, null)
+    PostDaoRemoveEvent(Datastore source, Object entity) {
+        super(source, entity)
     }
 
     @Override
     EventType getEventType() {
-        return EventType.PostDelete
+        return EventType.SaveOrUpdate
     }
 }

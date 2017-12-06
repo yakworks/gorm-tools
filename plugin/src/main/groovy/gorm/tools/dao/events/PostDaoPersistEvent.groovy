@@ -11,12 +11,12 @@ import org.grails.datastore.mapping.model.PersistentEntity
  */
 class PostDaoPersistEvent extends AbstractPersistenceEvent {
 
-    protected PostDaoPersistEvent() {
-        super(null, null, null)
+    PostDaoPersistEvent(Datastore source, Object entity) {
+        super(source, entity)
     }
 
     @Override
     EventType getEventType() {
-        return EventType.PostInsert
+        return EventType.SaveOrUpdate
     }
 }

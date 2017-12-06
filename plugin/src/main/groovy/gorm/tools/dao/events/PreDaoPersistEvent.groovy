@@ -1,5 +1,6 @@
 package gorm.tools.dao.events
 
+import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.EventType
 
@@ -8,12 +9,12 @@ import org.grails.datastore.mapping.engine.event.EventType
  */
 class PreDaoPersistEvent extends AbstractPersistenceEvent {
 
-    protected PreDaoPersistEvent() {
-        super(null, null, null)
+    PreDaoPersistEvent(Datastore source, Object entity) {
+        super(source, entity)
     }
 
     @Override
     EventType getEventType() {
-        return EventType.PreInsert
+        return EventType.Validation
     }
 }

@@ -1,6 +1,6 @@
 package gorm.tools.dao.events
 
-import gorm.tools.dao.DaoEntity
+import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.EventType
 
@@ -10,16 +10,14 @@ import org.grails.datastore.mapping.engine.event.EventType
 class PostDaoCreateEvent extends AbstractPersistenceEvent {
 
     Map params
-    DaoEntity instance
 
-    protected PostDaoCreateEvent(def instance, Map params) {
-        super(null, null, null)
-        this.instance = instance
+    PostDaoCreateEvent(Datastore source, Object entity, Map params) {
+        super(source, entity)
         this.params = params
     }
 
     @Override
     EventType getEventType() {
-        return EventType.PreInsert
+        return EventType.SaveOrUpdate
     }
 }

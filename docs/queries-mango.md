@@ -3,7 +3,7 @@ Gorm-tools provides a convenient way for iterating over records which correspond
 ## Mango Overview
 
 The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
-The gorm dao's come with a `list(criteriaMap, closure)` method. It allows to get list of entities restricted by
+The gorm dao's come with a `query(criteriaMap, closure)` method. It allows to get list of entities restricted by
 the properties in the `criteriaMap`. The map could be passed as JSON string or Map. All restrictions should be under `criteria` keyword by default, see example
 bellow.
 
@@ -19,8 +19,8 @@ with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as we
 
 ``` java
 Org.dao.list([
-  criteria: [name: "Virgin%", type: "New"],
-  order: {name:"asc"},
+  criteria: [name: "Bill%", type: "New"],
+  sort: {name:"asc"},
   max: 20
 ]){
   gt "id", 5
@@ -35,18 +35,20 @@ Criteria criteria = Org.createCriteria()
 criteria.list(max: 20) {
     ilike "name", "Bill%"
     eq "type", "New"
-    gt "age", 5
+    gt "id", 5
     order("name", "asc")
 }
 ```
 ### Restful API query
 
-see the docs here for more examples and info https://yakworks.github.io/gorm-rest-api/
+See the docs here for more examples and info https://yakworks.github.io/gorm-rest-api/
 
 ### Criteria options
 
-for examples well assume we are querying a domain model that looks like the
+For examples well assume we are querying a domain model that looks like the
 starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
+
+Bellow are listed all supported options.
 
 #### Logical
 
@@ -73,7 +75,7 @@ starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
 | $in        | Match any value in array         | `"field" : {"$in" : [value1, value2, ...]`   |
 | $nin       | Not match any value in array     | `"field" : {"$nin" : [value1, value2, ...]}` |
 | $isNull    | Value is null                    | `"name": "$isNull" \|  `"name": null         |
-| $isNotNull |                                  | `"name": "$isNotNull" \| `"name":{$ne: null} |
+| $isNotNull | Value is not null                | `"name": "$isNotNull" \| `"name":{$ne: null} |
 
 **Fields**
 
@@ -102,7 +104,7 @@ Assume we are running these on star trek characters http://stapi.co/api/v1/rest/
     "dateOfBirth": "1957-07-26" // dates
     "placeOfBirth": {"$eqf": "$placeOfDeath"} //equals another field in set
   },
-  "sort":"name"
+  "sort":"name" // asc by default
 }
 ```
 
@@ -115,7 +117,7 @@ This would produce in a round about way with criteria builders a where clause li
 ```
 
 
-**associations**
+**Associations**
 ```js
 {
   "criteria": {
@@ -146,7 +148,7 @@ This would produce in a round about way with criteria builders a where clause li
       "id": {"$in": [101,102,103]}
     },
 
-    "customer.id": {"$nin": [101,102,103]}, /* an array means it will use not { in/inList }*/
+    "customer.id": {"$nin": [101,102,103]}, /* an array means it will use `not { in/inList }`*/
   }
 }
 ```
@@ -225,10 +227,10 @@ This would produce in a round about way with criteria builders a where clause li
 }
 
 ```
-**Quick Search**
+###Quick Search
 
 Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
-search can be passed in `quickSearch` or `q` keywords. The list of fields should be specified in static property `quickSearchFields`
+search can be passed in `$quickSearch` or `$q` keywords. The list of fields should be specified in static property `quickSearchFields`
 as list of strings, see bellow:
 
 ```groovy
@@ -244,9 +246,10 @@ So mapQL will add `%` automatically, if quick search string doesn't have it and 
 for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
-Org.dao.search([criteria: [quickSearch: "abc"], max: 20])
+Org.dao.search([criteria: [$quickSearch: "abc"], max: 20])
 
 ```
+So it is the same as:
 
 ```groovy
 Criteria criteria = Org.createCriteria()
@@ -258,31 +261,33 @@ criteria.list(max: 20) {
 }
 ```
 
-**Configuration**
+###Configuration
 
-The default `criteria` word for the restrictions can be changed in config:
+The default `criteria` keyword for the restriction map can be changed in config:
 ```yml
-dao:
-    mango:
-        criteria: filters
+gorm:
+    tools:
+        mango:
+            criteriaKeyName: filters
 ```
 
 With such configuration restrictions for Mango criteria should be under `filters` keyword.
 
-**Count totals**
+###Count totals
 
-If one needs to compute totals for some fields, dao has `countTotals` method restrictions are
+If one needs to compute totals for some fields, MangoQuery has `countTotals` method restrictions is
 working in the same way as for list, so it can be specified with params map and criteria closure.
+But Dao doesn't contain this method, so one can call it on mangoQuery bean.
 To specify what fields sums should be computed for, the list with fields name should be passed.
 See example:
 ```groovy
-Org.dao.countTotals([
+Org.dao.mangoQuery.countTotals(domainClass, [
   criteria: [name: "Virgin%", type: "New"]
 ], ["amount", credit]){
   gt "id", 5
 }
 ```
-Result will be look like: `[amount: 1500, credit: 440]`.
+Result will be look like: `[amount: 1500, credit: 440]`, it doesn't take into account pagination.
 
 ## ScrollableQuery
 See [ScrollableQuery](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy)

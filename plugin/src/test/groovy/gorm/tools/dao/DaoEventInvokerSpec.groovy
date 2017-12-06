@@ -1,5 +1,7 @@
 package gorm.tools.dao
 
+import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.dao.events.DaoEventType
 import gorm.tools.testing.DaoDataTest
 import grails.persistence.Entity
 import spock.lang.Specification

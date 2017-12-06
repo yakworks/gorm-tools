@@ -1,7 +1,7 @@
 package grails.plugin.dao
 
 import gorm.tools.DbDialectService
-import gorm.tools.dao.DaoEventInvoker
+import gorm.tools.dao.events.DaoEventInvoker
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.databinding.FastBinder

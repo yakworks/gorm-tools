@@ -2,13 +2,17 @@ package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
+import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.dao.events.DaoEventType
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.transaction.interceptor.TransactionAspectSupport
@@ -22,10 +26,12 @@ class DaoUtil implements ApplicationContextAware {
 
     static ApplicationContext ctx
     static DaoEventInvoker daoEventInvoker
+    static ApplicationEventPublisher applicationEventPublisher
 
     void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = ctx
         daoEventInvoker = (DaoEventInvoker)ctx.getBean("daoEventInvoker")
+        applicationEventPublisher = (ApplicationEventPublisher)ctx
     }
 
     /**
@@ -93,7 +99,9 @@ class DaoUtil implements ApplicationContextAware {
     }
 
     static void fireEvent(GormDao dao, DaoEventType eventType, Object... args) {
-        daoEventInvoker.invokeEvent(dao, eventType, args)
+        AbstractPersistenceEvent event = eventType.eventClass.newInstance(args)
+        applicationEventPublisher.publishEvent(event)
+        //daoEventInvoker.invokeEvent(dao, eventType, args)
     }
 
     static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {

@@ -1,7 +1,6 @@
 package gorm.tools.dao.events
 
 import gorm.tools.dao.GormDao
-import gorm.tools.dao.events.DaoEventType
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugin.dao.DaoArtefactHandler

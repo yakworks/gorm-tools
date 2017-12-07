@@ -112,8 +112,11 @@ class DaoUtil implements ApplicationContextAware {
 
         AbstractPersistenceEvent event = eventType.eventClass.newInstance(constructorAgs as Object[])
 
+        //publish event as persistence event
         applicationEventPublisher.publishEvent(event)
-        //daoEventInvoker.invokeEvent(dao, eventType, args)
+
+        //publish events on dao as regular method calls.
+        daoEventInvoker.invokeEvent(dao, eventType, args)
     }
 
     static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {

@@ -7,7 +7,6 @@ import grails.persistence.Entity
 import spock.lang.Ignore
 import spock.lang.Specification
 
-@Ignore
 class DaoEventInvokerSpec extends Specification implements DaoDataTest {
 
     void setup() {

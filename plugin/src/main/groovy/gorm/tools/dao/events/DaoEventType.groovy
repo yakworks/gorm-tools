@@ -3,6 +3,7 @@ package gorm.tools.dao.events
 import groovy.transform.CompileStatic
 
 @CompileStatic
+@SuppressWarnings("FieldName")
 enum DaoEventType {
 
     BeforeRemove(PreDaoRemoveEvent),

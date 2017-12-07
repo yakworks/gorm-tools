@@ -15,6 +15,6 @@ class PostDaoRemoveEvent extends AbstractPersistenceEvent {
 
     @Override
     EventType getEventType() {
-        return EventType.SaveOrUpdate
+        return EventType.Validation
     }
 }

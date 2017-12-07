@@ -18,6 +18,6 @@ class PostDaoCreateEvent extends AbstractPersistenceEvent {
 
     @Override
     EventType getEventType() {
-        return EventType.SaveOrUpdate
+        return EventType.Validation
     }
 }

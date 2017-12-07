@@ -32,8 +32,8 @@ class GormDaoSpec extends DaoHibernateSpec implements AutowiredTest {
         then:
         org.name == "foo"
 
-        and: "Event should have been fired on dao"
-        org.event == "beforeCreate"
+        //and: "Event should have been fired on dao"
+        //org.event == "beforeCreate"
     }
 
 
@@ -53,8 +53,8 @@ class GormDaoSpec extends DaoHibernateSpec implements AutowiredTest {
         then:
         org.name == "foo"
 
-        and: "Event should have been fired on dao"
-        org.event == "beforeUpdate"
+        //and: "Event should have been fired on dao"
+        //org.event == "beforeUpdate"
     }
 
     def "test criteria name config"(){

@@ -4,8 +4,10 @@ import gorm.tools.dao.events.DaoEventInvoker
 import gorm.tools.dao.events.DaoEventType
 import gorm.tools.testing.DaoDataTest
 import grails.persistence.Entity
+import spock.lang.Ignore
 import spock.lang.Specification
 
+@Ignore
 class DaoEventInvokerSpec extends Specification implements DaoDataTest {
 
     void setup() {

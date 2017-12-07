@@ -43,8 +43,8 @@ This is critical for deeply nested domain logic dealing with saving multiple dom
 ## Mango Queries
 
 The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
-The DAO Service's and RestApiController come with a `query(criteriaMap, closure)` method. It allows yout get a paginated list of entities restricted by
-the properties in the `criteriaMap`.
+The DAO Service's and RestApiController come with a `query(criteriaMap, closure)` method. It allows you to get a paginated 
+list of entities restricted by the properties in the `criteriaMap`.
 The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
 and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax)
 with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well

@@ -1,11 +1,70 @@
 package gorm.tools
 
+import gorm.tools.dao.DefaultGormDao
+import grails.gorm.annotation.Entity
+import grails.testing.gorm.DataTest
+import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 
-/**
- *@author Sudhir
- */
-class PagerSpec extends Specification {
+class PagerSpec extends Specification implements AutowiredTest, DataTest{
+
+    void setupSpec() {
+        //mockDomain Person
+        mockDomains ClassB
+    }
+
+    def "test default values"(){
+        when:
+        Pager pager = new Pager()
+
+        then:
+        pager.max == 10
+        pager.page == 1
+        pager.recordCount == 0
+        pager.data == null
+
+    }
+
+    def "test setting params"(){
+        when:
+        Pager pager = new Pager([page:3,max: 20])
+
+        then:
+        pager.max == 20
+        pager.page == 3
+        pager.offset == 40
+        pager.recordCount == 0
+        pager.data == null
+
+        when:
+        pager.setupData(40..50 as List)
+        Map jsonData = pager.getJsonData()
+
+        then:
+        pager.recordCount == 11
+        jsonData.page == 3
+        jsonData.total == 1
+        jsonData.records == 11
+        jsonData.rows == 40..50 as List
+    }
+
+    def "test setupData with fields"(){
+        setup:
+        Pager pager = new Pager()
+        50.times{
+            new ClassB(
+                    value: 5*it
+            ).save(failOnError: true)
+        }
+        when:
+        pager.setupData(ClassB.list(max: pager.max, offset: pager.offset), ["*"])
+        Map jsonData = pager.jsonData
+        then:
+        jsonData.page == 1
+        jsonData.records == 50
+        jsonData.total == 5
+        jsonData.rows == (0..9 as List).collect{[id:it+1, value: 5*(it), version: 0]}
+    }
 
     def "test eachPage"() {
         setup:
@@ -26,4 +85,17 @@ class PagerSpec extends Specification {
         90 == pages[9].offset
         10 == pages[9].max
     }
+}
+
+
+@Entity
+class ClassB {
+    Long id
+    int value
+
+    int version = 0
+    def getDao() {
+        new DefaultGormDao(ClassB)
+    }
+
 }

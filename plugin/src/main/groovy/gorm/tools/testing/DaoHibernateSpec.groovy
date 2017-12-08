@@ -46,8 +46,7 @@ class DaoHibernateSpec extends HibernateSpec implements  GrailsUnitTest {
 
         defineBeans(beans)
     }
-
-
+        
     Closure registerDao(Class domain, Class daoClass) {
         String beanName = "${GrailsNameUtils.getPropertyName(domain.name)}Dao"
         grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)
@@ -56,7 +55,6 @@ class DaoHibernateSpec extends HibernateSpec implements  GrailsUnitTest {
         }
 
     }
-
 
     //may be change to DaoScanner like ClassPathEntityScanner !?
     protected Class<GormDao> findDao(Class domainClass) {

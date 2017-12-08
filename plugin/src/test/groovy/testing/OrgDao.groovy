@@ -8,10 +8,6 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class OrgDao implements GormDao<Org> {
 
-    OrgDao(){
-        domainClass = Org
-    }
-
     void beforeCreate(Org org, Map params) {
         org.event = "beforeCreate"
     }

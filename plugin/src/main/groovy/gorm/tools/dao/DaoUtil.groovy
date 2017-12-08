@@ -2,13 +2,19 @@ package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
+import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.dao.events.DaoEventType
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.transaction.interceptor.TransactionAspectSupport
@@ -22,10 +28,12 @@ class DaoUtil implements ApplicationContextAware {
 
     static ApplicationContext ctx
     static DaoEventInvoker daoEventInvoker
+    static ApplicationEventPublisher applicationEventPublisher
 
     void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = ctx
         daoEventInvoker = (DaoEventInvoker)ctx.getBean("daoEventInvoker")
+        applicationEventPublisher = (ApplicationEventPublisher)ctx
     }
 
     /**
@@ -92,7 +100,22 @@ class DaoUtil implements ApplicationContextAware {
         ctx.sessionFactory.currentSession.clear()
     }
 
+    @CompileDynamic
     static void fireEvent(GormDao dao, DaoEventType eventType, Object... args) {
+        GormEntity entity = (GormEntity)args[0]
+
+        Datastore datastore = GormEnhancer.findInstanceApi(entity.class).datastore
+
+        List<Object> constructorAgs = [datastore]
+        constructorAgs << args
+        constructorAgs = constructorAgs.flatten()
+
+        AbstractPersistenceEvent event = eventType.eventClass.newInstance(constructorAgs as Object[])
+
+        //publish event as persistence event
+        applicationEventPublisher.publishEvent(event)
+
+        //publish events on dao as regular method calls.
         daoEventInvoker.invokeEvent(dao, eventType, args)
     }
 

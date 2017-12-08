@@ -1,5 +1,6 @@
 package gorm.tools.dao
 
+import gorm.tools.dao.events.DaoEventInvoker
 import gorm.tools.testing.DaoHibernateSpec
 import grails.testing.spring.AutowiredTest
 import testing.Location

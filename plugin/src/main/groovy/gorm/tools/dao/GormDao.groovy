@@ -1,6 +1,7 @@
 package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainNotFoundException
+import gorm.tools.dao.events.DaoEventType
 import gorm.tools.databinding.FastBinder
 import gorm.tools.mango.DaoQuery
 import gorm.tools.dao.errors.DomainException

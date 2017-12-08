@@ -9,6 +9,7 @@ class Org {
     BigDecimal revenue = 0
     BigDecimal credit
     Long refId = 0L
+    String event
 
     static quickSearchFields = ["name", "num"]
     static constraints = {
@@ -17,5 +18,6 @@ class Org {
         address nullable: true
         testDate nullable: true
         credit nullable: true
+        event nullable: true
     }
 }

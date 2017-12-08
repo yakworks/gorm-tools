@@ -66,16 +66,46 @@ Every domain gets a dao which is either setup for you or setup by implementing  
 
 
 ## Dao events
-Each of the dao can implement any of the methods listed below and they will get called during persistence operation.
+Each of the dao can implement any of the methods listed below and they will get called during persistence operation.  
  
-**beforeCreate(T instance)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.
-**afterCreate(T instance, Map params)** - Called after the new instance is saved.
-**beforeRemove(T instance)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.
-**afterRemove(T instance)** - After an instance is removed.
-**beforeUpdate(T instance, Map params)** - Called before an instance is updated
-**afterUpdate(T instance, Map params)** - Called after an instance is updated
-**beforePersist(T instance)** - Called every time before an instance is saved.
+**beforeCreate(T instance)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  
+**afterCreate(T instance, Map params)** - Called after the new instance is saved.  
+**beforeRemove(T instance)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
+**afterRemove(T instance)** - After an instance is removed.  
+**beforeUpdate(T instance, Map params)** - Called before an instance is updated  
+**afterUpdate(T instance, Map params)** - Called after an instance is updated  
+**beforePersist(T instance)** - Called every time before an instance is saved.  
 **afterPersist(T instance)** - Called every time after an instance is saved.
+  
+## Dao persistence events  
+Dao plugin also fires persistence events which can be subscribed just like Gorm events using @Listener.
+
+Following are the events fired.  
+**PreDaoCreateEvent**  
+**PostDaoCreateEvent**  
+**PreDaoUpdateEvent**  
+**PostDaoUpdateEvent**  
+**PreDaoPersistEvent**  
+**PostDaoPersistEvent**  
+**PreDaoRemoveEvent**  
+**PostDaoRemoveEvent**  
+
+**Example**  
+```groovy
+
+
+class OrgListener {
+   
+   @Listener(Org)
+   void beforeCreate(PreDaoCreateEvent event) {
+      Org org = event.entityObject
+      Map params = event.params
+      //do some thing with org
+   }
+
+}
+
+```
 
 ## DaoUtil and DaoMessage
 

@@ -5,8 +5,10 @@ import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value
 
+@CompileStatic
 @Transactional(readOnly = true)
 class MangoQuery implements MangoQueryApi {
 
@@ -20,12 +22,11 @@ class MangoQuery implements MangoQueryApi {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    @CompileDynamic
     DetachedCriteria buildCriteria(Class domainClass, Map params = [:], Closure closure = null) {
         Map criteria
         if (params[criteriaKeyName] instanceof String) {
             JSON.use('deep')
-            criteria = JSON.parse(params[criteriaKeyName]) as Map
+            criteria = JSON.parse(params[criteriaKeyName] as String) as Map
         } else {
             criteria = params[criteriaKeyName] as Map ?: [:]
         }
@@ -42,7 +43,6 @@ class MangoQuery implements MangoQueryApi {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    @CompileDynamic
     List query(Class domainClass, Map params = [:], Closure closure = null) {
         query(buildCriteria(domainClass, params, closure), params, closure)
     }
@@ -54,7 +54,6 @@ class MangoQuery implements MangoQueryApi {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    @CompileDynamic
     List query(DetachedCriteria criteria, Map params = [:], Closure closure = null) {
         Pager pager = new Pager(params)
         criteria.list(max: pager.max, offset: pager.offset)
@@ -68,7 +67,6 @@ class MangoQuery implements MangoQueryApi {
      * @param closure additional restriction for criteria
      * @return map where keys are names of fields and value - sum for restricted entities
      */
-    @CompileDynamic
     Map countTotals(Class domainClass, Map params = [:], List<String> sums, Closure closure = null) {
         DetachedCriteria mangoCriteria = buildCriteria(domainClass, params, closure)
 
@@ -81,9 +79,10 @@ class MangoQuery implements MangoQueryApi {
             }
         }
 
+        List totalsData = (List)totalList[0]
         Map result = [:]
         sums.eachWithIndex { String name, i ->
-            result[name] = totalList[0][i]
+            result[name] = totalsData[i]
         }
         return result
     }

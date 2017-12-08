@@ -5,15 +5,13 @@ import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileDynamic
+import org.springframework.beans.factory.annotation.Value
 
 @Transactional(readOnly = true)
 class MangoQuery implements MangoQueryApi {
 
+    @Value('${gorm.tools.mango.criteriaKeyName:criteria}') //gets criteria keyword from config, if there is no, then uses 'criteria'
     String criteriaKeyName
-
-    MangoQuery(String criteriaKeyName){
-        this.criteriaKeyName = criteriaKeyName
-    }
 
     /**
      * Builds detached criteria for dao's domain based on mango criteria language and additional criteria

@@ -131,7 +131,7 @@ class MangoBuilder {
             }
 
         }
-        // if field ends in Id then try removing prefix and see if its a property
+        // if field ends in Id then try removing the Id postfix and see if its a property
         else if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))){
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
         }

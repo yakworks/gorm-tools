@@ -5,6 +5,7 @@ import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.GormDao
 import gorm.tools.databinding.FastBinder
+import gorm.tools.mango.MangoQuery
 import grails.plugin.dao.DaoArtefactHandler
 import grails.test.hibernate.HibernateSpec
 import grails.util.GrailsNameUtils
@@ -39,6 +40,7 @@ class DaoHibernateSpec extends HibernateSpec implements  GrailsUnitTest {
         }
 
         beans = beans << {
+            mangoQuery(MangoQuery)
             fastBinder(FastBinder)
             daoEventInvoker(DaoEventInvoker)
             daoUtilBean(DaoUtil)
@@ -46,7 +48,7 @@ class DaoHibernateSpec extends HibernateSpec implements  GrailsUnitTest {
 
         defineBeans(beans)
     }
-        
+
     Closure registerDao(Class domain, Class daoClass) {
         String beanName = "${GrailsNameUtils.getPropertyName(domain.name)}Dao"
         grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)

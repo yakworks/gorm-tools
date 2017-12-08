@@ -1,8 +1,12 @@
 package gorm.tools.mango
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+
 /**
  * Utils to normalizes params map to transform it to mango language
  */
+@CompileStatic
 class MangoTidyMap {
 
     /**
@@ -11,7 +15,7 @@ class MangoTidyMap {
      * @param map params that should be transformed to mango language
      * @return normalized mango map
      */
-    static Map tidy(Map map) {
+    static Map tidy(Map<String, Object> map) {
         Map nested = [:]
         map.each { String k, Object v ->
             pathToMap(k, v, nested)
@@ -29,6 +33,7 @@ class MangoTidyMap {
      * @param map map that should be extended with the nested value
      * @return extended map
      */
+    @CompileDynamic
     static Map pathToMap(String path, Object val, Map map) {
         if (path.contains(".")) {
             String newKey = path.split("[.]")[0]
@@ -55,6 +60,7 @@ class MangoTidyMap {
      * @param result map that should contain mango results
      * @return map with mango criteria params
      */
+    @CompileDynamic
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]

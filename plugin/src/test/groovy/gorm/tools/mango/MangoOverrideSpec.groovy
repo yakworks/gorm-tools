@@ -10,6 +10,7 @@ class MangoOverrideSpec extends Specification implements DaoDataTest {
 
     void setup() {
         mockDomain(City)
+        defineBeans({mangoQuery(NewMangoQuery)})
     }
 
     void testMangoOverride() {
@@ -24,24 +25,13 @@ class MangoOverrideSpec extends Specification implements DaoDataTest {
         then:
         list.size() == 1
         list[0].id == 2
-
     }
 
 }
-
 
 @Entity
 class City {
     String name
-}
-
-class CityDao implements GormDao<City> {
-
-    @Override
-    MangoQueryApi getMangoQuery() {
-        new NewMangoQuery()
-    }
-
 }
 
 class NewMangoQuery implements MangoQueryApi {

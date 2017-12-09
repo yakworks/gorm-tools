@@ -1,7 +1,8 @@
 package gorm.tools.beans
 
-import java.text.SimpleDateFormat
 import spock.lang.Specification
+
+import java.text.SimpleDateFormat
 
 class MultiFormatDateConverterSpec extends Specification {
 

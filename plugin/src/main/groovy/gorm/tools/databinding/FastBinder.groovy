@@ -18,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired
  *
  */
 @CompileStatic
-class FastBinder {
+class FastBinder implements MapDataBinder{
     private static final String ID_PROP = "id"
 
-	ConversionService conversionService = new SpringConversionServiceAdapter()
+    ConversionService conversionService = new SpringConversionServiceAdapter()
 
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
@@ -52,9 +52,9 @@ class FastBinder {
                         valueToAssign = converter.convert(value)
                     }
                 }
-				else if (conversionService?.canConvert(value.getClass(), typeToConvertTo)) {
-					valueToAssign = conversionService.convert(value, typeToConvertTo)
-				}
+                else if (conversionService?.canConvert(value.getClass(), typeToConvertTo)) {
+                    valueToAssign = conversionService.convert(value, typeToConvertTo)
+                }
             }
 
             target[prop.name] = valueToAssign

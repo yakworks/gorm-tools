@@ -1,9 +1,7 @@
 package gorm.tools
 
-import grails.test.hibernate.HibernateSpec
 import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
-import grails.testing.gorm.DomainUnitTest
 import spock.lang.Specification
 
 class GormUtilsSpec extends Specification implements DataTest{

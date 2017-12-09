@@ -1,12 +1,13 @@
 package gorm.tools.jdbc
 
-import grails.testing.mixin.integration.Integration
-import spock.lang.Specification
-import grails.plugin.dao.Application
 import grails.gorm.transactions.Rollback
-import javax.sql.DataSource
+import grails.plugin.dao.Application
+import grails.testing.mixin.integration.Integration
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
+import spock.lang.Specification
+
+import javax.sql.DataSource
 
 @Rollback
 @Integration(applicationClass = Application.class)

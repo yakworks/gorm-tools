@@ -1,9 +1,10 @@
 package grails.plugin.dao
 
 import gorm.tools.DbDialectService
-import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.async.GparsBatchService
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
+import gorm.tools.dao.events.DaoEventPublisher
 import gorm.tools.databinding.FastBinder
 import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
@@ -38,8 +39,10 @@ class DaoPluginHelper {
             idGenerator = ref("idGenerator")
         }
 
-        daoEventInvoker(DaoEventInvoker)
+        daoEventInvoker(DaoEventPublisher)
         daoUtilBean(DaoUtil) //this is here just so the app ctx can get picked up and set on DaoUtils
+
+        gparsBatchService(GparsBatchService)
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 
@@ -49,7 +52,7 @@ class DaoPluginHelper {
         }
 
         //make sure each domain has a dao, if not set up a DefaultGormDao for it.
-        Class[] domainClasses = application.domainClasses.collect() { it.clazz} as Class[]
+        Class[] domainClasses = application.domainClasses*.clazz
         domainClasses.each { Class domainClass ->
             String daoName = "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
             def hasDao = daoClasses.find { it.propertyName ==  daoName}

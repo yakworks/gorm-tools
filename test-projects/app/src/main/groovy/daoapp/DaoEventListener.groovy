@@ -1,29 +1,30 @@
 package daoapp
 
-import gorm.tools.dao.events.PostDaoRemoveEvent
-import gorm.tools.dao.events.PreDaoCreateEvent
-import gorm.tools.dao.events.PreDaoUpdateEvent
+import gorm.tools.dao.events.AfterRemoveEvent
+import gorm.tools.dao.events.BeforeCreateEvent
+import gorm.tools.dao.events.BeforeUpdateEvent
 import grails.events.annotation.gorm.Listener
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
 public class DaoEventListener {
 
-    @Listener(Org)
-    void beforeCreate(PreDaoCreateEvent event) {
-        Org org = event.entityObject
+    @EventListener
+    void beforeCreate(BeforeCreateEvent<Org> event) {
+        Org org = event.entity
         org.event = "PreDaoCreateEvent"
     }
 
-    @Listener(Org)
-    void beforeCreate(PreDaoUpdateEvent event) {
-        Org org = event.entityObject
+    @EventListener
+    void beforeCreate(BeforeUpdateEvent<Org> event) {
+        Org org = event.entity
         org.event = "PreDaoUpdateEvent"
     }
 
-    @Listener(Org)
-    void beforeCreate(PostDaoRemoveEvent event) {
-        Org org = event.entityObject
+    @EventListener
+    void beforeCreate(AfterRemoveEvent<Org> event) {
+        Org org = event.entity
         org.event = "PostDaoRemoveEvent"
     }
 }

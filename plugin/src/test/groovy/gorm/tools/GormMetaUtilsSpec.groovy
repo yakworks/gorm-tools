@@ -1,7 +1,7 @@
 package gorm.tools
 
-import grails.test.hibernate.HibernateSpec
 import grails.gorm.annotation.Entity
+import grails.test.hibernate.HibernateSpec
 import grails.testing.gorm.DomainUnitTest
 
 class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {

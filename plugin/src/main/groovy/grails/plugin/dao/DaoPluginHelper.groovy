@@ -51,7 +51,7 @@ class DaoPluginHelper {
         //make sure each domain has a dao, if not set up a DefaultGormDao for it.
         Class[] domainClasses = application.domainClasses.collect() { it.clazz} as Class[]
         domainClasses.each { Class domainClass ->
-            String daoName = "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
+            String daoName = DaoUtil.getDaoBeanName(domainClass)
             def hasDao = daoClasses.find { it.propertyName ==  daoName}
             if(!hasDao){
                 //println "${daoName}"

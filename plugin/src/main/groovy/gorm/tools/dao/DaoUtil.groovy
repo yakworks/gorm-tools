@@ -4,6 +4,7 @@ import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
 import gorm.tools.dao.events.DaoEventInvoker
 import gorm.tools.dao.events.DaoEventType
+import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -34,6 +35,14 @@ class DaoUtil implements ApplicationContextAware {
         this.ctx = ctx
         daoEventInvoker = (DaoEventInvoker)ctx.getBean("daoEventInvoker")
         applicationEventPublisher = (ApplicationEventPublisher)ctx
+    }
+
+    static String getDaoClassName(Class domainClass) {
+        return "${domainClass.name}Dao"
+    }
+
+    static String getDaoBeanName(Class domainClass) {
+        return "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
     }
 
     /**

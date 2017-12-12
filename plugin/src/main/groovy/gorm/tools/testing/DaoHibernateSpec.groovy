@@ -34,6 +34,8 @@ class DaoHibernateSpec extends HibernateSpec implements AutowiredTest  {
             }
         }
 
+        beans = beans << DaoTestHelper.commonBeans()
+
         defineBeans(beans)
     }
 

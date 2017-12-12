@@ -2,13 +2,11 @@ package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
-import gorm.tools.dao.events.DaoEventPublisher
 import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.model.config.GormProperties
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -25,19 +23,24 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 class DaoUtil implements ApplicationContextAware {
 
     static ApplicationContext ctx
-    static DaoEventPublisher daoEventInvoker
     static ApplicationEventPublisher applicationEventPublisher
 
     void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = ctx
-        daoEventInvoker = (DaoEventPublisher)ctx.getBean("daoEventInvoker")
         applicationEventPublisher = (ApplicationEventPublisher)ctx
     }
 
+
+    static String getDaoClassName(Class domainClass) {
+        return "${domainClass.name}Dao"
+    }
+
+    static String getDaoBeanName(Class domainClass) {
+        return "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
+    }
+
     static DaoApi findDao(Class domainClass){
-        String domainName = GrailsNameUtils.getPropertyName(domainClass.name)
-        String daoName = "${domainName}Dao"
-        return ctx.getBean(daoName, DaoApi)
+        return ctx.getBean(getDaoBeanName(domainClass), DaoApi)
     }
 
     /**
@@ -48,7 +51,6 @@ class DaoUtil implements ApplicationContextAware {
      * @param ver the version this used to be (entity will have the )
      * @throws DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
      */
-    //FIXME Need good tests for this
     static void checkVersion(GormEntity entity, Long oldVersion) {
         if (oldVersion == null) return
         if (entity.hasProperty('version')) {
@@ -129,24 +131,6 @@ class DaoUtil implements ApplicationContextAware {
         }
 
     }
-
-//  static GormDaoSupport getDao(Class entity) {
-//      String domainName = entity.simpleName
-//
-//      String daoName = "${GrailsNameUtils.getPropertyName(domainName)}Dao"
-//      GormDaoSupport dao
-//      if (ctx.containsBean(daoName)) {
-//          println "found $daoName"
-//          println entity
-//          dao = ctx.getBean(daoName) as GormDaoSupport
-//      } else {
-//          println "NOT found $daoName"
-//          println entity
-//          dao = (GormDaoSupport) ctx.getBean("gormDaoBean")
-//          dao.domainClass = entity
-//      }
-//      return dao
-//  }
 
 }
 

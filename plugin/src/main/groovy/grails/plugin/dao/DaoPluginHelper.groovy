@@ -39,7 +39,7 @@ class DaoPluginHelper {
             idGenerator = ref("idGenerator")
         }
 
-        daoEventInvoker(DaoEventPublisher)
+        daoEventPublisher(DaoEventPublisher)
         daoUtilBean(DaoUtil) //this is here just so the app ctx can get picked up and set on DaoUtils
 
         gparsBatchService(GparsBatchService)
@@ -54,7 +54,7 @@ class DaoPluginHelper {
         //make sure each domain has a dao, if not set up a DefaultGormDao for it.
         Class[] domainClasses = application.domainClasses*.clazz
         domainClasses.each { Class domainClass ->
-            String daoName = "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
+            String daoName = DaoUtil.getDaoBeanName(domainClass)
             def hasDao = daoClasses.find { it.propertyName ==  daoName}
             if(!hasDao){
                 //println "${daoName}"

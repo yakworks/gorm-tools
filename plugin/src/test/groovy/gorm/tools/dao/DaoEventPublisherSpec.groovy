@@ -17,7 +17,7 @@ class DaoEventPublisherSpec extends Specification implements DaoDataTest {
         trxService(TrxService)
     }}
 
-    DaoEventPublisher daoEventInvoker
+    DaoEventPublisher daoEventPublisher
 
     void testEventsFired() {
         given:
@@ -46,25 +46,25 @@ class DaoEventPublisherSpec extends Specification implements DaoDataTest {
         Map params = [name: "test"]
 
         when:
-        daoEventInvoker.invokeEventMethod(City.dao, DaoEventType.BeforeUpdate.eventKey, city, params)
+        daoEventPublisher.invokeEventMethod(City.dao, DaoEventType.BeforeUpdate.eventKey, city, params)
 
         then:
         city.region == "beforeUpdate"
 
         when:
-        daoEventInvoker.invokeEventMethod(City.dao, DaoEventType.AfterUpdate.eventKey, city, params)
+        daoEventPublisher.invokeEventMethod(City.dao, DaoEventType.AfterUpdate.eventKey, city, params)
 
         then:
         city.region == "afterUpdate"
 
         when:
-        daoEventInvoker.invokeEventMethod(City.dao, DaoEventType.BeforeRemove.eventKey, city, params)
+        daoEventPublisher.invokeEventMethod(City.dao, DaoEventType.BeforeRemove.eventKey, city, params)
 
         then:
         city.region == "beforeRemove"
 
         when:
-        daoEventInvoker.invokeEventMethod(City.dao    , DaoEventType.AfterRemove.eventKey, city, params)
+        daoEventPublisher.invokeEventMethod(City.dao    , DaoEventType.AfterRemove.eventKey, city, params)
 
         then:
         city.region == "afterRemove"

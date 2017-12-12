@@ -1,4 +1,5 @@
 gorm.tools
+gorm.tools.async
 gorm.tools.beans
 gorm.tools.dao
 gorm.tools.dao.errors

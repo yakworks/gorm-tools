@@ -481,8 +481,8 @@ This is critical for deeply nested domain logic dealing with saving multiple dom
 </ul>
 <h2 id="mango-queries">Mango Queries<a class="headerlink" href="#mango-queries" title="Permanent link">&para;</a></h2>
 <p>The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
-The DAO Service's and RestApiController come with a <code>query(criteriaMap, closure)</code> method. It allows yout get a paginated list of entities restricted by
-the properties in the <code>criteriaMap</code>.
+The DAO Service's and RestApiController come with a <code>query(criteriaMap, closure)</code> method. It allows you to get a paginated 
+list of entities restricted by the properties in the <code>criteriaMap</code>.
 The query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a>
 and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a>
 with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sql</a> as well</p>

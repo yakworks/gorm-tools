@@ -23,7 +23,7 @@ trait DaoDataTest implements DataTest, AutowiredTest {
             Class daoClass = DaoTestHelper.findDaoClass(domainClass)
             daoBeans = daoBeans << DaoTestHelper.registerDao(domainClass, daoClass)
         }
-        
+
         defineBeans(daoBeans << DaoTestHelper.commonBeans())
     }
 

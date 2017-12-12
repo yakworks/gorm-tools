@@ -3,7 +3,6 @@ package gorm.tools.mango
 import grails.gorm.DetachedCriteria
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
-import spock.lang.Specification
 import testing.Location
 import testing.Nested
 import testing.Org

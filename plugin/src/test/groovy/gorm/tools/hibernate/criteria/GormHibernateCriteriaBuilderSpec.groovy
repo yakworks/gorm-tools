@@ -1,11 +1,6 @@
 package gorm.tools.hibernate.criteria
 
 import grails.test.hibernate.HibernateSpec
-import grails.testing.gorm.DataTest
-import grails.testing.spring.AutowiredTest
-import grails.util.Holders
-import org.hibernate.SessionFactory
-import spock.lang.Specification
 
 class GormHibernateCriteriaBuilderSpec extends HibernateSpec { //c DataTest {//implements DataTest{
 

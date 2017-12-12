@@ -1,6 +1,6 @@
 package gorm.tools.dao
 
-import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.dao.events.DaoEventPublisher
 import gorm.tools.testing.DaoHibernateSpec
 import grails.testing.spring.AutowiredTest
 import testing.Location
@@ -9,13 +9,13 @@ import testing.Org
 
 class GormDaoSpec extends DaoHibernateSpec implements AutowiredTest {
 
-    DaoEventInvoker daoEventInvoker
+    DaoEventPublisher daoEventInvoker
 
     List<Class> getDomainClasses() { [Org,Location,Nested] }
 
     void setup() {
         //have to do this because when daoInvoker is registered dao artefacts are not available, TODO find better way
-        //daoEventInvoker.cacheEvents(OrgDao)
+        //daoEventInvoker.cacheEventsMethods(OrgDao)
     }
 
     Closure doWithConfig() {{ config ->

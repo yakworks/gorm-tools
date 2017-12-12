@@ -1,9 +1,10 @@
 package gorm.tools.testing
 
-import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.TrxService
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.GormDao
+import gorm.tools.dao.events.DaoEventPublisher
 import gorm.tools.databinding.FastBinder
 import grails.plugin.dao.DaoArtefactHandler
 import grails.test.hibernate.HibernateSpec
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.util.ClassUtils
 
+@SuppressWarnings(['ClassForName'])
 class DaoHibernateSpec extends HibernateSpec implements  GrailsUnitTest {
 
     void setupSpec() {
@@ -24,29 +26,30 @@ class DaoHibernateSpec extends HibernateSpec implements  GrailsUnitTest {
 
         Closure beans = { }
 
-        if (!domainClasses) {
-            Set<Class> daoClasses = scanDaoClasses(packageName)
-            //TODO figureout alternative to find entities if possible.
-            new ClasspathEntityScanner().scan(packageToScan).each { Class domainClass ->
-                Class daoClass = daoClasses.find({ it.simpleName == "${domainClass.simpleName}Dao"}) ?: DefaultGormDao
-                beans = beans << registerDao(domainClass, daoClass)
-            }
-        }
-        else {
+        if (domainClasses) {
             domainClasses.each {Class domainClass ->
                 beans = beans << registerDao(domainClass, findDao(domainClass))
             }
         }
+        else {
+            Set<Class> daoClasses = scanDaoClasses(packageName)
+            //TODO figureout alternative to find entities if possible.
+            new ClasspathEntityScanner().scan(packageToScan).each { Class domainClass ->
+                Class daoClass = daoClasses.find{ it.simpleName == "${domainClass.simpleName}Dao"} ?: DefaultGormDao
+                beans = beans << registerDao(domainClass, daoClass)
+            }
+        }
 
         beans = beans << {
+            trxService(TrxService)
             fastBinder(FastBinder)
-            daoEventInvoker(DaoEventInvoker)
+            daoEventInvoker(DaoEventPublisher)
             daoUtilBean(DaoUtil)
         }
 
         defineBeans(beans)
     }
-        
+
     Closure registerDao(Class domain, Class daoClass) {
         String beanName = "${GrailsNameUtils.getPropertyName(domain.name)}Dao"
         grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)

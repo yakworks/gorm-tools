@@ -1,8 +1,9 @@
 package gorm.tools.testing
 
-import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.TrxService
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
+import gorm.tools.dao.events.DaoEventPublisher
 import gorm.tools.databinding.FastBinder
 import grails.plugin.dao.DaoArtefactHandler
 import grails.testing.gorm.DataTest
@@ -40,8 +41,9 @@ trait DaoDataTest implements DataTest, AutowiredTest {
         }
 
         defineBeans(daoBeans << {
+            trxService(TrxService)
             fastBinder(FastBinder)
-            daoEventInvoker(DaoEventInvoker)
+            daoEventInvoker(DaoEventPublisher)
             daoUtilBean(DaoUtil)
         })
     }

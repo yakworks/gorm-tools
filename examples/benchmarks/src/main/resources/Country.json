@@ -1,0 +1,275 @@
+{"id":1,"capital":"Kabul","fips104":"AF","iso2":"AF","iso3":"AFG","name":"Afghanistan"}
+{"id":2,"capital":"Tirana","fips104":"AL","iso2":"AL","iso3":"ALB","name":"Albania"}
+{"id":3,"capital":"Algiers","fips104":"AG","iso2":"DZ","iso3":"DZA","name":"Algeria"}
+{"id":4,"capital":"Pago Pago","fips104":"AQ","iso2":"AS","iso3":"ASM","name":"American Samoa"}
+{"id":5,"capital":"Andorra la Vella","fips104":"AN","iso2":"AD","iso3":"AND","name":"Andorra"}
+{"id":6,"capital":"Luanda","fips104":"AO","iso2":"AO","iso3":"AGO","name":"Angola"}
+{"id":7,"capital":"The Valley","fips104":"AV","iso2":"AI","iso3":"AIA","name":"Anguilla"}
+{"id":8,"capital":null,"fips104":"AY","iso2":"AQ","iso3":"ATA","name":"Antarctica"}
+{"id":9,"capital":"Saint John's","fips104":"AC","iso2":"AG","iso3":"ATG","name":"Antigua and Barbuda"}
+{"id":10,"capital":"Buenos Aires","fips104":"AR","iso2":"AR","iso3":"ARG","name":"Argentina"}
+{"id":11,"capital":"Yerevan","fips104":"AM","iso2":"AM","iso3":"ARM","name":"Armenia"}
+{"id":12,"capital":"Oranjestad","fips104":"AA","iso2":"AW","iso3":"ABW","name":"Aruba"}
+{"id":13,"capital":null,"fips104":"AT","iso2":"--","iso3":"--","name":"Ashmore and Cartier"}
+{"id":14,"capital":"Canberra","fips104":"AS","iso2":"AU","iso3":"AUS","name":"Australia"}
+{"id":15,"capital":"Vienna","fips104":"AU","iso2":"AT","iso3":"AUT","name":"Austria"}
+{"id":16,"capital":"Baku (Baki)","fips104":"AJ","iso2":"AZ","iso3":"AZE","name":"Azerbaijan"}
+{"id":17,"capital":"Nassau","fips104":"BF","iso2":"BS","iso3":"BHS","name":"The Bahamas"}
+{"id":18,"capital":"Manama","fips104":"BA","iso2":"BH","iso3":"BHR","name":"Bahrain"}
+{"id":19,"capital":null,"fips104":"FQ","iso2":"--","iso3":"--","name":"Baker Island"}
+{"id":20,"capital":"Dhaka","fips104":"BG","iso2":"BD","iso3":"BGD","name":"Bangladesh"}
+{"id":21,"capital":"Bridgetown","fips104":"BB","iso2":"BB","iso3":"BRB","name":"Barbados"}
+{"id":22,"capital":null,"fips104":"BS","iso2":"--","iso3":"--","name":"Bassas da India"}
+{"id":23,"capital":"Minsk","fips104":"BO","iso2":"BY","iso3":"BLR","name":"Belarus"}
+{"id":24,"capital":"Brussels","fips104":"BE","iso2":"BE","iso3":"BEL","name":"Belgium"}
+{"id":25,"capital":"Belmopan","fips104":"BH","iso2":"BZ","iso3":"BLZ","name":"Belize"}
+{"id":26,"capital":"Porto-Novo","fips104":"BN","iso2":"BJ","iso3":"BEN","name":"Benin"}
+{"id":27,"capital":"Hamilton","fips104":"BD","iso2":"BM","iso3":"BMU","name":"Bermuda"}
+{"id":28,"capital":"Thimphu","fips104":"BT","iso2":"BT","iso3":"BTN","name":"Bhutan"}
+{"id":29,"capital":"La Paz /Sucre","fips104":"BL","iso2":"BO","iso3":"BOL","name":"Bolivia"}
+{"id":30,"capital":"Sarajevo","fips104":"BK","iso2":"BA","iso3":"BIH","name":"Bosnia and Herzegovina"}
+{"id":31,"capital":"Gaborone","fips104":"BC","iso2":"BW","iso3":"BWA","name":"Botswana"}
+{"id":32,"capital":null,"fips104":"BV","iso2":"BV","iso3":"BVT","name":"Bouvet Island"}
+{"id":33,"capital":"Brasilia","fips104":"BR","iso2":"BR","iso3":"BRA","name":"Brazil"}
+{"id":34,"capital":null,"fips104":"IO","iso2":"IO","iso3":"IOT","name":"British Indian Ocean Territory"}
+{"id":35,"capital":"Road Town","fips104":"VI","iso2":"VG","iso3":"VGB","name":"British Virgin Islands"}
+{"id":36,"capital":null,"fips104":"BX","iso2":"BN","iso3":"BRN","name":"Brunei Darussalam"}
+{"id":37,"capital":"Sofia","fips104":"BU","iso2":"BG","iso3":"BGR","name":"Bulgaria"}
+{"id":38,"capital":"Ouagadougou","fips104":"UV","iso2":"BF","iso3":"BFA","name":"Burkina Faso"}
+{"id":39,"capital":"Rangoon","fips104":"BM","iso2":"MM","iso3":"MMR","name":"Burma"}
+{"id":40,"capital":"Bujumbura","fips104":"BY","iso2":"BI","iso3":"BDI","name":"Burundi"}
+{"id":41,"capital":"Phnom Penh","fips104":"CB","iso2":"KH","iso3":"KHM","name":"Cambodia"}
+{"id":42,"capital":"Yaounde","fips104":"CM","iso2":"CM","iso3":"CMR","name":"Cameroon"}
+{"id":43,"capital":"Ottawa","fips104":"CA","iso2":"CA","iso3":"CAN","name":"Canada"}
+{"id":44,"capital":"Praia","fips104":"CV","iso2":"CV","iso3":"CPV","name":"Cape Verde"}
+{"id":45,"capital":"George Town","fips104":"CJ","iso2":"KY","iso3":"CYM","name":"Cayman Islands"}
+{"id":46,"capital":"Bangui","fips104":"CT","iso2":"CF","iso3":"CAF","name":"Central African Republic"}
+{"id":47,"capital":"N'Djamena","fips104":"CD","iso2":"TD","iso3":"TCD","name":"Chad"}
+{"id":48,"capital":"Santiago","fips104":"CI","iso2":"CL","iso3":"CHL","name":"Chile"}
+{"id":49,"capital":"Beijing","fips104":"CH","iso2":"CN","iso3":"CHN","name":"China"}
+{"id":50,"capital":"The Settlement","fips104":"KT","iso2":"CX","iso3":"CXR","name":"Christmas Island"}
+{"id":51,"capital":null,"fips104":"IP","iso2":"--","iso3":"--","name":"Clipperton Island"}
+{"id":52,"capital":"West Island","fips104":"CK","iso2":"CC","iso3":"CCK","name":"Cocos (Keeling) Islands"}
+{"id":53,"capital":"Bogota","fips104":"CO","iso2":"CO","iso3":"COL","name":"Colombia"}
+{"id":54,"capital":"Moroni","fips104":"CN","iso2":"KM","iso3":"COM","name":"Comoros"}
+{"id":55,"capital":"Kinshasa","fips104":"CG","iso2":"CD","iso3":"COD","name":"Congo, Democratic Republic of the"}
+{"id":56,"capital":"Brazzaville","fips104":"CF","iso2":"CG","iso3":"COG","name":"Congo, Republic of the"}
+{"id":57,"capital":"Avarua","fips104":"CW","iso2":"CK","iso3":"COK","name":"Cook Islands"}
+{"id":58,"capital":null,"fips104":"CR","iso2":"--","iso3":"--","name":"Coral Sea Islands"}
+{"id":59,"capital":"San Jose","fips104":"CS","iso2":"CR","iso3":"CRI","name":"Costa Rica"}
+{"id":60,"capital":"Yamoussoukro","fips104":"IV","iso2":"CI","iso3":"CIV","name":"Cote d'Ivoire"}
+{"id":61,"capital":"Zagreb","fips104":"HR","iso2":"HR","iso3":"HRV","name":"Croatia"}
+{"id":62,"capital":"Havana","fips104":"CU","iso2":"CU","iso3":"CUB","name":"Cuba"}
+{"id":63,"capital":"Nicosia","fips104":"CY","iso2":"CY","iso3":"CYP","name":"Cyprus"}
+{"id":64,"capital":"Prague","fips104":"EZ","iso2":"CZ","iso3":"CZE","name":"Czech Republic"}
+{"id":65,"capital":"Copenhagen","fips104":"DA","iso2":"DK","iso3":"DNK","name":"Denmark"}
+{"id":66,"capital":"Djibouti","fips104":"DJ","iso2":"DJ","iso3":"DJI","name":"Djibouti"}
+{"id":67,"capital":"Roseau","fips104":"DO","iso2":"DM","iso3":"DMA","name":"Dominica"}
+{"id":68,"capital":"Santo Domingo","fips104":"DR","iso2":"DO","iso3":"DOM","name":"Dominican Republic"}
+{"id":69,"capital":null,"fips104":"TT","iso2":"TL","iso3":"TLS","name":"East Timor"}
+{"id":70,"capital":"Quito","fips104":"EC","iso2":"EC","iso3":"ECU","name":"Ecuador"}
+{"id":71,"capital":"Cairo","fips104":"EG","iso2":"EG","iso3":"EGY","name":"Egypt"}
+{"id":72,"capital":"San Salvador","fips104":"ES","iso2":"SV","iso3":"SLV","name":"El Salvador"}
+{"id":73,"capital":"Malabo","fips104":"EK","iso2":"GQ","iso3":"GNQ","name":"Equatorial Guinea"}
+{"id":74,"capital":"Asmara","fips104":"ER","iso2":"ER","iso3":"ERI","name":"Eritrea"}
+{"id":75,"capital":"Tallinn","fips104":"EN","iso2":"EE","iso3":"EST","name":"Estonia"}
+{"id":76,"capital":"Addis Ababa","fips104":"ET","iso2":"ET","iso3":"ETH","name":"Ethiopia"}
+{"id":77,"capital":null,"fips104":"EU","iso2":"--","iso3":"--","name":"Europa Island"}
+{"id":78,"capital":"Stanley","fips104":"FK","iso2":"FK","iso3":"FLK","name":"Falkland Islands (Islas Malvinas)"}
+{"id":79,"capital":"Torshavn","fips104":"FO","iso2":"FO","iso3":"FRO","name":"Faroe Islands"}
+{"id":80,"capital":"Suva","fips104":"FJ","iso2":"FJ","iso3":"FJI","name":"Fiji"}
+{"id":81,"capital":"Helsinki","fips104":"FI","iso2":"FI","iso3":"FIN","name":"Finland"}
+{"id":82,"capital":"Paris","fips104":"FR","iso2":"FR","iso3":"FRA","name":"France"}
+{"id":83,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"France, Metropolitan"}
+{"id":84,"capital":"Cayenne","fips104":"FG","iso2":"GF","iso3":"GUF","name":"French Guiana"}
+{"id":85,"capital":"Papeete","fips104":"FP","iso2":"PF","iso3":"PYF","name":"French Polynesia"}
+{"id":86,"capital":null,"fips104":"FS","iso2":"TF","iso3":"ATF","name":"French Southern and Antarctic Lands"}
+{"id":87,"capital":"Libreville","fips104":"GB","iso2":"GA","iso3":"GAB","name":"Gabon"}
+{"id":88,"capital":"Banjul","fips104":"GA","iso2":"GM","iso3":"GMB","name":"The Gambia"}
+{"id":89,"capital":null,"fips104":"GZ","iso2":"--","iso3":"--","name":"Gaza Strip"}
+{"id":90,"capital":"T'bilisi","fips104":"GG","iso2":"GE","iso3":"GEO","name":"Georgia"}
+{"id":91,"capital":"Berlin","fips104":"GM","iso2":"DE","iso3":"DEU","name":"Germany"}
+{"id":92,"capital":"Accra","fips104":"GH","iso2":"GH","iso3":"GHA","name":"Ghana"}
+{"id":93,"capital":"Gibraltar","fips104":"GI","iso2":"GI","iso3":"GIB","name":"Gibraltar"}
+{"id":94,"capital":null,"fips104":"GO","iso2":"--","iso3":"--","name":"Glorioso Islands"}
+{"id":95,"capital":"Athens","fips104":"GR","iso2":"GR","iso3":"GRC","name":"Greece"}
+{"id":96,"capital":"Nuuk","fips104":"GL","iso2":"GL","iso3":"GRL","name":"Greenland"}
+{"id":97,"capital":"Saint George's","fips104":"GJ","iso2":"GD","iso3":"GRD","name":"Grenada"}
+{"id":98,"capital":"Basse-Terre","fips104":"GP","iso2":"GP","iso3":"GLP","name":"Guadeloupe"}
+{"id":99,"capital":"Hagatna","fips104":"GQ","iso2":"GU","iso3":"GUM","name":"Guam"}
+{"id":100,"capital":"Guatemala","fips104":"GT","iso2":"GT","iso3":"GTM","name":"Guatemala"}
+{"id":101,"capital":"Saint Peter Port","fips104":"GK","iso2":"--","iso3":"--","name":"Guernsey"}
+{"id":102,"capital":"Conakry","fips104":"GV","iso2":"GN","iso3":"GIN","name":"Guinea"}
+{"id":103,"capital":"Bissau","fips104":"PU","iso2":"GW","iso3":"GNB","name":"Guinea-Bissau"}
+{"id":104,"capital":"Georgetown","fips104":"GY","iso2":"GY","iso3":"GUY","name":"Guyana"}
+{"id":105,"capital":"Port-au-Prince","fips104":"HA","iso2":"HT","iso3":"HTI","name":"Haiti"}
+{"id":106,"capital":null,"fips104":"HM","iso2":"HM","iso3":"HMD","name":"Heard Island and McDonald Islands"}
+{"id":107,"capital":"Vatican City","fips104":"VT","iso2":"VA","iso3":"VAT","name":"Holy See (Vatican City)"}
+{"id":108,"capital":"Tegucigalpa","fips104":"HO","iso2":"HN","iso3":"HND","name":"Honduras"}
+{"id":109,"capital":null,"fips104":"HK","iso2":"HK","iso3":"HKG","name":"Hong Kong (SAR)"}
+{"id":110,"capital":null,"fips104":"HQ","iso2":"--","iso3":"--","name":"Howland Island"}
+{"id":111,"capital":"Budapest","fips104":"HU","iso2":"HU","iso3":"HUN","name":"Hungary"}
+{"id":112,"capital":"Reykjavik","fips104":"IC","iso2":"IS","iso3":"ISL","name":"Iceland"}
+{"id":113,"capital":"New Delhi","fips104":"IN","iso2":"IN","iso3":"IND","name":"India"}
+{"id":114,"capital":"Jakarta","fips104":"ID","iso2":"ID","iso3":"IDN","name":"Indonesia"}
+{"id":115,"capital":"Tehran","fips104":"IR","iso2":"IR","iso3":"IRN","name":"Iran"}
+{"id":116,"capital":"Baghdad","fips104":"IZ","iso2":"IQ","iso3":"IRQ","name":"Iraq"}
+{"id":117,"capital":"Dublin","fips104":"EI","iso2":"IE","iso3":"IRL","name":"Ireland"}
+{"id":118,"capital":"Jerusalem","fips104":"IS","iso2":"IL","iso3":"ISR","name":"Israel"}
+{"id":119,"capital":"Rome","fips104":"IT","iso2":"IT","iso3":"ITA","name":"Italy"}
+{"id":120,"capital":"Kingston","fips104":"JM","iso2":"JM","iso3":"JAM","name":"Jamaica"}
+{"id":121,"capital":null,"fips104":"JN","iso2":"--","iso3":"--","name":"Jan Mayen"}
+{"id":122,"capital":"Tokyo","fips104":"JA","iso2":"JP","iso3":"JPN","name":"Japan"}
+{"id":123,"capital":null,"fips104":"DQ","iso2":"--","iso3":"--","name":"Jarvis Island"}
+{"id":124,"capital":"Saint Helier","fips104":"JE","iso2":"--","iso3":"--","name":"Jersey"}
+{"id":125,"capital":null,"fips104":"JQ","iso2":"--","iso3":"--","name":"Johnston Atoll"}
+{"id":126,"capital":"Amman","fips104":"JO","iso2":"JO","iso3":"JOR","name":"Jordan"}
+{"id":127,"capital":null,"fips104":"JU","iso2":"--","iso3":"--","name":"Juan de Nova Island"}
+{"id":128,"capital":"Astana","fips104":"KZ","iso2":"KZ","iso3":"KAZ","name":"Kazakhstan"}
+{"id":129,"capital":"Nairobi","fips104":"KE","iso2":"KE","iso3":"KEN","name":"Kenya"}
+{"id":130,"capital":null,"fips104":"KQ","iso2":"--","iso3":"--","name":"Kingman Reef"}
+{"id":131,"capital":"Tarawa","fips104":"KR","iso2":"KI","iso3":"KIR","name":"Kiribati"}
+{"id":132,"capital":"P'yongyang","fips104":"KN","iso2":"KP","iso3":"PRK","name":"Korea, North"}
+{"id":133,"capital":"Seoul","fips104":"KS","iso2":"KR","iso3":"KOR","name":"Korea, South"}
+{"id":134,"capital":"Kuwait","fips104":"KU","iso2":"KW","iso3":"KWT","name":"Kuwait"}
+{"id":135,"capital":"Bishkek","fips104":"KG","iso2":"KG","iso3":"KGZ","name":"Kyrgyzstan"}
+{"id":136,"capital":"Vientiane","fips104":"LA","iso2":"LA","iso3":"LAO","name":"Laos"}
+{"id":137,"capital":"Riga","fips104":"LG","iso2":"LV","iso3":"LVA","name":"Latvia"}
+{"id":138,"capital":"Beirut","fips104":"LE","iso2":"LB","iso3":"LBN","name":"Lebanon"}
+{"id":139,"capital":"Maseru","fips104":"LT","iso2":"LS","iso3":"LSO","name":"Lesotho"}
+{"id":140,"capital":"Monrovia","fips104":"LI","iso2":"LR","iso3":"LBR","name":"Liberia"}
+{"id":141,"capital":"Tripoli","fips104":"LY","iso2":"LY","iso3":"LBY","name":"Libya"}
+{"id":142,"capital":"Vaduz","fips104":"LS","iso2":"LI","iso3":"LIE","name":"Liechtenstein"}
+{"id":143,"capital":"Vilnius","fips104":"LH","iso2":"LT","iso3":"LTU","name":"Lithuania"}
+{"id":144,"capital":"Luxembourg","fips104":"LU","iso2":"LU","iso3":"LUX","name":"Luxembourg"}
+{"id":145,"capital":null,"fips104":"MC","iso2":"MO","iso3":"MAC","name":"Macao"}
+{"id":146,"capital":"Skopje","fips104":"MK","iso2":"MK","iso3":"MKD","name":"Macedonia, The Former Yugoslav Republic of"}
+{"id":147,"capital":"Antananarivo","fips104":"MA","iso2":"MG","iso3":"MDG","name":"Madagascar"}
+{"id":148,"capital":"Lilongwe","fips104":"MI","iso2":"MW","iso3":"MWI","name":"Malawi"}
+{"id":149,"capital":"Kuala Lumpur","fips104":"MY","iso2":"MY","iso3":"MYS","name":"Malaysia"}
+{"id":150,"capital":"Male","fips104":"MV","iso2":"MV","iso3":"MDV","name":"Maldives"}
+{"id":151,"capital":"Bamako","fips104":"ML","iso2":"ML","iso3":"MLI","name":"Mali"}
+{"id":152,"capital":"Valletta","fips104":"MT","iso2":"MT","iso3":"MLT","name":"Malta"}
+{"id":153,"capital":"Douglas","fips104":"IM","iso2":"--","iso3":"--","name":"Man, Isle of"}
+{"id":154,"capital":"Majuro","fips104":"RM","iso2":"MH","iso3":"MHL","name":"Marshall Islands"}
+{"id":155,"capital":"Fort-de-France","fips104":"MB","iso2":"MQ","iso3":"MTQ","name":"Martinique"}
+{"id":156,"capital":"Nouakchott","fips104":"MR","iso2":"MR","iso3":"MRT","name":"Mauritania"}
+{"id":157,"capital":"Port Louis","fips104":"MP","iso2":"MU","iso3":"MUS","name":"Mauritius"}
+{"id":158,"capital":"Mamoutzou","fips104":"MF","iso2":"YT","iso3":"MYT","name":"Mayotte"}
+{"id":159,"capital":"Mexico","fips104":"MX","iso2":"MX","iso3":"MEX","name":"Mexico"}
+{"id":160,"capital":"Palikir","fips104":"FM","iso2":"FM","iso3":"FSM","name":"Micronesia, Federated States of"}
+{"id":161,"capital":null,"fips104":"MQ","iso2":"--","iso3":"--","name":"Midway Islands"}
+{"id":162,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Miscellaneous (French)"}
+{"id":163,"capital":"Chisinau","fips104":"MD","iso2":"MD","iso3":"MDA","name":"Moldova"}
+{"id":164,"capital":"Monaco","fips104":"MN","iso2":"MC","iso3":"MCO","name":"Monaco"}
+{"id":165,"capital":"Ulaanbaatar","fips104":"MG","iso2":"MN","iso3":"MNG","name":"Mongolia"}
+{"id":166,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Montenegro"}
+{"id":167,"capital":"Plymouth","fips104":"MH","iso2":"MS","iso3":"MSR","name":"Montserrat"}
+{"id":168,"capital":"Rabat","fips104":"MO","iso2":"MA","iso3":"MAR","name":"Morocco"}
+{"id":169,"capital":"Maputo","fips104":"MZ","iso2":"MZ","iso3":"MOZ","name":"Mozambique"}
+{"id":170,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Myanmar"}
+{"id":171,"capital":"Windhoek","fips104":"WA","iso2":"NA","iso3":"NAM","name":"Namibia"}
+{"id":172,"capital":null,"fips104":"NR","iso2":"NR","iso3":"NRU","name":"Nauru"}
+{"id":173,"capital":null,"fips104":"BQ","iso2":"--","iso3":"--","name":"Navassa Island"}
+{"id":174,"capital":"Kathmandu","fips104":"NP","iso2":"NP","iso3":"NPL","name":"Nepal"}
+{"id":175,"capital":"Amsterdam","fips104":"NL","iso2":"NL","iso3":"NLD","name":"Netherlands"}
+{"id":176,"capital":"Willemstad","fips104":"NT","iso2":"AN","iso3":"ANT","name":"Netherlands Antilles"}
+{"id":177,"capital":"Noumea","fips104":"NC","iso2":"NC","iso3":"NCL","name":"New Caledonia"}
+{"id":178,"capital":"Wellington","fips104":"NZ","iso2":"NZ","iso3":"NZL","name":"New Zealand"}
+{"id":179,"capital":"Managua","fips104":"NU","iso2":"NI","iso3":"NIC","name":"Nicaragua"}
+{"id":180,"capital":"Niamey","fips104":"NG","iso2":"NE","iso3":"NER","name":"Niger"}
+{"id":181,"capital":"Abuja","fips104":"NI","iso2":"NG","iso3":"NGA","name":"Nigeria"}
+{"id":182,"capital":"Alofi","fips104":"NE","iso2":"NU","iso3":"NIU","name":"Niue"}
+{"id":183,"capital":"Kingston","fips104":"NF","iso2":"NF","iso3":"NFK","name":"Norfolk Island"}
+{"id":184,"capital":"Saipan","fips104":"CQ","iso2":"MP","iso3":"MNP","name":"Northern Mariana Islands"}
+{"id":185,"capital":"Oslo","fips104":"NO","iso2":"NO","iso3":"NOR","name":"Norway"}
+{"id":186,"capital":"Muscat","fips104":"MU","iso2":"OM","iso3":"OMN","name":"Oman"}
+{"id":187,"capital":"Islamabad","fips104":"PK","iso2":"PK","iso3":"PAK","name":"Pakistan"}
+{"id":188,"capital":"Koror","fips104":"PS","iso2":"PW","iso3":"PLW","name":"Palau"}
+{"id":189,"capital":null,"fips104":"LQ","iso2":"--","iso3":"--","name":"Palmyra Atoll"}
+{"id":190,"capital":"Panama","fips104":"PM","iso2":"PA","iso3":"PAN","name":"Panama"}
+{"id":191,"capital":"Port Moresby","fips104":"PP","iso2":"PG","iso3":"PNG","name":"Papua New Guinea"}
+{"id":192,"capital":null,"fips104":"PF","iso2":"--","iso3":"--","name":"Paracel Islands"}
+{"id":193,"capital":"Asuncion","fips104":"PA","iso2":"PY","iso3":"PRY","name":"Paraguay"}
+{"id":194,"capital":"Lima","fips104":"PE","iso2":"PE","iso3":"PER","name":"Peru"}
+{"id":195,"capital":"Manila","fips104":"RP","iso2":"PH","iso3":"PHL","name":"Philippines"}
+{"id":196,"capital":"Adamstown","fips104":"PC","iso2":"PN","iso3":"PCN","name":"Pitcairn Islands"}
+{"id":197,"capital":"Warsaw","fips104":"PL","iso2":"PL","iso3":"POL","name":"Poland"}
+{"id":198,"capital":"Lisbon","fips104":"PO","iso2":"PT","iso3":"PRT","name":"Portugal"}
+{"id":199,"capital":"San Juan","fips104":"RQ","iso2":"PR","iso3":"PRI","name":"Puerto Rico"}
+{"id":200,"capital":"Doha","fips104":"QA","iso2":"QA","iso3":"QAT","name":"Qatar"}
+{"id":201,"capital":"Saint-Denis","fips104":"RE","iso2":"RE","iso3":"REU","name":"R�union"}
+{"id":202,"capital":"Bucharest","fips104":"RO","iso2":"RO","iso3":"ROU","name":"Romania"}
+{"id":203,"capital":"Moscow","fips104":"RS","iso2":"RU","iso3":"RUS","name":"Russia"}
+{"id":204,"capital":"Kigali","fips104":"RW","iso2":"RW","iso3":"RWA","name":"Rwanda"}
+{"id":205,"capital":"Jamestown","fips104":"SH","iso2":"SH","iso3":"SHN","name":"Saint Helena"}
+{"id":206,"capital":"Basseterre","fips104":"SC","iso2":"KN","iso3":"KNA","name":"Saint Kitts and Nevis"}
+{"id":207,"capital":"Castries","fips104":"ST","iso2":"LC","iso3":"LCA","name":"Saint Lucia"}
+{"id":208,"capital":"Saint-Pierre","fips104":"SB","iso2":"PM","iso3":"SPM","name":"Saint Pierre and Miquelon"}
+{"id":209,"capital":"Kingstown","fips104":"VC","iso2":"VC","iso3":"VCT","name":"Saint Vincent and the Grenadines"}
+{"id":210,"capital":"Apia","fips104":"WS","iso2":"WS","iso3":"WSM","name":"Samoa"}
+{"id":211,"capital":"San Marino","fips104":"SM","iso2":"SM","iso3":"SMR","name":"San Marino"}
+{"id":212,"capital":"Sao Tome","fips104":"TP","iso2":"ST","iso3":"STP","name":"S�o Tom� and Pr�ncipe"}
+{"id":213,"capital":"Riyadh","fips104":"SA","iso2":"SA","iso3":"SAU","name":"Saudi Arabia"}
+{"id":214,"capital":"Dakar","fips104":"SG","iso2":"SN","iso3":"SEN","name":"Senegal"}
+{"id":215,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Serbia"}
+{"id":216,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Serbia and Montenegro"}
+{"id":217,"capital":"Victoria","fips104":"SE","iso2":"SC","iso3":"SYC","name":"Seychelles"}
+{"id":218,"capital":"Freetown","fips104":"SL","iso2":"SL","iso3":"SLE","name":"Sierra Leone"}
+{"id":219,"capital":"Singapore","fips104":"SN","iso2":"SG","iso3":"SGP","name":"Singapore"}
+{"id":220,"capital":"Bratislava","fips104":"LO","iso2":"SK","iso3":"SVK","name":"Slovakia"}
+{"id":221,"capital":"Ljubljana","fips104":"SI","iso2":"SI","iso3":"SVN","name":"Slovenia"}
+{"id":222,"capital":"Honiara","fips104":"BP","iso2":"SB","iso3":"SLB","name":"Solomon Islands"}
+{"id":223,"capital":"Mogadishu","fips104":"SO","iso2":"SO","iso3":"SOM","name":"Somalia"}
+{"id":224,"capital":"Pretoria","fips104":"SF","iso2":"ZA","iso3":"ZAF","name":"South Africa"}
+{"id":225,"capital":null,"fips104":"SX","iso2":"GS","iso3":"SGS","name":"South Georgia and the South Sandwich Islands"}
+{"id":226,"capital":"Madrid","fips104":"SP","iso2":"ES","iso3":"ESP","name":"Spain"}
+{"id":227,"capital":null,"fips104":"PG","iso2":"--","iso3":"--","name":"Spratly Islands"}
+{"id":228,"capital":"Colombo","fips104":"CE","iso2":"LK","iso3":"LKA","name":"Sri Lanka"}
+{"id":229,"capital":"Khartoum","fips104":"SU","iso2":"SD","iso3":"SDN","name":"Sudan"}
+{"id":230,"capital":"Paramaribo","fips104":"NS","iso2":"SR","iso3":"SUR","name":"Suriname"}
+{"id":231,"capital":"Longyearbyen","fips104":"SV","iso2":"SJ","iso3":"SJM","name":"Svalbard"}
+{"id":232,"capital":"Mbabane","fips104":"WZ","iso2":"SZ","iso3":"SWZ","name":"Swaziland"}
+{"id":233,"capital":"Stockholm","fips104":"SW","iso2":"SE","iso3":"SWE","name":"Sweden"}
+{"id":234,"capital":"Bern","fips104":"SZ","iso2":"CH","iso3":"CHE","name":"Switzerland"}
+{"id":235,"capital":"Damascus","fips104":"SY","iso2":"SY","iso3":"SYR","name":"Syria"}
+{"id":236,"capital":"Taipei","fips104":"TW","iso2":"TW","iso3":"TWN","name":"Taiwan"}
+{"id":237,"capital":"Dushanbe","fips104":"TI","iso2":"TJ","iso3":"TJK","name":"Tajikistan"}
+{"id":238,"capital":"Dar es Salaam","fips104":"TZ","iso2":"TZ","iso3":"TZA","name":"Tanzania"}
+{"id":239,"capital":"Bangkok","fips104":"TH","iso2":"TH","iso3":"THA","name":"Thailand"}
+{"id":240,"capital":"Lome","fips104":"TO","iso2":"TG","iso3":"TGO","name":"Togo"}
+{"id":241,"capital":null,"fips104":"TL","iso2":"TK","iso3":"TKL","name":"Tokelau"}
+{"id":242,"capital":"Nuku'alofa","fips104":"TN","iso2":"TO","iso3":"TON","name":"Tonga"}
+{"id":243,"capital":"Port-of-Spain","fips104":"TD","iso2":"TT","iso3":"TTO","name":"Trinidad and Tobago"}
+{"id":244,"capital":null,"fips104":"TE","iso2":"--","iso3":"--","name":"Tromelin Island"}
+{"id":245,"capital":"Tunis","fips104":"TS","iso2":"TN","iso3":"TUN","name":"Tunisia"}
+{"id":246,"capital":"Ankara","fips104":"TU","iso2":"TR","iso3":"TUR","name":"Turkey"}
+{"id":247,"capital":"Ashgabat","fips104":"TX","iso2":"TM","iso3":"TKM","name":"Turkmenistan"}
+{"id":248,"capital":"Cockburn Town","fips104":"TK","iso2":"TC","iso3":"TCA","name":"Turks and Caicos Islands"}
+{"id":249,"capital":"Funafuti","fips104":"TV","iso2":"TV","iso3":"TUV","name":"Tuvalu"}
+{"id":250,"capital":"Kampala","fips104":"UG","iso2":"UG","iso3":"UGA","name":"Uganda"}
+{"id":251,"capital":"Kiev","fips104":"UP","iso2":"UA","iso3":"UKR","name":"Ukraine"}
+{"id":252,"capital":"Abu Dhabi","fips104":"AE","iso2":"AE","iso3":"ARE","name":"United Arab Emirates"}
+{"id":253,"capital":"London","fips104":"UK","iso2":"GB","iso3":"GBR","name":"United Kingdom"}
+{"id":254,"capital":"Washington, DC","fips104":"US","iso2":"US","iso3":"USA","name":"United States"}
+{"id":255,"capital":null,"fips104":"--","iso2":"UM","iso3":"UMI","name":"United States Minor Outlying Islands"}
+{"id":256,"capital":"Montevideo","fips104":"UY","iso2":"UY","iso3":"URY","name":"Uruguay"}
+{"id":257,"capital":"Tashkent","fips104":"UZ","iso2":"UZ","iso3":"UZB","name":"Uzbekistan"}
+{"id":258,"capital":"Port-Vila","fips104":"NH","iso2":"VU","iso3":"VUT","name":"Vanuatu"}
+{"id":259,"capital":"Caracas","fips104":"VE","iso2":"VE","iso3":"VEN","name":"Venezuela"}
+{"id":260,"capital":"Hanoi","fips104":"VM","iso2":"VN","iso3":"VNM","name":"Vietnam"}
+{"id":261,"capital":"Charlotte Amalie","fips104":"VQ","iso2":"VI","iso3":"VIR","name":"Virgin Islands"}
+{"id":262,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Virgin Islands (UK)"}
+{"id":263,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Virgin Islands (US)"}
+{"id":264,"capital":null,"fips104":"WQ","iso2":"--","iso3":"--","name":"Wake Island"}
+{"id":265,"capital":"Mata-Utu","fips104":"WF","iso2":"WF","iso3":"WLF","name":"Wallis and Futuna"}
+{"id":266,"capital":null,"fips104":"WE","iso2":"--","iso3":"--","name":"West Bank"}
+{"id":267,"capital":null,"fips104":"WI","iso2":"EH","iso3":"ESH","name":"Western Sahara"}
+{"id":268,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Western Samoa"}
+{"id":269,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"World"}
+{"id":270,"capital":"Sanaa","fips104":"YM","iso2":"YE","iso3":"YEM","name":"Yemen"}
+{"id":271,"capital":"Belgrade","fips104":"YI","iso2":"YU","iso3":"YUG","name":"Yugoslavia"}
+{"id":272,"capital":null,"fips104":"--","iso2":"--","iso3":"--","name":"Zaire"}
+{"id":273,"capital":"Lusaka","fips104":"ZA","iso2":"ZM","iso3":"ZWB","name":"Zambia"}
+{"id":274,"capital":"Harare","fips104":"ZI","iso2":"ZW","iso3":"ZWE","name":"Zimbabwe"}
+{"id":275,"capital":null,"fips104":"--","iso2":"PS","iso3":"PSE","name":"Palestinian Territory, Occupied"}

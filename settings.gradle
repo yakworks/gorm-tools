@@ -1,7 +1,10 @@
-rootProject.name = 'gorm-tools-root'
+rootProject.name = 'gorm-tools'
 
 include 'plugin'
 findProject(':plugin').name = 'dao'
 
-include 'test-projects/app'
-findProject(':test-projects/app').name = 'test-app'
+include 'examples/benchmarks'
+findProject(':examples/benchmarks').name = 'benchmarks'
+
+include 'examples/test-app'
+findProject(':examples/test-app').name = 'test-app'

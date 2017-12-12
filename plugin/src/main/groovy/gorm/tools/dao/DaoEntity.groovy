@@ -12,24 +12,24 @@ import javax.persistence.Transient
 trait DaoEntity<D extends GormEntity<D>> {
 
     @Transient
-    private static DaoApi _cachedDao
+    private static DaoApi cachedDao
 
     /**
      * Looks up and caches a dao bean
      * @return The dao
      */
     static DaoApi<D> getDao() {
-        if(!_cachedDao) {
+        if(!cachedDao) {
             GrailsApplication grailsApplication = Holders.grailsApplication
             String domainName = GrailsNameUtils.getPropertyName(this.name)
             String daoName = "${domainName}Dao"
-            _cachedDao = grailsApplication.mainContext.getBean(daoName, DaoApi)
+            cachedDao = grailsApplication.mainContext.getBean(daoName, DaoApi)
         }
-        return _cachedDao
+        return cachedDao
     }
 
     static void setDao(DaoApi<D> dao) {
-        _cachedDao = dao
+        cachedDao = dao
     }
 
     D persist(Map args = [:]) {

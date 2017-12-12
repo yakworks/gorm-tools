@@ -1,15 +1,19 @@
 package gorm.tools.testing
 
+import gorm.tools.TrxService
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
-import gorm.tools.dao.events.DaoEventInvoker
+import gorm.tools.dao.events.DaoEventPublisher
 import gorm.tools.databinding.FastBinder
 import grails.core.GrailsApplication
 import grails.plugin.dao.DaoArtefactHandler
 import org.springframework.util.ClassUtils
 
 /**
- * Created by sudhir on 11/12/17.
+ * Helper utils for mocking spring beans needed to test dao's and domains.
+ *
+ * @author Sudhir
+ * @since 3.3.2
  */
 class DaoTestHelper {
     static GrailsApplication grailsApplication
@@ -17,8 +21,9 @@ class DaoTestHelper {
     static Closure commonBeans() {
         return {
             fastBinder(FastBinder)
-            daoEventInvoker(DaoEventInvoker)
+            daoEventPublisher(DaoEventPublisher)
             daoUtilBean(DaoUtil)
+            trxService(TrxService)
         }
     }
 
@@ -33,22 +38,19 @@ class DaoTestHelper {
         String daoBeanName = DaoUtil.getDaoBeanName(domainClass)
         if (ClassUtils.isPresent(daoClassName, grailsApplication.classLoader)) {
             return ClassUtils.forName(daoClassName)
-        } else {
-            return DefaultGormDao
         }
+        return DefaultGormDao
     }
 
     static Closure registerDao(Class domain, Class daoClass) {
         String beanName = DaoUtil.getDaoBeanName(domain)
         grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)
+        Closure clos = { "$beanName"(daoClass) { bean -> bean.autowire = true } }
+
         if (daoClass == DefaultGormDao) {
-            return {
-                "$beanName"(daoClass, domain) { bean -> bean.autowire = true }
-            }
-        } else {
-            return {
-                "$beanName"(daoClass) { bean -> bean.autowire = true }
-            }
+            clos = { "$beanName"(daoClass, domain) { bean -> bean.autowire = true } }
         }
+
+        return clos
     }
 }

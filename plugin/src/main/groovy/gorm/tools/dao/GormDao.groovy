@@ -27,7 +27,7 @@ import org.springframework.dao.DataIntegrityViolationException
 trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
 
     @Autowired FastBinder dataBinder
-    @Autowired DaoEventPublisher daoEventInvoker
+    @Autowired DaoEventPublisher daoEventPublisher
     @Autowired TrxService trxService
 
     //use getters when accessing domainClass so implementing class can override the property if desired
@@ -56,10 +56,10 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
     D doPersist(D entity, Map args = [:]) {
         try {
             //DaoUtil.fireEvent(this, DaoEventType.BeforePersist, entity)
-            daoEventInvoker.doBeforePersist(this, entity)
+            daoEventPublisher.doBeforePersist(this, entity)
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             entity.save(args)
-            daoEventInvoker.doAfterPersist(this, entity)
+            daoEventPublisher.doAfterPersist(this, entity)
             //DaoUtil.fireEvent(this, DaoEventType.AfterPersist, entity)
             return entity
         }
@@ -78,9 +78,9 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
     D doCreate(Map params) {
         D entity = (D) getDomainClass().newInstance()
         //watch for the http://docs.groovy-lang.org/next/html/documentation/core-traits.html#_inheritance_of_state_gotchas, use getters
-        daoEventInvoker.doBeforeCreate(this, entity, params)
+        daoEventPublisher.doBeforeCreate(this, entity, params)
         bindAndSave(entity, params, "Create")
-        daoEventInvoker.doAfterCreate(this, entity, params)
+        daoEventPublisher.doAfterCreate(this, entity, params)
         return entity
     }
 
@@ -93,9 +93,9 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
 
     D doUpdate(Map params) {
         D entity = get(params)
-        daoEventInvoker.doBeforeUpdate(this, entity, params)
+        daoEventPublisher.doBeforeUpdate(this, entity, params)
         bindAndSave(entity, params, "Update")
-        daoEventInvoker.doAfterUpdate(this, entity, params)
+        daoEventPublisher.doAfterUpdate(this, entity, params)
         return entity
     }
 
@@ -139,9 +139,9 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
 
     void doRemove(D entity) {
         try {
-            daoEventInvoker.doBeforeRemove(this, entity)
+            daoEventPublisher.doBeforeRemove(this, entity)
             entity.delete(flush:true)
-            daoEventInvoker.doAfterRemove(this, entity)
+            daoEventPublisher.doAfterRemove(this, entity)
         }
         catch (DataIntegrityViolationException dae) {
             throw handleException(entity, dae)
@@ -176,8 +176,6 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
     D get(Map params) {
         return get(params.id as Serializable, params.version as Long)
     }
-
-
 
     @Override
     DomainException handleException(D entity, RuntimeException e) {

@@ -20,9 +20,9 @@ class CityDao implements GormDao<City> { //extends DefaultGormDao<City>{
     //    City create(Map params) {
     //        //watch for the http://docs.groovy-lang.org/next/html/documentation/core-traits.html#_inheritance_of_state_gotchas, use getters
 //        City entity = (City)getDomainClass().newInstance()
-//        daoEventInvoker.doBeforeCreate(this, entity, params)
+//        daoEventPublisher.doBeforeCreate(this, entity, params)
 //        bindAndSave(entity, params, "Create")
-//        daoEventInvoker.doAfterCreate(this, entity, params)
+//        daoEventPublisher.doAfterCreate(this, entity, params)
 //        return entity
 //    }
 

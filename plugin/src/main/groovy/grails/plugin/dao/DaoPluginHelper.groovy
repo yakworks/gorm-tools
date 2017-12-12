@@ -39,7 +39,7 @@ class DaoPluginHelper {
             idGenerator = ref("idGenerator")
         }
 
-        daoEventInvoker(DaoEventPublisher)
+        daoEventPublisher(DaoEventPublisher)
         daoUtilBean(DaoUtil) //this is here just so the app ctx can get picked up and set on DaoUtils
 
         gparsBatchService(GparsBatchService)

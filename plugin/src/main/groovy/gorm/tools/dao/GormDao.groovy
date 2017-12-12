@@ -1,14 +1,17 @@
 package gorm.tools.dao
 
+import gorm.tools.TrxService
+import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
-import gorm.tools.dao.events.DaoEventType
+import gorm.tools.dao.events.DaoEventPublisher
 import gorm.tools.databinding.FastBinder
 import gorm.tools.mango.DaoQuery
-import gorm.tools.dao.errors.DomainException
+import grails.gorm.transactions.TransactionService
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
@@ -21,14 +24,16 @@ import org.springframework.dao.DataIntegrityViolationException
  * @author Joshua Burnett
  */
 @CompileStatic
-trait GormDao<D extends GormEntity> implements DaoQuery{
+trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
 
-    @Autowired
-    FastBinder dataBinder
+    @Autowired FastBinder dataBinder
+    @Autowired DaoEventPublisher daoEventPublisher
+    @Autowired TrxService trxService
 
     //use getters when accessing domainClass so implementing class can override the property if desired
     Class<D> domainClass // the domain class this is for
 
+    @Override
     Class<D> getDomainClass() {
         if(!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDao.class)
         return domainClass
@@ -39,22 +44,23 @@ trait GormDao<D extends GormEntity> implements DaoQuery{
      *
      * @param entity the domain entity to call save on
      * @param args the arguments to pass to save
-     * @throws DomainException if a validation or DataAccessException error happens
+     * @throws DataAccessException if a validation or DataAccessException error happens
      */
+    @Override
     D persist(D entity, Map args = [:]) {
-        withTransaction {
+        trxService.withTrx {
             return doPersist(entity, args)
         }
     }
 
     D doPersist(D entity, Map args = [:]) {
         try {
-            DaoUtil.fireEvent(this, DaoEventType.BeforePersist, entity)
-
+            //DaoUtil.fireEvent(this, DaoEventType.BeforePersist, entity)
+            daoEventPublisher.doBeforePersist(this, entity)
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             entity.save(args)
-
-            DaoUtil.fireEvent(this, DaoEventType.AfterPersist, entity)
+            daoEventPublisher.doAfterPersist(this, entity)
+            //DaoUtil.fireEvent(this, DaoEventType.AfterPersist, entity)
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
@@ -62,32 +68,48 @@ trait GormDao<D extends GormEntity> implements DaoQuery{
         }
     }
 
+    @Override
     D create(Map params) {
+        trxService.withTrx {
+            return doCreate(params)
+        }
+    }
+
+    D doCreate(Map params) {
+        D entity = (D) getDomainClass().newInstance()
         //watch for the http://docs.groovy-lang.org/next/html/documentation/core-traits.html#_inheritance_of_state_gotchas, use getters
-        D entity = (D)getDomainClass().newInstance()
-        withTransaction {
-            return bindAndSave(entity, params, "Create")
-        }
-
-    }
-
-    D update(Map params) {
-        D entity = get(params)
-        withTransaction {
-            return bindAndSave(entity, params, "Update")
-        }
-    }
-
-    D bindAndSave(D entity, Map params, String bindMethod) {
-        DaoUtil.fireEvent(this, DaoEventType.valueOf("Before$bindMethod"), entity, params)
-        bind(entity, params, bindMethod)
-        persist(entity)
-        DaoUtil.fireEvent(this, DaoEventType.valueOf("After$bindMethod"), entity, params)
+        daoEventPublisher.doBeforeCreate(this, entity, params)
+        bindAndSave(entity, params, "Create")
+        daoEventPublisher.doAfterCreate(this, entity, params)
         return entity
     }
 
-    D bind(D entity, Map row, String bindMethod){
-        (D) getDataBinder().bind(entity, row, bindMethod)
+    @Override
+    D update(Map params) {
+        trxService.withTrx {
+            return doUpdate(params)
+        }
+    }
+
+    D doUpdate(Map params) {
+        D entity = get(params)
+        daoEventPublisher.doBeforeUpdate(this, entity, params)
+        bindAndSave(entity, params, "Update")
+        daoEventPublisher.doAfterUpdate(this, entity, params)
+        return entity
+    }
+
+    @Override
+    //@CompileDynamic
+    D bindAndSave(D entity, Map params, String bindMethod) {
+        bind(entity, params, bindMethod)
+        doPersist(entity)
+        return entity
+    }
+
+    @Override
+    void bind(D entity, Map row, String bindMethod = null){
+        getDataBinder().bind(entity, row, bindMethod)
     }
 
     /**
@@ -96,6 +118,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery{
      * @param params the parameter map that has the id for the domain entity to delete
      * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
+    @Override
     void removeById(Serializable id) {
         D entity = get(id, null)
         remove(entity)
@@ -107,17 +130,18 @@ trait GormDao<D extends GormEntity> implements DaoQuery{
      * @param entity the domain entity
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
+    @Override
     void remove(D entity) {
-        withTransaction {
+        trxService.withTrx {
             doRemove(entity)
         }
     }
 
     void doRemove(D entity) {
         try {
-            DaoUtil.fireEvent(this, DaoEventType.BeforeRemove, entity)
+            daoEventPublisher.doBeforeRemove(this, entity)
             entity.delete(flush:true)
-            DaoUtil.fireEvent(this, DaoEventType.AfterRemove, entity)
+            daoEventPublisher.doAfterRemove(this, entity)
         }
         catch (DataIntegrityViolationException dae) {
             throw handleException(entity, dae)
@@ -134,6 +158,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery{
      * @throws DomainNotFoundException if its not found
      * @throws DomainException if the versions mismatch
      */
+    @Override
     D get(Serializable id, Long version) throws DomainNotFoundException, DomainException {
         D entity = GormEnhancer.findStaticApi(getDomainClass()).get(id)
         DaoUtil.checkFound(entity, [id: id], getDomainClass().name)
@@ -147,16 +172,26 @@ trait GormDao<D extends GormEntity> implements DaoQuery{
      * @param params expects a Map with an id key and optionally a version
      * @return
      */
+    @Override
     D get(Map params) {
         return get(params.id as Serializable, params.version as Long)
     }
 
+    @Override
     DomainException handleException(D entity, RuntimeException e) {
         return DaoUtil.handleException(entity, e)
     }
 
-    public <T> T withTransaction(Map transProps = [:], Closure<T> callable) {
-        GormEnhancer.findStaticApi(getDomainClass()).withTransaction(transProps, callable)
+    public <T> T withTrx(Map transProps = [:], Closure<T> callable) {
+        //this seems to be faster than the withTransaction on the static gorm api. the TrxService seems to be as fast
+        TransactionService txService = getDatastore().getService(TransactionService)
+        txService.withTransaction(transProps, callable)
+        //GormEnhancer.findStaticApi(getDomainClass()).withTransaction(transProps, callable)
+        //callable()
+    }
+
+    Datastore getDatastore(){
+        GormEnhancer.findInstanceApi(domainClass).datastore
     }
 
 //    public <T> T withTransaction(Closure<T> callable) {

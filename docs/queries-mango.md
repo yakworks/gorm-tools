@@ -3,24 +3,20 @@ Gorm-tools provides a convenient way for iterating over records which correspond
 ## Mango Overview
 
 The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
-The gorm dao's come with a `query(criteriaMap, closure)` method. It allows to get list of entities restricted by
-the properties in the `criteriaMap`. The map could be passed as JSON string or Map. All restrictions should be under `criteria` keyword by default, see example
-bellow.
+The gorm dao's come with a `query(criteriaMap, closure)` method. It allows to get paged list of entities restricted by
+the properties in the `criteriaMap`. The map could be passed as JSON string or Map. All restrictions should be under 
+`criteria` keyword by default, but it can be changed with [config](queries-mango.md#configuration).
 
 Anything in the optional closure will be passed into Gorm/Hibernate criteria closure
 
-The query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
-and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax)
-with some inspiration from [json-sql](https://github.com/2do2go/json-sql/) as well
-
 >Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.
 
-**Example**
+**Basic example**
 
 ``` java
-Org.dao.list([
+Org.dao.query([
   criteria: [name: "Bill%", type: "New"],
-  sort: {name:"asc"},
+  sort: [name:"asc"],
   max: 20
 ]){
   gt "id", 5
@@ -39,16 +35,16 @@ criteria.list(max: 20) {
     order("name", "asc")
 }
 ```
+
 ### Restful API query
 
 See the docs here for more examples and info https://yakworks.github.io/gorm-rest-api/
 
-### Criteria options
+### Mango QL
 
-For examples well assume we are querying a domain model that looks like the
-starwars api here http://stapi.co/api/v1/rest/spacecraft?uid=SRMA0000008279
-
-Bellow are listed all supported options.
+The Mango query language is similar to [Mongo's][mongo]
+and CouchDB's new [Mango selector-syntax][couchDB]
+with some inspiration from [json-sql][json-sql] as well
 
 #### Logical
 
@@ -77,7 +73,7 @@ Bellow are listed all supported options.
 | $isNull    | Value is null                    | `"name": "$isNull" \|  `"name": null         |
 | $isNotNull | Value is not null                | `"name": "$isNotNull" \| `"name":{$ne: null} |
 
-**Fields**
+#### Fields
 
 |  Op   |    Description    |                Example                 |
 | ----- | ----------------- | -------------------------------------- |
@@ -88,7 +84,33 @@ Bellow are listed all supported options.
 | $eqf  | = field           | `"cargo": {"$eqf": "controlTotal"}`    |
 | $nef  | not equal, !=, <> | `"cargo" : {"$nef" : "controlTotal"}}` |
 
-### Examples
+#### Convert to Mango QL
+
+The [MangoTidyMap utility][MangoTidyMap]
+transforms parameters map to Mango QL criteria map. 
+Here is several examples of usage:
+
+```java
+assert MangoTidyMap.tidy([a:5]) == [a:['$eq':5]]
+assert MangoTidyMap.tidy([b:"Bill%"]) == [b:['$ilike':5]]
+assert MangoTidyMap.tidy([c: [1,2,3]]) == [c:['$in':[1,2,3]]]
+
+```
+
+One of the useful features of the MangoTidyMap is that it converts path to nested map which is required by [mangoQuery](queries-mango.md#mango-query)  
+```java
+assert MangoTidyMap.tidy['a.b.c': 3]) == [a:[b:[c:['$eq':3]]]]
+```
+For more example take a look on [MangoTidyMapSpec][MangoTidyMapSpec] 
+
+### Mango query
+
+Dao service by default has not all features of mango service, just `buildCriteria` and `query` methods, but both automatically
+convert map params to mango map, so just `params` or `request.JSON` can be passed. 
+
+See [Mango Api](queries-mango.md#mango-api) to know all features that are provided.
+
+#### Examples
 
 Bellow will be a list of supported syntax for params in json format, which is supported:
 Assume we are running these on star trek characters http://stapi.co/api/v1/rest/character?uid=CHMA0000128908
@@ -117,7 +139,7 @@ This would produce in a round about way with criteria builders a where clause li
 ```
 
 
-**Associations**
+#### Associations
 ```js
 {
   "criteria": {
@@ -135,7 +157,7 @@ This would produce in a round about way with criteria builders a where clause li
 }
 ```
 
-**IN Clause**
+#### IN Clause
 ```js
 {
   "criteria": {
@@ -154,7 +176,7 @@ This would produce in a round about way with criteria builders a where clause li
 ```
 
 
-**Comparison Examples**
+#### Fields Comparison Examples
 ```js
   "amount": {"$ne": 50}, /*not equal*/
   "amount": {"$gt": 100}, /* greater than value */
@@ -178,7 +200,7 @@ This would produce in a round about way with criteria builders a where clause li
   "status": null /* translates to isNull*/
 ```
 
-**Logical**
+#### Logical operators
 ```js
     "$or": { // if a single or then it can be done like this
       "customer.name":{"$ilike": "wal"},
@@ -227,11 +249,11 @@ This would produce in a round about way with criteria builders a where clause li
 }
 
 ```
-###Quick Search
+### Quick Search
 
 Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
 search can be passed in `$quickSearch` or `$q` keywords. The list of fields should be specified in static property `quickSearchFields`
-as list of strings, see bellow:
+as list of strings, see example bellow:
 
 ```groovy
 class Org {
@@ -242,7 +264,7 @@ class Org {
     ...
 
 ```
-So mapQL will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
+So Mango criteria will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
 for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
@@ -261,7 +283,7 @@ criteria.list(max: 20) {
 }
 ```
 
-###Configuration
+### Configuration
 
 The default `criteria` keyword for the restriction map can be changed in config:
 ```yml
@@ -273,11 +295,43 @@ gorm:
 
 With such configuration restrictions for Mango criteria should be under `filters` keyword.
 
-###Count totals
 
-If one needs to compute totals for some fields, MangoQuery has `countTotals` method restrictions is
-working in the same way as for list, so it can be specified with params map and criteria closure.
-But Dao doesn't contain this method, so one can call it on mangoQuery bean.
+### Mango API
+
+#### Mango in Dao
+[Dao service](dao.md) implements [DaoQuery.trait][DaoQuery]
+which contains implementation for two query methods:
+
+```java
+DetachedCriteria buildCriteria( Map params=[:], Closure closure=null) {
+        mangoQuery.buildCriteria(getDomainClass(), params, closure)
+    }
+```
+see docs for [DetachedCriteria][DetachedCriteria]
+
+```java
+ List query(Map params=[:], Closure closure=null){
+         mangoQuery.query(getDomainClass(), params, closure)
+     }
+```
+returns list of entities with pagination. For pagination take a look at [Pager][Pager]
+
+If one need to override mango bean for dao it can be achieved by creating new `mangoQuery` bean, it should
+implement [MangoQueryApi.trait][MangoQueryApi] so it can be autowired
+ 
+#### Build Mango criteria
+
+Under the hood Mango uses [DetachedCriteria][DetachedCriteria] take a look on main [build method][build method]
+One can see that it normalizes params map to make it Mango QL and then adds restrictions to detached criteria based on map,
+if closure is passed then applies it too. 
+
+### Count totals
+
+If one needs to compute totals for some fields, [MangoQuery] [MangoQuery] 
+has `countTotals` method. Restrictions for it are working in the same way as for query method, so it can be specified 
+with params map and criteria closure.
+
+But Dao bean doesn't contain this method, so one can call it on mangoQuery bean.
 To specify what fields sums should be computed for, the list with fields name should be passed.
 See example:
 ```groovy
@@ -289,8 +343,9 @@ Org.dao.mangoQuery.countTotals(domainClass, [
 ```
 Result will be look like: `[amount: 1500, credit: 440]`, it doesn't take into account pagination.
 
+
 ## ScrollableQuery
-See [ScrollableQuery](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy)
+See [ScrollableQuery][ScrollableQuery]
 
 ### Execute a closure for each record
 
@@ -330,7 +385,21 @@ This closure is called for a specified number of records. For example, code belo
 
 ## GrailsParameterMapRowMapper
 
-See [GrailsParameterMapRowMapper](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/GrailsParameterMapRowMapper.groovy)
+See [GrailsParameterMapRowMapper][GrailsParameterMapRowMapper]
 
 Row mapper which allows to convert data from a given ResultSet instance
 to a grails parameter map, which can be used for databinding.
+
+[mongo]:https://docs.mongodb.com/manual/reference/operator/query/
+[couchDB]:http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax
+[json-sql]:https://github.com/2do2go/json-sql/
+[MangoTidyMap]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoTidyMap.groovy
+[MangoTidyMapSpec]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/test/groovy/gorm/tools/mango/MangoTidyMapSpec.groovy 
+[MangoQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQuery.groovy
+[DaoQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/DaoQuery.groovy
+[DetachedCriteria]:http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria
+[Pager]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/Pager.groovy
+[build method]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoBuilder.groovy#L73
+[ScrollableQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy
+[GrailsParameterMapRowMapper]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/GrailsParameterMapRowMapper.groovy
+[MangoQueryApi]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQueryApi.groovy

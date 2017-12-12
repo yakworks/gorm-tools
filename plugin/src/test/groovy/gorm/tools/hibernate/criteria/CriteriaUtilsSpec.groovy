@@ -1,9 +1,7 @@
 package gorm.tools.hibernate.criteria
 
-import grails.gorm.annotation.Entity
 import grails.persistence.Entity
 import grails.test.hibernate.HibernateSpec
-import spock.lang.Specification
 
 class CriteriaUtilsSpec extends HibernateSpec {
 

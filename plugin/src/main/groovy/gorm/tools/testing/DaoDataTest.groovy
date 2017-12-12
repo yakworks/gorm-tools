@@ -1,15 +1,7 @@
 package gorm.tools.testing
 
-import gorm.tools.dao.events.DaoEventInvoker
-import gorm.tools.dao.DaoUtil
-import gorm.tools.dao.DefaultGormDao
-import gorm.tools.databinding.FastBinder
-import gorm.tools.mango.MangoQuery
-import grails.plugin.dao.DaoArtefactHandler
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
-import grails.util.GrailsNameUtils
-import org.springframework.util.ClassUtils
 
 @SuppressWarnings(['JUnitPublicNonTestMethod'])
 trait DaoDataTest implements DataTest, AutowiredTest {
@@ -21,35 +13,16 @@ trait DaoDataTest implements DataTest, AutowiredTest {
      * @param domainClassesToMock The list of domain classes to mock
      */
     void mockDomains(Class<?>... domainClassesToMock) {
+        DaoTestHelper.grailsApplication = grailsApplication
+
         DataTest.super.mockDomains(domainClassesToMock)
 
         Closure daoBeans = {}
+
         domainClassesToMock.each { Class domainClass ->
-            String daoClassName = "${domainClass.name}Dao"
-            if(ClassUtils.isPresent(daoClassName, grailsApplication.classLoader)){
-                Class daoClass = ClassUtils.forName(daoClassName)// Class.forName(daoClassName)
-                registerGormDaoClass(daoClass)
-                daoBeans = daoBeans << {
-                    "${GrailsNameUtils.getPropertyName(daoClass.name)}"(daoClass) { bean -> bean.autowire = true }
-                }
-            } else{
-                String daoName = "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
-                daoBeans = daoBeans << {
-                    "${daoName}"(DefaultGormDao, domainClass) { bean -> bean.autowire = true }
-                }
-            }
+            Class daoClass = DaoTestHelper.findDaoClass(domainClass)
+            daoBeans = daoBeans << DaoTestHelper.registerDao(domainClass, daoClass)
         }
-
-        defineBeans(daoBeans << {
-            mangoQuery(MangoQuery)
-            fastBinder(FastBinder)
-            daoEventInvoker(DaoEventInvoker)
-            daoUtilBean(DaoUtil)
-        })
-    }
-
-    private void registerGormDaoClass(Class daoClass) {
-        grailsApplication.addArtefact(DaoArtefactHandler.TYPE, daoClass)
     }
 
 }

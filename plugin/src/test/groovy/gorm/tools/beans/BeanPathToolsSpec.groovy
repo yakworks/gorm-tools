@@ -1,12 +1,12 @@
 package gorm.tools.beans
 
 import gorm.tools.dao.DefaultGormDao
+import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
-import spock.lang.Specification
-import grails.gorm.annotation.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
+import spock.lang.Specification
 
 class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest{
 

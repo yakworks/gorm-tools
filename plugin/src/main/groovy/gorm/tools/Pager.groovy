@@ -1,15 +1,9 @@
 package gorm.tools
 
 import gorm.tools.beans.BeanPathTools
-import grails.gorm.PagedResultList
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.grails.datastore.mapping.query.Query
-import org.hibernate.criterion.Projections
-import org.hibernate.internal.CriteriaImpl
-
-import java.lang.reflect.Field
 
 /**
  * a holder object for paged data
@@ -17,46 +11,108 @@ import java.lang.reflect.Field
 @Slf4j
 @CompileStatic
 class Pager {
-    //the page we are on
+
+    /**
+     * The page we are on
+     */
     Integer page = 1
-    //max rows to show
+
+    /**
+     * Max rows to show
+     */
     Integer max = 10
-    //the max rows the user can set it to
+
+    /**
+     * the max rows the user can set it to
+     */
     Integer allowedMax = 10000
-    //the total record count. This is used to calculate the number of pages
+
+    /**
+     * The total record count. This is used to calculate the number of pages
+     */
     Integer recordCount = 0
+
+    /**
+     * Offset max * (page - 1)
+     */
     Integer offset
+
+    /**
+     * List of elements
+     */
     List data
+
+    /**
+     * Parameters
+     */
     Map params
 
+    /**
+     * Constructor without params
+     */
     Pager() {}
 
+    /**
+     * Constructor with params
+     *
+     * @param params
+     */
     Pager(Map params) {
         setParams(params)
     }
 
+    /**
+     * Computes max value, if max not specified, then 10
+     * Default max allowed value is 100
+     *
+     * @param p map of params that may contain max value
+     * @param defaultMax default max value if max in params isnt set
+     * @return max value for pagination
+     */
     static Integer max(Map p, Integer defaultMax = 100) {
         Integer defmin = p.max ? toInteger(p.max) : 10
         p.max = Math.min(defmin, defaultMax)
         return p.max as Integer
     }
 
+    /**
+     * Computes page number, if not passed then 1
+     *
+     * @param p map of params
+     * @return page number
+     */
     static Integer page(Map p) {
         p.page = p.page ? toInteger(p.page) : 1
         return p.page as Integer
     }
 
+    /**
+     * Set params for Pager
+     *
+     * @param params map of params
+     */
     void setParams(Map params) {
         page = params.page = params.page ? toInteger(params.page) : 1
         max = params.max = Math.min(params.max ? toInteger(params.max) : 10, allowedMax)
         this.params = params
     }
 
+    /**
+     *  Converts object to integer
+     *
+     * @param v value
+     * @return value as integer
+     */
     @CompileDynamic
     static Integer toInteger(Object v){
         return v.toInteger()
     }
 
+    /**
+     * Calculates offset based on page number and max value
+     *
+     * @return offset value
+     */
     Integer getOffset() {
         if (!offset) {
             return (max * (page - 1))
@@ -64,10 +120,20 @@ class Pager {
         return offset
     }
 
+    /**
+     * Calculates total number of pages
+     *
+     * @return total number of pages
+     */
     Integer getPageCount() {
         return Math.ceil((Double)(recordCount / max)).intValue()
     }
 
+    /**
+     * Calls passed closure for each page
+     *
+     * @param c closure that should be called for pages
+     */
     void eachPage(Closure c) {
         if(pageCount < 1) return
         log.debug "eachPage total pages : pageCount"
@@ -86,10 +152,16 @@ class Pager {
 
     }
 
+    /**
+     * Returns formatted page with next values
+     *  page is the page we are on,
+     *  total is the total number f pages based on max per page setting
+     *  records is the total # of records we have
+     *  rows are the data
+     *
+     * @return Map with pager values
+     */
     Map getJsonData() {
-        //page is the page we are on, total is the total number f pages based on max per page setting
-        //records is the total # of records we have
-        //rows are the data
         return [
             page: this.page,
             total: this.getPageCount(),
@@ -98,13 +170,18 @@ class Pager {
         ]
     }
 
+    /**
+     * Setup totalCount property for list, if it absent and fill values that are listed in fieldList
+     *
+     * @param dlist list of entities
+     * @param fieldList list of fields names which values should be in the result list based on dlist
+     * @return new list with values selected from dlist based on fieldLists field names
+     */
     Pager setupData(List dlist, List fieldList = null) {
         setData(dlist)
         if (dlist?.size() > 0) {
             if (dlist.hasProperty('totalCount')) {
                 setRecordCount(dlist.getProperties().totalCount as Integer)
-            } else if (dlist instanceof PagedResultList) {
-                setRecordCount(loadTotalFromDb((PagedResultList)dlist))
             } else {
                 log.warn("Cannot get totalCount for ${dlist.class}")
                 setRecordCount(dlist.size())
@@ -118,30 +195,4 @@ class Pager {
         }
         return this
     }
-
-    @CompileDynamic
-    int loadTotalFromDb(PagedResultList src) {
-        int pageSize = src.size() //we _NEED_ this call, to make sure that data is already fetched,
-        //before we changed original query
-
-        if (pageSize == 0) { //actually this is just to double check that src.size() was actually called, result is not so important
-            log.warn("Page size is zero, but we will try to load count(*) anyway")
-        }
-
-        //get original query and modify it to get count of records. sadly, we cannot clone it
-        Query q = src.query
-        Field criteriaField = q.class.declaredFields.find { it.name == 'criteria' }
-        criteriaField.setAccessible(true)
-        CriteriaImpl realCriteria = criteriaField.get(q)
-        realCriteria.setProjection(Projections.rowCount()) // count(*)
-
-        //now we need to remove ORDER BY, because MS SQL cannot execute count(*) query with ORDER BY
-        Field currentOrder = realCriteria.class.declaredFields.find { it.name == 'orderEntries' }
-        currentOrder.setAccessible(true)
-        currentOrder.get(realCriteria).clear()
-
-        //actual count
-        return realCriteria.uniqueResult() as Integer ?: 0
-    }
-
 }

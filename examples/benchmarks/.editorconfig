@@ -1,0 +1,54 @@
+root = true
+
+[*]
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+indent_style = space
+max_line_length=100
+
+[*.coffee]
+indent_style = space
+indent_size = 2
+
+[*.js]
+indent_style = space
+indent_size = 2
+
+[{*.yml,*.yaml}]
+indent_style = space
+indent_size = 2
+
+[*.css]
+indent_style = space
+indent_size = 2
+
+[*.styl]
+indent_style = space
+indent_size = 2
+
+[*.html]
+indent_style = space
+indent_size = 4
+
+[*.groovy]
+indent_style = space
+indent_size = 4
+
+[*.gsp]
+indent_style = space
+indent_size = 4
+
+[*.gradle]
+indent_style = space
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Stylint - https://rosspatton.github.io/stylint/
+[{package.json,.stylintrc}]
+indent_size = 2
+
+[*.json]
+indent_size = 2

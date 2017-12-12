@@ -1,6 +1,6 @@
 package gorm.tools.beans
 
-import gorm.tools.dao.GormDao
+import gorm.tools.dao.DaoApi
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEntity
@@ -10,7 +10,7 @@ import org.grails.datastore.gorm.GormEntity
  */
 @CompileStatic
 class DaoDelegatingBean extends DelegatingBean {
-    GormDao dao
+    DaoApi dao
 
     @CompileStatic(TypeCheckingMode.SKIP)
     DaoDelegatingBean(GormEntity target) {

@@ -1,12 +1,12 @@
 package gorm.tools.idgen
 
 import grails.gorm.transactions.Rollback
+import grails.plugin.dao.Application
 import grails.testing.mixin.integration.Integration
 import org.junit.FixMethodOrder
 import org.junit.Test
 import org.junit.runners.MethodSorters
 import org.springframework.jdbc.core.JdbcTemplate
-import grails.plugin.dao.Application
 
 import javax.annotation.Resource
 

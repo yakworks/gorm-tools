@@ -1,10 +1,9 @@
 package gorm.tools.idgen
 
-import grails.gorm.transactions.Rollback
+import grails.plugin.dao.Application
 import grails.testing.mixin.integration.Integration
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
-import grails.plugin.dao.Application
 
 @Integration(applicationClass = Application.class)
 //@Rollback

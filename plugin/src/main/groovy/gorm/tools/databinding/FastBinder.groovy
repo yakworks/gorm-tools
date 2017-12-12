@@ -25,7 +25,7 @@ class FastBinder implements MapDataBinder{
 
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod = "Create") {
+    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
 

@@ -1,7 +1,7 @@
 package gorm.tools.idgen
 
-import org.springframework.jdbc.core.JdbcTemplate
 import groovy.transform.CompileStatic
+import org.springframework.jdbc.core.JdbcTemplate
 
 @CompileStatic
 class IdGeneratorTestHelper {

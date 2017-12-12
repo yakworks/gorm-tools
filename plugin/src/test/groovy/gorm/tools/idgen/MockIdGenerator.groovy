@@ -1,7 +1,7 @@
 package gorm.tools.idgen
 
-import org.springframework.transaction.annotation.Propagation
 import grails.gorm.transactions.Transactional
+import org.springframework.transaction.annotation.Propagation
 
 /**
  *  This is mocked out like so

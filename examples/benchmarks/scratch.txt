@@ -1,0 +1,178 @@
+Orig
+--- Warmming up JVM ---
+--- Running Benchmarks ---
+Took 10.964 seconds to run GparsBatchInsert:databinding=false
+Took 16.776 seconds to run GparsBatchInsert:databinding=true
+Took 13.29 seconds to run GparsBatchInsertWithoutDao:databinding=true, validation:true
+Took 9.593 seconds to run GparsBatchInsertWithoutDao:databinding=false, validation:true
+Took 8.813 seconds to run GparsBatchInsertWithoutDao:databinding=true, validation:false
+Took 6.644 seconds to run GparsBatchInsertWithoutDao:databinding=false, validation:false
+Took 13.044 seconds to run Gpars one thread per transaction: databinding=false
+Took 18.937 seconds to run Gpars one thread per transaction: databinding=true
+Took 13.892 seconds to run GparsBatchInsert with dataflow queue: databinding=true
+Took 9.006 seconds to run GparsBatchInsert with dataflow queue: databinding=false
+Took 38.28 seconds to run SimpleBatchInsert without gpars: databinding=false
+Took 67.458 seconds to run SimpleBatchInsert without gpars: databinding=true
+Took 50.665 seconds to run Commit each save: databinding=false
+Took 96.195 seconds to run Commit each save: databinding=true
+Took 48.395 seconds to run All records in one big single transaction: databinding=false
+Took 79.949 seconds to run All records in one big single transaction: databinding=true
+Took 10.24 seconds to run DataFlawQueueWithScrollableQuery: databinding: false
+
+
+With my tweaks
+--- with dao=true, databinding=true, validation:true
+Took 14.7 seconds to run GparsBatchInsert with dataflow queue: databinding=true
+Took 15.216 seconds to run GparsBatchInsert:databinding=true
+--- databinding=false
+Took 9.949 seconds to run GparsBatchInsert:databinding=false
+--- no dao
+Took 15.662 seconds to run GparsBatchInsertWithoutDao:databinding=true, validation:true
+--- no dao, no databinding
+Took 8.392 seconds to run GparsBatchInsertWithoutDao:databinding=true, validation:false
+--- no dao, no databinding, no validation
+Took 5.926 seconds to run GparsBatchInsertWithoutDao:databinding=false, validation:false
+Took 9.125 seconds to run GparsBatchInsert with dataflow queue: databinding=false
+Took 9.318 seconds to run DataFlawQueueWithScrollableQuery: databinding: false
+
+-- multi-threaded Pass 1
+  - Grails Baseline
+8.343s for GparsBatchInsertWithoutDao:databinding=true, validation:true
+6.022s for GparsBatchInsertWithoutDao:databinding=false, validation:true
+7.332s for GparsBatchInsertWithoutDao:databinding=true, validation:false
+4.232s for GparsBatchInsertWithoutDao:databinding=false, validation:false
+
+  - Gorm Tools Dao
+9.243s for BatchInsertWithDataFlowQueueBenchmark: databinding=true
+9.282s for GparsBatchInsert: binding=grails validate=true
+6.494s for GparsBatchInsert: binding=copy validate=true
+5.852s for GparsBatchInsert: binding=setter validate=true
+8.098s for GparsBatchInsert: binding=grails validate=false
+5.495s for GparsBatchInsert: binding=copy validate=false
+5.35s for GparsBatchInsert: binding=setter validate=false
+
+  - grails databinding=false
+5.057s for BatchInsertWithDataFlowQueueBenchmark: databinding=false
+9.324s for GparsBatchInsert: binding=grails validate=true
+
+
+IdGenerator enabled: false
+- Warmming up JVM
+- Running Benchmarks
+********* Pass 1 multi-core binding
+
+- Grails Binding Compare
+8.898s for GparsBaselineBenchmark: databinding=true, validation:true
+9.673s for BatchInsertWithDataFlowQueueBenchmark: databinding=true
+8.599s for GparsDaoBenchmark: bindingMethod=grails validate=true
+9.13s for GparsScriptEngine: databinding=true, validation:true
+7.263s for GparsDaoIdGenBenchmark: bindingMethod=grails validate=true
+********* Pass 2 multi-core binding
+
+- Grails Binding Compare
+8.885s for GparsBaselineBenchmark: databinding=true, validation:true
+9.681s for BatchInsertWithDataFlowQueueBenchmark: databinding=true
+8.39s for GparsDaoBenchmark: bindingMethod=grails validate=true
+9.006s for GparsScriptEngine: databinding=true, validation:true
+7.369s for GparsDaoIdGenBenchmark: bindingMethod=grails validate=true   
+
+**** audit-trail off
+- Warmming up JVM
+13.122s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
+7.934s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
+9.731s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: grails ]
+
+- Running Benchmarks
+
+********* Pass 1 multi-core binding
+
+- Grails Binding Compare
+8.071s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
+10.128s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: grails ]
+7.328s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: grails ]
+8.08s for GparsBaselineBenchmark<CityIdGenAssigned> [ bindingMethod: grails ]
+8.3s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: grails ]
+13.492s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: grails ]
+10.01s for GparsBaselineBenchmark<CityDateStamp> [ bindingMethod: grails ]
+8.43s for GparsDaoBenchmark<City> [ bindingMethod: grails ]
+8.809s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: grails ]
+9.202s for BatchInsertWithDataFlowQueueBenchmark<City> [ bindingMethod: grails ]
+9.314s for GparsScriptEngineBenchmark<City> [ bindingMethod: grails ]
+7.68s for RxJavaBenchmark<CityBaseline> [ bindingMethod: grails ]
+7.684s for RxJavaBenchmark<CityBaseline> [ bindingMethod: grails ]
+********* Pass 2 multi-core no grails binding
+
+- GormUtils.copyDomain insead of grails databinding
+5.991s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: bindWithCopy ]
+6.218s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: bindWithCopy ]
+5.318s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: bindWithCopy ]
+10.851s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: bindWithCopy ]
+9.157s for GparsBaselineBenchmark<CityDateStamp> [ bindingMethod: bindWithCopy ]
+5.695s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: bindWithCopyDomain ]
+5.355s for BatchInsertWithDataFlowQueueBenchmark<City> [ bindingMethod: copy ]
+5.464s for GparsDaoBenchmark<City> [ bindingMethod: copy ]
+5.373s for GparsScriptEngineBenchmark<City> [ bindingMethod: copy ]
+4.838s for GparsDaoBenchmark<CityIdGen> [ bindingMethod: copy ]
+4.945s for GparsBaselineBenchmark<CityIdGenAssigned> [ bindingMethod: copy ]
+********* Pass 3 multi-threaded
+
+
+-- WITH autowire
+- Warming up JVM with initial pass
+*************
+- Running Benchmarks
+
+--- Pass 1 multi-thread - standard grails binding with GrailsParameterMap
+
+  - These should all run within 5% of each other
+31.992s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
+36.533s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: grails ]
+29.69s for GparsDaoBenchmark<City> [ bindingMethod: grails ]
+32.594s for GparsScriptEngineBenchmark<City> [ bindingMethod: grails ]
+32.405s for BatchInsertWithDataFlowQueueBenchmark<City> [ bindingMethod: grails ]
+
+  - These run faster
+23.391s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: grails ]
+29.09s for RxJavaBenchmark<City> [ bindingMethod: grails ]
+
+  --These have performance issues
+
+36.708s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: grails ]
+39.753s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: grails ]
+
+--- Pass 2 multi-thread - copy props
+
+  - These should all run within 5% of each other
+22.773s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: copy ]
+22.401s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: copy ]
+25.096s for GparsDaoBenchmark<City> [ bindingMethod: copy ]
+22.743s for GparsScriptEngineBenchmark<City> [ bindingMethod: copy ]
+22.792s for BatchInsertWithDataFlowQueueBenchmark<City> [ bindingMethod: copy ]
+
+  - These run faster
+17.777s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: copy ]
+21.358s for RxJavaBenchmark<City> [ bindingMethod: copy ]
+
+  --These have performance issues
+
+32.706s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: copy ]
+23.235s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: copy ]
+
+********* Pass 4 sanity checks other misc sanity checks
+
+   -assign id inside domain with beforeValidate
+22.699s for GparsBaselineBenchmark<CityIdGenAssigned> [ bindingMethod: grails ]
+31.715s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: grails ]
+
+   -Using fields from traits slows it down
+38.337s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: grails ]
+
+ - not much difference static and dynamic method calls
+
+   -dao with static setter method calls
+23.215s for GparsDaoBenchmark<City> [ bindingMethod: setter ]
+22.508s for GparsDaoBenchmark<City> [ bindingMethod: copy ]
+21.605s for GparsDaoBenchmark<City> [ bindingMethod: bindWithSetters ]
+23.341s for GparsDaoBenchmark<City> [ bindingMethod: bindWithCopyDomain ]
+
+

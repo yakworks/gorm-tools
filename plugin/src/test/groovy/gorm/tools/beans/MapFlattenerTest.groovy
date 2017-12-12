@@ -2,10 +2,6 @@ package gorm.tools.beans
 
 import org.junit.Test
 
-import java.text.SimpleDateFormat
-
-import static org.junit.Assert.assertEquals
-
 class MapFlattenerTest {
 
     @Test

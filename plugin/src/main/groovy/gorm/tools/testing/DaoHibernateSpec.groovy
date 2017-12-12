@@ -20,7 +20,12 @@ class DaoHibernateSpec extends HibernateSpec implements GrailsUnitTest {
 
         Closure beans = {}
 
-        if (!domainClasses) {
+        if (domainClasses) {
+            domainClasses.each {Class domainClass ->
+                beans = beans << registerDao(domainClass, findDao(domainClass))
+            }
+        }
+        else {
             Set<Class> daoClasses = scanDaoClasses(packageName)
             //TODO figureout alternative to find entities if possible.
             new ClasspathEntityScanner().scan(packageToScan).each { Class domainClass ->

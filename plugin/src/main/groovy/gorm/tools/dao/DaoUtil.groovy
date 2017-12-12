@@ -2,16 +2,13 @@ package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
-import gorm.tools.dao.events.DaoEventInvoker
-import gorm.tools.dao.events.DaoEventType
+import gorm.tools.dao.events.DaoEventPublisher
 import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
+import org.grails.datastore.mapping.model.config.GormProperties
 import org.springframework.beans.BeansException
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationContextAware
@@ -28,14 +25,15 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 class DaoUtil implements ApplicationContextAware {
 
     static ApplicationContext ctx
-    static DaoEventInvoker daoEventInvoker
+    static DaoEventPublisher daoEventInvoker
     static ApplicationEventPublisher applicationEventPublisher
 
     void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = ctx
-        daoEventInvoker = (DaoEventInvoker)ctx.getBean("daoEventInvoker")
+        daoEventInvoker = (DaoEventPublisher)ctx.getBean("daoEventInvoker")
         applicationEventPublisher = (ApplicationEventPublisher)ctx
     }
+
 
     static String getDaoClassName(Class domainClass) {
         return "${domainClass.name}Dao"
@@ -43,6 +41,10 @@ class DaoUtil implements ApplicationContextAware {
 
     static String getDaoBeanName(Class domainClass) {
         return "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
+    }
+  
+    static DaoApi findDao(Class domainClass){
+        return ctx.getBean(getDaoBeanName(domainClass), DaoApi)
     }
 
     /**
@@ -53,14 +55,17 @@ class DaoUtil implements ApplicationContextAware {
      * @param ver the version this used to be (entity will have the )
      * @throws DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
      */
-    @CompileDynamic
-    static void checkVersion(entity, ver) {
-        if (ver == null) return
-        Long version = ver.toLong()
-        if (entity.version > version) {
-            Map msgMap = DaoMessage.optimisticLockingFailure(entity)
-            entity.errors.rejectValue("version", msgMap.code, msgMap.args as Object[], msgMap.defaultMessage)
-            throw new DomainException(msgMap, entity, entity.errors)
+    //FIXME Need good tests for this
+    static void checkVersion(GormEntity entity, Long oldVersion) {
+        if (oldVersion == null) return
+        if (entity.hasProperty('version')) {
+            Long currentVersion = entity['version'] as Long
+            //println "currentVersion: $currentVersion  oldVersion: $oldVersion"
+            if (currentVersion > oldVersion) {
+                Map msgMap = DaoMessage.optimisticLockingFailure(entity)
+                entity.errors.rejectValue("version", msgMap.code as String, msgMap.args as Object[], msgMap.defaultMessage as String)
+                throw new DomainException(msgMap, entity, entity.errors)
+            }
         }
     }
 
@@ -107,25 +112,6 @@ class DaoUtil implements ApplicationContextAware {
     @CompileDynamic
     static void clear() {
         ctx.sessionFactory.currentSession.clear()
-    }
-
-    @CompileDynamic
-    static void fireEvent(GormDao dao, DaoEventType eventType, Object... args) {
-        GormEntity entity = (GormEntity)args[0]
-
-        Datastore datastore = GormEnhancer.findInstanceApi(entity.class).datastore
-
-        List<Object> constructorAgs = [datastore]
-        constructorAgs << args
-        constructorAgs = constructorAgs.flatten()
-
-        AbstractPersistenceEvent event = eventType.eventClass.newInstance(constructorAgs as Object[])
-
-        //publish event as persistence event
-        applicationEventPublisher.publishEvent(event)
-
-        //publish events on dao as regular method calls.
-        daoEventInvoker.invokeEvent(dao, eventType, args)
     }
 
     static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {

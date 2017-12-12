@@ -3,8 +3,8 @@ rootProject.name = 'gorm-tools'
 include 'plugin'
 findProject(':plugin').name = 'dao'
 
-include 'test-projects/benchmarks'
-findProject(':test-projects/benchmarks').name = 'benchmarks'
+include 'examples/benchmarks'
+findProject(':examples/benchmarks').name = 'benchmarks'
 
-include 'test-projects/app'
-findProject(':test-projects/app').name = 'test-app'
+include 'examples/test-app'
+findProject(':examples/test-app').name = 'test-app'

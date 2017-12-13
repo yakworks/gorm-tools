@@ -18,10 +18,11 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 
     CityDao cityDao
+
     BatchInsertWithDataFlowQueueBenchmark(boolean databinding) { super(databinding) }
 
     BatchInsertWithDataFlowQueueBenchmark(String bindingMethod = 'grails', boolean validate = true) {
-        super(City, bindingMethod,validate)
+        super(City, bindingMethod, validate)
     }
 
     @Override
@@ -34,7 +35,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
         DataflowQueue queue = new DataflowQueue()
 
         //setup an operator
-        def op1 = operator(inputs: [queue], outputs: [], maxForks:poolSize) {List<Map> batch ->
+        def op1 = operator(inputs: [queue], outputs: [], maxForks: poolSize) { List<Map> batch ->
             insertBatch(batch, dao)
         }
 
@@ -60,7 +61,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
             try {
                 //String dataBinder = dataBinder == 'copy' ? 'bindFast' : 'grailsWeb'
                 dao.create(record)
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace()
             }
         }

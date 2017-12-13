@@ -8,23 +8,24 @@ import groovy.transform.CompileStatic
 @CompileStatic
 abstract class AbstractBenchmark {
 
-	BigDecimal timeTaken
+    BigDecimal timeTaken
 
-	void setup() {}
-	void cleanup(){}
+    void setup() {}
 
-	protected run() {
-		setup()
-		Long start = System.currentTimeMillis()
-		execute()
-		Long end = System.currentTimeMillis()
-		timeTaken = ((end - start) / 1000)
-		cleanup()
-	}
+    void cleanup() {}
 
-	protected abstract execute()
+    protected run() {
+        setup()
+        Long start = System.currentTimeMillis()
+        execute()
+        Long end = System.currentTimeMillis()
+        timeTaken = ((end - start) / 1000)
+        cleanup()
+    }
 
-	String getDescription() {
-		return getClass().simpleName
-	}
+    protected abstract execute()
+
+    String getDescription() {
+        return getClass().simpleName
+    }
 }

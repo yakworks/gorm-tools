@@ -8,8 +8,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SecUtil {
 
-    static Long getUserId(){
+    static Long getUserId() {
         def secServ = (SpringSecurityService) Holders.applicationContext.getBean("springSecurityService")
-        ((GrailsUser)secServ.principal).id as Long
+        ((GrailsUser) secServ.principal).id as Long
     }
 }

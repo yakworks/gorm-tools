@@ -10,29 +10,29 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 @CompileStatic
 abstract class BaseBenchmark extends AbstractBenchmark {
-	JdbcTemplate jdbcTemplate
+    JdbcTemplate jdbcTemplate
 
-	CsvReader csvReader
-	JsonReader jsonReader
+    CsvReader csvReader
+    JsonReader jsonReader
 
-	CityDao cityDao
+    CityDao cityDao
 
-	boolean useDatabinding = false
+    boolean useDatabinding = false
 
-	List<Map> cities
+    List<Map> cities
 
-	BaseBenchmark(boolean databinding) {
-		this.useDatabinding = databinding
-	}
+    BaseBenchmark(boolean databinding) {
+        this.useDatabinding = databinding
+    }
 
-	void setup() {
-		RecordsLoader recordsLoader = useDatabinding ? csvReader : jsonReader
-		cities = recordsLoader.read("City100k")
-	}
+    void setup() {
+        RecordsLoader recordsLoader = useDatabinding ? csvReader : jsonReader
+        cities = recordsLoader.read("City100k")
+    }
 
-	@Transactional
-	void cleanup() {
-		jdbcTemplate.execute("DELETE FROM city")
-	}
+    @Transactional
+    void cleanup() {
+        jdbcTemplate.execute("DELETE FROM city")
+    }
 
 }

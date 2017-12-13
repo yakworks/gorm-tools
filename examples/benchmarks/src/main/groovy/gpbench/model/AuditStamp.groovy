@@ -12,12 +12,12 @@ trait AuditStamp {
     Long editedBy
 }
 
-class AuditStampConstraints implements AuditStamp{
+class AuditStampConstraints implements AuditStamp {
 
     static constraints = {
-        createdDate nullable:false,display:false,editable:false,bindable:false
-        editedDate nullable:false,display:false,editable:false,bindable:false
-        createdBy nullable:false,display:false,editable:false,bindable:false
-        editedBy nullable:false,display:false,editable:false,bindable:false
+        createdDate nullable: false, display: false, editable: false, bindable: false
+        editedDate nullable: false, display: false, editable: false, bindable: false
+        createdBy nullable: false, display: false, editable: false, bindable: false
+        editedBy nullable: false, display: false, editable: false, bindable: false
     }
 }

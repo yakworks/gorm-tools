@@ -7,7 +7,7 @@ class DatabindingBenchmark extends AbstractBenchmark {
 
     Class domain
 
-    Map props = ['name': 'test', 'shortCode':'test', 'latitude':"10.10", 'longitude': "10.10", 'region': null, 'country': null]
+    Map props = ['name': 'test', 'shortCode': 'test', 'latitude': "10.10", 'longitude': "10.10", 'region': null, 'country': null]
 
     DatabindingBenchmark(Class domain) {
         this.domain = domain
@@ -22,6 +22,6 @@ class DatabindingBenchmark extends AbstractBenchmark {
     }
 
     String getDescription() {
-       return "DatabindingBenchmark<$domain.simpleName> 1 Million records"
+        return "DatabindingBenchmark<$domain.simpleName> 1 Million records"
     }
 }

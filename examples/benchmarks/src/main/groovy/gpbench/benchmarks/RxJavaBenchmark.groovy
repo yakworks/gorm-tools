@@ -3,7 +3,6 @@ package gpbench.benchmarks
 import gorm.tools.dao.DaoUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 import io.reactivex.Flowable
 import io.reactivex.schedulers.Schedulers
 import org.grails.datastore.gorm.GormEntity
@@ -15,7 +14,7 @@ import org.grails.datastore.gorm.GormEntity
 class RxJavaBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
 
     RxJavaBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
-        super(clazz, bindingMethod,validate)
+        super(clazz, bindingMethod, validate)
     }
 
     @Override
@@ -25,13 +24,13 @@ class RxJavaBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
             //println "${batch.size()} Thread : " + Thread.currentThread().name
             insertBatch(batch)
             return true
-        }).sequential().blockingForEach({  })
+        }).sequential().blockingForEach({})
     }
 
     @Transactional
     //@CompileStatic(TypeCheckingMode.SKIP)
     void insertBatch(List<Map> batch) {
-        for(Map row : batch) {
+        for (Map row : batch) {
             insertRow(row)
         }
 

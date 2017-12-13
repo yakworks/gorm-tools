@@ -2,16 +2,13 @@ package gpbench.helpers
 
 import grails.core.GrailsApplication
 import grails.plugins.csv.CSVMapReader
-import grails.web.servlet.mvc.GrailsParameterMap
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
-//import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.stereotype.Component
 
-import javax.servlet.http.HttpServletRequest
+//import org.springframework.mock.web.MockHttpServletRequest
 import java.text.NumberFormat
 
 @Component
@@ -31,7 +28,7 @@ class CsvReader extends RecordsLoader {
         CSVMapReader reader = new CSVMapReader(new InputStreamReader(resource.inputStream))
         reader.each { Map m ->
             //need to convert to grails parameter map, so that it can be binded
-            cleanup( m)
+            cleanup(m)
             //m = toGrailsParamsMap(m)
             results.add(m)
         }
@@ -40,16 +37,16 @@ class CsvReader extends RecordsLoader {
 
     }
 
-    void cleanup(Map m){
-        ['latitude',"longitude"].each{key->
-            if(m[key]) m[key] = NumberFormat.getInstance().parse(m[key] as String)
+    void cleanup(Map m) {
+        ['latitude', "longitude"].each { key ->
+            if (m[key]) m[key] = NumberFormat.getInstance().parse(m[key] as String)
         }
-        if(m.containsKey("country.id")){
+        if (m.containsKey("country.id")) {
             m["country"] = [:]
             m["country"]["id"] = m["country.id"]
             m.remove("country.id")
         }
-        if(m.containsKey("region.id")){
+        if (m.containsKey("region.id")) {
             m["region"] = [:]
             m["region"]["id"] = m["region.id"]
             m.remove("region.id")
@@ -62,7 +59,7 @@ class CsvReader extends RecordsLoader {
             final int nestedIndex = key.indexOf('.')
             if (nestedIndex == -1) {
                 wrappedMap.put(key, initialMap[key])
-            }else{
+            } else {
                 processNestedKeys(initialMap, key, key, wrappedMap)
             }
         }
@@ -74,6 +71,7 @@ class CsvReader extends RecordsLoader {
  *
  * This also allows data binding to occur for only a subset of the properties in the parameter map.
  */
+
     private void processNestedKeys(Map requestMap, String key, String nestedKey, Map nestedLevel) {
         final int nestedIndex = nestedKey.indexOf('.');
         if (nestedIndex == -1) {
@@ -100,7 +98,7 @@ class CsvReader extends RecordsLoader {
             return;
         }
 
-        Map nestedMap = (Map)prefixValue;
+        Map nestedMap = (Map) prefixValue;
         if (nestedIndex < nestedKey.length() - 1) {
             String remainderOfKey = nestedKey.substring(nestedIndex + 1, nestedKey.length());
             nestedMap[remainderOfKey] = requestMap[key]

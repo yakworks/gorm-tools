@@ -3,7 +3,7 @@ package gpbench.model
 import groovy.transform.CompileStatic
 
 @CompileStatic
-trait DatesTrait{
+trait DatesTrait {
     //LocalDate localDate
     Date date1
     Date date2
@@ -11,7 +11,7 @@ trait DatesTrait{
     Date date4
 }
 
-class DatesTraitConstraints implements DatesTrait{
+class DatesTraitConstraints implements DatesTrait {
 
     static constraints = {
         date1 nullable: true

@@ -44,14 +44,14 @@ class BenchmarkDatabindingService {
 
         jsonReader._cache = [:]
         loadCities3xProps(loadCityTimes)
-        println "Warm up logan  "
+        println "Warm up pass "
         mute = true
         (1..2).each {
             if (!mute) println "\n - setters, copy and fast bind on simple no associations"
             useSetPropsFastIterate(CityFatSimple)
             if (!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFat)
-            useSetPropsFastIterate(CityFat)
+            //useSetPropsFastIterate(CityFat)
             useFastBinder(CityFat)
             if (!mute) println " - Dynamic setters are slower"
             useDynamicSettersFat(CityFat)

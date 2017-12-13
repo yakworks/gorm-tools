@@ -6,7 +6,7 @@
     \    \_\  (  <_> )  | \/  Y Y  \        ( ( .,-') )    Yak Works         ```
      \______  /\____/|__|  |__|_|  /         \ '   (_/                         !!
             \/                   \/           |       /)           '           !!!
-  ___________           .__                   `\    ^'            '     !    !!!!
+  ___________           .__                   ^\    ~'            '     !    !!!!
   \__    ___/___   ____ |  |   ______           !      _/! , !   !  ! !  !   !!!
     |    | /  _ \ /  _ \|  |  /  ___/            \Y,   |!!!  !  ! !!  !! !!!!!!!
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
@@ -16,9 +16,14 @@
 
 </pre>
 
-This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.io/gorm-rest-api/). There are 2 primary patterns this library enables as detailed below for DAO's and Mango ( A mongo query like way to get data with a Map)
+This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
+domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.io/gorm-rest-api/). 
+There are 2 primary patterns this library enables as detailed below for DAO's 
+and Mango ( A mongo query like way to get data with a Map)
 
+## Features
 
+## Benefits
 
 ## DAO Services
 <small>[jump to docs](dao)</small>

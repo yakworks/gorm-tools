@@ -6,9 +6,15 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value
 
+/**
+ * a trait to be used for inserting or updating a list into Transactional batches for performance.
+ *
+ * @see GparsBatchSupport for a concrete implementation
+ */
 @CompileStatic
 trait AsyncBatchSupport {
 
+    /** The list size to send to the collate that slices.*/
     @Value('${hibernate.jdbc.batch_size:0}')
     int batchSize
 

@@ -1,6 +1,6 @@
 package gpbench
 
-import gorm.tools.async.GparsBatchService
+import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.dao.DaoApi
 import gorm.tools.dao.DaoUtil
 import gpbench.benchmarks.*
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 class BenchmarkRunnerService {
 
-    GparsBatchService gparsBatchService
+    AsyncBatchSupport asyncBatchSupport
     static transactional = false
 
     @Value('${gpars.poolsize}')
@@ -216,7 +216,7 @@ class BenchmarkRunnerService {
 
     @CompileStatic(TypeCheckingMode.SKIP)
     void insert(List<List<Map>> batchList, DaoApi dao) {
-        gparsBatchService.eachParallel(batchList) { Map row, args ->
+        asyncBatchSupport.parallel(batchList) { Map row, args ->
             dao.create(row)
         }
     }

@@ -1,7 +1,7 @@
 package grails.plugin.dao
 
 import gorm.tools.DbDialectService
-import gorm.tools.async.GparsBatchService
+import gorm.tools.async.GparsBatchSupport
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.events.DaoEventPublisher
@@ -43,7 +43,7 @@ class DaoPluginHelper {
         daoEventPublisher(DaoEventPublisher)
         daoUtilBean(DaoUtil) //this is here just so the app ctx can get picked up and set on DaoUtils
 
-        gparsBatchService(GparsBatchService)
+        asyncBatchSupport(GparsBatchSupport)
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 

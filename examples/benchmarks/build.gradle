@@ -19,6 +19,7 @@ apply plugin:"org.grails.grails-web"
 // apply plugin:"com.energizedwork.idea-project-components"
 //apply plugin:"org.grails.grails-gsp"
 
+//Dont cache snapshots so that gradle will download it whenever it changes
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
 }
@@ -102,6 +103,7 @@ dependencies {
 //    options.forkOptions.jvmArgs = ["-DauditTrail.enabled=$auditTrailEnabled".toString()]
 //}
 
+//Pass system properties to bootrun tasks, so that it can be used in benchmarks.
 tasks.withType(org.springframework.boot.gradle.run.BootRunTask) {
     systemProperties = System.properties
 }
@@ -120,6 +122,9 @@ war.archiveName = "benchmarks.war"
 //     systemProperty "webdriver.gecko.driver", System.getProperty('webdriver.gecko.driver')
 // }
 
+/**
+ * Need to pass module path system property to groovy compiler so that AuditTrailAST Transformation can find correct application.groovy
+ */
 compileGroovy {
     groovyOptions.fork = true
     String path = projectDir.absolutePath

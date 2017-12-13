@@ -14,7 +14,7 @@ class ErrorMessageService {
 
     /**
      * Builds the error response from error to make it more human readable.
-     *	Used in BaseDomain controller and ArTranMassUpdateService, to show all errors that occurred during processing
+     * Used in BaseDomain controller and ArTranMassUpdateService, to show all errors that occurred during processing
      *
      * @param e exception object
      * @return map with next fields
@@ -37,11 +37,11 @@ class ErrorMessageService {
         }
 
         Map errMap = [
-                "code": code,
-                "status": "error",
-                "message": e.hasProperty('messageMap') ? buildMsg(e.messageMap) : e.message,
-                "messageCode": e.hasProperty('messageMap') ? e.messageMap.code : 0,
-                "errors": [:]
+            "code"       : code,
+            "status"     : "error",
+            "message"    : e.hasProperty('messageMap') ? buildMsg(e.messageMap) : e.message,
+            "messageCode": e.hasProperty('messageMap') ? e.messageMap.code : 0,
+            "errors"     : [:]
         ]
 
         if (e.hasProperty('errors')) {
@@ -53,8 +53,7 @@ class ErrorMessageService {
                         [(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
                     }
                 }
-            }
-            else if (!e.hasProperty("entity") ) {
+            } else if (!e.hasProperty("entity")) {
                 errMap.errors = e.errors.fieldErrors.groupBy {
                     GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
                 }.each {

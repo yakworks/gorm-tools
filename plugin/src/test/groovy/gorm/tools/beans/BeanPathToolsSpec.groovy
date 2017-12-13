@@ -8,7 +8,7 @@ import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.Specification
 
-class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest{
+class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest {
 
     void setupSpec() {
         //mockDomain Person
@@ -20,41 +20,41 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
     void "Can get property value for a basic class"() {
         setup:
         def obj = new TestClazzA(
-                foo: '1111',
-                bar: -12.52,
-                baz: null,
-                bazList: ["1", "test", "foo"],
-                bazMap: ["testKey": 1, "oneMore": 2]
+            foo: '1111',
+            bar: -12.52,
+            baz: null,
+            bazList: ["1", "test", "foo"],
+            bazMap: ["testKey": 1, "oneMore": 2]
         )
         expect:
         exp == BeanPathTools.getFieldValue(obj, path)
         where:
-        exp                             | path
-        '1111'                          | 'foo'
-        -12.52                          | 'bar'
-        null                            | 'baz'
-        ["1", "test", "foo"]            | 'bazList'
-        ["testKey": 1, "oneMore": 2]    | 'bazMap'
+        exp                          | path
+        '1111'                       | 'foo'
+        -12.52                       | 'bar'
+        null                         | 'baz'
+        ["1", "test", "foo"]         | 'bazList'
+        ["testKey": 1, "oneMore": 2] | 'bazMap'
     }
 
     void "Can get property value for a class hierarchy"() {
         setup:
         def obj = new TestClazzB(
-                left: new TestClazzA(
-                        foo: '1',
-                        bazList: ["foo"]
-                ),
+            left: new TestClazzA(
+                foo: '1',
+                bazList: ["foo"]
+            ),
+            right: new TestClazzB(
                 right: new TestClazzB(
-                        right: new TestClazzB(
-                                value: 2
-                        ),
-                        left: new TestClazzA(
-                                foo: '3',
-                                bar: 4,
-                                bazMap: ["test": 1]
-                        )
+                    value: 2
                 ),
-                value: 5
+                left: new TestClazzA(
+                    foo: '3',
+                    bar: 4,
+                    bazMap: ["test": 1]
+                )
+            ),
+            value: 5
         )
 
         expect:
@@ -74,116 +74,116 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
     void "Get properties by path"() {
         setup:
         def obj = new TestClazzB(
-                left: new TestClazzA(
-                        foo: '1'
-                ),
+            left: new TestClazzA(
+                foo: '1'
+            ),
+            right: new TestClazzB(
                 right: new TestClazzB(
-                        right: new TestClazzB(
-                                value: 2
-                        ),
-                        left: new TestClazzA(
-                                foo: '3',
-                                bar: 4,
-                                id: 5
-                        ),
-                        id: 6
+                    value: 2
                 ),
-                value: 7,
-                id: 8
+                left: new TestClazzA(
+                    foo: '3',
+                    bar: 4,
+                    id: 5
+                ),
+                id: 6
+            ),
+            value: 7,
+            id: 8
         )
         expect:
         Map act = [:]
         exp == BeanPathTools.propsToMap(obj, path, act)
         exp == act
         where:
-        path                    | exp
-        'value'                 | [value: 7]
-        'value1'                | [:]
-        'left.foo'              | [left: [foo: '1']]
-        'left1.foo'             | [:]
-        'right.right.value'     | [right: [right: [value: 2]]]
-        'right.left.value1'     | [right: [left: [:]]]
-        'right.left.bar'        | [right: [left: [bar: 4]]]
-        'right.left.*'          | [right: [left: [bar: 4, foo: '3', id: 5, version: 0, bazMap:null, bazList: null]]]
-        'right.*'               | [right: [id: 6, value: 0, version: null]]
+        path                | exp
+        'value'             | [value: 7]
+        'value1'            | [:]
+        'left.foo'          | [left: [foo: '1']]
+        'left1.foo'         | [:]
+        'right.right.value' | [right: [right: [value: 2]]]
+        'right.left.value1' | [right: [left: [:]]]
+        'right.left.bar'    | [right: [left: [bar: 4]]]
+        'right.left.*'      | [right: [left: [bar: 4, foo: '3', id: 5, version: 0, bazMap: null, bazList: null]]]
+        'right.*'           | [right: [id: 6, value: 0, version: null]]
     }
 
     void "Property returns list of domains"() {
         setup:
         def obj = new TestClazzC(
-                id: 9,
-                value: 10
+            id: 9,
+            value: 10
         )
         expect:
         Map act = [:]
         exp == BeanPathTools.propsToMap(obj, path, act)
         exp == act
         where:
-        path                    | exp
-        'value'                 | [value: 10]
-        'fooValues.*'           | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: 0, bazMap:null, bazList: null], [id: 2, bar: null, foo: 'val 2', version: 0, bazMap:null, bazList: null]]]
+        path          | exp
+        'value'       | [value: 10]
+        'fooValues.*' | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: 0, bazMap: null, bazList: null], [id: 2, bar: null, foo: 'val 2', version: 0, bazMap: null, bazList: null]]]
     }
 
     void "test propsToMap for a non domain"() {
         setup:
         PropsToMapTest nested = new PropsToMapTest(field: "test2", field2: 2L,
-                nested: new PropsToMapTest(field: 'test3'))
-        Map map = [a:'a', b:'b', c:'c']
+            nested: new PropsToMapTest(field: 'test3'))
+        Map map = [a: 'a', b: 'b', c: 'c']
         List list = [1, 2, 3]
         PropsToMapTest test = new PropsToMapTest(field: "test", field2: 1L, field3: 1L, field4: true,
-                field5: false, field6: map, field7: list, nested: nested)
+            field5: false, field6: map, field7: list, nested: nested)
 
         expect:
         Map act = [:]
         exp == BeanPathTools.propsToMap(test, path, act)
         exp == act
         where:
-        path                    | exp
-        'field'                 | [field: "test"]
-        'field2'                | [field2: 1L]
-        'field3'                | [field3: 1L]
-        'field4'                | [field4: true]
-        'field5'                | [field5: false]
-        'field6'                | [field6: [a:'a', b:'b', c:'c']]
-        'field7'                | [field7: [1, 2, 3]]
-        'nested.field'          | [nested: [field: "test2"]]
-        'nested.nested.field'   | [nested: [nested: [field: "test3"]]]
+        path                  | exp
+        'field'               | [field: "test"]
+        'field2'              | [field2: 1L]
+        'field3'              | [field3: 1L]
+        'field4'              | [field4: true]
+        'field5'              | [field5: false]
+        'field6'              | [field6: [a: 'a', b: 'b', c: 'c']]
+        'field7'              | [field7: [1, 2, 3]]
+        'nested.field'        | [nested: [field: "test2"]]
+        'nested.nested.field' | [nested: [nested: [field: "test3"]]]
     }
 
     void "test propsToMap for a non domain2"() {
         setup:
         PropsToMapTest nested = new PropsToMapTest(field: "test2", field2: 2L,
-                nested: new PropsToMapTest(field: "some_text"))
-        Map map = [a:'a', b:'b', c:'c']
+            nested: new PropsToMapTest(field: "some_text"))
+        Map map = [a: 'a', b: 'b', c: 'c']
         List list = [1, 2, 3]
         PropsToMapTest test = new PropsToMapTest(field: "test", field2: 1L, field3: 1L, field4: true,
-                field5: false, field6: map, field7: list, field8: 50.0, field9:101.1d, nested: nested)
+            field5: false, field6: map, field7: list, field8: 50.0, field9: 101.1d, nested: nested)
 
         Map expectedMap = [
-                field: "test",
-                field2: 1L,
-                field3: 1L,
-                field4: true,
+            field : "test",
+            field2: 1L,
+            field3: 1L,
+            field4: true,
+            field5: false,
+            field6: [a: 'a', b: 'b', c: 'c'],
+            field7: [1, 2, 3],
+            field8: 50.0,
+            field9: 101.1d,
+            nested: [
+                field : "test2",
+                field2: 2L,
+                field3: null,
+                field4: null,
                 field5: false,
-                field6: [a:'a', b:'b', c:'c'],
-                field7: [1, 2, 3],
-                field8: 50.0,
-                field9: 101.1d,
+                field6: null,
+                field7: null,
+                field8: null,
+                field9: null,
                 nested: [
-                    field: "test2",
-                    field2: 2L,
-                    field3: null,
-                    field4: null,
-                    field5: false,
-                    field6: null,
-                    field7: null,
-                    field8: null,
-                    field9: null,
-                    nested: [
-                        field: "some_text", field2: 0L, field3: null, field4: null,
-                        field5: false, field6: null, field7: null, field8: null, field9: null, nested: null
-                    ]
+                    field : "some_text", field2: 0L, field3: null, field4: null,
+                    field5: false, field6: null, field7: null, field8: null, field9: null, nested: null
                 ]
+            ]
         ]
 
         when:
@@ -196,17 +196,17 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
 
     void "test buildMapFromPaths"() {
         setup:
-        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2] )
+        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2])
         object.addToBaz(new TestClazzC(id: 5, version: 0, value: 23))
 
         expect:
         result == BeanPathTools.buildMapFromPaths(object, fields)
 
         where:
-        fields   | result
-        ['foo']  | [foo: 'foo']
-        ['*']    | [foo: 'foo', bar: 10.00, id: 0L, version:0, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
-        ['*', 'baz.id']    | [foo: 'foo', bar: 10.00, id: 0L, version:0, baz:[[id:5]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+        fields          | result
+        ['foo']         | [foo: 'foo']
+        ['*']           | [foo: 'foo', bar: 10.00, id: 0L, version: 0, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+        ['*', 'baz.id'] | [foo: 'foo', bar: 10.00, id: 0L, version: 0, baz: [[id: 5]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
     }
 
     void "test buildMapFromPaths for all fields using delegating bean"() {
@@ -257,7 +257,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
 @Entity
 class TestClazzA {
     Long id
-    Long version=0
+    Long version = 0
 
     String foo
     BigDecimal bar
@@ -268,7 +268,6 @@ class TestClazzA {
     Map bazMap
 
     static hasMany = [baz: TestClazzC, bazList: String]
-
 
 
     def getDao() {
@@ -296,8 +295,8 @@ class TestClazzC {
 
     List getFooValues() {
         [
-                new TestClazzA(id: 1, version: 0, foo: 'val 1'),
-                new TestClazzA(id: 2, version: 0, foo: 'val 2')
+            new TestClazzA(id: 1, version: 0, foo: 'val 1'),
+            new TestClazzA(id: 2, version: 0, foo: 'val 2')
         ]
     }
 

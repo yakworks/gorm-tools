@@ -22,7 +22,7 @@ class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
     /**
      * Returns a GrailsParameterMap instance which is build from records in a given ResultSet.
      *
-     * @param rs     the ResultSet
+     * @param rs the ResultSet
      * @param rowNum number of records to include to the map
      * @return the map which is build from records in the given ResultSet
      * @throws SQLException

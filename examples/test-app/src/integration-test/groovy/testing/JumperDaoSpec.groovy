@@ -8,24 +8,24 @@ import spock.lang.Specification
 @Rollback
 class JumperDaoSpec extends Specification {
 
-	static transactional = false
+    static transactional = false
 
-	JumperDao jumperDao
+    JumperDao jumperDao
 
-	def "verify domainClass"() {
-		expect:
-		jumperDao.domainClass == Jumper
-	}
+    def "verify domainClass"() {
+        expect:
+        jumperDao.domainClass == Jumper
+    }
 
-	void testNonTranDao(){
+    void testNonTranDao() {
 
-		when:
-		Jumper dom = new Jumper(name:"testSave")
+        when:
+        Jumper dom = new Jumper(name: "testSave")
 
-		then:
-		dom.persist([flush: true])
-		dom.id != null
-	}
+        then:
+        dom.persist([flush: true])
+        dom.id != null
+    }
 
 
 }

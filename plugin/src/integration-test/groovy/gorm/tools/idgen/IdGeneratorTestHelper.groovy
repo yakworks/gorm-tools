@@ -6,13 +6,13 @@ import org.springframework.jdbc.core.JdbcTemplate
 @CompileStatic
 class IdGeneratorTestHelper {
 
-	static void createTables(JdbcTemplate jdbcTemplate) {
-		//createNewObjectIdTable(jdbcTemplate)
-		createCustomTable(jdbcTemplate)
-	}
+    static void createTables(JdbcTemplate jdbcTemplate) {
+        //createNewObjectIdTable(jdbcTemplate)
+        createCustomTable(jdbcTemplate)
+    }
 
-	static void createNewObjectIdTable(JdbcTemplate template) {
-		String query = """
+    static void createNewObjectIdTable(JdbcTemplate template) {
+        String query = """
 			create table NewObjectId
 				(
 					KeyName varchar(255) not null,
@@ -20,11 +20,11 @@ class IdGeneratorTestHelper {
 				)
 				"""
 
-		template.execute(query)
-	}
+        template.execute(query)
+    }
 
-	static void createCustomTable(JdbcTemplate template) {
-		String query = """
+    static void createCustomTable(JdbcTemplate template) {
+        String query = """
 			create table if not exists Custom1
 				(
 					id int not null,
@@ -32,7 +32,7 @@ class IdGeneratorTestHelper {
 				)
 				"""
 
-		template.execute(query)
-	}
+        template.execute(query)
+    }
 
 }

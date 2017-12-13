@@ -9,12 +9,12 @@ import spock.lang.Specification
 class JumperDelegateDaoSpec extends Specification //FIXME extends BasicTestsForDao
 {
 
-	void testNonTranDao(){
-		Jumper dom = new Jumper(name:"testSave")
+    void testNonTranDao() {
+        Jumper dom = new Jumper(name: "testSave")
 
-		expect:
-		dom.persist()
-	}
+        expect:
+        dom.persist()
+    }
 
 
 }

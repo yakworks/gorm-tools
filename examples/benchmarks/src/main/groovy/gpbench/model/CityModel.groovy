@@ -7,20 +7,20 @@ import groovy.transform.CompileStatic
 @CompileStatic
 trait CityModel {
 
-	String name
-	String shortCode
+    String name
+    String shortCode
 
-	BigDecimal latitude
-	BigDecimal longitude
+    BigDecimal latitude
+    BigDecimal longitude
 
-	Region region
-	Country country
+    Region region
+    Country country
     String state
     String countryName
 
-	Date dateCreated
-	Date lastUpdated
-	Long dateCreatedUser
-	Long lastUpdatedUser
+    Date dateCreated
+    Date lastUpdated
+    Long dateCreatedUser
+    Long lastUpdatedUser
 
 }

@@ -71,14 +71,16 @@ class MangoTidyMap {
                 }
 
                 if (val instanceof List) {
-                    result[key] = val.collect { v -> tidy(['$and':v]) }
+                    result[key] = val.collect { v -> tidy(['$and': v]) }
                     return
                 }
             }
             if (val instanceof Map && !MangoBuilder.sortOps.keySet().contains(key)) {
                 toMangoOperator(val, result[key] as Map)
             } else {
-                if (key.toString().startsWith('$')) {result[key] = val; return} //if we already have Mango method
+                if (key.toString().startsWith('$')) {
+                    result[key] = val; return
+                } //if we already have Mango method
                 if (val instanceof List) {
                     // for handling case {customer: [{id:1}, {id:2}]}, transforms to {customer:{id:{'$in': [1,2]}}}
                     if (val[0] instanceof Map) {
@@ -92,7 +94,7 @@ class MangoTidyMap {
                     result[key]['$ilike'] = val
                     return
                 }
-                if(MangoBuilder.existOps.keySet().contains(val)) {
+                if (MangoBuilder.existOps.keySet().contains(val)) {
                     result[key][val] = true
                 } else {
                     result[key]['$eq'] = val

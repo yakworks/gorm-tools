@@ -3,35 +3,22 @@ package gpbench.fat
 import gorm.tools.beans.DateUtil
 import gpbench.Country
 import gpbench.Region
-import gpbench.model.CityTrait
-import gpbench.model.CityTrait2
-import gpbench.model.CityTrait2Constraints
-import gpbench.model.CityTrait3
-import gpbench.model.CityTrait3Constraints
-import gpbench.model.CityTraitConstraints
 import gpbench.model.CityTraitFat
 import gpbench.model.CityTraitFatConstraints
 import gpbench.model.DateUserStamp
 import gpbench.model.DateUserStampConstraints
-import gpbench.model.DatesTrait
-import gpbench.model.DatesTraitConstraints
 import grails.compiler.GrailsCompileStatic
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import groovy.transform.TypeChecked
-import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEnhancer
 
 /**
  *
  */
 @GrailsCompileStatic
-class CityFat implements CityTraitFat, DateUserStamp{
+class CityFat implements CityTraitFat, DateUserStamp {
 
-    static belongsTo = [region:Region, country:Country,
-                        region2:Region, country2:Country,
-                        region3:Region, country3:Country]
-
+    static belongsTo = [region : Region, country: Country,
+                        region2: Region, country2: Country,
+                        region3: Region, country3: Country]
 
     //@CompileStatic(TypeCheckingMode.SKIP)
     static constraints = {
@@ -75,8 +62,8 @@ class CityFat implements CityTraitFat, DateUserStamp{
         //println latitude3
     }
 
-    void setAssociation(String key, Class assocClass, Map row){
-        if(row[key] && row[key]['id']){
+    void setAssociation(String key, Class assocClass, Map row) {
+        if (row[key] && row[key]['id']) {
             this[key] = GormEnhancer.findStaticApi(assocClass).load(row[key]['id'] as Long)
         }
     }

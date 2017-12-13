@@ -15,14 +15,12 @@ class DaoGrailsPlugin extends grails.plugins.Plugin {
 
     List<ArtefactHandler> artefacts = DaoPluginHelper.artefacts
 
-    Closure doWithSpring() {{->
-        Closure closure = DaoPluginHelper.doWithSpring
-        closure.delegate = delegate
-        closure.call()
-    }}
+    Closure doWithSpring() {
+        return DaoPluginHelper.doWithSpring
+    }
 
     @Override
-    void onChange(Map<String,Object> event) {
+    void onChange(Map<String, Object> event) {
         DaoPluginHelper.onChange(event, grailsApplication, this)
     }
 

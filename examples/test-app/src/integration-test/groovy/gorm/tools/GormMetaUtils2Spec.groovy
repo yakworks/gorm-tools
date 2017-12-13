@@ -1,11 +1,9 @@
 package gorm.tools
 
+import daoapp.Org
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import testing.Jumper
-import daoapp.Org
-
-import grails.gorm.transactions.Rollback
 
 @Integration
 @Rollback

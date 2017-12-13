@@ -1,7 +1,6 @@
 package gpbench
 
 import grails.compiler.GrailsCompileStatic
-import groovy.transform.CompileStatic
 
 /**
  * Baseline stock grails domain. no DAO, no Traits or anything else should be attached to this
@@ -27,7 +26,7 @@ class CityBaseline {
     String state
     String countryName
 
-    static belongsTo = [region:Region, country:Country]
+    static belongsTo = [region: Region, country: Country]
 
     static mapping = {
         //cache true
@@ -36,17 +35,17 @@ class CityBaseline {
     static constraints = {
         name blank: false, nullable: false
         shortCode blank: false, nullable: false
-        latitude nullable: false, scale: 4, max:90.00
-        longitude nullable: false, scale: 4, max:380.00
+        latitude nullable: false, scale: 4, max: 90.00
+        longitude nullable: false, scale: 4, max: 380.00
         region nullable: false
         country nullable: false
         state nullable: true
         countryName nullable: true
 
-        dateCreated nullable:true,display:false,editable:false,bindable:false
-        lastUpdated nullable:true,display:false,editable:false,bindable:false
-        dateCreatedUser nullable:true,display:false,editable:false,bindable:false
-        lastUpdatedUser nullable:true,display:false,editable:false,bindable:false
+        dateCreated nullable: true, display: false, editable: false, bindable: false
+        lastUpdated nullable: true, display: false, editable: false, bindable: false
+        dateCreatedUser nullable: true, display: false, editable: false, bindable: false
+        lastUpdatedUser nullable: true, display: false, editable: false, bindable: false
     }
 
     String toString() { name }

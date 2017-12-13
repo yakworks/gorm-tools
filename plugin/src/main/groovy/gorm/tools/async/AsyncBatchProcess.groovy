@@ -12,6 +12,6 @@ interface AsyncBatchProcess {
      */
     void eachCollate(List<Map> batchList, Map args, Closure clos)
 
-    void withTransaction(List<Map> batch,  Map args, Closure clos)
+    void withTransaction(List<Map> batch, Map args, Closure clos)
 
 }

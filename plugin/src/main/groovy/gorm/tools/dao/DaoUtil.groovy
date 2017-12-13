@@ -27,7 +27,7 @@ class DaoUtil implements ApplicationContextAware {
 
     void setApplicationContext(ApplicationContext ctx) throws BeansException {
         this.ctx = ctx
-        applicationEventPublisher = (ApplicationEventPublisher)ctx
+        applicationEventPublisher = (ApplicationEventPublisher) ctx
     }
 
     static String getDaoClassName(Class domainClass) {
@@ -38,7 +38,7 @@ class DaoUtil implements ApplicationContextAware {
         return "${GrailsNameUtils.getPropertyName(domainClass.name)}Dao"
     }
 
-    static DaoApi findDao(Class domainClass){
+    static DaoApi findDao(Class domainClass) {
         return ctx.getBean(getDaoBeanName(domainClass), DaoApi)
     }
 
@@ -110,17 +110,15 @@ class DaoUtil implements ApplicationContextAware {
 
     static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {
         if (ex instanceof ValidationException) {
-            if (ex instanceof DomainException) return (DomainException)ex //if this is already fired
+            if (ex instanceof DomainException) return (DomainException) ex //if this is already fired
 
-            ValidationException ve = (ValidationException)ex
+            ValidationException ve = (ValidationException) ex
             return new DomainException(DaoMessage.notSaved(entity), entity, ve.errors, ve)
-        }
-        else if (ex instanceof DataIntegrityViolationException) {
+        } else if (ex instanceof DataIntegrityViolationException) {
             String ident = DaoMessage.badge(entity.ident(), entity)
             //log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
             return new DomainException(DaoMessage.notDeleted(entity, ident), entity, ex)
-        }
-        else if (ex instanceof DataAccessException ) {
+        } else if (ex instanceof DataAccessException) {
             //log.error("unexpected dao save error on ${entity.id} of ${entity.class.name}",dae)
             //TODO we can build a better message with optimisticLockingFailure(entity) if dae.cause instanceof org.springframework.dao.OptimisticLockingFailureException
             //TODO also, in the case of optimisticLocking, is that really un expected? shoud we log it?

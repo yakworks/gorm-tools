@@ -12,9 +12,9 @@ import java.sql.SQLException
 class DbDialectService {
 
     private static final int UNKNOWN = 0
-    private static final int MSSQL   = 1
-    private static final int MYSQL   = 2
-    private static final int ORACLE  = 3
+    private static final int MSSQL = 1
+    private static final int MYSQL = 2
+    private static final int ORACLE = 3
 
     //GrailsApplication grailsApplication
     JdbcTemplate jdbcTemplate
@@ -25,12 +25,14 @@ class DbDialectService {
     @CompileDynamic
     private static int setupDialect() {
         int result = UNKNOWN
-        if(!dialectName) dialectName = Holders.grailsApplication.config.hibernate.dialect	// just to make the stuff below easier to read.
-        if(dialectName.contains("SQLServerDialect"))         result = MSSQL
-        else if(dialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
-        else if(dialectName.contains("Oracle")) 			 result = ORACLE
-        if(result == UNKNOWN) throw new SQLException("Unknown dialect ${dialectName} in nine.rally.DbDialectService.\n"
-                + "Please use a known dialect or make accommodation for a new dialect.")
+        // just to make the stuff below easier to read.
+        if (!dialectName) dialectName = Holders.grailsApplication.config.hibernate.dialect
+
+        if (dialectName.contains("SQLServerDialect")) result = MSSQL
+        else if (dialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
+        else if (dialectName.contains("Oracle")) result = ORACLE
+        if (result == UNKNOWN) throw new SQLException("Unknown dialect ${dialectName} in nine.rally.DbDialectService.\n"
+            + "Please use a known dialect or make accommodation for a new dialect.")
         return result
     }
 
@@ -132,8 +134,7 @@ class DbDialectService {
             Date dateobj
             if (myDate instanceof String) {
                 dateobj = new Date(myDate)
-            }
-            else {
+            } else {
                 dateobj = myDate
             }
             String formattedDate = dateobj.format("yyyy-MM-dd hh:mm:ss")

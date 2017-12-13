@@ -11,9 +11,9 @@ class CriteriaUtilsSpec extends HibernateSpec {
         (1..3).each { index ->
             String value = "someField_" + index
             new Test(id: index,
-                     someField: value,
-                     someField2: value,
-                     nestedField: new Test2(someField: value)
+                someField: value,
+                someField2: value,
+                nestedField: new Test2(someField: value)
             ).save()
         }
     }
@@ -29,18 +29,18 @@ class CriteriaUtilsSpec extends HibernateSpec {
         }
 
         then:
-        res.eachWithIndex{ Test entry, int i ->
+        res.eachWithIndex { Test entry, int i ->
             assert entry.someField == res2[i].someField
         }
     }
 
     def "test order for two columns"() {
         when:
-        List res = Test.createCriteria().list(){
+        List res = Test.createCriteria().list() {
             CriteriaUtils.applyOrder([sort: "someField asc, someField", order: "desc"], delegate)
         }
 
-        List res2 = Test.createCriteria().list(){
+        List res2 = Test.createCriteria().list() {
             and {
                 order("someField", "asc")
                 order("someField2", "desc")
@@ -48,7 +48,7 @@ class CriteriaUtilsSpec extends HibernateSpec {
         }
 
         then:
-        res.eachWithIndex{ Test entry, int i ->
+        res.eachWithIndex { Test entry, int i ->
             assert entry.someField == res2[i].someField
             assert entry.someField2 == res2[i].someField2
         }
@@ -56,11 +56,11 @@ class CriteriaUtilsSpec extends HibernateSpec {
 
     def "test order with nested field"() {
         when:
-        List res = Test.createCriteria().list(){
+        List res = Test.createCriteria().list() {
             CriteriaUtils.applyOrder([sort: "nestedField.id asc, someField", order: "desc"], delegate)
         }
 
-        List res2 = Test.createCriteria().list(){
+        List res2 = Test.createCriteria().list() {
             and {
                 nestedField {
                     order("id", "asc")
@@ -70,7 +70,7 @@ class CriteriaUtilsSpec extends HibernateSpec {
         }
 
         then:
-        res.eachWithIndex{ def entry, int i ->
+        res.eachWithIndex { def entry, int i ->
             assert entry.someField == res2[i].someField
             assert entry.someField2 == res2[i].someField2
             assert entry.nestedField.id == res2[i].nestedField.id

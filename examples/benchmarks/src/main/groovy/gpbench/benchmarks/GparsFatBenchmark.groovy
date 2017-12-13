@@ -11,7 +11,7 @@ import org.grails.datastore.gorm.GormEntity
 class GparsFatBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
 
     GparsFatBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
-        super(clazz, bindingMethod,validate)
+        super(clazz, bindingMethod, validate)
     }
 
     void setup() {
@@ -20,18 +20,18 @@ class GparsFatBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> 
         List cityfull = recordsLoader.read("City")
 
         for (Map row in cityfull) {
-            row.region2 = [id:row.region.id]
-            row.region3 = [id:row.region.id]
+            row.region2 = [id: row.region.id]
+            row.region3 = [id: row.region.id]
 
-            row.country2 = [id:row.country.id]
-            row.country3 = [id:row.country.id]
+            row.country2 = [id: row.country.id]
+            row.country3 = [id: row.country.id]
 
             //row.state  = row.region.id
             //row.countryName  = row.country.id
-            row.state2  = row.region.id
-            row.countryName2  = row.country.id
-            row.state3  = row.region.id
-            row.countryName3  = row.country.id
+            row.state2 = row.region.id
+            row.countryName2 = row.country.id
+            row.state3 = row.region.id
+            row.countryName3 = row.country.id
 
             row.name2 = row.name
             row.shortCode2 = row.shortCode

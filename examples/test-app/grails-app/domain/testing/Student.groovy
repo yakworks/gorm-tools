@@ -1,11 +1,11 @@
 package testing
 
 class Student {
-	//static belongsTo = [jumper:Jumper]
-	Jumper jumper
-	String name
-	//static daoType = 'transactional'
+    //static belongsTo = [jumper:Jumper]
+    Jumper jumper
+    String name
+    //static daoType = 'transactional'
 
-	static constraints = {
-	}
+    static constraints = {
+    }
 }

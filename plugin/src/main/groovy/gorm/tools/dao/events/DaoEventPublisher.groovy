@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Invokes event methods on Dao classes.
  */
 @CompileStatic
-class DaoEventPublisher implements EventPublisher{
+class DaoEventPublisher implements EventPublisher {
     @Autowired
     GrailsApplication grailsApplication
 
@@ -29,21 +29,21 @@ class DaoEventPublisher implements EventPublisher{
     private final Map<String, Map<String, Method>> eventsCache = new ConcurrentHashMap<>()
 
     @PostConstruct
-    void init(){
-        applicationEventPublisher = (ApplicationEventPublisher)grailsApplication.mainContext
+    void init() {
+        applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
 
         GrailsClass[] daoClasses = grailsApplication.getArtefacts(DaoArtefactHandler.TYPE)
-        for(GrailsClass daoClass : daoClasses) {
+        for (GrailsClass daoClass : daoClasses) {
             cacheEventsMethods(daoClass.clazz)
         }
     }
 
     public void invokeEventMethod(Object dao, String eventKey, Object... args) {
         Map<String, Method> events = eventsCache.get(dao.class.simpleName)
-        if(!events) return
+        if (!events) return
 
         Method method = events.get(eventKey)
-        if(!method) return
+        if (!method) return
 
         ReflectionUtils.invokeMethod(method, dao, args)
     }
@@ -64,14 +64,14 @@ class DaoEventPublisher implements EventPublisher{
 
     private void findAndCacheEventMethods(String eventKey, Class daoClass, Map<String, Method> events) {
         Method method = ReflectionUtils.findMethod(daoClass, eventKey, null)
-        if(method != null) events[eventKey] = method
+        if (method != null) events[eventKey] = method
     }
 
-    Datastore getDatastore(entity){
+    Datastore getDatastore(entity) {
         GormEnhancer.findInstanceApi(entity.class).datastore
     }
 
-    void publishEvent(DaoEvent event){
+    void publishEvent(DaoEvent event) {
         applicationEventPublisher.publishEvent(event)
         //println event.routingKey
         notify(event.routingKey, event)

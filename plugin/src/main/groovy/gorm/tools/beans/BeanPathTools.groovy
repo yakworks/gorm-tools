@@ -29,8 +29,8 @@ import javax.servlet.http.HttpServletRequest
 class BeanPathTools {
     //static Log log = LogFactory.getLog(getClass())
     static GrailsApplication grailsApplication = Holders.grailsApplication
-    private static Map excludes = [hasMany: true, belongsTo: true, searchable: true, __timeStamp: true,
-                                   constraints: true, version: true, metaClass: true]
+    private static List<String> excludes = ['hasMany', 'belongsTo', 'searchable', '__timeStamp',
+                                            'constraints', 'version', 'metaClass']
 
     private BeanPathTools() {
         throw new AssertionError()
@@ -59,7 +59,7 @@ class BeanPathTools {
         List props = []
 
         domain?.class?.properties?.declaredFields.each { field ->
-            if (!excludes.containsKey(field.name) && !field.name.contains("class\$") && !field.name.startsWith("__timeStamp")) {
+            if (!excludes.contains(field.name) && !field.name.contains("class\$") && !field.name.startsWith("__timeStamp")) {
                 props.add(field.name)
             }
         }
@@ -75,8 +75,8 @@ class BeanPathTools {
      *
      * Note: propList = ['*'] represents all fields.
      *
-     * @param source            a source object
-     * @param propList          a query of properties to include to a map
+     * @param source a source object
+     * @param propList a query of properties to include to a map
      * @param useDelegatingBean
      * @return a map which is based on object properties
      */
@@ -114,9 +114,9 @@ class BeanPathTools {
      *   propsToMap(object, 'nested.foo', map)       // [nested: [foo: 1]]
      *
      *
-     * @param source        a source object
-     * @param propertyPath  a property name, e.g. 'someField', 'someField.nestedField', '*' (for all properties)
-     * @param currentMap    a destination map
+     * @param source a source object
+     * @param propertyPath a property name, e.g. 'someField', 'someField.nestedField', '*' (for all properties)
+     * @param currentMap a destination map
      * @return a map which contains an object's property (properties)
      */
     @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CatchException'])
@@ -130,14 +130,14 @@ class BeanPathTools {
                 if (log.debugEnabled) log.debug("source:$source propertyPath:$propertyPath currentMap:$currentMap")
 
                 //just get the persistentProperties
-                Object object = (source instanceof DelegatingBean) ? ((DelegatingBean)source).target : source
+                Object object = (source instanceof DelegatingBean) ? ((DelegatingBean) source).target : source
 
                 if (object instanceof GormEntity) {
                     PersistentEntity domainClass = GormMetaUtils.getPersistentEntity(object)
                     PersistentProperty[] pprops = domainClass.persistentProperties
 
                     //filter out the associations. need to explicitly add those to be included
-                    pprops = pprops.findAll { p -> !(p instanceof Association && p.associatedEntity)}
+                    pprops = pprops.findAll { p -> !(p instanceof Association && p.associatedEntity) }
                     //force the the id to be included
                     String id = domainClass.identity.name
                     currentMap[id] = source?."$id"
@@ -148,7 +148,7 @@ class BeanPathTools {
                 } else {
                     Closure notConvert = {
                         it instanceof Map || it instanceof Collection ||
-                        it instanceof Number || it?.class in [String, Boolean, Character]
+                            it instanceof Number || it?.class in [String, Boolean, Character]
                     }
                     Map props = object.properties.findAll { it.key != 'class' }
                     props.each { String name, Object value ->
@@ -161,8 +161,8 @@ class BeanPathTools {
                     }
                 }
 
-            // I think it would be enough to check if a property exists.
-            // So it's the same as catching MissingPropertyException and do nothing if there is no property
+                // I think it would be enough to check if a property exists.
+                // So it's the same as catching MissingPropertyException and do nothing if there is no property
             } else if (source?.hasProperty(propertyPath)) {
                 currentMap[propertyPath] = source."$propertyPath"
             }
@@ -207,7 +207,7 @@ class BeanPathTools {
     }
 
     @CompileDynamic
-    static GrailsParameterMap getGrailsParameterMap(Map p, HttpServletRequest request){
+    static GrailsParameterMap getGrailsParameterMap(Map p, HttpServletRequest request) {
         GrailsParameterMap gpm = new GrailsParameterMap(p, request)
         gpm.updateNestedKeys(p)
         return gpm

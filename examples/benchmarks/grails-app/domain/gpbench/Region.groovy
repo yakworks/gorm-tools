@@ -6,7 +6,7 @@ class Region {
     String code
     String admCode
 
-    static belongsTo = [country:Country]
+    static belongsTo = [country: Country]
 
     static mapping = {
         cache true
@@ -16,7 +16,7 @@ class Region {
 
     static constraints = {
         name nullable: false
-        code nullable:false
+        code nullable: false
         admCode nullable: true
     }
 

@@ -41,7 +41,7 @@ class CityFatNoTraits {
     BigDecimal latitude3
     BigDecimal longitude3
 
-    static belongsTo = [region:Region, country:Country, region2:Region, country2:Country, region3:Region, country3:Country]
+    static belongsTo = [region: Region, country: Country, region2: Region, country2: Country, region3: Region, country3: Country]
 
     static mapping = {
         cache true
@@ -50,8 +50,8 @@ class CityFatNoTraits {
     static constraints = {
         name blank: false, nullable: false
         shortCode blank: false, nullable: false
-        latitude nullable: false, scale: 4, max:90.00
-        longitude nullable: false, scale: 4, max:380.00
+        latitude nullable: false, scale: 4, max: 90.00
+        longitude nullable: false, scale: 4, max: 380.00
         region nullable: true
         country nullable: true
         state nullable: true
@@ -59,8 +59,8 @@ class CityFatNoTraits {
 
         name2 blank: false, nullable: false
         shortCode2 blank: false, nullable: false
-        latitude2 nullable: false, scale: 4, max:90.00
-        longitude2 nullable: false, scale: 4, max:380.00
+        latitude2 nullable: false, scale: 4, max: 90.00
+        longitude2 nullable: false, scale: 4, max: 380.00
         region2 nullable: true
         country2 nullable: true
         state2 nullable: true
@@ -68,17 +68,17 @@ class CityFatNoTraits {
 
         name3 blank: false, nullable: false
         shortCode3 blank: false, nullable: false
-        latitude3 nullable: false, scale: 4, max:90.00
-        longitude3 nullable: false, scale: 4, max:380.00
+        latitude3 nullable: false, scale: 4, max: 90.00
+        longitude3 nullable: false, scale: 4, max: 380.00
         region3 nullable: true
         country3 nullable: true
         state3 nullable: true
         countryName3 nullable: true
 
-        dateCreated nullable:true,display:false,editable:false,bindable:false
-        lastUpdated nullable:true,display:false,editable:false,bindable:false
-        dateCreatedUser nullable:true,display:false,editable:false,bindable:false
-        lastUpdatedUser nullable:true,display:false,editable:false,bindable:false
+        dateCreated nullable: true, display: false, editable: false, bindable: false
+        lastUpdated nullable: true, display: false, editable: false, bindable: false
+        dateCreatedUser nullable: true, display: false, editable: false, bindable: false
+        lastUpdatedUser nullable: true, display: false, editable: false, bindable: false
     }
 
     String toString() { name }

@@ -25,7 +25,8 @@ class DaoMessage {
 
     static Map notFoundId(String domainClassName, Serializable id) {
         String domainLabel = GrailsNameUtils.getShortName(domainClassName)
-        return [code: "default.not.found.message", args: [domainLabel, id],
+        return [code          : "default.not.found.message",
+                args          : [domainLabel, id],
                 defaultMessage: "${domainLabel} not found with id ${id}"]
     }
 

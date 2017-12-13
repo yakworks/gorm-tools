@@ -1,6 +1,5 @@
 package gorm.tools.mango
 
-import gorm.tools.dao.GormDao
 import gorm.tools.testing.DaoDataTest
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
@@ -10,7 +9,7 @@ class MangoOverrideSpec extends Specification implements DaoDataTest {
 
     void setup() {
         mockDomain(City)
-        defineBeans({mangoQuery(NewMangoQuery)})
+        defineBeans({ mangoQuery(NewMangoQuery) })
     }
 
     void testMangoOverride() {
@@ -37,12 +36,12 @@ class City {
 class NewMangoQuery implements MangoQueryApi {
 
     @Override
-    DetachedCriteria buildCriteria(Class domainClass, Map params, Closure closure=null) {
+    DetachedCriteria buildCriteria(Class domainClass, Map params, Closure closure = null) {
         new DetachedCriteria(domainClass).build { eq "id", 2 }
     }
 
     @Override
-    List query(Class domainClass, Map params, Closure closure= null) {
+    List query(Class domainClass, Map params, Closure closure = null) {
         buildCriteria(domainClass, [:]).list()
     }
 }

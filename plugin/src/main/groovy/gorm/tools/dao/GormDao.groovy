@@ -24,18 +24,21 @@ import org.springframework.dao.DataIntegrityViolationException
  * @author Joshua Burnett
  */
 @CompileStatic
-trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
+trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D> {
 
-    @Autowired FastBinder dataBinder
-    @Autowired DaoEventPublisher daoEventPublisher
-    @Autowired TrxService trxService
+    @Autowired
+    FastBinder dataBinder
+    @Autowired
+    DaoEventPublisher daoEventPublisher
+    @Autowired
+    TrxService trxService
 
     //use getters when accessing domainClass so implementing class can override the property if desired
     Class<D> domainClass // the domain class this is for
 
     @Override
     Class<D> getDomainClass() {
-        if(!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDao.class)
+        if (!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDao.class)
         return domainClass
     }
 
@@ -108,7 +111,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
     }
 
     @Override
-    void bind(D entity, Map row, String bindMethod = null){
+    void bind(D entity, Map row, String bindMethod = null) {
         getDataBinder().bind(entity, row, bindMethod)
     }
 
@@ -140,7 +143,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
     void doRemove(D entity) {
         try {
             daoEventPublisher.doBeforeRemove(this, entity)
-            entity.delete(flush:true)
+            entity.delete(flush: true)
             daoEventPublisher.doAfterRemove(this, entity)
         }
         catch (DataIntegrityViolationException dae) {
@@ -162,7 +165,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
     D get(Serializable id, Long version) throws DomainNotFoundException, DomainException {
         D entity = GormEnhancer.findStaticApi(getDomainClass()).get(id)
         DaoUtil.checkFound(entity, [id: id], getDomainClass().name)
-        if(version != null) DaoUtil.checkVersion(entity, version)
+        if (version != null) DaoUtil.checkVersion(entity, version)
         return entity
     }
 
@@ -190,7 +193,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D>{
         //callable()
     }
 
-    Datastore getDatastore(){
+    Datastore getDatastore() {
         GormEnhancer.findInstanceApi(domainClass).datastore
     }
 

@@ -1,11 +1,9 @@
 package gpbench.listeners
 
 import gorm.tools.dao.events.BeforeCreateEvent
-import gorm.tools.dao.events.BeforeUpdateEvent
 import gpbench.CityDaoSpringEvents
 import gpbench.SecUtil
 import groovy.transform.CompileStatic
-import org.springframework.context.ApplicationListener
 import org.springframework.context.event.EventListener
 
 import javax.annotation.ManagedBean

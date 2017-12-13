@@ -18,7 +18,7 @@ trait CityTrait3 {
     Country country3
 }
 
-class CityTrait3Constraints implements CityTrait3{
+class CityTrait3Constraints implements CityTrait3 {
 
     static constraints = {
         name3 blank: false, nullable: false

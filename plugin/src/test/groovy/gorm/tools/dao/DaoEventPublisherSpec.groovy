@@ -13,16 +13,18 @@ class DaoEventPublisherSpec extends Specification implements DaoDataTest {
         mockDomain(City)
     }
 
-    Closure doWithSpring() {{ ->
-        trxService(TrxService)
-    }}
+    Closure doWithSpring() {
+        { ->
+            trxService(TrxService)
+        }
+    }
 
     DaoEventPublisher daoEventPublisher
 
     void testEventsFired() {
         given:
         //CityDao cityDao = City.dao
-        Map params = [id:1, name: "test"]
+        Map params = [id: 1, name: "test"]
 
         when:
         City city = City.create(params)
@@ -64,7 +66,7 @@ class DaoEventPublisherSpec extends Specification implements DaoDataTest {
         city.region == "beforeRemove"
 
         when:
-        daoEventPublisher.invokeEventMethod(City.dao    , DaoEventType.AfterRemove.eventKey, city, params)
+        daoEventPublisher.invokeEventMethod(City.dao, DaoEventType.AfterRemove.eventKey, city, params)
 
         then:
         city.region == "afterRemove"

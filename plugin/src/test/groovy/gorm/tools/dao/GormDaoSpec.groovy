@@ -7,16 +7,18 @@ import testing.Org
 
 class GormDaoSpec extends DaoHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org,Location,Nested] }
+    List<Class> getDomainClasses() { [Org, Location, Nested] }
 
-    Closure doWithConfig() {{ config ->
-        config.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
-    }}
+    Closure doWithConfig() {
+        { config ->
+            config.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
+        }
+    }
 
 
     def "test create"() {
         when:
-        Map p = [name:'foo']
+        Map p = [name: 'foo']
         p.location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
         Org org = Org.dao.create(p)
 
@@ -30,7 +32,7 @@ class GormDaoSpec extends DaoHibernateSpec {
 
     def "test update"() {
         given:
-        Org org = new Org(name:"test")
+        Org org = new Org(name: "test")
         org.location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
         org.persist()
 
@@ -38,7 +40,7 @@ class GormDaoSpec extends DaoHibernateSpec {
         org.id != null
 
         when:
-        Map p = [name:'foo', id:org.id]
+        Map p = [name: 'foo', id: org.id]
         org = Org.dao.update(p)
 
         then:
@@ -48,9 +50,9 @@ class GormDaoSpec extends DaoHibernateSpec {
         org.event == "beforeUpdate"
     }
 
-    def "test criteria name config"(){
+    def "test criteria name config"() {
         when:
-        Org org = new Org(name:"test")
+        Org org = new Org(name: "test")
 
         then:
         org.dao.mangoQuery.criteriaKeyName == "testCriteriaName"

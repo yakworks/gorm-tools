@@ -9,7 +9,7 @@ import org.grails.datastore.gorm.GormEntity
  * Runs batch inserts in parallel using gparse.
  */
 @CompileStatic
-class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T>  {
+class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T> {
 
     //FastBinder fastBinder
 
@@ -22,7 +22,7 @@ class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T
 
     @Override
     def execute() {
-        gparsBatchService.eachParallel(cities ){ Map row, Map cargs ->
+        gparsBatchService.eachParallel(cities) { Map row, Map cargs ->
             //domainClass.dao.create( row, [validate:validate, dataBinder:dataBinder ])
             dao.doCreate(row)
             //insertRow(row)

@@ -12,39 +12,39 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 
-	CityDao cityDao
+    CityDao cityDao
 
-	SimpleBatchInsertBenchmark(boolean databinding) {
-		super(databinding)
-	}
+    SimpleBatchInsertBenchmark(boolean databinding) {
+        super(databinding)
+    }
 
-	@Override
-	def execute() {
-		assert City.count() == 0
-		insert(cities, cityDao)
-		assert City.count() == 115000
-	}
+    @Override
+    def execute() {
+        assert City.count() == 0
+        insert(cities, cityDao)
+        assert City.count() == 115000
+    }
 
-	void insert(List<List<Map>> batchList, CityDao dao) {
-		for (List<Map> batch : batchList) {
-			insertBatch(batch, dao)
-			DaoUtil.flushAndClear()
-		}
-	}
+    void insert(List<List<Map>> batchList, CityDao dao) {
+        for (List<Map> batch : batchList) {
+            insertBatch(batch, dao)
+            DaoUtil.flushAndClear()
+        }
+    }
 
-	@Transactional
-	void insertBatch(List<Map> batch, CityDao dao) {
-		for (Map record : batch) {
-			try {
-				dao.create(record)
-			} catch (Exception e) {
-				e.printStackTrace()
-			}
-		}
-	}
+    @Transactional
+    void insertBatch(List<Map> batch, CityDao dao) {
+        for (Map record : batch) {
+            try {
+                dao.create(record)
+            } catch (Exception e) {
+                e.printStackTrace()
+            }
+        }
+    }
 
-	@Override
-	String getDescription() {
-		return "SimpleBatchInsert without gpars: databinding=${useDatabinding}"
-	}
+    @Override
+    String getDescription() {
+        return "SimpleBatchInsert without gpars: databinding=${useDatabinding}"
+    }
 }

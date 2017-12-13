@@ -1,6 +1,6 @@
 package gpbench
 
-class CityDynamic{
+class CityDynamic {
     //transient springSecurityService
 
     String name

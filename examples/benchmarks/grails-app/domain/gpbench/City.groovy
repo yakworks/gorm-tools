@@ -12,7 +12,7 @@ import grails.compiler.GrailsCompileStatic
 @GrailsCompileStatic
 class City implements CityTrait, DateUserStamp {
 
-    static belongsTo = [region:Region, country:Country]
+    static belongsTo = [region: Region, country: Country]
 
 //    static mapping = {
 //        cache true

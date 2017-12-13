@@ -19,7 +19,6 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     }
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
     root(ERROR, ['STDOUT', 'FULL_STACKTRACE'])
-}
-else {
+} else {
     root(ERROR, ['STDOUT'])
 }

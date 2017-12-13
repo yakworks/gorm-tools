@@ -3,7 +3,7 @@ package testing
 import grails.persistence.Entity
 
 @Entity
-class Location{
+class Location {
     int id
     String city
     Nested nested

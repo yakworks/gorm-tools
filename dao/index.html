@@ -316,6 +316,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
+    Data binding using MapBinder
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#daoutil-and-daomessage" title="DaoUtil and DaoMessage" class="md-nav__link">
     DaoUtil and DaoMessage
   </a>
@@ -527,6 +534,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
+    Data binding using MapBinder
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#daoutil-and-daomessage" title="DaoUtil and DaoMessage" class="md-nav__link">
     DaoUtil and DaoMessage
   </a>
@@ -698,6 +712,44 @@ Plugin will automatically lookup all dao classes and configure them as spring be
 
 <span class="o">}</span>
 </pre></div></p>
+<h2 id="data-binding-using-mapbinder">Data binding using MapBinder<a class="headerlink" href="#data-binding-using-mapbinder" title="Permanent link">&para;</a></h2>
+<p>Plugin comes with a <code>MapBinder</code> Which is used by Daos to perform databinding.
+Plugin configures <code>GormMapBinder</code> as default implementation of <code>MapBinder</code>. <code>GormMapBinder</code> is similar to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.
+However GormMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates without going through the converters, thus resulting in faster performance.</p>
+<p><strong>Example</strong></p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">SomeService</span> <span class="o">{</span>
+        <span class="nd">@Autowired</span> <span class="n">MapBinder</span> <span class="n">binder</span>
+
+        <span class="kt">void</span> <span class="nf">foo</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
+           <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Org</span><span class="o">()</span>
+            <span class="n">binder</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">org</span><span class="o">,</span> <span class="n">params</span><span class="o">)</span>
+        <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+<p><strong>Using custom MapBinder</strong><br />
+By default all dao's use the default <code>GormMapBinder</code> for databinding. However when a dao is explicitely created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.</p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CustomMapBinder</span> <span class="kd">implements</span> <span class="n">MapBinder</span> <span class="o">{</span>
+
+     <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">,</span> <span class="n">String</span> <span class="n">bindMethod</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//implement  </span>
+      <span class="o">}</span>
+
+     <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//implement</span>
+     <span class="o">}</span>
+
+
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">OrgDao</span> <span class="kd">implements</span> <span class="n">GormDao</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span> <span class="n">CustomMapBinder</span> <span class="n">mapBinder</span>
+    <span class="o">...</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>This will make the OrgDao use CustomMapBinder for data binding.</p>
 <h2 id="daoutil-and-daomessage">DaoUtil and DaoMessage<a class="headerlink" href="#daoutil-and-daomessage" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy">DaoUtil</a></p>
 <h4 id="daoutil">DaoUtil:<a class="headerlink" href="#daoutil" title="Permanent link">&para;</a></h4>

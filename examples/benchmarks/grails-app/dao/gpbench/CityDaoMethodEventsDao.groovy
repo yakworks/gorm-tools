@@ -1,7 +1,6 @@
 package gpbench
 
 import gorm.tools.dao.GormDao
-import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
 //@Transactional

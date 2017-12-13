@@ -1,7 +1,6 @@
-
 grails {
     plugin {
-        audittrail{
+        audittrail {
             enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled", "true"))
             //For a field to be added by the annotation at least on config setting needs to be present for that field.
             createdBy.field = "createdBy"  // createdBy is default
@@ -25,7 +24,7 @@ gpars.poolsize = 5
 
 benchmark {
     //#items per transation. used to collate the rows into lists of lists of batchSliceSize.
-    def bss = System.getProperty("batchSliceSize","0").toInteger()
+    def bss = System.getProperty("batchSliceSize", "0").toInteger()
     bss = bss ?: System.getProperty("jdbcBatchSize", "100").toInteger()
     batchSliceSize = bss
     //number of times to load the file of 36k rows. the default of 3 is equal to 111k rows for example
@@ -38,6 +37,6 @@ benchmark {
 
 grails {
     gorm.default.mapping = {
-        id generator:'gorm.tools.idgen.SpringIdGenerator'
+        id generator: 'gorm.tools.idgen.SpringIdGenerator'
     }
 }

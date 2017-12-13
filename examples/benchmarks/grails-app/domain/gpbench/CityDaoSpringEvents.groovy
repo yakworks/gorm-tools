@@ -13,7 +13,7 @@ import grails.compiler.GrailsCompileStatic
 @GrailsCompileStatic
 class CityDaoSpringEvents implements CityTrait, AuditStamp {
 
-    static belongsTo = [region:Region, country:Country]
+    static belongsTo = [region: Region, country: Country]
 
     static constraints = {
         importFrom CityTraitConstraints

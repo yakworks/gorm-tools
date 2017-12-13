@@ -3,10 +3,10 @@ package gpbench
 import gorm.tools.GormUtils
 import gorm.tools.beans.DateUtil
 import gorm.tools.databinding.FastBinder
-import gpbench.fat.CityFatNoTraits
-import gpbench.fat.CityFatSimple
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
+import gpbench.fat.CityFatNoTraits
+import gpbench.fat.CityFatSimple
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.databinding.converters.ValueConverter
@@ -27,7 +27,7 @@ class BenchmarkDatabindingService {
 
     Long count = 111690
     Map props = [
-        'name': 'test', 'shortCode':'test', state:"Gujarat", "countryName": "india", 'latitude':"10.10", 'longitude': "10.10"]
+        'name': 'test', 'shortCode': 'test', state: "Gujarat", "countryName": "india", 'latitude': "10.10", 'longitude': "10.10"]
 //    ,
 //        'name2': 'test', 'shortCode2':'test', state2:"Gujarat", "country2": "india", 'latitude2':"10.10", 'longitude2': "10.10",
 //        'name3': 'test', 'shortCode4':'test', state3:"Gujarat", "country3": "india", 'latitude3':"10.10", 'longitude3': "10.10",]
@@ -37,7 +37,7 @@ class BenchmarkDatabindingService {
     int loadCityTimes = 3
     List cities
 
-    def runFat(){
+    def runFat() {
         println "run load json file 3x number of fields"
 
         jsonReader._cache = [:]
@@ -45,15 +45,15 @@ class BenchmarkDatabindingService {
         println "Warm up logan  "
         mute = true
         (1..2).each {
-            if(!mute) println "\n - setters, copy and fast bind on simple no associations"
+            if (!mute) println "\n - setters, copy and fast bind on simple no associations"
             useSetPropsFastIterate(CityFatSimple)
-            if(!mute) println "\n - setters or property copy on associations with 20 fields"
+            if (!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFat)
             useSetPropsFastIterate(CityFat)
             useFastBinder(CityFat)
-            if(!mute) println " - Dynamic setters are slower"
+            if (!mute) println " - Dynamic setters are slower"
             useDynamicSettersFat(CityFat)
-            if(!mute) println " - Slower without @GrailsCompileStatic on domain"
+            if (!mute) println " - Slower without @GrailsCompileStatic on domain"
             useDynamicSettersFat(CityFatDynamic)
             useFastBinder(CityFatDynamic)
             mute = false
@@ -69,38 +69,38 @@ class BenchmarkDatabindingService {
     }
 
     void useDatabinding(Class domain) {
-        eachCity("useDatabinding", domain){ instance , Map row ->
+        eachCity("useDatabinding", domain) { instance, Map row ->
             instance.properties = row
         }
     }
 
     void useStaticSettersInDomain(Class domain) {
-        eachCity("useStaticSettersInDomain", domain){ instance , Map row ->
+        eachCity("useStaticSettersInDomain", domain) { instance, Map row ->
             instance.setPropsFast(row)
         }
     }
 
     void useSetPropsFastIterate(Class domain) {
-        eachCity("setPropsFastIterate", domain){ instance , Map row ->
+        eachCity("setPropsFastIterate", domain) { instance, Map row ->
             setPropsFastIterate(instance, row)
         }
     }
 
     void gormUtilsBindFast(Class domain) {
-        eachCity("gormUtilsBindFast", domain){ instance , Map row ->
+        eachCity("gormUtilsBindFast", domain) { instance, Map row ->
             GormUtils.bindFast(instance, row)
             //setPropsFastIterate(instance, row)
         }
     }
 
     void useFastBinder(Class domain) {
-        eachCity("useFastBinder", domain){ instance , Map row ->
+        eachCity("useFastBinder", domain) { instance, Map row ->
             fastBinder.bind(instance, row)
         }
     }
 
     void useSettersDynamicSimple(Class domain) {
-        eachCity("useDynamicSettersFat", domain){ instance , Map row ->
+        eachCity("useDynamicSettersFat", domain) { instance, Map row ->
             instance.name = row['name']
             instance.shortCode = row['shortCode']
             instance.state = row['state']
@@ -112,7 +112,7 @@ class BenchmarkDatabindingService {
 
     void useDynamicSettersFat(Class domain) {
 
-        eachCity("useDynamicSettersFat", domain){ instance , Map row ->
+        eachCity("useDynamicSettersFat", domain) { instance, Map row ->
             instance.name = row['name']
             instance.shortCode = row['shortCode']
             instance.state = row['state']
@@ -148,8 +148,8 @@ class BenchmarkDatabindingService {
         }
     }
 
-    void setAssociations(instance, String key, Class assocClass, Map row){
-        if(instance.hasProperty(key) && row[key] && row[key].id){
+    void setAssociations(instance, String key, Class assocClass, Map row) {
+        if (instance.hasProperty(key) && row[key] && row[key].id) {
             instance[key] = assocClass.load(row[key].id)
         }
     }
@@ -163,15 +163,15 @@ class BenchmarkDatabindingService {
             //instance.validate([failOnError:true])
         }
         watch.stop()
-        if(!mute) println "${watch.totalTimeSeconds}s $msg $domain.simpleName | ${cities.size()} rows"
+        if (!mute) println "${watch.totalTimeSeconds}s $msg $domain.simpleName | ${cities.size()} rows"
     }
 
     void loadCities(int mult) {
         RecordsLoader recordsLoader = jsonReader //useDatabinding ? csvReader : jsonReader
         List cityfull = recordsLoader.read("City")
         for (Map row in cityfull) {
-            row.state  = row.region.id
-            row.countryName  = row.country.id
+            row.state = row.region.id
+            row.countryName = row.country.id
             row.remove('region')
             row.remove('country')
             //instance.properties = row
@@ -188,18 +188,18 @@ class BenchmarkDatabindingService {
         RecordsLoader recordsLoader = jsonReader //useDatabinding ? csvReader : jsonReader
         List cityfull = recordsLoader.read("City")
         for (Map row in cityfull) {
-            row.region2 = [id:row.region.id]
-            row.region3 = [id:row.region.id]
+            row.region2 = [id: row.region.id]
+            row.region3 = [id: row.region.id]
 
-            row.country2 = [id:row.country.id]
-            row.country3 = [id:row.country.id]
+            row.country2 = [id: row.country.id]
+            row.country3 = [id: row.country.id]
 
-            row.state  = row.region.id
-            row.countryName  = row.country.id
-            row.state2  = row.region.id
-            row.countryName2  = row.country.id
-            row.state3  = row.region.id
-            row.countryName3  = row.country.id
+            row.state = row.region.id
+            row.countryName = row.country.id
+            row.state2 = row.region.id
+            row.countryName2 = row.country.id
+            row.state3 = row.region.id
+            row.countryName3 = row.country.id
 
             row.name2 = row.name
             row.shortCode2 = row.shortCode.toString()
@@ -229,6 +229,7 @@ class BenchmarkDatabindingService {
     }
 
     DateFormat dateFormat = new SimpleDateFormat('yyyy-MM-dd')
+
     @CompileStatic
     Object setPropsFastIterate(Object obj, Map source, boolean ignoreAssociations = false) {
         //if (target == null) throw new IllegalArgumentException("Target is null")
@@ -236,33 +237,30 @@ class BenchmarkDatabindingService {
 
         def sapi = GormEnhancer.findStaticApi(obj.getClass())
         def properties = sapi.gormPersistentEntity.getPersistentProperties()
-        for (PersistentProperty prop : properties){
-            if(!source.containsKey(prop.name)) {
+        for (PersistentProperty prop : properties) {
+            if (!source.containsKey(prop.name)) {
                 continue
             }
             def sval = source[prop.name]
             def valToAssisgn = sval
             Class typeToConvertTo = prop.getType()
             if (prop instanceof Association && sval['id']) {
-                if(ignoreAssociations) return
-                def asocProp = (Association)prop
+                if (ignoreAssociations) return
+                def asocProp = (Association) prop
                 def asc = GormEnhancer.findStaticApi(asocProp.associatedEntity.javaClass).load(sval['id'] as Long)
                 valToAssisgn = asc
-            }
-            else if (sval instanceof String) {
-                if(Number.isAssignableFrom(typeToConvertTo)){
+            } else if (sval instanceof String) {
+                if (Number.isAssignableFrom(typeToConvertTo)) {
                     valToAssisgn = (sval as String).asType(typeToConvertTo)
-                }
-                else if(Date.isAssignableFrom(typeToConvertTo)){
+                } else if (Date.isAssignableFrom(typeToConvertTo)) {
                     //valToAssisgn = dateFormat.parse(sval as String)
                     valToAssisgn = DateUtil.parseJsonDate(sval as String)
                     //println "converted $sval to ${valToAssisgn} for $prop.name with DateUtil.parseJsonDate"
-                }
-                else if(conversionHelpers.containsKey(typeToConvertTo)){
+                } else if (conversionHelpers.containsKey(typeToConvertTo)) {
                     def convertersList = conversionHelpers.get(typeToConvertTo)
                     ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(sval) }
                     if (converter) {
-                        valToAssisgn= converter.convert(sval)
+                        valToAssisgn = converter.convert(sval)
                         //println new Date()
                         //println "converted $sval to ${valToAssisgn} for $prop.name with ${converter.class.name}"
                     }
@@ -279,7 +277,7 @@ class BenchmarkDatabindingService {
     }
 
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     @CompileStatic
     void setValueConverters(ValueConverter[] converters) {
         converters.each { ValueConverter converter ->

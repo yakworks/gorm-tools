@@ -7,8 +7,8 @@ class Origin {
     City city
 
     static constraints = {
-        country 	nullable:false
-        state 		nullable:true
-        city		nullable:true
+        country nullable: false
+        state nullable: true
+        city nullable: true
     }
 }

@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class RegionDao implements GormDao<Region> {
 
-    RegionDao(){ domainClass = Region }
+    RegionDao() { domainClass = Region }
 
     void beforeCreate(Region region, Map params) {
         region.id = params.id as Long

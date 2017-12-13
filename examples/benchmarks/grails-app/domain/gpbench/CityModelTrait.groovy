@@ -5,7 +5,7 @@ import grails.compiler.GrailsCompileStatic
 
 
 @GrailsCompileStatic
-class CityModelTrait implements CityModel{
+class CityModelTrait implements CityModel {
 
     static belongsTo = [Region, Country]
 

@@ -1,6 +1,6 @@
 package gorm.tools
 
-import gorm.tools.databinding.FastBinder
+import gorm.tools.databinding.GormMapBinder
 import grails.compiler.GrailsCompileStatic
 import grails.util.Holders
 import groovy.transform.CompileStatic
@@ -20,8 +20,7 @@ class GormUtils {
     /**
      * The list of domain properties which are ignored during copying.
      */
-    final
-    static List<String> IGNORED_PROPERTIES = ["id", "version", "createdBy", "createdDate", "editedBy", "editedDate", "num"]
+    static final List<String> IGNORED_PROPERTIES = ["id", "version", "createdBy", "createdDate", "editedBy", "editedDate", "num"]
 
     /**
      * Creates an instance of a given domain class and copies properties from source object.
@@ -73,7 +72,7 @@ class GormUtils {
      */
     @CompileStatic
     static <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, Map<String, Object> override = [:], boolean ignoreAssociations = false) {
-        FastBinder binder = (FastBinder) Holders.applicationContext.getBean("fastBinder")
+        GormMapBinder binder = (GormMapBinder) Holders.applicationContext.getBean("gormMapBinder")
         binder.bind(target, source)
 
         if (override) {

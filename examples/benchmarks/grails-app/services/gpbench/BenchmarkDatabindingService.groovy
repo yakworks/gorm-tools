@@ -2,7 +2,7 @@ package gpbench
 
 import gorm.tools.GormUtils
 import gorm.tools.beans.DateUtil
-import gorm.tools.databinding.FastBinder
+import gorm.tools.databinding.GormMapBinder
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
 import gpbench.fat.CityFatNoTraits
@@ -23,7 +23,9 @@ import java.text.SimpleDateFormat
 
 class BenchmarkDatabindingService {
     JsonReader jsonReader
-    FastBinder fastBinder
+
+    @Autowired
+    GormMapBinder gormMapBinder
 
     Long count = 111690
     Map props = [
@@ -95,7 +97,7 @@ class BenchmarkDatabindingService {
 
     void useFastBinder(Class domain) {
         eachCity("useFastBinder", domain) { instance, Map row ->
-            fastBinder.bind(instance, row)
+            gormMapBinder.bind(instance, row)
         }
     }
 

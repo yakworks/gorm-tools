@@ -11,8 +11,6 @@ import org.grails.datastore.gorm.GormEntity
 @CompileStatic
 class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T> {
 
-    //FastBinder fastBinder
-
     DaoApi<T> dao
 
     GparsDaoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {

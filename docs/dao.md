@@ -107,6 +107,54 @@ class OrgListener {
 
 ```
 
+## Data binding using MapBinder
+Plugin comes with a ```MapBinder``` Which is used by Daos to perform databinding.
+Plugin configures ```GormMapBinder``` as default implementation of ```MapBinder```. ```GormMapBinder``` is similar to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.
+However GormMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates without going through the converters, thus resulting in faster performance.
+
+**Example**
+
+```groovy
+
+class SomeService {
+        @Autowired MapBinder binder
+        
+        void foo(Map params) {
+           Org org = new Org()
+            binder.bind(org, params)
+        }
+
+}
+
+```
+
+**Using custom MapBinder**  
+By default all dao's use the default ```GormMapBinder``` for databinding. However when a dao is explicitely created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.
+
+```groovy
+
+class CustomMapBinder implements MapBinder {
+     
+     public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod) {
+        //implement  
+      }
+      
+     public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source) {
+        //implement
+     }
+
+
+}
+
+class OrgDao implements GormDao<Org> {
+    @Autowired CustomMapBinder mapBinder
+    ...
+}
+
+```
+
+This will make the OrgDao use CustomMapBinder for data binding.
+
 ## DaoUtil and DaoMessage
 
 See [DaoUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DaoUtil.groovy)

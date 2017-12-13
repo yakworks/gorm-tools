@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Propagation
  * 	idColumn - "NextId"
  * 	seedValue - "1000" this is the starting ID fi the row does not exist and is created by this object.
  *
- *	setCreateIdRow = false to not create the row automatically if it does not exist
+ * 	setCreateIdRow = false to not create the row automatically if it does not exist
  * @author Josh
  *
  */
@@ -32,49 +32,49 @@ class JdbcIdGenerator implements IdGenerator {
     private String keyColumn = "KeyName"
     private String idColumn = "NextId"
 
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
-    long getNextId(String keyName){
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    long getNextId(String keyName) {
         return getNextId(keyName, 1)
     }
 
     @SuppressWarnings('SynchronizedMethod')
-    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     synchronized long getNextId(String keyName, long increment) {
         return updateIncrement(keyName, increment)
     }
 
     // Transactional!  The annotation only works on public methods, so this method should only be called by transactional
     // methods.
-    private long updateIncrement(String name, long increment){
+    private long updateIncrement(String name, long increment) {
         //println "updateIncrement $name $increment"
-        Validate.notNull( idColumn, "The idColumn is undefined")
-        Validate.notNull( keyColumn, "The keyColumn is undefined")
-        Validate.notNull( table, "The table is undefined")
-        Validate.notNull( name, "The name is undefined")
-        Validate.notEmpty( name, "The name is empty")
+        Validate.notNull(idColumn, "The idColumn is undefined")
+        Validate.notNull(keyColumn, "The keyColumn is undefined")
+        Validate.notNull(table, "The table is undefined")
+        Validate.notNull(name, "The name is undefined")
+        Validate.notEmpty(name, "The name is empty")
 
-        String query = "Select " + idColumn + " from " + table + " where "+keyColumn+" ='" + name + "'"
+        String query = "Select " + idColumn + " from " + table + " where " + keyColumn + " ='" + name + "'"
         long oid = 0
         try {
             oid = jdbcTemplate.queryForObject(query, Long)
         } catch (EmptyResultDataAccessException erdax) {
-            oid = createRow( table, keyColumn,  idColumn,  name)
+            oid = createRow(table, keyColumn, idColumn, name)
             //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.")
         } catch (BadSqlGrammarException bge) {
             log.error("Looks like the idgen table is not found. This will do a dirty setup for the table for the JdbcIdGenerator for testing apps \
                 but its STRONGLY suggested you set it up properly with something like db-migration \
                 or another tools as not indexes or optimization are taken into account", bge)
-            createTable( table, keyColumn,  idColumn)
-            oid = createRow( table, keyColumn,  idColumn,  name)
+            createTable(table, keyColumn, idColumn)
+            oid = createRow(table, keyColumn, idColumn, name)
             //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
         }
-        if (oid>0) { //found it
-            if(oid < seedValue) {
+        if (oid > 0) { //found it
+            if (oid < seedValue) {
                 oid = seedValue
             }
             long newValue = oid + increment
             jdbcTemplate.update("Update " + table + " set " + idColumn + " = " + newValue + " where " + keyColumn
-                    + " ='" + name + "'")
+                + " ='" + name + "'")
         }
         if (log.isDebugEnabled()) {
             log.debug("Returning id " + oid + " for key '" + name + "'")
@@ -82,24 +82,24 @@ class JdbcIdGenerator implements IdGenerator {
         return oid
     }
 
-    private long createRow(String table, String keyColumn, String idColumn, String name){
-        Long maxId= seedValue
-        String[] tableInfo  = name.split("\\.")
-        if(tableInfo.length>1){
+    private long createRow(String table, String keyColumn, String idColumn, String name) {
+        Long maxId = seedValue
+        String[] tableInfo = name.split("\\.")
+        if (tableInfo.length > 1) {
             try {
-                String maxSql = "select max("+tableInfo[1]+") from " + tableInfo[0]
+                String maxSql = "select max(" + tableInfo[1] + ") from " + tableInfo[0]
                 Long currentMax = jdbcTemplate.queryForObject(maxSql, Long)
-                if(currentMax != null) maxId = currentMax + 1
-            } catch(EmptyResultDataAccessException ex) {
+                if (currentMax != null) maxId = currentMax + 1
+            } catch (EmptyResultDataAccessException ex) {
                 log.debug("No rows yet so just leave it as seed. TableInfo=${tableInfo}")
                 //now rows yet so just leave it as  seed
             }
         }
-        jdbcTemplate.update("insert into "+table+" ("+keyColumn+"," + idColumn + ") "+ "Values('" +name+"'," + maxId + ")" )
+        jdbcTemplate.update("insert into " + table + " (" + keyColumn + "," + idColumn + ") " + "Values('" + name + "'," + maxId + ")")
         return maxId
     }
 
-    private void createTable(String table, String keyColumn, String idColumn){
+    private void createTable(String table, String keyColumn, String idColumn) {
         String query = """
             create table $table
                 (

@@ -48,8 +48,7 @@ public class DefaultGrailsDaoClass extends AbstractInjectableGrailsClass impleme
                 if (datasourceName == null) {
                     datasourceName = DEFAULT_DATA_SOURCE;
                 }
-            }
-            else {
+            } else {
                 datasourceName = "";
             }
         }

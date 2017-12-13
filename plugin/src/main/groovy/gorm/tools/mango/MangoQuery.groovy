@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Value
 @Transactional(readOnly = true)
 class MangoQuery implements MangoQueryApi {
 
-    @Value('${gorm.tools.mango.criteriaKeyName:criteria}') //gets criteria keyword from config, if there is no, then uses 'criteria'
+    @Value('${gorm.tools.mango.criteriaKeyName:criteria}')
+    //gets criteria keyword from config, if there is no, then uses 'criteria'
     String criteriaKeyName
 
     /**
@@ -78,7 +79,7 @@ class MangoQuery implements MangoQueryApi {
             }
         }
 
-        List totalsData = (List)totalList[0]
+        List totalsData = (List) totalList[0]
         Map result = [:]
         sums.eachWithIndex { String name, i ->
             result[name] = totalsData[i]

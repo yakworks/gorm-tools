@@ -11,7 +11,7 @@ import org.springframework.core.ResolvableTypeProvider
 
 /**
  * Base event class for Dao firing
- * @param <D>
+ * @param < D >
  */
 @CompileStatic
 class DaoEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {//extends ApplicationEvent {//
@@ -41,5 +41,5 @@ class DaoEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {//
     /**
      * @return the routing key in the form of "DomainClass.eventMethod", for example "City.afterPersist"
      */
-    String getRoutingKey() { "${entity.class.simpleName}.${eventKey}"}
+    String getRoutingKey() { "${entity.class.simpleName}.${eventKey}" }
 }

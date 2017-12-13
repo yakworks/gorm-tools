@@ -9,6 +9,6 @@ interface MapDataBinder {
 
     public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod)
 
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source )
+    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source)
 
 }

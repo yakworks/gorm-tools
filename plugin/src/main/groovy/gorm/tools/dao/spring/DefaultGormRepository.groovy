@@ -22,7 +22,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
 
     private Class<T> thisDomainClass = T
 
-    DefaultGormRepository() { }
+    DefaultGormRepository() {}
 
     DefaultGormRepository(Class<T> clazz) {
         thisDomainClass = clazz
@@ -37,6 +37,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
     Class<T> getDomainClass() {
         return thisDomainClass
     }
+
     void setDomainClass(Class<T> clazz) {
         thisDomainClass = clazz
     }
@@ -70,7 +71,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
         args['failOnError'] = true
         try {
             if (methodEvents) beforeSave(entity)
-            return ((GormEntity)entity).save(args)
+            return ((GormEntity) entity).save(args)
         }
         catch (ValidationException ve) {
             if (ve instanceof DomainException) throw ve //if this is already fired
@@ -207,7 +208,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
      */
     @Override
     long count() {
-        (Long)GormEnhancer.findStaticApi(domainClass).count()
+        (Long) GormEnhancer.findStaticApi(domainClass).count()
     }
 
     /**
@@ -227,7 +228,7 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
     @CompileDynamic
     @Override
     void delete(ID id) {
-        delete((T)domainClass.load(id))
+        delete((T) domainClass.load(id))
     }
 
     /**
@@ -264,31 +265,31 @@ class DefaultGormRepository<T, ID extends Serializable> implements GormRepositor
     }
 
     protected final void doDelete(T entity, Map args) {
-        if( !(args?.containsKey("flush")) ) args.flush = true
+        if (!(args?.containsKey("flush"))) args.flush = true
         try {
             if (methodEvents) beforeDelete(entity)
-            ((GormEntity)entity).delete(args)
+            ((GormEntity) entity).delete(args)
         }
         catch (DataIntegrityViolationException dae) {
-            String ident = DaoMessage.badge(((GormEntity)entity).ident(), entity)
+            String ident = DaoMessage.badge(((GormEntity) entity).ident(), entity)
             //log.error("dao delete error on ${entity.id} of ${entity.class.name}",dae)
             throw new DomainException(DaoMessage.notDeleted(entity, ident), entity, dae)
         }
     }
 
     //event templates
-    protected void beforeSave(T entity) { }
+    protected void beforeSave(T entity) {}
 
-    protected void beforeDelete(T entity) { }
+    protected void beforeDelete(T entity) {}
 
-    protected void beforeInsertSave(T entity, Map params) { }
+    protected void beforeInsertSave(T entity, Map params) {}
 
-    protected void beforeUpdateSave(T entity, Map params) { }
+    protected void beforeUpdateSave(T entity, Map params) {}
 
-    protected void beforeRemoveSave(T entity, Map params) { }
+    protected void beforeRemoveSave(T entity, Map params) {}
 
     private static GormStaticApi<T> currentGormStaticApi(Class<T> domainClass) {
-        (GormStaticApi<T>)GormEnhancer.findStaticApi(domainClass)
+        (GormStaticApi<T>) GormEnhancer.findStaticApi(domainClass)
     }
 
 }

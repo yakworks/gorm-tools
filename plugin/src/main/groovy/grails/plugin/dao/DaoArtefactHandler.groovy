@@ -27,15 +27,15 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class DaoArtefactHandler extends ArtefactHandlerAdapter {
 
-	static final String TYPE = "Dao"
-	static final String PLUGIN_NAME = "dao"
+    static final String TYPE = "Dao"
+    static final String PLUGIN_NAME = "dao"
 
-	DaoArtefactHandler() {
-		super(TYPE, GrailsDaoClass.class, DefaultGrailsDaoClass.class, DefaultGrailsDaoClass.DAO, false)
-	}
+    DaoArtefactHandler() {
+        super(TYPE, GrailsDaoClass.class, DefaultGrailsDaoClass.class, DefaultGrailsDaoClass.DAO, false)
+    }
 
-	String getPluginName() {
-		return PLUGIN_NAME
-	}
+    String getPluginName() {
+        return PLUGIN_NAME
+    }
 
 }

@@ -13,7 +13,7 @@ class DefaultGormDao<D extends GormEntity> implements GormDao<D> {
         this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormDao.class)
     }
 
-    DefaultGormDao(Class<D> clazz){
+    DefaultGormDao(Class<D> clazz) {
         setDomainClass(clazz)
     }
 

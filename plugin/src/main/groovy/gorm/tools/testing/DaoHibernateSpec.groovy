@@ -10,7 +10,7 @@ import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AssignableTypeFilter
 
-class DaoHibernateSpec extends HibernateSpec implements AutowiredTest  {
+class DaoHibernateSpec extends HibernateSpec implements AutowiredTest {
 
     void setupSpec() {
         DaoTestHelper.grailsApplication = grailsApplication
@@ -24,12 +24,13 @@ class DaoHibernateSpec extends HibernateSpec implements AutowiredTest  {
             domainClasses.each { Class domainClass ->
                 beans = beans << DaoTestHelper.registerDao(domainClass, DaoTestHelper.findDaoClass(domainClass))
             }
-        }
-        else {
+        } else {
             Set<Class> daoClasses = scanDaoClasses(packageName)
             //TODO figureout alternative to find entities if possible.
             new ClasspathEntityScanner().scan(packageToScan).each { Class domainClass ->
-                Class daoClass = daoClasses.find{ it.simpleName == DaoUtil.getDaoBeanName(domainClass) } ?: DefaultGormDao
+                Class daoClass = daoClasses.find {
+                    it.simpleName == DaoUtil.getDaoBeanName(domainClass)
+                } ?: DefaultGormDao
                 beans = beans << DaoTestHelper.registerDao(domainClass, daoClass)
             }
         }

@@ -25,17 +25,17 @@ class DaoPluginHelper {
 
         fastBinder(FastBinder)
 
-        jdbcIdGenerator(JdbcIdGenerator){
+        jdbcIdGenerator(JdbcIdGenerator) {
             jdbcTemplate = ref("jdbcTemplate")
             table = "NewObjectId"
-            keyColumn="KeyName"
-            idColumn="NextId"
+            keyColumn = "KeyName"
+            idColumn = "NextId"
         }
-        idGenerator(BatchIdGenerator){
+        idGenerator(BatchIdGenerator) {
             generator = ref("jdbcIdGenerator")
         }
         //here to set the static in the holder for use in SpringIdGenerator
-        idGeneratorHolder(IdGeneratorHolder){
+        idGeneratorHolder(IdGeneratorHolder) {
             idGenerator = ref("idGenerator")
         }
 
@@ -56,8 +56,8 @@ class DaoPluginHelper {
         Class[] domainClasses = application.domainClasses*.clazz
         domainClasses.each { Class domainClass ->
             String daoName = DaoUtil.getDaoBeanName(domainClass)
-            def hasDao = daoClasses.find { it.propertyName ==  daoName}
-            if(!hasDao){
+            def hasDao = daoClasses.find { it.propertyName == daoName }
+            if (!hasDao) {
                 //println "${daoName}"
                 "${daoName}"(DefaultGormDao, domainClass) { bean ->
                     bean.autowire = true
@@ -79,7 +79,7 @@ class DaoPluginHelper {
         }
     }
 
-    static Closure getDaoBeanClosure(GrailsDaoClass daoClass, beanBuilder = null){
+    static Closure getDaoBeanClosure(GrailsDaoClass daoClass, beanBuilder = null) {
         def lazyInit = daoClass.hasProperty("lazyInit") ? daoClass.getPropertyValue("lazyInit") : true
 
         def bClosure = {

@@ -85,7 +85,7 @@ class DateUtil {
     /**
      * Converts a Date into a string using a specified format.
      *
-     * @param date   a date to covert
+     * @param date a date to covert
      * @param format a date format, by default "MM/dd/yyyy hh:mm:ss"
      * @return a string representation of a Date object or empty string
      */
@@ -105,7 +105,7 @@ class DateUtil {
      *
      * @return the next month
      */
-    static Date getNextMonth(){
+    static Date getNextMonth() {
         return shiftCurrentDateByMonths(1)
     }
 
@@ -120,17 +120,17 @@ class DateUtil {
 
     //looks like those are not used
     @Deprecated
-    static Date getTwoMonthsBack(){
+    static Date getTwoMonthsBack() {
         return shiftCurrentDateByMonths(-2)
     }
 
     @Deprecated
-    static Date getThreeMonthsBack(){
+    static Date getThreeMonthsBack() {
         return shiftCurrentDateByMonths(-3)
     }
 
     @Deprecated
-    static Date getFourMonthsBack(){
+    static Date getFourMonthsBack() {
         return shiftCurrentDateByMonths(-4)
     }
 
@@ -138,10 +138,10 @@ class DateUtil {
      * Shifts the current date by specified number of months
      * and sets current day of month to 1.
      *
-     * @param months  number of months to shift
+     * @param months number of months to shift
      * @return a date which shifted on specified number of months from now
      */
-    static Date shiftCurrentDateByMonths(int months){
+    static Date shiftCurrentDateByMonths(int months) {
         Calendar month = getCurrentCalendarInstance()
         month.set(Calendar.DATE, 1)
         month.add(Calendar.MONTH, months)
@@ -161,7 +161,7 @@ class DateUtil {
         use(TimeCategory) {
             result = date + number.months
         }
-        return  result
+        return result
     }
 
     /**
@@ -179,7 +179,7 @@ class DateUtil {
     static Date getFirstDayOfWeek() {
         Calendar startDate = getCurrentCalendarInstance()
         int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        while (dayOfWeek  != Calendar.MONDAY) {
+        while (dayOfWeek != Calendar.MONDAY) {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
@@ -192,7 +192,7 @@ class DateUtil {
     static Date getLastDayOfWeek() {
         Calendar endDate = getCurrentCalendarInstance()
         int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        while(dayOfWeek  != Calendar.SUNDAY) {
+        while (dayOfWeek != Calendar.SUNDAY) {
             endDate.add(Calendar.DATE, 1)
             dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
         }
@@ -204,7 +204,7 @@ class DateUtil {
     static Date getLastWeekEndDate() {
         Calendar endDate = getCurrentCalendarInstance()
         int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        while(dayOfWeek  != Calendar.SUNDAY) {
+        while (dayOfWeek != Calendar.SUNDAY) {
             endDate.add(Calendar.DATE, -1)
             dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
         }
@@ -216,11 +216,11 @@ class DateUtil {
     static int getLastWeekStartDate() {
         Calendar startDate = getCurrentCalendarInstance()
         int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        while(dayOfWeek != Calendar.SUNDAY) {
+        while (dayOfWeek != Calendar.SUNDAY) {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
-        while(dayOfWeek != Calendar.MONDAY) {
+        while (dayOfWeek != Calendar.MONDAY) {
             startDate.add(Calendar.DATE, -1)
             dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
         }
@@ -256,7 +256,7 @@ class DateUtil {
      * @param periodToPost a string which contains date in format YYYYMM
      * @return the first letter of a specified month
      */
-    static String getMonthLetter(String periodToPost){
+    static String getMonthLetter(String periodToPost) {
         String monthLetter
         if (periodToPost && periodToPost.length() >= 5) {
             String month = periodToPost.substring(4, 6)
@@ -276,7 +276,7 @@ class DateUtil {
      */
     static String getMonthLetterByNum(int monthNumber) {
         String[] monthNames = new DateFormatSymbols().getMonths()
-        monthNumber in (1..12) ? monthNames[monthNumber-1].getAt(0) : '?'
+        monthNumber in (1..12) ? monthNames[monthNumber - 1].getAt(0) : '?'
     }
 
     //didn't find any usage
@@ -353,17 +353,17 @@ class DateUtil {
      * @param date a calendar for which to setup time
      * @return a calendar with time set to 23:59:59
      */
-    static Calendar setTimeBeforeMidnight(Calendar cal){
+    static Calendar setTimeBeforeMidnight(Calendar cal) {
         return setTime(cal, 23, 59, 59)
     }
 
     /**
      * Sets time for a given calendar instance.
      *
-     * @param cal          a calendar instance
-     * @param hours        hours, by default is 0
-     * @param minutes      minutes, by default is 0
-     * @param seconds      seconds, by default is 0
+     * @param cal a calendar instance
+     * @param hours hours, by default is 0
+     * @param minutes minutes, by default is 0
+     * @param seconds seconds, by default is 0
      * @param milliseconds milliseconds, by default is 0
      * @return
      */
@@ -379,14 +379,14 @@ class DateUtil {
     /**
      * Checks if the current day number is equal to specified day number in a given period.
      *
-     * @period     daily, weekly or monthly
-     * @dayNumber  1-30 for monthly, 1-7 for weekly (1 is Sunday)
+     * @period daily , weekly or monthly
+     * @dayNumber 1-30 for monthly, 1-7 for weekly (1 is Sunday)
      * @return is today the date for a specified period and dayInPeriod
      */
     static boolean isTodayTheDate(String period, int dayNumber) {
         int dayOfMonth = new Date().getAt(Calendar.DAY_OF_MONTH)
         int dayOfWeek = new Date().getAt(Calendar.DAY_OF_WEEK)
-        switch ( period.toLowerCase() ) {
+        switch (period.toLowerCase()) {
             case "daily":
                 return true
             case "weekly":
@@ -453,6 +453,7 @@ class DateUtil {
     * @addMonth to move the month for which is the last day is displayed, if 0 - then for the month of the date
     * @return a date which represents the last day of month
     */
+
     static Date getLastDayOfMonth(Date date, int addMonth = 0) {
         Calendar c = Calendar.getInstance()
         c.setTime(date)
@@ -468,6 +469,7 @@ class DateUtil {
     * @addMonth to move the month for which is the first day is displayed, if 0 - then for the month of the date
     * @return a date which represents the first day of month
     */
+
     static Date getFirstDayOfMonth(Date date, int addMonth = 0) {
         Calendar c = Calendar.getInstance()
         c.setTime(date)

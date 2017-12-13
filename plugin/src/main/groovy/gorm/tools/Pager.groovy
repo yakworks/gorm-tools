@@ -104,7 +104,7 @@ class Pager {
      * @return value as integer
      */
     @CompileDynamic
-    static Integer toInteger(Object v){
+    static Integer toInteger(Object v) {
         return v.toInteger()
     }
 
@@ -126,7 +126,7 @@ class Pager {
      * @return total number of pages
      */
     Integer getPageCount() {
-        return Math.ceil((Double)(recordCount / max)).intValue()
+        return Math.ceil((Double) (recordCount / max)).intValue()
     }
 
     /**
@@ -135,16 +135,16 @@ class Pager {
      * @param c closure that should be called for pages
      */
     void eachPage(Closure c) {
-        if(pageCount < 1) return
+        if (pageCount < 1) return
         log.debug "eachPage total pages : pageCount"
 
-        (1..pageCount).each {Integer pageNum ->
+        (1..pageCount).each { Integer pageNum ->
             page = pageNum
             offset = (max * (page - 1))
             try {
                 log.debug "Executing eachPage closer with [max:$max, offset:$offset]"
                 c.call(max, offset)
-            }catch (e) {
+            } catch (e) {
                 log.error "Error encountered while calling closure in eachPage [max:$max, offset:$offset]}]", e
                 throw e
             }
@@ -163,10 +163,10 @@ class Pager {
      */
     Map getJsonData() {
         return [
-            page: this.page,
-            total: this.getPageCount(),
+            page   : this.page,
+            total  : this.getPageCount(),
             records: this.recordCount,
-            rows: data
+            rows   : data
         ]
     }
 

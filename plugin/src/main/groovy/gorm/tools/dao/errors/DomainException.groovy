@@ -5,8 +5,8 @@ import groovy.transform.CompileStatic
 import org.springframework.validation.Errors
 
 /**
-* an extension of the default ValidationException so you can pass the entity and the message map
-*/
+ * an extension of the default ValidationException so you can pass the entity and the message map
+ */
 @CompileStatic
 class DomainException extends ValidationException {
     Object entity //the entity that the error occured on
@@ -26,7 +26,7 @@ class DomainException extends ValidationException {
     DomainException(String msg, Errors e, Throwable cause) {
         super(msg, e)
         initCause(cause)
-        messageMap = [code:"validationException", args:[], defaultMessage:msg]
+        messageMap = [code: "validationException", args: [], defaultMessage: msg]
     }
 
     DomainException(Map msgMap, entity, Errors errors) {

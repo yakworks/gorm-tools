@@ -23,9 +23,9 @@ class ScrollableQuery {
     /**
      * Creates a ScrollableQuery instance with given parameters.
      *
-     * @param mapper     a row mapper
+     * @param mapper a row mapper
      * @param dataSource a datasource
-     * @param fetchSize  the number of result set rows
+     * @param fetchSize the number of result set rows
      */
     ScrollableQuery(RowMapper mapper, DataSource dataSource, int fetchSize = Integer.MIN_VALUE) {
         this.dataSource = dataSource
@@ -36,7 +36,7 @@ class ScrollableQuery {
     /**
      * Executes the query and calls the closure for each row.
      *
-     * @param query   an sql query which represents records
+     * @param query an sql query which represents records
      * @param closure a closure which is called for each row
      */
     void eachRow(String query, Closure closure) {
@@ -59,11 +59,10 @@ class ScrollableQuery {
      *  eachBatch(sqlQuery, 10) { List batch ->
      *      println batch
      *      println batch.size()
-     *  }
-     *
-     * @param query     an sql query which represents records
+     *}*
+     * @param query an sql query which represents records
      * @param batchSize number of records in a single batch
-     * @param closure   a closure which is called for each batch
+     * @param closure a closure which is called for each batch
      */
     void eachBatch(String query, int batchSize, Closure cl) {
         List batch = []

@@ -8,13 +8,13 @@ import org.grails.core.artefact.DomainClassArtefactHandler
 @CompileStatic
 class DaoDomainClassTraitInjector implements TraitInjector {
 
-	@Override
-	Class getTrait() {
-		DaoEntity
-	}
+    @Override
+    Class getTrait() {
+        DaoEntity
+    }
 
-	@Override
-	String[] getArtefactTypes() {
-		[DomainClassArtefactHandler.TYPE] as String[]
-	}
+    @Override
+    String[] getArtefactTypes() {
+        [DomainClassArtefactHandler.TYPE] as String[]
+    }
 }

@@ -5,9 +5,9 @@ import grails.util.Holders
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.model.MappingContext
 
 //import org.grails.core.artefact.DomainClassArtefactHandler
-import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.orm.hibernate.cfg.Mapping
 
@@ -58,8 +58,8 @@ class GormMetaUtils {
      * @param name an entity name to search for
      * @return The entity or null
      */
-    static PersistentEntity findPersistentEntity(String name){
-        if(name.indexOf('.') == -1){
+    static PersistentEntity findPersistentEntity(String name) {
+        if (name.indexOf('.') == -1) {
             String propertyName = GrailsNameUtils.getPropertyName(name)
             return getMappingContext().persistentEntities.find { PersistentEntity entity ->
                 entity.decapitalizedName == propertyName

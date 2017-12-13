@@ -17,26 +17,26 @@ class MangoBuilder {
     //DetachedCriteria criteria
 
     static final Map<String, String> compareOps = [
-        '$gt'     : 'gt',
-        '$eq'     : 'eq',
-        '$gte'    : 'ge',
-        '$lt'     : 'lt',
-        '$lte'    : 'le',
-        '$ne'     : 'ne',
-        '$not'    : 'not',
-        '$ilike'  : 'ilike',
-        '$like'   : 'like',
-        '$in'     : 'in',
-        '$inList' : 'inList'
+        '$gt'    : 'gt',
+        '$eq'    : 'eq',
+        '$gte'   : 'ge',
+        '$lt'    : 'lt',
+        '$lte'   : 'le',
+        '$ne'    : 'ne',
+        '$not'   : 'not',
+        '$ilike' : 'ilike',
+        '$like'  : 'like',
+        '$in'    : 'in',
+        '$inList': 'inList'
     ]
 
     static final Map<String, String> propertyOps = [
-        '$gtf'    : 'gtProperty',
-        '$gtef'   : 'geProperty',
-        '$ltf'    : 'ltProperty',
-        '$ltef'   : 'leProperty',
-        '$eqf'    : 'eqProperty',
-        '$nef'    : 'neProperty'
+        '$gtf' : 'gtProperty',
+        '$gtef': 'geProperty',
+        '$ltf' : 'ltProperty',
+        '$ltef': 'leProperty',
+        '$eqf' : 'eqProperty',
+        '$nef' : 'neProperty'
     ]
 
     static final Map<String, String> overrideOps = [
@@ -71,7 +71,7 @@ class MangoBuilder {
 
     @CompileDynamic
     static DetachedCriteria build(DetachedCriteria criteria, Map map, Closure callable = null) {
-        DetachedCriteria newCriteria = (DetachedCriteria)criteria.clone()
+        DetachedCriteria newCriteria = (DetachedCriteria) criteria.clone()
         applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
         if (callable) newCriteria.with callable
         return newCriteria
@@ -123,7 +123,7 @@ class MangoBuilder {
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
-        if(prop instanceof Association) {
+        if (prop instanceof Association) {
             criteria."${field}" {
                 //the delegate is the DetachedAssocationCriteria. See methodMissing in AbstractDetachedCriteria
                 applyMapOrList((DetachedCriteria) delegate, fieldVal)
@@ -132,13 +132,11 @@ class MangoBuilder {
 
         }
         // if field ends in Id then try removing the Id postfix and see if its a property
-        else if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))){
+        else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
-        }
-        else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List)) {
+        } else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List)) {
             criteria.eq(field, toType(criteria, field, fieldVal))
-        }
-        else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
+        } else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
             //could be 1 or more too
             //for example field=amount and fieldVal=['$lt': 100, '$gt':200]
             for (String key : (fieldVal as Map).keySet()) {
@@ -160,7 +158,7 @@ class MangoBuilder {
 
                 op = compareOps[key]
                 if (op) {
-                    if (opArg == null){
+                    if (opArg == null) {
                         criteria.isNull(field)
                         continue
                     }
@@ -194,7 +192,7 @@ class MangoBuilder {
     static DetachedCriteria order(DetachedCriteria criteria, Object sort) {
         if (sort instanceof String) return criteria.order(sort as String)
         DetachedCriteria result
-        (sort as Map).each {k, v->
+        (sort as Map).each { k, v ->
             result = criteria.order(k.toString(), v.toString())
         }
         return result
@@ -203,7 +201,7 @@ class MangoBuilder {
     @CompileDynamic
     static DetachedCriteria quickSearch(DetachedCriteria criteria, String value) {
         Map result = MangoTidyMap.tidy(['$or': criteria.targetClass.quickSearchFields.collectEntries {
-            [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value+"%" : value)]
+            [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value + "%" : value)]
         }])
 
         return applyMap(criteria, result)
@@ -213,7 +211,7 @@ class MangoBuilder {
     static DetachedCriteria notIn(DetachedCriteria criteria, String propertyName, List params) {
         Map val = [:]
         val[propertyName] = ['$in': params]
-        return criteria.notIn(propertyName, ( build(criteria.targetClass, val)."$propertyName") as QueryableCriteria)
+        return criteria.notIn(propertyName, (build(criteria.targetClass, val)."$propertyName") as QueryableCriteria)
     }
 
     /**
@@ -265,8 +263,8 @@ class MangoBuilder {
     }
 
     static Object toType(DetachedCriteria criteria, String propertyName, Object value) {
-        if (value instanceof List){
-            return value.collect{toType(criteria, propertyName, it)}
+        if (value instanceof List) {
+            return value.collect { toType(criteria, propertyName, it) }
         }
         PersistentProperty prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
         Class typeToConvertTo = prop?.getType()
@@ -275,17 +273,15 @@ class MangoBuilder {
 
         Object valueToAssign = value
 
-        if (valueToAssign instanceof String){
-            if(String.isAssignableFrom(typeToConvertTo)){
+        if (valueToAssign instanceof String) {
+            if (String.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = value
-            }
-            else if (Number.isAssignableFrom(typeToConvertTo)) {
+            } else if (Number.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = (value as String).asType(typeToConvertTo)
             } else if (Date.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = DateUtil.parseJsonDate(value as String)
             }
-        }
-        else {
+        } else {
             valueToAssign = valueToAssign.asType(typeToConvertTo)
         }
 

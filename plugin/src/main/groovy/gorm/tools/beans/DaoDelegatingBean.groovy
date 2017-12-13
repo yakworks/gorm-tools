@@ -22,7 +22,7 @@ class DaoDelegatingBean extends DelegatingBean {
     Object propertyMissing(String name) {
         try {
             return super.propertyMissing(name)
-        }catch (MissingPropertyException e) {
+        } catch (MissingPropertyException e) {
             String method
             if (name.startsWith("has") || name.startsWith("is")) {
                 method = name
@@ -32,7 +32,7 @@ class DaoDelegatingBean extends DelegatingBean {
 
             try {
                 return dao.invokeMethod(method, target)
-            }catch (MissingMethodException me) {
+            } catch (MissingMethodException me) {
                 //dao does not have that method either, so throw back original MissingPropertyException exception
                 throw e
             }
@@ -42,10 +42,10 @@ class DaoDelegatingBean extends DelegatingBean {
     Object methodMissing(String name, args) {
         try {
             return target.invokeMethod(name, args)
-        }catch (MissingMethodException e) {
+        } catch (MissingMethodException e) {
             try {
                 dao.invokeMethod(name, args)
-            }catch (MissingMethodException me) {
+            } catch (MissingMethodException me) {
                 //if dao does not have the method either, throw back original exception
                 throw e
             }

@@ -19,7 +19,7 @@ trait DaoEntity<D extends GormEntity<D>> {
      * @return The dao
      */
     static DaoApi<D> getDao() {
-        if(!cachedDao) {
+        if (!cachedDao) {
             GrailsApplication grailsApplication = Holders.grailsApplication
             String domainName = GrailsNameUtils.getPropertyName(this.name)
             String daoName = "${domainName}Dao"

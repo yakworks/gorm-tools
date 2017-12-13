@@ -49,9 +49,9 @@ class MapFlattener {
         }
 
         if (groovyJsonObject instanceof Map) {
-            keyValues.putAll(transformGroovyJsonMap((Map)groovyJsonObject, ""))
+            keyValues.putAll(transformGroovyJsonMap((Map) groovyJsonObject, ""))
         } else if (groovyJsonObject instanceof List) {
-            keyValues.putAll(transformJsonArray((List)groovyJsonObject, ""))
+            keyValues.putAll(transformJsonArray((List) groovyJsonObject, ""))
         }
 
         return keyValues

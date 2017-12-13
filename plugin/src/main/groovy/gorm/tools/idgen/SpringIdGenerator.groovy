@@ -31,13 +31,13 @@ class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configu
     @Override
     void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
         //this.params = params;
-        segmentValue = params.getProperty( TABLE ) + ".id "
+        segmentValue = params.getProperty(TABLE) + ".id "
         showProperties("SpringIdGenerator configure ")
     }
 
     private void showProperties(String prefix) {
-        if(log.isDebugEnabled()) {
-            log.debug(prefix + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator==null?"null! ":"not null. "))
+        if (log.isDebugEnabled()) {
+            log.debug(prefix + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator == null ? "null! " : "not null. "))
         }
     }
 

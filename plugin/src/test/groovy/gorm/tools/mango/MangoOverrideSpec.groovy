@@ -1,7 +1,10 @@
 package gorm.tools.mango
 
+import gorm.tools.dao.GormDao
 import gorm.tools.testing.DaoDataTest
+import grails.artefact.Artefact
 import grails.gorm.DetachedCriteria
+import grails.gorm.transactions.Transactional
 import grails.persistence.Entity
 import spock.lang.Specification
 
@@ -9,14 +12,13 @@ class MangoOverrideSpec extends Specification implements DaoDataTest {
 
     void setup() {
         mockDomain(City)
-        defineBeans({ mangoQuery(NewMangoQuery) })
     }
 
     void testMangoOverride() {
         setup:
         10.times {
-            City city = new City(id: it, name: "Name#$it")
-            city.save(failOnError: true)
+            City City = new City(id: it, name: "Name#$it")
+            City.save(failOnError: true)
         }
 
         when:
@@ -46,3 +48,8 @@ class NewMangoQuery implements MangoQueryApi {
     }
 }
 
+@Artefact("Dao")
+@Transactional
+class CityDao implements GormDao<City> {
+    MangoQueryApi getMangoQuery(){ new NewMangoQuery()}
+}

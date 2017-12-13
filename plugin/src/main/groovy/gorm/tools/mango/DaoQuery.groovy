@@ -21,7 +21,7 @@ trait DaoQuery<D extends GormEntity> {
      * @return Detached criteria build based on mango language params and criteria closure
      */
     DetachedCriteria buildCriteria(Map params = [:], Closure closure = null) {
-        mangoQuery.buildCriteria(getDomainClass(), params, closure)
+        getMangoQuery().buildCriteria(getDomainClass(), params, closure)
     }
 
     /**
@@ -32,7 +32,7 @@ trait DaoQuery<D extends GormEntity> {
      * @return query of entities restricted by mango params
      */
     List query(Map params = [:], Closure closure = null) {
-        mangoQuery.query(getDomainClass(), params, closure)
+        getMangoQuery().query(getDomainClass(), params, closure)
     }
 
 }

@@ -316,8 +316,8 @@ see docs for [DetachedCriteria][DetachedCriteria]
 ```
 returns list of entities with pagination. For pagination take a look at [Pager][Pager]
 
-If one need to override mango bean for dao it can be achieved by creating new `mangoQuery` bean, it should
-implement [MangoQueryApi.trait][MangoQueryApi] so it can be autowired
+If one need to override mango bean for a certain dao it can be achieved by implementing `getMangoQuery()` method that should
+return instance of class that implements [MangoQueryApi.trait][MangoQueryApi]
  
 #### Build Mango criteria
 

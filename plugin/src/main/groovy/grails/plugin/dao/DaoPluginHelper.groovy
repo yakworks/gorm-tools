@@ -5,7 +5,7 @@ import gorm.tools.async.GparsBatchService
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.events.DaoEventPublisher
-import gorm.tools.databinding.FastBinder
+import gorm.tools.databinding.GormMapBinder
 import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
@@ -23,7 +23,7 @@ class DaoPluginHelper {
     static Closure doWithSpring = {
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
-        fastBinder(FastBinder)
+        gormMapBinder(GormMapBinder)
 
         jdbcIdGenerator(JdbcIdGenerator) {
             jdbcTemplate = ref("jdbcTemplate")

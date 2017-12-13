@@ -4,7 +4,7 @@ import gorm.tools.TrxService
 import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.events.DaoEventPublisher
-import gorm.tools.databinding.FastBinder
+import gorm.tools.databinding.GormMapBinder
 import gorm.tools.mango.MangoQuery
 import grails.core.GrailsApplication
 import grails.plugin.dao.DaoArtefactHandler
@@ -21,7 +21,7 @@ class DaoTestHelper {
 
     static Closure commonBeans() {
         return {
-            fastBinder(FastBinder)
+            gormMapBinder(GormMapBinder)
             daoEventPublisher(DaoEventPublisher)
             daoUtilBean(DaoUtil)
             trxService(TrxService)

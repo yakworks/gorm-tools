@@ -9,10 +9,10 @@ import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Specification
 
 class FastBinderUnitSpec extends Specification implements DataTest {
-    FastBinder binder
+    GormMapBinder binder
 
     void setup() {
-        binder = new FastBinder()
+        binder = new GormMapBinder()
     }
 
     Class[] getDomainClassesToMock() {

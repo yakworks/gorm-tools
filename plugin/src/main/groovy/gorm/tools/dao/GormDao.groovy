@@ -4,7 +4,7 @@ import gorm.tools.TrxService
 import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.DomainNotFoundException
 import gorm.tools.dao.events.DaoEventPublisher
-import gorm.tools.databinding.FastBinder
+import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.DaoQuery
 import grails.gorm.transactions.TransactionService
 import grails.validation.ValidationException
@@ -18,7 +18,6 @@ import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
- *
  * A trait that turns a class into a DAO
  *
  * @author Joshua Burnett
@@ -27,7 +26,7 @@ import org.springframework.dao.DataIntegrityViolationException
 trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D> {
 
     @Autowired
-    FastBinder dataBinder
+    MapBinder mapBinder
     @Autowired
     DaoEventPublisher daoEventPublisher
     @Autowired
@@ -112,7 +111,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D> {
 
     @Override
     void bind(D entity, Map row, String bindMethod = null) {
-        getDataBinder().bind(entity, row, bindMethod)
+        getMapBinder().bind(entity, row, bindMethod)
     }
 
     /**

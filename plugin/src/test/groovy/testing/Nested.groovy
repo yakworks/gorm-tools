@@ -3,7 +3,7 @@ package testing
 import grails.persistence.Entity
 
 @Entity
-class Nested{
+class Nested {
     String name
     BigDecimal value
 

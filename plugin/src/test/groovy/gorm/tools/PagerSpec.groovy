@@ -6,14 +6,14 @@ import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 
-class PagerSpec extends Specification implements AutowiredTest, DataTest{
+class PagerSpec extends Specification implements AutowiredTest, DataTest {
 
     void setupSpec() {
         //mockDomain Person
         mockDomains ClassB
     }
 
-    def "test default values"(){
+    def "test default values"() {
         when:
         Pager pager = new Pager()
 
@@ -25,9 +25,9 @@ class PagerSpec extends Specification implements AutowiredTest, DataTest{
 
     }
 
-    def "test setting params"(){
+    def "test setting params"() {
         when:
-        Pager pager = new Pager([page:3,max: 20])
+        Pager pager = new Pager([page: 3, max: 20])
 
         then:
         pager.max == 20
@@ -48,12 +48,12 @@ class PagerSpec extends Specification implements AutowiredTest, DataTest{
         jsonData.rows == 40..50 as List
     }
 
-    def "test setupData with fields"(){
+    def "test setupData with fields"() {
         setup:
         Pager pager = new Pager()
-        50.times{
+        50.times {
             new ClassB(
-                    value: 5*it
+                value: 5 * it
             ).save(failOnError: true)
         }
         when:
@@ -63,7 +63,7 @@ class PagerSpec extends Specification implements AutowiredTest, DataTest{
         jsonData.page == 1
         jsonData.records == 50
         jsonData.total == 5
-        jsonData.rows == (0..9 as List).collect{[id:it+1, value: 5*(it), version: 0]}
+        jsonData.rows == (0..9 as List).collect { [id: it + 1, value: 5 * (it), version: 0] }
     }
 
     def "test eachPage"() {
@@ -75,7 +75,7 @@ class PagerSpec extends Specification implements AutowiredTest, DataTest{
 
         when:
         paginator.eachPage { def max, def offset ->
-            pages << [max:max, offset:offset]
+            pages << [max: max, offset: offset]
         }
 
         then:
@@ -94,6 +94,7 @@ class ClassB {
     int value
 
     int version = 0
+
     def getDao() {
         new DefaultGormDao(ClassB)
     }

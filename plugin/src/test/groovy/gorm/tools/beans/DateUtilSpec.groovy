@@ -64,10 +64,10 @@ class DateUtilSpec extends Specification {
 
         then:
         DateUtil.isTodayTheDate('monthly', dayOfMonth)
-        !DateUtil.isTodayTheDate('monthly', dayOfMonth-1)
+        !DateUtil.isTodayTheDate('monthly', dayOfMonth - 1)
 
         DateUtil.isTodayTheDate('weekly', dayOfWeek)
-        !DateUtil.isTodayTheDate('weekly', dayOfWeek-1)
+        !DateUtil.isTodayTheDate('weekly', dayOfWeek - 1)
 
         DateUtil.isTodayTheDate('daily', 122)
         !DateUtil.isTodayTheDate('bzzz', dayOfWeek)
@@ -177,10 +177,10 @@ class DateUtilSpec extends Specification {
         year == DateUtil.getYearOf(new SimpleDateFormat(dateFormat).parse(date))
 
         where:
-        year   | dateFormat     | date
-        2017   | "yyyy-MM-dd"   | "2017-10-19"
-        2016   | "MM/dd/yyyy"   | "10/19/2016"
-        2015   | "yyMMddHHmmss" | "151019105000"
+        year | dateFormat     | date
+        2017 | "yyyy-MM-dd"   | "2017-10-19"
+        2016 | "MM/dd/yyyy"   | "10/19/2016"
+        2015 | "yyMMddHHmmss" | "151019105000"
     }
 
     void "test shiftCurrentDateByMonths"() {
@@ -209,21 +209,21 @@ class DateUtilSpec extends Specification {
         monthLetter == DateUtil.getMonthLetter(date)
 
         where:
-        monthLetter   | date
-        "J"           | "201701"
-        "F"           | "201702"
-        "M"           | "201703"
-        "A"           | "201704"
-        "M"           | "201705"
-        "J"           | "201706"
-        "J"           | "201707"
-        "A"           | "201708"
-        "S"           | "201709"
-        "O"           | "201710"
-        "N"           | "201711"
-        "D"           | "201712"
-        "?"           | "201713"
-        "?"           | ""
+        monthLetter | date
+        "J"         | "201701"
+        "F"         | "201702"
+        "M"         | "201703"
+        "A"         | "201704"
+        "M"         | "201705"
+        "J"         | "201706"
+        "J"         | "201707"
+        "A"         | "201708"
+        "S"         | "201709"
+        "O"         | "201710"
+        "N"         | "201711"
+        "D"         | "201712"
+        "?"         | "201713"
+        "?"         | ""
     }
 
     void "test getMonthLetterByNum"() {
@@ -231,21 +231,21 @@ class DateUtilSpec extends Specification {
         monthLetter == DateUtil.getMonthLetterByNum(monthNumber)
 
         where:
-        monthLetter   | monthNumber
-        "J"           | 1
-        "F"           | 2
-        "M"           | 3
-        "A"           | 4
-        "M"           | 5
-        "J"           | 6
-        "J"           | 7
-        "A"           | 8
-        "S"           | 9
-        "O"           | 10
-        "N"           | 11
-        "D"           | 12
-        "?"           | 13
-        "?"           | -1
+        monthLetter | monthNumber
+        "J"         | 1
+        "F"         | 2
+        "M"         | 3
+        "A"         | 4
+        "M"         | 5
+        "J"         | 6
+        "J"         | 7
+        "A"         | 8
+        "S"         | 9
+        "O"         | 10
+        "N"         | 11
+        "D"         | 12
+        "?"         | 13
+        "?"         | -1
     }
 
     void "test setTime"() {

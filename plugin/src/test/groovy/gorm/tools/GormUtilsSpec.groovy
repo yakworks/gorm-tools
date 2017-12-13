@@ -4,7 +4,7 @@ import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
 import spock.lang.Specification
 
-class GormUtilsSpec extends Specification implements DataTest{
+class GormUtilsSpec extends Specification implements DataTest {
 
     void setupSpec() {
         //mockDomain Person
@@ -14,10 +14,10 @@ class GormUtilsSpec extends Specification implements DataTest{
     void "test copyDomain"() {
         setup:
         Address address = new Address(street: 'street1', city: 'city1').save()
-        Person person = new Person(id: 0, version: 0, createdBy: 'test0', createdDate:'10-22-2017',
-                editedBy: 'test0', editedDate: '10-22-2017', num:'000', name: 'Joey', age: 35, address: address).save()
+        Person person = new Person(id: 0, version: 0, createdBy: 'test0', createdDate: '10-22-2017',
+            editedBy: 'test0', editedDate: '10-22-2017', num: '000', name: 'Joey', age: 35, address: address).save()
         Person person2 = new Person(id: 1, version: 1, createdBy: 'test1', createdDate: '10-23-2017',
-                editedBy: 'test1', editedDate: '10-23-2017', num:'111').save()
+            editedBy: 'test1', editedDate: '10-23-2017', num: '111').save()
 
         when:
         Person copy = GormUtils.copyDomain(person2, person)

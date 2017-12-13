@@ -7,11 +7,11 @@ import testing.Location
 import testing.Nested
 import testing.Org
 
-class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
+class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
-    List<Class> getDomainClasses() { [Org,Location,Nested]}
+    List<Class> getDomainClasses() { [Org, Location, Nested] }
 
-    static DetachedCriteria build(map, Closure closure = null){
+    static DetachedCriteria build(map, Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
         return MangoBuilder.build(Org, map, closure)
     }
@@ -35,7 +35,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
 
     def "test detached isActive"() {
         when:
-        List res = build([isActive:true]).list()
+        List res = build([isActive: true]).list()
 
         then:
         res.size() == 5
@@ -61,7 +61,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
     def "test combined"() {
         when:
 
-        List res = build(([amount: [1*1.34, 2*1.34, 3*1.34, 4*1.34], isActive:true])).list()
+        List res = build(([amount: [1 * 1.34, 2 * 1.34, 3 * 1.34, 4 * 1.34], isActive: true])).list()
 
         then:
         res.size() == 2
@@ -77,7 +77,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         res.size() == 1
 
         when:
-        res = build(([amount: ['$gt':6.0]])).list()
+        res = build(([amount: ['$gt': 6.0]])).list()
 
         then:
         res.size() == 5
@@ -103,7 +103,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
 
-        List res = build(([id: ['$gt':4]])).list()
+        List res = build(([id: ['$gt': 4]])).list()
 
         then:
         res.size() == 6
@@ -113,7 +113,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
 
-        List res = build(([id: ['$ne':4]])).list()
+        List res = build(([id: ['$ne': 4]])).list()
 
         then:
         res.size() == 9
@@ -122,7 +122,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
     def "test nested"() {
         when:
 
-        List res = build((["location.id": ['$eq':6]])).list()
+        List res = build((["location.id": ['$eq': 6]])).list()
 
         then:
         res.size() == 1
@@ -157,7 +157,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
     def "test nestedId"() {
         when:
 
-        List res = build((["locationId": ['$eq':6]])).list()
+        List res = build((["locationId": ['$eq': 6]])).list()
 
         then:
         res.size() == 1
@@ -168,9 +168,9 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
         List res = build([
-            '$or':[
+            '$or': [
                 [name: "Name#7"],
-                [id:2]
+                [id: 2]
             ]
         ]).list()
 
@@ -182,7 +182,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
 
-        List res = build(([amount: ['$nin':[1*1.34, 2*1.34, 3*1.34, 4*1.34]]])).list()
+        List res = build(([amount: ['$nin': [1 * 1.34, 2 * 1.34, 3 * 1.34, 4 * 1.34]]])).list()
 
         then:
         res.size() == 6
@@ -192,7 +192,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
 
-        List res = build(([id: [1,2,3,4]])).list()
+        List res = build(([id: [1, 2, 3, 4]])).list()
 
         then:
         res.size() == 4
@@ -202,7 +202,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
 
-        List res = build((['$not': [[id:['$eq':1]]]])).list()
+        List res = build((['$not': [[id: ['$eq': 1]]]])).list()
 
         then:
         res.size() == 9
@@ -213,7 +213,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
 
-        List res = build(([amount: ['$between':[1*1.34, 4*1.34]]])).list()
+        List res = build(([amount: ['$between': [1 * 1.34, 4 * 1.34]]])).list()
 
         then:
         res.size() == 4
@@ -239,31 +239,31 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
     def "test fields comparison"() {
         when:
 
-        List res = build(([amount: ['$gtef':"amount2"]])).list()
+        List res = build(([amount: ['$gtef': "amount2"]])).list()
 
         then:
         res.size() == 5
 
         when:
-        res = build(([amount: ['$gtf':"amount2"]])).list()
+        res = build(([amount: ['$gtf': "amount2"]])).list()
 
         then:
         res.size() == 4
 
         when:
-        res = build(([amount: ['$ltf':"amount2"]])).list()
+        res = build(([amount: ['$ltf': "amount2"]])).list()
 
         then:
         res.size() == 5
 
         when:
-        res = build(([amount: ['$eqf':"amount2"]])).list()
+        res = build(([amount: ['$eqf': "amount2"]])).list()
 
         then:
         res.size() == 1
 
         when:
-        res = build(([amount: ['$nef':"amount2"]])).list()
+        res = build(([amount: ['$nef': "amount2"]])).list()
 
         then:
         res.size() == 9
@@ -297,7 +297,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
         when:
 
 
-        List res = build([name: "Name#%"]){gt "id", 5}.list()
+        List res = build([name: "Name#%"]) { gt "id", 5 }.list()
 
         then:
         res.size() == 5
@@ -314,7 +314,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
 
     def "test with `or` on one level"() {
         when:
-        List res = build((['$or': [["location.id": 5 ], ["name": "Name#1", "location.id": 4 ]]])).list()
+        List res = build((['$or': [["location.id": 5], ["name": "Name#1", "location.id": 4]]])).list()
 
         then:
         res.size() == 1
@@ -322,7 +322,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest{
 
     def "test order"() {
         when:
-        List res = build(([id: [1,2,3,4], '$sort':[id: "desc"]])).list()
+        List res = build(([id: [1, 2, 3, 4], '$sort': [id: "desc"]])).list()
 
         then:
         res.size() == 4

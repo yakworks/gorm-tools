@@ -4,7 +4,6 @@ import gorm.tools.dao.errors.DomainException
 import gorm.tools.dao.errors.EmptyErrors
 import grails.persistence.Entity
 import org.junit.Test
-import org.springframework.validation.Errors
 
 class DaoUtilsTests {
 

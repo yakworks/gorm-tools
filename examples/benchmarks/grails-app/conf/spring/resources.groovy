@@ -12,12 +12,12 @@ beans = {
     (1..1).each { eid ->
         lang.groovy(
             id: "cityDaoSpringEventsBean$eid",
-            'script-source': "file:scripts/CityDaoSpringEventsBean.groovy",
+            'script-source': "file:resources/refreshable-beans/CityDaoSpringEventsBean.groovy",
             'refresh-check-delay': 1000
         )
     }
 
-    File scriptsDir = new File("scripts")
+    File scriptsDir = new File("resources/refreshable-beans")
     assert scriptsDir.exists()
 
     int listenerCount = application.config.benchmark.eventListenerCount
@@ -26,14 +26,14 @@ beans = {
     if (listenerCount > 0) {
         scriptsDir.eachFileMatch(FileType.FILES, ~/.*Listener\.groovy/) { File plugin ->
             String beanName = GrailsNameUtils.getPropertyName(plugin.name.replace('.groovy', ''))
-            lang.groovy(id: beanName, 'script-source': "file:scripts/${plugin.name}", 'refresh-check-delay': 1000)
+            lang.groovy(id: beanName, 'script-source': "file:resources/refreshable-beans/${plugin.name}", 'refresh-check-delay': 1000)
             println "refreshable bean $beanName created"
         }
 
         if (listenerCount > 1) {
             println "adding extra listeners to benchmark load"
             (2..listenerCount).each { eid ->
-                lang.groovy(id: "dummyListenerBean$eid", 'script-source': "file:scripts/DummyListenerBean.groovy", 'refresh-check-delay': 1000)
+                lang.groovy(id: "dummyListenerBean$eid", 'script-source': "file:resources/refreshable-beans/DummyListenerBean.groovy", 'refresh-check-delay': 1000)
             }
         }
     } else {
@@ -46,7 +46,7 @@ beans = {
         (1..subCount).each { eid ->
             scriptsDir.eachFileMatch(FileType.FILES, ~/.*Subscriber\.groovy/) { File plugin ->
                 String beanName = GrailsNameUtils.getPropertyName(plugin.name.replace('.groovy', '')) + "$eid"
-                lang.groovy(id: beanName, 'script-source': "file:scripts/${plugin.name}", 'refresh-check-delay': 1000) {
+                lang.groovy(id: beanName, 'script-source': "file:resources/refreshable-beans/${plugin.name}", 'refresh-check-delay': 1000) {
                     lang.property(name: 'subnum', value: eid)
                 }
                 println "refreshable bean $beanName created"

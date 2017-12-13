@@ -5,6 +5,7 @@ import gorm.tools.dao.DaoUtil
 import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.events.DaoEventPublisher
 import gorm.tools.databinding.FastBinder
+import gorm.tools.mango.MangoQuery
 import grails.core.GrailsApplication
 import grails.plugin.dao.DaoArtefactHandler
 import org.springframework.util.ClassUtils
@@ -24,6 +25,7 @@ class DaoTestHelper {
             daoEventPublisher(DaoEventPublisher)
             daoUtilBean(DaoUtil)
             trxService(TrxService)
+            mangoQuery(MangoQuery)
         }
     }
 

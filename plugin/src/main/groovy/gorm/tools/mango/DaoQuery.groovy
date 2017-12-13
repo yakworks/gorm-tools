@@ -1,12 +1,9 @@
 package gorm.tools.mango
 
 import grails.gorm.DetachedCriteria
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.beans.factory.annotation.Autowire
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 
 @CompileStatic
 trait DaoQuery<D extends GormEntity> {

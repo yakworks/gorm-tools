@@ -14,7 +14,6 @@ import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
-import grails.util.GrailsNameUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
 @SuppressWarnings(['NoDef'])

@@ -131,7 +131,7 @@ class MangoBuilder {
             }
 
         }
-        // if field ends in Id then try removing prefix and see if its a property
+        // if field ends in Id then try removing the Id postfix and see if its a property
         else if(field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))){
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
         }
@@ -213,7 +213,7 @@ class MangoBuilder {
     static DetachedCriteria notIn(DetachedCriteria criteria, String propertyName, List params) {
         Map val = [:]
         val[propertyName] = ['$in': params]
-        return criteria.notIn(propertyName, ( MangoBuilder.build(criteria.targetClass, val)."$propertyName") as QueryableCriteria)
+        return criteria.notIn(propertyName, ( build(criteria.targetClass, val)."$propertyName") as QueryableCriteria)
     }
 
     /**
@@ -221,7 +221,6 @@ class MangoBuilder {
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    @CompileDynamic
     static DetachedCriteria and(DetachedCriteria criteria, List andList) {
         criteria.junctions << new Query.Conjunction()
         handleJunction(criteria, andList)
@@ -233,7 +232,6 @@ class MangoBuilder {
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    @CompileDynamic
     static DetachedCriteria or(DetachedCriteria criteria, List orList) {
         criteria.junctions << new Query.Disjunction()
         handleJunction(criteria, orList)
@@ -245,7 +243,6 @@ class MangoBuilder {
      * @param list junctions list of condition maps
      * @return This criterion
      */
-    @CompileDynamic
     static DetachedCriteria not(DetachedCriteria criteria, List notList) {
         criteria.junctions << new Query.Negation()
         handleJunction(criteria, notList)
@@ -257,7 +254,6 @@ class MangoBuilder {
      * The add method checks to see if there is an active junction we are in.
      * @param mangoMap
      */
-    @CompileDynamic
     static void handleJunction(DetachedCriteria criteria, List list) {
         try {
             applyMapOrList(criteria, list)

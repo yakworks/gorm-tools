@@ -30,7 +30,6 @@ class DaoUtil implements ApplicationContextAware {
         applicationEventPublisher = (ApplicationEventPublisher)ctx
     }
 
-
     static String getDaoClassName(Class domainClass) {
         return "${domainClass.name}Dao"
     }

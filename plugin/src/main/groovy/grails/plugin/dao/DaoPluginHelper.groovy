@@ -9,11 +9,11 @@ import gorm.tools.databinding.FastBinder
 import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
+import gorm.tools.mango.MangoQuery
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
-import grails.util.GrailsNameUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
 @SuppressWarnings(['NoDef'])
@@ -39,6 +39,7 @@ class DaoPluginHelper {
             idGenerator = ref("idGenerator")
         }
 
+        mangoQuery(MangoQuery)
         daoEventPublisher(DaoEventPublisher)
         daoUtilBean(DaoUtil) //this is here just so the app ctx can get picked up and set on DaoUtils
 

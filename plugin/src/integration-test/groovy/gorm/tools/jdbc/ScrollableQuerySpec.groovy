@@ -25,7 +25,7 @@ class ScrollableQuerySpec extends Specification {
 
         when:
         List values = []
-        scrollableQuery.eachRow("select * from ScrollableQueryTest") { row -> values.add(row.value)  }
+        scrollableQuery.eachRow("select * from ScrollableQueryTest") { row -> values.add(row.value) }
 
         then:
         values.size() == 2
@@ -55,7 +55,7 @@ class ScrollableQuerySpec extends Specification {
         setup:
         ScrollableQuery scrollableQuery = new ScrollableQuery(new ColumnMapRowMapper(), dataSource, 50)
         (0..2).each { insertTestRecord(it, 'test') }
-        (3..5).each { insertTestRecord(it, 'test1')}
+        (3..5).each { insertTestRecord(it, 'test1') }
 
         when:
         List values = scrollableQuery.rows("select * from ScrollableQueryTest where value='test'")

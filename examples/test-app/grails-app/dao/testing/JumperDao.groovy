@@ -5,6 +5,6 @@ import grails.compiler.GrailsCompileStatic
 
 @GrailsCompileStatic
 class JumperDao extends DefaultGormDao<Jumper> {
-	//Class domainClas  s = Jumper
+    //Class domainClas  s = Jumper
 }
 

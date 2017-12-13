@@ -29,7 +29,7 @@ class DaoEventsSpec extends Specification {
         org.id != null
 
         when:
-        org = Org.update([id:org.id, name:"updated"])
+        org = Org.update([id: org.id, name: "updated"])
 
         then:
         org.event == "PreDaoUpdateEvent"

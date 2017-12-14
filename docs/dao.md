@@ -1,21 +1,147 @@
 
-Dao Artefacts
----
-Plugin adds a new artefact type **Dao**. One dao bean is configured for each domain.   
-[DefaultGormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/DefaultGormDao.groovy) is configured, If no explicit dao class exists for a domain.
+## Quick Start Example
 
-Reference to a dao for given domain class can be easily obtained by calling ```DomainClass.dao``` static method.
+To show what DAO Repository Services are all about let’s walk through an example.
 
-**Creating Dao classes**  
-Dao classes are put inside grails-app/dao and named as ```DomainNameDao``` (eg ```OrgDao```). 
-Plugin will automatically lookup all dao classes and configure them as spring beans.
+Lets assume we are setting up a way to track details for this Project. We might setup a couple of domains like this. 
 
-Dao must either implement [GormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/GormDao.groovy) Trait. Or Extend [DefaultGormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/DefaultGormDao.groovy)
+```groovy
+//change the default contraints to be nullable:true
+gorm.default.constraints = {
+    '*'(nullable:true)
+}
+
+class Project {
+    String name
+    String description
+
+    GithubRepo gitHubRepo   
+}
+
+class GitHubRepo {
+    Long repoId         //1829344
+    String slug         //yakworks/gorm-tools
+    String description  //gorm tools for a clean shaved yak
+}
+```
+
+and lets say we have a map, perhaps that came from a resful json request or some other service, test data etc...
+
+```groovy
+params = [
+    name: 'gorm-tools',
+    gitHubRepo: [
+        repoId: 1829344,
+        slug: 'yakworks/gorm-tools',
+    ]
+]
+```
+
+Using stock Grails [Gorm][]{.new-tab} we would probably implement something like the following 
+simplified boiler plate design pattern for the **C** in CRUD
+
+```groovy
+@Transactional
+class ProjectService {
+    
+    Project createNew(Map data){
+        def project = new Project()
+        project.properties = data
+        project.save(failOnError:true) //throw runtime to roll back if error
+    }
+    
+    //.... other imps
+}
+
+// elsewhwere, probably in a controller action, we would inject the service and use it to save
+@Autowired ProjectService projectService
+...
+projectService.createNew(params)
+
+```
+
+With the DAO services plugin, we have shaved the yak for you and each domain has a Repository or Dao automitically 
+setup for this pattern. So with this plugin all the boiler plate from above can be replaced with 1 line!
+
+```groovy
+// elsewhwere, probably in a controller action. 
+Project.create(params)
+```
+
+Thats it. The `Project.create()` actually delegates to the Default[GormDao][].create(). The `create` is wrapped in a transaction, creates the intance,
+binds the data and defaults to saving with `failOnError:true`. 
+Like all transactional methods if the method is called from inside another transaction it will use it
+otherwise it creates a new one. 
+
+> :bulb: **Other Dao Domain Methods**  
+> You can do the same thing as above for an `update` or `delete`. 
+> The details of whats available can be seen in the [DaoEntity]{.new-tab} trait or in the [DaoEntity source]{.new-tab} and are outlined below
+
+Now lets say we want to do something more advanced during the create. As its not recomended to autowire domains for performance reasons
+and it can be tricky to edit or create with the method events inside the Domain we can abstract out the logic into a ProjectDao. 
+
+Lets say we wanted to use a service to validate Github repo and retrieve the description on create.
+We can add a class to the `grails-app/dao` directory as in the following example.
+
+```groovy
+package tracker
+
+@CompileStatic
+class ProjectDao implements GormDao<Project>{
+    
+    @Autowired GitHubApi gitHubApi
+
+    //event method used to update the descriptions with the ones in github
+    void afterCreate(Project project, Map params){
+        Map repoInfo = gitHubApi.getRepo(params.gitHubRepo)
+        //check that it was found using the slug or repoId
+        if (!repoInfo) 
+            throw new DataRetrievalFailureException("Github Repo is invalid for ${params.gitHubRepo}")
+        
+        if(repoInfo.description){
+            //force the gitHubRepo.description to be whats in github
+            project.gitHubRepo.description = repoInfo.description
+            project.gitHubRepo.persist()  //optional 
+            //update project.description to be the same if its null
+            project.description = project.description ?: repoInfo.description
+            project.persist() //optional
+        }
+    }
+}
+
+// elsewhwere, you can call and it will be automatically taken care of
+Project.create(params)
+
+```
+
+Events methods and fired spring events are run inside the inherited transaction and as usual an uncaught runtime exception will rollback.
+The `persist` methods is another addition to the domains added by the DaoEntity trait. In the example above its not really needed as 
+the changes will be flushed during the transaction commit. They are here to doc whats happening 
+and so that validation failures can be easily seen.
+
+
+## The Dao Service Artefact
+
+This plugin adds a new artefact type **Dao**. Each domain will have a spring bean setup for it if one doesn't exists already.
+
+A dao bean is configured for each domain with a [DefaultGormDao][]{.new-tab} unless explicit dao class.   
+The trait [GormDao][]{.new-tab} implements the [DaoApi][]{.new-tab} interface and is what backs the DefaultGormDao. 
+You'll mostly use the [GormDao][]{.new-tab} trait when creating a custom concrete implementation of a Dao.
+
+Reference to a dao for given domain class can be easily obtained by calling `MyDomainClass.dao` static method.
+
+### Implementing Dao Services
+
+If you need to override the [DefaultGormDao][] that is attached to each domain then you can create your own service
+inside grails-app/dao and name it ```YourDomainNameDao``` (eg ```OrgDao```). 
+Plugin will automatically lookup all dao classes and configure them as spring service beans to be used for your domain.
+
+Dao must either implement [GormDao][] Trait or if you wish extend [DefaultGormDao][]
  
-Example:
+**Example:**
  
  ```groovy
- class OrgDao extends DefaultGormDao<Org> {
+ class OrgDao implements GormDao<Org> {
      
      void beforeCreate(Org org, Map params) {
         //do some thing before create
@@ -24,72 +150,53 @@ Example:
  }
  ```
 
-**Example of the transaction propagation issue:**
+## DaoEntity Trait
 
-With the cascade save of an association where we were saving a Parent with new Child. The issue will kick in when new Child saved and blew up and the Parent changes stay. We have a good example of this issue in the demo-app under test
+See Groovydocs api for the [DaoEntity][] that is injected onto all domains.
 
-With this plugin and a controller you can just do:
+### Instance methods added to the domains
 
-```groovy
-def update() {
-  try{
-    def result = YourDomainClass.update(p)
-      flash.message = result.message
-      redirect(action: 'show', id: result.entity.id)
-  } catch(DomainException e) {
-    flash.message = e.messageMap
-    render(view: 'edit', model: [(domainInstanceName): e.entity])
-  }
-}
-```
+Every domain gets a dao which is either setup for you or setup by implementing 
+[GormDao][] 
+Each method is transactional and will prevent incomplete cascading saves.
 
+- **persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) 
+  with any other args passed in. ex: someDomain.persist(). 
+  Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-## Domain Traits
-
-### Methods added to the domains
-
-Every domain gets a dao which is either setup for you or setup by implementing  [GormDao](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/GormDao.groovy). Each method is transactional to prevent incomplete cascading saves as exaplained above.
-
-**persist()**: calls the dao.save which in turn calls the dao.save(args) and then domain.save(failOnError:true) with any other args passed in. ex: someDomain.persist(). Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
-
-**remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by default. Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
+- **remove()**:  calls the dao.delete which calls the dao.remove(args) which in turn calls the domain.delete(flush:true) by default. Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
 ### Statics added to the domain
 
-**create(params)**:  calls the dao.create which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (essentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
+- **create(params)**:  calls the dao.create which does the bolier plate code you might find in a scaffolded controller. creates a new instance, sets the params and calls the dao.save (essentially the persist()). **ex:** Book.insertAndSave([name:'xyz',isbn:'123']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-**update(params)**:  calls the dao.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
+- **update(params)**:  calls the dao.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the dao.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-**remove(id)**:  calls the dao.removeById gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
+- **remove(id)**:  calls the dao.removeById gets the instance base in the params.id, calls the delete for it. **ex:** Book.remove([id:11]) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/dao/DomainException.groovy) if anything goes wrong
 
-**dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
+- **dao**: a quick way to get to the dao for the Domain. It will return the stock dao that was created from GormDaoSupport or the Dao you created for the domain.
 
 
-## Dao events
+## Dao Events 
+
+### Methods
+
 Each of the dao can implement any of the methods listed below and they will get called during persistence operation.  
  
-**beforeCreate(T instance)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  
-**afterCreate(T instance, Map params)** - Called after the new instance is saved.  
-**beforeRemove(T instance)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
-**afterRemove(T instance)** - After an instance is removed.  
-**beforeUpdate(T instance, Map params)** - Called before an instance is updated  
-**afterUpdate(T instance, Map params)** - Called after an instance is updated  
-**beforePersist(T instance)** - Called every time before an instance is saved.  
-**afterPersist(T instance)** - Called every time after an instance is saved.
+- **beforeCreate(T instance, Map params)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  
+- **afterCreate(T instance, Map params)** - Called after the new instance is saved.  
+- **beforeRemove(T instance)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
+- **afterRemove(T instance)** - After an instance is removed.  
+- **beforeUpdate(T instance, Map params)** - Called before an instance is updated  
+- **afterUpdate(T instance, Map params)** - Called after an instance is updated  
+- **beforePersist(T instance)** - Called every time before an instance is saved.  
+- **afterPersist(T instance)** - Called every time after an instance is saved.
   
-## Dao persistence events  
-Dao plugin also fires persistence events which can be subscribed just like Gorm events using @Listener.
+### Spring Events
 
-Following are the events fired.  
-**PreDaoCreateEvent**  
-**PostDaoCreateEvent**  
-**PreDaoUpdateEvent**  
-**PostDaoUpdateEvent**  
-**PreDaoPersistEvent**  
-**PostDaoPersistEvent**  
-**PreDaoRemoveEvent**  
-**PostDaoRemoveEvent**  
+The dao also publishes a number of [events as listed in the Groovydoc API](https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/events/package-summary.html)
 
+==TODO UPDATE==
 **Example**  
 ```groovy
 
@@ -281,3 +388,11 @@ class CitySpec extends DaoHibernateSpec {
 
 When ```getDomainClasses()``` is overridden DaoHibernateSpec will try to find the dao in the same package as domain class. Alternatively if ```getPackageToScan()``` is provided, it will find all the dao from the given package and below it. 
 
+
+[DaoApi]: https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/DaoApi.html
+[GormDao]: https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/GormDao.html
+[GormDao source]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/GormDao.groovy
+[DefaultGormDao]: https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/DefaultGormDao.html
+[DaoEntity]: https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/DaoEntity.html
+[DaoEntity source]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/DaoEntity.groovy
+[Gorm]: http://gorm.grails.org/latest/hibernate/manual/index.html

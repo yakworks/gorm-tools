@@ -10,12 +10,19 @@ import org.springframework.beans.factory.annotation.Value
 
 import javax.annotation.PostConstruct
 
+/**
+ * a Gpars implementation of the AsyncBatchSupport trait
+ * to be used for colating/slicing a list into "batches" to then asynchronously process with Transactions
+ * insert or update for maximum performance.
+ */
 @CompileStatic
 class GparsBatchSupport implements AsyncBatchSupport {
 
+    /** the pool size passed to GParsPool.withPool. if gpars.poolsize is not set then it uses PoolUtils.retrieveDefaultPoolSize()*/
     @Value('${gpars.poolsize:0}')
     int poolSize
 
+    /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct
     void init() {
         if (poolSize == 0) poolSize = PoolUtils.retrieveDefaultPoolSize()
@@ -23,8 +30,18 @@ class GparsBatchSupport implements AsyncBatchSupport {
         if (batchSize == 0) batchSize = 100
     }
 
-    //@CompileDynamic
-    void parallelClosure(Map args = [:], List<List> batchList, Closure clos) {
+    /**
+     * Iterates over the batchList with eachParallel and calls the closure passing in the list and the args
+     * Generally you will want to use the {@link AsyncBatchSupport#parallel} method
+     * that added by the Trait as it calls the withTransaction
+     *
+     * @param args _optional_ arg map will be passed down through the closure as well <br>
+     *     - poolSize : gets passed down into the GParsPool.withPool for
+     * @param batchList a collated list of lists. each list in the batchList will be asynchronously passed to the provided closure
+     * @param closure the closure to call on each list in the batchList
+     */
+    @Override
+    void parallelClosure(Map args, List<List> batchList, Closure clos) {
         int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
         GParsPool.withPool(psize) {
             GParsPoolUtil.eachParallel(batchList){ List batch ->

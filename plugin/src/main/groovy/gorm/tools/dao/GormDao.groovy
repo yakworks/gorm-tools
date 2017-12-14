@@ -101,8 +101,9 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D> {
         return entity
     }
 
-    @Override
-    //@CompileDynamic
+    /**
+     * Convenience method to call {@link #bind} and then {@link #doPersist}
+     */
     D bindAndSave(D entity, Map params, String bindMethod) {
         bind(entity, params, bindMethod)
         doPersist(entity)
@@ -175,7 +176,7 @@ trait GormDao<D extends GormEntity> implements DaoQuery, DaoApi<D> {
      * @return
      */
     @Override
-    D get(Map params) {
+    D get(Map<String,Object> params) {
         return get(params.id as Serializable, params.version as Long)
     }
 

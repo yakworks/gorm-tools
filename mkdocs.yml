@@ -9,11 +9,14 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 pages:
   - Overview: index.md
   - DAO Services: dao.md
-  - Mango & Queries: queries-mango.md
-  - Id Generation: id-generation.md
-  - Gorm Utils: gorm-utils.md
-  - Bean Path Tools: beanPathTools.md
-  - Date Utils: working-with-dates.md
+  - Mango Query: queries-mango.md
+  - Async: async.md
+  - Utilities & Helpers:
+    - Id Generation: id-generation.md
+    - GormUtils Class: gorm-utils.md
+    - Bean Path Tools: beanPathTools.md
+    - Date Utils: working-with-dates.md
+  - API Docs: api.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

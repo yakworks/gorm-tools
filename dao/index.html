@@ -921,17 +921,17 @@ Each method is transactional and will prevent incomplete cascading saves.</p>
 </ul>
 <h3 id="spring-events">Spring Events<a class="headerlink" href="#spring-events" title="Permanent link">&para;</a></h3>
 <p>The dao also publishes a number of <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/events/package-summary.html">events as listed in the Groovydoc API</a></p>
-<p><mark>TODO UPDATE</mark>
-<strong>Example</strong><br />
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgListener</span> <span class="o">{</span>
+<p><strong>Example</strong><br />
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.event.EventListener</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.dao.events.BeforeCreateEvent</span>
 
-   <span class="nd">@Listener</span><span class="o">(</span><span class="n">Org</span><span class="o">)</span>
-   <span class="kt">void</span> <span class="nf">beforeCreate</span><span class="o">(</span><span class="n">PreDaoCreateEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
-      <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entityObject</span>
-      <span class="n">Map</span> <span class="n">params</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">params</span>
-      <span class="c1">//do some thing with org</span>
-   <span class="o">}</span>
+<span class="kd">class</span> <span class="nc">OrgListener</span> <span class="o">{</span>
 
+    <span class="nd">@EventListener</span>
+    <span class="kt">void</span> <span class="nf">beforeCreate</span><span class="o">(</span><span class="n">BeforeCreateEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+       <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
+       <span class="c1">//Do some thing here.</span>
+    <span class="o">}</span>
 <span class="o">}</span>
 </pre></div></p>
 <h2 id="data-binding-using-mapbinder">Data binding using MapBinder<a class="headerlink" href="#data-binding-using-mapbinder" title="Permanent link">&para;</a></h2>
@@ -940,11 +940,13 @@ Plugin configures <code>GormMapBinder</code> as default implementation of <code>
 However GormMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates without going through the converters, thus resulting in faster performance.</p>
 <p><strong>Example</strong></p>
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">SomeService</span> <span class="o">{</span>
-        <span class="nd">@Autowired</span> <span class="n">MapBinder</span> <span class="n">binder</span>
+
+        <span class="nd">@Autowired</span> 
+        <span class="n">MapBinder</span> <span class="n">binder</span>
 
         <span class="kt">void</span> <span class="nf">foo</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
            <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Org</span><span class="o">()</span>
-            <span class="n">binder</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">org</span><span class="o">,</span> <span class="n">params</span><span class="o">)</span>
+           <span class="n">binder</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">org</span><span class="o">,</span> <span class="n">params</span><span class="o">)</span>
         <span class="o">}</span>
 
 <span class="o">}</span>
@@ -954,20 +956,22 @@ However GormMapBinder is optimized to convert most commonly encountered property
 By default all dao's use the default <code>GormMapBinder</code> for databinding. However when a dao is explicitely created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.</p>
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CustomMapBinder</span> <span class="kd">implements</span> <span class="n">MapBinder</span> <span class="o">{</span>
 
-     <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">,</span> <span class="n">String</span> <span class="n">bindMethod</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">,</span> <span class="n">String</span> <span class="n">bindMethod</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">//implement  </span>
-      <span class="o">}</span>
+    <span class="o">}</span>
 
-     <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">//implement</span>
-     <span class="o">}</span>
-
+    <span class="o">}</span>
 
 <span class="o">}</span>
 
 <span class="kd">class</span> <span class="nc">OrgDao</span> <span class="kd">implements</span> <span class="n">GormDao</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="nd">@Autowired</span> <span class="n">CustomMapBinder</span> <span class="n">mapBinder</span>
-    <span class="o">...</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="n">CustomMapBinder</span> <span class="n">mapBinder</span>
+
+    <span class="o">.........</span>   
 <span class="o">}</span>
 </pre></div>
 
@@ -1025,7 +1029,7 @@ DaoDataTest extends grails DataTest and configures a dao bean for every mock dom
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CitySpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">DaoDataTest</span> <span class="o">{</span>
 
    <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="o">{</span>
-        <span class="n">mockDomain</span><span class="o">(</span><span class="n">City</span><span class="o">)</span>
+     <span class="n">mockDomain</span><span class="o">(</span><span class="n">City</span><span class="o">)</span>
    <span class="o">}</span>
 
    <span class="kt">void</span> <span class="s2">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>

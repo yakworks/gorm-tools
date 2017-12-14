@@ -12,12 +12,12 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-            v3.3.1-SNAPSHOT
+            v3.3.2-SNAPSHOT
 
 </pre>
 
 This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
-domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.io/gorm-rest-api/). 
+domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.io/gorm-rest-api/){.new-tab}. 
 There are 2 primary patterns this library enables as detailed below for DAO's 
 and Mango ( A mongo query like way to get data with a Map)
 

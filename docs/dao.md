@@ -3,6 +3,8 @@
 
 To show what DAO Repository Services are all about let’s walk through an example.
 
+#### Domain setup
+
 Lets assume we are setting up a way to track details for this Project. We might setup a couple of domains like this. 
 
 ```groovy
@@ -11,13 +13,17 @@ gorm.default.constraints = {
     '*'(nullable:true)
 }
 
+@GrailsCompileStatic
 class Project {
     String name
     String description
 
-    GithubRepo gitHubRepo   
+    GithubRepo gitHubRepo 
+    
+      
 }
 
+@GrailsCompileStatic
 class GitHubRepo {
     Long repoId         //1829344
     String slug         //yakworks/gorm-tools
@@ -37,11 +43,13 @@ params = [
 ]
 ```
 
-Using stock Grails [Gorm][]{.new-tab} we would probably implement something like the following 
+### Stock Grails Gorm
+
+**Using stock Grails** [Gorm][]{.new-tab} we would probably implement something like the following 
 simplified boiler plate design pattern for the **C** in CRUD
 
 ```groovy
-@Transactional
+@GrailsCompileStatic @Transactional
 class ProjectService {
     
     Project createNew(Map data){
@@ -60,7 +68,9 @@ projectService.createNew(params)
 
 ```
 
-With the DAO services plugin, we have shaved the yak for you and each domain has a Repository or Dao automitically 
+### Using the Dao
+
+**With this Gorm repository plugin**, we have shaved the yak for you and each domain has a Repository or Dao automitically 
 setup for this pattern. So with this plugin all the boiler plate from above can be replaced with 1 line!
 
 ```groovy
@@ -77,8 +87,34 @@ otherwise it creates a new one.
 > You can do the same thing as above for an `update` or `delete`. 
 > The details of whats available can be seen in the [DaoEntity]{.new-tab} trait or in the [DaoEntity source]{.new-tab} and are outlined below
 
-Now lets say we want to do something more advanced during the create. As its not recomended to autowire domains for performance reasons
-and it can be tricky to edit or create with the method events inside the Domain we can abstract out the logic into a ProjectDao. 
+### Testing the Domain
+
+If you used the script to create the domains then the tests will already be in place for us or you can add one manually like so.
+
+```groovy
+package testing
+
+import gorm.tools.testing.DomainAutoTest
+import spock.lang.Specification
+
+class ProjectSpec extends Specification implements DomainAutoTest<Project> {
+    /** automatically runs tests on persist(), create(), update(), delete().*/
+}
+```
+
+Notice the absence of test methods? Running with the the mantra of "convetion over configuration" and "intelligent defaults"
+`DomainAutoTest` will mock the domain, setup and create the data for you then exercise the domain and the default dao service for you.
+We'll see in the next section how to override the automated tests in the DomainAutoTest. 
+
+### Implementing ProjectDao Service 
+
+The [DefaultGormDao] that is setup for the Project domain will of course not always be adequate for the business logic.
+Again running with the "intelligent defaults but easy to override" mantra we can easily and selectively override the defaults in the dao. 
+Lets say we want to do something more advanced during the create such as validate and retrieve info from GitHub. 
+Its not recomended to autowire beans into the domains for performance reasons
+It can also be tricky to modify the domain using the event methods such as `beforeCreate` inside the Project domain and deal with flushing.
+
+We can abstract out the logic into a ProjectDao. 
 
 Lets say we wanted to use a service to validate Github repo and retrieve the description on create.
 We can add a class to the `grails-app/dao` directory as in the following example.
@@ -109,7 +145,7 @@ class ProjectDao implements GormDao<Project>{
     }
 }
 
-// elsewhwere, you can call and it will be automatically taken care of
+// elsewhere, you can call and it will be automatically taken care of
 Project.create(params)
 
 ```
@@ -119,6 +155,14 @@ The `persist` methods is another addition to the domains added by the DaoEntity 
 the changes will be flushed during the transaction commit. They are here to doc whats happening 
 and so that validation failures can be easily seen.
 
+### Testing the Custom ProjectDao
+
+```
+class ProjectSpec extends Specification implements DomainAutoTest<Project> {
+    
+    
+}
+```
 
 ## The Dao Service Artefact
 

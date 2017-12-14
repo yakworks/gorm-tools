@@ -272,6 +272,54 @@
     Quick Start Example
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domain-setup" title="Domain setup" class="md-nav__link">
+    Domain setup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stock-grails-gorm" title="Stock Grails Gorm" class="md-nav__link">
+    Stock Grails Gorm
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-dao" title="Using the Dao" class="md-nav__link">
+    Using the Dao
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-the-domain" title="Testing the Domain" class="md-nav__link">
+    Testing the Domain
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementing-projectdao-service" title="Implementing ProjectDao Service" class="md-nav__link">
+    Implementing ProjectDao Service
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-the-custom-projectdao" title="Testing the Custom ProjectDao" class="md-nav__link">
+    Testing the Custom ProjectDao
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -571,6 +619,54 @@
     Quick Start Example
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#domain-setup" title="Domain setup" class="md-nav__link">
+    Domain setup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stock-grails-gorm" title="Stock Grails Gorm" class="md-nav__link">
+    Stock Grails Gorm
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-dao" title="Using the Dao" class="md-nav__link">
+    Using the Dao
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-the-domain" title="Testing the Domain" class="md-nav__link">
+    Testing the Domain
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementing-projectdao-service" title="Implementing ProjectDao Service" class="md-nav__link">
+    Implementing ProjectDao Service
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#testing-the-custom-projectdao" title="Testing the Custom ProjectDao" class="md-nav__link">
+    Testing the Custom ProjectDao
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -752,19 +848,24 @@
                 
                 <h2 id="quick-start-example">Quick Start Example<a class="headerlink" href="#quick-start-example" title="Permanent link">&para;</a></h2>
 <p>To show what DAO Repository Services are all about let’s walk through an example.</p>
+<h4 id="domain-setup">Domain setup<a class="headerlink" href="#domain-setup" title="Permanent link">&para;</a></h4>
 <p>Lets assume we are setting up a way to track details for this Project. We might setup a couple of domains like this. </p>
 <div class="codehilite"><pre><span></span><span class="c1">//change the default contraints to be nullable:true</span>
 <span class="n">gorm</span><span class="o">.</span><span class="na">default</span><span class="o">.</span><span class="na">constraints</span> <span class="o">=</span> <span class="o">{</span>
     <span class="s1">&#39;*&#39;</span><span class="o">(</span><span class="nl">nullable:</span><span class="kc">true</span><span class="o">)</span>
 <span class="o">}</span>
 
+<span class="nd">@GrailsCompileStatic</span>
 <span class="kd">class</span> <span class="nc">Project</span> <span class="o">{</span>
     <span class="n">String</span> <span class="n">name</span>
     <span class="n">String</span> <span class="n">description</span>
 
-    <span class="n">GithubRepo</span> <span class="n">gitHubRepo</span>   
+    <span class="n">GithubRepo</span> <span class="n">gitHubRepo</span> 
+
+
 <span class="o">}</span>
 
+<span class="nd">@GrailsCompileStatic</span>
 <span class="kd">class</span> <span class="nc">GitHubRepo</span> <span class="o">{</span>
     <span class="n">Long</span> <span class="n">repoId</span>         <span class="c1">//1829344</span>
     <span class="n">String</span> <span class="n">slug</span>         <span class="c1">//yakworks/gorm-tools</span>
@@ -782,9 +883,10 @@
 <span class="o">]</span>
 </pre></div>
 
-<p>Using stock Grails <a class="new-tab" href="http://gorm.grails.org/latest/hibernate/manual/index.html">Gorm</a> we would probably implement something like the following 
+<h3 id="stock-grails-gorm">Stock Grails Gorm<a class="headerlink" href="#stock-grails-gorm" title="Permanent link">&para;</a></h3>
+<p><strong>Using stock Grails</strong> <a class="new-tab" href="http://gorm.grails.org/latest/hibernate/manual/index.html">Gorm</a> we would probably implement something like the following 
 simplified boiler plate design pattern for the <strong>C</strong> in CRUD</p>
-<div class="codehilite"><pre><span></span><span class="nd">@Transactional</span>
+<div class="codehilite"><pre><span></span><span class="nd">@GrailsCompileStatic</span> <span class="nd">@Transactional</span>
 <span class="kd">class</span> <span class="nc">ProjectService</span> <span class="o">{</span>
 
     <span class="n">Project</span> <span class="nf">createNew</span><span class="o">(</span><span class="n">Map</span> <span class="n">data</span><span class="o">){</span>
@@ -802,7 +904,8 @@ simplified boiler plate design pattern for the <strong>C</strong> in CRUD</p>
 <span class="n">projectService</span><span class="o">.</span><span class="na">createNew</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
 </pre></div>
 
-<p>With the DAO services plugin, we have shaved the yak for you and each domain has a Repository or Dao automitically 
+<h3 id="using-the-dao">Using the Dao<a class="headerlink" href="#using-the-dao" title="Permanent link">&para;</a></h3>
+<p><strong>With this Gorm repository plugin</strong>, we have shaved the yak for you and each domain has a Repository or Dao automitically 
 setup for this pattern. So with this plugin all the boiler plate from above can be replaced with 1 line!</p>
 <div class="codehilite"><pre><span></span><span class="c1">// elsewhwere, probably in a controller action. </span>
 <span class="n">Project</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
@@ -817,8 +920,28 @@ otherwise it creates a new one. </p>
 You can do the same thing as above for an <code>update</code> or <code>delete</code>. 
 The details of whats available can be seen in the <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/DaoEntity.html">DaoEntity</a> trait or in the <a class="new-tab" href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/dao/DaoEntity.groovy">DaoEntity source</a> and are outlined below</p>
 </blockquote>
-<p>Now lets say we want to do something more advanced during the create. As its not recomended to autowire domains for performance reasons
-and it can be tricky to edit or create with the method events inside the Domain we can abstract out the logic into a ProjectDao. </p>
+<h3 id="testing-the-domain">Testing the Domain<a class="headerlink" href="#testing-the-domain" title="Permanent link">&para;</a></h3>
+<p>If you used the script to create the domains then the tests will already be in place for us or you can add one manually like so.</p>
+<div class="codehilite"><pre><span></span><span class="kn">package</span> <span class="n">testing</span>
+
+<span class="kn">import</span> <span class="nn">gorm.tools.testing.DomainAutoTest</span>
+<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
+
+<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">DomainAutoTest</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>Notice the absence of test methods? Running with the the mantra of "convetion over configuration" and "intelligent defaults"
+<code>DomainAutoTest</code> will mock the domain, setup and create the data for you then exercise the domain and the default dao service for you.
+We'll see in the next section how to override the automated tests in the DomainAutoTest. </p>
+<h3 id="implementing-projectdao-service">Implementing ProjectDao Service<a class="headerlink" href="#implementing-projectdao-service" title="Permanent link">&para;</a></h3>
+<p>The <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/DefaultGormDao.html">DefaultGormDao</a> that is setup for the Project domain will of course not always be adequate for the business logic.
+Again running with the "intelligent defaults but easy to override" mantra we can easily and selectively override the defaults in the dao. 
+Lets say we want to do something more advanced during the create such as validate and retrieve info from GitHub. 
+Its not recomended to autowire beans into the domains for performance reasons
+It can also be tricky to modify the domain using the event methods such as <code>beforeCreate</code> inside the Project domain and deal with flushing.</p>
+<p>We can abstract out the logic into a ProjectDao. </p>
 <p>Lets say we wanted to use a service to validate Github repo and retrieve the description on create.
 We can add a class to the <code>grails-app/dao</code> directory as in the following example.</p>
 <div class="codehilite"><pre><span></span><span class="kn">package</span> <span class="n">tracker</span>
@@ -846,7 +969,7 @@ We can add a class to the <code>grails-app/dao</code> directory as in the follow
     <span class="o">}</span>
 <span class="o">}</span>
 
-<span class="c1">// elsewhwere, you can call and it will be automatically taken care of</span>
+<span class="c1">// elsewhere, you can call and it will be automatically taken care of</span>
 <span class="n">Project</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
 </pre></div>
 
@@ -854,6 +977,13 @@ We can add a class to the <code>grails-app/dao</code> directory as in the follow
 The <code>persist</code> methods is another addition to the domains added by the DaoEntity trait. In the example above its not really needed as 
 the changes will be flushed during the transaction commit. They are here to doc whats happening 
 and so that validation failures can be easily seen.</p>
+<h3 id="testing-the-custom-projectdao">Testing the Custom ProjectDao<a class="headerlink" href="#testing-the-custom-projectdao" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>class ProjectSpec extends Specification implements DomainAutoTest&lt;Project&gt; {
+
+
+}
+</pre></div>
+
 <h2 id="the-dao-service-artefact">The Dao Service Artefact<a class="headerlink" href="#the-dao-service-artefact" title="Permanent link">&para;</a></h2>
 <p>This plugin adds a new artefact type <strong>Dao</strong>. Each domain will have a spring bean setup for it if one doesn't exists already.</p>
 <p>A dao bean is configured for each domain with a <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/DefaultGormDao.html">DefaultGormDao</a> unless explicit dao class. <br />

@@ -11,8 +11,6 @@ import org.grails.datastore.gorm.GormEntity
 @CompileStatic
 class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T> {
 
-    //FastBinder fastBinder
-
     DaoApi<T> dao
 
     GparsDaoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {
@@ -22,7 +20,7 @@ class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T
 
     @Override
     def execute() {
-        gparsBatchService.eachParallel(cities) { Map row, Map cargs ->
+        asyncBatchSupport.parallel(cities) { Map row, Map cargs ->
             //domainClass.dao.create( row, [validate:validate, dataBinder:dataBinder ])
             dao.doCreate(row)
             //insertRow(row)

@@ -2,7 +2,7 @@ package gpbench
 
 import gorm.tools.GormUtils
 import gorm.tools.beans.DateUtil
-import gorm.tools.databinding.FastBinder
+import gorm.tools.databinding.GormMapBinder
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
 import gpbench.fat.CityFatNoTraits
@@ -23,7 +23,9 @@ import java.text.SimpleDateFormat
 
 class BenchmarkDatabindingService {
     JsonReader jsonReader
-    FastBinder fastBinder
+
+    @Autowired
+    GormMapBinder gormMapBinder
 
     Long count = 111690
     Map props = [
@@ -42,14 +44,14 @@ class BenchmarkDatabindingService {
 
         jsonReader._cache = [:]
         loadCities3xProps(loadCityTimes)
-        println "Warm up logan  "
+        println "Warm up pass "
         mute = true
         (1..2).each {
             if (!mute) println "\n - setters, copy and fast bind on simple no associations"
             useSetPropsFastIterate(CityFatSimple)
             if (!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFat)
-            useSetPropsFastIterate(CityFat)
+            //useSetPropsFastIterate(CityFat)
             useFastBinder(CityFat)
             if (!mute) println " - Dynamic setters are slower"
             useDynamicSettersFat(CityFat)
@@ -95,7 +97,7 @@ class BenchmarkDatabindingService {
 
     void useFastBinder(Class domain) {
         eachCity("useFastBinder", domain) { instance, Map row ->
-            fastBinder.bind(instance, row)
+            gormMapBinder.bind(instance, row)
         }
     }
 

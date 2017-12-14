@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
  *
  */
 @CompileStatic
-class FastBinder implements MapDataBinder {
+class GormMapBinder implements MapBinder {
     private static final String ID_PROP = "id"
 
     ConversionService conversionService = new SpringConversionServiceAdapter()

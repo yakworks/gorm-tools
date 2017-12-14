@@ -9,7 +9,14 @@ the properties in the `criteriaMap`. The map could be passed as JSON string or M
 
 Anything in the optional closure will be passed into Gorm/Hibernate criteria closure
 
->Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.
+* A lot of inspiration was drawn from [Restdb.io](https://restdb.io/docs/querying-with-the-api)
+* the query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
+* and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax).
+* Also inspired by [json-sql](https://github.com/2do2go/json-sql/)
+
+> :memo: 
+Whilst selectors have many similarities with MongoDB query documents, 
+these arise more from a similarity of purpose and do not necessarily extend to commonality of function or result.
 
 **Basic example**
 

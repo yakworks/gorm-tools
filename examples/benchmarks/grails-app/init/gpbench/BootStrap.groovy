@@ -1,18 +1,23 @@
 package gpbench
 
 import grails.plugin.springsecurity.userdetails.GrailsUser
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 
 class BootStrap {
 
+    @Value('${runDataBindingBenchmark:false}')
+    boolean runDataBindingBenchmark
+
     BenchmarkRunnerService benchmarkRunnerService
     BenchmarkDatabindingService benchmarkDatabindingService
 
     def init = { servletContext ->
         mockAuthentication()
-        //benchmarkDatabindingService.runFat()
+        if(runDataBindingBenchmark)
+            benchmarkDatabindingService.runFat()
         //loaderNoPersistService.runFileLoad()
         //loaderNoPersistService.run()
         benchmarkRunnerService.runBenchMarks()

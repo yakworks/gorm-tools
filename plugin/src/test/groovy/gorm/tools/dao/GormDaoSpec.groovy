@@ -4,6 +4,7 @@ import gorm.tools.testing.DaoHibernateSpec
 import testing.Location
 import testing.Nested
 import testing.Org
+import testing.OrgDao
 
 class GormDaoSpec extends DaoHibernateSpec {
 
@@ -13,6 +14,15 @@ class GormDaoSpec extends DaoHibernateSpec {
         { config ->
             config.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
         }
+    }
+
+    def "assert proper daos are setup"() {
+        expect:
+        Org.dao instanceof OrgDao
+        Location.dao instanceof DefaultGormDao
+        Location.dao.domainClass == Location
+        Nested.dao instanceof DefaultGormDao
+        Nested.dao.domainClass == Nested
     }
 
 

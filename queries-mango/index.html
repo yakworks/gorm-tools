@@ -23,7 +23,7 @@
     
     
       
-        <title>Mango & Queries - Gorm Tools</title>
+        <title>Mango Query - Gorm Tools</title>
       
     
     
@@ -121,7 +121,7 @@
             
               
             
-            Mango & Queries
+            Mango Query
           
         </span>
       </div>
@@ -264,11 +264,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="toc">
-        Mango & Queries
+        Mango Query
       </label>
     
-    <a href="./" title="Mango & Queries" class="md-nav__link md-nav__link--active">
-      Mango & Queries
+    <a href="./" title="Mango Query" class="md-nav__link md-nav__link--active">
+      Mango Query
     </a>
     
       
@@ -492,27 +492,58 @@
 
 
   <li class="md-nav__item">
+    <a href="../async/" title="Async" class="md-nav__link">
+      Async
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Utilities & Helpers
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Utilities & Helpers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../id-generation/" title="Id Generation" class="md-nav__link">
       Id Generation
     </a>
   </li>
 
-    
-      
-      
-      
+        
+          
+          
+          
 
 
   <li class="md-nav__item">
-    <a href="../gorm-utils/" title="Gorm Utils" class="md-nav__link">
-      Gorm Utils
+    <a href="../gorm-utils/" title="GormUtils Class" class="md-nav__link">
+      GormUtils Class
     </a>
   </li>
 
-    
-      
-      
-      
+        
+          
+          
+          
 
 
   <li class="md-nav__item">
@@ -521,6 +552,23 @@
     </a>
   </li>
 
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../working-with-dates/" title="Date Utils" class="md-nav__link">
+      Date Utils
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
     
       
       
@@ -528,8 +576,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../working-with-dates/" title="Date Utils" class="md-nav__link">
-      Date Utils
+    <a href="../api/" title="API Docs" class="md-nav__link">
+      API Docs
     </a>
   </li>
 
@@ -767,7 +815,7 @@
                   <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/queries-mango.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Mango & Queries</h1>
+                  <h1>Mango Query</h1>
                 
                 
                 <p>Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL query.</p>
@@ -777,8 +825,16 @@ The gorm dao's come with a <code>query(criteriaMap, closure)</code> method. It a
 the properties in the <code>criteriaMap</code>. The map could be passed as JSON string or Map. All restrictions should be under 
 <code>criteria</code> keyword by default, but it can be changed with <a href="./#configuration">config</a>.</p>
 <p>Anything in the optional closure will be passed into Gorm/Hibernate criteria closure</p>
+<ul>
+<li>A lot of inspiration was drawn from <a href="https://restdb.io/docs/querying-with-the-api">Restdb.io</a></li>
+<li>the query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a></li>
+<li>and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a>.</li>
+<li>Also inspired by <a href="https://github.com/2do2go/json-sql/">json-sql</a></li>
+</ul>
 <blockquote>
-<p>Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
+<p><img alt="📝" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
+Whilst selectors have many similarities with MongoDB query documents, 
+these arise more from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
 </blockquote>
 <p><strong>Basic example</strong></p>
 <div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">dao</span><span class="o">.</span><span class="na">query</span><span class="o">([</span>
@@ -1233,13 +1289,13 @@ to a grails parameter map, which can be used for databinding.</p>
           </a>
         
         
-          <a href="../id-generation/" title="Id Generation" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../async/" title="Async" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Id Generation
+                Async
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

@@ -276,8 +276,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mango-queries" title="Mango Queries" class="md-nav__link">
-    Mango Queries
+  <a href="#mango-query" title="Mango Query" class="md-nav__link">
+    Mango Query
   </a>
   
 </li>
@@ -316,8 +316,8 @@
 
 
   <li class="md-nav__item">
-    <a href="queries-mango/" title="Mango & Queries" class="md-nav__link">
-      Mango & Queries
+    <a href="queries-mango/" title="Mango Query" class="md-nav__link">
+      Mango Query
     </a>
   </li>
 
@@ -325,6 +325,37 @@
       
       
       
+
+
+  <li class="md-nav__item">
+    <a href="async/" title="Async" class="md-nav__link">
+      Async
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Utilities & Helpers
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Utilities & Helpers
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
 
 
   <li class="md-nav__item">
@@ -333,22 +364,22 @@
     </a>
   </li>
 
-    
-      
-      
-      
+        
+          
+          
+          
 
 
   <li class="md-nav__item">
-    <a href="gorm-utils/" title="Gorm Utils" class="md-nav__link">
-      Gorm Utils
+    <a href="gorm-utils/" title="GormUtils Class" class="md-nav__link">
+      GormUtils Class
     </a>
   </li>
 
-    
-      
-      
-      
+        
+          
+          
+          
 
 
   <li class="md-nav__item">
@@ -357,6 +388,23 @@
     </a>
   </li>
 
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="working-with-dates/" title="Date Utils" class="md-nav__link">
+      Date Utils
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
     
       
       
@@ -364,8 +412,8 @@
 
 
   <li class="md-nav__item">
-    <a href="working-with-dates/" title="Date Utils" class="md-nav__link">
-      Date Utils
+    <a href="api/" title="API Docs" class="md-nav__link">
+      API Docs
     </a>
   </li>
 
@@ -409,8 +457,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mango-queries" title="Mango Queries" class="md-nav__link">
-    Mango Queries
+  <a href="#mango-query" title="Mango Query" class="md-nav__link">
+    Mango Query
   </a>
   
 </li>
@@ -452,7 +500,7 @@
     \    \_\  (  <_> )  | \/  Y Y  \        ( ( .,-') )    Yak Works         ```
      \______  /\____/|__|  |__|_|  /         \ '   (_/                         !!
             \/                   \/           |       /)           '           !!!
-  ___________           .__                   `\    ^'            '     !    !!!!
+  ___________           .__                   ^\    ~'            '     !    !!!!
   \__    ___/___   ____ |  |   ______           !      _/! , !   !  ! !  !   !!!
     |    | /  _ \ /  _ \|  |  /  ___/            \Y,   |!!!  !  ! !!  !! !!!!!!!
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
@@ -462,32 +510,58 @@
 
 </pre>
 
-<p>This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for domains and is the basis for the <a href="https://yakworks.github.io/gorm-rest-api/">Gorm Rest API plugin</a>. There are 2 primary patterns this library enables as detailed below for DAO's and Mango ( A mongo query like way to get data with a Map)</p>
+<p>This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
+domains and is the basis for the <a href="https://yakworks.github.io/gorm-rest-api/">Gorm Rest API plugin</a>. 
+There are 2 primary patterns this library enables as detailed below for DAO's 
+and Mango ( A mongo query like way to get data with a Map)</p>
 <h2 id="dao-services">DAO Services<a class="headerlink" href="#dao-services" title="Permanent link">&para;</a></h2>
-<p><small><a href="./dao">jump to docs</a></small></p>
+<p><small><a href="./dao">jump to detailed docs</a></small></p>
 <p>A DAO, Data Access Object, is a data service bean for logic to validate, bind, persist and query data that resides in a database or  (via GORM usually of course).
 The design here is similiar to <a href="https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/">Spring's Repository pattern</a> and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices">Data Services</a> pattern.</p>
-<p>We found our selves setting up a bunch of services that looked a lot like the old school Dao's (or Repositories in DDD language). We figured we would just call them that instead of data services, repository, etc... to prevent confusion with spring and now gorm.</p>
+<blockquote>
+<p><img alt="💡" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" title=":bulb:" /> <strong>The DAO name</strong>
+We found our selves setting up a bunch of services that looked a lot like the old school Dao's (or Repositories in DDD language). 
+We figured we would just call them that instead of data services, repository, etc... to prevent confusion with spring and now gorm.</p>
+</blockquote>
 <h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Standardization</strong>: a clean common pattern across our apps for service layer logic that reduces boiler plate in both services as well as controllers.</li>
-<li><strong>Transactional Saves</strong>: every save() or persist() is wrapped in a transaction if one doesn't already exist. This is critical when there are cascading saves and updates.</li>
-<li><strong>RuntimeException Rollback</strong>: saves or <code>persist()</code> always occur with failOnError:true so a RuntimeException is thrown for both DataAccessExceptions as well a validation exceptions.
-This is critical for deeply nested domain logic dealing with saving multiple domains chains.</li>
-<li><strong>Data Binding Service</strong>: databinding maps and therefore JSON is a first class citizen where it belongs in the data service layer. Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.</li>
-<li><strong>Events &amp; Validation</strong>: the DAO service allows a central place to do events such as beforeSave, beforeValidate, etc so as not to pollute the domain class. This pattern makes it easier to keeps the special logic in a transaction as well. Allows validation outside of constraints to persistence without needing to modify the domain source.</li>
-<li><strong>Events with Flushing</strong>: As mentioned in the Gorm docs, "Do not attempt to flush the session within an event (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.". Putting the event business logic in the DAO keeps it all in a normal transaction and a flush is perfectly fine.  </li>
-<li><strong>Override Plugin's Domain Logic</strong>: Since the DAO is a service this also easily allows default logic in a provided plugin to be overriden in an application. For example, I can have a CustomerDao in a plugin that deals with common logic to validate address. I can then easily override and implement that CustomerDao in</li>
+<li><strong>Standardization</strong>: a clean common pattern across our apps for service layer logic that 
+  reduces boiler plate in both services as well as controllers.</li>
+<li><strong>Transactional Saves</strong>: every save() or persist() is wrapped in a transaction if one doesn't already exist. 
+  This is critical when there are cascading saves and updates.</li>
+<li><strong>RuntimeException Rollback</strong>: saves or <code>persist()</code> always occur with failOnError:true so a RuntimeException is 
+  thrown for both DataAccessExceptions as well a validation exceptions.
+  This is critical for deeply nested domain logic dealing with saving multiple domains chains.</li>
+<li><strong>Fast Data Binding Service</strong>: databinding from maps (and thus JSON) has to be fast 
+  and therefore maps and json are a first class citizen where it belongs in the data service layer instead of the controller layer. 
+  Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.</li>
+<li><strong>Events &amp; Validation</strong>: the DAO service allows a central place to do events such as beforeSave, beforeValidate, etc 
+  so as not to pollute the domain class. This pattern makes it easier to keeps the special logic in a transaction as well. 
+  Allows validation outside of constraints to persistence without needing to modify the domain source.</li>
+<li><strong>Events with Flushing</strong>: As mentioned in the Gorm docs, "Do not attempt to flush the session within an event 
+  (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.". 
+  Putting the event business logic in the DAO keeps it all in a normal transaction and a flush is perfectly fine.  </li>
+<li><strong>Override Plugin's Domain Logic</strong>: Since the DAO is a service this also easily allows default logic in a provided 
+  plugin to be overriden in an application. For example, I can have a CustomerDao in a plugin that deals with common 
+  logic to validate address. I can then easily override and implement that CustomerDao in</li>
 </ul>
-<h2 id="mango-queries">Mango Queries<a class="headerlink" href="#mango-queries" title="Permanent link">&para;</a></h2>
-<p>The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
+<h2 id="mango-query">Mango Query<a class="headerlink" href="#mango-query" title="Permanent link">&para;</a></h2>
+<p>The primary motive here is to create an easy dynamic map based way to query any Gorm Datastore (SQL or NoSQL). 
+Using a simple map that can come from json, yaml, groovy config etc... 
+A huge motivating factor being able is to be able to have a powerful and flexible way to query using json from a REST 
+based client without having to use GraphQL (the only other clean alternative)
 The DAO Service's and RestApiController come with a <code>query(criteriaMap, closure)</code> method. It allows you to get a paginated 
-list of entities restricted by the properties in the <code>criteriaMap</code>.
-The query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a>
-and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a>
-with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sql</a> as well</p>
+list of entities restricted by the properties in the <code>criteriaMap</code>.</p>
+<ul>
+<li>A lot of inspiration was drawn from <a href="https://restdb.io/docs/querying-with-the-api">Restdb.io</a></li>
+<li>the query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a></li>
+<li>and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a>.</li>
+<li>Also inspired by <a href="https://github.com/2do2go/json-sql/">json-sql</a></li>
+</ul>
 <blockquote>
-<p>Whilst selectors have some similarities with MongoDB query documents, these arise from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
+<p><img alt="📝" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
+Whilst selectors have many similarities with MongoDB query documents, 
+these arise more from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
 </blockquote>
 <p><strong>Example</strong>
 for example, sending a JSON search param that looks like this

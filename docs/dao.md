@@ -196,20 +196,19 @@ Each of the dao can implement any of the methods listed below and they will get 
 
 The dao also publishes a number of [events as listed in the Groovydoc API](https://yakworks.github.io/gorm-tools/api/gorm/tools/dao/events/package-summary.html)
 
-==TODO UPDATE==
 **Example**  
 ```groovy
 
+import org.springframework.context.event.EventListener
+import gorm.tools.dao.events.BeforeCreateEvent
 
 class OrgListener {
    
-   @Listener(Org)
-   void beforeCreate(PreDaoCreateEvent event) {
-      Org org = event.entityObject
-      Map params = event.params
-      //do some thing with org
-   }
-
+    @EventListener
+    void beforeCreate(BeforeCreateEvent<Org> event) {
+       Org org = event.entity
+       //Do some thing here.
+    }
 }
 
 ```
@@ -224,11 +223,13 @@ However GormMapBinder is optimized to convert most commonly encountered property
 ```groovy
 
 class SomeService {
-        @Autowired MapBinder binder
+        
+        @Autowired 
+        MapBinder binder
         
         void foo(Map params) {
            Org org = new Org()
-            binder.bind(org, params)
+           binder.bind(org, params)
         }
 
 }
@@ -241,21 +242,23 @@ By default all dao's use the default ```GormMapBinder``` for databinding. Howeve
 ```groovy
 
 class CustomMapBinder implements MapBinder {
-     
-     public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod) {
-        //implement  
-      }
-      
-     public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source) {
-        //implement
-     }
 
+    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod) {
+        //implement  
+    }
+
+    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source) {
+        //implement
+    }
 
 }
 
 class OrgDao implements GormDao<Org> {
-    @Autowired CustomMapBinder mapBinder
-    ...
+    
+    @Autowired
+    CustomMapBinder mapBinder
+    
+    .........   
 }
 
 ```
@@ -345,7 +348,7 @@ DaoDataTest extends grails DataTest and configures a dao bean for every mock dom
 class CitySpec extends Specification implements DaoDataTest {
    
    void setup() {
-        mockDomain(City)
+     mockDomain(City)
    }
    
    void "test create"() {

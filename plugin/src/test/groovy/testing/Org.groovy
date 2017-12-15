@@ -1,8 +1,9 @@
 package testing
 
+import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity
+@Entity @GrailsCompileStatic
 class Org {
     int id
     String name

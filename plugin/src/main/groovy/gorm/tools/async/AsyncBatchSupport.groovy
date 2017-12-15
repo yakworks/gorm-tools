@@ -19,10 +19,10 @@ trait AsyncBatchSupport {
     @Value('${hibernate.jdbc.batch_size:0}')
     int batchSize
 
-    /** calls {@link #parallelClosure}. Passes closure args,batchList and closure on through to {@link #withTransaction}*/
-    void parallel(Map args = [:], List<List> batchList, Closure closure) {
-        parallelClosure(args, batchList){ List batch, Map cargs ->
-            withTransaction(cargs, batch, closure)
+    /** calls {@link #parallelClosure} and asses closure args,batchList and closure on through to {@link #withTrx}*/
+    void parallelWithTrx(Map args = [:], List<List> batchList, Closure closure) {
+        parallel(args, batchList){ List batch, Map cargs ->
+            withTrx(cargs, batch, closure)
         }
     }
 
@@ -39,7 +39,7 @@ trait AsyncBatchSupport {
      * @param batchList a collated list of lists. each list in the batchList will be asynchronously passed to the provided closure
      * @param closure the closure to call on each list in the batchList
      */
-    abstract void parallelClosure(Map args = [:], List<List> batchList, Closure closure)
+    abstract void parallel(Map args = [:], List<List> batchList, Closure closure)
 
     /**
      * Uses collate to break or slice the list into batches and then calls parallel
@@ -50,7 +50,7 @@ trait AsyncBatchSupport {
      * @param closure the closure to pass to eachParallel which is then passed to withTransaction
      */
     void parallelCollate(Map args = [:], List list, Closure closure) {
-        parallel(args, collate(list, args.batchSize as Integer), closure)
+        parallelWithTrx(args, collate(list, args.batchSize as Integer), closure)
     }
 
     /**
@@ -64,13 +64,13 @@ trait AsyncBatchSupport {
     }
 
     /**
-     * Should be overriden and annotated with Transactional
+     * Should be overriden and annotated with Transactional by the implementing class
      *
      * @param args <i>optional args to pass to the closure. coming from parallelClosure
      * @param list the list to iterate over and run the closure on each item
      * @param closure the closure to execute. will get passed the item and args as it itereates over the list
      */
-    void withTransaction(Map args = [:], List list, Closure closure) {
+    void withTrx(Map args, List list, Closure closure) {
         for (Object item : list) {
             closure(item, args)
         }

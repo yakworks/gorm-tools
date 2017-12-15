@@ -1,5 +1,6 @@
 package gorm.tools.dao.events
 
+import gorm.tools.dao.DaoApi
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.events.EventPublisher
@@ -71,57 +72,51 @@ class DaoEventPublisher implements EventPublisher {
         GormEnhancer.findInstanceApi(entity.class).datastore
     }
 
-    void publishEvent(DaoEvent event) {
+    void publishEvents(DaoApi dao, DaoEvent event, Object... args) {
+        invokeEventMethod(dao, event.eventKey, args)
+        if(!dao.enableEvents) return
         applicationEventPublisher.publishEvent(event)
         //println event.routingKey
         notify(event.routingKey, event)
     }
 
-    void doBeforePersist(Object dao, GormEntity entity) {
+    void doBeforePersist(DaoApi dao, GormEntity entity, Map args) {
         BeforePersistEvent event = new BeforePersistEvent(getDatastore(entity), entity)
-        invokeEventMethod(dao, event.eventKey, [entity] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity, args] as Object[])
     }
 
-    void doAfterPersist(Object dao, GormEntity entity) {
+    void doAfterPersist(DaoApi dao, GormEntity entity, Map args) {
         AfterPersistEvent event = new AfterPersistEvent(getDatastore(entity), entity)
-        invokeEventMethod(dao, event.eventKey, [entity] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity, args] as Object[])
     }
 
-    void doBeforeCreate(Object dao, GormEntity entity, Map params) {
+    void doBeforeCreate(DaoApi dao, GormEntity entity, Map params) {
         BeforeCreateEvent event = new BeforeCreateEvent(getDatastore(entity), entity, params)
-        invokeEventMethod(dao, event.eventKey, [entity, params] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity, params] as Object[])
     }
 
-    void doAfterCreate(Object dao, GormEntity entity, Map params) {
+    void doAfterCreate(DaoApi dao, GormEntity entity, Map params) {
         AfterCreateEvent event = new AfterCreateEvent(getDatastore(entity), entity, params)
-        invokeEventMethod(dao, event.eventKey, [entity, params] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity, params] as Object[])
     }
 
-    void doBeforeUpdate(Object dao, GormEntity entity, Map params) {
+    void doBeforeUpdate(DaoApi dao, GormEntity entity, Map params) {
         BeforeUpdateEvent event = new BeforeUpdateEvent(getDatastore(entity), entity, params)
-        invokeEventMethod(dao, event.eventKey, [entity, params] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity, params] as Object[])
     }
 
-    void doAfterUpdate(Object dao, GormEntity entity, Map params) {
+    void doAfterUpdate(DaoApi dao, GormEntity entity, Map params) {
         AfterUpdateEvent event = new AfterUpdateEvent(getDatastore(entity), entity, params)
-        invokeEventMethod(dao, event.eventKey, [entity, params] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity, params] as Object[])
     }
 
-    void doBeforeRemove(Object dao, GormEntity entity) {
+    void doBeforeRemove(DaoApi dao, GormEntity entity) {
         BeforeRemoveEvent event = new BeforeRemoveEvent(getDatastore(entity), entity)
-        invokeEventMethod(dao, event.eventKey, [entity] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity] as Object[])
     }
 
-    void doAfterRemove(Object dao, GormEntity entity) {
+    void doAfterRemove(DaoApi dao, GormEntity entity) {
         AfterRemoveEvent event = new AfterRemoveEvent(getDatastore(entity), entity)
-        invokeEventMethod(dao, event.eventKey, [entity] as Object[])
-        publishEvent(event)
+        publishEvents(dao, event, [entity] as Object[])
     }
 }

@@ -20,9 +20,10 @@ class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T
 
     @Override
     def execute() {
-        asyncBatchSupport.parallel(cities) { Map row, Map cargs ->
+        asyncBatchSupport.parallel(cities) { List<Map> list, Map args ->
+            dao.batchCreate(list)
             //domainClass.dao.create( row, [validate:validate, dataBinder:dataBinder ])
-            dao.doCreate(row)
+            //dao.create(row)
             //insertRow(row)
         }
     }

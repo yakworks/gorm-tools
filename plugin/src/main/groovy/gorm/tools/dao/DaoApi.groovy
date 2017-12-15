@@ -18,6 +18,8 @@ interface DaoApi<D> {
     /** The data binder to use. By default gets injected with GormMapBinder*/
     MapBinder getMapBinder()
 
+    boolean isEnableEvents()
+
     /**
      * Transactional wrap for {@link #doPersist}
      */
@@ -44,13 +46,13 @@ interface DaoApi<D> {
     D create(Map data)
 
     /**
-     * Transactional creates entity using the data from params. calls the {@link #bindAndSave} with bindMethod='Create'
+     * Creates entity using the data from params. calls the {@link #bindAndSave} with bindMethod='Create'
      *
      * @param data the data to bind onto the entity
      * @return the created domain entity
      * @see #doPersist
      */
-    D doCreate(Map data)
+    D doCreate(Map data, Map args)
 
     /**
      * Transactional wrap for {@link #doUpdate}
@@ -58,14 +60,13 @@ interface DaoApi<D> {
     D update(Map data)
 
     /**
-     * Transactional updates entity using the data from params. calls the {@link #bindAndSave} with bindMethod='Update'
+     * Updates entity using the data from params. calls the {@link #bind} with bindMethod='Update'
      *
      * @param data the data to bind onto the entity
      * @return the updated domain entity
      * @see #doPersist
      */
-    D doUpdate(Map data)
-
+    D doUpdate(Map data, Map args)
 
     /**
      * use {@link #getMapBinder} and bind the data using the bindMethod
@@ -82,6 +83,7 @@ interface DaoApi<D> {
      * @param params the parameter map that has the id for the domain entity to delete
      * @throws gorm.tools.dao.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
+    void removeById(Serializable id, Map args)
     void removeById(Serializable id)
 
     /**
@@ -90,6 +92,8 @@ interface DaoApi<D> {
      * @param entity the domain entity
      */
     void remove(D entity)
+
+    void doRemove(D entity, Map args)
 
     /**
      * gets and verifies that the entity can eb retrieved and version matches.
@@ -111,4 +115,16 @@ interface DaoApi<D> {
     D get(Map<String,Object> params)
 
     DomainException handleException(D entity, RuntimeException e)
+
+    void batchCreate(Map args, List<Map> batch)
+    void batchCreate(List<Map> batch)
+
+    void batchUpdate(Map args, List<Map> batch)
+    void batchUpdate(List<Map> batch)
+
+    void batchRemove(Map args, List batch)
+    void batchRemove(List batch)
+
+    void batchPersist(Map args, List<D> list)
+    void batchPersist(List<D> list)
 }

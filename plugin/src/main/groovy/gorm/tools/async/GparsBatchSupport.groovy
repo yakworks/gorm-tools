@@ -41,20 +41,20 @@ class GparsBatchSupport implements AsyncBatchSupport {
      * @param closure the closure to call on each list in the batchList
      */
     @Override
-    void parallelClosure(Map args, List<List> batchList, Closure clos) {
+    void parallel(Map args, List<List> batchList, Closure closure) {
         int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
         GParsPool.withPool(psize) {
             GParsPoolUtil.eachParallel(batchList){ List batch ->
-                clos(batch, args)
+                closure(batch, args)
             }
         }
     }
 
     @Override
     @Transactional
-    void withTransaction(Map args, List batch, Closure clos) {
+    void withTrx(Map args, List batch, Closure closure) {
         for (Object item : batch) {
-            clos(item, args)
+            closure(item, args)
         }
         DaoUtil.flushAndClear()
     }

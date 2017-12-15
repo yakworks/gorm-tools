@@ -97,7 +97,7 @@ class DaoUtil implements ApplicationContextAware {
      */
     @CompileDynamic
     static void flush() {
-        ctx.sessionFactory.currentSession.flush()
+        ctx.sessionFactory?.currentSession?.flush()
     }
 
     /**
@@ -105,7 +105,7 @@ class DaoUtil implements ApplicationContextAware {
      */
     @CompileDynamic
     static void clear() {
-        ctx.sessionFactory.currentSession.clear()
+        ctx.sessionFactory?.currentSession?.clear()
     }
 
     static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {

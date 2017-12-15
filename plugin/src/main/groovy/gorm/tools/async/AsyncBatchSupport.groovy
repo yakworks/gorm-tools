@@ -1,8 +1,5 @@
 package gorm.tools.async
 
-import gorm.tools.dao.DaoUtil
-import grails.gorm.transactions.Transactional
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value
 

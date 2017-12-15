@@ -9,7 +9,7 @@ import org.grails.datastore.gorm.GormEntity
 import javax.persistence.Transient
 
 @CompileStatic
-trait DaoEntity<D extends GormEntity<D>> {
+trait DaoEntity<D extends GormEntity<D>> implements MangoDaoEntity{
 
     @Transient
     private static DaoApi cachedDao

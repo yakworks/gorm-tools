@@ -24,4 +24,21 @@ class DaoGrailsPlugin extends grails.plugins.Plugin {
         DaoPluginHelper.onChange(event, grailsApplication, this)
     }
 
+    @Override
+    void doWithDynamicMethods() {
+        grailsApplication.domainClasses.each { domainClass ->
+            List<String> fields = config.gorm?.tools?.mango?.defaultQuickSearch
+            if (!domainClass.clazz.quickSearchFields && fields instanceof List){
+                domainClass.clazz.quickSearchFields = fields.findAll{ //TODO: refactor
+                    try {
+                        domainClass.getPropertyByName(it)
+                        true
+                    } catch (e){
+                        false
+                    }
+                }
+
+            }}
+    }
+
 }

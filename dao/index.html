@@ -940,7 +940,8 @@ We'll see in the next section how to override the automated tests in the DomainA
 Again running with the "intelligent defaults but easy to override" mantra we can easily and selectively override the defaults in the dao. 
 Lets say we want to do something more advanced during the create such as validate and retrieve info from GitHub. 
 Its not recomended to autowire beans into the domains for performance reasons
-It can also be tricky to modify the domain using the event methods such as <code>beforeCreate</code> inside the Project domain and deal with flushing.</p>
+It can also be tricky and at times fairly messy trying to modify or create domains using gorm's hibernate inspired event methods.
+Such as <code>beforeCreate</code> inside the Project domain and deal with flushing.</p>
 <p>We can abstract out the logic into a ProjectDao. </p>
 <p>Lets say we wanted to use a service to validate Github repo and retrieve the description on create.
 We can add a class to the <code>grails-app/dao</code> directory as in the following example.</p>

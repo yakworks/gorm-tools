@@ -258,6 +258,53 @@ class OrgListener {
 
 ```
 
+## Using external groovy beans as event listeners.
+[Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) can be used to register classes defined outside of application into groovy scripts as spring beans.
+Which makes it possible to externalize the event listeners if required so.
+ 
+Here's an example.
+
+ ```DaoEventListener.groovy``` outside of grails app.
+ 
+ ```groovy
+import gorm.tools.dao.events.AfterRemoveEvent
+import gorm.tools.dao.events.BeforeCreateEvent
+import gorm.tools.dao.events.BeforeUpdateEvent
+import org.springframework.context.event.EventListener
+
+public class DaoEventListener {
+
+    @EventListener
+    void beforeCreate(BeforeCreateEvent<Org> event) {
+        Org org = event.entity
+        org.event = "PreDaoCreateEvent"
+    }
+
+    @EventListener
+    void beforeCreate(BeforeUpdateEvent<Org> event) {
+        Org org = event.entity
+        org.event = "PreDaoUpdateEvent"
+    }
+}
+```
+
+ Define external class a spring bean in resources.groovy
+
+ File ```grails-app/conf/spring/resources.groovy```
+ 
+ ```groovy
+
+    File file = new File("path to DaoEventListener.groovy")
+    xmlns lang: "http://www.springframework.org/schema/lang"
+    
+    String beanName = GrailsNameUtils.getPropertyName(file.name.replace('.groovy', ''))
+    lang.groovy(id: beanName, 'script-source': "file:<path to file>", 'refresh-check-delay': 1000)
+
+```
+ 
+See [example](https://github.com/yakworks/gorm-tools/blob/8356c50e13874921c9b42c2c9fa1f93d2c2a6826/examples/benchmarks/grails-app/conf/spring/resources.groovy#L25-L25) in benchmarks project.  
+
+
 ## Data binding using MapBinder
 Plugin comes with a ```MapBinder``` Which is used by Daos to perform databinding.
 Plugin configures ```GormMapBinder``` as default implementation of ```MapBinder```. ```GormMapBinder``` is similar to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.

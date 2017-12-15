@@ -397,6 +397,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#using-external-groovy-beans-as-event-listeners" title="Using external groovy beans as event listeners." class="md-nav__link">
+    Using external groovy beans as event listeners.
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
     Data binding using MapBinder
   </a>
@@ -751,6 +758,13 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#using-external-groovy-beans-as-event-listeners" title="Using external groovy beans as event listeners." class="md-nav__link">
+    Using external groovy beans as event listeners.
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
     Data binding using MapBinder
   </a>
@@ -1079,6 +1093,44 @@ Each method is transactional and will prevent incomplete cascading saves.</p>
     <span class="o">}</span>
 <span class="o">}</span>
 </pre></div></p>
+<h2 id="using-external-groovy-beans-as-event-listeners">Using external groovy beans as event listeners.<a class="headerlink" href="#using-external-groovy-beans-as-event-listeners" title="Permanent link">&para;</a></h2>
+<p><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy">Spring dynamic languages support</a> can be used to register classes defined outside of application into groovy scripts as spring beans.
+Which makes it possible to externalize the event listeners if required so.</p>
+<p>Here's an example.</p>
+<p><code>DaoEventListener.groovy</code> outside of grails app.</p>
+<p>```groovy
+import gorm.tools.dao.events.AfterRemoveEvent
+import gorm.tools.dao.events.BeforeCreateEvent
+import gorm.tools.dao.events.BeforeUpdateEvent
+import org.springframework.context.event.EventListener</p>
+<p>public class DaoEventListener {</p>
+<div class="codehilite"><pre><span></span>@EventListener
+void beforeCreate(BeforeCreateEvent&lt;Org&gt; event) {
+    Org org = event.entity
+    org.event = &quot;PreDaoCreateEvent&quot;
+}
+
+@EventListener
+void beforeCreate(BeforeUpdateEvent&lt;Org&gt; event) {
+    Org org = event.entity
+    org.event = &quot;PreDaoUpdateEvent&quot;
+}
+</pre></div>
+
+
+<p>}
+<code>Define external class a spring bean in resources.groovy
+
+ File</code>grails-app/conf/spring/resources.groovy<code></code>groovy
+
+    File file = new File("path to DaoEventListener.groovy")
+    xmlns lang: "<a href="http://www.springframework.org/schema/lang">http://www.springframework.org/schema/lang</a>"
+
+    String beanName = GrailsNameUtils.getPropertyName(file.name.replace('.groovy', ''))
+    lang.groovy(id: beanName, 'script-source': "file:<path to file>", 'refresh-check-delay': 1000)
+
+```</p>
+<p>See <a href="https://github.com/yakworks/gorm-tools/blob/8356c50e13874921c9b42c2c9fa1f93d2c2a6826/examples/benchmarks/grails-app/conf/spring/resources.groovy#L25-L25">example</a> in benchmarks project.  </p>
 <h2 id="data-binding-using-mapbinder">Data binding using MapBinder<a class="headerlink" href="#data-binding-using-mapbinder" title="Permanent link">&para;</a></h2>
 <p>Plugin comes with a <code>MapBinder</code> Which is used by Daos to perform databinding.
 Plugin configures <code>GormMapBinder</code> as default implementation of <code>MapBinder</code>. <code>GormMapBinder</code> is similar to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.

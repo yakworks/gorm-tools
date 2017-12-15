@@ -25,7 +25,7 @@ class DaoTestHelper {
             daoEventPublisher(DaoEventPublisher)
             daoUtilBean(DaoUtil)
             trxService(TrxService)
-            mangoQuery(MangoQuery)
+            mango(MangoQuery)
         }
     }
 

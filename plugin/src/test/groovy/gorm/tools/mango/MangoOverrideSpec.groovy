@@ -1,16 +1,20 @@
 package gorm.tools.mango
 
+import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.GormDao
 import gorm.tools.testing.DaoDataTest
 import grails.artefact.Artefact
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import grails.persistence.Entity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import spock.lang.Specification
 
 class MangoOverrideSpec extends Specification implements DaoDataTest {
 
-    void setup() {
+    void setupSpec() {
+        defineBeans{ newMangoQuery(NewMangoQuery) }
         mockDomain(City)
     }
 
@@ -50,6 +54,9 @@ class NewMangoQuery implements MangoQueryApi {
 
 @Artefact("Dao")
 @Transactional
-class CityDao implements GormDao<City> {
-    MangoQueryApi getMangoQuery(){ new NewMangoQuery()}
+class CityDao extends DefaultGormDao<City> {
+
+    @Autowired
+    @Qualifier("newMangoQuery")
+    NewMangoQuery mangoQuery
 }

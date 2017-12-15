@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 @CompileStatic
 trait DaoQuery<D extends GormEntity> {
@@ -11,6 +12,7 @@ trait DaoQuery<D extends GormEntity> {
     abstract Class<D> getDomainClass()
 
     @Autowired
+    @Qualifier("mango")
     MangoQueryApi mangoQuery
 
     /**

@@ -4,8 +4,7 @@ import gorm.tools.dao.GormDao
 import grails.artefact.Artefact
 import grails.gorm.transactions.Transactional
 
-@Artefact("Dao")
-@Transactional
+@Artefact("Dao") @Transactional
 class OrgDao implements GormDao<Org> {
 
     void beforeCreate(Org org, Map params) {

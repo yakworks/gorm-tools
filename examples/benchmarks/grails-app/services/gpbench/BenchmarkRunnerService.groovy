@@ -45,6 +45,7 @@ class BenchmarkRunnerService {
 
     RegionDao regionDao
     CountryDao countryDao
+    CityDao cityDao
     GrailsApplication grailsApplication
 
     CsvReader csvReader
@@ -57,13 +58,13 @@ class BenchmarkRunnerService {
         //println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
         //println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
         println "Available processors: " + Runtime.getRuntime().availableProcessors()
-        println "Gpars pool size (poolSize): " + poolSize
+        println "Gpars pool size (gpars.poolsize): " + poolSize
         println "binderType: " + binderType
-        println "hibernate.jdbc.batch_size (batchSize): " + batchSize
+        println "hibernate.jdbc.batch_size (jdbcBatchSize): " + batchSize
         println "batchSliceSize: " + batchSliceSize
         println "auditTrailEnabled: " + auditTrailEnabled
         println "refreshableBeansEnabled (eventListenerCount): " + eventListenerCount
-        println "Autowire enabled: " + grailsApplication.config.grails.gorm.autowire
+        println "Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
 
         //load base country and city data which is used by all benchmarks
         benchmarkHelper.truncateTables()
@@ -86,23 +87,18 @@ class BenchmarkRunnerService {
         if (eventListenerCount)
             warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
 
-        warmUpAndRun("### Dao events", "runDaoEvents", binderType)
+        warmUpAndRun("### Dao events - set audit fields", "runDaoEvents", binderType)
 
         if (auditTrailEnabled)
             warmUpAndRun("### Gpars - audit trail", "runWithAuditTrail", binderType)
 
         warmUpAndRun("### RXJava, Script executor, etc", "runOther", binderType)
 
-//        warmUpAndRun("### Gpars - standard grails binding with baseline Slower",
-//            "runBaselineCompare", 'grails')
-//
 //        warmUpAndRun("  - Performance problems go away without databinding on traits",
 //            "runMultiCoreSlower", 'fast')
-//
-//        warmUpAndRun("  - Performance problems - standard grails binding with baseline",
-//            "runMultiCoreSlower", 'grails')
 
-        runMultiThreadsOther("## Misc sanity checks")
+
+        //runMultiThreadsOther("## Misc sanity checks")
 
         System.exit(0)
     }
@@ -131,12 +127,18 @@ class BenchmarkRunnerService {
     void runBaselineCompare(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
-
         runBenchmark(new GparsBaselineBenchmark(CityBaseline, bindingMethod))
-        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
-
         runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
+
+        logMessage "  - Events disabled"
+        City.dao.enableEvents = false
         runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
+
+        logMessage "  - Events enabled"
+        City.dao.enableEvents = true
+        runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
+
+        //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
         //logMessage "\n  - These should all run within about 5% of City and each other"
         //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
     }
@@ -214,10 +216,9 @@ class BenchmarkRunnerService {
         assert Region.count() == 3953
     }
 
-    @CompileStatic(TypeCheckingMode.SKIP)
     void insert(List<List<Map>> batchList, DaoApi dao) {
-        asyncBatchSupport.parallel(batchList) { Map row, args ->
-            dao.create(row)
+        asyncBatchSupport.parallel(batchList) { List<Map> list, Map args ->
+            dao.batchCreate(list)
         }
     }
 

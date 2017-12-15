@@ -8,6 +8,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class CityDao implements GormDao<City> {
 
+    boolean enableEvents = false
+
     //@NotTransactional
     //@CompileDynamic
     City bindWithSetters(Map row) {

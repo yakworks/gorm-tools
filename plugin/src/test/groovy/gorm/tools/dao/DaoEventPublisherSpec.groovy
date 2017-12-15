@@ -13,12 +13,6 @@ class DaoEventPublisherSpec extends Specification implements DaoDataTest {
         mockDomain(City)
     }
 
-    Closure doWithSpring() {
-        { ->
-            trxService(TrxService)
-        }
-    }
-
     DaoEventPublisher daoEventPublisher
 
     void testEventsFired() {

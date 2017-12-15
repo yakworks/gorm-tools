@@ -112,7 +112,8 @@ The [DefaultGormDao] that is setup for the Project domain will of course not alw
 Again running with the "intelligent defaults but easy to override" mantra we can easily and selectively override the defaults in the dao. 
 Lets say we want to do something more advanced during the create such as validate and retrieve info from GitHub. 
 Its not recomended to autowire beans into the domains for performance reasons
-It can also be tricky to modify the domain using the event methods such as `beforeCreate` inside the Project domain and deal with flushing.
+It can also be tricky and at times fairly messy trying to modify or create domains using gorm's hibernate inspired event methods.
+Such as `beforeCreate` inside the Project domain and deal with flushing.
 
 We can abstract out the logic into a ProjectDao. 
 

@@ -28,7 +28,7 @@ class GparsScriptEngineBenchmark<T extends GormEntity> extends GparsBaselineBenc
         def scriptinsert = scriptEngine.run("insert-city.groovy",
             new Binding([dataBinder: dataBinder]))//new Binding([batch:batch])
 
-        asyncBatchSupport.parallel(cities) { row, zargs ->
+        asyncBatchSupport.parallelWithTrx(cities) { row, zargs ->
             scriptinsert.insertRow(row)
         }
     }

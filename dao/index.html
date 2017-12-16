@@ -1220,8 +1220,8 @@ Uses i18n messages.</p>
 <p>An extension of the DomainException to be able to handle rest request which should respond with 404 error.</p>
 <h2 id="async-batch-processing-support">Async batch processing support<a class="headerlink" href="#async-batch-processing-support" title="Permanent link">&para;</a></h2>
 <p>Plugin makes it easy to process list of batches asynchronously with transaction using <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>. 
-<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsBatchSupport.html">BparsBatchSupport</a> is default implementation provided by the plugin.</p>
-<p><strong>BatchSize</strong> - Is the batchsize used for slicing the list. The default value is obtained from <code>hibernate.jdbc.batch_size</code> configuration setting. However it can be explicitely passed in args as shown in below example.<br />
+<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsBatchSupport.html">GparsBatchSupport</a> is default implementation provided by the plugin.</p>
+<p><strong>batchSize</strong> - Is the batchsize used for slicing the list. The default value is obtained from <code>hibernate.jdbc.batch_size</code> configuration setting. However it can be explicitely passed in args as shown in below example.<br />
 <strong>poolSize</strong> - Is the size of Gpars thread pool used by <code>GparsBatchSupport</code>. The default value can configured using <code>gpars.poolsize</code>. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1</p>
 <p><strong>Example</strong>:
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">TestService</span> <span class="o">{</span>

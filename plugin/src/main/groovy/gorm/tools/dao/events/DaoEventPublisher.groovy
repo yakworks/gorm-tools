@@ -74,7 +74,7 @@ class DaoEventPublisher implements EventPublisher {
 
     void publishEvents(DaoApi dao, DaoEvent event, Object... args) {
         invokeEventMethod(dao, event.eventKey, args)
-        if(!dao.enableEvents) return
+        if (!dao.enableEvents) return
         applicationEventPublisher.publishEvent(event)
         //println event.routingKey
         notify(event.routingKey, event)

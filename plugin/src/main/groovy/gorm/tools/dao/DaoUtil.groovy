@@ -18,6 +18,9 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 /**
  * A bunch of statics to support the GormDaoSupport.
  * this is also setup as daoUtilsBean so that it gets injected with the ApplicationContext once its setup
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 1.0
  */
 @CompileStatic
 class DaoUtil implements ApplicationContextAware {

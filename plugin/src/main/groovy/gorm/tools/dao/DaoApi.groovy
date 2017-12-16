@@ -2,10 +2,16 @@ package gorm.tools.dao
 
 import gorm.tools.dao.errors.DomainException
 import gorm.tools.databinding.MapBinder
-import groovy.transform.CompileStatic
 import grails.validation.ValidationException
+import groovy.transform.CompileStatic
 import org.springframework.dao.DataAccessException
 
+/**
+ * A complete interface for a DAO.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.x
+ */
 @CompileStatic
 interface DaoApi<D> {
 
@@ -84,6 +90,7 @@ interface DaoApi<D> {
      * @throws gorm.tools.dao.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args)
+
     void removeById(Serializable id)
 
     /**
@@ -112,19 +119,23 @@ interface DaoApi<D> {
      *
      * @param params expects a Map with an [id] key and optionally a [version] key
      */
-    D get(Map<String,Object> params)
+    D get(Map<String, Object> params)
 
     DomainException handleException(D entity, RuntimeException e)
 
     void batchCreate(Map args, List<Map> batch)
+
     void batchCreate(List<Map> batch)
 
     void batchUpdate(Map args, List<Map> batch)
+
     void batchUpdate(List<Map> batch)
 
     void batchRemove(Map args, List batch)
+
     void batchRemove(List batch)
 
     void batchPersist(Map args, List<D> list)
+
     void batchPersist(List<D> list)
 }

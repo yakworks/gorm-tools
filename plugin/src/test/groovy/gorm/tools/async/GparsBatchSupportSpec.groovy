@@ -2,6 +2,7 @@ package gorm.tools.async
 
 import gorm.tools.dao.DaoUtil
 import gorm.tools.testing.DaoDataTest
+import grails.gorm.transactions.TransactionService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
@@ -15,6 +16,7 @@ class GparsBatchSupportSpec extends Specification implements DaoDataTest {
 
     void setupSpec() {
         DaoUtil.ctx = grailsApplication.mainContext
+
         defineBeans({
             asyncBatchSupport(GparsBatchSupport)
         })
@@ -23,6 +25,7 @@ class GparsBatchSupportSpec extends Specification implements DaoDataTest {
     void "test collate"() {
         given:
         List list = createList(100)
+        //asyncBatchSupport.transactionService = getDatastore().getService(TransactionService)
 
         expect:
         list.size() == 100
@@ -76,7 +79,7 @@ class GparsBatchSupportSpec extends Specification implements DaoDataTest {
 
         when:
         int count = 0
-        asyncBatchSupport.withTrx([test:1], list) { Map item, Map args ->
+        asyncBatchSupport.batchTrx([test:1], list) { Map item, Map args ->
             count = count + 1
             assert args.test == 1
         }

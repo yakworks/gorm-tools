@@ -5,15 +5,18 @@ import gorm.tools.dao.DefaultGormDao
 import gorm.tools.dao.GormDao
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.utils.ClasspathEntityScanner
+import org.grails.datastore.mapping.core.AbstractDatastore
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AssignableTypeFilter
 
-class DaoHibernateSpec extends HibernateSpec implements AutowiredTest {
+@CompileStatic
+class DaoHibernateSpec extends HibernateSpec implements DaoTestHelper, AutowiredTest {
 
     void setupSpec() {
-        DaoTestHelper.grailsApplication = grailsApplication
         List<Class> domainClasses = getDomainClasses()
         String packageName = getPackageToScan(config)
         Package packageToScan = Package.getPackage(packageName) ?: getClass().getPackage()
@@ -22,7 +25,7 @@ class DaoHibernateSpec extends HibernateSpec implements AutowiredTest {
 
         if (domainClasses) {
             domainClasses.each { Class domainClass ->
-                beans = beans << DaoTestHelper.registerDao(domainClass, DaoTestHelper.findDaoClass(domainClass))
+                beans = beans << registerDao(domainClass, findDaoClass(domainClass))
             }
         } else {
             Set<Class> daoClasses = scanDaoClasses(packageName)
@@ -31,13 +34,18 @@ class DaoHibernateSpec extends HibernateSpec implements AutowiredTest {
                 Class daoClass = daoClasses.find {
                     it.simpleName == DaoUtil.getDaoBeanName(domainClass)
                 } ?: DefaultGormDao
-                beans = beans << DaoTestHelper.registerDao(domainClass, daoClass)
+                beans = beans << registerDao(domainClass, daoClass)
             }
         }
 
-        beans = beans << DaoTestHelper.commonBeans()
+        beans = beans << commonBeans()
 
         defineBeans(beans)
+    }
+
+    @CompileDynamic
+    AbstractDatastore getDatastore() {
+        hibernateDatastore
     }
 
     //scans all dao classes in given package.

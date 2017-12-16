@@ -1,9 +1,7 @@
 package gorm.tools.async
 
 import gorm.tools.WithTrx
-import grails.gorm.transactions.TransactionService
 import groovy.transform.CompileStatic
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
 
@@ -17,13 +15,13 @@ import org.springframework.transaction.TransactionStatus
  * @since 6.1
  */
 @CompileStatic
-trait AsyncBatchSupport implements WithTrx{
+trait AsyncBatchSupport implements WithTrx {
 
     /** The list size to send to the collate that slices.*/
     @Value('${hibernate.jdbc.batch_size:0}')
     int batchSize
 
-    /** calls {@link #parallel()} and passes args, batchList and the closure through to {@link #batchTrx()}*/
+    /** calls {@link #parallel()} and passes args, batchList and the closure through to {@link #batchTrx()} */
     /**
      * calls {@link #parallel} with the args, batches list calling {@link #doBatch} for each batch in batches
      * passes itemClosure down through to the {@link #doBatch}
@@ -36,7 +34,7 @@ trait AsyncBatchSupport implements WithTrx{
      * @param batchClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
      */
     void parallelBatch(Map args = [:], List<List> batches, Closure itemClosure) {
-        parallel(args, batches){ List batch, Map cargs ->
+        parallel(args, batches) { List batch, Map cargs ->
             batchTrx(cargs, batch, itemClosure)
         }
     }
@@ -74,12 +72,12 @@ trait AsyncBatchSupport implements WithTrx{
      * @param batchSize _optional_ the length of each batch sub-list in the returned list. override the {@link #batchSize}
      * @return the batches (list of lists) containing the chunked list of items
      */
-    List<List> collate(List items, Integer batchSize = null){
+    List<List> collate(List items, Integer batchSize = null) {
         items.collate(batchSize ?: getBatchSize())
     }
 
     /**
-     * runs {@link #doBatch) in a Transaction and flush and clear is called after doBatch but before commit.
+     * runs {@link #doBatch ) in a Transaction and flush and clear is called after doBatch but before commit.
      */
     void batchTrx(Map args, List items, Closure itemClosure) {
         withTrx { TransactionStatus status ->

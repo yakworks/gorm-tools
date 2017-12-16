@@ -25,7 +25,7 @@ trait DaoTestHelper extends GrailsUnitTest {
     void setupTransactionService() {
         DaoUtil.ctx = grailsApplication.mainContext
         //setup transactionService
-        if(!ctx.containsBean("transactionService"))
+        if (!ctx.containsBean("transactionService"))
             ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
     }
 

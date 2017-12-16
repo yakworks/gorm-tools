@@ -1,7 +1,5 @@
 package gorm.tools.async
 
-import gorm.tools.dao.DaoUtil
-import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovyx.gpars.GParsPool
 import groovyx.gpars.GParsPoolUtil
@@ -48,7 +46,7 @@ class GparsBatchSupport implements AsyncBatchSupport {
     void parallel(Map args, List<List> batches, Closure batchClosure) {
         int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
         GParsPool.withPool(psize) {
-            GParsPoolUtil.eachParallel(batches){ List batch ->
+            GParsPoolUtil.eachParallel(batches) { List batch ->
                 batchClosure(batch, args)
             }
         }

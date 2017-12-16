@@ -181,7 +181,7 @@ trait GormDao<D extends GormEntity> implements GormBatchDao<D>, DaoQuery, WithTr
      * @return
      */
     @Override
-    D get(Map<String,Object> params) {
+    D get(Map<String, Object> params) {
         return get(params.id as Serializable, params.version as Long)
     }
 
@@ -195,10 +195,10 @@ trait GormDao<D extends GormEntity> implements GormBatchDao<D>, DaoQuery, WithTr
     }
 
     GormInstanceApi<D> getInstanceApi() {
-        (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getDomainClass())
+        (GormInstanceApi<D>) GormEnhancer.findInstanceApi(getDomainClass())
     }
 
     GormStaticApi<D> getStaticApi() {
-        (GormStaticApi<D>)GormEnhancer.findStaticApi(getDomainClass())
+        (GormStaticApi<D>) GormEnhancer.findStaticApi(getDomainClass())
     }
 }

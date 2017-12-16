@@ -19,7 +19,9 @@ import org.springframework.transaction.annotation.Propagation
  * 	seedValue - "1000" this is the starting ID fi the row does not exist and is created by this object.
  *
  * 	setCreateIdRow = false to not create the row automatically if it does not exist
- * @author Josh
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 1.0
  *
  */
 @CompileStatic

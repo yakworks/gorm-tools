@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicLong
  * set in the constructor. Usually a Jdbc type implmentation that will get the values for this class for both initialization
  * and when this runs out of allocated ids.
  *
- * @author josh
+ * @author Joshua Burnett (@basejump)
+ * @since 1.0
  *
  */
 @CompileStatic

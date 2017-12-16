@@ -6,6 +6,12 @@ import groovy.transform.CompileStatic
 import grails.validation.ValidationException
 import org.springframework.dao.DataAccessException
 
+/**
+ * A complete interface for a DAO.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.x
+ */
 @CompileStatic
 interface DaoApi<D> {
 

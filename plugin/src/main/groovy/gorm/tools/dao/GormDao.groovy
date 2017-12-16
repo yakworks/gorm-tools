@@ -21,10 +21,11 @@ import org.springframework.dao.DataIntegrityViolationException
 /**
  * A trait that turns a class into a DAO
  *
- * @author Joshua Burnett
+ * @author Joshua Burnett (@basejump)
+ * @since 6.x
  */
 @CompileStatic
-trait GormDao<D extends GormEntity> implements WithTrx, GormBatchDao<D>, DaoQuery, DaoApi<D> {
+trait GormDao<D extends GormEntity> implements GormBatchDao<D>, DaoQuery, WithTrx, DaoApi<D> {
 
     @Autowired
     MapBinder mapBinder

@@ -1,24 +1,24 @@
 package gorm.tools.beans
 
-import gorm.tools.dao.DaoApi
+import gorm.tools.repository.RepositoryApi
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEntity
 
 /**
- * Delegates missing properties as method calls to the dao for the domain class.
+ * Delegates missing properties as method calls to the repository for the domain class.
  */
 @CompileStatic
 class DaoDelegatingBean extends DelegatingBean {
-    DaoApi dao
+    RepositoryApi repo
 
     @CompileStatic(TypeCheckingMode.SKIP)
     DaoDelegatingBean(GormEntity target) {
         super(target)
-        dao = target.getDao()
+        repo = target.getRepo()
     }
 
-    //first try if target bean has property, if not, check if dao has the method
+    //first try if target bean has property, if not, check if repository has the method
     Object propertyMissing(String name) {
         try {
             return super.propertyMissing(name)
@@ -31,9 +31,9 @@ class DaoDelegatingBean extends DelegatingBean {
             }
 
             try {
-                return dao.invokeMethod(method, target)
+                return repo.invokeMethod(method, target)
             } catch (MissingMethodException me) {
-                //dao does not have that method either, so throw back original MissingPropertyException exception
+                //repository does not have that method either, so throw back original MissingPropertyException exception
                 throw e
             }
         }
@@ -44,9 +44,9 @@ class DaoDelegatingBean extends DelegatingBean {
             return target.invokeMethod(name, args)
         } catch (MissingMethodException e) {
             try {
-                dao.invokeMethod(name, args)
+                repo.invokeMethod(name, args)
             } catch (MissingMethodException me) {
-                //if dao does not have the method either, throw back original exception
+                //if repository does not have the method either, throw back original exception
                 throw e
             }
         }

@@ -1,6 +1,6 @@
 package gpbench.benchmarks
 
-import gpbench.CityDao
+import gpbench.CityRepo
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
@@ -15,7 +15,7 @@ abstract class BaseBenchmark extends AbstractBenchmark {
     CsvReader csvReader
     JsonReader jsonReader
 
-    CityDao cityDao
+    CityRepo cityDao
 
     boolean useDatabinding = false
 

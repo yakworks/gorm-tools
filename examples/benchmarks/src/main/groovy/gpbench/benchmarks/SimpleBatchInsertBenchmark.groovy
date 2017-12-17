@@ -1,8 +1,8 @@
 package gpbench.benchmarks
 
-import gorm.tools.dao.DaoUtil
+import gorm.tools.repository.RepoUtil
 import gpbench.City
-import gpbench.CityDao
+import gpbench.CityRepo
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
@@ -12,7 +12,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 
-    CityDao cityDao
+    CityRepo cityDao
 
     SimpleBatchInsertBenchmark(boolean databinding) {
         super(databinding)
@@ -25,18 +25,18 @@ class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
         assert City.count() == 115000
     }
 
-    void insert(List<List<Map>> batchList, CityDao dao) {
+    void insert(List<List<Map>> batchList, CityRepo repo) {
         for (List<Map> batch : batchList) {
-            insertBatch(batch, dao)
-            DaoUtil.flushAndClear()
+            insertBatch(batch, repo)
+            RepoUtil.flushAndClear()
         }
     }
 
     @Transactional
-    void insertBatch(List<Map> batch, CityDao dao) {
+    void insertBatch(List<Map> batch, CityRepo repo) {
         for (Map record : batch) {
             try {
-                dao.create(record)
+                repo.create(record)
             } catch (Exception e) {
                 e.printStackTrace()
             }

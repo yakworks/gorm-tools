@@ -1,7 +1,7 @@
 package gpbench.listeners
 
-import gorm.tools.dao.events.BeforeCreateEvent
-import gpbench.CityDaoSpringEvents
+import gorm.tools.repository.events.BeforeCreateEvent
+import gpbench.CitySpringEvents
 import gpbench.SecUtil
 import groovy.transform.CompileStatic
 import org.springframework.context.event.EventListener
@@ -13,9 +13,9 @@ import javax.annotation.ManagedBean
 class CityDaoSpringEventListener {
 
     @EventListener
-    void beforeCreate(BeforeCreateEvent<CityDaoSpringEvents> event) {
-        //println "beforeCreate on CityDaoSpringEvents"
-        CityDaoSpringEvents entity = event.entity
+    void beforeCreate(BeforeCreateEvent<CitySpringEvents> event) {
+        //println "beforeCreate on CitySpringEvents"
+        CitySpringEvents entity = event.entity
         entity.createdBy = SecUtil.userId
         entity.editedBy = SecUtil.userId
         entity.createdDate = new Date()
@@ -24,7 +24,7 @@ class CityDaoSpringEventListener {
 
     //@Listener(CityDaoPerisistenceEvents)
 //    void beforeUpdate(BeforeUpdateEvent event) {
-//        CityDaoSpringEvents entity = (CityDaoSpringEvents)event.entityObject
+//        CitySpringEvents entity = (CitySpringEvents)event.entityObject
 //        entity.lastUpdatedUser = SecUtil.userId
 //        entity.lastUpdated = new Date()
 //    }

@@ -14,7 +14,7 @@ trait DaoQuery<D extends GormEntity> {
     MangoQueryApi mangoQuery
 
     /**
-     * Builds detached criteria for dao's domain based on mango criteria language and additional criteria
+     * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
      *
      * @param params mango language criteria map
      * @param closure additional restriction for criteria

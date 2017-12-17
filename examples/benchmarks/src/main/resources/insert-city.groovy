@@ -7,8 +7,8 @@ class Loader {
     String dataBinder
 
     String insertRow(Map row) {
-        //City.dao.create(row, [dataBinder:dataBinder])
-        City.dao.create(row)
+        //City.repository.create(row, [dataBinder:dataBinder])
+        City.repo.create(row)
     }
 }
 

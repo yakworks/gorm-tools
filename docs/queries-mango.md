@@ -21,7 +21,7 @@ these arise more from a similarity of purpose and do not necessarily extend to c
 **Basic example**
 
 ``` java
-Org.dao.query([
+Org.repo.query([
   criteria: [name: "Bill%", type: "New"],
   sort: [name:"asc"],
   max: 20
@@ -275,7 +275,7 @@ So Mango criteria will add `%` automatically, if quick search string doesn't hav
 for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
-Org.dao.search([criteria: [$quickSearch: "abc"], max: 20])
+Org.repo.search([criteria: [$quickSearch: "abc"], max: 20])
 
 ```
 So it is the same as:
@@ -342,7 +342,7 @@ But Dao bean doesn't contain this method, so one can call it on mangoQuery bean.
 To specify what fields sums should be computed for, the list with fields name should be passed.
 See example:
 ```groovy
-Org.dao.mangoQuery.countTotals(domainClass, [
+Org.repo.mangoQuery.countTotals(domainClass, [
   criteria: [name: "Virgin%", type: "New"]
 ], ["amount", credit]){
   gt "id", 5

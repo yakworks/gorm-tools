@@ -1,7 +1,7 @@
 package gpbench.benchmarks
 
-import gorm.tools.dao.DaoApi
-import gorm.tools.dao.DaoUtil
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepositoryApi
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
@@ -11,27 +11,27 @@ import org.grails.datastore.gorm.GormEntity
 @CompileStatic
 class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T> {
 
-    DaoApi<T> dao
+    RepositoryApi<T> repo
 
     GparsDaoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {
         super(clazz, bindingMethod)
-        dao = DaoUtil.findDao(clazz)
+        repo = RepoUtil.findRepository(clazz)
     }
 
     @Override
     def execute() {
         asyncBatchSupport.parallel(cities) { List<Map> list, Map args ->
-            dao.batchCreate(list)
-            //domainClass.dao.create( row, [validate:validate, dataBinder:dataBinder ])
-            //dao.create(row)
+            repo.batchCreate(list)
+            //domainClass.repository.create( row, [validate:validate, dataBinder:dataBinder ])
+            //repository.create(row)
             //insertRow(row)
         }
     }
 //
 //    void insertRow(Map row) {
 //        //T c = domainClass.newInstance()
-//        T c = dao.getDomainClass().newInstance()
-//        c = (T)dao.bind(c, row, null)
+//        T c = repository.getDomainClass().newInstance()
+//        c = (T)repository.bind(c, row, null)
 //        c.save(failOnError:true, validate:validate)
 //    }
 

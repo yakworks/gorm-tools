@@ -1,21 +1,20 @@
 package gorm.tools.async
 
-import gorm.tools.dao.DaoUtil
-import gorm.tools.testing.DaoDataTest
-import grails.gorm.transactions.TransactionService
+import gorm.tools.repository.RepoUtil
+import gorm.tools.testing.GormToolsTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification
 
 import java.util.concurrent.atomic.AtomicInteger
 
-class GparsBatchSupportSpec extends Specification implements DaoDataTest {
+class GparsBatchSupportSpec extends Specification implements GormToolsTest {
 
     @Autowired
     GparsBatchSupport asyncBatchSupport
 
     void setupSpec() {
-        DaoUtil.ctx = grailsApplication.mainContext
+        RepoUtil.ctx = grailsApplication.mainContext
 
         defineBeans({
             asyncBatchSupport(GparsBatchSupport)

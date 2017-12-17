@@ -1,8 +1,8 @@
 package gpbench
 
 import gorm.tools.async.AsyncBatchSupport
-import gorm.tools.dao.DaoApi
-import gorm.tools.dao.DaoUtil
+import gorm.tools.repository.RepositoryApi
+import gorm.tools.repository.RepoUtil
 import gpbench.benchmarks.*
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
@@ -43,9 +43,9 @@ class BenchmarkRunnerService {
     int warmupCycles = 1
     boolean muteConsole = false
 
-    RegionDao regionDao
-    CountryDao countryDao
-    CityDao cityDao
+    RegionRepo regionDao
+    CountryRepo countryDao
+    CityRepo cityDao
     GrailsApplication grailsApplication
 
     CsvReader csvReader
@@ -131,11 +131,11 @@ class BenchmarkRunnerService {
         runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
 
         logMessage "  - Events disabled"
-        City.dao.enableEvents = false
+        City.repo.enableEvents = false
         runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
 
         logMessage "  - Events enabled"
-        City.dao.enableEvents = true
+        City.repo.enableEvents = true
         runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
 
         //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
@@ -150,9 +150,9 @@ class BenchmarkRunnerService {
 
     void runDaoEvents(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
-        runBenchmark(new GparsDaoBenchmark(CityDaoMethodEvents, bindingMethod))
-        runBenchmark(new GparsDaoBenchmark(CityDaoSpringEvents, bindingMethod))
-        runBenchmark(new GparsDaoBenchmark(CityDaoSpringEventsRefreshable, bindingMethod))
+        runBenchmark(new GparsDaoBenchmark(CityMethodEvents, bindingMethod))
+        runBenchmark(new GparsDaoBenchmark(CitySpringEvents, bindingMethod))
+        runBenchmark(new GparsDaoBenchmark(CitySpringEventsRefreshable, bindingMethod))
     }
 
     void runWithAuditTrail(String msg, String bindingMethod = 'grails') {
@@ -210,15 +210,15 @@ class BenchmarkRunnerService {
         insert(countries, countryDao)
         insert(regions, regionDao)
 
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
 
         assert Country.count() == 275
         assert Region.count() == 3953
     }
 
-    void insert(List<List<Map>> batchList, DaoApi dao) {
+    void insert(List<List<Map>> batchList, RepositoryApi repo) {
         asyncBatchSupport.parallel(batchList) { List<Map> list, Map args ->
-            dao.batchCreate(list)
+            repo.batchCreate(list)
         }
     }
 

@@ -1,10 +1,10 @@
 package gpbench.benchmarks
 
-import gorm.tools.dao.DaoUtil
+import gorm.tools.repository.RepoUtil
 import gorm.tools.jdbc.GrailsParameterMapRowMapper
 import gorm.tools.jdbc.ScrollableQuery
 import gpbench.City
-import gpbench.CityDao
+import gpbench.CityRepo
 import gpbench.helpers.BenchmarkHelper
 import gpbench.helpers.CsvReader
 import grails.gorm.transactions.Transactional
@@ -32,7 +32,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
     BenchmarkHelper benchmarkHelper
     JdbcTemplate jdbcTemplate
     DataSource dataSource
-    CityDao cityDao
+    CityRepo cityDao
     CsvReader csvReader
 
     void setup() {
@@ -99,7 +99,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
             }
         }
 
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
     }
 
     @Override

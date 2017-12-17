@@ -1,20 +1,20 @@
 package testing
 
-import gorm.tools.dao.DaoUtil
-import gorm.tools.dao.errors.DomainException
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.errors.DomainException
 import spock.lang.Specification
 
 class BasicTestsForDao extends Specification {
 
-    def dao
+    def repo
 
 
     void testSave() {
         println "testSave"
         def dom = new Jumper(name: "testSave")
         try {
-            dao.save(dom)
-            DaoUtil.flushAndClear()
+            repo.save(dom)
+            RepoUtil.flushAndClear()
             def dom2 = Jumper.findByName("testSave")
             assert dom2
         } catch (DomainException e) {
@@ -26,10 +26,10 @@ class BasicTestsForDao extends Specification {
         println "testDelete"
         def dom = new Jumper(name: "testDelete")
         try {
-            dao.save(dom)
-            DaoUtil.flushAndClear()
+            repo.save(dom)
+            RepoUtil.flushAndClear()
             def dom2 = Jumper.findByName("testDelete")
-            dao.delete(dom2)
+            repo.delete(dom2)
             def dom3 = Jumper.findByName("testDelete")
             dom3 == null
         } catch (DomainException e) {
@@ -40,8 +40,8 @@ class BasicTestsForDao extends Specification {
     void testInsert() {
         println "testInsert"
         try {
-            def result = dao.insert([name: "testInsert"])
-            DaoUtil.flushAndClear()
+            def result = repo.insert([name: "testInsert"])
+            RepoUtil.flushAndClear()
             //println result
             assertTrue result.ok
             assertEquals "testInsert", result.entity.name
@@ -56,8 +56,8 @@ class BasicTestsForDao extends Specification {
     void testCreate() {
         println "testInsert"
         try {
-            def result = dao.create([name: "testInsert"])
-            DaoUtil.flushAndClear()
+            def result = repo.create([name: "testInsert"])
+            RepoUtil.flushAndClear()
             //println result
             assertTrue result.ok
             assertEquals "testInsert", result.entity.name
@@ -73,11 +73,11 @@ class BasicTestsForDao extends Specification {
         println "testUpdate"
         def dup = new Jumper(name: "testUpdate")
         dup.save()
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
         assert Jumper.findByName("testUpdate")
         try {
-            def result = dao.update([id: dup.id, name: "testUpdateXXX"])
-            DaoUtil.flushAndClear()
+            def result = repo.update([id: dup.id, name: "testUpdateXXX"])
+            RepoUtil.flushAndClear()
             //println result
             assertTrue result.ok
             assertEquals "testUpdateXXX", result.entity.name
@@ -94,11 +94,11 @@ class BasicTestsForDao extends Specification {
         println "testRemove"
         def dup = new Jumper(name: "testRemove")
         dup.save()
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
         assert Jumper.findByName("testRemove")
         try {
-            def result = dao.remove([id: dup.id])
-            DaoUtil.flushAndClear()
+            def result = repo.remove([id: dup.id])
+            RepoUtil.flushAndClear()
             //println result
             assertTrue result.ok
             assertEquals dup.id, result.id

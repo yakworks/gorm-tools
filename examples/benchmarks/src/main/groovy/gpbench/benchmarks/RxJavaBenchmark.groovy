@@ -1,6 +1,6 @@
 package gpbench.benchmarks
 
-import gorm.tools.dao.DaoUtil
+import gorm.tools.repository.RepoUtil
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import io.reactivex.Flowable
@@ -34,7 +34,7 @@ class RxJavaBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
             insertRow(row)
         }
 
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
     }
 
 }

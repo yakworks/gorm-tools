@@ -10,11 +10,11 @@ class JumperDaoSpec extends Specification {
 
     static transactional = false
 
-    JumperDao jumperDao
+    JumperRepo jumperRepo
 
     def "verify domainClass"() {
         expect:
-        jumperDao.domainClass == Jumper
+        jumperRepo.domainClass == Jumper
     }
 
     void testNonTranDao() {

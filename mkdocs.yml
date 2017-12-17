@@ -8,7 +8,7 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 # Page tree
 pages:
   - Overview: index.md
-  - DAO Services: dao.md
+  - Gorm Repository: repository.md
   - Mango Query: queries-mango.md
   - Async: async.md
   - Utilities & Helpers:

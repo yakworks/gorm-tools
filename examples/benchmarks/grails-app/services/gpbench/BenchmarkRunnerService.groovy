@@ -1,7 +1,7 @@
 package gpbench
 
 import gorm.tools.async.AsyncBatchSupport
-import gorm.tools.repository.RepositoryApi
+import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.RepoUtil
 import gpbench.benchmarks.*
 import gpbench.fat.CityFat

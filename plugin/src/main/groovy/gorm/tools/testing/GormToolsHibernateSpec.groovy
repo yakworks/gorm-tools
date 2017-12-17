@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter
 
 @CompileStatic
-class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper, AutowiredTest {
+abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper, AutowiredTest {
 
     void setupSpec() {
         List<Class> domainClasses = getDomainClasses()

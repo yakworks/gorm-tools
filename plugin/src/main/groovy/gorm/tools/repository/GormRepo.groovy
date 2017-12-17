@@ -1,10 +1,12 @@
 package gorm.tools.repository
 
 import gorm.tools.WithTrx
+import gorm.tools.databinding.MapBinder
+import gorm.tools.mango.api.MangoQueryTrait
+import gorm.tools.repository.api.GormBatchRepo
+import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.DomainException
 import gorm.tools.repository.errors.DomainNotFoundException
-import gorm.tools.databinding.MapBinder
-import gorm.tools.mango.MangoQueryRepo
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
@@ -25,7 +27,7 @@ import org.springframework.dao.DataIntegrityViolationException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryRepo, WithTrx, RepositoryApi<D> {
+trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrait, WithTrx, RepositoryApi<D> {
 
     @Autowired
     MapBinder mapBinder

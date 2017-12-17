@@ -1,4 +1,4 @@
-package gorm.tools.repository
+package gorm.tools.repository.api
 
 import gorm.tools.WithTrx
 import groovy.transform.CompileStatic

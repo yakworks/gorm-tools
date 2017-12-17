@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 
 //@Transactional
 @CompileStatic
-class CityRepoMethodEventsRepo implements GormRepo<CityMethodEvents> {
+class CityMethodEventsRepo implements GormRepo<CityMethodEvents> {
 
     void beforeCreate(CityMethodEvents entity, Map params) {
         entity.createdBy = SecUtil.userId

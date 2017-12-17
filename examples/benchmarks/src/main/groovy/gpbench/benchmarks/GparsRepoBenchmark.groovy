@@ -1,7 +1,7 @@
 package gpbench.benchmarks
 
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.RepositoryApi
+import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 

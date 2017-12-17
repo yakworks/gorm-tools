@@ -1,14 +1,13 @@
-package gorm.tools.mango
+package gorm.tools.mango.api
 
 import grails.gorm.DetachedCriteria
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 
 @CompileStatic
-trait MangoQueryRepo<D extends GormEntity> {
+trait MangoQueryTrait{
 
-    abstract Class<D> getDomainClass()
+    abstract Class getDomainClass()
 
     @Autowired
     MangoQueryApi mangoQuery

@@ -3,6 +3,7 @@ package gorm.tools.testing
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import groovy.transform.CompileStatic
+import org.junit.Test
 
 @SuppressWarnings(['JUnitPublicNonTestMethod'])
 @CompileStatic
@@ -26,6 +27,12 @@ trait GormToolsTest implements GormToolsTestHelper, DataTest, AutowiredTest {
         }
 
         defineBeans(repoBeans << commonBeans())
+    }
+
+    @Test
+    void foobar(){
+        expect:
+            assert 1==2
     }
 
 }

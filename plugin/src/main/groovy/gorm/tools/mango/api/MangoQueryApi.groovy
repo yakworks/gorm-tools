@@ -1,4 +1,4 @@
-package gorm.tools.mango
+package gorm.tools.mango.api
 
 import grails.gorm.DetachedCriteria
 import groovy.transform.CompileStatic

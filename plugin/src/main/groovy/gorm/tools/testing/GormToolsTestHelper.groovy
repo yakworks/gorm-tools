@@ -2,7 +2,7 @@ package gorm.tools.testing
 
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.databinding.GormMapBinder
+import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.MangoQuery
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.gorm.transactions.TransactionService
@@ -44,7 +44,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
 
     Closure commonBeans() {
         return {
-            gormMapBinder(GormMapBinder)
+            gormMapBinder(EntityMapBinder)
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
             //trxService(TrxService)

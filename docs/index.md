@@ -22,7 +22,7 @@ There are 2 primary patterns this library enables as detailed below for Reposito
 and Mango ( A mongo query like way to get data with a Map)
 
 ## Domain Repository Services
-<small>[jump to detailed docs](repository.md)</small>
+<small>[jump to reference](repository/ref.md)</small>
 
 A repository is a [Domain Driven Design][] pattern. Used a a place logic to validate, bind, persist and query data that resides 
 either in a database or NoSql (via GORM usually of course).

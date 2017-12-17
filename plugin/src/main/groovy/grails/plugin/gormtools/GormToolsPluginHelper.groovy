@@ -5,7 +5,7 @@ import gorm.tools.async.GparsBatchSupport
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.databinding.GormMapBinder
+import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
@@ -23,7 +23,7 @@ class GormToolsPluginHelper {
     static Closure doWithSpring = {
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
-        gormMapBinder(GormMapBinder)
+        gormMapBinder(EntityMapBinder)
 
         jdbcIdGenerator(JdbcIdGenerator) {
             jdbcTemplate = ref("jdbcTemplate")
@@ -92,7 +92,5 @@ class GormToolsPluginHelper {
 
         return bClosure
     }
-
-
 
 }

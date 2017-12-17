@@ -1,6 +1,7 @@
 package gorm.tools.mango
 
 import gorm.tools.Pager
+import gorm.tools.mango.api.MangoQueryApi
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional

@@ -1,6 +1,6 @@
 package gorm.tools.repository.events
 
-import gorm.tools.repository.RepositoryApi
+import gorm.tools.repository.api.RepositoryApi
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.events.EventPublisher

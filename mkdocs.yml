@@ -8,10 +8,12 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 # Page tree
 pages:
   - Overview: index.md
-  - Gorm Repository: repository.md
+  - Repository Pattern:
+    - Quick Start: repository/intro.md
+    - Reference: repository/ref.md
   - Mango Query: queries-mango.md
   - Async: async.md
-  - Utilities & Helpers:
+  - Toolbox:
     - Id Generation: id-generation.md
     - GormUtils Class: gorm-utils.md
     - Bean Path Tools: beanPathTools.md
@@ -29,7 +31,7 @@ theme: material-components
 
 # Options
 extra:
-  version: 3.3.1-SNAPSHOT
+  version: 6.1-SNAPSHOT
   # adds <meta name="robots" content="noindex,nofollow"> to keep search engines from indexing this
   # noindex: true
   feature:

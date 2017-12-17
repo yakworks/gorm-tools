@@ -1,5 +1,6 @@
 package gorm.tools.mango
 
+import gorm.tools.mango.api.MangoQueryApi
 import gorm.tools.testing.GormToolsTest
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity

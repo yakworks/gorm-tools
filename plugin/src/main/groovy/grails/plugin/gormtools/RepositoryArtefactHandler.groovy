@@ -35,9 +35,8 @@ class RepositoryArtefactHandler extends ArtefactHandlerAdapter {
     static final String TYPE = "Repository"
     static final String SUFFIX = "Repo"
     static final String PLUGIN_NAME = "gorm-tools"
-    static Pattern REPO_PATH_PATTERN = Pattern.compile(".+" + REGEX_FILE_SEPARATOR + GRAILS_APP_DIR +
+    static final Pattern REPO_PATH_PATTERN = Pattern.compile(".+" + REGEX_FILE_SEPARATOR + GRAILS_APP_DIR +
         REGEX_FILE_SEPARATOR + "repository" + REGEX_FILE_SEPARATOR + "(.+)\\.(groovy)")
-
 
     RepositoryArtefactHandler() {
         super(TYPE, GrailsRepositoryClass.class, DefaultGrailsRepositoryClass.class, SUFFIX, false)

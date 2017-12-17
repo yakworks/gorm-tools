@@ -8,11 +8,11 @@ import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Specification
 
-class GormMapBinderUnitSpec extends Specification implements DataTest {
-    GormMapBinder binder
+class EntityMapBinderUnitSpec extends Specification implements DataTest {
+    EntityMapBinder binder
 
     void setup() {
-        binder = new GormMapBinder()
+        binder = new EntityMapBinder()
     }
 
     Class[] getDomainClassesToMock() {

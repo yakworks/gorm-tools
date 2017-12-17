@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.DomainException
 import gorm.tools.repository.errors.DomainNotFoundException
 import grails.plugin.gormtools.RepositoryArtefactHandler

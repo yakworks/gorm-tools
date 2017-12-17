@@ -13,19 +13,19 @@ import org.grails.web.databinding.SpringConversionServiceAdapter
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
- * Faster data binder. Copies properties from source to target object.
- * Explicitely checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
+ * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
+ * Explicitly checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
  *
  */
 @CompileStatic
-class GormMapBinder implements MapBinder {
+class EntityMapBinder implements MapBinder {
     private static final String ID_PROP = "id"
 
     ConversionService conversionService = new SpringConversionServiceAdapter()
 
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod = null) {
+    void bind(Object target, Map<String, Object> source, String bindMethod = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
 
@@ -60,9 +60,20 @@ class GormMapBinder implements MapBinder {
 
         }
 
-        return target
-
     }
+
+    //TODO
+    void bindUpdate(Object target, Map<String, Object> source) {
+        //for now just pass them on
+        bind(target, source, "Update")
+    }
+
+    //TODO
+    void bindCreate(Object target, Map<String, Object> source) {
+        //for now just pass them on
+        bind(target, source, "Create")
+    }
+
 
     @Autowired(required = true)
     void setValueConverters(ValueConverter[] converters) {

@@ -1,7 +1,7 @@
 package gorm.tools.repository
 
+import gorm.tools.repository.api.RepositoryApi
 import grails.core.GrailsApplication
-import grails.util.GrailsNameUtils
 import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity

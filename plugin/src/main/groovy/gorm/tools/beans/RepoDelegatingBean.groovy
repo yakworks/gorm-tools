@@ -1,6 +1,6 @@
 package gorm.tools.beans
 
-import gorm.tools.repository.RepositoryApi
+import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEntity

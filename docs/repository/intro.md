@@ -138,7 +138,6 @@ class ProjectRepo implements GormRepo<Project>{
         if(repoInfo.description){
             //force the gitHubRepo.description to be whats in github
             project.gitHubInfo.description = repoInfo.description
-            project.gitHubInfo.persist()  //optional 
             //update project.description to be the same if its null
             project.description = project.description ?: repoInfo.description
             project.persist() //optional

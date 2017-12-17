@@ -2,7 +2,7 @@ package gpbench
 
 import gorm.tools.GormUtils
 import gorm.tools.beans.DateUtil
-import gorm.tools.databinding.GormMapBinder
+import gorm.tools.databinding.EntityMapBinder
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
 import gpbench.fat.CityFatNoTraits
@@ -25,7 +25,7 @@ class BenchmarkDatabindingService {
     JsonReader jsonReader
 
     @Autowired
-    GormMapBinder gormMapBinder
+    EntityMapBinder gormMapBinder
 
     Long count = 111690
     Map props = [

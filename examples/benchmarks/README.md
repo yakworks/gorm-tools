@@ -32,7 +32,7 @@ The goal is to have good benchmarks to measure and answer following questions.
 - Does binding slow it down, why, can it be optimized, best alternative
 - Does valiation slow it down, why, can it be optimized
 - Does Auditstamp slow it down, can it be optimized
-- Does Daos slow it down
+- Does Repostories slow it down
 - Do custom Id generator slow it down, or improve speed
 - does @compileStatic speed things up, where does it matter? does it help to have it on the domains?
 

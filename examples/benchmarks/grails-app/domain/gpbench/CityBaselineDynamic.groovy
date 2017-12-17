@@ -1,8 +1,8 @@
 package gpbench
 
 /**
- * Baseline stock grails domain. no DAO or anything else should be attached to this.
- * only Grails AST should have touched this.
+ * Baseline stock grails domain. no Repository or anything else should be attached to this.
+ * only normal Grails AST should have touched this.
  */
 class CityBaselineDynamic {
     String name

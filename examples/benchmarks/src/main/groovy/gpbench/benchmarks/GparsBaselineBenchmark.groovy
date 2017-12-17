@@ -1,6 +1,6 @@
 package gpbench.benchmarks
 
-import gorm.tools.databinding.GormMapBinder
+import gorm.tools.databinding.EntityMapBinder
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -13,7 +13,7 @@ import org.grails.datastore.gorm.GormEntity
 @CompileStatic
 class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends BaseBatchInsertBenchmark<T> {
 
-    GormMapBinder gormMapBinder
+    EntityMapBinder gormMapBinder
 
     GparsBaselineBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)

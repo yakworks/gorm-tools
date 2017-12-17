@@ -1,11 +1,12 @@
 package gorm.tools.mango
 
-import gorm.tools.testing.DaoDataTest
+import gorm.tools.mango.api.MangoQueryApi
+import gorm.tools.testing.GormToolsTest
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 import spock.lang.Specification
 
-class MangoOverrideSpec extends Specification implements DaoDataTest {
+class MangoOverrideSpec extends Specification implements GormToolsTest {
 
     void setup() {
         mockDomain(City)
@@ -20,7 +21,7 @@ class MangoOverrideSpec extends Specification implements DaoDataTest {
         }
 
         when:
-        List list = City.dao.query()
+        List list = City.repo.query()
         then:
         list.size() == 1
         list[0].id == 2

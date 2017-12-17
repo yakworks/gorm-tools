@@ -1,5 +1,5 @@
 # Introduction
-This document describes the release process designed and implemented for `grails dao plugin`. Its main purpose is to explain to developers and maintainers how to prepare and release a new version of this plugin.
+This document describes the release process designed and implemented for `gorm-tools plugin`. Its main purpose is to explain to developers and maintainers how to prepare and release a new version of this plugin.
 
 ## The Process
 We publish snapshots and releases for the plugin.

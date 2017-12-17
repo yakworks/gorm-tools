@@ -1,14 +1,12 @@
 package gorm.tools.beans
 
-import gorm.tools.dao.DefaultGormDao
-import grails.gorm.annotation.Entity
-import grails.testing.gorm.DataTest
-import grails.testing.spring.AutowiredTest
+import gorm.tools.testing.GormToolsTest
+import grails.persistence.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.Specification
 
-class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest {
+class BeanPathToolsSpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
@@ -28,6 +26,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         )
         expect:
         exp == BeanPathTools.getFieldValue(obj, path)
+
         where:
         exp                          | path
         '1111'                       | 'foo'
@@ -83,13 +82,10 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
                 ),
                 left: new TestClazzA(
                     foo: '3',
-                    bar: 4,
-                    id: 5
-                ),
-                id: 6
+                    bar: 4
+                )
             ),
-            value: 7,
-            id: 8
+            value: 7
         )
         expect:
         Map act = [:]
@@ -104,8 +100,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         'right.right.value' | [right: [right: [value: 2]]]
         'right.left.value1' | [right: [left: [:]]]
         'right.left.bar'    | [right: [left: [bar: 4]]]
-        'right.left.*'      | [right: [left: [bar: 4, foo: '3', id: 5, version: 0, bazMap: null, bazList: null]]]
-        'right.*'           | [right: [id: 6, value: 0, version: null]]
+        'right.left.*'      | [right: [left: [bar: 4, foo: '3', id: 1, version: null, bazMap: null, bazList: null]]]
+        'right.*'           | [right: [id: 2, value: 0, version: null]]
     }
 
     void "Property returns list of domains"() {
@@ -121,7 +117,7 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         where:
         path          | exp
         'value'       | [value: 10]
-        'fooValues.*' | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: 0, bazMap: null, bazList: null], [id: 2, bar: null, foo: 'val 2', version: 0, bazMap: null, bazList: null]]]
+        'fooValues.*' | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: null, bazMap: null, bazList: null], [id: 1, bar: null, foo: 'val 2', version: null, bazMap: null, bazList: null]]]
     }
 
     void "test propsToMap for a non domain"() {
@@ -196,8 +192,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
 
     void "test buildMapFromPaths"() {
         setup:
-        TestClazzA object = new TestClazzA(id: 0L, foo: 'foo', bar: 10.00, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2])
-        object.addToBaz(new TestClazzC(id: 5, version: 0, value: 23))
+        TestClazzA object = new TestClazzA(foo: 'foo', bar: 10.00, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2])
+        object.addToBaz(new TestClazzC(value: 23))
 
         expect:
         result == BeanPathTools.buildMapFromPaths(object, fields)
@@ -205,8 +201,8 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
         where:
         fields          | result
         ['foo']         | [foo: 'foo']
-        ['*']           | [foo: 'foo', bar: 10.00, id: 0L, version: 0, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
-        ['*', 'baz.id'] | [foo: 'foo', bar: 10.00, id: 0L, version: 0, baz: [[id: 5]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+        ['*']           | [foo: 'foo', bar: 10.00, id: 1, version: null, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+        ['*', 'baz.value'] | [foo: 'foo', bar: 10.00, id: 1, version: null, baz: [[value: 23]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
     }
 
     void "test buildMapFromPaths for all fields using delegating bean"() {
@@ -257,8 +253,9 @@ class BeanPathToolsSpec extends Specification implements AutowiredTest, DataTest
 @Entity
 class TestClazzA {
     Long id
-    Long version = 0
-
+    TestClazzA(){
+        id = 1
+    }
     String foo
     BigDecimal bar
 
@@ -269,34 +266,40 @@ class TestClazzA {
 
     static hasMany = [baz: TestClazzC, bazList: String]
 
-
-    def getDao() {
-        new DefaultGormDao(TestClazzA)
+    static mapping = {
+        id generator:'assigned'
     }
 }
 
 @Entity
 class TestClazzB {
-    Long id
-    Long version
-
+    TestClazzB(){
+        id = 2
+    }
     TestClazzA left
     TestClazzB right
     int value
 
+    static mapping = {
+        id generator:'assigned'
+    }
 }
 
 @Entity
 class TestClazzC {
-    Long id
-    Long version
-
+    TestClazzC(){
+        id = 3
+    }
     int value
+
+    static mapping = {
+        id generator:'assigned'
+    }
 
     List getFooValues() {
         [
-            new TestClazzA(id: 1, version: 0, foo: 'val 1'),
-            new TestClazzA(id: 2, version: 0, foo: 'val 2')
+            new TestClazzA(foo: 'val 1'),
+            new TestClazzA(foo: 'val 2')
         ]
     }
 

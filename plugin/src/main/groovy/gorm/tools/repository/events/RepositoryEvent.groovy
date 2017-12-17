@@ -10,8 +10,8 @@ import org.springframework.core.ResolvableTypeProvider
 //import org.springframework.core.GenericTypeResolver
 
 /**
- * Base event class for Dao firing
- * @param < D >
+ * Base event class for Repository event firing
+ * @param D
  */
 @CompileStatic
 class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {//extends ApplicationEvent {//
@@ -28,10 +28,10 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     }
 
     /**
-     * done per spring docs so that listeners can bind to the generic of the event.
-     * ex: implements ApplicationListener<BeforeCreateEvent<CityDaoSpringEventsRefreshable>>
+     * done per the spring docs so that listeners can bind to the generic of the event.
+     * ex: implements ApplicationListener<BeforeCreateEvent<City>>
      * or @EventListener
-     *    void beforeCreate(BeforeCreateEvent<CityDaoSpringEvents> event)
+     *    void beforeCreate(BeforeCreateEvent<City> event)
      */
     @Override
     public ResolvableType getResolvableType() {

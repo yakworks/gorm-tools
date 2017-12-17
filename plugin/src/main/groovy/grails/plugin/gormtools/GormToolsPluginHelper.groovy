@@ -41,7 +41,7 @@ class GormToolsPluginHelper {
 
         mangoQuery(MangoQuery)
         repoEventPublisher(RepoEventPublisher)
-        repoUtilBean(RepoUtil) //this is here just so the app ctx can get picked up and set on DaoUtils
+        repoUtilBean(RepoUtil) //this is here just so the app ctx can get picked up and set on the static
 
         asyncBatchSupport(GparsBatchSupport)
 
@@ -56,8 +56,8 @@ class GormToolsPluginHelper {
         Class[] domainClasses = application.domainClasses*.clazz
         domainClasses.each { Class domainClass ->
             String repoName = RepoUtil.getRepoBeanName(domainClass)
-            def hasDao = repoClasses.find { it.propertyName == repoName }
-            if (!hasDao) {
+            def hasRepo = repoClasses.find { it.propertyName == repoName }
+            if (!hasRepo) {
                 //println "${repoName}"
                 "${repoName}"(DefaultGormRepo, domainClass) { bean ->
                     bean.autowire = true

@@ -9,7 +9,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
- * A bunch of statics to support the GormDaoSupport.
+ * A bunch of statics to support the Repository artifacts.
  */
 //@CompileStatic
 class RepoMessage {

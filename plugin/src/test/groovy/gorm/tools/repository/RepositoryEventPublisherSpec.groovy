@@ -16,7 +16,6 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
     void testEventsFired() {
         given:
-        //CityRepo cityDao = City.repository
         Map params = [id: 1, name: "test"]
 
         when:
@@ -36,7 +35,6 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
     void testInvokeEvent() {
         given:
-        //CityRepo cityDao = City.repository
         City city = new City()
         Map params = [name: "test"]
 

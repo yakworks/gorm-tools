@@ -3,7 +3,7 @@ package gpbench
 import grails.compiler.GrailsCompileStatic
 
 /**
- * Baseline stock grails domain. no DAO, no Traits or anything else should be attached to this
+ * Baseline stock grails domain. no repo, no Traits or anything else should be attached to this
  * only stock out-of-the-box Grails/Gorm AST should have touched this.
  */
 @GrailsCompileStatic

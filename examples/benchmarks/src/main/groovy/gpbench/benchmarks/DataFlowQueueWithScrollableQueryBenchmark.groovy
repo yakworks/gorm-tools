@@ -32,7 +32,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
     BenchmarkHelper benchmarkHelper
     JdbcTemplate jdbcTemplate
     DataSource dataSource
-    CityRepo cityDao
+    CityRepo cityRepo
     CsvReader csvReader
 
     void setup() {
@@ -93,7 +93,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
     void insertBatch(List<Map> batch) {
         for (Map record : batch) {
             try {
-                cityDao.insertWithSetter(record)
+                cityRepo.insertWithSetter(record)
             } catch (Exception e) {
                 e.printStackTrace()
             }

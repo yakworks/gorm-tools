@@ -4,7 +4,7 @@ import gorm.tools.WithTrx
 import gorm.tools.repository.errors.DomainException
 import gorm.tools.repository.errors.DomainNotFoundException
 import gorm.tools.databinding.MapBinder
-import gorm.tools.mango.DaoQuery
+import gorm.tools.mango.MangoQueryRepo
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
@@ -19,13 +19,13 @@ import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
- * A trait that turns a class into a DAO
+ * A trait that turns a class into a Repository
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, DaoQuery, WithTrx, RepositoryApi<D> {
+trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryRepo, WithTrx, RepositoryApi<D> {
 
     @Autowired
     MapBinder mapBinder

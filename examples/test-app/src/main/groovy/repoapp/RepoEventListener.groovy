@@ -7,23 +7,23 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
 @Component
-public class DaoEventListener {
+public class RepoEventListener {
 
     @EventListener
     void beforeCreate(BeforeCreateEvent<Org> event) {
         Org org = event.entity
-        org.event = "PreDaoCreateEvent"
+        org.event = "BeforeCreateEvent"
     }
 
     @EventListener
     void beforeCreate(BeforeUpdateEvent<Org> event) {
         Org org = event.entity
-        org.event = "PreDaoUpdateEvent"
+        org.event = "BeforeUpdateEvent"
     }
 
     @EventListener
     void beforeCreate(AfterRemoveEvent<Org> event) {
         Org org = event.entity
-        org.event = "PostDaoRemoveEvent"
+        org.event = "AfterRemoveEvent"
     }
 }

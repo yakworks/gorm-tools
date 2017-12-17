@@ -19,7 +19,7 @@ class OneBigTransactionBenchmark extends BaseBenchmark {
     @Override
     def execute() {
         assert City.count() == 0
-        insert(cities, cityDao)
+        insert(cities, cityRepo)
         assert City.count() == 115000
     }
 

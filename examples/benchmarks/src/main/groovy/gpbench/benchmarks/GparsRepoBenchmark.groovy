@@ -9,11 +9,11 @@ import org.grails.datastore.gorm.GormEntity
  * Runs batch inserts in parallel using gparse.
  */
 @CompileStatic
-class GparsDaoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T> {
+class GparsRepoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T> {
 
     RepositoryApi<T> repo
 
-    GparsDaoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {
+    GparsRepoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {
         super(clazz, bindingMethod)
         repo = RepoUtil.findRepository(clazz)
     }

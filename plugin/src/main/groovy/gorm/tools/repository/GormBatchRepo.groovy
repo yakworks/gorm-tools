@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import org.springframework.transaction.TransactionStatus
 
 /**
- * A trait add batch processing and "mass" updating to a DAO service
+ * A trait add batch processing and "mass" updating methods to a Repository
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.x

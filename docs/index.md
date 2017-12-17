@@ -18,22 +18,20 @@
 
 This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
 domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.io/gorm-rest-api/){.new-tab}. 
-There are 2 primary patterns this library enables as detailed below for DAO's 
+There are 2 primary patterns this library enables as detailed below for Repositories
 and Mango ( A mongo query like way to get data with a Map)
 
-## DAO Services
-<small>[jump to detailed docs](dao)</small>
+## Domain Repository Services
+<small>[jump to detailed docs](repository.md)</small>
 
-A DAO, Data Access Object, is a data service bean for logic to validate, bind, persist and query data that resides in a database or  (via GORM usually of course).
-The design here is similiar to [Spring's Repository pattern](https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/) and Grails GORM's new [Data Services](http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices) pattern.
-
-> :bulb: **The DAO name**
-We found our selves setting up a bunch of services that looked a lot like the old school Dao's (or Repositories in DDD language). 
-We figured we would just call them that instead of data services, repository, etc... to prevent confusion with spring and now gorm.
+A repository is a [Domain Driven Design][] pattern. Used a a place logic to validate, bind, persist and query data that resides 
+either in a database or NoSql (via GORM usually of course).
+The design pattern here is a bit similiar to [Spring's Repository pattern](https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/)
+and Grails GORM's new [Data Services](http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices) pattern.
 
 ### Goals
 
-* **Standardization**: a clean common pattern across our apps for service layer logic that 
+* **Standardization**: a clean common pattern across our apps for domain service layer logic that 
   reduces boiler plate in both services as well as controllers.
 * **Transactional Saves**: every save() or persist() is wrapped in a transaction if one doesn't already exist. 
   This is critical when there are cascading saves and updates.
@@ -43,15 +41,16 @@ We figured we would just call them that instead of data services, repository, et
 * **Fast Data Binding Service**: databinding from maps (and thus JSON) has to be fast 
   and therefore maps and json are a first class citizen where it belongs in the data service layer instead of the controller layer. 
   Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.
-* **Events & Validation**: the DAO service allows a central place to do events such as beforeSave, beforeValidate, etc 
+* **Events & Validation**: the Repository allows a central place to do events such as beforeSave, beforeValidate, etc 
   so as not to pollute the domain class. This pattern makes it easier to keeps the special logic in a transaction as well. 
   Allows validation outside of constraints to persistence without needing to modify the domain source.
 * **Events with Flushing**: As mentioned in the Gorm docs, "Do not attempt to flush the session within an event 
   (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.". 
-  Putting the event business logic in the DAO keeps it all in a normal transaction and a flush is perfectly fine.  
-* **Override Plugin's Domain Logic**: Since the DAO is a service this also easily allows default logic in a provided 
-  plugin to be overriden in an application. For example, I can have a CustomerDao in a plugin that deals with common 
-  logic to validate address. I can then easily override and implement that CustomerDao in
+  Putting the event business logic in the Repository keeps it all in a normal transaction and a flush is perfectly fine.  
+* **Override Plugin's Domain Logic**: Since the Repository is a service this also easily allows default logic in a provided 
+  plugin to be overriden in an application. For example, I may have a CustomerRepo in a plugin that deals with deault common 
+  logic to validate address. I can then implement a CustomerRepo in an application and it will override the spring bean
+  just as it does for a service. 
 
 
 ## Mango Query
@@ -60,7 +59,7 @@ The primary motive here is to create an easy dynamic map based way to query any 
 Using a simple map that can come from json, yaml, groovy config etc... 
 A huge motivating factor being able is to be able to have a powerful and flexible way to query using json from a REST 
 based client without having to use GraphQL (the only other clean alternative)
-The DAO Service's and RestApiController come with a `query(criteriaMap, closure)` method. It allows you to get a paginated 
+The Repositories and RestApiController come with a `query(criteriaMap, closure)` method. It allows you to get a paginated 
 list of entities restricted by the properties in the `criteriaMap`.
 
 * A lot of inspiration was drawn from [Restdb.io](https://restdb.io/docs/querying-with-the-api)
@@ -96,11 +95,11 @@ criteria.list {
 To use the Gorm-Tools add the dependency on the plugin to your build.gradle file:
 
 ```
-runtime "org.grails.plugins:dao:@VERSION@"
+runtime "org.grails.plugins:gorm-tools:@VERSION@"
 ```
 
-And you can start using the plugin by calling the dao methods on domain classes. 
-The plugin adds several persistence methods to domain classes. Which delegates to dao classes. This includes persist(), create(params), update(update), remove()
+And you can start using the plugin by calling the repository methods on domain classes. 
+The plugin adds several persistence methods to domain classes. Which delegates to repository classes. This includes persist(), create(params), update(update), remove()
 
-See [DAO Services](dao.md) for more details
+See [Repository](repository.md) for more details
 

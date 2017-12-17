@@ -12,7 +12,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 
-    CityRepo cityDao
+    CityRepo cityRepo
 
     SimpleBatchInsertBenchmark(boolean databinding) {
         super(databinding)
@@ -21,7 +21,7 @@ class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
     @Override
     def execute() {
         assert City.count() == 0
-        insert(cities, cityDao)
+        insert(cities, cityRepo)
         assert City.count() == 115000
     }
 

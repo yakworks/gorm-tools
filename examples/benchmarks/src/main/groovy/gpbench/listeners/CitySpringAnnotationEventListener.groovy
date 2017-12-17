@@ -10,7 +10,7 @@ import javax.annotation.ManagedBean
 
 @ManagedBean
 @CompileStatic
-class CityDaoSpringEventListener {
+class CitySpringAnnotationEventListener {
 
     @EventListener
     void beforeCreate(BeforeCreateEvent<CitySpringEvents> event) {
@@ -21,12 +21,5 @@ class CityDaoSpringEventListener {
         entity.createdDate = new Date()
         entity.editedDate = new Date()
     }
-
-    //@Listener(CityDaoPerisistenceEvents)
-//    void beforeUpdate(BeforeUpdateEvent event) {
-//        CitySpringEvents entity = (CitySpringEvents)event.entityObject
-//        entity.lastUpdatedUser = SecUtil.userId
-//        entity.lastUpdated = new Date()
-//    }
 
 }

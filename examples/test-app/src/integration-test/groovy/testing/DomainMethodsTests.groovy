@@ -12,13 +12,9 @@ import spock.lang.Specification
 @Integration
 @Rollback
 class DomainMethodsTests extends Specification {
-    //static transactional = false
     static dataInit = false
 
     void setup() {
-        //super.setUp()
-        //repository = jumperDelegateDao
-        //assert repository.domainClass == Jumper
         initData()
     }
 
@@ -155,13 +151,10 @@ class DomainMethodsTests extends Specification {
         Student.findByName("student1") == null
     }
 
-    void testGetDaoSetup() {
-        assertTrue Jumper.repo.class.name.contains("testing.JumperRepo")
+    void testGetRepoSetup() {
+        assert Jumper.repo.class.name.contains("testing.JumperRepo")
         println Student.repo.class.name
-        // grails.plugin.repository.GormDaoSupport$$EnhancerBySpringCGLIB$$27f04eca
         assert Student.repo.class.name == ("DefaultGormRepo")
-        assert DropZone.repo.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
-        //assertEquals "grails.plugin.repository.GormDaoSupport",DropZone.repository.class.name
     }
 
 

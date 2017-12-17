@@ -4,10 +4,9 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.DomainException
 import spock.lang.Specification
 
-class BasicTestsForDao extends Specification {
+class BasicTestsForRepo extends Specification {
 
     def repo
-
 
     void testSave() {
         println "testSave"

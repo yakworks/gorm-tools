@@ -25,19 +25,19 @@ class RepositoryEventsSpec extends Specification {
         RepoUtil.flush()
 
         then: "Event listener should have been called"
-        org.event == "PreDaoCreateEvent"
+        org.event == "BeforeCreateEvent"
         org.id != null
 
         when:
         org = Org.update([id: org.id, name: "updated"])
 
         then:
-        org.event == "PreDaoUpdateEvent"
+        org.event == "BeforeUpdateEvent"
 
         when:
         org.remove()
 
         then:
-        org.event == "PostDaoRemoveEvent"
+        org.event == "AfterRemoveEvent"
     }
 }

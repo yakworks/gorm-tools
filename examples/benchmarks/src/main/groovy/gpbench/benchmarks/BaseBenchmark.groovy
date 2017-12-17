@@ -15,7 +15,7 @@ abstract class BaseBenchmark extends AbstractBenchmark {
     CsvReader csvReader
     JsonReader jsonReader
 
-    CityRepo cityDao
+    CityRepo cityRepo
 
     boolean useDatabinding = false
 

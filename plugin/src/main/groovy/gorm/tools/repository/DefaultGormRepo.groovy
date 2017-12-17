@@ -14,21 +14,6 @@ class DefaultGormRepo<D extends GormEntity> implements GormRepo<D> {
     }
 
     DefaultGormRepo(Class<D> clazz) {
-        setDomainClass(clazz)
+        this.domainClass = clazz
     }
-
-//    @Override
-//    D persist(D entity, Map args) {
-//        return doPersist(this, entity, args)
-//    }
-//
-//    @Override
-//    D persist(D entity) {
-//        return doPersist(entity, [:])
-//    }
-
-//    @Override
-//    D create(Map params) {
-//        gormDaoApi.doCreate(this, params)
-//    }
 }

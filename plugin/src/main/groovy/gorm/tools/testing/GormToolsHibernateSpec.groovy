@@ -28,7 +28,7 @@ class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelpe
                 beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
             }
         } else {
-            Set<Class> repoClasses = scanDaoClasses(packageName)
+            Set<Class> repoClasses = scanRepoClasses(packageName)
             //TODO figureout alternative to find entities if possible.
             new ClasspathEntityScanner().scan(packageToScan).each { Class domainClass ->
                 Class repoClass = repoClasses.find {
@@ -49,9 +49,9 @@ class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelpe
     }
 
     //scans all repository classes in given package.
-    //may be change to DaoScanner like ClassPathEntityScanner !?
+    //may be change to RepoScanner like ClassPathEntityScanner !?
     @SuppressWarnings(['ClassForName'])
-    protected Set<Class> scanDaoClasses(String packageName) {
+    protected Set<Class> scanRepoClasses(String packageName) {
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false)
         provider.addIncludeFilter(new AssignableTypeFilter(GormRepo))
         Set<BeanDefinition> beans = provider.findCandidateComponents(packageName)

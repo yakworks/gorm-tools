@@ -9,11 +9,11 @@ import org.grails.datastore.gorm.GormEntity
  * Delegates missing properties as method calls to the repository for the domain class.
  */
 @CompileStatic
-class DaoDelegatingBean extends DelegatingBean {
+class RepoDelegatingBean extends DelegatingBean {
     RepositoryApi repo
 
     @CompileStatic(TypeCheckingMode.SKIP)
-    DaoDelegatingBean(GormEntity target) {
+    RepoDelegatingBean(GormEntity target) {
         super(target)
         repo = target.getRepo()
     }

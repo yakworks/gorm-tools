@@ -18,7 +18,7 @@ import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Invokes event methods on Dao classes.
+ * Invokes event methods on Repository artifcats.
  */
 @CompileStatic
 class RepoEventPublisher implements EventPublisher {

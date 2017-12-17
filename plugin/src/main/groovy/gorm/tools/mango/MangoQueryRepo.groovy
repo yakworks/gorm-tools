@@ -6,7 +6,7 @@ import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 
 @CompileStatic
-trait DaoQuery<D extends GormEntity> {
+trait MangoQueryRepo<D extends GormEntity> {
 
     abstract Class<D> getDomainClass()
 

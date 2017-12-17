@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 import org.springframework.dao.DataAccessException
 
 /**
- * A complete interface for a DAO.
+ * A complete interface for the Repository.
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.x

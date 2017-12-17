@@ -58,6 +58,6 @@ Add dependency for snapshot
 
 ```groovy
 dependencies {
- compile("org.grails.plugins:dao:3.3.2-SNAPSHOT") { changing = true } //see gradle.properties for latest snapshot version.
+ compile("org.grails.plugins:gorm-tools:3.3.2-SNAPSHOT") { changing = true } //see gradle.properties for latest snapshot version.
 }
 ```

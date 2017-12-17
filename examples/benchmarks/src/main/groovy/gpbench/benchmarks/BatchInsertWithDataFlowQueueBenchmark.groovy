@@ -17,7 +17,7 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 @CompileStatic
 class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 
-    CityRepo cityDao
+    CityRepo cityRepo
 
     BatchInsertWithDataFlowQueueBenchmark(boolean databinding) { super(databinding) }
 
@@ -27,7 +27,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 
     @Override
     def execute() {
-        insert(cities, cityDao)
+        insert(cities, cityRepo)
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)

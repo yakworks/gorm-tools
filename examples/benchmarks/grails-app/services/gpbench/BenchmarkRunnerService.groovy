@@ -43,9 +43,9 @@ class BenchmarkRunnerService {
     int warmupCycles = 1
     boolean muteConsole = false
 
-    RegionRepo regionDao
-    CountryRepo countryDao
-    CityRepo cityDao
+    RegionRepo regionRepo
+    CountryRepo countryRepo
+    CityRepo cityRepo
     GrailsApplication grailsApplication
 
     CsvReader csvReader
@@ -87,7 +87,7 @@ class BenchmarkRunnerService {
         if (eventListenerCount)
             warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
 
-        warmUpAndRun("### Dao events - set audit fields", "runDaoEvents", binderType)
+        warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
 
         if (auditTrailEnabled)
             warmUpAndRun("### Gpars - audit trail", "runWithAuditTrail", binderType)
@@ -132,11 +132,11 @@ class BenchmarkRunnerService {
 
         logMessage "  - Events disabled"
         City.repo.enableEvents = false
-        runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
 
         logMessage "  - Events enabled"
         City.repo.enableEvents = true
-        runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
 
         //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
         //logMessage "\n  - These should all run within about 5% of City and each other"
@@ -148,11 +148,11 @@ class BenchmarkRunnerService {
         runBenchmark(new GparsBaselineBenchmark(CityRefreshableBeanEvents, bindingMethod))
     }
 
-    void runDaoEvents(String msg, String bindingMethod = 'grails') {
+    void runRepoEvents(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
-        runBenchmark(new GparsDaoBenchmark(CityMethodEvents, bindingMethod))
-        runBenchmark(new GparsDaoBenchmark(CitySpringEvents, bindingMethod))
-        runBenchmark(new GparsDaoBenchmark(CitySpringEventsRefreshable, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(CityMethodEvents, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(CitySpringEvents, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(CitySpringEventsRefreshable, bindingMethod))
     }
 
     void runWithAuditTrail(String msg, String bindingMethod = 'grails') {
@@ -184,11 +184,11 @@ class BenchmarkRunnerService {
         //runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 
         println "\n  - not much difference between static and dynamic method calls"
-//		runBenchmark(new GparsDaoBenchmark(City,"setter"))
-//		runBenchmark(new GparsDaoBenchmark(City,"fast"))
+//		runBenchmark(new GparsRepoBenchmark(City,"setter"))
+//		runBenchmark(new GparsRepoBenchmark(City,"fast"))
 //
-//		runBenchmark(new GparsDaoBenchmark(City,"bindWithSetters"))
-//		runBenchmark(new GparsDaoBenchmark(City,"bindFast"))
+//		runBenchmark(new GparsRepoBenchmark(City,"bindWithSetters"))
+//		runBenchmark(new GparsRepoBenchmark(City,"bindFast"))
 
         new City().attached
 
@@ -207,8 +207,8 @@ class BenchmarkRunnerService {
         benchmarkHelper.executeSqlScript("test-tables.sql")
         List<List<Map>> countries = csvReader.read("Country").collate(batchSize)
         List<List<Map>> regions = csvReader.read("Region").collate(batchSize)
-        insert(countries, countryDao)
-        insert(regions, regionDao)
+        insert(countries, countryRepo)
+        insert(regions, regionRepo)
 
         RepoUtil.flushAndClear()
 

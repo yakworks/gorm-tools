@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 import org.springframework.context.ApplicationListener
 
 @CompileStatic
-class CityDaoSpringEventsBean implements ApplicationListener<BeforeCreateEvent<CitySpringEventsRefreshable>> {
+class CitySpringEventsBean implements ApplicationListener<BeforeCreateEvent<CitySpringEventsRefreshable>> {
 
     @Override
     void onApplicationEvent(BeforeCreateEvent<CitySpringEventsRefreshable> event) {

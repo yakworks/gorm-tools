@@ -7,7 +7,7 @@ import gpbench.model.DateUserStampConstraints
 import grails.compiler.GrailsCompileStatic
 
 /**
- * Dao Baseline. This has a DAO and has been touched by the gorm-tools AST
+ * repo Baseline. This has a repo and has been touched by the gorm-tools AST
  */
 @GrailsCompileStatic
 class City implements CityTrait, DateUserStamp {

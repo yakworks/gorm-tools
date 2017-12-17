@@ -9,8 +9,8 @@ import groovy.transform.CompileStatic
 trait GormToolsTest implements GormToolsTestHelper, DataTest, AutowiredTest {
 
     /**
-     * Mocks domain classes providing the equivalent GORM behavior as well as the Dao for the domain.
-     * If a Dao Class is explicitly defined then this looks for it in the same package
+     * Mocks domain classes providing the equivalent GORM behavior as well as the Repo for the domain.
+     * If a Repository Class is explicitly defined then this looks for it in the same package
      *
      * @param domainClassesToMock The list of domain classes to mock
      */

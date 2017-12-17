@@ -30,7 +30,6 @@ class CityRepo implements GormRepo<City> {
 
     City insertWithSetter(Map row) {
         City c = bindWithSetters(row)
-        //gormDaoApi.persist(c)
         persist(c)
         return c
     }

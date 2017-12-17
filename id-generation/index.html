@@ -121,7 +121,7 @@
             
               
                 <span class="md-header-nav__parent">
-                  Utilities & Helpers
+                  Toolbox
                 </span>
               
             
@@ -248,10 +248,46 @@
       
 
 
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      Repository Pattern
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        Repository Pattern
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
   <li class="md-nav__item">
-    <a href="../dao/" title="DAO Services" class="md-nav__link">
-      DAO Services
+    <a href="../repository/intro/" title="Quick Start" class="md-nav__link">
+      Quick Start
     </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../repository/ref/" title="Reference" class="md-nav__link">
+      Reference
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
   </li>
 
     
@@ -291,11 +327,11 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
     
     <label class="md-nav__link" for="nav-5">
-      Utilities & Helpers
+      Toolbox
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-5">
-        Utilities & Helpers
+        Toolbox
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
         
@@ -499,7 +535,7 @@
                 
                 
                 <h3 id="database-id-generator">Database ID Generator<a class="headerlink" href="#database-id-generator" title="Permanent link">&para;</a></h3>
-<p>Dao plugin comes with an implementation of hibernate identity generator for a cross database and NoSQL way to assign Long ids from an in memory incrementor. It uses a central table to track the last used id for each table. This helps a lot when dealing with associations and relationships. It also increases the performance of batch inserts.</p>
+<p>The plugin comes with an implementation of hibernate identity generator for a cross database and NoSQL way to assign Long ids from an in memory incrementor. It uses a central table to track the last used id for each table. This helps a lot when dealing with associations and relationships. It also increases the performance of batch inserts.</p>
 <h3 id="newobjectid-table">NewObjectId table<a class="headerlink" href="#newobjectid-table" title="Permanent link">&para;</a></h3>
 <p>The table name is configurable and will get created if it does not exist. You can also create the table as shown below and add indexes if desired.</p>
 <div class="codehilite"><pre><span></span><span class="k">create</span> <span class="k">table</span> <span class="n">NewObjectId</span>
@@ -549,9 +585,9 @@ Internally it uses jdbcIdGenerator to query for next batch of ids.</p>
   <span class="o">}</span>
 </pre></div>
 
-<p>Dao plugin by default configures the BatchIdGenerator as default idgenerator. If you need to use another idgenerator or provide a custom implementation, you can override the <strong>idGenerator</strong> spring bean.</p>
+<p>The plugin by default configures the BatchIdGenerator as default idgenerator. If you need to use another idgenerator or provide a custom implementation, you can override the <strong>idGenerator</strong> spring bean.</p>
 <p><strong>jdbcTemplate</strong>
-Dao plugin also configures JdbcTemplate which can be used for low level jdbc access. It uses TransactionAwareDataSourceProxy so the queries run through the jdbcTemplate will be part of the current transaction.</p>
+This plugin also configures JdbcTemplate which can be used for low level jdbc access. It uses TransactionAwareDataSourceProxy so the queries run through the jdbcTemplate will be part of the current transaction.</p>
                 
                   
                 

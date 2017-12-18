@@ -25,7 +25,7 @@ class BenchmarkDatabindingService {
     JsonReader jsonReader
 
     @Autowired
-    EntityMapBinder gormMapBinder
+    EntityMapBinder entityMapBinder
 
     Long count = 111690
     Map props = [
@@ -97,7 +97,7 @@ class BenchmarkDatabindingService {
 
     void useFastBinder(Class domain) {
         eachCity("useFastBinder", domain) { instance, Map row ->
-            gormMapBinder.bind(instance, row)
+            entityMapBinder.bind(instance, row)
         }
     }
 

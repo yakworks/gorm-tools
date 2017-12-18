@@ -23,7 +23,7 @@ class GormToolsPluginHelper {
     static Closure doWithSpring = {
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
-        gormMapBinder(EntityMapBinder)
+        entityMapBinder(EntityMapBinder)
 
         jdbcIdGenerator(JdbcIdGenerator) {
             jdbcTemplate = ref("jdbcTemplate")

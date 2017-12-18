@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+gradle assemble; java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 build/libs/benchmarks.war
 
 echo "##### Running benchamarks simple single thread"
 ./gradlew assemble -DauditTrail.enabled=false

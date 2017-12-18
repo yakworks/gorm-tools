@@ -45,8 +45,10 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Org org = new Org(name: "test")
         org.location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
         org.persist()
+        org.name = "test2"
 
         expect:
+        org.isDirty()
         org.id != null
 
         when:

@@ -1,8 +1,7 @@
 package gorm.tools.repository
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.api.RepositoryApi
-import grails.core.GrailsApplication
-import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
@@ -19,11 +18,7 @@ trait GormRepoEntity<D extends GormEntity<D>> {
      * @return The repository
      */
     static RepositoryApi<D> getRepo() {
-        if (!cachedRepo) {
-            GrailsApplication grailsApplication = Holders.grailsApplication
-            String repoName = RepoUtil.getRepoBeanName(this)
-            cachedRepo = grailsApplication.mainContext.getBean(repoName, RepositoryApi)
-        }
+        if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), RepositoryApi)
         return cachedRepo
     }
 

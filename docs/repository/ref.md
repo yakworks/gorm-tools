@@ -150,8 +150,10 @@ in benchmarks project.
 
 ## Data binding using MapBinder
 Plugin comes with a ```MapBinder``` Which is used by a Repository to perform databinding.
-Plugin configures ```GormMapBinder``` as default implementation of ```MapBinder```. ```GormMapBinder``` is similar to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.
-However GormMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates without going through the converters, thus resulting in faster performance.
+Plugin configures ```entityMapBinder``` as default implementation of ```MapBinder```. ```entityMapBinder``` is similar 
+to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.
+However entityMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates 
+without going through the converters, thus resulting in faster performance.
 
 **Example**
 
@@ -172,7 +174,7 @@ class SomeService {
 ```
 
 **Using custom MapBinder**  
-By default all Repositories use the default ```GormMapBinder``` for databinding. However when a Repository is explicitly 
+By default all Repositories use the default ```entityMapBinder``` for databinding. However when a Repository is explicitly 
 created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.
 
 ```groovy

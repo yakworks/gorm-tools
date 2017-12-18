@@ -1,8 +1,10 @@
 package gorm.tools.repository
 
+import gorm.tools.beans.AppCtx
 import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.context.MessageSource
 import org.springframework.web.context.request.RequestContextHolder
@@ -11,7 +13,7 @@ import org.springframework.web.servlet.support.RequestContextUtils
 /**
  * A bunch of statics to support the Repository artifacts.
  */
-//@CompileStatic
+@CompileStatic
 class RepoMessage {
 
     /**
@@ -98,8 +100,8 @@ class RepoMessage {
     }
 
     //@CompileDynamic
-    static String resolveMessage(code, defaultMsg) {
-        return (RepoUtil.ctx.getBean("messageSource") as MessageSource).getMessage(code, [] as Object[], defaultMsg, defaultLocale())
+    static String resolveMessage(String code, String defaultMsg) {
+        return AppCtx.get("messageSource",MessageSource).getMessage(code, [] as Object[], defaultMsg, defaultLocale())
     }
 
     static Locale defaultLocale() {

@@ -16,14 +16,15 @@ import org.springframework.dao.DataAccessException
 interface RepositoryApi<D> {
 
     /**
-     * The gorm domain class. will generally get set in contructor or using the generic as done in {@link gorm.tools.repository.GormRepo#getDomainClass}
+     * The gorm domain class. will generally get set in contructor or using the generic as
+     * done in {@link gorm.tools.repository.GormRepo#getDomainClass}
      * using the {@link org.springframework.core.GenericTypeResolver}
      */
     Class<D> getDomainClass()
 
     /** The data binder to use. By default gets injected with EntityMapBinder*/
     MapBinder getMapBinder()
-
+    /** default to true. If false only method events are invoked on the implemented Repository. */
     boolean isEnableEvents()
 
     /**

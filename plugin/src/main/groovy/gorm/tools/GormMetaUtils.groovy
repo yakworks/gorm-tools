@@ -6,8 +6,6 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.MappingContext
-
-//import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.orm.hibernate.cfg.Mapping
 

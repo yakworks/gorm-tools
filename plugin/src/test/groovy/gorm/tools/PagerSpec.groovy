@@ -1,12 +1,13 @@
 package gorm.tools
 
-import gorm.tools.dao.DefaultGormDao
-import grails.gorm.annotation.Entity
+import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.testing.GormToolsTest
+import grails.persistence.Entity
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 
-class PagerSpec extends Specification implements AutowiredTest, DataTest {
+class PagerSpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
@@ -90,13 +91,6 @@ class PagerSpec extends Specification implements AutowiredTest, DataTest {
 
 @Entity
 class ClassB {
-    Long id
     int value
-
     int version = 0
-
-    def getDao() {
-        new DefaultGormDao(ClassB)
-    }
-
 }

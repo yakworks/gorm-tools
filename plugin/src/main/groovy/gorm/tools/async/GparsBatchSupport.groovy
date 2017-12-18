@@ -1,7 +1,5 @@
 package gorm.tools.async
 
-import gorm.tools.dao.DaoUtil
-import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovyx.gpars.GParsPool
 import groovyx.gpars.GParsPoolUtil
@@ -14,6 +12,9 @@ import javax.annotation.PostConstruct
  * a Gpars implementation of the AsyncBatchSupport trait
  * to be used for colating/slicing a list into "batches" to then asynchronously process with Transactions
  * insert or update for maximum performance.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class GparsBatchSupport implements AsyncBatchSupport {
@@ -31,32 +32,24 @@ class GparsBatchSupport implements AsyncBatchSupport {
     }
 
     /**
-     * Iterates over the batchList with eachParallel and calls the closure passing in the list and the args
+     * Iterates over the batchList with GParsPoolUtil.eachParallel and calls the closure passing in the list and the args
      * Generally you will want to use the {@link AsyncBatchSupport#parallel} method
      * that added by the Trait as it calls the withTransaction
      *
-     * @param args _optional_ arg map will be passed down through the closure as well <br>
-     *     - poolSize : gets passed down into the GParsPool.withPool for
-     * @param batchList a collated list of lists. each list in the batchList will be asynchronously passed to the provided closure
-     * @param closure the closure to call on each list in the batchList
+     * @param args _optional_ arg map to be passed to the async engine such as gpars.
+     *     can also add any other value and they will be passed down through the closure as well <br>
+     *     - poolSize : gets passed down into the GParsPool.withPool for example
+     * @param batches a collated list of lists. each batch list in the batches will be asynchronously passed to the provided closure
+     * @param batchClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
      */
     @Override
-    void parallel(Map args, List<List> batchList, Closure closure) {
+    void parallel(Map args, List<List> batches, Closure batchClosure) {
         int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
         GParsPool.withPool(psize) {
-            GParsPoolUtil.eachParallel(batchList){ List batch ->
-                closure(batch, args)
+            GParsPoolUtil.eachParallel(batches) { List batch ->
+                batchClosure(batch, args)
             }
         }
-    }
-
-    @Override
-    @Transactional
-    void withTrx(Map args, List batch, Closure closure) {
-        for (Object item : batch) {
-            closure(item, args)
-        }
-        DaoUtil.flushAndClear()
     }
 
 }

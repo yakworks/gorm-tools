@@ -1,6 +1,7 @@
 package gorm.tools.mango
 
 import gorm.tools.Pager
+import gorm.tools.mango.api.MangoQueryApi
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
@@ -16,7 +17,7 @@ class MangoQuery implements MangoQueryApi {
     String criteriaKeyName
 
     /**
-     * Builds detached criteria for dao's domain based on mango criteria language and additional criteria
+     * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
      *
      * @param params mango language criteria map
      * @param closure additional restriction for criteria

@@ -85,7 +85,7 @@ class BeanPathTools {
         if (useDelegatingBean) {
             Class delegatingBean = GrailsClassUtils.getStaticFieldValue(source.getClass(), "delegatingBean")
             if (!delegatingBean && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, source.getClass())) {
-                delegatingBean = DaoDelegatingBean
+                delegatingBean = RepoDelegatingBean
             }
             if (delegatingBean != null) source = delegatingBean.newInstance(source)
         }

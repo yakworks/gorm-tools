@@ -11,8 +11,8 @@ beans = {
     //adding lots of listeners by change to 1..10 doesn't seem to slow it down
     (1..1).each { eid ->
         lang.groovy(
-            id: "cityDaoSpringEventsBean$eid",
-            'script-source': "file:resources/refreshable-beans/CityDaoSpringEventsBean.groovy",
+            id: "citySpringEventsBean$eid",
+            'script-source': "file:resources/refreshable-beans/CitySpringEventsBean.groovy",
             'refresh-check-delay': 1000
         )
     }

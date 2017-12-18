@@ -25,14 +25,14 @@ repositories {
 //Root project and view-tools plugin uses same version.
 version project.projectVersion
 
-project(':dao') {
+project(':gorm-tools') {
     version = project.projectVersion
 }
 
 ext {
     commonBuild = "https://raw.githubusercontent.com/yakworks/grails-common-build/master"
     grailsApps = ['test-app', 'benchmarks']
-    grailsPlugins = ['dao']
+    grailsPlugins = ['gorm-tools']
 }
 
 
@@ -176,8 +176,8 @@ subprojects {
 
     //     // Uncomment line bellow to show in console all tests that were executed in next format:
     //     //:test-app:integrationTest
-    //     //-- Test Check list(daoapp.OrgSpec)
-    //     //-- Test Filter by Name eq(daoapp.OrgSpec)
+    //     //-- Test Check list(repoapp.OrgSpec)
+    //     //-- Test Filter by Name eq(repoapp.OrgSpec)
 
     //     //beforeTest { descriptor -> logger.quiet " -- $descriptor" }
     // }

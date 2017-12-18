@@ -259,8 +259,9 @@ This would produce in a round about way with criteria builders a where clause li
 ### Quick Search
 
 Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
-search can be passed in `$quickSearch` or `$q` keywords. The list of fields should be specified in static property `quickSearchFields`
-as list of strings, see example bellow:
+search can be passed in `$quickSearch` or `$q` keywords. 
+There are 2 ways to specify fields that should be searched against:
+1. in static property `quickSearchFields` as list of strings, see example bellow:
 
 ```groovy
 class Org {
@@ -271,6 +272,22 @@ class Org {
     ...
 
 ```
+1. default fields in config
+
+```yaml
+gorm:
+    tools:
+        mango:
+            defaultQuickSearch:
+              - name
+              - num
+              - address.city
+
+```
+
+On application start for all domains that doesn't have a `quickSearchFields` property, the fields from `defaultQuickSearch`
+that each domain contains will be added. 
+
 So Mango criteria will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
 for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
 

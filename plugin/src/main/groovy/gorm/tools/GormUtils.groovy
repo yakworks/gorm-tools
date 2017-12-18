@@ -3,12 +3,15 @@ package gorm.tools
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
 import grails.compiler.GrailsCompileStatic
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.Identity
+import org.springframework.data.mapping.context.PersistentEntities
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -138,6 +141,28 @@ class GormUtils {
         }
 
         return result
+    }
+
+    /**
+     * Check if Persistent Entity has property by path
+     *
+     * @param clazz Persistent Entity
+     * @param property path for property
+     * @return true if there is such property, false othervise
+     */
+    @CompileDynamic
+    static boolean hasProperty(PersistentEntity domain, String property) {
+        Closure checkProperty
+        checkProperty = { PersistentEntity domainClass, List path ->
+            PersistentProperty prop = domainClass?.getPropertyByName(path[0].toString())
+            if (path.size() > 1 && prop) {
+                checkProperty(prop.associatedEntity, path.tail())
+            } else {
+                prop as boolean
+            }
+        }
+        checkProperty(domain, property.split("[.]") as List)
+
     }
 
 }

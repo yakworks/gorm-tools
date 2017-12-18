@@ -2,6 +2,7 @@ package repoapp
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import testing.Student
 
 @Integration
 class OrgSpec extends Specification {
@@ -450,6 +451,12 @@ class OrgSpec extends Specification {
         List list = Org.repo.query([criteria: ['$quickSearch': "Org#2%"], max: 150])
         then:
         list.size() == 11
+
+    }
+
+    def "test quick search fields"() {
+        expect:
+        Student.quickSearchFields == ["name", "jumper.name"]
 
     }
 }

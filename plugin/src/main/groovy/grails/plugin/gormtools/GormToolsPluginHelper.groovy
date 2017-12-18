@@ -1,6 +1,7 @@
 package grails.plugin.gormtools
 
 import gorm.tools.DbDialectService
+import gorm.tools.GormUtils
 import gorm.tools.async.GparsBatchSupport
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.DefaultGormRepo
@@ -10,6 +11,7 @@ import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.mango.MangoQuery
+import grails.config.Config
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -91,6 +93,17 @@ class GormToolsPluginHelper {
         if (beanBuilder) bClosure.delegate = beanBuilder
 
         return bClosure
+    }
+
+    static void addQuickSearchFields(Config config,GrailsApplication grailsApplication){
+        List<String> fields = config.gorm?.tools?.mango?.defaultQuickSearch ?: []
+        grailsApplication.getMappingContext().getPersistentEntities().each { domainClass ->
+            if (fields && !domainClass.getJavaClass().quickSearchFields) {
+                domainClass.getJavaClass().quickSearchFields = fields.findAll {
+                    GormUtils.hasProperty(domainClass, it as String)
+                }
+            }
+        }
     }
 
 }

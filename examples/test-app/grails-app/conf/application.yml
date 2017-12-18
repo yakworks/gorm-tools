@@ -82,9 +82,10 @@ gorm:
             criteriaKeyName: criteria
             defaultQuickSearch:
               - name
-              - description
               - num
-              - 'address.city'
+              - description
+              - address.city
+              - jumper.name
 ---
 hibernate:
     cache:

@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.DomainException
 import gorm.tools.repository.errors.DomainNotFoundException
@@ -7,13 +8,12 @@ import grails.plugin.gormtools.RepositoryArtefactHandler
 import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.beans.BeansException
-import org.springframework.context.ApplicationContext
-import org.springframework.context.ApplicationContextAware
-import org.springframework.context.ApplicationEventPublisher
+import org.grails.datastore.mapping.core.Datastore
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 /**
@@ -24,15 +24,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
  * @since 1.0
  */
 @CompileStatic
-class RepoUtil implements ApplicationContextAware {
-
-    static ApplicationContext ctx
-    static ApplicationEventPublisher applicationEventPublisher
-
-    void setApplicationContext(ApplicationContext ctx) throws BeansException {
-        this.ctx = ctx
-        applicationEventPublisher = (ApplicationEventPublisher) ctx
-    }
+class RepoUtil {
 
     static String getRepoClassName(Class domainClass) {
         RepositoryArtefactHandler.getRepoClassName(domainClass)
@@ -43,7 +35,7 @@ class RepoUtil implements ApplicationContextAware {
     }
 
     static RepositoryApi findRepository(Class domainClass) {
-        return ctx.getBean(getRepoBeanName(domainClass), RepositoryApi)
+        return AppCtx.get(getRepoBeanName(domainClass), RepositoryApi)
     }
 
     /**
@@ -91,6 +83,7 @@ class RepoUtil implements ApplicationContextAware {
     /**
      * flushes the session and clears the session cache and the DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
      */
+    @Deprecated
     static void flushAndClear() {
         flush()
         clear()
@@ -100,16 +93,32 @@ class RepoUtil implements ApplicationContextAware {
      * flushes the session
      */
     @CompileDynamic
+    @Deprecated
     static void flush() {
-        ctx.sessionFactory?.currentSession?.flush()
+        Datastore ds = GormEnhancer.findSingleDatastore()
+        if(ds.hasCurrentSession()) ds.getCurrentSession().flush()
     }
 
     /**
      * clears the session cache
      */
     @CompileDynamic
+    @Deprecated
     static void clear() {
-        ctx.sessionFactory?.currentSession?.clear()
+        Datastore ds = GormEnhancer.findSingleDatastore()
+        if(ds.hasCurrentSession()) ds.getCurrentSession().clear()
+    }
+
+    @CompileDynamic
+    void flushAndClear(TransactionStatus status) {
+        //TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
+        status.flush()
+        clear(status)
+    }
+
+    @CompileDynamic
+    void clear(TransactionStatus status) {
+        status.transaction.sessionHolder.getSession().clear()
     }
 
     static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {

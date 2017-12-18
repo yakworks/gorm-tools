@@ -14,8 +14,6 @@ class GparsBatchSupportSpec extends Specification implements GormToolsTest {
     GparsBatchSupport asyncBatchSupport
 
     void setupSpec() {
-        RepoUtil.ctx = grailsApplication.mainContext
-
         defineBeans({
             asyncBatchSupport(GparsBatchSupport)
         })

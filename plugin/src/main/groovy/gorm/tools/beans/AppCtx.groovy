@@ -18,7 +18,7 @@ import org.springframework.context.ApplicationContext
 class AppCtx {
 
     private static GrailsApplication cachedGrailsApplication
-    private static ApplicationContext cachedApplicationContext
+    //private static ApplicationContext cachedApplicationContext
 
     /**
      * @return the GrailsApplication
@@ -34,10 +34,10 @@ class AppCtx {
      * @return the spring ApplicationContext
      */
     static ApplicationContext getCtx() {
-        if (!cachedApplicationContext) {
-            cachedApplicationContext = getGrails().mainContext
-        }
-        return cachedApplicationContext
+//        if (!cachedApplicationContext) {
+//            cachedApplicationContext = Holders.applicationContext
+//        }
+        return Holders.applicationContext
     }
 
     /**

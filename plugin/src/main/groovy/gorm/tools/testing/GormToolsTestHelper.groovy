@@ -23,7 +23,6 @@ trait GormToolsTestHelper extends GrailsUnitTest {
 
     @BeforeClass
     void setupTransactionService() {
-        RepoUtil.ctx = grailsApplication.mainContext
         //setup transactionService
         if (!ctx.containsBean("transactionService"))
             ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
@@ -60,7 +59,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
      */
     Class findRepoClass(Class domainClass) {
         String repoClassName = RepoUtil.getRepoClassName(domainClass)
-        println "finding $repoClassName"
+        //println "finding $repoClassName"
         if (ClassUtils.isPresent(repoClassName, grailsApplication.classLoader)) {
             return ClassUtils.forName(repoClassName)
         }

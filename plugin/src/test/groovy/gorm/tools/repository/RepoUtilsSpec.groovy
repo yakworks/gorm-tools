@@ -3,35 +3,36 @@ package gorm.tools.repository
 import gorm.tools.repository.errors.DomainException
 import gorm.tools.repository.errors.EmptyErrors
 import grails.persistence.Entity
+import grails.testing.gorm.DataTest
+import org.grails.testing.GrailsUnitTest
 import org.junit.Test
+import spock.lang.Specification
 
-class RepoUtilsTests {
+class RepoUtilsSpec extends Specification implements DataTest {
 
-    @Test
     void testCheckVersion() {
-        RepoMessage.metaClass.'static'.resolveMessage = { code, defaultMsg ->
-            return defaultMsg
-        }
+        when:
         def mocke = new MockDomain([name: "Billy"])
         mocke.version = 1
         mocke.errors = new EmptyErrors("empty")
-        //should pass
+
+        then:
         RepoUtil.checkVersion(mocke, 1)
-        //shold fail
-        try {
-            RepoUtil.checkVersion(mocke, 0)
-            fail "should not have made it here"
-        } catch (DomainException e) {
-            assert mocke.id == e.entity.id
-            assert "default.optimistic.locking.failure" == e.messageMap.code
-        }
+
+        when:
+        RepoUtil.checkVersion(mocke, 0)
+
+        then:
+        def e = thrown(DomainException)
+        mocke.id == e.entity.id
+        "default.optimistic.locking.failure" == e.messageMap.code
+
     }
 
-    @Test
     void testCheckFound() {
         try {
             RepoUtil.checkFound(null, [id: '99'], "xxx")
-            fail "should not have made it here"
+            assert false, "should not have made it here"
         } catch (DomainException e) {
             //id
             assert '99' == e.messageMap.args[1]
@@ -41,13 +42,11 @@ class RepoUtilsTests {
         }
     }
 
-    @Test
     void testPropName() {
         def propname = RepoMessage.propName('xxx.yyy.ArDoc')
         assert 'arDoc' == propname
     }
 
-    @Test
     void testNotFound() {
         def r = RepoMessage.notFound("xxx.MockDomain", [id: "2"])
         assert r.code == "default.not.found.message"
@@ -55,13 +54,6 @@ class RepoUtilsTests {
         assert r.defaultMessage == "MockDomain not found with id 2"
     }
 
-//    void testCreateMessage(){
-//        def msg = RepoMessage.created(mocke,false)
-//        assert 'arDoc' == msg.code
-//        assert 'arDoc' == msg.args[0]
-//    }
-
-    @Test
     void testDefaultLocale() {
         def loc = RepoMessage.defaultLocale()
         assert Locale.ENGLISH == loc

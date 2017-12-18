@@ -5,7 +5,6 @@ import grails.databinding.converters.ValueConverter
 import groovy.transform.CompileStatic
 import org.grails.databinding.converters.ConversionService
 import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -73,7 +72,6 @@ class EntityMapBinder implements MapBinder {
         //for now just pass them on
         bind(target, source, "Create")
     }
-
 
     @Autowired(required = true)
     void setValueConverters(ValueConverter[] converters) {

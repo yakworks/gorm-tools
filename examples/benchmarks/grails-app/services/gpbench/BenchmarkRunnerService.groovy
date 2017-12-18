@@ -210,8 +210,6 @@ class BenchmarkRunnerService {
         insert(countries, countryRepo)
         insert(regions, regionRepo)
 
-        RepoUtil.flushAndClear()
-
         assert Country.count() == 275
         assert Region.count() == 3953
     }

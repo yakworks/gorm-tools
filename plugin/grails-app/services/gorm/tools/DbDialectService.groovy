@@ -1,6 +1,6 @@
 package gorm.tools
 
-import grails.util.Holders
+import gorm.tools.beans.AppCtx
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
@@ -28,7 +28,7 @@ class DbDialectService {
     private static int setupDialect() {
         int result = UNKNOWN
         // just to make the stuff below easier to read.
-        if (!dialectName) dialectName = Holders.grailsApplication.config.hibernate.dialect
+        if (!dialectName) dialectName = AppCtx.config.hibernate.dialect
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath
         if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver", getClass().classLoader)) || dialectName.contains('H2')) result = H2

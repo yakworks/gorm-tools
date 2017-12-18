@@ -1,8 +1,10 @@
 package gpbench.benchmarks
 
+import gorm.tools.WithTrx
 import gorm.tools.repository.RepoUtil
 import gpbench.City
 import gpbench.CityRepo
+import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -14,8 +16,8 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 /**
  * Runs batch inserts in parallel using gparse dataflow queue.
  */
-@CompileStatic
-class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
+@GrailsCompileStatic
+class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark implements WithTrx{
 
     CityRepo cityRepo
 
@@ -65,8 +67,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
                 e.printStackTrace()
             }
         }
-
-        RepoUtil.flushAndClear()
+        flushAndClear(transactionStatus)
     }
 
 }

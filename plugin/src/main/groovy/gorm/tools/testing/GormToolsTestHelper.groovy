@@ -44,7 +44,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
 
     Closure commonBeans() {
         return {
-            gormMapBinder(EntityMapBinder)
+            entityMapBinder(EntityMapBinder)
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
             //trxService(TrxService)

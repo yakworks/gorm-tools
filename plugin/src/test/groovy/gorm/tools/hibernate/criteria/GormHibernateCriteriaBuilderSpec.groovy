@@ -13,7 +13,6 @@ class GormHibernateCriteriaBuilderSpec extends HibernateSpec { //c DataTest {//i
     private GormHibernateCriteriaBuilder builder
 
     void setup() {
-        //SessionFactory sessionFactory = Holders.grailsApplication.mainContext.sessionFactory
         builder = new GormHibernateCriteriaBuilder(Test.class, sessionFactory)
     }
 

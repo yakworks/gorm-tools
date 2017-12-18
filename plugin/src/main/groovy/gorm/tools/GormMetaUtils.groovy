@@ -1,7 +1,7 @@
 package gorm.tools
 
+import gorm.tools.beans.AppCtx
 import grails.util.GrailsNameUtils
-import grails.util.Holders
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
@@ -71,7 +71,7 @@ class GormMetaUtils {
      * @return
      */
     static MappingContext getMappingContext() {
-        Holders.applicationContext.getBean("grailsDomainClassMappingContext", MappingContext)
+        AppCtx.get("grailsDomainClassMappingContext", MappingContext)
     }
 
     /**

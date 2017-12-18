@@ -4,6 +4,7 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 trait DateUserStamp {
+
     Date dateCreated
     Date lastUpdated
 

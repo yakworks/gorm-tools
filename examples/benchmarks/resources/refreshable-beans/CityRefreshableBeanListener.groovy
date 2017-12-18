@@ -1,14 +1,12 @@
-
 import gpbench.CityRefreshableBeanEvents
 import gpbench.SecUtil
 import grails.events.annotation.gorm.Listener
-import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.engine.EntityAccess
 import org.grails.datastore.mapping.engine.event.PreInsertEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
 import org.grails.datastore.mapping.engine.event.ValidationEvent
-import org.springframework.beans.factory.annotation.Autowired
+
 //import org.grails.events.gorm.GormDispatcherRegistrar
 
 /**

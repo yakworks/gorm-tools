@@ -3,15 +3,12 @@ package gorm.tools
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
 import grails.compiler.GrailsCompileStatic
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.Identity
-import org.springframework.data.mapping.context.PersistentEntities
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.

@@ -11,11 +11,9 @@ import org.grails.datastore.mapping.core.Datastore
 @CompileStatic
 class BeforeCreateEvent<D> extends RepositoryEvent<D> {
 
-    Map params
-
-    BeforeCreateEvent(Datastore source, D entity, Map params) {
+    BeforeCreateEvent(Datastore source, D entity, Map data) {
         super(source, entity, RepositoryEventType.BeforeCreate.eventKey)
-        this.params = params
+        this.data = data
     }
 
 }

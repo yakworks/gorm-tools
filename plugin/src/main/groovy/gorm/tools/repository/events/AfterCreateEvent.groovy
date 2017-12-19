@@ -11,11 +11,9 @@ import org.grails.datastore.mapping.core.Datastore
 @CompileStatic
 class AfterCreateEvent<D> extends RepositoryEvent<D> {
 
-    Map params
-
-    AfterCreateEvent(Datastore source, D entity, Map params) {
+    AfterCreateEvent(Datastore source, D entity, Map data) {
         super(source, entity, RepositoryEventType.AfterCreate.eventKey)
-        this.params = params
+        this.data = data
     }
 
 }

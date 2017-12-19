@@ -47,7 +47,7 @@ class GparsBatchSupport implements AsyncBatchSupport {
         int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
         GParsPool.withPool(psize) {
             GParsPoolUtil.eachParallel(batches) { List batch ->
-                batchClosure(batch, args)
+                batchClosure(batch, args.clone())
             }
         }
     }

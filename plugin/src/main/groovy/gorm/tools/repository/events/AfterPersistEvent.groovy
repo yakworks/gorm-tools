@@ -9,8 +9,17 @@ import org.grails.datastore.mapping.core.Datastore
 @CompileStatic
 class AfterPersistEvent<D> extends RepositoryEvent<D> {
 
+    /** the args passed into persist */
+    Map args
+
     AfterPersistEvent(Datastore source, D entity) {
         super(source, entity, RepositoryEventType.AfterPersist.eventKey)
+    }
+
+    AfterPersistEvent(Datastore source, D entity, Map args) {
+        super(source, entity, RepositoryEventType.AfterPersist.eventKey)
+        this.args = args
+        setDataFromArgMap(args)
     }
 
 }

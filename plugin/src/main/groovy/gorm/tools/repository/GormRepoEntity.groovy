@@ -42,11 +42,11 @@ trait GormRepoEntity<D extends GormEntity<D>> implements MangoRepoEntity {
         getRepo().update(params)
     }
 
-    void remove() {
-        getRepo().remove((D) this)
+    void remove(Map args = [:]) {
+        getRepo().remove((D) this, args)
     }
 
-    static void remove(Serializable id) {
-        getRepo().removeById(id)
+    static void remove(Serializable id, Map args = [:]) {
+        getRepo().removeById(id, args)
     }
 }

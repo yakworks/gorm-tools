@@ -1,6 +1,7 @@
 package gorm.tools.repository
 
 import gorm.tools.WithTrx
+import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.MangoQueryTrait
 import gorm.tools.repository.api.GormBatchRepo
@@ -44,9 +45,6 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      */
     Class<D> domainClass // the domain class this is for
 
-    //the cached datastore
-    Datastore datastore
-
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
@@ -65,9 +63,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     @Override
-    D persist(D entity, Map saveArgs = [:]) {
+    D persist(D entity, Map args = [:]) {
         withTrx {
-            return doPersist(entity, saveArgs)
+            return doPersist(entity, args)
         }
     }
 
@@ -76,15 +74,22 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * If a {@link ValidationException} is caught it wraps and throws it with our DataValidationException.
      *
      * @param entity the domain entity to call save on
-     * @param saveArgs the arguments to pass to save
+     * @param saveArgs - the arguments to pass to save as well as the PersistEvents.  can be any of the normal gorm save args
+     * plus some others specific to here
+     *   - failOnError: (boolean) defaults to true
+     *   - flush: (boolean) flush the session
+     *   - bindType: (String) "Create" or "Update" when coming from those actions
+     *   - data: (Map) if it was a Create or Update method called then this is the data and gets passed into events
+     *
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D doPersist(D entity, Map saveArgs = [:]) {
+    D doPersist(D entity, Map args = [:]) {
         try {
-            saveArgs['failOnError'] = saveArgs.containsKey('failOnError') ? saveArgs['failOnError'] : true
-            getRepoEventPublisher().doBeforePersist(this, entity, saveArgs)
-            entity.save(saveArgs)
-            getRepoEventPublisher().doAfterPersist(this, entity, saveArgs)
+            //Map argsCopy =  [failOnError: true] + args
+            args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
+            getRepoEventPublisher().doBeforePersist(this, entity, args)
+            entity.save(args)
+            getRepoEventPublisher().doAfterPersist(this, entity, args)
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
@@ -92,10 +97,13 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
         }
     }
 
+    /**
+     * Transactional wrap for {@link #doCreate}
+     */
     @Override
-    D create(Map params) {
+    D create(Map data) {
         withTrx {
-            return doCreate(params)
+            return doCreate(data)
         }
     }
 
@@ -106,29 +114,46 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @return the created domain entity
      * @see #doPersist
      */
-    D doCreate(Map params, Map saveArgs = [:]) {
+    D doCreate(Map data, Map args = [:]) {
         D entity = (D) getDomainClass().newInstance()
-        getRepoEventPublisher().doBeforeCreate(this, entity, params)
-        bind(entity, params, "Create")
-        doPersist(entity, saveArgs)
-        getRepoEventPublisher().doAfterCreate(this, entity, params)
+
+        getRepoEventPublisher().doBeforeCreate(this, entity, data)
+        bind(entity, data, BindAction.Create)
+        getRepoEventPublisher().doAfterCreate(this, entity, data)
+        //saveArgs << [bindAction: BindAction.Create, data: data] //create a new arg map
+        args['bindAction'] = BindAction.Create
+        args['data'] = data
+        doPersist(entity, args)
         return entity
     }
 
+    /**
+     * Transactional wrap for {@link #doUpdate}
+     */
     @Override
-    D update(Map params) {
+    D update(Map data) {
         withTrx {
-            return doUpdate(params)
+            return doUpdate(data)
         }
     }
 
+    /**
+     * Updates entity using the data from params. calls the {@link #bind} with bindMethod='Update'
+     *
+     * @param data the data to bind onto the entity
+     * @return the updated domain entity
+     * @see #doPersist
+     */
     @Override
-    D doUpdate(Map params, Map saveArgs = [:]) {
-        D entity = get(params)
-        getRepoEventPublisher().doBeforeUpdate(this, entity, params)
-        bind(entity, params, "Update")
-        doPersist(entity, saveArgs)
-        getRepoEventPublisher().doAfterUpdate(this, entity, params)
+    D doUpdate(Map data, Map saveArgs = [:]) {
+        D entity = get(data)
+
+        getRepoEventPublisher().doBeforeUpdate(this, entity, data)
+        bind(entity, data, BindAction.Update)
+        getRepoEventPublisher().doAfterUpdate(this, entity, data)
+
+        Map args = saveArgs + [bindAction: BindAction.Update, data: data] //create a new arg map
+        doPersist(entity, args)
         return entity
     }
 
@@ -142,15 +167,17 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
 //    }
 
     @Override
-    void bind(D entity, Map data, String bindMethod = null) {
-        getMapBinder().bind(entity, data, bindMethod)
+    void bind(D entity, Map data, BindAction bindAction) {
+        getMapBinder().bind(entity, data, bindAction)
     }
 
     /**
-     * Deletes a new domain entity base on the id in the params. Non Trx
+     * Remove by ID
      *
-     * @param params the parameter map that has the id for the domain entity to delete
-     * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
+     * @param id - the id to delete
+     * @param args - the args to pass to delete. flush being the most common
+     *
+     * @throws gorm.tools.repository.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
     @Override
     void removeById(Serializable id, Map args = [:]) {
@@ -165,25 +192,31 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
     @Override
-    void remove(D entity) {
+    void remove(D entity, Map args = [:]) {
         withTrx {
-            doRemove(entity)
+            doRemove(entity, args)
         }
     }
 
+    /**
+     * no trx wrapper. delete entity.
+     *
+     * @param entity - the domain instance to delete
+     * @param args - args passed to delete
+     */
     void doRemove(D entity, Map args = [:]) {
         try {
             getRepoEventPublisher().doBeforeRemove(this, entity)
-            entity.delete(flush: true)
+            entity.delete(args)
             getRepoEventPublisher().doAfterRemove(this, entity)
         }
-        catch (DataIntegrityViolationException dae) {
+        catch (DataAccessException dae) {
             throw handleException(entity, dae)
         }
     }
 
     /**
-     * gets and verfiies that the entity can eb retireved and version matches.
+     * gets and verifies that the entity can be retrieved and version matches.
      *
      * @param id required, the id to get
      * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
@@ -201,10 +234,13 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     }
 
     /**
-     * calls {@link #get(Serializable id, Long version)}
+     * This default will redirect the call to {@link #get(Serializable id, Long version)}.
+     * Implementing classes can override this and add custom finders
+     * using another unique lookup key other than id, such as customer number or invoice number. Unlike the normal get(id)
+     * This throws a DomainNotFoundException if nothing is found instead of returning a null.
      *
-     * @param params expects a Map with an id key and optionally a version
-     * @return
+     * @param params - expects a Map with an id key and optionally a version, implementation classes can customize to work with more.
+     * @return the entity. Won't return null, instead it throws an exception
      */
     @Override
     D get(Map<String, Object> params) {
@@ -216,8 +252,19 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
         return RepoUtil.handleException(entity, e)
     }
 
+    /** gets the dataStore for this Gorm domain instance */
     Datastore getDatastore() {
         getInstanceApi().datastore
+    }
+
+    /** flush on the datastore's currentSession. When possible use the transactionStatus.flush(). see WithTrx trait */
+    void flush(){
+        getDatastore().currentSession.flush()
+    }
+
+    /** cache clear on the datastore's currentSession. When possible use the transactionStatus. see WithTrx trait  */
+    void clear(){
+        getDatastore().currentSession.clear()
     }
 
     GormInstanceApi<D> getInstanceApi() {

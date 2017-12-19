@@ -1,5 +1,6 @@
 package gorm.tools.repository.api
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.errors.DomainException
 import gorm.tools.databinding.MapBinder
 import grails.validation.ValidationException
@@ -53,7 +54,7 @@ interface RepositoryApi<D> {
     D create(Map data)
 
     /**
-     * Creates entity using the data from params. calls the {@link #bindAndSave} with bindMethod='Create'
+     * Creates entity using the data from params. calls the {@link #bind} with BindAction.Create
      *
      * @param data the data to bind onto the entity
      * @return the created domain entity
@@ -67,7 +68,7 @@ interface RepositoryApi<D> {
     D update(Map data)
 
     /**
-     * Updates entity using the data from params. calls the {@link #bind} with bindMethod='Update'
+     * Updates entity using the data from params. calls the {@link #bind} with BindAction.Update
      *
      * @param data the data to bind onto the entity
      * @return the updated domain entity
@@ -82,7 +83,7 @@ interface RepositoryApi<D> {
      * @param row
      * @param bindMethod
      */
-    void bind(D entity, Map data, String bindMethod)
+    void bind(D entity, Map data, BindAction bindAction)
 
     /**
      * Deletes a new domain entity base on the id in the params.
@@ -90,15 +91,23 @@ interface RepositoryApi<D> {
      * @param params the parameter map that has the id for the domain entity to delete
      * @throws gorm.tools.repository.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
-    void removeById(Serializable id, Map args)
 
-    void removeById(Serializable id)
+    /**
+     * Remove by ID. Trx in implementing class here is optional
+     *
+     * @param id - the id for the
+     * @param args - the args to pass to delete. can be null and [flush] being the most common
+     *
+     * @throws gorm.tools.repository.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
+     */
+    void removeById(Serializable id, Map args)
 
     /**
      * Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
      */
+    void remove(D entity, Map args)
     void remove(D entity)
 
     void doRemove(D entity, Map args)
@@ -116,7 +125,7 @@ interface RepositoryApi<D> {
     D get(Serializable id, Long version)
 
     /**
-     * calls {@link #get(Serializable id, Long version)}
+     * Should call {@link #get(Serializable id, Long version)}
      *
      * @param params expects a Map with an [id] key and optionally a [version] key
      */

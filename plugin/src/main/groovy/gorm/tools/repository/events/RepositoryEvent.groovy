@@ -16,7 +16,12 @@ import org.springframework.core.ResolvableTypeProvider
 @CompileStatic
 class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {//extends ApplicationEvent {//
 
+    /** the domain instance this event is for */
     D entity
+    /** if this event fired during binding action then this is the data used */
+    Map data
+
+    /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this will be 'beforePersist' */
     String eventKey = "repoEvent"
 
     RepositoryEvent(final Datastore source, final D entity, String eventKey) {
@@ -42,4 +47,8 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
      * @return the routing key in the form of "DomainClass.eventMethod", for example "City.afterPersist"
      */
     String getRoutingKey() { "${entity.class.simpleName}.${eventKey}" }
+
+    void setDataFromArgMap(Map args){
+        this.data = args ? args['data'] as Map : null
+    }
 }

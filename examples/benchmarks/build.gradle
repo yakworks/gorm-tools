@@ -71,9 +71,7 @@ dependencies {
     testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 
     //runtime 'mysql:mysql-connector-java:5.1.5'
-    //compile("org.grails.plugins:dao:3.3.2-SNAPSHOT") { changing = true}
-    //runtime project(":boo")
-    compile project(':dao')
+    compile project(':gorm-tools')
     compile("org.grails.plugins:audit-trail:3.0.8-SNAPSHOT") { changing = true }
     compile 'org.grails.plugins:csv:1.0'
 
@@ -84,14 +82,6 @@ dependencies {
 
     //compile "org.springframework:spring-test:4.3.7.RELEASE"
 }
-
-//grails {
-//    exploded = true
-//    plugins {
-//        //println "Inside grails: $rootProject.name"
-//        compile project(':dao')
-//    }
-//}
 
 // bootRun {
 //     jvmArgs('-Dspring.output.ansi.enabled=always')

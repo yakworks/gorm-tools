@@ -3,7 +3,7 @@ Gorm-tools provides a convenient way for iterating over records which correspond
 ## Mango Overview
 
 The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
-The gorm dao's come with a `query(criteriaMap, closure)` method. It allows to get paged list of entities restricted by
+The repository comes with a `query(criteriaMap, closure)` method. It allows to get paged list of entities restricted by
 the properties in the `criteriaMap`. The map could be passed as JSON string or Map. All restrictions should be under 
 `criteria` keyword by default, but it can be changed with [config](queries-mango.md#configuration).
 
@@ -21,7 +21,7 @@ these arise more from a similarity of purpose and do not necessarily extend to c
 **Basic example**
 
 ``` java
-Org.dao.query([
+Org.repo.query([
   criteria: [name: "Bill%", type: "New"],
   sort: [name:"asc"],
   max: 20
@@ -112,7 +112,7 @@ For more example take a look on [MangoTidyMapSpec][MangoTidyMapSpec]
 
 ### Mango query
 
-Dao service by default has not all features of mango service, just `buildCriteria` and `query` methods, but both automatically
+The repository by default does not have all the features of mango service, just `buildCriteria` and `query` methods, but both automatically
 convert map params to mango map, so just `params` or `request.JSON` can be passed. 
 
 See [Mango Api](queries-mango.md#mango-api) to know all features that are provided.
@@ -259,8 +259,9 @@ This would produce in a round about way with criteria builders a where clause li
 ### Quick Search
 
 Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
-search can be passed in `$quickSearch` or `$q` keywords. The list of fields should be specified in static property `quickSearchFields`
-as list of strings, see example bellow:
+search can be passed in `$quickSearch` or `$q` keywords. 
+There are 2 ways to specify fields that should be searched against:
+1. in static property `quickSearchFields` as list of strings, see example bellow:
 
 ```groovy
 class Org {
@@ -271,11 +272,27 @@ class Org {
     ...
 
 ```
+1. default fields in config
+
+```yaml
+gorm:
+    tools:
+        mango:
+            defaultQuickSearch:
+              - name
+              - num
+              - address.city
+
+```
+
+On application start for all domains that doesn't have a `quickSearchFields` property, the fields from `defaultQuickSearch`
+that each domain contains will be added. 
+
 So Mango criteria will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
 for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
-Org.dao.search([criteria: [$quickSearch: "abc"], max: 20])
+Org.repo.search([criteria: [$quickSearch: "abc"], max: 20])
 
 ```
 So it is the same as:
@@ -305,29 +322,29 @@ With such configuration restrictions for Mango criteria should be under `filters
 
 ### Mango API
 
-#### Mango in Dao
-[Dao service](dao.md) implements [DaoQuery.trait][DaoQuery]
+#### Mango in the Repository
+[The Repository](repository.md) implements [MangoQueryRepo][MangoQueryRepo] Trait
 which contains implementation for two query methods:
 
-```java
+```groovy
 DetachedCriteria buildCriteria( Map params=[:], Closure closure=null) {
         mangoQuery.buildCriteria(getDomainClass(), params, closure)
     }
 ```
 see docs for [DetachedCriteria][DetachedCriteria]
 
-```java
+```groovy
  List query(Map params=[:], Closure closure=null){
          mangoQuery.query(getDomainClass(), params, closure)
      }
 ```
 returns list of entities with pagination. For pagination take a look at [Pager][Pager]
 
-If one need to override mango bean for a certain dao it can be achieved in two ways:
+If one need to override mango bean for a certain repo it can be achieved in two ways:
 
 1. implement `getMangoQuery()` method that should return instance of the class that implements [MangoQueryApi.trait][MangoQueryApi]
 
-1. register a new bean for custom criteria, and set it for the dao with ``@Qualifier`` annotation
+1. register a new bean for custom criteria, and set it for the repo with ``@Qualifier`` annotation
 
 ```java
 beans = {
@@ -352,7 +369,7 @@ class NewMangoQuery implements MangoQueryApi {
 ```
 
 ```java
-class CityDao extends DefaultGormDao<City> {
+class CityRepo extends DefaultGormRepo<City> {
 
     @Autowired
     @Qualifier("newMangoQuery")
@@ -373,11 +390,11 @@ If one needs to compute totals for some fields, [MangoQuery] [MangoQuery]
 has `countTotals` method. Restrictions for it are working in the same way as for query method, so it can be specified 
 with params map and criteria closure.
 
-But Dao bean doesn't contain this method, so one can call it on mangoQuery bean.
+But the repository beans don't contain this method, so one can call it on mangoQuery bean.
 To specify what fields sums should be computed for, the list with fields name should be passed.
 See example:
 ```groovy
-Org.dao.mangoQuery.countTotals(domainClass, [
+Org.repo.mangoQuery.countTotals(domainClass, [
   criteria: [name: "Virgin%", type: "New"]
 ], ["amount", credit]){
   gt "id", 5
@@ -438,7 +455,7 @@ to a grails parameter map, which can be used for databinding.
 [MangoTidyMap]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoTidyMap.groovy
 [MangoTidyMapSpec]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/test/groovy/gorm/tools/mango/MangoTidyMapSpec.groovy 
 [MangoQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQuery.groovy
-[DaoQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/DaoQuery.groovy
+[MangoQueryRepo]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQueryRepo.groovy
 [DetachedCriteria]:http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria
 [Pager]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/Pager.groovy
 [build method]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoBuilder.groovy#L73

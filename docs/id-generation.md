@@ -1,6 +1,6 @@
 
 ### Database ID Generator
-Dao plugin comes with an implementation of hibernate identity generator for a cross database and NoSQL way to assign Long ids from an in memory incrementor. It uses a central table to track the last used id for each table. This helps a lot when dealing with associations and relationships. It also increases the performance of batch inserts.
+The plugin comes with an implementation of hibernate identity generator for a cross database and NoSQL way to assign Long ids from an in memory incrementor. It uses a central table to track the last used id for each table. This helps a lot when dealing with associations and relationships. It also increases the performance of batch inserts.
 
 ### NewObjectId table
 The table name is configurable and will get created if it does not exist. You can also create the table as shown below and add indexes if desired.
@@ -71,7 +71,7 @@ BatchIdGenerator by default uses allocationSize size of 100. Which can be change
 
 ```
 
-Dao plugin by default configures the BatchIdGenerator as default idgenerator. If you need to use another idgenerator or provide a custom implementation, you can override the **idGenerator** spring bean.
+The plugin by default configures the BatchIdGenerator as default idgenerator. If you need to use another idgenerator or provide a custom implementation, you can override the **idGenerator** spring bean.
 
 **jdbcTemplate**
-Dao plugin also configures JdbcTemplate which can be used for low level jdbc access. It uses TransactionAwareDataSourceProxy so the queries run through the jdbcTemplate will be part of the current transaction.
+This plugin also configures JdbcTemplate which can be used for low level jdbc access. It uses TransactionAwareDataSourceProxy so the queries run through the jdbcTemplate will be part of the current transaction.

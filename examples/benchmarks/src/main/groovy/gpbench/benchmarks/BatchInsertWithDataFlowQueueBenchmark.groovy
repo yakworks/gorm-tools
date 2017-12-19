@@ -1,8 +1,10 @@
 package gpbench.benchmarks
 
-import gorm.tools.dao.DaoUtil
+import gorm.tools.WithTrx
+import gorm.tools.repository.RepoUtil
 import gpbench.City
-import gpbench.CityDao
+import gpbench.CityRepo
+import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -14,10 +16,10 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 /**
  * Runs batch inserts in parallel using gparse dataflow queue.
  */
-@CompileStatic
-class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
+@GrailsCompileStatic
+class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark implements WithTrx{
 
-    CityDao cityDao
+    CityRepo cityRepo
 
     BatchInsertWithDataFlowQueueBenchmark(boolean databinding) { super(databinding) }
 
@@ -27,16 +29,16 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
 
     @Override
     def execute() {
-        insert(cities, cityDao)
+        insert(cities, cityRepo)
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)
-    void insert(List<List<Map>> batchList, CityDao dao) {
+    void insert(List<List<Map>> batchList, CityRepo repo) {
         DataflowQueue queue = new DataflowQueue()
 
         //setup an operator
         def op1 = operator(inputs: [queue], outputs: [], maxForks: poolSize) { List<Map> batch ->
-            insertBatch(batch, dao)
+            insertBatch(batch, repo)
         }
 
         final int MAX_QUEUE_SIZE = 10
@@ -56,17 +58,16 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark {
     }
 
     @Transactional
-    void insertBatch(List<Map> batch, CityDao dao) {
+    void insertBatch(List<Map> batch, CityRepo repo) {
         for (Map record : batch) {
             try {
                 //String dataBinder = dataBinder == 'copy' ? 'bindFast' : 'grailsWeb'
-                dao.create(record)
+                repo.create(record)
             } catch (Exception e) {
                 e.printStackTrace()
             }
         }
-
-        DaoUtil.flushAndClear()
+        flushAndClear(transactionStatus)
     }
 
 }

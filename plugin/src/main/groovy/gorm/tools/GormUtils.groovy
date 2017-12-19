@@ -1,8 +1,8 @@
 package gorm.tools
 
-import gorm.tools.databinding.GormMapBinder
+import gorm.tools.beans.AppCtx
+import gorm.tools.databinding.EntityMapBinder
 import grails.compiler.GrailsCompileStatic
-import grails.util.Holders
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.grails.datastore.gorm.GormEntity
@@ -72,7 +72,7 @@ class GormUtils {
      */
     @CompileStatic
     static <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, Map<String, Object> override = [:], boolean ignoreAssociations = false) {
-        GormMapBinder binder = (GormMapBinder) Holders.applicationContext.getBean("gormMapBinder")
+        EntityMapBinder binder = (EntityMapBinder) AppCtx.get("entityMapBinder")
         binder.bind(target, source)
 
         if (override) {

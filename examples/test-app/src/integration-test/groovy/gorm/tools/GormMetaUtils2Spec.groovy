@@ -1,6 +1,6 @@
 package gorm.tools
 
-import daoapp.Org
+import repoapp.Org
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
@@ -16,13 +16,13 @@ class GormMetaUtils2Spec extends Specification {
 
     def "GetDomainClass string"() {
         expect:
-        GormMetaUtils.getPersistentEntity("daoapp.Org")
+        GormMetaUtils.getPersistentEntity("repoapp.Org")
     }
 
     def "GetDomainClass instance"() {
         expect:
         def o = Org.get(100)
-        assert o.dao
+        assert o.repo
         GormMetaUtils.getPersistentEntity(o)
     }
 
@@ -30,7 +30,7 @@ class GormMetaUtils2Spec extends Specification {
         expect:
         GormMetaUtils.findPersistentEntity("Org")
         GormMetaUtils.findPersistentEntity("org")
-        GormMetaUtils.findPersistentEntity("daoapp.Org")
+        GormMetaUtils.findPersistentEntity("repoapp.Org")
         GormMetaUtils.findPersistentEntity("dropZone")
         GormMetaUtils.findPersistentEntity("DropZone")
         //GormMetaUtils.findDomainClass("dropzone")
@@ -38,7 +38,7 @@ class GormMetaUtils2Spec extends Specification {
 
     def "GetPersistentEntity name string"() {
         expect:
-        GormMetaUtils.getPersistentEntity("daoapp.Org")
+        GormMetaUtils.getPersistentEntity("repoapp.Org")
     }
 
     def "GetPersistentEntity instance"() {
@@ -55,7 +55,7 @@ class GormMetaUtils2Spec extends Specification {
         expect:
         GormMetaUtils.findPersistentEntity("Org")
         GormMetaUtils.findPersistentEntity("org")
-        GormMetaUtils.findPersistentEntity("daoapp.Org")
+        GormMetaUtils.findPersistentEntity("repoapp.Org")
 
     }
 }

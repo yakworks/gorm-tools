@@ -1,8 +1,9 @@
 package testing
 
+import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity
+@Entity @GrailsCompileStatic
 class Org {
     int id
     String name
@@ -12,7 +13,7 @@ class Org {
     Location location
     String secondName
     Date date
-    String nameFromDao
+    String nameFromRepo
 
     String event
 
@@ -25,7 +26,7 @@ class Org {
         amount2 nullable: true
         date nullable: true
         secondName nullable: true
-        nameFromDao nullable: true
+        nameFromRepo nullable: true
         event nullable: true, blank: false
     }
 }

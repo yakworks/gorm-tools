@@ -27,7 +27,7 @@ grails {
     exploded = true
     plugins {
         //println "Inside grails: $rootProject.name"
-        compile project(':dao')
+        compile project(':gorm-tools')
     }
 }
 

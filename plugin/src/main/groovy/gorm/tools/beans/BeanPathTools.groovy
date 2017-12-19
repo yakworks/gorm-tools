@@ -1,14 +1,11 @@
 package gorm.tools.beans
 
 import gorm.tools.GormMetaUtils
-import grails.core.GrailsApplication
 import grails.util.GrailsClassUtils
-import grails.util.Holders
 import grails.web.servlet.mvc.GrailsParameterMap
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
@@ -27,8 +24,7 @@ import javax.servlet.http.HttpServletRequest
 @Slf4j
 @CompileStatic
 class BeanPathTools {
-    //static Log log = LogFactory.getLog(getClass())
-    static GrailsApplication grailsApplication = Holders.grailsApplication
+
     private static List<String> excludes = ['hasMany', 'belongsTo', 'searchable', '__timeStamp',
                                             'constraints', 'version', 'metaClass']
 
@@ -84,8 +80,8 @@ class BeanPathTools {
     static Map buildMapFromPaths(Object source, List<String> propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {
             Class delegatingBean = GrailsClassUtils.getStaticFieldValue(source.getClass(), "delegatingBean")
-            if (!delegatingBean && Holders.grailsApplication.isArtefactOfType(DomainClassArtefactHandler.TYPE, source.getClass())) {
-                delegatingBean = DaoDelegatingBean
+            if (!delegatingBean && source instanceof GormEntity) {
+                delegatingBean = RepoDelegatingBean
             }
             if (delegatingBean != null) source = delegatingBean.newInstance(source)
         }

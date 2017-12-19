@@ -1,6 +1,6 @@
 package gpbench.benchmarks
 
-import gorm.tools.databinding.GormMapBinder
+import gorm.tools.databinding.EntityMapBinder
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -13,7 +13,7 @@ import org.grails.datastore.gorm.GormEntity
 @CompileStatic
 class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends BaseBatchInsertBenchmark<T> {
 
-    GormMapBinder gormMapBinder
+    EntityMapBinder entityMapBinder
 
     GparsBaselineBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
@@ -21,7 +21,7 @@ class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends Base
 
     @Override
     def execute() {
-        asyncBatchSupport.parallel(cities) { Map row, Map zargs ->
+        asyncBatchSupport.parallelBatch(cities) { Map row, Map zargs ->
             //println "insertingRow $row"
             insertRow(row)
         }
@@ -32,7 +32,7 @@ class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends Base
         if (dataBinder == 'grails') {
             bindGrails(c, row)
         } else {
-            gormMapBinder.bind(c, row)
+            entityMapBinder.bind(c, row)
         }
         c.save(failOnError: true, validate: validate)
     }

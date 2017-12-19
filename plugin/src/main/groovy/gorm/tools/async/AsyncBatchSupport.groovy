@@ -1,28 +1,41 @@
 package gorm.tools.async
 
-import gorm.tools.dao.DaoUtil
-import grails.gorm.transactions.Transactional
-import groovy.transform.CompileDynamic
+import gorm.tools.WithTrx
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.transaction.TransactionStatus
 
 /**
  * a trait to be used for colating/slicing a list into "batches" to then asynchronously with Transactions
  * insert or update for maximum performance.
  *
  * @see GparsBatchSupport  GparsBatchSupport - for a concrete implementation
+ *
+ * @author Joshua Burnett
+ * @since 6.1
  */
 @CompileStatic
-trait AsyncBatchSupport {
+trait AsyncBatchSupport implements WithTrx {
 
     /** The list size to send to the collate that slices.*/
     @Value('${hibernate.jdbc.batch_size:0}')
     int batchSize
 
-    /** calls {@link #parallelClosure}. Passes closure args,batchList and closure on through to {@link #withTransaction}*/
-    void parallel(Map args = [:], List<List> batchList, Closure closure) {
-        parallelClosure(args, batchList){ List batch, Map cargs ->
-            withTransaction(cargs, batch, closure)
+    /** calls {@link #parallel()} and passes args, batchList and the closure through to {@link #batchTrx()} */
+    /**
+     * calls {@link #parallel} with the args, batches list calling {@link #doBatch} for each batch in batches
+     * passes itemClosure down through to the {@link #doBatch}
+     *
+     * @param args _optional_ arg map to be passed to the async engine such as gpars.
+     *     can also add any other value and they will be passed down through the closure as well <br>
+     *     - poolSize : gets passed down into the GParsPool.withPool for example
+     * @param batches a collated list(batches) of sub-lists(a batch or items). each item in the batch(sub-list)
+     *   will be asynchronously passed to the provided itemClosure. You should first collate the list with {@link #collate}
+     * @param batchClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
+     */
+    void parallelBatch(Map args = [:], List<List> batches, Closure itemClosure) {
+        parallel(args, batches) { List batch, Map cargs ->
+            batchTrx(cargs, batch, itemClosure)
         }
     }
 
@@ -36,13 +49,13 @@ trait AsyncBatchSupport {
      * @param args _optional_ arg map to be passed to the async engine such as gpars.
      *     can also add any other value and they will be passed down through the closure as well <br>
      *     - poolSize : gets passed down into the GParsPool.withPool for example
-     * @param batchList a collated list of lists. each list in the batchList will be asynchronously passed to the provided closure
-     * @param closure the closure to call on each list in the batchList
+     * @param batches a collated list of lists. each batch list in the batches will be asynchronously passed to the provided closure
+     * @param batchClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
      */
-    abstract void parallelClosure(Map args = [:], List<List> batchList, Closure closure)
+    abstract void parallel(Map args = [:], List<List> batches, Closure batchClosure)
 
     /**
-     * Uses collate to break or slice the list into batches and then calls parallel
+     * Uses collate to break or slice the list into batches and then calls parallelBatch
      *
      * @param args optional arg map to be passed on through to eachParallel and the async engine such as gpars. <br>
      *     - batchSize : parameter to be passed into collate
@@ -50,29 +63,43 @@ trait AsyncBatchSupport {
      * @param closure the closure to pass to eachParallel which is then passed to withTransaction
      */
     void parallelCollate(Map args = [:], List list, Closure closure) {
-        parallel(args, collate(list, args.batchSize as Integer), closure)
+        parallelBatch(args, collate(list, args.batchSize as Integer), closure)
     }
 
     /**
      * Uses collate to break or slice the list into sub-lists of batches. Uses the {@link #batchSize} unless listSize is sent in
-     * @param list the list to slice up
-     * @param listSize _optional_ the length of each batch sub-list in the returned list. override the {@link #batchSize}
-     * @return a List containing the data collated into sub-lists batches
+     * @param items the list to slice up into batches
+     * @param batchSize _optional_ the length of each batch sub-list in the returned list. override the {@link #batchSize}
+     * @return the batches (list of lists) containing the chunked list of items
      */
-    List<List> collate(List list, Integer listSize = null){
-        list.collate(listSize ?: getBatchSize())
+    List<List> collate(List items, Integer batchSize = null) {
+        items.collate(batchSize ?: getBatchSize())
     }
 
     /**
-     * Should be overriden and annotated with Transactional
+     * runs {@link #doBatch ) in a Transaction and flush and clear is called after doBatch but before commit.
+     */
+    void batchTrx(Map args, List items, Closure itemClosure) {
+        withTrx { TransactionStatus status ->
+            doBatch(args, items, itemClosure)
+            //status.flush()
+            //clear(status)
+            flushAndClear(status)
+        }
+
+    }
+
+    /**
+     * calls closure for each item in list. flush and clear is called after all items are done
+     * and just before commit.
      *
      * @param args <i>optional args to pass to the closure. coming from parallelClosure
-     * @param list the list to iterate over and run the closure on each item
-     * @param closure the closure to execute. will get passed the item and args as it itereates over the list
+     * @param items the list or items to iterate over and run the closure
+     * @param itemClosure the closure to execute for each item. will get passed the item and args as it itereates over the list
      */
-    void withTransaction(Map args = [:], List list, Closure closure) {
-        for (Object item : list) {
-            closure(item, args)
+    void doBatch(Map args, List items, Closure itemClosure) {
+        for (Object item : items) {
+            itemClosure(item, args)
         }
     }
 }

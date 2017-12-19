@@ -1,8 +1,8 @@
 package gpbench
 
 import gorm.tools.async.AsyncBatchSupport
-import gorm.tools.dao.DaoApi
-import gorm.tools.dao.DaoUtil
+import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.RepoUtil
 import gpbench.benchmarks.*
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
@@ -43,8 +43,9 @@ class BenchmarkRunnerService {
     int warmupCycles = 1
     boolean muteConsole = false
 
-    RegionDao regionDao
-    CountryDao countryDao
+    RegionRepo regionRepo
+    CountryRepo countryRepo
+    CityRepo cityRepo
     GrailsApplication grailsApplication
 
     CsvReader csvReader
@@ -57,13 +58,13 @@ class BenchmarkRunnerService {
         //println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
         //println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
         println "Available processors: " + Runtime.getRuntime().availableProcessors()
-        println "Gpars pool size (poolSize): " + poolSize
+        println "Gpars pool size (gpars.poolsize): " + poolSize
         println "binderType: " + binderType
-        println "hibernate.jdbc.batch_size (batchSize): " + batchSize
+        println "hibernate.jdbc.batch_size (jdbcBatchSize): " + batchSize
         println "batchSliceSize: " + batchSliceSize
         println "auditTrailEnabled: " + auditTrailEnabled
         println "refreshableBeansEnabled (eventListenerCount): " + eventListenerCount
-        println "Autowire enabled: " + grailsApplication.config.grails.gorm.autowire
+        println "Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
 
         //load base country and city data which is used by all benchmarks
         benchmarkHelper.truncateTables()
@@ -86,23 +87,18 @@ class BenchmarkRunnerService {
         if (eventListenerCount)
             warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
 
-        warmUpAndRun("### Dao events", "runDaoEvents", binderType)
+        warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
 
         if (auditTrailEnabled)
             warmUpAndRun("### Gpars - audit trail", "runWithAuditTrail", binderType)
 
         warmUpAndRun("### RXJava, Script executor, etc", "runOther", binderType)
 
-//        warmUpAndRun("### Gpars - standard grails binding with baseline Slower",
-//            "runBaselineCompare", 'grails')
-//
 //        warmUpAndRun("  - Performance problems go away without databinding on traits",
 //            "runMultiCoreSlower", 'fast')
-//
-//        warmUpAndRun("  - Performance problems - standard grails binding with baseline",
-//            "runMultiCoreSlower", 'grails')
 
-        runMultiThreadsOther("## Misc sanity checks")
+
+        //runMultiThreadsOther("## Misc sanity checks")
 
         System.exit(0)
     }
@@ -131,12 +127,18 @@ class BenchmarkRunnerService {
     void runBaselineCompare(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
-
         runBenchmark(new GparsBaselineBenchmark(CityBaseline, bindingMethod))
-        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
-
         runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
-        runBenchmark(new GparsDaoBenchmark(City, bindingMethod))
+
+        logMessage "  - Events disabled"
+        City.repo.enableEvents = false
+        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
+
+        logMessage "  - Events enabled"
+        City.repo.enableEvents = true
+        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
+
+        //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
         //logMessage "\n  - These should all run within about 5% of City and each other"
         //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
     }
@@ -146,11 +148,11 @@ class BenchmarkRunnerService {
         runBenchmark(new GparsBaselineBenchmark(CityRefreshableBeanEvents, bindingMethod))
     }
 
-    void runDaoEvents(String msg, String bindingMethod = 'grails') {
+    void runRepoEvents(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
-        runBenchmark(new GparsDaoBenchmark(CityDaoMethodEvents, bindingMethod))
-        runBenchmark(new GparsDaoBenchmark(CityDaoSpringEvents, bindingMethod))
-        runBenchmark(new GparsDaoBenchmark(CityDaoSpringEventsRefreshable, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(CityMethodEvents, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(CitySpringEvents, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(CitySpringEventsRefreshable, bindingMethod))
     }
 
     void runWithAuditTrail(String msg, String bindingMethod = 'grails') {
@@ -182,11 +184,11 @@ class BenchmarkRunnerService {
         //runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 
         println "\n  - not much difference between static and dynamic method calls"
-//		runBenchmark(new GparsDaoBenchmark(City,"setter"))
-//		runBenchmark(new GparsDaoBenchmark(City,"fast"))
+//		runBenchmark(new GparsRepoBenchmark(City,"setter"))
+//		runBenchmark(new GparsRepoBenchmark(City,"fast"))
 //
-//		runBenchmark(new GparsDaoBenchmark(City,"bindWithSetters"))
-//		runBenchmark(new GparsDaoBenchmark(City,"bindFast"))
+//		runBenchmark(new GparsRepoBenchmark(City,"bindWithSetters"))
+//		runBenchmark(new GparsRepoBenchmark(City,"bindFast"))
 
         new City().attached
 
@@ -205,19 +207,16 @@ class BenchmarkRunnerService {
         benchmarkHelper.executeSqlScript("test-tables.sql")
         List<List<Map>> countries = csvReader.read("Country").collate(batchSize)
         List<List<Map>> regions = csvReader.read("Region").collate(batchSize)
-        insert(countries, countryDao)
-        insert(regions, regionDao)
-
-        DaoUtil.flushAndClear()
+        insert(countries, countryRepo)
+        insert(regions, regionRepo)
 
         assert Country.count() == 275
         assert Region.count() == 3953
     }
 
-    @CompileStatic(TypeCheckingMode.SKIP)
-    void insert(List<List<Map>> batchList, DaoApi dao) {
-        asyncBatchSupport.parallel(batchList) { Map row, args ->
-            dao.create(row)
+    void insert(List<List<Map>> batchList, RepositoryApi repo) {
+        asyncBatchSupport.parallel(batchList) { List<Map> list, Map args ->
+            repo.batchCreate(list)
         }
     }
 

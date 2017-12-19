@@ -7,8 +7,12 @@ import org.grails.datastore.gorm.GormEntity
  */
 interface MapBinder {
 
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod)
+    void bind(Object target, Map<String, Object> source, String bindMethod)
 
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source)
+    void bind(Object target, Map<String, Object> source)
+
+    void bindCreate(Object target, Map<String, Object> source)
+
+    void bindUpdate(Object target, Map<String, Object> source)
 
 }

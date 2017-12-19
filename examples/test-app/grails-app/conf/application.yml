@@ -2,7 +2,7 @@
 grails:
     profile: web
     codegen:
-        defaultPackage: daoapp
+        defaultPackage: repoapp
     spring:
         transactionManagement:
             proxies: false
@@ -80,6 +80,7 @@ gorm:
     tools:
         mango:
             criteriaKeyName: criteria
+            defaultQuickSearch: [name, num, description, address.city, jumper.name]
 ---
 hibernate:
     cache:

@@ -1,7 +1,7 @@
 package testing
 
-import gorm.tools.dao.DaoUtil
-import gorm.tools.dao.errors.DomainException
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.errors.DomainException
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import grails.validation.ValidationException
@@ -12,13 +12,9 @@ import spock.lang.Specification
 @Integration
 @Rollback
 class DomainMethodsTests extends Specification {
-    //static transactional = false
     static dataInit = false
 
     void setup() {
-        //super.setUp()
-        //dao = jumperDelegateDao
-        //assert dao.domainClass == Jumper
         initData()
     }
 
@@ -54,7 +50,7 @@ class DomainMethodsTests extends Specification {
         def dom = Student.findByName("student1")
         assert dom.name == "student1"
         dom.remove()
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
         then:
         Student.findByName("student1") == null
     }
@@ -122,7 +118,7 @@ class DomainMethodsTests extends Specification {
         then:
         def jumper = Jumper.create([name: "testInsert"])
         assert jumper
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
         def dom2 = Jumper.findByName("testInsert")
         assert dom2.id == jumper.id
     }
@@ -136,7 +132,7 @@ class DomainMethodsTests extends Specification {
 
         assert jump
         def j2 = Jumper.update([id: jump.id, name: "testUpdateXXX"])
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
         "testUpdateXXX" == j2.name
         jump.id == j2.id
         def dom2 = Jumper.findByName("testUpdateXXX")
@@ -151,17 +147,14 @@ class DomainMethodsTests extends Specification {
 
         then:
         Student.remove(stud.id)
-        DaoUtil.flushAndClear()
+        RepoUtil.flushAndClear()
         Student.findByName("student1") == null
     }
 
-    void testGetDaoSetup() {
-        assertTrue Jumper.dao.class.name.contains("testing.JumperDao")
-        println Student.dao.class.name
-        // grails.plugin.dao.GormDaoSupport$$EnhancerBySpringCGLIB$$27f04eca
-        assert Student.dao.class.name == ("DefaultGormDao")
-        assert DropZone.dao.class.name.contains("GormDaoSupport\$\$EnhancerBySpringCGLIB")
-        //assertEquals "grails.plugin.dao.GormDaoSupport",DropZone.dao.class.name
+    void testGetRepoSetup() {
+        assert Jumper.repo.class.name.contains("testing.JumperRepo")
+        println Student.repo.class.name
+        assert Student.repo.class.name == ("DefaultGormRepo")
     }
 
 

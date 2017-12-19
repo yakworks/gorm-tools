@@ -1,7 +1,7 @@
 package gorm.tools.jdbc
 
 import grails.gorm.transactions.Rollback
-import grails.plugin.dao.Application
+import grails.plugin.gormtools.Application
 import grails.testing.mixin.integration.Integration
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.core.JdbcTemplate

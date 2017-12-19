@@ -143,26 +143,4 @@ class GormUtils {
         return result
     }
 
-    /**
-     * Check if Persistent Entity has property by path
-     *
-     * @param clazz Persistent Entity
-     * @param property path for property
-     * @return true if there is such property, false othervise
-     */
-    @CompileDynamic
-    static boolean hasProperty(PersistentEntity domain, String property) {
-        Closure checkProperty
-        checkProperty = { PersistentEntity domainClass, List path ->
-            PersistentProperty prop = domainClass?.getPropertyByName(path[0].toString())
-            if (path.size() > 1 && prop) {
-                checkProperty(prop.associatedEntity, path.tail())
-            } else {
-                prop as boolean
-            }
-        }
-        checkProperty(domain, property.split("[.]") as List)
-
-    }
-
 }

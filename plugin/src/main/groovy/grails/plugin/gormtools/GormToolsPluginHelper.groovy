@@ -1,7 +1,7 @@
 package grails.plugin.gormtools
 
 import gorm.tools.DbDialectService
-import gorm.tools.GormUtils
+import gorm.tools.GormMetaUtils
 import gorm.tools.async.GparsBatchSupport
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.DefaultGormRepo
@@ -16,6 +16,7 @@ import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
+import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
 
 @SuppressWarnings(['NoDef'])
@@ -95,12 +96,19 @@ class GormToolsPluginHelper {
         return bClosure
     }
 
-    static void addQuickSearchFields(Config config,GrailsApplication grailsApplication){
-        List<String> fields = config.gorm?.tools?.mango?.defaultQuickSearch ?: []
-        grailsApplication.getMappingContext().getPersistentEntities().each { domainClass ->
+    /**
+     * Adds quickSearch fields to domains from config, if domain has such properties.
+     * Supports paths for nested domains, for example "address.city", so if domain has
+     * association address and it has property city it will be added
+     *
+     * @param config config bean
+     * @param grailsApplication grails application context
+     */
+    static void addQuickSearchFields(List<String> fields, List<PersistentEntity> domains){
+        domains.each { domainClass ->
             if (fields && !domainClass.getJavaClass().quickSearchFields) {
                 domainClass.getJavaClass().quickSearchFields = fields.findAll {
-                    GormUtils.hasProperty(domainClass, it as String)
+                    GormMetaUtils.hasProperty(domainClass, it as String)
                 }
             }
         }

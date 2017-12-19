@@ -5,7 +5,7 @@ import spock.lang.Specification
 import testing.Student
 
 @Integration
-class OrgSpec extends Specification {
+class MangoSpec extends Specification {
 
     def "Check list"() {
         expect:
@@ -456,7 +456,9 @@ class OrgSpec extends Specification {
 
     def "test quick search fields"() {
         expect:
+        //Student has name property, and due to the fact that Student has relation to Jumper and it has property name
         Student.quickSearchFields == ["name", "jumper.name"]
+
 
     }
 }

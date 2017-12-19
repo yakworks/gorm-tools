@@ -7,6 +7,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.orm.hibernate.cfg.Mapping
 
 /**
@@ -83,6 +84,28 @@ class GormMetaUtils {
     @CompileDynamic
     Mapping getMapping(PersistentEntity pe) {
         return getMappingContext().mappingFactory?.entityToMapping?.get(pe)
+    }
+
+    /**
+     * Check if Persistent Entity has property by path
+     *
+     * @param domain Persistent Entity
+     * @param property path for property
+     * @return true if there is such property, false othervise
+     */
+    @CompileDynamic
+    static boolean hasProperty(PersistentEntity domain, String property) {
+        Closure checkProperty
+        checkProperty = { PersistentEntity domainClass, List path ->
+            PersistentProperty prop = domainClass?.getPropertyByName(path[0].toString())
+            if (path.size() > 1 && prop) {
+                checkProperty(prop.associatedEntity, path.tail())
+            } else {
+                prop as boolean
+            }
+        }
+        checkProperty(domain, property.split("[.]") as List)
+
     }
 
 }

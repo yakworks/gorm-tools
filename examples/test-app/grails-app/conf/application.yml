@@ -80,12 +80,7 @@ gorm:
     tools:
         mango:
             criteriaKeyName: criteria
-            defaultQuickSearch:
-              - name
-              - num
-              - description
-              - address.city
-              - jumper.name
+            defaultQuickSearch: [name, num, description, address.city, jumper.name]
 ---
 hibernate:
     cache:

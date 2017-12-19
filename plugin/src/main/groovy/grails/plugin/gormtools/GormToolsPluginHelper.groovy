@@ -11,7 +11,6 @@ import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.mango.MangoQuery
-import grails.config.Config
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -42,7 +41,7 @@ class GormToolsPluginHelper {
             idGenerator = ref("idGenerator")
         }
 
-        mangoQuery(MangoQuery)
+        mango(MangoQuery)
         repoEventPublisher(RepoEventPublisher)
         repoUtilBean(RepoUtil) //this is here just so the app ctx can get picked up and set on the static
 

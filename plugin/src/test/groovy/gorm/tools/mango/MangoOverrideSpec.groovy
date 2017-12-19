@@ -2,6 +2,7 @@ package gorm.tools.mango
 
 import gorm.tools.mango.api.MangoQueryApi
 import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.testing.GormToolsHibernateSpec
 import gorm.tools.testing.GormToolsTest
 import grails.artefact.Artefact
 import grails.gorm.DetachedCriteria
@@ -52,9 +53,9 @@ class NewMangoQuery implements MangoQueryApi {
     }
 }
 
-@Artefact("Dao")
+@Artefact("Repository")
 @Transactional
-class CityDao extends DefaultGormRepo<City> {
+class CityRepo extends DefaultGormRepo<City> {
 
     @Autowired
     @Qualifier("newMangoQuery")

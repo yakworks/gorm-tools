@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 @CompileStatic
-trait MangoQueryTrait{
+trait MangoQueryTrait {
 
     abstract Class getDomainClass()
 

@@ -1254,8 +1254,42 @@ see docs for <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#
      <span class="o">}</span>
 </pre></div>
 returns list of entities with pagination. For pagination take a look at <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/Pager.groovy">Pager</a></p>
-<p>If one need to override mango bean for repository it can be achieved by creating new <code>mangoQuery</code> bean, it should
-implement <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQueryApi.groovy">MangoQueryApi.trait</a> so it can be autowired</p>
+<p>If one need to override mango bean for a certain repo it can be achieved in two ways:</p>
+<ol>
+<li>
+<p>implement <code>getMangoQuery()</code> method that should return instance of the class that implements <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/api/MangoQueryApi.groovy">MangoQueryApi.trait</a></p>
+</li>
+<li>
+<p>register a new bean for custom criteria, and set it for the repo with <code>@Qualifier</code> annotation</p>
+</li>
+</ol>
+<div class="codehilite"><pre><span></span><span class="n">beans</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">newMangoQuery</span><span class="o">(</span><span class="n">NewMangoQuery</span><span class="o">)</span> 
+<span class="o">}</span>
+</pre></div>
+
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">NewMangoQuery</span> <span class="kd">implements</span> <span class="n">MangoQueryApi</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">DetachedCriteria</span> <span class="nf">buildCriteria</span><span class="o">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+       <span class="k">return</span> <span class="kc">null</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="n">List</span> <span class="nf">query</span><span class="o">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+       <span class="k">return</span> <span class="o">[]</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CityRepo</span> <span class="kd">extends</span> <span class="n">DefaultGormRepo</span><span class="o">&lt;</span><span class="n">City</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="nd">@Qualifier</span><span class="o">(</span><span class="s">&quot;newMangoQuery&quot;</span><span class="o">)</span>
+    <span class="n">NewMangoQuery</span> <span class="n">mangoQuery</span>
+<span class="o">}</span>
+</pre></div>
+
 <h4 id="build-mango-criteria">Build Mango criteria<a class="headerlink" href="#build-mango-criteria" title="Permanent link">&para;</a></h4>
 <p>Under the hood Mango uses <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria">DetachedCriteria</a> take a look on main <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoBuilder.groovy#L73">build method</a>
 One can see that it normalizes params map to make it Mango QL and then adds restrictions to detached criteria based on map,

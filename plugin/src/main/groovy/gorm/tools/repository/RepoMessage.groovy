@@ -101,7 +101,7 @@ class RepoMessage {
 
     //@CompileDynamic
     static String resolveMessage(String code, String defaultMsg) {
-        return AppCtx.get("messageSource",MessageSource).getMessage(code, [] as Object[], defaultMsg, defaultLocale())
+        return AppCtx.get("messageSource", MessageSource).getMessage(code, [] as Object[], defaultMsg, defaultLocale())
     }
 
     static Locale defaultLocale() {

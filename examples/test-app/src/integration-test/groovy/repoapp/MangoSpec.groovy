@@ -2,9 +2,10 @@ package repoapp
 
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import testing.Student
 
 @Integration
-class OrgSpec extends Specification {
+class MangoSpec extends Specification {
 
     def "Check list"() {
         expect:
@@ -450,6 +451,14 @@ class OrgSpec extends Specification {
         List list = Org.repo.query([criteria: ['$quickSearch': "Org#2%"], max: 150])
         then:
         list.size() == 11
+
+    }
+
+    def "test quick search fields"() {
+        expect:
+        //Student has name property, and due to the fact that Student has relation to Jumper and it has property name
+        Student.quickSearchFields == ["name", "jumper.name"]
+
 
     }
 }

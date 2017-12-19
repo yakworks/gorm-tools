@@ -1,6 +1,9 @@
 package gorm.tools.repository
 
 import gorm.tools.testing.GormToolsHibernateSpec
+import grails.plugin.gormtools.GormToolsPluginHelper
+import org.grails.datastore.mapping.model.PersistentEntity
+import testing.Company
 import testing.Location
 import testing.Nested
 import testing.Org
@@ -8,7 +11,7 @@ import testing.OrgRepo
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org, Location, Nested] }
+    List<Class> getDomainClasses() { [Org, Location, Nested, Company] }
 
     Closure doWithConfig() {
         { config ->
@@ -68,5 +71,20 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         then:
         org.repo.mangoQuery.criteriaKeyName == "testCriteriaName"
+    }
+
+    def "test default quick search fields"() {
+        when:
+        GormToolsPluginHelper.addQuickSearchFields(["name", "num", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
+
+        then:
+        Company.quickSearchFields == ["name", "num"]
+
+        when:
+        Company.quickSearchFields = []
+        GormToolsPluginHelper.addQuickSearchFields(["name", "location.city", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
+
+        then:
+        Company.quickSearchFields == ["name", "location.city"]
     }
 }

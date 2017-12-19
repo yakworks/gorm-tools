@@ -24,4 +24,10 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
         GormToolsPluginHelper.onChange(event, grailsApplication, this)
     }
 
+
+    @Override
+    void onStartup(Map event) {
+        GormToolsPluginHelper.addQuickSearchFields(config.gorm?.tools?.mango?.defaultQuickSearch ?: [], grailsApplication.getMappingContext().getPersistentEntities() as List)
+    }
+
 }

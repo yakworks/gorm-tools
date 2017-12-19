@@ -1196,8 +1196,9 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
 
 <h3 id="quick-search">Quick Search<a class="headerlink" href="#quick-search" title="Permanent link">&para;</a></h3>
 <p>Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
-search can be passed in <code>$quickSearch</code> or <code>$q</code> keywords. The list of fields should be specified in static property <code>quickSearchFields</code>
-as list of strings, see example bellow:</p>
+search can be passed in <code>$quickSearch</code> or <code>$q</code> keywords. 
+There are 2 ways to specify fields that should be searched against:
+1. in static property <code>quickSearchFields</code> as list of strings, see example bellow:</p>
 <p><div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Org</span> <span class="o">{</span>
     <span class="n">String</span> <span class="n">name</span>
     <span class="n">Address</span> <span class="n">address</span>
@@ -1205,7 +1206,19 @@ as list of strings, see example bellow:</p>
     <span class="kd">static</span> <span class="n">quickSearchFields</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">,</span> <span class="s2">&quot;address.city&quot;</span><span class="o">]</span>
     <span class="o">...</span>
 </pre></div>
-So Mango criteria will add <code>%</code> automatically, if quick search string doesn't have it and will apply <code>ilike</code> statement
+1. default fields in config</p>
+<div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">gorm</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">tools</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">mango</span><span class="p p-Indicator">:</span>
+            <span class="l l-Scalar l-Scalar-Plain">defaultQuickSearch</span><span class="p p-Indicator">:</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">name</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">num</span>
+              <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">address.city</span>
+</pre></div>
+
+<p>On application start for all domains that doesn't have a <code>quickSearchFields</code> property, the fields from <code>defaultQuickSearch</code>
+that each domain contains will be added. </p>
+<p>So Mango criteria will add <code>%</code> automatically, if quick search string doesn't have it and will apply <code>ilike</code> statement
 for each field in <code>quickSearchFields</code>. If domain field is not string type, then <code>eq</code> statement will be used.</p>
 <p><div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">repo</span><span class="o">.</span><span class="na">search</span><span class="o">([</span><span class="nl">criteria:</span> <span class="o">[</span><span class="n">$quickSearch</span><span class="o">:</span> <span class="s2">&quot;abc&quot;</span><span class="o">],</span> <span class="nl">max:</span> <span class="mi">20</span><span class="o">])</span>
 </pre></div>

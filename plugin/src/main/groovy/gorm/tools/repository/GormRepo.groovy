@@ -35,7 +35,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     @Autowired RepoEventPublisher repoEventPublisher
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
-    boolean enableEvents = true
+    Boolean enableEvents = true
 
     /**
      * The gorm domain class. will generally get set in contructor or using the generic as
@@ -58,13 +58,13 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * Saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error.
      *
      * @param entity the domain entity to call save on
-     * @param saveArgs the arguments to pass to save
+     * @param args the arguments to pass to save
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     @Override
-    D persist(D entity, Map args = [:]) {
+    D persist(Map args = [:], D entity) {
         withTrx {
-            return doPersist(entity, args)
+            return doPersist(args, entity)
         }
     }
 
@@ -73,7 +73,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * If a {@link ValidationException} is caught it wraps and throws it with our DataValidationException.
      *
      * @param entity the domain entity to call save on
-     * @param saveArgs - the arguments to pass to save as well as the PersistEvents.  can be any of the normal gorm save args
+     * @param args (optional) - the arguments to pass to save as well as the PersistEvents.  can be any of the normal gorm save args
      * plus some others specific to here
      *   - failOnError: (boolean) defaults to true
      *   - flush: (boolean) flush the session
@@ -82,9 +82,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      *
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D doPersist(D entity, Map args = [:]) {
+    @Override
+    D doPersist(Map args = [:], D entity) {
         try {
-            //Map argsCopy =  [failOnError: true] + args
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             getRepoEventPublisher().doBeforePersist(this, entity, args)
             entity.save(args)
@@ -113,14 +113,10 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @return the created domain entity
      * @see #doPersist
      */
-    D doCreate(Map data, Map args = [:]) {
+    @Override
+    D doCreate(Map args = [:], Map data) {
         D entity = (D) getDomainClass().newInstance()
-
-        bindWithPublish(entity, data, BindAction.Create)
-
-        args['bindAction'] = BindAction.Create
-        args['data'] = data
-        doPersist(entity, args)
+        bindAndSave(args, entity, data, BindAction.Create)
         return entity
     }
 
@@ -142,24 +138,38 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @see #doPersist
      */
     @Override
-    D doUpdate(Map data, Map saveArgs = [:]) {
+    D doUpdate(Map args = [:], Map data) {
         D entity = get(data)
-
-        bindWithPublish(entity, data, BindAction.Update)
-
-        Map args = saveArgs + [bindAction: BindAction.Update, data: data] //create a new arg map
-        doPersist(entity, args)
+        bindAndSave(args, entity, data, BindAction.Update)
         return entity
     }
 
-    void bindWithPublish(D entity, Map data, BindAction bindAction) {
-        getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction)
+    /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
+    void bindAndSave(Map args = [:], D entity, Map data, BindAction bindAction){
         bind(entity, data, bindAction)
+        args['bindAction'] = bindAction
+        args['data'] = data
+        doPersist(args, entity)
+    }
+
+    /**
+     * binds by calling {@link #doBind} and fires before and after events
+     * better to override doBind in implementing classes for custom logic.
+     * Or just implement the beforeBind|afterBind event methods
+     */
+    @Override
+    void bind(D entity, Map data, BindAction bindAction) {
+        getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction)
+        doBind(entity, data, bindAction)
         getRepoEventPublisher().doAfterBind(this, entity, data, bindAction)
     }
 
+    /**
+     * Main bind method that redirects call to the injected mapBinder.
+     * override this one in implementing classes. can also call this if you don't want events to fire
+     */
     @Override
-    void bind(D entity, Map data, BindAction bindAction) {
+    void doBind(D entity, Map data, BindAction bindAction) {
         getMapBinder().bind(entity, data, bindAction)
     }
 
@@ -172,7 +182,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @throws gorm.tools.repository.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
     @Override
-    void removeById(Serializable id, Map args = [:]) {
+    void removeById( Map args = [:], Serializable id) {
         D entity = getStaticApi().load(id)
         doRemove(entity)
     }
@@ -184,9 +194,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @throws DomainException if a spring DataIntegrityViolationException is thrown
      */
     @Override
-    void remove(D entity, Map args = [:]) {
+    void remove(Map args = [:], D entity) {
         withTrx {
-            doRemove(entity, args)
+            doRemove(args, entity)
         }
     }
 
@@ -196,7 +206,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @param entity - the domain instance to delete
      * @param args - args passed to delete
      */
-    void doRemove(D entity, Map args = [:]) {
+    void doRemove(Map args = [:], D entity) {
         try {
             getRepoEventPublisher().doBeforeRemove(this, entity)
             entity.delete(args)
@@ -235,7 +245,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @return the entity. Won't return null, instead it throws an exception
      */
     @Override
-    D get(Map<String, Object> params) {
+    D get(Map params) {
         return get(params.id as Serializable, params.version as Long)
     }
 

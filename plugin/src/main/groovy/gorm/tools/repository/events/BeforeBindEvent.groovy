@@ -1,7 +1,7 @@
 package gorm.tools.repository.events
 
+import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
-import org.grails.datastore.mapping.core.Datastore
 
 /**
  * Fired before a bind and save/persist. Allows modification to params used in the binding
@@ -11,7 +11,7 @@ import org.grails.datastore.mapping.core.Datastore
 @CompileStatic
 class BeforeBindEvent<D> extends RepositoryEvent<D> {
 
-    BeforeBindEvent(Datastore source, D entity, Map data, String bindAction) {
+    BeforeBindEvent(RepositoryApi source, D entity, Map data, String bindAction) {
         super(source, entity, RepositoryEventType.BeforeBind.eventKey)
         this.data = data
         this.bindAction = bindAction

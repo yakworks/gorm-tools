@@ -146,7 +146,7 @@ class DomainMethodsTests extends Specification {
         def stud = Student.findByName("student1")
 
         then:
-        Student.remove(stud.id)
+        Student.removeById(stud.id)
         RepoUtil.flushAndClear()
         Student.findByName("student1") == null
     }

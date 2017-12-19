@@ -1,8 +1,7 @@
 package gorm.tools.repository.events
 
+import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
-import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.model.MappingContext
 import org.springframework.context.ApplicationEvent
 import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
@@ -26,13 +25,20 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this will be 'beforePersist' */
     String eventKey = "repoEvent"
 
-    RepositoryEvent(final Datastore source, final D entity, String eventKey) {
-        super(source)
-        MappingContext mappingContext = source.getMappingContext()
-        this.entity = mappingContext.getProxyHandler().unwrap(entity)
+    RepositoryEvent(RepositoryApi repo, final D entity, String eventKey) {
+        super(repo)
+        this.entity = entity
         this.eventKey = eventKey
         //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
     }
+
+//    RepositoryEvent(final Datastore source, final D entity, String eventKey) {
+//        super(source)
+//        MappingContext mappingContext = source.getMappingContext()
+//        this.entity = mappingContext.getProxyHandler().unwrap(entity)
+//        this.eventKey = eventKey
+//        //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
+//    }
 
     /**
      * done per the spring docs so that listeners can bind to the generic of the event.

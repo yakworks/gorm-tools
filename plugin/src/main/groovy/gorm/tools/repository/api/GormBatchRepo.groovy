@@ -27,25 +27,25 @@ trait GormBatchRepo<D> implements WithTrx, RepositoryApi<D> {
 
     void batchPersist(Map args = [:], List<D> list) {
         batchTrx(list) { D item ->
-            doPersist(item, args)
+            doPersist(args, item)
         }
     }
 
     void batchCreate(Map args = [:], List<Map> list) {
         batchTrx(list) { Map item ->
-            doCreate(item, args)
+            doCreate(args, item)
         }
     }
 
     void batchUpdate(Map args = [:], List<Map> list) {
         batchTrx(list) { Map item ->
-            doUpdate(item, args)
+            doUpdate(args, item)
         }
     }
 
     void batchRemove(Map args = [:], List list) {
         batchTrx(list) { Serializable item ->
-            removeById(item, args)
+            removeById(args, item)
         }
     }
 

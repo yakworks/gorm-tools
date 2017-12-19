@@ -3,13 +3,15 @@ package gorm.tools.mango.api
 import grails.gorm.DetachedCriteria
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 @CompileStatic
-trait MangoQueryTrait{
+trait MangoQueryTrait {
 
     abstract Class getDomainClass()
 
     @Autowired
+    @Qualifier("mango")
     MangoQueryApi mangoQuery
 
     /**
@@ -20,7 +22,7 @@ trait MangoQueryTrait{
      * @return Detached criteria build based on mango language params and criteria closure
      */
     DetachedCriteria buildCriteria(Map params = [:], Closure closure = null) {
-        mangoQuery.buildCriteria(getDomainClass(), params, closure)
+        getMangoQuery().buildCriteria(getDomainClass(), params, closure)
     }
 
     /**
@@ -31,7 +33,7 @@ trait MangoQueryTrait{
      * @return query of entities restricted by mango params
      */
     List query(Map params = [:], Closure closure = null) {
-        mangoQuery.query(getDomainClass(), params, closure)
+        getMangoQuery().query(getDomainClass(), params, closure)
     }
 
 }

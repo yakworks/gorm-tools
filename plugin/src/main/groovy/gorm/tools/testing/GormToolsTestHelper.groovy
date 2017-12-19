@@ -47,7 +47,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
             //trxService(TrxService)
-            mangoQuery(MangoQuery)
+            mango(MangoQuery)
         }
     }
 

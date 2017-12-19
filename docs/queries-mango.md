@@ -340,8 +340,43 @@ see docs for [DetachedCriteria][DetachedCriteria]
 ```
 returns list of entities with pagination. For pagination take a look at [Pager][Pager]
 
-If one need to override mango bean for repository it can be achieved by creating new `mangoQuery` bean, it should
-implement [MangoQueryApi.trait][MangoQueryApi] so it can be autowired
+If one need to override mango bean for a certain repo it can be achieved in two ways:
+
+1. implement `getMangoQuery()` method that should return instance of the class that implements [MangoQueryApi.trait][MangoQueryApi]
+
+1. register a new bean for custom criteria, and set it for the repo with ``@Qualifier`` annotation
+
+```java
+beans = {
+    newMangoQuery(NewMangoQuery) 
+}
+
+```
+
+```java
+class NewMangoQuery implements MangoQueryApi {
+
+    @Override
+    DetachedCriteria buildCriteria(Class domainClass, Map params, Closure closure = null) {
+       return null
+    }
+
+    @Override
+    List query(Class domainClass, Map params, Closure closure = null) {
+       return []
+    }
+}
+```
+
+```java
+class CityRepo extends DefaultGormRepo<City> {
+
+    @Autowired
+    @Qualifier("newMangoQuery")
+    NewMangoQuery mangoQuery
+}
+```
+
  
 #### Build Mango criteria
 
@@ -426,4 +461,4 @@ to a grails parameter map, which can be used for databinding.
 [build method]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoBuilder.groovy#L73
 [ScrollableQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy
 [GrailsParameterMapRowMapper]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/GrailsParameterMapRowMapper.groovy
-[MangoQueryApi]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQueryApi.groovy
+[MangoQueryApi]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/api/MangoQueryApi.groovy

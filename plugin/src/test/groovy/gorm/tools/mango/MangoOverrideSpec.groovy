@@ -1,16 +1,22 @@
 package gorm.tools.mango
 
 import gorm.tools.mango.api.MangoQueryApi
+import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.testing.GormToolsHibernateSpec
 import gorm.tools.testing.GormToolsTest
+import grails.artefact.Artefact
 import grails.gorm.DetachedCriteria
+import grails.gorm.transactions.Transactional
 import grails.persistence.Entity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import spock.lang.Specification
 
 class MangoOverrideSpec extends Specification implements GormToolsTest {
 
-    void setup() {
+    void setupSpec() {
+        defineBeans{ newMangoQuery(NewMangoQuery) }
         mockDomain(City)
-        defineBeans({ mangoQuery(NewMangoQuery) })
     }
 
     void testMangoOverride() {
@@ -47,3 +53,11 @@ class NewMangoQuery implements MangoQueryApi {
     }
 }
 
+@Artefact("Repository")
+@Transactional
+class CityRepo extends DefaultGormRepo<City> {
+
+    @Autowired
+    @Qualifier("newMangoQuery")
+    NewMangoQuery mangoQuery
+}

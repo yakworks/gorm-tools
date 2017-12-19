@@ -9,11 +9,12 @@ import org.grails.datastore.mapping.core.Datastore
  * @param D the entity domain class
  */
 @CompileStatic
-class AfterCreateEvent<D> extends RepositoryEvent<D> {
+class AfterBindEvent<D> extends RepositoryEvent<D> {
 
-    AfterCreateEvent(Datastore source, D entity, Map data) {
-        super(source, entity, RepositoryEventType.AfterCreate.eventKey)
+    AfterBindEvent(Datastore source, D entity, Map data, String bindAction) {
+        super(source, entity, RepositoryEventType.AfterBind.eventKey)
         this.data = data
+        this.bindAction = bindAction
     }
 
 }

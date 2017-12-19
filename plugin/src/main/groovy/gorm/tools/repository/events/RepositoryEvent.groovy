@@ -20,6 +20,8 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     D entity
     /** if this event fired during binding action then this is the data used */
     Map data
+    /** during a binding action this can be set to the BindAction.Created, Updated*/
+    String bindAction
 
     /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this will be 'beforePersist' */
     String eventKey = "repoEvent"
@@ -34,9 +36,9 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
 
     /**
      * done per the spring docs so that listeners can bind to the generic of the event.
-     * ex: implements ApplicationListener<BeforeCreateEvent<City>>
+     * ex: implements ApplicationListener<BeforeBindEvent<City>>
      * or @EventListener
-     *    void beforeCreate(BeforeCreateEvent<City> event)
+     *    void beforeBind(BeforeBindEvent<City> event)
      */
     @Override
     public ResolvableType getResolvableType() {
@@ -50,5 +52,6 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
 
     void setDataFromArgMap(Map args){
         this.data = args ? args['data'] as Map : null
+        this.bindAction = args ? args['bindAction'] as String : null
     }
 }

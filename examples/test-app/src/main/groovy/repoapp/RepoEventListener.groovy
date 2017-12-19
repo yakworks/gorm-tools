@@ -1,8 +1,7 @@
 package repoapp
 
 import gorm.tools.repository.events.AfterRemoveEvent
-import gorm.tools.repository.events.BeforeCreateEvent
-import gorm.tools.repository.events.BeforeUpdateEvent
+import gorm.tools.repository.events.BeforeBindEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
@@ -10,19 +9,13 @@ import org.springframework.stereotype.Component
 public class RepoEventListener {
 
     @EventListener
-    void beforeCreate(BeforeCreateEvent<Org> event) {
+    void bc(BeforeBindEvent<Org> event) {
         Org org = event.entity
-        org.event = "BeforeCreateEvent"
+        org.event = "BeforeBindEvent ${event.bindAction}"
     }
 
     @EventListener
-    void beforeCreate(BeforeUpdateEvent<Org> event) {
-        Org org = event.entity
-        org.event = "BeforeUpdateEvent"
-    }
-
-    @EventListener
-    void beforeCreate(AfterRemoveEvent<Org> event) {
+    void ar(AfterRemoveEvent<Org> event) {
         Org org = event.entity
         org.event = "AfterRemoveEvent"
     }

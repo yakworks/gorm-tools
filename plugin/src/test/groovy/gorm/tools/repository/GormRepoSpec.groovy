@@ -39,7 +39,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.name == "foo"
 
         and: "Event should have been fired on repository"
-        org.event == "beforeCreate"
+        org.event == "beforeBind Create"
     }
 
 
@@ -62,7 +62,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.name == "foo"
 
         and: "Event should have been fired on repository"
-        org.event == "beforeUpdate"
+        org.event == "beforeBind Update"
     }
 
     def "test criteria name config"() {

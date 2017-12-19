@@ -19,7 +19,6 @@ import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
-import org.springframework.dao.DataIntegrityViolationException
 
 /**
  * A trait that turns a class into a Repository
@@ -78,7 +77,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * plus some others specific to here
      *   - failOnError: (boolean) defaults to true
      *   - flush: (boolean) flush the session
-     *   - bindType: (String) "Create" or "Update" when coming from those actions
+     *   - bindType: (String) "Create" or "Update" when coming from those actions/methods
      *   - data: (Map) if it was a Create or Update method called then this is the data and gets passed into events
      *
      * @throws DataAccessException if a validation or DataAccessException error happens
@@ -117,10 +116,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     D doCreate(Map data, Map args = [:]) {
         D entity = (D) getDomainClass().newInstance()
 
-        getRepoEventPublisher().doBeforeCreate(this, entity, data)
-        bind(entity, data, BindAction.Create)
-        getRepoEventPublisher().doAfterCreate(this, entity, data)
-        //saveArgs << [bindAction: BindAction.Create, data: data] //create a new arg map
+        bindWithPublish(entity, data, BindAction.Create)
+
         args['bindAction'] = BindAction.Create
         args['data'] = data
         doPersist(entity, args)
@@ -148,23 +145,18 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     D doUpdate(Map data, Map saveArgs = [:]) {
         D entity = get(data)
 
-        getRepoEventPublisher().doBeforeUpdate(this, entity, data)
-        bind(entity, data, BindAction.Update)
-        getRepoEventPublisher().doAfterUpdate(this, entity, data)
+        bindWithPublish(entity, data, BindAction.Update)
 
         Map args = saveArgs + [bindAction: BindAction.Update, data: data] //create a new arg map
         doPersist(entity, args)
         return entity
     }
 
-    /**
-     * Convenience method to call {@link #bind} and then {@link #doPersist}
-     */
-//    D bindAndSave(D entity, Map params, String bindMethod) {
-//        bind(entity, params, bindMethod)
-//        doPersist(entity)
-//        return entity
-//    }
+    void bindWithPublish(D entity, Map data, BindAction bindAction) {
+        getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction)
+        bind(entity, data, bindAction)
+        getRepoEventPublisher().doAfterBind(this, entity, data, bindAction)
+    }
 
     @Override
     void bind(D entity, Map data, BindAction bindAction) {

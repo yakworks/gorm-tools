@@ -1,5 +1,6 @@
 package testing
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import grails.artefact.Artefact
 import grails.gorm.transactions.Transactional
@@ -7,12 +8,8 @@ import grails.gorm.transactions.Transactional
 @Artefact("Repository") @Transactional
 class OrgRepo implements GormRepo<Org> {
 
-    void beforeCreate(Org org, Map params) {
-        org.event = "beforeCreate"
-    }
-
-    void beforeUpdate(Org org, Map params) {
-        org.event = "beforeUpdate"
+    void beforeBind(Org org, Map params, BindAction ba) {
+        org.event = "beforeBind ${ba.name()}"
     }
 
     void insertTestData() {

@@ -8,12 +8,10 @@ import groovy.transform.CompileStatic
 enum RepositoryEventType {
 
     BeforeRemove(BeforeRemoveEvent),
-    BeforeCreate(BeforeCreateEvent),
-    BeforeUpdate(BeforeUpdateEvent),
+    BeforeBind(BeforeBindEvent),
     BeforePersist(BeforePersistEvent),
     AfterRemove(AfterRemoveEvent),
-    AfterCreate(AfterCreateEvent),
-    AfterUpdate(AfterUpdateEvent),
+    AfterBind(AfterBindEvent),
     AfterPersist(AfterPersistEvent)
 
     Class eventClass

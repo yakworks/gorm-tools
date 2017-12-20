@@ -766,7 +766,7 @@ your domain.</p>
 <p><strong>Example:</strong></p>
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
 
-    <span class="kt">void</span> <span class="nf">beforeCreate</span><span class="o">(</span><span class="n">Org</span> <span class="n">org</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">Org</span> <span class="n">org</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
        <span class="c1">//do some thing before create</span>
      <span class="o">}</span>
 
@@ -812,7 +812,7 @@ Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/
 <h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
 <p>Each Repository can implement any of the methods listed below and they will get called during persistence operation.  </p>
 <ul>
-<li><strong>beforeCreate(T instance, Map params)</strong> - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  </li>
+<li><strong>beforeBind(T instance, Map params)</strong> - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  </li>
 <li><strong>afterCreate(T instance, Map params)</strong> - Called after the new instance is saved.  </li>
 <li><strong>beforeRemove(T instance)</strong> - Called before an instance is deleted. Can be utilized to cleanup related records etc.  </li>
 <li><strong>afterRemove(T instance)</strong> - After an instance is removed.  </li>
@@ -826,12 +826,12 @@ Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/
 <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html">events as listed in the Groovydoc API</a></p>
 <p><strong>Example</strong><br />
 <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.event.EventListener</span>
-<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforeCreateEvent</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforeBindEvent</span>
 
 <span class="kd">class</span> <span class="nc">OrgListener</span> <span class="o">{</span>
 
     <span class="nd">@EventListener</span>
-    <span class="kt">void</span> <span class="nf">beforeCreate</span><span class="o">(</span><span class="n">BeforeCreateEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">beforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
        <span class="c1">//Do some thing here.</span>
     <span class="o">}</span>
@@ -845,20 +845,18 @@ Which makes it possible to externalize the event listeners if required so.</p>
 <p><code>SomeEventListener.groovy</code> outside of grails app.</p>
 <p>```groovy
 import gorm.tools.repository.events.AfterRemoveEvent
-import gorm.tools.repository.events.BeforeCreateEvent
-import gorm.tools.repository.events.BeforeUpdateEvent
+import gorm.tools.repository.events.BeforeBindEvent
 import org.springframework.context.event.EventListener</p>
 <p>public class SomeEventListener {</p>
 <div class="codehilite"><pre><span></span>@EventListener
-void beforeCreate(BeforeCreateEvent&lt;Org&gt; event) {
+void beforeBind(BeforeBindEvent&lt;Org&gt; event) {
     Org org = event.entity
-    org.event = &quot;PreRepoCreateEvent&quot;
-}
-
-@EventListener
-void beforeCreate(BeforeUpdateEvent&lt;Org&gt; event) {
-    Org org = event.entity
-    org.event = &quot;PreRepoUpdateEvent&quot;
+    if(event.bindAction == &#39;Create&#39;){
+        //do something before create with event.data
+        org.event = &quot;Creating with data ${event.data}&quot;
+    } else if(event.bindAction == &#39;Update&#39;){
+        org.event = &quot;Updating with data ${event.data}&quot;
+    }
 }
 </pre></div>
 

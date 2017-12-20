@@ -27,26 +27,26 @@ trait GormRepoEntity<D extends GormEntity<D>> implements MangoRepoEntity {
     }
 
     D persist(Map args = [:]) {
-        getRepo().persist((D) this, args)
+        getRepo().persist(args, (D) this)
+    }
+
+    void remove(Map args = [:]) {
+        getRepo().remove(args, (D) this)
     }
 
     /**
      * Creates, binds and persists and instance
      * @return The created instance
      */
-    static D create(Map params) {
-        getRepo().create(params)
+    static D create(Map data) {
+        getRepo().create(data)
     }
 
-    static D update(Map params) {
-        getRepo().update(params)
+    static D update(Map data) {
+        getRepo().update(data)
     }
 
-    void remove() {
-        getRepo().remove((D) this)
-    }
-
-    static void remove(Serializable id) {
-        getRepo().removeById(id)
+    static void removeById(Map args = [:], Serializable id) {
+        getRepo().removeById(args, id)
     }
 }

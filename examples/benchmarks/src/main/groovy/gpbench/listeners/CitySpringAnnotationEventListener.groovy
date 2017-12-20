@@ -1,6 +1,6 @@
 package gpbench.listeners
 
-import gorm.tools.repository.events.BeforeCreateEvent
+import gorm.tools.repository.events.BeforeBindEvent
 import gpbench.CitySpringEvents
 import gpbench.SecUtil
 import groovy.transform.CompileStatic
@@ -13,13 +13,16 @@ import javax.annotation.ManagedBean
 class CitySpringAnnotationEventListener {
 
     @EventListener
-    void beforeCreate(BeforeCreateEvent<CitySpringEvents> event) {
-        //println "beforeCreate on CitySpringEvents"
+    void beforeBind(BeforeBindEvent<CitySpringEvents> event) {
+        assert event.data
+        //println "beforeBind on CitySpringEvents"
         CitySpringEvents entity = event.entity
-        entity.createdBy = SecUtil.userId
-        entity.editedBy = SecUtil.userId
-        entity.createdDate = new Date()
-        entity.editedDate = new Date()
+        Long uid = SecUtil.userId
+        Date dt = new Date()
+        entity.createdBy = uid
+        entity.editedBy = uid
+        entity.createdDate = dt
+        entity.editedDate = dt
     }
 
 }

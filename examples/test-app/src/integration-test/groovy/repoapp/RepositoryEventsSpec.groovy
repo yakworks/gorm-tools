@@ -25,14 +25,14 @@ class RepositoryEventsSpec extends Specification {
         RepoUtil.flush()
 
         then: "Event listener should have been called"
-        org.event == "BeforeCreateEvent"
+        org.event == "BeforeBindEvent Create"
         org.id != null
 
         when:
         org = Org.update([id: org.id, name: "updated"])
 
         then:
-        org.event == "BeforeUpdateEvent"
+        org.event == "BeforeBindEvent Update"
 
         when:
         org.remove()

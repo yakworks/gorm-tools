@@ -24,7 +24,7 @@ class EntityMapBinder implements MapBinder {
 
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
-    void bind(Object target, Map<String, Object> source, String bindMethod = null) {
+    void bind(Object target, Map<String, Object> source, BindAction bindAction = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
 
@@ -64,13 +64,13 @@ class EntityMapBinder implements MapBinder {
     //TODO
     void bindUpdate(Object target, Map<String, Object> source) {
         //for now just pass them on
-        bind(target, source, "Update")
+        bind(target, source, BindAction.Update)
     }
 
     //TODO
     void bindCreate(Object target, Map<String, Object> source) {
         //for now just pass them on
-        bind(target, source, "Create")
+        bind(target, source, BindAction.Create)
     }
 
     @Autowired(required = true)

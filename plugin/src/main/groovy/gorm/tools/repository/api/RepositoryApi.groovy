@@ -1,5 +1,6 @@
 package gorm.tools.repository.api
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.errors.DomainException
 import gorm.tools.databinding.MapBinder
 import grails.validation.ValidationException
@@ -24,13 +25,14 @@ interface RepositoryApi<D> {
 
     /** The data binder to use. By default gets injected with EntityMapBinder*/
     MapBinder getMapBinder()
+
     /** default to true. If false only method events are invoked on the implemented Repository. */
-    boolean isEnableEvents()
+    Boolean getEnableEvents()
 
     /**
-     * Transactional wrap for {@link #doPersist}
+     * Transactional wrap for {@link #doPersist} with arguments to pass to save
      */
-    D persist(D entity, Map args)
+    D persist(Map args, D entity)
 
     /**
      * Transactional wrap for {@link #doPersist}
@@ -45,7 +47,8 @@ interface RepositoryApi<D> {
      * @param args the arguments to pass to save
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D doPersist(D entity, Map args)
+    D doPersist(Map args, D entity)
+    D doPersist(D entity)
 
     /**
      * Transactional wrap for {@link #doCreate}
@@ -53,13 +56,14 @@ interface RepositoryApi<D> {
     D create(Map data)
 
     /**
-     * Creates entity using the data from params. calls the {@link #bindAndSave} with bindMethod='Create'
+     * Creates entity using the data from params. calls the {@link #bind} with BindAction.Create
      *
      * @param data the data to bind onto the entity
      * @return the created domain entity
      * @see #doPersist
      */
-    D doCreate(Map data, Map args)
+    D doCreate(Map args, Map data)
+    D doCreate(Map data)
 
     /**
      * Transactional wrap for {@link #doUpdate}
@@ -67,44 +71,52 @@ interface RepositoryApi<D> {
     D update(Map data)
 
     /**
-     * Updates entity using the data from params. calls the {@link #bind} with bindMethod='Update'
+     * Updates entity using the data from params. calls the {@link #bind} with BindAction.Update
      *
      * @param data the data to bind onto the entity
      * @return the updated domain entity
      * @see #doPersist
      */
-    D doUpdate(Map data, Map args)
+    D doUpdate(Map args, Map data)
+    D doUpdate(Map data)
 
     /**
-     * use {@link #getMapBinder} and bind the data using the bindMethod
-     *
-     * @param entity
-     * @param row
-     * @param bindMethod
+     * binds by calling {@link #doBind} and fires before and after events
+     * better to override doBind in implementing classes for custom logic.
+     * Or just implement the beforeBind|afterBind event methods
      */
-    void bind(D entity, Map data, String bindMethod)
+    void bind(D entity, Map data, BindAction bindAction)
 
     /**
-     * Deletes a new domain entity base on the id in the params.
+     * Main bind method that redirects call to the injected mapBinder. see {@link #getMapBinder}
+     * override this one in implementing classes. can also call this if you don't want events to fire
+     */
+    void doBind(D entity, Map data, BindAction bindAction)
+
+    /**
+     * Remove by ID. Wrapping this in a Transaction in an implementing class here is optional
      *
-     * @param params the parameter map that has the id for the domain entity to delete
+     * @param id - the id for the
+     * @param args - the args to pass to delete. can be null and [flush] being the most common
+     *
      * @throws gorm.tools.repository.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
      */
-    void removeById(Serializable id, Map args)
-
+    void removeById(Map args, Serializable id)
     void removeById(Serializable id)
 
     /**
-     * Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
+     * Wrappep in Trx. Calls doRemove.
      *
      * @param entity the domain entity
      */
     void remove(D entity)
+    void remove(Map args, D entity)
 
-    void doRemove(D entity, Map args)
+    void doRemove(Map args, D entity)
+    void doRemove(D entity)
 
     /**
-     * gets and verifies that the entity can eb retrieved and version matches.
+     * gets and verifies that the entity can be retrieved and version matches.
      *
      * @param id required, the id to get
      * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
@@ -116,11 +128,17 @@ interface RepositoryApi<D> {
     D get(Serializable id, Long version)
 
     /**
-     * calls {@link #get(Serializable id, Long version)}
+     * This default will redirect the call to {@link #get(Serializable id, Long version)}.
+     * Implementing classes can override this and add custom finders
+     * using another unique lookup key other than id, such as customer number or invoice number. Unlike the normal get(id)
+     * This throws a DomainNotFoundException if nothing is found instead of returning a null.
      *
-     * @param params expects a Map with an [id] key and optionally a [version] key
+     * @param args - name params expects at least and [id] key and optionally a version,
+     *    implementation classes can customize to work with more.
+     *
+     * @return the entity. Won't return null, instead it throws an exception
      */
-    D get(Map<String, Object> params)
+    D get(Map params)
 
     DomainException handleException(D entity, RuntimeException e)
 

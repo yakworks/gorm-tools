@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.events.RepositoryEventType
 import gorm.tools.testing.GormToolsTest
@@ -23,14 +24,16 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
         then:
         city != null
-        city.region == "beforeCreate"
+        city.event == "beforeBind Create"
+        city.eventAfter == "afterBind Create"
 
         when:
         city = City.update(params)
 
         then:
         city != null
-        city.region == "afterUpdate"
+        city.event == "beforeBind Update"
+        city.eventAfter == "afterBind Update"
     }
 
     void testInvokeEvent() {
@@ -39,28 +42,28 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         Map params = [name: "test"]
 
         when:
-        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeUpdate.eventKey, city, params)
+        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeBind.eventKey, city, params, BindAction.Create)
 
         then:
-        city.region == "beforeUpdate"
+        city.event == "beforeBind Create"
 
         when:
-        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterUpdate.eventKey, city, params)
+        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterBind.eventKey, city, params, BindAction.Update)
 
         then:
-        city.region == "afterUpdate"
+        city.eventAfter == "afterBind Update"
 
         when:
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeRemove.eventKey, city, params)
 
         then:
-        city.region == "beforeRemove"
+        city.event == "beforeRemove"
 
         when:
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterRemove.eventKey, city, params)
 
         then:
-        city.region == "afterRemove"
+        city.event == "afterRemove"
     }
 }
 
@@ -68,29 +71,26 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 @Entity
 class City {
     String name
-    String region
+    String event
+    String eventAfter
 }
 
 class CityRepo implements GormRepo<City> {
 
-    void beforeCreate(City city, Map params) {
-        city.region = "beforeCreate"
+    void beforeBind(City city, Map params, BindAction ba) {
+        city.event = "beforeBind ${ba.name()}"
     }
 
-    void beforeUpdate(City city, Map params) {
-        city.region = "beforeUpdate"
-    }
-
-    void afterUpdate(City city, Map params) {
-        city.region = "afterUpdate"
+    void afterBind(City city, Map params, BindAction ba) {
+        city.eventAfter = "afterBind ${ba.name()}"
     }
 
     void beforeRemove(City city, Map params) {
-        city.region = "beforeRemove"
+        city.event = "beforeRemove"
     }
 
     void afterRemove(City city, Map params) {
-        city.region = "afterRemove"
+        city.event = "afterRemove"
     }
 
 }

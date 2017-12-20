@@ -24,7 +24,7 @@ A Repository must either implement [GormRepo][] Trait or if you wish extend [Def
  ```groovy
  class OrgRepo implements GormRepo<Org> {
      
-     void beforeCreate(Org org, Map params) {
+     void beforeBind(Org org, Map params) {
         //do some thing before create
       }
       
@@ -68,7 +68,7 @@ Throws a [DomainException]if anything goes wrong
 
 Each Repository can implement any of the methods listed below and they will get called during persistence operation.  
  
-- **beforeCreate(T instance, Map params)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  
+- **beforeBind(T instance, Map params)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  
 - **afterCreate(T instance, Map params)** - Called after the new instance is saved.  
 - **beforeRemove(T instance)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
 - **afterRemove(T instance)** - After an instance is removed.  
@@ -84,14 +84,13 @@ The Repository also publishes a number of
 
 **Example**  
 ```groovy
-
 import org.springframework.context.event.EventListener
-import gorm.tools.repository.events.BeforeCreateEvent
+import gorm.tools.repository.events.BeforeBindEvent
 
 class OrgListener {
    
     @EventListener
-    void beforeCreate(BeforeCreateEvent<Org> event) {
+    void beforeBind(beforeBindEvent<Org> event) {
        Org org = event.entity
        //Do some thing here.
     }
@@ -110,22 +109,20 @@ Here's an example.
  
  ```groovy
 import gorm.tools.repository.events.AfterRemoveEvent
-import gorm.tools.repository.events.BeforeCreateEvent
-import gorm.tools.repository.events.BeforeUpdateEvent
+import gorm.tools.repository.events.BeforeBindEvent
 import org.springframework.context.event.EventListener
 
 public class SomeEventListener {
 
     @EventListener
-    void beforeCreate(BeforeCreateEvent<Org> event) {
+    void beforeBind(BeforeBindEvent<Org> event) {
         Org org = event.entity
-        org.event = "PreRepoCreateEvent"
-    }
-
-    @EventListener
-    void beforeCreate(BeforeUpdateEvent<Org> event) {
-        Org org = event.entity
-        org.event = "PreRepoUpdateEvent"
+        if(event.bindAction == 'Create'){
+            //do something before create with event.data
+            org.event = "Creating with data ${event.data}"
+        } else if(event.bindAction == 'Update'){
+            org.event = "Updating with data ${event.data}"
+        }
     }
 }
 ```

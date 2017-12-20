@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class CityRepo implements GormRepo<City> {
 
-    boolean enableEvents = false
+    Boolean enableEvents = false
 
     //@NotTransactional
     //@CompileDynamic

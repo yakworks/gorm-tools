@@ -1,7 +1,7 @@
 package gorm.tools.repository
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.events.AfterBindEvent
+import gorm.tools.repository.events.*
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.events.RepositoryEventType
 import gorm.tools.testing.GormToolsTest
@@ -69,6 +69,18 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city.event == "afterRemove"
     }
 
+    void "test subscriber with BeforeBindEvent"() {
+        given:
+        Map params = [name: "test"]
+
+        when:
+        City city = City.create(params)
+
+        then:
+        sleep(1000)
+        city.eventSub == "BeforeBindEvent"
+    }
+
     void "test subscriber"() {
         given:
         Map params = [name: "test"]
@@ -79,8 +91,23 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
         then:
         sleep(1000)
-        c.eventSub == "XXX"
+        c.eventSubAfter == "XXX"
 
+    }
+
+    //Todo
+    @spock.lang.Ignore
+    void "test subscriber with BeforeRemoveEvent"() {
+        given:
+        Map params = [name: "test"]
+
+        when:
+        City city = City.create(params)
+        city.remove()
+
+        then:
+        sleep(1000)
+        city.eventSub == "BeforeRemoveEvent"
     }
 }
 
@@ -91,11 +118,13 @@ class City {
     String event
     String eventAfter
     String eventSub
+    String eventSubAfter
 
     static constraints = {
         event nullable:true
         eventAfter nullable:true
         eventSub nullable:true
+        eventSubAfter nullable:true
     }
 }
 
@@ -118,10 +147,22 @@ class CityRepo implements GormRepo<City> {
         city.event = "afterRemove"
     }
 
+    @Subscriber("City.beforeBind")
+    void beforeBindSub(BeforeBindEvent e){
+        City city = (City) e.entity
+        city.eventSub = "BeforeBindEvent"
+    }
+
     @Subscriber("City.afterBind")
     void afterBindSub(AfterBindEvent e){
         City city = (City) e.entity
-        city.eventSub = "XXX"
+        city.eventSubAfter = "XXX"
+    }
+
+    @Subscriber("City.beforeRemove")
+    void beforeRemoveSub(BeforeRemoveEvent e){
+        City city = (City) e.entity
+        city.eventSub = "BeforeRemoveEvent"
     }
 
 }

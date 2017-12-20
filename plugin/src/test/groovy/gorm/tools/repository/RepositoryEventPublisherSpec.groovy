@@ -1,9 +1,12 @@
 package gorm.tools.repository
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.events.RepositoryEventType
 import gorm.tools.testing.GormToolsTest
+import grails.artefact.Artefact
+import grails.events.annotation.Subscriber
 import grails.persistence.Entity
 import spock.lang.Specification
 
@@ -65,6 +68,20 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         then:
         city.event == "afterRemove"
     }
+
+    void "test subscriber"() {
+        given:
+        Map params = [name: "test"]
+
+        when:
+        City c = City.create(params)
+        //repoEventPublisher.doBeforeBind(City.repo, c, params, BindAction.Create)
+
+        then:
+        sleep(1000)
+        c.eventSub == "XXX"
+
+    }
 }
 
 
@@ -73,8 +90,16 @@ class City {
     String name
     String event
     String eventAfter
+    String eventSub
+
+    static constraints = {
+        event nullable:true
+        eventAfter nullable:true
+        eventSub nullable:true
+    }
 }
 
+@Artefact("Repository")
 class CityRepo implements GormRepo<City> {
 
     void beforeBind(City city, Map params, BindAction ba) {
@@ -91,6 +116,12 @@ class CityRepo implements GormRepo<City> {
 
     void afterRemove(City city, Map params) {
         city.event = "afterRemove"
+    }
+
+    @Subscriber("City.afterBind")
+    void afterBindSub(AfterBindEvent e){
+        City city = (City) e.entity
+        city.eventSub = "XXX"
     }
 
 }

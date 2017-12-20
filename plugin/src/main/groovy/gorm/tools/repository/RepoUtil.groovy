@@ -38,6 +38,10 @@ class RepoUtil {
         return AppCtx.get(getRepoBeanName(domainClass), RepositoryApi)
     }
 
+    static List<Class<RepositoryApi>> getRepositoryClasses() {
+        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
+    }
+
     /**
      * checks the passed in version with the version on the entity (entity.version)
      * make sure entity.version is not greater

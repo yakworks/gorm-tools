@@ -1,10 +1,10 @@
 package gorm.tools.repository.events
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
 import grails.core.GrailsApplication
-import grails.core.GrailsClass
-import grails.events.EventPublisher
+import grails.events.bus.EventBus
 import grails.plugin.gormtools.RepositoryArtefactHandler
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
@@ -17,47 +17,40 @@ import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Invokes event methods on Repository artifcats.
+ * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners
+ * which can be Transactional and fires Grails events that will be asynchronous
  */
 @CompileStatic
-class RepoEventPublisher implements EventPublisher {
+class RepoEventPublisher {
     @Autowired
-    GrailsApplication grailsApplication
+    private GrailsApplication grailsApplication
 
-    ApplicationEventPublisher applicationEventPublisher
+    @Autowired
+    private EventBus eventBus
 
-    private final Map<String, Map<String, Method>> eventsCache = new ConcurrentHashMap<>()
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher
+
+    private final Map<String, Map<String, Method>> repoEventMethodCache = new ConcurrentHashMap<>()
 
     @PostConstruct
     void init() {
-        applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
-
-        GrailsClass[] repoClasses = grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)
-        for (GrailsClass repoClass : repoClasses) {
-            cacheEventsMethods(repoClass.clazz)
+        for (Class repoClass : grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz) {
+            cacheEventsMethods(repoClass)
         }
     }
 
-    public void invokeEventMethod(Object repo, String eventKey, Object... args) {
-        Map<String, Method> events = eventsCache.get(repo.class.simpleName)
-        if (!events) return
-
-        Method method = events.get(eventKey)
-        if (!method) return
-
-        ReflectionUtils.invokeMethod(method, repo, args)
-    }
-
     void cacheEventsMethods(Class repoClass) {
-        Map<String, Method> events = new ConcurrentHashMap<>()
-        eventsCache.put(repoClass.simpleName, events)
+        Map<String, Method> eventMethodMap = new ConcurrentHashMap<>()
+        repoEventMethodCache.put(repoClass.simpleName, eventMethodMap)
 
-        findAndCacheEventMethods(RepositoryEventType.BeforeBind.eventKey, repoClass, events)
-        findAndCacheEventMethods(RepositoryEventType.AfterBind.eventKey, repoClass, events)
-        findAndCacheEventMethods(RepositoryEventType.BeforeRemove.eventKey, repoClass, events)
-        findAndCacheEventMethods(RepositoryEventType.AfterRemove.eventKey, repoClass, events)
-        findAndCacheEventMethods(RepositoryEventType.BeforePersist.eventKey, repoClass, events)
-        findAndCacheEventMethods(RepositoryEventType.AfterPersist.eventKey, repoClass, events)
+        findAndCacheEventMethods(RepositoryEventType.BeforeBind.eventKey, repoClass, eventMethodMap)
+        findAndCacheEventMethods(RepositoryEventType.AfterBind.eventKey, repoClass, eventMethodMap)
+        findAndCacheEventMethods(RepositoryEventType.BeforeRemove.eventKey, repoClass, eventMethodMap)
+        findAndCacheEventMethods(RepositoryEventType.AfterRemove.eventKey, repoClass, eventMethodMap)
+        findAndCacheEventMethods(RepositoryEventType.BeforePersist.eventKey, repoClass, eventMethodMap)
+        findAndCacheEventMethods(RepositoryEventType.AfterPersist.eventKey, repoClass, eventMethodMap)
+
     }
 
     private void findAndCacheEventMethods(String eventKey, Class repoClass, Map<String, Method> events) {
@@ -69,8 +62,16 @@ class RepoEventPublisher implements EventPublisher {
         invokeEventMethod(repo, event.eventKey, args)
         if (!repo.enableEvents) return
         applicationEventPublisher.publishEvent(event)
-        //println event.routingKey
-        notify(event.routingKey, event)
+        eventBus.notify(event.routingKey, event)
+    }
+
+    void invokeEventMethod(Object repo, String eventKey, Object... args) {
+        Map<String, Method> eventMethodMap = repoEventMethodCache.get(repo.class.simpleName)
+        //if (!eventMethodMap) return //eventMethodMap = cacheEventsMethods(repo.class)
+        Method method = eventMethodMap?.get(eventKey)
+        if (!method) return
+
+        ReflectionUtils.invokeMethod(method, repo, args)
     }
 
     void doBeforePersist(RepositoryApi repo, GormEntity entity, Map args) {

@@ -96,8 +96,6 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city.events.afterBind
     }
 
-    //Todo
-    @spock.lang.Ignore
     void "test subscriber listener when removing an entity"() {
         given:
         Map params = [name: "test"]
@@ -179,7 +177,7 @@ class CityRepo implements GormRepo<City> {
     @Subscriber("City.afterRemove")
     void afterRemoveSub(AfterRemoveEvent e){
         City city = (City) e.entity
-        city.events.beforeRemove = true
+        city.events.afterRemove = true
     }
 
 }

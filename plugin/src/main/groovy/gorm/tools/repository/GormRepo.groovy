@@ -208,9 +208,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      */
     void doRemove(Map args = [:], D entity) {
         try {
-            getRepoEventPublisher().doBeforeRemove(this, entity)
+            getRepoEventPublisher().doBeforeRemove(this, entity, args)
             entity.delete(args)
-            getRepoEventPublisher().doAfterRemove(this, entity)
+            getRepoEventPublisher().doAfterRemove(this, entity, args)
         }
         catch (DataAccessException dae) {
             throw handleException(entity, dae)

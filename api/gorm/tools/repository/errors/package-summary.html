@@ -96,6 +96,14 @@ function windowTitle()
                             </td>
                             <td></td>
                         </tr>
+<tr class="altColor">
+                            <td class="colOne">
+                                <strong><a href="RepoExceptionSupport.html" title="class in gorm/tools/repository/errors">
+                                    RepoExceptionSupport
+                                </a></strong>
+                            </td>
+                            <td>Handler for exceptions thrown by the Repository</td>
+                        </tr>
 
                     </tbody>
                 </table>
@@ -118,19 +126,20 @@ function windowTitle()
                     </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="DomainException.html" title="class in gorm/tools/repository/errors">
-                                    DomainException
+                                <strong><a href="EntityNotFoundException.html" title="class in gorm/tools/repository/errors">
+                                    EntityNotFoundException
                                 </a></strong>
                             </td>
-                            <td>an extension of the default ValidationException so you can pass the entity and the message map</td>
+                            <td>an extension of the DataRetrievalFailureException that is more performant. fillInStackTrace is overriden to show nothing
+ so it will be faster and consume less memory when thrown.</td>
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="DomainNotFoundException.html" title="class in gorm/tools/repository/errors">
-                                    DomainNotFoundException
+                                <strong><a href="EntityValidationException.html" title="class in gorm/tools/repository/errors">
+                                    EntityValidationException
                                 </a></strong>
                             </td>
-                            <td>an extension of the DomainException to be able to handle rest request which should response with 404 error</td>
+                            <td>an extension of the default ValidationException so you can pass the entity and the message map</td>
                         </tr>
 
                     </tbody>

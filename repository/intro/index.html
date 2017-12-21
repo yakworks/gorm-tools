@@ -614,7 +614,7 @@
 <h3 id="stock-grails-gorm">Stock Grails Gorm<a class="headerlink" href="#stock-grails-gorm" title="Permanent link">&para;</a></h3>
 <p><strong>Using stock Grails</strong> <a class="new-tab" href="http://gorm.grails.org/latest/hibernate/manual/index.html">Gorm</a> we would probably implement something like the following 
 simplified boiler plate design pattern for the <strong>C</strong> in CRUD</p>
-<div class="codehilite"><pre><span></span><span class="nd">@GrailsCompileStatic</span> <span class="nd">@Transactional</span>
+<p><div class="codehilite"><pre><span></span><span class="nd">@GrailsCompileStatic</span> <span class="nd">@Transactional</span>
 <span class="kd">class</span> <span class="nc">ProjectService</span> <span class="o">{</span>
 
     <span class="n">Project</span> <span class="nf">createNew</span><span class="o">(</span><span class="n">Map</span> <span class="n">data</span><span class="o">){</span>
@@ -631,7 +631,7 @@ simplified boiler plate design pattern for the <strong>C</strong> in CRUD</p>
 <span class="o">...</span>
 <span class="n">projectService</span><span class="o">.</span><span class="na">createNew</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
 </pre></div>
-
+ or perhaps we would do it with the new Data Services</p>
 <h3 id="using-the-repository">Using the Repository<a class="headerlink" href="#using-the-repository" title="Permanent link">&para;</a></h3>
 <p><strong>With this Gorm repository plugin</strong>, we have shaved the yak for you and each domain has a Repository automatically 
 setup for this pattern. So with this plugin all the boiler plate from above can be replaced with 1 line!</p>
@@ -655,7 +655,7 @@ The details of whats available can be seen in the <a class="new-tab" href="https
 <span class="kn">import</span> <span class="nn">gorm.tools.testing.DomainAutoTest</span>
 <span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
-<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">DomainAutoTest</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">DomainAutoTest</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
     <span class="cm">/** automatically runs tests on pxersist(), create(), update(), delete().*/</span>
 <span class="o">}</span>
 </pre></div>

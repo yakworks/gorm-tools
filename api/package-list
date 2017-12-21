@@ -7,7 +7,6 @@ gorm.tools.idgen
 gorm.tools.jdbc
 gorm.tools.mango
 gorm.tools.mango.api
-gorm.tools.query
 gorm.tools.repository
 gorm.tools.repository.api
 gorm.tools.repository.errors

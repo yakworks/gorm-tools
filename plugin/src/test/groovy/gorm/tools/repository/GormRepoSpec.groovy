@@ -23,9 +23,9 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         expect:
         Org.repo instanceof OrgRepo
         Location.repo instanceof DefaultGormRepo
-        Location.repo.domainClass == Location
+        Location.repo.entityClass == Location
         Nested.repo instanceof DefaultGormRepo
-        Nested.repo.domainClass == Nested
+        Nested.repo.entityClass == Nested
     }
 
 

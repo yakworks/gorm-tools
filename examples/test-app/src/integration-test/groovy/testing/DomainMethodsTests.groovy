@@ -1,7 +1,7 @@
 package testing
 
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.errors.DomainException
+import gorm.tools.repository.errors.EntityValidationException
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import grails.validation.ValidationException
@@ -71,7 +71,7 @@ class DomainMethodsTests extends Specification {
         try {
             jump.persist()
             fail "it was supposed to fail the save because of validationException"
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             e.cause instanceof ValidationException
             e.entity == jump
         }
@@ -88,7 +88,7 @@ class DomainMethodsTests extends Specification {
             jump.name = 'fukt'
             jump.persist(flush: true)
             fail "it was supposed to fail the save because of validationException"
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             e.cause instanceof DataAccessException
             //assert e.cause instanceof org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException
             e.entity == jump

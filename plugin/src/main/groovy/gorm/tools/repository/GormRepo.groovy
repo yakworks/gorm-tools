@@ -6,8 +6,9 @@ import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.MangoQueryTrait
 import gorm.tools.repository.api.GormBatchRepo
 import gorm.tools.repository.api.RepositoryApi
-import gorm.tools.repository.errors.DomainException
-import gorm.tools.repository.errors.DomainNotFoundException
+import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
@@ -31,31 +32,32 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
 
     /** The data binder to use. By default gets injected with EntityMapBinder*/
     @Autowired MapBinder mapBinder
-
     @Autowired RepoEventPublisher repoEventPublisher
+    @Autowired RepoExceptionSupport repoExceptionSupport
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
 
     /**
-     * The gorm domain class. will generally get set in contructor or using the generic as
-     * done in {@link gorm.tools.repository.GormRepo#getDomainClass}
+     * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
+     * done in {@link gorm.tools.repository.GormRepo#getEntityClass}
      * using the {@link org.springframework.core.GenericTypeResolver}
+     * @see org.grails.datastore.mapping.model.PersistentEntity#getJavaClass().
      */
-    Class<D> domainClass // the domain class this is for
+    Class<D> entityClass // the domain class this is for
 
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
     @Override
-    Class<D> getDomainClass() {
-        if (!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo.class)
-        return domainClass
+    Class<D> getEntityClass() {
+        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo.class)
+        return entityClass
     }
 
     /**
      * Transactional wrap for {@link #doPersist}
-     * Saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error.
+     * Saves a domain entity with the passed in args and rewraps ValidationException with EntityValidationException on error.
      *
      * @param entity the domain entity to call save on
      * @param args the arguments to pass to save
@@ -92,7 +94,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
-            throw handleException(entity, ex)
+            throw handleException(ex, entity)
         }
     }
 
@@ -115,7 +117,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      */
     @Override
     D doCreate(Map args = [:], Map data) {
-        D entity = (D) getDomainClass().newInstance()
+        D entity = (D) getEntityClass().newInstance()
         bindAndSave(args, entity, data, BindAction.Create)
         return entity
     }
@@ -166,7 +168,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
 
     /**
      * Main bind method that redirects call to the injected mapBinder.
-     * override this one in implementing classes. can also call this if you don't want events to fire
+     * override this one in implementing classes.
+     * can also call this if you do NOT want the before/after Bind events to fire
      */
     @Override
     void doBind(D entity, Map data, BindAction bindAction) {
@@ -179,7 +182,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
-     * @throws gorm.tools.repository.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
+     * @throws EntityValidationException if its not found or if a DataIntegrityViolationException is thrown
      */
     @Override
     void removeById( Map args = [:], Serializable id) {
@@ -191,7 +194,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
-     * @throws DomainException if a spring DataIntegrityViolationException is thrown
+     * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
      */
     @Override
     void remove(Map args = [:], D entity) {
@@ -213,7 +216,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
             getRepoEventPublisher().doAfterRemove(this, entity)
         }
         catch (DataAccessException dae) {
-            throw handleException(entity, dae)
+            throw handleException(dae, entity)
         }
     }
 
@@ -224,13 +227,13 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
      * @return the retrieved entity. Will always be an entity as this throws an error if not
      *
-     * @throws DomainNotFoundException if its not found
-     * @throws DomainException if the versions mismatch
+     * @throws EntityNotFoundException if its not found
+     * @throws gorm.tools.repository.errors.EntityValidationException if the versions mismatch
      */
     @Override
     D get(Serializable id, Long version) {
         D entity = getStaticApi().get(id)
-        RepoUtil.checkFound(entity, [id: id], getDomainClass().name)
+        RepoUtil.checkFound(entity, [id: id], getEntityClass().name)
         if (version != null) RepoUtil.checkVersion(entity, version)
         return entity
     }
@@ -239,7 +242,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * This default will redirect the call to {@link #get(Serializable id, Long version)}.
      * Implementing classes can override this and add custom finders
      * using another unique lookup key other than id, such as customer number or invoice number. Unlike the normal get(id)
-     * This throws a DomainNotFoundException if nothing is found instead of returning a null.
+     * This throws a EntityNotFoundException if nothing is found instead of returning a null.
      *
      * @param params - expects a Map with an id key and optionally a version, implementation classes can customize to work with more.
      * @return the entity. Won't return null, instead it throws an exception
@@ -250,8 +253,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     }
 
     @Override
-    DomainException handleException(D entity, RuntimeException e) {
-        return RepoUtil.handleException(entity, e)
+    RuntimeException handleException(RuntimeException ex, D entity) {
+        return getRepoExceptionSupport().translateException(ex, entity)
     }
 
     /** gets the dataStore for this Gorm domain instance */
@@ -270,10 +273,10 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     }
 
     GormInstanceApi<D> getInstanceApi() {
-        (GormInstanceApi<D>) GormEnhancer.findInstanceApi(getDomainClass())
+        (GormInstanceApi<D>) GormEnhancer.findInstanceApi(getEntityClass())
     }
 
     GormStaticApi<D> getStaticApi() {
-        (GormStaticApi<D>) GormEnhancer.findStaticApi(getDomainClass())
+        (GormStaticApi<D>) GormEnhancer.findStaticApi(getEntityClass())
     }
 }

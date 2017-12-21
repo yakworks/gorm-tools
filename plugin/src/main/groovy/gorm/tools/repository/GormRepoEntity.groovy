@@ -1,6 +1,8 @@
 package gorm.tools.repository
 
 import gorm.tools.beans.AppCtx
+import gorm.tools.mango.api.MangoQueryEntity
+import gorm.tools.mango.api.MangoQueryTrait
 import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
@@ -8,7 +10,7 @@ import org.grails.datastore.gorm.GormEntity
 import javax.persistence.Transient
 
 @CompileStatic
-trait GormRepoEntity<D extends GormEntity<D>> implements MangoRepoEntity {
+trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
 
     @Transient
     private static RepositoryApi cachedRepo
@@ -24,6 +26,10 @@ trait GormRepoEntity<D extends GormEntity<D>> implements MangoRepoEntity {
 
     static void setRepo(RepositoryApi<D> repo) {
         cachedRepo = repo
+    }
+
+    static MangoQueryTrait getMangoQueryTrait(){
+        (MangoQueryTrait)getRepo()
     }
 
     D persist(Map args = [:]) {

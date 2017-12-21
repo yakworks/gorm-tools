@@ -1,11 +1,9 @@
 package gorm.tools.repository
 
-import gorm.tools.repository.errors.DomainException
 import gorm.tools.repository.errors.EmptyErrors
+import gorm.tools.repository.errors.EntityValidationException
 import grails.persistence.Entity
 import grails.testing.gorm.DataTest
-import org.grails.testing.GrailsUnitTest
-import org.junit.Test
 import spock.lang.Specification
 
 class RepoUtilsSpec extends Specification implements DataTest {
@@ -23,7 +21,7 @@ class RepoUtilsSpec extends Specification implements DataTest {
         RepoUtil.checkVersion(mocke, 0)
 
         then:
-        def e = thrown(DomainException)
+        def e = thrown(EntityValidationException)
         mocke.id == e.entity.id
         "default.optimistic.locking.failure" == e.messageMap.code
 
@@ -33,7 +31,7 @@ class RepoUtilsSpec extends Specification implements DataTest {
         try {
             RepoUtil.checkFound(null, [id: '99'], "xxx")
             assert false, "should not have made it here"
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             //id
             assert '99' == e.messageMap.args[1]
             //domain name

@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class RegionRepo implements GormRepo<Region> {
 
-    RegionRepo() { domainClass = Region }
+    RegionRepo() { entityClass = Region }
 
     void beforeBind(Region region, Map params, BindAction bindAction) {
         if(bindAction == BindAction.Create) region.id = params.id as Long

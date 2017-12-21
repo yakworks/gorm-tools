@@ -4,6 +4,7 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.MangoQuery
+import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.gorm.transactions.TransactionService
 import grails.plugin.gormtools.RepositoryArtefactHandler
@@ -46,7 +47,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
             entityMapBinder(EntityMapBinder)
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
-            //trxService(TrxService)
+            repoExceptionSupport(RepoExceptionSupport)
             mango(MangoQuery)
         }
     }

@@ -150,7 +150,12 @@ class BenchmarkRunnerService {
 
     void runRepoEvents(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
+
+        logMessage "  - Spring Events disabled, invokes only method events"
+        CityMethodEvents.repo.enableEvents = false
         runBenchmark(new GparsRepoBenchmark(CityMethodEvents, bindingMethod))
+
+        logMessage "  - All Events enabled"
         runBenchmark(new GparsRepoBenchmark(CitySpringEvents, bindingMethod))
         runBenchmark(new GparsRepoBenchmark(CitySpringEventsRefreshable, bindingMethod))
     }

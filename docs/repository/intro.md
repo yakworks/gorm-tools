@@ -67,7 +67,8 @@ class ProjectService {
 projectService.createNew(params)
 
 ```
-
+ or perhaps we would do it with the new Data Services
+ 
 ### Using the Repository
 
 **With this Gorm repository plugin**, we have shaved the yak for you and each domain has a Repository automatically 
@@ -97,7 +98,7 @@ package testing
 import gorm.tools.testing.DomainAutoTest
 import spock.lang.Specification
 
-class ProjectSpec extends Specification implements DomainAutoTest<Project> {
+class ProjectSpec extends DomainAutoTest<Project> {
     /** automatically runs tests on pxersist(), create(), update(), delete().*/
 }
 ```

@@ -1,5 +1,6 @@
 package gorm.tools.query
 
+import gorm.tools.beans.ListParseUtil
 import spock.lang.Specification
 
 class ListParseUtilSpec extends Specification {

@@ -13,7 +13,7 @@ class CityDynamicRepo extends DefaultGormRepo<CityDynamic> {
     def bindWithCopyDomain(Map row) {
         def r = Region.load(row['region']['id'] as Long)
         def country = Country.load(row['country']['id'] as Long)
-        def c = domainClass.newInstance()
+        def c = entityClass.newInstance()
         GormUtils.copyDomain(c, row)
         c.region = r
         c.country = country
@@ -24,7 +24,7 @@ class CityDynamicRepo extends DefaultGormRepo<CityDynamic> {
     def insert(row, args) {
         def entity
         if (args.dataBinder == 'grails') {
-            entity = domainClass.newInstance()
+            entity = entityClass.newInstance()
             entity.properties = row
         } else if (args.dataBinder == 'copy') {
             entity = bindWithCopyDomain(row)

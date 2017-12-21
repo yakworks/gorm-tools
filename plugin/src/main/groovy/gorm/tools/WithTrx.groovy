@@ -42,7 +42,7 @@ trait WithTrx {
 
     // older experiments for reference
     //    public <T> T withTrx(Map transProps = [:], Closure<T> callable) {
-//        //GormEnhancer.findStaticApi(getDomainClass()).withTransaction(transProps, callable)
+//        //GormEnhancer.findStaticApi(getEntityClass()).withTransaction(transProps, callable)
 //        //this seems to be faster than the withTransaction on the static gorm api. the TrxService seems to be as fast
 //        //TransactionService txService = getDatastore().getService(TransactionService)
 //        transactionService.withTransaction(transProps, callable)

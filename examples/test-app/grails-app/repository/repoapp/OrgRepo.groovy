@@ -7,7 +7,7 @@ import grails.gorm.transactions.Transactional
 @Transactional
 @GrailsCompileStatic
 class OrgRepo extends DefaultGormRepo<Org> {
-    //Class domainClass = Org
+    //Class entityClass = Org
 
 
 }

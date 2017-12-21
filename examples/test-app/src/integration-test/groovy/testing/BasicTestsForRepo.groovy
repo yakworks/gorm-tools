@@ -1,7 +1,7 @@
 package testing
 
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.errors.DomainException
+import gorm.tools.repository.errors.EntityValidationException
 import spock.lang.Specification
 
 class BasicTestsForRepo extends Specification {
@@ -16,7 +16,7 @@ class BasicTestsForRepo extends Specification {
             RepoUtil.flushAndClear()
             def dom2 = Jumper.findByName("testSave")
             assert dom2
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             fail "Errors ${e.errors.allErrors[0]}"
         }
     }
@@ -31,7 +31,7 @@ class BasicTestsForRepo extends Specification {
             repo.delete(dom2)
             def dom3 = Jumper.findByName("testDelete")
             dom3 == null
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             fail "Errors ${e.errors.allErrors[0]}"
         }
     }
@@ -47,7 +47,7 @@ class BasicTestsForRepo extends Specification {
             assertEquals "default.created.message", result.message.code
             def dom2 = Jumper.findByName("testInsert")
             assert dom2.name == "testInsert"
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             fail "Errors ${e.errors.allErrors[0]}"
         }
     }
@@ -63,7 +63,7 @@ class BasicTestsForRepo extends Specification {
             assertEquals "default.created.message", result.message.code
             def dom2 = Jumper.findByName("testInsert")
             assert dom2.name == "testInsert"
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             fail "Errors ${e.errors.allErrors[0]}"
         }
     }
@@ -84,7 +84,7 @@ class BasicTestsForRepo extends Specification {
             assertEquals "default.updated.message", result.message.code
             def dom2 = Jumper.findByName("testUpdateXXX")
             assert dom2.name == "testUpdateXXX"
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             fail "Errors ${e.errors.allErrors[0]}"
         }
     }
@@ -103,7 +103,7 @@ class BasicTestsForRepo extends Specification {
             assertEquals dup.id, result.id
             assertEquals "default.deleted.message", result.message.code
             assertNull Jumper.findByName("testRemove")
-        } catch (DomainException e) {
+        } catch (EntityValidationException e) {
             fail "Errors ${e.errors.allErrors[0]}"
         }
     }

@@ -2,17 +2,14 @@ package gorm.tools.repository
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.api.RepositoryApi
-import gorm.tools.repository.errors.DomainException
-import gorm.tools.repository.errors.DomainNotFoundException
+import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.errors.EntityValidationException
 import grails.plugin.gormtools.RepositoryArtefactHandler
-import grails.validation.ValidationException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.core.Datastore
-import org.springframework.dao.DataAccessException
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
@@ -48,7 +45,7 @@ class RepoUtil {
      *
      * @param entity the domain object the check
      * @param ver the version this used to be (entity will have the )
-     * @throws DomainException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
+     * @throws EntityValidationException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
      */
     static void checkVersion(GormEntity entity, Long oldVersion) {
         if (oldVersion == null) return
@@ -58,22 +55,22 @@ class RepoUtil {
             if (currentVersion > oldVersion) {
                 Map msgMap = RepoMessage.optimisticLockingFailure(entity)
                 entity.errors.rejectValue("version", msgMap.code as String, msgMap.args as Object[], msgMap.defaultMessage as String)
-                throw new DomainException(msgMap, entity, entity.errors)
+                throw new EntityValidationException(msgMap, entity, entity.errors)
             }
         }
     }
 
     /**
-     * check that the passed in entity is not null and throws DomainException setup with the notfound message
+     * check that the passed in entity is not null and throws EntityNotFoundException if so
      *
-     * @param entity the domain object the check
-     * @param params the params map
-     * @param domainClassName the name of the domain
-     * @throws DomainException if it not found
+     * @param entity - the domain object the check
+     * @param id - the identifier use when trying to find it. Will be used to construct the exception message
+     * @param domainClassName - the name of the domain that will be used to build error message if thrown
+     * @throws EntityNotFoundException if it not found
      */
-    static void checkFound(entity, Map params, String domainClassName) {
+    static void checkFound(entity, Serializable id, String domainClassName) {
         if (!entity) {
-            throw new DomainNotFoundException(RepoMessage.notFound(domainClassName, params))
+            throw new EntityNotFoundException(id, domainClassName)
         }
     }
 
@@ -123,27 +120,6 @@ class RepoUtil {
     @CompileDynamic
     void clear(TransactionStatus status) {
         status.transaction.sessionHolder.getSession().clear()
-    }
-
-    static DomainException handleException(GormEntity entity, RuntimeException ex) throws DataAccessException {
-        if (ex instanceof ValidationException) {
-            if (ex instanceof DomainException) return (DomainException) ex //if this is already fired
-
-            ValidationException ve = (ValidationException) ex
-            return new DomainException(RepoMessage.notSaved(entity), entity, ve.errors, ve)
-        } else if (ex instanceof DataIntegrityViolationException) {
-            String ident = RepoMessage.badge(entity.ident(), entity)
-            //log.error("repository delete error on ${entity.id} of ${entity.class.name}",dae)
-            return new DomainException(RepoMessage.notDeleted(entity, ident), entity, ex)
-        } else if (ex instanceof DataAccessException) {
-            //log.error("unexpected repository save error on ${entity.id} of ${entity.class.name}",dae)
-            //TODO we can build a better message with optimisticLockingFailure(entity) if dae.cause instanceof org.springframework.repository.OptimisticLockingFailureException
-            //TODO also, in the case of optimisticLocking, is that really un expected? shoud we log it?
-            //TODO we shold really chnage the message from the default notSaved as this is more of a critical low level error a
-            //and save the default notSaved for when a validation occurs like above
-            return new DomainException(RepoMessage.notSaved(entity), entity, ex) //make a RepoMessage.notSavedDataAccess
-        }
-
     }
 
 }

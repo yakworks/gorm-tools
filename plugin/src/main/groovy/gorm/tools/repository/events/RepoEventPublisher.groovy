@@ -1,7 +1,6 @@
 package gorm.tools.repository.events
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
 import grails.core.GrailsApplication
 import grails.events.bus.EventBus

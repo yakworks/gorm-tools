@@ -1,14 +1,14 @@
 package gorm.tools.repository
 
-import gorm.tools.repository.errors.DomainException
 import gorm.tools.repository.errors.EmptyErrors
+import gorm.tools.repository.errors.EntityValidationException
 import spock.lang.Specification
 
-class DomainExceptionSpec extends Specification {
+class EntityValidationExceptionSpec extends Specification {
 
     void testSimple() {
         when:
-        def e = new DomainException("fubar", new EmptyErrors("blah"))
+        def e = new EntityValidationException("fubar", new EmptyErrors("blah"))
 
         then:
         "validationException" == e.messageMap.code
@@ -23,7 +23,7 @@ class DomainExceptionSpec extends Specification {
         Map entity = [someEntity: "go cubs"]
 
         when:
-        def e = new DomainException(m, entity, new EmptyErrors("blah"))
+        def e = new EntityValidationException(m, entity, new EmptyErrors("blah"))
 
         then:
         "vtest" == e.messageMap.code
@@ -39,7 +39,7 @@ class DomainExceptionSpec extends Specification {
         Map entity = [someEntity: "go cubs"]
 
         when:
-        def e = new DomainException(m, entity)
+        def e = new EntityValidationException(m, entity)
 
         then:
         "vtest" == e.messageMap.code

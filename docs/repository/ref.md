@@ -98,6 +98,39 @@ class OrgListener {
 
 ```
 
+### Grails Events
+
+The Repository also provides a possibility to handle events using Grails annotations like Subscriber. See [Grails Events](http://async.grails.org/latest/guide/index.html#events).
+According to Grails docs, a class which contains a listener method (with @Subscriber) should be a spring bean.
+
+> From Grails docs: ``` Note that the class using this annotation needs to be a Spring bean. ```
+
+Repository initiates events with name in format ``` <entityName>.<eventName> ```,
+see [Repository events](https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html).
+That is why it is important to provide event name to the Subscriber annotation. Subscriber method should take an appropriate event as a parameter, e.g. BeforeBindEvent.
+Please see examples below:
+
+**Example**
+```groovy
+import grails.events.annotation.Subscriber
+import gorm.tools.repository.events.BeforeBindEvent
+import gorm.tools.repository.events.AfterBindEvent
+
+class OrgSubscriber {
+   
+    @Subscriber('Org.beforeBind')
+    void beforeBind(BeforeBindEvent event) {
+       // ...
+    }
+    
+    @Subscriber('Org.afterBind')
+    void afterBind(AfterBindEvent event) {
+       // ...
+    }
+}
+
+```
+
 ## Using external groovy beans as event listeners.
 [Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) 
 can be used to register classes defined outside of application into groovy scripts as spring beans.

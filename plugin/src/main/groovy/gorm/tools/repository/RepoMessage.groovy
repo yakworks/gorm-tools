@@ -1,7 +1,6 @@
 package gorm.tools.repository
 
 import gorm.tools.beans.AppCtx
-import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -116,10 +115,7 @@ class RepoMessage {
     }
 
     static String propName(String prop) {
-        String cname = GrailsNameUtils.getShortName(prop)
-        String firstCharString = cname.charAt(0).toLowerCase().toString()
-        cname = firstCharString + cname.substring(1)
-        return GrailsClassUtils.getPropertyForGetter(cname) ?: cname
+        GrailsNameUtils.getPropertyName(prop)
     }
 
     //used for messages, if the entity has a name field then use that other wise fall back on the id and return that

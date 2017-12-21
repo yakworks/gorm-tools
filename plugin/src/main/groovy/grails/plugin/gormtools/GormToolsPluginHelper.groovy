@@ -5,6 +5,7 @@ import gorm.tools.GormMetaUtils
 import gorm.tools.async.GparsBatchSupport
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.BatchIdGenerator
@@ -43,6 +44,9 @@ class GormToolsPluginHelper {
 
         mango(MangoQuery)
         repoEventPublisher(RepoEventPublisher)
+
+        repoExceptionSupport(RepoExceptionSupport)
+
         repoUtilBean(RepoUtil) //this is here just so the app ctx can get picked up and set on the static
 
         asyncBatchSupport(GparsBatchSupport)

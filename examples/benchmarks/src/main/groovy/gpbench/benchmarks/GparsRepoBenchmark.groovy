@@ -22,15 +22,15 @@ class GparsRepoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<
     def execute() {
         asyncBatchSupport.parallel(cities) { List<Map> list, Map args ->
             repo.batchCreate(list)
-            //domainClass.repository.create( row, [validate:validate, dataBinder:dataBinder ])
+            //entityClass.repository.create( row, [validate:validate, dataBinder:dataBinder ])
             //repository.create(row)
             //insertRow(row)
         }
     }
 //
 //    void insertRow(Map row) {
-//        //T c = domainClass.newInstance()
-//        T c = repository.getDomainClass().newInstance()
+//        //T c = entityClass.newInstance()
+//        T c = repository.getEntityClass().newInstance()
 //        c = (T)repository.bind(c, row, null)
 //        c.save(failOnError:true, validate:validate)
 //    }

@@ -295,6 +295,7 @@ https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/batch.html
 
 
 ## References and reading
+Good Video from 2017 on High Performance Hibernate https://vimeo.com/190275665
 
 Here are a 2 links you should read that will give you some background information on processing large bulk data batches.
 read up through 13.2

@@ -1,7 +1,6 @@
 package gorm.tools.repository.api
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.errors.DomainException
 import gorm.tools.databinding.MapBinder
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
@@ -17,11 +16,12 @@ import org.springframework.dao.DataAccessException
 interface RepositoryApi<D> {
 
     /**
-     * The gorm domain class. will generally get set in contructor or using the generic as
-     * done in {@link gorm.tools.repository.GormRepo#getDomainClass}
+     * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
+     * done in {@link gorm.tools.repository.GormRepo#getEntityClass}
      * using the {@link org.springframework.core.GenericTypeResolver}
+     * @see org.grails.datastore.mapping.model.PersistentEntity#getJavaClass().
      */
-    Class<D> getDomainClass()
+    Class<D> getEntityClass()
 
     /** The data binder to use. By default gets injected with EntityMapBinder*/
     MapBinder getMapBinder()
@@ -99,7 +99,7 @@ interface RepositoryApi<D> {
      * @param id - the id for the
      * @param args - the args to pass to delete. can be null and [flush] being the most common
      *
-     * @throws gorm.tools.repository.errors.DomainException if its not found or if a DataIntegrityViolationException is thrown
+     * @throws gorm.tools.repository.errors.EntityValidationException if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Map args, Serializable id)
     void removeById(Serializable id)
@@ -122,7 +122,7 @@ interface RepositoryApi<D> {
      * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
      * @return the retrieved entity. Will always be an entity as this throws an error if not
      *
-     * @throws gorm.tools.repository.errors.DomainNotFoundException if its not found
+     * @throws gorm.tools.repository.errors.EntityNotFoundException if its not found
      * @throws org.springframework.dao.OptimisticLockingFailureException if the versions mismatch
      */
     D get(Serializable id, Long version)
@@ -131,7 +131,7 @@ interface RepositoryApi<D> {
      * This default will redirect the call to {@link #get(Serializable id, Long version)}.
      * Implementing classes can override this and add custom finders
      * using another unique lookup key other than id, such as customer number or invoice number. Unlike the normal get(id)
-     * This throws a DomainNotFoundException if nothing is found instead of returning a null.
+     * This throws a EntityNotFoundException if nothing is found instead of returning a null.
      *
      * @param args - name params expects at least and [id] key and optionally a version,
      *    implementation classes can customize to work with more.
@@ -140,7 +140,7 @@ interface RepositoryApi<D> {
      */
     D get(Map params)
 
-    DomainException handleException(D entity, RuntimeException e)
+    RuntimeException handleException(RuntimeException e, D entity)
 
     void batchCreate(Map args, List<Map> batch)
 

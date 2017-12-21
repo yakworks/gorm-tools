@@ -1,4 +1,4 @@
-package gorm.tools.query
+package gorm.tools.beans
 
 import groovy.transform.CompileStatic
 

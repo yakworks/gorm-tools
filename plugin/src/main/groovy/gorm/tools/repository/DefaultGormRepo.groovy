@@ -10,10 +10,10 @@ import org.springframework.core.GenericTypeResolver
 class DefaultGormRepo<D extends GormEntity> implements GormRepo<D> {
 
     DefaultGormRepo() {
-        this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo.class)
+        this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo.class)
     }
 
     DefaultGormRepo(Class<D> clazz) {
-        this.domainClass = clazz
+        this.entityClass = clazz
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 @CompileStatic
 trait MangoQueryTrait {
 
-    abstract Class getDomainClass()
+    abstract Class getEntityClass()
 
     @Autowired
     @Qualifier("mango")
@@ -22,7 +22,7 @@ trait MangoQueryTrait {
      * @return Detached criteria build based on mango language params and criteria closure
      */
     DetachedCriteria buildCriteria(Map params = [:], Closure closure = null) {
-        getMangoQuery().buildCriteria(getDomainClass(), params, closure)
+        getMangoQuery().buildCriteria(getEntityClass(), params, closure)
     }
 
     /**
@@ -33,7 +33,7 @@ trait MangoQueryTrait {
      * @return query of entities restricted by mango params
      */
     List query(Map params = [:], Closure closure = null) {
-        getMangoQuery().query(getDomainClass(), params, closure)
+        getMangoQuery().query(getEntityClass(), params, closure)
     }
 
 }

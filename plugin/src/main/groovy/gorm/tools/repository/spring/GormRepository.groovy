@@ -1,6 +1,5 @@
 package gorm.tools.repository.spring
 
-import gorm.tools.repository.errors.DomainException
 import groovy.transform.CompileStatic
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
@@ -12,12 +11,12 @@ interface GormRepository<T, ID> extends PagingAndSortingRepository<T, ID>, CrudR
     Class<T> getDomainClass()
 
     /**
-     * saves a domain entity with the passed in args and rewraps ValidationException with DomainException on error
+     * saves a domain entity with the passed in args and rewraps ValidationException with EntityValidationException on error
      *
      * @param entity the domain entity instance to call save on
      * @param args the arguments to pass to the Gorm Domain.save(args)
      * @return the saved entity
-     * @throws DomainException if a validation or DataAccessException error happens
+     * @throws gorm.tools.repository.errors.EntityValidationException if a validation or DataAccessException error happens
      */
     public <S extends T> S save(S entity, Map args)
 
@@ -31,7 +30,7 @@ interface GormRepository<T, ID> extends PagingAndSortingRepository<T, ID>, CrudR
      *
      * @param params the parameter map
      * @return the created entity
-     * @throws DomainException if a validation error happens
+     * @throws gorm.tools.repository.errors.EntityValidationException if a validation error happens
      */
     T create(Map params)
 
@@ -40,7 +39,7 @@ interface GormRepository<T, ID> extends PagingAndSortingRepository<T, ID>, CrudR
      *
      * @param params the parameter map
      * @return the updated entity
-     * @throws DomainException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
+     * @throws gorm.tools.repository.errors.EntityValidationException if a validation error happens or its not found with the params.id or the version is off and someone else edited it
      */
     T update(Map params)
 
@@ -48,7 +47,7 @@ interface GormRepository<T, ID> extends PagingAndSortingRepository<T, ID>, CrudR
      * deletes a new domain entity base on the id in the params
      *
      * @param params the parameter map that has the id for the domain entity to delete
-     * @throws DomainException if its not found or if a DataIntegrityViolationException is thrown
+     * @throws gorm.tools.repository.errors.EntityValidationException if its not found or if a DataIntegrityViolationException is thrown
      */
     Map remove(Map params)
 

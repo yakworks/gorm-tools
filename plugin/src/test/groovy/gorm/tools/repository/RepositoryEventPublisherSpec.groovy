@@ -80,6 +80,30 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         sleep(1000)
         city.events.beforePersist
         city.events.afterPersist
+
+        when:
+        City city2 = new City(id: 1, name: "test")
+        city2.persist()
+
+        then:
+        sleep(1000)
+        city2.events.beforePersist
+        city2.events.afterPersist
+    }
+
+    void "test events are not raised if using default save()"() {
+        setup:
+        City city = new City(name: "test")
+
+        when:
+        city.save()
+
+        then:
+        sleep(1000)
+        !city.events.beforeBind
+        !city.events.afterBind
+        !city.events.beforePersist
+        !city.events.afterPersist
     }
 
     void "test subscriber listener with bind events"() {
@@ -88,7 +112,6 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
         when:
         City city = City.create(params)
-        //repoEventPublisher.doBeforeBind(City.repo, c, params, BindAction.Create)
 
         then:
         sleep(1000)
@@ -102,13 +125,47 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
         when:
         City city = City.create(params)
+        City city2 = City.create(params)
         city.remove()
+        City.removeById(city2.id)
 
         then:
         sleep(1000)
         city.events.beforeRemove
         city.events.afterRemove
+        city2.events.beforeRemove
+        city2.events.afterRemove
     }
+
+    void "test subscriber listener when updating an entity"() {
+        setup:
+        Map params = [id: 1, name: "test"]
+        City city = City.create(params)
+        city.events = [:]
+
+        when:
+        City.update([id: 1, name: "test1"])
+
+        then:
+        sleep(1000)
+        City.get(1).name == "test1"
+        city.events.beforeBind
+        city.events.afterBind
+        city.events.beforePersist
+        city.events.afterPersist
+
+        when:
+        city.events = [:]
+        city.update([id: 1, name: "test2"])
+
+        then:
+        City.get(1).name == "test2"
+        city.events.beforeBind
+        city.events.afterBind
+        city.events.beforePersist
+        city.events.afterPersist
+    }
+
 }
 
 

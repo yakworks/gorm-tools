@@ -79,12 +79,13 @@ import java.util.Set;
  */
 
 /**
- * OVERRIDES So we can change the FOREIGN_KEY_SUFFIX. TODO Raise an issue so this can be configurable
+ * OVERRIDES So we can change the GrailsDomainBinder.FOREIGN_KEY_SUFFIX = 'Id'. TODO Raise an issue so this can be configurable
+ * adds to resources.groovy in app
  */
 public class GrailsDomainBinder implements MetadataContributor {
+    public static String FOREIGN_KEY_SUFFIX = "_id";
 
     protected static final String CASCADE_ALL_DELETE_ORPHAN = "all-delete-orphan";
-    protected static final String FOREIGN_KEY_SUFFIX = "Id";
     protected static final String STRING_TYPE = "string";
     protected static final String EMPTY_PATH = "";
     protected static final char UNDERSCORE = '_';

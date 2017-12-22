@@ -78,4 +78,9 @@ trait GormToolsTestHelper extends GrailsUnitTest {
 
         return clos
     }
+
+    void flushAndClear(){
+        getDatastore().currentSession.flush()
+        getDatastore().currentSession.clear()
+    }
 }

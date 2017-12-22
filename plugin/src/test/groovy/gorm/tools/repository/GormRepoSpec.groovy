@@ -30,39 +30,81 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
 
     def "test create"() {
+        setup:
+        Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
+        Map params = [name: 'foo', location: location]
+
         when:
-        Map p = [name: 'foo']
-        p.location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
-        Org org = Org.repo.create(p)
+        Org org = Org.repo.create(params)
 
         then:
         org.name == "foo"
+        org.location.city == location.city
+        org.location.nested == location.nested
 
         and: "Event should have been fired on repository"
         org.event == "beforeBind Create"
     }
 
+    def "test persist"() {
+        setup:
+        Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
+
+        when:
+        Org org = new Org(name: 'foo', location: location)
+        Org.repo.persist(org)
+        org = Org.get(org.id)
+
+        then:
+        org.name == "foo"
+        org.location.city == location.city
+        org.location.nested == location.nested
+    }
 
     def "test update"() {
-        given:
+        setup:
+        Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
         Org org = new Org(name: "test")
-        org.location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
         org.persist()
         org.name = "test2"
 
         expect:
         org.isDirty()
         org.id != null
+        org.location == null
 
         when:
-        Map p = [name: 'foo', id: org.id]
+        Map p = [name: 'foo', id: org.id, location: location]
         org = Org.repo.update(p)
 
         then:
         org.name == "foo"
+        org.location == location
 
         and: "Event should have been fired on repository"
         org.event == "beforeBind Update"
+    }
+
+    def "test remove"() {
+        setup:
+        Org org = new Org(name: "test").save()
+
+        when:
+        Org.repo.remove(org)
+
+        then:
+        Org.get(org.id) == null
+    }
+
+    def "test remove by Id"() {
+        setup:
+        Org org = new Org(name: "test2").save()
+
+        when:
+        Org.repo.removeById([:], org.id)
+
+        then:
+        Org.get(org.id) == null
     }
 
     def "test criteria name config"() {

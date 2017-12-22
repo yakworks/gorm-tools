@@ -100,36 +100,62 @@ class OrgListener {
 
 ### Grails Events
 
-The Repository also provides a possibility to handle events using Grails annotations like Subscriber. See [Grails Events](http://async.grails.org/latest/guide/index.html#events).
-According to Grails docs, a class which contains a listener method (with @Subscriber) should be a spring bean.
+The Repository also provides a possibility to handle events using Grails annotations. Please see docs for [Grails Events]{.new-tab}.
 
-> From Grails docs: ``` Note that the class using this annotation needs to be a Spring bean. ```
+#### Publishing events
+Grails provides two ways for creating events - using [@Publisher]{.new-tab} annotation on a method and using
+[EventBus]{.new-tab} directly, please see docs for [Event Publishing]{.new-tab}.
+In case of using publisher annotation Grails takes event id from the method name (method with [@Publisher]{.new-tab} annotation).
+If using [EventBus]{.new-tab} we should specify event id manually.
 
-Repository initiates events with name in format ``` <entityName>.<eventName> ```,
-see [Repository events](https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html).
-That is why it is important to provide event name to the Subscriber annotation. Subscriber method should take an appropriate event as a parameter, e.g. BeforeBindEvent.
-Please see examples below:
+By default Repository uses [EventBus]{.new-tab} to create events (see [RepoEventPublisher]{.new-tab}).
+It publishes a number of [Repository Events]{.new-tab} and provides it's own way to build event ids.
+All ids of repository events correspond to the format ```<domainName>.<eventTypeName>```.
+As we can see there are two values separated with a dot. The first comes a name of a domain class, for which an event
+is created and the second - a type of a specific repository event. For example, in case we call ```persist()``` method
+on a domain entity called ```Org```, the repository invokes several events, one of them is BeforePersist event with id ```Org.beforePersist```.
+
+#### Subscribing to events
+Grails provides several options for handling events, please see Grails docs for [Event Handling].
+
+In case of adding [@Subscriber]{.new-tab} annotation to a method, Grails determines event id from the method name
+by default. For example, methods like ```someEvent()``` or ```onSomeEvent()``` listen to the event with id ```someEvent```.
+
+Due to the fact that ids of repository events contain ``` . ``` symbol, we should pass event id to the Subscriber annotation like so:
+
+```groovy
+    @Subscriber("SomeDomain.someEvent")
+    void someMethod() {}
+```
+
+According to Grails docs, a class which contains a listener method (with [@Subscriber]{.new-tab} annotation) should be a **spring bean**.
+
+Please see the example with ```OrgSubscriber``` below:
 
 **Example**
 ```groovy
 import grails.events.annotation.Subscriber
-import gorm.tools.repository.events.BeforeBindEvent
-import gorm.tools.repository.events.AfterBindEvent
+import gorm.tools.repository.events.BeforePersistEvent
+import gorm.tools.repository.events.AfterPersistEvent
 
 class OrgSubscriber {
    
-    @Subscriber('Org.beforeBind')
-    void beforeBind(BeforeBindEvent event) {
+    @Subscriber("Org.beforePersist")
+    void beforePersist(BeforePersistEvent event) {
        // ...
     }
     
-    @Subscriber('Org.afterBind')
-    void afterBind(AfterBindEvent event) {
+    @Subscriber("Org.afterPersist")
+    void afterPersist(AfterPersistEvent event) {
        // ...
     }
 }
 
 ```
+In this example we can see two listeners which handle events that occur before and after
+persisting an entity of the Org domain class.
+
+> NOTE: calling methods which trigger events inside an event listener causes an infinite loop
 
 ## Using external groovy beans as event listeners.
 [Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) 
@@ -398,3 +424,12 @@ Alternatively if ```getPackageToScan()``` is provided, it will find all the repo
 [DomainException]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/DomainException.groovy
 [GormToolsTest]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsTest.groovy
 [GormToolsHibernateSpec]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsHibernateSpec.groovy
+[Repository Events]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html
+[RepoEventPublisher]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/events/RepoEventPublisher.groovy
+
+[Grails Events]: http://async.grails.org/latest/guide/index.html#events
+[Event Publishing]: http://async.grails.org/latest/guide/index.html#notifying
+[Event Handling]: http://async.grails.org/latest/guide/index.html#consuming
+[@Subscriber]: http://async.grails.org/latest/api/grails/events/annotation/Subscriber.html
+[@Publisher]: http://async.grails.org/latest/api/grails/events/annotation/Publisher.html
+[EventBus]: http://async.grails.org/latest/api/grails/events/bus/EventBus.html 

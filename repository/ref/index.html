@@ -373,6 +373,33 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#grails-events" title="Grails Events" class="md-nav__link">
+    Grails Events
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#publishing-events" title="Publishing events" class="md-nav__link">
+    Publishing events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subscribing-to-events" title="Subscribing to events" class="md-nav__link">
+    Subscribing to events
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -656,6 +683,33 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#grails-events" title="Grails Events" class="md-nav__link">
+    Grails Events
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#publishing-events" title="Publishing events" class="md-nav__link">
+    Publishing events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subscribing-to-events" title="Subscribing to events" class="md-nav__link">
+    Subscribing to events
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -837,6 +891,53 @@ Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/
     <span class="o">}</span>
 <span class="o">}</span>
 </pre></div></p>
+<h3 id="grails-events">Grails Events<a class="headerlink" href="#grails-events" title="Permanent link">&para;</a></h3>
+<p>The Repository also provides a possibility to handle events using Grails annotations. Please see docs for <a class="new-tab" href="http://async.grails.org/latest/guide/index.html#events">Grails Events</a>.</p>
+<h4 id="publishing-events">Publishing events<a class="headerlink" href="#publishing-events" title="Permanent link">&para;</a></h4>
+<p>Grails provides two ways for creating events - using <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Publisher.html">@Publisher</a> annotation on a method and using
+<a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> directly, please see docs for <a class="new-tab" href="http://async.grails.org/latest/guide/index.html#notifying">Event Publishing</a>.
+In case of using publisher annotation Grails takes event id from the method name (method with <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Publisher.html">@Publisher</a> annotation).
+If using <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> we should specify event id manually.</p>
+<p>By default Repository uses <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> to create events (see <a class="new-tab" href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/events/RepoEventPublisher.groovy">RepoEventPublisher</a>).
+It publishes a number of <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html">Repository Events</a> and provides it's own way to build event ids.
+All ids of repository events correspond to the format <code>&lt;domainName&gt;.&lt;eventTypeName&gt;</code>.
+As we can see there are two values separated with a dot. The first comes a name of a domain class, for which an event
+is created and the second - a type of a specific repository event. For example, in case we call <code>persist()</code> method
+on a domain entity called <code>Org</code>, the repository invokes several events, one of them is BeforePersist event with id <code>Org.beforePersist</code>.</p>
+<h4 id="subscribing-to-events">Subscribing to events<a class="headerlink" href="#subscribing-to-events" title="Permanent link">&para;</a></h4>
+<p>Grails provides several options for handling events, please see Grails docs for <a href="http://async.grails.org/latest/guide/index.html#consuming">Event Handling</a>.</p>
+<p>In case of adding <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Subscriber.html">@Subscriber</a> annotation to a method, Grails determines event id from the method name
+by default. For example, methods like <code>someEvent()</code> or <code>onSomeEvent()</code> listen to the event with id <code>someEvent</code>.</p>
+<p>Due to the fact that ids of repository events contain <code>.</code> symbol, we should pass event id to the Subscriber annotation like so:</p>
+<div class="codehilite"><pre><span></span>    <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;SomeDomain.someEvent&quot;</span><span class="o">)</span>
+    <span class="kt">void</span> <span class="nf">someMethod</span><span class="o">()</span> <span class="o">{}</span>
+</pre></div>
+
+<p>According to Grails docs, a class which contains a listener method (with <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Subscriber.html">@Subscriber</a> annotation) should be a <strong>spring bean</strong>.</p>
+<p>Please see the example with <code>OrgSubscriber</code> below:</p>
+<p><strong>Example</strong>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">grails.events.annotation.Subscriber</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforePersistEvent</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.AfterPersistEvent</span>
+
+<span class="kd">class</span> <span class="nc">OrgSubscriber</span> <span class="o">{</span>
+
+    <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.beforePersist&quot;</span><span class="o">)</span>
+    <span class="kt">void</span> <span class="nf">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+       <span class="c1">// ...</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.afterPersist&quot;</span><span class="o">)</span>
+    <span class="kt">void</span> <span class="nf">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+       <span class="c1">// ...</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+In this example we can see two listeners which handle events that occur before and after
+persisting an entity of the Org domain class.</p>
+<blockquote>
+<p>NOTE: calling methods which trigger events inside an event listener causes an infinite loop</p>
+</blockquote>
 <h2 id="using-external-groovy-beans-as-event-listeners">Using external groovy beans as event listeners.<a class="headerlink" href="#using-external-groovy-beans-as-event-listeners" title="Permanent link">&para;</a></h2>
 <p><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy">Spring dynamic languages support</a> 
 can be used to register classes defined outside of application into groovy scripts as spring beans.

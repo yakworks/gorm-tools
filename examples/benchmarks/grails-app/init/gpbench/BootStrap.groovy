@@ -11,6 +11,9 @@ class BootStrap {
     @Value('${runDataBindingBenchmark:false}')
     boolean runDataBindingBenchmark
 
+    @Value('${runBenchmarks:true}')
+    boolean runBenchmarks
+
     BenchmarkRunnerService benchmarkRunnerService
     BenchmarkDatabindingService benchmarkDatabindingService
 
@@ -20,7 +23,8 @@ class BootStrap {
             benchmarkDatabindingService.runFat()
         //loaderNoPersistService.runFileLoad()
         //loaderNoPersistService.run()
-        benchmarkRunnerService.runBenchMarks()
+        if(runBenchmarks)
+            benchmarkRunnerService.runBenchMarks()
     }
 
     void mockAuthentication() {

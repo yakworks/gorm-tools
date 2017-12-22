@@ -89,6 +89,7 @@ endpoints:
 
 ---
 hibernate:
+    naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
     cache:
         queries: false
         use_second_level_cache: false

@@ -40,3 +40,11 @@ grails {
         id generator: 'gorm.tools.idgen.SpringIdGenerator'
     }
 }
+
+grails.plugin.springsecurity.active = Boolean.valueOf(System.getProperty("springsecurity.active", "true"))
+
+environments {
+    production {
+        grails.dbconsole.enabled = true
+    }
+}

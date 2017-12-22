@@ -12,6 +12,7 @@ import org.springframework.dao.DataAccessException
  * @author Joshua Burnett (@basejump)
  * @since 6.x
  */
+@SuppressWarnings("MethodCount")
 @CompileStatic
 interface RepositoryApi<D> {
 

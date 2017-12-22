@@ -1,6 +1,9 @@
 package grails.plugin.gormtools
 
 import grails.core.ArtefactHandler
+import org.grails.orm.hibernate.cfg.GrailsDomainBinder
+
+import java.lang.reflect.Field
 
 class GormToolsGrailsPlugin extends grails.plugins.Plugin {
     def loadAfter = ['hibernate', 'datasources']
@@ -24,10 +27,23 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
         GormToolsPluginHelper.onChange(event, grailsApplication, this)
     }
 
-
     @Override
     void onStartup(Map event) {
         GormToolsPluginHelper.addQuickSearchFields(config.gorm?.tools?.mango?.defaultQuickSearch ?: [], grailsApplication.getMappingContext().getPersistentEntities() as List)
+    }
+
+    /**
+     * Invoked in a phase where plugins can add dynamic methods. Subclasses should override
+     */
+    @Override
+    void doWithDynamicMethods() {
+//        GrailsDomainBinder.class.declaredFields.each { Field f ->
+//            if(f.name == 'FOREIGN_KEY_SUFFIX'){
+//                println "changing FOREIGN_KEY_SUFFIX"
+//                GormToolsPluginHelper.setFinalStatic(f, 'Id')
+//            }
+//        }
+//        assert GrailsDomainBinder.FOREIGN_KEY_SUFFIX == 'Id'
     }
 
 }

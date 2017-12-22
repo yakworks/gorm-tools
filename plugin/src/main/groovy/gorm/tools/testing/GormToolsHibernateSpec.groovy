@@ -16,6 +16,10 @@ import org.springframework.core.type.filter.AssignableTypeFilter
 @CompileStatic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper, AutowiredTest {
 
+    Set<String> getIncludePlugins() {
+        ["core", "eventBus", "gorm-tools"].toSet()
+    }
+
     void setupSpec() {
         List<Class> domainClasses = getDomainClasses()
         String packageName = getPackageToScan(config)

@@ -1,7 +1,6 @@
 package gorm.tools.repository.errors
 
 import gorm.tools.repository.RepoMessage
-import grails.validation.ValidationException
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
@@ -13,7 +12,7 @@ class RepoExceptionSupport {
 
     RuntimeException translateException(RuntimeException ex, GormEntity entity) {
         if (ex instanceof grails.validation.ValidationException) {
-            ValidationException ve = (ValidationException) ex
+            grails.validation.ValidationException ve = (grails.validation.ValidationException) ex
             return new EntityValidationException(RepoMessage.notSaved(entity), entity, ve.errors, ve)
         } else if (ex instanceof DataIntegrityViolationException) {
             //see http://www.baeldung.com/spring-dataIntegrityviolationexception

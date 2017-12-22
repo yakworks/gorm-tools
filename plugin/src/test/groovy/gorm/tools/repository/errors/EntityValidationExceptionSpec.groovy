@@ -1,4 +1,4 @@
-package gorm.tools.repository
+package gorm.tools.repository.errors
 
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityValidationException

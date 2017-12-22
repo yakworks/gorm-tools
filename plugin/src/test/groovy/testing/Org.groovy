@@ -5,7 +5,6 @@ import grails.persistence.Entity
 
 @Entity @GrailsCompileStatic
 class Org {
-    int id
     String name
     Boolean isActive = false
     BigDecimal amount
@@ -14,8 +13,13 @@ class Org {
     String secondName
     Date date
     String nameFromRepo
-
     String event
+
+    OrgExt ext
+
+    static mapping = {
+        id generator:'assigned'
+    }
 
     static List quickSearchFields = ["name"]
 

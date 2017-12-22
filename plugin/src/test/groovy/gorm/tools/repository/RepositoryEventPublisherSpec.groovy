@@ -166,17 +166,34 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city.events.afterPersist
     }
 
+    void "test changing entity in listener with calling default save"() {
+        given:
+        Map params = [id: 1, name: "test", name2: "test2"]
+
+        when:
+        City city = City.create(params)
+
+        RepoUtil.flushAndClear()
+        city = City.get(1)
+
+        then:
+        sleep(1000)
+        city.name2 == "name2"
+    }
+
 }
 
 
 @Entity
 class City {
     String name
+    String name2
     String event
     String eventAfter
     Map<String, Boolean> events = [:]
 
     static constraints = {
+        name2 nullable:true
         event nullable:true
         eventAfter nullable:true
     }
@@ -222,7 +239,10 @@ class CityRepo implements GormRepo<City> {
     @Subscriber("City.afterPersist")
     void afterPersistSub(AfterPersistEvent e){
         City city = (City) e.entity
+        city.name2 = "name2"
         city.events.afterPersist = true
+        //we don't call persist, so it doesn't stuck in the infinite loop
+        city.save()
     }
 
     @Subscriber("City.beforeRemove")

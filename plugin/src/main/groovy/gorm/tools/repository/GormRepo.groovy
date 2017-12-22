@@ -18,6 +18,7 @@ import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 
@@ -30,7 +31,9 @@ import org.springframework.dao.DataAccessException
 @CompileStatic
 trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrait, WithTrx, RepositoryApi<D> {
 
-    /** The data binder to use. By default gets injected with EntityMapBinder*/
+    /** The data binder to use. By default gets injected with EntityMapBinder.
+        Have to use Qualifier to avoid duplicat bean error when custom binder is defined. */
+    @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder
     @Autowired RepoEventPublisher repoEventPublisher
     @Autowired RepoExceptionSupport repoExceptionSupport

@@ -3,6 +3,8 @@ package gorm.tools.testing
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
+import grails.gorm.transactions.TransactionService
+import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
 import groovy.transform.CompileDynamic
@@ -13,14 +15,15 @@ import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AssignableTypeFilter
 
-@CompileStatic
+//@CompileStatic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper, AutowiredTest {
 
-    Set<String> getIncludePlugins() {
-        ["core", "eventBus", "gorm-tools"].toSet()
-    }
-
     void setupSpec() {
+        if (!ctx.containsBean("dataSource"))
+            ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
+        if (!ctx.containsBean("transactionService"))
+            ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+
         List<Class> domainClasses = getDomainClasses()
         String packageName = getPackageToScan(config)
         Package packageToScan = Package.getPackage(packageName) ?: getClass().getPackage()
@@ -42,7 +45,7 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements GormTools
             }
         }
 
-        beans = beans << commonBeans()
+        beans = beans << GormToolsPluginHelper.doWithSpring //commonBeans()
 
         defineBeans(beans)
     }

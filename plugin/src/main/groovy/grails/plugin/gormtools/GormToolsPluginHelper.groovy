@@ -62,6 +62,7 @@ class GormToolsPluginHelper {
 
         //make sure each domain has a repository, if not set up a DefaultGormRepo for it.
         Class[] domainClasses = application.domainClasses*.clazz
+        //println "domainClasses: ${domainClasses}"
         domainClasses.each { Class domainClass ->
             String repoName = RepoUtil.getRepoBeanName(domainClass)
             def hasRepo = repoClasses.find { it.propertyName == repoName }
@@ -119,15 +120,15 @@ class GormToolsPluginHelper {
         }
     }
 
-    static void setFinalStatic(Field field, Object newValue) throws Exception {
-        field.setAccessible(true);
-
-        // remove final modifier from field
-        Field modifiersField = Field.class.getDeclaredField("modifiers");
-        modifiersField.setAccessible(true);
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-        field.set(null, newValue);
-    }
+//    static void setFinalStatic(Field field, Object newValue) throws Exception {
+//        field.setAccessible(true);
+//
+//        // remove final modifier from field
+//        Field modifiersField = Field.class.getDeclaredField("modifiers");
+//        modifiersField.setAccessible(true);
+//        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+//
+//        field.set(null, newValue);
+//    }
 
 }

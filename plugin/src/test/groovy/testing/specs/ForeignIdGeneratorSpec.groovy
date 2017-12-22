@@ -2,23 +2,24 @@ package testing.specs
 
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.GormToolsHibernateSpec
+import grails.artefact.Artefact
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-class ForeignIdGeneratorSpec extends GormToolsHibernateSpec {
+class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
 
     List<Class> getDomainClasses() { [FidMaster, FidChild] }
 
     def "test create"() {
         when:
         def master = new FidMaster(name:'bob')
-        master.id = 1
+        //master.id = 1
         master.child = new FidChild(name:'foo')
         master.persist()
         flushAndClear()
 
         then:
-        def mt = FidMaster.get(1)
+        def mt = FidMaster.get(master.id)
         mt.name == "bob"
         mt.child.name == 'foo'
 
@@ -27,7 +28,7 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec {
     def "test validation error on child"() {
         when:
         def master = new FidMaster(name:'bob')
-        master.id = 1
+        //master.id = 1
         master.child = new FidChild()
         master.persist()
         //flushAndClear()
@@ -53,7 +54,7 @@ class FidMaster {
     FidChild child
 
     static mapping = {
-        id generator:'assigned'
+        id generator:'gorm.tools.idgen.SpringIdGenerator'
     }
 
     static constraints = {

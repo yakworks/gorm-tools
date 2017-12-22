@@ -18,7 +18,7 @@ class Org {
     OrgExt ext
 
     static mapping = {
-        id generator:'assigned'
+        //id generator:'assigned'
     }
 
     static List quickSearchFields = ["name"]

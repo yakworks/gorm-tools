@@ -63,9 +63,9 @@ class JdbcIdGenerator implements IdGenerator {
             oid = createRow(table, keyColumn, idColumn, name)
             //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.")
         } catch (BadSqlGrammarException bge) {
-            log.error("Looks like the idgen table is not found. This will do a dirty setup for the table for the JdbcIdGenerator for testing apps \
-                but its STRONGLY suggested you set it up properly with something like db-migration \
-                or another tools as not indexes or optimization are taken into account", bge)
+            log.warn("Looks like the idgen table is not found. This will do a dirty setup for the table for the JdbcIdGenerator "+
+                "for testing apps but its STRONGLY suggested you set it up properly with something like db-migration"+
+                "or another tools as not indexes or optimization are taken into account")
             createTable(table, keyColumn, idColumn)
             oid = createRow(table, keyColumn, idColumn, name)
             //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
@@ -109,7 +109,7 @@ class JdbcIdGenerator implements IdGenerator {
                     $idColumn bigint not null
                 )
                 """
-
+        println "creating with $query"
         jdbcTemplate.execute(query)
     }
 

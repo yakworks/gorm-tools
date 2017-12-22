@@ -26,8 +26,6 @@ class GormToolsPluginHelper {
     static Closure doWithSpring = {
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
-        entityMapBinder(EntityMapBinder)
-
         jdbcIdGenerator(JdbcIdGenerator) {
             jdbcTemplate = ref("jdbcTemplate")
             table = "NewObjectId"
@@ -43,11 +41,12 @@ class GormToolsPluginHelper {
         }
 
         mango(MangoQuery)
+
+        entityMapBinder(EntityMapBinder)
+
         repoEventPublisher(RepoEventPublisher)
 
         repoExceptionSupport(RepoExceptionSupport)
-
-        repoUtilBean(RepoUtil) //this is here just so the app ctx can get picked up and set on the static
 
         asyncBatchSupport(GparsBatchSupport)
 

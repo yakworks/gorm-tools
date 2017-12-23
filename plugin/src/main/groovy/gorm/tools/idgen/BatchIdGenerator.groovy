@@ -27,7 +27,7 @@ class BatchIdGenerator implements IdGenerator {
     //this is a thread safe hashmap
     private ConcurrentMap<String, AtomicReference<IdTuple>> entries = new ConcurrentHashMap<String, AtomicReference<IdTuple>>()
     private IdGenerator generator
-    private long batchSize = 100
+    private long batchSize = 255
 
     BatchIdGenerator() {
     }
@@ -57,6 +57,7 @@ class BatchIdGenerator implements IdGenerator {
                 if(curCtr.atMax()){
                     //getNextId in the generator we delegate to here must be syncronized
                     long curId = getGenerator().getNextId(keyName, batchSize)
+                    //println "got next batch of ids with $keyName $batchSize $curId"
                     return new IdTuple(keyName, curId, batchSize)
                 }
                 return curCtr
@@ -102,7 +103,7 @@ class BatchIdGenerator implements IdGenerator {
         IdTuple(String keyName, long currentId, long batchSize) {
             this.keyName = keyName
             this.atomicId = new AtomicLong(currentId)
-            this.maxId = currentId + batchSize
+            this.maxId = currentId + batchSize - 1
         }
 
         boolean atMax(){

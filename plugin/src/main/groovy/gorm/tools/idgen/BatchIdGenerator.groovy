@@ -5,7 +5,10 @@ import org.apache.commons.lang.Validate
 import org.apache.log4j.Category
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
+import java.util.function.UnaryOperator
 
 /**
  * An Thread safe implementation that caches a range of values in memory by the key name (ie: "tablename.id")
@@ -22,9 +25,9 @@ class BatchIdGenerator implements IdGenerator {
     private static Category log = Category.getInstance(BatchIdGenerator.class)
 
     //this is a thread safe hashmap
-    private Map<String, IdRow> entries = new ConcurrentHashMap<String, IdRow>()
+    private ConcurrentMap<String, AtomicReference<IdTuple>> entries = new ConcurrentHashMap<String, AtomicReference<IdTuple>>()
     private IdGenerator generator
-    private long allocationSize = 100
+    private long batchSize = 100
 
     BatchIdGenerator() {
     }
@@ -34,62 +37,51 @@ class BatchIdGenerator implements IdGenerator {
     }
 
     void setAllocationSize(long batchSize) {
-        this.allocationSize = batchSize
+        this.batchSize = batchSize
     }
 
     long getNextId(String name) {
         return getNextId(name, 1)
     }
 
-    @SuppressWarnings(['SynchronizedMethod'])
-    synchronized long getNextId(String keyName, long increment) {
-        long r
-        if (keyName == null) {
-            // If the name is null at this point, it's either a pick list or we want it to fail.
-            // If we throw an exception here, the error is virtually untraceable.
-            // if it's a pick list (or other non-resolved ds) putting a zero here hurts nothing.
-            r = 0
-        } else {
-            //if increment is bigger than batchsize then use the increment instead
-            long newAllocationSize = increment > allocationSize ? increment : allocationSize
-            IdRow idrow
 
-            idrow = findOrCreate(keyName, increment)
+    long getNextId(String keyName, long increment) {
 
-            long current = idrow.getNextId(increment)
-            if (current >= idrow.max || idrow.nextId.get() > idrow.max) {
-                current = getGenerator().getNextId(keyName, newAllocationSize)
-                idrow.max = current + newAllocationSize
-                idrow.nextId.set(current + increment)
+        AtomicReference<IdTuple> idAtomic = findOrCreate(keyName)
+
+        //check to see if its at its max. if so then go to the (jdbcBatchIdGen) and get a new bbatch range.
+        if (idAtomic.get().atMax()) {
+
+            Closure update = { IdTuple curCtr ->
+                //check again if its atMax. another thread might have jumped in and done it by the time this is run
+                if(curCtr.atMax()){
+                    //getNextId in the generator we delegate to here must be syncronized
+                    long curId = getGenerator().getNextId(keyName, batchSize)
+                    return new IdTuple(keyName, curId, batchSize)
+                }
+                return curCtr
             }
-            r = current
+
+            return idAtomic.updateAndGet(update as UnaryOperator<IdTuple>).getAndIncrement()
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Returning ID " + r + " for key '" + keyName + "'")
-        }
-        return r
+        return idAtomic.get().getAndIncrement()
     }
 
-    @SuppressWarnings(['SynchronizedOnThis'])
-    private IdRow findOrCreate(String name, long increment) {
-        Validate.notNull(entries, "The entries hashmap is undefined!")
-        Validate.notNull(name, "The row key name can't be null")
-        //if its there then return it and don't block
-        if (entries.containsKey(name))
-            return entries.get(name)
+    private AtomicReference<IdTuple> findOrCreate(String keyName) {
+        Validate.notNull(keyName, "The row key name can't be null")
 
-        synchronized (this) {
-            //make sure again that its not there in case another thread finished adding it since the containsKey check right above
-            if (entries.containsKey(name)) {
-                return entries.get(name)
+        if (!entries.containsKey(keyName)) {
+            //synchronize on the keyname. itern forces it to use same string. see http://java-performance.info/string-intern-java-6-7-8-multithreaded-access/
+            synchronized (keyName.intern()) {
+                log.debug("Creating a BatchIDGenerator.IdTuple for " + keyName)
+                //go to the (jdbcBatchIdGen) and get a new batch range.
+                long current = getGenerator().getNextId(keyName, batchSize)
+                AtomicReference<IdTuple> aidc = new AtomicReference<IdTuple>(new IdTuple(keyName, current, batchSize))
+                entries.putIfAbsent(keyName, aidc)
             }
-            long current = getGenerator().getNextId(name, increment > allocationSize ? increment : allocationSize)
-            IdRow idrow = new IdRow(name)
-            idrow.max = current + allocationSize
-            idrow.nextId.set(current)
-            entries.put(name, idrow)
-            return idrow
+
         }
+        return entries.get(keyName)
     }
 
     void setGenerator(IdGenerator generator) {
@@ -102,18 +94,23 @@ class BatchIdGenerator implements IdGenerator {
     }
 
     // MARKER holder class for cached id info
-    class IdRow {
-        IdRow(String keyname) {
-            this.keyName = keyname
-            log.debug("Creating a BatchIDGenerator for " + keyName)
+    class IdTuple {
+        private final String keyName
+        private final long maxId //if nextID reaches this point it time to hit the db(generator) for a new set of values
+        final AtomicLong atomicId
+
+        IdTuple(String keyName, long currentId, long batchSize) {
+            this.keyName = keyName
+            this.atomicId = new AtomicLong(currentId)
+            this.maxId = currentId + batchSize
         }
 
-        final String keyName
-        long max        //if nextID reaches this point it time to hit the db(generator) for a new set of values
-        AtomicLong nextId = new AtomicLong()
+        boolean atMax(){
+            atomicId.get() >= maxId
+        }
 
-        long getNextId(long increment) {
-            return nextId.getAndAdd(increment)
+        long getAndIncrement() {
+            return atomicId.getAndIncrement()
         }
     }
 

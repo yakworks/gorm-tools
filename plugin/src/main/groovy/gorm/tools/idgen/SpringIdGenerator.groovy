@@ -15,10 +15,8 @@ import org.springframework.beans.factory.annotation.Configurable
 @CompileStatic
 class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
     // Property names for configure() params.
-    static final String PROP_ENTITY = "entity_name"
-    static final String PROP_TABLE = "target_table"
-    static final String PROP_ID_TABLE = "identity_tables"
-    static final String PROP_COLUMN = "target_column"
+    static final String TARGET_TABLE = "target_table"
+    static final String TARGET_COLUMN = "target_column"
 
     /**
      * The configuration parameter holding the table name for the
@@ -30,20 +28,13 @@ class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configu
 
     @Override
     void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
-        //this.params = params;
-        segmentValue = params.getProperty(TABLE) + ".id "
-        showProperties("SpringIdGenerator configure ")
+        segmentValue = "${params.getProperty(TARGET_TABLE)}.${params.getProperty(TARGET_COLUMN)}"
+
+        if (log.isDebugEnabled())
+            log.debug("SpringIdGenerator configure " + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator == null ? "null! " : "not null. "))
     }
 
-    private void showProperties(String prefix) {
-        if (log.isDebugEnabled()) {
-            log.debug(prefix + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator == null ? "null! " : "not null. "))
-        }
-    }
-
-    @SuppressWarnings('SynchronizedMethod')
-    synchronized Serializable generate(final SessionImplementor session, Object obj) {
-        showProperties("SpringIdGenerator.generate ")
+    Serializable generate(final SessionImplementor session, Object obj) {
         return (Long) IdGeneratorHolder.idGenerator.getNextId(segmentValue)
     }
 

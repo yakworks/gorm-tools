@@ -36,7 +36,7 @@ class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configu
 
     Serializable generate(final SessionImplementor session, Object obj) {
         Long id = (Long) IdGeneratorHolder.idGenerator.getNextId(segmentValue)
-        println "${obj.class.name} $id"
+        //println "${obj.class.name} $id"
         return id
     }
 

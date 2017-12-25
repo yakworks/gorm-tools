@@ -3,10 +3,8 @@ package gorm.tools.repository
 import gorm.tools.testing.GormToolsHibernateSpec
 import gorm.tools.repository.errors.*
 import gorm.tools.databinding.BindAction
-import org.grails.datastore.gorm.*
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
-import org.hibernate.ObjectNotFoundException
 import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
@@ -206,7 +204,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Org.repo.removeById([:], Org.last().id + 1)
 
         then:
-        thrown ObjectNotFoundException
+        thrown EntityNotFoundException
     }
 
     def "test bind"() {

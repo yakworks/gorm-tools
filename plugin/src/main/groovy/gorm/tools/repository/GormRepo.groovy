@@ -188,8 +188,14 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      */
     @Override
     void removeById( Map args = [:], Serializable id) {
-        D entity = getStaticApi().load(id)
-        doRemove(entity)
+        D entity
+        try {
+            entity = getStaticApi().load(id)
+            doRemove(entity)
+        } catch (RuntimeException ex){
+            throw new EntityNotFoundException(id, entityClass.name)
+        }
+
     }
 
     /**
@@ -212,13 +218,14 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @param args - args passed to delete
      */
     void doRemove(Map args = [:], D entity) {
+        RepoUtil.checkFound(entity, entity.ident(), getEntityClass().name)
         try {
             getRepoEventPublisher().doBeforeRemove(this, entity, args)
             entity.delete(args)
             getRepoEventPublisher().doAfterRemove(this, entity, args)
         }
-        catch (DataAccessException dae) {
-            throw handleException(dae, entity)
+        catch (ValidationException | DataAccessException ex) {
+            throw handleException(ex, entity)
         }
     }
 

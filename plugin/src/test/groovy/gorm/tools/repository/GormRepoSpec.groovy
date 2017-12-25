@@ -1,13 +1,15 @@
 package gorm.tools.repository
 
 import gorm.tools.testing.GormToolsHibernateSpec
+import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.databinding.BindAction
+import org.grails.datastore.gorm.*
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
 import testing.Company
 import testing.Location
 import testing.Nested
 import testing.Org
-import testing.OrgRepo
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
@@ -21,13 +23,63 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "assert proper repos are setup"() {
         expect:
-        Org.repo instanceof OrgRepo
+        Org.repo instanceof DefaultGormRepo
+        Org.repo.entityClass == Org
         Location.repo instanceof DefaultGormRepo
         Location.repo.entityClass == Location
         Nested.repo instanceof DefaultGormRepo
         Nested.repo.entityClass == Nested
     }
 
+    def "test get"() {
+        setup:
+        Org org = new Org(name: "get_test").save()
+
+        when:
+        Org newOrg = Org.repo.get(org.id, null)
+
+        then:
+        null != newOrg
+        org.id == newOrg.id
+        org.name == newOrg.name
+
+        when:
+        newOrg = Org.repo.get([id: org.id])
+
+        then:
+        null != newOrg
+        org.id == newOrg.id
+        org.name == newOrg.name
+    }
+
+    def "test get with version"() {
+        setup:
+        Org org = new Org(name: "get_test_version").save()
+        org.name = "get_test_version_1"
+        org.save(flush: true)
+
+        when: "test get() with valid version"
+        Org newOrg = Org.repo.get(org.id, 1L)
+
+        then:
+        noExceptionThrown()
+        1L == newOrg.version
+        org.id == newOrg.id
+
+        when: "test get() with lower version"
+        Org.repo.get(org.id, 0L)
+
+        then:
+        thrown EntityValidationException
+
+        when: "check get() passing map of params"
+        newOrg = Org.repo.get([id: org.id, version: 1L])
+
+        then:
+        noExceptionThrown()
+        1L == newOrg.version
+        org.id == newOrg.id
+    }
 
     def "test create"() {
         setup:
@@ -42,8 +94,19 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.location.city == location.city
         org.location.nested == location.nested
 
-        and: "Event should have been fired on repository"
-        org.event == "beforeBind Create"
+//        and: "Event should have been fired on repository"
+//        org.event == "beforeBind Create"
+    }
+
+    def "test create without required field"() {
+        setup:
+        Map params = [isActive: true, amount: 10.0]
+
+        when:
+        Org org = Org.repo.create(params)
+
+        then:
+        thrown EntityValidationException
     }
 
     def "test persist"() {
@@ -81,8 +144,8 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.name == "foo"
         org.location == location
 
-        and: "Event should have been fired on repository"
-        org.event == "beforeBind Update"
+//        and: "Event should have been fired on repository"
+//        org.event == "beforeBind Update"
     }
 
     def "test remove"() {
@@ -105,6 +168,21 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         then:
         Org.get(org.id) == null
+    }
+
+    def "test bind"() {
+        setup:
+        Map data = [name: "bind_test"]
+        Org org = new Org(name: "test").save()
+
+        expect:
+        org.name == "test"
+
+        when:
+        Org.repo.bind(org, data, BindAction.Update)
+
+        then:
+        org.name == "bind_test"
     }
 
     def "test criteria name config"() {

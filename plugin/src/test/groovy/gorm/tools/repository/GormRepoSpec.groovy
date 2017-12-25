@@ -66,12 +66,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         1L == newOrg.version
         org.id == newOrg.id
 
-        when: "test get() with lower version"
-        Org.repo.get(org.id, 0L)
-
-        then:
-        thrown EntityValidationException
-
         when: "check get() passing map of params"
         newOrg = Org.repo.get([id: org.id, version: 1L])
 
@@ -79,6 +73,13 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         noExceptionThrown()
         1L == newOrg.version
         org.id == newOrg.id
+
+        when: "test get() with lower version"
+        Org.repo.get(org.id, 0L)
+
+        then:
+        def e = thrown(EntityValidationException)
+        e.message.contains("Another user has updated the Org while you were editing")
     }
 
     def "test create"() {
@@ -106,7 +107,8 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Org org = Org.repo.create(params)
 
         then:
-        thrown EntityValidationException
+        def e = thrown(EntityValidationException)
+        e.message.contains("Field error in object 'testing.Org' on field 'name': rejected value [null]")
     }
 
     def "test persist"() {

@@ -1,7 +1,5 @@
 package gorm.tools.repository.errors
 
-import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.repository.errors.EntityValidationException
 import spock.lang.Specification
 
 class EntityValidationExceptionSpec extends Specification {

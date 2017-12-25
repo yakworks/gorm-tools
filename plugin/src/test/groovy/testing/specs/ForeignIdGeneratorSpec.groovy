@@ -2,7 +2,6 @@ package testing.specs
 
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.GormToolsHibernateSpec
-import grails.artefact.Artefact
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -36,7 +35,7 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         then: "should get an error for child.name field"
         def e = thrown(EntityValidationException)
         e.entity == master
-        e.cause.class == grails.validation.ValidationException
+        e.cause.class == org.grails.datastore.mapping.validation.ValidationException
         e.errors.objectName == "testing.specs.FidMaster"
         e.errors.allErrors.size() == 1
         def fe = e.errors.getFieldError("child.name")

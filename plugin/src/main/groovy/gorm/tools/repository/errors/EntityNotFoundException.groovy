@@ -1,6 +1,7 @@
 package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
+import org.hibernate.ObjectNotFoundException
 import org.springframework.dao.DataRetrievalFailureException
 
 /**
@@ -10,13 +11,12 @@ import org.springframework.dao.DataRetrievalFailureException
 @CompileStatic
 class EntityNotFoundException extends DataRetrievalFailureException {
 
-    //TODO finish this
     public EntityNotFoundException(String msg) {
         super(msg)
     }
 
-    public EntityNotFoundException(Serializable id, String msg) {
-        super(msg)
+    public EntityNotFoundException(Serializable id, String domainName) {
+        super("${domainName} not found with id ${id}")
     }
 
     /**

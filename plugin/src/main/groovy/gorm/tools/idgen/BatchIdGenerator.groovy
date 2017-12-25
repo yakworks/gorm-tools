@@ -7,9 +7,7 @@ import org.apache.log4j.Category
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.atomic.AtomicLongArray
 import java.util.concurrent.atomic.AtomicReference
-import java.util.function.LongUnaryOperator
 import java.util.function.UnaryOperator
 
 /**
@@ -34,6 +32,8 @@ class BatchIdGenerator implements IdGenerator {
     private IdGenerator generator
     Long defaultBatchSize = 255
 
+    AtomicLong dummy = new AtomicLong(1000)
+
     BatchIdGenerator() {
     }
 
@@ -56,83 +56,10 @@ class BatchIdGenerator implements IdGenerator {
             return defaultBatchSize
     }
 
-//    private final UnaryOperator<IdTuple> updateAndGetOperator = { IdTuple curCtr ->
-//        //check again if its atMax. another thread might have squeezed in and incremented it already
-//        if(curCtr.atomicId.get() >= curCtr.maxId){
-//            //getNextId in the generator we delegate to here must be syncronized
-//            long minId = getGenerator().getNextId(curCtr.keyName, curCtr.batchSize.get())
-//            //println "got next batch of ids with $curCtr.keyName ${curCtr.batchSize.get()} $minId"
-//            return new IdTuple(curCtr.keyName, minId, curCtr.batchSize.get())
-//        } else {
-//            long id = curCtr.atomicId.getAndIncrement()
-//            return curCtr
-//        }
-//
-//    } as UnaryOperator<IdTuple>
-
     long getNextId(String keyName) {
+        //dummy.getAndIncrement()
         AtomicReference<IdTuple> tuple = findOrCreate(keyName)
         getAndUpdate(keyName, tuple)
-
-//        if(tuple.get(2) > 0){
-//            synchronized (keyName.intern()) {
-//                //getNextId in the generator we delegate to here must be syncronized
-//                long newid = getGenerator().getNextId(keyName, batchSize)
-//                tuple.set(0,newid) //nextId
-//                tuple.set(1, newid + batchSize - 1) //maxId
-//                tuple.set(2,0)
-//                //println "got next batch of ids with ${tuple.get(0)} : ${tuple.get(1)}"
-//            }
-//        }
-//        id = tuple.getAndIncrement(0)
-//
-//        return id
-//        if(cur[0] > cur[1]){
-//            //getNextId in the generator we delegate to here must be syncronized
-//            long id = getGenerator().getNextId(curCtr.keyName, batchSize)
-//            //println "got next batch of ids with $curCtr.keyName ${curCtr.batchSize.get()} $minId"
-//            return [ (id + 1), (id + batchSize - 1)] as long[]
-//        }
-//        long[] tup = idAtomic.updateAndGet(0, { long[] cur ->
-//            //check again if its atMax. another thread might have squeezed in and incremented it already
-//            if(cur[0] > cur[1]){
-//                //getNextId in the generator we delegate to here must be syncronized
-//                long id = getGenerator().getNextId(curCtr.keyName, batchSize)
-//                //println "got next batch of ids with $curCtr.keyName ${curCtr.batchSize.get()} $minId"
-//                return [ (id + 1), (id + batchSize - 1)] as long[]
-//            } else {
-//                return [ cur[0] + 1, cur[1]] as long[]
-//            }
-//        } as UnaryOperator<IdTuple>)
-//
-//        return tup.nextId.get()
-
-//        while (true) {
-//            IdTuple curTuple = idAtomic.get()
-//            long id = curTuple.nextId
-//            IdTuple newTup
-//            if (id > curTuple.maxId) {
-//                //println "===== id >= curTuple.maxId: id:$id , curTuple.maxId: ${curTuple.maxId}"
-//                id = getGenerator().getNextId(keyName, batchSize)
-//                newTup = new IdTuple(keyName, id + 1, id + batchSize - 1)
-//                //println "**** after getGenerator id: $id , maxsize: ${newTup.maxId}"
-//            } else{
-//                newTup = new IdTuple(keyName, id + 1, curTuple.maxId)
-//            }
-//            if (idAtomic.compareAndSet(curTuple, newTup)){
-//                //println "ADDED keyName: $keyName , id: $id , maxsize: ${newTup.maxId} "
-//                return id
-//            } else{
-//                //println "!!!!!! FAILED id: $id "
-//            }
-//        }
-        //return idAtomic.updateAndGet(updateAndGetOperator).atomicId.get()
-        //return updateAndGet(idAtomic)
-        //check to see if its at its max. if so then go to the (jdbcBatchIdGen) and get a new bbatch range.
-//        if (idAtomic.get().atMax()) {
-//            return updateAndGet(idAtomic)
-//        }
-//        return idAtomic.get().getAndIncrement()
     }
 
     /**
@@ -148,20 +75,19 @@ class BatchIdGenerator implements IdGenerator {
      */
     long getAndUpdate(String keyName, AtomicReference<IdTuple> idAtomic) {
 
-        UnaryOperator updateOp = { IdTuple curCtr ->
-            //check again if its atMax. another thread might have squeezed in and incremented it already
-            if(curCtr.atMax){
+        // the return value here in the closure is what is stored in the atomic for use next time through, not now.
+        // "current" tuple here is whats actually returned in the getAndUpdate itself
+        UnaryOperator updateOp = { IdTuple current ->
+            if(current.atMax){
                 IdTuple newTuple
                 synchronized (keyName.intern()) {
                     long batchSize = getBatchSize(keyName)
-                    //getNextId in the generator we delegate to here must be syncronized
                     long nextId = getGenerator().getNextId(keyName, batchSize)
-                    //println "got next batch of ids with $keyName $batchSize $curId"
                     newTuple = new IdTuple(nextId, nextId + batchSize - 1)
                 }
                 return newTuple
             }
-            return new IdTuple(curCtr.nextId + 1 , curCtr.maxId)
+            return new IdTuple(current.nextId + 1 , current.maxId)
         } as UnaryOperator<IdTuple>
 
         return idAtomic.getAndUpdate(updateOp).nextId
@@ -221,8 +147,6 @@ class BatchIdGenerator implements IdGenerator {
         final long maxId //if nextID reaches this point it time to hit the db(generator) for a new set of values
         final boolean atMax
         final long nextId
-        //final boolean needsRefresh = false
-        //final AtomicLong batchSize //atomic as it can get updated later
 
         IdTuple(long currentId, long maxId) {
             this.nextId = currentId //new AtomicLong(currentId)
@@ -231,38 +155,6 @@ class BatchIdGenerator implements IdGenerator {
             if(nextId > maxId) throw new IllegalStateException("ID can't be greater than maxId")
         }
 
-//        void setBatchSize(long size){
-//            batchSize.set(size)
-//        }
-//
-        boolean atMax(){
-            //if(nextId > maxId) throw new IllegalStateException("ID can't be greater than maxId")
-            nextId == maxId
-        }
-//
-//        int getRemainingIds(){
-//            (maxId + 1) - atomicId.get()
-//        }
-
-//        private final LongUnaryOperator updateAndGetOperator = { Long curId ->
-//            //check again if its atMax. another thread might have squeezed in and incremented it already
-//            if(curId >= maxId){
-//                //getNextId in the generator we delegate to here must be syncronized
-//                long minId = getGenerator().getNextId(keyName, batchSize.get())
-//                //println "got next batch of ids with $curCtr.keyName ${curCtr.batchSize.get()} $minId"
-//                return minId
-//            }
-//            return curId
-//        } as LongUnaryOperator
-//
-//        public final long getAndUpdate() {
-//            long prev, next;
-//            do {
-//                prev = get();
-//                next = updateFunction.applyAsLong(prev);
-//            } while (!compareAndSet(prev, next));
-//            return prev;
-//        }
 //        long getAndIncrement() {
 //            long id = nextId.getAndIncrement()
 //            if(id > maxId) throw new IllegalStateException("ID can't be greater than maxId")

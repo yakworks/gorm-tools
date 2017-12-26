@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.compiler.GormRepository
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.events.*
 import gorm.tools.repository.events.RepoEventPublisher
@@ -199,7 +200,7 @@ class City {
     }
 }
 
-@Artefact("Repository")
+@GormRepository
 class CityRepo implements GormRepo<City> {
 
     void beforeBind(City city, Map params, BindAction ba) {

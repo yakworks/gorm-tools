@@ -32,7 +32,7 @@ import static org.grails.io.support.GrailsResourceUtils.REGEX_FILE_SEPARATOR
 @CompileStatic
 class RepositoryArtefactHandler extends ArtefactHandlerAdapter {
 
-    static final String TYPE = "Repository"
+    public static final String TYPE = "Repository"
     static final String SUFFIX = "Repo"
     static final String PLUGIN_NAME = "gorm-tools"
     static final Pattern REPO_PATH_PATTERN = Pattern.compile(".+" + REGEX_FILE_SEPARATOR + GRAILS_APP_DIR +

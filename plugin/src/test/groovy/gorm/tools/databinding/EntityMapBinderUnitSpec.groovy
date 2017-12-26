@@ -1,11 +1,13 @@
 package gorm.tools.databinding
 
 import gorm.tools.beans.DateUtil
+import grails.artefact.Artefact
 import grails.databinding.converters.ValueConverter
 import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 class EntityMapBinderUnitSpec extends Specification implements DataTest {
@@ -122,10 +124,37 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.active == true
     }
 
+    void "test whitelist blacklist"() {
+        given:
+        TestDomain testDomain = new TestDomain()
+
+        when: "not in whitelist"
+        binder.bind(testDomain, [name:"test"], ["age"], null)
+
+        then:
+        testDomain.name == null
+
+        when: "in blacklist"
+        binder.bind(testDomain, [name:"test"], null, ["name"])
+
+        then:
+        testDomain.name == null
+
+
+        when:
+        binder.bind(testDomain, [name:"test", age:"10"], ["name", "dob"], null)
+
+        then:
+        testDomain.name == "test"
+        testDomain.age == null
+
+    }
+
 }
 
 
 @Entity
+@Artefact("Domain")
 class TestDomain {
     String name
     Long age
@@ -133,7 +162,13 @@ class TestDomain {
     Currency currency
     Boolean active
 
+    String nonBindable
+
     AnotherDomain anotherDomain
+
+    static constraints = {
+        nonBindable bindable:false
+    }
 }
 
 @Entity

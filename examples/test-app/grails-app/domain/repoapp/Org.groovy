@@ -18,6 +18,6 @@ class Org {
         address nullable: true
         testDate nullable: true
         credit nullable: true
-        event nullable: true
+        event nullable: true, bindable:false
     }
 }

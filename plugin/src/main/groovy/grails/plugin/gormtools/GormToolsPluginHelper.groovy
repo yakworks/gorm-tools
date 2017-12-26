@@ -12,6 +12,7 @@ import gorm.tools.idgen.BatchIdGenerator
 import gorm.tools.idgen.IdGeneratorHolder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.mango.MangoQuery
+import grails.config.Settings
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -45,7 +46,14 @@ class GormToolsPluginHelper {
 
         mango(MangoQuery)
 
-        entityMapBinder(EntityMapBinder)
+        def config = application.config
+        boolean trimStringsSetting = config.getProperty(Settings.TRIM_STRINGS, Boolean, true)
+        boolean convertEmptyStringsToNullSetting = config.getProperty(Settings.CONVERT_EMPTY_STRINGS_TO_NULL, Boolean, true)
+
+        entityMapBinder(EntityMapBinder) {
+            trimStrings = trimStringsSetting
+            convertEmptyStringsToNull = convertEmptyStringsToNullSetting
+        }
 
         repoEventPublisher(RepoEventPublisher)
 

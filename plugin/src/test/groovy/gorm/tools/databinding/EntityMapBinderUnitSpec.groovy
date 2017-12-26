@@ -147,7 +147,24 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         then:
         testDomain.name == "test"
         testDomain.age == null
+    }
 
+    void "test trimStrings and convertEmptyStringsToNull"() {
+        given:
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: " test "]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == "test"
+
+        when:
+        binder.bind(testDomain, [name: "   "])
+
+        then:
+        testDomain.name == null
     }
 
 }

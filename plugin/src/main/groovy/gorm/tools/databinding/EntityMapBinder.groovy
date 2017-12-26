@@ -27,6 +27,9 @@ class EntityMapBinder implements MapBinder {
     private static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
     private static final String ID_PROP = "id"
 
+    boolean trimStrings = true
+    boolean convertEmptyStringsToNull = true
+
     ConversionService conversionService = new SpringConversionServiceAdapter()
 
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
@@ -55,7 +58,7 @@ class EntityMapBinder implements MapBinder {
 
         for (PersistentProperty prop : properties) {
             if (!source.containsKey(prop.name) || !shouldBind(prop.name, whiteList, blackList)) continue
-            Object value = source[prop.name]
+            Object value = preprocessValue(source[prop.name])
             Object valueToAssign = value
 
             if (prop instanceof Association && value[ID_PROP]) {
@@ -134,6 +137,20 @@ class EntityMapBinder implements MapBinder {
         } catch (Exception e) {
         }
         return includeList
+    }
+
+    protected preprocessValue(propertyValue) {
+        if(propertyValue instanceof CharSequence) {
+            String stringValue = propertyValue.toString()
+            if (trimStrings) {
+                stringValue = stringValue.trim()
+            }
+            if (convertEmptyStringsToNull && "".equals(stringValue)) {
+                stringValue = null
+            }
+            return stringValue
+        }
+        return propertyValue
     }
 
 }

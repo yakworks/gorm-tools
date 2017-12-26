@@ -2,14 +2,20 @@ package gorm.tools.databinding
 
 import gorm.tools.beans.DateUtil
 import grails.databinding.converters.ValueConverter
+import grails.util.Environment
 import groovy.transform.CompileStatic
 import org.grails.databinding.converters.ConversionService
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.web.databinding.DefaultASTDatabindingHelper
 import org.grails.web.databinding.SpringConversionServiceAdapter
 import org.springframework.beans.factory.annotation.Autowired
+
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -18,13 +24,32 @@ import org.springframework.beans.factory.annotation.Autowired
  */
 @CompileStatic
 class EntityMapBinder implements MapBinder {
+    private static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
     private static final String ID_PROP = "id"
+
+    boolean trimStrings = true
+    boolean convertEmptyStringsToNull = true
 
     ConversionService conversionService = new SpringConversionServiceAdapter()
 
     protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
 
-    void bind(Object target, Map<String, Object> source, BindAction bindAction = null) {
+    @Override
+    void bind(Object target, Map<String, Object> source, BindAction bindAction) {
+        bind(target, source, null, getBindingIncludeList(target), null)
+    }
+
+    @Override
+    void bind(Object target, Map<String, Object> source) {
+        bind(target, source, null, getBindingIncludeList(target), null)
+    }
+
+    @Override
+    void bind(Object target, Map<String, Object> source, List<String> whiteList, List<String> blackList) {
+        bind(target, source, null, whiteList, blackList)
+    }
+
+    void bind(Object target, Map<String, Object> source, BindAction bindAction, List<String> whiteList, List<String> blackList) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
 
@@ -32,8 +57,8 @@ class EntityMapBinder implements MapBinder {
         List<PersistentProperty> properties = gormStaticApi.gormPersistentEntity.persistentProperties
 
         for (PersistentProperty prop : properties) {
-            if (!source.containsKey(prop.name)) continue
-            Object value = source[prop.name]
+            if (!source.containsKey(prop.name) || !shouldBind(prop.name, whiteList, blackList)) continue
+            Object value = preprocessValue(source[prop.name])
             Object valueToAssign = value
 
             if (prop instanceof Association && value[ID_PROP]) {
@@ -61,6 +86,10 @@ class EntityMapBinder implements MapBinder {
 
     }
 
+    protected boolean shouldBind(String propName, List whiteList, List blackList) {
+        return !blackList?.contains(propName) && (!whiteList || whiteList.contains(propName))
+    }
+
     //TODO
     void bindUpdate(Object target, Map<String, Object> source) {
         //for now just pass them on
@@ -84,4 +113,45 @@ class EntityMapBinder implements MapBinder {
         conversionHelpers[converter.targetType] << converter
     }
 
+    @SuppressWarnings(["EmptyCatchBlock", "BitwiseOperatorInConditional", "CatchException"])
+    private List getBindingIncludeList(final Object object) {
+        List includeList = Collections.emptyList()
+        try {
+            Class<? extends Object> objectClass = object.getClass()
+            if (CLASS_TO_BINDING_INCLUDE_LIST.containsKey(objectClass)) {
+                includeList = CLASS_TO_BINDING_INCLUDE_LIST.get(objectClass)
+            } else {
+                Field whiteListField = objectClass.getDeclaredField(DefaultASTDatabindingHelper.DEFAULT_DATABINDING_WHITELIST)
+                if (whiteListField != null) {
+                    if ((whiteListField.getModifiers() & Modifier.STATIC) != 0) {
+                        Object whiteListValue = whiteListField.get(objectClass)
+                        if (whiteListValue instanceof List) {
+                            includeList = (List)whiteListValue
+                        }
+                    }
+                }
+                if (!Environment.getCurrent().isReloadEnabled()) {
+                    CLASS_TO_BINDING_INCLUDE_LIST.put(objectClass, includeList)
+                }
+            }
+        } catch (Exception e) {
+        }
+        return includeList
+    }
+
+    protected preprocessValue(propertyValue) {
+        if(propertyValue instanceof CharSequence) {
+            String stringValue = propertyValue.toString()
+            if (trimStrings) {
+                stringValue = stringValue.trim()
+            }
+            if (convertEmptyStringsToNull && "".equals(stringValue)) {
+                stringValue = null
+            }
+            return stringValue
+        }
+        return propertyValue
+    }
+
 }
+

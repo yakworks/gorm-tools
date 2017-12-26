@@ -28,12 +28,8 @@ import org.hibernate.SessionFactory
  * order('invoice.customer.name')
  *
  * instead of
- * invoice {
- *    customer {
- *       order(name)
- *    }
- * }
- *
+ * invoice {*    customer {*       order(name)
+ *}*}*
  * simliar with eq, like and in
  *
  * ilike('invoice.customer.name', 'foo')
@@ -59,12 +55,8 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      * Orders by the specified property name and direction
      * takes invoice.customer.name and builds a closure that looks like
      *
-     * invoice {
-     *    customer {
-     *       order(name)
-     *    }
-     * }
-     * and then calls the that closure on this.
+     * invoice {*    customer {*       order(name)
+     *}*}* and then calls the that closure on this.
      *
      * @param propertyName The property name to order by
      * @param direction Either "asc" for ascending or "desc" for descending
@@ -133,7 +125,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
      * Dynamic method dispatch fail!
      */
     Object methodMissing(String name, args) {
-//		println "hibernate $name with $args"
+//      println "hibernate $name with $args"
         return super.invokeMethod(name, args)
     }
 

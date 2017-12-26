@@ -1,24 +1,30 @@
 package gorm.tools.repository
 
 import gorm.tools.testing.GormToolsHibernateSpec
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.errors.*
 import gorm.tools.databinding.BindAction
 import org.grails.datastore.gorm.*
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.hibernate.ObjectNotFoundException
 import testing.Company
 import testing.Location
 import testing.Nested
 import testing.Org
+import testing.Org2
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org, Location, Nested, Company] }
+    List<Class> getDomainClasses() { [Org, Org2, Location, Nested, Company] }
 
     Closure doWithConfig() {
         { config ->
             config.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
         }
+    }
+
+    def setup() {
+        new Org(name: "test_from_setup").save(flush: true)
     }
 
     def "assert proper repos are setup"() {
@@ -82,6 +88,17 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         e.message.contains("Another user has updated the Org while you were editing")
     }
 
+    def "test get with non-existent id"() {
+        setup:
+        Org org = new Org(name: "test").save()
+
+        when:
+        Org.repo.get(Org.last().id + 1, null)
+
+        then:
+        thrown EntityNotFoundException
+    }
+
     def "test create"() {
         setup:
         Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
@@ -126,6 +143,15 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.location.nested == location.nested
     }
 
+    def "test persist with validation"() {
+        when:
+        Org.repo.persist(new Org(amount: 500))
+
+        then:
+        def e = thrown(EntityValidationException)
+        e.message.contains("Field error in object 'testing.Org' on field 'name': rejected value [null]")
+    }
+
     def "test update"() {
         setup:
         Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
@@ -150,6 +176,33 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 //        org.event == "beforeBind Update"
     }
 
+    def "test update with non-existent id"() {
+        setup:
+        Org org = new Org(name: "test").save()
+        Map params = [name: 'foo', id: Org.last().id + 1]
+
+        when:
+        Org.repo.update(params)
+
+        then:
+        thrown EntityNotFoundException
+    }
+
+    @spock.lang.Ignore
+    def "test update with transaction"() {
+        setup:
+        Org2 org = new Org2(name: "test").save()
+        Map params = [name: 'foo', id: org.id]
+
+        when:
+        Org2.repo.update(params)
+        RepoUtil.clear()
+
+        then:
+        thrown RuntimeException
+        org.name == "test"
+    }
+
     def "test remove"() {
         setup:
         Org org = new Org(name: "test").save()
@@ -170,6 +223,17 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         then:
         Org.get(org.id) == null
+    }
+
+    def "test remove by Id with non-existent id"() {
+        setup:
+        new Org(name: '1').save()
+
+        when:
+        Org.repo.removeById([:], Org.last().id + 1)
+
+        then:
+        thrown ObjectNotFoundException
     }
 
     def "test bind"() {

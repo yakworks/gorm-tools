@@ -12,14 +12,18 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
 
     def "test create"() {
         when:
-        def master = new FidMaster(name:'bob')
-        //master.id = 1
-        master.child = new FidChild(name:'foo')
-        master.persist()
+        Long firstId
+        (1..5).each {
+            def master = new FidMaster(name: 'bob')
+            //master.id = 1
+            master.child = new FidChild(name: 'foo')
+            master.persist()
+            firstId = master.id
+        }
         flushAndClear()
 
         then:
-        def mt = FidMaster.get(master.id)
+        def mt = FidMaster.get(firstId)
         mt.name == "bob"
         mt.child.name == 'foo'
 
@@ -54,7 +58,7 @@ class FidMaster {
     FidChild child
 
     static mapping = {
-        id generator:'gorm.tools.idgen.SpringIdGenerator'
+        id generator:'gorm.tools.hibernate.PooledTableIdGenerator', params:[foo:'bar']
     }
 
     static constraints = {

@@ -93,13 +93,14 @@ class RepoEventPublisher {
         publishEvents(repo, event, [entity, data, bindAction] as Object[])
     }
 
-    void doBeforeRemove(RepositoryApi repo, GormEntity entity) {
+    void doBeforeRemove(RepositoryApi repo, GormEntity entity, Map args) {
         BeforeRemoveEvent event = new BeforeRemoveEvent(repo, entity)
-        publishEvents(repo, event, [entity] as Object[])
+        publishEvents(repo, event, [entity, args] as Object[])
     }
 
-    void doAfterRemove(RepositoryApi repo, GormEntity entity) {
+    void doAfterRemove(RepositoryApi repo, GormEntity entity, Map args) {
         AfterRemoveEvent event = new AfterRemoveEvent(repo, entity)
-        publishEvents(repo, event, [entity] as Object[])
+        publishEvents(repo, event, [entity, args] as Object[])
+
     }
 }

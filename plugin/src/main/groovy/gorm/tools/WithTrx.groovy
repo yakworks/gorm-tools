@@ -24,9 +24,20 @@ trait WithTrx {
      * @param callable The callable The callable
      * @return The result of the callable
      */
-    public <T> T withTrx(Map definition = [:], @ClosureParams(value = SimpleType.class,
+    public <T> T withTrx(Map definition, @ClosureParams(value = SimpleType.class,
         options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
         transactionService.withTransaction(definition, callable)
+    }
+
+    /**
+     * Executes the given callable within the context of a transaction with the given definition
+     *
+     * @param callable The callable The callable
+     * @return The result of the callable
+     */
+    public <T> T withTrx(@ClosureParams(value = SimpleType.class,
+        options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
+        transactionService.withTransaction(callable)
     }
 
     void flushAndClear(TransactionStatus status) {

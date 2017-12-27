@@ -18,7 +18,7 @@ class RepoExceptionSupport {
             //see http://www.baeldung.com/spring-dataIntegrityviolationexception
             String ident = RepoMessage.badge(entity.ident(), entity)
             //log.error("repository delete error on ${entity.id} of ${entity.class.name}",dae)
-            return new EntityValidationException(RepoMessage.notDeleted(entity, ident), entity, ex)
+            return new EntityValidationException(ex.message, entity, ex)
         } else if (ex instanceof DataAccessException) {
             //for now just return it. TODO we need to look into the OptimisticLocking and how to handle that here.
             return new EntityValidationException(RepoMessage.notSaved(entity), entity, ex) //make a RepoMessage.notSavedDataAccess

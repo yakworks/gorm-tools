@@ -106,7 +106,8 @@ class JdbcIdGenerator implements IdGenerator {
             create table $table
                 (
                     $keyColumn varchar(255) not null,
-                    $idColumn bigint not null
+                    $idColumn bigint not null,
+                    CONSTRAINT PK_$table PRIMARY KEY ($keyColumn)
                 )
                 """
         println "creating with $query"

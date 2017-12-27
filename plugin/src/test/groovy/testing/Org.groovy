@@ -24,7 +24,7 @@ class Org {
     static List quickSearchFields = ["name"]
 
     static constraints = {
-        name blank: true, nullable: true
+        name blank: false, nullable: false
         isActive nullable: true
         amount nullable: true
         amount2 nullable: true

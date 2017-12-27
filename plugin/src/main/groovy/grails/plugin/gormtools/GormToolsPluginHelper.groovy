@@ -18,7 +18,7 @@ import grails.plugins.Plugin
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
 
-@SuppressWarnings(['NoDef','UnnecessarySelfAssignment'])
+@SuppressWarnings(['NoDef', 'UnnecessarySelfAssignment'])
 class GormToolsPluginHelper {
     static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
 

@@ -51,8 +51,13 @@ class BenchmarkDatabindingService {
             useSetPropsFastIterate(CityFatSimple)
             if (!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFat)
-            //useSetPropsFastIterate(CityFat)
             useFastBinder(CityFat)
+            mute = false
+        }
+
+        println "Warm up pass "
+        mute = true
+        (1..2).each {
             if (!mute) println " - Dynamic setters are slower"
             useDynamicSettersFat(CityFat)
             if (!mute) println " - Slower without @GrailsCompileStatic on domain"

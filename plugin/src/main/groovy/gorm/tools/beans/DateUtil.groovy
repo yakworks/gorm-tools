@@ -17,7 +17,7 @@ import java.util.regex.Pattern
  * Provides a set of methods for parsing/formatting and making custom manipulations with dates.
  * (e.g. to get a number of days between dates or to get last day of month, etc)
  */
-@SuppressWarnings(['MethodCount', 'EmptyCatchBlock', 'ExplicitCallToGetAtMethod'])
+@SuppressWarnings(['MethodCount', 'EmptyCatchBlock', 'ExplicitCallToGetAtMethod', 'PropertyName'])
 @CompileStatic
 class DateUtil {
 
@@ -28,12 +28,13 @@ class DateUtil {
 
     //private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
     //private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX"
-    private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
+    //private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
     private static final String TZ_LESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
 
     static final ThreadLocal<SimpleDateFormat> formatterLocalDate = ThreadLocal.withInitial(
         { return new SimpleDateFormat("yyyy-MM-dd") } as Supplier<SimpleDateFormat>
     )
+    //see https://stackoverflow.com/questions/4032967/json-date-to-java-date#4033027
     static final ThreadLocal<SimpleDateFormat> formatterDateTime = ThreadLocal.withInitial(
         { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX") } as Supplier<SimpleDateFormat>
     )
@@ -64,6 +65,7 @@ class DateUtil {
         return formatterDateTime.get().parse(date)
     }
 
+    //see https://stackoverflow.com/questions/10286204/the-right-json-date-format
     static Date parseJsonDate(String date) {
         date = date?.trim()
         if (!date) return null
@@ -71,8 +73,12 @@ class DateUtil {
         DateFormat dateFormat
         if(date.matches(LOCAL_DATE)){
             dateFormat = formatterLocalDate.get()
-        } else {
+        } else if(date.matches(GMT_MILLIS)) {
             dateFormat = formatterDateTime.get()
+        } else if(date.matches(GMT_SECONDS)) {
+            dateFormat = formatterSec.get()
+        } else if(date.matches(TZ_LESS)) {
+            dateFormat = formatterTZ.get()
         }
 
         return dateFormat.parse(date)

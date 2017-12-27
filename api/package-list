@@ -2,6 +2,7 @@ gorm.tools
 gorm.tools.async
 gorm.tools.beans
 gorm.tools.databinding
+gorm.tools.hibernate
 gorm.tools.hibernate.criteria
 gorm.tools.idgen
 gorm.tools.jdbc

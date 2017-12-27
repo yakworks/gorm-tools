@@ -134,11 +134,13 @@ function windowTitle()
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="BatchIdGenerator.IdRow.html" title="class in gorm/tools/idgen">
-                                    BatchIdGenerator.IdRow
+                                <strong><a href="BatchIdGenerator.IdTuple.html" title="class in gorm/tools/idgen">
+                                    BatchIdGenerator.IdTuple
                                 </a></strong>
                             </td>
-                            <td></td>
+                            <td>Used before creating large batches where you know the count and want to pre pool and id range larger than the default
+ to avoid the DB round trips to keep incrementing the sequence in the table.
+ </td>
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
@@ -158,11 +160,23 @@ function windowTitle()
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="SpringIdGenerator.html" title="class in gorm/tools/idgen">
-                                    SpringIdGenerator
+                                <strong><a href="PooledIdGenerator.html" title="class in gorm/tools/idgen">
+                                    PooledIdGenerator
                                 </a></strong>
                             </td>
-                            <td>This is a hibernate/spring wrapper that acts as a proxy to the normal IdGenerator generic implementation.</td>
+                            <td>An Thread safe implementation that caches a range of values in memory by the key name (ie: "tablename.id")
+ Default cache allocation size is 50 but can be set to other values. requires another IdGenerator implementation to be
+ set in the constructor. </td>
+                        </tr>
+<tr class="altColor">
+                            <td class="colOne">
+                                <strong><a href="PooledIdGenerator.IdTuple.html" title="class in gorm/tools/idgen">
+                                    PooledIdGenerator.IdTuple
+                                </a></strong>
+                            </td>
+                            <td>Used before creating large batches where you know the count and want to pre pool and id range larger than the default
+ to avoid the DB round trips to keep incrementing the sequence in the table.
+ </td>
                         </tr>
 
                     </tbody>

@@ -3,15 +3,14 @@ package grails.plugin.gormtools
 import gorm.tools.DbDialectService
 import gorm.tools.GormMetaUtils
 import gorm.tools.async.GparsBatchSupport
-import gorm.tools.repository.RepoUtil
+import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.idgen.JdbcIdGenerator
+import gorm.tools.idgen.PooledIdGenerator
+import gorm.tools.mango.MangoQuery
 import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.idgen.BatchIdGenerator
-import gorm.tools.idgen.IdGeneratorHolder
-import gorm.tools.idgen.JdbcIdGenerator
-import gorm.tools.mango.MangoQuery
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -19,10 +18,7 @@ import grails.plugins.Plugin
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
 
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
-
-@SuppressWarnings(['NoDef'])
+@SuppressWarnings(['NoDef','UnnecessarySelfAssignment'])
 class GormToolsPluginHelper {
     static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
 
@@ -30,18 +26,18 @@ class GormToolsPluginHelper {
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
         jdbcIdGenerator(JdbcIdGenerator) {
-            jdbcTemplate = ref("jdbcTemplate")
+            jdbcTemplate = jdbcTemplate
             table = "NewObjectId"
             keyColumn = "KeyName"
             idColumn = "NextId"
         }
-        idGenerator(BatchIdGenerator) {
-            generator = ref("jdbcIdGenerator")
-        }
-        //here to set the static in the holder for use in SpringIdGenerator
-        idGeneratorHolder(IdGeneratorHolder) {
-            idGenerator = ref("idGenerator")
-        }
+
+        idGenerator(PooledIdGenerator, jdbcIdGenerator)
+
+        //here to set the static in the holder for use in PooledIdGenerator
+        //idGeneratorHolder(IdGeneratorHolder) {
+        //    idGenerator = ref("idGenerator")
+        //}
 
         mango(MangoQuery)
 

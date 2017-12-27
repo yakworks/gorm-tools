@@ -1,6 +1,7 @@
 package gpbench.benchmarks
 
 import gorm.tools.async.AsyncBatchSupport
+import gorm.tools.repository.RepoUtil
 import gpbench.City
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
@@ -58,6 +59,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
     void cleanup() {
         assert domainClass.count() == cityListSize * repeatedCityTimes//345000 //37230
         domainClass.executeUpdate("delete from ${domainClass.getSimpleName()}".toString())
+        RepoUtil.flushAndClear()
     }
 
     @Override

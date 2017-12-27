@@ -1,7 +1,7 @@
-package gorm.tools.idgen
+package gorm.tools.hibernate
 
 import gorm.tools.beans.AppCtx
-import grails.util.Holders
+import gorm.tools.idgen.IdGenerator
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.hibernate.MappingException
@@ -9,13 +9,10 @@ import org.hibernate.engine.spi.SessionImplementor
 import org.hibernate.id.IdentifierGenerator
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.type.Type
-import org.springframework.beans.factory.annotation.Configurable
 
-/** This is a hibernate/spring wrapper that acts as a proxy to the normal IdGenerator generic implementation. */
-@Configurable
 @Slf4j
 @CompileStatic
-class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
+class PooledTableIdGenerator implements IdentifierGenerator, org.hibernate.id.Configurable {
     // Property names for configure() params.
     static final String TARGET_TABLE = "target_table"
     static final String TARGET_COLUMN = "target_column"
@@ -33,15 +30,14 @@ class SpringIdGenerator implements IdentifierGenerator, org.hibernate.id.Configu
     void configure(Type type, Properties params, ServiceRegistry serviceRegistry) throws MappingException {
         segmentValue = "${params.getProperty(TARGET_TABLE)}.${params.getProperty(TARGET_COLUMN)}"
         //idGenerator = AppCtx.get("idGenerator",IdGenerator)
-        println "configure with $segmentValue"
+        //println "PooledTableIdGenerator.configure params: $params and segmentValue: $segmentValue and type: ${type.name}"
         if (log.isDebugEnabled())
-            log.debug("SpringIdGenerator configure " + segmentValue + "\t\tidGenerator:" + (IdGeneratorHolder.idGenerator == null ? "null! " : "not null. "))
+            log.debug("PooledTableIdGenerator segmentValue: $segmentValue with params: $params")
     }
 
     Serializable generate(final SessionImplementor session, Object obj) {
         if(idGenerator == null) idGenerator = AppCtx.get("idGenerator", IdGenerator)
         Long id = idGenerator.getNextId(segmentValue)
-        //Long id = IdGeneratorHolder.idGenerator.getNextId(segmentValue)
         //println "${obj.class.name} $id"
         return id
     }

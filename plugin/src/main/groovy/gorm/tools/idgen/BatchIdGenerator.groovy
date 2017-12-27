@@ -49,10 +49,10 @@ class BatchIdGenerator implements IdGenerator {
         batchSizeByKey[keyName] = batchSize
     }
     long getBatchSize(String keyName) {
-        if (batchSizeByKey.containsKey(keyName))
+        if (batchSizeByKey.containsKey(keyName)) {
             return batchSizeByKey[keyName]
-        else
-            return defaultBatchSize
+        }
+        return defaultBatchSize
     }
 
     long getNextId(String keyName) {
@@ -160,7 +160,6 @@ class BatchIdGenerator implements IdGenerator {
 //            return id
 //        }
     }
-
 
     void setGenerator(IdGenerator generator) {
         Validate.isTrue(this.generator == null, "IdGenerator is already created, no hot swapping")

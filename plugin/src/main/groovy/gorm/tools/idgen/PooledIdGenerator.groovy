@@ -1,15 +1,13 @@
 package gorm.tools.idgen
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.Validate
-import org.apache.log4j.Category
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
-import java.util.function.UnaryOperator
 
 /**
  * An Thread safe implementation that caches a range of values in memory by the key name (ie: "tablename.id")
@@ -22,22 +20,24 @@ import java.util.function.UnaryOperator
  *
  */
 @CompileStatic
-class IdPool implements IdGenerator {
-    private static Category log = Category.getInstance(IdPool.class)
+@Slf4j
+class PooledIdGenerator implements IdGenerator {
 
     //holds the rows of the id generation by key.
     private ConcurrentMap<String, AtomicReference<IdTuple>> idTupleMap = new ConcurrentHashMap<String, AtomicReference<IdTuple>>()
     //overrides default for the keys
     private ConcurrentMap<String, Long> batchSizeByKey = new ConcurrentHashMap<String, Long>()
+    //overrides all defaults for a single use next time fetching occurs with the injected generator
+    //private ConcurrentMap<String, Long> batchSizeByKeyUseOnce = new ConcurrentHashMap<String, Long>()
 
     private IdGenerator generator
-    Long defaultBatchSize = 255
+    Long defaultBatchSize = 1000
 
-    AtomicLong dummy = new AtomicLong(1000)
+    //private final AtomicLong dummy = new AtomicLong(1000)
 
-    IdPool() { }
+    PooledIdGenerator() { }
 
-    IdPool(IdGenerator generator) {
+    PooledIdGenerator(IdGenerator generator) {
         setGenerator(generator)
     }
 
@@ -49,11 +49,14 @@ class IdPool implements IdGenerator {
     void setBatchSize(String keyName, Long batchSize) {
         batchSizeByKey[keyName] = batchSize
     }
+
     long getBatchSize(String keyName) {
-        if (batchSizeByKey.containsKey(keyName))
+//        if (batchSizeByKeyUseOnce.containsKey(keyName))
+//            return batchSizeByKeyUseOnce.remove(keyName)
+        if (batchSizeByKey.containsKey(keyName)) {
             return batchSizeByKey[keyName]
-        else
-            return defaultBatchSize
+        }
+        return defaultBatchSize
     }
 
     long getNextId(String keyName) {
@@ -73,43 +76,25 @@ class IdPool implements IdGenerator {
      * Uses a lambda/closure to go get a new set of ids if the current iterator is at its max
      * @return the id to use
      */
-//    long getAndUpdate(String keyName, AtomicReference<IdTuple> idAtomic) {
-//
-//        // the return value here in the closure is what is stored in the atomic for use next time through, not now.
-//        // "current" tuple here is whats actually returned in the getAndUpdate itself
-//        UnaryOperator updateOp = { IdTuple current ->
-//            if(current.atMax){
-//                IdTuple newTuple
-//                synchronized (keyName.intern()) {
-//                    long batchSize = getBatchSize(keyName)
-//                    long nextId = getGenerator().getNextId(keyName, batchSize)
-//                    newTuple = new IdTuple(nextId, nextId + batchSize - 1)
-//                }
-//                return newTuple
-//            }
-//            return new IdTuple(current.nextId + 1 , current.maxId)
-//        } as UnaryOperator<IdTuple>
-//
-//        return idAtomic.getAndUpdate(updateOp).nextId
-//    }
-
     long getAndUpdate(String keyName, AtomicReference<IdTuple> idAtomic) {
-        long nextId, next
-        IdTuple currentTup, nextTup
 
-        currentTup = idAtomic.get()
-        nextId = currentTup.getAndIncrement()
-        while(nextId <= 0) {
-            if (nextId == 0) {
-                synchronized (keyName.intern()) {
+        IdTuple currentTup = idAtomic.get()
+        long nextId = currentTup.getAndIncrement()
+
+        //if nextId is 0 then its equal or over the maxId and needs a refresh
+        while(nextId == 0) {
+            //synchronize on the key so only 1 thread can get a new set of ids at a time
+            synchronized (keyName.intern()) {
+                /* only do it if the atomic tuple is the original one we got to ensure
+                another thread following right behind doesn't hit the db again */
+                if (idAtomic.get() == currentTup) {
                     //check again now that we are inside of synchronized to make sure it didn't already get run
                     long batchSize = getBatchSize(keyName)
                     long futureId = getGenerator().getNextId(keyName, batchSize)
-                    nextTup = new IdTuple(futureId, batchSize)
-                    assert idAtomic.compareAndSet(currentTup, nextTup)
+                    assert idAtomic.compareAndSet(currentTup, new IdTuple(futureId, batchSize))
                 }
+                nextId = idAtomic.get().getAndIncrement()
             }
-            nextId = idAtomic.get().getAndIncrement()
         }
         return nextId // return next; for transformAndGet
     }
@@ -145,47 +130,33 @@ class IdPool implements IdGenerator {
      * to avoid the DB round trips to keep incrementing the sequence in the table.
      * YOU DO NOT WANT to use this repeatedly.
      * In this implementation this forces a call to the injected primary idGenerator (jdbcBatchIdGen?)
-     * with the specified batchSize and erases/looses forever the ids currently in memory.
+     * with the specified batchSize and erases/looses forever the ids that are currently in memory.
      * This is fine if you don't care about a possible gap in the ids.
      */
 //    void reserveIds(String keyName, long batchSize) {
-//        synchronized (keyName.intern()) {
-//            log.debug("Creating a BatchIDGenerator.IdTuple for " + keyName)
-//
-//            idTupleMap.put(keyName,
-//                new AtomicReference<IdTuple>(
-//                    new IdTuple(
-//                        keyName,
-//                        getGenerator().getNextId(keyName, batchSize),
-//                        batchSize)
-//                )
-//            )
-//        }
 //    }
 
     // MARKER holder class for cached id info
     class IdTuple {
-        final long maxId //if nextID reaches this point it time to hit the db(generator) for a new set of values
-        final AtomicBoolean atMax = new AtomicBoolean(false)
-        final AtomicLong nextId
+        private final long maxId //if nextID reaches this point it time to hit the db(generator) for a new set of values
+        private final AtomicLong nextId
 
         IdTuple(long currentId, long batchSize) {
             this.nextId = new AtomicLong(currentId) //new AtomicLong(currentId)
             this.maxId = currentId + batchSize
-            if(currentId == maxId) atMax.set(true)
-            if(currentId > maxId) throw new IllegalStateException("ID can't be greater than maxId")
+            if(currentId >= maxId) throw new IllegalStateException("ID can't be greater than maxId")
         }
 
         long getAndIncrement() {
             long id = nextId.getAndIncrement()
-            //println(id)
-            if(id == maxId) return 0 //atMax.set(true)
-            if(id > maxId) return -1
-            //if(id > maxId) throw new IllegalStateException("ID can't be greater than maxId")
+            if(id >= maxId) return 0
             return id
         }
-    }
 
+        String toString(){
+            "maxId: $maxId nextId: ${nextId.get()}"
+        }
+    }
 
     void setGenerator(IdGenerator generator) {
         Validate.isTrue(this.generator == null, "IdGenerator is already created, no hot swapping")

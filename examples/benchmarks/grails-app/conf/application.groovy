@@ -37,7 +37,7 @@ benchmark {
 
 grails {
     gorm.default.mapping = {
-        id generator: 'gorm.tools.hibernate.SpringBeanIdGenerator'
+        id generator: 'gorm.tools.hibernate.PooledTableIdGenerator'
     }
 }
 

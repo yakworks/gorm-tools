@@ -25,13 +25,13 @@ The identity generator can be configured globally in application.groovy as shown
 grails {
 
 	gorm.default.mapping = {
-		id column: 'id', generator:'gorm.tools.idgen.SpringIdGenerator'
+		id column: 'id', generator:'gorm.tools.hibernate.PooledTableIdGenerator'
 	}
 }
 
 ```
 
-This will use the SpringIdGenerator for all domains in the application. However it can be done per domain too if required.
+This will use the PooledTableIdGenerator for all domains in the application. However it can be done per domain too if required.
 
 ### Using IdGenerator programmatically
 Plugin defines a bean with name idGenerator that can be used to programmatically generate new Ids.

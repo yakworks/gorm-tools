@@ -18,10 +18,10 @@ class ErrorMessageService {
      *
      * @param e exception object
      * @return map with next fields
-     * 		code - HTTP response code
-     * 		message - text message of the error
-     * 		messageCode - code of the error
-     * 		errors - list of errors for each entity field
+     *      code - HTTP response code
+     *      message - text message of the error
+     *      messageCode - code of the error
+     *      errors - list of errors for each entity field
      */
     Map buildErrorResponse(e) {
         int code = 500

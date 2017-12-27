@@ -10,6 +10,7 @@ import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.function.Supplier
 import java.util.regex.Pattern
 
 /**
@@ -20,14 +21,28 @@ import java.util.regex.Pattern
 @CompileStatic
 class DateUtil {
 
+    static final Pattern LOCAL_DATE = ~/\d{4}-\d{2}-\d{2}$/
     static final Pattern GMT_MILLIS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
     static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
     static final Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
 
-    private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
-    private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    //private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
+    //private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX"
     private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
     private static final String TZ_LESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
+
+    static final ThreadLocal<SimpleDateFormat> formatterLocalDate = ThreadLocal.withInitial(
+        { return new SimpleDateFormat("yyyy-MM-dd") } as Supplier<SimpleDateFormat>
+    )
+    static final ThreadLocal<SimpleDateFormat> formatterDateTime = ThreadLocal.withInitial(
+        { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX") } as Supplier<SimpleDateFormat>
+    )
+    static final ThreadLocal<SimpleDateFormat> formatterSec = ThreadLocal.withInitial(
+        { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ") } as Supplier<SimpleDateFormat>
+    )
+    static final ThreadLocal<SimpleDateFormat> formatterTZ = ThreadLocal.withInitial(
+        { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss") } as Supplier<SimpleDateFormat>
+    )
 
     /**
      * Parse date sent by client (in a JSON).
@@ -37,25 +52,27 @@ class DateUtil {
      * @return parsed date
      * @throws ParseException if it cannot recognize a date format
      */
+    static Date parseJsonLocalDate(String date) {
+        date = date?.trim()
+        if (!date) return null
+        return formatterLocalDate.get().parse(date)
+    }
+
+    static Date parseJsonDateTime(String date) {
+        date = date?.trim()
+        if (!date) return null
+        return formatterDateTime.get().parse(date)
+    }
+
     static Date parseJsonDate(String date) {
-        if (date == null) return null
-        date = date.trim()
-        if (date.length() == 0) return null
+        date = date?.trim()
+        if (!date) return null
 
-        DateFormat dateFormat = new SimpleDateFormat(DEFAULT_FORMAT)
-
-        switch (date) {
-            case GMT_MILLIS:
-                date = date.replaceFirst('Z$', '-0000')
-                dateFormat = new SimpleDateFormat(GMT_MILLIS_FORMAT)
-                break
-            case GMT_SECONDS:
-                date = date.replaceFirst('Z$', '-0000')
-                dateFormat = new SimpleDateFormat(GMT_SECONDS_FORMAT)
-                break
-            case TZ_LESS:
-                dateFormat = new SimpleDateFormat(TZ_LESS_FORMAT)
-                break
+        DateFormat dateFormat
+        if(date.matches(LOCAL_DATE)){
+            dateFormat = formatterLocalDate.get()
+        } else {
+            dateFormat = formatterDateTime.get()
         }
 
         return dateFormat.parse(date)
@@ -68,7 +85,7 @@ class DateUtil {
      * @return a string representation of a given date
      */
     static String dateToJsonString(Date date) {
-        dateToString(date, GMT_MILLIS_FORMAT)
+        return formatterDateTime.get().format(date)
     }
 
     /**
@@ -79,7 +96,13 @@ class DateUtil {
      * @return a date instance
      */
     static Date stringToDate(String date) {
-        convertStringToDateTime(date, DEFAULT_FORMAT)
+        Date dtTmp = null
+        try {
+            dtTmp = formatterLocalDate.get().parse(date)
+        } catch (ParseException e) {
+            //e.printStackTrace()
+        }
+        return dtTmp
     }
 
     /**

@@ -7,24 +7,16 @@ import org.grails.datastore.gorm.*
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.hibernate.ObjectNotFoundException
-import testing.Company
-import testing.Location
-import testing.Nested
-import testing.Org
-import testing.Org2
+import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org, Org2, Location, Nested, Company] }
+    List<Class> getDomainClasses() { [Org, TestTrxRollback, Location, Nested, Company] }
 
     Closure doWithConfig() {
         { config ->
             config.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
         }
-    }
-
-    def setup() {
-        new Org(name: "test_from_setup").save(flush: true)
     }
 
     def "assert proper repos are setup"() {
@@ -111,9 +103,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.name == "foo"
         org.location.city == location.city
         org.location.nested == location.nested
-
-//        and: "Event should have been fired on repository"
-//        org.event == "beforeBind Create"
     }
 
     def "test create without required field"() {
@@ -167,13 +156,12 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         when:
         Map p = [name: 'foo', id: org.id, location: location]
         org = Org.repo.update(p)
+        Org.repo.flush()
 
         then:
         org.name == "foo"
+        Org.findByName("foo") != null
         org.location == location
-
-//        and: "Event should have been fired on repository"
-//        org.event == "beforeBind Update"
     }
 
     def "test update with non-existent id"() {
@@ -188,24 +176,9 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         thrown EntityNotFoundException
     }
 
-    @spock.lang.Ignore
-    def "test update with transaction"() {
-        setup:
-        Org2 org = new Org2(name: "test").save()
-        Map params = [name: 'foo', id: org.id]
-
-        when:
-        Org2.repo.update(params)
-        RepoUtil.clear()
-
-        then:
-        thrown RuntimeException
-        org.name == "test"
-    }
-
     def "test remove"() {
         setup:
-        Org org = new Org(name: "test").save()
+        Org org = new Org(name: "test_update_withTrx").save()
 
         when:
         Org.repo.remove(org)
@@ -249,6 +222,146 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         then:
         org.name == "bind_test"
+    }
+
+    def "test flush"() {
+        setup:
+        Org org = new Org(name: 'test_flush').save()
+
+        expect:
+        org.isAttached()
+        Org.findByName('test_flush') != null
+
+        when:
+        org.name = 'test_flush_updated'
+
+        then:
+        Org.findByName('test_flush') != null
+        Org.findByName('test_flush_updated') == null
+
+        when:
+        Org.repo.flush()
+        assert org.isAttached()
+        then:
+        Org.findByName('test_flush_updated') != null
+        Org.findByName('test_flush') == null
+    }
+
+    def "test clear"() {
+        setup:
+        Org org = new Org(name: 'test_clear').save()
+
+        expect:
+        org.isAttached()
+
+        when:
+        Org.repo.clear()
+
+        then:
+        !org.isAttached()
+    }
+
+    def "test clear when update"() {
+        setup:
+        Org org = new Org(name: 'test_clear').save()
+
+        when:
+        org.name = "test_clear_updated"
+
+        then:
+        org.isDirty()
+
+        when:
+        org.save()
+        Org.repo.clear()
+
+        then:
+        !org.isDirty()
+        !org.isAttached()
+        Org.findByName("test_clear_updated") == null
+        Org.findByName("test_clear") != null
+    }
+
+    def "test transaction rollback using withTrx"() {
+        setup:
+        Org org = new Org(name: "test").save()
+
+        when:
+        Org.repo.withTrx {
+            Org newOrg = Org.get(org.id)
+            newOrg.name = "test_changed"
+            newOrg.save()
+            throw new RuntimeException()
+        }
+
+        then:
+        thrown RuntimeException
+        Org.findByName("test_changed") == null
+
+        when:
+        Org.repo.withTrx {
+            Org.repo.remove(org)
+            throw new RuntimeException()
+        }
+
+        then:
+        thrown RuntimeException
+        Org.findByName("test") != null
+    }
+
+    def "test persist with transaction rollback"() {
+        setup:
+        TestTrxRollback org = new TestTrxRollback(name: "test_persist_withTrx").save()
+
+        when:
+        org.name = "changed"
+
+        /* persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
+         * persist contains withTrx {} inside, so transaction should rollback */
+        TestTrxRollback.repo.persist(org)
+
+        then:
+        thrown RuntimeException
+        TestTrxRollback.findByName("changed") == null
+
+    }
+
+    def "test update with transaction rollback"() {
+        setup:
+        TestTrxRollback org = new TestTrxRollback(name: "test_update_withTrx").save()
+        Map params = [name: 'foo', id: org.id]
+        TestTrxRollback.repo.clear()
+
+        expect:
+        !org.isAttached()
+
+        when:
+        /* persist is overridden in TestTrxRollbackRepo and throws a runtime exception.
+         * update contains withTrx {} inside, so transaction should rollback */
+        TestTrxRollback.repo.update(params)
+
+        then:
+        thrown RuntimeException
+        TestTrxRollback.findByName("test_update_withTrx") != null
+        TestTrxRollback.findByName("foo") == null
+    }
+
+    def "test remove with transaction rollback"() {
+        setup:
+        TestTrxRollback org = new TestTrxRollback(name: "test_remove_withTrx").save()
+        TestTrxRollback.repo.clear()
+
+        expect:
+        !org.isAttached()
+
+        when:
+        /* remove is overridden in TestTrxRollbackRepo and throws a runtime exception.
+         * remove contains withTrx {} inside, so transaction should rollback */
+        TestTrxRollback.repo.remove(org)
+
+        then:
+        thrown RuntimeException
+        TestTrxRollback.findByName("test_remove_withTrx") != null
     }
 
     def "test criteria name config"() {

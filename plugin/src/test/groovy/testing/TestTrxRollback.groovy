@@ -4,7 +4,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity @GrailsCompileStatic
-class Org2 {
+class TestTrxRollback {
     String name
     BigDecimal amount
 

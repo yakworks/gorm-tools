@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Propagation
 /**
  * A Jdbc implementation of the IdGenerator. Will query a central table for new ids.
  * defaults to the following but can be set accordingly:
- * 	table - "NEWOBJECTID"
- * 	keyColumn - "KeyName"
- * 	idColumn - "NextId"
- * 	seedValue - "1000" this is the starting ID fi the row does not exist and is created by this object.
+ *  table - "NEWOBJECTID"
+ *  keyColumn - "KeyName"
+ *  idColumn - "NextId"
+ *  seedValue - "1000" this is the starting ID fi the row does not exist and is created by this object.
  *
- * 	setCreateIdRow = false to not create the row automatically if it does not exist
+ *  setCreateIdRow = false to not create the row automatically if it does not exist
  *
  * @author Joshua Burnett (@basejump)
  * @since 1.0

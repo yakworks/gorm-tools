@@ -11,6 +11,8 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.web.databinding.SpringConversionServiceAdapter
 import org.springframework.beans.factory.annotation.Autowired
 
+import java.time.LocalDate
+
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
  * Explicitly checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
@@ -43,7 +45,9 @@ class EntityMapBinder implements MapBinder {
                 if (Number.isAssignableFrom(typeToConvertTo)) {
                     valueToAssign = (value as String).asType(typeToConvertTo)
                 } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = DateUtil.parseJsonDate(value as String)
+                    valueToAssign = DateUtil.parseJsonDateTime(value as String)
+                } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = LocalDate.parse(value as String)
                 } else if (conversionHelpers.containsKey(typeToConvertTo)) {
                     List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                     ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(value) }

@@ -10,6 +10,10 @@ import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.function.Supplier
 import java.util.regex.Pattern
 
@@ -59,20 +63,26 @@ class DateUtil {
         return formatterLocalDate.get().parse(date)
     }
 
+    //see https://stackoverflow.com/questions/10286204/the-right-json-date-format
     static Date parseJsonDateTime(String date) {
         date = date?.trim()
         if (!date) return null
+        //Date.from(Instant.parse( date ))
+        //DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(date)
         return formatterDateTime.get().parse(date)
+        //Date.from(OffsetDateTime.parse(date, DateTimeFormatter.ISO_ZONED_DATE_TIME).toInstant())
     }
 
-    //see https://stackoverflow.com/questions/10286204/the-right-json-date-format
+
     static Date parseJsonDate(String date) {
         date = date?.trim()
         if (!date) return null
 
-        DateFormat dateFormat
+        DateFormat dateFormat = formatterLocalDate.get()
+
+        //if-then is slightly faster than a switch here
         if(date.matches(LOCAL_DATE)){
-            dateFormat = formatterLocalDate.get()
+            //dateFormat = formatterLocalDate.get()
         } else if(date.matches(GMT_MILLIS)) {
             dateFormat = formatterDateTime.get()
         } else if(date.matches(GMT_SECONDS)) {

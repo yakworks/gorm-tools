@@ -2,13 +2,15 @@ package gpbench.model
 
 import groovy.transform.CompileStatic
 
+import java.time.LocalDate
+
 @CompileStatic
 trait DatesTrait {
     //LocalDate localDate
     Date date1
-    Date date2
+    LocalDate date2
     Date date3
-    Date date4
+    LocalDate date4
 }
 
 class DatesTraitConstraints implements DatesTrait {

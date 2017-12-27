@@ -20,6 +20,7 @@ import org.springframework.util.StopWatch
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 
 class BenchmarkDatabindingService {
     JsonReader jsonReader
@@ -47,8 +48,8 @@ class BenchmarkDatabindingService {
         println "Warm up pass "
         mute = true
         (1..2).each {
-            if (!mute) println "\n - setters, copy and fast bind on simple no associations"
-            useSetPropsFastIterate(CityFatSimple)
+            if (!mute) println "\n - fast bind on simple no associations"
+            useFastBinder(CityFatSimple)
             if (!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInDomain(CityFat)
             useFastBinder(CityFat)
@@ -141,10 +142,10 @@ class BenchmarkDatabindingService {
             instance.latitude3 = row['latitude3'] as BigDecimal
             instance.longitude3 = row['longitude3'] as BigDecimal
             //instance.properties = row
-            instance.date1 = DateUtil.parseJsonDate(row['date1'] as String)
-            instance.date2 = DateUtil.parseJsonDate(row['date2'] as String)
-            instance.date3 = DateUtil.parseJsonDate(row['date3'] as String)
-            instance.date4 = DateUtil.parseJsonDate(row['date4'] as String)
+            instance.date1 = DateUtil.parseJsonDateTime(row['date1'] as String)
+            instance.date2 = LocalDate.parse(row['date2'] as String)
+            instance.date3 = DateUtil.parseJsonDateTime(row['date3'] as String)
+            instance.date4 = LocalDate.parse(row['date4'] as String)
 
             setAssociations(instance, "region", Region, row)
             setAssociations(instance, "country", Country, row)

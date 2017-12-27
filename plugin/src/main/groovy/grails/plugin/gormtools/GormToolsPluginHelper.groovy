@@ -3,24 +3,20 @@ package grails.plugin.gormtools
 import gorm.tools.DbDialectService
 import gorm.tools.GormMetaUtils
 import gorm.tools.async.GparsBatchSupport
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.errors.RepoExceptionSupport
-import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.idgen.BatchIdGenerator
-import gorm.tools.idgen.IdGeneratorHolder
+import gorm.tools.idgen.IdPool
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.mango.MangoQuery
+import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.errors.RepoExceptionSupport
+import gorm.tools.repository.events.RepoEventPublisher
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
-
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 
 @SuppressWarnings(['NoDef'])
 class GormToolsPluginHelper {
@@ -35,13 +31,13 @@ class GormToolsPluginHelper {
             keyColumn = "KeyName"
             idColumn = "NextId"
         }
-        idGenerator(BatchIdGenerator) {
+        idGenerator(IdPool) {
             generator = ref("jdbcIdGenerator")
         }
         //here to set the static in the holder for use in SpringIdGenerator
-        idGeneratorHolder(IdGeneratorHolder) {
-            idGenerator = ref("idGenerator")
-        }
+//        idGeneratorHolder(IdGeneratorHolder) {
+//            idGenerator = ref("idGenerator")
+//        }
 
         mango(MangoQuery)
 

@@ -1,6 +1,6 @@
 package gorm.tools.mango
 
-import gorm.tools.beans.DateUtil
+import gorm.tools.beans.IsoDateUtil
 import grails.gorm.DetachedCriteria
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -279,7 +279,7 @@ class MangoBuilder {
             } else if (Number.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = (value as String).asType(typeToConvertTo)
             } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = DateUtil.parseJsonDate(value as String)
+                valueToAssign = IsoDateUtil.parse(value as String)
             }
         } else {
             valueToAssign = valueToAssign.asType(typeToConvertTo)

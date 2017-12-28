@@ -10,95 +10,14 @@ import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.regex.Pattern
 
 /**
- * Provides a set of methods for parsing/formatting and making custom manipulations with dates.
+ * custom manipulations with dates.
  * (e.g. to get a number of days between dates or to get last day of month, etc)
  */
-@SuppressWarnings(['MethodCount', 'EmptyCatchBlock', 'ExplicitCallToGetAtMethod'])
+@SuppressWarnings(['EmptyCatchBlock', 'ExplicitCallToGetAtMethod'])
 @CompileStatic
 class DateUtil {
-
-    static final Pattern GMT_MILLIS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
-    static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
-    static final Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
-
-    private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
-    private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-    private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
-    private static final String TZ_LESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
-
-    /**
-     * Parse date sent by client (in a JSON).
-     * Expected format: 2000-03-30T22:00:00.000Z or 2000-03-30T22:00:00Z
-     *
-     * @param date formatted date
-     * @return parsed date
-     * @throws ParseException if it cannot recognize a date format
-     */
-    static Date parseJsonDate(String date) {
-        if (date == null) return null
-        date = date.trim()
-        if (date.length() == 0) return null
-
-        DateFormat dateFormat = new SimpleDateFormat(DEFAULT_FORMAT)
-
-        switch (date) {
-            case GMT_MILLIS:
-                date = date.replaceFirst('Z$', '-0000')
-                dateFormat = new SimpleDateFormat(GMT_MILLIS_FORMAT)
-                break
-            case GMT_SECONDS:
-                date = date.replaceFirst('Z$', '-0000')
-                dateFormat = new SimpleDateFormat(GMT_SECONDS_FORMAT)
-                break
-            case TZ_LESS:
-                dateFormat = new SimpleDateFormat(TZ_LESS_FORMAT)
-                break
-        }
-
-        return dateFormat.parse(date)
-    }
-
-    /**
-     * Returns a string representation of a given date in the 'yyyy-MM-dd'T'HH:mm:ss.SSSZ' format.
-     *
-     * @param date a date to convert into a string
-     * @return a string representation of a given date
-     */
-    static String dateToJsonString(Date date) {
-        dateToString(date, GMT_MILLIS_FORMAT)
-    }
-
-    /**
-     * Converts a string representation of date to Date.
-     * Expected format: yyyy-MM-dd
-     *
-     * @param date a string with date in the format "yyyy-MM-dd"
-     * @return a date instance
-     */
-    static Date stringToDate(String date) {
-        convertStringToDateTime(date, DEFAULT_FORMAT)
-    }
-
-    /**
-     * Converts a Date into a string using a specified format.
-     *
-     * @param date a date to covert
-     * @param format a date format, by default "MM/dd/yyyy hh:mm:ss"
-     * @return a string representation of a Date object or empty string
-     */
-    static String dateToString(Date date, String format = 'MM/dd/yyyy hh:mm:ss') {
-        DateFormat df = new SimpleDateFormat(format)
-        String dtStr = ''
-        try {
-            dtStr = df.format(date)
-        } catch (ParseException e) {
-            //e.printStackTrace()
-        }
-        return dtStr
-    }
 
     /**
      * Returns the next month for current date and sets the day number to 1.
@@ -277,12 +196,6 @@ class DateUtil {
     static String getMonthLetterByNum(int monthNumber) {
         String[] monthNames = new DateFormatSymbols().getMonths()
         monthNumber in (1..12) ? monthNames[monthNumber - 1].getAt(0) : '?'
-    }
-
-    //didn't find any usage
-    @Deprecated
-    static Date stringToDateTime(String strDt) {
-        convertStringToDateTime(strDt, TZ_LESS_FORMAT)
     }
 
     /**

@@ -97,8 +97,8 @@ class MapFlattener {
                 if (value) {
                     value = value.trim() //trim strings - same as grails.databinding.trimStrings
                     try {
-                        Date date = DateUtil.parseJsonDate(value)
-                        value = DateUtil.dateToJsonString(date)
+                        Date date = IsoDateUtil.parse(value)
+                        value = IsoDateUtil.format(date)
                     } catch (ParseException e) {
                         // it cannot recognize a date format, so do nothing
                     }

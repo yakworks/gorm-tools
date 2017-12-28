@@ -96,6 +96,8 @@ subprojects {
         //compile "org.grails.plugins:async"
         compile "org.grails.plugins:events"
         compile "org.codehaus.gpars:gpars:1.2.0"
+        compile 'org.grails.plugins:grails-java8:1.2.2'
+
         compileOnly "org.springframework.data:spring-data-commons"
 
         compile "org.grails.plugins:hibernate5"

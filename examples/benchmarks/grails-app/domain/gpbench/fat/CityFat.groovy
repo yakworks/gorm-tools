@@ -1,6 +1,6 @@
 package gpbench.fat
 
-import gorm.tools.beans.DateUtil
+import gorm.tools.beans.IsoDateUtil
 import gpbench.Country
 import gpbench.Region
 import gpbench.model.CityTraitFat
@@ -9,6 +9,10 @@ import gpbench.model.DateUserStamp
 import gpbench.model.DateUserStampConstraints
 import grails.compiler.GrailsCompileStatic
 import org.grails.datastore.gorm.GormEnhancer
+
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  *
@@ -48,10 +52,10 @@ class CityFat implements CityTraitFat, DateUserStamp {
         this.latitude3 = row['latitude3'] as BigDecimal
         this.longitude3 = row['longitude3'] as BigDecimal
         //this.properties = row
-        date1 = DateUtil.parseJsonDate(row['date1'] as String)
-        date2 = DateUtil.parseJsonDate(row['date2'] as String)
-        date3 = DateUtil.parseJsonDate(row['date3'] as String)
-        date4 = DateUtil.parseJsonDate(row['date4'] as String)
+        date1 = IsoDateUtil.parse(row['date1'] as String)
+        date2 = LocalDate.parse(row['date2'] as String) //DateUtil.parse(row['date2'] as String)
+        date3 = LocalDateTime.parse(row['date3'] as String, DateTimeFormatter.ISO_DATE_TIME)
+        date4 = LocalDate.parse(row['date4'] as String)
 
         setAssociation("region", Region, row)
         setAssociation("country", Country, row)

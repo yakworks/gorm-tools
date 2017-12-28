@@ -1,6 +1,6 @@
 package gorm.tools.databinding
 
-import gorm.tools.beans.DateUtil
+import gorm.tools.beans.IsoDateUtil
 import grails.databinding.converters.ValueConverter
 import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
@@ -48,7 +48,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
 
         then:
         0 * dateConverter.canConvert(_)
-        domain.dob == DateUtil.parseJsonDate("2017-10-10")
+        domain.dob == IsoDateUtil.parse("2017-10-10")
     }
 
 

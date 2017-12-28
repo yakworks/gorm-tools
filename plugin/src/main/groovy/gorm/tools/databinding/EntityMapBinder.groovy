@@ -1,6 +1,6 @@
 package gorm.tools.databinding
 
-import gorm.tools.beans.DateUtil
+import gorm.tools.beans.IsoDateUtil
 import grails.databinding.converters.ValueConverter
 import groovy.transform.CompileStatic
 import org.grails.databinding.converters.ConversionService
@@ -12,6 +12,8 @@ import org.grails.web.databinding.SpringConversionServiceAdapter
 import org.springframework.beans.factory.annotation.Autowired
 
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -41,14 +43,20 @@ class EntityMapBinder implements MapBinder {
             if (prop instanceof Association && value[ID_PROP]) {
                 valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(value[ID_PROP] as Long)
             } else if (value instanceof String) {
+                String val = value as String
                 Class typeToConvertTo = prop.getType()
-                if (Number.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = (value as String).asType(typeToConvertTo)
+                if (String.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = val
+                } else if (Number.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = val.asType(typeToConvertTo)
                 } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = DateUtil.parseJsonDateTime(value as String)
+                    valueToAssign = IsoDateUtil.parse(val)
                 } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = LocalDate.parse(value as String)
+                    valueToAssign = LocalDate.parse(val)
+                } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = LocalDateTime.parse(val, DateTimeFormatter.ISO_DATE_TIME)
                 } else if (conversionHelpers.containsKey(typeToConvertTo)) {
+                    println "going to conversionHelpers"
                     List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                     ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(value) }
                     if (converter) {

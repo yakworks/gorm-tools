@@ -41,8 +41,8 @@ class MultiFormatDateConverter implements ValueConverter {
         if (value instanceof String) {
             String input = (String) value
             if (this.allowEmpty && !input) return dateValue
-            if (DateUtil.GMT_MILLIS.matcher(input).matches() || DateUtil.GMT_SECONDS.matcher(input).matches() || DateUtil.TZ_LESS.matcher(input).matches()) {
-                dateValue = DateUtil.parseJsonDate(input)
+            if (IsoDateUtil.GMT_MILLIS.matcher(input).matches() || IsoDateUtil.GMT_SECONDS.matcher(input).matches() || IsoDateUtil.TZ_LESS.matcher(input).matches()) {
+                dateValue = IsoDateUtil.parse(input)
             } else {
                 dateValue = DateUtils.parseDate(input, formats)
             }

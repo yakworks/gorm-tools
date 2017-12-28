@@ -3,13 +3,14 @@ package gpbench.model
 import groovy.transform.CompileStatic
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @CompileStatic
 trait DatesTrait {
     //LocalDate localDate
     Date date1
     LocalDate date2
-    Date date3
+    LocalDateTime date3
     LocalDate date4
 }
 

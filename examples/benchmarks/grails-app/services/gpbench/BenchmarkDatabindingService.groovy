@@ -1,7 +1,7 @@
 package gpbench
 
 import gorm.tools.GormUtils
-import gorm.tools.beans.DateUtil
+import gorm.tools.beans.IsoDateUtil
 import gorm.tools.databinding.EntityMapBinder
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
@@ -21,6 +21,8 @@ import org.springframework.util.StopWatch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class BenchmarkDatabindingService {
     JsonReader jsonReader
@@ -142,9 +144,9 @@ class BenchmarkDatabindingService {
             instance.latitude3 = row['latitude3'] as BigDecimal
             instance.longitude3 = row['longitude3'] as BigDecimal
             //instance.properties = row
-            instance.date1 = DateUtil.parseJsonDateTime(row['date1'] as String)
+            instance.date1 = IsoDateUtil.parse(row['date1'] as String)
             instance.date2 = LocalDate.parse(row['date2'] as String)
-            instance.date3 = DateUtil.parseJsonDateTime(row['date3'] as String)
+            instance.date3 = LocalDateTime.parse(row['date3'] as String, DateTimeFormatter.ISO_DATE_TIME)
             instance.date4 = LocalDate.parse(row['date4'] as String)
 
             setAssociations(instance, "region", Region, row)
@@ -262,8 +264,8 @@ class BenchmarkDatabindingService {
                     valToAssisgn = (sval as String).asType(typeToConvertTo)
                 } else if (Date.isAssignableFrom(typeToConvertTo)) {
                     //valToAssisgn = dateFormat.parse(sval as String)
-                    valToAssisgn = DateUtil.parseJsonDate(sval as String)
-                    //println "converted $sval to ${valToAssisgn} for $prop.name with DateUtil.parseJsonDate"
+                    valToAssisgn = IsoDateUtil.parse(sval as String)
+                    //println "converted $sval to ${valToAssisgn} for $prop.name with DateUtil.parse"
                 } else if (conversionHelpers.containsKey(typeToConvertTo)) {
                     def convertersList = conversionHelpers.get(typeToConvertTo)
                     ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(sval) }

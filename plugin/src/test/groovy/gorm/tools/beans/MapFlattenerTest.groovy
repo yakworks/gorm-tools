@@ -27,9 +27,9 @@ class MapFlattenerTest {
         assert res.containsKey("customer.blah")
         assert res['customer.blah'] == null
         assert res.'keyContact.id' == '1'
-        assert res["customer.date"] == DateUtil.dateToJsonString(DateUtil.parseJsonDate(testMap.customer.date))
-        assert res["customer.date2"] == DateUtil.dateToJsonString(DateUtil.parseJsonDate(testMap.customer.date2))
-        assert res["customer.date3"] == DateUtil.dateToJsonString(DateUtil.parseJsonDate(testMap.customer.date3))
+        assert res["customer.date"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date))
+        assert res["customer.date2"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date2))
+        assert res["customer.date3"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date3))
         assert res["customer.notDate"] == "200a0-03-30"
 
     }

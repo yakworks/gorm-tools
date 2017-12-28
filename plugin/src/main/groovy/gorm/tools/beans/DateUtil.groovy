@@ -10,134 +10,14 @@ import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
-import java.util.function.Supplier
-import java.util.regex.Pattern
 
 /**
- * Provides a set of methods for parsing/formatting and making custom manipulations with dates.
+ * custom manipulations with dates.
  * (e.g. to get a number of days between dates or to get last day of month, etc)
  */
-@SuppressWarnings(['MethodCount', 'EmptyCatchBlock', 'ExplicitCallToGetAtMethod', 'PropertyName'])
+@SuppressWarnings(['EmptyCatchBlock', 'ExplicitCallToGetAtMethod'])
 @CompileStatic
 class DateUtil {
-
-    static final Pattern LOCAL_DATE = ~/\d{4}-\d{2}-\d{2}$/
-    static final Pattern GMT_MILLIS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
-    static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
-    static final Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
-
-    //private static final String DEFAULT_FORMAT = "yyyy-MM-dd"
-    //private static final String GMT_MILLIS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX"
-    //private static final String GMT_SECONDS_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ"
-    private static final String TZ_LESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
-
-    static final ThreadLocal<SimpleDateFormat> formatterLocalDate = ThreadLocal.withInitial(
-        { return new SimpleDateFormat("yyyy-MM-dd") } as Supplier<SimpleDateFormat>
-    )
-    //see https://stackoverflow.com/questions/4032967/json-date-to-java-date#4033027
-    static final ThreadLocal<SimpleDateFormat> formatterDateTime = ThreadLocal.withInitial(
-        { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX") } as Supplier<SimpleDateFormat>
-    )
-    static final ThreadLocal<SimpleDateFormat> formatterSec = ThreadLocal.withInitial(
-        { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ") } as Supplier<SimpleDateFormat>
-    )
-    static final ThreadLocal<SimpleDateFormat> formatterTZ = ThreadLocal.withInitial(
-        { return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss") } as Supplier<SimpleDateFormat>
-    )
-
-    /**
-     * Parse date sent by client (in a JSON).
-     * Expected format: 2000-03-30T22:00:00.000Z or 2000-03-30T22:00:00Z
-     *
-     * @param date formatted date
-     * @return parsed date
-     * @throws ParseException if it cannot recognize a date format
-     */
-    static Date parseJsonLocalDate(String date) {
-        date = date?.trim()
-        if (!date) return null
-        return formatterLocalDate.get().parse(date)
-    }
-
-    //see https://stackoverflow.com/questions/10286204/the-right-json-date-format
-    static Date parseJsonDateTime(String date) {
-        date = date?.trim()
-        if (!date) return null
-        //Date.from(Instant.parse( date ))
-        //DateTimeFormatter.ISO_ZONED_DATE_TIME.parse(date)
-        return formatterDateTime.get().parse(date)
-        //Date.from(OffsetDateTime.parse(date, DateTimeFormatter.ISO_ZONED_DATE_TIME).toInstant())
-    }
-
-
-    static Date parseJsonDate(String date) {
-        date = date?.trim()
-        if (!date) return null
-
-        DateFormat dateFormat = formatterLocalDate.get()
-
-        //if-then is slightly faster than a switch here
-        if(date.matches(LOCAL_DATE)){
-            //dateFormat = formatterLocalDate.get()
-        } else if(date.matches(GMT_MILLIS)) {
-            dateFormat = formatterDateTime.get()
-        } else if(date.matches(GMT_SECONDS)) {
-            dateFormat = formatterSec.get()
-        } else if(date.matches(TZ_LESS)) {
-            dateFormat = formatterTZ.get()
-        }
-
-        return dateFormat.parse(date)
-    }
-
-    /**
-     * Returns a string representation of a given date in the 'yyyy-MM-dd'T'HH:mm:ss.SSSZ' format.
-     *
-     * @param date a date to convert into a string
-     * @return a string representation of a given date
-     */
-    static String dateToJsonString(Date date) {
-        return formatterDateTime.get().format(date)
-    }
-
-    /**
-     * Converts a string representation of date to Date.
-     * Expected format: yyyy-MM-dd
-     *
-     * @param date a string with date in the format "yyyy-MM-dd"
-     * @return a date instance
-     */
-    static Date stringToDate(String date) {
-        Date dtTmp = null
-        try {
-            dtTmp = formatterLocalDate.get().parse(date)
-        } catch (ParseException e) {
-            //e.printStackTrace()
-        }
-        return dtTmp
-    }
-
-    /**
-     * Converts a Date into a string using a specified format.
-     *
-     * @param date a date to covert
-     * @param format a date format, by default "MM/dd/yyyy hh:mm:ss"
-     * @return a string representation of a Date object or empty string
-     */
-    static String dateToString(Date date, String format = 'MM/dd/yyyy hh:mm:ss') {
-        DateFormat df = new SimpleDateFormat(format)
-        String dtStr = ''
-        try {
-            dtStr = df.format(date)
-        } catch (ParseException e) {
-            //e.printStackTrace()
-        }
-        return dtStr
-    }
 
     /**
      * Returns the next month for current date and sets the day number to 1.
@@ -316,12 +196,6 @@ class DateUtil {
     static String getMonthLetterByNum(int monthNumber) {
         String[] monthNames = new DateFormatSymbols().getMonths()
         monthNumber in (1..12) ? monthNames[monthNumber - 1].getAt(0) : '?'
-    }
-
-    //didn't find any usage
-    @Deprecated
-    static Date stringToDateTime(String strDt) {
-        convertStringToDateTime(strDt, TZ_LESS_FORMAT)
     }
 
     /**

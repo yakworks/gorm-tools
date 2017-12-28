@@ -1,28 +1,43 @@
 package gorm.tools.beans
 
+import spock.lang.Shared
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat
 
 class DateUtilSpec extends Specification {
+    @Shared SimpleDateFormat tester = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+
+    void setupSpec(){
+        tester.setTimeZone(TimeZone.getTimeZone('UTC'))
+    }
 
     void "test ParseJsonDate"() {
         when:
-        SimpleDateFormat tester = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss z')
-        tester.setTimeZone(TimeZone.getTimeZone('GMT'))
-        Date date = DateUtil.parseJsonDate('2000-03-30T22:00:00.000Z')
+        Date date = IsoDateUtil.parse('2000-03-30T22:00:00.000Z')
         then:
-        '2000-03-30 22:00:00 GMT' == tester.format(date)
+        '2000-03-30T22:00:00Z' == tester.format(date)
 
         when:
-        date = DateUtil.parseJsonDate('2013-11-01T17:00:00Z')
+        date = IsoDateUtil.parse('2013-11-01T17:00:00Z')
         then:
-        '2013-11-01 17:00:00 GMT' == tester.format(date)
+        '2013-11-01T17:00:00Z' == tester.format(date)
 
         when:
-        date = DateUtil.parseJsonDate('2013-11-01T23:00:00Z')
+        date = IsoDateUtil.parse('2013-11-01T23:00:00Z')
         then:
-        '2013-11-01 23:00:00 GMT' == tester.format(date)
+        '2013-11-01T23:00:00Z' == tester.format(date)
+    }
+
+    void "test ParseJsonDate multiple"() {
+        expect:
+        Date date = IsoDateUtil.parse(dateString)
+        tester.format(date) == result
+
+        where:
+        dateString                 | result
+        "2017-10-10"               | "2017-10-10T00:00:00Z"
+        "2017-11-20T23:28:56.782Z" | "2017-11-20T23:28:56Z"
     }
 
     void "test getLastDayOfMonth"() {
@@ -123,7 +138,7 @@ class DateUtilSpec extends Specification {
 
     void "test dateToString with default format"() {
         expect:
-        result == DateUtil.dateToString(date)
+        result == IsoDateUtil.dateToString(date)
 
         where:
         result                | date
@@ -137,7 +152,7 @@ class DateUtilSpec extends Specification {
         Date date = dateFormat.parse('2017-10-19T11:50:10')
 
         expect:
-        result == DateUtil.dateToString(date, format)
+        result == IsoDateUtil.dateToString(date, format)
 
         where:
         result                | format
@@ -163,13 +178,14 @@ class DateUtilSpec extends Specification {
     void "test dateToJsonString"() {
         setup:
         SimpleDateFormat formatter = new SimpleDateFormat('yyyy-MM-dd HH:mm:ss')
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = formatter.parse('2017-10-20 22:00:00')
 
         when:
-        String result = DateUtil.dateToJsonString(date)
+        String result = IsoDateUtil.format(date)
 
         then:
-        result == date.format("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+        result == '2017-10-20T22:00:00.000Z'
     }
 
     void "test getYearOf"() {

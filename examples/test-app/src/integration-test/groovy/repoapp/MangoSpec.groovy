@@ -208,7 +208,6 @@ class MangoSpec extends Specification {
 
     def "Filter with several `or` on one level"() {
         when:
-        println "Filter with several `or` on one level"
         List list = Org.repo.query([criteria: ['$or': [["address.id": 5], ["name": "Org#1", "address.id": 4]]], max: 150])
         then:
         list.size() == Org.createCriteria().list() {

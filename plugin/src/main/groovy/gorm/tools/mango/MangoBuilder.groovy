@@ -269,8 +269,6 @@ class MangoBuilder {
         PersistentProperty prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
         Class typeToConvertTo = prop?.getType()
 
-        //println "$criteria -> $prop -> $propertyName -> ${prop.type} -> $value"
-
         Object valueToAssign = value
 
         if (valueToAssign instanceof String) {

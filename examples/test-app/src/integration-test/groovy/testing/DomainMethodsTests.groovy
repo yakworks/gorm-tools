@@ -19,7 +19,6 @@ class DomainMethodsTests extends Specification {
     }
 
     void initData() {
-        println "testSave"
         (1..10).each {
             def jumper = new Jumper(name: "jumper$it")
             //jumper.student = new Student(name:"student$it")
@@ -112,10 +111,8 @@ class DomainMethodsTests extends Specification {
     }*/
 
     void testInsert() {
-        when:
-        println "testInsert"
 
-        then:
+        expect:
         def jumper = Jumper.create([name: "testInsert"])
         assert jumper
         RepoUtil.flushAndClear()
@@ -153,7 +150,6 @@ class DomainMethodsTests extends Specification {
 
     void testGetRepoSetup() {
         assert Jumper.repo.class.name.contains("testing.JumperRepo")
-        println Student.repo.class.name
         assert Student.repo.class.name == ("DefaultGormRepo")
     }
 

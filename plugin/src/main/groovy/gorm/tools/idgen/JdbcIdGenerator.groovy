@@ -110,7 +110,7 @@ class JdbcIdGenerator implements IdGenerator {
                     CONSTRAINT PK_$table PRIMARY KEY ($keyColumn)
                 )
                 """
-        println "creating with $query"
+        //println "creating with $query"
         jdbcTemplate.execute(query)
     }
 

@@ -10,6 +10,8 @@ import java.util.regex.Pattern
 
 /**
  * Provides a set of methods for parsing/formatting ISO 8601 dates.
+ * https://en.wikipedia.org/wiki/ISO_8601
+ *
  */
 @SuppressWarnings(['EmptyCatchBlock'])
 @CompileStatic
@@ -26,6 +28,7 @@ class IsoDateUtil {
     //see https://stackoverflow.com/questions/4032967/json-date-to-java-date#4033027
     static final ThreadLocal<SimpleDateFormat> LOCAL_DATE_FORMAT = ThreadLocal.withInitial({
         SimpleDateFormat fmatter = new SimpleDateFormat("yyyy-MM-dd")
+        https://stackoverflow.com/questions/2891361/how-to-set-time-zone-of-a-java-util-date
         fmatter.setTimeZone(TimeZone.getTimeZone('UTC'))
         return fmatter
     } as Supplier<SimpleDateFormat>)

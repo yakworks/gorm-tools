@@ -47,16 +47,20 @@ class EntityMapBinder implements MapBinder {
                 Class typeToConvertTo = prop.getType()
                 if (String.isAssignableFrom(typeToConvertTo)) {
                     valueToAssign = val
-                } else if (Number.isAssignableFrom(typeToConvertTo)) {
+                }
+                else if (Number.isAssignableFrom(typeToConvertTo)) {
                     valueToAssign = val.asType(typeToConvertTo)
-                } else if (Date.isAssignableFrom(typeToConvertTo)) {
+                }
+                else if (Date.isAssignableFrom(typeToConvertTo)) {
                     valueToAssign = IsoDateUtil.parse(val)
-                } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
+                }
+                else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
                     valueToAssign = LocalDate.parse(val)
-                } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
+                }
+                else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
                     valueToAssign = LocalDateTime.parse(val, DateTimeFormatter.ISO_DATE_TIME)
-                } else if (conversionHelpers.containsKey(typeToConvertTo)) {
-                    println "going to conversionHelpers"
+                }
+                else if (conversionHelpers.containsKey(typeToConvertTo)) {
                     List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                     ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(value) }
                     if (converter) {

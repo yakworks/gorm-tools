@@ -9,7 +9,7 @@ class BasicTestsForRepo extends Specification {
     def repo
 
     void testSave() {
-        println "testSave"
+
         def dom = new Jumper(name: "testSave")
         try {
             repo.save(dom)
@@ -22,7 +22,7 @@ class BasicTestsForRepo extends Specification {
     }
 
     void testDelete() {
-        println "testDelete"
+
         def dom = new Jumper(name: "testDelete")
         try {
             repo.save(dom)
@@ -37,7 +37,7 @@ class BasicTestsForRepo extends Specification {
     }
 
     void testInsert() {
-        println "testInsert"
+
         try {
             def result = repo.insert([name: "testInsert"])
             RepoUtil.flushAndClear()
@@ -53,7 +53,7 @@ class BasicTestsForRepo extends Specification {
     }
 
     void testCreate() {
-        println "testInsert"
+
         try {
             def result = repo.create([name: "testInsert"])
             RepoUtil.flushAndClear()
@@ -69,7 +69,7 @@ class BasicTestsForRepo extends Specification {
     }
 
     void testUpdate() {
-        println "testUpdate"
+
         def dup = new Jumper(name: "testUpdate")
         dup.save()
         RepoUtil.flushAndClear()
@@ -90,7 +90,7 @@ class BasicTestsForRepo extends Specification {
     }
 
     void testRemove() {
-        println "testRemove"
+
         def dup = new Jumper(name: "testRemove")
         dup.save()
         RepoUtil.flushAndClear()

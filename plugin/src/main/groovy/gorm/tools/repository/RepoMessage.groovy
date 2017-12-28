@@ -69,6 +69,13 @@ class RepoMessage {
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
+    //TODO:
+    static Map notSavedDataAccess(entity) {
+        String domainLabel = resolveDomainLabel(entity)
+        return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
+    }
+
+
     static Map updated(entity) {
         Map p = buildMessageParams(entity)
         return setup("default.updated.message", p.args, "${p.domainLabel} ${p.ident} updated")

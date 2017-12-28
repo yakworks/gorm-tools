@@ -1,6 +1,8 @@
 package testing
 
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.errors.EntityOptimisticLockingException
 import gorm.tools.repository.errors.EntityValidationException
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -88,11 +90,11 @@ class DomainMethodsTests extends Specification {
             jump.name = 'fukt'
             jump.persist(flush: true)
             fail "it was supposed to fail the save because of validationException"
-        } catch (EntityValidationException e) {
+        } catch (EntityOptimisticLockingException e) {
             e.cause instanceof DataAccessException
             //assert e.cause instanceof org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException
             e.entity == jump
-            e.messageMap.code == 'default.not.saved.message'
+            e.messageMap.code == "Another user has updated the Jumper while you were editing"
         }
     }
 
@@ -149,6 +151,23 @@ class DomainMethodsTests extends Specification {
         Student.removeById(stud.id)
         RepoUtil.flushAndClear()
         Student.findByName("student1") == null
+    }
+
+    void testRemoveParamsFailed() {
+        setup:
+        initData()
+        when:
+        def stud = Student.findByName("student1")
+
+        then:
+        try {
+            Student.removeById(Student.last().id + 1)
+            fail "it was supposed to fail because such id doesn't exist"
+        }catch(e){
+            assert e != null
+            assert e instanceof EntityNotFoundException
+            assert e.message.startsWith("testing.Student not found with id ")
+        }
     }
 
     void testGetRepoSetup() {

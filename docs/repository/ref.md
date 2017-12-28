@@ -167,6 +167,7 @@ Here's an example.
  ```SomeEventListener.groovy``` outside of grails app.
  
  ```groovy
+ 
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import org.springframework.context.event.EventListener
@@ -184,6 +185,7 @@ public class SomeEventListener {
         }
     }
 }
+
 ```
 
  Define external class a spring bean in resources.groovy

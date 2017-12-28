@@ -1,9 +1,9 @@
-package testing
+package testing.specs
 
 import gorm.tools.testing.DomainAutoTest
-import spock.lang.Specification
+import testing.Project
 
-class ProjectSpec extends Specification implements DomainAutoTest<Project> {
+class ProjectSpec extends DomainAutoTest<Project> {
 
     /** automatically runs tests on persist(), create(), update(), delete().*/
 

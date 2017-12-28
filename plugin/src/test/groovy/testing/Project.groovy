@@ -1,8 +1,9 @@
 package testing
 
 import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
 
-@GrailsCompileStatic
+@Entity @GrailsCompileStatic
 class Project {
 
     String name

@@ -1,5 +1,6 @@
 package gorm.tools.testing
 
+import gorm.tools.databinding.GormToolsBinder
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.databinding.EntityMapBinder
@@ -45,6 +46,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
     Closure commonBeans() {
         return {
             entityMapBinder(EntityMapBinder)
+            gormToolsBinder(GormToolsBinder, ref("grailsApplication"))
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
             repoExceptionSupport(RepoExceptionSupport)

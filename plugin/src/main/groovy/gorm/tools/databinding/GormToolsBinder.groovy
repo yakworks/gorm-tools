@@ -17,7 +17,7 @@ class GormToolsBinder extends GrailsWebDataBinder {
 
     @Override
     protected Object convert(Class typeToConvertTo, Object value) {
-        if (value != null && typeToConvertTo.isAssignableFrom(value)) return value
+        if (value != null && typeToConvertTo.isAssignableFrom(value?.getClass())) return value
         else if (value instanceof String) {
             String val = value as String
             if (String.isAssignableFrom(typeToConvertTo)) {

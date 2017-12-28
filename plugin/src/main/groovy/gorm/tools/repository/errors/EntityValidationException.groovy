@@ -30,6 +30,13 @@ class EntityValidationException extends ValidationException {
         messageMap = [code: "validationException", args: [], defaultMessage: msg]
     }
 
+    EntityValidationException(String msg, entity, Errors e, Throwable cause) {
+        super(msg, e)
+        initCause(cause)
+        messageMap = [code: "validationException", args: [], defaultMessage: msg]
+        this.entity = entity
+    }
+
     EntityValidationException(Map msgMap, entity, Errors errors) {
         this(msgMap, entity, errors, null)
     }

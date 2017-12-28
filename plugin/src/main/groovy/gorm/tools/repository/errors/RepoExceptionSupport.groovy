@@ -6,7 +6,6 @@ import org.hibernate.ObjectNotFoundException
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.orm.hibernate5.HibernateOptimisticLockingFailureException
 
 /**
  * Handler for exceptions thrown by the Repository

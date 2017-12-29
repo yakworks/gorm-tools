@@ -56,6 +56,7 @@ class BenchmarkDatabindingService {
             if (!mute) println "\n - setters or property copy on associations with 20 fields"
             useStaticSettersInCityFat()
             useFastBinder(CityFat)
+            useEntityBinderBind(CityFat)
             mute = false
         }
 
@@ -113,9 +114,17 @@ class BenchmarkDatabindingService {
 
     @CompileStatic
     void useFastBinder(Class domain) {
-        eachCity("useFastBinder", domain) { instance, Map row ->
-            entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row), null)
+        eachCity("useEntityBinder.fastBind", domain) { instance, Map row ->
+            entityMapBinder.bind(instance, row)
             //entityMapBinder.bind(instance, new SimpleMapDataBindingSource(row))
+        }
+    }
+
+    @CompileStatic
+    void useEntityBinderBind(Class domain) {
+        eachCity("useEntityBinderBind", domain) { instance, Map row ->
+            //entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row), null)
+            entityMapBinder.bind(instance, new SimpleMapDataBindingSource(row))
         }
     }
 

@@ -1,7 +1,10 @@
 package gorm.tools
 
 import gorm.tools.beans.AppCtx
+import grails.gorm.validation.ConstrainedEntity
+import grails.gorm.validation.ConstrainedProperty
 import grails.util.GrailsNameUtils
+import grails.validation.Constrained
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
@@ -9,6 +12,7 @@ import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.orm.hibernate.cfg.Mapping
+import org.springframework.validation.Validator
 
 /**
  * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
@@ -84,6 +88,16 @@ class GormMetaUtils {
     @CompileDynamic
     Mapping getMapping(PersistentEntity pe) {
         return getMappingContext().mappingFactory?.entityToMapping?.get(pe)
+    }
+
+    static Map<String, ConstrainedProperty> findConstrainedProperties(PersistentEntity entity) {
+        Validator validator = entity.getMappingContext().getEntityValidator(entity)
+        if(validator instanceof ConstrainedEntity) {
+            ConstrainedEntity constrainedEntity = (ConstrainedEntity)validator
+            Map<String, ConstrainedProperty> constrainedProperties = constrainedEntity.getConstrainedProperties()
+            return constrainedProperties
+        }
+        return Collections.emptyMap()
     }
 
     /**

@@ -6,6 +6,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.hibernate.MappingException
 import org.hibernate.engine.spi.SessionImplementor
+import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.type.Type
@@ -35,11 +36,12 @@ class PooledTableIdGenerator implements IdentifierGenerator, org.hibernate.id.Co
             log.debug("PooledTableIdGenerator segmentValue: $segmentValue with params: $params")
     }
 
-    Serializable generate(final SessionImplementor session, Object obj) {
+    Serializable generate(SharedSessionContractImplementor session, Object obj) {
         if(idGenerator == null) idGenerator = AppCtx.get("idGenerator", IdGenerator)
         Long id = idGenerator.getNextId(segmentValue)
-        //println "${obj.class.name} $id"
         return id
     }
+
+    //public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException;
 
 }

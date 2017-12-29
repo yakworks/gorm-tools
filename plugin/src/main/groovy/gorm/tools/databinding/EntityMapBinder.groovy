@@ -3,9 +3,11 @@ package gorm.tools.databinding
 import gorm.tools.beans.IsoDateUtil
 import grails.core.GrailsApplication
 import grails.databinding.DataBindingSource
+import grails.databinding.SimpleMapDataBindingSource
 import grails.databinding.converters.ValueConverter
 import grails.databinding.events.DataBindingListener
 import grails.web.databinding.GrailsWebDataBinder
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
@@ -53,6 +55,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         boolean bind = listenerWrapper.beforeBinding(object, bindingResult)
 
         if (bind) {
+            //Map mapSource = getMapFromSource(source as SimpleMapDataBindingSource)
+            fastBind(object, source, whiteList)
             //super.doBind object, source, filter, whiteList, blackList, listenerWrapper, bindingResult
         }
 
@@ -64,6 +68,56 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     void bind(Object target, Map<String, Object> source, BindAction bindAction = null) {
         fastBind(target, source)
     }
+
+    void fastBind(Object target, DataBindingSource source, List whiteList) {
+        Objects.requireNonNull(target, "Target is null")
+        if (!source) return
+        //println whiteList
+        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(target.getClass())
+        List<PersistentProperty> properties = gormStaticApi.gormPersistentEntity.persistentProperties
+
+        for (PersistentProperty prop : properties) {
+            if (!source.containsProperty(prop.name)) continue
+            Object value = source.getPropertyValue(prop.name)
+            Object valueToAssign = value
+
+            if (prop instanceof Association && value[ID_PROP]) {
+                valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(value[ID_PROP] as Long)
+            } else if (value instanceof String) {
+                String val = value as String
+                Class typeToConvertTo = prop.getType()
+                if (String.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = val
+                }
+                else if (Number.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = val.asType(typeToConvertTo)
+                }
+                else if (Date.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = IsoDateUtil.parse(val)
+                }
+                else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = LocalDate.parse(val)
+                }
+                else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = LocalDateTime.parse(val, DateTimeFormatter.ISO_DATE_TIME)
+                }
+                else if (conversionHelpers.containsKey(typeToConvertTo)) {
+                    List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
+                    ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(value) }
+                    if (converter) {
+                        valueToAssign = converter.convert(value)
+                    }
+                } else if (conversionService?.canConvert(value.getClass(), typeToConvertTo)) {
+                    valueToAssign = conversionService.convert(value, typeToConvertTo)
+                }
+            }
+
+            target[prop.name] = valueToAssign
+
+        }
+
+    }
+
 
     void fastBind(Object target, Map<String, Object> source) {
         Objects.requireNonNull(target, "Target is null")

@@ -12,19 +12,18 @@ import javax.persistence.Transient
 @CompileStatic
 trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
 
-    @Transient
     private static RepositoryApi cachedRepo
 
     /**
      * Looks up and caches a repository bean
      * @return The repository
      */
-    static RepositoryApi<D> getRepo() {
+    transient static RepositoryApi<D> getRepo() {
         if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), RepositoryApi)
         return cachedRepo
     }
 
-    static void setRepo(RepositoryApi<D> repo) {
+    transient static void setRepo(RepositoryApi<D> repo) {
         cachedRepo = repo
     }
 

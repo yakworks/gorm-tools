@@ -17,7 +17,6 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.Datastore
-import org.hibernate.ObjectNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
@@ -194,8 +193,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
         try {
             entity = getStaticApi().load(id)
             doRemove(entity)
-        } catch (ObjectNotFoundException ex){
-            throw handleException(ex, entity)
+        } catch (RuntimeException ex){
+            throw new EntityNotFoundException(id, entityClass.name)
         }
 
     }
@@ -220,6 +219,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @param args - args passed to delete
      */
     void doRemove(Map args = [:], D entity) {
+        RepoUtil.checkFound(entity, entity.ident(), getEntityClass().name)
         try {
             getRepoEventPublisher().doBeforeRemove(this, entity, args)
             entity.delete(args)

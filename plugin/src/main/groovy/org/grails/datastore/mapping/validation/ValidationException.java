@@ -20,10 +20,17 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 
 /**
- * Overridden to avoid grails.validation.ValidationException blowup
  * Exception thrown when a validation error occurs
  *
  * @author Graeme Rocher
+ */
+
+/**
+ *
+ * Overridden to avoid grails.validation.ValidationException to be blowed up, temporary hack without it,
+ * grails.validation.ValidationException will be thrown by default
+ *
+ * see issue https://github.com/grails/grails-data-mapping/issues/1038
  */
 public class ValidationException extends DataIntegrityViolationException {
 

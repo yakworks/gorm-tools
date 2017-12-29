@@ -1,7 +1,6 @@
 package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
-import org.hibernate.ObjectNotFoundException
 import org.springframework.dao.DataRetrievalFailureException
 
 /**

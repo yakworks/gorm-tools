@@ -63,7 +63,7 @@ class DomainMethodsTests extends Specification {
 
         def check = Jumper.findByName("jumpargs")
         then:
-        check.name == "jumpargs"
+        assert check.name == "jumpargs"
     }
 
     void testPersistFailValidation() {
@@ -74,8 +74,8 @@ class DomainMethodsTests extends Specification {
             jump.persist()
             fail "it was supposed to fail the save because of validationException"
         } catch (EntityValidationException e) {
-            e.cause instanceof ValidationException
-            e.entity == jump
+            assert e.cause instanceof org.grails.datastore.mapping.validation.ValidationException
+            assert e.entity == jump
         }
     }
 
@@ -91,10 +91,10 @@ class DomainMethodsTests extends Specification {
             jump.persist(flush: true)
             fail "it was supposed to fail the save because of validationException"
         } catch (EntityOptimisticLockingException e) {
-            e.cause instanceof DataAccessException
+            assert e.cause instanceof RuntimeException
             //assert e.cause instanceof org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException
-            e.entity == jump
-            e.messageMap.code == "Another user has updated the Jumper while you were editing"
+            assert e.entity == jump
+            assert e.messageMap.code == "default.optimistic.locking.failure"
         }
     }
 

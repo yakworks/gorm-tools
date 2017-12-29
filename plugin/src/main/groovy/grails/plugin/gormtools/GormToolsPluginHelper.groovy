@@ -4,7 +4,6 @@ import gorm.tools.DbDialectService
 import gorm.tools.GormMetaUtils
 import gorm.tools.async.GparsBatchSupport
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.databinding.GormToolsBinder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.MangoQuery
@@ -42,8 +41,7 @@ class GormToolsPluginHelper {
 
         mango(MangoQuery)
 
-        entityMapBinder(EntityMapBinder)
-        gormToolsBinder(GormToolsBinder, ref("grailsApplication"))
+        entityMapBinder(EntityMapBinder, ref('grailsApplication'))
 
         repoEventPublisher(RepoEventPublisher)
 

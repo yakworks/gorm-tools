@@ -33,10 +33,9 @@ import org.springframework.dao.DataAccessException
 @CompileStatic
 trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrait, WithTrx, RepositoryApi<D> {
 
-    /** The data binder to use. By default gets injected with EntityMapBinder.
-        Have to use Qualifier to avoid duplicat bean error when custom binder is defined. */
-    @Qualifier("gormToolsBinder")
-    @Autowired DataBinder mapBinder
+    @Qualifier("entityMapBinder")
+    @Autowired MapBinder mapBinder
+
     @Autowired RepoEventPublisher repoEventPublisher
     @Autowired RepoExceptionSupport repoExceptionSupport
 
@@ -178,8 +177,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      */
     @Override
     void doBind(D entity, Map data, BindAction bindAction) {
-        //getMapBinder().bind(entity, data, bindAction)
-        getMapBinder().bind(entity, new SimpleMapDataBindingSource(data))
+        getMapBinder().bind(entity, data, bindAction)
+        //getMapBinder().bind(entity, new SimpleMapDataBindingSource(data))
     }
 
     /**

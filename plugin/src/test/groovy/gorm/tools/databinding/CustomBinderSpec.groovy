@@ -15,7 +15,7 @@ class CustomBinderSpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         defineBeans {
-            customBinder(CustomBinder)
+            customBinder(CustomBinder, grailsApplication)
         }
 
         mockDomains(City)
@@ -33,19 +33,8 @@ class City {
     String name
 }
 
-class CustomBinder implements MapBinder {
+class CustomBinder extends EntityMapBinder {
 
-    @Override
-    void bind(Object target, Map<String, Object> source, BindAction bindAction) {}
-
-    @Override
-    void bind(Object target, Map<String, Object> source) {}
-
-    @Override
-    void bindCreate(Object target, Map<String, Object> source) {}
-
-    @Override
-    void bindUpdate(Object target, Map<String, Object> source) {}
 }
 
 @Artefact("Repository")
@@ -53,5 +42,5 @@ class CityRepo extends DefaultGormRepo<City> {
 
     @Autowired
     @Qualifier("customBinder")
-    DataBinder mapBinder //TODO Fix
+    MapBinder mapBinder
 }

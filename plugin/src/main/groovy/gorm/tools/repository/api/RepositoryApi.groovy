@@ -2,7 +2,6 @@ package gorm.tools.repository.api
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
-import grails.databinding.DataBinder
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
 import org.springframework.dao.DataAccessException
@@ -26,7 +25,7 @@ interface RepositoryApi<D> {
     Class<D> getEntityClass()
 
     /** The data binder to use. By default gets injected with EntityMapBinder*/
-    DataBinder getMapBinder()
+    MapBinder getMapBinder()
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean getEnableEvents()

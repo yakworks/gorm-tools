@@ -1,15 +1,19 @@
 package gorm.tools.databinding
 
 import gorm.tools.beans.IsoDateUtil
+import grails.core.GrailsApplication
+import grails.databinding.DataBindingSource
 import grails.databinding.converters.ValueConverter
+import grails.databinding.events.DataBindingListener
+import grails.web.databinding.GrailsWebDataBinder
 import groovy.transform.CompileStatic
-import org.grails.databinding.converters.ConversionService
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
-import org.grails.web.databinding.SpringConversionServiceAdapter
-import org.springframework.beans.factory.annotation.Autowired
+import org.grails.web.databinding.DataBindingEventMulticastListener
+import org.grails.web.databinding.GrailsWebDataBindingListener
+import org.springframework.validation.BeanPropertyBindingResult
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -21,14 +25,47 @@ import java.time.format.DateTimeFormatter
  *
  */
 @CompileStatic
-class EntityMapBinder implements MapBinder {
+class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     private static final String ID_PROP = "id"
 
-    ConversionService conversionService = new SpringConversionServiceAdapter()
+    EntityMapBinder() {
+        super(null)
+    }
 
-    protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
+    EntityMapBinder(GrailsApplication grailsApplication) {
+        super(grailsApplication)
+    }
+
+    @Override
+    protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
+        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
+        def errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
+
+        List<DataBindingListener> allListeners = []
+        allListeners << errorHandlingListener
+        if(listener != null && !(listener instanceof DataBindingEventMulticastListener)) {
+            allListeners << listener
+        }
+        allListeners.addAll listeners.findAll { DataBindingListener l -> l.supports(object.getClass()) }
+
+        def listenerWrapper = new DataBindingEventMulticastListener(allListeners)
+
+        boolean bind = listenerWrapper.beforeBinding(object, bindingResult)
+
+        if (bind) {
+            //super.doBind object, source, filter, whiteList, blackList, listenerWrapper, bindingResult
+        }
+
+        listenerWrapper.afterBinding object, bindingResult
+
+        populateErrors(object, bindingResult)
+    }
 
     void bind(Object target, Map<String, Object> source, BindAction bindAction = null) {
+        fastBind(target, source)
+    }
+
+    void fastBind(Object target, Map<String, Object> source) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
 
@@ -75,29 +112,6 @@ class EntityMapBinder implements MapBinder {
 
         }
 
-    }
-
-    //TODO
-    void bindUpdate(Object target, Map<String, Object> source) {
-        //for now just pass them on
-        bind(target, source, BindAction.Update)
-    }
-
-    //TODO
-    void bindCreate(Object target, Map<String, Object> source) {
-        //for now just pass them on
-        bind(target, source, BindAction.Create)
-    }
-
-    @Autowired(required = true)
-    void setValueConverters(ValueConverter[] converters) {
-        converters.each { ValueConverter converter ->
-            registerConverter converter
-        }
-    }
-
-    void registerConverter(ValueConverter converter) {
-        conversionHelpers[converter.targetType] << converter
     }
 
 }

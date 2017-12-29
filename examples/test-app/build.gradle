@@ -9,7 +9,7 @@ buildscript {
     }
     dependencies {
         classpath "org.grails.plugins:views-gradle:1.2.5"
-        classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
+        //classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
     }
 }
 

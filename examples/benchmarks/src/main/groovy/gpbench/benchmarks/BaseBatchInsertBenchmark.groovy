@@ -5,6 +5,7 @@ import gorm.tools.repository.RepoUtil
 import gpbench.City
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
+import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 import groovy.transform.CompileDynamic
 
@@ -55,6 +56,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
         cities = repeatedCity.collate(batchSize)
     }
 
+    @Transactional
     @CompileDynamic
     void cleanup() {
         assert domainClass.count() == cityListSize * repeatedCityTimes//345000 //37230

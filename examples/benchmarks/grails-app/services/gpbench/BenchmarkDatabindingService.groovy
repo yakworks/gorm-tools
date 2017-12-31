@@ -51,9 +51,9 @@ class BenchmarkDatabindingService {
         println "Warm up pass "
         mute = true
         (1..2).each {
-            if (!mute) println "\n - fast bind on simple no associations"
+            if (!mute) println "\n - fast bind on simple, no dates or associations"
             useFastBinder(CityFatSimple)
-            if (!mute) println "\n - setters or property copy on associations with 20 fields"
+            if (!mute) println "\n - fat with 20+ fields, has dates and associations"
             useStaticSettersInCityFat()
             useFastBinder(CityFat)
             useEntityBinderBind(CityFat)
@@ -115,16 +115,14 @@ class BenchmarkDatabindingService {
     @CompileStatic
     void useFastBinder(Class domain) {
         eachCity("useEntityBinder.fastBind", domain) { instance, Map row ->
-            entityMapBinder.bind(instance, row)
-            //entityMapBinder.bind(instance, new SimpleMapDataBindingSource(row))
+            entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row))
         }
     }
 
     @CompileStatic
     void useEntityBinderBind(Class domain) {
         eachCity("useEntityBinderBind", domain) { instance, Map row ->
-            //entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row), null)
-            entityMapBinder.bind(instance, new SimpleMapDataBindingSource(row))
+            entityMapBinder.bind(instance, row)
         }
     }
 

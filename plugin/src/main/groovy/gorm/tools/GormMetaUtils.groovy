@@ -4,7 +4,6 @@ import gorm.tools.beans.AppCtx
 import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
 import grails.util.GrailsNameUtils
-import grails.validation.Constrained
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity

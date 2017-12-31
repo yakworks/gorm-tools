@@ -10,8 +10,6 @@ import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import grails.databinding.DataBinder
-import grails.databinding.SimpleMapDataBindingSource
 import grails.validation.ValidationException
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
@@ -177,8 +175,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      */
     @Override
     void doBind(D entity, Map data, BindAction bindAction) {
-        getMapBinder().bind(entity, data, bindAction)
-        //getMapBinder().bind(entity, new SimpleMapDataBindingSource(data))
+        //getMapBinder().bind(entity, data, bindAction)
+        getMapBinder().bind(entity, data, bindAction: bindAction)
     }
 
     /**

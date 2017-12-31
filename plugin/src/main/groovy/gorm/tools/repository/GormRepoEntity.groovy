@@ -7,8 +7,6 @@ import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
-import javax.persistence.Transient
-
 @CompileStatic
 trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
 

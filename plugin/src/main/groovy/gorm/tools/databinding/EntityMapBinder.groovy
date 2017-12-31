@@ -11,6 +11,7 @@ import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
 import grails.web.databinding.GrailsWebDataBinder
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
@@ -54,55 +55,30 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     @Override
     protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
-        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
-        def errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
+        //TODO this is where we will store errors
+        //BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
+//        GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
+//        List<DataBindingListener> allListeners = [errorHandlingListener]
+//        DataBindingEventMulticastListener listenerWrapper = new DataBindingEventMulticastListener(allListeners)
+//
+        fastBind(object, source, whiteList)
 
-        List<DataBindingListener> allListeners = []
-        allListeners << errorHandlingListener
-        if(listener != null && !(listener instanceof DataBindingEventMulticastListener)) {
-            allListeners << listener
-        }
-        allListeners.addAll listeners.findAll { DataBindingListener l -> l.supports(object.getClass()) }
-
-        def listenerWrapper = new DataBindingEventMulticastListener(allListeners)
-
-        boolean bind = listenerWrapper.beforeBinding(object, bindingResult)
-
-        if (bind) {
-            fastBind(object, source, whiteList)
-            //super.doBind object, source, filter, whiteList, blackList, listenerWrapper, bindingResult
-        }
-
-        listenerWrapper.afterBinding object, bindingResult
-
-        populateErrors(object, bindingResult)
+        //populateErrors(object, bindingResult)
     }
 
-    void bind(Object target, Map<String, Object> source, BindAction bindAction = null) {
-        fastBind(target, new SimpleMapDataBindingSource(source))
+    void bind(Map args = [:], Object target, Map<String, Object> source) {
+        bind(target, new SimpleMapDataBindingSource(source))
     }
 
-    void fastBind(Object target, DataBindingSource source) {
+    void fastBind(Object target, DataBindingSource source, List whiteList = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
         //println whiteList
         GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(target.getClass())
-        List<PersistentProperty> properties = gormStaticApi.gormPersistentEntity.persistentProperties
-
-        for (PersistentProperty prop : properties) {
-            setProp(target, source, prop)
-        }
-
-    }
-
-    void fastBind(Object target, DataBindingSource source, List whiteList) {
-        Objects.requireNonNull(target, "Target is null")
-        if (!source) return
-
-        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(target.getClass())
         PersistentEntity entity = gormStaticApi.gormPersistentEntity
+        List<String> properties = whiteList ?: entity.persistentPropertyNames
 
-        for (String prop : whiteList) {
+        for (String prop : properties) {
             setProp(target, source, entity.getPropertyByName(prop))
         }
 
@@ -114,9 +90,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         Object value = source.getPropertyValue(prop.name)
         Object valueToAssign = value
 
-        if (prop instanceof Association && value[ID_PROP]) {
-            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(value[ID_PROP] as Long)
-        } else if (value instanceof String) {
+        if (value instanceof String) {
             String val = value as String
             Class typeToConvertTo = prop.getType()
             if (String.isAssignableFrom(typeToConvertTo)) {
@@ -143,6 +117,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             } else if (conversionService?.canConvert(value.getClass(), typeToConvertTo)) {
                 valueToAssign = conversionService.convert(value, typeToConvertTo)
             }
+        } else if (prop instanceof Association && value[ID_PROP]) {
+            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(value[ID_PROP] as Long)
         }
 
         target[prop.name] = valueToAssign
@@ -158,9 +134,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             PersistentEntity entity = gormStaticApi.gormPersistentEntity
             List<PersistentProperty> properties = entity.persistentProperties
             Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
-            //println constraints
             for (PersistentProperty prop : properties) {
-                //println prop
                 DefaultConstrainedProperty cp = (DefaultConstrainedProperty)constraints[prop.name]
                 Boolean bindable = cp?.getMetaConstraintValue("bindable") as Boolean
                 if(bindable == null || bindable == true) {
@@ -170,31 +144,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             if (!Environment.getCurrent().isReloadEnabled()) {
                 CLASS_TO_BINDING_INCLUDE_LIST.put objectClass, whiteList
             }
-            println whiteList
+            //println whiteList
         }
 
         return whiteList
-//        List includeList = Collections.EMPTY_LIST
-//        try {
-//            final Class<? extends Object> objectClass = object.getClass()
-//            if (CLASS_TO_BINDING_INCLUDE_LIST.containsKey(objectClass)) {
-//                includeList = CLASS_TO_BINDING_INCLUDE_LIST.get objectClass
-//            } else {
-//                def whiteListField = objectClass.getDeclaredField DefaultASTDatabindingHelper.DEFAULT_DATABINDING_WHITELIST
-//                if (whiteListField != null) {
-//                    if ((whiteListField.getModifiers() & Modifier.STATIC) != 0) {
-//                        final Object whiteListValue = whiteListField.get objectClass
-//                        if (whiteListValue instanceof List) {
-//                            includeList = (List)whiteListValue
-//                        }
-//                    }
-//                }
-//                if (!Environment.getCurrent().isReloadEnabled()) {
-//                    CLASS_TO_BINDING_INCLUDE_LIST.put objectClass, includeList
-//                }
-//            }
-//        } catch (Exception e) { }
-//        includeList
     }
 
 }

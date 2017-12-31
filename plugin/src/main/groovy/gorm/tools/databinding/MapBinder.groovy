@@ -1,18 +1,13 @@
 package gorm.tools.databinding
 
-import org.grails.datastore.gorm.GormEntity
+import grails.databinding.DataBinder
 
 /**
  * binds data from a map to a GormEntity. The map can of course be a JSONObject as is common when binding rest resources
  */
-interface MapBinder {
+interface MapBinder extends DataBinder{
 
-    void bind(Object target, Map<String, Object> source, BindAction bindAction)
+    void bind(Map args, Object target, Map<String, Object> source)
 
     void bind(Object target, Map<String, Object> source)
-
-    void bindCreate(Object target, Map<String, Object> source)
-
-    void bindUpdate(Object target, Map<String, Object> source)
-
 }

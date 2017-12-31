@@ -7,24 +7,21 @@ import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
-import javax.persistence.Transient
-
 @CompileStatic
 trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
 
-    @Transient
     private static RepositoryApi cachedRepo
 
     /**
      * Looks up and caches a repository bean
      * @return The repository
      */
-    static RepositoryApi<D> getRepo() {
+    transient static RepositoryApi<D> getRepo() {
         if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), RepositoryApi)
         return cachedRepo
     }
 
-    static void setRepo(RepositoryApi<D> repo) {
+    transient static void setRepo(RepositoryApi<D> repo) {
         cachedRepo = repo
     }
 
@@ -44,12 +41,12 @@ trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
      * Creates, binds and persists and instance
      * @return The created instance
      */
-    static D create(Map data) {
-        getRepo().create(data)
+    static D create(Map args = [:], Map data) {
+        getRepo().create(args, data)
     }
 
-    static D update(Map data) {
-        getRepo().update(data)
+    static D update(Map args = [:], Map data) {
+        getRepo().update(args, data)
     }
 
     static void removeById(Map args = [:], Serializable id) {

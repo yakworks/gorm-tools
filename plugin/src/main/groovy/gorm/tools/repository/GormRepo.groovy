@@ -31,10 +31,9 @@ import org.springframework.dao.DataAccessException
 @CompileStatic
 trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrait, WithTrx, RepositoryApi<D> {
 
-    /** The data binder to use. By default gets injected with EntityMapBinder.
-        Have to use Qualifier to avoid duplicat bean error when custom binder is defined. */
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder
+
     @Autowired RepoEventPublisher repoEventPublisher
     @Autowired RepoExceptionSupport repoExceptionSupport
 
@@ -105,9 +104,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * Transactional wrap for {@link #doCreate}
      */
     @Override
-    D create(Map data) {
+    D create(Map args = [:], Map data) {
         withTrx {
-            return doCreate(data)
+            return doCreate(args, data)
         }
     }
 
@@ -119,7 +118,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @see #doPersist
      */
     @Override
-    D doCreate(Map args = [:], Map data) {
+    D doCreate(Map args, Map data) {
         D entity = (D) getEntityClass().newInstance()
         bindAndSave(args, entity, data, BindAction.Create)
         return entity
@@ -129,9 +128,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * Transactional wrap for {@link #doUpdate}
      */
     @Override
-    D update(Map data) {
+    D update(Map args = [:], Map data) {
         withTrx {
-            return doUpdate(data)
+            return doUpdate(args, data)
         }
     }
 
@@ -143,29 +142,29 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @see #doPersist
      */
     @Override
-    D doUpdate(Map args = [:], Map data) {
+    D doUpdate(Map args, Map data) {
         D entity = get(data)
         bindAndSave(args, entity, data, BindAction.Update)
         return entity
     }
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
-    void bindAndSave(Map args = [:], D entity, Map data, BindAction bindAction){
-        bind(entity, data, bindAction)
+    void bindAndSave(Map args, D entity, Map data, BindAction bindAction){
         args['bindAction'] = bindAction
+        bind(args, entity, data, bindAction)
         args['data'] = data
         doPersist(args, entity)
     }
 
     /**
      * binds by calling {@link #doBind} and fires before and after events
-     * better to override doBind in implementing classes for custom logic.
-     * Or just implement the beforeBind|afterBind event methods
+     * better to override doBind in implementing classes for custom binding logic.
+     * Or even better implement the beforeBind|afterBind event methods
      */
     @Override
-    void bind(D entity, Map data, BindAction bindAction) {
+    void bind(Map args = [:], D entity, Map data, BindAction bindAction) {
         getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction)
-        doBind(entity, data, bindAction)
+        doBind(args, entity, data)
         getRepoEventPublisher().doAfterBind(this, entity, data, bindAction)
     }
 
@@ -175,8 +174,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * can also call this if you do NOT want the before/after Bind events to fire
      */
     @Override
-    void doBind(D entity, Map data, BindAction bindAction) {
-        getMapBinder().bind(entity, data, bindAction)
+    void doBind(Map args, D entity, Map data) {
+        getMapBinder().bind(args, entity, data)
     }
 
     /**

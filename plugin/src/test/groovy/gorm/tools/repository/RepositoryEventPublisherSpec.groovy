@@ -78,7 +78,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         City city = City.create(params)
 
         then:
-        sleep(1000)
+        sleep(100)
         city.events.beforePersist
         city.events.afterPersist
 
@@ -87,7 +87,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city2.persist()
 
         then:
-        sleep(1000)
+        sleep(100)
         city2.events.beforePersist
         city2.events.afterPersist
     }
@@ -100,7 +100,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city.save()
 
         then:
-        sleep(1000)
+        sleep(100)
         !city.events.beforeBind
         !city.events.afterBind
         !city.events.beforePersist
@@ -115,7 +115,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         City city = City.create(params)
 
         then:
-        sleep(1000)
+        sleep(100)
         city.events.beforeBind
         city.events.afterBind
     }
@@ -131,7 +131,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         City.removeById(city2.id)
 
         then:
-        sleep(1000)
+        sleep(100)
         city.events.beforeRemove
         city.events.afterRemove
         city2.events.beforeRemove
@@ -178,7 +178,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city = City.get(1)
 
         then:
-        sleep(1000)
+        sleep(100)
         city.name2 == "name2"
     }
 

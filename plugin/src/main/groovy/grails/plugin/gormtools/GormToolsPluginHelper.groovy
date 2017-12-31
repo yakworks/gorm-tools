@@ -41,7 +41,7 @@ class GormToolsPluginHelper {
 
         mango(MangoQuery)
 
-        entityMapBinder(EntityMapBinder)
+        entityMapBinder(EntityMapBinder, ref('grailsApplication'))
 
         repoEventPublisher(RepoEventPublisher)
 

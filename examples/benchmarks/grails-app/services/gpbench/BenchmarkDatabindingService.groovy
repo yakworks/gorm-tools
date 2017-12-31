@@ -9,6 +9,7 @@ import gpbench.fat.CityFatNoTraits
 import gpbench.fat.CityFatSimple
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
+import grails.databinding.SimpleMapDataBindingSource
 import grails.databinding.converters.ValueConverter
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
@@ -50,11 +51,12 @@ class BenchmarkDatabindingService {
         println "Warm up pass "
         mute = true
         (1..2).each {
-            if (!mute) println "\n - fast bind on simple no associations"
+            if (!mute) println "\n - fast bind on simple, no dates or associations"
             useFastBinder(CityFatSimple)
-            if (!mute) println "\n - setters or property copy on associations with 20 fields"
-            useStaticSettersInDomain(CityFat)
+            if (!mute) println "\n - fat with 20+ fields, has dates and associations"
+            useStaticSettersInCityFat()
             useFastBinder(CityFat)
+            useEntityBinderBind(CityFat)
             mute = false
         }
 
@@ -90,21 +92,36 @@ class BenchmarkDatabindingService {
         }
     }
 
+    @CompileStatic
+    void useStaticSettersInCityFat() {
+        eachCity("useStaticSettersInDomain", CityFat) { CityFat instance, Map row ->
+            instance.setPropsFast(row)
+        }
+    }
+
     void useSetPropsFastIterate(Class domain) {
         eachCity("setPropsFastIterate", domain) { instance, Map row ->
             setPropsFastIterate(instance, row)
         }
     }
+//
+//    void gormUtilsBindFast(Class domain) {
+//        eachCity("gormUtilsBindFast", domain) { instance, Map row ->
+//            GormUtils.bindFast(instance, row)
+//            //setPropsFastIterate(instance, row)
+//        }
+//    }
 
-    void gormUtilsBindFast(Class domain) {
-        eachCity("gormUtilsBindFast", domain) { instance, Map row ->
-            GormUtils.bindFast(instance, row)
-            //setPropsFastIterate(instance, row)
+    @CompileStatic
+    void useFastBinder(Class domain) {
+        eachCity("useEntityBinder.fastBind", domain) { instance, Map row ->
+            entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row))
         }
     }
 
-    void useFastBinder(Class domain) {
-        eachCity("useFastBinder", domain) { instance, Map row ->
+    @CompileStatic
+    void useEntityBinderBind(Class domain) {
+        eachCity("useEntityBinderBind", domain) { instance, Map row ->
             entityMapBinder.bind(instance, row)
         }
     }
@@ -164,12 +181,13 @@ class BenchmarkDatabindingService {
         }
     }
 
+    @CompileStatic
     void eachCity(String msg, Class domain, Closure rowClosure) {
         StopWatch watch = new StopWatch()
         watch.start()
-        for (Map row in cities) {
+        for (Object row in cities) {
             GormEntity instance = domain.newInstance()
-            rowClosure.call(instance, row)
+            rowClosure.call(instance, (Map) row)
             //instance.validate([failOnError:true])
         }
         watch.stop()
@@ -237,78 +255,5 @@ class BenchmarkDatabindingService {
         cities = repeatedCity
         //cities = repeatedCity.collate(batchSize)
     }
-
-    DateFormat dateFormat = new SimpleDateFormat('yyyy-MM-dd')
-
-    @CompileStatic
-    Object setPropsFastIterate(Object obj, Map source, boolean ignoreAssociations = false) {
-        //if (target == null) throw new IllegalArgumentException("Target is null")
-        if (source == null) return
-
-        def sapi = GormEnhancer.findStaticApi(obj.getClass())
-        def properties = sapi.gormPersistentEntity.getPersistentProperties()
-        for (PersistentProperty prop : properties) {
-            if (!source.containsKey(prop.name)) {
-                continue
-            }
-            def sval = source[prop.name]
-            def valToAssisgn = sval
-            Class typeToConvertTo = prop.getType()
-            if (prop instanceof Association && sval['id']) {
-                if (ignoreAssociations) return
-                def asocProp = (Association) prop
-                def asc = GormEnhancer.findStaticApi(asocProp.associatedEntity.javaClass).load(sval['id'] as Long)
-                valToAssisgn = asc
-            } else if (sval instanceof String) {
-                if (Number.isAssignableFrom(typeToConvertTo)) {
-                    valToAssisgn = (sval as String).asType(typeToConvertTo)
-                } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                    //valToAssisgn = dateFormat.parse(sval as String)
-                    valToAssisgn = IsoDateUtil.parse(sval as String)
-                    //println "converted $sval to ${valToAssisgn} for $prop.name with DateUtil.parse"
-                } else if (conversionHelpers.containsKey(typeToConvertTo)) {
-                    def convertersList = conversionHelpers.get(typeToConvertTo)
-                    ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(sval) }
-                    if (converter) {
-                        valToAssisgn = converter.convert(sval)
-                        //println new Date()
-                        //println "converted $sval to ${valToAssisgn} for $prop.name with ${converter.class.name}"
-                    }
-                }
-            }
-
-            // all else fails let groovy bind it
-            obj[prop.name] = valToAssisgn
-
-            //println prop
-            //println "${prop.name}: ${obj[prop.name]} -> region:${obj.region}"
-        }
-        return obj
-    }
-
-
-    @Autowired(required = true)
-    @CompileStatic
-    void setValueConverters(ValueConverter[] converters) {
-        converters.each { ValueConverter converter ->
-            registerConverter converter
-        }
-    }
-    protected Map<Class, List<ValueConverter>> conversionHelpers = [:].withDefault { c -> [] }
-
-    @CompileStatic
-    void registerConverter(ValueConverter converter) {
-        //println converter.targetType
-        //conversionHelpers[converter.targetType] == converter
-        conversionHelpers[converter.targetType] << converter
-    }
-
-//    @Autowired(required=false)
-//    void setFormattedValueConverters(FormattedValueConverter[] converters) {
-//        converters.each { FormattedValueConverter converter ->
-//            registerFormattedValueConverter converter
-//        }
-//    }
-
 
 }

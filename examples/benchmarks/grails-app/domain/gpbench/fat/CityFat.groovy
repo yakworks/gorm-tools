@@ -53,9 +53,9 @@ class CityFat implements CityTraitFat, DateUserStamp {
         this.longitude3 = row['longitude3'] as BigDecimal
         //this.properties = row
         date1 = IsoDateUtil.parse(row['date1'] as String)
-        date2 = LocalDate.parse(row['date2'] as String) //DateUtil.parse(row['date2'] as String)
-        date3 = LocalDateTime.parse(row['date3'] as String, DateTimeFormatter.ISO_DATE_TIME)
-        date4 = LocalDate.parse(row['date4'] as String)
+        date2 = IsoDateUtil.parseLocalDate(row['date2'] as String) //DateUtil.parse(row['date2'] as String)
+        date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
+        date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
 
         setAssociation("region", Region, row)
         setAssociation("country", Country, row)

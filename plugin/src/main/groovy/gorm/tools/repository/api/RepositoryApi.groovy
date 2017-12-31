@@ -49,12 +49,12 @@ interface RepositoryApi<D> {
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     D doPersist(Map args, D entity)
-    D doPersist(D entity)
 
     /**
      * Transactional wrap for {@link #doCreate}
      */
     D create(Map data)
+    D create(Map args, Map data)
 
     /**
      * Creates entity using the data from params. calls the {@link #bind} with BindAction.Create
@@ -64,12 +64,12 @@ interface RepositoryApi<D> {
      * @see #doPersist
      */
     D doCreate(Map args, Map data)
-    D doCreate(Map data)
 
     /**
      * Transactional wrap for {@link #doUpdate}
      */
     D update(Map data)
+    D update(Map args, Map data)
 
     /**
      * Updates entity using the data from params. calls the {@link #bind} with BindAction.Update
@@ -79,20 +79,19 @@ interface RepositoryApi<D> {
      * @see #doPersist
      */
     D doUpdate(Map args, Map data)
-    D doUpdate(Map data)
 
     /**
      * binds by calling {@link #doBind} and fires before and after events
      * better to override doBind in implementing classes for custom logic.
      * Or just implement the beforeBind|afterBind event methods
      */
-    void bind(D entity, Map data, BindAction bindAction)
+    void bind(Map args, D entity, Map data, BindAction bindAction)
 
     /**
      * Main bind method that redirects call to the injected mapBinder. see {@link #getMapBinder}
      * override this one in implementing classes. can also call this if you don't want events to fire
      */
-    void doBind(D entity, Map data, BindAction bindAction)
+    void doBind(Map args, D entity, Map data)
 
     /**
      * Remove by ID. Wrapping this in a Transaction in an implementing class here is optional

@@ -41,12 +41,12 @@ trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
      * Creates, binds and persists and instance
      * @return The created instance
      */
-    static D create(Map data) {
-        getRepo().create(data)
+    static D create(Map args = [:], Map data) {
+        getRepo().create(args, data)
     }
 
-    static D update(Map data) {
-        getRepo().update(data)
+    static D update(Map args = [:], Map data) {
+        getRepo().update(args, data)
     }
 
     static void removeById(Map args = [:], Serializable id) {

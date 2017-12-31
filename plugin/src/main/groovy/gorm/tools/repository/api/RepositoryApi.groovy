@@ -49,12 +49,12 @@ interface RepositoryApi<D> {
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     D doPersist(Map args, D entity)
-    D doPersist(D entity)
 
     /**
      * Transactional wrap for {@link #doCreate}
      */
     D create(Map data)
+    D create(Map args, Map data)
 
     /**
      * Creates entity using the data from params. calls the {@link #bind} with BindAction.Create
@@ -64,12 +64,12 @@ interface RepositoryApi<D> {
      * @see #doPersist
      */
     D doCreate(Map args, Map data)
-    D doCreate(Map data)
 
     /**
      * Transactional wrap for {@link #doUpdate}
      */
     D update(Map data)
+    D update(Map args, Map data)
 
     /**
      * Updates entity using the data from params. calls the {@link #bind} with BindAction.Update
@@ -79,7 +79,6 @@ interface RepositoryApi<D> {
      * @see #doPersist
      */
     D doUpdate(Map args, Map data)
-    D doUpdate(Map data)
 
     /**
      * binds by calling {@link #doBind} and fires before and after events

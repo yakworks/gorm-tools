@@ -104,9 +104,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * Transactional wrap for {@link #doCreate}
      */
     @Override
-    D create(Map data) {
+    D create(Map args = [:], Map data) {
         withTrx {
-            return doCreate(data)
+            return doCreate(args, data)
         }
     }
 
@@ -118,7 +118,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @see #doPersist
      */
     @Override
-    D doCreate(Map args = [:], Map data) {
+    D doCreate(Map args, Map data) {
         D entity = (D) getEntityClass().newInstance()
         bindAndSave(args, entity, data, BindAction.Create)
         return entity
@@ -128,9 +128,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * Transactional wrap for {@link #doUpdate}
      */
     @Override
-    D update(Map data) {
+    D update(Map args = [:], Map data) {
         withTrx {
-            return doUpdate(data)
+            return doUpdate(args, data)
         }
     }
 
@@ -142,7 +142,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @see #doPersist
      */
     @Override
-    D doUpdate(Map args = [:], Map data) {
+    D doUpdate(Map args, Map data) {
         D entity = get(data)
         bindAndSave(args, entity, data, BindAction.Update)
         return entity

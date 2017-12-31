@@ -86,13 +86,13 @@ interface RepositoryApi<D> {
      * better to override doBind in implementing classes for custom logic.
      * Or just implement the beforeBind|afterBind event methods
      */
-    void bind(D entity, Map data, BindAction bindAction)
+    void bind(Map args, D entity, Map data, BindAction bindAction)
 
     /**
      * Main bind method that redirects call to the injected mapBinder. see {@link #getMapBinder}
      * override this one in implementing classes. can also call this if you don't want events to fire
      */
-    void doBind(D entity, Map data, BindAction bindAction)
+    void doBind(Map args, D entity, Map data)
 
     /**
      * Remove by ID. Wrapping this in a Transaction in an implementing class here is optional

@@ -149,22 +149,22 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     }
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
-    void bindAndSave(Map args = [:], D entity, Map data, BindAction bindAction){
-        bind(entity, data, bindAction)
+    void bindAndSave(Map args, D entity, Map data, BindAction bindAction){
         args['bindAction'] = bindAction
+        bind(args, entity, data, bindAction)
         args['data'] = data
         doPersist(args, entity)
     }
 
     /**
      * binds by calling {@link #doBind} and fires before and after events
-     * better to override doBind in implementing classes for custom logic.
-     * Or just implement the beforeBind|afterBind event methods
+     * better to override doBind in implementing classes for custom binding logic.
+     * Or even better implement the beforeBind|afterBind event methods
      */
     @Override
-    void bind(D entity, Map data, BindAction bindAction) {
+    void bind(Map args = [:], D entity, Map data, BindAction bindAction) {
         getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction)
-        doBind(entity, data, bindAction)
+        doBind(args, entity, data)
         getRepoEventPublisher().doAfterBind(this, entity, data, bindAction)
     }
 
@@ -174,9 +174,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * can also call this if you do NOT want the before/after Bind events to fire
      */
     @Override
-    void doBind(D entity, Map data, BindAction bindAction) {
-        //getMapBinder().bind(entity, data, bindAction)
-        getMapBinder().bind(entity, data, bindAction: bindAction)
+    void doBind(Map args, D entity, Map data) {
+        getMapBinder().bind(args, entity, data)
     }
 
     /**

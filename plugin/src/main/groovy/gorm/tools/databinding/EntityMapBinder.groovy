@@ -63,7 +63,12 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     }
 
     void bind(Map args = [:], Object target, Map<String, Object> source) {
-        bind(target, new SimpleMapDataBindingSource(source))
+        List includeList = (List) args.get("include")
+        if(includeList) {
+            bind target, new SimpleMapDataBindingSource(source), null, includeList, null, null
+        } else{
+            bind target, new SimpleMapDataBindingSource(source)
+        }
     }
 
     void fastBind(Object target, DataBindingSource source, List whiteList = null) {
@@ -87,10 +92,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         Object valueToAssign = value
 
         if (value instanceof String) {
-            String val = value as String
+            String val = (value as String)?.trim()
             Class typeToConvertTo = prop.getType()
             if (String.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = val
+                valueToAssign = ("" == val) ? null : val
             }
             else if (Number.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = val.asType(typeToConvertTo)
@@ -99,10 +104,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 valueToAssign = IsoDateUtil.parse(val)
             }
             else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = LocalDate.parse(val)
+                valueToAssign = IsoDateUtil.parseLocalDate(val) //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
             }
             else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = LocalDateTime.parse(val, DateTimeFormatter.ISO_DATE_TIME)
+                valueToAssign = IsoDateUtil.parseLocalDateTime(val)
             }
             else if (conversionHelpers.containsKey(typeToConvertTo)) {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)

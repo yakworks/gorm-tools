@@ -5,6 +5,10 @@ import groovy.transform.CompileStatic
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.function.Supplier
 import java.util.regex.Pattern
 
@@ -20,10 +24,12 @@ class IsoDateUtil {
     static final Pattern LOCAL_DATE = ~/\d{4}-\d{2}-\d{2}$/
     //yyyy-MM-dd'T'HH:mm:ss.SSSZ
     static final Pattern GMT_MILLIS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z/
-    //yyyy-MM-dd'T'HH:mm:ss
-    static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
     //yyyy-MM-dd'T'HH:mm:ssZ
     static final Pattern GMT_SECONDS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/
+    //yyyy-MM-dd'T'HH:mm:ss
+    static final Pattern TZ_LESS = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
+    //yyyy-MM-dd'T'HH:mm
+    static final Pattern TZ_LESS_HH_MM = ~/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
 
     //see https://stackoverflow.com/questions/4032967/json-date-to-java-date#4033027
     static final ThreadLocal<SimpleDateFormat> LOCAL_DATE_FORMAT = ThreadLocal.withInitial({
@@ -33,7 +39,7 @@ class IsoDateUtil {
         return fmatter
     } as Supplier<SimpleDateFormat>)
 
-    static final ThreadLocal<SimpleDateFormat> ISO_DATE_FORMAT = ThreadLocal.withInitial({
+    static final ThreadLocal<SimpleDateFormat> DATE_TIME_FORMAT = ThreadLocal.withInitial({
         SimpleDateFormat fmatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
         fmatter.setTimeZone(TimeZone.getTimeZone('UTC'))
         return fmatter
@@ -55,7 +61,7 @@ class IsoDateUtil {
         if (!date) return null
 
         //default for GMT_MILLIS match
-        DateFormat dateFormat = ISO_DATE_FORMAT.get()
+        DateFormat dateFormat = DATE_TIME_FORMAT.get()
 
         //if-then is slightly faster than a switch here
         if (date.matches(GMT_MILLIS)){
@@ -66,9 +72,35 @@ class IsoDateUtil {
             date =  date.replaceFirst('Z$', '.000Z')
         } else if(date.matches(TZ_LESS)) {
             date = "${date}.000Z"
+        } else if(date.matches(TZ_LESS_HH_MM)) {
+            date = "${date}:00.000Z"
         }
 
         return dateFormat.parse(date)
+    }
+
+    static LocalDate parseLocalDate(String date) {
+        date = date?.trim()
+        if (!date) return null
+
+        try{
+            return LocalDate.parse(date)
+        } catch (DateTimeParseException e){
+            //try with full dateTime
+            return LocalDate.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+        }
+
+    }
+
+    static LocalDateTime parseLocalDateTime(String date) {
+        date = date?.trim()
+        if (!date) return null
+
+        if (date.matches(LOCAL_DATE)){
+            date = "${date}T00:00"
+        }
+        LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+
     }
 
     /**
@@ -78,7 +110,7 @@ class IsoDateUtil {
      * @return a string representation of a given date
      */
     static String format(Date date) {
-        return ISO_DATE_FORMAT.get().format(date)
+        return DATE_TIME_FORMAT.get().format(date)
     }
 
     /**

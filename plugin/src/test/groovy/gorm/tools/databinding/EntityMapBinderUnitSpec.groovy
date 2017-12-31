@@ -9,6 +9,10 @@ import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Ignore
 import spock.lang.Specification
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 class EntityMapBinderUnitSpec extends Specification implements DataTest {
     EntityMapBinder binder
 
@@ -45,11 +49,36 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [dob: "2017-10-10"])
+        binder.bind(domain, [dobDate: "2017-10-10", localDate: "2017-10-10", localDateTime: "2017-11-22"])
 
         then:
         0 * dateConverter.canConvert(_)
-        domain.dob == IsoDateUtil.parse("2017-10-10")
+        domain.dobDate == IsoDateUtil.parse("2017-10-10")
+        domain.localDate == LocalDate.parse("2017-10-10")
+        domain.localDateTime == LocalDateTime.parse("2017-11-22T00:00") //LocalDateTime.parse(row['date3'] as String, DateTimeFormatter.ISO_DATE_TIME)
+        //'2017-11-22T23:28:56.782Z'
+
+        when:
+        def isoDateZ = "2017-11-22T22:22:22.222Z"
+        binder.bind(domain, [dobDate: isoDateZ,
+                             localDate: isoDateZ,
+                             localDateTime: isoDateZ])
+
+        then:
+        domain.dobDate == IsoDateUtil.parse(isoDateZ)
+        domain.localDate == LocalDate.parse("2017-11-22")
+        domain.localDateTime == LocalDateTime.parse("2017-11-22T22:22:22.222")
+
+        when:
+        def isoDateNoTZ = "2017-11-22T22:22"
+        binder.bind(domain, [dobDate: isoDateNoTZ,
+                             localDate: isoDateNoTZ,
+                             localDateTime: isoDateNoTZ])
+
+        then:
+        domain.dobDate == IsoDateUtil.parse(isoDateNoTZ)
+        domain.localDate == LocalDate.parse("2017-11-22")
+        domain.localDateTime == LocalDateTime.parse(isoDateNoTZ)
     }
 
 
@@ -70,7 +99,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         domain.currency == Currency.getInstance("INR")
     }
 
-    @Ignore //TODO Fix
     void "should fallback to conversion service if no converversion helpers found"() {
         setup:
         ConversionService conversionService = Mock(ConversionService)
@@ -124,18 +152,65 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.active == true
     }
 
+    void "test trimStrings and convertEmptyStringsToNull"() {
+        given:
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: " test "]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == "test"
+
+        when:
+        binder.bind(testDomain, [name: "   "])
+
+        then:
+        testDomain.name == null
+    }
+
+    void "test default whitelist"() {
+        given:
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'bill', notBindable: 'got it']
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == 'bill'
+        testDomain.notBindable == null
+
+        when:
+        testDomain = new TestDomain()
+        binder.bind(testDomain, params, include: ['notBindable'])
+
+        then:
+        testDomain.name == null
+        testDomain.notBindable == "got it"
+    }
+
+
 }
 
 
 @Entity
 class TestDomain {
     String name
+    String notBindable
     Long age
-    Date dob
+    Date dobDate
+    LocalDate localDate
+    LocalDateTime localDateTime
     Currency currency
     Boolean active
 
     AnotherDomain anotherDomain
+
+    static constraints = {
+        notBindable bindable: false
+    }
 }
 
 @Entity

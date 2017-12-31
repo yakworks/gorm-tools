@@ -88,38 +88,43 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     void setProp(Object target, DataBindingSource source, PersistentProperty prop){
         if (!source.containsProperty(prop.name)) return
 
-        Object value = source.getPropertyValue(prop.name)
-        Object valueToAssign = value
+        Object propValue = source.getPropertyValue(prop.name)
+        Object valueToAssign = propValue
 
-        if (value instanceof String) {
-            String val = (value as String)?.trim()
+        if (propValue instanceof String) {
+            String sval = propValue as String
             Class typeToConvertTo = prop.getType()
-            if (String.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = ("" == val) ? null : val
-            }
-            else if (Number.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = val.asType(typeToConvertTo)
+
+            if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
+                if(sval != null){
+                    sval = sval.trim()
+                    sval = ("" == sval) ? null : sval
+                }
+                valueToAssign = sval
             }
             else if (Date.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parse(val)
+                valueToAssign = IsoDateUtil.parse(sval)
             }
             else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parseLocalDate(val) //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
+                valueToAssign = IsoDateUtil.parseLocalDate(sval) //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
             }
             else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parseLocalDateTime(val)
+                valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
+            }
+            else if (Number.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = sval.asType(typeToConvertTo)
             }
             else if (conversionHelpers.containsKey(typeToConvertTo)) {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
-                ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(value) }
+                ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
                 if (converter) {
-                    valueToAssign = converter.convert(value)
+                    valueToAssign = converter.convert(propValue)
                 }
-            } else if (conversionService?.canConvert(value.getClass(), typeToConvertTo)) {
-                valueToAssign = conversionService.convert(value, typeToConvertTo)
+            } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
+                valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
-        } else if (prop instanceof Association && value[ID_PROP]) {
-            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(value[ID_PROP] as Long)
+        } else if (prop instanceof Association && propValue[ID_PROP]) {
+            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(propValue[ID_PROP] as Long)
         }
 
         target[prop.name] = valueToAssign

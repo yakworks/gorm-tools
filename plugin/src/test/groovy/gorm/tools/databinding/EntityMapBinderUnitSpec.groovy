@@ -191,7 +191,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.notBindable == "got it"
     }
 
-
 }
 
 

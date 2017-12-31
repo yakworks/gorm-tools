@@ -39,6 +39,9 @@ grails {
     gorm.default.mapping = {
         id generator: 'gorm.tools.hibernate.PooledTableIdGenerator'
     }
+    gorm.default.constraints = {
+        '*'(nullable:true)
+    }
 }
 
 grails.plugin.springsecurity.active = Boolean.valueOf(System.getProperty("springsecurity.active", "true"))

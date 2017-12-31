@@ -34,9 +34,6 @@ class BenchmarkDatabindingService {
     Long count = 111690
     Map props = [
         'name': 'test', 'shortCode': 'test', state: "Gujarat", "countryName": "india", 'latitude': "10.10", 'longitude': "10.10"]
-//    ,
-//        'name2': 'test', 'shortCode2':'test', state2:"Gujarat", "country2": "india", 'latitude2':"10.10", 'longitude2': "10.10",
-//        'name3': 'test', 'shortCode4':'test', state3:"Gujarat", "country3": "india", 'latitude3':"10.10", 'longitude3': "10.10",]
 
     boolean mute = false
     int warmupCityTimes = 3
@@ -52,10 +49,9 @@ class BenchmarkDatabindingService {
         mute = true
         (1..2).each {
             if (!mute) println "\n - fast bind on simple, no dates or associations"
-            useFastBinder(CityFatSimple)
+            useEntityBinderBind(CityFatSimple)
             if (!mute) println "\n - fat with 20+ fields, has dates and associations"
             useStaticSettersInCityFat()
-            useFastBinder(CityFat)
             useEntityBinderBind(CityFat)
             mute = false
         }
@@ -67,15 +63,15 @@ class BenchmarkDatabindingService {
             useDynamicSettersFat(CityFat)
             if (!mute) println " - Slower without @GrailsCompileStatic on domain"
             useDynamicSettersFat(CityFatDynamic)
-            useFastBinder(CityFatDynamic)
+            useEntityBinderBind(CityFatDynamic)
             mute = false
         }
 
-        println "\n - Binding is slower"
-        useDatabinding(CityFatNoTraits)
+        println "\n - Binding is much slower"
+        //useDatabinding(CityFatNoTraits)
         println "\n - Binding with Traits are very slow, especially with associations"
-        useDatabinding(CityFat)
-        //println " - And SUPER SLOW when not using @CompileStatic"
+        //useDatabinding(CityFat)
+        println " - And SUPER SLOW when not using @CompileStatic"
         //useDatabinding(CityFatDynamic)
 
     }
@@ -99,19 +95,6 @@ class BenchmarkDatabindingService {
         }
     }
 
-    void useSetPropsFastIterate(Class domain) {
-        eachCity("setPropsFastIterate", domain) { instance, Map row ->
-            setPropsFastIterate(instance, row)
-        }
-    }
-//
-//    void gormUtilsBindFast(Class domain) {
-//        eachCity("gormUtilsBindFast", domain) { instance, Map row ->
-//            GormUtils.bindFast(instance, row)
-//            //setPropsFastIterate(instance, row)
-//        }
-//    }
-
     @CompileStatic
     void useFastBinder(Class domain) {
         eachCity("useEntityBinder.fastBind", domain) { instance, Map row ->
@@ -127,7 +110,7 @@ class BenchmarkDatabindingService {
     }
 
     void useSettersDynamicSimple(Class domain) {
-        eachCity("useDynamicSettersFat", domain) { instance, Map row ->
+        eachCity("useSettersDynamicSimple", domain) { instance, Map row ->
             instance.name = row['name']
             instance.shortCode = row['shortCode']
             instance.state = row['state']

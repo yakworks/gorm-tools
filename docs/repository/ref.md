@@ -214,17 +214,14 @@ without going through the converters, thus resulting in faster performance.
 **Example**
 
 ```groovy
-
 class SomeService {
-        
-        @Autowired 
-        MapBinder binder
-        
-        void foo(Map params) {
-           Org org = new Org()
-           binder.bind(org, params)
-        }
+    @Autowired
+    MapBinder binder
 
+    void foo(Map params) {
+        Org org = new Org()
+        binder.bind(org, params)
+    }
 }
 
 ```

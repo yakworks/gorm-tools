@@ -19,8 +19,10 @@ class BootStrap {
 
     def init = { servletContext ->
         mockAuthentication()
-        if(runBenchmarks && runDataBindingBenchmark)
-            benchmarkDatabindingService.runFat()
+        if(runBenchmarks && runDataBindingBenchmark){
+            benchmarkDatabindingService.runFast()
+            benchmarkDatabindingService.runFast(true)
+        }
         //loaderNoPersistService.runFileLoad()
         //loaderNoPersistService.run()
         if(runBenchmarks)

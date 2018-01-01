@@ -80,19 +80,19 @@ class BenchmarkRunnerService {
             runBenchmark(new SimpleBatchInsertBenchmark(true))
         }
 
-        // warmUpAndRun("### Gpars - fat props","runFat", binderType)
-
         warmUpAndRun("### Gpars - Assign Properties, no grails databinding", "runBaselineCompare", binderType)
-
-        if (eventListenerCount)
-            warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
 
         warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
 
         if (auditTrailEnabled)
             warmUpAndRun("### Gpars - audit trail", "runWithAuditTrail", binderType)
 
-        warmUpAndRun("### RXJava, Script executor, etc", "runOther", binderType)
+        if (eventListenerCount)
+            warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
+
+        // warmUpAndRun("### Gpars - fat props","runFast", binderType)
+
+        // warmUpAndRun("### RXJava, Script executor, etc", "runOther", binderType)
 
 //        warmUpAndRun("  - Performance problems go away without databinding on traits",
 //            "runMultiCoreSlower", 'fast')

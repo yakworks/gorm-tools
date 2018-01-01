@@ -1,6 +1,5 @@
 package gpbench
 
-import gorm.tools.GormUtils
 import gorm.tools.beans.IsoDateUtil
 import gorm.tools.databinding.EntityMapBinder
 import gpbench.fat.CityFat
@@ -10,17 +9,11 @@ import gpbench.fat.CityFatSimple
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.databinding.SimpleMapDataBindingSource
-import grails.databinding.converters.ValueConverter
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.model.PersistentProperty
-import org.grails.datastore.mapping.model.types.Association
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.StopWatch
 
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -36,27 +29,39 @@ class BenchmarkDatabindingService {
         'name': 'test', 'shortCode': 'test', state: "Gujarat", "countryName": "india", 'latitude': "10.10", 'longitude': "10.10"]
 
     boolean mute = false
+    boolean doValidate = false
     int warmupCityTimes = 3
     int loadCityTimes = 3
     List cities
 
-    def runFat() {
+    def runFast(boolean doValidate = false) {
+        this.doValidate = doValidate
         println "run load json file 3x number of fields"
 
         jsonReader._cache = [:]
         loadCities3xProps(loadCityTimes)
         println "Warm up pass "
+        if(doValidate) println "** Running with VALIDATION TRUE**"
         mute = true
         (1..2).each {
             if (!mute) println "\n - fast bind on simple, no dates or associations"
+            useStaticSettersInCityFatSimple()
             useEntityBinderBind(CityFatSimple)
-            if (!mute) println "\n - fat with 20+ fields, has dates and associations"
+
+            if (!mute) println " - fat with 20+ fields, has dates and associations"
             useStaticSettersInCityFat()
             useEntityBinderBind(CityFat)
             mute = false
         }
+        println ""
+    }
 
-        println "Warm up pass "
+    def runSlow() {
+        println "run load json file 3x number of fields"
+        jsonReader._cache = [:]
+        loadCities3xProps(loadCityTimes)
+
+        println "Warm up pass"
         mute = true
         (1..2).each {
             if (!mute) println " - Dynamic setters are slower"
@@ -68,11 +73,11 @@ class BenchmarkDatabindingService {
         }
 
         println "\n - Binding is much slower"
-        //useDatabinding(CityFatNoTraits)
+        useDatabinding(CityFatNoTraits)
         println "\n - Binding with Traits are very slow, especially with associations"
-        //useDatabinding(CityFat)
+        useDatabinding(CityFat)
         println " - And SUPER SLOW when not using @CompileStatic"
-        //useDatabinding(CityFatDynamic)
+        useDatabinding(CityFatDynamic)
 
     }
 
@@ -84,14 +89,21 @@ class BenchmarkDatabindingService {
 
     void useStaticSettersInDomain(Class domain) {
         eachCity("useStaticSettersInDomain", domain) { instance, Map row ->
-            instance.setPropsFast(row)
+            instance.setProps(row)
+        }
+    }
+
+    @CompileStatic
+    void useStaticSettersInCityFatSimple() {
+        eachCity("Static Setters In CityFatSimple", CityFatSimple) { CityFatSimple instance, Map row ->
+            instance.setProps(row)
         }
     }
 
     @CompileStatic
     void useStaticSettersInCityFat() {
-        eachCity("useStaticSettersInDomain", CityFat) { CityFat instance, Map row ->
-            instance.setPropsFast(row)
+        eachCity("Static Setters In CityFat", CityFat) { CityFat instance, Map row ->
+            instance.setProps(row)
         }
     }
 
@@ -104,7 +116,7 @@ class BenchmarkDatabindingService {
 
     @CompileStatic
     void useEntityBinderBind(Class domain) {
-        eachCity("useEntityBinderBind", domain) { instance, Map row ->
+        eachCity("EntityMapBinder bind", domain) { instance, Map row ->
             entityMapBinder.bind(instance, row)
         }
     }
@@ -171,7 +183,7 @@ class BenchmarkDatabindingService {
         for (Object row in cities) {
             GormEntity instance = domain.newInstance()
             rowClosure.call(instance, (Map) row)
-            //instance.validate([failOnError:true])
+            if(doValidate) instance.validate([failOnError:true])
         }
         watch.stop()
         if (!mute) println "${watch.totalTimeSeconds}s $msg $domain.simpleName | ${cities.size()} rows"

@@ -30,7 +30,7 @@ class CityFat implements CityTraitFat, DateUserStamp {
         importFrom DateUserStampConstraints
     }
 
-    void setPropsFast(Map row) {
+    void setProps(Map row) {
         this.name = row['name']
         this.shortCode = row['shortCode']
         this.state = row['state']

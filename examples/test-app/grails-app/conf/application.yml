@@ -88,6 +88,8 @@ hibernate:
         use_second_level_cache: true
         use_query_cache: false
         region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+    jdbc:
+      time_zone: UTC
 
 dataSource:
     pooled: true

@@ -984,15 +984,13 @@ However entityMapBinder is optimized to convert most commonly encountered proper
 without going through the converters, thus resulting in faster performance.</p>
 <p><strong>Example</strong></p>
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">SomeService</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="n">MapBinder</span> <span class="n">binder</span>
 
-        <span class="nd">@Autowired</span> 
-        <span class="n">MapBinder</span> <span class="n">binder</span>
-
-        <span class="kt">void</span> <span class="nf">foo</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
-           <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Org</span><span class="o">()</span>
-           <span class="n">binder</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">org</span><span class="o">,</span> <span class="n">params</span><span class="o">)</span>
-        <span class="o">}</span>
-
+    <span class="kt">void</span> <span class="nf">foo</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Org</span><span class="o">()</span>
+        <span class="n">binder</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">org</span><span class="o">,</span> <span class="n">params</span><span class="o">)</span>
+    <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 

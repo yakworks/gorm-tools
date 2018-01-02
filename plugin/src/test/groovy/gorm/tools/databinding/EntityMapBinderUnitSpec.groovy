@@ -191,6 +191,19 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.notBindable == "got it"
     }
 
+    void "test type conversion errors"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [age: 'test']
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        noExceptionThrown()
+        testDomain.errors.errorCount == 1
+        testDomain.errors.hasFieldErrors('age')
+    }
+
 }
 
 

@@ -17,6 +17,9 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.web.databinding.DataBindingEventMulticastListener
+import org.grails.web.databinding.GrailsWebDataBindingListener
+import org.springframework.validation.BeanPropertyBindingResult
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -52,14 +55,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     @Override
     protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
         //TODO this is where we will store errors
-        //BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
-//        GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
-//        List<DataBindingListener> allListeners = [errorHandlingListener]
-//        DataBindingEventMulticastListener listenerWrapper = new DataBindingEventMulticastListener(allListeners)
-//
-        fastBind(object, source, whiteList)
+        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
+        GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
+        List<DataBindingListener> allListeners = []
+        allListeners << errorHandlingListener
 
-        //populateErrors(object, bindingResult)
+        DataBindingEventMulticastListener listenerWrapper = new DataBindingEventMulticastListener(allListeners)
+
+        fastBind(object, source, whiteList, listenerWrapper, errors)
+
+        populateErrors(object, bindingResult)
     }
 
     void bind(Map args = [:], Object target, Map<String, Object> source) {
@@ -71,7 +76,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
     }
 
-    void fastBind(Object target, DataBindingSource source, List whiteList = null) {
+    void fastBind(Object target, DataBindingSource source, List whiteList, DataBindingListener listener, errors) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
         //println whiteList
@@ -80,54 +85,54 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         List<String> properties = whiteList ?: entity.persistentPropertyNames
 
         for (String prop : properties) {
-            setProp(target, source, entity.getPropertyByName(prop))
+            setProp(target, source, entity.getPropertyByName(prop), listener, errors)
         }
 
     }
 
-    void setProp(Object target, DataBindingSource source, PersistentProperty prop){
+    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener, errors){
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
         Object valueToAssign = propValue
 
-        if (propValue instanceof String) {
-            String sval = propValue as String
-            Class typeToConvertTo = prop.getType()
+        try {
+            if (propValue instanceof String) {
+                String sval = propValue as String
+                Class typeToConvertTo = prop.getType()
 
-            if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
-                if(sval != null){
-                    sval = sval.trim()
-                    sval = ("" == sval) ? null : sval
+                if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
+                    if (sval != null) {
+                        sval = sval.trim()
+                        sval = ("" == sval) ? null : sval
+                    }
+                    valueToAssign = sval
+                } else if (Date.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = IsoDateUtil.parse(sval)
+                } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = IsoDateUtil.parseLocalDate(sval)
+                    //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
+                } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
+                } else if (Number.isAssignableFrom(typeToConvertTo)) {
+                    valueToAssign = sval.asType(typeToConvertTo)
+                } else if (conversionHelpers.containsKey(typeToConvertTo)) {
+                    List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
+                    ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
+                    if (converter) {
+                        valueToAssign = converter.convert(propValue)
+                    }
+                } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
+                    valueToAssign = conversionService.convert(propValue, typeToConvertTo)
                 }
-                valueToAssign = sval
+            } else if (prop instanceof Association && propValue[ID_PROP]) {
+                valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(propValue[ID_PROP] as Long)
             }
-            else if (Date.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parse(sval)
-            }
-            else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parseLocalDate(sval) //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
-            }
-            else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
-            }
-            else if (Number.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = sval.asType(typeToConvertTo)
-            }
-            else if (conversionHelpers.containsKey(typeToConvertTo)) {
-                List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
-                ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
-                if (converter) {
-                    valueToAssign = converter.convert(propValue)
-                }
-            } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
-                valueToAssign = conversionService.convert(propValue, typeToConvertTo)
-            }
-        } else if (prop instanceof Association && propValue[ID_PROP]) {
-            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(propValue[ID_PROP] as Long)
+
+            target[prop.name] = valueToAssign
+        }catch (Exception e) {
+            addBindingError(target, prop.name, propValue, e, listener, errors)
         }
-
-        target[prop.name] = valueToAssign
     }
 
     static List getBindingIncludeList(final Object object) {

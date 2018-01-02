@@ -110,7 +110,7 @@ class BenchmarkDatabindingService {
     @CompileStatic
     void useFastBinder(Class domain) {
         eachCity("useEntityBinder.fastBind", domain) { instance, Map row ->
-            entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row))
+            entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row), null, null, null)
         }
     }
 

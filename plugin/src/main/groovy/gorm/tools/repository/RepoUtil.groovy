@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.core.Datastore
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
@@ -45,16 +46,15 @@ class RepoUtil {
      *
      * @param entity the domain object the check
      * @param ver the version this used to be (entity will have the )
-     * @throws EntityValidationException adds a rejectvalue to the errors on the entity and throws with code optimistic.locking.failure
+     * @throws OptimisticLockingFailureException
      */
     static void checkVersion(GormEntity entity, Long oldVersion) {
         if (oldVersion == null) return
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
             if (currentVersion > oldVersion) {
-                Map msgMap = RepoMessage.optimisticLockingFailure(entity)
-                entity.errors.rejectValue("version", msgMap.code as String, msgMap.args as Object[], msgMap.defaultMessage as String)
-                throw new EntityValidationException(msgMap, entity, entity.errors)
+                Map msgMap = RepoMessage.optimisticLockingFailure(entity, false)
+                throw new OptimisticLockingFailureException(msgMap.defaultMessage as String)
             }
         }
     }

@@ -2,12 +2,12 @@ package testing
 
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityNotFoundException
-import gorm.tools.repository.errors.EntityOptimisticLockingException
 import gorm.tools.repository.errors.EntityValidationException
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import grails.validation.ValidationException
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
 
 //tests the persist and remove methods
@@ -73,7 +73,7 @@ class DomainMethodsTests extends Specification {
             jump.persist()
             fail "it was supposed to fail the save because of validationException"
         } catch (EntityValidationException e) {
-            assert e.cause instanceof org.grails.datastore.mapping.validation.ValidationException
+            assert e.cause instanceof grails.validation.ValidationException
             assert e.entity == jump
         }
     }
@@ -88,12 +88,9 @@ class DomainMethodsTests extends Specification {
             Jumper.executeUpdate("update Jumper j set j.version=20 where j.name='jumper1'")
             jump.name = 'fukt'
             jump.persist(flush: true)
-            fail "it was supposed to fail the save because of validationException"
-        } catch (EntityOptimisticLockingException e) {
-            assert e.cause instanceof RuntimeException
-            //assert e.cause instanceof org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException
-            assert e.entity == jump
-            assert e.messageMap.code == "default.optimistic.locking.failure"
+            fail "it was supposed to fail the save because of OptimisticLockingFailureException"
+        } catch (OptimisticLockingFailureException e) {
+            assert e.message == "Another user has updated the testing.Jumper while you were editing"
         }
     }
 

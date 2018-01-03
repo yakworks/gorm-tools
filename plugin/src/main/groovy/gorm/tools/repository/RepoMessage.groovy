@@ -44,7 +44,7 @@ class RepoMessage {
      * domainLabel -> the label to use for the domain. just the class name unless there is a entry in message.properties
      * arg -> the array [domainLabel,ident]
      *
-     * @param entity the domain instance to buld the message params from
+     * @param entity the domain instance to build the message params from
      */
     @CompileDynamic
     static Map buildMessageParams(entity) {
@@ -54,50 +54,66 @@ class RepoMessage {
         return [ident: ident, domainLabel: domainLabel, args: args]
     }
 
-    static Map created(entity) {
-        Map p = buildMessageParams(entity)
+    /**
+     * build a map of message params as @buildMessageParams, but light version to speed up it
+     * ident -> entity id
+     * domainLabel -> domain class name
+     * arg -> the array [domainLabel,ident]
+     *
+     * @param entity the domain instance to build the message params from
+     */
+    @CompileDynamic
+    static Map buildLightMessageParams(entity) {
+        String ident = entity.id
+        String domainLabel = entity.class.name
+        List args = [domainLabel, ident]
+        return [ident: ident, domainLabel: domainLabel, args: args]
+    }
+
+    static Map created(entity, boolean buildLight = false) {
+        Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.created.message", p.args, "${p.domainLabel} ${p.ident} created")
     }
 
-    static Map saved(entity) {
-        Map p = buildMessageParams(entity)
+    static Map saved(entity, boolean buildLight = false) {
+        Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.saved.message", p.args, "${p.domainLabel} ${p.ident} saved")
     }
 
-    static Map notSaved(entity) {
-        String domainLabel = resolveDomainLabel(entity)
+    static Map notSaved(entity, boolean buildLight = false) {
+        String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
     //TODO:
-    static Map notSavedDataAccess(entity) {
-        String domainLabel = resolveDomainLabel(entity)
+    static Map notSavedDataAccess(entity, boolean buildLight = false) {
+        String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
 
-    static Map updated(entity) {
-        Map p = buildMessageParams(entity)
+    static Map updated(entity, boolean buildLight = false) {
+        Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.updated.message", p.args, "${p.domainLabel} ${p.ident} updated")
     }
 
-    static Map notUpdated(entity) {
-        Map p = buildMessageParams(entity)
+    static Map notUpdated(entity, boolean buildLight = false) {
+        Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.not.updated.message", p.args, "${p.domainLabel} ${p.ident} update failed")
     }
 
-    static Map deleted(entity, ident) {
-        String domainLabel = resolveDomainLabel(entity)
+    static Map deleted(entity, ident, boolean buildLight = false) {
+        String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} deleted")
     }
 
-    static Map notDeleted(entity, ident) {
-        String domainLabel = resolveDomainLabel(entity)
+    static Map notDeleted(entity, ident, boolean buildLight = false) {
+        String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} could not be deleted")
     }
 
-    static Map optimisticLockingFailure(entity) {
-        String domainLabel = resolveDomainLabel(entity)
+    static Map optimisticLockingFailure(entity, boolean buildLight = false) {
+        String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.optimistic.locking.failure", [domainLabel], "Another user has updated the ${domainLabel} while you were editing")
     }
 

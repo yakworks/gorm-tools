@@ -5,6 +5,7 @@ import gorm.tools.repository.errors.*
 import gorm.tools.databinding.BindAction
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.springframework.dao.OptimisticLockingFailureException
 import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
@@ -74,7 +75,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Org.repo.get(org.id, 0L)
 
         then:
-        def e = thrown(EntityValidationException)
+        def e = thrown(OptimisticLockingFailureException)
         e.message.contains("Another user has updated the Org while you were editing")
     }
 

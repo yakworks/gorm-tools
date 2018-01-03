@@ -68,15 +68,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     }
 
     void bind(Map args = [:], Object target, Map<String, Object> source) {
-        List includeList = (List) args.get("include")
-        if(includeList) {
+        List includeList = (List) args["include"] ?: getBindingIncludeList(target)
+        Boolean errorHandling = args["errorHandling"] == null ? true : args["errorHandling"]
+        if(errorHandling) {
             bind target, new SimpleMapDataBindingSource(source), null, includeList, null, null
         } else{
-            bind target, new SimpleMapDataBindingSource(source)
+            fastBind target, new SimpleMapDataBindingSource(source), includeList
         }
     }
 
-    void fastBind(Object target, DataBindingSource source, List whiteList, DataBindingListener listener, errors) {
+    void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener = null, errors = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
         //println whiteList
@@ -85,54 +86,60 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         List<String> properties = whiteList ?: entity.persistentPropertyNames
 
         for (String prop : properties) {
-            setProp(target, source, entity.getPropertyByName(prop), listener, errors)
+            PersistentProperty perProp = entity.getPropertyByName(prop)
+            try{
+                setProp(target, source, perProp)
+            } catch (Exception e) {
+                if(errors) {
+                    addBindingError(target, perProp.name, source.getPropertyValue(perProp.name), e, listener, errors)
+                } else {
+                    throw e
+                }
+            }
         }
 
     }
 
-    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener, errors){
+    void setProp(Object target, DataBindingSource source, PersistentProperty prop){
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
         Object valueToAssign = propValue
 
-        try {
-            if (propValue instanceof String) {
-                String sval = propValue as String
-                Class typeToConvertTo = prop.getType()
+        if (propValue instanceof String) {
+            String sval = propValue as String
+            Class typeToConvertTo = prop.getType()
 
-                if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
-                    if (sval != null) {
-                        sval = sval.trim()
-                        sval = ("" == sval) ? null : sval
-                    }
-                    valueToAssign = sval
-                } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = IsoDateUtil.parse(sval)
-                } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = IsoDateUtil.parseLocalDate(sval)
-                    //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
-                } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
-                } else if (Number.isAssignableFrom(typeToConvertTo)) {
-                    valueToAssign = sval.asType(typeToConvertTo)
-                } else if (conversionHelpers.containsKey(typeToConvertTo)) {
-                    List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
-                    ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
-                    if (converter) {
-                        valueToAssign = converter.convert(propValue)
-                    }
-                } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
-                    valueToAssign = conversionService.convert(propValue, typeToConvertTo)
+            if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
+                if (sval != null) {
+                    sval = sval.trim()
+                    sval = ("" == sval) ? null : sval
                 }
-            } else if (prop instanceof Association && propValue[ID_PROP]) {
-                valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(propValue[ID_PROP] as Long)
+                valueToAssign = sval
+            } else if (Date.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = IsoDateUtil.parse(sval)
+            } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = IsoDateUtil.parseLocalDate(sval)
+                //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
+            } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
+            } else if (Number.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = sval.asType(typeToConvertTo)
+            } else if (conversionHelpers.containsKey(typeToConvertTo)) {
+                List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
+                ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
+                if (converter) {
+                    valueToAssign = converter.convert(propValue)
+                }
+            } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
+                valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
-
-            target[prop.name] = valueToAssign
-        }catch (Exception e) {
-            addBindingError(target, prop.name, propValue, e, listener, errors)
+        } else if (prop instanceof Association && propValue[ID_PROP]) {
+            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(propValue[ID_PROP] as Long)
         }
+
+        target[prop.name] = valueToAssign
+
     }
 
     static List getBindingIncludeList(final Object object) {

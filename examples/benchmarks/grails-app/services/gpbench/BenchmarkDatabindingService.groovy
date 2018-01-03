@@ -51,6 +51,7 @@ class BenchmarkDatabindingService {
             if (!mute) println " - fat with 20+ fields, has dates and associations"
             useStaticSettersInCityFat()
             useEntityBinderBind(CityFat)
+            useEntityBinderNoErrorHandling(CityFat)
             mute = false
         }
         println ""
@@ -107,10 +108,17 @@ class BenchmarkDatabindingService {
         }
     }
 
+//    @CompileStatic
+//    void useFastBinder(Class domain) {
+//        eachCity("useEntityBinder.fastBind", domain) { instance, Map row ->
+//            entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row), null, null, null)
+//        }
+//    }
+
     @CompileStatic
-    void useFastBinder(Class domain) {
-        eachCity("useEntityBinder.fastBind", domain) { instance, Map row ->
-            entityMapBinder.fastBind(instance, new SimpleMapDataBindingSource(row), null, null, null)
+    void useEntityBinderNoErrorHandling(Class domain) {
+        eachCity("EntityMapBinder bind no error handling", domain) { instance, Map row ->
+            entityMapBinder.bind(instance, row, errorHandling: false)
         }
     }
 

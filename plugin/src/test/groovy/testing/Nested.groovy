@@ -8,7 +8,7 @@ class Nested {
     BigDecimal value
 
     static constraints = {
-        name blank: true, nullable: true
-        value nullable: true
+        name blank: true, nullable: true, examole: "test"
+        value nullable: true, example: new BigDecimal(123)
     }
 }

@@ -173,7 +173,7 @@ subprojects {
     // }
 
     test {
-        testLogging.showStandardStreams = true
+        //testLogging.showStandardStreams = true
         testLogging.exceptionFormat = 'full'
     }
 

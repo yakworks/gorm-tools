@@ -42,21 +42,21 @@ Every domain gets a repository which is either setup for you or setup by impleme
 Each method is transactional and will prevent incomplete cascading saves.
 
 - **persist()**: calls the GormRepo's persist which in turn calls domain.save(failOnError:true) 
-  Throws a [DomainException]
+  Throws a [EntityValidationException][EntityValidationException]
   
 - **remove()**:  calls the GormRepo's remove. 
-  Throws a [DomainException]
+  Throws a [EntityNotFoundException][EntityNotFoundException]
   
 ### Statics added to the domain
 
 - **create(params)**:  calls the repo.create which does the bolier plate code you might find in a scaffolded controller. 
 creates a new instance, sets the params and calls the repository.save (essentially the persist()). **ex:** `Book.insertAndSave([name:'xyz',isbn:'123'])`
-Throws a [DomainException] if anything goes wrong
+Throws a [EntityValidationException][EntityValidationException] if anything goes wrong
 
-- **update(params)**:  calls the repo.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the repository.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/DomainException.groovy) if anything goes wrong
+- **update(params)**:  calls the repo.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the repository.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [EntityValidationException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/EntityValidationException.groovy) if anything goes wrong
 
 - **remove(id)**:  calls the repository.removeById gets the instance base in the params.id, calls the delete for it. **ex:** `Book.remove([id:11])`
-Throws a [DomainException]if anything goes wrong
+Throws a [EntityNotFoundException][EntityNotFoundException] if anything goes wrong
 
 - **repo**: a quick way to get to the repository for the Domain. It will return the DefaultGormRepo that was auto created 
   or one you defined for the domain under grails-app/repository.
@@ -167,6 +167,7 @@ Here's an example.
  ```SomeEventListener.groovy``` outside of grails app.
  
  ```groovy
+ 
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import org.springframework.context.event.EventListener
@@ -184,6 +185,7 @@ public class SomeEventListener {
         }
     }
 }
+
 ```
 
  Define external class a spring bean in resources.groovy
@@ -264,7 +266,7 @@ See [RepoUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/mai
 
 **checkFound(entity, Map params,String domainClassName)** checks does the entity exists, if not throws DomainNotFoundException with human readable error text
 
-**checkVersion(entity,ver)** checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws DomainException
+**checkVersion(entity,ver)** checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws EntityValidationException
 
 **flush()** flushes the session
 
@@ -301,15 +303,15 @@ List of available messages
 
 Gorm-tools provides its own types of exceptions to handle errors which relate to domains.
 
-## DomainException
-See [DomainException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/DomainException.groovy)
+## EntityValidationException
+See [EntityValidationException][EntityValidationException]
 
 An extension of the default ValidationException. It is possible to pass the entity and the message map.
 
 ## DomainNotFoundException
-See [DomainNotFoundException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/DomainNotFoundException.groovy)
+See [EntityNotFoundException][EntityNotFoundException]
 
-An extension of the DomainException to be able to handle rest request which should respond with 404 error.
+An extension of the EntityValidationException to be able to handle rest request which should respond with 404 error.
 
 
 ## Async batch processing support
@@ -418,7 +420,8 @@ Alternatively if ```getPackageToScan()``` is provided, it will find all the repo
 [GormRepoEntity]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepoEntity.html
 [GormRepoEntity source]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/GormRepoEntity.groovy
 [Gorm]: http://gorm.grails.org/latest/hibernate/manual/index.html
-[DomainException]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/DomainException.groovy
+[EntityValidationException]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityValidationException.groovy
+[EntityNotFoundException]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityNotFoundException.groovy
 [GormToolsTest]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsTest.groovy
 [GormToolsHibernateSpec]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsHibernateSpec.groovy
 [Repository Events]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html

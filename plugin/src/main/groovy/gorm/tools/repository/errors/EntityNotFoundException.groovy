@@ -10,13 +10,12 @@ import org.springframework.dao.DataRetrievalFailureException
 @CompileStatic
 class EntityNotFoundException extends DataRetrievalFailureException {
 
-    //TODO finish this
     public EntityNotFoundException(String msg) {
         super(msg)
     }
 
-    public EntityNotFoundException(Serializable id, String msg) {
-        super(msg)
+    public EntityNotFoundException(Serializable id, String domainName) {
+        super("${domainName} not found with id ${id}")
     }
 
     /**

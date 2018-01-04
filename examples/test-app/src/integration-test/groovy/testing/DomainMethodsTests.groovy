@@ -1,11 +1,13 @@
 package testing
 
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import grails.validation.ValidationException
 import org.springframework.dao.DataAccessException
+import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
 
 //tests the persist and remove methods
@@ -60,7 +62,7 @@ class DomainMethodsTests extends Specification {
 
         def check = Jumper.findByName("jumpargs")
         then:
-        check.name == "jumpargs"
+        assert check.name == "jumpargs"
     }
 
     void testPersistFailValidation() {
@@ -71,8 +73,8 @@ class DomainMethodsTests extends Specification {
             jump.persist()
             fail "it was supposed to fail the save because of validationException"
         } catch (EntityValidationException e) {
-            e.cause instanceof ValidationException
-            e.entity == jump
+            assert e.cause instanceof grails.validation.ValidationException
+            assert e.entity == jump
         }
     }
 
@@ -86,12 +88,9 @@ class DomainMethodsTests extends Specification {
             Jumper.executeUpdate("update Jumper j set j.version=20 where j.name='jumper1'")
             jump.name = 'fukt'
             jump.persist(flush: true)
-            fail "it was supposed to fail the save because of validationException"
-        } catch (EntityValidationException e) {
-            e.cause instanceof DataAccessException
-            //assert e.cause instanceof org.springframework.orm.hibernate4.HibernateOptimisticLockingFailureException
-            e.entity == jump
-            e.messageMap.code == 'default.not.saved.message'
+            fail "it was supposed to fail the save because of OptimisticLockingFailureException"
+        } catch (OptimisticLockingFailureException e) {
+            assert e.message == "Another user has updated the testing.Jumper while you were editing"
         }
     }
 
@@ -146,6 +145,23 @@ class DomainMethodsTests extends Specification {
         Student.removeById(stud.id)
         RepoUtil.flushAndClear()
         Student.findByName("student1") == null
+    }
+
+    void testRemoveParamsFailed() {
+        setup:
+        initData()
+        when:
+        def stud = Student.findByName("student1")
+
+        then:
+        try {
+            Student.removeById(Student.last().id + 1)
+            fail "it was supposed to fail because such id doesn't exist"
+        }catch(e){
+            assert e != null
+            assert e instanceof EntityNotFoundException
+            assert e.message.startsWith("testing.Student not found with id ")
+        }
     }
 
     void testGetRepoSetup() {

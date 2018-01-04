@@ -184,11 +184,11 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
-     * @throws EntityValidationException if its not found or if a DataIntegrityViolationException is thrown
+     * @throws EntityNotFoundException if its not found or if a DataIntegrityViolationException is thrown
      */
     @Override
     void removeById( Map args = [:], Serializable id) {
-        D entity = getStaticApi().load(id)
+        D entity = get([id: id])
         doRemove(entity)
     }
 
@@ -212,13 +212,14 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * @param args - args passed to delete
      */
     void doRemove(Map args = [:], D entity) {
+        RepoUtil.checkFound(entity, entity?.ident(), getEntityClass().name)
         try {
             getRepoEventPublisher().doBeforeRemove(this, entity, args)
             entity.delete(args)
             getRepoEventPublisher().doAfterRemove(this, entity, args)
         }
-        catch (DataAccessException dae) {
-            throw handleException(dae, entity)
+        catch (DataAccessException ex) {
+            throw handleException(ex, entity)
         }
     }
 

@@ -1,21 +1,31 @@
 package gpbench.benchmarks
 
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.errors.EntityValidationException
 import gpbench.City
 import gpbench.CityRepo
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
+import org.springframework.dao.DataAccessException
+
+import static gpbench.benchmarks.ExceptionHandlingBenchmark.*
 
 /**
- * Runs batch inserts but without gpars.
+ * Runs batch inserts with exception.
  */
 @CompileStatic
-class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
+class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
 
     CityRepo cityRepo
+    Class exceptionToThrow
+    Class exceptionToCatch
 
-    SimpleBatchInsertBenchmark(boolean databinding) {
+
+    ExceptionHandlingBenchmark(boolean databinding, Class exceptionToThrow = EntityValidationException, Class exceptionToCatch=DataAccessException) {
         super(databinding)
+        this.exceptionToThrow = exceptionToThrow
+        this.exceptionToCatch = exceptionToCatch
     }
 
     @Override
@@ -36,15 +46,15 @@ class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
     void insertBatch(List<Map> batch, CityRepo repo) {
         for (Map record : batch) {
             try {
+                throw exceptionToThrow.newInstance("test")
+            } catch (exceptionToCatch) {
                 repo.create(record)
-            } catch (Exception e) {
-                e.printStackTrace()
             }
         }
     }
 
     @Override
     String getDescription() {
-        return "SimpleBatchInsert without gpars: databinding=${useDatabinding}"
+        return "ExceptionHandlingBenchmark without gpars: databinding=${useDatabinding}"
     }
 }

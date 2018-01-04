@@ -3,6 +3,8 @@ package gpbench
 import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.errors.EntityValidationException
 import gpbench.benchmarks.*
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
@@ -13,6 +15,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
+import org.springframework.dao.DataAccessException
 
 class BenchmarkRunnerService {
 
@@ -79,6 +82,10 @@ class BenchmarkRunnerService {
             println "-- single threaded - no gpars"
             runBenchmark(new SimpleBatchInsertBenchmark(true))
         }
+
+        //warmUpAndRun("### Exception handling", "runWithExceptions", binderType)
+
+        // warmUpAndRun("### Gpars - fat props","runFat", binderType)
 
         warmUpAndRun("### Gpars - Assign Properties, no grails databinding", "runBaselineCompare", binderType)
 
@@ -197,6 +204,20 @@ class BenchmarkRunnerService {
 
         new City().attached
 
+    }
+
+    void runWithExceptions(String msg, String binding) {
+        logMessage "\n$msg"
+        println "-- single threaded without exception, just for comparison"
+        runBenchmark(new SimpleBatchInsertBenchmark(true))
+        println "-- Exceptions thrown - EntityValidationException, catched - EntityValidationException"
+        runBenchmark(new ExceptionHandlingBenchmark(true, EntityValidationException, EntityValidationException))
+        println "-- Exceptions thrown - EntityValidationException, catched - DataAccessException"
+        runBenchmark(new ExceptionHandlingBenchmark(true, EntityValidationException, DataAccessException))
+        println "-- Exceptions thrown - grails.validation.ValidationException, catched - grails.validation.ValidationException"
+        runBenchmark(new ExceptionHandlingBenchmark(true, grails.validation.ValidationException, grails.validation.ValidationException))
+        println "-- Exceptions thrown - EntityNotFoundException, catched - EntityNotFoundException"
+        runBenchmark(new ExceptionHandlingBenchmark(true, EntityNotFoundException, EntityNotFoundException))
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)

@@ -4,6 +4,7 @@ import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityValidationException
 import grails.persistence.Entity
 import grails.testing.gorm.DataTest
+import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
 
 class RepoUtilsSpec extends Specification implements DataTest {
@@ -21,9 +22,8 @@ class RepoUtilsSpec extends Specification implements DataTest {
         RepoUtil.checkVersion(mocke, 0)
 
         then:
-        def e = thrown(EntityValidationException)
-        mocke.id == e.entity.id
-        "default.optimistic.locking.failure" == e.messageMap.code
+        def e = thrown(OptimisticLockingFailureException)
+        e.message == "Another user has updated the MockDomain while you were editing"
 
     }
 

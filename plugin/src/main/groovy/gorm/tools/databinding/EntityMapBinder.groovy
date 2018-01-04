@@ -17,6 +17,9 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.web.databinding.DataBindingEventMulticastListener
+import org.grails.web.databinding.GrailsWebDataBindingListener
+import org.springframework.validation.BeanPropertyBindingResult
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -52,26 +55,29 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     @Override
     protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
         //TODO this is where we will store errors
-        //BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
-//        GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
-//        List<DataBindingListener> allListeners = [errorHandlingListener]
-//        DataBindingEventMulticastListener listenerWrapper = new DataBindingEventMulticastListener(allListeners)
-//
-        fastBind(object, source, whiteList)
+        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
+        GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
+        List<DataBindingListener> allListeners = []
+        allListeners << errorHandlingListener
 
-        //populateErrors(object, bindingResult)
+        DataBindingEventMulticastListener listenerWrapper = new DataBindingEventMulticastListener(allListeners)
+
+        fastBind(object, source, whiteList, listenerWrapper, errors)
+
+        populateErrors(object, bindingResult)
     }
 
     void bind(Map args = [:], Object target, Map<String, Object> source) {
-        List includeList = (List) args.get("include")
-        if(includeList) {
+        List includeList = (List) args["include"] ?: getBindingIncludeList(target)
+        Boolean errorHandling = args["errorHandling"] == null ? true : args["errorHandling"]
+        if(errorHandling) {
             bind target, new SimpleMapDataBindingSource(source), null, includeList, null, null
         } else{
-            bind target, new SimpleMapDataBindingSource(source)
+            fastBind target, new SimpleMapDataBindingSource(source), includeList
         }
     }
 
-    void fastBind(Object target, DataBindingSource source, List whiteList = null) {
+    void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener = null, errors = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
         //println whiteList
@@ -80,7 +86,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         List<String> properties = whiteList ?: entity.persistentPropertyNames
 
         for (String prop : properties) {
-            setProp(target, source, entity.getPropertyByName(prop))
+            PersistentProperty perProp = entity.getPropertyByName(prop)
+            try{
+                setProp(target, source, perProp)
+            } catch (Exception e) {
+                if(errors) {
+                    addBindingError(target, perProp.name, source.getPropertyValue(perProp.name), e, listener, errors)
+                } else {
+                    throw e
+                }
+            }
         }
 
     }
@@ -96,25 +111,21 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             Class typeToConvertTo = prop.getType()
 
             if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
-                if(sval != null){
+                if (sval != null) {
                     sval = sval.trim()
                     sval = ("" == sval) ? null : sval
                 }
                 valueToAssign = sval
-            }
-            else if (Date.isAssignableFrom(typeToConvertTo)) {
+            } else if (Date.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = IsoDateUtil.parse(sval)
-            }
-            else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parseLocalDate(sval) //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
-            }
-            else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
+            } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
+                valueToAssign = IsoDateUtil.parseLocalDate(sval)
+                //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
+            } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
-            }
-            else if (Number.isAssignableFrom(typeToConvertTo)) {
+            } else if (Number.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = sval.asType(typeToConvertTo)
-            }
-            else if (conversionHelpers.containsKey(typeToConvertTo)) {
+            } else if (conversionHelpers.containsKey(typeToConvertTo)) {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                 ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
                 if (converter) {
@@ -128,6 +139,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
 
         target[prop.name] = valueToAssign
+
     }
 
     static List getBindingIncludeList(final Object object) {

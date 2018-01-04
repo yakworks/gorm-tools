@@ -15,6 +15,7 @@ buildscript {
 
 
 dependencies {
+    compile 'org.grails.plugins:grails-java8:1.2.2'
     testCompile "org.grails:grails-datastore-rest-client"
 }
 

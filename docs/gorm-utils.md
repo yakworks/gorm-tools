@@ -1,6 +1,6 @@
 Gorm-tools provides two utils to work with domains.
-See [GormUtils](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/GormUtils.groovy)
-and [GormMetaUtils](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/GormMetaUtils.groovy)
+See [GormUtils]{.new-tab}
+and [GormMetaUtils]{.new-tab}
 
 ## GormUtils
 
@@ -87,3 +87,6 @@ or with existing object
     // using a class
     GormMetaUtils.getPersistentEntity(Org)
 ```
+
+[GormUtils]:https://yakworks.github.io/gorm-tools/api/gorm/tools/GormUtils.html
+[GormMetaUtils]:https://yakworks.github.io/gorm-tools/api/gorm/tools/GormMetaUtils.html

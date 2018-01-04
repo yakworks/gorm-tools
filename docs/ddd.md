@@ -1,5 +1,5 @@
 
-## References
+### References
 http://blog.sapiensworks.com/post/2015/05/25/DDD-Concepts-As-One-Liners
 
 https://stackoverflow.com/questions/2378069/ddd-with-grails)

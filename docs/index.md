@@ -24,10 +24,10 @@ and Mango ( A mongo query like way to get data with a Map)
 ## Domain Repository Services
 <small>[jump to reference](repository/ref.md)</small>
 
-A repository is a [Domain Driven Design][] pattern. Used a a place logic to validate, bind, persist and query data that resides 
+A repository is a [Domain Driven Design](usefulLinks.md#references) pattern. Used a a place logic to validate, bind, persist and query data that resides 
 either in a database or NoSql (via GORM usually of course).
-The design pattern here is a bit similiar to [Spring's Repository pattern](https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/)
-and Grails GORM's new [Data Services](http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices) pattern.
+The design pattern here is a bit similiar to [Spring's Repository pattern]
+and Grails GORM's new [Data Services] pattern.
 
 ### Goals
 
@@ -62,10 +62,10 @@ based client without having to use GraphQL (the only other clean alternative)
 The Repositories and RestApiController come with a `query(criteriaMap, closure)` method. It allows you to get a paginated 
 list of entities restricted by the properties in the `criteriaMap`.
 
-* A lot of inspiration was drawn from [Restdb.io](https://restdb.io/docs/querying-with-the-api)
-* the query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
-* and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax).
-* Also inspired by [json-sql](https://github.com/2do2go/json-sql/)
+* A lot of inspiration was drawn from [Restdb.io]
+* the query language is similar to [Mongo's]
+* and CouchDB's new [Mango selector-syntax] .
+* Also inspired by [json-sql]
 
 > :memo: 
 Whilst selectors have many similarities with MongoDB query documents, 
@@ -101,5 +101,13 @@ runtime "org.grails.plugins:gorm-tools:@VERSION@"
 And you can start using the plugin by calling the repository methods on domain classes. 
 The plugin adds several persistence methods to domain classes. Which delegates to repository classes. This includes persist(), create(params), update(update), remove()
 
-See [Repository](repository.md) for more details
+See [Repository](repository/ref.md) for more details
 
+
+
+[Spring's Repository pattern]:https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/
+[Data Services]:http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices
+[Restdb.io]:https://restdb.io/docs/querying-with-the-api
+[Mongo's]:https://docs.mongodb.com/manual/reference/operator/query/
+[Mango selector-syntax]:http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax
+[json-sql]:https://github.com/2do2go/json-sql/

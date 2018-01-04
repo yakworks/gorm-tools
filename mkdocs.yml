@@ -19,6 +19,7 @@ pages:
     - Bean Path Tools: beanPathTools.md
     - Date Utils: working-with-dates.md
   - API Docs: api.md
+  - Useful links: usefulLinks.md
 
 ## edit link settings
 repo_name: yakworks/gorm-tools

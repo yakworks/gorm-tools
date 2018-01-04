@@ -1,5 +1,5 @@
 Gorm-tools comes with BeanPathTools util which provides a convenient way for manipulating with object's properties.
-See [BeanPathTools](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/BeanPathTools.groovy)
+See [BeanPathTools]{.new-tab}
 
 ### Getting specified object's properties to a map
 
@@ -36,7 +36,7 @@ a full path including parent field names divided with the ( ``` . ``` ) sign. Se
 
 ### Getting all object's properties to a map
 
-> NOTE: in case of a domain instance the method looks only for persistent properties
+> :memo: in case of a domain instance the method looks only for persistent properties
 
 The ( ```*``` )  sign represents all properties. Thus in order to get all fields we can use it as shown below:
 
@@ -46,3 +46,7 @@ The ( ```*``` )  sign represents all properties. Thus in order to get all fields
     assert userMap == [firstName: 'John', lastName: 'Doe' age: 30]
 
 ```
+
+
+
+[BeanPathTools]:https://yakworks.github.io/gorm-tools/api/gorm/tools/beans/BeanPathTools.html

@@ -9,10 +9,10 @@ the properties in the `criteriaMap`. The map could be passed as JSON string or M
 
 Anything in the optional closure will be passed into Gorm/Hibernate criteria closure
 
-* A lot of inspiration was drawn from [Restdb.io](https://restdb.io/docs/querying-with-the-api)
-* the query language is similar to [Mongo's](https://docs.mongodb.com/manual/reference/operator/query/)
-* and CouchDB's new [Mango selector-syntax](http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax).
-* Also inspired by [json-sql](https://github.com/2do2go/json-sql/)
+* A lot of inspiration was drawn from [Restdb.io]{.new-tab}
+* the query language is similar to [Mongo's]{.new-tab}
+* and CouchDB's new [Mango selector-syntax]{.new-tab}
+* Also inspired by [json-sql]{.new-tab}
 
 > :memo: 
 Whilst selectors have many similarities with MongoDB query documents, 
@@ -261,8 +261,8 @@ This would produce in a round about way with criteria builders a where clause li
 Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
 search can be passed in `$quickSearch` or `$q` keywords. 
 There are 2 ways to specify fields that should be searched against:
-1. in static property `quickSearchFields` as list of strings, see example bellow:
 
+1. in static property `quickSearchFields` as list of strings, see example bellow:
 ```groovy
 class Org {
 	String name
@@ -273,15 +273,11 @@ class Org {
 
 ```
 1. default fields in config
-
 ```yaml
 gorm:
     tools:
         mango:
-            defaultQuickSearch:
-              - name
-              - num
-              - address.city
+            defaultQuickSearch: [name, num, address.city]
 
 ```
 
@@ -323,7 +319,7 @@ With such configuration restrictions for Mango criteria should be under `filters
 ### Mango API
 
 #### Mango in the Repository
-[The Repository](repository.md) implements [MangoQueryRepo][MangoQueryRepo] Trait
+[The Repository](repository/ref.md) implements [MangoQueryTrait] Trait
 which contains implementation for two query methods:
 
 ```groovy
@@ -342,7 +338,7 @@ returns list of entities with pagination. For pagination take a look at [Pager][
 
 If one need to override mango bean for a certain repo it can be achieved in two ways:
 
-1. implement `getMangoQuery()` method that should return instance of the class that implements [MangoQueryApi.trait][MangoQueryApi]
+1. implement `getMangoQuery()` method that should return instance of the class that implements [MangoQueryApi]
 
 1. register a new bean for custom criteria, and set it for the repo with ``@Qualifier`` annotation
 
@@ -386,7 +382,7 @@ if closure is passed then applies it too.
 
 ### Count totals
 
-If one needs to compute totals for some fields, [MangoQuery] [MangoQuery] 
+If one needs to compute totals for some fields, [MangoQuery][MangoQuery] 
 has `countTotals` method. Restrictions for it are working in the same way as for query method, so it can be specified 
 with params map and criteria closure.
 
@@ -434,7 +430,7 @@ This closure is called for a specified number of records. For example, code belo
 
 ### Fetching a list of all records:
 
-> NOTE: This method holds all rows in memory, so this should not be used if there is going to be large number of rows.
+> :memo: This method holds all rows in memory, so this should not be used if there is going to be large number of rows.
 
 ```groovy
 
@@ -452,13 +448,18 @@ to a grails parameter map, which can be used for databinding.
 [mongo]:https://docs.mongodb.com/manual/reference/operator/query/
 [couchDB]:http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax
 [json-sql]:https://github.com/2do2go/json-sql/
-[MangoTidyMap]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoTidyMap.groovy
+[MangoTidyMap]:https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/MangoTidyMap.html
 [MangoTidyMapSpec]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/test/groovy/gorm/tools/mango/MangoTidyMapSpec.groovy 
-[MangoQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQuery.groovy
-[MangoQueryRepo]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoQueryRepo.groovy
+[MangoQueryRepo]:https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/api/MangoQueryApi.html
 [DetachedCriteria]:http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria
-[Pager]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/Pager.groovy
+[Pager]:https://yakworks.github.io/gorm-tools/api/gorm/tools/Pager.html
 [build method]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoBuilder.groovy#L73
-[ScrollableQuery]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/ScrollableQuery.groovy
-[GrailsParameterMapRowMapper]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/jdbc/GrailsParameterMapRowMapper.groovy
-[MangoQueryApi]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/api/MangoQueryApi.groovy
+[ScrollableQuery]:https://yakworks.github.io/gorm-tools/api/gorm/tools/jdbc/ScrollableQuery.html
+[GrailsParameterMapRowMapper]:https://yakworks.github.io/gorm-tools/api/gorm/tools/jdbc/GrailsParameterMapRowMapper.html
+[MangoQueryApi]:https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/api/MangoQueryApi.html
+[MangoQuery]:https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/MangoQuery.html
+[MangoQueryTrait]: https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/api/MangoQueryTrait.html
+[Restdb.io]:https://restdb.io/docs/querying-with-the-api
+[Mongo's]:https://docs.mongodb.com/manual/reference/operator/query/
+[Mango selector-syntax]:http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax
+[json-sql]:https://github.com/2do2go/json-sql/

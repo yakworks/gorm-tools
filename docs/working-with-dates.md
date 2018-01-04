@@ -90,3 +90,6 @@ Under the hood it uses DateUtil and supports next formats "yyyy-MM-dd", "yyyy-MM
 "yyyy-MM-dd'T'HH:mm:ss", "MM/dd/yy"
 
 To apply it to application add a spring bean for it. The bean name could be any
+
+
+[DateUtil]:https://yakworks.github.io/gorm-tools/api/gorm/tools/beans/DateUtil.html

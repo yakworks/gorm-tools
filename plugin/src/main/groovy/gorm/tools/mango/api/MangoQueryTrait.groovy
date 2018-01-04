@@ -5,6 +5,10 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+/**
+ * A helper that just delegates calls to MangoQueryApi passing in the class from the implemented getEntityClass
+ * Primary use is to enhance a Repository. see {@link gorm.tools.repository.GormRepo}
+ */
 @CompileStatic
 trait MangoQueryTrait {
 

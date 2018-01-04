@@ -53,7 +53,7 @@ Each method is transactional and will prevent incomplete cascading saves.
 creates a new instance, sets the params and calls the repository.save (essentially the persist()). **ex:** `Book.insertAndSave([name:'xyz',isbn:'123'])`
 Throws a [EntityValidationException][EntityValidationException] if anything goes wrong
 
-- **update(params)**:  calls the repo.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the repository.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [EntityValidationException](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/EntityValidationException.groovy) if anything goes wrong
+- **update(params)**:  calls the repo.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the repository.save for it. **ex:** Book.update([id:11,name:'aaa']) Throws a [EntityValidationException] if anything goes wrong
 
 - **remove(id)**:  calls the repository.removeById gets the instance base in the params.id, calls the delete for it. **ex:** `Book.remove([id:11])`
 Throws a [EntityNotFoundException][EntityNotFoundException] if anything goes wrong
@@ -155,7 +155,8 @@ class OrgSubscriber {
 In this example we can see two listeners which handle events that occur before and after
 persisting an entity of the Org domain class.
 
-> NOTE: calling methods which trigger events inside an event listener causes an infinite loop
+> :memo: 
+Calling methods which trigger events inside an event listener causes an infinite loop
 
 ## Using external groovy beans as event listeners.
 [Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) 
@@ -166,7 +167,8 @@ Here's an example.
 
  ```SomeEventListener.groovy``` outside of grails app.
  
- ```groovy
+```groovy
+ 
  
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
@@ -192,7 +194,7 @@ public class SomeEventListener {
 
  File ```grails-app/conf/spring/resources.groovy```
  
- ```groovy
+```groovy
 
     File file = new File("path to RepoEventListener.groovy")
     xmlns lang: "http://www.springframework.org/schema/lang"
@@ -245,10 +247,20 @@ class CustomMapBinder implements MapBinder {
     }
 
 }
+```
+then register the bean 
 
+```java
+beans = {
+    customMapBinder(CustomMapBinder) 
+}
+```
+
+```groovy
 class OrgRepo implements GormRepo<Org> {
     
     @Autowired
+    @Qualifier("customMapBinder")
     CustomMapBinder mapBinder
     
     .........   
@@ -260,13 +272,13 @@ This will make the OrgRepo use CustomMapBinder for data binding.
 
 ## RepoUtil, RepoMessage Helpers
 
-See [RepoUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/RepoUtil.groovy)
+See [RepoUtil]
 
 #### RepoUtil:
 
-**checkFound(entity, Map params,String domainClassName)** checks does the entity exists, if not throws DomainNotFoundException with human readable error text
+**checkFound(entity, Map params,String domainClassName)** checks does the entity exists, if not throws [EntityNotFoundException] with human readable error text
 
-**checkVersion(entity,ver)** checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws EntityValidationException
+**checkVersion(entity,ver)** checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws OptimisticLockingFailureException
 
 **flush()** flushes the session
 
@@ -276,7 +288,7 @@ See [RepoUtil](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/mai
 
 #### RepoMessage contains bunch of help methods for creating text messages
 
-See [RepoMessage](https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repositoryRepoMessage.groovy)
+See [RepoMessage]
 
 The example below shows how to build ```saved``` message for a domain:
 
@@ -308,7 +320,7 @@ See [EntityValidationException][EntityValidationException]
 
 An extension of the default ValidationException. It is possible to pass the entity and the message map.
 
-## DomainNotFoundException
+## EntityNotFoundException
 See [EntityNotFoundException][EntityNotFoundException]
 
 An extension of the EntityValidationException to be able to handle rest request which should respond with 404 error.
@@ -420,12 +432,15 @@ Alternatively if ```getPackageToScan()``` is provided, it will find all the repo
 [GormRepoEntity]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepoEntity.html
 [GormRepoEntity source]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/GormRepoEntity.groovy
 [Gorm]: http://gorm.grails.org/latest/hibernate/manual/index.html
-[EntityValidationException]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityValidationException.groovy
-[EntityNotFoundException]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityNotFoundException.groovy
-[GormToolsTest]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsTest.groovy
-[GormToolsHibernateSpec]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsHibernateSpec.groovy
+[EntityValidationException]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html
+[EntityNotFoundException]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html
+[GormToolsTest]: https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/GormToolsTest.html
+[GormToolsHibernateSpec]: https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/GormToolsHibernateSpec.html
 [Repository Events]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html
-[RepoEventPublisher]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/events/RepoEventPublisher.groovy
+[RepoEventPublisher]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/RepoEventPublisher.html
+[RepoUtil]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoUtil.html
+[RepoMessage]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoMessage.html
+[RepoMessage]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoMessage.html
 
 [Grails Events]: http://async.grails.org/latest/guide/index.html#events
 [Event Publishing]: http://async.grails.org/latest/guide/index.html#notifying

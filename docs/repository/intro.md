@@ -99,7 +99,7 @@ import gorm.tools.testing.DomainAutoTest
 import spock.lang.Specification
 
 class ProjectSpec extends DomainAutoTest<Project> {
-    /** automatically runs tests on pxersist(), create(), update(), delete().*/
+    /** automatically runs tests on persist(), create(), update(), delete().*/
 }
 ```
 
@@ -159,7 +159,7 @@ and so that validation failures can be easily seen.
 ### Testing the ProjectRepo Changes
 
 ```
-class ProjectSpec extends Specification implements DomainAutoTest<Project> {
+class ProjectSpec extends DomainAutoTest<Project> {
 TODO
 }
 ```

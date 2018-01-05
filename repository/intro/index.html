@@ -481,6 +481,18 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../usefulLinks/" title="Useful links" class="md-nav__link">
+      Useful links
+    </a>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
@@ -656,7 +668,7 @@ The details of whats available can be seen in the <a class="new-tab" href="https
 <span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
 
 <span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">DomainAutoTest</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="cm">/** automatically runs tests on pxersist(), create(), update(), delete().*/</span>
+    <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
 <span class="o">}</span>
 </pre></div>
 
@@ -706,7 +718,7 @@ The <code>persist</code> methods is another addition to the domains added by the
 the changes will be flushed during the transaction commit. They are here to doc whats happening 
 and so that validation failures can be easily seen.</p>
 <h3 id="testing-the-projectrepo-changes">Testing the ProjectRepo Changes<a class="headerlink" href="#testing-the-projectrepo-changes" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span>class ProjectSpec extends Specification implements DomainAutoTest&lt;Project&gt; {
+<div class="codehilite"><pre><span></span>class ProjectSpec extends DomainAutoTest&lt;Project&gt; {
 TODO
 }
 </pre></div>

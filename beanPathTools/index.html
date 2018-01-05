@@ -447,6 +447,18 @@
   </li>
 
     
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../usefulLinks/" title="Useful links" class="md-nav__link">
+      Useful links
+    </a>
+  </li>
+
+    
   </ul>
 </nav>
                   </div>
@@ -507,7 +519,7 @@
                 
                 
                 <p>Gorm-tools comes with BeanPathTools util which provides a convenient way for manipulating with object's properties.
-See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/beans/BeanPathTools.groovy">BeanPathTools</a></p>
+See <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/beans/BeanPathTools.html">BeanPathTools</a></p>
 <h3 id="getting-specified-objects-properties-to-a-map">Getting specified object's properties to a map<a class="headerlink" href="#getting-specified-objects-properties-to-a-map" title="Permanent link">&para;</a></h3>
 <p>In order to retrieve properties from an object and place them to a map we can use <code>buildMapFromPaths</code>
 We can possible to specify fields which should be added to the resulting map
@@ -533,7 +545,7 @@ a full path including parent field names divided with the ( <code>.</code> ) sig
 
 <h3 id="getting-all-objects-properties-to-a-map">Getting all object's properties to a map<a class="headerlink" href="#getting-all-objects-properties-to-a-map" title="Permanent link">&para;</a></h3>
 <blockquote>
-<p>NOTE: in case of a domain instance the method looks only for persistent properties</p>
+<p><img alt="📝" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> in case of a domain instance the method looks only for persistent properties</p>
 </blockquote>
 <p>The ( <code>*</code> )  sign represents all properties. Thus in order to get all fields we can use it as shown below:</p>
 <div class="codehilite"><pre><span></span>    <span class="n">Map</span> <span class="n">userMap</span> <span class="o">=</span> <span class="n">BeanPathTools</span><span class="o">.</span><span class="na">buildMapFromPaths</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="o">[</span><span class="s1">&#39;*&#39;</span><span class="o">])</span>

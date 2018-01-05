@@ -454,8 +454,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#domainnotfoundexception" title="DomainNotFoundException" class="md-nav__link">
-    DomainNotFoundException
+  <a href="#entitynotfoundexception" title="EntityNotFoundException" class="md-nav__link">
+    EntityNotFoundException
   </a>
   
 </li>
@@ -592,6 +592,18 @@
   <li class="md-nav__item">
     <a href="../../api/" title="API Docs" class="md-nav__link">
       API Docs
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../usefulLinks/" title="Useful links" class="md-nav__link">
+      Useful links
     </a>
   </li>
 
@@ -764,8 +776,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#domainnotfoundexception" title="DomainNotFoundException" class="md-nav__link">
-    DomainNotFoundException
+  <a href="#entitynotfoundexception" title="EntityNotFoundException" class="md-nav__link">
+    EntityNotFoundException
   </a>
   
 </li>
@@ -836,11 +848,11 @@ Each method is transactional and will prevent incomplete cascading saves.</p>
 <ul>
 <li>
 <p><strong>persist()</strong>: calls the GormRepo's persist which in turn calls domain.save(failOnError:true) 
-  Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityValidationException.groovy">EntityValidationException</a></p>
+  Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a></p>
 </li>
 <li>
 <p><strong>remove()</strong>:  calls the GormRepo's remove. 
-  Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityNotFoundException.groovy">EntityNotFoundException</a></p>
+  Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a></p>
 </li>
 </ul>
 <h3 id="statics-added-to-the-domain">Statics added to the domain<a class="headerlink" href="#statics-added-to-the-domain" title="Permanent link">&para;</a></h3>
@@ -848,14 +860,14 @@ Each method is transactional and will prevent incomplete cascading saves.</p>
 <li>
 <p><strong>create(params)</strong>:  calls the repo.create which does the bolier plate code you might find in a scaffolded controller. 
 creates a new instance, sets the params and calls the repository.save (essentially the persist()). <strong>ex:</strong> <code>Book.insertAndSave([name:'xyz',isbn:'123'])</code>
-Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityValidationException.groovy">EntityValidationException</a> if anything goes wrong</p>
+Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a> if anything goes wrong</p>
 </li>
 <li>
-<p><strong>update(params)</strong>:  calls the repo.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the repository.save for it. <strong>ex:</strong> Book.update([id:11,name:'aaa']) Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/EntityValidationException.groovy">EntityValidationException</a> if anything goes wrong</p>
+<p><strong>update(params)</strong>:  calls the repo.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the repository.save for it. <strong>ex:</strong> Book.update([id:11,name:'aaa']) Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a> if anything goes wrong</p>
 </li>
 <li>
 <p><strong>remove(id)</strong>:  calls the repository.removeById gets the instance base in the params.id, calls the delete for it. <strong>ex:</strong> <code>Book.remove([id:11])</code>
-Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityNotFoundException.groovy">EntityNotFoundException</a> if anything goes wrong</p>
+Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a> if anything goes wrong</p>
 </li>
 <li>
 <p><strong>repo</strong>: a quick way to get to the repository for the Domain. It will return the DefaultGormRepo that was auto created 
@@ -898,7 +910,7 @@ Throws a <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/
 <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> directly, please see docs for <a class="new-tab" href="http://async.grails.org/latest/guide/index.html#notifying">Event Publishing</a>.
 In case of using publisher annotation Grails takes event id from the method name (method with <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Publisher.html">@Publisher</a> annotation).
 If using <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> we should specify event id manually.</p>
-<p>By default Repository uses <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> to create events (see <a class="new-tab" href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/events/RepoEventPublisher.groovy">RepoEventPublisher</a>).
+<p>By default Repository uses <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> to create events (see <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>).
 It publishes a number of <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html">Repository Events</a> and provides it's own way to build event ids.
 All ids of repository events correspond to the format <code>&lt;domainName&gt;.&lt;eventTypeName&gt;</code>.
 As we can see there are two values separated with a dot. The first comes a name of a domain class, for which an event
@@ -936,7 +948,8 @@ by default. For example, methods like <code>someEvent()</code> or <code>onSomeEv
 In this example we can see two listeners which handle events that occur before and after
 persisting an entity of the Org domain class.</p>
 <blockquote>
-<p>NOTE: calling methods which trigger events inside an event listener causes an infinite loop</p>
+<p><img alt="📝" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
+Calling methods which trigger events inside an event listener causes an infinite loop</p>
 </blockquote>
 <h2 id="using-external-groovy-beans-as-event-listeners">Using external groovy beans as event listeners.<a class="headerlink" href="#using-external-groovy-beans-as-event-listeners" title="Permanent link">&para;</a></h2>
 <p><a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy">Spring dynamic languages support</a> 
@@ -944,36 +957,32 @@ can be used to register classes defined outside of application into groovy scrip
 Which makes it possible to externalize the event listeners if required so.</p>
 <p>Here's an example.</p>
 <p><code>SomeEventListener.groovy</code> outside of grails app.</p>
-<p>```groovy</p>
-<p>import gorm.tools.repository.events.AfterRemoveEvent
-import gorm.tools.repository.events.BeforeBindEvent
-import org.springframework.context.event.EventListener</p>
-<p>public class SomeEventListener {</p>
-<div class="codehilite"><pre><span></span>@EventListener
-void beforeBind(BeforeBindEvent&lt;Org&gt; event) {
-    Org org = event.entity
-    if(event.bindAction == &#39;Create&#39;){
-        //do something before create with event.data
-        org.event = &quot;Creating with data ${event.data}&quot;
-    } else if(event.bindAction == &#39;Update&#39;){
-        org.event = &quot;Updating with data ${event.data}&quot;
-    }
-}
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gorm.tools.repository.events.AfterRemoveEvent</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforeBindEvent</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.event.EventListener</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SomeEventListener</span> <span class="o">{</span>
+
+    <span class="nd">@EventListener</span>
+    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">BeforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
+        <span class="k">if</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">bindAction</span> <span class="o">==</span> <span class="s1">&#39;Create&#39;</span><span class="o">){</span>
+            <span class="c1">//do something before create with event.data</span>
+            <span class="n">org</span><span class="o">.</span><span class="na">event</span> <span class="o">=</span> <span class="s2">&quot;Creating with data ${event.data}&quot;</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">bindAction</span> <span class="o">==</span> <span class="s1">&#39;Update&#39;</span><span class="o">){</span>
+            <span class="n">org</span><span class="o">.</span><span class="na">event</span> <span class="o">=</span> <span class="s2">&quot;Updating with data ${event.data}&quot;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
 
+<p>Define external class a spring bean in resources.groovy</p>
+<p>File <code>grails-app/conf/spring/resources.groovy</code></p>
+<div class="codehilite"><pre><span></span>    <span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s2">&quot;path to RepoEventListener.groovy&quot;</span><span class="o">)</span>
+    <span class="n">xmlns</span> <span class="nl">lang:</span> <span class="s2">&quot;http://www.springframework.org/schema/lang&quot;</span>
 
-<p>}</p>
-<div class="codehilite"><pre><span></span> Define external class a spring bean in resources.groovy
-
- File ```grails-app/conf/spring/resources.groovy```
-
- ```groovy
-
-    File file = new File(&quot;path to RepoEventListener.groovy&quot;)
-    xmlns lang: &quot;http://www.springframework.org/schema/lang&quot;
-
-    String beanName = GrailsNameUtils.getPropertyName(file.name.replace(&#39;.groovy&#39;, &#39;&#39;))
-    lang.groovy(id: beanName, &#39;script-source&#39;: &quot;file:&lt;path to file&gt;&quot;, &#39;refresh-check-delay&#39;: 1000)
+    <span class="n">String</span> <span class="n">beanName</span> <span class="o">=</span> <span class="n">GrailsNameUtils</span><span class="o">.</span><span class="na">getPropertyName</span><span class="o">(</span><span class="n">file</span><span class="o">.</span><span class="na">name</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s1">&#39;.groovy&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">))</span>
+    <span class="n">lang</span><span class="o">.</span><span class="na">groovy</span><span class="o">(</span><span class="nl">id:</span> <span class="n">beanName</span><span class="o">,</span> <span class="s1">&#39;script-source&#39;</span><span class="o">:</span> <span class="s2">&quot;file:&lt;path to file&gt;&quot;</span><span class="o">,</span> <span class="s1">&#39;refresh-check-delay&#39;</span><span class="o">:</span> <span class="mi">1000</span><span class="o">)</span>
 </pre></div>
 
 <p>See <a href="https://github.com/yakworks/gorm-tools/blob/8356c50e13874921c9b42c2c9fa1f93d2c2a6826/examples/benchmarks/grails-app/conf/spring/resources.groovy#L25-L25">example</a> 
@@ -999,7 +1008,7 @@ without going through the converters, thus resulting in faster performance.</p>
 <p><strong>Using custom MapBinder</strong><br />
 By default all Repositories use the default <code>entityMapBinder</code> for databinding. However when a Repository is explicitly 
 created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.</p>
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CustomMapBinder</span> <span class="kd">implements</span> <span class="n">MapBinder</span> <span class="o">{</span>
+<p><div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CustomMapBinder</span> <span class="kd">implements</span> <span class="n">MapBinder</span> <span class="o">{</span>
 
     <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">,</span> <span class="n">String</span> <span class="n">bindMethod</span><span class="o">)</span> <span class="o">{</span>
         <span class="c1">//implement  </span>
@@ -1010,10 +1019,17 @@ created for a domain class, and if required, a custom MapBinder implementation c
     <span class="o">}</span>
 
 <span class="o">}</span>
+</pre></div>
+then register the bean </p>
+<div class="codehilite"><pre><span></span><span class="n">beans</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">customMapBinder</span><span class="o">(</span><span class="n">CustomMapBinder</span><span class="o">)</span> 
+<span class="o">}</span>
+</pre></div>
 
-<span class="kd">class</span> <span class="nc">OrgRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="nd">@Autowired</span>
+    <span class="nd">@Qualifier</span><span class="o">(</span><span class="s2">&quot;customMapBinder&quot;</span><span class="o">)</span>
     <span class="n">CustomMapBinder</span> <span class="n">mapBinder</span>
 
     <span class="o">.........</span>   
@@ -1022,15 +1038,15 @@ created for a domain class, and if required, a custom MapBinder implementation c
 
 <p>This will make the OrgRepo use CustomMapBinder for data binding.</p>
 <h2 id="repoutil-repomessage-helpers">RepoUtil, RepoMessage Helpers<a class="headerlink" href="#repoutil-repomessage-helpers" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/RepoUtil.groovy">RepoUtil</a></p>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoUtil.html">RepoUtil</a></p>
 <h4 id="repoutil">RepoUtil:<a class="headerlink" href="#repoutil" title="Permanent link">&para;</a></h4>
-<p><strong>checkFound(entity, Map params,String domainClassName)</strong> checks does the entity exists, if not throws DomainNotFoundException with human readable error text</p>
-<p><strong>checkVersion(entity,ver)</strong> checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws EntityValidationException</p>
+<p><strong>checkFound(entity, Map params,String domainClassName)</strong> checks does the entity exists, if not throws <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a> with human readable error text</p>
+<p><strong>checkVersion(entity,ver)</strong> checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws OptimisticLockingFailureException</p>
 <p><strong>flush()</strong> flushes the session</p>
 <p><strong>clear()</strong> clears session cache</p>
 <p><strong>flushAndClear()</strong> flushes the session and clears the session cache</p>
 <h4 id="repomessage-contains-bunch-of-help-methods-for-creating-text-messages">RepoMessage contains bunch of help methods for creating text messages<a class="headerlink" href="#repomessage-contains-bunch-of-help-methods-for-creating-text-messages" title="Permanent link">&para;</a></h4>
-<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repositoryRepoMessage.groovy">RepoMessage</a></p>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoMessage.html">RepoMessage</a></p>
 <p>The example below shows how to build <code>saved</code> message for a domain:</p>
 <div class="codehilite"><pre><span></span>    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">id:</span><span class="mi">100</span><span class="o">,</span><span class="nl">version:</span><span class="mi">1</span><span class="o">)</span>
 
@@ -1052,10 +1068,10 @@ created for a domain class, and if required, a custom MapBinder implementation c
 </ul>
 <p>Gorm-tools provides its own types of exceptions to handle errors which relate to domains.</p>
 <h2 id="entityvalidationexception">EntityValidationException<a class="headerlink" href="#entityvalidationexception" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityValidationException.groovy">EntityValidationException</a></p>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a></p>
 <p>An extension of the default ValidationException. It is possible to pass the entity and the message map.</p>
-<h2 id="domainnotfoundexception">DomainNotFoundException<a class="headerlink" href="#domainnotfoundexception" title="Permanent link">&para;</a></h2>
-<p>See <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/errors/EntityNotFoundException.groovy">EntityNotFoundException</a></p>
+<h2 id="entitynotfoundexception">EntityNotFoundException<a class="headerlink" href="#entitynotfoundexception" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a></p>
 <p>An extension of the EntityValidationException to be able to handle rest request which should respond with 404 error.</p>
 <h2 id="async-batch-processing-support">Async batch processing support<a class="headerlink" href="#async-batch-processing-support" title="Permanent link">&para;</a></h2>
 <p>Plugin makes it easy to process list of batches asynchronously with transaction using <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>. 
@@ -1082,7 +1098,7 @@ created for a domain class, and if required, a custom MapBinder implementation c
 </pre></div>
 
 <h2 id="testing-support">Testing support<a class="headerlink" href="#testing-support" title="Permanent link">&para;</a></h2>
-<p>Plugin provides <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsTest.groovy">GormToolsTest</a> and <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsHibernateSpec.groovy">GormToolsHibernateSpec</a>
+<p>Plugin provides <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/GormToolsTest.html">GormToolsTest</a> and <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/GormToolsHibernateSpec.html">GormToolsHibernateSpec</a>
 To make it easy to write tests which utilizes repository.</p>
 <p><strong>Writing unit tests using GormToolsTest</strong><br />
 GormToolsTest extends grails DataTest and configures a repository bean for every mock domain.<br />

@@ -135,13 +135,42 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
                 valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
-        } else if (prop instanceof Association && propValue[ID_PROP]) {
-            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(propValue[ID_PROP] as Long)
+        } else if (prop instanceof Association) {
+            //TODO pass bindAction
+            bindAssociation(target, valueToAssign, (Association)prop, BindAction.Update)
         }
 
         target[prop.name] = valueToAssign
+    }
+
+    void bindAssociation(Object target, def value, Association association, BindAction bindAction) {
+        Object idValue = getIdentifierValueFrom(value)
+        if(bindAction == BindAction.Update) {
+            if (idValue != 'null' && idValue != null && idValue != '') {
+                def instace = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+                target[association.name] = instace
+                if(association.isOwningSide() && value instanceof Map && instace) {
+                    //TODO pass listener and errors
+                    fastBind(instace, new SimpleMapDataBindingSource(value))
+                }
+            }
+        }
+
+        else if (bindAction == BindAction.Create) {
+            Object instance
+            if(association.isOwningSide() && value instanceof Map) {
+                instance = association.type.newInstance()
+            } else {
+                instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+            }
+
+            if(value instanceof Map) fastBind(instance, new SimpleMapDataBindingSource((Map)value))
+            target[association.name] = instance
+        }
 
     }
+
+
 
     static List getBindingIncludeList(final Object object) {
         List<String> whiteList = []

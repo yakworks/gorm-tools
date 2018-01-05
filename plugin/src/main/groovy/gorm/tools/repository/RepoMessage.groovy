@@ -91,7 +91,6 @@ class RepoMessage {
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
-
     static Map updated(entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.updated.message", p.args, "${p.domainLabel} ${p.ident} updated")

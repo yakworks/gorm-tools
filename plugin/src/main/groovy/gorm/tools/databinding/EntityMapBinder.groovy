@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter
  * Explicitly checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
  *
  */
+@SuppressWarnings(['CatchException', 'VariableName'])
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     private static final String ID_PROP = "id"

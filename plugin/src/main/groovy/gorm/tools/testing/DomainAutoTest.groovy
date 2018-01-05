@@ -1,7 +1,6 @@
 package gorm.tools.testing
 
 import gorm.tools.GormMetaUtils
-import gorm.tools.beans.DateUtil
 import gorm.tools.beans.IsoDateUtil
 import grails.gorm.validation.DefaultConstrainedProperty
 import grails.testing.gorm.DomainUnitTest
@@ -99,7 +98,7 @@ abstract class DomainAutoTest<D> extends GormToolsHibernateSpec implements Domai
     void test_update() {
         setup:
         D entity = getDomainClass().create(values)
-        Map values = values
+        //Map values = values
         values.id = entity.id
         when:
         getDomainClass().update(values)

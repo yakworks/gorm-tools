@@ -24,8 +24,7 @@ class RepoExceptionSupport {
             return new OptimisticLockingFailureException(RepoMessage.optimisticLockingFailure(entity, true).defaultMessage as String)
         } else if (ex instanceof DataAccessException) {
             return new EntityValidationException(RepoMessage.notSavedDataAccess(entity, true), entity, ex)
-        } else {
-            throw ex
         }
+        throw ex
     }
 }

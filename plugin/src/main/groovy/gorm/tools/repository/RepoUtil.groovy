@@ -3,7 +3,6 @@ package gorm.tools.repository
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
-import gorm.tools.repository.errors.EntityValidationException
 import grails.plugin.gormtools.RepositoryArtefactHandler
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic

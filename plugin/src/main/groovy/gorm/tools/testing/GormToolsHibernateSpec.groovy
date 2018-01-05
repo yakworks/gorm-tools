@@ -15,6 +15,7 @@ import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AssignableTypeFilter
 
+@SuppressWarnings(['AbstractClassWithoutAbstractMethod'])
 //@CompileStatic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper, AutowiredTest {
 

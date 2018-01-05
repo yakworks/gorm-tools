@@ -114,5 +114,11 @@ This will instruct hibernate to store and retrieve the dates in UTC timezone.
 However it should be noted that if you query the date values with JDBC it will be retrieved in JVM timezone and not UTC and will need to be converted to UTC manually or use the overloaded version of ResultSet.getTimeStamp that takes calendar as second argument
 Eg. ```ResultSet#getTimestamp(int columnIndex, Calendar cal)```
 
+### References on this
+http://in.relation.to/2016/09/12/jdbc-time-zone-configuration-property/
+https://hibernate.atlassian.net/browse/HHH-11396
+https://vladmihalcea.com/2017/03/14/how-to-store-date-time-and-timestamps-in-utc-time-zone-with-jdbc-and-hibernate/
+https://stackoverflow.com/questions/31965179/whats-new-in-hibernate-orm-5
+
 
 [DateUtil]:https://yakworks.github.io/gorm-tools/api/gorm/tools/beans/DateUtil.html

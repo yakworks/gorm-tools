@@ -91,5 +91,28 @@ Under the hood it uses DateUtil and supports next formats "yyyy-MM-dd", "yyyy-MM
 
 To apply it to application add a spring bean for it. The bean name could be any
 
+## Dealing with timezones when storing dates.
+
+By default JDBC drivers stores and retrieves the dates/timestamps in local JVM timezone. 
+However it is generally recommended to use UTC for storing dates in database. 
+
+There are two ways to store the date values in UTC. One is to change the default time zone of JVM using ```TimeZone.setDefault( TimeZone.getTimeZone( "UTC" ) );```
+However this forces to change the jvm default time zone which may not be possible in all cases.
+
+Another option is to use the hibernate setting ```hibernamte.jdbc.time_zone```
+
+With grails, the timezone which hibernate uses can be configured in ```application.yml``` as shown below.
+
+```yaml
+hibernate:
+    jdbc:
+      time_zone: UTC
+``` 
+
+This will instruct hibernate to store and retrieve the dates in UTC timezone.
+
+However it should be noted that if you query the date values with JDBC it will be retrieved in JVM timezone and not UTC and will need to be converted to UTC manually or use the overloaded version of ResultSet.getTimeStamp that takes calendar as second argument
+Eg. ```ResultSet#getTimestamp(int columnIndex, Calendar cal)```
+
 
 [DateUtil]:https://yakworks.github.io/gorm-tools/api/gorm/tools/beans/DateUtil.html

@@ -30,6 +30,8 @@ abstract class DomainAutoTest<D> extends GormToolsHibernateSpec implements Domai
         values = buildExampleData.buildValues()
     }
 
+    //TODO: think about more intelligent way to override default test methods
+
     void test_create() {
         when:
         D entity = getDomainClass().create(values)

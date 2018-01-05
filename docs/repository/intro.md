@@ -158,9 +158,35 @@ and so that validation failures can be easily seen.
 
 ### Testing the ProjectRepo Changes
 
+[DomainAutoTest] already contains default tests for `create`, `update`, `persist`, `delete` methods, that are called from 
+repo. So if, for example, any changes were made for create method for ProjectRepo:
+
+```groovy
+@Artefact("Repository")
+@Transactional
+class ProjectRepo extends DefaultGormRepo<Project> {
+
+    @Override
+    @CompileDynamic
+    Org create(Map params) {
+        params.name = "#" + params.name 
+        super.create(params)
+     }
+}
+```
+then you can override test case to check specific value 
+
 ```
 class ProjectSpec extends DomainAutoTest<Project> {
-TODO
+    
+    void test_create() {
+            when:
+            D entity = getDomainClass().create(values)
+            then:
+            entity.id != null
+            entity.name[0] == "#"
+        }
+    
 }
 ```
 
@@ -175,3 +201,4 @@ TODO
 [DomainException]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/grails/plugin/repository/DomainException.groovy
 [GormToolsTest]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsTest.groovy
 [GormToolsHibernateSpec]: https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/testing/GormToolsHibernateSpec.groovy
+[DomainAutoTest]: https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/DomainAutoTest.html

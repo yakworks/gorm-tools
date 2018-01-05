@@ -166,14 +166,28 @@ The interval can be configured using ```refresh-check-delay```
 
 Here is an example of how to define a refreshable bean within grails application.
 
-File: resources.groovy
+File: ```RefreshableBean.groovy```
+
+```groovy
+class RefreshableBean {
+
+    void helloWorld() { }    
+    .....
+
+}
+```
+
+
+File: ```resources.groovy```
 
 ```groovy
  
  xmlns lang: "http://www.springframework.org/schema/lang"
- lang.groovy(id: "testBean", 'script-source': "file:<path to groovy script>", 'refresh-check-delay': 1000)
+ lang.groovy(id: "refreshableBean", 'script-source': "file:<path to RefreshableBean.groovy>", 'refresh-check-delay': 1000)
 
 ```
+
+Now the ```refreshableBean``` can be injected into any other bean. Spring will reload it automatically if the RefreshableBean.groovy changes.
 
 See [Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) for more details. 
 

@@ -448,6 +448,26 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dealing-with-timezones-when-storing-dates" title="Dealing with timezones when storing dates." class="md-nav__link">
+    Dealing with timezones when storing dates.
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#references-on-this" title="References on this" class="md-nav__link">
+    References on this
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
       
       
     </ul>
@@ -552,6 +572,26 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#dealing-with-timezones-when-storing-dates" title="Dealing with timezones when storing dates." class="md-nav__link">
+    Dealing with timezones when storing dates.
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#references-on-this" title="References on this" class="md-nav__link">
+    References on this
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
       
       
     </ul>
@@ -639,6 +679,26 @@
 <p>Under the hood it uses DateUtil and supports next formats "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ss.SSSZ", "yyyy-MM-dd'T'HH:mm:ssZ",
 "yyyy-MM-dd'T'HH:mm:ss", "MM/dd/yy"</p>
 <p>To apply it to application add a spring bean for it. The bean name could be any</p>
+<h2 id="dealing-with-timezones-when-storing-dates">Dealing with timezones when storing dates.<a class="headerlink" href="#dealing-with-timezones-when-storing-dates" title="Permanent link">&para;</a></h2>
+<p>By default JDBC drivers stores and retrieves the dates/timestamps in local JVM timezone. 
+However it is generally recommended to use UTC for storing dates in database. </p>
+<p>There are two ways to store the date values in UTC. One is to change the default time zone of JVM using <code>TimeZone.setDefault( TimeZone.getTimeZone( &quot;UTC&quot; ) );</code>
+However this forces to change the jvm default time zone which may not be possible in all cases.</p>
+<p>Another option is to use the hibernate setting <code>hibernamte.jdbc.time_zone</code></p>
+<p>With grails, the timezone which hibernate uses can be configured in <code>application.yml</code> as shown below.</p>
+<div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hibernate</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">jdbc</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">time_zone</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">UTC</span>
+</pre></div>
+
+<p>This will instruct hibernate to store and retrieve the dates in UTC timezone.</p>
+<p>However it should be noted that if you query the date values with JDBC it will be retrieved in JVM timezone and not UTC and will need to be converted to UTC manually or use the overloaded version of ResultSet.getTimeStamp that takes calendar as second argument
+Eg. <code>ResultSet#getTimestamp(int columnIndex, Calendar cal)</code></p>
+<h3 id="references-on-this">References on this<a class="headerlink" href="#references-on-this" title="Permanent link">&para;</a></h3>
+<p><a href="http://in.relation.to/2016/09/12/jdbc-time-zone-configuration-property/">http://in.relation.to/2016/09/12/jdbc-time-zone-configuration-property/</a>
+<a href="https://hibernate.atlassian.net/browse/HHH-11396">https://hibernate.atlassian.net/browse/HHH-11396</a>
+<a href="https://vladmihalcea.com/2017/03/14/how-to-store-date-time-and-timestamps-in-utc-time-zone-with-jdbc-and-hibernate/">https://vladmihalcea.com/2017/03/14/how-to-store-date-time-and-timestamps-in-utc-time-zone-with-jdbc-and-hibernate/</a>
+<a href="https://stackoverflow.com/questions/31965179/whats-new-in-hibernate-orm-5">https://stackoverflow.com/questions/31965179/whats-new-in-hibernate-orm-5</a></p>
                 
                   
                 

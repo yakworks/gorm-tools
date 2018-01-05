@@ -135,12 +135,15 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
                 valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
+
+            target[prop.name] = valueToAssign
+            
         } else if (prop instanceof Association) {
             //TODO pass bindAction
-            bindAssociation(target, valueToAssign, (Association)prop, BindAction.Update)
+            bindAssociation(target, valueToAssign, (Association)prop, BindAction.Create)
         }
 
-        target[prop.name] = valueToAssign
+
     }
 
     void bindAssociation(Object target, def value, Association association, BindAction bindAction) {

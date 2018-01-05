@@ -158,9 +158,29 @@ persisting an entity of the Org domain class.
 > :memo: 
 Calling methods which trigger events inside an event listener causes an infinite loop
 
+## Defining refreshable beans using Spring dynamic language support.
+Since 2.0 Spring added support for defining beans using supported dynamic languages. Eg. groovy. 
+This makes it possible to create groovy script files outside of application which contains class definition, and use it as spring bean.
+This feature can be used to create refreshable beans, spring will watch the external script for changes and automatically reload the bean if it has changed.
+The interval can be configured using ```refresh-check-delay``` 
+
+Here is an example of how to define a refreshable bean within grails application.
+
+File: resources.groovy
+
+```groovy
+ 
+ xmlns lang: "http://www.springframework.org/schema/lang"
+ lang.groovy(id: "testBean", 'script-source': "file:<path to groovy script>", 'refresh-check-delay': 1000)
+
+```
+
+See [Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) for more details. 
+
+Below is an example of how to use refreshable bean as event listener.
+
 ## Using external groovy beans as event listeners.
-[Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) 
-can be used to register classes defined outside of application into groovy scripts as spring beans.
+Spring dynamic language support can be used to register classes defined outside of application into groovy scripts as spring beans.
 Which makes it possible to externalize the event listeners if required so.
  
 Here's an example.

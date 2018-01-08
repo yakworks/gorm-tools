@@ -33,7 +33,6 @@ import java.time.format.DateTimeFormatter
 @SuppressWarnings(['CatchException', 'VariableName'])
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
-    private static final String ID_PROP = "id"
 
     EntityMapBinder() {
         super(null)
@@ -137,12 +136,11 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             }
 
             target[prop.name] = valueToAssign
-            
+
         } else if (prop instanceof Association) {
             //TODO pass bindAction
             bindAssociation(target, valueToAssign, (Association)prop, BindAction.Create)
         }
-
 
     }
 
@@ -150,7 +148,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         Object idValue = getIdentifierValueFrom(value)
         if(bindAction == BindAction.Update) {
             if (idValue != 'null' && idValue != null && idValue != '') {
-                def instace = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+                Object instace = getPersistentInstance(getDomainClassType(target, association.name), idValue)
                 target[association.name] = instace
                 if(association.isOwningSide() && value instanceof Map && instace) {
                     //TODO pass listener and errors
@@ -163,7 +161,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             Object instance
             if(association.isOwningSide() && value instanceof Map) {
                 instance = association.type.newInstance()
-            } else {
+            } else if (association.getType().isAssignableFrom(value.getClass())) {
+                instance = value
+            }
+            else {
                 instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
 
@@ -172,8 +173,6 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
 
     }
-
-
 
     static List getBindingIncludeList(final Object object) {
         List<String> whiteList = []

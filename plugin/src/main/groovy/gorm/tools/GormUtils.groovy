@@ -73,7 +73,7 @@ class GormUtils {
     @CompileStatic
     static <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, Map<String, Object> override = [:], boolean ignoreAssociations = false) {
         EntityMapBinder binder = (EntityMapBinder) AppCtx.get("entityMapBinder")
-        binder.bind(target, source)
+        binder.bind(target, source, null)
 
         if (override) {
             override.each { String key, val ->

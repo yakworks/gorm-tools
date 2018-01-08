@@ -7,7 +7,7 @@ import grails.databinding.DataBinder
  */
 interface MapBinder extends DataBinder{
 
-    void bind(Map args, Object target, Map<String, Object> source)
+    void bind(Map args, Object target, Map<String, Object> source, BindAction bindAction)
 
-    void bind(Object target, Map<String, Object> source)
+    void bind(Object target, Map<String, Object> source, BindAction bindAction)
 }

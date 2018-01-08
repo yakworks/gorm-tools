@@ -7,6 +7,7 @@ import grails.testing.gorm.DataTest
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -33,7 +34,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [age: "100"])
+        binder.bind(domain, [age: "100"], BindAction.Create)
 
         then:
         0 * longConverter.canConvert(_)
@@ -49,7 +50,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [dobDate: "2017-10-10", localDate: "2017-10-10", localDateTime: "2017-11-22"])
+        binder.bind(domain, [dobDate: "2017-10-10", localDate: "2017-10-10", localDateTime: "2017-11-22"], BindAction.Create)
 
         then:
         0 * dateConverter.canConvert(_)
@@ -62,7 +63,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         def isoDateZ = "2017-11-22T22:22:22.222Z"
         binder.bind(domain, [dobDate: isoDateZ,
                              localDate: isoDateZ,
-                             localDateTime: isoDateZ])
+                             localDateTime: isoDateZ], BindAction.Create)
 
         then:
         domain.dobDate == IsoDateUtil.parse(isoDateZ)
@@ -73,7 +74,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         def isoDateNoTZ = "2017-11-22T22:22"
         binder.bind(domain, [dobDate: isoDateNoTZ,
                              localDate: isoDateNoTZ,
-                             localDateTime: isoDateNoTZ])
+                             localDateTime: isoDateNoTZ], BindAction.Create)
 
         then:
         domain.dobDate == IsoDateUtil.parse(isoDateNoTZ)
@@ -90,7 +91,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [currency: "INR"])
+        binder.bind(domain, [currency: "INR"], BindAction.Create)
 
         then:
         1 * currencyConverter.canConvert("INR") >> true
@@ -106,7 +107,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [currency: "INR"])
+        binder.bind(domain, [currency: "INR"], BindAction.Create)
 
         then:
         1 * conversionService.canConvert(_, _) >> true
@@ -121,7 +122,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         AnotherDomain assoc = new AnotherDomain(id: 1, name: "test").save(failOnError: true, flush: true)
         Map params = ["anotherDomain": [id: 1]]
         when:
-        binder.bind(domain, params)
+        binder.bind(domain, params, BindAction.Create)
 
         then:
         domain.anotherDomain == assoc
@@ -132,21 +133,21 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [active: "true"]
 
         when:
-        binder.bind(testDomain, params)
+        binder.bind(testDomain, params, BindAction.Create)
 
         then:
         testDomain.active == true
 
         when:
         params = [active: "false"]
-        binder.bind(testDomain, params)
+        binder.bind(testDomain, params, BindAction.Create)
 
         then:
         testDomain.active == false
 
         when:
         params = [active: "on"]
-        binder.bind(testDomain, params)
+        binder.bind(testDomain, params, BindAction.Create)
 
         then:
         testDomain.active == true
@@ -158,13 +159,13 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [name: " test "]
 
         when:
-        binder.bind(testDomain, params)
+        binder.bind(testDomain, params, BindAction.Create)
 
         then:
         testDomain.name == "test"
 
         when:
-        binder.bind(testDomain, [name: "   "])
+        binder.bind(testDomain, [name: "   "], BindAction.Create)
 
         then:
         testDomain.name == null
@@ -176,7 +177,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [name: 'bill', notBindable: 'got it']
 
         when:
-        binder.bind(testDomain, params)
+        binder.bind(testDomain, params, BindAction.Create)
 
         then:
         testDomain.name == 'bill'
@@ -184,7 +185,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
 
         when:
         testDomain = new TestDomain()
-        binder.bind(testDomain, params, include: ['notBindable'])
+        binder.bind(testDomain, params, include: ['notBindable'], BindAction.Create)
 
         then:
         testDomain.name == null
@@ -196,7 +197,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [age: 'test']
 
         when:
-        binder.bind(testDomain, params)
+        binder.bind(testDomain, params, BindAction.Create)
 
         then:
         noExceptionThrown()

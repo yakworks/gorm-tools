@@ -1,6 +1,7 @@
 package gpbench
 
 import gorm.tools.beans.IsoDateUtil
+import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
@@ -118,14 +119,14 @@ class BenchmarkDatabindingService {
     @CompileStatic
     void useEntityBinderNoErrorHandling(Class domain) {
         eachCity("EntityMapBinder bind no error handling", domain) { instance, Map row ->
-            entityMapBinder.bind(instance, row, errorHandling: false)
+            entityMapBinder.bind(instance, row, errorHandling: false, BindAction.Create)
         }
     }
 
     @CompileStatic
     void useEntityBinderBind(Class domain) {
         eachCity("EntityMapBinder bind", domain) { instance, Map row ->
-            entityMapBinder.bind(instance, row)
+            entityMapBinder.bind(instance, row, BindAction.Create)
         }
     }
 

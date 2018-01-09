@@ -718,8 +718,31 @@ The <code>persist</code> methods is another addition to the domains added by the
 the changes will be flushed during the transaction commit. They are here to doc whats happening 
 and so that validation failures can be easily seen.</p>
 <h3 id="testing-the-projectrepo-changes">Testing the ProjectRepo Changes<a class="headerlink" href="#testing-the-projectrepo-changes" title="Permanent link">&para;</a></h3>
+<p><a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/DomainAutoTest.html">DomainAutoTest</a> already contains default tests for <code>create</code>, <code>update</code>, <code>persist</code>, <code>delete</code> methods, that are called from 
+repo. So if, for example, any changes were made for create method for ProjectRepo:</p>
+<p><div class="codehilite"><pre><span></span><span class="nd">@Artefact</span><span class="o">(</span><span class="s2">&quot;Repository&quot;</span><span class="o">)</span>
+<span class="nd">@Transactional</span>
+<span class="kd">class</span> <span class="nc">ProjectRepo</span> <span class="kd">extends</span> <span class="n">DefaultGormRepo</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="nd">@CompileDynamic</span>
+    <span class="n">Org</span> <span class="nf">create</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">params</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="n">params</span><span class="o">.</span><span class="na">name</span> 
+        <span class="kd">super</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
+     <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+then you can override test case to check specific value </p>
 <div class="codehilite"><pre><span></span>class ProjectSpec extends DomainAutoTest&lt;Project&gt; {
-TODO
+
+    void test_create() {
+            when:
+            D entity = getDomainClass().create(values)
+            then:
+            entity.id != null
+            entity.name[0] == &quot;#&quot;
+        }
+
 }
 </pre></div>
                 

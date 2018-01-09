@@ -1152,7 +1152,6 @@ DefaultGormRepo as the repository for the given domain.</p>
 
      <span class="nl">when:</span>
      <span class="n">City</span> <span class="n">city</span> <span class="o">=</span> <span class="n">City</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
-     <span class="n">gormtools</span>
 
      <span class="nl">then:</span>
      <span class="n">city</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="s2">&quot;Chicago&quot;</span>
@@ -1183,6 +1182,34 @@ Can be used to unit test with full hibernate support with inmemory database.</p>
 
 <p>When <code>getDomainClasses()</code> is overridden GormToolsHibernateSpec will try to find the repository in the same package as domain class. 
 Alternatively if <code>getPackageToScan()</code> is provided, it will find all the repository from the given package and below it. </p>
+<p><strong>DomainAutoTest</strong>
+Also plugin provides <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/DomainAutoTest.html">DomainAutoTest</a> abstract class that contains default tests cases for CRUD operations. 
+<code>DomainAutoTest</code> will mock the domain, setup and create the data for you then exercise the domain and the default repository service for you.
+See example bellow:</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gorm.tools.testing.DomainAutoTest</span>
+<span class="kn">import</span> <span class="nn">testing.Project</span>
+
+<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">DomainAutoTest</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
+
+<span class="o">}</span>
+</pre></div>
+
+<p>The next methods will be added and executed for Project class:</p>
+<ul>
+<li>test_create</li>
+<li>test_update</li>
+<li>test_persist</li>
+<li>test_delete</li>
+</ul>
+<p>Each of them can be overridden by the method with the same name if needed. //TODO: think how make it more intelligent</p>
+<p>Test data is build with help of <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/BuildExampleHolder.html">BuildExampleData</a> and [BuildExampleHolder]. </p>
+<p>BuildExampleHolder - is a holder that stores BuildExampleData instances for domains, to avoid creating of the same values 
+several times</p>
+<p>BuildExampleData is class that builds test data based on <code>example</code> property from constraints section. If domain class has association
+that shouldn't be <code>null</code>(has constrain <code>nullable: false</code>), creates test data for it to, left null otherwise.
+Dates in <code>example</code> should be string format, they will be parsed to dates.</p>
                 
                   
                 

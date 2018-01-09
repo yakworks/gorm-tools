@@ -242,68 +242,6 @@ See [example](https://github.com/yakworks/gorm-tools/blob/8356c50e13874921c9b42c
 in benchmarks project.  
 
 
-## Data binding using MapBinder
-Plugin comes with a ```MapBinder``` Which is used by a Repository to perform databinding.
-Plugin configures ```entityMapBinder``` as default implementation of ```MapBinder```. ```entityMapBinder``` is similar 
-to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.
-However entityMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates 
-without going through the converters, thus resulting in faster performance.
-
-**Example**
-
-```groovy
-class SomeService {
-    @Autowired
-    MapBinder binder
-
-    void foo(Map params) {
-        Org org = new Org()
-        binder.bind(org, params)
-    }
-}
-
-```
-
-**Using custom MapBinder**  
-By default all Repositories use the default ```entityMapBinder``` for databinding. However when a Repository is explicitly 
-created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.
-
-```groovy
-
-class CustomMapBinder implements MapBinder {
-
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, String bindMethod) {
-        //implement  
-    }
-
-    public <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source) {
-        //implement
-    }
-
-}
-```
-then register the bean 
-
-```java
-beans = {
-    customMapBinder(CustomMapBinder) 
-}
-```
-
-```groovy
-class OrgRepo implements GormRepo<Org> {
-    
-    @Autowired
-    @Qualifier("customMapBinder")
-    CustomMapBinder mapBinder
-    
-    .........   
-}
-
-```
-
-This will make the OrgRepo use CustomMapBinder for data binding.
-
 ## RepoUtil, RepoMessage Helpers
 
 See [RepoUtil]

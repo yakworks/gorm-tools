@@ -205,6 +205,63 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.errors.hasFieldErrors('age')
     }
 
+    void "create should create new association if it belongsTo"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'test', nested:[name:"test"]]
+
+        when:
+        binder.bind(testDomain, params, BindAction.Create)
+
+        then:
+        testDomain.name == "test"
+        testDomain.nested != null
+        testDomain.nested.name == "test"
+    }
+
+    void "create should load existing association if it does not belongsTo"() {
+        TestDomain testDomain = new TestDomain()
+        AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
+        Map params = [name: 'test', anotherDomain:[id:1, name:"test"]]
+
+        when:
+        binder.bind(testDomain, params, BindAction.Create)
+
+        then:
+        testDomain.name == "test"
+        testDomain.anotherDomain != null
+        testDomain.anotherDomain == anotherDomain
+        testDomain.anotherDomain.name == "test"
+    }
+
+    void "update should load existing association"() {
+        TestDomain testDomain = new TestDomain()
+        AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
+        Map params = [name: 'test', anotherDomain:[id:1, name:"test"]]
+
+        when:
+        binder.bind(testDomain, params, BindAction.Update)
+
+        then:
+        testDomain.name == "test"
+        testDomain.anotherDomain != null
+        testDomain.anotherDomain == anotherDomain
+        testDomain.anotherDomain.name == "name"
+    }
+
+    void "update should deep bind association if it belongsTo"() {
+        TestDomain testDomain = new TestDomain()
+        Nested nested = new Nested(id:1, name:"name").save()
+        Map params = [name: 'test', nested:[id:1, name:"test"]]
+
+        when:
+        binder.bind(testDomain, params, BindAction.Update)
+
+        then:
+        testDomain.name == "test"
+        testDomain.nested != null
+        testDomain.nested == nested
+        testDomain.nested.name == "test"
+    }
 }
 
 
@@ -220,13 +277,27 @@ class TestDomain {
     Boolean active
 
     AnotherDomain anotherDomain
+    Nested nested
 
     static constraints = {
         notBindable bindable: false
+        nested nullable: false
+        anotherDomain nullable: true
     }
 }
 
 @Entity
 class AnotherDomain {
     String name
+}
+
+@Entity
+class Nested {
+    String name
+
+    static belongsTo = [TestDomain]
+
+    static constraints = {
+        name nullable: false
+    }
 }

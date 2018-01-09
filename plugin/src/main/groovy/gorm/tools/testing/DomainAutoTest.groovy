@@ -94,7 +94,7 @@ abstract class DomainAutoTest<D> extends GormToolsHibernateSpec implements Domai
         then:
         entity.id != null
     }
-    
+
     void test_update() {
         setup:
         D entity = getDomainClass().create(values)

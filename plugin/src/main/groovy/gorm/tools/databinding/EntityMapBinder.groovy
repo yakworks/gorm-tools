@@ -90,7 +90,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         for (String prop : properties) {
             PersistentProperty perProp = entity.getPropertyByName(prop)
             try{
-                setProp(target, source, perProp, bindAction)
+                setProp(target, source, perProp, listener, errors, bindAction)
             } catch (Exception e) {
                 if(errors) {
                     addBindingError(target, perProp.name, source.getPropertyValue(perProp.name), e, listener, errors)
@@ -102,7 +102,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
-    void setProp(Object target, DataBindingSource source, PersistentProperty prop, BindAction bindAction){
+    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null, BindAction bindAction){
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
@@ -140,15 +140,14 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             target[prop.name] = valueToAssign
 
         } else if (prop instanceof Association) {
-            //TODO pass bindAction
-            bindAssociation(target, valueToAssign, (Association)prop, bindAction)
+            bindAssociation(target, valueToAssign, (Association)prop, listener, errors, bindAction)
         } else {
             target[prop.name] = valueToAssign
         }
 
     }
 
-    void bindAssociation(Object target, def value, Association association, BindAction bindAction) {
+    void bindAssociation(Object target, def value, Association association, DataBindingListener listener = null, errors = null, BindAction bindAction) {
         Object idValue =  isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
         if(bindAction == BindAction.Update) {
 
@@ -161,7 +160,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 target[association.name] = instace
                 if(association.isOwningSide() && value instanceof Map && instace) {
                     //TODO pass listener and errors
-                    fastBind(instace, new SimpleMapDataBindingSource(value), bindAction)
+                    fastBind(instace, new SimpleMapDataBindingSource(value), null, listener, errors, bindAction)
                 }
             }
         }

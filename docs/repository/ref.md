@@ -482,7 +482,7 @@ The next methods will be added and executed for Project class:
 * test_persist
 * test_delete
 
-Each of them can be overridden by the method with the same name if needed. //TODO: think how make it more intelligent
+Each of them can be overridden by the method with the same name if needed. 
 
 Test data is build with help of [BuildExampleData] and [BuildExampleHolder]. 
 

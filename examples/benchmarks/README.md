@@ -39,8 +39,9 @@ The goal is to have good benchmarks to measure and answer following questions.
 ## How to run the benchmarks
 
 - There is a script ```run-benchmarks.sh``` which will run the benchmarks
-- Run ```./run-benchmarks.sh```
-- See the script for more details.
+- Run ```./run-benchmarks.sh``` or `gradle assemble; java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 build/libs/benchmarks.war`
+- **loadIterations** multiplies the base 36k City record set. so setting it to 3 will insert 118k rows.
+- **gpars.poolsize** 1 for single thread, set to 5 if you have a 4 core processor (even if its 8 cores with hyperhreading)
 
 
 ## Changing default pool size

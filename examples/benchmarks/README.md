@@ -55,13 +55,16 @@ Example: ```java -Dgpars.poolsize=5 -jar grails-gpars-batch-load-benchmark-0.1.w
   Example: ```java -DsecondLevelCache=true -jar grails-gpars-batch-load-benchmark-0.1.war```
 
 * To specify caching strategy ('read-write, 'read-only', 'nonstrict-read-write', 'transactional')
-  pass 'cacheStrategy' system property with name strategy. By default, it is 'read-write'.
+  pass 'cacheStrategy' system property with name strategy. See Grails [Caching strategy]{.new-tab}.
+  By default, it is 'read-write'.
   Example: 
   ``` java -DsecondLevelCache=true -jar grails-gpars-batch-load-benchmark-0.1.war ```
   ``` java -DsecondLevelCache=true -DsecondLevelCache='read-only' -jar grails-gpars-batch-load-benchmark-0.1.war ```
 
 * It is important to specify correct config for EhCache (such as maxElementsInMemory parameter).
   See benchmarks/conf/ehcache.xml file.
+  
+* Config for MySql is added, but it is commented out for now.
 
 ## The Benchmarks
 
@@ -119,12 +122,19 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 
 ## Benchmark results for case when using Second Level Cache
 
-* Intel® Core™ i5-6600 CPU @ 3.30GHz × 4; 15.5 GiB RAM; Ubuntu 16.04 64bit
-* each thread reads 37230 records
+* Intel® Core™ i5-6600 CPU @ 3.30GHz × 4; 16 GiB RAM; Ubuntu 16.04 64bit
+
+* Second level cache makes sense for read operations and doesn't increase performance significantly for inserts.
+  The benchmark reads all the records once at the beginning to save them to cache
+  (records will be added to second level cache only after the first read).
+  Then it reads the same records in multiple threads at the same time.
+  **Each thread reads all records - 37230 records. As a result (37230 * numberOfThreads) will be read.**
+    This is done to simulate work of multiple users, that interact with the same data. 
+  
+* These are results of the benchmark for **read** operations for different databases and caching strategies.
+  In most cases using of Second Level Cache improves the benchmark performance.  
 
 **Results for case when using Second Level Cache with H2 database**
-
-*** processing time  
 
 |         Cache strategy         | 2 threads | 5 threads | 9 threads |
 | ------------------------------ | --------- | --------- | --------- |
@@ -134,20 +144,7 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 | nonstrict-read-write           | 1.748s    | 1.204s    | 1.549s    |
 | transactional                  | 0.584s    | 0.603s    | 0.848s    |
 
-*** Second level cache hits
-
-|         Cache strategy         | 2 threads | 5 threads | 9 threads |
-| ------------------------------ | --------- | --------- | --------- |
-| without second level cache     | 0         | 0         | 0         |
-| read-only                      | 111673    | 223352    | 372267    |
-| read-write                     | 74460     | 186150    | 335070    |
-| nonstrict-read-write           | 74430     | 186078    | 335017    |
-| transactional                  | 111652    | 223345    | 372253    |
-
-
 **Results for case when using Second Level Cache with MySQL database**
-
-*** processing time
 
 |         Cache strategy         | 2 threads | 5 threads | 9 threads |
 | ------------------------------ | --------- | --------- | --------- |
@@ -156,16 +153,6 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 | read-write                     | 4.324s    | 4.442s    | 4.56s     |
 | nonstrict-read-write           | 4.183s    | 5.036s    | 4.688s    |
 | transactional                  | 0.488s    | 0.615s    | 1.124s    |
-
-*** Second level cache hits
-
-|         Cache strategy         | 2 threads | 5 threads | 9 threads |
-| ------------------------------ | --------- | --------- | --------- |
-| without second level cache     | 0         | 0         | 0         |
-| read-only                      | 111665    | 223338    | 372261    |
-| read-write                     | 74460     | 186150    | 335070    |
-| nonstrict-read-write           | 74415     | 186069    | 334995    |
-| transactional                  | 111662    | 223349    | 372259    |
 
 <!-- BENCHMARKS -->
 ```
@@ -378,3 +365,4 @@ and the gpars docs
 [GPars]: http://gpars.org/guide/index.html
 [SimpleJdbc Example]: http://www.brucephillips.name/blog/index.cfm/2010/10/28/Example-Of-Using-Spring-JDBC-Execute-Batch-To-Insert-Multiple-Rows-Into-A-Database-Table
 [Zach]:http://grails.1312388.n4.nabble.com/Grails-Hang-with-Bulk-Data-Import-Using-GPars-td3410441.html
+[Caching strategy]:http://docs.grails.org/3.1.1/guide/single.html#caching

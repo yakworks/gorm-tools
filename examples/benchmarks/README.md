@@ -49,6 +49,20 @@ The goal is to have good benchmarks to measure and answer following questions.
 By default benchmarks uses default gpars pool size which is (availableProcessors + 1) which can be modified by passing system property ```gpars.poolsize=xx```
 Example: ```java -Dgpars.poolsize=5 -jar grails-gpars-batch-load-benchmark-0.1.war```
 
+## Enable Second Level cache
+
+* By default Second level cache is disabled for benchmarks. Use the 'secondLevelCache' system property to enable it.
+  Example: ```java -DsecondLevelCache=true -jar grails-gpars-batch-load-benchmark-0.1.war```
+
+* To specify caching strategy ('read-write, 'read-only', 'nonstrict-read-write', 'transactional')
+  pass 'cacheStrategy' system property with name strategy. By default, it is 'read-write'.
+  Example: 
+  ``` java -DsecondLevelCache=true -jar grails-gpars-batch-load-benchmark-0.1.war ```
+  ``` java -DsecondLevelCache=true -DsecondLevelCache='read-only' -jar grails-gpars-batch-load-benchmark-0.1.war ```
+
+* It is important to specify correct config for EhCache (such as maxElementsInMemory parameter).
+  See benchmarks/conf/ehcache.xml file.
+
 ## The Benchmarks
 
 - GparsBatchInsertBenchmark - Runs the batches in parallel, each batch with the same size as jdbc batch size (50).
@@ -101,6 +115,57 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 | no dao                                    | 10.603 |
 | DataflowQueue (CED Way)                   | 12.356 |
 | Custom IdGenerator                        | 12.532 |
+
+
+## Benchmark results for case when using Second Level Cache
+
+* Intel® Core™ i5-6600 CPU @ 3.30GHz × 4; 15.5 GiB RAM; Ubuntu 16.04 64bit
+* each thread reads 37230 records
+
+**Results for case when using Second Level Cache with H2 database**
+
+*** processing time  
+
+|         Cache strategy         | 2 threads | 5 threads | 9 threads |
+| ------------------------------ | --------- | --------- | --------- |
+| without second level cache     | 1.223s    | 1.55s     | 2.389s    |
+| read-only                      | 0.556s    | 0.742s    | 0.839s    |
+| read-write                     | 1.014s    | 1.046s    | 1.43s     |
+| nonstrict-read-write           | 1.748s    | 1.204s    | 1.549s    |
+| transactional                  | 0.584s    | 0.603s    | 0.848s    |
+
+*** Second level cache hits
+
+|         Cache strategy         | 2 threads | 5 threads | 9 threads |
+| ------------------------------ | --------- | --------- | --------- |
+| without second level cache     | 0         | 0         | 0         |
+| read-only                      | 111673    | 223352    | 372267    |
+| read-write                     | 74460     | 186150    | 335070    |
+| nonstrict-read-write           | 74430     | 186078    | 335017    |
+| transactional                  | 111652    | 223345    | 372253    |
+
+
+**Results for case when using Second Level Cache with MySQL database**
+
+*** processing time
+
+|         Cache strategy         | 2 threads | 5 threads | 9 threads |
+| ------------------------------ | --------- | --------- | --------- |
+| without second level cache     | 8.044s    | 9.533s    | 14.52s    |
+| read-only                      | 0.476s    | 0.645s    | 1.113s    |
+| read-write                     | 4.324s    | 4.442s    | 4.56s     |
+| nonstrict-read-write           | 4.183s    | 5.036s    | 4.688s    |
+| transactional                  | 0.488s    | 0.615s    | 1.124s    |
+
+*** Second level cache hits
+
+|         Cache strategy         | 2 threads | 5 threads | 9 threads |
+| ------------------------------ | --------- | --------- | --------- |
+| without second level cache     | 0         | 0         | 0         |
+| read-only                      | 111665    | 223338    | 372261    |
+| read-write                     | 74460     | 186150    | 335070    |
+| nonstrict-read-write           | 74415     | 186069    | 334995    |
+| transactional                  | 111662    | 223349    | 372259    |
 
 <!-- BENCHMARKS -->
 ```

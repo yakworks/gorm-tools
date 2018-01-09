@@ -38,6 +38,7 @@ benchmark {
 grails {
     gorm.default.mapping = {
         id generator: 'gorm.tools.hibernate.PooledTableIdGenerator'
+        cache System.getProperty("cacheStrategy", "true").toString()
     }
     gorm.default.constraints = {
         '*'(nullable:true)
@@ -49,5 +50,11 @@ grails.plugin.springsecurity.active = Boolean.valueOf(System.getProperty("spring
 environments {
     production {
         grails.dbconsole.enabled = true
+    }
+}
+
+hibernate {
+    cache {
+        use_second_level_cache = System.getProperty("secondLevelCache", "false").toBoolean()
     }
 }

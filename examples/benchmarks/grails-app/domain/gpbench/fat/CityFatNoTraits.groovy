@@ -44,7 +44,7 @@ class CityFatNoTraits {
     static belongsTo = [region: Region, country: Country, region2: Region, country2: Country, region3: Region, country3: Country]
 
     static mapping = {
-        cache true
+//        cache true
     }
 
     static constraints = {

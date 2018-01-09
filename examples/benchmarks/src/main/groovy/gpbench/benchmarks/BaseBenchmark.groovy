@@ -27,7 +27,7 @@ abstract class BaseBenchmark extends AbstractBenchmark {
 
     void setup() {
         RecordsLoader recordsLoader = useDatabinding ? csvReader : jsonReader
-        cities = recordsLoader.read("City100k")
+        cities = recordsLoader.read("City")
     }
 
     @Transactional

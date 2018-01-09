@@ -9,7 +9,7 @@ class Region {
     static belongsTo = [country: Country]
 
     static mapping = {
-        cache true
+//        cache true
         id generator: "assigned"
 
     }

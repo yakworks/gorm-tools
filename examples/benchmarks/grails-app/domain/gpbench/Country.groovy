@@ -9,7 +9,7 @@ class Country {
 
     static mapping = {
         id generator: "assigned"
-        cache true
+//        cache true
     }
 
     static constraints = {

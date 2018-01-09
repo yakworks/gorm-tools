@@ -1,19 +1,17 @@
 package gorm.tools.testing
 
-import gorm.tools.GormMetaUtils
-import gorm.tools.beans.IsoDateUtil
-import grails.gorm.validation.DefaultConstrainedProperty
 import grails.testing.gorm.DomainUnitTest
-import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.PersistentProperty
-import org.grails.datastore.mapping.model.types.Association
 import org.springframework.core.GenericTypeResolver
 import spock.lang.Shared
 
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert', 'AbstractClassWithoutAbstractMethod'])
 abstract class DomainAutoTest<D> extends GormToolsHibernateSpec implements DomainUnitTest<D> {
 
-    D domainInstance
+    /** this is called by the {@link org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor} */
+    Class<?>[] getDomainClassesToMock() {
+        [getDomainClass()].toArray(Class)
+    }
+
     Class<D> domainClass // the domain class this is for
 
     Class<D> getDomainClass() {
@@ -22,71 +20,17 @@ abstract class DomainAutoTest<D> extends GormToolsHibernateSpec implements Domai
     }
 
     @Shared
+    BuildExampleData<D> buildExampleData = BuildExampleHolder.get(getDomainClass())
+
+    @Shared
     Map values = [:]
-    // map of values for domain, build based on `example`, includes values for required nested associations
-
-    /**
-     *
-     * @return persistent entity
-     */
-    PersistentEntity getPersistentEntity(String domainClassName = getDomainClass().name) {
-        GormMetaUtils.getPersistentEntity(domainClassName)
-    }
-
-    /**
-     *
-     * @return list of persistent properties
-     */
-    List<PersistentProperty> getPersistentProperties(PersistentEntity persistentEntity) {
-        persistentEntity.persistentProperties
-    }
-
-    //Map of constrains properties for class
-    Map getConstrainedProperties(PersistentEntity persistentEntity) {
-        GormMetaUtils.findConstrainedProperties(persistentEntity)
-    }
-
-    /**
-     *
-     * setup values from `example` of constraints
-     *
-     * @return map with values from constraint example
-     */
-    Map fillValues(PersistentEntity persistentEntity) {
-        Map result = [:]
-        getPersistentProperties(persistentEntity).each { PersistentProperty property ->
-            DefaultConstrainedProperty constrain = getConstrainedProperties(persistentEntity)[property.getName()]
-            if (property instanceof Association) {
-                if (!constrain.getAppliedConstraint("nullable").nullable) {
-                    Class<PersistentEntity> pe = getPersistentEntity(property.associatedEntity.javaClass.name)
-                    result[property.getName()] = pe.newInstance(fillValues(getPersistentEntity(property.associatedEntity.javaClass.name)))
-                }
-            } else {
-                result[property.getName()] = property.type == Date ? IsoDateUtil.parse(constrain?.metaConstraints?.example?:"") : constrain?.metaConstraints?.example
-            }
-        }
-        result
-    }
-
-    /** this is called by the {@link org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor} */
-    Class<?>[] getDomainClassesToMock() {
-        [getDomainClass()].toArray(Class)
-    }
-
-    /**
-     * @return An instance of the domain class
-     */
-    D getDomain() {
-        if (domainInstance == null) {
-            domainInstance = getDomainClass().newInstance()
-        }
-        domainInstance
-    }
 
     @Override
     void setupSpec() {
-        values = fillValues(getPersistentEntity())
+        values = buildExampleData.buildValues()
     }
+
+    //TODO: think about more intelligent way to override default test methods
 
     void test_create() {
         when:
@@ -122,6 +66,10 @@ abstract class DomainAutoTest<D> extends GormToolsHibernateSpec implements Domai
         entity.delete()
         then:
         getDomainClass().get(entity.id) == null
+    }
+
+    void cleanupSpec(){
+        BuildExampleHolder.clear()
     }
 
 }

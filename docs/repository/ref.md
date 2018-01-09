@@ -422,7 +422,6 @@ class CitySpec extends Specification implements GormToolsTest {
      
      when:
      City city = City.create(params)
-     gormtools
      
      then:
      city.name == "Chicago"
@@ -458,6 +457,41 @@ class CitySpec extends GormToolsHibernateSpec {
 When ```getDomainClasses()``` is overridden GormToolsHibernateSpec will try to find the repository in the same package as domain class. 
 Alternatively if ```getPackageToScan()``` is provided, it will find all the repository from the given package and below it. 
 
+**DomainAutoTest**
+Also plugin provides [DomainAutoTest] abstract class that contains default tests cases for CRUD operations. 
+`DomainAutoTest` will mock the domain, setup and create the data for you then exercise the domain and the default repository service for you.
+See example bellow:
+
+```groovy
+
+import gorm.tools.testing.DomainAutoTest
+import testing.Project
+
+class ProjectSpec extends DomainAutoTest<Project> {
+
+    /** automatically runs tests on persist(), create(), update(), delete().*/
+
+}
+
+```
+
+The next methods will be added and executed for Project class:
+
+* test_create
+* test_update
+* test_persist
+* test_delete
+
+Each of them can be overridden by the method with the same name if needed. //TODO: think how make it more intelligent
+
+Test data is build with help of [BuildExampleData] and [BuildExampleHolder]. 
+
+BuildExampleHolder - is a holder that stores BuildExampleData instances for domains, to avoid creating of the same values 
+several times
+
+BuildExampleData is class that builds test data based on `example` property from constraints section. If domain class has association
+that shouldn't be `null`(has constrain `nullable: false`), creates test data for it to, left null otherwise.
+Dates in `example` should be string format, they will be parsed to dates.
 
 [RepositoryApi]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepositoryApi.html
 [GormRepo]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepo.html
@@ -475,6 +509,9 @@ Alternatively if ```getPackageToScan()``` is provided, it will find all the repo
 [RepoUtil]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoUtil.html
 [RepoMessage]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoMessage.html
 [RepoMessage]: https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoMessage.html
+[DomainAutoTest]: https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/DomainAutoTest.html
+[BuildExampleData]: https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/BuildExampleData.html
+[BuildExampleData]: https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/BuildExampleHolder.html
 
 [Grails Events]: http://async.grails.org/latest/guide/index.html#events
 [Event Publishing]: http://async.grails.org/latest/guide/index.html#notifying

@@ -43,28 +43,72 @@ The goal is to have good benchmarks to measure and answer following questions.
 - **loadIterations** multiplies the base 36k City record set. so setting it to 3 will insert 118k rows.
 - **gpars.poolsize** 1 for single thread, set to 5 if you have a 4 core processor (even if its 8 cores with hyperhreading)
 
+## How to run the benchmarks with Second level cache
+
+* By default Second level cache is disabled for benchmarks. To enable it we should use the 'secondLevelCache' system property.
+  For example:
+    ```java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 -DsecondLevelCache=true build/libs/benchmarks.war```
+    
+*  ```./run-benchmarks.sh``` script by default starts benchmarks without Second Level Cache.
+  It contains the "Running benchmarks with Second Level cache" section with commented out configuration,
+  which can be used to run benchmarks with Second Level Cache.
+  Uncomment the next line in the script to run benchmarks with Second Level cache:
+  ```#gradle assemble; java -server -jar -DloadIterations=3 -Dgpars.poolsize=5 -DsecondLevelCache=true build/libs/benchmarks.war```
+  
+  **Note**: Changing caching strategy can affect benchmark results
+    
+* Caching strategies
+    - read-only: Useful for data that is read frequently but never updated (e.g. referential data like Countries). It has the best performances of all.
+    - read-write: Desirable if your data needs to be updated. But it doesn't provide a SERIALIZABLE isolation level, phantom reads can occur (you may see at the end of a transaction something that wasn't there at the start). It has more overhead than read-only.
+    - nonstrict-read-write: Alternatively, if it's unlikely two separate transaction threads could update the same object, you may use the nonstrict–read–write strategy. It has less overhead than read-write. This one is useful for data that are rarely updated.
+    - transactional: If you need a fully transactional cache. Only suitable in a JTA environment.
+    See Grails [Caching strategy]{.new-tab} and [Hiberante Second Level cache]{.new-tab} docs for more information 
+
+* Using 'cacheStrategy' system property we can specify the caching strategy for all domains.
+  The default caching strategy is 'read-write'.
+  For example:
+  we can use default strategy (read-write)
+  ```java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 -DsecondLevelCache=true build/libs/benchmarks.war```
+  or specify it as a string parameter like so
+  ```java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 -DsecondLevelCache=true -DcacheStrategy='read-write' build/libs/benchmarks.war ```
+  
+* EhCache configuration.
+  We use [EhCache]{.new-tab} as the implementation for Second Level cache.
+  Grails documentation has not much information about configuring EhCache.
+  By default EhCache uses it's own configuration for cache (e.g. max elements in memory, etc).
+  **Note** that there might be issues with benchmark results when the max number of records in
+  default EhCache config is less that the number of records are used in a benchmark.
+  Due to this fact it is highly critical to have appropriate cache size (it depends on data amount),
+  we have defined custom configuration for EhCache in the ```benchmarks/grails-app/conf/ehcache.xml``` file.
+  Here is the example of custom ```ehcache.xml`` file: 
+  ```
+  <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/ehcache.xsd">
+      <diskStore path="java.io.tmpdir"/>
+      <defaultCache
+              maxElementsInMemory="50000"
+              overflowToDisk="false"
+              maxElementsOnDisk="0"
+      >
+      </defaultCache>
+  </ehcache>
+  ```
+  
+  ```maxElementsInMemory``` defines maximum number of elements in memory;
+  ```overflowToDisk``` defines if data should be saved to disk in case if maximum number of elements in memory is reached 
+  For more information see docs for [EhCache Configuration]{.new-tabs}
+
+* Using MySQL database.
+  In case of using MySQL database instead of H2, the performance impact from using Second level cache
+  can be better seen in benchmark results.
+  To be able to use MySQL database please uncomment config for dataSource in 
+  ```../benchmarks/conf/application.yml``` and dependency for the mysql connector in ```../benchmarks/build.gradle```
+  and change default production environment config.
+  Tested with MySQL 5.7.20.
 
 ## Changing default pool size
 
 By default benchmarks uses default gpars pool size which is (availableProcessors + 1) which can be modified by passing system property ```gpars.poolsize=xx```
 Example: ```java -Dgpars.poolsize=5 -jar grails-gpars-batch-load-benchmark-0.1.war```
-
-## Enable Second Level cache
-
-* By default Second level cache is disabled for benchmarks. Use the 'secondLevelCache' system property to enable it.
-  Example: ```java -DsecondLevelCache=true -jar grails-gpars-batch-load-benchmark-0.1.war```
-
-* To specify caching strategy ('read-write, 'read-only', 'nonstrict-read-write', 'transactional')
-  pass 'cacheStrategy' system property with name strategy. See Grails [Caching strategy]{.new-tab}.
-  By default, it is 'read-write'.
-  Example: 
-  ``` java -DsecondLevelCache=true -jar grails-gpars-batch-load-benchmark-0.1.war ```
-  ``` java -DsecondLevelCache=true -DsecondLevelCache='read-only' -jar grails-gpars-batch-load-benchmark-0.1.war ```
-
-* It is important to specify correct config for EhCache (such as maxElementsInMemory parameter).
-  See benchmarks/conf/ehcache.xml file.
-  
-* Config for MySql is added, but it is commented out for now.
 
 ## The Benchmarks
 
@@ -122,19 +166,50 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 
 ## Benchmark results for case when using Second Level Cache
 
-* Intel® Core™ i5-6600 CPU @ 3.30GHz × 4; 16 GiB RAM; Ubuntu 16.04 64bit
+* Next benchmarks were launched on the PC - Intel® Core™ i5-6600 CPU @ 3.30GHz × 4; 16 GiB RAM; Ubuntu 16.04 64bit
 
-* Second level cache makes sense for read operations and doesn't increase performance significantly for inserts.
+* Benchmark results for insert operations with- and without- Second Level Cache.
+
+**Note:** An attempt to update an entity with ```read-only``` caching strategy
+        will produce the exception with message "Cannot make an immutable entity modifiable" 
+
+**Using H2 database**
+
+|            Pool size                                 | without cache | read-write | nonstrict-read-write | transactional |
+| ---------------------------------------------------- | ------------- | ---------- | -------------------- | ------------- |
+| GparsBaselineBenchmark<CityBaseline>                 | 2.394s        | 2.462s     | 2.26s                | 2.741s        |
+| GparsBaselineBenchmark<City>                         | 2.237s        | 3.218s     | 2.641s               | 2.655s        |
+| GparsRepoBenchmark<City> (Events disabled)           | 2.207s        | 2.335s     | 2.316s               | 2.6s          |
+| GparsRepoBenchmark<City> (Events enabled)            | 2.309s        | 2.453s     | 2.463s               | 2.911s        |
+| GparsRepoBenchmark<CityMethodEvents> (method events) | 2.619s        | 2.888s     | 3.812s               | 2.638s        |
+| GparsRepoBenchmark<CitySpringEvents> (spring events) | 2.209s        | 3.572s     | 3.915s               | 4.955s        |
+| GparsRepoBenchmark<CitySpringEventsRefreshable>      | 2.546s        | 3.223s     | 2.616s               | 2.573s        |
+| GparsBaselineBenchmark<CityAuditTrail>               | 2.326s        | 2.371s     | 2.259s               | 2.429s        |
+
+
+**Using MySQL database**
+
+|            Pool size                                 | without cache | read-write | nonstrict-read-write | transactional |
+| ---------------------------------------------------- | ------------- | ---------- | -------------------- | ------------- |
+| GparsBaselineBenchmark<CityBaseline>                 | 6.569s        | 5.437s     | 5.486s               | 6.095s        |
+| GparsBaselineBenchmark<City>                         | 6.092s        | 6.744s     | 6.744s               | 6.209s        |
+| GparsRepoBenchmark<City> (Events disabled)           | 6.084s        | 6.786s     | 7.092s               | 6.024s        |
+| GparsRepoBenchmark<City> (Events enabled)            | 6.359s        | 6.466s     | 7.176s               | 6.439s        |
+| GparsRepoBenchmark<CityMethodEvents> (method events) | 5.04s         | 6.904s     | 5.634s               | 5.26s         |
+| GparsRepoBenchmark<CitySpringEvents> (spring events) | 6.105s        | 6.495s     | 6.849s               | 6.207s        |
+| GparsRepoBenchmark<CitySpringEventsRefreshable>      | 6.658s        | 6.521s     | 6.51s                | 6.083s        |
+| GparsBaselineBenchmark<CityAuditTrail>               | 5.831s        | 5.877s     | 6.228s               | 6.952s        |
+
+
+**Results of the benchmark for **read** operations for different databases and caching strategies**
+
   The benchmark reads all the records once at the beginning to save them to cache
   (records will be added to second level cache only after the first read).
   Then it reads the same records in multiple threads at the same time.
   **Each thread reads all records - 37230 records. As a result (37230 * numberOfThreads) will be read.**
-    This is done to simulate work of multiple users, that interact with the same data. 
-  
-* These are results of the benchmark for **read** operations for different databases and caching strategies.
-  In most cases using of Second Level Cache improves the benchmark performance.  
+  This is done to simulate work of multiple users, that interact with the same data.
 
-**Results for case when using Second Level Cache with H2 database**
+**Using H2 database**
 
 |         Cache strategy         | 2 threads | 5 threads | 9 threads |
 | ------------------------------ | --------- | --------- | --------- |
@@ -144,7 +219,7 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 | nonstrict-read-write           | 1.748s    | 1.204s    | 1.549s    |
 | transactional                  | 0.584s    | 0.603s    | 0.848s    |
 
-**Results for case when using Second Level Cache with MySQL database**
+**Using MySQL database**
 
 |         Cache strategy         | 2 threads | 5 threads | 9 threads |
 | ------------------------------ | --------- | --------- | --------- |
@@ -153,6 +228,40 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 | read-write                     | 4.324s    | 4.442s    | 4.56s     |
 | nonstrict-read-write           | 4.183s    | 5.036s    | 4.688s    |
 | transactional                  | 0.488s    | 0.615s    | 1.124s    |
+
+**Results of the benchmark for **update** operations for different databases and caching strategies.
+  Firstly, this benchmark reads all the records (37k) at the beginning to save them to Second level cache.
+  Then it updates records using pool of threads and splits 37k between threads** 
+
+**Using H2 database**
+
+|         Cache strategy         | 2 threads | 5 threads | 9 threads |
+| ------------------------------ | --------- | --------- | --------- |
+| without second level cache     | 3.101s    | 2.989s    | 2.389s    |
+| read-write                     | 1.748s    | 1.204s    | 4.215s    |
+| nonstrict-read-write           | 1.748s    | 1.204s    | 4.215s    |
+| transactional                  | 2.565s    | 3.37s     | 2.827s    |
+
+**Using MySQL database**
+
+|         Cache strategy         | 2 threads | 5 threads | 9 threads |
+| ------------------------------ | --------- | --------- | --------- |
+| without second level cache     | 23.199s   | 16.534s   | 12.517s   |
+| read-write                     | 14.99s    | 11.674s   | 10.447s   |
+| nonstrict-read-write           | 22.197s   | 12.22s    | 11.631s   |
+| transactional                  | 14.041s   | 8.849s    | 7.702s    |
+
+
+**Conclusions**
+
+  1. According to benchmarks there is no profit of using Second Level cache with insert operations.
+     The results of the tests are ambiguous and in most cases show the worst performance when using Second level cache.
+     There is an option to disable cache for the current session by adding ignore cache property.
+     For example, ```session.setCacheMode(CacheMode.IGNORE)```. See [Disable cache for a session]{.new-tab} article.
+  2. Second Level Cache makes sense for read operations.
+     It significantly improves the performance of read operations when the data is not changing.
+  3. Second level cache also makes sense for update operations, because updates use read to get required entities.
+  
 
 <!-- BENCHMARKS -->
 ```
@@ -366,3 +475,7 @@ and the gpars docs
 [SimpleJdbc Example]: http://www.brucephillips.name/blog/index.cfm/2010/10/28/Example-Of-Using-Spring-JDBC-Execute-Batch-To-Insert-Multiple-Rows-Into-A-Database-Table
 [Zach]:http://grails.1312388.n4.nabble.com/Grails-Hang-with-Bulk-Data-Import-Using-GPars-td3410441.html
 [Caching strategy]:http://docs.grails.org/3.1.1/guide/single.html#caching
+[EhCache]:http://www.ehcache.org/
+[EhCache Configuration]:http://www.ehcache.org/documentation/2.8/configuration/configuration.html
+[Hiberante Second Level cache]:https://docs.jboss.org/hibernate/orm/3.3/reference/en/html/performance.html#performance-cache
+[Disable cache for a session]:https://forum.hibernate.org/viewtopic.php?f=1&t=964775

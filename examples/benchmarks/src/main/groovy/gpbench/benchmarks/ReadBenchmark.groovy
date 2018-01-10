@@ -13,7 +13,6 @@ class ReadBenchmark extends BaseBenchmark {
 
     CityRepo cityRepo
     int poolSize
-    boolean showStatistics
 
     /**
      * If true, data is read in multiple threads. In this case the test works
@@ -26,11 +25,10 @@ class ReadBenchmark extends BaseBenchmark {
      */
     List<Long> ids
 
-    ReadBenchmark(boolean databinding, boolean useMultiUserEnvironment = true, boolean showStatistics = true) {
+    ReadBenchmark(boolean databinding, boolean useMultiUserEnvironment = true) {
         super(databinding)
         this.useMultiUserEnvironment = useMultiUserEnvironment
         this.ids = Collections.synchronizedList([])
-        this.showStatistics = showStatistics
     }
 
     @Override

@@ -158,88 +158,51 @@ persisting an entity of the Org domain class.
 > :memo: 
 Calling methods which trigger events inside an event listener causes an infinite loop
 
-## Defining refreshable beans using Spring dynamic language support.
+## External refreshable beans for Events
 Since 2.0 Spring added support for defining beans using supported dynamic languages. Eg. groovy. 
 This makes it possible to create groovy script files outside of application which contains class definition, and use it as spring bean.
 This feature can be used to create refreshable beans, spring will watch the external script for changes and automatically reload the bean if it has changed.
-The interval can be configured using ```refresh-check-delay``` 
+The interval can be configured using ```refresh-check-delay```. This feature makes it possible to externalize the event listeners outside of application.
 
-Here is an example of how to define a refreshable bean within grails application.
+Here is an example of how to use an external refreshable bean as event listener. 
 
-File: ```RefreshableBean.groovy```
+Create a groovy script containing bean definition for event listener some where on file system out side of grails application directory.
+
+
+**File** ```OrgEventListener.groovy```
 
 ```groovy
-class RefreshableBean {
 
-    void helloWorld() { }    
-    .....
+public class OrgEventListener {
 
+      @Subscriber("Org.beforePersist")
+      void beforePersist(BeforePersistEvent e){
+          Org org = (Org) e.entity
+          //do some thing with org
+      }
+  
+      @Subscriber("Org.afterPersist")
+      void afterPersist(AfterPersistEvent e){
+          Org org = (Org) e.entity
+          //do some thing with org
+      }
 }
+
 ```
 
+Define ```OrgEventListener``` as spring bean in ```grails-app/conf/spring/resources.groovy```
 
-File: ```resources.groovy```
 
 ```groovy
  
  xmlns lang: "http://www.springframework.org/schema/lang"
- lang.groovy(id: "refreshableBean", 'script-source': "file:<path to RefreshableBean.groovy>", 'refresh-check-delay': 1000)
+ lang.groovy(id: "orgEventListener", 'script-source': "file:<path to OrgEventListener.groovy>", 'refresh-check-delay': 1000)
 
 ```
 
 Now the ```refreshableBean``` can be injected into any other bean. Spring will reload it automatically if the RefreshableBean.groovy changes.
 
-See [Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) for more details. 
-
-Below is an example of how to use refreshable bean as event listener.
-
-## Using external groovy beans as event listeners.
-Spring dynamic language support can be used to register classes defined outside of application into groovy scripts as spring beans.
-Which makes it possible to externalize the event listeners if required so.
- 
-Here's an example.
-
- ```SomeEventListener.groovy``` outside of grails app.
- 
-```groovy
- 
- 
-import gorm.tools.repository.events.AfterRemoveEvent
-import gorm.tools.repository.events.BeforeBindEvent
-import org.springframework.context.event.EventListener
-
-public class SomeEventListener {
-
-    @EventListener
-    void beforeBind(BeforeBindEvent<Org> event) {
-        Org org = event.entity
-        if(event.bindAction == 'Create'){
-            //do something before create with event.data
-            org.event = "Creating with data ${event.data}"
-        } else if(event.bindAction == 'Update'){
-            org.event = "Updating with data ${event.data}"
-        }
-    }
-}
-
-```
-
- Define external class a spring bean in resources.groovy
-
- File ```grails-app/conf/spring/resources.groovy```
- 
-```groovy
-
-    File file = new File("path to RepoEventListener.groovy")
-    xmlns lang: "http://www.springframework.org/schema/lang"
-    
-    String beanName = GrailsNameUtils.getPropertyName(file.name.replace('.groovy', ''))
-    lang.groovy(id: beanName, 'script-source': "file:<path to file>", 'refresh-check-delay': 1000)
-
-```
- 
-See [example](https://github.com/yakworks/gorm-tools/blob/8356c50e13874921c9b42c2c9fa1f93d2c2a6826/examples/benchmarks/grails-app/conf/spring/resources.groovy#L25-L25) 
-in benchmarks project.  
+See [Spring dynamic languages support](https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy) for more details on dynamic language support.
 
 
 ## Data binding using MapBinder

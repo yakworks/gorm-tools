@@ -12,6 +12,7 @@ import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
 import grails.web.databinding.GrailsWebDataBinder
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -42,14 +43,43 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         super(grailsApplication)
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param obj The target object to bind
+     * @param source The data binding source
+     * @param bindAction
+     */
     void bind(obj, DataBindingSource source, BindAction bindAction) {
         bind obj, source, null, getBindingIncludeList(obj), null, null, bindAction
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param obj The target object to bind
+     * @param source The data binding source
+     * @param listener DataBindingListener
+     * @param bindAction BindAction
+     */
     void bind(obj, DataBindingSource source, DataBindingListener listener, BindAction bindAction) {
         bind obj, source, null, getBindingIncludeList(obj), null, listener, bindAction
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param obj The target object to bind
+     * @param source The data binding source
+     * @param filter Only properties beginning with filter will be included in the data binding.
+     * @param whiteList A list of property names to be included during this
+     * data binding.  All other properties represented in the binding source
+     * will be ignored
+     * @param blackList A list of properties names to be excluded during
+     * this data binding.
+     * @param listener DataBindingListener
+     * @param bindAction BindAction
+     */
     void bind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, BindAction bindAction) {
         Object bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
         doBind object, source, filter, whiteList, blackList, listener, bindingResult, bindAction
@@ -69,6 +99,19 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         populateErrors(object, bindingResult)
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param args An optional map of options. supports two boolean options
+     * <ul>
+     *     <li><b>include</b> The list of properties to include in data binding</li>
+     *     <li><b>errorHandling</b> If type conversion error should be handled and Added to Errors</li>
+     * </ul>
+     *
+     * @param target The target object to bind
+     * @param source The data binding source
+     * @param bindAction BindAction
+     */
     void bind(Map args = [:], Object target, Map<String, Object> source, BindAction bindAction) {
         List includeList = (List) args["include"] ?: getBindingIncludeList(target)
         Boolean errorHandling = args["errorHandling"] == null ? true : args["errorHandling"]
@@ -176,7 +219,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
 
-            if(value instanceof Map) fastBind(instance, new SimpleMapDataBindingSource((Map)value), bindAction)
+            if(value instanceof Map && instance) fastBind(instance, new SimpleMapDataBindingSource((Map)value), bindAction)
             target[association.name] = instance
         }
 
@@ -206,6 +249,14 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
 
         return whiteList
+    }
+
+
+    @Override
+    protected getPersistentInstance(Class<?> type, id) {
+        try {
+            InvokerHelper.invokeStaticMethod type, 'load', id
+        } catch (Exception exc) {}
     }
 
 }

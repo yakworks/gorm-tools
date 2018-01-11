@@ -104,6 +104,9 @@ class BenchmarkRunnerService {
 //        warmUpAndRun("  - Performance problems go away without databinding on traits",
 //            "runMultiCoreSlower", 'fast')
 
+        warmUpAndRun("### Reading record", "runRead", binderType)
+
+        warmUpAndRun("### Updating records", "runUpdate", binderType)
 
         //runMultiThreadsOther("## Misc sanity checks")
 
@@ -218,6 +221,29 @@ class BenchmarkRunnerService {
         runBenchmark(new ExceptionHandlingBenchmark(true, grails.validation.ValidationException, grails.validation.ValidationException))
         println "-- Exceptions thrown - EntityNotFoundException, catched - EntityNotFoundException"
         runBenchmark(new ExceptionHandlingBenchmark(true, EntityNotFoundException, EntityNotFoundException))
+    }
+
+    void runRead(String msg, String bindingMethod = 'grails') {
+        println "\n$msg"
+
+        def cacheStatistics = grailsApplication.mainContext.sessionFactory.statistics
+        cacheStatistics.clear()
+
+        runBenchmark(new ReadBenchmark(true, true))
+
+        //logMessage "  --not found in the cache and loaded from the db: ${cacheStatistics.getSecondLevelCacheMissCount()}"
+        logMessage "  --Second level cache hits: ${cacheStatistics.getSecondLevelCacheHitCount()}"
+    }
+
+    void runUpdate(String msg, String bindingMethod = 'grails') {
+        println "\n$msg"
+
+        def cacheStatistics = grailsApplication.mainContext.sessionFactory.statistics
+        cacheStatistics.clear()
+
+        runBenchmark(new UpdateBenchmark(true))
+
+        logMessage "  --Second level cache hits: ${cacheStatistics.getSecondLevelCacheHitCount()}"
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)

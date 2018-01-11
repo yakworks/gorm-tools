@@ -1,5 +1,6 @@
 package gpbench
 
+import grails.core.GrailsApplication
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -17,7 +18,12 @@ class BootStrap {
     BenchmarkRunnerService benchmarkRunnerService
     BenchmarkDatabindingService benchmarkDatabindingService
 
+    GrailsApplication grailsApplication
+
     def init = { servletContext ->
+        print "Second Level Cache: "
+        println(grailsApplication.config.hibernate.cache.use_second_level_cache)
+
         mockAuthentication()
         if(runBenchmarks && runDataBindingBenchmark){
             benchmarkDatabindingService.runFast()

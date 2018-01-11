@@ -27,7 +27,7 @@ class CityBaselineDynamic {
 
     static mapping = {
         //id generator:'native'
-        cache true
+//        cache true
     }
 
     static constraints = {

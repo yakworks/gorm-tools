@@ -89,11 +89,14 @@ endpoints:
 
 ---
 hibernate:
+    generate_statistics: true
     naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
     cache:
         queries: false
-        use_second_level_cache: false
         use_query_cache: false
+        provider_class: net.sf.ehcache.hibernate.EhCacheProvider
+        region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
     jdbc:
         # batch_size: 100 # this is set in application.groovy using system prop
         order_inserts: true
@@ -141,3 +144,35 @@ environments:
                 testOnReturn: false
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+
+# Config for MySQL
+
+#    production:
+#        hibernate:
+#            dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+#        dataSource:
+#            dbCreate: create-drop
+#            url: jdbc:mysql://localhost:3306/benchmarks
+#
+#            driverClassName: com.mysql.jdbc.Driver
+#            username: root
+#            password: ''
+#            properties:
+#                jmxEnabled: true
+#                initialSize: 5
+#                maxActive: 50
+#                minIdle: 5
+#                maxIdle: 25
+#                maxWait: 10000
+#                maxAge: 600000
+#                timeBetweenEvictionRunsMillis: 5000
+#                minEvictableIdleTimeMillis: 60000
+#                validationQuery: SELECT 1
+#                validationQueryTimeout: 3
+#                validationInterval: 15000
+#                testOnBorrow: true
+#                testWhileIdle: true
+#                testOnReturn: false
+#                jdbcInterceptors: ConnectionState
+#                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+

@@ -22,7 +22,7 @@ class CityDynamic {
     static belongsTo = [Region, Country]
 
     static mapping = {
-        cache true
+//        cache true
     }
 
     static constraints = {

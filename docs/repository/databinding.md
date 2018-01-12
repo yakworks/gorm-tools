@@ -67,9 +67,8 @@ Gorm tools MapBinder handles associations little differently than Grails data bi
 Associations are handled differently for create vs update.  
 
 - For create, if the association belongs to the domain which is being bound, new instance will be created. Else if the map contains id, reference to existing instance will be set.
-- For update, if the map contains id reference to existing instance will be set, but it will be updated only if the association belongs to the object which is being bound.
-
-
+- Update never creates a new instance, if the map contains id reference to existing instance will be set, it will do deep databinding on associated object only if the association belongs to the object which is being bound. 
+   
 Example
 
 ```groovy

@@ -175,7 +175,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      */
     @Override
     void doBind(Map args, D entity, Map data, BindAction bindAction) {
-        getMapBinder().bind(args, entity, data, bindAction)
+        getMapBinder().bind(args, entity, data)
     }
 
     /**

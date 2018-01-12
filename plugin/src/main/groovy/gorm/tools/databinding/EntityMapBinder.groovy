@@ -112,7 +112,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * @param source The data binding source
      * @param bindAction BindAction
      */
-    void bind(Map args = [:], Object target, Map<String, Object> source, BindAction bindAction) {
+    @Override
+    void bind(Map args = [:], Object target, Map<String, Object> source) {
+        BindAction bindAction = (BindAction) args["bindAction"]
+
         List includeList = (List) args["include"] ?: getBindingIncludeList(target)
         Boolean errorHandling = args["errorHandling"] == null ? true : args["errorHandling"]
         if(errorHandling) {

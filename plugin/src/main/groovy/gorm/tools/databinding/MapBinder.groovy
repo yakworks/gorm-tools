@@ -13,9 +13,8 @@ interface MapBinder extends DataBinder{
      * @param args a Map of options
      * @param target The target object to bind
      * @param source The source map
-     * @param bindAction
      */
-    void bind(Map args, Object target, Map<String, Object> source, BindAction bindAction)
+    void bind(Map args, Object target, Map<String, Object> source)
 
     /**
      * Binds data from a map on target object.
@@ -24,5 +23,5 @@ interface MapBinder extends DataBinder{
      * @param source The source map
      * @param bindAction
      */
-    void bind(Object target, Map<String, Object> source, BindAction bindAction)
+    void bind(Object target, Map<String, Object> source)
 }

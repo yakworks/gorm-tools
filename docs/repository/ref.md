@@ -68,35 +68,13 @@ Throws a [EntityNotFoundException][EntityNotFoundException] if anything goes wro
 
 Each Repository can implement any of the methods listed below and they will get called during persistence operation.  
  
-- **beforeBind(T instance, Map params)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  
-- **afterCreate(T instance, Map params)** - Called after the new instance is saved.  
-- **beforeRemove(T instance)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
-- **afterRemove(T instance)** - After an instance is removed.  
-- **beforeUpdate(T instance, Map params)** - Called before an instance is updated  
-- **afterUpdate(T instance, Map params)** - Called after an instance is updated  
-- **beforePersist(T instance)** - Called every time before an instance is saved.  
-- **afterPersist(T instance)** - Called every time after an instance is saved.
+- **beforeBind(T instance, Map params, BindAction action)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.
+- **afterBind(T instance, Map params, BindAction action)** -  Called after databinding is performed.  
+- **beforePersist(T instance, Map args)** - Called every time before an instance is saved.  
+- **afterPersist(T instance, Map args)** - Called every time after an instance is saved.
+- **beforeRemove(T instance, Map args)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
+- **afterRemove(T instance, Map args)** -  Called After an instance is deleted.  
   
-### Spring Events
-
-The Repository also publishes a number of 
-[events as listed in the Groovydoc API](https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html)
-
-**Example**  
-```groovy
-import org.springframework.context.event.EventListener
-import gorm.tools.repository.events.BeforeBindEvent
-
-class OrgListener {
-   
-    @EventListener
-    void beforeBind(beforeBindEvent<Org> event) {
-       Org org = event.entity
-       //Do some thing here.
-    }
-}
-
-```
 
 ### Grails Events
 
@@ -155,10 +133,31 @@ class OrgSubscriber {
 In this example we can see two listeners which handle events that occur before and after
 persisting an entity of the Org domain class.
 
+### Spring Events
+
+The Repository also publishes a number of 
+[events as listed in the Groovydoc API](https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html)
+
+**Example**  
+```groovy
+import org.springframework.context.event.EventListener
+import gorm.tools.repository.events.BeforeBindEvent
+
+class OrgListener {
+   
+    @EventListener
+    void beforeBind(BeforeBindEvent<Org> event) {
+       Org org = event.entity
+       //Do some thing here.
+    }
+}
+
+```
+
 > :memo: 
 Calling methods which trigger events inside an event listener causes an infinite loop
 
-## External refreshable beans for Events
+### External refreshable beans for Events
 Since 2.0 Spring added support for defining beans using supported dynamic languages. Eg. groovy. 
 This makes it possible to create groovy script files outside of application which contains class definition, and use it as spring bean.
 This feature can be used to create refreshable beans, spring will watch the external script for changes and automatically reload the bean if it has changed.
@@ -172,6 +171,9 @@ Create a groovy script containing bean definition for event listener some where 
 **File** ```OrgEventListener.groovy```
 
 ```groovy
+import grails.events.annotation.Subscriber
+import gorm.tools.repository.events.BeforePersistEvent
+import gorm.tools.repository.events.AfterPersistEvent
 
 public class OrgEventListener {
 
@@ -187,6 +189,24 @@ public class OrgEventListener {
           //do some thing with org
       }
 }
+```
+
+The above example uses ```Subscriber``` annotation from [Grails async](https://async.grails.org) project. The event handler methods will get called asynchronously and does not take part in transaction.
+Repository also publishes events using spring event mechanism which can be used to define event listeners which gets called synchronously and takes part in current transaction. 
+
+Following example shows how to define synchronous event listener.
+
+```groovy
+import org.springframework.context.ApplicationListener 
+import gorm.tools.repository.events.BeforePersistEvent
+
+class OrgEventListener implements ApplicationListener<BeforePersistEvent<Org>>  {
+
+    void onApplicationEvent(BeforePersistEvent<Org> event) {
+        Org org = event.entity
+        //dome some thing with org.
+    }
+} 
 
 ```
 

@@ -33,7 +33,7 @@ class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends Base
         if (dataBinder == 'grails') {
             bindGrails(c, row)
         } else {
-            entityMapBinder.bind(c, row, BindAction.Create)
+            entityMapBinder.bind(c, row)
         }
         c.save(failOnError: true, validate: validate)
     }

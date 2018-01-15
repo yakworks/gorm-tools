@@ -119,14 +119,14 @@ class BenchmarkDatabindingService {
     @CompileStatic
     void useEntityBinderNoErrorHandling(Class domain) {
         eachCity("EntityMapBinder bind no error handling", domain) { instance, Map row ->
-            entityMapBinder.bind(instance, row, errorHandling: false, BindAction.Create)
+            entityMapBinder.bind(instance, row, errorHandling: false)
         }
     }
 
     @CompileStatic
     void useEntityBinderBind(Class domain) {
         eachCity("EntityMapBinder bind", domain) { instance, Map row ->
-            entityMapBinder.bind(instance, row, BindAction.Create)
+            entityMapBinder.bind(instance, row)
         }
     }
 

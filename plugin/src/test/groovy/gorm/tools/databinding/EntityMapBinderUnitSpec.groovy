@@ -34,7 +34,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [age: "100"], BindAction.Create)
+        binder.bind(domain, [age: "100"])
 
         then:
         0 * longConverter.canConvert(_)
@@ -50,7 +50,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [dobDate: "2017-10-10", localDate: "2017-10-10", localDateTime: "2017-11-22"], BindAction.Create)
+        binder.bind(domain, [dobDate: "2017-10-10", localDate: "2017-10-10", localDateTime: "2017-11-22"])
 
         then:
         0 * dateConverter.canConvert(_)
@@ -63,7 +63,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         def isoDateZ = "2017-11-22T22:22:22.222Z"
         binder.bind(domain, [dobDate: isoDateZ,
                              localDate: isoDateZ,
-                             localDateTime: isoDateZ], BindAction.Create)
+                             localDateTime: isoDateZ])
 
         then:
         domain.dobDate == IsoDateUtil.parse(isoDateZ)
@@ -74,7 +74,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         def isoDateNoTZ = "2017-11-22T22:22"
         binder.bind(domain, [dobDate: isoDateNoTZ,
                              localDate: isoDateNoTZ,
-                             localDateTime: isoDateNoTZ], BindAction.Create)
+                             localDateTime: isoDateNoTZ])
 
         then:
         domain.dobDate == IsoDateUtil.parse(isoDateNoTZ)
@@ -91,7 +91,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [currency: "INR"], BindAction.Create)
+        binder.bind(domain, [currency: "INR"])
 
         then:
         1 * currencyConverter.canConvert("INR") >> true
@@ -107,7 +107,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [currency: "INR"], BindAction.Create)
+        binder.bind(domain, [currency: "INR"])
 
         then:
         1 * conversionService.canConvert(_, _) >> true
@@ -122,7 +122,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         AnotherDomain assoc = new AnotherDomain(id: 1, name: "test").save(failOnError: true, flush: true)
         Map params = ["anotherDomain": [id: 1]]
         when:
-        binder.bind(domain, params, BindAction.Create)
+        binder.bind(domain, params)
 
         then:
         domain.anotherDomain == assoc
@@ -133,21 +133,21 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [active: "true"]
 
         when:
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.active == true
 
         when:
         params = [active: "false"]
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.active == false
 
         when:
         params = [active: "on"]
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.active == true
@@ -159,13 +159,13 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [name: " test "]
 
         when:
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.name == "test"
 
         when:
-        binder.bind(testDomain, [name: "   "], BindAction.Create)
+        binder.bind(testDomain, [name: "   "])
 
         then:
         testDomain.name == null
@@ -177,7 +177,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [name: 'bill', notBindable: 'got it']
 
         when:
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.name == 'bill'
@@ -185,7 +185,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
 
         when:
         testDomain = new TestDomain()
-        binder.bind(testDomain, params, include: ['notBindable'], BindAction.Create)
+        binder.bind(testDomain, params, include: ['notBindable'])
 
         then:
         testDomain.name == null
@@ -197,7 +197,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         Map params = [age: 'test']
 
         when:
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         noExceptionThrown()
@@ -205,12 +205,12 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.errors.hasFieldErrors('age')
     }
 
-    void "create should create new association if it belongsTo"() {
+    void "binder should create new association if it belongsTo"() {
         TestDomain testDomain = new TestDomain()
         Map params = [name: 'test', nested:[name:"test"]]
 
         when:
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.name == "test"
@@ -218,49 +218,34 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.nested.name == "test"
     }
 
-    void "create should load existing association if it does not belongsTo"() {
+    void "binder should load existing association if it does not belongsTo"() {
         TestDomain testDomain = new TestDomain()
         AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
         Map params = [name: 'test', anotherDomain:[id:1, name:"test"]]
 
         when:
-        binder.bind(testDomain, params, BindAction.Create)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.name == "test"
         testDomain.anotherDomain != null
         testDomain.anotherDomain == anotherDomain
-        testDomain.anotherDomain.name == "test"
+        testDomain.anotherDomain.name != "test" //should not be deep bound if does not belogsTo
     }
 
-    void "update should load existing association"() {
+    void "binder should set reference if value if of association type"() {
         TestDomain testDomain = new TestDomain()
         AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
-        Map params = [name: 'test', anotherDomain:[id:1, name:"test"]]
+        Map params = [name: 'test', anotherDomain:anotherDomain]
 
         when:
-        binder.bind(testDomain, params, BindAction.Update)
+        binder.bind(testDomain, params)
 
         then:
         testDomain.name == "test"
         testDomain.anotherDomain != null
         testDomain.anotherDomain == anotherDomain
         testDomain.anotherDomain.name == "name"
-    }
-
-    void "update should deep bind association if it belongsTo"() {
-        TestDomain testDomain = new TestDomain()
-        Nested nested = new Nested(id:1, name:"name").save()
-        Map params = [name: 'test', nested:[id:1, name:"test"]]
-
-        when:
-        binder.bind(testDomain, params, BindAction.Update)
-
-        then:
-        testDomain.name == "test"
-        testDomain.nested != null
-        testDomain.nested == nested
-        testDomain.nested.name == "test"
     }
 }
 

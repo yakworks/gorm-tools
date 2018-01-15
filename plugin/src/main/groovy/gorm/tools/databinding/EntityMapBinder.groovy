@@ -48,10 +48,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      *
      * @param obj The target object to bind
      * @param source The data binding source
-     * @param bindAction
      */
-    void bind(obj, DataBindingSource source, BindAction bindAction) {
-        bind obj, source, null, getBindingIncludeList(obj), null, null, bindAction
+    @Override
+    void bind(obj, DataBindingSource source) {
+        bind obj, source, null, getBindingIncludeList(obj), null, null
     }
 
     /**
@@ -60,10 +60,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * @param obj The target object to bind
      * @param source The data binding source
      * @param listener DataBindingListener
-     * @param bindAction BindAction
      */
-    void bind(obj, DataBindingSource source, DataBindingListener listener, BindAction bindAction) {
-        bind obj, source, null, getBindingIncludeList(obj), null, listener, bindAction
+    @Override
+    void bind(obj, DataBindingSource source, DataBindingListener listener) {
+        bind obj, source, null, getBindingIncludeList(obj), null, listener
     }
 
     /**
@@ -78,23 +78,24 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * @param blackList A list of properties names to be excluded during
      * this data binding.
      * @param listener DataBindingListener
-     * @param bindAction BindAction
      */
-    void bind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, BindAction bindAction) {
+    @Override
+    void bind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
         Object bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
-        doBind object, source, filter, whiteList, blackList, listener, bindingResult, bindAction
+        doBind object, source, filter, whiteList, blackList, listener, bindingResult
     }
 
-    protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors, BindAction bindAction) {
+    @Override
+    protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
         //TODO this is where we will store errors
-        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
+        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult) errors
         GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
         List<DataBindingListener> allListeners = []
         allListeners << errorHandlingListener
 
         DataBindingEventMulticastListener listenerWrapper = new DataBindingEventMulticastListener(allListeners)
 
-        fastBind(object, source, whiteList, listenerWrapper, errors, bindAction)
+        fastBind(object, source, whiteList, listenerWrapper, errors)
 
         populateErrors(object, bindingResult)
     }
@@ -110,22 +111,21 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      *
      * @param target The target object to bind
      * @param source The data binding source
-     * @param bindAction BindAction
      */
     @Override
     void bind(Map args = [:], Object target, Map<String, Object> source) {
-        BindAction bindAction = (BindAction) args["bindAction"]
+        //BindAction bindAction = (BindAction) args["bindAction"]
 
         List includeList = (List) args["include"] ?: getBindingIncludeList(target)
         Boolean errorHandling = args["errorHandling"] == null ? true : args["errorHandling"]
-        if(errorHandling) {
-            bind target, new SimpleMapDataBindingSource(source), null, includeList, null, null, bindAction
-        } else{
-            fastBind target, new SimpleMapDataBindingSource(source), includeList, bindAction
+        if (errorHandling) {
+            bind target, new SimpleMapDataBindingSource(source), null, includeList, null, null
+        } else {
+            fastBind target, new SimpleMapDataBindingSource(source), includeList
         }
     }
 
-    void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener = null, errors = null, BindAction bindAction) {
+    void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener = null, errors = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
         //println whiteList
@@ -135,10 +135,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         for (String prop : properties) {
             PersistentProperty perProp = entity.getPropertyByName(prop)
-            try{
-                setProp(target, source, perProp, listener, errors, bindAction)
+            try {
+                setProp(target, source, perProp, listener, errors)
             } catch (Exception e) {
-                if(errors) {
+                if (errors) {
                     addBindingError(target, perProp.name, source.getPropertyValue(perProp.name), e, listener, errors)
                 } else {
                     throw e
@@ -148,7 +148,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
-    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null, BindAction bindAction){
+    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
@@ -186,46 +186,28 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             target[prop.name] = valueToAssign
 
         } else if (prop instanceof Association) {
-            bindAssociation(target, valueToAssign, (Association)prop, listener, errors, bindAction)
+            bindAssociation(target, valueToAssign, (Association) prop, listener, errors)
         } else {
             target[prop.name] = valueToAssign
         }
 
     }
 
-    void bindAssociation(Object target, def value, Association association, DataBindingListener listener = null, errors = null, BindAction bindAction) {
-        Object idValue =  isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
-        if(bindAction == BindAction.Update) {
-
-            if (association.getType().isAssignableFrom(value.getClass())) {
-                target[association.name] = value
-            }
-
-            else if (idValue != 'null' && idValue != null && idValue != '') {
-                Object instace = getPersistentInstance(getDomainClassType(target, association.name), idValue)
-                target[association.name] = instace
-                if(association.isOwningSide() && value instanceof Map && instace) {
-                    //TODO pass listener and errors
-                    fastBind(instace, new SimpleMapDataBindingSource(value), null, listener, errors, bindAction)
-                }
-            }
+    void bindAssociation(Object target,
+                         def value, Association association, DataBindingListener listener = null, errors = null) {
+        Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
+        Object instance
+        if (association.getType().isAssignableFrom(value.getClass())) {
+            instance = value
+        } else if (association.isOwningSide() && value instanceof Map) {
+            instance = association.type.newInstance()
+        }
+        else if (idValue != 'null' && idValue != null && idValue != '') {
+            instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
         }
 
-        else if (bindAction == BindAction.Create) {
-            Object instance
-            if(association.isOwningSide() && value instanceof Map) {
-                instance = association.type.newInstance()
-            } else if (association.getType().isAssignableFrom(value.getClass())) {
-                instance = value
-            }
-            else {
-                instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
-            }
-
-            if(value instanceof Map && instance) fastBind(instance, new SimpleMapDataBindingSource((Map)value), bindAction)
-            target[association.name] = instance
-        }
-
+        if (value instanceof Map && instance && association.isOwningSide()) fastBind(instance, new SimpleMapDataBindingSource((Map) value))
+        target[association.name] = instance
     }
 
     static List getBindingIncludeList(final Object object) {
@@ -239,9 +221,9 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             List<PersistentProperty> properties = entity.persistentProperties
             Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
             for (PersistentProperty prop : properties) {
-                DefaultConstrainedProperty cp = (DefaultConstrainedProperty)constraints[prop.name]
+                DefaultConstrainedProperty cp = (DefaultConstrainedProperty) constraints[prop.name]
                 Boolean bindable = cp?.getMetaConstraintValue("bindable") as Boolean
-                if(bindable == null || bindable == true) {
+                if (bindable == null || bindable == true) {
                     whiteList.add(prop.name)
                 }
             }
@@ -259,7 +241,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     protected getPersistentInstance(Class<?> type, id) {
         try {
             InvokerHelper.invokeStaticMethod type, 'load', id
-        } catch (Exception exc) {}
+        } catch (Exception exc) {
+        }
     }
 
 }

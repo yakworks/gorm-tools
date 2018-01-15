@@ -64,10 +64,11 @@ This will make the OrgRepo use CustomMapBinder for data binding.
 
 ## Binding Associations
 Gorm tools MapBinder handles associations little differently than Grails data binder for performance reasons.
-Associations are handled differently for create vs update.  
+How associations are handled depends on if the associated domain belongs to the domain which is being bound.
+If the domain being bound is owning side of association and value is of type map, a new instance of associated domain is created.
+If the association does not use belongsTo then existing instance is loaded if the map contains the id.
+The databinding on associated domain will be performed only if it belongs to the domain which is being bound
 
-- For create, if the association belongs to the domain which is being bound, new instance will be created. Else if the map contains id, reference to existing instance will be set.
-- Update never creates a new instance, if the map contains id reference to existing instance will be set, it will do deep databinding on associated object only if the association belongs to the object which is being bound. 
    
 Example
 
@@ -91,6 +92,8 @@ class Book {
 ```
 
 Given the above domain model, when creating a new book. It will not create new instance of Author or category, but will set reference to existing instance if id is provided in parameter.
+It will create new book and set the author and category to existing records with provided id.
+
 
 ```groovy
 
@@ -98,35 +101,15 @@ Book.create([name:"Grails In Action", author:[id:1], category:[id:1]])
 
 ```
 
-It will create new book and set the author and category to existing records with provided id.
-
 However a new book can be created when creating a new author, because book belongs to Author.
 
-So following will create a new book
+So following will create a new book instance and set author.book to this new instance.
 
 ```groovy
 
 Author.create(name:"test", book:[name:"Grails in action"])
 
 ```
-
-When updating an instance, the association will be updated only if it belongsTo the domain which is being updated.
-
-```groovy
-
-Author.update(id:1, book:[id:1, name: "updated"])
-
-```
-
-Above will update the author, set book with id 1 and update book.name to 'updated'
-
-When updating book
-
-```groovy
-Book.update(id:1, author:[id:2, name:"updated"])
-```
-
-The above snippet will update the book, set its author to instance with id 2, but will not update the author.name. Because author does not belong to book.
 
 [MapBinder]: https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/MapBinder.html
 [EntityMapBinder]: https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/EntityMapBinder.html

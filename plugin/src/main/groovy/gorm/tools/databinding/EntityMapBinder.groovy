@@ -193,20 +193,24 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
-    void bindAssociation(Object target,
-                         def value, Association association, DataBindingListener listener = null, errors = null) {
-        Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
+    void bindAssociation(Object target, def value, Association association, DataBindingListener listener = null, errors = null) {
         Object instance
+
         if (association.getType().isAssignableFrom(value.getClass())) {
             instance = value
         } else if (association.isOwningSide() && value instanceof Map) {
             instance = association.type.newInstance()
         }
-        else if (idValue != 'null' && idValue != null && idValue != '') {
-            instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+        else {
+            Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
+            if (idValue != 'null' && idValue != null && idValue != '') {
+                instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+            }
         }
 
         if (value instanceof Map && instance && association.isOwningSide()) fastBind(instance, new SimpleMapDataBindingSource((Map) value))
+
+
         target[association.name] = instance
     }
 
@@ -240,7 +244,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     @Override
     protected getPersistentInstance(Class<?> type, id) {
         try {
-            InvokerHelper.invokeStaticMethod type, 'load', id
+            GormEnhancer.findStaticApi(type).load((Serializable)id)
         } catch (Exception exc) {
         }
     }

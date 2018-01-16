@@ -12,7 +12,6 @@ import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
 import grails.web.databinding.GrailsWebDataBinder
 import groovy.transform.CompileStatic
-import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -24,7 +23,6 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -210,7 +208,6 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         if (value instanceof Map && instance && association.isOwningSide()) fastBind(instance, new SimpleMapDataBindingSource((Map) value))
 
-
         target[association.name] = instance
     }
 
@@ -240,8 +237,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         return whiteList
     }
 
-
     @Override
+    @SuppressWarnings(["EmptyCatchBlock"])
     protected getPersistentInstance(Class<?> type, id) {
         try {
             GormEnhancer.findStaticApi(type).load((Serializable)id)

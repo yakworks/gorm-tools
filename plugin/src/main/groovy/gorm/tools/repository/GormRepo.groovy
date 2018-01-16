@@ -164,7 +164,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     @Override
     void bind(Map args = [:], D entity, Map data, BindAction bindAction) {
         getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction)
-        doBind(args, entity, data)
+        doBind(args, entity, data, bindAction)
         getRepoEventPublisher().doAfterBind(this, entity, data, bindAction)
     }
 
@@ -174,7 +174,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * can also call this if you do NOT want the before/after Bind events to fire
      */
     @Override
-    void doBind(Map args, D entity, Map data) {
+    void doBind(Map args, D entity, Map data, BindAction bindAction) {
         getMapBinder().bind(args, entity, data)
     }
 

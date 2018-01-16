@@ -1,5 +1,6 @@
 package gpbench.benchmarks
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic

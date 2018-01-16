@@ -11,6 +11,7 @@ pages:
   - Repository Pattern:
     - Quick Start: repository/intro.md
     - Reference: repository/ref.md
+    - Databinding: repository/databinding.md
   - Mango Query: queries-mango.md
   - Async: async.md
   - Toolbox:

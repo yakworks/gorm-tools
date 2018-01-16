@@ -1,8 +1,9 @@
 package gorm.tools.repository
 
-import gorm.tools.testing.GormToolsHibernateSpec
-import gorm.tools.repository.errors.*
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.testing.GormToolsHibernateSpec
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.dao.OptimisticLockingFailureException
@@ -142,7 +143,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test update"() {
         setup:
-        Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
+        Location location = new Location(id:1, city: "City", nested: new Nested(name: "Nested", value: 1)).save()
         Org org = new Org(name: "test")
         org.persist()
         org.name = "test2"

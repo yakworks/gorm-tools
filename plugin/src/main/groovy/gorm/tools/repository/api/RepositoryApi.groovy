@@ -91,7 +91,7 @@ interface RepositoryApi<D> {
      * Main bind method that redirects call to the injected mapBinder. see {@link #getMapBinder}
      * override this one in implementing classes. can also call this if you don't want events to fire
      */
-    void doBind(Map args, D entity, Map data)
+    void doBind(Map args, D entity, Map data, BindAction bindAction)
 
     /**
      * Remove by ID. Wrapping this in a Transaction in an implementing class here is optional

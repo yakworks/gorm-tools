@@ -7,6 +7,7 @@ import grails.testing.gorm.DataTest
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -204,6 +205,48 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         testDomain.errors.hasFieldErrors('age')
     }
 
+    void "binder should create new association if it belongsTo"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'test', nested:[name:"test"]]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == "test"
+        testDomain.nested != null
+        testDomain.nested.name == "test"
+    }
+
+    void "binder should load existing association if it does not belongsTo"() {
+        TestDomain testDomain = new TestDomain()
+        AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
+        Map params = [name: 'test', anotherDomain:[id:1, name:"test"]]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == "test"
+        testDomain.anotherDomain != null
+        testDomain.anotherDomain == anotherDomain
+        testDomain.anotherDomain.name != "test" //should not be deep bound if does not belogsTo
+    }
+
+    void "binder should set reference if value if of association type"() {
+        TestDomain testDomain = new TestDomain()
+        AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
+        Map params = [name: 'test', anotherDomain:anotherDomain]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == "test"
+        testDomain.anotherDomain != null
+        testDomain.anotherDomain == anotherDomain
+        testDomain.anotherDomain.name == "name"
+    }
 }
 
 
@@ -219,13 +262,27 @@ class TestDomain {
     Boolean active
 
     AnotherDomain anotherDomain
+    Nested nested
 
     static constraints = {
         notBindable bindable: false
+        nested nullable: false
+        anotherDomain nullable: true
     }
 }
 
 @Entity
 class AnotherDomain {
     String name
+}
+
+@Entity
+class Nested {
+    String name
+
+    static belongsTo = [TestDomain]
+
+    static constraints = {
+        name nullable: false
+    }
 }

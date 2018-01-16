@@ -1,6 +1,7 @@
 package gpbench
 
 import gorm.tools.beans.IsoDateUtil
+import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic

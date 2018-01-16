@@ -12,6 +12,7 @@ import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
 import grails.web.databinding.GrailsWebDataBinder
 import groovy.transform.CompileStatic
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -33,7 +34,6 @@ import java.time.format.DateTimeFormatter
 @SuppressWarnings(['CatchException', 'VariableName'])
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
-    private static final String ID_PROP = "id"
 
     EntityMapBinder() {
         super(null)
@@ -43,20 +43,52 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         super(grailsApplication)
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param obj The target object to bind
+     * @param source The data binding source
+     */
     @Override
     void bind(obj, DataBindingSource source) {
         bind obj, source, null, getBindingIncludeList(obj), null, null
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param obj The target object to bind
+     * @param source The data binding source
+     * @param listener DataBindingListener
+     */
     @Override
     void bind(obj, DataBindingSource source, DataBindingListener listener) {
         bind obj, source, null, getBindingIncludeList(obj), null, listener
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param obj The target object to bind
+     * @param source The data binding source
+     * @param filter Only properties beginning with filter will be included in the data binding.
+     * @param whiteList A list of property names to be included during this
+     * data binding.  All other properties represented in the binding source
+     * will be ignored
+     * @param blackList A list of properties names to be excluded during
+     * this data binding.
+     * @param listener DataBindingListener
+     */
+    @Override
+    void bind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
+        Object bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
+        doBind object, source, filter, whiteList, blackList, listener, bindingResult
+    }
+
     @Override
     protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
         //TODO this is where we will store errors
-        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult)errors
+        BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult) errors
         GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
         List<DataBindingListener> allListeners = []
         allListeners << errorHandlingListener
@@ -68,12 +100,27 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         populateErrors(object, bindingResult)
     }
 
+    /**
+     * Binds data from a map on target object.
+     *
+     * @param args An optional map of options. supports two boolean options
+     * <ul>
+     *     <li><b>include</b> The list of properties to include in data binding</li>
+     *     <li><b>errorHandling</b> If type conversion error should be handled and Added to Errors</li>
+     * </ul>
+     *
+     * @param target The target object to bind
+     * @param source The data binding source
+     */
+    @Override
     void bind(Map args = [:], Object target, Map<String, Object> source) {
+        //BindAction bindAction = (BindAction) args["bindAction"]
+
         List includeList = (List) args["include"] ?: getBindingIncludeList(target)
         Boolean errorHandling = args["errorHandling"] == null ? true : args["errorHandling"]
-        if(errorHandling) {
+        if (errorHandling) {
             bind target, new SimpleMapDataBindingSource(source), null, includeList, null, null
-        } else{
+        } else {
             fastBind target, new SimpleMapDataBindingSource(source), includeList
         }
     }
@@ -88,10 +135,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         for (String prop : properties) {
             PersistentProperty perProp = entity.getPropertyByName(prop)
-            try{
-                setProp(target, source, perProp)
+            try {
+                setProp(target, source, perProp, listener, errors)
             } catch (Exception e) {
-                if(errors) {
+                if (errors) {
                     addBindingError(target, perProp.name, source.getPropertyValue(perProp.name), e, listener, errors)
                 } else {
                     throw e
@@ -101,7 +148,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
-    void setProp(Object target, DataBindingSource source, PersistentProperty prop){
+    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
@@ -135,12 +182,36 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
                 valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
-        } else if (prop instanceof Association && propValue[ID_PROP]) {
-            valueToAssign = GormEnhancer.findStaticApi(((Association) prop).associatedEntity.javaClass).load(propValue[ID_PROP] as Long)
+
+            target[prop.name] = valueToAssign
+
+        } else if (prop instanceof Association) {
+            bindAssociation(target, valueToAssign, (Association) prop, listener, errors)
+        } else {
+            target[prop.name] = valueToAssign
         }
 
-        target[prop.name] = valueToAssign
+    }
 
+    void bindAssociation(Object target, def value, Association association, DataBindingListener listener = null, errors = null) {
+        Object instance
+
+        if (association.getType().isAssignableFrom(value.getClass())) {
+            instance = value
+        } else if (association.isOwningSide() && value instanceof Map) {
+            instance = association.type.newInstance()
+        }
+        else {
+            Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
+            if (idValue != 'null' && idValue != null && idValue != '') {
+                instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+            }
+        }
+
+        if (value instanceof Map && instance && association.isOwningSide()) fastBind(instance, new SimpleMapDataBindingSource((Map) value))
+
+
+        target[association.name] = instance
     }
 
     static List getBindingIncludeList(final Object object) {
@@ -154,9 +225,9 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             List<PersistentProperty> properties = entity.persistentProperties
             Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
             for (PersistentProperty prop : properties) {
-                DefaultConstrainedProperty cp = (DefaultConstrainedProperty)constraints[prop.name]
+                DefaultConstrainedProperty cp = (DefaultConstrainedProperty) constraints[prop.name]
                 Boolean bindable = cp?.getMetaConstraintValue("bindable") as Boolean
-                if(bindable == null || bindable == true) {
+                if (bindable == null || bindable == true) {
                     whiteList.add(prop.name)
                 }
             }
@@ -167,6 +238,15 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
 
         return whiteList
+    }
+
+
+    @Override
+    protected getPersistentInstance(Class<?> type, id) {
+        try {
+            GormEnhancer.findStaticApi(type).load((Serializable)id)
+        } catch (Exception exc) {
+        }
     }
 
 }

@@ -367,13 +367,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#spring-events" title="Spring Events" class="md-nav__link">
-    Spring Events
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#grails-events" title="Grails Events" class="md-nav__link">
     Grails Events
   </a>
@@ -400,29 +393,22 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#spring-events" title="Spring Events" class="md-nav__link">
+    Spring Events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-refreshable-beans-for-events" title="External refreshable beans for Events" class="md-nav__link">
+    External refreshable beans for Events
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#defining-refreshable-beans-using-spring-dynamic-language-support" title="Defining refreshable beans using Spring dynamic language support." class="md-nav__link">
-    Defining refreshable beans using Spring dynamic language support.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-external-groovy-beans-as-event-listeners" title="Using external groovy beans as event listeners." class="md-nav__link">
-    Using external groovy beans as event listeners.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
-    Data binding using MapBinder
-  </a>
   
 </li>
       
@@ -487,6 +473,18 @@
   
 </nav>
     
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../databinding/" title="Databinding" class="md-nav__link">
+      Databinding
+    </a>
   </li>
 
         
@@ -696,13 +694,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#spring-events" title="Spring Events" class="md-nav__link">
-    Spring Events
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#grails-events" title="Grails Events" class="md-nav__link">
     Grails Events
   </a>
@@ -729,29 +720,22 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#spring-events" title="Spring Events" class="md-nav__link">
+    Spring Events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-refreshable-beans-for-events" title="External refreshable beans for Events" class="md-nav__link">
+    External refreshable beans for Events
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#defining-refreshable-beans-using-spring-dynamic-language-support" title="Defining refreshable beans using Spring dynamic language support." class="md-nav__link">
-    Defining refreshable beans using Spring dynamic language support.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#using-external-groovy-beans-as-event-listeners" title="Using external groovy beans as event listeners." class="md-nav__link">
-    Using external groovy beans as event listeners.
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
-    Data binding using MapBinder
-  </a>
   
 </li>
       
@@ -892,31 +876,13 @@ Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repositor
 <h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
 <p>Each Repository can implement any of the methods listed below and they will get called during persistence operation.  </p>
 <ul>
-<li><strong>beforeBind(T instance, Map params)</strong> - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.  </li>
-<li><strong>afterCreate(T instance, Map params)</strong> - Called after the new instance is saved.  </li>
-<li><strong>beforeRemove(T instance)</strong> - Called before an instance is deleted. Can be utilized to cleanup related records etc.  </li>
-<li><strong>afterRemove(T instance)</strong> - After an instance is removed.  </li>
-<li><strong>beforeUpdate(T instance, Map params)</strong> - Called before an instance is updated  </li>
-<li><strong>afterUpdate(T instance, Map params)</strong> - Called after an instance is updated  </li>
-<li><strong>beforePersist(T instance)</strong> - Called every time before an instance is saved.  </li>
-<li><strong>afterPersist(T instance)</strong> - Called every time after an instance is saved.</li>
+<li><strong>beforeBind(T instance, Map params, BindAction action)</strong> - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.</li>
+<li><strong>afterBind(T instance, Map params, BindAction action)</strong> -  Called after databinding is performed.  </li>
+<li><strong>beforePersist(T instance, Map args)</strong> - Called every time before an instance is saved.  </li>
+<li><strong>afterPersist(T instance, Map args)</strong> - Called every time after an instance is saved.</li>
+<li><strong>beforeRemove(T instance, Map args)</strong> - Called before an instance is deleted. Can be utilized to cleanup related records etc.  </li>
+<li><strong>afterRemove(T instance, Map args)</strong> -  Called After an instance is deleted.  </li>
 </ul>
-<h3 id="spring-events">Spring Events<a class="headerlink" href="#spring-events" title="Permanent link">&para;</a></h3>
-<p>The Repository also publishes a number of 
-<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html">events as listed in the Groovydoc API</a></p>
-<p><strong>Example</strong><br />
-<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.event.EventListener</span>
-<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforeBindEvent</span>
-
-<span class="kd">class</span> <span class="nc">OrgListener</span> <span class="o">{</span>
-
-    <span class="nd">@EventListener</span>
-    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">beforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
-       <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
-       <span class="c1">//Do some thing here.</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div></p>
 <h3 id="grails-events">Grails Events<a class="headerlink" href="#grails-events" title="Permanent link">&para;</a></h3>
 <p>The Repository also provides a possibility to handle events using Grails annotations. Please see docs for <a class="new-tab" href="http://async.grails.org/latest/guide/index.html#events">Grails Events</a>.</p>
 <h4 id="publishing-events">Publishing events<a class="headerlink" href="#publishing-events" title="Permanent link">&para;</a></h4>
@@ -961,118 +927,76 @@ by default. For example, methods like <code>someEvent()</code> or <code>onSomeEv
 </pre></div>
 In this example we can see two listeners which handle events that occur before and after
 persisting an entity of the Org domain class.</p>
+<h3 id="spring-events">Spring Events<a class="headerlink" href="#spring-events" title="Permanent link">&para;</a></h3>
+<p>The Repository also publishes a number of 
+<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html">events as listed in the Groovydoc API</a></p>
+<p><strong>Example</strong><br />
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.event.EventListener</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforeBindEvent</span>
+
+<span class="kd">class</span> <span class="nc">OrgListener</span> <span class="o">{</span>
+
+    <span class="nd">@EventListener</span>
+    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">BeforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+       <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
+       <span class="c1">//Do some thing here.</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div></p>
 <blockquote>
 <p><img alt="📝" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
 Calling methods which trigger events inside an event listener causes an infinite loop</p>
 </blockquote>
-<h2 id="defining-refreshable-beans-using-spring-dynamic-language-support">Defining refreshable beans using Spring dynamic language support.<a class="headerlink" href="#defining-refreshable-beans-using-spring-dynamic-language-support" title="Permanent link">&para;</a></h2>
+<h3 id="external-refreshable-beans-for-events">External refreshable beans for Events<a class="headerlink" href="#external-refreshable-beans-for-events" title="Permanent link">&para;</a></h3>
 <p>Since 2.0 Spring added support for defining beans using supported dynamic languages. Eg. groovy. 
 This makes it possible to create groovy script files outside of application which contains class definition, and use it as spring bean.
 This feature can be used to create refreshable beans, spring will watch the external script for changes and automatically reload the bean if it has changed.
-The interval can be configured using <code>refresh-check-delay</code> </p>
-<p>Here is an example of how to define a refreshable bean within grails application.</p>
-<p>File: <code>RefreshableBean.groovy</code></p>
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">RefreshableBean</span> <span class="o">{</span>
+The interval can be configured using <code>refresh-check-delay</code>. This feature makes it possible to externalize the event listeners outside of application.</p>
+<p>Here is an example of how to use an external refreshable bean as event listener. </p>
+<p>Create a groovy script containing bean definition for event listener some where on file system out side of grails application directory.</p>
+<p><strong>File</strong> <code>OrgEventListener.groovy</code></p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">grails.events.annotation.Subscriber</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforePersistEvent</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.AfterPersistEvent</span>
 
-    <span class="kt">void</span> <span class="nf">helloWorld</span><span class="o">()</span> <span class="o">{</span> <span class="o">}</span>    
-    <span class="o">.....</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrgEventListener</span> <span class="o">{</span>
 
+      <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.beforePersist&quot;</span><span class="o">)</span>
+      <span class="kt">void</span> <span class="nf">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">e</span><span class="o">){</span>
+          <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="o">(</span><span class="n">Org</span><span class="o">)</span> <span class="n">e</span><span class="o">.</span><span class="na">entity</span>
+          <span class="c1">//do some thing with org</span>
+      <span class="o">}</span>
+
+      <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.afterPersist&quot;</span><span class="o">)</span>
+      <span class="kt">void</span> <span class="nf">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">e</span><span class="o">){</span>
+          <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="o">(</span><span class="n">Org</span><span class="o">)</span> <span class="n">e</span><span class="o">.</span><span class="na">entity</span>
+          <span class="c1">//do some thing with org</span>
+      <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 
-<p>File: <code>resources.groovy</code></p>
+<p>The above example uses <code>Subscriber</code> annotation from <a href="https://async.grails.org">Grails async</a> project. The event handler methods will get called asynchronously and does not take part in transaction.
+Repository also publishes events using spring event mechanism which can be used to define event listeners which gets called synchronously and takes part in current transaction. </p>
+<p>Following example shows how to define synchronous event listener.</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationListener</span> 
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforePersistEvent</span>
+
+<span class="kd">class</span> <span class="nc">OrgEventListener</span> <span class="kd">implements</span> <span class="n">ApplicationListener</span><span class="o">&lt;</span><span class="n">BeforePersistEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;&gt;</span>  <span class="o">{</span>
+
+    <span class="kt">void</span> <span class="nf">onApplicationEvent</span><span class="o">(</span><span class="n">BeforePersistEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
+        <span class="c1">//dome some thing with org.</span>
+    <span class="o">}</span>
+<span class="o">}</span> 
+</pre></div>
+
+<p>Define <code>OrgEventListener</code> as spring bean in <code>grails-app/conf/spring/resources.groovy</code></p>
 <div class="codehilite"><pre><span></span> <span class="n">xmlns</span> <span class="nl">lang:</span> <span class="s2">&quot;http://www.springframework.org/schema/lang&quot;</span>
- <span class="n">lang</span><span class="o">.</span><span class="na">groovy</span><span class="o">(</span><span class="nl">id:</span> <span class="s2">&quot;refreshableBean&quot;</span><span class="o">,</span> <span class="s1">&#39;script-source&#39;</span><span class="o">:</span> <span class="s2">&quot;file:&lt;path to RefreshableBean.groovy&gt;&quot;</span><span class="o">,</span> <span class="s1">&#39;refresh-check-delay&#39;</span><span class="o">:</span> <span class="mi">1000</span><span class="o">)</span>
+ <span class="n">lang</span><span class="o">.</span><span class="na">groovy</span><span class="o">(</span><span class="nl">id:</span> <span class="s2">&quot;orgEventListener&quot;</span><span class="o">,</span> <span class="s1">&#39;script-source&#39;</span><span class="o">:</span> <span class="s2">&quot;file:&lt;path to OrgEventListener.groovy&gt;&quot;</span><span class="o">,</span> <span class="s1">&#39;refresh-check-delay&#39;</span><span class="o">:</span> <span class="mi">1000</span><span class="o">)</span>
 </pre></div>
 
 <p>Now the <code>refreshableBean</code> can be injected into any other bean. Spring will reload it automatically if the RefreshableBean.groovy changes.</p>
-<p>See <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy">Spring dynamic languages support</a> for more details. </p>
-<p>Below is an example of how to use refreshable bean as event listener.</p>
-<h2 id="using-external-groovy-beans-as-event-listeners">Using external groovy beans as event listeners.<a class="headerlink" href="#using-external-groovy-beans-as-event-listeners" title="Permanent link">&para;</a></h2>
-<p>Spring dynamic language support can be used to register classes defined outside of application into groovy scripts as spring beans.
-Which makes it possible to externalize the event listeners if required so.</p>
-<p>Here's an example.</p>
-<p><code>SomeEventListener.groovy</code> outside of grails app.</p>
-<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gorm.tools.repository.events.AfterRemoveEvent</span>
-<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforeBindEvent</span>
-<span class="kn">import</span> <span class="nn">org.springframework.context.event.EventListener</span>
-
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SomeEventListener</span> <span class="o">{</span>
-
-    <span class="nd">@EventListener</span>
-    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">BeforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
-        <span class="k">if</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">bindAction</span> <span class="o">==</span> <span class="s1">&#39;Create&#39;</span><span class="o">){</span>
-            <span class="c1">//do something before create with event.data</span>
-            <span class="n">org</span><span class="o">.</span><span class="na">event</span> <span class="o">=</span> <span class="s2">&quot;Creating with data ${event.data}&quot;</span>
-        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span><span class="o">(</span><span class="n">event</span><span class="o">.</span><span class="na">bindAction</span> <span class="o">==</span> <span class="s1">&#39;Update&#39;</span><span class="o">){</span>
-            <span class="n">org</span><span class="o">.</span><span class="na">event</span> <span class="o">=</span> <span class="s2">&quot;Updating with data ${event.data}&quot;</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-<p>Define external class a spring bean in resources.groovy</p>
-<p>File <code>grails-app/conf/spring/resources.groovy</code></p>
-<div class="codehilite"><pre><span></span>    <span class="n">File</span> <span class="n">file</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s2">&quot;path to RepoEventListener.groovy&quot;</span><span class="o">)</span>
-    <span class="n">xmlns</span> <span class="nl">lang:</span> <span class="s2">&quot;http://www.springframework.org/schema/lang&quot;</span>
-
-    <span class="n">String</span> <span class="n">beanName</span> <span class="o">=</span> <span class="n">GrailsNameUtils</span><span class="o">.</span><span class="na">getPropertyName</span><span class="o">(</span><span class="n">file</span><span class="o">.</span><span class="na">name</span><span class="o">.</span><span class="na">replace</span><span class="o">(</span><span class="s1">&#39;.groovy&#39;</span><span class="o">,</span> <span class="s1">&#39;&#39;</span><span class="o">))</span>
-    <span class="n">lang</span><span class="o">.</span><span class="na">groovy</span><span class="o">(</span><span class="nl">id:</span> <span class="n">beanName</span><span class="o">,</span> <span class="s1">&#39;script-source&#39;</span><span class="o">:</span> <span class="s2">&quot;file:&lt;path to file&gt;&quot;</span><span class="o">,</span> <span class="s1">&#39;refresh-check-delay&#39;</span><span class="o">:</span> <span class="mi">1000</span><span class="o">)</span>
-</pre></div>
-
-<p>See <a href="https://github.com/yakworks/gorm-tools/blob/8356c50e13874921c9b42c2c9fa1f93d2c2a6826/examples/benchmarks/grails-app/conf/spring/resources.groovy#L25-L25">example</a> 
-in benchmarks project.  </p>
-<h2 id="data-binding-using-mapbinder">Data binding using MapBinder<a class="headerlink" href="#data-binding-using-mapbinder" title="Permanent link">&para;</a></h2>
-<p>Plugin comes with a <code>MapBinder</code> Which is used by a Repository to perform databinding.
-Plugin configures <code>entityMapBinder</code> as default implementation of <code>MapBinder</code>. <code>entityMapBinder</code> is similar 
-to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.
-However entityMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates 
-without going through the converters, thus resulting in faster performance.</p>
-<p><strong>Example</strong></p>
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">SomeService</span> <span class="o">{</span>
-    <span class="nd">@Autowired</span>
-    <span class="n">MapBinder</span> <span class="n">binder</span>
-
-    <span class="kt">void</span> <span class="nf">foo</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Org</span><span class="o">()</span>
-        <span class="n">binder</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">org</span><span class="o">,</span> <span class="n">params</span><span class="o">)</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-
-<p><strong>Using custom MapBinder</strong><br />
-By default all Repositories use the default <code>entityMapBinder</code> for databinding. However when a Repository is explicitly 
-created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.</p>
-<p><div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CustomMapBinder</span> <span class="kd">implements</span> <span class="n">MapBinder</span> <span class="o">{</span>
-
-    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">,</span> <span class="n">String</span> <span class="n">bindMethod</span><span class="o">)</span> <span class="o">{</span>
-        <span class="c1">//implement  </span>
-    <span class="o">}</span>
-
-    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">)</span> <span class="o">{</span>
-        <span class="c1">//implement</span>
-    <span class="o">}</span>
-
-<span class="o">}</span>
-</pre></div>
-then register the bean </p>
-<div class="codehilite"><pre><span></span><span class="n">beans</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="n">customMapBinder</span><span class="o">(</span><span class="n">CustomMapBinder</span><span class="o">)</span> 
-<span class="o">}</span>
-</pre></div>
-
-<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
-
-    <span class="nd">@Autowired</span>
-    <span class="nd">@Qualifier</span><span class="o">(</span><span class="s2">&quot;customMapBinder&quot;</span><span class="o">)</span>
-    <span class="n">CustomMapBinder</span> <span class="n">mapBinder</span>
-
-    <span class="o">.........</span>   
-<span class="o">}</span>
-</pre></div>
-
-<p>This will make the OrgRepo use CustomMapBinder for data binding.</p>
+<p>See <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy">Spring dynamic languages support</a> for more details on dynamic language support.</p>
 <h2 id="repoutil-repomessage-helpers">RepoUtil, RepoMessage Helpers<a class="headerlink" href="#repoutil-repomessage-helpers" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoUtil.html">RepoUtil</a></p>
 <h4 id="repoutil">RepoUtil:<a class="headerlink" href="#repoutil" title="Permanent link">&para;</a></h4>
@@ -1243,13 +1167,13 @@ Dates in <code>example</code> should be string format, they will be parsed to da
           </a>
         
         
-          <a href="../../queries-mango/" title="Mango Query" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../databinding/" title="Databinding" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Mango Query
+                Databinding
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

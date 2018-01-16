@@ -11,34 +11,34 @@
         <meta name="description" content="Helpers for gorm">
       
       
-        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/">
+        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/repository/databinding/">
       
       
         <meta name="author" content="Joshua Burnett">
       
       
-        <link rel="shortcut icon" href="./assets/images/favicon.png">
+        <link rel="shortcut icon" href="../../assets/images/favicon.png">
       
       <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-components-1.10.11">
     
     
       
-        <title>Gorm Tools</title>
+        <title>Databinding - Gorm Tools</title>
       
     
     
       
     
     
-      <script src="./assets/javascripts/modernizr-e826f8942a.js"></script>
+      <script src="../../assets/javascripts/modernizr-e826f8942a.js"></script>
     
     
-      <link rel="stylesheet" href="./assets/stylesheets/application-2cd7d9ab0f.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/application-2cd7d9ab0f.css">
       
-        <link rel="stylesheet" href="./assets/stylesheets/application-035c261bc5.palette.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/application-035c261bc5.palette.css">
       
-      <link rel="stylesheet" href="./assets/stylesheets/material-components-web.min.css">
-      <link rel="stylesheet" href="./assets/stylesheets/mdc-web.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/material-components-web.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/mdc-web.css">
     
     
       
@@ -107,7 +107,7 @@
       <div class="md-flex__cell md-flex__cell--shrink md-flex__cell--vmiddle">
         <a href="http://yakworks.github.io/gorm-tools/" title="Gorm Tools" class="md-header-nav__button md-logo">
           
-            <img src="./assets/images/logo_white.png" width="36" height="36">
+            <img src="../../assets/images/logo_white.png" width="36" height="36">
           
         </a>
       </div>
@@ -120,8 +120,12 @@
             Gorm Tools -
             
               
+                <span class="md-header-nav__parent">
+                  Repository Pattern
+                </span>
+              
             
-            Overview
+            Databinding
           
         </span>
       </div>
@@ -231,70 +235,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Overview
-      </label>
-    
-    <a href="." title="Overview" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../.." title="Overview" class="md-nav__link">
       Overview
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#domain-repository-services" title="Domain Repository Services" class="md-nav__link">
-    Domain Repository Services
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#goals" title="Goals" class="md-nav__link">
-    Goals
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mango-query" title="Mango Query" class="md-nav__link">
-    Mango Query
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#getting-started" title="Getting started" class="md-nav__link">
-    Getting started
-  </a>
-  
-</li>
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -302,10 +247,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
     
     <label class="md-nav__link" for="nav-2">
       Repository Pattern
@@ -323,7 +270,7 @@
 
 
   <li class="md-nav__item">
-    <a href="repository/intro/" title="Quick Start" class="md-nav__link">
+    <a href="../intro/" title="Quick Start" class="md-nav__link">
       Quick Start
     </a>
   </li>
@@ -335,7 +282,7 @@
 
 
   <li class="md-nav__item">
-    <a href="repository/ref/" title="Reference" class="md-nav__link">
+    <a href="../ref/" title="Reference" class="md-nav__link">
       Reference
     </a>
   </li>
@@ -345,11 +292,50 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="repository/databinding/" title="Databinding" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Databinding
+      </label>
+    
+    <a href="./" title="Databinding" class="md-nav__link md-nav__link--active">
       Databinding
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
+    Data binding using MapBinder
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binding-associations" title="Binding Associations" class="md-nav__link">
+    Binding Associations
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -364,7 +350,7 @@
 
 
   <li class="md-nav__item">
-    <a href="queries-mango/" title="Mango Query" class="md-nav__link">
+    <a href="../../queries-mango/" title="Mango Query" class="md-nav__link">
       Mango Query
     </a>
   </li>
@@ -376,7 +362,7 @@
 
 
   <li class="md-nav__item">
-    <a href="async/" title="Async" class="md-nav__link">
+    <a href="../../async/" title="Async" class="md-nav__link">
       Async
     </a>
   </li>
@@ -407,7 +393,7 @@
 
 
   <li class="md-nav__item">
-    <a href="id-generation/" title="Id Generation" class="md-nav__link">
+    <a href="../../id-generation/" title="Id Generation" class="md-nav__link">
       Id Generation
     </a>
   </li>
@@ -419,7 +405,7 @@
 
 
   <li class="md-nav__item">
-    <a href="gorm-utils/" title="GormUtils Class" class="md-nav__link">
+    <a href="../../gorm-utils/" title="GormUtils Class" class="md-nav__link">
       GormUtils Class
     </a>
   </li>
@@ -431,7 +417,7 @@
 
 
   <li class="md-nav__item">
-    <a href="beanPathTools/" title="Bean Path Tools" class="md-nav__link">
+    <a href="../../beanPathTools/" title="Bean Path Tools" class="md-nav__link">
       Bean Path Tools
     </a>
   </li>
@@ -443,7 +429,7 @@
 
 
   <li class="md-nav__item">
-    <a href="working-with-dates/" title="Date Utils" class="md-nav__link">
+    <a href="../../working-with-dates/" title="Date Utils" class="md-nav__link">
       Date Utils
     </a>
   </li>
@@ -460,7 +446,7 @@
 
 
   <li class="md-nav__item">
-    <a href="api/" title="API Docs" class="md-nav__link">
+    <a href="../../api/" title="API Docs" class="md-nav__link">
       API Docs
     </a>
   </li>
@@ -472,7 +458,7 @@
 
 
   <li class="md-nav__item">
-    <a href="usefulLinks/" title="Useful links" class="md-nav__link">
+    <a href="../../usefulLinks/" title="Useful links" class="md-nav__link">
       Useful links
     </a>
   </li>
@@ -497,35 +483,15 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#domain-repository-services" title="Domain Repository Services" class="md-nav__link">
-    Domain Repository Services
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#goals" title="Goals" class="md-nav__link">
-    Goals
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mango-query" title="Mango Query" class="md-nav__link">
-    Mango Query
+  <a href="#data-binding-using-mapbinder" title="Data binding using MapBinder" class="md-nav__link">
+    Data binding using MapBinder
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#getting-started" title="Getting started" class="md-nav__link">
-    Getting started
+  <a href="#binding-associations" title="Binding Associations" class="md-nav__link">
+    Binding Associations
   </a>
   
 </li>
@@ -544,107 +510,94 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/index.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/repository/databinding.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Overview</h1>
+                  <h1>Databinding</h1>
                 
                 
-                  <code>Version: 6.1-SNAPSHOT</code>
-                
-                <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
+                <h2 id="data-binding-using-mapbinder">Data binding using MapBinder<a class="headerlink" href="#data-binding-using-mapbinder" title="Permanent link">&para;</a></h2>
+<p>Plugin comes with a <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/MapBinder.html">MapBinder</a> Which is used by a Repository to perform databinding.
+Plugin configures <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a> as default implementation of <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/MapBinder.html">MapBinder</a>. <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a> is similar 
+to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.
+However entityMapBinder is optimized to convert most commonly encountered property types such as Numbers and Dates 
+without going through the converters, thus resulting in faster performance.</p>
+<p><strong>Example</strong></p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">SomeService</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="n">EntityMapBinder</span> <span class="n">binder</span>
 
-      ________                                           _.-````'-,_
-     /  _____/  ___________  _____                   ,-'`           `'-.,_
-    /   \  ___ /  _ \_  __ \/     \          /)     (\       9ci's       '``-.
-    \    \_\  (  <_> )  | \/  Y Y  \        ( ( .,-') )    Yak Works         ```
-     \______  /\____/|__|  |__|_|  /         \ '   (_/                         !!
-            \/                   \/           |       /)           '           !!!
-  ___________           .__                   ^\    ~'            '     !    !!!!
-  \__    ___/___   ____ |  |   ______           !      _/! , !   !  ! !  !   !!!
-    |    | /  _ \ /  _ \|  |  /  ___/            \Y,   |!!!  !  ! !!  !! !!!!!!!
-    |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
-    |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
-                                  \/               /_(      /_(/_(    /_(  /_(   
-            v3.3.2-SNAPSHOT
-
-</pre>
-
-<p>This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
-domains and is the basis for the <a class="new-tab" href="https://yakworks.github.io/gorm-rest-api/">Gorm Rest API plugin</a>. 
-There are 2 primary patterns this library enables as detailed below for Repositories
-and Mango ( A mongo query like way to get data with a Map)</p>
-<h2 id="domain-repository-services">Domain Repository Services<a class="headerlink" href="#domain-repository-services" title="Permanent link">&para;</a></h2>
-<p><small><a href="repository/ref/">jump to reference</a></small></p>
-<p>A repository is a <a href="usefulLinks/#references">Domain Driven Design</a> pattern. Used a a place logic to validate, bind, persist and query data that resides 
-either in a database or NoSql (via GORM usually of course).
-The design pattern here is a bit similiar to <a href="https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/">Spring's Repository pattern</a>
-and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices">Data Services</a> pattern.</p>
-<h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Standardization</strong>: a clean common pattern across our apps for domain service layer logic that 
-  reduces boiler plate in both services as well as controllers.</li>
-<li><strong>Transactional Saves</strong>: every save() or persist() is wrapped in a transaction if one doesn't already exist. 
-  This is critical when there are cascading saves and updates.</li>
-<li><strong>RuntimeException Rollback</strong>: saves or <code>persist()</code> always occur with failOnError:true so a RuntimeException is 
-  thrown for both DataAccessExceptions as well a validation exceptions.
-  This is critical for deeply nested domain logic dealing with saving multiple domains chains.</li>
-<li><strong>Fast Data Binding Service</strong>: databinding from maps (and thus JSON) has to be fast 
-  and therefore maps and json are a first class citizen where it belongs in the data service layer instead of the controller layer. 
-  Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.</li>
-<li><strong>Events &amp; Validation</strong>: the Repository allows a central place to do events such as beforeSave, beforeValidate, etc 
-  so as not to pollute the domain class. This pattern makes it easier to keeps the special logic in a transaction as well. 
-  Allows validation outside of constraints to persistence without needing to modify the domain source.</li>
-<li><strong>Events with Flushing</strong>: As mentioned in the Gorm docs, "Do not attempt to flush the session within an event 
-  (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.". 
-  Putting the event business logic in the Repository keeps it all in a normal transaction and a flush is perfectly fine.  </li>
-<li><strong>Override Plugin's Domain Logic</strong>: Since the Repository is a service this also easily allows default logic in a provided 
-  plugin to be overriden in an application. For example, I may have a CustomerRepo in a plugin that deals with deault common 
-  logic to validate address. I can then implement a CustomerRepo in an application and it will override the spring bean
-  just as it does for a service. </li>
-</ul>
-<h2 id="mango-query">Mango Query<a class="headerlink" href="#mango-query" title="Permanent link">&para;</a></h2>
-<p>The primary motive here is to create an easy dynamic map based way to query any Gorm Datastore (SQL or NoSQL). 
-Using a simple map that can come from json, yaml, groovy config etc... 
-A huge motivating factor being able is to be able to have a powerful and flexible way to query using json from a REST 
-based client without having to use GraphQL (the only other clean alternative)
-The Repositories and RestApiController come with a <code>query(criteriaMap, closure)</code> method. It allows you to get a paginated 
-list of entities restricted by the properties in the <code>criteriaMap</code>.</p>
-<ul>
-<li>A lot of inspiration was drawn from <a href="https://restdb.io/docs/querying-with-the-api">Restdb.io</a></li>
-<li>the query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a></li>
-<li>and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a> .</li>
-<li>Also inspired by <a href="https://github.com/2do2go/json-sql/">json-sql</a></li>
-</ul>
-<blockquote>
-<p><img alt="📝" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
-Whilst selectors have many similarities with MongoDB query documents, 
-these arise more from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
-</blockquote>
-<p><strong>Example</strong>
-for example, sending a JSON search param that looks like this
-<div class="codehilite"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Bill%&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;New&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;age&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mi">65</span><span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-would get converted to the equivalent criteria</p>
-<div class="codehilite"><pre><span></span><span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span> <span class="p">{</span>
-    <span class="nx">ilike</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill%&quot;</span>
-    <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
-    <span class="nx">gt</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="mi">65</span>
-<span class="p">}</span>
+    <span class="kt">void</span> <span class="nf">foo</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Org</span><span class="o">()</span>
+        <span class="n">binder</span><span class="o">.</span><span class="na">bind</span><span class="o">(</span><span class="n">org</span><span class="o">,</span> <span class="n">params</span><span class="o">)</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
 
-<h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
-<p>To use the Gorm-Tools add the dependency on the plugin to your build.gradle file:</p>
-<div class="codehilite"><pre><span></span>runtime &quot;org.grails.plugins:gorm-tools:@VERSION@&quot;
+<p><strong>Using custom MapBinder</strong><br />
+By default all Repositories use the default <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a> for databinding. However when a Repository is explicitly 
+created for a domain class, and if required, a custom MapBinder implementation can be used to perform databinding as per the need.</p>
+<p><div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CustomMapBinder</span> <span class="kd">implements</span> <span class="n">MapBinder</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">Map</span> <span class="n">args</span><span class="o">,</span> <span class="n">Object</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">,</span> <span class="n">BindAction</span> <span class="n">bindAction</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//implement  </span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">GormEntity</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">bind</span><span class="o">(</span><span class="n">Object</span> <span class="n">target</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">source</span><span class="o">,</span> <span class="n">BindAction</span> <span class="n">bindAction</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//implement</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+then register the bean </p>
+<div class="codehilite"><pre><span></span><span class="n">beans</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">customMapBinder</span><span class="o">(</span><span class="n">CustomMapBinder</span><span class="o">)</span> 
+<span class="o">}</span>
 </pre></div>
 
-<p>And you can start using the plugin by calling the repository methods on domain classes. 
-The plugin adds several persistence methods to domain classes. Which delegates to repository classes. This includes persist(), create(params), update(update), remove()</p>
-<p>See <a href="repository/ref/">Repository</a> for more details</p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="nd">@Qualifier</span><span class="o">(</span><span class="s2">&quot;customMapBinder&quot;</span><span class="o">)</span>
+    <span class="n">CustomMapBinder</span> <span class="n">mapBinder</span>
+
+    <span class="o">.........</span>   
+<span class="o">}</span>
+</pre></div>
+
+<p>This will make the OrgRepo use CustomMapBinder for data binding.</p>
+<h2 id="binding-associations">Binding Associations<a class="headerlink" href="#binding-associations" title="Permanent link">&para;</a></h2>
+<p>Gorm tools MapBinder handles associations little differently than Grails data binder for performance reasons.
+How associations are handled depends on if the associated domain belongs to the domain which is being bound.
+If the domain being bound is owning side of association and value is of type map, a new instance of associated domain is created.
+If the association does not use belongsTo then existing instance is loaded if the map contains the id.
+The databinding on associated domain will be performed only if it belongs to the domain which is being bound</p>
+<p>Example</p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Author</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">name</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Category</span> <span class="o">{</span>
+  <span class="n">String</span> <span class="n">name</span>
+<span class="o">}</span>
+
+<span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">name</span>
+    <span class="n">Category</span> <span class="n">category</span>
+
+    <span class="kd">static</span> <span class="n">belongsTo</span> <span class="o">=</span> <span class="o">[</span><span class="nl">author:</span><span class="n">Author</span><span class="o">]</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>Given the above domain model, when creating a new book. It will not create new instance of Author or category, but will set reference to existing instance if id is provided in parameter.
+It will create new book and set the author and category to existing records with provided id.</p>
+<div class="codehilite"><pre><span></span><span class="n">Book</span><span class="o">.</span><span class="na">create</span><span class="o">([</span><span class="nl">name:</span><span class="s2">&quot;Grails In Action&quot;</span><span class="o">,</span> <span class="nl">author:</span><span class="o">[</span><span class="nl">id:</span><span class="mi">1</span><span class="o">],</span> <span class="nl">category:</span><span class="o">[</span><span class="nl">id:</span><span class="mi">1</span><span class="o">]])</span> 
+</pre></div>
+
+<p>However a new book can be created when creating a new author, because book belongs to Author.</p>
+<p>So following will create a new book instance and set author.book to this new instance.</p>
+<div class="codehilite"><pre><span></span><span class="n">Author</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="nl">name:</span><span class="s2">&quot;test&quot;</span><span class="o">,</span> <span class="nl">book:</span><span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Grails in action&quot;</span><span class="o">])</span>
+</pre></div>
                 
                   
                 
@@ -663,14 +616,28 @@ The plugin adds several persistence methods to domain classes. Which delegates t
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
+          <a href="../ref/" title="Reference" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Reference
+              </span>
+            </div>
+          </a>
         
-          <a href="repository/intro/" title="Quick Start" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+        
+          <a href="../../queries-mango/" title="Mango Query" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Quick Start
+                Mango Query
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
@@ -701,16 +668,16 @@ The plugin adds several persistence methods to domain classes. Which delegates t
       
     </div>
     
-      <script src="./assets/javascripts/application-68832431b5.js"></script>
+      <script src="../../assets/javascripts/application-68832431b5.js"></script>
       
       
       <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
       <script>window.mdc.autoInit()</script>
-      <script src="./assets/javascripts/headroom.min.js"></script>
-      <script src="./assets/javascripts/jQuery.headroom.min.js"></script>
-      <script src="./assets/javascripts/jq-mdc-web.js"></script>
+      <script src="../../assets/javascripts/headroom.min.js"></script>
+      <script src="../../assets/javascripts/jQuery.headroom.min.js"></script>
+      <script src="../../assets/javascripts/jq-mdc-web.js"></script>
       <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
-      <script>app.initialize({version:"0.16.3",url:{base:"."}})</script>
+      <script>app.initialize({version:"0.16.3",url:{base:"../.."}})</script>
       
     
     

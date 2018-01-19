@@ -53,7 +53,9 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
         (1..repeatedCityTimes).each { i ->
             repeatedCity = repeatedCity + cityfull
         }
+        //println repeatedCity.size()
         cities = repeatedCity.collate(batchSize)
+        //println cities.size()
     }
 
     @Transactional

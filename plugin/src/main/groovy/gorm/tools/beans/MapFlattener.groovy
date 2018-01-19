@@ -96,11 +96,13 @@ class MapFlattener {
 
                 if (value) {
                     value = value.trim() //trim strings - same as grails.databinding.trimStrings
-                    try {
-                        Date date = IsoDateUtil.parse(value)
-                        value = IsoDateUtil.format(date)
-                    } catch (ParseException e) {
-                        // it cannot recognize a date format, so do nothing
+                    if (!value.isEmpty()) {
+                        try {
+                            Date date = IsoDateUtil.parse(value)
+                            value = IsoDateUtil.format(date)
+                        } catch (ParseException e) {
+                            // it cannot recognize a date format, so do nothing
+                        }
                     }
                 }
                 //convert empty strings to null - same behavior as grails.databinding.convertEmptyStringsToNull

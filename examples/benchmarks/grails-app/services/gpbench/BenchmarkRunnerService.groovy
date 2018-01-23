@@ -87,6 +87,7 @@ class BenchmarkRunnerService {
 
         // warmUpAndRun("### Gpars - fat props","runFat", binderType)
 
+        warmUpAndRun("### Gpars - update benchmarks", "runUpdateBenchmarks", binderType)
         warmUpAndRun("### Gpars - Assign Properties, no grails databinding", "runBaselineCompare", binderType)
 
         warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
@@ -151,6 +152,14 @@ class BenchmarkRunnerService {
         //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
         //logMessage "\n  - These should all run within about 5% of City and each other"
         //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
+    }
+
+    void runUpdateBenchmarks(String msg, String bindingMethod = 'grails') {
+        logMessage "\n$msg"
+        runBenchmark(new GparsBaseLineUpdateBenchmark(CityBaseline))
+        runBenchmark(new GparsBaseLineUpdateBenchmark(City))
+        runBenchmark(new RepoUpdateBenchmark(CityBaseline))
+        runBenchmark(new RepoUpdateBenchmark(City))
     }
 
     void runWithEvents(String msg, String bindingMethod = 'grails') {

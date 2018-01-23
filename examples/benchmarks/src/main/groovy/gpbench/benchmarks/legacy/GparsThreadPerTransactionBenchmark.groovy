@@ -1,4 +1,4 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.legacy
 
 import gpbench.City
 import gpbench.CityRepo

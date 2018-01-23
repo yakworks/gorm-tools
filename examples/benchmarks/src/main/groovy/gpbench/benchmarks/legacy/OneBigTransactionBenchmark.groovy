@@ -1,4 +1,4 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.legacy
 
 import gorm.tools.repository.RepoUtil
 import gpbench.City
@@ -7,13 +7,12 @@ import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 
-/**
- *  Commit each record in individual transaction
+/**Inserts all records in a single big transaction.
  */
 @CompileStatic
-class CommitEachSaveBenchmark extends BaseBenchmark {
+class OneBigTransactionBenchmark extends BaseBenchmark {
 
-    CommitEachSaveBenchmark(boolean databinding) {
+    OneBigTransactionBenchmark(boolean databinding) {
         super(databinding)
     }
 
@@ -25,6 +24,7 @@ class CommitEachSaveBenchmark extends BaseBenchmark {
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)
+    @Transactional
     void insert(List<Map> batch, CityRepo repo) {
         batch.eachWithIndex { Map record, int index ->
             insert(record, repo)
@@ -32,7 +32,6 @@ class CommitEachSaveBenchmark extends BaseBenchmark {
         }
     }
 
-    @Transactional
     void insert(Map record, CityRepo repo) {
         try {
             if (useDatabinding) repo.create(record)
@@ -45,6 +44,6 @@ class CommitEachSaveBenchmark extends BaseBenchmark {
 
     @Override
     String getDescription() {
-        return "Commit each save: databinding=${useDatabinding}"
+        return "All records in one big single transaction: databinding=${useDatabinding}"
     }
 }

@@ -1,7 +1,8 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.update
 
 import gpbench.City
 import gpbench.CityRepo
+import gpbench.benchmarks.legacy.BaseBenchmark
 import groovyx.gpars.GParsPool
 import org.springframework.transaction.annotation.Transactional
 

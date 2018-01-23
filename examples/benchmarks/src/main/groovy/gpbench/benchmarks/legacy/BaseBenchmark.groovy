@@ -1,6 +1,7 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.legacy
 
 import gpbench.CityRepo
+import gpbench.benchmarks.AbstractBenchmark
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader

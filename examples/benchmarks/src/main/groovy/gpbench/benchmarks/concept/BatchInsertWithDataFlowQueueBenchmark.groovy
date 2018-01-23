@@ -1,9 +1,9 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.concept
 
 import gorm.tools.WithTrx
-import gorm.tools.repository.RepoUtil
 import gpbench.City
 import gpbench.CityRepo
+import gpbench.benchmarks.BaseBatchInsertBenchmark
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic

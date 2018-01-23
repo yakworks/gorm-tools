@@ -1,16 +1,18 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.update
 
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.api.RepositoryApi
 import gpbench.City
 import grails.web.databinding.WebDataBinding
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.jdbc.core.JdbcTemplate
 
-class GparsBaseLineUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpdateBenchmark<T>{
+class RepoUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpdateBenchmark<T>{
 
-    JdbcTemplate jdbcTemplate
+    RepositoryApi<T> repo
 
-    GparsBaseLineUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
+    RepoUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
+        repo = RepoUtil.findRepository(clazz)
     }
 
     @Override
@@ -23,11 +25,11 @@ class GparsBaseLineUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
         }
     }
 
-
     void updateRow(Long id) {
         def instance = domainClass.get(id)
-        instance.properties = getUpdateData(instance)
-        instance.save()
+        Map data = getUpdateData(instance)
+        data.id = id
+        repo.update(data)
     }
 
 }

@@ -1,4 +1,4 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.update
 
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.RepoUtil
@@ -6,6 +6,7 @@ import gorm.tools.repository.api.RepositoryApi
 import gpbench.City
 import gpbench.Country
 import gpbench.Region
+import gpbench.benchmarks.BaseBatchInsertBenchmark
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic

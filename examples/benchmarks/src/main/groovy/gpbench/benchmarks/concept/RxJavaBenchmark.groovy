@@ -1,6 +1,7 @@
-package gpbench.benchmarks
+package gpbench.benchmarks.concept
 
 import gorm.tools.repository.RepoUtil
+import gpbench.benchmarks.GparsBaselineBenchmark
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import io.reactivex.Flowable

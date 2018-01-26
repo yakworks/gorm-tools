@@ -26,6 +26,7 @@ abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
 
     EntityMapBinder entityMapBinder
     RepositoryApi<T> repo
+    List<Map> citiesUpdated
 
     BaseUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
@@ -39,15 +40,39 @@ abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
     @CompileDynamic
     void setup() {
         super.setup()
+        regionIds = Region.executeQuery("select id from Region")
+        regionCount = Region.count()
+
         asyncBatchSupport.parallel(cities) { List<Map> list, Map args ->
             repo.batchCreate(list)
+            updateRows(list)
         }
         //make sure cities are inserted
         assert  domainClass.count() != 0
-        regionIds = Region.executeQuery("select id from Region")
-        regionCount = Region.count()
+        citiesUpdated = cities.flatten()
     }
 
+    @CompileDynamic
+    void updateRows(List<Map> list) {
+        for(Map row : list) {
+            BigDecimal latitude = (row.latitude as BigDecimal)
+            BigDecimal longitude = (row.longitude as BigDecimal)
+
+
+            if(latitude < 89.00) latitude = latitude + 1
+            if(longitude < 378.00) longitude = longitude + 1
+            
+            row.latitude = latitude.toString()
+            row.longitude = longitude.toString()
+            row.name = row.name + "-Updated"
+            row.shortCode = row.shortCode + "-Updated"
+            row.region = [id:randomRegionId]
+            row.country = [id:randomCountryId]
+        }
+    }
+
+    /*
+    TODO remove
     @CompileDynamic
     Map getUpdateData(GormEntity<T> entity) {
         Map data = [:]
@@ -73,7 +98,7 @@ abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
     def getUpdatedAssociation(GormEntity entity, Association association) {
         if(association.type.isAssignableFrom(Country)) return getRandomCountryId()
         if(association.type.isAssignableFrom(Region)) return getRandomRegionId()
-    }
+    }*/
 
     Long getRandomCountryId() {
         return ThreadLocalRandom.current().nextLong(1, 276)

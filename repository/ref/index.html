@@ -1110,10 +1110,10 @@ Alternatively if <code>getPackageToScan()</code> is provided, it will find all t
 Also plugin provides <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/DomainAutoTest.html">DomainAutoTest</a> abstract class that contains default tests cases for CRUD operations. 
 <code>DomainAutoTest</code> will mock the domain, setup and create the data for you then exercise the domain and the default repository service for you.
 See example bellow:</p>
-<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gorm.tools.testing.DomainAutoTest</span>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gorm.tools.testing.hibernate.AutoHibernateSpec</span>
 <span class="kn">import</span> <span class="nn">testing.Project</span>
 
-<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">DomainAutoTest</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">AutoHibernateSpec</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
 

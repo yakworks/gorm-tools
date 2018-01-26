@@ -146,7 +146,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
-    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
+    void setProp(target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
@@ -191,7 +191,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
-    void bindAssociation(Object target, def value, Association association, DataBindingListener listener = null, errors = null) {
+    void bindAssociation(target, value, Association association, DataBindingListener listener = null, errors = null) {
         Object instance
 
         if (association.getType().isAssignableFrom(value.getClass())) {

@@ -2,6 +2,8 @@ package testing
 
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 @Entity @GrailsCompileStatic
 class Org {
@@ -32,5 +34,16 @@ class Org {
         secondName nullable: true
         nameFromRepo nullable: true
         event nullable: true, blank: false
+    }
+
+    @CompileDynamic
+    static getConfigs(){
+        return {
+            json.includes = '*'
+            json.excludes = ['location']
+            query.quickSearch = ["name", "secondName"]
+            audittrail.enabled = false
+            autotest.update = [name:'foo']
+        }
     }
 }

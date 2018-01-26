@@ -2,7 +2,6 @@ package gorm.tools.mango
 
 import gorm.tools.mango.api.MangoQueryApi
 import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.testing.GormToolsHibernateSpec
 import gorm.tools.testing.GormToolsTest
 import grails.artefact.Artefact
 import grails.gorm.DetachedCriteria

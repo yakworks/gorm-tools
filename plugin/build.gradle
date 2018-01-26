@@ -33,6 +33,9 @@ dependencies {
     //used for bundled Test traits
     compileOnly "org.grails:grails-gorm-testing-support"
     compileOnly "org.grails:grails-web-testing-support"
+    compileOnly "org.grails.plugins:build-test-data:$buildTestDataVersion"
+
+    //testCompile "org.grails.plugins:views-json-testing-support:$viewsVersion"
 
     codenarc 'org.codenarc:CodeNarc:0.27.0'
 }

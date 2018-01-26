@@ -1,8 +1,9 @@
-package gorm.tools.testing
+package gorm.tools.testing.hibernate
 
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
+import gorm.tools.testing.GormToolsTestHelper
 import grails.gorm.transactions.TransactionService
 import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
@@ -17,13 +18,15 @@ import org.springframework.core.type.filter.AssignableTypeFilter
 
 @SuppressWarnings(['AbstractClassWithoutAbstractMethod'])
 //@CompileStatic
-abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper, AutowiredTest {
+abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper {
 
     void setupSpec() {
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
         if (!ctx.containsBean("transactionService"))
             ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+        if (!ctx.containsBean("grailsDomainClassMappingContext"))
+            ctx.beanFactory.registerSingleton("grailsDomainClassMappingContext", hibernateDatastore.getMappingContext())
 
         List<Class> domainClasses = getDomainClasses()
         String packageName = getPackageToScan(config)

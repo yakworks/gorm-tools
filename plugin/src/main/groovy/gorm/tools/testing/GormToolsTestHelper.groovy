@@ -8,6 +8,9 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.gorm.transactions.TransactionService
 import grails.plugin.gormtools.RepositoryArtefactHandler
+import grails.testing.spock.OnceBefore
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.testing.GrailsUnitTest
 import org.junit.BeforeClass
@@ -20,19 +23,39 @@ import org.springframework.util.ClassUtils
  * @author Sudhir
  * @since 3.3.2
  */
+@CompileStatic
 trait GormToolsTestHelper extends GrailsUnitTest {
 
     @BeforeClass
     void setupTransactionService() {
-        //setup transactionService
         if (!ctx.containsBean("transactionService"))
             ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+    }
+
+    /**
+     * Mocks Repositories for passed in Domain classes.
+     * If a Repository Class is explicitly defined then this looks for it in the same package
+     * The domains should be mocked before this is called
+     */
+    void mockRepositories(Class<?>... domainClassesToMock) {
+        Closure repoBeans = {}
+
+        domainClassesToMock.each { Class domainClass ->
+            Class repoClass = findRepoClass(domainClass)
+            repoBeans = repoBeans << registerRepository(domainClass, repoClass)
+        }
+        //check again for transactionService, for some reason it doesn't get picked up in @OnceBefore
+        if (!ctx.containsBean("transactionService"))
+            ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+
+        defineBeans(repoBeans << commonBeans())
     }
 
     /**
      * FIX for https://github.com/grails/grails-testing-support/issues/22
      * changes dataStore to lowercase datastore for consistency
      */
+    @CompileDynamic
     AbstractDatastore getDatastore() {
         getDataStore()
     }
@@ -42,6 +65,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
         getApplicationContext()
     }
 
+    @CompileDynamic
     Closure commonBeans() {
         return {
             entityMapBinder(EntityMapBinder, grailsApplication)
@@ -67,6 +91,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
         return DefaultGormRepo
     }
 
+    @CompileDynamic
     Closure registerRepository(Class domain, Class repoClass) {
         String beanName = RepoUtil.getRepoBeanName(domain)
         grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)

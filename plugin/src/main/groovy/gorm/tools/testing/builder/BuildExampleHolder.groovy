@@ -1,4 +1,4 @@
-package gorm.tools.testing
+package gorm.tools.testing.builder
 
 /**
  * Holder for BuildExampleData of test classes that allows to build test values, some sort of cache

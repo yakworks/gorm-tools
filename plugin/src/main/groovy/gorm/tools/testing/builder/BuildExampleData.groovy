@@ -1,4 +1,4 @@
-package gorm.tools.testing
+package gorm.tools.testing.builder
 
 import gorm.tools.GormMetaUtils
 import gorm.tools.beans.IsoDateUtil

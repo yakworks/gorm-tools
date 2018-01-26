@@ -3,7 +3,7 @@ package gorm.tools.repository
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.testing.GormToolsHibernateSpec
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.dao.OptimisticLockingFailureException

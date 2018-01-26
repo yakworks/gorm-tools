@@ -14,18 +14,10 @@ trait GormToolsTest implements GormToolsTestHelper, DataTest, AutowiredTest {
      *
      * @param domainClassesToMock The list of domain classes to mock
      */
+    @Override
     void mockDomains(Class<?>... domainClassesToMock) {
-
         DataTest.super.mockDomains(domainClassesToMock)
-
-        Closure repoBeans = {}
-
-        domainClassesToMock.each { Class domainClass ->
-            Class repoClass = findRepoClass(domainClass)
-            repoBeans = repoBeans << registerRepository(domainClass, repoClass)
-        }
-
-        defineBeans(repoBeans << commonBeans())
+        mockRepositories(domainClassesToMock)
     }
 
 }

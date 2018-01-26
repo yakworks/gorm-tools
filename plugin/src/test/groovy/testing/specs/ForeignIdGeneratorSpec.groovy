@@ -1,7 +1,7 @@
 package testing.specs
 
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.testing.GormToolsHibernateSpec
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

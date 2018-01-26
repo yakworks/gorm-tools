@@ -124,26 +124,6 @@ function windowTitle()
                     </tr>
 <tr class="altColor">
                             <td class="colOne">
-                                <strong><a href="BatchIdGenerator.html" title="class in gorm/tools/idgen">
-                                    BatchIdGenerator
-                                </a></strong>
-                            </td>
-                            <td>An Thread safe implementation that caches a range of values in memory by the key name (ie: "tablename.id")
- Default cache allocation size is 50 but can be set to other values. requires another IdGenerator implementation to be
- set in the constructor. </td>
-                        </tr>
-<tr class="altColor">
-                            <td class="colOne">
-                                <strong><a href="BatchIdGenerator.IdTuple.html" title="class in gorm/tools/idgen">
-                                    BatchIdGenerator.IdTuple
-                                </a></strong>
-                            </td>
-                            <td>Used before creating large batches where you know the count and want to pre pool and id range larger than the default
- to avoid the DB round trips to keep incrementing the sequence in the table.
- </td>
-                        </tr>
-<tr class="altColor">
-                            <td class="colOne">
                                 <strong><a href="IdGeneratorHolder.html" title="class in gorm/tools/idgen">
                                     IdGeneratorHolder
                                 </a></strong>

@@ -3,23 +3,22 @@ package gorm.tools.idgen
 import grails.test.hibernate.HibernateSpec
 import spock.lang.Shared
 
-
-class BatchIdGeneratorTests extends HibernateSpec {
+class PooledIdGeneratorSpec extends HibernateSpec {
 
     @Shared
     MockIdGenerator mockdbgen
     @Shared
-    BatchIdGenerator batchgen
+    PooledIdGenerator batchgen
 
-    void setup() {
+    void setupSpec() {
         mockdbgen = new MockIdGenerator()
-        batchgen = new BatchIdGenerator(mockdbgen)
+        batchgen = new PooledIdGenerator(mockdbgen)
         mockdbgen.transactionManager = getTransactionManager()
-        batchgen.setAllocationSize(5)
+        //batchgen.setBatchSize(5)
 
     }
 
-    void testGetNextIdStringInt() {
+    def testGetNextIdStringInt() {
         //the id waiting will be 1 and this will increment to 3
         assertTrue(1 == batchgen.getNextId("table.id", 2))
         //so this following should get 3 back and set the next avail id to 3+2=5
@@ -39,7 +38,7 @@ class BatchIdGeneratorTests extends HibernateSpec {
 
     }
 
-    void testGetIncrementPastBatchSize() {
+    def testGetIncrementPastBatchSize() {
         //positon the next Id to 5
         assertTrue(1 == batchgen.getNextId("table.id", 3))
         assertEquals(new Long(6), mockdbgen.table.get("table.id")) //should be 6
@@ -51,7 +50,7 @@ class BatchIdGeneratorTests extends HibernateSpec {
         assertEquals(new Long(150), mockdbgen.table.get("table.id"))
     }
 
-    void testGetIncrementInsideBatchSize() {
+    def testGetIncrementInsideBatchSize() {
         //positon the next Id to 4
         assertTrue(1 == batchgen.getNextId("table.id", 3))
         assertEquals(new Long(6), mockdbgen.table.get("table.id")) //should be 6
@@ -65,7 +64,7 @@ class BatchIdGeneratorTests extends HibernateSpec {
         assertEquals(new Long(11), mockdbgen.table.get("table.id"))
     }
 
-    void testGetNextIdString() {
+    def testGetNextIdString() {
 
         for (int i = 1; i < 10; i++) {
             assertEquals(new Long(i), new Long(batchgen.getNextId("table.id")))

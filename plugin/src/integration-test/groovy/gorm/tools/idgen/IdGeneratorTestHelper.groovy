@@ -13,24 +13,24 @@ class IdGeneratorTestHelper {
 
     static void createNewObjectIdTable(JdbcTemplate template) {
         String query = """
-			create table NewObjectId
-				(
-					KeyName varchar(255) not null,
-					NextId bigint not null
-				)
-				"""
+        create table NewObjectId
+            (
+                KeyName varchar(255) not null,
+                NextId bigint not null
+            )
+         """
 
         template.execute(query)
     }
 
     static void createCustomTable(JdbcTemplate template) {
         String query = """
-			create table if not exists Custom1
-				(
-					id int not null,
-					version int null
-				)
-				"""
+            create table if not exists Custom1
+                (
+                    id int not null,
+                    version int null
+                )
+             """
 
         template.execute(query)
     }

@@ -17,6 +17,7 @@ class BootStrap {
 
     BenchmarkRunnerService benchmarkRunnerService
     BenchmarkDatabindingService benchmarkDatabindingService
+    //CityFatBenchService cityFatBenchService
 
     GrailsApplication grailsApplication
 
@@ -25,6 +26,9 @@ class BootStrap {
         println(grailsApplication.config.hibernate.cache.use_second_level_cache)
 
         mockAuthentication()
+
+        //cityFatBenchService.runBenchMarks()
+
         if(runBenchmarks && runDataBindingBenchmark){
             benchmarkDatabindingService.runFast()
             benchmarkDatabindingService.runFast(true)

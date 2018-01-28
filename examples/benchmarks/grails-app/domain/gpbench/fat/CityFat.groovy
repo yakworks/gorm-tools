@@ -63,14 +63,6 @@ class CityFat implements CityTraitFat, DateUserStamp {
         setAssociation("country", Country, row)
         setAssociation("country2", Country, row)
         setAssociation("country3", Country, row)
-//        region = Region.load(row["region"]['id'] as Long)
-//        region2 = Region.load(row["region2"]['id'] as Long)
-//        region3 = Region.load(row["region3"]['id'] as Long)
-//        country = Country.load(row["country"]['id'] as Long)
-//        country2 = Country.load(row["country2"]['id'] as Long)
-//        country3 = Country.load(row["country3"]['id'] as Long)
-
-        //println latitude3
     }
 
     void setAssociation(String key, Class assocClass, Map row) {

@@ -34,7 +34,7 @@ class JsonReader extends RecordsLoader {
     }
 
     @CompileDynamic
-    List<Map> loadCityFatData(int multip) {
+    List<Map> loadCityFatData(int mult) {
         //RecordsLoader recordsLoader = jsonReader //useDatabinding ? csvReader : jsonReader
         List cityfull = read("City")
         for (Map row in cityfull) {
@@ -74,6 +74,7 @@ class JsonReader extends RecordsLoader {
         (1..mult).each { i ->
             repeatedCity = repeatedCity + cityfull
         }
+        println "JSON read and built for CityFat for ${repeatedCity.size()} records"
         return repeatedCity
         //cities = repeatedCity.collate(batchSize)
     }

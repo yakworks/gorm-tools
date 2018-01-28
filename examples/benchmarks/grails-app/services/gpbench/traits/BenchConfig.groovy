@@ -1,9 +1,10 @@
-package gpbench.benchmarks
+package gpbench.traits
 
 import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepoEntity
-import gpbench.helpers.BenchmarkHelper
+import gpbench.DataSetupService
+import gpbench.benchmarks.AbstractBenchmark
 import gpbench.helpers.JsonReader
 import grails.core.GrailsApplication
 import grails.web.databinding.WebDataBinding
@@ -23,7 +24,7 @@ trait BenchConfig {
     @Autowired
     JsonReader jsonReader
     @Autowired
-    BenchmarkHelper benchmarkHelper
+    DataSetupService dataSetupService
     @Autowired
     EntityMapBinder entityMapBinder
     @Autowired
@@ -54,14 +55,19 @@ trait BenchConfig {
 
     boolean muteConsole = false
 
-    String saveAction
+    String createAction
     String msgKey
 
     List<Map> dataList
+    List<Map> warmupDataList
 
     void runBenchMarks() { }
 
     void loadData() { }
+
+    void loadWarmUpData() { }
+
+    void cleanup(Class domainClass) { }
 
     @CompileDynamic
     void setup() {
@@ -79,14 +85,23 @@ trait BenchConfig {
         println "Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
 
         //load base country and city data which is used by all benchmarks
-        benchmarkHelper.initBaseData()
-
-        println "run load json file 3x number of fields"
+        dataSetupService.initBaseData()
 
         //jsonReader._cache = [:]
         //dataList = loadData()
         loadData()
+        loadWarmUpData()
+
         muteConsole = false
+    }
+
+    @CompileStatic(TypeCheckingMode.SKIP)
+    void logMessage(String msg) {
+        if (!muteConsole) {
+            println msg
+        } else {
+            //System.out.print("*")
+        }
     }
 
     void warmUpAndRun(String msg, String runMethod, List args = []) {
@@ -128,98 +143,6 @@ trait BenchConfig {
     @CompileStatic
     void autowire(def bean) {
         grailsApplication.mainContext.autowireCapableBeanFactory.autowireBeanProperties(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
-    }
-
-
-    @CompileStatic(TypeCheckingMode.SKIP)
-    void logMessage(String msg) {
-        if (!muteConsole) {
-            println msg
-        } else {
-            System.out.print("*")
-        }
-    }
-
-    void warmUpAndInsert(Class<?> domainClass) {
-        muteConsole = true
-        def oldLoadIterations = loadIterations
-        loadIterations = 1
-        System.out.print("Warm up pass with ${loadIterations * 37230} records ")
-
-        (1..warmupCycles).each {
-            insertData(domainClass)
-        }
-        loadIterations = oldLoadIterations
-        muteConsole = false
-
-        //run the real deal
-        insertData(domainClass)
-
-        println ""
-    }
-
-    @CompileStatic
-    void insertData(Class domainClass) {
-        StopWatch watch = new StopWatch()
-        watch.start()
-        if(saveAction == 'batch') {
-            insertDataBatch(domainClass)
-        } else if(saveAction == 'async') {
-            insertDataAsync(domainClass)
-        } else {
-            insertDataBasic(domainClass)
-        }
-
-        watch.stop()
-        if (!muteConsole) println "${watch.totalTimeSeconds}s $msgKey - binderType: $binderType, " +
-            "${saveAction ? 'saveAction: ' + saveAction : ''} " +
-            "- $domainClass.simpleName | ${dataList.size()} rows"
-    }
-
-
-    void insertDataBasic(Class<?> domainClass) {
-        for (Map row in dataList) {
-            insertRow(domainClass, row)
-        }
-    }
-
-    void insertDataBatch(Class<?> domainClass) {
-        //slice or chunk the list into a list of lists
-//        List<List> collatedList = asyncBatchSupport.collate(dataList)
-//        City.withTransaction {
-//            dataList.eachWithIndex { Map row, int index ->
-//                insertRow(domainClass, row)
-//                if (index % batchSize == 0) RepoUtil.flushAndClear()
-//            }
-//        }
-    }
-
-    void insertDataAsync(Class<?> domainClass) {
-        //slice or chunk the list into a list of lists
-        List<List> collatedList = asyncBatchSupport.collate(dataList)
-        asyncBatchSupport.parallelBatch(collatedList) { Map row, Map zargs ->
-            insertRow(domainClass, row)
-        }
-    }
-
-    void insertRow(Class<?> domainClass, Map row) {
-        GormEntity instance = (GormEntity)domainClass.newInstance()
-        //rowClosure.call(instance, row)
-        if(binderType == 'grails') {
-            ((WebDataBinding)instance).setProperties(row)
-        } else if(binderType == 'fast') {
-            entityMapBinder.bind(instance, row)
-        } else if(binderType == 'setters') {
-            instance.invokeMethod('setProps', row)
-        }
-
-        if(saveAction == 'validate') {
-            instance.validate([failOnError:true])
-        } else if(saveAction == 'save') {
-            instance.save([failOnError:true])
-        } else if(saveAction == 'persist') {
-            ((GormRepoEntity)instance).persist()
-        }
     }
 
 }

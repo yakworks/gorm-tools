@@ -57,6 +57,12 @@ class CityFat implements CityTraitFat, DateUserStamp {
         date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
         date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
 
+//        region = Region.load(row['region']['id'] as Long)
+//        region2 = Region.load(row['region2']['id'] as Long)
+//        region3 = Region.load(row['region3']['id'] as Long)
+//        country = Country.load(row['country']['id'] as Long)
+//        country2 = Country.load(row['country2']['id'] as Long)
+//        country3 = Country.load(row['country3']['id'] as Long)
         setAssociation("region", Region, row)
         setAssociation("region2", Region, row)
         setAssociation("region3", Region, row)
@@ -66,7 +72,7 @@ class CityFat implements CityTraitFat, DateUserStamp {
     }
 
     void setAssociation(String key, Class assocClass, Map row) {
-        if (row[key]) {
+        if (row[key] != null) {
             Long id = row[key]['id'] as Long
             this[key] = GormEnhancer.findStaticApi(assocClass).load(id)
         }

@@ -12,7 +12,8 @@ import java.time.LocalDateTime
 /**
  * Single version of without traits
  */
-class CityFatDynamicNoTraits {
+@GrailsCompileStatic
+class CityFatNoTraitsNoAssoc {
     String name
     String shortCode
     BigDecimal latitude
@@ -48,17 +49,20 @@ class CityFatDynamicNoTraits {
     LocalDateTime date3
     LocalDate date4
 
-    static belongsTo = [ region: Region, country: Country,
-                         region2: Region, country2: Country,
-                         region3: Region, country3: Country ]
+    Long regionId
+    Long region2Id
+    Long region3Id
+    Long countryId
+    Long country2Id
+    Long country3Id
 
     static constraints = {
         name blank: false, nullable: false
         shortCode blank: false, nullable: false
         latitude nullable: false, scale: 4, max: 90.00
         longitude nullable: false, scale: 4, max: 380.00
-        region nullable: false
-        country nullable: false
+        regionId nullable: false
+        countryId nullable: false
         state nullable: true
         countryName nullable: true
 
@@ -66,8 +70,8 @@ class CityFatDynamicNoTraits {
         shortCode2 blank: false, nullable: false
         latitude2 nullable: false, scale: 4, max: 90.00
         longitude2 nullable: false, scale: 4, max: 380.00
-        region2 nullable: false
-        country2 nullable: false
+        region2Id nullable: false
+        country2Id nullable: false
         state2 nullable: true
         countryName2 nullable: true
 
@@ -75,8 +79,8 @@ class CityFatDynamicNoTraits {
         shortCode3 blank: false, nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
-        region3 nullable: false
-        country3 nullable: false
+        region3Id nullable: false
+        country3Id nullable: false
         state3 nullable: true
         countryName3 nullable: true
 
@@ -91,6 +95,45 @@ class CityFatDynamicNoTraits {
         date4 nullable: true
     }
 
+    static mapping = {
+        //id generator: "native"
+    }
+
     String toString() { name }
 
+    void setProps(Map row) {
+        this.name = row['name']
+        this.shortCode = row['shortCode']
+        this.state = row['state']
+        this.countryName = row['countryName']
+        this.latitude = row['latitude'] as BigDecimal
+        this.longitude = row['longitude'] as BigDecimal
+
+        this.name2 = row['name2']
+        this.shortCode2 = row['shortCode2']
+        this.state2 = row['state2']
+        this.countryName2 = row['countryName2']
+        this.latitude2 = row['latitude2'] as BigDecimal
+        this.longitude2 = row['longitude2'] as BigDecimal
+
+        this.name3 = row['name3']
+        this.shortCode3 = row['shortCode3']
+        this.state3 = row['state3']
+        this.countryName3 = row['countryName3']
+        this.latitude3 = row['latitude3'] as BigDecimal
+        this.longitude3 = row['longitude3'] as BigDecimal
+        //this.properties = row
+        date1 = IsoDateUtil.parse(row['date1'] as String)
+        date2 = IsoDateUtil.parseLocalDate(row['date2'] as String) //DateUtil.parse(row['date2'] as String)
+        date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
+        date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
+
+        regionId = row['region']['id'] as Long
+        region2Id = row['region2']['id'] as Long
+        region3Id = row['region3']['id'] as Long
+
+        countryId = row['country']['id'] as Long
+        country2Id = row['country2']['id'] as Long
+        country3Id = row['country3']['id'] as Long
+    }
 }

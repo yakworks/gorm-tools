@@ -17,7 +17,7 @@ class BootStrap {
 
     BenchmarkRunnerService benchmarkRunnerService
     BenchmarkDatabindingService benchmarkDatabindingService
-    //CityFatBenchService cityFatBenchService
+    CityFatBenchService cityFatBenchService
 
     GrailsApplication grailsApplication
 
@@ -27,16 +27,17 @@ class BootStrap {
 
         mockAuthentication()
 
-        //cityFatBenchService.runBenchMarks()
+        cityFatBenchService.runBenchMarks()
 
-        if(runBenchmarks && runDataBindingBenchmark){
-            benchmarkDatabindingService.runFast()
-            benchmarkDatabindingService.runFast(true)
-        }
+//        if(runBenchmarks && runDataBindingBenchmark){
+//            benchmarkDatabindingService.runFast()
+//            benchmarkDatabindingService.runFast(true)
+//        }
         //loaderNoPersistService.runFileLoad()
         //loaderNoPersistService.run()
-        if(runBenchmarks)
-            benchmarkRunnerService.runBenchMarks()
+
+//        if(runBenchmarks)
+//            benchmarkRunnerService.runBenchMarks()
     }
 
     void mockAuthentication() {

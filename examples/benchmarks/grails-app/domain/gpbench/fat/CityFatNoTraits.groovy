@@ -58,8 +58,8 @@ class CityFatNoTraits {
         shortCode blank: false, nullable: false
         latitude nullable: false, scale: 4, max: 90.00
         longitude nullable: false, scale: 4, max: 380.00
-        region nullable: true
-        country nullable: true
+        region nullable: false
+        country nullable: false
         state nullable: true
         countryName nullable: true
 
@@ -67,8 +67,8 @@ class CityFatNoTraits {
         shortCode2 blank: false, nullable: false
         latitude2 nullable: false, scale: 4, max: 90.00
         longitude2 nullable: false, scale: 4, max: 380.00
-        region2 nullable: true
-        country2 nullable: true
+        region2 nullable: false
+        country2 nullable: false
         state2 nullable: true
         countryName2 nullable: true
 
@@ -76,8 +76,8 @@ class CityFatNoTraits {
         shortCode3 blank: false, nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
-        region3 nullable: true
-        country3 nullable: true
+        region3 nullable: false
+        country3 nullable: false
         state3 nullable: true
         countryName3 nullable: true
 
@@ -90,6 +90,10 @@ class CityFatNoTraits {
         date2 nullable: true
         date3 nullable: true
         date4 nullable: true
+    }
+
+    static mapping = {
+        id generator: "native"
     }
 
     String toString() { name }

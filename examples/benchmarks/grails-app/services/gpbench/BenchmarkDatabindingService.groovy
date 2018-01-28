@@ -1,15 +1,13 @@
 package gpbench
 
 import gorm.tools.beans.IsoDateUtil
-import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
 import gpbench.fat.CityFatNoTraits
-import gpbench.fat.CityFatSimple
+import gpbench.fat.CityFatNoTraitsNoAssoc
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
-import grails.databinding.SimpleMapDataBindingSource
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,7 +45,7 @@ class BenchmarkDatabindingService {
         (1..2).each {
             if (!mute) println "\n - fast bind on simple, no dates or associations"
             useStaticSettersInCityFatSimple()
-            useEntityBinderBind(CityFatSimple)
+            useEntityBinderBind(CityFatNoTraitsNoAssoc)
 
             if (!mute) println " - fat with 20+ fields, has dates and associations"
             useStaticSettersInCityFat()
@@ -97,7 +95,7 @@ class BenchmarkDatabindingService {
 
     @CompileStatic
     void useStaticSettersInCityFatSimple() {
-        eachCity("Static Setters In CityFatSimple", CityFatSimple) { CityFatSimple instance, Map row ->
+        eachCity("Static Setters In CityFatNoTraitsNoAssoc", CityFatNoTraitsNoAssoc) { CityFatNoTraitsNoAssoc instance, Map row ->
             instance.setProps(row)
         }
     }

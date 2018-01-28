@@ -6,7 +6,7 @@ import gorm.tools.jdbc.ScrollableQuery
 import gpbench.City
 import gpbench.CityRepo
 import gpbench.benchmarks.AbstractBenchmark
-import gpbench.helpers.BenchmarkHelper
+import gpbench.DataSetupService
 import gpbench.helpers.CsvReader
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
@@ -30,7 +30,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
     int poolSize
     int batchSize
 
-    BenchmarkHelper benchmarkHelper
+    DataSetupService benchmarkHelper
     JdbcTemplate jdbcTemplate
     DataSource dataSource
     CityRepo cityRepo

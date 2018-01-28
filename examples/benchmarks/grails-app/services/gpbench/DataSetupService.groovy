@@ -1,13 +1,15 @@
-package gpbench.helpers
+package gpbench
 
 import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.repository.api.RepositoryApi
 import gpbench.Country
 import gpbench.Region
+import gpbench.helpers.CsvReader
 import grails.core.GrailsApplication
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.init.ScriptUtils
@@ -16,9 +18,9 @@ import org.springframework.stereotype.Component
 import javax.sql.DataSource
 import java.sql.Connection
 
-@Component
+//@Component
 @CompileStatic
-class BenchmarkHelper {
+class DataSetupService {
 
     @Autowired
     JdbcTemplate jdbcTemplate
@@ -30,6 +32,9 @@ class BenchmarkHelper {
     AsyncBatchSupport asyncBatchSupport
     @Autowired
     CsvReader csvReader
+
+    @Value('${hibernate.jdbc.batch_size}')
+    int batchSize
 
     @CompileDynamic
     void initBaseData() {

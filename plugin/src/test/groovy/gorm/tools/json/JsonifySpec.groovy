@@ -53,6 +53,16 @@ class JsonifySpec extends Specification implements BuildEntityTester<TestJsonify
 
     }
 
+    void "test json expand association"() {
+        when:
+        def args = [deep:true, includes: ['name', 'ext', 'ext.id', 'ext.nameExt']]
+        def result = Jsonify.render(getEntity(includes: ['ext']), args)
+
+        then:
+        result.jsonText == '{"ext":{"id":1,"nameExt":"nameExt"},"name":"name"}'
+
+    }
+
     void "test buildJson deep with *"() {
         when:
         def renderArgs = [deep:true, excludes:['ext.testJsonifyDom']]

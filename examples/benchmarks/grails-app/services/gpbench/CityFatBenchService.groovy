@@ -37,10 +37,10 @@ class CityFatBenchService extends BenchDataInsert {
         ["save", "save batch", "save async"].each{
             createAction = it
             println "-- createAction: $createAction --"
-            settersStaticNoAssoc()
-//            settersStatic()
-//            settersDynamic()
+            settersDynamic()
+            settersStatic()
             gormToolsFast()
+            settersStaticNoAssoc()
         }
 
 
@@ -69,21 +69,26 @@ class CityFatBenchService extends BenchDataInsert {
     void settersStatic(){
         binderType = 'settersStatic'
         msgKey = 'setters static'
-        warmUpAndInsert(CityFat)
-        warmUpAndInsert(CityFatDynamic)
+        insertData(CityFat, dataList)
+        insertData(CityFatDynamic, dataList)
+//        warmUpAndInsert(CityFat)
+//        warmUpAndInsert(CityFatDynamic)
     }
 
     void settersDynamic(){
         binderType = 'settersDynamic'
         msgKey = 'setters dynamic'
-        warmUpAndInsert(CityFat)
-        warmUpAndInsert(CityFatDynamic)
+        insertData(CityFat, dataList)
+        insertData(CityFatDynamic, dataList)
+//        warmUpAndInsert(CityFat)
+//        warmUpAndInsert(CityFatDynamic)
     }
 
     void gormToolsFast(){
         binderType = 'fast'
         msgKey = 'gorm-tools: repository & fast binder'
         insertData(CityFat, dataList)
+        insertData(CityFatDynamic, dataList)
         //warmUpAndInsert(CityFat)
         //warmUpAndInsert(CityFatDynamic)
     }

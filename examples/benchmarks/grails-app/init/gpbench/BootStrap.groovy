@@ -27,7 +27,7 @@ class BootStrap {
 
         mockAuthentication()
 
-        cityFatBenchService.runBenchMarks()
+        //cityFatBenchService.runBenchMarks()
 
 //        if(runBenchmarks && runDataBindingBenchmark){
 //            benchmarkDatabindingService.runFast()
@@ -36,8 +36,8 @@ class BootStrap {
         //loaderNoPersistService.runFileLoad()
         //loaderNoPersistService.run()
 
-//        if(runBenchmarks)
-//            benchmarkRunnerService.runBenchMarks()
+        if(runBenchmarks)
+            benchmarkRunnerService.runBenchMarks()
     }
 
     void mockAuthentication() {

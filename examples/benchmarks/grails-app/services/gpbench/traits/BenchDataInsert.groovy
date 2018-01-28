@@ -129,7 +129,8 @@ class BenchDataInsert implements BenchConfig {
             assert instance.validate()
         } else if(createAction.startsWith('save')) {
             if(binderType == 'fast') {
-                ((GormRepoEntity)instance).persist()
+                ((GormRepoEntity)instance).doPersist()
+                //instance.save([failOnError:true])
             } else{
                 instance.save([failOnError:true])
             }

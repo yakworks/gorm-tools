@@ -8,6 +8,7 @@ import gpbench.benchmarks.AbstractBenchmark
 import gpbench.helpers.JsonReader
 import grails.core.GrailsApplication
 import grails.web.databinding.WebDataBinding
+import groovy.json.JsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -56,10 +57,12 @@ trait BenchConfig {
     boolean muteConsole = false
 
     String createAction
-    String msgKey
+    String benchKey
 
     List<Map> dataList
     List<Map> warmupDataList
+
+    Map<String,Map> stats
 
     void runBenchMarks() { }
 
@@ -87,10 +90,11 @@ trait BenchConfig {
         //load base country and city data which is used by all benchmarks
         dataSetupService.initBaseData()
 
-        //jsonReader._cache = [:]
-        //dataList = loadData()
         loadData()
         loadWarmUpData()
+
+        //blank stats map
+        stats = new HashMap<String,Map>()
 
         muteConsole = false
     }
@@ -102,6 +106,26 @@ trait BenchConfig {
         } else {
             //System.out.print("*")
         }
+    }
+
+    void recordStat(Class domainClass, int dataSize, double timeInSeconds){
+        String staticOrDynamic = (domainClass.simpleName.endsWith("Dynamic")) ? "dynamic" : "static"
+        String statsKey = "$benchKey-${domainClass.simpleName}"
+        stats[statsKey] = [
+            benchKey: benchKey,
+            binderType: binderType,
+            createAction: createAction,
+            domainCompile: staticOrDynamic,
+            time: timeInSeconds,
+            domainClass: domainClass.simpleName,
+            dataSize: dataSize,
+            batchSize: batchSize,
+            poolSize: poolSize
+        ]
+    }
+
+    void saveStatsToJsonFile(String fileName){
+        new File(fileName).write(new JsonBuilder(stats).toPrettyString())
     }
 
     void warmUpAndRun(String msg, String runMethod, List args = []) {
@@ -125,24 +149,4 @@ trait BenchConfig {
         muteConsole = false
         println ""
     }
-
-    @CompileStatic(TypeCheckingMode.SKIP)
-    void runBenchmark(AbstractBenchmark benchmark, boolean mute = false) {
-        if (benchmark.hasProperty("poolSize")) benchmark.poolSize = poolSize
-        if (benchmark.hasProperty("batchSize")) benchmark.batchSize = batchSize
-        if (benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = loadIterations
-        if (benchmark.hasProperty("disableSave")) benchmark.disableSave = disableSave
-
-        autowire(benchmark)
-        benchmark.run()
-        logMessage "${benchmark.timeTaken}s for $benchmark.description"
-        //if(!MUTE_CONSOLE) println "${benchmark.timeTaken}s for $benchmark.description"
-    }
-
-
-    @CompileStatic
-    void autowire(def bean) {
-        grailsApplication.mainContext.autowireCapableBeanFactory.autowireBeanProperties(bean, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
-    }
-
 }

@@ -20,11 +20,8 @@ class BenchDataInsert implements BenchConfig {
             insertData(domainClass, warmupDataList)
         }
         muteConsole = false
-
         //run the real deal
         insertData(domainClass, dataList)
-
-        //println ""
     }
 
     @CompileStatic
@@ -34,9 +31,9 @@ class BenchDataInsert implements BenchConfig {
         StopWatch watch = new StopWatch()
         watch.start()
 
-
         //cleanup and remove the inserted data
         if(createAction.startsWith('save')){
+
             if(createAction == 'save batch') {
                 insertDataBatch(domainClass, data)
             } else if(createAction == 'save async') {
@@ -51,17 +48,20 @@ class BenchDataInsert implements BenchConfig {
 
         watch.stop()
 
+        Integer dataSize = data.size()
+
         //cleanup and remove the inserted data
         if(createAction.startsWith('save')){
-            Integer dataSize = data.size()
             Integer rowCount = GormEnhancer.findStaticApi(domainClass).count()
             assert dataSize == rowCount
             cleanup(domainClass)
         }
 
-        logMessage "${watch.totalTimeSeconds}s $msgKey - binderType: $binderType, " +
+        logMessage "${watch.totalTimeSeconds}s $benchKey - binderType: $binderType, " +
             "${createAction ? 'createAction: ' + createAction : ''} " +
-            "- $domainClass.simpleName | ${data.size()} rows"
+            "- $domainClass.simpleName | $dataSize rows"
+
+        recordStat(domainClass, dataSize, watch.totalTimeSeconds)
 
     }
 

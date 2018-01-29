@@ -31,7 +31,8 @@ class PooledIdGenerator implements IdGenerator {
     //private ConcurrentMap<String, Long> batchSizeByKeyUseOnce = new ConcurrentHashMap<String, Long>()
 
     private IdGenerator generator
-    Long defaultBatchSize = 255
+
+    Long defaultBatchSize = 120000
 
     //private final AtomicLong dummy = new AtomicLong(1000)
 

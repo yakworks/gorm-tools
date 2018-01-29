@@ -89,6 +89,8 @@ endpoints:
 
 ---
 hibernate:
+#    flush:
+#        mode: AUTO
 #    generate_statistics: true
 #    naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
 #    cache:

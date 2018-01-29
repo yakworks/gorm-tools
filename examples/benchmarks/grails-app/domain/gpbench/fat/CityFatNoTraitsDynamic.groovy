@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 /**
  * Single version of without traits
  */
-class CityFatDynamicNoTraits {
+class CityFatNoTraitsDynamic {
     String name
     String shortCode
     BigDecimal latitude

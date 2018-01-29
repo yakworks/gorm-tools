@@ -14,8 +14,8 @@ trait CityTrait {
     BigDecimal latitude
     BigDecimal longitude
 
-    Region region
-    Country country
+//    Region region
+//    Country country
 }
 
 //@GrailsCompileStatic
@@ -26,8 +26,8 @@ class CityTraitConstraints implements CityTrait {
         shortCode blank: false, nullable: false
         latitude nullable: false, scale: 4, max: 90.00
         longitude nullable: false, scale: 4, max: 380.00
-        region nullable: false
-        country nullable: false
+//        region nullable: false
+//        country nullable: false
         state nullable: true
         countryName nullable: true
     }

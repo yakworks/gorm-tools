@@ -1,94 +1,95 @@
 package gpbench
 
 import gorm.tools.beans.IsoDateUtil
-import gorm.tools.repository.RepoUtil
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
-import gpbench.fat.CityFatDynamicNoTraits
+import gpbench.fat.CityFatNoTraitsDynamic
 import gpbench.fat.CityFatNoTraits
 import gpbench.fat.CityFatNoTraitsNoAssoc
-import gpbench.traits.BenchConfig
 import gpbench.traits.BenchDataInsert
-import grails.gorm.transactions.Transactional
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormEntity
 
 /**
  * single threaded sanity checks
  */
 @CompileStatic
-class CityFatBenchService extends BenchDataInsert {
+class CityFatBenchInsertService extends BenchDataInsert {
 
     void runBenchMarks() {
         setup()
 
-//        ["bind/setters only", "validate"].each{
-//            createAction = it
-//            println "** createAction: $createAction"
-//            settersStaticNoAssoc()
-//            settersStatic()
-//            settersDynamic()
-//            gormToolsFast()
-//
-//        }
-
-        ["save", "save batch", "save async"].each{
+        ["setters/databinding", "validate", "save batch", "save async"].each{
             createAction = it
             println "-- createAction: $createAction --"
-            settersDynamic()
-            settersStatic()
-            gormToolsFast()
             settersStaticNoAssoc()
+            settersStatic(CityFat)
+            settersDynamic(CityFat)
+            gormToolsFast(CityFat)
         }
+        saveStatsToJsonFile "CityFatBench.json"
 
+        logMessage "\n**** The slower ones ****"
+        ["setters/databinding", "validate", "save batch", "save async"].each{
+            createAction = it
+            println "-- createAction: $createAction --"
+            //settersStaticNoAssoc() //this is fast and kept here for reference
+            settersStatic(CityFatDynamic)
+            settersDynamic(CityFatDynamic)
+            gormToolsFast(CityFatDynamic)
+        }
+        saveStatsToJsonFile "CityFatBench.json"
 
-        createAction = "bind/setters only"
+        createAction = "setters/databinding"
         binderType = 'grails'
-        msgKey = 'stockGrailsBinderNoTraits'
-        warmUpAndInsert(CityFatNoTraits)
-        warmUpAndInsert(CityFatDynamicNoTraits)
+        benchKey = 'stockGrailsBinderNoTraits'
 
-        logMessage "* Using traits with grails databinding is super slow, see bug report"
-        msgKey = 'stockGrailsBinderWithTraits'
+        logMessage "\n-- Grails default DataBinder --"
+        insertData(CityFatNoTraits, dataList)
+        insertData(CityFatNoTraitsDynamic, dataList)
+        //warmUpAndInsert(CityFatNoTraits)
+
+        logMessage "*** Using traits with the Grails default DataBinder is super slow, see bug report"
+        benchKey = 'stockGrailsBinderWithTraits'
         binderType = 'grails'
-        warmUpAndInsert(CityFat)
-        //warmUpAndInsert(CityFatDynamic)
+        insertData(CityFat, dataList)
+        //warmUpAndInsert(CityFat)
+
+        saveStatsToJsonFile "CityFatBench.json"
 
     }
 
     //@Transactional
     void settersStaticNoAssoc(){
         binderType = 'settersStatic'
-        msgKey = 'setters static, no associations'
+        benchKey = 'setters static, no associations'
         //no warm up on this one
         insertData(CityFatNoTraitsNoAssoc, dataList)
     }
 
-    void settersStatic(){
+    void settersStatic(Class domainClass){
         binderType = 'settersStatic'
-        msgKey = 'setters static'
-        insertData(CityFat, dataList)
-        insertData(CityFatDynamic, dataList)
+        benchKey = 'setters static'
+        insertData(domainClass, dataList)
+        //insertData(CityFatDynamic, dataList)
 //        warmUpAndInsert(CityFat)
 //        warmUpAndInsert(CityFatDynamic)
     }
 
-    void settersDynamic(){
+    void settersDynamic(Class domainClass){
         binderType = 'settersDynamic'
-        msgKey = 'setters dynamic'
-        insertData(CityFat, dataList)
-        insertData(CityFatDynamic, dataList)
+        benchKey = 'setters dynamic'
+        insertData(domainClass, dataList)
+        //insertData(CityFatDynamic, dataList)
 //        warmUpAndInsert(CityFat)
 //        warmUpAndInsert(CityFatDynamic)
     }
 
-    void gormToolsFast(){
+    void gormToolsFast(Class domainClass){
         binderType = 'fast'
-        msgKey = 'gorm-tools: repository & fast binder'
-        insertData(CityFat, dataList)
-        insertData(CityFatDynamic, dataList)
+        benchKey = 'gorm-tools: repository & fast binder'
+        insertData(domainClass, dataList)
+        //insertData(CityFatDynamic, dataList)
         //warmUpAndInsert(CityFat)
         //warmUpAndInsert(CityFatDynamic)
     }

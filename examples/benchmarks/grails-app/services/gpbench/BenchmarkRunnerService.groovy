@@ -27,7 +27,6 @@ class BenchmarkRunnerService {
 
     AsyncBatchSupport asyncBatchSupport
     DataSetupService dataSetupService
-    static transactional = false
 
     @Value('${gpars.poolsize}')
     int poolSize

@@ -61,8 +61,6 @@ class CityFatNoTraitsNoAssoc {
         shortCode blank: false, nullable: false
         latitude nullable: false, scale: 4, max: 90.00
         longitude nullable: false, scale: 4, max: 380.00
-        regionId nullable: false
-        countryId nullable: false
         state nullable: true
         countryName nullable: true
 
@@ -70,8 +68,6 @@ class CityFatNoTraitsNoAssoc {
         shortCode2 blank: false, nullable: false
         latitude2 nullable: false, scale: 4, max: 90.00
         longitude2 nullable: false, scale: 4, max: 380.00
-        region2Id nullable: false
-        country2Id nullable: false
         state2 nullable: true
         countryName2 nullable: true
 
@@ -79,8 +75,7 @@ class CityFatNoTraitsNoAssoc {
         shortCode3 blank: false, nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
-        region3Id nullable: false
-        country3Id nullable: false
+
         state3 nullable: true
         countryName3 nullable: true
 
@@ -93,6 +88,13 @@ class CityFatNoTraitsNoAssoc {
         date2 nullable: true
         date3 nullable: true
         date4 nullable: true
+
+        regionId nullable: false
+        countryId nullable: false
+        region3Id nullable: false
+        country3Id nullable: false
+        region2Id nullable: false
+        country2Id nullable: false
     }
 
     static mapping = {

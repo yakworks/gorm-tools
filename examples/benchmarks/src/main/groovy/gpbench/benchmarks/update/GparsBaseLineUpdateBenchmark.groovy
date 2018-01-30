@@ -1,13 +1,18 @@
 package gpbench.benchmarks.update
 
 import gpbench.basic.CityBasic
+import gorm.tools.databinding.EntityMapBinder
 import grails.web.databinding.WebDataBinding
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.jdbc.core.JdbcTemplate
 
+import java.util.concurrent.atomic.AtomicInteger
+
+@CompileStatic
 class GparsBaseLineUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpdateBenchmark<T>{
 
-    JdbcTemplate jdbcTemplate
+    EntityMapBinder entityMapBinder
 
     GparsBaseLineUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
@@ -17,16 +22,17 @@ class GparsBaseLineUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
     protected execute() {
         List<Long> all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
         List<List<Long>> batches = all.collate(batchSize)
-
+        AtomicInteger at = new AtomicInteger(-1)
         asyncBatchSupport.parallelBatch(batches){Long id, Map args ->
-            updateRow(id)
+            updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
     }
 
 
-    void updateRow(Long id) {
+    @CompileDynamic
+    void updateRow(Long id, Map row) {
         def instance = domainClass.get(id)
-        instance.properties = getUpdateData(instance)
+        entityMapBinder.bind(instance, row)
         instance.save()
     }
 

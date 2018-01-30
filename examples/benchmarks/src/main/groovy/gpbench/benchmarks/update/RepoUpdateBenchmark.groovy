@@ -4,8 +4,13 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
 import gpbench.basic.CityBasic
 import grails.web.databinding.WebDataBinding
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
+import java.util.concurrent.atomic.AtomicInteger
+
+@CompileStatic
 class RepoUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpdateBenchmark<T>{
 
     RepositoryApi<T> repo
@@ -19,17 +24,16 @@ class RepoUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpd
     protected execute() {
         List<Long> all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
         List<List<Long>> batches = all.collate(batchSize)
-
+        AtomicInteger at = new AtomicInteger(-1)
         asyncBatchSupport.parallelBatch(batches){Long id, Map args ->
-            updateRow(id)
+            updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
     }
 
-    void updateRow(Long id) {
-        def instance = domainClass.get(id)
-        Map data = getUpdateData(instance)
-        data.id = id
-        repo.update(data)
+    @CompileDynamic
+    void updateRow(Long id, Map row) {
+        row.id = id
+        repo.update(row)
     }
 
 }

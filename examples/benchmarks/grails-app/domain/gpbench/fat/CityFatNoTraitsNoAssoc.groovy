@@ -1,10 +1,7 @@
 package gpbench.fat
 
 import gorm.tools.beans.IsoDateUtil
-import gpbench.Country
-import gpbench.Region
 import grails.compiler.GrailsCompileStatic
-import org.grails.datastore.gorm.GormEnhancer
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -13,7 +10,7 @@ import java.time.LocalDateTime
  * Single version of without traits
  */
 @GrailsCompileStatic
-class CityFatNoTraits {
+class CityFatNoTraitsNoAssoc {
     String name
     String shortCode
     BigDecimal latitude
@@ -49,17 +46,18 @@ class CityFatNoTraits {
     LocalDateTime date3
     LocalDate date4
 
-    static belongsTo = [ region: Region, country: Country,
-                         region2: Region, country2: Country,
-                         region3: Region, country3: Country ]
+    Long regionId
+    Long region2Id
+    Long region3Id
+    Long countryId
+    Long country2Id
+    Long country3Id
 
     static constraints = {
         name blank: false, nullable: false
         shortCode blank: false, nullable: false
         latitude nullable: false, scale: 4, max: 90.00
         longitude nullable: false, scale: 4, max: 380.00
-        region nullable: false
-        country nullable: false
         state nullable: true
         countryName nullable: true
 
@@ -67,8 +65,6 @@ class CityFatNoTraits {
         shortCode2 blank: false, nullable: false
         latitude2 nullable: false, scale: 4, max: 90.00
         longitude2 nullable: false, scale: 4, max: 380.00
-        region2 nullable: false
-        country2 nullable: false
         state2 nullable: true
         countryName2 nullable: true
 
@@ -76,8 +72,7 @@ class CityFatNoTraits {
         shortCode3 blank: false, nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
-        region3 nullable: false
-        country3 nullable: false
+
         state3 nullable: true
         countryName3 nullable: true
 
@@ -90,10 +85,17 @@ class CityFatNoTraits {
         date2 nullable: true
         date3 nullable: true
         date4 nullable: true
+
+        regionId nullable: false
+        countryId nullable: false
+        region3Id nullable: false
+        country3Id nullable: false
+        region2Id nullable: false
+        country2Id nullable: false
     }
 
     static mapping = {
-        id generator: "native"
+        //id generator: "native"
     }
 
     String toString() { name }
@@ -125,19 +127,12 @@ class CityFatNoTraits {
         date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
         date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
 
-        setAssociation("region", Region, row)
-        setAssociation("region2", Region, row)
-        setAssociation("region3", Region, row)
-        setAssociation("country", Country, row)
-        setAssociation("country2", Country, row)
-        setAssociation("country3", Country, row)
-    }
+        regionId = row['region']['id'] as Long
+        region2Id = row['region2']['id'] as Long
+        region3Id = row['region3']['id'] as Long
 
-    void setAssociation(String key, Class assocClass, Map row) {
-        if (row[key]) {
-            Long id = row[key]['id'] as Long
-            this[key] = GormEnhancer.findStaticApi(assocClass).load(id)
-        }
+        countryId = row['country']['id'] as Long
+        country2Id = row['country2']['id'] as Long
+        country3Id = row['country3']['id'] as Long
     }
-
 }

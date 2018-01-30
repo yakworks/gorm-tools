@@ -4,12 +4,9 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.testing.GormToolsTestHelper
-import grails.gorm.transactions.TransactionService
 import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
-import grails.testing.spring.AutowiredTest
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.utils.ClasspathEntityScanner
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.springframework.beans.factory.config.BeanDefinition
@@ -23,8 +20,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements GormTools
     void setupSpec() {
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
-        if (!ctx.containsBean("transactionService"))
-            ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+//        if (!ctx.containsBean("transactionService"))
+//            ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
         if (!ctx.containsBean("grailsDomainClassMappingContext"))
             ctx.beanFactory.registerSingleton("grailsDomainClassMappingContext", hibernateDatastore.getMappingContext())
 
@@ -50,7 +47,6 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements GormTools
         }
 
         beans = beans << GormToolsPluginHelper.doWithSpring //commonBeans()
-
         defineBeans(beans)
     }
 

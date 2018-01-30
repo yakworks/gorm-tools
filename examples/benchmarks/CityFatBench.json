@@ -1,0 +1,54 @@
+{
+    "setters static, no associations-CityFatNoTraitsNoAssoc": {
+        "benchKey": "setters static, no associations",
+        "binderType": "settersStatic",
+        "setters/databinding": "0.83s",
+        "domainCompile": "static",
+        "domainClass": "CityFatNoTraitsNoAssoc",
+        "dataSize": 37230,
+        "batchSize": 100,
+        "poolSize": 5,
+        "validate": "2.23s",
+        "save batch": "3.43s",
+        "save async": "0.97s"
+    },
+    "setters dynamic-CityFat": {
+        "benchKey": "setters dynamic",
+        "binderType": "settersDynamic",
+        "setters/databinding": "2.07s",
+        "domainCompile": "static",
+        "domainClass": "CityFat",
+        "dataSize": 37230,
+        "batchSize": 100,
+        "poolSize": 5,
+        "validate": "2.67s",
+        "save batch": "5.25s",
+        "save async": "2.08s"
+    },
+    "setters static-CityFat": {
+        "benchKey": "setters static",
+        "binderType": "settersStatic",
+        "setters/databinding": "0.98s",
+        "domainCompile": "static",
+        "domainClass": "CityFat",
+        "dataSize": 37230,
+        "batchSize": 100,
+        "poolSize": 5,
+        "validate": "1.74s",
+        "save batch": "4.37s",
+        "save async": "1.89s"
+    },
+    "gorm-tools: repository & fast binder-CityFat": {
+        "benchKey": "gorm-tools: repository & fast binder",
+        "binderType": "fast",
+        "setters/databinding": "1.94s",
+        "domainCompile": "static",
+        "domainClass": "CityFat",
+        "dataSize": 37230,
+        "batchSize": 100,
+        "poolSize": 5,
+        "validate": "2.47s",
+        "save batch": "5.48s",
+        "save async": "1.89s"
+    }
+}

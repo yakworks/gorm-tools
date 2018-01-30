@@ -3,10 +3,10 @@ package gpbench.benchmarks.concept
 import gorm.tools.repository.RepoUtil
 import gorm.tools.jdbc.GrailsParameterMapRowMapper
 import gorm.tools.jdbc.ScrollableQuery
-import gpbench.City
-import gpbench.CityRepo
+import gpbench.basic.CityBasicRepo
+import gpbench.basic.CityBasic
 import gpbench.benchmarks.AbstractBenchmark
-import gpbench.helpers.BenchmarkHelper
+import gpbench.DataSetup
 import gpbench.helpers.CsvReader
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql
@@ -30,10 +30,10 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
     int poolSize
     int batchSize
 
-    BenchmarkHelper benchmarkHelper
+    DataSetup benchmarkHelper
     JdbcTemplate jdbcTemplate
     DataSource dataSource
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
     CsvReader csvReader
 
     void setup() {
@@ -56,12 +56,12 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
 
     @Override
     def execute() {
-        assert City.count() == 0
+        assert CityBasic.count() == 0
 
         RowMapper<Map> mapper = new GrailsParameterMapRowMapper()
         ScrollableQuery query = new ScrollableQuery(mapper, dataSource, batchSize)
         insert(query)
-        assert City.count() == 115000
+        assert CityBasic.count() == 115000
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)

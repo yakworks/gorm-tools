@@ -1,7 +1,7 @@
 package gpbench.benchmarks.update
 
+import gpbench.basic.CityBasic
 import gorm.tools.databinding.EntityMapBinder
-import gpbench.City
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -20,7 +20,7 @@ class GparsBaseLineUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
 
     @Override
     protected execute() {
-        List<Long> all = City.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
+        List<Long> all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
         asyncBatchSupport.parallelBatch(batches){Long id, Map args ->

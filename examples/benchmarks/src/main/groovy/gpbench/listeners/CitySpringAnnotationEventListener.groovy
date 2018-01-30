@@ -1,14 +1,13 @@
 package gpbench.listeners
 
 import gorm.tools.repository.events.BeforeBindEvent
-import gpbench.CitySpringEvents
+import gpbench.fat.CitySpringEvents
 import gpbench.SecUtil
 import groovy.transform.CompileStatic
 import org.springframework.context.event.EventListener
+import org.springframework.stereotype.Component
 
-import javax.annotation.ManagedBean
-
-@ManagedBean
+@Component
 @CompileStatic
 class CitySpringAnnotationEventListener {
 

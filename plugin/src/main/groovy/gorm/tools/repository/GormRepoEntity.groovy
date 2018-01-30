@@ -33,6 +33,10 @@ trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
         getRepo().persist(args, (D) this)
     }
 
+    D doPersist(Map args = [:]) {
+        getRepo().doPersist(args, (D) this)
+    }
+
     void remove(Map args = [:]) {
         getRepo().remove(args, (D) this)
     }

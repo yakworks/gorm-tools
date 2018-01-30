@@ -1,8 +1,8 @@
 package gpbench.benchmarks.concept
 
 import gorm.tools.WithTrx
-import gpbench.City
-import gpbench.CityRepo
+import gpbench.basic.CityBasic
+import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
@@ -19,12 +19,12 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 @GrailsCompileStatic
 class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark implements WithTrx{
 
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
 
     BatchInsertWithDataFlowQueueBenchmark(boolean databinding) { super(databinding) }
 
     BatchInsertWithDataFlowQueueBenchmark(String bindingMethod = 'grails', boolean validate = true) {
-        super(City, bindingMethod, validate)
+        super(CityBasic, bindingMethod, validate)
     }
 
     @Override
@@ -33,7 +33,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark imp
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)
-    void insert(List<List<Map>> batchList, CityRepo repo) {
+    void insert(List<List<Map>> batchList, CityBasicRepo repo) {
         DataflowQueue queue = new DataflowQueue()
 
         //setup an operator
@@ -58,7 +58,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark imp
     }
 
     @Transactional
-    void insertBatch(List<Map> batch, CityRepo repo) {
+    void insertBatch(List<Map> batch, CityBasicRepo repo) {
         for (Map record : batch) {
             try {
                 //String dataBinder = dataBinder == 'copy' ? 'bindFast' : 'grailsWeb'

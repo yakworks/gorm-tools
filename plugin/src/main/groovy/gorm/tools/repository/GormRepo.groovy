@@ -102,6 +102,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
 
     /**
      * Transactional wrap for {@link #doCreate}
+     * createTrx(data)
      */
     @Override
     D create(Map args = [:], Map data) {

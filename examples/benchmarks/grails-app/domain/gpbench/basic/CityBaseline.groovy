@@ -1,5 +1,7 @@
-package gpbench
+package gpbench.basic
 
+import gpbench.Country
+import gpbench.Region
 import grails.compiler.GrailsCompileStatic
 
 /**

@@ -4,6 +4,11 @@ import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
+import gpbench.basic.CityAuditTrail
+import gpbench.basic.CityBaseline
+import gpbench.basic.CityBaselineDynamic
+import gpbench.basic.CityBasic
+import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.*
 import gpbench.benchmarks.legacy.SimpleBatchInsertBenchmark
 import gpbench.benchmarks.read.ReadBenchmark
@@ -15,7 +20,9 @@ import gpbench.benchmarks.update.RepoUpdateBenchmark
 import gpbench.benchmarks.update.UpdateBenchmark
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
-import gpbench.helpers.BenchmarkHelper
+import gpbench.fat.CityMethodEvents
+import gpbench.fat.CitySpringEvents
+import gpbench.fat.CitySpringEventsRefreshable
 import gpbench.helpers.CsvReader
 import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
@@ -24,10 +31,10 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.dao.DataAccessException
 
-class BenchmarkRunnerService {
+class DeprecatedRunnerService {
 
     AsyncBatchSupport asyncBatchSupport
-    static transactional = false
+    DataSetup dataSetup
 
     @Value('${gpars.poolsize}')
     int poolSize
@@ -48,18 +55,18 @@ class BenchmarkRunnerService {
     @Value('${benchmark.binder.type}')
     String binderType
 
-    @Value('${benchmark.loadIterations}')
-    int loadIterations = System.getProperty("load.iterations", "3").toInteger()
+    @Value('${benchmark.multiplyData}')
+    int multiplyData //= System.getProperty("multiplyData", "3").toInteger()
+
     int warmupCycles = 1
     boolean muteConsole = false
 
     RegionRepo regionRepo
     CountryRepo countryRepo
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
     GrailsApplication grailsApplication
 
     CsvReader csvReader
-    BenchmarkHelper benchmarkHelper
 
     //@CompileStatic
     void runBenchMarks() {
@@ -77,13 +84,13 @@ class BenchmarkRunnerService {
         println "Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
 
         //load base country and city data which is used by all benchmarks
-        benchmarkHelper.truncateTables()
+        dataSetup.truncateTables()
         prepareBaseData()
 
         muteConsole = false
 
         //real benchmarks starts here
-        println "\n- Running Benchmarks, loading ${loadIterations * 37230} records each run"
+        println "\n- Running Benchmarks, loading ${multiplyData * 37230} records each run"
 
         if (System.getProperty("runSingleThreaded", "false").toBoolean()) {
             println "-- single threaded - no gpars"
@@ -94,10 +101,10 @@ class BenchmarkRunnerService {
 
         // warmUpAndRun("### Gpars - fat props","runFat", binderType)
 
-        warmUpAndRun("### Gpars - update benchmarks", "runUpdateBenchmarks", binderType)
-        warmUpAndRun("### Gpars - Assign Properties, no grails databinding", "runBaselineCompare", binderType)
+        //warmUpAndRun("### Gpars - update benchmarks", "runUpdateBenchmarks", binderType)
+        warmUpAndRun("### Gpars - baseline", "runBaselineCompare", binderType)
 
-        warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
+        //warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
 
         if (auditTrailEnabled)
             warmUpAndRun("### Gpars - audit trail", "runWithAuditTrail", binderType)
@@ -105,12 +112,9 @@ class BenchmarkRunnerService {
         if (eventListenerCount)
             warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
 
-        // warmUpAndRun("### Gpars - fat props","runFast", binderType)
-
         // warmUpAndRun("### RXJava, Script executor, etc", "runOther", binderType)
 
-//        warmUpAndRun("  - Performance problems go away without databinding on traits",
-//            "runMultiCoreSlower", 'fast')
+        //warmUpAndRun("  - Performance problems go away without databinding on traits", "runMultiCoreSlower", 'fast')
 
         warmUpAndRun("### Reading record", "runRead", binderType)
 
@@ -123,14 +127,14 @@ class BenchmarkRunnerService {
 
     void warmUp(String runMethod, String bindingMethod) {
         muteConsole = true
-        def oldLoadIterations = loadIterations
-        loadIterations = 1
-        System.out.print("Warm up pass with ${loadIterations * 37230} records ")
+        def oldLoadIterations = multiplyData
+        multiplyData = 1
+        System.out.print("Warm up pass with ${multiplyData * 37230} records ")
         //runMultiCoreGrailsBaseline("")
         (1..warmupCycles).each {
             "$runMethod"("", bindingMethod)
         }
-        loadIterations = oldLoadIterations
+        multiplyData = oldLoadIterations
         muteConsole = false
         println ""
     }
@@ -146,44 +150,21 @@ class BenchmarkRunnerService {
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
         runBenchmark(new GparsBaselineBenchmark(CityBaseline, bindingMethod))
-        runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
-
-        logMessage "  - Events disabled"
-        City.repo.enableEvents = false
-        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
-
-        logMessage "  - Events enabled"
-        City.repo.enableEvents = true
-        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
-
-        //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
-        //logMessage "\n  - These should all run within about 5% of City and each other"
-        //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
+        runBenchmark(new GparsBaselineBenchmark(CityBasic, bindingMethod))
+        runBenchmark(new GparsRepoBenchmark(CityBasic, bindingMethod))
     }
 
     void runUpdateBenchmarks(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         runBenchmark(new GparsBaseLineUpdateBenchmark(CityBaseline))
-        runBenchmark(new GparsBaseLineUpdateBenchmark(City))
+        runBenchmark(new GparsBaseLineUpdateBenchmark(CityBasic))
         runBenchmark(new RepoUpdateBenchmark(CityBaseline))
-        runBenchmark(new RepoUpdateBenchmark(City))
+        runBenchmark(new RepoUpdateBenchmark(CityBasic))
     }
 
     void runWithEvents(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         runBenchmark(new GparsBaselineBenchmark(CityRefreshableBeanEvents, bindingMethod))
-    }
-
-    void runRepoEvents(String msg, String bindingMethod = 'grails') {
-        logMessage "\n$msg"
-
-        logMessage "  - Spring Events disabled, invokes only method events"
-        CityMethodEvents.repo.enableEvents = false
-        runBenchmark(new GparsRepoBenchmark(CityMethodEvents, bindingMethod))
-
-        logMessage "  - All Events enabled"
-        runBenchmark(new GparsRepoBenchmark(CitySpringEvents, bindingMethod))
-        runBenchmark(new GparsRepoBenchmark(CitySpringEventsRefreshable, bindingMethod))
     }
 
     void runWithAuditTrail(String msg, String bindingMethod = 'grails') {
@@ -193,35 +174,17 @@ class BenchmarkRunnerService {
 
     void runOther(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
-        runBenchmark(new RxJavaBenchmark(City, bindingMethod))
-        runBenchmark(new GparsScriptEngineBenchmark(City, bindingMethod))
-    }
-
-    void runFat(String msg, String bindingMethod = 'grails') {
-        logMessage "\n$msg"
-        logMessage "  - benefits of CompileStatic and 'fast' binding are more obvious with more fields"
-        runBenchmark(new GparsFatBenchmark(CityFatDynamic, bindingMethod))
-        runBenchmark(new GparsFatBenchmark(CityFat, bindingMethod))
+        runBenchmark(new RxJavaBenchmark(CityBasic, bindingMethod))
     }
 
     void runMultiThreadsOther(String msg) {
         println "\n$msg"
-        runBenchmark(new BatchInsertWithDataFlowQueueBenchmark('fast'))
+        runBenchmark(new BatchInsertWithDataFlowQueueBenchmark('gorm-tools'))
 
         logMessage "  - using copy instead of binding and no validation, <10% faster"
-        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, 'fast', false))
+        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, 'gorm-tools', false))
 
-        println "\n - assign id inside domain with beforeValidate"
-        //runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
-
-        println "\n  - not much difference between static and dynamic method calls"
-//		runBenchmark(new GparsRepoBenchmark(City,"setter"))
-//		runBenchmark(new GparsRepoBenchmark(City,"fast"))
-//
-//		runBenchmark(new GparsRepoBenchmark(City,"bindWithSetters"))
-//		runBenchmark(new GparsRepoBenchmark(City,"bindFast"))
-
-        new City().attached
+        new CityBasic().attached
 
     }
 
@@ -272,7 +235,7 @@ class BenchmarkRunnerService {
     }
 
     void prepareBaseData() {
-        benchmarkHelper.executeSqlScript("test-tables.sql")
+        dataSetup.executeSqlScript("test-tables.sql")
         List<List<Map>> countries = csvReader.read("Country").collate(batchSize)
         List<List<Map>> regions = csvReader.read("Region").collate(batchSize)
         insert(countries, countryRepo)
@@ -292,7 +255,7 @@ class BenchmarkRunnerService {
     void runBenchmark(AbstractBenchmark benchmark, boolean mute = false) {
         if (benchmark.hasProperty("poolSize")) benchmark.poolSize = poolSize
         if (benchmark.hasProperty("batchSize")) benchmark.batchSize = batchSize
-        if (benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = loadIterations
+        if (benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = multiplyData
         if (benchmark.hasProperty("disableSave")) benchmark.disableSave = disableSave
 
         autowire(benchmark)

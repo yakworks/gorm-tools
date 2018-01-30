@@ -2,7 +2,7 @@ package gpbench.benchmarks.update
 
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
-import gpbench.City
+import gpbench.basic.CityBasic
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -22,7 +22,7 @@ class RepoUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpd
 
     @Override
     protected execute() {
-        List<Long> all = City.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
+        List<Long> all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
         asyncBatchSupport.parallelBatch(batches){Long id, Map args ->

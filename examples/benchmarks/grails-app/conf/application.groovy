@@ -1,7 +1,7 @@
 grails {
     plugin {
         audittrail {
-            enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled", "true"))
+            enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled", "false"))
             //For a field to be added by the annotation at least on config setting needs to be present for that field.
             createdBy.field = "createdBy"  // createdBy is default
             createdBy.constraints = "nullable:false,display:false,editable:false,bindable:false"
@@ -28,17 +28,17 @@ benchmark {
     bss = bss ?: System.getProperty("jdbcBatchSize", "100").toInteger()
     batchSliceSize = bss
     //number of times to load the file of 36k rows. the default of 3 is equal to 111k rows for example
-    loadIterations = System.getProperty("loadIterations", "3").toInteger()
+    multiplyData = System.getProperty("multiplyData", "3").toInteger()
     //number of refreshable listeners to register to simulate load on performance
     eventListenerCount = System.getProperty("eventListenerCount", "0").toInteger()
     eventSubscriberCount = System.getProperty("eventSubscriberCount", "0").toInteger()
-    binder.type = System.getProperty("binderType", "fast")
+    binder.type = System.getProperty("binderType", "gorm-tools")
 }
 
 grails {
     gorm.default.mapping = {
         id generator: 'gorm.tools.hibernate.PooledTableIdGenerator'
-        cache usage: System.getProperty("cacheStrategy", "read-write").toString()
+        //cache usage: System.getProperty("cacheStrategy", "read-write").toString()
     }
     gorm.default.constraints = {
         '*'(nullable:true)

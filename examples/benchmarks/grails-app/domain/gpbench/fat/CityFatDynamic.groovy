@@ -20,6 +20,12 @@ class CityFatDynamic implements CityTraitFat, DateUserStamp {
     static constraints = {
         importFrom(CityTraitFatConstraints)
         importFrom DateUserStampConstraints
+//        region nullable: false
+//        country nullable: false
+//        region2 nullable: false
+//        country2 nullable: false
+//        region3 nullable: false
+//        country3 nullable: false
     }
 
 }

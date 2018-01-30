@@ -1,5 +1,7 @@
-package gpbench
+package gpbench.basic
 
+import gpbench.Country
+import gpbench.Region
 import gpbench.model.CityTrait
 import gpbench.model.CityTraitConstraints
 import gpbench.model.DateUserStamp
@@ -10,7 +12,7 @@ import grails.compiler.GrailsCompileStatic
  * repo Baseline. This has a repo and has been touched by the gorm-tools AST
  */
 @GrailsCompileStatic
-class City implements CityTrait, DateUserStamp {
+class CityBasic implements CityTrait, DateUserStamp {
 
     static belongsTo = [region: Region, country: Country]
 

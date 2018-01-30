@@ -1,4 +1,5 @@
-import gpbench.City
+import gpbench.basic.CityBasic
+import org.grails.datastore.gorm.GormEntity
 
 //import groovy.transform.CompileStatic
 
@@ -6,9 +7,10 @@ import gpbench.City
 class Loader {
     String dataBinder
 
-    String insertRow(Map row) {
-        //City.repository.create(row, [dataBinder:dataBinder])
-        City.repo.create(row)
+    String insertRow(Class dclass, Map row) {
+        dclass.repo.create(row)
+//        GormRepoEntity instance = (GormRepoEntity)dclass.newInstance()
+//        insertRow(instance, row)
     }
 }
 

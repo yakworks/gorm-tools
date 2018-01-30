@@ -2,7 +2,7 @@ package gpbench.benchmarks.concept
 
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityValidationException
-import gpbench.CityRepo
+import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
@@ -14,7 +14,7 @@ import org.springframework.dao.DataAccessException
 @CompileStatic
 class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
 
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
     Class exceptionToThrow
     Class exceptionToCatch
 
@@ -27,12 +27,12 @@ class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
 
     @Override
     def execute() {
-        //assert City.count() == 0
+        //assert CityBasic.count() == 0
         insert(cities, cityRepo)
-        //assert City.count() == 115000
+        //assert CityBasic.count() == 115000
     }
 
-    void insert(List<List<Map>> batchList, CityRepo repo) {
+    void insert(List<List<Map>> batchList, CityBasicRepo repo) {
         for (List<Map> batch : batchList) {
             insertBatch(batch, repo)
             RepoUtil.flushAndClear()
@@ -40,7 +40,7 @@ class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
     }
 
     @Transactional
-    void insertBatch(List<Map> batch, CityRepo repo) {
+    void insertBatch(List<Map> batch, CityBasicRepo repo) {
         for (Map record : batch) {
             try {
                 throw exceptionToThrow.newInstance("test")

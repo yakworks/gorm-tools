@@ -1,7 +1,7 @@
 package gpbench.benchmarks.update
 
-import gpbench.City
-import gpbench.CityRepo
+import gpbench.basic.CityBasicRepo
+import gpbench.basic.CityBasic
 import gpbench.benchmarks.legacy.BaseBenchmark
 import groovyx.gpars.GParsPool
 import org.springframework.transaction.annotation.Transactional
@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class UpdateBenchmark extends BaseBenchmark {
 
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
     int poolSize
 
     /**
@@ -35,7 +35,7 @@ class UpdateBenchmark extends BaseBenchmark {
                 }
             }
         }
-        assert City.count() == 37230
+        assert CityBasic.count() == 37230
     }
 
     @Override
@@ -49,7 +49,7 @@ class UpdateBenchmark extends BaseBenchmark {
     }
 
     void update(Long id) {
-        City.withNewSession {
+        CityBasic.withNewSession {
             cityRepo.update([flush: true], [id: id, name: "cityId=${id}"])
         }
     }

@@ -15,24 +15,25 @@ class BootStrap {
     @Value('${runBenchmarks:true}')
     boolean runBenchmarks
 
-    BenchmarkRunnerService benchmarkRunnerService
-    BenchmarkDatabindingService benchmarkDatabindingService
-
+    DeprecatedRunnerService deprecatedRunnerService
+    CityFatInsertBenchmarks cityFatInsertBenchmarks
+    DataSetup dataSetup
     GrailsApplication grailsApplication
 
     def init = { servletContext ->
-        print "Second Level Cache: "
-        println(grailsApplication.config.hibernate.cache.use_second_level_cache)
+        dataSetup.printEnvironment()
+        //load base country and city data which is used by all benchmarks
+        dataSetup.initBaseData()
 
         mockAuthentication()
-        if(runBenchmarks && runDataBindingBenchmark){
-            benchmarkDatabindingService.runFast()
-            benchmarkDatabindingService.runFast(true)
-        }
-        //loaderNoPersistService.runFileLoad()
-        //loaderNoPersistService.run()
-        if(runBenchmarks)
-            benchmarkRunnerService.runBenchMarks()
+
+        cityFatInsertBenchmarks.run()
+        cityFatInsertBenchmarks.runEvents()
+
+//        if(runBenchmarks)
+//            benchmarkRunnerService.runBenchMarks()
+
+        System.exit(0)
     }
 
     void mockAuthentication() {
@@ -43,4 +44,5 @@ class BootStrap {
             true, false, true, AuthorityUtils.createAuthorityList('ROLE_ADMIN'), 1 as Long)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, "test", AuthorityUtils.createAuthorityList('ROLE_ADMIN'))
     }
+
 }

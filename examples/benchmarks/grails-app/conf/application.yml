@@ -89,19 +89,21 @@ endpoints:
 
 ---
 hibernate:
-    generate_statistics: true
-    naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
-    cache:
-        queries: false
-        use_query_cache: false
-        provider_class: net.sf.ehcache.hibernate.EhCacheProvider
-        region:
-            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
-    jdbc:
-        # batch_size: 100 # this is set in application.groovy using system prop
-        order_inserts: true
-        order_updates: true
-        batch_versioned_data: true
+#    flush:
+#        mode: AUTO
+#    generate_statistics: true
+#    naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
+#    cache:
+#        queries: false
+#        use_query_cache: false
+#        provider_class: net.sf.ehcache.hibernate.EhCacheProvider
+#        region:
+#            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+#    jdbc:
+#        # batch_size: 100 # this is set in application.groovy using system prop
+#        order_inserts: true
+#        order_updates: true
+#        batch_versioned_data: true
 
 dataSource:
     pooled: true

@@ -1,10 +1,12 @@
 package gpbench
 
+import gpbench.basic.CityBasic
+
 class Origin {
 
     Country country
     Region state
-    City city
+    CityBasic city
 
     static constraints = {
         country nullable: false

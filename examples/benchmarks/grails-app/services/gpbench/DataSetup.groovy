@@ -1,6 +1,8 @@
-package gpbench.helpers
+package gpbench
 
-import grails.core.GrailsApplication
+import gorm.tools.repository.api.RepositoryApi
+import gpbench.traits.BenchConfig
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
@@ -13,17 +15,31 @@ import java.sql.Connection
 
 @Component
 @CompileStatic
-class BenchmarkHelper {
+class DataSetup implements BenchConfig {
 
     @Autowired
     JdbcTemplate jdbcTemplate
-
-    @Autowired
-    GrailsApplication grailsApplication
-
     @Autowired
     DataSource dataSource
 
+    @CompileDynamic
+    void initBaseData() {
+        truncateTables()
+        executeSqlScript("test-tables.sql")
+        List<List<Map>> countries = csvReader.read("Country").collate(batchSize)
+        List<List<Map>> regions = csvReader.read("Region").collate(batchSize)
+        insert(countries, Country.repo)
+        insert(regions, Region.repo)
+
+        assert Country.count() == 275
+        assert Region.count() == 3953
+    }
+
+    void insert(List<List<Map>> batchList, RepositoryApi repo) {
+        asyncBatchSupport.parallel(batchList) { List<Map> list, Map args ->
+            repo.batchCreate(list)
+        }
+    }
 
     void executeSqlScript(String file) {
         Resource resource = grailsApplication.mainContext.getResource("classpath:$file")
@@ -34,7 +50,7 @@ class BenchmarkHelper {
 
     void truncateTables() {
         jdbcTemplate.update("DELETE FROM origin")
-        jdbcTemplate.update("DELETE FROM city")
+        //jdbcTemplate.update("DELETE FROM city")
         jdbcTemplate.update("DELETE FROM region")
         jdbcTemplate.update("DELETE FROM country")
     }

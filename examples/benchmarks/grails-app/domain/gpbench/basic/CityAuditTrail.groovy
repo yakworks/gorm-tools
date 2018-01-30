@@ -1,23 +1,26 @@
-package gpbench
+package gpbench.basic
 
-import gpbench.model.AuditStamp
-import gpbench.model.AuditStampConstraints
+import gorm.AuditStamp
+import gpbench.Country
+import gpbench.Region
 import gpbench.model.CityTrait
 import gpbench.model.CityTraitConstraints
 import grails.compiler.GrailsCompileStatic
 
-/**
- * Event methods exist in the repository
- */
+@AuditStamp
 @GrailsCompileStatic
-class CityMethodEvents implements CityTrait, AuditStamp {
+class CityAuditTrail implements CityTrait {
 
     static belongsTo = [region: Region, country: Country]
 
+    static mapping = {
+        //cache true
+    }
+
     static constraints = {
         importFrom CityTraitConstraints
-        importFrom AuditStampConstraints
     }
 
     String toString() { name }
+
 }

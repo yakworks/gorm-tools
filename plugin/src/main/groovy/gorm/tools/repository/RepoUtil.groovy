@@ -36,7 +36,7 @@ class RepoUtil {
     }
 
     static List<Class<RepositoryApi>> getRepositoryClasses() {
-        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
+        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz as List<Class<RepositoryApi>>
     }
 
     /**
@@ -109,14 +109,14 @@ class RepoUtil {
     }
 
     @CompileDynamic
-    void flushAndClear(TransactionStatus status) {
+    static void flushAndClear(TransactionStatus status) {
         //TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
         status.flush()
         clear(status)
     }
 
     @CompileDynamic
-    void clear(TransactionStatus status) {
+    static void clear(TransactionStatus status) {
         status.transaction.sessionHolder.getSession().clear()
     }
 

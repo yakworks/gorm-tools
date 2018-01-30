@@ -1,8 +1,7 @@
 package gpbench.benchmarks.legacy
 
 import gorm.tools.repository.RepoUtil
-import gpbench.City
-import gpbench.CityRepo
+import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
@@ -13,7 +12,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
 
     SimpleBatchInsertBenchmark(boolean databinding) {
         super(databinding)
@@ -21,12 +20,12 @@ class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
 
     @Override
     def execute() {
-        //assert City.count() == 0
+        //assert CityBasic.count() == 0
         insert(cities, cityRepo)
-        //assert City.count() == 115000
+        //assert CityBasic.count() == 115000
     }
 
-    void insert(List<List<Map>> batchList, CityRepo repo) {
+    void insert(List<List<Map>> batchList, CityBasicRepo repo) {
         for (List<Map> batch : batchList) {
             insertBatch(batch, repo)
             RepoUtil.flushAndClear()
@@ -34,7 +33,7 @@ class SimpleBatchInsertBenchmark extends BaseBatchInsertBenchmark {
     }
 
     @Transactional
-    void insertBatch(List<Map> batch, CityRepo repo) {
+    void insertBatch(List<Map> batch, CityBasicRepo repo) {
         for (Map record : batch) {
             try {
                 repo.create(record)

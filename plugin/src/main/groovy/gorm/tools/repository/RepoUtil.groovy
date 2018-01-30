@@ -36,7 +36,7 @@ class RepoUtil {
     }
 
     static List<Class<RepositoryApi>> getRepositoryClasses() {
-        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
+        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz as List<Class<RepositoryApi>>
     }
 
     /**

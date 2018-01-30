@@ -15,8 +15,8 @@ class BootStrap {
     @Value('${runBenchmarks:true}')
     boolean runBenchmarks
 
-    BenchmarkRunnerService benchmarkRunnerService
-    CityFatBenchInsertService cityFatBenchInsertService
+    DeprecatedRunnerService deprecatedRunnerService
+    CityFatInsertBenchmarks cityFatInsertBenchmarks
     DataSetup dataSetup
     GrailsApplication grailsApplication
 
@@ -27,10 +27,8 @@ class BootStrap {
 
         mockAuthentication()
 
-        cityFatBenchInsertService.runBenchMarks()
-
-        //loaderNoPersistService.runFileLoad()
-        //loaderNoPersistService.run()
+        cityFatInsertBenchmarks.run()
+        cityFatInsertBenchmarks.runEvents()
 
 //        if(runBenchmarks)
 //            benchmarkRunnerService.runBenchMarks()

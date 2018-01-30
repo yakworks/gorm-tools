@@ -3,7 +3,6 @@ package gpbench
 import gorm.tools.beans.IsoDateUtil
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
-import gpbench.fat.CityFatNoTraitsDynamic
 import gpbench.fat.CityFatNoTraits
 import gpbench.fat.CityFatNoTraitsNoAssoc
 import gpbench.fat.CityMethodEvents
@@ -12,67 +11,83 @@ import gpbench.fat.CitySpringEventsRefreshable
 import gpbench.traits.BenchDataInsert
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.springframework.stereotype.Component
 
 /**
  * single threaded sanity checks
  */
+@Component
 @CompileStatic
-class CityFatBenchInsertService extends BenchDataInsert {
+class CityFatInsertBenchmarks extends BenchDataInsert {
 
-    void runBenchMarks() {
+    void run() {
         setup()
 
         muteConsole = true
-        //create is in twice as the first pass is a warmup run
-        ["create", "create", "validate", "save batch", "save async"].each{ action ->
+        //"save async" is in twice as the first pass is a warmup run
+        ["save async", "create", "validate", "save batch", "save async"].each{ action ->
             createAction = action
             println "-- createAction: $createAction --"
             settersStaticNoAssoc()
             settersStatic(CityFat)
             settersDynamic(CityFat)
-            gormToolsFast(CityFat)
+            gormToolsRepo(CityFat)
             //grailsDataBinderNoTraits(CityFatNoTraits)
-            logMessage statsToMarkdownTable()
-            muteConsole = false
+            println "\n" + statsToMarkdownTable()
         }
 
-        logMessage "\n**** The slower ones ****"
+        println "\n**** The slower ones ****"
         ["create", "validate", "save batch", "save async"].each{
             createAction = it
             println "-- createAction: $createAction --"
             //settersStaticNoAssoc() //this is fast and kept here for reference
             settersStatic(CityFatDynamic)
             settersDynamic(CityFatDynamic)
-            gormToolsFast(CityFatDynamic)
-            logMessage statsToMarkdownTable()
+            gormToolsRepo(CityFatDynamic)
+            println "\n" + statsToMarkdownTable()
         }
 
         //logMessage statsToMarkdownTable()
 
         createAction = "create"
-        logMessage "\n-- Grails default DataBinder --"
+        println "\n-- Grails default DataBinder --"
         grailsDataBinderNoTraits(CityFatNoTraits)
         //grailsDataBinderNoTraits(CityFatNoTraitsDynamic)
 
-        logMessage "*** Using traits with the Grails default DataBinder is super slow, see bug report"
+        println "*** Using traits with the Grails default DataBinder is super slow, see bug report"
         grailsDataBinderWithTraits(CityFat)
         //warmUpAndInsert(CityFat)
 
-        logMessage statsToMarkdownTable()
+        println "\n**Stats to insert ${dataList.size()} items on City Domains with 32+ fields**"
+        println statsToMarkdownTable()
 
     }
 
-    void runBenchMarksVerify() {
-
-        //create is in twice as the first pass is a warmup run
-        ["save async"].each{ action ->
+    @CompileDynamic
+    void runEvents() {
+        setup()
+        muteConsole = true
+        //doo a warmup pass
+        warmup = true
+        createAction = "save batch"
+        ["save batch", "save async"].each{ action ->
             createAction = action
-            gormToolsFast(CityMethodEvents)
-            gormToolsFast(CitySpringEvents)
-            gormToolsFast(CitySpringEventsRefreshable)
+            gormToolsRepo(CityFat)
+        }
+        warmup = false
+
+        ["save batch", "save async"].each{ action ->
+            createAction = action
+            gormToolsRepo(CityFat)
+            gormToolsRepo(CitySpringEvents, 'Repository Spring Events')
+            gormToolsRepo(CitySpringEventsRefreshable, 'Repository Refreshable Bean Spring Events')
+            gormToolsRepo(CityMethodEvents, 'Repository Method Events')
+            scriptEngine(CityFat)
+            muteConsole = false
         }
 
-        logMessage statsToMarkdownTable()
+        println "\n**Stats to insert ${dataList.size()} items on City Domains with 32+ fields**"
+        println statsToMarkdownTable(['Benchmark'] , ['save batch', 'save async'] )
 
     }
 
@@ -81,50 +96,62 @@ class CityFatBenchInsertService extends BenchDataInsert {
         binderType = 'settersStatic'
         benchKey = 'setters static, no assocs'
         //no warm up on this one
-        insertData(CityFatNoTraitsNoAssoc, dataList)
+        insertData(CityFatNoTraitsNoAssoc, data())
     }
 
     void settersStatic(Class domainClass){
         binderType = 'settersStatic'
         benchKey = 'setters static'
-        insertData(domainClass, dataList)
+        insertData(domainClass, data())
         //insertData(CityFatDynamic, dataList)
-//        warmUpAndInsert(CityFat)
-//        warmUpAndInsert(CityFatDynamic)
     }
 
     void settersDynamic(Class domainClass){
         binderType = 'settersDynamic'
         benchKey = 'setters dynamic'
-        insertData(domainClass, dataList)
-        //insertData(CityFatDynamic, dataList)
-//        warmUpAndInsert(CityFat)
-//        warmUpAndInsert(CityFatDynamic)
+        insertData(domainClass, data())
     }
 
-    void gormToolsFast(Class domainClass){
+    void gormToolsRepo(Class domainClass, String benchKey = 'gorm-tools: repository & fast binder'){
         binderType = 'gorm-tools'
-        benchKey = 'gorm-tools: repository & fast binder'
-        insertData(domainClass, dataList)
-        //insertData(CityFatDynamic, dataList)
-        //warmUpAndInsert(CityFat)
-        //warmUpAndInsert(CityFatDynamic)
+        this.benchKey = benchKey
+        insertData(domainClass, data())
     }
 
     void grailsDataBinderNoTraits(Class domainClass){
         binderType = 'grails'
         benchKey = 'Grails default DataBinder, No Traits'
-        insertData(domainClass, dataList)
+        insertData(domainClass, data())
     }
 
     void grailsDataBinderWithTraits(Class domainClass){
         benchKey = 'Grails DataBinder w/Traits'
         binderType = 'grails'
-        insertData(domainClass, dataList)
+        insertData(domainClass, data())
     }
 
-    void warmup(){
+    @CompileDynamic
+    void scriptEngine(Class domainClass, String benchKey = 'Repository runs script each row'){
+        binderType = 'gorm-tools'
+        this.benchKey = benchKey
 
+        GroovyScriptEngine scriptEngine = new GroovyScriptEngine("src/main/resources", grailsApplication.classLoader)
+        def scriptinsert = scriptEngine.run("insert-city.groovy", new Binding([dataBinder: binderType]))
+
+        List<Map> data = data()
+
+        runAndRecord(domainClass, data){
+            if(createAction == 'save batch') {
+                insertDataBatch(domainClass, data){ Class dc, Map row ->
+                    scriptinsert.insertRow(domainClass, row)
+                }
+            } else if(createAction == 'save async') {
+                asyncBatchSupport.parallelCollate(data) { row, zargs ->
+                    scriptinsert.insertRow(domainClass, row)
+                }
+            }
+        }
+        assertAndCleanup(domainClass, data.size())
     }
 
     @Override

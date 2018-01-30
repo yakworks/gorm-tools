@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.dao.DataAccessException
 
-class BenchmarkRunnerService {
+class DeprecatedRunnerService {
 
     AsyncBatchSupport asyncBatchSupport
     DataSetup dataSetup
@@ -101,10 +101,10 @@ class BenchmarkRunnerService {
 
         // warmUpAndRun("### Gpars - fat props","runFat", binderType)
 
-//        warmUpAndRun("### Gpars - update benchmarks", "runUpdateBenchmarks", binderType)
+        //warmUpAndRun("### Gpars - update benchmarks", "runUpdateBenchmarks", binderType)
         warmUpAndRun("### Gpars - baseline", "runBaselineCompare", binderType)
-//
-//        warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
+
+        //warmUpAndRun("### Repo events - set audit fields", "runRepoEvents", binderType)
 
         if (auditTrailEnabled)
             warmUpAndRun("### Gpars - audit trail", "runWithAuditTrail", binderType)
@@ -112,12 +112,9 @@ class BenchmarkRunnerService {
         if (eventListenerCount)
             warmUpAndRun("### Gpars - with events in refreshable groovy script bean", "runWithEvents", binderType)
 
-        // warmUpAndRun("### Gpars - fat props","runFast", binderType)
-
         // warmUpAndRun("### RXJava, Script executor, etc", "runOther", binderType)
 
-//        warmUpAndRun("  - Performance problems go away without databinding on traits",
-//            "runMultiCoreSlower", 'fast')
+        //warmUpAndRun("  - Performance problems go away without databinding on traits", "runMultiCoreSlower", 'fast')
 
         warmUpAndRun("### Reading record", "runRead", binderType)
 
@@ -154,19 +151,7 @@ class BenchmarkRunnerService {
         logMessage "  - Grails Basic Baseline to measure against"
         runBenchmark(new GparsBaselineBenchmark(CityBaseline, bindingMethod))
         runBenchmark(new GparsBaselineBenchmark(CityBasic, bindingMethod))
-
-        logMessage "  - Events disabled"
-        CityBasic.repo.enableEvents = false
         runBenchmark(new GparsRepoBenchmark(CityBasic, bindingMethod))
-
-        logMessage "  - Events enabled"
-        CityBasic.repo.enableEvents = true
-        runBenchmark(new GparsRepoBenchmark(CityBasic, bindingMethod))
-
-        runBenchmark(new GparsFatBenchmark(CityFat, bindingMethod))
-        //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
-        //logMessage "\n  - These should all run within about 5% of CityBasic and each other"
-        //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
     }
 
     void runUpdateBenchmarks(String msg, String bindingMethod = 'grails') {
@@ -182,18 +167,6 @@ class BenchmarkRunnerService {
         runBenchmark(new GparsBaselineBenchmark(CityRefreshableBeanEvents, bindingMethod))
     }
 
-    void runRepoEvents(String msg, String bindingMethod = 'grails') {
-        logMessage "\n$msg"
-
-        logMessage "  - Spring Events disabled, invokes only method events"
-        CityMethodEvents.repo.enableEvents = false
-        runBenchmark(new GparsRepoBenchmark(CityMethodEvents, bindingMethod))
-
-        logMessage "  - All Events enabled"
-        runBenchmark(new GparsRepoBenchmark(CitySpringEvents, bindingMethod))
-        runBenchmark(new GparsRepoBenchmark(CitySpringEventsRefreshable, bindingMethod))
-    }
-
     void runWithAuditTrail(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
@@ -202,14 +175,6 @@ class BenchmarkRunnerService {
     void runOther(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         runBenchmark(new RxJavaBenchmark(CityBasic, bindingMethod))
-        runBenchmark(new GparsScriptEngineBenchmark(CityBasic, bindingMethod))
-    }
-
-    void runFat(String msg, String bindingMethod = 'grails') {
-        logMessage "\n$msg"
-        logMessage "  - benefits of CompileStatic and 'gorm-tools' binding are more obvious with more fields"
-        runBenchmark(new GparsFatBenchmark(CityFatDynamic, bindingMethod))
-        runBenchmark(new GparsFatBenchmark(CityFat, bindingMethod))
     }
 
     void runMultiThreadsOther(String msg) {
@@ -218,16 +183,6 @@ class BenchmarkRunnerService {
 
         logMessage "  - using copy instead of binding and no validation, <10% faster"
         runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, 'gorm-tools', false))
-
-        println "\n - assign id inside domain with beforeValidate"
-        //runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
-
-        println "\n  - not much difference between static and dynamic method calls"
-//		runBenchmark(new GparsRepoBenchmark(CityBasic,"setter"))
-//		runBenchmark(new GparsRepoBenchmark(CityBasic,"gorm-tools"))
-//
-//		runBenchmark(new GparsRepoBenchmark(CityBasic,"bindWithSetters"))
-//		runBenchmark(new GparsRepoBenchmark(CityBasic,"bindFast"))
 
         new CityBasic().attached
 

@@ -10,8 +10,10 @@ import groovy.json.JsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.util.StopWatch
 
 import java.text.DecimalFormat
 
@@ -53,6 +55,8 @@ trait BenchConfig {
 
     boolean muteConsole = false
 
+    boolean warmup = false
+
     String createAction
     String benchKey
 
@@ -61,11 +65,16 @@ trait BenchConfig {
 
     Map<String,Map> stats
 
-    void runBenchMarks() { }
+
+    void run() { }
 
     void loadData() { }
 
     void loadWarmUpData() { }
+
+    List<Map> data(){
+        warmup ? warmupDataList : dataList
+    }
 
     void cleanup(Class domainClass) { }
 
@@ -86,6 +95,28 @@ trait BenchConfig {
         stats = [:]
 
         muteConsole = false
+    }
+
+    @CompileStatic
+    void runAndRecord(Class domainClass, List<Map> data, Closure closure) {
+        //logMessage "insertData with ${dataList.size()} records. ${domainClass.simpleName}-$saveAction - binderType: $binderType"
+
+        StopWatch watch = new StopWatch()
+        watch.start()
+
+        closure.call()
+
+        watch.stop()
+
+        Integer dataSize = data.size()
+
+        String time = new DecimalFormat("##0.00s").format(watch.totalTimeSeconds)
+        logMessage "$time $benchKey - binderType: $binderType, " +
+            "${createAction ? 'createAction: ' + createAction : ''} " +
+            "- $domainClass.simpleName | $dataSize rows"
+
+        recordStat(domainClass, dataSize, watch.totalTimeSeconds)
+
     }
 
     @CompileDynamic
@@ -112,7 +143,7 @@ trait BenchConfig {
         if (!muteConsole) {
             println msg
         } else {
-            //System.out.print("*")
+            System.out.print("*")
         }
     }
 
@@ -141,15 +172,18 @@ trait BenchConfig {
     }
 
     @CompileDynamic
-    String statsToMarkdownTable(){
+    String statsToMarkdownTable(List columns = ['Benchmark', "Domain @Compile"] ,
+                                List measures = ['create', 'validate', 'save batch', 'save async'] ){
         Map mapLen = [:]
-        List cols = ['Benchmark', "Domain @Compile", 'create', 'validate', 'save batch', 'save async']
+        List cols = columns + measures //['Benchmark', "Domain @Compile", 'create', 'validate', 'save batch', 'save async']
 
         //sort by create
+        List timeFields = measures //['create', 'validate', 'save batch', 'save async']
+
         List statList = stats.collect{k,v ->
             v.findAll{true} //copy the map
         }.sort { it['create'] }
-        List timeFields = ['create', 'validate', 'save batch', 'save async']
+
         //format the time fields
         statList = statList.collect { stat ->
             timeFields.each { tf ->
@@ -190,14 +224,6 @@ trait BenchConfig {
         }
         return table
     }
-
-    void warmUpAndRun(String msg, String runMethod, List args = []) {
-        warmUp(runMethod, args)
-        //warmUp(runMethod, bindingMethod)
-        invokeMethod(runMethod, args as Object[])
-        //"$runMethod"(msg, bindingMethod)
-    }
-
 
     @CompileDynamic
     void warmUp(String runMethod, List args = []) {

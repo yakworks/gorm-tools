@@ -8,78 +8,60 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
-import org.springframework.util.StopWatch
-
-import java.text.DecimalFormat
 
 @CompileStatic
 class BenchDataInsert implements BenchConfig {
 
-    void warmUpAndInsert(Class<?> domainClass) {
-        muteConsole = true
-        (1..warmupCycles).each {
-            insertData(domainClass, warmupDataList)
-        }
-        muteConsole = false
-        //run the real deal
-        insertData(domainClass, dataList)
+    Closure defaultInsertClosure = { Class<?> domainClass, Map row ->
+        GormEntity instance = (GormEntity)domainClass.newInstance()
+        insertRow(instance, row)
     }
 
     @CompileStatic
     void insertData(Class domainClass, List<Map> data) {
-        //logMessage "insertData with ${dataList.size()} records. ${domainClass.simpleName}-$saveAction - binderType: $binderType"
+        setRepo(domainClass)
+        runAndRecord(domainClass,data){
+            //cleanup and remove the inserted data
+            if(createAction.startsWith('save')){
+                if(createAction == 'save batch') {
+                    binderType == 'gorm-tools' ? insertDataRepository(domainClass, data) : insertDataBatch(domainClass, data)
+                } else if(createAction == 'save async') {
+                    binderType == 'gorm-tools' ? insertDataAsyncRepository(domainClass, data) : insertDataAsync(domainClass, data)
+                } else {
+                    insertDataBasicTrx(domainClass, data)
+                }
 
-        StopWatch watch = new StopWatch()
-        watch.start()
-
-        //cleanup and remove the inserted data
-        if(createAction.startsWith('save')){
-            if(createAction == 'save batch') {
-                binderType == 'gorm-tools' ? insertDataRepository(domainClass, data) : insertDataBatch(domainClass, data)
-            } else if(createAction == 'save async') {
-                binderType == 'gorm-tools' ? insertDataAsyncRepository(domainClass, data) : insertDataAsync(domainClass, data)
             } else {
-                insertDataBasicTrx(domainClass, data)
+                insertDataBasic(domainClass, data)
             }
-
-        } else {
-            insertDataBasic(domainClass, data)
         }
 
-        watch.stop()
+        assertAndCleanup(domainClass, data.size())
 
-        Integer dataSize = data.size()
+    }
 
-        //cleanup and remove the inserted data
+    void assertAndCleanup(Class domainClass, Integer dataSize){
         if(createAction.startsWith('save')){
             Integer rowCount = GormEnhancer.findStaticApi(domainClass).count()
             assert dataSize == rowCount
             cleanup(domainClass)
         }
-//        String time = new DecimalFormat("##0.00s").format(watch.totalTimeSeconds)
-//        logMessage "$time $benchKey - binderType: $binderType, " +
-//            "${createAction ? 'createAction: ' + createAction : ''} " +
-//            "- $domainClass.simpleName | $dataSize rows"
-
-        recordStat(domainClass, dataSize, watch.totalTimeSeconds)
-
     }
 
-    void insertDataBasic(Class<?> domainClass, List<Map> data) {
+    void insertDataBasic(Class<?> domainClass, List<Map> data, Closure rowClosure = defaultInsertClosure) {
         //logMessage "insertDataBasic"
         for (Map row : data) {
-            GormEntity instance = (GormEntity)domainClass.newInstance()
-            insertRow(instance, row)
+            rowClosure.call(domainClass, row)
         }
     }
 
     @Transactional
-    void insertDataBasicTrx(Class<?> domainClass, List<Map> data) {
+    void insertDataBasicTrx(Class<?> domainClass, List<Map> data, Closure rowClosure = defaultInsertClosure) {
         //logMessage "insertDataBasic"
         for (Map row : data) {
-            GormEntity instance = (GormEntity)domainClass.newInstance()
-            insertRow(instance, row)
+            rowClosure.call(domainClass, row)
         }
+        RepoUtil.flushAndClear()
     }
 
     void insertDataRepository(Class<?> domainClass, List<Map> data) {
@@ -90,25 +72,24 @@ class BenchDataInsert implements BenchConfig {
         }
     }
 
-    void insertDataBatch(Class<?> domainClass, List<Map> data) {
+    void insertDataBatch(Class<?> domainClass, List<Map> data, Closure rowClosure = defaultInsertClosure) {
         //slice or chunk the list into a list of lists
         List<List<Map>> collatedList = dataList.collate(batchSize)
         for (List<Map> batchList : collatedList) {
-            insertDataBatchChunk(domainClass, batchList)
+            insertDataBatchChunk(domainClass, batchList, rowClosure)
         }
     }
 
     @Transactional
-    void insertDataBatchChunk(Class<?> domainClass, List<Map> data){
+    void insertDataBatchChunk(Class<?> domainClass, List<Map> data, Closure rowClosure = defaultInsertClosure){
         //println "insertDataBatchChunk $domainClass with ${data.size()} data items "
         data.eachWithIndex { Map row, int index ->
-            GormEntity instance = (GormEntity)domainClass.newInstance()
-            insertRow(instance, row)
+            rowClosure.call(domainClass, row)
         }
         RepoUtil.flushAndClear()
     }
 
-    void insertDataAsync(Class<?> domainClass, List<Map> data) {
+    void insertDataAsync(Class<?> domainClass, List<Map> data, Closure rowClosure = defaultInsertClosure) {
         //slice or chunk the list into a list of lists
         List<List> collatedList = asyncBatchSupport.collate(data)
         asyncBatchSupport.parallelBatch(collatedList) { Map row, Map zargs ->

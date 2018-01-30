@@ -28,11 +28,11 @@ benchmark {
     bss = bss ?: System.getProperty("jdbcBatchSize", "100").toInteger()
     batchSliceSize = bss
     //number of times to load the file of 36k rows. the default of 3 is equal to 111k rows for example
-    loadIterations = System.getProperty("loadIterations", "1").toInteger()
+    multiplyData = System.getProperty("multiplyData", "3").toInteger()
     //number of refreshable listeners to register to simulate load on performance
     eventListenerCount = System.getProperty("eventListenerCount", "0").toInteger()
     eventSubscriberCount = System.getProperty("eventSubscriberCount", "0").toInteger()
-    binder.type = System.getProperty("binderType", "fast")
+    binder.type = System.getProperty("binderType", "gorm-tools")
 }
 
 grails {

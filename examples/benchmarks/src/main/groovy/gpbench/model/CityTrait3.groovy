@@ -14,8 +14,8 @@ trait CityTrait3 {
     BigDecimal latitude3
     BigDecimal longitude3
 
-//    Region region3
-//    Country country3
+    Region region3
+    Country country3
 }
 
 class CityTrait3Constraints implements CityTrait3 {
@@ -25,8 +25,8 @@ class CityTrait3Constraints implements CityTrait3 {
         shortCode3 blank: false, nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
-//        region3 nullable: false
-//        country3 nullable: false
+        region3 nullable: false
+        country3 nullable: false
         state3 nullable: true
         countryName3 nullable: true
     }

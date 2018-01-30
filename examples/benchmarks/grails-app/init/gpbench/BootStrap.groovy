@@ -31,8 +31,10 @@ class BootStrap {
         //loaderNoPersistService.runFileLoad()
         //loaderNoPersistService.run()
 
-        if(runBenchmarks)
-            benchmarkRunnerService.runBenchMarks()
+//        if(runBenchmarks)
+//            benchmarkRunnerService.runBenchMarks()
+
+        System.exit(0)
     }
 
     void mockAuthentication() {

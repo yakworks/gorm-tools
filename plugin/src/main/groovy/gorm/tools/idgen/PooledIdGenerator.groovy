@@ -32,7 +32,7 @@ class PooledIdGenerator implements IdGenerator {
 
     private IdGenerator generator
 
-    Long defaultBatchSize = 120000
+    Long defaultBatchSize = 255
 
     //private final AtomicLong dummy = new AtomicLong(1000)
 

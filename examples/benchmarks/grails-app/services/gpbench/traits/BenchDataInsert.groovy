@@ -10,11 +10,12 @@ import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.util.StopWatch
 
+import java.text.DecimalFormat
+
 @CompileStatic
 class BenchDataInsert implements BenchConfig {
 
     void warmUpAndInsert(Class<?> domainClass) {
-        //logMessage "warmUpAndInsert with ${dataList.size()} records. ${domainClass.simpleName}-$saveAction - binderType: $binderType"
         muteConsole = true
         (1..warmupCycles).each {
             insertData(domainClass, warmupDataList)
@@ -33,11 +34,10 @@ class BenchDataInsert implements BenchConfig {
 
         //cleanup and remove the inserted data
         if(createAction.startsWith('save')){
-
             if(createAction == 'save batch') {
-                insertDataBatch(domainClass, data)
+                binderType == 'gorm-tools' ? insertDataRepository(domainClass, data) : insertDataBatch(domainClass, data)
             } else if(createAction == 'save async') {
-                insertDataAsync(domainClass, data)
+                binderType == 'gorm-tools' ? insertDataAsyncRepository(domainClass, data) : insertDataAsync(domainClass, data)
             } else {
                 insertDataBasicTrx(domainClass, data)
             }
@@ -56,10 +56,10 @@ class BenchDataInsert implements BenchConfig {
             assert dataSize == rowCount
             cleanup(domainClass)
         }
-
-        logMessage "${watch.totalTimeSeconds}s $benchKey - binderType: $binderType, " +
-            "${createAction ? 'createAction: ' + createAction : ''} " +
-            "- $domainClass.simpleName | $dataSize rows"
+//        String time = new DecimalFormat("##0.00s").format(watch.totalTimeSeconds)
+//        logMessage "$time $benchKey - binderType: $binderType, " +
+//            "${createAction ? 'createAction: ' + createAction : ''} " +
+//            "- $domainClass.simpleName | $dataSize rows"
 
         recordStat(domainClass, dataSize, watch.totalTimeSeconds)
 
@@ -82,14 +82,20 @@ class BenchDataInsert implements BenchConfig {
         }
     }
 
+    void insertDataRepository(Class<?> domainClass, List<Map> data) {
+        setRepo(domainClass)
+        List<List<Map>> collatedList = dataList.collate(batchSize)
+        for (List<Map> batchList : collatedList) {
+            repository.batchCreate(batchList)
+        }
+    }
+
     void insertDataBatch(Class<?> domainClass, List<Map> data) {
-        //println "insertDataBatch $domainClass"
         //slice or chunk the list into a list of lists
         List<List<Map>> collatedList = dataList.collate(batchSize)
         for (List<Map> batchList : collatedList) {
             insertDataBatchChunk(domainClass, batchList)
         }
-
     }
 
     @Transactional
@@ -98,7 +104,6 @@ class BenchDataInsert implements BenchConfig {
         data.eachWithIndex { Map row, int index ->
             GormEntity instance = (GormEntity)domainClass.newInstance()
             insertRow(instance, row)
-            //if (index % batchSize == 0) RepoUtil.flushAndClear()
         }
         RepoUtil.flushAndClear()
     }
@@ -112,12 +117,20 @@ class BenchDataInsert implements BenchConfig {
         }
     }
 
+    void insertDataAsyncRepository(Class<?> domainClass, List<Map> data) {
+        setRepo(domainClass)
+        List<List> collatedList = asyncBatchSupport.collate(data)
+        asyncBatchSupport.parallel(collatedList) { List<Map> list, Map args ->
+            repository.batchCreate(list)
+        }
+    }
+
     void insertRow(GormEntity instance, Map row) {
         //rowClosure.call(instance, row)
         if(binderType == 'grails') {
             //logMessage "insertRow setProperties"
             ((WebDataBinding)instance).setProperties(row)
-        } else if(binderType == 'fast') {
+        } else if(binderType == 'gorm-tools') {
             entityMapBinder.bind(instance, row)
         } else if(binderType == 'settersStatic') {
             instance.invokeMethod('setProps', row)
@@ -128,7 +141,7 @@ class BenchDataInsert implements BenchConfig {
         if(createAction == 'validate') {
             assert instance.validate()
         } else if(createAction.startsWith('save')) {
-            if(binderType == 'fast') {
+            if(binderType == 'gorm-tools') {
                 ((GormRepoEntity)instance).doPersist()
                 //instance.save([failOnError:true])
             } else{
@@ -138,6 +151,7 @@ class BenchDataInsert implements BenchConfig {
             ((GormRepoEntity)instance).persist()
         }
     }
+
     @CompileDynamic
     void flushAndClear(){
         RepoUtil.flushAndClear()

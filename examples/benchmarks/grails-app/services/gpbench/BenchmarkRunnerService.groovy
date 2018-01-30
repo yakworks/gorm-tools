@@ -47,8 +47,9 @@ class BenchmarkRunnerService {
     @Value('${benchmark.binder.type}')
     String binderType
 
-    @Value('${benchmark.loadIterations}')
-    int loadIterations = System.getProperty("load.iterations", "3").toInteger()
+    @Value('${benchmark.multiplyData}')
+    int multiplyData //= System.getProperty("multiplyData", "3").toInteger()
+
     int warmupCycles = 1
     boolean muteConsole = false
 
@@ -81,7 +82,7 @@ class BenchmarkRunnerService {
         muteConsole = false
 
         //real benchmarks starts here
-        println "\n- Running Benchmarks, loading ${loadIterations * 37230} records each run"
+        println "\n- Running Benchmarks, loading ${multiplyData * 37230} records each run"
 
         if (System.getProperty("runSingleThreaded", "false").toBoolean()) {
             println "-- single threaded - no gpars"
@@ -121,14 +122,14 @@ class BenchmarkRunnerService {
 
     void warmUp(String runMethod, String bindingMethod) {
         muteConsole = true
-        def oldLoadIterations = loadIterations
-        loadIterations = 1
-        System.out.print("Warm up pass with ${loadIterations * 37230} records ")
+        def oldLoadIterations = multiplyData
+        multiplyData = 1
+        System.out.print("Warm up pass with ${multiplyData * 37230} records ")
         //runMultiCoreGrailsBaseline("")
         (1..warmupCycles).each {
             "$runMethod"("", bindingMethod)
         }
-        loadIterations = oldLoadIterations
+        multiplyData = oldLoadIterations
         muteConsole = false
         println ""
     }
@@ -198,24 +199,24 @@ class BenchmarkRunnerService {
 
     void runFat(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
-        logMessage "  - benefits of CompileStatic and 'fast' binding are more obvious with more fields"
+        logMessage "  - benefits of CompileStatic and 'gorm-tools' binding are more obvious with more fields"
         runBenchmark(new GparsFatBenchmark(CityFatDynamic, bindingMethod))
         runBenchmark(new GparsFatBenchmark(CityFat, bindingMethod))
     }
 
     void runMultiThreadsOther(String msg) {
         println "\n$msg"
-        runBenchmark(new BatchInsertWithDataFlowQueueBenchmark('fast'))
+        runBenchmark(new BatchInsertWithDataFlowQueueBenchmark('gorm-tools'))
 
         logMessage "  - using copy instead of binding and no validation, <10% faster"
-        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, 'fast', false))
+        runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, 'gorm-tools', false))
 
         println "\n - assign id inside domain with beforeValidate"
         //runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 
         println "\n  - not much difference between static and dynamic method calls"
 //		runBenchmark(new GparsRepoBenchmark(City,"setter"))
-//		runBenchmark(new GparsRepoBenchmark(City,"fast"))
+//		runBenchmark(new GparsRepoBenchmark(City,"gorm-tools"))
 //
 //		runBenchmark(new GparsRepoBenchmark(City,"bindWithSetters"))
 //		runBenchmark(new GparsRepoBenchmark(City,"bindFast"))
@@ -291,7 +292,7 @@ class BenchmarkRunnerService {
     void runBenchmark(AbstractBenchmark benchmark, boolean mute = false) {
         if (benchmark.hasProperty("poolSize")) benchmark.poolSize = poolSize
         if (benchmark.hasProperty("batchSize")) benchmark.batchSize = batchSize
-        if (benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = loadIterations
+        if (benchmark.hasProperty("repeatedCityTimes")) benchmark.repeatedCityTimes = multiplyData
         if (benchmark.hasProperty("disableSave")) benchmark.disableSave = disableSave
 
         autowire(benchmark)

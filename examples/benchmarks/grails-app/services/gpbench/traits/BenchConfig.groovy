@@ -3,6 +3,7 @@ package gpbench.traits
 import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepoEntity
+import gorm.tools.repository.api.RepositoryApi
 import gpbench.DataSetupService
 import gpbench.benchmarks.AbstractBenchmark
 import gpbench.helpers.JsonReader
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.util.StopWatch
+
+import java.text.DecimalFormat
 
 @CompileStatic
 trait BenchConfig {
@@ -49,8 +52,8 @@ trait BenchConfig {
     @Value('${benchmark.binder.type}')
     String binderType
 
-    @Value('${benchmark.loadIterations}')
-    int loadIterations
+    @Value('${benchmark.multiplyData}')
+    int multiplyData
 
     int warmupCycles = 1
 
@@ -71,6 +74,13 @@ trait BenchConfig {
     void loadWarmUpData() { }
 
     void cleanup(Class domainClass) { }
+
+    RepositoryApi repository
+
+    @CompileDynamic
+    void setRepo(Class domainClass){
+        repository = domainClass.repo
+    }
 
     @CompileDynamic
     void setup() {
@@ -108,24 +118,79 @@ trait BenchConfig {
         }
     }
 
-    void recordStat(Class domainClass, int dataSize, double timeInSeconds){
+    void recordStat(Class domainClass, int dataSize, double time){
         String staticOrDynamic = (domainClass.simpleName.endsWith("Dynamic")) ? "dynamic" : "static"
         String statsKey = "$benchKey-${domainClass.simpleName}"
-        stats[statsKey] = [
-            benchKey: benchKey,
-            binderType: binderType,
-            createAction: createAction,
-            domainCompile: staticOrDynamic,
-            time: timeInSeconds,
-            domainClass: domainClass.simpleName,
-            dataSize: dataSize,
-            batchSize: batchSize,
-            poolSize: poolSize
-        ]
+        if(!stats[statsKey]) {
+            stats[statsKey] = [
+                "Benchmark"         : benchKey,
+                binderType       : binderType,
+                (createAction): time,
+                "Domain @Compile"    : staticOrDynamic,
+                //time             : time,
+                domainClass      : domainClass.simpleName,
+                dataSize         : dataSize,
+                batchSize        : batchSize,
+                poolSize         : poolSize
+            ]
+        } else{
+            stats[statsKey][createAction] = time
+        }
     }
 
     void saveStatsToJsonFile(String fileName){
         new File(fileName).write(new JsonBuilder(stats).toPrettyString())
+    }
+
+    @CompileDynamic
+    String statsToMarkdownTable(){
+        Map mapLen = [:]
+        List cols = ['Benchmark', "Domain @Compile", 'create', 'validate', 'save batch', 'save async']
+
+        //sort by create
+        List statList = stats.collect{k,v ->
+            v.findAll{true} //copy the map
+        }.sort { it['create'] }
+        List timeFields = ['create', 'validate', 'save batch', 'save async']
+        //format the time fields
+        statList = statList.collect { stat ->
+            timeFields.each { tf ->
+                if(stat.containsKey(tf)) stat[tf] = new DecimalFormat("##0.00s").format(stat[tf])
+            }
+            stat
+        }
+
+        //get max length for each val
+        statList[0].keySet().each{ statKey ->
+            mapLen[statKey] = statList.collect{it[statKey].toString()}*.length().max()
+        }
+        //see if titles are longer
+        cols.each {
+            mapLen[it] = mapLen[it] ?: it.length()
+            if(it.length() > mapLen[it]) mapLen[it] = it.length()
+        }
+
+        //build markdown table
+        String table = "| "
+
+        cols.each{
+            def val = timeFields.contains(it) ? it.padLeft(mapLen[it]) : it.padRight(mapLen[it])
+            table = table + "$val | "
+        }
+        table += "\n|"
+        cols.each{
+            table = table + "-${"".padRight(mapLen[it],'-')}-|"
+        }
+        //table += "\n| "
+        statList.each {Map vmap ->
+            table += "\n| "
+            cols.each { String col->
+                def val = vmap[col]?:""
+                val = timeFields.contains(col) ? val.padLeft(mapLen[col]) : val.padRight(mapLen[col])
+                table = table + "$val | "
+            }
+        }
+        return table
     }
 
     void warmUpAndRun(String msg, String runMethod, List args = []) {
@@ -139,13 +204,13 @@ trait BenchConfig {
     @CompileDynamic
     void warmUp(String runMethod, List args = []) {
         muteConsole = true
-        def oldLoadIterations = loadIterations
-        loadIterations = 1
-        System.out.print("Warm up pass with ${loadIterations * 37230} records ")
+        def oldLoadIterations = multiplyData
+        multiplyData = 1
+        System.out.print("Warm up pass with ${multiplyData * 37230} records ")
         (1..warmupCycles).each {
             invokeMethod(runMethod, args as Object[])
         }
-        loadIterations = oldLoadIterations
+        multiplyData = oldLoadIterations
         muteConsole = false
         println ""
     }

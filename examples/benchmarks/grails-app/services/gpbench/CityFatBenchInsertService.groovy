@@ -19,50 +19,48 @@ class CityFatBenchInsertService extends BenchDataInsert {
     void runBenchMarks() {
         setup()
 
-        ["setters/databinding", "validate", "save batch", "save async"].each{
+        //create is in twice as the first pass is a warmup run
+        ["create", "create", "validate", "save batch", "save async"].each{
             createAction = it
             println "-- createAction: $createAction --"
             settersStaticNoAssoc()
             settersStatic(CityFat)
             settersDynamic(CityFat)
             gormToolsFast(CityFat)
+            //grailsDataBinderNoTraits(CityFatNoTraits)
+            logMessage statsToMarkdownTable()
         }
-        saveStatsToJsonFile "CityFatBench.json"
 
         logMessage "\n**** The slower ones ****"
-        ["setters/databinding", "validate", "save batch", "save async"].each{
+        ["create", "validate", "save batch", "save async"].each{
             createAction = it
             println "-- createAction: $createAction --"
             //settersStaticNoAssoc() //this is fast and kept here for reference
             settersStatic(CityFatDynamic)
             settersDynamic(CityFatDynamic)
             gormToolsFast(CityFatDynamic)
+            logMessage statsToMarkdownTable()
         }
-        saveStatsToJsonFile "CityFatBench.json"
 
-        createAction = "setters/databinding"
-        binderType = 'grails'
-        benchKey = 'stockGrailsBinderNoTraits'
+        //logMessage statsToMarkdownTable()
 
+        createAction = "create"
         logMessage "\n-- Grails default DataBinder --"
-        insertData(CityFatNoTraits, dataList)
-        insertData(CityFatNoTraitsDynamic, dataList)
-        //warmUpAndInsert(CityFatNoTraits)
+        grailsDataBinderNoTraits(CityFatNoTraits)
+        //grailsDataBinderNoTraits(CityFatNoTraitsDynamic)
 
         logMessage "*** Using traits with the Grails default DataBinder is super slow, see bug report"
-        benchKey = 'stockGrailsBinderWithTraits'
-        binderType = 'grails'
-        insertData(CityFat, dataList)
+        grailsDataBinderWithTraits(CityFat)
         //warmUpAndInsert(CityFat)
 
-        saveStatsToJsonFile "CityFatBench.json"
+        logMessage statsToMarkdownTable()
 
     }
 
     //@Transactional
     void settersStaticNoAssoc(){
         binderType = 'settersStatic'
-        benchKey = 'setters static, no associations'
+        benchKey = 'setters static, no assocs'
         //no warm up on this one
         insertData(CityFatNoTraitsNoAssoc, dataList)
     }
@@ -86,7 +84,7 @@ class CityFatBenchInsertService extends BenchDataInsert {
     }
 
     void gormToolsFast(Class domainClass){
-        binderType = 'fast'
+        binderType = 'gorm-tools'
         benchKey = 'gorm-tools: repository & fast binder'
         insertData(domainClass, dataList)
         //insertData(CityFatDynamic, dataList)
@@ -94,12 +92,27 @@ class CityFatBenchInsertService extends BenchDataInsert {
         //warmUpAndInsert(CityFatDynamic)
     }
 
+    void grailsDataBinderNoTraits(Class domainClass){
+        binderType = 'grails'
+        benchKey = 'Grails default DataBinder, No Traits'
+        insertData(domainClass, dataList)
+    }
+
+    void grailsDataBinderWithTraits(Class domainClass){
+        benchKey = 'Grails DataBinder w/Traits'
+        binderType = 'grails'
+        insertData(domainClass, dataList)
+    }
+
+    void warmup(){
+
+    }
 
     @Override
     void loadData(){
         println "run load city data json file 3x number of fields"
         //jsonReader._cache = [:]
-        dataList = jsonReader.loadCityFatData(loadIterations)
+        dataList = jsonReader.loadCityFatData(multiplyData)
 
     }
 
@@ -108,7 +121,6 @@ class CityFatBenchInsertService extends BenchDataInsert {
         println "loadWarmUpData"
         //jsonReader._cache = [:]
         warmupDataList = jsonReader.loadCityFatData(1)
-
     }
 
     @CompileDynamic

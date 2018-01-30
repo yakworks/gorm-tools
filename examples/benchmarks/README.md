@@ -1,86 +1,225 @@
-# GORM : batch importing large datasets and a performance benchmarking app
+# GORM : batch bulk inserts benchmarking
 
+<!-- TOC depthFrom:2 depthTo:4 withLinks:1 updateOnSave:1 orderedList:0 -->
 
-<!-- TOC depthFrom:2 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
-
-- [Intro](#intro)
-- [How to run the benchmarks](#how-to-run-the-benchmarks)
-- [Changing default pool size](#changing-default-pool-size)
-- [The Benchmarks](#the-benchmarks)
-- [Bench Mark Results and details](#bench-mark-results-and-details)
-- [Pass 1 multi-thread - standard grails binding baseline](#pass-1-multi-thread-standard-grails-binding-baseline)
-- [Pass 2 multi-thread](#pass-2-multi-thread)
-- [Pass 3 multi-thread - copy props](#pass-3-multi-thread-copy-props)
+- [Overview](#overview)
+	- [Running the benchmarks](#running-the-benchmarks)
+- [Batch or Bulk Data Inserts with large datasets](#batch-or-bulk-data-inserts-with-large-datasets)
+	- [CityFatBenchInsert Benchmarks](#cityfatbenchinsert-benchmarks)
+		- [Bench Mark Results](#bench-mark-results)
 	- [CPU Load during Gparse batch insert](#cpu-load-during-gparse-batch-insert)
-- [System specs](#system-specs)
-- [Conclusions](#conclusions)
+	- [Batching inserts and updates with hibernate](#batching-inserts-and-updates-with-hibernate)
 	- [Optimum setting for Gpars pool size.](#optimum-setting-for-gpars-pool-size)
+- [Second level cache](#second-level-cache)
+	- [Overview](#overview)
+		- [Caching strategies](#caching-strategies)
+		- [EhCache configuration](#ehcache-configuration)
+		- [Using MySQL database.](#using-mysql-database)
+	- [Benchmarks for Second Level Cache](#benchmarks-for-second-level-cache)
+- [Conclusions](#conclusions)
 	- [Questions answered by above conclusion.](#questions-answered-by-above-conclusion)
-- [Batching inserts and updates with hibernate](#batching-inserts-and-updates-with-hibernate)	
 - [References and reading](#references-and-reading)
 
 <!-- /TOC -->
 
-## Intro
+## Overview
 
 The application runs large batch inserts (115K records) in different ways. The goal is to decide the optimum way to run large batch inserts with Gorm.
 
-The goal is to have good benchmarks to measure and answer following questions.
+The goal is to have good benchmarks to measure and answer the following questions.
 
-- Fastest way to persist/insert large batches using gorm.
-- Show advantages of using multi-core.
-- Does binding slow it down, why, can it be optimized, best alternative
-- Does valiation slow it down, why, can it be optimized
-- Does Auditstamp slow it down, can it be optimized
-- Does Repostories slow it down
+- Fastest way to persist/insert large batches of JSON or CSV data using gorm.
+- How big are the advantages of using multi-core.
+- Does Data Binding slow it down? How much faster is it to use plain old school setters?
+- Does validation slow it down?
+- Does @CompileStatic and @GrailsCompileStatic speed things up on domains, setters methods, etc..? Where should it be used and what are the impacts?
+- When using Traits to build domains classes is there an impact on performance.
+- Do associations slow inserts and updates down?
+- Does AuditTrail's Auditstamp slow it down, can it be optimized
+- Does Repositories slow it down
 - Do custom Id generator slow it down, or improve speed
-- does @compileStatic speed things up, where does it matter? does it help to have it on the domains?
 
-## How to run the benchmarks
+### Running the benchmarks
 
 - There is a script ```run-benchmarks.sh``` which will run the benchmarks
-- Run ```./run-benchmarks.sh``` or `gradle assemble; java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 build/libs/benchmarks.war`
-- **loadIterations** multiplies the base 36k City record set. so setting it to 3 will insert 118k rows.
-- **gpars.poolsize** 1 for single thread, set to 5 if you have a 4 core processor (even if its 8 cores with hyperhreading)
+- Run ```./run-benchmarks.sh``` or `gradle assemble; java -server -jar -DmultiplyData=3 -Dgpars.poolsize=1 build/libs/benchmarks.war`
+- **multiplyData** multiplies the base 36k City record set. so setting it to 3 will process 3 x 36k=118k rows.
 
-## How to run the benchmarks with Second level cache
+By default benchmarks uses default gpars pool size which is (availableProcessors + 1) which can be modified by passing system property
 
-* By default Second level cache is disabled for benchmarks. To enable it we should use the 'secondLevelCache' system property.
-  For example:
-    ```java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 -DsecondLevelCache=true build/libs/benchmarks.war```
-    
-*  ```./run-benchmarks.sh``` script by default starts benchmarks without Second Level Cache.
-  It contains the "Running benchmarks with Second Level cache" section with commented out configuration,
-  which can be used to run benchmarks with Second Level Cache.
-  Uncomment the next line in the script to run benchmarks with Second Level cache:
-  ```#gradle assemble; java -server -jar -DloadIterations=3 -Dgpars.poolsize=5 -DsecondLevelCache=true build/libs/benchmarks.war```
-  
+- **gpars.poolsize** 1 for single thread, set to 5 if you have a 4 core processor (even if its 8 cores with hyperhreading), 9 for 8 cores, etc..
+
+## Batch or Bulk Data Inserts with large datasets
+
+### CityFatBenchInsert Benchmarks
+
+- **setters static, no assocs** - Uses the [CityFatNoTraitsNoAssoc] with no associations and does not use Traits.
+  staticically compiled method with plain old setters are used as can be seen in the domain.
+- **setters static**  - uses statically compiled setters to populate the domain.
+- **setters dynamic**  - uses setters in a method that is marked with `@CompileDynamic`
+- **gorm-tools: repository & fast binder** - uses the gorm-tools fast
+	EntityMapBinder to bind the json data and the repository methods
+ 	to create persist. Uses defaults with all events enabled.
+- **Grails default DataBinder, No Traits** - this benchmark uses the "out of the box"
+	binder in grails with [CityFatNoTraits] which is statically compiled.
+  basically what you get when you do `someDomain.properties = jsonData`.
+	Its only run with the "create" method as its sufficient to show that its much slower.
+- **Grails DataBinder w/Traits** - this benchmark uses the "out of the box"
+	binder in grails with [CityFat] like the others.
+  Its only run with the "create" method as its sufficient to show that its
+	much slower and an issue has been filed for performance problems.
+
+**column data descriptions**
+
+- **Domain @Compile** - when it static its using the [CityFat] domain that
+	had @CompileStatic or @GrailsCompileStatic and when its dynamic its using
+	the [CityFatDynamic] which is fuly dynamicaly compiled.
+- **create** - creates a new instance and sets or binds the json data
+	depending on the benchmark type. The 'setters ..' benchmarks will use setters,
+	the others use either gorm-tools databinding or grails etc..
+- **validate** - does the create and also calls `validate()` for each item
+- **save batch** - see the examples. uses the the jdb_batch size(default of 100)
+	and "chunks" or batches the saves. calls flush() after each batch of 100
+	is inserted and calls clear() to empty the hibernate/gorm cache
+- **save async** - Uses the gorm-tools helper bean [AsyncBatchSupport]
+	which uses gpars by default. This also chunks or batches the inserts
+  asynchronously using a pool size of 5 threads by default.
+	essentially collates the List of items from json into a list of lists(or batches)
+  and fires each batch into it own thread to run.
+
+[CityFatNoTraitsNoAssoc]: todo
+[CityFat]: todo
+[CityFatDynamic]: todo
+[CityFatNoTraits]: todo
+[AsyncBatchSupport]: todo
+
+#### Bench Mark Results
+
+MacBook pro 2.5 GHz Intel Core i7
+Java 8
+Grails 3.3.2
+Gorm 6.1.9
+
+ ```
+ gradle assemble; java -server -jar -DmultiplyData=3 -Dgpars.poolsize=5 build/libs/benchmarks.war
+ --- Environment info ---
+ Available processors: 8
+ Gpars pool size (gpars.poolsize): 5
+ binderType: gorm-tools
+ hibernate.jdbc.batch_size (jdbcBatchSize): 100
+ batchSliceSize: 100
+ auditTrailEnabled: false
+ refreshableBeansEnabled (eventListenerCount): 0
+ Autowire enabled (autowire.enabled): false
+ ```
+
+**Results H2 115k JSON records**
+
+| Benchmark                            | Domain @Compile | create | validate | save batch | save async |
+|--------------------------------------|-----------------|-------:|---------:|-----------:|-----------:|
+| setters static, no assocs            | static          |  1.37s |    4.25s |      8.12s |      2.77s |
+| setters static                       | static          |  2.12s |    5.05s |     12.90s |      5.74s |
+| gorm-tools: repository & fast binder | static          |  4.25s |    7.30s |     15.66s |      6.10s |
+| setters dynamic                      | static          |  4.79s |    7.90s |     15.82s |      5.63s |
+| setters static                       | dynamic         |  6.71s |   10.21s |     17.72s |      6.11s |
+| setters dynamic                      | dynamic         |  9.64s |   13.40s |     22.64s |      9.42s |
+| gorm-tools: repository & fast binder | dynamic         | 12.22s |   16.51s |     25.79s |      7.85s |
+| Grails default DataBinder, No Traits | static          | 34.97s |          |            |            |
+| Grails DataBinder w/Traits           | static          | 62.47s |          |            |            |
+
+
+### CPU Load during Gparse batch insert
+
+It can be seen that cpu load goes highest during Gparse batch insert
+
+![Image of Yaktocat](./cupload.png)
+
+### Batching inserts and updates with hibernate
+JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.
+
+**hibernate.jdbc.batch_size**
+This is the most important setting which tells hibernate to enable batching of statements and configures the batch size used by hibernate.
+
+**hibernate.order_inserts** and **hibernate.order_updates**
+By default hibernate executes each statement in the same order it appears. However it affects the batching. Batching can target one table at a time.
+As soon as a DML statement for a different table is encountered, it ends the current batch. This can result in hibernate not being able to use batching effectively.
+The above two settings tells hibernate to order inserts and update statements respectively based on entity type.
+
+**hibernate.jdbc.batch_versioned_data**
+This setting tells hibernate to enable batching for versioned entities and is required to enable batching of update statements.
+
+**Note** from hibernate
+>Some JDBC drivers return incorrect row counts when a batch is executed. If your JDBC driver falls into this category this setting should be set to false. Otherwise, it is safe to enable this which will allow Hibernate to still batch the DML for versioned entities and still use the returned row counts for optimistic lock checks. Since 5.0, it defaults to true. Previously (versions 3.x and 4.x), it used to be false.
+
+
+**Caveats**
+- Hibernate disables insert batching at the JDBC level transparently if you use an identity identifier generator. identity is often the default if nothing is set in Gorm
+- Hibernate disables batch insert when using hibernate.cache.use_second_level_cache = true
+
+**Reference**
+https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
+https://stackoverflow.com/questions/35791383/spring-data-jpa-batch-insert-for-nested-entities#35794220
+https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
+https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
+https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html
+https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/batch.html
+
+
+### Optimum setting for Gpars pool size.
+
+It is observed that 5 cores gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four(4) physical cores. Intel hyper-threading simulates to the OS and Java a total of 8 cores and uses Hyper threading.
+
+Gparse does not seem to benefit if it is given 8 cores when there are just four physical cores and four virtual cores.
+
+The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1
+see [here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
+But since the hyper-threading shows 8 cores this needs to be overriden manually on such systems
+
+As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
+> In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
+
+## Second level cache
+
+### Overview
+By default Second level cache is disabled for benchmarks. To enable it we should use the 'secondLevelCache' system property.
+
+For example: `java -server -jar -DmultiplyData=3 -Dgpars.poolsize=1 -DsecondLevelCache=true build/libs/benchmarks.war`
+
+`./run-benchmarks.sh` script by default starts benchmarks without Second Level Cache.
+It contains the "Running benchmarks with Second Level cache" section with commented out configuration,
+which can be used to run benchmarks with Second Level Cache.
+Uncomment the next line in the script to run benchmarks with Second Level cache:
+
+```
+java -server -jar -DmultiplyData=3 -Dgpars.poolsize=5 -DsecondLevelCache=true build/libs/benchmarks.war
+```
+
   **Note**: Changing caching strategy can affect benchmark results
-    
-* Caching strategies
-    - read-only: Useful for data that is read frequently but never updated (e.g. referential data like Countries). It has the best performances of all.
-    - read-write: Desirable if your data needs to be updated. But it doesn't provide a SERIALIZABLE isolation level, phantom reads can occur (you may see at the end of a transaction something that wasn't there at the start). It has more overhead than read-only.
-    - nonstrict-read-write: Alternatively, if it's unlikely two separate transaction threads could update the same object, you may use the nonstrict–read–write strategy. It has less overhead than read-write. This one is useful for data that are rarely updated.
-    - transactional: If you need a fully transactional cache. Only suitable in a JTA environment.
-    See Grails [Caching strategy]{.new-tab} and [Hiberante Second Level cache]{.new-tab} docs for more information 
 
-* Using 'cacheStrategy' system property we can specify the caching strategy for all domains.
-  The default caching strategy is 'read-write'.
-  For example:
-  we can use default strategy (read-write)
-  ```java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 -DsecondLevelCache=true build/libs/benchmarks.war```
-  or specify it as a string parameter like so
-  ```java -server -jar -DloadIterations=3 -Dgpars.poolsize=1 -DsecondLevelCache=true -DcacheStrategy='read-write' build/libs/benchmarks.war ```
-  
-* EhCache configuration.
-  We use [EhCache]{.new-tab} as the implementation for Second Level cache.
-  Grails documentation has not much information about configuring EhCache.
-  By default EhCache uses it's own configuration for cache (e.g. max elements in memory, etc).
-  **Note** that there might be issues with benchmark results when the max number of records in
-  default EhCache config is less that the number of records are used in a benchmark.
-  Due to this fact it is highly critical to have appropriate cache size (it depends on data amount),
-  we have defined custom configuration for EhCache in the ```benchmarks/grails-app/conf/ehcache.xml``` file.
-  Here is the example of custom ```ehcache.xml`` file: 
+#### Caching strategies
+
+- **read-only**: Useful for data that is read frequently but never updated (e.g. referential data like Countries). It has the best performances of all.
+- **read-write**: Desirable if your data needs to be updated. But it doesn't provide a SERIALIZABLE isolation level, phantom reads can occur (you may see at the end of a transaction something that wasn't there at the start). It has more overhead than read-only.
+- **nonstrict-read-write**: Alternatively, if it's unlikely two separate transaction threads could update the same object, you may use the nonstrict–read–write strategy. It has less overhead than read-write. This one is useful for data that are rarely updated.
+- **transactional**: If you need a fully transactional cache. Only suitable in a JTA environment.
+See Grails [Caching strategy]{.new-tab} and [Hiberante Second Level cache]{.new-tab} docs for more information
+
+Using 'cacheStrategy' system property we can specify the caching strategy for all domains.
+The default caching strategy is 'read-write'.
+For example:
+`java -server -jar -DmultiplyData=3 -Dgpars.poolsize=1 -DsecondLevelCache=true -DcacheStrategy='read-write' build/libs/benchmarks.war `
+
+#### EhCache configuration
+
+We use [EhCache]{.new-tab} as the implementation for Second Level cache.
+Grails documentation has not much information about configuring EhCache.
+By default EhCache uses it's own configuration for cache (e.g. max elements in memory, etc).
+**Note** that there might be issues with benchmark results when the max number of records in
+default EhCache config is less that the number of records are used in a benchmark.
+Due to this fact it is highly critical to have appropriate cache size (it depends on data amount),
+we have defined custom configuration for EhCache in the `benchmarks/grails-app/conf/ehcache.xml` file.
+Here is the example of custom `ehcache.xml` file:
+
   ```
   <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../config/ehcache.xsd">
       <diskStore path="java.io.tmpdir"/>
@@ -92,86 +231,33 @@ The goal is to have good benchmarks to measure and answer following questions.
       </defaultCache>
   </ehcache>
   ```
-  
-  ```maxElementsInMemory``` defines maximum number of elements in memory;
-  ```overflowToDisk``` defines if data should be saved to disk in case if maximum number of elements in memory is reached 
-  For more information see docs for [EhCache Configuration]{.new-tabs}
 
-* Using MySQL database.
-  In case of using MySQL database instead of H2, the performance impact from using Second level cache
-  can be better seen in benchmark results.
-  To be able to use MySQL database please uncomment config for dataSource in 
-  ```../benchmarks/conf/application.yml``` and dependency for the mysql connector in ```../benchmarks/build.gradle```
-  and change default production environment config.
-  Tested with MySQL 5.7.20.
+`maxElementsInMemory` defines maximum number of elements in memory
 
-## Changing default pool size
+`overflowToDisk` defines if data should be saved to disk in case if maximum number of elements in memory is reached
 
-By default benchmarks uses default gpars pool size which is (availableProcessors + 1) which can be modified by passing system property ```gpars.poolsize=xx```
-Example: ```java -Dgpars.poolsize=5 -jar grails-gpars-batch-load-benchmark-0.1.war```
+For more information see docs for [EhCache Configuration]{.new-tabs}
 
-## The Benchmarks
+#### Using MySQL database.
 
-- GparsBatchInsertBenchmark - Runs the batches in parallel, each batch with the same size as jdbc batch size (50).
-- GparsBatchInsertWithoutDaoBenchmark - Same as above, but without using dao for inserting records.
-- GparsBatchInsertWithoutValidation - Runs the batches with gpars but with grails domain validation tunred off during save using ```domain.save(false)```
-- GparsThreadPerTransactionBenchmark - Runs the inserts in parallel with one thread per transaction.
-- BatchInsertWithDataFlawQueueBenchmark - Runs the batch inserts in parallel using Gprase dataflow operator [see](http://www.gpars.org/webapp/quickstart/index.html#__strong_dataflow_concurrency_strong)
-- SimpleBatchInsertBenchmark - Batch inserts but without gpars parallelism.
-- CommitEachSaveBenchmark - Insert each record in individual transactions.
-- OneBigTransactionBenchmark - Inserts all records within a single big transaction.
-- DataFlawQueueWithScrollableQueryBenchmark : same as BatchInsertWithDataFlawQueueBenchmark but the data is being loaded from another table simultanously using scrollable resultset.
+In case of using MySQL database instead of H2, the performance impact from using Second level cache
+can be better seen in benchmark results.
+To be able to use MySQL database please uncomment config for dataSource in
+```
+../benchmarks/conf/application.yml
+```
+and dependency for the mysql connector in `../benchmarks/build.gradle` and change default production environment config.
 
-Note: All of above benchmarks are run with and without data binding, and you will see the results for both.
+Tested with MySQL 5.7.20.
 
-
-## Bench Mark Results and details
-
-* 115k CSV records on a MacBook pro 2.5 GHz Intel Core i7. 2048 mb ram was given to the VM and these were run using ```java -jar grails-gpars-batch-load-benchmark-0.1.war```
-* All of these have jdbc.batch_size = 50 and use the principals from #2 above and flush/clear every 50 rows
-* The winner seems to be gpars and batched (smaller chunks) transactions
-
-
-**Results with Gparse pool size 8**
-
-|                      | All records in single transaction | Commit each record | Batched Transaction - Without Gpars  | Batched Transactions - With Gpars  | Gpars single transaction per thread  |
-|----------------------|-----------------------------------|--------------------|--------------------------------------|------------------------------------|--------------------------------------|
-| With data binding    | 40.807                           | **81.521**          | 43.569                              |  12.32                              | 22.372                               |
-
-
-
-**Results for Gparse batched with different pool sizes**
-
-|            Pool size            | 2 threads | 3 threads | 4 threads | 5 threads | 6 threads | 7 threads | 8 threads | 9 threads | 10 threads | 11 threads | 12 threads |
-| ------------------------------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | ---------- | ---------- | ---------- |
-| With data binding               | 24.522    | 22.473    | 16.063    | 17.363    | 16.698    | 14.53     | 12.32     | 12.012    | 12.145     | 14.785     | 14.081     |
-| Without data binding            | 12.302    | 12.593    | 9.52      | 8.586     | 8.509     | 7.46      | 6.842     | 6.27      | 6.696      | 6.896      | 7.074      |
-| No validation                   | 15.335    | 17.588    | 9.906     | 10.3      | 10.724    | 9.489     | 7.993     | 8.112     | 8.203      | 9.069      | 9.032      |
-| No validation & No data binding | 10.619    | 9.311     | 7.088     | 7.59      | 7.997     | 8.088     | 6.558     | 5.896     | 5.683      | 6.223      | 6.594      |
-
-
-|               Gpars Benchs                |  time  |
-| ----------------------------------------- | ------ |
-| with databinding                          | 12.32  |
-| no binding                                | 6.842  |
-| No autowire                               | 12.969 |
-| no validation                             | 7.993  |
-| no binding, no autowire,  no validation   | 6.221  |
-| grails date stamp fields                  | 14.726 |
-| audit-trail stamp fields (user and dates) | 21.728 |
-| no dao                                    | 10.603 |
-| DataflowQueue (CED Way)                   | 12.356 |
-| Custom IdGenerator                        | 12.532 |
-
-
-## Benchmark results for case when using Second Level Cache
+### Benchmarks for Second Level Cache
 
 * Next benchmarks were launched on the PC - Intel® Core™ i5-6600 CPU @ 3.30GHz × 4; 16 GiB RAM; Ubuntu 16.04 64bit
 
 * Benchmark results for insert operations with- and without- Second Level Cache.
 
 **Note:** An attempt to update an entity with ```read-only``` caching strategy
-        will produce the exception with message "Cannot make an immutable entity modifiable" 
+        will produce the exception with message "Cannot make an immutable entity modifiable"
 
 **Using H2 database**
 
@@ -231,7 +317,7 @@ Note: All of above benchmarks are run with and without data binding, and you wil
 
 **Results of the benchmark for **update** operations for different databases and caching strategies.
   Firstly, this benchmark reads all the records (37k) at the beginning to save them to Second level cache.
-  Then it updates records using pool of threads and splits 37k between threads** 
+  Then it updates records using pool of threads and splits 37k between threads**
 
 **Using H2 database**
 
@@ -261,133 +347,30 @@ Note: All of above benchmarks are run with and without data binding, and you wil
   2. Second Level Cache makes sense for read operations.
      It significantly improves the performance of read operations when the data is not changing.
   3. Second level cache also makes sense for update operations, because updates use read to get required entities.
-  
-
-<!-- BENCHMARKS -->
-```
-- Running Benchmarks, loading 372300 records each run
-Warm up cycle ********
-
-# Gpars - standard grails binding with baseline
-  - Grails Basic Baseline to measure against
-26.866s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: grails ]
-
-  - These should all run within 5% of baseline and each other
-25.634s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: grails ]
-27.245s for GparsDaoBenchmark<City> [ bindingMethod: grails ]
-27.778s for GparsScriptEngineBenchmark<City> [ bindingMethod: grails ]
-25.511s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: grails ]
-Warm up cycle ****
-
-  - Performance problems - standard grails binding with baseline
-  - These show performance issues
-29.554s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: grails ]
-33.875s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: grails ]
-Warm up cycle ****
-
-  - Faster Options - standard grails binding
-  - These run faster
-21.392s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: grails ]
-24.261s for RxJavaBenchmark<City> [ bindingMethod: grails ]
-Warm up cycle ********
-
-# Gpars - copy to fields, no grails databinding
-  - Grails Basic Baseline to measure against
-17.926s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: copy ]
-
-  - These should all run within 5% of baseline and each other
-17.617s for GparsBaselineBenchmark<CityAuditStampManual> [ bindingMethod: copy ]
-18.463s for GparsDaoBenchmark<City> [ bindingMethod: copy ]
-17.982s for GparsScriptEngineBenchmark<City> [ bindingMethod: copy ]
-18.311s for GparsDaoBenchmark<CityDynamic> [ bindingMethod: copy ]
-Warm up cycle ****
-
-  - Performance problems - standard grails binding with baseline
-  - These show performance issues
-20.566s for GparsBaselineBenchmark<CityAuditTrail> [ bindingMethod: copy ]
-18.631s for GparsBaselineBenchmark<CityModelTrait> [ bindingMethod: copy ]
-Warm up cycle ****
-
-  - Faster Options - copy to fields, no grails databinding
-  - These run faster
-13.753s for GparsBaselineBenchmark<CityIdGen> [ bindingMethod: copy ]
-17.131s for RxJavaBenchmark<City> [ bindingMethod: copy ]
-
-## Misc sanity checks
-17.97s for BatchInsertWithDataFlowQueueBenchmark<City> [ bindingMethod: copy ]
-  - using copy instead of binding and no validation, <10% faster
-19.377s for GparsBaselineBenchmark<CityBaseline> [ bindingMethod: copy , validation: false]
-
- - assign id inside domain with beforeValidate
-25.183s for GparsBaselineBenchmark<CityIdGenAssigned> [ bindingMethod: grails ]
-
-  - not much difference between static and dynamic method calls
-17.17s for GparsDaoBenchmark<City> [ bindingMethod: setter ]
-17.913s for GparsDaoBenchmark<City> [ bindingMethod: copy ]
-17.71s for GparsDaoBenchmark<City> [ bindingMethod: bindWithSetters ]
-19.076s for GparsDaoBenchmark<City> [ bindingMethod: bindWithCopyDomain ]
-```
-<!-- /BENCHMARKS -->
-
-### CPU Load during Gparse batch insert
-
-It can be seen that cpu load goes highest during Gparse batch insert
-
-![Image of Yaktocat](./cupload.png)
-
-
-**Note:**
-- All Numbers are in Seconds.
-- Domain autowiring, validation and databinding are enabled, unless explicitly specified.
-- One service is injected in each of the domains.
-- H2 In memory database is used.
-
-## System specs
-
-- Macbook Pro Intel(R) Core(TM) i7-4870HQ CPU @ 2.50GHz
-- Gparse pool size of 9
-- GRAILS_OPTS="-Xmx2048M -server -XX:+UseParallelGC"
-
 
 ## Conclusions
 
 The key conclusions Are as below
 
-1. Gparse with batch insert is the optimum way to do large batch inserts.
-2. Grails Databinding has BIG (2-6x slower) performance penalty and an even bigger hit when using Traits for fields on the domain. 
-   See [grails issue #10862](https://github.com/grails/grails-core/issues/10862) 
+1. Gpars with batch insert is the optimum way to do large batch inserts.
+2. Grails Databinding has BIG (2-6x slower) performance penalty and an even bigger hit when using Traits for fields on the domain.
+   See [grails issue #10862](https://github.com/grails/grails-core/issues/10862)
 3. Inserting each record in seperate transaction has a BIG performance penalty and should be avoided when updating or inserting data.
 5. use small transaction batches (50-100 items) and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
-6. JDBC Batch size of 50-100 Gave the best results, as batch size goes higher, performance started to degrade.
 7. Disabling validation improves performance only slightly and performs well eg. ```domain.save(false)```
 8. Grails Date stamp fields has a negligible effect on performance.
 9. AuditTrail stamp affects performance (see below for details)
 10. Did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).
 11. Dao does not have any major noticable effect on performance.
 12. Disabling validation has slight performance benifits but not significant (see below for details)
-13. Using custom [idgenerator](https://yakworks.github.io/gorm-tools/id-generation/) improves greatly over auto 
+13. Using custom [idgenerator](https://yakworks.github.io/gorm-tools/id-generation/) improves greatly over auto
    as it allows hibernate to use the jdbc.batch_size. see links above
-14. Using listeners and grails @Listener events slows it down a bit. With out specs about 3 seconds for synchronous single thread processing 100k+ records. 
+14. Using listeners and grails @Listener events slows it down a bit. With out specs about 3 seconds for synchronous single thread processing 100k+ records.
    which drops to <1 second when doing the same thing asyncronously (gpars parralel batches)
 15. From above table, it can be seen that
-    * Going from 2 cores to 4 improves numbers significantly  
+    * Going from 2 cores to 4 improves numbers significantly
     * Going from 4 cores to 8 numbers either degrades or improves only slightly on an intel 4 core with hyper-threading simulating 8 cores
-    * from pool size 9 onward, performance defintely starts degrading as expected with threads fighting for resources. 
-
-
-### Optimum setting for Gpars pool size.
-
-It is observed that 5-9 core gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four(4) physical cores.
-Intel hyper-threading simulates to the OS and Java a total of 8 cores and uses Hyper threading.
-
-Gparse will utilize may benefit if it is given 8 cores even if there are just four physical cores and four virtual cores.
-
-The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1 see ()here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
-And this indeed gives better performance.
-
-As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
-> In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
-
+    * from pool size 9 onward, performance defintely starts degrading as expected with threads fighting for resources.
 
 ### Questions answered by above conclusion.
 
@@ -398,7 +381,7 @@ Gpars batch insert without data binding and validation.
 - Yes, databinding has huge overhead on performance
 - The overhead is caused by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
   and other stuff done by GrailsWebDataBinder.
-- There is nothing much can be done other then not using databinding  
+- There is nothing much can be done other then not using databinding
 
 **Does valiation slow it down, why, can it be optimized**
 - Yes, it has slight performance impact
@@ -409,7 +392,7 @@ Gpars batch insert without data binding and validation.
 - Yes
 - Thats because audit trail plugin hooks into validation and gets called every time when the domain is validated.
   It does some reflection to check for properties/value and checks in hibernate persistence context if the instance is being inserted or being updated. All this makes it little slower.
-- Need to try what can be done in audit trail plugin to improve performance.   
+- Need to try what can be done in audit trail plugin to improve performance.
 
 **Do daos slow it down**
 - No, very very little effect, some thing around 1 to 1.5 seconds for 115K records.
@@ -425,36 +408,6 @@ Gpars batch insert without data binding and validation.
 - Putting CompileStatic on domain class improves the databinding speed.
 - It is recommended to use compile static on services, domain classes and other code as far as possible, unless the code need to use dynamic dispatch.
 
-### Batching inserts and updates with hibernate
-JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.  
-
-**hibernate.jdbc.batch_size**  
-This is the most important setting which tells hibernate to enable batching of statements and configures the batch size used by hibernate.
-
-**hibernate.order_inserts** and **hibernate.order_updates**  
-By default hibernate executes each statement in the same order it appears. However it affects the batching. Batching can target one table at a time.
-As soon as a DML statement for a different table is encountered, it ends the current batch. This can result in hibernate not being able to use batching effectively.
-The above two settings tells hibernate to order inserts and update statements respectively based on entity type.
- 
-**hibernate.jdbc.batch_versioned_data**
-This setting tells hibernate to enable batching for versioned entities and is required to enable batching of update statements.
-
-**Note** from hibernate
->Some JDBC drivers return incorrect row counts when a batch is executed. If your JDBC driver falls into this category this setting should be set to false. Otherwise, it is safe to enable this which will allow Hibernate to still batch the DML for versioned entities and still use the returned row counts for optimistic lock checks. Since 5.0, it defaults to true. Previously (versions 3.x and 4.x), it used to be false.
- 
-
-**Caveats**
-- Hibernate disables insert batching at the JDBC level transparently if you use an identity identifier generator.
-- Hibernate disables batch insert when using hibernate.cache.use_second_level_cache = true
-  
-**Reference**
-https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
-https://stackoverflow.com/questions/35791383/spring-data-jpa-batch-insert-for-nested-entities#35794220
-https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
-https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
-https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html
-https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/batch.html 
-
 
 ## References and reading
 Good Video from 2017 on High Performance Hibernate https://vimeo.com/190275665
@@ -462,14 +415,6 @@ Good Video from 2017 on High Performance Hibernate https://vimeo.com/190275665
 Here are a 2 links you should read that will give you some background information on processing large bulk data batches.
 read up through 13.2
 <http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html>
-and read this entire post
-<http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql/>
-
-Thomas Lin setup a test for some processing for GPars
-<http://fbflex.wordpress.com/2010/06/11/writing-batch-import-scripts-with-grails-gsql-and-gpars/>
-
-and the gpars docs
-<http://gpars.org/guide/index.html>
 
 [GPars]: http://gpars.org/guide/index.html
 [SimpleJdbc Example]: http://www.brucephillips.name/blog/index.cfm/2010/10/28/Example-Of-Using-Spring-JDBC-Execute-Batch-To-Insert-Multiple-Rows-Into-A-Database-Table

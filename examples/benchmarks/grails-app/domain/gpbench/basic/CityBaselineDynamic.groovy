@@ -1,4 +1,7 @@
-package gpbench
+package gpbench.basic
+
+import gpbench.Country
+import gpbench.Region
 
 /**
  * Baseline stock grails domain. no Repository or anything else should be attached to this.

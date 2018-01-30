@@ -1,4 +1,8 @@
-package gpbench
+package gpbench.basic
+
+import gpbench.Country
+import gpbench.Region
+import gpbench.SecUtil
 
 class CityDynamic {
     //transient springSecurityService

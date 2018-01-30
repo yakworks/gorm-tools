@@ -2,7 +2,7 @@ package gpbench.benchmarks
 
 import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.repository.RepoUtil
-import gpbench.City
+import gpbench.basic.CityBasic
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.gorm.transactions.Transactional
@@ -20,7 +20,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
 
     SpringSecurityService springSecurityService
 
-    Class<T> domainClass = City
+    Class<T> domainClass = CityBasic
 
     boolean useDatabinding = true //use default grails databinding
     boolean validate = true

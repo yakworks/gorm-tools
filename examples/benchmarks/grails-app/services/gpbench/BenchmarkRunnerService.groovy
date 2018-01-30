@@ -4,6 +4,11 @@ import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
+import gpbench.basic.CityAuditTrail
+import gpbench.basic.CityBaseline
+import gpbench.basic.CityBaselineDynamic
+import gpbench.basic.CityBasic
+import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.*
 import gpbench.benchmarks.legacy.SimpleBatchInsertBenchmark
 import gpbench.benchmarks.read.ReadBenchmark
@@ -15,6 +20,9 @@ import gpbench.benchmarks.update.RepoUpdateBenchmark
 import gpbench.benchmarks.update.UpdateBenchmark
 import gpbench.fat.CityFat
 import gpbench.fat.CityFatDynamic
+import gpbench.fat.CityMethodEvents
+import gpbench.fat.CitySpringEvents
+import gpbench.fat.CitySpringEventsRefreshable
 import gpbench.helpers.CsvReader
 import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
@@ -26,7 +34,7 @@ import org.springframework.dao.DataAccessException
 class BenchmarkRunnerService {
 
     AsyncBatchSupport asyncBatchSupport
-    DataSetupService dataSetupService
+    DataSetup dataSetup
 
     @Value('${gpars.poolsize}')
     int poolSize
@@ -55,7 +63,7 @@ class BenchmarkRunnerService {
 
     RegionRepo regionRepo
     CountryRepo countryRepo
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
     GrailsApplication grailsApplication
 
     CsvReader csvReader
@@ -76,7 +84,7 @@ class BenchmarkRunnerService {
         println "Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
 
         //load base country and city data which is used by all benchmarks
-        dataSetupService.truncateTables()
+        dataSetup.truncateTables()
         prepareBaseData()
 
         muteConsole = false
@@ -145,28 +153,28 @@ class BenchmarkRunnerService {
         logMessage "\n$msg"
         logMessage "  - Grails Basic Baseline to measure against"
         runBenchmark(new GparsBaselineBenchmark(CityBaseline, bindingMethod))
-        runBenchmark(new GparsBaselineBenchmark(City, bindingMethod))
+        runBenchmark(new GparsBaselineBenchmark(CityBasic, bindingMethod))
 
         logMessage "  - Events disabled"
-        City.repo.enableEvents = false
-        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
+        CityBasic.repo.enableEvents = false
+        runBenchmark(new GparsRepoBenchmark(CityBasic, bindingMethod))
 
         logMessage "  - Events enabled"
-        City.repo.enableEvents = true
-        runBenchmark(new GparsRepoBenchmark(City, bindingMethod))
+        CityBasic.repo.enableEvents = true
+        runBenchmark(new GparsRepoBenchmark(CityBasic, bindingMethod))
 
         runBenchmark(new GparsFatBenchmark(CityFat, bindingMethod))
         //runBenchmark(new GparsBaselineBenchmark(CityBaselineDynamic, bindingMethod))
-        //logMessage "\n  - These should all run within about 5% of City and each other"
+        //logMessage "\n  - These should all run within about 5% of CityBasic and each other"
         //runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
     }
 
     void runUpdateBenchmarks(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         runBenchmark(new GparsBaseLineUpdateBenchmark(CityBaseline))
-        runBenchmark(new GparsBaseLineUpdateBenchmark(City))
+        runBenchmark(new GparsBaseLineUpdateBenchmark(CityBasic))
         runBenchmark(new RepoUpdateBenchmark(CityBaseline))
-        runBenchmark(new RepoUpdateBenchmark(City))
+        runBenchmark(new RepoUpdateBenchmark(CityBasic))
     }
 
     void runWithEvents(String msg, String bindingMethod = 'grails') {
@@ -193,8 +201,8 @@ class BenchmarkRunnerService {
 
     void runOther(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
-        runBenchmark(new RxJavaBenchmark(City, bindingMethod))
-        runBenchmark(new GparsScriptEngineBenchmark(City, bindingMethod))
+        runBenchmark(new RxJavaBenchmark(CityBasic, bindingMethod))
+        runBenchmark(new GparsScriptEngineBenchmark(CityBasic, bindingMethod))
     }
 
     void runFat(String msg, String bindingMethod = 'grails') {
@@ -215,13 +223,13 @@ class BenchmarkRunnerService {
         //runBenchmark(new GparsBaselineBenchmark(CityIdGenAssigned))
 
         println "\n  - not much difference between static and dynamic method calls"
-//		runBenchmark(new GparsRepoBenchmark(City,"setter"))
-//		runBenchmark(new GparsRepoBenchmark(City,"gorm-tools"))
+//		runBenchmark(new GparsRepoBenchmark(CityBasic,"setter"))
+//		runBenchmark(new GparsRepoBenchmark(CityBasic,"gorm-tools"))
 //
-//		runBenchmark(new GparsRepoBenchmark(City,"bindWithSetters"))
-//		runBenchmark(new GparsRepoBenchmark(City,"bindFast"))
+//		runBenchmark(new GparsRepoBenchmark(CityBasic,"bindWithSetters"))
+//		runBenchmark(new GparsRepoBenchmark(CityBasic,"bindFast"))
 
-        new City().attached
+        new CityBasic().attached
 
     }
 
@@ -272,7 +280,7 @@ class BenchmarkRunnerService {
     }
 
     void prepareBaseData() {
-        dataSetupService.executeSqlScript("test-tables.sql")
+        dataSetup.executeSqlScript("test-tables.sql")
         List<List<Map>> countries = csvReader.read("Country").collate(batchSize)
         List<List<Map>> regions = csvReader.read("Region").collate(batchSize)
         insert(countries, countryRepo)

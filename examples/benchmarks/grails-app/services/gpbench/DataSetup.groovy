@@ -1,15 +1,10 @@
 package gpbench
 
-import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.repository.api.RepositoryApi
-import gpbench.Country
-import gpbench.Region
-import gpbench.helpers.CsvReader
-import grails.core.GrailsApplication
+import gpbench.traits.BenchConfig
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.Resource
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.datasource.init.ScriptUtils
@@ -18,23 +13,14 @@ import org.springframework.stereotype.Component
 import javax.sql.DataSource
 import java.sql.Connection
 
-//@Component
+@Component
 @CompileStatic
-class DataSetupService {
+class DataSetup implements BenchConfig {
 
     @Autowired
     JdbcTemplate jdbcTemplate
     @Autowired
-    GrailsApplication grailsApplication
-    @Autowired
     DataSource dataSource
-    @Autowired
-    AsyncBatchSupport asyncBatchSupport
-    @Autowired
-    CsvReader csvReader
-
-    @Value('${hibernate.jdbc.batch_size}')
-    int batchSize
 
     @CompileDynamic
     void initBaseData() {
@@ -64,7 +50,7 @@ class DataSetupService {
 
     void truncateTables() {
         jdbcTemplate.update("DELETE FROM origin")
-        jdbcTemplate.update("DELETE FROM city")
+        //jdbcTemplate.update("DELETE FROM city")
         jdbcTemplate.update("DELETE FROM region")
         jdbcTemplate.update("DELETE FROM country")
     }

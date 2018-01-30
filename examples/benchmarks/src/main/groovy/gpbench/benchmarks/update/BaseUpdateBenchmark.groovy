@@ -3,7 +3,6 @@ package gpbench.benchmarks.update
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
-import gpbench.City
 import gpbench.Country
 import gpbench.Region
 import gpbench.benchmarks.BaseBatchInsertBenchmark

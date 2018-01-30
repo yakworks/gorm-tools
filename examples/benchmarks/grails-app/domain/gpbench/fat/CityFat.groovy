@@ -1,6 +1,5 @@
 package gpbench.fat
 
-import gorm.tools.beans.IsoDateUtil
 import gpbench.Country
 import gpbench.Region
 import gpbench.model.CityTraitFat
@@ -8,11 +7,6 @@ import gpbench.model.CityTraitFatConstraints
 import gpbench.model.DateUserStamp
 import gpbench.model.DateUserStampConstraints
 import grails.compiler.GrailsCompileStatic
-import org.grails.datastore.gorm.GormEnhancer
-
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  *

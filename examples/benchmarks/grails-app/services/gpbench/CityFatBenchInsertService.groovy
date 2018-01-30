@@ -6,6 +6,9 @@ import gpbench.fat.CityFatDynamic
 import gpbench.fat.CityFatNoTraitsDynamic
 import gpbench.fat.CityFatNoTraits
 import gpbench.fat.CityFatNoTraitsNoAssoc
+import gpbench.fat.CityMethodEvents
+import gpbench.fat.CitySpringEvents
+import gpbench.fat.CitySpringEventsRefreshable
 import gpbench.traits.BenchDataInsert
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -19,9 +22,10 @@ class CityFatBenchInsertService extends BenchDataInsert {
     void runBenchMarks() {
         setup()
 
+        muteConsole = true
         //create is in twice as the first pass is a warmup run
-        ["create", "create", "validate", "save batch", "save async"].each{
-            createAction = it
+        ["create", "create", "validate", "save batch", "save async"].each{ action ->
+            createAction = action
             println "-- createAction: $createAction --"
             settersStaticNoAssoc()
             settersStatic(CityFat)
@@ -29,6 +33,7 @@ class CityFatBenchInsertService extends BenchDataInsert {
             gormToolsFast(CityFat)
             //grailsDataBinderNoTraits(CityFatNoTraits)
             logMessage statsToMarkdownTable()
+            muteConsole = false
         }
 
         logMessage "\n**** The slower ones ****"
@@ -52,6 +57,20 @@ class CityFatBenchInsertService extends BenchDataInsert {
         logMessage "*** Using traits with the Grails default DataBinder is super slow, see bug report"
         grailsDataBinderWithTraits(CityFat)
         //warmUpAndInsert(CityFat)
+
+        logMessage statsToMarkdownTable()
+
+    }
+
+    void runBenchMarksVerify() {
+
+        //create is in twice as the first pass is a warmup run
+        ["save async"].each{ action ->
+            createAction = action
+            gormToolsFast(CityMethodEvents)
+            gormToolsFast(CitySpringEvents)
+            gormToolsFast(CitySpringEventsRefreshable)
+        }
 
         logMessage statsToMarkdownTable()
 
@@ -110,16 +129,11 @@ class CityFatBenchInsertService extends BenchDataInsert {
 
     @Override
     void loadData(){
-        println "run load city data json file 3x number of fields"
-        //jsonReader._cache = [:]
         dataList = jsonReader.loadCityFatData(multiplyData)
-
     }
 
     @Override
     void loadWarmUpData(){
-        println "loadWarmUpData"
-        //jsonReader._cache = [:]
         warmupDataList = jsonReader.loadCityFatData(1)
     }
 

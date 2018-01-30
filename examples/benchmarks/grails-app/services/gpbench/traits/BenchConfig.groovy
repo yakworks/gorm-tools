@@ -2,22 +2,16 @@ package gpbench.traits
 
 import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.api.RepositoryApi
-import gpbench.DataSetupService
-import gpbench.benchmarks.AbstractBenchmark
+import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import grails.core.GrailsApplication
-import grails.web.databinding.WebDataBinding
 import groovy.json.JsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory
-import org.springframework.util.StopWatch
 
 import java.text.DecimalFormat
 
@@ -28,11 +22,11 @@ trait BenchConfig {
     @Autowired
     JsonReader jsonReader
     @Autowired
-    DataSetupService dataSetupService
-    @Autowired
     EntityMapBinder entityMapBinder
     @Autowired
     AsyncBatchSupport asyncBatchSupport
+    @Autowired
+    CsvReader csvReader
 
     @Value('${gpars.poolsize}')
     int poolSize
@@ -84,7 +78,19 @@ trait BenchConfig {
 
     @CompileDynamic
     void setup() {
-        println "--- Environment info ---"
+
+        loadData()
+        loadWarmUpData()
+
+        //blank stats map
+        stats = [:]
+
+        muteConsole = false
+    }
+
+    @CompileDynamic
+    void printEnvironment(){
+        println "\n--- Environment info ---"
         //println "Max memory: " + (Runtime.getRuntime().maxMemory() / 1024 )+ " KB"
         //println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
         //println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
@@ -96,17 +102,9 @@ trait BenchConfig {
         println "auditTrailEnabled: " + auditTrailEnabled
         println "refreshableBeansEnabled (eventListenerCount): " + eventListenerCount
         println "Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
+        println "Second Level Cache: " + grailsApplication.config.hibernate.cache.use_second_level_cache
+        println "-----------------------------------------"
 
-        //load base country and city data which is used by all benchmarks
-        dataSetupService.initBaseData()
-
-        loadData()
-        loadWarmUpData()
-
-        //blank stats map
-        stats = new HashMap<String,Map>()
-
-        muteConsole = false
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)

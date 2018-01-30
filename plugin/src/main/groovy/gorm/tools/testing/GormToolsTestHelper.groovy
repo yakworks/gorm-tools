@@ -1,16 +1,14 @@
 package gorm.tools.testing
 
+import gorm.tools.TrxService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.MangoQuery
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import grails.gorm.transactions.TransactionService
 import grails.plugin.gormtools.RepositoryArtefactHandler
-import grails.testing.spock.OnceBefore
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.testing.GrailsUnitTest
 import org.junit.BeforeClass
@@ -19,17 +17,17 @@ import org.springframework.util.ClassUtils
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
- *
- * @author Sudhir
- * @since 3.3.2
  */
-@CompileStatic
+//@CompileStatic
 trait GormToolsTestHelper extends GrailsUnitTest {
 
     @BeforeClass
     void setupTransactionService() {
-        if (!ctx.containsBean("transactionService"))
-            ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+        //if (!ctx.containsBean("transactionService"))
+        //    ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+        defineBeans({
+            trxService(TrxService)
+        })
     }
 
     /**
@@ -45,8 +43,8 @@ trait GormToolsTestHelper extends GrailsUnitTest {
             repoBeans = repoBeans << registerRepository(domainClass, repoClass)
         }
         //check again for transactionService, for some reason it doesn't get picked up in @OnceBefore
-        if (!ctx.containsBean("transactionService"))
-            ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
+        //if (!ctx.containsBean("transactionService"))
+        //    ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
 
         defineBeans(repoBeans << commonBeans())
     }
@@ -73,6 +71,7 @@ trait GormToolsTestHelper extends GrailsUnitTest {
             repoUtilBean(RepoUtil)
             repoExceptionSupport(RepoExceptionSupport)
             mango(MangoQuery)
+            trxService(TrxService)
         }
     }
 

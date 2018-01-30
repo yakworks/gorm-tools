@@ -1,8 +1,8 @@
 package gpbench.benchmarks.legacy
 
 import gorm.tools.repository.RepoUtil
-import gpbench.City
-import gpbench.CityRepo
+import gpbench.basic.CityBasicRepo
+import gpbench.basic.CityBasic
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
@@ -18,21 +18,21 @@ class OneBigTransactionBenchmark extends BaseBenchmark {
 
     @Override
     def execute() {
-        assert City.count() == 0
+        assert CityBasic.count() == 0
         insert(cities, cityRepo)
-        assert City.count() == 115000
+        assert CityBasic.count() == 115000
     }
 
     @CompileStatic(TypeCheckingMode.SKIP)
     @Transactional
-    void insert(List<Map> batch, CityRepo repo) {
+    void insert(List<Map> batch, CityBasicRepo repo) {
         batch.eachWithIndex { Map record, int index ->
             insert(record, repo)
             if (index % batchSize == 0) RepoUtil.flushAndClear()
         }
     }
 
-    void insert(Map record, CityRepo repo) {
+    void insert(Map record, CityBasicRepo repo) {
         try {
             if (useDatabinding) repo.create(record)
             else repo.insertWithSetter(record)

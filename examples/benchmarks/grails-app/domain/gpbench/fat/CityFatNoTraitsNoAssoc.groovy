@@ -1,10 +1,7 @@
 package gpbench.fat
 
 import gorm.tools.beans.IsoDateUtil
-import gpbench.Country
-import gpbench.Region
 import grails.compiler.GrailsCompileStatic
-import org.grails.datastore.gorm.GormEnhancer
 
 import java.time.LocalDate
 import java.time.LocalDateTime

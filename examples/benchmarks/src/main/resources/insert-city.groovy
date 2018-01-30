@@ -1,4 +1,4 @@
-import gpbench.City
+import gpbench.basic.CityBasic
 
 //import groovy.transform.CompileStatic
 
@@ -7,8 +7,8 @@ class Loader {
     String dataBinder
 
     String insertRow(Map row) {
-        //City.repository.create(row, [dataBinder:dataBinder])
-        City.repo.create(row)
+        //CityBasic.repository.create(row, [dataBinder:dataBinder])
+        CityBasic.repo.create(row)
     }
 }
 

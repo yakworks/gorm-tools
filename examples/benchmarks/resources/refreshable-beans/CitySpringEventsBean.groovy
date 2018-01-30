@@ -1,5 +1,5 @@
 import gorm.tools.repository.events.BeforeBindEvent
-import gpbench.CitySpringEventsRefreshable
+import gpbench.fat.CitySpringEventsRefreshable
 import gpbench.SecUtil
 import groovy.transform.CompileStatic
 import org.springframework.context.ApplicationListener

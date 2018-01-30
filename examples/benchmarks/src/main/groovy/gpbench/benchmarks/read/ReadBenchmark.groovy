@@ -1,9 +1,9 @@
 package gpbench.benchmarks.read
 
-import gpbench.CityRepo
+import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.legacy.BaseBenchmark
 import groovyx.gpars.GParsPool
-import gpbench.City
+import gpbench.basic.CityBasic
 import org.springframework.transaction.annotation.Transactional
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ReadBenchmark extends BaseBenchmark {
 
-    CityRepo cityRepo
+    CityBasicRepo cityRepo
     int poolSize
 
     /**
@@ -45,7 +45,7 @@ class ReadBenchmark extends BaseBenchmark {
                 }
             }
         }
-        assert City.count() == 37230
+        assert CityBasic.count() == 37230
     }
 
     @Override
@@ -55,7 +55,7 @@ class ReadBenchmark extends BaseBenchmark {
         if (useMultiUserEnvironment) {
             GParsPool.withPool(poolSize) {
                 (1..poolSize).eachParallel {
-                    City.withNewSession { read() }
+                    CityBasic.withNewSession { read() }
                 }
             }
         } else {
@@ -64,7 +64,7 @@ class ReadBenchmark extends BaseBenchmark {
     }
 
     void read() {
-        City currentRecord
+        CityBasic currentRecord
 
         ids.each { Long id ->
             currentRecord = cityRepo.get(id, null)

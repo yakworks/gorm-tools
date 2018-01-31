@@ -18,7 +18,8 @@ import org.springframework.util.ClassUtils
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
  */
-//@CompileStatic
+@CompileDynamic
+@SuppressWarnings(["ClosureAsLastMethodParameter"])
 trait GormToolsTestHelper extends GrailsUnitTest {
 
     @BeforeClass

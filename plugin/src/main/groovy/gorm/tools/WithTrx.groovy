@@ -19,6 +19,7 @@ trait WithTrx {
     TrxService trxService
 
     @PostConstruct
+    @SuppressWarnings(["EmptyMethod"])
     void init() {
         //fixes "Field gorm_tools_WithTrx__transactionService in gorm.tools.async.GparsBatchSupport required a bean of type 'grails.gorm.transactions.TransactionService' that could not be found.
         //transactionService = AppCtx.get("transactionService",TransactionService)

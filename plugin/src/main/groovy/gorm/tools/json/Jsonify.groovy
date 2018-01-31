@@ -56,6 +56,7 @@ class Jsonify {
         return new JsonifyResult(writer: writer)
     }
 
+    @CompileStatic
     static class JsonifyResult {
         JsonWritable writer
         /**

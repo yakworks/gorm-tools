@@ -1,8 +1,11 @@
 package gorm.tools.testing.builder
 
+import groovy.transform.CompileStatic
+
 /**
  * Holder for BuildExampleData of test classes that allows to build test values, some sort of cache
  */
+@CompileStatic
 class BuildExampleHolder {
     private static Map<Class, BuildExampleData> holder = [:]
 

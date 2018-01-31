@@ -1,6 +1,8 @@
 package gorm.tools.repository.errors
 
 import gorm.tools.repository.RepoMessage
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
@@ -10,8 +12,10 @@ import org.springframework.validation.Errors
 /**
  * Handler for exceptions thrown by the Repository
  */
+@CompileStatic
 class RepoExceptionSupport {
 
+    @CompileDynamic
     RuntimeException translateException(RuntimeException ex, GormEntity entity) {
         if (ex instanceof grails.validation.ValidationException) {
             grails.validation.ValidationException ve = (grails.validation.ValidationException) ex

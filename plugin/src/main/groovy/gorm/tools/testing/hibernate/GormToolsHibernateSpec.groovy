@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter
 
 @SuppressWarnings(['AbstractClassWithoutAbstractMethod'])
-//@CompileStatic
+@CompileDynamic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper {
 
     void setupSpec() {

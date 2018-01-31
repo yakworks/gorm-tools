@@ -3,9 +3,10 @@ package gorm.tools.testing
 import gorm.tools.json.Jsonify
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.TestData
-import grails.views.json.test.JsonViewUnitTest
+import groovy.transform.CompileStatic
 
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'NoDef', 'FieldName', 'UnnecessarySelfAssignment'])
+@CompileStatic
 trait GormToolsDataTester implements JsonifyUnitTest, GormToolsTestHelper, BuildDataTest {
 
     void mockDomains(Class<?>... domainClassesToMock) {

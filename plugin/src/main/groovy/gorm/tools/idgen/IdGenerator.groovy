@@ -1,5 +1,8 @@
 package gorm.tools.idgen
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 interface IdGenerator {
 
     /**

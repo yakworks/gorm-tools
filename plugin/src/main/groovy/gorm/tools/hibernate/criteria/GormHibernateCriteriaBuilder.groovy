@@ -141,6 +141,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
 /**
  * This class exists solely to circumvent the "protected" visibility of the org.hibernate.criterion.Order class constructor.
  */
+@CompileDynamic
 class OrderCheater extends Query.Order {
     OrderCheater(String propertyName, boolean ascending) {
         super(propertyName, ascending)

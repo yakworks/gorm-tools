@@ -3,10 +3,13 @@ package gorm.tools.testing.builder
 import gorm.tools.GormMetaUtils
 import gorm.tools.beans.IsoDateUtil
 import grails.gorm.validation.ConstrainedProperty
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 
+@CompileStatic
 class BuildExampleData<D> {
 
     D domainInstance
@@ -43,6 +46,7 @@ class BuildExampleData<D> {
      *
      * @return map with values from constraint example
      */
+    @CompileDynamic
     Map buildValues() {
         Map result = [:]
         getPersistentProperties().each { PersistentProperty property ->

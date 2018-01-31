@@ -1,12 +1,14 @@
 package gorm.tools.hibernate.criteria
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import org.hibernate.criterion.CriteriaSpecification
 
 /**
  * For consistently searching across data types.
  */
 @SuppressWarnings(["NestedBlockDepth", "ExplicitCallToAndMethod", "ExplicitCallToOrMethod"])
+@CompileStatic
 class CriteriaUtils {
 
     /**

@@ -136,6 +136,7 @@ class PooledIdGenerator implements IdGenerator {
 //    }
 
     // MARKER holder class for cached id info
+    @CompileStatic
     class IdTuple {
         private final long maxId //if nextID reaches this point it time to hit the db(generator) for a new set of values
         private final AtomicLong nextId

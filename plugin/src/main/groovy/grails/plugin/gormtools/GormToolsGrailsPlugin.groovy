@@ -1,10 +1,12 @@
 package grails.plugin.gormtools
 
 import grails.core.ArtefactHandler
+import groovy.transform.CompileDynamic
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
 
 import java.lang.reflect.Field
 
+@CompileDynamic
 class GormToolsGrailsPlugin extends grails.plugins.Plugin {
     def loadAfter = ['hibernate', 'datasources']
 

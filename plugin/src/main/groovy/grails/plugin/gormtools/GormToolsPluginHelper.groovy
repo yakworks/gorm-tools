@@ -15,10 +15,12 @@ import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
+import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
 
 @SuppressWarnings(['NoDef', 'UnnecessarySelfAssignment'])
+@CompileDynamic
 class GormToolsPluginHelper {
     static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
 

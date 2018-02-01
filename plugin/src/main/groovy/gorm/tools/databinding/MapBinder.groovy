@@ -1,12 +1,10 @@
 package gorm.tools.databinding
 
 import grails.databinding.DataBinder
-import groovy.transform.CompileStatic
 
 /**
  * binds data from a map to a GormEntity. The map can of course be a JSONObject as is common when binding rest resources
  */
-@CompileStatic
 interface MapBinder extends DataBinder {
 
     /**

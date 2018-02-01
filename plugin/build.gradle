@@ -39,7 +39,7 @@ dependencies {
     //testCompile "org.grails.plugins:views-json-testing-support:$viewsVersion"
 
     codenarc 'org.codenarc:CodeNarc:0.27.0'
-    codenarc "io.9ci.yakworks:codenarc-extra:1.0.1.RC2"
+    codenarc "yakworks:codenarc-extra:1.0.1"
 }
 
 //bootRepackage and maybe addResources are needed for the test-projects grails.plugin.compile depndency to work

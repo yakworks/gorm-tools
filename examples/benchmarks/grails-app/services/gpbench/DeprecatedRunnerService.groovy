@@ -4,25 +4,17 @@ import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
-import gpbench.basic.CityAuditTrail
-import gpbench.basic.CityBaseline
-import gpbench.basic.CityBaselineDynamic
-import gpbench.basic.CityBasic
-import gpbench.basic.CityBasicRepo
-import gpbench.benchmarks.*
-import gpbench.benchmarks.legacy.SimpleBatchInsertBenchmark
-import gpbench.benchmarks.read.ReadBenchmark
+import gpbench.basic.*
+import gpbench.benchmarks.AbstractBenchmark
+import gpbench.benchmarks.GparsBaselineBenchmark
+import gpbench.benchmarks.GparsRepoBenchmark
 import gpbench.benchmarks.concept.BatchInsertWithDataFlowQueueBenchmark
 import gpbench.benchmarks.concept.ExceptionHandlingBenchmark
 import gpbench.benchmarks.concept.RxJavaBenchmark
+import gpbench.benchmarks.read.ReadBenchmark
 import gpbench.benchmarks.update.GparsBaseLineUpdateBenchmark
 import gpbench.benchmarks.update.RepoUpdateBenchmark
 import gpbench.benchmarks.update.UpdateBenchmark
-import gpbench.fat.CityFat
-import gpbench.fat.CityFatDynamic
-import gpbench.fat.CityMethodEvents
-import gpbench.fat.CitySpringEvents
-import gpbench.fat.CitySpringEventsRefreshable
 import gpbench.helpers.CsvReader
 import grails.core.GrailsApplication
 import groovy.transform.CompileStatic
@@ -94,7 +86,7 @@ class DeprecatedRunnerService {
 
         if (System.getProperty("runSingleThreaded", "false").toBoolean()) {
             println "-- single threaded - no gpars"
-            runBenchmark(new SimpleBatchInsertBenchmark(true))
+            //runBenchmark(new SimpleBatchInsertBenchmark(true))
         }
 
         //warmUpAndRun("### Exception handling", "runWithExceptions", binderType)
@@ -167,11 +159,6 @@ class DeprecatedRunnerService {
         runBenchmark(new GparsBaselineBenchmark(CityRefreshableBeanEvents, bindingMethod))
     }
 
-    void runWithAuditTrail(String msg, String bindingMethod = 'grails') {
-        logMessage "\n$msg"
-        runBenchmark(new GparsBaselineBenchmark(CityAuditTrail, bindingMethod))
-    }
-
     void runOther(String msg, String bindingMethod = 'grails') {
         logMessage "\n$msg"
         runBenchmark(new RxJavaBenchmark(CityBasic, bindingMethod))
@@ -191,7 +178,7 @@ class DeprecatedRunnerService {
     void runWithExceptions(String msg, String binding) {
         logMessage "\n$msg"
         println "-- single threaded without exception, just for comparison"
-        runBenchmark(new SimpleBatchInsertBenchmark(true))
+        //runBenchmark(new SimpleBatchInsertBenchmark(true))
         println "-- Exceptions thrown - EntityValidationException, catched - EntityValidationException"
         runBenchmark(new ExceptionHandlingBenchmark(true, EntityValidationException, EntityValidationException))
         println "-- Exceptions thrown - EntityValidationException, catched - DataAccessException"

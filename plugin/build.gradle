@@ -51,7 +51,7 @@ bootRepackage.enabled = false
 
 codenarc {
     toolVersion = '0.27.0'
-    config = project.resources.text.fromString("${commonBuild}/codenarc/rules.groovy".toURL().text)
+    configFile = file("${commonBuild}/codenarc-rules.groovy")//project.resources.text.fromString("${commonBuild}/codenarc-rules.groovy".toURL().text)
     reportFormat = 'html'
     //ignoreFailures = true
 

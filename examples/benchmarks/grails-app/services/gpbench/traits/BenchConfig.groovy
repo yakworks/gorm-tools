@@ -11,6 +11,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import org.grails.datastore.gorm.GormEnhancer
+import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.util.StopWatch
@@ -21,6 +22,8 @@ import java.text.DecimalFormat
 trait BenchConfig {
     @Autowired
     GrailsApplication grailsApplication
+    @Autowired
+    HibernateDatastore hibernateDatastore
     @Autowired
     JsonReader jsonReader
     @Autowired
@@ -53,9 +56,9 @@ trait BenchConfig {
 
     int warmupCycles = 1
 
-    boolean muteConsole = false
+    boolean muteConsole
 
-    boolean warmup = false
+    boolean warmup
 
     String createAction
     String benchKey
@@ -66,30 +69,28 @@ trait BenchConfig {
     Map<String,Map> stats
 
 
-    void run() { }
+    RepositoryApi repository
 
     void loadData() { }
 
     void loadWarmUpData() { }
 
     List<Map> data(){
-        warmup ? warmupDataList : dataList
+        getWarmup() ? warmupDataList : dataList
     }
 
-    void cleanup(Class domainClass) { }
-
-    RepositoryApi repository
 
     @CompileDynamic
     void setRepo(Class domainClass){
         repository = domainClass.repo
     }
 
-    @CompileDynamic
     void setup() {
 
-        loadData()
         loadWarmUpData()
+
+        loadData()
+
 
         //blank stats map
         stats = [:]
@@ -97,9 +98,8 @@ trait BenchConfig {
         muteConsole = false
     }
 
-    @CompileStatic
     void runAndRecord(Class domainClass, List<Map> data, Closure closure) {
-        //logMessage "insertData with ${dataList.size()} records. ${domainClass.simpleName}-$saveAction - binderType: $binderType"
+        //logMessage "processData with ${dataList.size()} records. ${domainClass.simpleName}-$saveAction - binderType: $binderType"
 
         StopWatch watch = new StopWatch()
         watch.start()
@@ -132,13 +132,14 @@ trait BenchConfig {
         println "batchSliceSize: " + batchSliceSize
         println "auditTrailEnabled: " + auditTrailEnabled
         println "refreshableBeansEnabled (eventListenerCount): " + eventListenerCount
-        println "Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
-        println "Second Level Cache: " + grailsApplication.config.hibernate.cache.use_second_level_cache
+        println "- Gorm -----------------------------------"
+        println "  Autowire enabled (autowire.enabled): " + grailsApplication.config.grails.gorm.autowire
+        println "  flushMode: " + hibernateDatastore.defaultFlushModeName
+        println "  Second Level Cache: " + grailsApplication.config.hibernate.cache.use_second_level_cache
         println "-----------------------------------------"
 
     }
 
-    @CompileStatic(TypeCheckingMode.SKIP)
     void logMessage(String msg) {
         if (!muteConsole) {
             println msg
@@ -207,11 +208,12 @@ trait BenchConfig {
 
         cols.each{
             def val = timeFields.contains(it) ? it.padLeft(mapLen[it]) : it.padRight(mapLen[it])
-            table = table + "$val | "
+            table += "$val | "
         }
         table += "\n|"
         cols.each{
-            table = table + "-${"".padRight(mapLen[it],'-')}-|"
+            table += "-${"".padRight(mapLen[it],'-')}"
+            table += (timeFields.contains(it) ? ":|" : "-|")
         }
         //table += "\n| "
         statList.each {Map vmap ->
@@ -219,7 +221,7 @@ trait BenchConfig {
             cols.each { String col->
                 def val = vmap[col]?:""
                 val = timeFields.contains(col) ? val.padLeft(mapLen[col]) : val.padRight(mapLen[col])
-                table = table + "$val | "
+                table += "$val | "
             }
         }
         return table

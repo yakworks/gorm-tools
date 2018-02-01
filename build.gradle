@@ -30,7 +30,8 @@ project(':gorm-tools') {
 }
 
 ext {
-    commonBuild = "https://raw.githubusercontent.com/yakworks/grails-common-build/master"
+    //commonBuild = "https://raw.githubusercontent.com/yakworks/grails-common-build/master"
+    commonBuild = new File(project.rootDir, "gradle").absolutePath
     grailsApps = ['test-app', 'benchmarks']
     grailsPlugins = ['gorm-tools']
 }

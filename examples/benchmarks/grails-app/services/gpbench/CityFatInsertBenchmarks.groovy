@@ -2,13 +2,14 @@ package gpbench
 
 import gorm.tools.beans.IsoDateUtil
 import gpbench.fat.CityFat
+import gpbench.fat.CityFatAuditTrail
 import gpbench.fat.CityFatDynamic
 import gpbench.fat.CityFatNoTraits
 import gpbench.fat.CityFatNoTraitsNoAssoc
 import gpbench.fat.CityMethodEvents
 import gpbench.fat.CitySpringEvents
 import gpbench.fat.CitySpringEventsRefreshable
-import gpbench.traits.BenchDataInsert
+import gpbench.traits.BenchProcessData
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.springframework.stereotype.Component
@@ -18,21 +19,25 @@ import org.springframework.stereotype.Component
  */
 @Component
 @CompileStatic
-class CityFatInsertBenchmarks extends BenchDataInsert {
+class CityFatInsertBenchmarks extends BenchProcessData {
 
     void run() {
         setup()
 
         muteConsole = true
+        warmup = true
         //"save async" is in twice as the first pass is a warmup run
         ["save async", "create", "validate", "save batch", "save async"].each{ action ->
             createAction = action
             println "-- createAction: $createAction --"
-            settersStaticNoAssoc()
-            settersStatic(CityFat)
-            settersDynamic(CityFat)
-            gormToolsRepo(CityFat)
+            //the fastest one
+            doSettersStatic(CityFatNoTraitsNoAssoc, 'static setters, no associations')
+            doSettersStatic(CityFat)
+            doSettersDynamic(CityFat)
+            doGormToolsRepoPersist(CityFat)
+            doGormToolsRepo(CityFat)
             //grailsDataBinderNoTraits(CityFatNoTraits)
+            warmup = false
             println "\n" + statsToMarkdownTable()
         }
 
@@ -41,9 +46,9 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
             createAction = it
             println "-- createAction: $createAction --"
             //settersStaticNoAssoc() //this is fast and kept here for reference
-            settersStatic(CityFatDynamic)
-            settersDynamic(CityFatDynamic)
-            gormToolsRepo(CityFatDynamic)
+            doSettersStatic(CityFatDynamic)
+            doSettersDynamic(CityFatDynamic)
+            doGormToolsRepo(CityFatDynamic)
             println "\n" + statsToMarkdownTable()
         }
 
@@ -51,12 +56,10 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
 
         createAction = "create"
         println "\n-- Grails default DataBinder --"
-        grailsDataBinderNoTraits(CityFatNoTraits)
-        //grailsDataBinderNoTraits(CityFatNoTraitsDynamic)
+        processData(CityFatNoTraits, 'grails', 'Grails: default dataBinder, No Traits')
 
         println "*** Using traits with the Grails default DataBinder is super slow, see bug report"
-        grailsDataBinderWithTraits(CityFat)
-        //warmUpAndInsert(CityFat)
+        processData(CityFat, 'grails', 'Grails: default dataBinder w/Traits')
 
         println "\n**Stats to insert ${dataList.size()} items on City Domains with 32+ fields**"
         println statsToMarkdownTable()
@@ -67,22 +70,23 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
     void runEvents() {
         setup()
         muteConsole = true
-        //doo a warmup pass
+
+        //do a warmup pass
         warmup = true
-        createAction = "save batch"
-        ["save batch", "save async"].each{ action ->
+        [/*"save batch", */"save async"].each{ action ->
             createAction = action
-            gormToolsRepo(CityFat)
+            doGormToolsRepo(CityFat)
         }
         warmup = false
 
         ["save batch", "save async"].each{ action ->
             createAction = action
-            gormToolsRepo(CityFat)
-            gormToolsRepo(CitySpringEvents, 'Repository Spring Events')
-            gormToolsRepo(CitySpringEventsRefreshable, 'Repository Refreshable Bean Spring Events')
-            gormToolsRepo(CityMethodEvents, 'Repository Method Events')
+            doGormToolsRepo(CityFat)
+            doGormToolsRepo(CitySpringEvents, 'Repository Spring Events')
+            doGormToolsRepo(CitySpringEventsRefreshable, 'Repository Refreshable Bean Spring Events')
+            doGormToolsRepo(CityMethodEvents, 'Repository Method Events')
             scriptEngine(CityFat)
+            doGormToolsRepo(CityFatAuditTrail, 'audit-trail: @AuditStamp')
             muteConsole = false
         }
 
@@ -91,43 +95,19 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
 
     }
 
-    //@Transactional
-    void settersStaticNoAssoc(){
-        binderType = 'settersStatic'
-        benchKey = 'setters static, no assocs'
-        //no warm up on this one
-        insertData(CityFatNoTraitsNoAssoc, data())
-    }
+    @CompileDynamic
+    void runIssues() {
+        setup()
+        //muteConsole = true
 
-    void settersStatic(Class domainClass){
-        binderType = 'settersStatic'
-        benchKey = 'setters static'
-        insertData(domainClass, data())
-        //insertData(CityFatDynamic, dataList)
-    }
+        // this validates ultra slow when association is set with get.
+        // create runs fine so its not the actual get.
+        ['create', 'validate'].each{ action ->
+            createAction = action
+            processData(CityFat, 'settersDynamic-useGet', 'set associations using get vs load')
+        }
+        println statsToMarkdownTable(['Benchmark'] , ['create', 'validate'] )
 
-    void settersDynamic(Class domainClass){
-        binderType = 'settersDynamic'
-        benchKey = 'setters dynamic'
-        insertData(domainClass, data())
-    }
-
-    void gormToolsRepo(Class domainClass, String benchKey = 'gorm-tools: repository & fast binder'){
-        binderType = 'gorm-tools'
-        this.benchKey = benchKey
-        insertData(domainClass, data())
-    }
-
-    void grailsDataBinderNoTraits(Class domainClass){
-        binderType = 'grails'
-        benchKey = 'Grails default DataBinder, No Traits'
-        insertData(domainClass, data())
-    }
-
-    void grailsDataBinderWithTraits(Class domainClass){
-        benchKey = 'Grails DataBinder w/Traits'
-        binderType = 'grails'
-        insertData(domainClass, data())
     }
 
     @CompileDynamic
@@ -142,7 +122,7 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
 
         runAndRecord(domainClass, data){
             if(createAction == 'save batch') {
-                insertDataBatch(domainClass, data){ Class dc, Map row ->
+                saveBatch(domainClass, data){ Class dc, Map row ->
                     scriptinsert.insertRow(domainClass, row)
                 }
             } else if(createAction == 'save async') {
@@ -151,7 +131,7 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
                 }
             }
         }
-        assertAndCleanup(domainClass, data.size())
+        cleanup(domainClass, data.size())
     }
 
     @Override
@@ -166,7 +146,7 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
 
     @CompileDynamic
     @Override
-    void setterDynamic(instance, row) {
+    void setterDynamic(instance, row, useGet = false) {
         instance.with {
             name = row['name']
             shortCode = row['shortCode']
@@ -194,19 +174,19 @@ class CityFatInsertBenchmarks extends BenchDataInsert {
             date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
             date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
         }
-        setAssociation(instance, "region", Region, row)
-        setAssociation(instance, "region2", Region, row)
-        setAssociation(instance, "region3", Region, row)
-        setAssociation(instance, "country", Country, row)
-        setAssociation(instance, "country2", Country, row)
-        setAssociation(instance, "country3", Country, row)
+        setAssociation(instance, "region", Region, row, useGet)
+        setAssociation(instance, "region2", Region, row, useGet)
+        setAssociation(instance, "region3", Region, row, useGet)
+        setAssociation(instance, "country", Country, row, useGet)
+        setAssociation(instance, "country2", Country, row, useGet)
+        setAssociation(instance, "country3", Country, row, useGet)
     }
 
     @CompileDynamic
-    void setAssociation(instance, String key, Class assocClass, Map row) {
+    void setAssociation(instance, String key, Class assocClass, Map row, boolean useGet = false) {
         if (row[key]) {
             Long id = row[key]['id'] as Long
-            instance[key] = assocClass.load(id)
+            instance[key] = useGet ? assocClass.get(id) : assocClass.load(id)
         }
     }
 

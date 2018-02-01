@@ -62,7 +62,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
      * Saves a domain entity with the passed in args and rewraps ValidationException with EntityValidationException on error.
      *
      * @param entity the domain entity to call save on
-     * @param args the arguments to pass to save
+     * @param args the arguments to pass to save. adds the following but see doPersist for more.
+     *   - tx: defaults to true. set to true to make sure this is wrapped in a transaction.
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     @Override
@@ -73,7 +74,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
     }
 
     /**
-     * saves a domain entity with the passed in args.
+     * saves a domain entity with the passed in args. Not wrapped in a transaction.
      * If a {@link ValidationException} is caught it wraps and throws it with our DataValidationException.
      *
      * @param entity the domain entity to call save on
@@ -102,7 +103,6 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrai
 
     /**
      * Transactional wrap for {@link #doCreate}
-     * createTrx(data)
      */
     @Override
     D create(Map args = [:], Map data) {

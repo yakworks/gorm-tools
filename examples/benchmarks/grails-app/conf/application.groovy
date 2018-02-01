@@ -1,7 +1,7 @@
 grails {
     plugin {
         audittrail {
-            enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled", "false"))
+            enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled", "true"))
             //For a field to be added by the annotation at least on config setting needs to be present for that field.
             createdBy.field = "createdBy"  // createdBy is default
             createdBy.constraints = "nullable:false,display:false,editable:false,bindable:false"

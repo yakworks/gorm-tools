@@ -51,14 +51,60 @@ By default benchmarks uses default gpars pool size which is (availableProcessors
 
 ## Batch or Bulk Data Inserts with large datasets
 
+Its assumed that the performance benefits are already understood of batching large datasets for bulk inserting and updating. 
+that setting `hibernate.jdbc.batch_size` to around 50 or 100 
+and `grails.gorm.flushMode=COMMIT` ( the default now in Gorm 6.1.x) to avoid flushing. 
+```
+//THE REALLY BAD SLOW PAINFUL WAY
+def saveBigData(List reallyLargeData) {
+    reallyLargeData.each { item ->
+        Foo foo = new Foo()
+        foo.bar = item.bar
+        foo.save(flush: true, failOnError: true)
+  }
+}
+```
+
+```
+//The Better way
+def saveBigData(List reallyLargeData) {
+    //collate the reallyLargeData into batch(chunks) of lists. batchSize can equal the jdbc.batch_size
+    List<List> collatedList = reallyLargeData.collate(batchSize)
+    collatedList.each { batchList ->
+        saveBatchChunk(batchList)
+    }
+}
+@Transactional
+void saveBatchChunk(List smallerData){
+    batchList.each { item ->
+        Foo foo = new Foo()
+        foo.bar = item.bar
+        foo.save(flush: true, failOnError: true)
+    }
+    //or inject the hibernateDatastore
+    Session session = GormEnhancer.findStaticApi(domainClass).datastore.currentSession
+    session.flush() //probably redundant as it automatically gets flushed at end of transaction
+    session.clear() //clear the cache
+}
+```
+
+The latter is essentially what the `save batch` is doing below.
+
 ### CityFatBenchInsert Benchmarks
+
+Goals: 
+* compare Domains with @CompileStatic vs letting it be dynamic
+* static and dynamic setters vs data binding
+* Gorm-tools binder vs Grails binder
+* asyncronous saving vs single thread
+
 
 - **setters static, no assocs** - Uses the [CityFatNoTraitsNoAssoc] with no associations and does not use Traits.
   staticically compiled method with plain old setters are used as can be seen in the domain.
 - **setters static**  - uses statically compiled setters to populate the domain.
 - **setters dynamic**  - uses setters in a method that is marked with `@CompileDynamic`
-- **gorm-tools: repository & fast binder** - uses the gorm-tools fast
-	EntityMapBinder to bind the json data and the repository methods
+- **gorm-tools: repository batch** - uses the gorm-tools repository's batchCreate
+	which in turn uses the fast EntityMapBinder to bind the json data and the repository methods
  	to create persist. Uses defaults with all events enabled.
 - **Grails default DataBinder, No Traits** - this benchmark uses the "out of the box"
 	binder in grails with [CityFatNoTraits] which is statically compiled.
@@ -69,7 +115,7 @@ By default benchmarks uses default gpars pool size which is (availableProcessors
   Its only run with the "create" method as its sufficient to show that its
 	much slower and an issue has been filed for performance problems.
 
-**column data descriptions**
+**column data and action descriptions**
 
 - **Domain @Compile** - when it static its using the [CityFat] domain that
 	had @CompileStatic or @GrailsCompileStatic and when its dynamic its using
@@ -102,37 +148,36 @@ Gorm 6.1.9
 
  ```
  gradle assemble; java -server -jar -DmultiplyData=3 -Dgpars.poolsize=5 build/libs/benchmarks.war
- --- Environment info ---
- Available processors: 8
- Gpars pool size (gpars.poolsize): 5
- binderType: gorm-tools
- hibernate.jdbc.batch_size (jdbcBatchSize): 100
- batchSliceSize: 100
- auditTrailEnabled: false
- refreshableBeansEnabled (eventListenerCount): 0
- Autowire enabled (autowire.enabled): false
+--- Environment info ---
+Available processors: 8
+Gpars pool size (gpars.poolsize): 5
+binderType: gorm-tools
+hibernate.jdbc.batch_size (jdbcBatchSize): 100
+batchSliceSize: 100
+auditTrailEnabled: true
+refreshableBeansEnabled (eventListenerCount): 0
+- Gorm -----------------------------------
+  Autowire enabled (autowire.enabled): false
+  flushMode: COMMIT
+  Second Level Cache: false
+-----------------------------------------
  ```
+ 
+**Stats to insert 111690 items on City Domains with 32+ fields**
 
-**Results H2 115k JSON records**
+| Benchmark                             | Domain @Compile | create | validate | save batch | save async |
+|---------------------------------------|-----------------|-------:|---------:|-----------:|-----------:|
+| static setters, no associations       | static          |  1.59s |    4.13s |      7.42s |      2.75s |
+| setters static                        | static          |  2.17s |    5.16s |     12.63s |      6.35s |
+| gorm-tools: repository batch methods  | static          |  4.72s |    8.01s |     15.99s |      5.41s |
+| gorm-tools: fast binder & persist     | static          |  4.83s |    8.06s |     16.39s |      6.28s |
+| setters dynamic                       | static          |  4.94s |    8.29s |     16.11s |      6.16s |
+| setters static                        | dynamic         |  6.50s |   10.09s |     19.79s |      7.41s |
+| setters dynamic                       | dynamic         |  9.52s |   13.56s |     24.15s |      8.39s |
+| gorm-tools: repository batch methods  | dynamic         | 12.80s |   18.65s |     28.73s |      9.32s |
+| Grails: default dataBinder, No Traits | static          | 37.00s |          |            |            |
+| Grails: default dataBinder w/Traits   | static          | 63.99s |          |            |            |
 
-| Benchmark                            | Domain @Compile | create | validate | save batch | save async |
-|--------------------------------------|-----------------|-------:|---------:|-----------:|-----------:|
-| setters static, no assocs            | static          |  1.37s |    4.25s |      8.12s |      2.77s |
-| setters static                       | static          |  2.12s |    5.05s |     12.90s |      5.74s |
-| gorm-tools: repository & fast binder | static          |  4.25s |    7.30s |     15.66s |      6.10s |
-| setters dynamic                      | static          |  4.79s |    7.90s |     15.82s |      5.63s |
-| setters static                       | dynamic         |  6.71s |   10.21s |     17.72s |      6.11s |
-| setters dynamic                      | dynamic         |  9.64s |   13.40s |     22.64s |      9.42s |
-| gorm-tools: repository & fast binder | dynamic         | 12.22s |   16.51s |     25.79s |      7.85s |
-| Grails default DataBinder, No Traits | static          | 34.97s |          |            |            |
-| Grails DataBinder w/Traits           | static          | 62.47s |          |            |            |
-
-
-### CPU Load during Gparse batch insert
-
-It can be seen that cpu load goes highest during Gparse batch insert
-
-![Image of Yaktocat](./cupload.png)
 
 ### Batching inserts and updates with hibernate
 JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.
@@ -151,19 +196,9 @@ This setting tells hibernate to enable batching for versioned entities and is re
 **Note** from hibernate
 >Some JDBC drivers return incorrect row counts when a batch is executed. If your JDBC driver falls into this category this setting should be set to false. Otherwise, it is safe to enable this which will allow Hibernate to still batch the DML for versioned entities and still use the returned row counts for optimistic lock checks. Since 5.0, it defaults to true. Previously (versions 3.x and 4.x), it used to be false.
 
-
 **Caveats**
 - Hibernate disables insert batching at the JDBC level transparently if you use an identity identifier generator. identity is often the default if nothing is set in Gorm
 - Hibernate disables batch insert when using hibernate.cache.use_second_level_cache = true
-
-**Reference**
-https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
-https://stackoverflow.com/questions/35791383/spring-data-jpa-batch-insert-for-nested-entities#35794220
-https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
-https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
-https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html
-https://docs.jboss.org/hibernate/orm/3.6/reference/en-US/html/batch.html
-
 
 ### Optimum setting for Gpars pool size.
 
@@ -177,6 +212,13 @@ But since the hyper-threading shows 8 cores this needs to be overriden manually 
 
 As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
 > In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
+
+### Reference
+https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html
+https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
+https://stackoverflow.com/questions/35791383/spring-data-jpa-batch-insert-for-nested-entities#35794220
+https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
+https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
 
 ## Second level cache
 

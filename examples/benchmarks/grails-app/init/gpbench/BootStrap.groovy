@@ -29,6 +29,7 @@ class BootStrap {
 
         cityFatInsertBenchmarks.run()
         cityFatInsertBenchmarks.runEvents()
+        cityFatInsertBenchmarks.runIssues()
 
 //        if(runBenchmarks)
 //            benchmarkRunnerService.runBenchMarks()

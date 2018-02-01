@@ -31,7 +31,7 @@ trait AsyncBatchSupport implements WithTrx {
      *     - poolSize : gets passed down into the GParsPool.withPool for example
      * @param batches a collated list(batches) of sub-lists(a batch or items). each item in the batch(sub-list)
      *   will be asynchronously passed to the provided itemClosure. You should first collate the list with {@link #collate}
-     * @param batchClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
+     * @param itemClosure the closure to call for each item lowest list.
      */
     void parallelBatch(Map args = [:], List<List> batches, Closure itemClosure) {
         parallel(args, batches) { List batch, Map cargs ->
@@ -60,10 +60,10 @@ trait AsyncBatchSupport implements WithTrx {
      * @param args optional arg map to be passed on through to eachParallel and the async engine such as gpars. <br>
      *     - batchSize : parameter to be passed into collate
      * @param list the list to process that will get sliced into batches via collate
-     * @param closure the closure to pass to eachParallel which is then passed to withTransaction
+     * @param itemClosure the closure to pass to eachParallel which is then passed to withTransaction
      */
-    void parallelCollate(Map args = [:], List list, Closure closure) {
-        parallelBatch(args, collate(list, args.batchSize as Integer), closure)
+    void parallelCollate(Map args = [:], List list, Closure itemClosure) {
+        parallelBatch(args, collate(list, args.batchSize as Integer), itemClosure)
     }
 
     /**
@@ -99,7 +99,7 @@ trait AsyncBatchSupport implements WithTrx {
      */
     void doBatch(Map args, List items, Closure itemClosure) {
         for (Object item : items) {
-            itemClosure(item, args)
+            itemClosure.call(item, args)
         }
     }
 }

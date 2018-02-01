@@ -13,7 +13,7 @@ import grails.compiler.GrailsCompileStatic
  */
 @gorm.AuditStamp
 @GrailsCompileStatic
-class CityFatAuditTrail implements CityTraitFat, AuditStamp {
+class CityFatAuditTrail implements CityTraitFat {
 
     static belongsTo = [region : Region, country: Country,
                         region2: Region, country2: Country,

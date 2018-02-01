@@ -66,7 +66,7 @@ class AppCtx {
      * returned instance.
      * @return the instance of the bean in the context
      */
-    static public <T> T get(String name, Class<T> requiredType){
+    static <T> T get(String name, Class<T> requiredType){
         getCtx().getBean(name, requiredType)
     }
 }

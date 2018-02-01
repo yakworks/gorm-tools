@@ -15,7 +15,7 @@ import org.grails.compiler.injection.ArtefactTypeAstTransformation
 
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
-public class GormRepositoryArtefactTypeTransformation extends ArtefactTypeAstTransformation {
+class GormRepositoryArtefactTypeTransformation extends ArtefactTypeAstTransformation {
 
     @Override
     protected String resolveArtefactType(SourceUnit sourceUnit, AnnotationNode annotationNode, ClassNode classNode) {

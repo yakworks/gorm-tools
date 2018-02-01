@@ -47,7 +47,7 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
      *    void beforeBind(BeforeBindEvent<City> event)
      */
     @Override
-    public ResolvableType getResolvableType() {
+    ResolvableType getResolvableType() {
         return ResolvableType.forClassWithGenerics(getClass(), ResolvableType.forInstance(getEntity()))
     }
 

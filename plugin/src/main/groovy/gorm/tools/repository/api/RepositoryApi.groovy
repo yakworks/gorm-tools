@@ -3,7 +3,6 @@ package gorm.tools.repository.api
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import grails.validation.ValidationException
-import groovy.transform.CompileStatic
 import org.springframework.dao.DataAccessException
 
 /**
@@ -13,7 +12,6 @@ import org.springframework.dao.DataAccessException
  * @since 6.x
  */
 @SuppressWarnings("MethodCount")
-@CompileStatic
 interface RepositoryApi<D> {
 
     /**

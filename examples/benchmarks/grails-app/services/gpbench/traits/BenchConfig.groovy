@@ -2,7 +2,9 @@ package gpbench.traits
 
 import gorm.tools.async.AsyncBatchSupport
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
+import gpbench.fat.CityFat
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import grails.core.GrailsApplication
@@ -69,7 +71,7 @@ trait BenchConfig {
     Map<String,Map> stats
 
 
-    RepositoryApi repository
+    RepositoryApi<?> repository
 
     void loadData() { }
 
@@ -80,9 +82,8 @@ trait BenchConfig {
     }
 
 
-    @CompileDynamic
-    void setRepo(Class domainClass){
-        repository = domainClass.repo
+    void setRepo(Class<?> domainClass){
+        repository = RepoUtil.getRepo(CityFat) //domainClass.repo
     }
 
     void setup() {

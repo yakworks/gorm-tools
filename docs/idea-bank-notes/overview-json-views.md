@@ -49,6 +49,7 @@ Instead of falling back to that `object/_object.gson` when it can't find a view 
 
 ## References
 [Grails Rest renderers guide]
+https://stackoverflow.com/questions/23940641/render-metadata-for-pagination-from-grails-restfulcontroller-index-search-action
 
 [Grails Rest renderers guide]: http://docs.grails.org/latest/guide/REST.html#renderers
 

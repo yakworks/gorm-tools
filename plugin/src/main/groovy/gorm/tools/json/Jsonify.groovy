@@ -25,6 +25,7 @@ class Jsonify {
 
     static JsonViewTemplate getViewTemplate() {
         if (!cachedEmptyTemplate) {
+            //create an empty and emptyTemplate and cache. we only use it to get ro the
             cachedEmptyTemplate = (JsonViewTemplate)AppCtx.get("jsonTemplateEngine", JsonViewTemplateEngine).createTemplate('')
         }
         return cachedEmptyTemplate

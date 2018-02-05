@@ -41,10 +41,6 @@ and Grails GORM's new [Data Services] pattern.
 * **RuntimeException Rollback by default**: saves or `persist()` always occur with failOnError:true so a RuntimeException is 
   thrown for both DataAccessExceptions as well a validation exceptions.
   This is critical for deeply nested domain logic dealing with saving multiple domains chains.
-* **FAST Data Binding Service**: databinding from maps (and thus JSON) has to be fast 
-  and therefore maps and json are a first class citizen where it belongs in the data service layer instead of the controller layer. 
-  Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.
-* **Asynchronous batch processing PERFORMANCE**: GORM insert and updates can be chunked and processed in parrallel using GPARS or RxJava making it easy to processes millions of records from JSON, CSV or Excel
 * **Events & Validation**: the Repository allows a central place to do events such as beforeSave, beforeValidate, etc 
   so as not to pollute the domain class. This pattern makes it easier to keeps the special logic in a transaction as well. 
   Allows validation outside of constraints to persistence without needing to modify the domain source.
@@ -56,13 +52,25 @@ and Grails GORM's new [Data Services] pattern.
   logic to validate address. I can then implement a CustomerRepo in an application and it will override the spring bean
   just as it does for a service. 
 
+## Fast Data Binder & Batch Insert/Update
 
-## Mango Query
+We process 
+
+### Goals
+
+* **FAST Data Binding Service**: databinding from maps (and thus JSON) has to be fast. 
+  We sacrfice a small amount of functionality for a big performance gain
+  Maps and json are a first class citizen in the data service layer instead of the controller layer. 
+  Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.
+* **Asynchronous batch processing PERFORMANCE**: GORM insert and updates can be chunked and processed in parrallel 
+  using GPARS or RxJava making it easy to processes millions of records from JSON, CSV or Excel
+  
+## JSON Query and Filtering (Mango Query)
 
 The primary motive here is to create an easy dynamic map based way to query any Gorm Datastore (SQL or NoSQL). 
 Using a simple map that can come from json, yaml, groovy config etc... 
 A huge motivating factor being able is to be able to have a powerful and flexible way to query using json from a REST 
-based client without having to use GraphQL (the only other clean alternative)
+based client without having to use *GraphQL* (the only other clean alternative)
 The Repositories and RestApiController come with a `query(criteriaMap, closure)` method. It allows you to get a paginated 
 list of entities restricted by the properties in the `criteriaMap`.
 

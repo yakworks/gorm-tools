@@ -57,7 +57,7 @@ class FidMaster {
     FidChild child
 
     static mapping = {
-        id generator:'gorm.tools.hibernate.PooledTableIdGenerator', params:[foo:'bar']
+        id generator:'gorm.tools.hibernate.SpringBeanIdGenerator', params:[foo:'bar']
     }
 
     static constraints = {

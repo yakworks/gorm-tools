@@ -21,7 +21,6 @@ repositories {
 }
 
 
-
 //Root project and view-tools plugin uses same version.
 version project.projectVersion
 

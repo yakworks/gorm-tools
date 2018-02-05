@@ -276,8 +276,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mango-query" title="Mango Query" class="md-nav__link">
-    Mango Query
+  <a href="#fast-data-binder-batch-insertupdate" title="Fast Data Binder &amp; Batch Insert/Update" class="md-nav__link">
+    Fast Data Binder &amp; Batch Insert/Update
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goals_1" title="Goals" class="md-nav__link">
+    Goals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-query-and-filtering-mango-query" title="JSON Query and Filtering (Mango Query)" class="md-nav__link">
+    JSON Query and Filtering (Mango Query)
   </a>
   
 </li>
@@ -517,8 +537,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mango-query" title="Mango Query" class="md-nav__link">
-    Mango Query
+  <a href="#fast-data-binder-batch-insertupdate" title="Fast Data Binder &amp; Batch Insert/Update" class="md-nav__link">
+    Fast Data Binder &amp; Batch Insert/Update
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goals_1" title="Goals" class="md-nav__link">
+    Goals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-query-and-filtering-mango-query" title="JSON Query and Filtering (Mango Query)" class="md-nav__link">
+    JSON Query and Filtering (Mango Query)
   </a>
   
 </li>
@@ -590,10 +630,6 @@ and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#da
 <li><strong>RuntimeException Rollback by default</strong>: saves or <code>persist()</code> always occur with failOnError:true so a RuntimeException is 
   thrown for both DataAccessExceptions as well a validation exceptions.
   This is critical for deeply nested domain logic dealing with saving multiple domains chains.</li>
-<li><strong>FAST Data Binding Service</strong>: databinding from maps (and thus JSON) has to be fast 
-  and therefore maps and json are a first class citizen where it belongs in the data service layer instead of the controller layer. 
-  Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.</li>
-<li><strong>Asynchronous batch processing PERFORMANCE</strong>: GORM insert and updates can be chunked and processed in parrallel using GPARS or RxJava making it easy to processes millions of records from JSON, CSV or Excel</li>
 <li><strong>Events &amp; Validation</strong>: the Repository allows a central place to do events such as beforeSave, beforeValidate, etc 
   so as not to pollute the domain class. This pattern makes it easier to keeps the special logic in a transaction as well. 
   Allows validation outside of constraints to persistence without needing to modify the domain source.</li>
@@ -605,11 +641,22 @@ and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#da
   logic to validate address. I can then implement a CustomerRepo in an application and it will override the spring bean
   just as it does for a service. </li>
 </ul>
-<h2 id="mango-query">Mango Query<a class="headerlink" href="#mango-query" title="Permanent link">&para;</a></h2>
+<h2 id="fast-data-binder-batch-insertupdate">Fast Data Binder &amp; Batch Insert/Update<a class="headerlink" href="#fast-data-binder-batch-insertupdate" title="Permanent link">&para;</a></h2>
+<p>We process </p>
+<h3 id="goals_1">Goals<a class="headerlink" href="#goals_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>FAST Data Binding Service</strong>: databinding from maps (and thus JSON) has to be fast. 
+  We sacrfice a small amount of functionality for a big performance gain
+  Maps and json are a first class citizen in the data service layer instead of the controller layer. 
+  Eliminates boiler plate in getting data from the database to Gorm to JSON Map then back again.</li>
+<li><strong>Asynchronous batch processing PERFORMANCE</strong>: GORM insert and updates can be chunked and processed in parrallel 
+  using GPARS or RxJava making it easy to processes millions of records from JSON, CSV or Excel</li>
+</ul>
+<h2 id="json-query-and-filtering-mango-query">JSON Query and Filtering (Mango Query)<a class="headerlink" href="#json-query-and-filtering-mango-query" title="Permanent link">&para;</a></h2>
 <p>The primary motive here is to create an easy dynamic map based way to query any Gorm Datastore (SQL or NoSQL). 
 Using a simple map that can come from json, yaml, groovy config etc... 
 A huge motivating factor being able is to be able to have a powerful and flexible way to query using json from a REST 
-based client without having to use GraphQL (the only other clean alternative)
+based client without having to use <em>GraphQL</em> (the only other clean alternative)
 The Repositories and RestApiController come with a <code>query(criteriaMap, closure)</code> method. It allows you to get a paginated 
 list of entities restricted by the properties in the <code>criteriaMap</code>.</p>
 <ul>

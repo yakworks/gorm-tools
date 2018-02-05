@@ -1,13 +1,11 @@
 package gorm.tools.testing.hibernate
 
-import gorm.tools.testing.JsonifyUnitTest
-import grails.buildtestdata.TestDataBuilder
 import groovy.transform.CompileDynamic
 import org.springframework.core.GenericTypeResolver
 
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert', 'AbstractClassWithoutAbstractMethod'])
 @CompileDynamic
-abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec implements JsonifyUnitTest, TestDataBuilder {
+abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {
 
     private Class<D> domainClass // the domain class this is for
 

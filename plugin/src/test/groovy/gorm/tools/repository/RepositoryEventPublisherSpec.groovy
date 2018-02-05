@@ -5,26 +5,25 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.repository.events.*
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.events.RepositoryEventType
+import gorm.tools.testing.GormToolsDataTester
 import gorm.tools.testing.GormToolsTest
 import grails.artefact.Artefact
 import grails.events.annotation.Subscriber
 import grails.persistence.Entity
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
-class RepositoryEventPublisherSpec extends Specification implements GormToolsTest {
+class RepositoryEventPublisherSpec extends Specification implements GormToolsDataTester {
+
+    RepoEventPublisher repoEventPublisher
 
     void setup() {
         mockDomain(City)
     }
 
-    RepoEventPublisher repoEventPublisher
-
     void testEventsFired() {
-        given:
-        Map params = [id: 1, name: "test"]
-
         when:
-        City city = City.create(params)
+        City city = buildCreate(City)//City.create(params)
 
         then:
         city != null
@@ -32,10 +31,10 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city.eventAfter == "afterBind Create"
 
         when:
-        city = City.update(params)
+        city = City.update([id: 1, name: "test update"])
 
         then:
-        city != null
+        city.name == "test update"
         city.event == "beforeBind Update"
         city.eventAfter == "afterBind Update"
     }
@@ -71,11 +70,8 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
     }
 
     void "test subscriber listener with persist events"() {
-        given:
-        Map params = [name: "test"]
-
         when:
-        City city = City.create(params)
+        City city = buildCreate(City) //City.create([name: "test"])
 
         then:
         sleep(100)
@@ -83,7 +79,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         city.events.afterPersist
 
         when:
-        City city2 = new City(id: 1, name: "test")
+        City city2 = build(City)//new City(id: 1, name: "test")
         city2.persist()
 
         then:
@@ -108,11 +104,8 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
     }
 
     void "test subscriber listener with bind events"() {
-        given:
-        Map params = [name: "test"]
-
         when:
-        City city = City.create(params)
+        City city = buildCreate(City)
 
         then:
         sleep(100)
@@ -121,12 +114,9 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
     }
 
     void "test subscriber listener when removing an entity"() {
-        given:
-        Map params = [name: "test"]
-
         when:
-        City city = City.create(params)
-        City city2 = City.create(params)
+        City city = buildCreate(City) //City.create(params)
+        City city2 = buildCreate(City) //City.create(params)
         city.remove()
         City.removeById(city2.id)
 
@@ -148,7 +138,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
         City.update([id: 1, name: "test1"])
 
         then:
-        sleep(1000)
+        sleep(100)
         City.get(1).name == "test1"
         city.events.beforeBind
         city.events.afterBind
@@ -157,7 +147,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
         when:
         city.events = [:]
-        city.update([id: 1, name: "test2"])
+        City.update([id: 1, name: "test2"])
 
         then:
         City.get(1).name == "test2"
@@ -169,17 +159,13 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsTes
 
     void "test changing entity in listener with calling default save"() {
         given:
-        Map params = [id: 1, name: "test", name2: "test2"]
+        Map params = [name: "test", name2: "test2"]
 
         when:
-        City city = City.create(params)
-
-        RepoUtil.flushAndClear()
-        city = City.get(1)
+        City.create(params)
 
         then:
-        sleep(100)
-        city.name2 == "name2"
+        City.get(1).name2 == "name2"
     }
 
 }

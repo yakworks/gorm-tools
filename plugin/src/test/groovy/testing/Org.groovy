@@ -33,6 +33,7 @@ class Org {
         date nullable: true
         secondName nullable: true
         nameFromRepo nullable: true
+        //location nullable: false
         event nullable: true, blank: false
     }
 

@@ -10,7 +10,7 @@ import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.web.servlet.i18n.SessionLocaleResolver
 
-//@SuppressWarnings(['JUnitPublicNonTestMethod'])
+@SuppressWarnings(['JUnitPublicNonTestMethod'])
 @CompileDynamic
 trait JsonifyUnitTest implements GrailsUnitTest {
 

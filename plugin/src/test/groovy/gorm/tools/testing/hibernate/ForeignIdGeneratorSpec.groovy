@@ -1,7 +1,6 @@
-package testing.specs
+package gorm.tools.testing.hibernate
 
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -40,12 +39,12 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         def e = thrown(EntityValidationException)
         e.entity == master
         e.cause.class == grails.validation.ValidationException
-        e.errors.objectName == "testing.specs.FidMaster"
+        e.errors.objectName == "gorm.tools.testing.hibernate.FidMaster"
         e.errors.allErrors.size() == 1
         def fe = e.errors.getFieldError("child.name")
         fe.code == 'nullable'
         fe.rejectedValue == null
-        fe.arguments as List == ['name', testing.specs.FidChild]
+        fe.arguments as List == ['name', FidChild]
     }
 
 }

@@ -4,6 +4,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+//import static grails.buildtestdata.TestData.build
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.dao.OptimisticLockingFailureException
@@ -31,7 +32,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test get"() {
         setup:
-        Org org = new Org(name: "get_test").save()
+        Org org = build(Org)
 
         when:
         Org newOrg = Org.repo.get(org.id, null)
@@ -51,38 +52,46 @@ class GormRepoSpec extends GormToolsHibernateSpec {
     }
 
     def "test get with version"() {
-        setup:
-        Org org = new Org(name: "get_test_version").save()
+        when:
+        Org org = build(Org)//new Org(name: "get_test_version").save()
+
+        then: "version should be 0"
+        org.version == 0
+
+        when:
         org.name = "get_test_version_1"
-        org.save(flush: true)
+        org.persist(flush: true)
+
+        then: "version updated"
+        org.version == 1
+
+        when: "test get() with old version"
+        Org.repo.get(org.id, 0)
+
+        then:
+        thrown(OptimisticLockingFailureException)
 
         when: "test get() with valid version"
-        Org newOrg = Org.repo.get(org.id, 1L)
+        Org newOrg = Org.repo.get(org.id, 1)
 
         then:
         noExceptionThrown()
-        1L == newOrg.version
+        1 == newOrg.version
         org.id == newOrg.id
 
         when: "check get() passing map of params"
-        newOrg = Org.repo.get([id: org.id, version: 1L])
+        newOrg = Org.repo.get([id: org.id, version: 1])
 
         then:
         noExceptionThrown()
-        1L == newOrg.version
+        1 == newOrg.version
         org.id == newOrg.id
 
-        when: "test get() with lower version"
-        Org.repo.get(org.id, 0L)
-
-        then:
-        def e = thrown(OptimisticLockingFailureException)
-        e.message.contains("Another user has updated the Org while you were editing")
     }
 
     def "test get with non-existent id"() {
         setup:
-        Org org = new Org(name: "test").save()
+        Org org = build(Org)
 
         when:
         Org.repo.get(Org.last().id + 1, null)
@@ -91,7 +100,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         thrown EntityNotFoundException
     }
 
-    def "test create"() {
+    def "test create with domain property"() {
         setup:
         Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
         Map params = [name: 'foo', location: location]
@@ -118,18 +127,15 @@ class GormRepoSpec extends GormToolsHibernateSpec {
     }
 
     def "test persist"() {
-        setup:
-        Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
-
         when:
-        Org org = new Org(name: 'foo', location: location)
+        Org org = build(Org, includes:['location'], save: false)
         Org.repo.persist(org)
         org = Org.get(org.id)
 
         then:
-        org.name == "foo"
-        org.location.city == location.city
-        org.location.nested == location.nested
+        org.name == "name"
+        org.location.city
+        org.location.nested
     }
 
     def "test persist with validation"() {
@@ -142,35 +148,26 @@ class GormRepoSpec extends GormToolsHibernateSpec {
     }
 
     def "test update"() {
-        setup:
-        Location location = new Location(id:1, city: "City", nested: new Nested(name: "Nested", value: 1)).save()
-        Org org = new Org(name: "test")
-        org.persist()
+        when:
+        Org org = build(Org)
         org.name = "test2"
 
-        expect:
+        then:
         org.isDirty()
         org.id != null
-        org.location == null
 
         when:
-        Map p = [name: 'foo', id: org.id, location: location]
-        org = Org.repo.update(p)
-        Org.repo.flush()
+        Map p = [id: org.id, name: 'foo']
+        org = Org.repo.update(p, flush: true)
 
         then:
         org.name == "foo"
         Org.findByName("foo") != null
-        org.location == location
     }
 
     def "test update with non-existent id"() {
-        setup:
-        Org org = new Org(name: "test").save()
-        Map params = [name: 'foo', id: Org.last().id + 1]
-
         when:
-        Org.repo.update(params)
+        Org.repo.update([name: 'foo', id: 99999999])
 
         then:
         thrown EntityNotFoundException
@@ -178,7 +175,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test remove"() {
         setup:
-        Org org = new Org(name: "test_update_withTrx").save()
+        Org org = build(Org)
 
         when:
         Org.repo.remove(org)
@@ -189,7 +186,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test remove by Id"() {
         setup:
-        Org org = new Org(name: "test2").save()
+        Org org = build(Org)
 
         when:
         Org.repo.removeById([:], org.id)
@@ -199,26 +196,17 @@ class GormRepoSpec extends GormToolsHibernateSpec {
     }
 
     def "test remove by Id with non-existent id"() {
-        setup:
-        new Org(name: '1').save()
-
         when:
-        Org.repo.removeById([:], Org.last().id + 1)
+        Org.repo.removeById(99999999)
 
         then:
         thrown EntityNotFoundException
     }
 
     def "test bind"() {
-        setup:
-        Map data = [name: "bind_test"]
-        Org org = new Org(name: "test").save()
-
-        expect:
-        org.name == "test"
-
         when:
-        Org.repo.bind(org, data, BindAction.Update)
+        Org org = build(Org)
+        Org.repo.bind(org, [name: "bind_test"], BindAction.Update)
 
         then:
         org.name == "bind_test"
@@ -226,7 +214,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test flush"() {
         setup:
-        Org org = new Org(name: 'test_flush').save()
+        Org org = build(Org, name: 'test_flush')
 
         expect:
         org.isAttached()
@@ -242,6 +230,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         when:
         Org.repo.flush()
         assert org.isAttached()
+
         then:
         Org.findByName('test_flush_updated') != null
         Org.findByName('test_flush') == null
@@ -249,7 +238,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test clear"() {
         setup:
-        Org org = new Org(name: 'test_clear').save()
+        Org org = build(Org)
 
         expect:
         org.isAttached()
@@ -263,7 +252,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test clear when update"() {
         setup:
-        Org org = new Org(name: 'test_clear').save()
+        Org org = build(Org, name: 'test_clear')
 
         when:
         org.name = "test_clear_updated"
@@ -284,7 +273,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test transaction rollback using withTrx"() {
         setup:
-        Org org = new Org(name: "test").save()
+        Org org = build(Org, name: 'test')
 
         when:
         Org.repo.withTrx {

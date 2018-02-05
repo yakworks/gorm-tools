@@ -13,9 +13,6 @@ class ExceptionSpec extends Specification {
             def e = thrown(EntityNotFoundException)
             e.message == "Bla not found with id 1"
 
-
     }
-
-
 
 }

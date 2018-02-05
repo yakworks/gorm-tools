@@ -3,6 +3,7 @@ package gorm.tools
 import grails.gorm.annotation.Entity
 import grails.test.hibernate.HibernateSpec
 import grails.testing.gorm.DomainUnitTest
+import testing.Org
 
 class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
 
@@ -14,7 +15,7 @@ class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
 
     def "GetPersistentEntity name string"() {
         expect:
-        GormMetaUtils.getPersistentEntity("gorm.tools.Org")
+        GormMetaUtils.getPersistentEntity("testing.Org")
     }
 
     def "GetPersistentEntity instance"() {
@@ -31,19 +32,10 @@ class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
         expect:
         GormMetaUtils.findPersistentEntity("Org")
         GormMetaUtils.findPersistentEntity("org")
-        GormMetaUtils.findPersistentEntity("gorm.tools.Org")
+        GormMetaUtils.findPersistentEntity("testing.Org")
 
     }
 
-}
-
-@Entity
-class Org {
-    String name
-
-    static constraints = {
-        name blank: false, inList: ['Joe']
-    }
 }
 
 

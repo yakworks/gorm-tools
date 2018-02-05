@@ -4,6 +4,8 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.testing.GormToolsTestHelper
+import gorm.tools.testing.JsonifyUnitTest
+import grails.buildtestdata.TestDataBuilder
 import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
 import groovy.transform.CompileDynamic
@@ -15,7 +17,7 @@ import org.springframework.core.type.filter.AssignableTypeFilter
 
 @SuppressWarnings(['AbstractClassWithoutAbstractMethod'])
 @CompileDynamic
-abstract class GormToolsHibernateSpec extends HibernateSpec implements GormToolsTestHelper {
+abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonifyUnitTest, TestDataBuilder, GormToolsTestHelper {
 
     void setupSpec() {
         if (!ctx.containsBean("dataSource"))
@@ -68,6 +70,12 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements GormTools
             repoClasses << Class.forName(bd.beanClassName, false, grailsApplication.classLoader)
         }
         return repoClasses
+    }
+
+    @CompileDynamic
+    def <T> T buildCreate(Map args = [:], Class<T> clazz, Map renderArgs = [:]) {
+        Map p = buildJson(args, clazz, renderArgs).json as Map
+        clazz.create(p)
     }
 
 }

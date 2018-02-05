@@ -12,18 +12,13 @@ import javax.annotation.PostConstruct
 /**
  * adds transaction methods to any class. relies on Gorms transactionService.
  */
+@SuppressWarnings(["NoDef"])
 @CompileStatic
 trait WithTrx {
 
     @Autowired
     TrxService trxService
 
-    @PostConstruct
-    @SuppressWarnings(["EmptyMethod"])
-    void init() {
-        //fixes "Field gorm_tools_WithTrx__transactionService in gorm.tools.async.GparsBatchSupport required a bean of type 'grails.gorm.transactions.TransactionService' that could not be found.
-        //transactionService = AppCtx.get("transactionService",TransactionService)
-    }
     /**
      * Executes the given callable within the context of a transaction with the given definition
      *

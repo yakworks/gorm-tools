@@ -68,4 +68,8 @@ trait BuildEntityTester<D> extends GormToolsDataTester {
         buildJson(testDataArgs, getEntityClass(), renderArgs)
     }
 
+    D buildCreate(Map args = [:], Map renderArgs = [:]) {
+        buildCreate(args, getEntityClass(), renderArgs)
+    }
+
 }

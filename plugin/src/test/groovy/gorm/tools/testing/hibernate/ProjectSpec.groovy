@@ -1,4 +1,4 @@
-package testing.specs
+package gorm.tools.testing.hibernate
 
 import gorm.tools.testing.hibernate.AutoHibernateSpec
 import testing.Project

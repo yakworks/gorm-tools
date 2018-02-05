@@ -1,22 +1,23 @@
 package gorm.tools.testing
 
-import gorm.tools.json.Jsonify
 import grails.buildtestdata.BuildDataTest
-import grails.buildtestdata.TestData
+import grails.testing.spring.AutowiredTest
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'NoDef', 'FieldName', 'UnnecessarySelfAssignment'])
 @CompileStatic
-trait GormToolsDataTester implements JsonifyUnitTest, GormToolsTestHelper, BuildDataTest {
+trait GormToolsDataTester implements JsonifyUnitTest, GormToolsTestHelper, BuildDataTest, AutowiredTest{
 
     void mockDomains(Class<?>... domainClassesToMock) {
         BuildDataTest.super.mockDomains(domainClassesToMock)
         mockRepositories(domainClassesToMock)
     }
 
-    Jsonify.JsonifyResult buildJson(Map args = [:], Class clazz, Map renderArgs = [:]) {
-        Object obj = TestData.build(args, clazz)
-        return Jsonify.render(obj, renderArgs)
+    @CompileDynamic
+    def <T> T buildCreate(Map args = [:], Class<T> clazz, Map renderArgs = [:]) {
+        Map p = buildJson(args, clazz, renderArgs).json as Map
+        clazz.create(p)
     }
 
 }

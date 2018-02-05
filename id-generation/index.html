@@ -576,12 +576,12 @@
 <div class="codehilite"><pre><span></span><span class="n">grails</span> <span class="o">{</span>
 
     <span class="n">gorm</span><span class="o">.</span><span class="na">default</span><span class="o">.</span><span class="na">mapping</span> <span class="o">=</span> <span class="o">{</span>
-        <span class="n">id</span> <span class="nl">column:</span> <span class="s1">&#39;id&#39;</span><span class="o">,</span> <span class="nl">generator:</span><span class="s1">&#39;gorm.tools.hibernate.PooledTableIdGenerator&#39;</span>
+        <span class="n">id</span> <span class="nl">column:</span> <span class="s1">&#39;id&#39;</span><span class="o">,</span> <span class="nl">generator:</span><span class="s1">&#39;gorm.tools.hibernate.SpringBeanIdGenerator&#39;</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </pre></div>
 
-<p>This will use the PooledTableIdGenerator for all domains in the application. However it can be done per domain too if required.</p>
+<p>This will use the SpringBeanIdGenerator for all domains in the application. However it can be done per domain too if required.</p>
 <h3 id="using-idgenerator-programmatically">Using IdGenerator programmatically<a class="headerlink" href="#using-idgenerator-programmatically" title="Permanent link">&para;</a></h3>
 <p>Plugin defines a bean with name idGenerator that can be used to programmatically generate new Ids.
 Here is an example domain class.</p>

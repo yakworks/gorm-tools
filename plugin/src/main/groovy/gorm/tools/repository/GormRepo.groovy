@@ -29,7 +29,7 @@ import org.springframework.dao.DataAccessException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrait, WithTrx, RepositoryApi<D> {
+trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrait, WithTrx, RepositoryApi<D>, EntityFieldsHandler<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder

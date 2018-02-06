@@ -1,6 +1,8 @@
 package gorm.tools.json
 
-import gorm.tools.testing.BuildEntityTester
+import gorm.tools.testing.TestDataJson
+import gorm.tools.testing.unit.DomainRepoTest
+import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import spock.lang.Specification
@@ -8,7 +10,7 @@ import spock.lang.Specification
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class JsonifySpec extends Specification implements BuildEntityTester<TestJsonifyDom> {
+class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom> {
 
     void setupSpec(){
         //need to mock the JsonifyDomExt too as it won't automatically get picked up as its not required.
@@ -32,7 +34,7 @@ class JsonifySpec extends Specification implements BuildEntityTester<TestJsonify
 
     void "test render json view"() {
         when:
-        def jsonResult = buildJson()
+        def jsonResult = TestDataJson.buildJson(TestJsonifyDom)
 
         then:
         jsonResult.json instanceof Map
@@ -65,8 +67,9 @@ class JsonifySpec extends Specification implements BuildEntityTester<TestJsonify
 
     void "test buildJson deep with *"() {
         when:
-        def renderArgs = [deep:true, excludes:['ext.testJsonifyDom']]
-        def result = buildJson(renderArgs, includes: '*' )
+        //def renderArgs = []
+        Object obj = TestData.build(entityClass, includes: '*')
+        def result =  Jsonify.render(obj, [deep:true, excludes:['ext.testJsonifyDom']])
 
         then:
         result.json

@@ -5,15 +5,14 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.repository.events.*
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.events.RepositoryEventType
-import gorm.tools.testing.GormToolsDataTester
-import gorm.tools.testing.GormToolsTest
-import grails.artefact.Artefact
+import gorm.tools.testing.TestDataJson
+import static gorm.tools.testing.TestDataJson.buildCreate
+import gorm.tools.testing.unit.DataRepoTest
 import grails.events.annotation.Subscriber
 import grails.persistence.Entity
-import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
-class RepositoryEventPublisherSpec extends Specification implements GormToolsDataTester {
+class RepositoryEventPublisherSpec extends Specification implements DataRepoTest {
 
     RepoEventPublisher repoEventPublisher
 
@@ -23,7 +22,7 @@ class RepositoryEventPublisherSpec extends Specification implements GormToolsDat
 
     void testEventsFired() {
         when:
-        City city = buildCreate(City)//City.create(params)
+        City city = TestDataJson.buildCreate(City)//City.create(params)
 
         then:
         city != null

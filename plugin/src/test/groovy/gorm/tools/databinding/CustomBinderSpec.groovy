@@ -1,10 +1,8 @@
 package gorm.tools.databinding
 
 import gorm.tools.repository.*
-import gorm.tools.testing.GormToolsTest
+import gorm.tools.testing.unit.GormToolsTest
 import grails.artefact.Artefact
-import grails.databinding.DataBinder
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import spock.lang.Ignore

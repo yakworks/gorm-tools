@@ -25,7 +25,7 @@ class Jsonify {
 
     static JsonViewTemplate getViewTemplate() {
         if (!cachedEmptyTemplate) {
-            //create an empty and emptyTemplate and cache. we only use it to get ro the
+            //create an empty and emptyTemplate and cache. we only use it to get to the DefaultGrailsJsonViewHelper
             cachedEmptyTemplate = (JsonViewTemplate)AppCtx.get("jsonTemplateEngine", JsonViewTemplateEngine).createTemplate('')
         }
         return cachedEmptyTemplate

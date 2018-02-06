@@ -3,8 +3,8 @@ package gorm.tools.testing.hibernate
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.testing.GormToolsTestHelper
-import gorm.tools.testing.JsonifyUnitTest
+import gorm.tools.testing.unit.GormToolsSpecHelper
+import gorm.tools.testing.unit.JsonViewSpecSetup
 import grails.buildtestdata.TestDataBuilder
 import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
@@ -16,13 +16,13 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter
 
 /**
- * Can be a crop in replacemnt for the HibernateSpec. Makes sure repositories are setup for the domains
- * Also incorporates the TestDataBuilder from build-test-data plugin methods and adds in JsonifyUnitTest
- * to build json and map test data
+ * Can be a drop in replacemnt for the HibernateSpec. Makes sure repositories are setup for the domains
+ * and incorporates the TestDataBuilder from build-test-data plugin methods and adds in JsonViewSpecSetup
+ * so that it possible to build json and map test data
  */
 @SuppressWarnings(['AbstractClassWithoutAbstractMethod'])
 @CompileDynamic
-abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonifyUnitTest, TestDataBuilder, GormToolsTestHelper {
+abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
 
     void setupSpec() {
         if (!ctx.containsBean("dataSource"))
@@ -75,12 +75,6 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonifyUn
             repoClasses << Class.forName(bd.beanClassName, false, grailsApplication.classLoader)
         }
         return repoClasses
-    }
-
-    @CompileDynamic
-    def <T> T buildCreate(Map args = [:], Class<T> clazz, Map renderArgs = [:]) {
-        Map p = buildJson(args, clazz, renderArgs).json as Map
-        clazz.create(p)
     }
 
 }

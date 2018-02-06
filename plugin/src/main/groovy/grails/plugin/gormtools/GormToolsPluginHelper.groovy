@@ -35,7 +35,7 @@ class GormToolsPluginHelper {
         }
 
         idGenerator(PooledIdGenerator, jdbcIdGenerator)
-        
+
         mango(MangoQuery)
 
         entityMapBinder(EntityMapBinder, ref('grailsApplication'))

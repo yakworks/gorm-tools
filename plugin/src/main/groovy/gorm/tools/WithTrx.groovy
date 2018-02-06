@@ -7,12 +7,9 @@ import groovy.transform.stc.SimpleType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
-import javax.annotation.PostConstruct
-
 /**
  * adds transaction methods to any class. relies on Gorms transactionService.
  */
-@SuppressWarnings(["NoDef"])
 @CompileStatic
 trait WithTrx {
 

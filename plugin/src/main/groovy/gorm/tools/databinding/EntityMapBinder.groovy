@@ -143,7 +143,6 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 }
             }
         }
-
     }
 
     void setProp(target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {

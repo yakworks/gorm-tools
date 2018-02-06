@@ -4,7 +4,10 @@ import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import groovy.transform.CompileStatic
 
-@SuppressWarnings(['JUnitPublicNonTestMethod'])
+/**
+ * Base test class to use as a drop in replacement of DataTest,
+ * will set up the repositories properly for the mocked domains.
+ */
 @CompileStatic
 trait GormToolsTest implements GormToolsTestHelper, DataTest, AutowiredTest {
 

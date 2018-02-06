@@ -5,7 +5,12 @@ import grails.testing.spring.AutowiredTest
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-@SuppressWarnings(['JUnitPublicNonTestMethod', 'NoDef', 'FieldName', 'UnnecessarySelfAssignment'])
+/**
+ * Base test class to use as a drop in replacement of DataTest and GormToolsTest,
+ * will set up the repositories properly for the mocked domains and adds all the methods from
+ * build-test-data plugin's BuildDataTest.
+ */
+//@SuppressWarnings(['JUnitPublicNonTestMethod', 'NoDef', 'FieldName', 'UnnecessarySelfAssignment'])
 @CompileStatic
 trait GormToolsDataTester implements JsonifyUnitTest, GormToolsTestHelper, BuildDataTest, AutowiredTest{
 
@@ -16,7 +21,7 @@ trait GormToolsDataTester implements JsonifyUnitTest, GormToolsTestHelper, Build
 
     @CompileDynamic
     def <T> T buildCreate(Map args = [:], Class<T> clazz, Map renderArgs = [:]) {
-        Map p = buildJson(args, clazz, renderArgs).json as Map
+        Map p = buildMap(args, clazz, renderArgs)
         clazz.create(p)
     }
 

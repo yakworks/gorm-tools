@@ -86,7 +86,7 @@ ruleset {
     IfStatementCouldBeTernary
     InvertedIfElse
     LongLiteralWithLowerCaseL
-    'NoDef' doNotApplyToFilesMatching: '.*Spec.groovy|.*Controller.groovy|.*GrailsPlugin.groovy'
+    //'NoDef' doNotApplyToFilesMatching: '.*Spec.groovy|.*Controller.groovy|.*GrailsPlugin.groovy'
     //ParameterReassignment
     TernaryCouldBeElvis
     VectorIsObsolete
@@ -245,7 +245,7 @@ ruleset {
     JUnitFailWithoutMessage
     JUnitLostTest
     JUnitPublicField
-    JUnitPublicNonTestMethod
+    //JUnitPublicNonTestMethod
     //JUnitPublicProperty
     JUnitSetUpCallsSuper
     JUnitStyleAssertions

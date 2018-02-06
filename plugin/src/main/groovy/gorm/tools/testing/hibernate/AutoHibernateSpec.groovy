@@ -1,5 +1,6 @@
 package gorm.tools.testing.hibernate
 
+import gorm.tools.json.Jsonify
 import groovy.transform.CompileDynamic
 import org.springframework.core.GenericTypeResolver
 
@@ -16,6 +17,14 @@ abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {
 
     @Override
     List<Class> getDomainClasses() { [getEntityClass()] }
+
+    Map buildMap(Map args = [:], Map renderArgs = [:]) {
+        buildJson(args, getEntityClass(), renderArgs).getJson() as Map
+    }
+
+    Jsonify.JsonifyResult buildJson(Map testDataArgs = [:], Map renderArgs = [:]) {
+        buildJson(testDataArgs, getEntityClass(), renderArgs)
+    }
 
     void testCreateRequired() {
         when:

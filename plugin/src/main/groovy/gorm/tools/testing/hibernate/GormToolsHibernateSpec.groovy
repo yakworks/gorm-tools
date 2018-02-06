@@ -15,6 +15,11 @@ import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AssignableTypeFilter
 
+/**
+ * Can be a crop in replacemnt for the HibernateSpec. Makes sure repositories are setup for the domains
+ * Also incorporates the TestDataBuilder from build-test-data plugin methods and adds in JsonifyUnitTest
+ * to build json and map test data
+ */
 @SuppressWarnings(['AbstractClassWithoutAbstractMethod'])
 @CompileDynamic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonifyUnitTest, TestDataBuilder, GormToolsTestHelper {

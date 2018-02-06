@@ -19,16 +19,16 @@ import org.springframework.util.ClassUtils
  * Helper utils for mocking spring beans needed to test repository's and domains.
  */
 @CompileDynamic
-@SuppressWarnings(["ClosureAsLastMethodParameter"])
+//@SuppressWarnings(["ClosureAsLastMethodParameter"])
 trait GormToolsTestHelper extends GrailsUnitTest {
 
     @BeforeClass
     void setupTransactionService() {
         //if (!ctx.containsBean("transactionService"))
         //    ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
-        defineBeans({
+        defineBeans {
             trxService(TrxService)
-        })
+        }
     }
 
     /**

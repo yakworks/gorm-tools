@@ -10,7 +10,10 @@ import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.web.servlet.i18n.SessionLocaleResolver
 
-@SuppressWarnings(['JUnitPublicNonTestMethod'])
+/**
+ * Uses build-test-data plugin and Jsonify wrapper to json-view to build. Does the setup to make sure beans
+ * for json-views are s
+ */
 @CompileDynamic
 trait JsonifyUnitTest implements GrailsUnitTest {
 
@@ -28,12 +31,21 @@ trait JsonifyUnitTest implements GrailsUnitTest {
         defineBeans(new JsonViewGrailsPlugin())
     }
 
-    Jsonify.JsonifyResult buildJson(Map args = [:], Class clazz, Map renderArgs = [:]) {
-        Object obj = TestData.build(args, clazz)
+    /**
+     * Uses the build-test-data plugin to first build the entity with data and then
+     * @param args
+     * @param entityClass
+     * @param renderArgs passed to {@link Jsonify} and json-views.
+     * @return use return.json to get the map
+     */
+    Jsonify.JsonifyResult buildJson(Map args = [:], Class entityClass, Map renderArgs = [:]) {
+        Object obj = TestData.build(args, entityClass)
         return Jsonify.render(obj, renderArgs)
     }
 
-    Jsonify.JsonifyResult buildJson(Map testDataArgs = [:], Map renderArgs = [:]) {
-        buildJson(testDataArgs, getEntityClass(), renderArgs)
+    /** see {@link TestData#build} for args and {@link Jsonify.} for renderArgs */
+    Map buildMap(Map args = [:], Class entityClass, Map renderArgs = [:]) {
+        buildJson(args, entityClass, renderArgs).json as Map
     }
+
 }

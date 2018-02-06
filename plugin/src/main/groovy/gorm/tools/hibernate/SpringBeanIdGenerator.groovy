@@ -22,11 +22,12 @@ import org.hibernate.type.Type
  * }
  * </pre>
  *
- * can also be overriden in the domain mapping liek so
+ * can also be sdt in the domain mapping. Example with custom bean name and key name.
  * <pre>
  * {@code
- *   gorm.default.mapping = {
- *     id generator:'gorm.tools.hibernate.SpringBeanIdGenerator'
+ *   static mapping = {
+ *     id generator:'gorm.tools.hibernate.SpringBeanIdGenerator',
+ *        params:[beanName:'specialIdGen', keyName:'Org.uuid']
  *   }
  * }
  * </pre>

@@ -19,7 +19,7 @@ import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
 
-@SuppressWarnings(['NoDef', 'UnnecessarySelfAssignment'])
+@SuppressWarnings(['UnnecessarySelfAssignment'])
 @CompileDynamic
 class GormToolsPluginHelper {
     static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
@@ -35,12 +35,7 @@ class GormToolsPluginHelper {
         }
 
         idGenerator(PooledIdGenerator, jdbcIdGenerator)
-
-        //here to set the static in the holder for use in PooledIdGenerator
-        //idGeneratorHolder(IdGeneratorHolder) {
-        //    idGenerator = ref("idGenerator")
-        //}
-
+        
         mango(MangoQuery)
 
         entityMapBinder(EntityMapBinder, ref('grailsApplication'))

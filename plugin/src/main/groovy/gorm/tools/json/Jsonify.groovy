@@ -36,6 +36,7 @@ class Jsonify {
         (DefaultGrailsJsonViewHelper) jv.getG()
     }
 
+    /** see {@link grails.plugin.json.view.api.internal.DefaultGrailsJsonViewHelper#render} */
     static JsonWritable renderWritable(Object object, Map arguments = Collections.emptyMap(),
                                    @DelegatesTo(StreamingJsonBuilder.StreamingJsonDelegate) Closure customizer = null) {
 
@@ -45,8 +46,11 @@ class Jsonify {
 
     /**
      * Useful for testing. Returns the result with the json object (map or collection) and the jsonText
+     * see {@link grails.plugin.json.view.api.internal.DefaultGrailsJsonViewHelper#render} for arguments
+     *
      * @param object
-     * @param arguments
+     * @param arguments [includes, excludes, deep, associations, expand]
+     *   see {@link grails.plugin.json.view.api.internal.DefaultGrailsJsonViewHelper#render} and json-views for more details
      * @param customizer
      * @return
      */

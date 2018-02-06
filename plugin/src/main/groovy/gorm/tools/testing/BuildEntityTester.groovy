@@ -12,7 +12,6 @@ import org.springframework.core.GenericTypeResolver
  * implement BuildDomainTest<Book> and it will take care of mocking the Author for you.
  */
 @CompileStatic
-@SuppressWarnings(['JUnitPublicNonTestMethod'])
 trait BuildEntityTester<D> extends GormToolsDataTester {
 
     private D entity
@@ -70,6 +69,10 @@ trait BuildEntityTester<D> extends GormToolsDataTester {
 
     D buildCreate(Map args = [:], Map renderArgs = [:]) {
         buildCreate(args, getEntityClass(), renderArgs)
+    }
+
+    Map buildMap(Map testDataArgs = [:], Map renderArgs = [:]) {
+        buildMap(testDataArgs, getEntityClass(), renderArgs)
     }
 
 }

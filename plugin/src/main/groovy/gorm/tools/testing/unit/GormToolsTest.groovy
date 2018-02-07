@@ -1,15 +1,16 @@
-package gorm.tools.testing
+package gorm.tools.testing.unit
 
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 import groovy.transform.CompileStatic
 
 /**
- * Base test class to use as a drop in replacement of DataTest,
+ * Specification trait to use as a drop in replacement for DataTest,
  * will set up the repositories properly for the mocked domains.
+ *
  */
 @CompileStatic
-trait GormToolsTest implements GormToolsTestHelper, DataTest, AutowiredTest {
+trait GormToolsTest implements GormToolsSpecHelper, DataTest, AutowiredTest {
 
     /**
      * Mocks domain classes providing the equivalent GORM behavior as well as the Repo for the domain.

@@ -1,6 +1,6 @@
 package gorm.tools.beans
 
-import gorm.tools.testing.GormToolsTest
+import gorm.tools.testing.unit.GormToolsTest
 import grails.persistence.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
@@ -253,11 +253,12 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
 @Entity
 class TestClazzA {
     Long id
+    String foo
+    BigDecimal bar
+
     TestClazzA(){
         id = 1
     }
-    String foo
-    BigDecimal bar
 
     //See https://sysgears.com/articles/advanced-gorm-features-inheritance-embedded-data-maps-and-lists-storing/
     List<String> bazList

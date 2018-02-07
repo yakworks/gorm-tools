@@ -1,7 +1,6 @@
 package gorm.tools.async
 
-import gorm.tools.repository.RepoUtil
-import gorm.tools.testing.GormToolsTest
+import gorm.tools.testing.unit.GormToolsTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import spock.lang.Specification

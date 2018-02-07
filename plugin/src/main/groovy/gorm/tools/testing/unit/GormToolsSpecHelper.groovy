@@ -1,4 +1,4 @@
-package gorm.tools.testing
+package gorm.tools.testing.unit
 
 import gorm.tools.TrxService
 import gorm.tools.databinding.EntityMapBinder
@@ -20,12 +20,10 @@ import org.springframework.util.ClassUtils
  */
 @CompileDynamic
 //@SuppressWarnings(["ClosureAsLastMethodParameter"])
-trait GormToolsTestHelper extends GrailsUnitTest {
+trait GormToolsSpecHelper extends GrailsUnitTest {
 
     @BeforeClass
     void setupTransactionService() {
-        //if (!ctx.containsBean("transactionService"))
-        //    ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
         defineBeans {
             trxService(TrxService)
         }
@@ -43,10 +41,6 @@ trait GormToolsTestHelper extends GrailsUnitTest {
             Class repoClass = findRepoClass(domainClass)
             repoBeans = repoBeans << registerRepository(domainClass, repoClass)
         }
-        //check again for transactionService, for some reason it doesn't get picked up in @OnceBefore
-        //if (!ctx.containsBean("transactionService"))
-        //    ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
-
         defineBeans(repoBeans << commonBeans())
     }
 

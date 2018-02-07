@@ -1,10 +1,7 @@
 package gorm.tools
 
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.testing.GormToolsTest
+import gorm.tools.testing.unit.GormToolsTest
 import grails.persistence.Entity
-import grails.testing.gorm.DataTest
-import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 
 class PagerSpec extends Specification implements GormToolsTest {

@@ -1,8 +1,11 @@
 package gorm.tools.testing.hibernate
 
-import gorm.tools.json.Jsonify
+import gorm.tools.testing.TestDataJson
+import grails.buildtestdata.TestData
 import groovy.transform.CompileDynamic
 import org.springframework.core.GenericTypeResolver
+//import static gorm.tools.testing.TestDataJson.buildCreate
+//import static gorm.tools.testing.TestDataJson.buildMap
 
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert', 'AbstractClassWithoutAbstractMethod'])
 @CompileDynamic
@@ -18,25 +21,25 @@ abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {
     @Override
     List<Class> getDomainClasses() { [getEntityClass()] }
 
-    Map buildMap(Map args = [:], Map renderArgs = [:]) {
-        buildJson(args, getEntityClass(), renderArgs).getJson() as Map
+    Map buildMap(Map args = [:]) {
+        TestDataJson.buildMap(args, getEntityClass())
     }
 
-    Jsonify.JsonifyResult buildJson(Map testDataArgs = [:], Map renderArgs = [:]) {
-        buildJson(testDataArgs, getEntityClass(), renderArgs)
+    D buildCreate(Map args = [:]) {
+        TestDataJson.buildCreate(args, getEntityClass())
     }
 
-    void testCreateRequired() {
+    void testCreate() {
         when:
-        D entity = entityClass.create(buildJson().json)
+        D entity = entityClass.create(buildMap())
         then:
         entity.id != null
     }
 
-    void testUpdateRequired() {
+    void testUpdate() {
         setup:
-        D entity = entityClass.create(buildJson().json)
-        Map values = buildJson().json
+        D entity = entityClass.create(buildMap())
+        Map values = buildMap()
         values.id = entity.id
         when:
         entityClass.update(values)
@@ -46,18 +49,18 @@ abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {
 
     void testPersist() {
         when:
-        D entity = entityClass.newInstance(buildJson().json)
+        D entity = TestData.build(entityClass, save:false)
         entity.persist()
         then:
         entity.id != null
     }
 
-    void testDelete() {
+    void testRemove() {
         setup:
-        D entity = entityClass.create(buildJson().json)
+        D entity = TestData.build(entityClass)
         assert entityClass.get(entity.id) != null
         when:
-        entity.delete()
+        entity.remove()
         then:
         entityClass.get(entity.id) == null
     }

@@ -201,6 +201,24 @@ class BeanPathTools {
         Map p = new MapFlattener().flatten(jsonMap ?: (Map) request.JSON)
         return getGrailsParameterMap(p, request)
     }
+    @CompileDynamic
+    static List<String> getIncludes(String className, List<String> fields){
+        List<PersistentProperty> properties = GormMetaUtils.getPersistentProperties(className)
+        List<String> result = []
+        fields.each{ String field ->
+                if (field == "*"){
+                    result.addAll(properties*.name)
+                } else if(field.endsWith(".*")){
+                    String[] path = field.split("[.]")
+                    String nestedClass = properties.find{it.name == path[0]}?.getAssociatedEntity()?.getName()
+                    if (nestedClass)
+                        result = result + getIncludes(nestedClass, [path[1..-1].join(".")])
+                } else {
+                    result << field // TODO: should we check that field really exists?
+                }
+        }
+        result
+    }
 
     @CompileDynamic
     static GrailsParameterMap getGrailsParameterMap(Map p, HttpServletRequest request) {

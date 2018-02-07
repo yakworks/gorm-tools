@@ -25,44 +25,70 @@ abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {
         TestDataJson.buildMap(args, getEntityClass())
     }
 
+    Map buildCreateMap(Map args = [:]) {
+        buildMap(args)
+    }
+
+    Map buildUpdateMap(Map args = [:]) {
+        buildMap(args)
+    }
+
     D buildCreate(Map args = [:]) {
-        TestDataJson.buildCreate(args, getEntityClass())
+        buildMap(args)
     }
 
     void testCreate() {
         when:
-        D entity = entityClass.create(buildMap())
+        D entity = entityClass.create(buildCreateMap())
+        Long id = entity.id
+        flushAndClear()
+
         then:
-        entity.id != null
+        entityClass.get(id).id
+
     }
 
     void testUpdate() {
-        setup:
-        D entity = entityClass.create(buildMap())
-        Map values = buildMap()
-        values.id = entity.id
+        given:
+        D entity = entityClass.create(buildCreateMap())
+        assert entity.version == 0
+        Long id = entity.id
+        flushAndClear()
+
         when:
-        entityClass.update(values)
+        Map updateMap = buildUpdateMap()
+        updateMap.id = id
+        entityClass.update(updateMap)
+        flushAndClear()
+        D upInstance = entityClass.get(id)
+
         then:
-        entityClass.get(values.id) != null
+        upInstance.id
+        upInstance.version == 1
     }
 
     void testPersist() {
         when:
         D entity = TestData.build(entityClass, save:false)
         entity.persist()
+        Long id = entity.id
+        flushAndClear()
+
         then:
-        entity.id != null
+        entityClass.get(id)
     }
 
     void testRemove() {
         setup:
         D entity = TestData.build(entityClass)
-        assert entityClass.get(entity.id) != null
+        Long id = entity.id
+        flushAndClear()
+
         when:
-        entity.remove()
+        entityClass.get(id).remove()
+
         then:
-        entityClass.get(entity.id) == null
+        entityClass.get(id) == null
     }
 
 }

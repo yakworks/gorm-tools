@@ -207,17 +207,19 @@ class BeanPathTools {
         List<String> result = []
         fields.each{ String field ->
                 if (field == "*"){
-                    result.addAll(properties*.name)
+                    result.addAll(properties.findAll{!(it instanceof Association)}*.name)
                 } else if(field.endsWith(".*")){
                     String[] path = field.split("[.]")
                     String nestedClass = properties.find{it.name == path[0]}?.getAssociatedEntity()?.getName()
                     if (nestedClass)
-                        result = result + getIncludes(nestedClass, [path[1..-1].join(".")])
+                        result = result + getIncludes(nestedClass, [path.tail().join(".")]).collect{"${path[0]}.${it}"}
+                        if (path.size() > 1) result = result + [path[0]]
+                        result = result.collect{it.toString()}
                 } else {
                     result << field // TODO: should we check that field really exists?
                 }
         }
-        result
+        result.unique()
     }
 
     @CompileDynamic

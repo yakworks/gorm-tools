@@ -256,8 +256,8 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         where:
         fields          | result
         ['foo']         | ['foo']
-        ['*']           | ['foo', 'baz', 'version', 'bazList', 'bar', 'bazMap', 'id']
-        ['baz.*']       | ['value', 'version','id']
+        ['*']           | ['id', 'foo', 'version', 'bar']
+        ['baz.*']       | ['baz.id', 'baz.value', 'baz.version', 'baz']
     }
 
 }

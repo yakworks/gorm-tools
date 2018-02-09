@@ -7,6 +7,7 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.testing.unit.idgen.MockIdGenerator
 import grails.plugin.gormtools.RepositoryArtefactHandler
 import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.core.AbstractDatastore
@@ -67,6 +68,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             repoExceptionSupport(RepoExceptionSupport)
             mango(MangoQuery)
             trxService(TrxService)
+            idGenerator(MockIdGenerator)
         }
     }
 

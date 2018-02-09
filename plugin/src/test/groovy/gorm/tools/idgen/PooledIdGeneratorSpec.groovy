@@ -1,5 +1,6 @@
 package gorm.tools.idgen
 
+import gorm.tools.testing.unit.idgen.MockIdGenerator
 import grails.test.hibernate.HibernateSpec
 import spock.lang.Shared
 

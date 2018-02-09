@@ -1,5 +1,6 @@
-package gorm.tools.idgen
+package gorm.tools.testing.unit.idgen
 
+import gorm.tools.idgen.IdGenerator
 import grails.gorm.transactions.Transactional
 import org.springframework.transaction.annotation.Propagation
 

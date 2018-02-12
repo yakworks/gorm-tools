@@ -79,3 +79,21 @@ groovydoc {
     link('http://gorm.grails.org/latest/hibernate/api/',  'grails.gorm', 'grails.orm', 'org.grails.datastore', 'org.grails.orm')
 }
 
+integrationTest {
+    testLogging {
+        exceptionFormat = 'full'
+        events "failed"//, "passed", "skipped", "standardOut", "standardError"
+    }
+
+    // Uncomment line bellow to show in console all tests that were executed in next format:
+    //:test-app:integrationTest
+    //-- Test Check list(repoapp.OrgSpec)
+    //-- Test Filter by Name eq(repoapp.OrgSpec)
+
+    beforeTest { descriptor -> logger.quiet " -- $descriptor" }
+}
+
+test {
+    //testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = 'full'
+}

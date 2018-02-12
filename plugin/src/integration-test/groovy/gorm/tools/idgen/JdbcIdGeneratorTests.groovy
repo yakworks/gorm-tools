@@ -16,7 +16,7 @@ import javax.annotation.Resource
 class JdbcIdGeneratorTests extends GroovyTestCase {
     private static final String TABLE_KEY = "Custom1.id"
     @Resource
-    IdGenerator jdbcIdGenerator
+    JdbcIdGenerator jdbcIdGenerator
     JdbcTemplate jdbcTemplate
     static int startVal
     static int nextIdEndVal

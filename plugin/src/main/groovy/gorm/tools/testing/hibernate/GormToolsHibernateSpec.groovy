@@ -1,22 +1,16 @@
 package gorm.tools.testing.hibernate
 
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
 import gorm.tools.testing.unit.GormToolsSpecHelper
 import gorm.tools.testing.unit.JsonViewSpecSetup
 import grails.buildtestdata.TestDataBuilder
 import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
+import grails.testing.spock.OnceBefore
 import groovy.transform.CompileDynamic
-import org.grails.datastore.gorm.utils.ClasspathEntityScanner
 import org.grails.datastore.mapping.core.AbstractDatastore
-import org.springframework.beans.factory.config.BeanDefinition
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AssignableTypeFilter
 
 /**
- * Can be a drop in replacemnt for the HibernateSpec. Makes sure repositories are setup for the domains
+ * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
  * and incorporates the TestDataBuilder from build-test-data plugin methods and adds in JsonViewSpecSetup
  * so that it possible to build json and map test data
  */
@@ -24,57 +18,26 @@ import org.springframework.core.type.filter.AssignableTypeFilter
 @CompileDynamic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
 
-    void setupSpec() {
+    @OnceBefore
+    void setupRepoBeans() {
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
-//        if (!ctx.containsBean("transactionService"))
-//            ctx.beanFactory.registerSingleton("transactionService", datastore.getService(TransactionService))
         if (!ctx.containsBean("grailsDomainClassMappingContext"))
             ctx.beanFactory.registerSingleton("grailsDomainClassMappingContext", hibernateDatastore.getMappingContext())
 
-        List<Class> domainClasses = getDomainClasses()
-        String packageName = getPackageToScan(config)
-        Package packageToScan = Package.getPackage(packageName) ?: getClass().getPackage()
-
         Closure beans = {}
 
-        if (domainClasses) {
-            domainClasses.each { Class domainClass ->
-                beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
-            }
-        } else {
-            Set<Class> repoClasses = scanRepoClasses(packageName)
-            //TODO figureout alternative to find entities if possible.
-            new ClasspathEntityScanner().scan(packageToScan).each { Class domainClass ->
-                Class repoClass = repoClasses.find {
-                    it.simpleName == RepoUtil.getRepoBeanName(domainClass)
-                } ?: DefaultGormRepo
-                beans = beans << registerRepository(domainClass, repoClass)
-            }
+        //finds and register repositories for all the persistentEntities that got setup
+        datastore.mappingContext.persistentEntities*.javaClass.each { domainClass ->
+            beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
         }
-
         beans = beans << GormToolsPluginHelper.doWithSpring //commonBeans()
         defineBeans(beans)
     }
 
-    @CompileDynamic
+    /** consistency with other areas of grails and other unit tests */
     AbstractDatastore getDatastore() {
         hibernateDatastore
-    }
-
-    //scans all repository classes in given package.
-    //may be change to RepoScanner like ClassPathEntityScanner !?
-    @SuppressWarnings(['ClassForName'])
-    protected Set<Class> scanRepoClasses(String packageName) {
-        ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false)
-        provider.addIncludeFilter(new AssignableTypeFilter(GormRepo))
-        Set<BeanDefinition> beans = provider.findCandidateComponents(packageName)
-
-        Set<Class> repoClasses = []
-        for (BeanDefinition bd : beans) {
-            repoClasses << Class.forName(bd.beanClassName, false, grailsApplication.classLoader)
-        }
-        return repoClasses
     }
 
 }

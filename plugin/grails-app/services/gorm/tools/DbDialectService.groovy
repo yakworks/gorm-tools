@@ -31,7 +31,8 @@ class DbDialectService {
         if (!dialectName) dialectName = AppCtx.config.hibernate.dialect
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath
-        if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver", getClass().classLoader)) || dialectName.contains('H2')) result = H2
+        if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver", getClass().classLoader))
+            || dialectName.contains('H2')) result = H2
         else if (dialectName.contains("SQLServerDialect")) result = MSSQL
         else if (dialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
         else if (dialectName.contains("Oracle")) result = ORACLE

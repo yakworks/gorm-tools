@@ -20,4 +20,18 @@ trait DomainRepoTest<D> implements DataRepoTest, BuildDomainTest<D> {
     D buildCreate(Map args = [:]) {
         TestDataJson.buildCreate(args, getEntityClass())
     }
+
+    /**
+     * By default, calling mockDomains() on {@link DomainRepoTest} will not mock a repository for the specified domain.
+     * It will call an inherited {@link grails.buildtestdata.BuildDataTest#mockDomains}.
+     *
+     * That will cause an error to be thrown for the buildCreate method, because it relies on the create() method in repo.
+     *
+     * In order to avoid that, an explicit override, which chains to the {@link DataRepoTest#mockDomains} which
+     * initializes the repository after mocking the domain) is required.
+     */
+    @Override
+    void mockDomains(Class<?>... domainClassesToMock) {
+        DataRepoTest.super.mockDomains(domainClassesToMock)
+    }
 }

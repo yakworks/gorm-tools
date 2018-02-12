@@ -35,8 +35,11 @@ class JdbcIdGenerator implements IdGenerator {
     String idColumn = "NextId"
 
     //@Transactional(propagation = Propagation.REQUIRES_NEW)
-    long getNextId(String keyName) {
-        throw new IllegalAccessException("Use the pooledIdGenerator with this backing it for fetching single IDs")
+    @SuppressWarnings('SynchronizedMethod')
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    synchronized long getNextId(String keyName) {
+        return updateIncrement(keyName, 1)
+        //throw new IllegalAccessException("Use the pooledIdGenerator with this backing it for fetching single IDs")
     }
 
     @SuppressWarnings('SynchronizedMethod')

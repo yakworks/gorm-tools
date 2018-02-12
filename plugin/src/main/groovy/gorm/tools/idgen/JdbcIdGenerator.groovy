@@ -29,14 +29,14 @@ class JdbcIdGenerator implements IdGenerator {
     private static Category log = Category.getInstance(JdbcIdGenerator.class)
     JdbcTemplate jdbcTemplate
 
-    private long seedValue = 1000 //the Id to start with if it does not exist in the table
-    private String table = "NEWOBJECTID"
-    private String keyColumn = "KeyName"
-    private String idColumn = "NextId"
+    long seedValue = 1000 //the Id to start with if it does not exist in the table
+    String table = "NEWOBJECTID"
+    String keyColumn = "KeyName"
+    String idColumn = "NextId"
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    //@Transactional(propagation = Propagation.REQUIRES_NEW)
     long getNextId(String keyName) {
-        return getNextId(keyName, 1)
+        throw new IllegalAccessException("Use the pooledIdGenerator with this backing it for fetching single IDs")
     }
 
     @SuppressWarnings('SynchronizedMethod')
@@ -113,41 +113,4 @@ class JdbcIdGenerator implements IdGenerator {
         //println "creating with $query"
         jdbcTemplate.execute(query)
     }
-
-    String getKeyColumn() {
-        return keyColumn
-    }
-
-    void setKeyColumn(String keyColumn) {
-        this.keyColumn = keyColumn
-    }
-
-    long getSeedValue() {
-        return seedValue
-    }
-
-    void setSeedValue(long seedValue) {
-        this.seedValue = seedValue
-    }
-
-    String getTable() {
-        return table
-    }
-
-    void setTable(String table) {
-        this.table = table
-    }
-
-    void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate
-    }
-
-    String getIdColumn() {
-        return idColumn
-    }
-
-    void setIdColumn(String idColumn) {
-        this.idColumn = idColumn
-    }
-
 }

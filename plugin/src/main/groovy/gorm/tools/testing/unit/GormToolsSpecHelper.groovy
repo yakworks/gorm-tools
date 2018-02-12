@@ -2,18 +2,22 @@ package gorm.tools.testing.unit
 
 import gorm.tools.TrxService
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.MangoQuery
 import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.testing.unit.idgen.MockIdGenerator
 import grails.plugin.gormtools.RepositoryArtefactHandler
 import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.testing.GrailsUnitTest
 import org.junit.BeforeClass
+import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
+import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.util.ClassUtils
 
 /**
@@ -68,15 +72,15 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             repoExceptionSupport(RepoExceptionSupport)
             mango(MangoQuery)
             trxService(TrxService)
-            idGenerator(MockIdGenerator)
+
+            jdbcIdGenerator(MockJdbcIdGenerator)
+            idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
         }
     }
 
     /**
      * Finds repository class in same package as domain class.
-     *
-     * @param domainClass
-     * @return
+     * returns a default DefaultGormRepo if no explicit ones are found
      */
     Class findRepoClass(Class domainClass) {
         String repoClassName = RepoUtil.getRepoClassName(domainClass)
@@ -98,6 +102,23 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         }
 
         return clos
+    }
+
+    /**
+     * No Usages Yet..., scans all repository classes in given package.
+     * may be change to RepoScanner like ClassPathEntityScanner !?
+     */
+    @SuppressWarnings(['ClassForName'])
+    Set<Class> scanRepoClasses(String packageName) {
+        ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false)
+        provider.addIncludeFilter(new AssignableTypeFilter(GormRepo))
+        Set<BeanDefinition> beans = provider.findCandidateComponents(packageName)
+
+        Set<Class> repoClasses = []
+        for (BeanDefinition bd : beans) {
+            repoClasses << Class.forName(bd.beanClassName, false, grailsApplication.classLoader)
+        }
+        return repoClasses
     }
 
     void flushAndClear(){

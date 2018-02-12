@@ -1,18 +1,21 @@
 package gorm.tools.idgen
 
-import gorm.tools.testing.unit.idgen.MockIdGenerator
+import gorm.tools.testing.unit.MockJdbcIdGenerator
 import grails.test.hibernate.HibernateSpec
 import spock.lang.Shared
 
 class PooledIdGeneratorSpec extends HibernateSpec {
 
     @Shared
-    MockIdGenerator mockdbgen
+    MockJdbcIdGenerator mockdbgen
     @Shared
     PooledIdGenerator batchgen
 
     void setupSpec() {
-        mockdbgen = new MockIdGenerator()
+        mockdbgen = new MockJdbcIdGenerator()
+        mockdbgen.table.put("table.id", 1)
+        mockdbgen.table.put("table1.id", 99)
+        
         batchgen = new PooledIdGenerator(mockdbgen)
         mockdbgen.transactionManager = getTransactionManager()
         //batchgen.setBatchSize(5)

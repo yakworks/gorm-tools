@@ -68,7 +68,7 @@ class PooledIdGenerator implements IdGenerator {
      * this implementation does nothing here. throws IllegalAccessException
      */
     long getNextId(String keyName, long batchSize) {
-        throw new IllegalAccessException("Use reserveIds get a specific icnrement size or setBatchSize(keyname,size) to set by key ")
+        throw new IllegalAccessException("Use reserveIds get a specific icrement size or setBatchSize(keyname,size) to set by key ")
     }
 
     /**
@@ -82,7 +82,7 @@ class PooledIdGenerator implements IdGenerator {
 
         //if nextId is 0 then its equal or over the maxId and needs a refresh
         while(nextId == 0) {
-            //synchronize on the key so only 1 thread can get a new set of ids at a time
+            //synchronize on the key so only 1 thread can get a new set of ids at a time for a keyName
             synchronized (keyName.intern()) {
                 /* only do it if the atomic tuple is the original one we got to ensure
                 another thread following right behind doesn't hit the db again */
@@ -106,6 +106,9 @@ class PooledIdGenerator implements IdGenerator {
             // so no bottlenecks should occure.
             // Note: itern forces it to use same string in memory. see http://java-performance.info/string-intern-java-6-7-8-multithreaded-access/
             synchronized (keyName.intern()) {
+                //check again and exit if another thread was here already and created it
+                if (idTupleMap.containsKey(keyName)) return idTupleMap.get(keyName)
+
                 log.debug("Creating a BatchIDGenerator.IdTuple for " + keyName)
 
                 //check to see if the size is overriden for the key, otherwise go with the default size

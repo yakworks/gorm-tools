@@ -47,7 +47,6 @@ class GormToolsPluginHelper {
         asyncBatchSupport(GparsBatchSupport){ bean ->
             bean.autowire = true
             bean.lazyInit = true
-            //transactionService = ref('transactionService')
         }
 
         DbDialectService.dialectName = application.config.hibernate.dialect

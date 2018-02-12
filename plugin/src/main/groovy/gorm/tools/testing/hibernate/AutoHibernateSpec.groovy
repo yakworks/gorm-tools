@@ -4,8 +4,6 @@ import gorm.tools.testing.TestDataJson
 import grails.buildtestdata.TestData
 import groovy.transform.CompileDynamic
 import org.springframework.core.GenericTypeResolver
-//import static gorm.tools.testing.TestDataJson.buildCreate
-//import static gorm.tools.testing.TestDataJson.buildMap
 
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert', 'AbstractClassWithoutAbstractMethod'])
 @CompileDynamic

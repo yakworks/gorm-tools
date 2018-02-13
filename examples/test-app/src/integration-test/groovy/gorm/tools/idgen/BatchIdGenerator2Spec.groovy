@@ -1,12 +1,12 @@
 package gorm.tools.idgen
 
-import grails.plugin.gormtools.Application
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 
-@Integration(applicationClass = Application.class)
-//@Rollback
+@Integration
+@Rollback
 class BatchIdGenerator2Spec extends Specification {
 
     JdbcTemplate jdbcTemplate

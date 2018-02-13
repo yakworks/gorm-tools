@@ -1,25 +1,30 @@
 package gorm.tools.idgen
 
+import grails.buildtestdata.TestData
 import grails.gorm.transactions.Rollback
-import grails.plugin.gormtools.Application
 import grails.testing.mixin.integration.Integration
+import repoapp.Org
 import spock.lang.Specification
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
+import testing.Jumper
 
+//import grails.persistence.Entity
+@Integration
 @Rollback
-@Integration(applicationClass = Application.class)
 class JdbcIdGeneratorSpec extends Specification {
-    private static final String TABLE_KEY = "Custom1.id"
+    private static final String TABLE_KEY = "Jumper.id"
 
-    @Autowired
     JdbcIdGenerator jdbcIdGenerator
-    JdbcTemplate jdbcTemplate
+    //JdbcTemplate jdbcTemplate
+
+    void "test WTF"() {
+        when:
+        def jumper = TestData.build(Jumper)
+
+        then:
+        jumper.id == 1
+    }
 
     void "test getNextId"() {
-        setup:
-        IdGeneratorTestHelper.createTables(jdbcTemplate)
-
         when:
         int startVal = jdbcIdGenerator.getNextId(TABLE_KEY, 100)
 
@@ -46,3 +51,5 @@ class JdbcIdGeneratorSpec extends Specification {
     }
 
 }
+
+

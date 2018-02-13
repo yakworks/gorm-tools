@@ -11,8 +11,8 @@ import java.sql.ResultSet
 import java.sql.Statement
 
 @SuppressWarnings(['JdbcResultSetReference', 'JdbcStatementReference'])
+@Integration
 @Rollback
-@Integration(applicationClass = Application.class)
 class GrailsParameterMapRowMapperSpec extends Specification {
 
     DataSource dataSource

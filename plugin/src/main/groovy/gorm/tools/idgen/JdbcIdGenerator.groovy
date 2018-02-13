@@ -4,6 +4,7 @@ import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.apache.log4j.Category
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
@@ -29,7 +30,8 @@ class JdbcIdGenerator implements IdGenerator {
     private static Category log = Category.getInstance(JdbcIdGenerator.class)
     JdbcTemplate jdbcTemplate
 
-    long seedValue = 1000 //the Id to start with if it does not exist in the table
+    @Value('${gorm.tools.idGenerator.seedValue:1000}')
+    long seedValue//the Id to start with if it does not exist in the table
     String table = "NEWOBJECTID"
     String keyColumn = "KeyName"
     String idColumn = "NextId"
@@ -70,6 +72,7 @@ class JdbcIdGenerator implements IdGenerator {
             oid = createRow(table, keyColumn, idColumn, name)
             //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
         }
+
         if (oid > 0) { //found it
             if (oid < seedValue) {
                 oid = seedValue

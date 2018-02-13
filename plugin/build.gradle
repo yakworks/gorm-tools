@@ -79,6 +79,8 @@ groovydoc {
     link('http://gorm.grails.org/latest/hibernate/api/',  'grails.gorm', 'grails.orm', 'org.grails.datastore', 'org.grails.orm')
 }
 
+// Added to be able to see failed tests and the cause in console on test run.
+// This really helpful and needed when viewing on Travis CI or others.
 integrationTest {
     testLogging {
         exceptionFormat = 'full'

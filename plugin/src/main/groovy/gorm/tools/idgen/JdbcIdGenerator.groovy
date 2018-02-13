@@ -32,11 +32,11 @@ class JdbcIdGenerator implements IdGenerator {
 
     @Value('${gorm.tools.idGenerator.seedValue:1000}')
     long seedValue//the Id to start with if it does not exist in the table
+
     String table = "NEWOBJECTID"
     String keyColumn = "KeyName"
     String idColumn = "NextId"
 
-    //@Transactional(propagation = Propagation.REQUIRES_NEW)
     long getNextId(String keyName) {
         throw new IllegalAccessException("Use the pooledIdGenerator with this backing it for fetching single IDs")
     }

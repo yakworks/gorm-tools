@@ -9,8 +9,8 @@ import spock.lang.Specification
 
 import javax.sql.DataSource
 
+@Integration
 @Rollback
-@Integration(applicationClass = Application.class)
 class ScrollableQuerySpec extends Specification {
 
     JdbcTemplate jdbcTemplate

@@ -79,3 +79,23 @@ groovydoc {
     link('http://gorm.grails.org/latest/hibernate/api/',  'grails.gorm', 'grails.orm', 'org.grails.datastore', 'org.grails.orm')
 }
 
+// Added to be able to see failed tests and the cause in console on test run.
+// This really helpful and needed when viewing on Travis CI or others.
+integrationTest {
+    testLogging {
+        exceptionFormat = 'full'
+        events "failed"//, "passed", "skipped", "standardOut", "standardError"
+    }
+
+    // Uncomment line bellow to show in console all tests that were executed in next format:
+    //:test-app:integrationTest
+    //-- Test Check list(repoapp.OrgSpec)
+    //-- Test Filter by Name eq(repoapp.OrgSpec)
+
+    beforeTest { descriptor -> logger.quiet " -- $descriptor" }
+}
+
+test {
+    //testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = 'full'
+}

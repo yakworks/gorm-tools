@@ -1,13 +1,14 @@
 package gorm.tools.beans
 
-import org.junit.Test
+import spock.lang.Specification
 
-class MapFlattenerTest {
+class MapFlattenerTest extends Specification {
 
-    @Test
-    void testParseJsonDate() {
-        def mf = new MapFlattener()
-        def testMap = [
+    MapFlattener mapFlattener = new MapFlattener()
+
+    void "test parse date"() {
+        setup:
+        Map testMap = [
             customer  : [
                 id     : 1,
                 name   : 'bill',
@@ -21,54 +22,66 @@ class MapFlattenerTest {
                 id: 1
             ]
         ]
-        def res = mf.flatten(testMap)
-        assert res.'customer.id' == "1"
-        assert res.'customer.name' == 'bill'
-        assert res.containsKey("customer.blah")
-        assert res['customer.blah'] == null
-        assert res.'keyContact.id' == '1'
-        assert res["customer.date"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date))
-        assert res["customer.date2"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date2))
-        assert res["customer.date3"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date3))
-        assert res["customer.notDate"] == "200a0-03-30"
+
+        when:
+        Map res = mapFlattener.flatten(testMap)
+
+        then:
+        res.'customer.id' == "1"
+        res.'customer.name' == 'bill'
+        res.containsKey("customer.blah")
+        res['customer.blah'] == null
+        res.'keyContact.id' == '1'
+        res["customer.date"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date))
+        res["customer.date2"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date2))
+        res["customer.date3"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date3))
+        res["customer.notDate"] == "200a0-03-30"
 
     }
 
-    @Test
-    void testParseListOfInts() {
-        def mf = new MapFlattener()
-        def testMap = [
+    void "test flatten list of ints"() {
+        setup:
+        Map testMap = [
             tags: [1, 2]
         ]
-        def res = mf.flatten(testMap)
-        assert res['tags'] == [1, 2]
-        assert res['tags.0'] == '1'
-        assert res['tags.1'] == '2'
+
+        when:
+        Map res = mapFlattener.flatten(testMap)
+
+        then:
+        res['tags'] == [1, 2]
+        res['tags.0'] == '1'
+        res['tags.1'] == '2'
     }
 
-    @Test
-    void testParseListOfMaps() {
-        def mf = new MapFlattener()
-        def testMap = [
+
+    void "test flatten with list of maps"() {
+        setup:
+        Map testMap = [
             tags: [[id: 1], [id: 2]]
         ]
-        def res = mf.flatten(testMap)
-        assert res['tags'] == [[id: 1], [id: 2]]
-        assert res['tags.0.id'] == '1'
-        assert res['tags.1.id'] == '2'
+
+        when:
+        Map res = mapFlattener.flatten(testMap)
+
+        then:
+        res['tags'] == [[id: 1], [id: 2]]
+        res['tags.0.id'] == '1'
+        res['tags.1.id'] == '2'
     }
 
-    @Test
-    void testNullParamValues() {
-        def mf = new MapFlattener()
-        def testMap = [
+    void "test flatten with null values"() {
+        setup:
+        Map testMap = [
             book: [author: [id: 'null', name: ' foo ', age: 'null']]
         ]
 
-        def res = mf.flatten(testMap)
-        assert res['book.author.id'] == "null"
-        assert res['book.author.name'] == 'foo'
-        assert res['book.author.age'] == null
+        when:
+        Map res = mapFlattener.flatten(testMap)
 
+        then:
+        res['book.author.id'] == "null"
+        res['book.author.name'] == 'foo'
+        res['book.author.age'] == null
     }
 }

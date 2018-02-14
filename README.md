@@ -18,12 +18,10 @@
          
 </pre>
 
-Documentation 
------
+**Guide**: https://yakworks.github.io/gorm-tools/  
+**API**: https://yakworks.github.io/gorm-tools/api/
 
-Guide: https://yakworks.github.io/gorm-tools/  
-API: https://yakworks.github.io/gorm-tools/api/
-
+## Overview
 
 This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
 domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.io/gorm-rest-api/){.new-tab}. 
@@ -63,7 +61,7 @@ and Grails GORM's new [Data Services] pattern.
 
 ## Fast Data Binder & Batch Insert/Update
 
-We process 
+We process millions of transactions per day and needed better bniding performance.
 
 ### Goals
 
@@ -111,21 +109,6 @@ criteria.list {
 }
 ```
 
-## Getting started
-
-To use the Gorm-Tools add the dependency on the plugin to your build.gradle file:
-
-```
-runtime "org.grails.plugins:gorm-tools:@VERSION@"
-```
-
-And you can start using the plugin by calling the repository methods on domain classes. 
-The plugin adds several persistence methods to domain classes. Which delegates to repository classes. This includes persist(), create(params), update(update), remove()
-
-See [Repository](repository/ref.md) for more details
-
-
-
 [Spring's Repository pattern]:https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/
 [Data Services]:http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices
 [Restdb.io]:https://restdb.io/docs/querying-with-the-api
@@ -133,13 +116,19 @@ See [Repository](repository/ref.md) for more details
 [Mango selector-syntax]:http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax
 [json-sql]:https://github.com/2do2go/json-sql/
 
-**Running mkdocs locally**  
+## Developer Notes
+
+### Running mkdocs locally
+
 Docs are built with https://yakworks.github.io/mkdocs-material-components/
 Run 
 > ```pip install -r pip-requirements.txt```
 And then ```mkdocs serve``` see the docs if you have troubles
 
-**Publishing**  
+### Publishing Releases
+
+See [Releases Doc](RELEASE.md) for info on our release process
+
 Build are automatically published by travis. 
 Snapshots are published from master branch, and releases are published from tags to BinTray.
 
@@ -155,6 +144,7 @@ Define following properties in ~/.gradle/gradle.properties
 bintray credentials are used for **bintrayUpload** task. Artifactory credentials are used for publishing snapshots to 9ci artifactory.
 
 **Using latests SNAPSHOT**  
+
 Configure 9ci repo in build.gradle
 
 ```groovy
@@ -163,7 +153,7 @@ repositories {
  }
 ```
 
-Add dependency for snapshot  
+Add snapshot Dep, example:
 
 ```groovy
 dependencies {

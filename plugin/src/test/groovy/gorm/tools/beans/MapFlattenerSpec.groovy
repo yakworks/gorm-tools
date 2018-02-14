@@ -2,7 +2,7 @@ package gorm.tools.beans
 
 import spock.lang.Specification
 
-class MapFlattenerTest extends Specification {
+class MapFlattenerSpec extends Specification {
 
     MapFlattener mapFlattener = new MapFlattener()
 

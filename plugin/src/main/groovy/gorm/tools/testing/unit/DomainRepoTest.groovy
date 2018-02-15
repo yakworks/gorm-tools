@@ -11,7 +11,8 @@ import groovy.transform.CompileStatic
  * implement BuildDomainTest<Book> and it will take care of mocking the Author for you.
  */
 @CompileStatic
-trait DomainRepoTest<D> implements DataRepoTest, BuildDomainTest<D> {
+trait DomainRepoTest<D> implements BuildDomainTest<D>, DataRepoTest{
+//order on the above Traits is important as both have mockDomains and we want the one in DataRepoTest to be called
 
     Map buildMap(Map args = [:]) {
         TestDataJson.buildMap(args, getEntityClass())
@@ -22,16 +23,13 @@ trait DomainRepoTest<D> implements DataRepoTest, BuildDomainTest<D> {
     }
 
     /**
-     * By default, calling mockDomains() on {@link DomainRepoTest} will not mock a repository for the specified domain.
-     * It will call an inherited {@link grails.buildtestdata.BuildDataTest#mockDomains}.
-     *
-     * That will cause an error to be thrown for the buildCreate method, because it relies on the create() method in repo.
-     *
-     * In order to avoid that, an explicit override, which chains to the {@link DataRepoTest#mockDomains} which
-     * initializes the repository after mocking the domain) is required.
+     * this is called by the {@link org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor} which calls the mockDomains.
+     * We override it here as the one in BuildDomainTest doesn't get called since the DataRepoTest implements DataTest which has an empty implementation
      */
     @Override
-    void mockDomains(Class<?>... domainClassesToMock) {
-        DataRepoTest.super.mockDomains(domainClassesToMock)
+    Class<?>[] getDomainClassesToMock() {
+        //getEntityClass in BuildDomainTest get the generic on the class
+        [getEntityClass()].toArray(Class)
     }
+
 }

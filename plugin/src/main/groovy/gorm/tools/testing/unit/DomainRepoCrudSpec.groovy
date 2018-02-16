@@ -11,19 +11,6 @@ import spock.lang.Specification
 //@CompileStatic
 abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepoTest<D> {
 //order on the above Traits is important as both have mockDomains and we want the one in DataRepoTest to be called
-    @Shared Map ignore = [:]
-
-//    def "create tests"() {
-//        when:
-//            D ent = createEntity(params)
-//        then:
-//            assertsCall "assertCreate", ent
-//            if(expected) assert subsetEquals(expected, ent.properties)
-//        where:
-//            dataPipes << ensureList(whereCreate())
-//            expected = dataPipes.expected
-//            params = dataPipes.params
-//    }
 
     def "create tests"() {
         expect:
@@ -62,7 +49,7 @@ abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepo
 
     //override this to customize or disable
     void testRemove(){
-        assert persistEntity().id
+        assert removeEntity()
     }
 
     /************************ Helpers Methods *************/
@@ -73,19 +60,6 @@ abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepo
 
     Map buildUpdateMap(Map args) {
         buildMap(args)
-    }
-
-    D buildPersist(Map args) {
-        args['save'] = false
-        build(args)
-    }
-
-    def whereCreate() {
-        [params: [:], expected: [:]]
-    }
-
-    def whereUpdate() {
-        [params: [:], expected: [:]]
     }
 
     D get(id){
@@ -109,24 +83,22 @@ abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepo
     }
 
     D persistEntity(Map args = [:]){
-        D instance = buildPersist(args)
+        args.get('save', false) //adds save:false if it doesn't exists
+        D instance = build(args)
         assert instance.persist()
         return get(instance.id)
     }
 
-    @Ignore
-    def removeEntity(){
+    def removeEntity(remId = null){
         //def id = createEntity().id
-        def id = build(save: true).id
-        flushAndClear()
-        def ge = get(id)
-        ge.remove()
+        def id = remId ?: persistEntity().id
+        get(id).remove()
         flushAndClear()
         assert entityClass.get(id) == null
         return id
     }
 
-    void assertsCall(String method, obj){
+    void callMethod(String method, obj){
         //if (this.metaClass.respondsTo(this, method, D)) {
         if (this.metaClass.respondsTo(this, method)) {
             "$method"(obj)
@@ -149,10 +121,9 @@ abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepo
      * http://csierra.github.io/posts/2013/02/12/loosely-test-for-map-equality-using-groovy/
      */
     boolean subsetEquals(Map subset, Map full, List<String> exclude=[]) {
-        println "subset: $subset"
-        println "full: $full"
+        //println "subset: $subset"
+        //println "full: $full"
         if(!subset) return false
-        //if (!full.keySet().containsAll(subset.keySet())) return false
         return subset.findAll{!exclude.contains(it.key)}.every {  it.value == full[it.key]}
     }
 

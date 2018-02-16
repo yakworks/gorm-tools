@@ -3,9 +3,8 @@ package gorm.tools.testing.unit
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.TestTools
 import grails.buildtestdata.BuildDataTest
-import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.TestData
-import groovy.transform.CompileStatic
+import groovy.transform.CompileDynamic
 import org.springframework.core.GenericTypeResolver
 
 /**
@@ -14,7 +13,7 @@ import org.springframework.core.GenericTypeResolver
  * Its walks the tree so if you have a Book that has a required Author association you only need to do
  * implement DomainRepoTest<Book> and it will take care of mocking the Author for you.
  */
-//@CompileStatic
+@CompileDynamic
 trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{
 //order on the above Traits is important as both have mockDomains and we want the one in DataRepoTest to be called
 

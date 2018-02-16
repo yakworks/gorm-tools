@@ -106,7 +106,7 @@ function windowTitle()
                             <td>Should works as a drop in replacement for the Grails Testing Support's
  grails.testing.gorm.DomainUnitTest for testing a single entity using Generics
  Its walks the tree so if you have a Book that has a required Author association you only need to do
- implement BuildDomainTest<Book> and it will take care of mocking the Author for you.</td>
+ implement DomainRepoTest<Book> and it will take care of mocking the Author for you.</td>
                         </tr>
 <tr class="altColor">
                             <td class="colOne">
@@ -152,6 +152,15 @@ function windowTitle()
                         <th class="colFirst" scope="col">Class</th>
                         <th class="colLast" scope="col">Description</th>
                     </tr>
+<tr class="altColor">
+                            <td class="colOne">
+                                <strong><a href="DomainRepoCrudSpec.html" title="class in gorm/tools/testing/unit">
+                                    DomainRepoCrudSpec
+                                </a></strong>
+                            </td>
+                            <td>executes a series automatic "sanity" checks on the domain and repo for CRUD.
+ </td>
+                        </tr>
 <tr class="altColor">
                             <td class="colOne">
                                 <strong><a href="MockJdbcIdGenerator.html" title="class in gorm/tools/testing/unit">

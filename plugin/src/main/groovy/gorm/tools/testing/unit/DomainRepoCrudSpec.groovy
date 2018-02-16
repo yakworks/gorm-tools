@@ -1,7 +1,6 @@
 package gorm.tools.testing.unit
 
-import spock.lang.Ignore
-import spock.lang.Shared
+import grails.buildtestdata.TestData
 import spock.lang.Specification
 
 /**
@@ -17,19 +16,9 @@ abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepo
             testCreate()
     }
 
-    //override this to customize or disable
-    void testCreate(){
-        assert createEntity().id
-    }
-
     def "update tests"() {
         expect:
             testUpdate()
-    }
-
-    //override this to customize or disable
-    void testUpdate(){
-        assert updateEntity().version > 0
     }
 
     def "persist tests"() {
@@ -37,94 +26,9 @@ abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepo
             testPersist()
     }
 
-    //override this to customize or disable
-    void testPersist(){
-        assert persistEntity().id
-    }
-
     def "remove tests"() {
         expect:
             testRemove()
-    }
-
-    //override this to customize or disable
-    void testRemove(){
-        assert removeEntity()
-    }
-
-    /************************ Helpers Methods *************/
-
-    Map buildCreateMap(Map args) {
-        buildMap(args)
-    }
-
-    Map buildUpdateMap(Map args) {
-        buildMap(args)
-    }
-
-    D get(id){
-        flushAndClear()
-        def ret = entityClass.get(id)
-        assert ret
-        return ret
-    }
-
-    D createEntity(Map args = [:]){
-        D instance = entityClass.create(buildCreateMap(args))
-        return get(instance.id)
-    }
-
-    D updateEntity(Map args = [:]){
-        def id = args.id ? args.remove('id') : createEntity().id
-        Map updateMap = buildUpdateMap(args)
-        updateMap.id = id
-        assert entityClass.update(updateMap)
-        return get(id)
-    }
-
-    D persistEntity(Map args = [:]){
-        args.get('save', false) //adds save:false if it doesn't exists
-        D instance = build(args)
-        assert instance.persist()
-        return get(instance.id)
-    }
-
-    def removeEntity(remId = null){
-        //def id = createEntity().id
-        def id = remId ?: persistEntity().id
-        get(id).remove()
-        flushAndClear()
-        assert entityClass.get(id) == null
-        return id
-    }
-
-    void callMethod(String method, obj){
-        //if (this.metaClass.respondsTo(this, method, D)) {
-        if (this.metaClass.respondsTo(this, method)) {
-            "$method"(obj)
-        }
-    }
-
-    /** makes sure the passed in object is a list, if not then it wraps it in one
-     * helpful when creating spocks data pipes */
-    List ensureList(obj){
-        obj instanceof List ? obj : [obj]
-    }
-
-    /**
-     * Loosely test 2 maps for equality
-     * asserts more or less that subset:[a: 1, b: 2] == full:[a: 1, b: 2, c: 3] returns true
-     * if subset is an empty map or null returns false
-     *
-     * @param subset the full map
-     * @param full the full map
-     * http://csierra.github.io/posts/2013/02/12/loosely-test-for-map-equality-using-groovy/
-     */
-    boolean subsetEquals(Map subset, Map full, List<String> exclude=[]) {
-        //println "subset: $subset"
-        //println "full: $full"
-        if(!subset) return false
-        return subset.findAll{!exclude.contains(it.key)}.every {  it.value == full[it.key]}
     }
 
 }

@@ -1,5 +1,6 @@
 package gorm.tools.testing.unit
 
+import grails.buildtestdata.TestData
 import spock.lang.Shared
 
 //test to check the overrride methods
@@ -18,32 +19,26 @@ class DomainRepoCrudOverrideSpec extends DomainRepoCrudSpec<CrudSpecDomain> {
     }
 
     @Override
-    CrudSpecDomain buildPersist(Map args) {
-        build(save:false, name: 'persist')
-    }
-
-    @Override
     void testUpdate() {
         methodCalls << 'testUpdate'
-        CrudSpecDomain ent = updateEntity()
+        updateEntity()
         //it should have used the data in the overriden buildUpdateMap
-        assert ent.name == 'create foo'
+        assert entity.name == 'create foo'
     }
 
     @Override
     void testCreate() {
         methodCalls << 'testCreate'
-        CrudSpecDomain ent = createEntity(firstName: 'billy', lastName: 'bob')
-        assert ent.firstName == 'billy' && ent.lastName == 'bob'
-        assert ent.name == 'billy bob'
+        createEntity(firstName: 'billy', lastName: 'bob')
+        assert entity.firstName == 'billy' && entity.lastName == 'bob'
+        assert entity.name == 'billy bob'
     }
 
     @Override
     void testPersist() {
         methodCalls << 'testPersist'
-        //it should use the data in the overriden buildPersist
-        CrudSpecDomain ent = persistEntity()
-        assert ent.name == 'persist'
+        persistEntity(name: 'persist')
+        assert entity.name == 'persist'
     }
 
     @Override
@@ -55,10 +50,9 @@ class DomainRepoCrudOverrideSpec extends DomainRepoCrudSpec<CrudSpecDomain> {
     //show data table option 1
     def "test with data tables"() {
         when:
-        def ent = createEntity(params)
-
+            createEntity(params)
         then:
-        subsetEquals(expected, ent.properties)
+            entityContains(expected)
 
         where:
         params             | expected
@@ -68,10 +62,10 @@ class DomainRepoCrudOverrideSpec extends DomainRepoCrudSpec<CrudSpecDomain> {
     //show data table option 2
     def "test with data tables cleaner table"() {
         when:
-        def ent = createEntity(firstName: firstName, lastName: lastName )
+            createEntity(firstName: firstName, lastName: lastName )
 
         then:
-        ent.name == name
+            entity.name == name
 
         where:
         firstName | lastName | name

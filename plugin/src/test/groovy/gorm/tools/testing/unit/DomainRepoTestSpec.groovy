@@ -8,13 +8,12 @@ class DomainRepoTestSpec extends Specification implements DomainRepoTest<Org> {
 
     void "verify repo is added"(){
         expect:
-        entity.repo
+        build().repo
     }
 
     void "verify build methods"(){
         expect:
         buildMap().name
-        buildCreate().name
     }
 
 }

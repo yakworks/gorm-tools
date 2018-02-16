@@ -19,13 +19,6 @@ class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom
 
     void "sanity check JsonifyDom build"() {
         when:
-        entity
-
-        then:
-        entity
-        !entity.ext
-
-        when:
         def e2 = build(includes: ['ext'])
 
         then:
@@ -48,7 +41,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom
     void "test json includes association"() {
         when:
         def args = [deep:true, includes: ['name', 'ext', 'ext.id', 'ext.nameExt']]
-        def result = Jsonify.render(getEntity(includes: ['ext']), args)
+        def result = Jsonify.render(build(includes: ['ext']), args)
 
         then:
         result.jsonText == '{"ext":{"id":1,"nameExt":"nameExt"},"name":"name"}'
@@ -58,7 +51,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom
     void "test json expand association"() {
         when:
         def args = [deep:true, includes: ['name', 'ext', 'ext.id', 'ext.nameExt']]
-        def result = Jsonify.render(getEntity(includes: ['ext']), args)
+        def result = Jsonify.render(build(includes: ['ext']), args)
 
         then:
         result.jsonText == '{"ext":{"id":1,"nameExt":"nameExt"},"name":"name"}'

@@ -4,6 +4,5 @@ import testing.Org
 
 class DomainRepoCrudSpecSpec extends DomainRepoCrudSpec<Org> {
 
-
 }
 

@@ -5,6 +5,7 @@ import grails.persistence.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.Specification
+import testing.Org
 
 class BeanPathToolsSpec extends Specification implements GormToolsTest {
 
@@ -246,6 +247,17 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         result.param1 == 'value1'
         result.'param2.param3' == 'value3'
         result.'param2.param4.param5' == 'value5'
+    }
+
+    void "test getIncludes"(){
+        expect:
+        result == BeanPathTools.getIncludes("TestClazzA", fields)
+
+        where:
+        fields          | result
+        ['foo']         | ['foo']
+        ['*']           | ['id', 'foo', 'version', 'bar']
+        ['baz.*']       | ['baz.id', 'baz.value', 'baz.version', 'baz']
     }
 
 }

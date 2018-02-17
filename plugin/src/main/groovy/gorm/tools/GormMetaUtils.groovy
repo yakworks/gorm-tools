@@ -121,4 +121,19 @@ class GormMetaUtils {
 
     }
 
+    /**
+     * Returns persistent properties for persistent entity(finds by name)
+     * Adds composite identeties, which are not in persistent properties by default
+     *
+     * @param className name of the Persistent entity
+     * @return list of PersistentProperties, includes composite Identities and identity
+     */
+    static List<PersistentProperty> getPersistentProperties(String className){
+        PersistentEntity domain = findPersistentEntity(className)
+        List<PersistentProperty> result = domain.persistentProperties
+        if(domain.compositeIdentity) result.addAll(domain.compositeIdentity)
+        result.add(0, domain.getIdentity())
+        result.unique()
+    }
+
 }

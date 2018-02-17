@@ -1,6 +1,7 @@
 package gorm.tools.json
 
 import gorm.tools.beans.AppCtx
+import gorm.tools.beans.BeanPathTools
 import grails.plugin.json.builder.JsonOutput.JsonWritable
 import grails.plugin.json.builder.StreamingJsonBuilder
 import grails.plugin.json.view.JsonViewTemplateEngine
@@ -56,7 +57,9 @@ class Jsonify {
      */
     static JsonifyResult render(Object object, Map arguments = Collections.emptyMap(),
                                    @DelegatesTo(StreamingJsonBuilder.StreamingJsonDelegate) Closure customizer = null ) {
-
+        if (arguments.includes){
+            arguments.includes = BeanPathTools.getIncludes(object.class.name, arguments.includes as List<String>)
+        }
         JsonWritable writer = renderWritable(object, arguments, customizer)
         return new JsonifyResult(writer: writer)
     }

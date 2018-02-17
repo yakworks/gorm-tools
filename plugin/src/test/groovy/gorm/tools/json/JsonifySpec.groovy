@@ -19,13 +19,6 @@ class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom
 
     void "sanity check JsonifyDom build"() {
         when:
-        entity
-
-        then:
-        entity
-        !entity.ext
-
-        when:
         def e2 = build(includes: ['ext'])
 
         then:
@@ -48,7 +41,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom
     void "test json includes association"() {
         when:
         def args = [deep:true, includes: ['name', 'ext', 'ext.id', 'ext.nameExt']]
-        def result = Jsonify.render(getEntity(includes: ['ext']), args)
+        def result = Jsonify.render(build(includes: ['ext']), args)
 
         then:
         result.jsonText == '{"ext":{"id":1,"nameExt":"nameExt"},"name":"name"}'
@@ -57,7 +50,6 @@ class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom
 
     void "test buildJson deep with *"() {
         when:
-        //def renderArgs = []
         Object obj = TestData.build(entityClass, includes: '*')
         def result =  Jsonify.render(obj, [deep:true, excludes:['ext.testJsonifyDom']])
 
@@ -69,7 +61,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<TestJsonifyDom
     void "test json includes with *"() {
         when:
         def args = [deep:true, includes: ["*"]]
-        def result = Jsonify.render(getEntity(), args)
+        def result = Jsonify.render(build(), args)
 
         then: //TODO: double id issue
         result.jsonText == '{"id":1,"id":1,"localDate":"2018-01-25","isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}'

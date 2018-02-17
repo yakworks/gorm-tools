@@ -12,7 +12,7 @@ import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org, TestTrxRollback, Location, Nested, Company] }
+    List<Class> getDomainClasses() { [Org, TestTrxRollback, Company] } //, Location, Nested, Company] }
 
     Closure doWithConfig() {
         { config ->

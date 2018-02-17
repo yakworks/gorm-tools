@@ -1,7 +1,7 @@
 package gorm.tools.repository
 
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.errors.EntityNotFoundException
 import grails.persistence.Entity
 import grails.testing.gorm.DataTest
 import org.springframework.dao.OptimisticLockingFailureException
@@ -27,34 +27,39 @@ class RepoUtilsSpec extends Specification implements DataTest {
 
     }
 
-    void testCheckFound() {
-        try {
-            RepoUtil.checkFound(null, [id: '99'], "xxx")
-            assert false, "should not have made it here"
-        } catch (EntityValidationException e) {
-            //id
-            assert '99' == e.messageMap.args[1]
-            //domain name
-            assert 'xxx' == e.messageMap.args[0]
-            assert "default.not.found.message" == e.messageMap.code
-        }
+    void "test checkFound"() {
+        when:
+        RepoUtil.checkFound(null, 99, 'xxx')
+
+        then:
+        EntityNotFoundException e = thrown(EntityNotFoundException)
+        e.message == 'xxx not found with id 99'
     }
 
-    void testPropName() {
-        def propname = RepoMessage.propName('xxx.yyy.ArDoc')
-        assert 'arDoc' == propname
+    void "test propName"() {
+        when:
+        String propname = RepoMessage.propName('xxx.yyy.ArDoc')
+
+        then:
+        propname == 'arDoc'
     }
 
-    void testNotFound() {
-        def r = RepoMessage.notFound("xxx.MockDomain", [id: "2"])
-        assert r.code == "default.not.found.message"
-        assert r.args == ["MockDomain", "2"]
-        assert r.defaultMessage == "MockDomain not found with id 2"
+    void "test notFound"() {
+        when:
+        Map r = RepoMessage.notFound("xxx.MockDomain", [id: "2"])
+
+        then:
+        r.code == "default.not.found.message"
+        r.args == ["MockDomain", "2"]
+        r.defaultMessage == "MockDomain not found with id 2"
     }
 
-    void testDefaultLocale() {
-        def loc = RepoMessage.defaultLocale()
-        assert Locale.ENGLISH == loc
+    void "test defaultLocale"() {
+        when:
+        Locale locale = RepoMessage.defaultLocale()
+
+        then:
+        locale == Locale.ENGLISH
     }
 
 }

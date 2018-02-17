@@ -17,7 +17,7 @@ if(binTrayUser && binTrayKey) {
         developers = [joshuaB: 'Joshua B', snimavat: "Sudhir Nimavat"]
         githubSlug = "${project.githubSlug}"
         issueTrackerUrl = "https://github.com/${project.githubSlug}/issues"
-        vcsUrl = "https://github.com/githubSlug"
+        vcsUrl = "https://github.com/${project.githubSlug}"
 
         license {
             name = 'Apache-2.0'

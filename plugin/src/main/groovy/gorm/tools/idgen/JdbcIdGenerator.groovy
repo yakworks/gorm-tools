@@ -4,6 +4,7 @@ import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import org.apache.commons.lang.Validate
 import org.apache.log4j.Category
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
@@ -29,14 +30,15 @@ class JdbcIdGenerator implements IdGenerator {
     private static Category log = Category.getInstance(JdbcIdGenerator.class)
     JdbcTemplate jdbcTemplate
 
-    private long seedValue = 1000 //the Id to start with if it does not exist in the table
-    private String table = "NEWOBJECTID"
-    private String keyColumn = "KeyName"
-    private String idColumn = "NextId"
+    @Value('${gorm.tools.idGenerator.seedValue:1000}')
+    long seedValue//the Id to start with if it does not exist in the table
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    String table = "NEWOBJECTID"
+    String keyColumn = "KeyName"
+    String idColumn = "NextId"
+
     long getNextId(String keyName) {
-        return getNextId(keyName, 1)
+        throw new IllegalAccessException("Use the pooledIdGenerator with this backing it for fetching single IDs")
     }
 
     @SuppressWarnings('SynchronizedMethod')
@@ -70,6 +72,7 @@ class JdbcIdGenerator implements IdGenerator {
             oid = createRow(table, keyColumn, idColumn, name)
             //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.");
         }
+
         if (oid > 0) { //found it
             if (oid < seedValue) {
                 oid = seedValue
@@ -113,41 +116,4 @@ class JdbcIdGenerator implements IdGenerator {
         //println "creating with $query"
         jdbcTemplate.execute(query)
     }
-
-    String getKeyColumn() {
-        return keyColumn
-    }
-
-    void setKeyColumn(String keyColumn) {
-        this.keyColumn = keyColumn
-    }
-
-    long getSeedValue() {
-        return seedValue
-    }
-
-    void setSeedValue(long seedValue) {
-        this.seedValue = seedValue
-    }
-
-    String getTable() {
-        return table
-    }
-
-    void setTable(String table) {
-        this.table = table
-    }
-
-    void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate
-    }
-
-    String getIdColumn() {
-        return idColumn
-    }
-
-    void setIdColumn(String idColumn) {
-        this.idColumn = idColumn
-    }
-
 }

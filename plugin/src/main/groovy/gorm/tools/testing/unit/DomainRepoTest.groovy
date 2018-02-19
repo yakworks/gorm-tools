@@ -93,6 +93,7 @@ trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{
 
     D createEntity(Map args = [:]){
         entity = entityClass.create(buildCreateMap(args))
+        //assert entity.properties == [foo:'foo']
         return get(entity.id)
     }
 

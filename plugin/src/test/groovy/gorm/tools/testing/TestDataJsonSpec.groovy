@@ -39,9 +39,9 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
 
     void "test buildJson"(){
         expect:
-        def buildJson = TestDataJson.buildJson(Org, name: 'foo')
+        def buildJson = TestDataJson.buildJson(Org, name: 'foo', name2: 'bar')
 
-        buildJson.jsonText == '{"name":"foo","type":{"id":1}}'
+        buildJson.jsonText == '{"name":"foo","type":{"id":1},"name2":"bar"}'
     }
 
 //    void "test includes *"(){

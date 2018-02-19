@@ -33,12 +33,16 @@ class DomainRepoCrudOverrideSpec extends DomainRepoCrudSpec<CrudSpecDomain> {
         assert entity.firstName == 'billy' && entity.lastName == 'bob'
         assert entity.name == 'billy bob'
     }
+//    void testCreate(){
+//        methodCalls << 'testCreate'
+//        assert createEntity(firstName: 'billy').id
+//    }
 
     @Override
     void testPersist() {
         methodCalls << 'testPersist'
-        persistEntity(name: 'persist')
-        assert entity.name == 'persist'
+        persistEntity(firstName: 'persist', lastName: 'bob')
+        assert entity.name == 'persist bob'
     }
 
     @Override

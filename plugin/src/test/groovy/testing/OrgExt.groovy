@@ -7,15 +7,15 @@ import grails.persistence.Entity
 class OrgExt {
     static belongsTo = [org:Org]
 
-    String aNullableString
-    String aNotNullableString
+    String text1
+    String text2
 
     static mapping = {
         id generator:'foreign', params:[property:'org']
         org insertable: false, updateable: false , column:'id'
     }
     static constraints = {
-        aNullableString nullable: true
-        aNotNullableString nullable: false
+        text1 nullable: false
+        text2 nullable: true
     }
 }

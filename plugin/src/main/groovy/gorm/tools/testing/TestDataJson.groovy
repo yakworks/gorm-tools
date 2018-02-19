@@ -92,7 +92,7 @@ class TestDataJson {
                 if (args.containsKey(key)) resMap['jsonArgs'][key] = args.remove(key)
             }
             //save should default to false and find to true
-            //args['save'] = args.containsKey('save') ? args['save'] : false
+            args['save'] = args.containsKey('save') ? args['save'] : false
             args['find'] = args.containsKey('find') ? args['find'] : true
             //setup the args for TestData
             ['save', 'find', 'includes', 'flush', 'failOnError'].each { key ->

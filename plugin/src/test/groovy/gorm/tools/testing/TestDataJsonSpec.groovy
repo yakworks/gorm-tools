@@ -34,7 +34,7 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
 
         then:
         incs == ['name', 'type', 'name2', 'secret', 'inactive', 'amount', 'amount2',
-                 'date', 'locDate', 'locDateTime', 'ext', 'type.id']
+                 'date', 'locDate', 'locDateTime', 'location', 'ext', 'type.id']
     }
 
     void "test buildJson"(){

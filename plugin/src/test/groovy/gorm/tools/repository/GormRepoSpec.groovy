@@ -366,17 +366,19 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test default quick search fields"() {
         when:
-        GormToolsPluginHelper.addQuickSearchFields(["name", "num", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
+        GormToolsPluginHelper.addQuickSearchFields(["name", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
 
         then:
-        Org.quickSearchFields == ["name", "num"]
+        TestTrxRollback.quickSearchFields == ["name"]
 
         when:
-        Org.quickSearchFields = []
-        GormToolsPluginHelper.addQuickSearchFields(["name", "ext.text1", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
+        TestTrxRollback.quickSearchFields = []
+        GormToolsPluginHelper.addQuickSearchFields(["name", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
 
         then:
-        Org.quickSearchFields == ["name", "ext.text1"]
+        TestTrxRollback.quickSearchFields == ["name"]
+
+
     }
 }
 

@@ -19,7 +19,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
 
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
-        mockDomains(OrgExt)
+        mockDomains(OrgExt, Location)
     }
 
     void "sanity check TestData.build"() {

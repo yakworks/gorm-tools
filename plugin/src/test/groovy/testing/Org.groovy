@@ -34,7 +34,7 @@ class Org {
         //id generator:'assigned'
     }
 
-    static List quickSearchFields = ["name", "num"]
+    static List quickSearchFields = ["name"]
 
     static constraints = {
         name     nullable: false

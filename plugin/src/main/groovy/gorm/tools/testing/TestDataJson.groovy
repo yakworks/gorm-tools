@@ -2,8 +2,11 @@ package gorm.tools.testing
 
 import gorm.tools.json.Jsonify
 import grails.buildtestdata.TestData
+import grails.buildtestdata.builders.DataBuilderContext
+import grails.buildtestdata.builders.PersistentEntityDataBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.mapping.model.types.Association
 
 /**
  * static build methods to wrap {@link TestData} and Jsonify's statics for the json-views.
@@ -28,7 +31,26 @@ class TestDataJson {
         //default for save should be false and find true, we don't want to save the dom as we are ust using it to build the json map
         Map<String, Map> res = parseArgs(args)
         Object obj = TestData.build(res.args, entityClass, res.data)
+        println res.args
+        println obj.properties
+        res.jsonArgs['includes'] = getFieldsToBuild(entityClass, res.args['includes'])
+        println res.jsonArgs['includes']
         return Jsonify.render(obj, res.jsonArgs)
+    }
+
+    static List<String> getFieldsToBuild(Class entityClass, Object buildDataIncludes = null) {
+        PersistentEntityDataBuilder builder = (PersistentEntityDataBuilder)TestData.findBuilder(entityClass)
+        //build an empty DataBuilderContext to set includes
+        DataBuilderContext ctx = new DataBuilderContext()
+        ctx.includes = buildDataIncludes //as Set<String>
+
+        Set<String> fieldsToBuild = builder.getFieldsToBuild(ctx)
+
+        builder.findRequiredAssociations().each {
+            fieldsToBuild.add(it.name + ".id")
+        }
+
+        return fieldsToBuild as List<String>
     }
 
     /**
@@ -66,11 +88,11 @@ class TestDataJson {
         Map<String, Map> resMap = [args:[:], data:[:], jsonArgs:[:]] as Map<String, Map>
         if (args){
             //the renderArgs for
-            ['includes', 'excludes', 'expand', 'associations', 'deep', 'renderNulls'].each { key ->
+            ['excludes', 'expand', 'associations', 'deep', 'renderNulls'].each { key ->
                 if (args.containsKey(key)) resMap['jsonArgs'][key] = args.remove(key)
             }
             //save should default to false and find to true
-            args['save'] = args.containsKey('save') ? args['save'] : false
+            //args['save'] = args.containsKey('save') ? args['save'] : false
             args['find'] = args.containsKey('find') ? args['find'] : true
             //setup the args for TestData
             ['save', 'find', 'includes', 'flush', 'failOnError'].each { key ->

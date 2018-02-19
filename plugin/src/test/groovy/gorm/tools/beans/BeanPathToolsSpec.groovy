@@ -258,6 +258,8 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         ['foo']         | ['foo']
         ['*']           | ['id', 'foo', 'version', 'bar']
         ['baz.*']       | ['baz.id', 'baz.value', 'baz.version', 'baz']
+        //FIXME make the following work
+        //['baz.id']      | ['baz.id', 'baz']
     }
 
 }

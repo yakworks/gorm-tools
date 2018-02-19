@@ -4,11 +4,11 @@ import grails.persistence.Entity
 
 @Entity
 class Location {
-    String city
+    String address
     Nested nested
 
     static constraints = {
         nested nullable: false
-        city nullable: false
+        address nullable: false
     }
 }

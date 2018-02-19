@@ -26,13 +26,14 @@ class Jsonify {
 
     static JsonViewTemplate getViewTemplate() {
         if (!cachedEmptyTemplate) {
-            //create an empty and emptyTemplate and cache. we only use it to get to the DefaultGrailsJsonViewHelper
+            //create an empty and emptyTemplate and cache. we only use it to get to the DefaultGrailsJsonViewHelper which has the beans we need setup
             cachedEmptyTemplate = (JsonViewTemplate)AppCtx.get("jsonTemplateEngine", JsonViewTemplateEngine).createTemplate('')
         }
         return cachedEmptyTemplate
     }
 
     static DefaultGrailsJsonViewHelper getViewHelper() {
+        //make the script class so we can get the DefaultGrailsJsonViewHelper which has the
         JsonViewWritableScript jv = (JsonViewWritableScript) getViewTemplate().make()
         (DefaultGrailsJsonViewHelper) jv.getG()
     }

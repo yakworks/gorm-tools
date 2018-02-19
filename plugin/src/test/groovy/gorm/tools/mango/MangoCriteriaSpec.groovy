@@ -1,11 +1,14 @@
 package gorm.tools.mango
 
+import grails.buildtestdata.TestData
 import grails.gorm.DetachedCriteria
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
+import org.junit.Ignore
 import testing.Location
 import testing.Nested
 import testing.Org
+import testing.OrgType
 
 class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
@@ -18,24 +21,35 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
     void setupSpec() {
         Org.withTransaction {
+            def type = TestData.build(OrgType)
             (1..10).each { index ->
                 String value = "Name#" + index
                 new Org(id: index,
                     name: value,
-                    isActive: (index % 2 == 0),
+                    type: type,
+                    inactive: (index % 2 == 0),
                     amount: (index - 1) * 1.34,
                     amount2: (index - 1) * (index - 1) * 0.3,
                     date: new Date().clearTime() + index,
-                    secondName: index % 2 == 0 ? null : "Name2#" + index,
-                    location: (new Location(city: "City#$index", nested: new Nested(name: "Nested#${2 * index}", value: index)).save())
+                    name2: index % 2 == 0 ? null : "Name2#" + index,
+                    location: (new Location(address: "City#$index", nested: new Nested(name: "Nested#${2 * index}", value: index)).save())
                 ).save(failOnError: true)
             }
         }
     }
 
+    @spock.lang.Ignore //FIXME this should give a better error message
+    def "test field that does not exist"() {
+        when:
+        List res = build([nonExistingFooBar: true]).list()
+
+        then:
+        res.size() == 5
+    }
+
     def "test detached isActive"() {
         when:
-        List res = build([isActive: true]).list()
+        List res = build([inactive: true]).list()
 
         then:
         res.size() == 5
@@ -61,7 +75,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
     def "test combined"() {
         when:
 
-        List res = build(([amount: [1 * 1.34, 2 * 1.34, 3 * 1.34, 4 * 1.34], isActive: true])).list()
+        List res = build(([amount: [1 * 1.34, 2 * 1.34, 3 * 1.34, 4 * 1.34], inactive: true])).list()
 
         then:
         res.size() == 2
@@ -131,7 +145,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
     def "test nested String"() {
         when:
 
-        List res = build((["location.city": "City#4"])).list()
+        List res = build((["location.address": "City#4"])).list()
 
         then:
         res.size() == 1
@@ -143,7 +157,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         List res = build(([
             location: [
                 '$or': [
-                    city: "City#4",
+                    address: "City#4",
                     id  : 4
                 ]
             ]
@@ -223,14 +237,14 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         when:
 
 
-        List res = build(([secondName: ['$isNull': true]])).list()
+        List res = build(([name2: ['$isNull': true]])).list()
 
         then:
         res.size() == 5
 
         when:
 
-        res = build(([secondName: '$isNull'])).list()
+        res = build(([name2: '$isNull'])).list()
 
         then:
         res.size() == 5
@@ -284,8 +298,8 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         then:
         res.size() == 1
 
-        when:
-        res = build((['$quickSearch': "Name#%", isActive: true])).list()
+        when: "quick search is combined with another field"
+        res = build((['$quickSearch': "Name#%", inactive: true])).list()
 
         then:
         res.size() == 5

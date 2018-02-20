@@ -35,7 +35,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         TestDomain domain = new TestDomain()
 
         when:
-        domain.bindMap([age: "100"])
+        domain.bind([age: "100"])
 
         then:
         0 * longConverter.canConvert(_)

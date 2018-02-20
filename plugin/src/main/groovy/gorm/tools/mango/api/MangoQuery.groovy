@@ -2,7 +2,10 @@ package gorm.tools.mango.api
 
 import grails.gorm.DetachedCriteria
 
-interface MangoQueryApi {
+/**
+ * For methods that
+ */
+interface MangoQuery {
 
     /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional criteria

@@ -1,32 +1,37 @@
 package gorm.tools.repository
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.mango.api.MangoQueryEntity
-import gorm.tools.mango.api.MangoQueryTrait
+import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
 @CompileStatic
-trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
+trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
+
+    Class getEntityClass(){ getClass() }
 
     private static RepositoryApi cachedRepo
 
     /**
-     * Looks up and caches a repository bean
+     * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set
      * @return The repository
      */
-    transient static RepositoryApi<D> getRepo() {
+    static RepositoryApi<D> findRepo() {
         if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), RepositoryApi)
         return cachedRepo
     }
 
-    transient static void setRepo(RepositoryApi<D> repo) {
-        cachedRepo = repo
+    /**
+     * Calls the findRepo(). can be overriden to return the concrete domain Repository
+     * @return The repository
+     */
+    transient static RepositoryApi<D> getRepo() {
+        return findRepo()
     }
 
-    static MangoQueryTrait getMangoQueryTrait(){
-        (MangoQueryTrait)getRepo()
+    transient static void setRepo(RepositoryApi<D> repo) {
+        cachedRepo = repo
     }
 
     D persist(Map args = [:]) {

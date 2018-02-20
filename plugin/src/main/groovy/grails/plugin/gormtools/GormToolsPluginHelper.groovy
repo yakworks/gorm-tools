@@ -6,7 +6,7 @@ import gorm.tools.async.GparsBatchSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
-import gorm.tools.mango.MangoQuery
+import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
@@ -36,7 +36,7 @@ class GormToolsPluginHelper {
 
         idGenerator(PooledIdGenerator, jdbcIdGenerator)
 
-        mango(MangoQuery)
+        mangoQuery(DefaultMangoQuery)
 
         entityMapBinder(EntityMapBinder, ref('grailsApplication'))
 

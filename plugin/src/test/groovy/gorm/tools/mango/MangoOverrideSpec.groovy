@@ -1,6 +1,6 @@
 package gorm.tools.mango
 
-import gorm.tools.mango.api.MangoQueryApi
+import gorm.tools.mango.api.MangoQuery
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.testing.unit.GormToolsTest
 import grails.artefact.Artefact
@@ -39,7 +39,7 @@ class City {
     String name
 }
 
-class NewMangoQuery implements MangoQueryApi {
+class NewMangoQuery implements MangoQuery {
 
     @Override
     DetachedCriteria buildCriteria(Class domainClass, Map params, Closure closure = null) {
@@ -57,6 +57,7 @@ class NewMangoQuery implements MangoQueryApi {
 class CityRepo extends DefaultGormRepo<City> {
 
     @Autowired
-    @Qualifier("newMangoQuery")
-    NewMangoQuery mangoQuery
+    NewMangoQuery newMangoQuery
+
+    MangoQuery getMangoQuery(){ newMangoQuery }
 }

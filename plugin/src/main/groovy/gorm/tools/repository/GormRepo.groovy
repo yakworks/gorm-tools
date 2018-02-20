@@ -3,7 +3,7 @@ package gorm.tools.repository
 import gorm.tools.WithTrx
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
-import gorm.tools.mango.api.MangoQueryTrait
+import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.api.GormBatchRepo
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
@@ -29,7 +29,7 @@ import org.springframework.dao.DataAccessException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, MangoQueryTrait, WithTrx, RepositoryApi<D> {
+trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEntityApi, WithTrx, RepositoryApi<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder

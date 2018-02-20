@@ -6,6 +6,7 @@ import grails.buildtestdata.builders.DataBuilderContext
 import grails.buildtestdata.builders.PersistentEntityDataBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.mapping.model.EmbeddedPersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 
 /**
@@ -45,9 +46,18 @@ class TestDataJson {
         Set<String> fieldsToBuild = builder.getFieldsToBuild(ctx)
         fieldsToBuild.addAll(data.keySet())
 
-        builder.findRequiredAssociations().each {
-            fieldsToBuild.add(it.name + ".id")
+        builder.persistentEntity.associations.each{ Association assc ->
+            if(fieldsToBuild.contains(assc.name) && !(assc.associatedEntity instanceof EmbeddedPersistentEntity)){
+                if(assc.isOwningSide()){
+                    fieldsToBuild.add(assc.name + ".*")
+                } else{
+                    fieldsToBuild.add(assc.name + ".id")
+                }
+            }
         }
+//        builder.findRequiredAssociations().each {
+//            fieldsToBuild.add(it.name + ".id")
+//        }
 
         return fieldsToBuild as List<String>
     }

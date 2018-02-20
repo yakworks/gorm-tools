@@ -9,7 +9,7 @@ import testing.OrgExt
 class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoTest{
 
     def setupSpec(){
-        mockDomains(Org, OrgExt)
+        mockDomains(Org)
     }
 
     void "sanity check TestData.build"(){
@@ -29,12 +29,13 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
         then:
         incs == ['name', 'type', 'type.id']
 
-        when:
-        incs = TestDataJson.getFieldsToBuild(Org, '*')
+    }
 
-        then:
-        incs == ['name', 'type', 'name2', 'secret', 'inactive', 'amount', 'amount2',
-                 'date', 'locDate', 'locDateTime', 'location', 'ext', 'type.id']
+    void "test buildMap"(){
+        expect:
+        def map = TestDataJson.buildMap(Org)
+
+        map == [name: 'name', type:[id:1]]
     }
 
     void "test buildJson"(){
@@ -43,13 +44,6 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
 
         buildJson.jsonText == '{"name":"foo","type":{"id":1},"name2":"bar"}'
     }
-
-//    void "test includes *"(){
-//        when:
-//        def buildJson = TestDataJson.buildJson(Org, name: 'bar', includes:'*')
-//        then:
-//        buildJson.json == '{"id":2,"isActive":false,"name":"bar"}'
-//    }
 
 }
 

@@ -37,6 +37,10 @@ trait GormRepoEntity<D extends GormEntity<D>> implements MangoQueryEntity {
         getRepo().remove(args, (D) this)
     }
 
+    void bind(Map args = [:], Map data) {
+        getRepo().getMapBinder().bind(args, (D) this, data)
+    }
+
     /**
      * Creates, binds and persists and instance
      * @return The created instance

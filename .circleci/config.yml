@@ -31,8 +31,6 @@ jobs:
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
 
       - run: ./gradlew dependencies
 
@@ -43,7 +41,18 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: ./gradlew test --no-daemon --max-workers=2
+      - run: ./gradlew check --no-daemon --max-workers=2
+
+      - store_artifacts:
+          path: plugin/build/report/tests/
+          destination: tests_reports/unit/
+
+      - store_artifacts:
+          path: examples/test-app/build/reports/tests
+          destination: tests_reports/int/
 
       - store_test_results:
-          path: plugin/build/reports/tests/test
+          path: plugin/build/test-results
+
+      - store_test_results:
+          path: examples/test-app/build/test-results

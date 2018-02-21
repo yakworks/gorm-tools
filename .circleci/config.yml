@@ -36,18 +36,24 @@ jobs:
       # - run: ./gradlew dependencies
 
       # run tests!
-      - run: ./gradlew test --no-daemon --max-workers=1
+      - run: ./gradlew plugin:check --no-daemon --max-workers=1
 
       - store_artifacts:
-          path: plugin/build/report/tests/
-          destination: tests_reports/unit/
+          path: plugin/build/reports/tests/test/
+          destination: test-reports/unit/
 
       - store_artifacts:
-          path: examples/test-app/build/reports/tests
-          destination: tests_reports/int/
+          path: plugin/build/reports/codenarc/
+          destination: codenarc/
 
       - store_test_results:
           path: plugin/build/test-results
+          
+      - run: ./gradlew test-app:check --no-daemon --max-workers=1
+
+      - store_artifacts:
+          path: examples/test-app/build/reports/tests
+          destination: test-reports/test-app/
 
       - store_test_results:
           path: examples/test-app/build/test-results

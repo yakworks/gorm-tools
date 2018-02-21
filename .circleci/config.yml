@@ -36,7 +36,7 @@ jobs:
       # - run: ./gradlew dependencies
 
       # run tests!
-      - run: ./gradlew gorm-tools:check --no-daemon --max-workers=1
+      - run: ./gradlew gorm-tools:test --no-daemon --max-workers=1
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/

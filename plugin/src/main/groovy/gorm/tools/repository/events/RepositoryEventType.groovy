@@ -12,7 +12,8 @@ enum RepositoryEventType {
     BeforePersist(BeforePersistEvent),
     AfterRemove(AfterRemoveEvent),
     AfterBind(AfterBindEvent),
-    AfterPersist(AfterPersistEvent)
+    AfterPersist(AfterPersistEvent),
+    OnError(ErrorEvent)
 
     Class eventClass
     String eventKey

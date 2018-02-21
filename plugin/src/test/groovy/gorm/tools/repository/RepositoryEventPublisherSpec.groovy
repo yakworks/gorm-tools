@@ -2,6 +2,7 @@ package gorm.tools.repository
 
 import gorm.tools.compiler.GormRepository
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.*
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.events.RepositoryEventType
@@ -66,6 +67,16 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
         then:
         city.event == "afterRemove"
+    }
+
+    void "test onError handler when persist fails"() {
+        when:
+        Map params = [id: 1, name: null]
+        City city = City.create(params)
+
+        then:
+        EntityValidationException exception = thrown(EntityValidationException)
+        exception.message.contains("Thrown from onError handler")
     }
 
     void "test subscriber listener with persist events"() {
@@ -179,6 +190,7 @@ class City {
     Map<String, Boolean> events = [:]
 
     static constraints = {
+        name nullable:false
         name2 nullable:true
         event nullable:true
         eventAfter nullable:true
@@ -202,6 +214,10 @@ class CityRepo implements GormRepo<City> {
 
     void afterRemove(City city, Map params) {
         city.event = "afterRemove"
+    }
+
+    void onError(City city, Map args, RuntimeException exception) {
+        throw new EntityValidationException("Thrown from onError handler")
     }
 
     @Subscriber("City.beforeBind")

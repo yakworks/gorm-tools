@@ -97,7 +97,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
-            throw handleException(ex, entity)
+            RuntimeException exception = handleException(ex, entity)
+            getRepoEventPublisher().doOnError(this, entity, args, exception)
+            throw exception
         }
     }
 

@@ -49,6 +49,7 @@ class RepoEventPublisher {
         findAndCacheEventMethods(RepositoryEventType.AfterRemove.eventKey, repoClass, eventMethodMap)
         findAndCacheEventMethods(RepositoryEventType.BeforePersist.eventKey, repoClass, eventMethodMap)
         findAndCacheEventMethods(RepositoryEventType.AfterPersist.eventKey, repoClass, eventMethodMap)
+        findAndCacheEventMethods(RepositoryEventType.OnError.eventKey, repoClass, eventMethodMap)
 
     }
 
@@ -103,4 +104,10 @@ class RepoEventPublisher {
         publishEvents(repo, event, [entity, args] as Object[])
 
     }
+
+    void doOnError(RepositoryApi repo, GormEntity entity, Map args, RuntimeException exception) {
+        ErrorEvent event = new ErrorEvent(repo, entity, args, exception)
+        publishEvents(repo, event, [entity, args, exception] as Object[])
+    }
+
 }

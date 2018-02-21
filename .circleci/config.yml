@@ -62,4 +62,6 @@ jobs:
           paths:
             - ~/.m2
             - ~/.gradle
+            - ~/.gradle/caches/
+            -~/.gradle/wrapper/
           key: v1-dependencies-{{ checksum "build.gradle" }}

@@ -4,6 +4,7 @@ import grails.buildtestdata.TestData
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import repoapp.Org
+import spock.lang.Ignore
 import spock.lang.Specification
 import testing.Jumper
 
@@ -16,6 +17,7 @@ class JdbcIdGeneratorSpec extends Specification {
     JdbcIdGenerator jdbcIdGenerator
     //JdbcTemplate jdbcTemplate
 
+    @Ignore
     void "test WTF"() {
         when:
         def jumper = TestData.build(Jumper)

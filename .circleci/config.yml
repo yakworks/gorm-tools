@@ -36,7 +36,7 @@ jobs:
       # - run: ./gradlew dependencies
 
       # run tests!
-      - run: ./gradlew check --no-daemon --max-workers=1
+      - run: ./gradlew test --no-daemon --max-workers=1
 
       - store_artifacts:
           path: plugin/build/report/tests/

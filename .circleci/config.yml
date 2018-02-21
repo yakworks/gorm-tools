@@ -33,8 +33,14 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
-      # - run: ./gradlew dependencies
+      - run: ./gradlew resolveConfigurations
 
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+          
       # run tests!
       - run: ./gradlew gorm-tools:test --no-daemon --max-workers=1
 
@@ -57,11 +63,3 @@ jobs:
 
       - store_test_results:
           path: examples/test-app/build/test-results
-
-      - save_cache:
-          paths:
-            - ~/.m2
-            - ~/.gradle
-            - ~/.gradle/caches/
-            - ~/.gradle/wrapper/
-          key: v1-dependencies-{{ checksum "build.gradle" }}

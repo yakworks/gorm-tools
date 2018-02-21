@@ -2,14 +2,19 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
+        maven { url 'https://palantir.bintray.com/releases/' }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails:grails-docs:$grailsVersion"
         classpath 'io.github.groovylang.groovydoc:groovydoc-gradle-plugin:1.0.1'
         classpath "gradle.plugin.com.energizedwork:idea-gradle-plugins:1.4"
+        classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
     }
 }
+//plugins {
+//    id 'com.palantir.configuration-resolver' version '0.3.0'
+//}
 
 apply plugin: 'idea'
 apply plugin: 'groovy'
@@ -35,6 +40,9 @@ ext {
     grailsPlugins = ['gorm-tools']
 }
 
+allprojects {
+    apply plugin: 'com.palantir.configuration-resolver'
+}
 
 subprojects {
 

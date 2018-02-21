@@ -15,6 +15,7 @@ apply plugin:"idea"
 apply plugin:"com.energizedwork.webdriver-binaries"
 apply plugin:"com.energizedwork.idea-project-components"
 apply plugin: 'codenarc'
+apply plugin: "jacoco"
 
 repositories {
     mavenLocal()

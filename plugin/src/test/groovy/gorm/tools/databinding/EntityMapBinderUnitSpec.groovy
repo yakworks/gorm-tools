@@ -1,8 +1,9 @@
 package gorm.tools.databinding
 
 import gorm.tools.beans.IsoDateUtil
+import gorm.tools.testing.unit.DataRepoTest
 import grails.databinding.converters.ValueConverter
-import grails.gorm.annotation.Entity
+import grails.persistence.Entity
 import grails.testing.gorm.DataTest
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
@@ -14,7 +15,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class EntityMapBinderUnitSpec extends Specification implements DataTest {
+class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     EntityMapBinder binder
 
     void setup() {
@@ -34,7 +35,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataTest {
         TestDomain domain = new TestDomain()
 
         when:
-        binder.bind(domain, [age: "100"])
+        domain.bind([age: "100"])
 
         then:
         0 * longConverter.canConvert(_)

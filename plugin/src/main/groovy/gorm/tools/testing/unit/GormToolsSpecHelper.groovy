@@ -3,7 +3,7 @@ package gorm.tools.testing.unit
 import gorm.tools.TrxService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
-import gorm.tools.mango.MangoQuery
+import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
@@ -70,7 +70,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
             repoExceptionSupport(RepoExceptionSupport)
-            mango(MangoQuery)
+            mangoQuery(DefaultMangoQuery)
             trxService(TrxService)
 
             jdbcIdGenerator(MockJdbcIdGenerator)

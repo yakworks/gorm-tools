@@ -4,6 +4,11 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import grails.artefact.Artefact
+import grails.buildtestdata.TestData
+import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
+
 //import static grails.buildtestdata.TestData.build
 import grails.plugin.gormtools.GormToolsPluginHelper
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -12,7 +17,7 @@ import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org, TestTrxRollback, Company] } //, Location, Nested, Company] }
+    List<Class> getDomainClasses() { [Org,OrgExt, TestTrxRollback] }
 
     Closure doWithConfig() {
         { config ->
@@ -102,16 +107,15 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test create with domain property"() {
         setup:
-        Location location = new Location(city: "City", nested: new Nested(name: "Nested", value: 1)).save()
-        Map params = [name: 'foo', location: location]
+        def type = TestData.build(OrgType)
+        Map params = [name: 'foo', type: type]
 
         when:
         Org org = Org.repo.create(params)
 
         then:
         org.name == "foo"
-        org.location.city == location.city
-        org.location.nested == location.nested
+        org.type
     }
 
     def "test create without required field"() {
@@ -128,14 +132,13 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test persist"() {
         when:
-        Org org = build(Org, includes:['location'], save: false)
+        Org org = build(Org, save: false)
         Org.repo.persist(org)
         org = Org.get(org.id)
 
         then:
         org.name == "name"
-        org.location.city
-        org.location.nested
+        org.type
     }
 
     def "test persist with validation"() {
@@ -363,16 +366,58 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test default quick search fields"() {
         when:
-        GormToolsPluginHelper.addQuickSearchFields(["name", "num", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
+        GormToolsPluginHelper.addQuickSearchFields(["name", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
 
         then:
-        Company.quickSearchFields == ["name", "num"]
+        TestTrxRollback.quickSearchFields == ["name"]
 
         when:
-        Company.quickSearchFields = []
-        GormToolsPluginHelper.addQuickSearchFields(["name", "location.city", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
+        TestTrxRollback.quickSearchFields = []
+        GormToolsPluginHelper.addQuickSearchFields(["name", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
 
         then:
-        Company.quickSearchFields == ["name", "location.city"]
+        TestTrxRollback.quickSearchFields == ["name"]
+
+
     }
 }
+
+@Entity @GrailsCompileStatic
+class TestTrxRollback {
+    String name
+    BigDecimal amount
+
+    static constraints = {
+        name blank: false, nullable: false
+        amount nullable: true
+    }
+}
+
+@Artefact("Repository")
+class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
+
+    @Override
+    TestTrxRollback doPersist(Map args, TestTrxRollback entity) {
+        args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
+        getRepoEventPublisher().doBeforePersist(this, entity, args)
+        entity.save(args)
+        getRepoEventPublisher().doAfterPersist(this, entity, args)
+
+        //throws the exception here to test transaction rollback
+        throw new RuntimeException()
+
+        return entity
+
+    }
+
+    @Override
+    void doRemove(Map args, TestTrxRollback entity) {
+        getRepoEventPublisher().doBeforeRemove(this, entity)
+        entity.delete(args)
+        getRepoEventPublisher().doAfterRemove(this, entity)
+
+        //throws the exception here to test transaction rollback
+        throw new RuntimeException()
+    }
+}
+

@@ -1,6 +1,7 @@
 package gorm.tools.json
 
 import gorm.tools.beans.AppCtx
+import gorm.tools.beans.BeanPathTools
 import grails.plugin.json.builder.JsonOutput.JsonWritable
 import grails.plugin.json.builder.StreamingJsonBuilder
 import grails.plugin.json.view.JsonViewTemplateEngine
@@ -25,13 +26,14 @@ class Jsonify {
 
     static JsonViewTemplate getViewTemplate() {
         if (!cachedEmptyTemplate) {
-            //create an empty and emptyTemplate and cache. we only use it to get to the DefaultGrailsJsonViewHelper
+            //create an empty and emptyTemplate and cache. we only use it to get to the DefaultGrailsJsonViewHelper which has the beans we need setup
             cachedEmptyTemplate = (JsonViewTemplate)AppCtx.get("jsonTemplateEngine", JsonViewTemplateEngine).createTemplate('')
         }
         return cachedEmptyTemplate
     }
 
     static DefaultGrailsJsonViewHelper getViewHelper() {
+        //make the script class so we can get the DefaultGrailsJsonViewHelper which has the
         JsonViewWritableScript jv = (JsonViewWritableScript) getViewTemplate().make()
         (DefaultGrailsJsonViewHelper) jv.getG()
     }
@@ -56,7 +58,9 @@ class Jsonify {
      */
     static JsonifyResult render(Object object, Map arguments = Collections.emptyMap(),
                                    @DelegatesTo(StreamingJsonBuilder.StreamingJsonDelegate) Closure customizer = null ) {
-
+        if (arguments.includes){
+            arguments.includes = BeanPathTools.getIncludes(object.class.name, arguments.includes as List<String>)
+        }
         JsonWritable writer = renderWritable(object, arguments, customizer)
         return new JsonifyResult(writer: writer)
     }

@@ -1,22 +1,19 @@
 package gorm.tools.mango.api
 
 import grails.gorm.DetachedCriteria
-import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 /**
- * A helper that just delegates calls to MangoQueryApi passing in the class from the implemented getEntityClass
- * Primary use is to enhance a Repository. see {@link gorm.tools.repository.GormRepo}
+ * For repos and concretes classes that work on a single entity
  */
-@CompileStatic
-trait MangoQueryTrait {
+trait QueryMangoEntityApi {
 
     abstract Class getEntityClass()
 
     @Autowired
-    @Qualifier("mango")
-    MangoQueryApi mangoQuery
+    @Qualifier("mangoQuery")
+    MangoQuery mangoQuery
 
     /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
@@ -39,5 +36,4 @@ trait MangoQueryTrait {
     List query(Map params = [:], Closure closure = null) {
         getMangoQuery().query(getEntityClass(), params, closure)
     }
-
 }

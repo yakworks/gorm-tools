@@ -14,7 +14,12 @@ trait DataRepoTest implements JsonViewSpecSetup, GormToolsSpecHelper, BuildDataT
 
     void mockDomains(Class<?>... domainClassesToMock) {
         BuildDataTest.super.mockDomains(domainClassesToMock)
-        mockRepositories(domainClassesToMock)
+        //mockRepositories(domainClassesToMock)
+    }
+
+    //called from BuildDataTest as it setups and mocks the domains
+    void onMockDomains(Class<?>... entityClasses) {
+        mockRepositories(entityClasses)
     }
 
 }

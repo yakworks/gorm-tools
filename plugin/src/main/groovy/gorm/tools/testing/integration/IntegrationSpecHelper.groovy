@@ -24,16 +24,9 @@ import org.springframework.mock.web.MockHttpServletRequest
  * 'specificSetup/specificCleanup/specificSetupSpec/specificCleanupSpec' that should not be marked with any annotations.
  * That's useful for the case, when you don't want your code to depend on test dependencies.
  */
-trait IntegrationSpecHelper implements SpecHookCaller {
+trait IntegrationSpecHelper {
 
-    /**
-     * An util for working with JDBC.
-     */
     JdbcTemplate jdbcTemplate
-
-    /**
-     * A service that provides the info about the current dialect of the DBMS used.
-     */
     DbDialectService dbDialectService
 
     /**
@@ -42,9 +35,6 @@ trait IntegrationSpecHelper implements SpecHookCaller {
      */
     private MetaClassRegistryCleaner registryCleaner
 
-    /**
-     * Contains common 'setupSpec' logic to be executed before the one from the Spock Specification.
-     */
     @BeforeClass
     void integrationSetupSpec() {
         doSpecificSetupSpec()

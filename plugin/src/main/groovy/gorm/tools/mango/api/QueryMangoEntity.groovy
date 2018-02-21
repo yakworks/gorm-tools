@@ -6,18 +6,19 @@ import groovy.transform.CompileStatic
 import javax.persistence.Transient
 
 /**
- * a trait for gorm domain entities to give them quick search and mango query statics
+ * a trait with statics for gorm domain entities that delegates the calls to the repository
+ * which should implement the QueryMangoEntityApi
  */
 @CompileStatic
-trait MangoQueryEntity {
+trait QueryMangoEntity {
 
     @Transient
     static List<String> quickSearchFields = []
 
-    static abstract MangoQueryTrait getMangoQueryTrait()
+    static abstract def getRepo()
 
     static DetachedCriteria buildCriteria(Map params = [:], Closure closure = null) {
-        getMangoQueryTrait().buildCriteria(params, closure)
+        ((QueryMangoEntityApi)getRepo()).buildCriteria(params, closure)
     }
 
     /**
@@ -28,6 +29,6 @@ trait MangoQueryEntity {
      * @return query of entities restricted by mango params
      */
     static List query(Map params = [:], Closure closure = null) {
-        getMangoQueryTrait().query(params, closure)
+        ((QueryMangoEntityApi)getRepo()).query(params, closure)
     }
 }

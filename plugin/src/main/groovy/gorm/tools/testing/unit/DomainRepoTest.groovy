@@ -93,6 +93,7 @@ trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{
 
     D createEntity(Map args = [:]){
         entity = entityClass.create(buildCreateMap(args))
+        //assert entity.properties == [foo:'foo']
         return get(entity.id)
     }
 
@@ -107,7 +108,7 @@ trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{
     D persistEntity(Map args = [:]){
         args.get('save', false) //adds save:false if it doesn't exists
         entity = build(args)
-        assert entity.persist()
+        assert entity.persist(flush: true)
         return get(entity.id)
     }
 

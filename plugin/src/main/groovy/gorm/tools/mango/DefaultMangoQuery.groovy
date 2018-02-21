@@ -1,7 +1,7 @@
 package gorm.tools.mango
 
 import gorm.tools.Pager
-import gorm.tools.mango.api.MangoQueryApi
+import gorm.tools.mango.api.MangoQuery
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value
 
 @CompileStatic
 @Transactional(readOnly = true)
-class MangoQuery implements MangoQueryApi {
+class DefaultMangoQuery implements MangoQuery {
 
     @Value('${gorm.tools.mango.criteriaKeyName:criteria}')
     //gets criteria keyword from config, if there is no, then uses 'criteria'

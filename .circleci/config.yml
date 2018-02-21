@@ -19,9 +19,10 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
-      GRADLE_OPTS: "-Xmx3200m -Dorg.gradle.daemon=false"
+      GRADLE_OPTS: "-Xmx3400M -Dorg.gradle.daemon=false"
       TERM: dumb
 
+    parallelism: 1
     resource_class: large
 
     steps:
@@ -32,16 +33,10 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: ./gradlew dependencies
-
-      - save_cache:
-          paths:
-            - ~/.m2
-            - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+      # - run: ./gradlew dependencies
 
       # run tests!
-      - run: ./gradlew check --no-daemon --max-workers=2
+      - run: ./gradlew check --no-daemon --max-workers=1
 
       - store_artifacts:
           path: plugin/build/report/tests/
@@ -56,3 +51,9 @@ jobs:
 
       - store_test_results:
           path: examples/test-app/build/test-results
+
+      - save_cache:
+          paths:
+            - ~/.m2
+            - ~/.gradle
+          key: v1-dependencies-{{ checksum "build.gradle" }}

@@ -6,3 +6,4 @@
 - check all moved fields
 - nameOrId is now identify
 - removed boolean on failure messages
+- foo

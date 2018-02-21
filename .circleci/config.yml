@@ -35,7 +35,7 @@ jobs:
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
       #- run: ./gradlew resolveConfigurations
-      - run: ./gradlew gorm-tools:dependencies
+      - run: ./gradlew test-app:dependencies
 
       - save_cache:
           paths:

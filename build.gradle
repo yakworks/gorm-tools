@@ -12,9 +12,6 @@ buildscript {
         //classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
     }
 }
-//plugins {
-//    id 'com.palantir.configuration-resolver' version '0.3.0'
-//}
 
 apply plugin: 'idea'
 apply plugin: 'groovy'

@@ -1,17 +1,16 @@
 package gorm.tools.jdbc
 
 import grails.gorm.transactions.Rollback
-import grails.plugin.gormtools.Application
 import grails.testing.mixin.integration.Integration
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import spock.lang.Specification
-import gorm.tools.testing.integration.IntegrationSpecHelper
+import gorm.tools.testing.integration.DataIntegrationTest
 
 import javax.sql.DataSource
 
 @Integration
 @Rollback
-class ScrollableQuerySpec extends Specification implements IntegrationSpecHelper {
+class ScrollableQuerySpec extends Specification implements DataIntegrationTest {
 
     DataSource dataSource
 

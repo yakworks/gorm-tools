@@ -466,6 +466,66 @@
             "title": "References on this"
         },
         {
+            "location": "/testing/",
+            "text": "Gorm-tools provides a set of test helpers to make the testing process more convenient\n\n\nIntegration testing\n\n\nIntegrationSpecHelper\n\n\nThis is a base trait that contains common logic for integration tests.\n\n\nTest class should extend \nSpecification\n class explicitly and implement IntegrationSpecHelper:\n\n\n    \nclass\n \nSomeSpec\n \nextends\n \nSpecification\n \nimplements\n \nIntegrationSpecHelper\n\n\n\n\n\nDue to the fact that Spock conventional approach with setup/cleanup methods doesn't work with traits,\nthis helper uses \n@Before\n / \n@After\n JUnit annotations to implement setup and cleanup logic.\n\n\nAs well as setup logic, IntegrationSpecHelper provides a bunch of useful methods which can be used in tests:\n\n\n\n\nbuildParams - build GrailsParameter map from a given map\n\n\nflushAndClear - flushes and clears the session cache, the shortcut for \nRepoUtil.flushAndClear()\n\n\nflush - flushes the session cache, the shortcut for \nRepoUtil.flush()\n\n\nclear - clears the session cache, the shortcut for \nRepoUtil.clear()\n\n\ntrackMetaClassChanges - start tracking all metaclass changes made after this call, so it can all be undone later\n\n\n\n\nIntegrationSpecHelper provides an ability to execute application-specific setup/cleanup logic simply by chaining it with\nsome custom trait:\n\n\n    \nclass\n \nSomeSpec\n \nextends\n \nSpecification\n \nimplements\n \nIntegrationSpecHelper\n,\n \nCustomSpecHelper\n\n\n\n\n\nCustomSpecHelper may implement the next methods:\n\n\n\n\nspecificSetup\n\n\nspecificCleanup\n\n\nspecificSetupSpec\n\n\nspecificCleanupSpec\n\n\n\n\nThe behavior of these methods is equivalent to Spock conventional methods\n\n\n\n\nNote\n\n\nSpecific method is executed after the method defined in IntegrationSpecHelper\n\n\n\n\nControllerIntegrationSpecHelper\n\n\nThis trait extends \nIntegrationSpecHelper\n and provides common logic\nwhich can be useful when testing controllers. So there is no need to implement IntegrationSpecHelper explicitly.\nFor example:\n\n\n    \nclass\n \nSomeSpec\n \nextends\n \nSpecification\n \nimplements\n \nControllerIntegrationSpecHelper\n\n\n\n\n\nBy default it sets up mock request/response pair and injects application context bean. \n\n\nControllerIntegrationSpecHelper contains the next util methods:\n\n\n\n\n\n\ngetControllerName - can be overridden in the test class to return the controller name.\n     This name is appended to the request attributes. Returns null by default value.\n\n\nAlso, can be specified as a property:\n \n   \nString\n \ncontrollerName\n \n=\n \nOrg\n\n\n\n\n\n\n\n\nautowire - autowires bean properties of a given controller and returns the controller instance\n\n\n\n\nmockRender - adds mock of the \nrender\n method to a metaclass of a given controller\n\n\ngetCurrentRequestAttributes - returns the current request attributes\n\n\n\n\nUtil methods from IntegrationSpecHelper are available as well.\n\n\n\n\nNote\n\n\nIn case of using this trait with a custom helper trait, the setup methods will be called in the next order:\nIntegrationSpecHelper -\n ControllerIntegrationSpecHelper -\n CustomSpecHelper\n\n\n\n\nUnit testing\n\n\nDataRepoTest\n\n\nTODO\n\n\n\n\n\nDomainRepoCrudSpec\n\n\nTODO\n\n\n\n\n\nDomainRepoTest\n\n\nTODO\n\n\n\n\n\nGormToolsSpecHelper\n\n\nTODO\n\n\n\n\n\nGormToolsTest\n\n\nTODO\n\n\n\n\n\nJsonViewSpecSetup\n\n\nTODO\n\n\n\n\n\nMockJdbcIdGenerator\n\n\nTODO",
+            "title": "Testing"
+        },
+        {
+            "location": "/testing/#integration-testing",
+            "text": "",
+            "title": "Integration testing"
+        },
+        {
+            "location": "/testing/#integrationspechelper",
+            "text": "This is a base trait that contains common logic for integration tests.  Test class should extend  Specification  class explicitly and implement IntegrationSpecHelper:       class   SomeSpec   extends   Specification   implements   IntegrationSpecHelper   Due to the fact that Spock conventional approach with setup/cleanup methods doesn't work with traits,\nthis helper uses  @Before  /  @After  JUnit annotations to implement setup and cleanup logic.  As well as setup logic, IntegrationSpecHelper provides a bunch of useful methods which can be used in tests:   buildParams - build GrailsParameter map from a given map  flushAndClear - flushes and clears the session cache, the shortcut for  RepoUtil.flushAndClear()  flush - flushes the session cache, the shortcut for  RepoUtil.flush()  clear - clears the session cache, the shortcut for  RepoUtil.clear()  trackMetaClassChanges - start tracking all metaclass changes made after this call, so it can all be undone later   IntegrationSpecHelper provides an ability to execute application-specific setup/cleanup logic simply by chaining it with\nsome custom trait:       class   SomeSpec   extends   Specification   implements   IntegrationSpecHelper ,   CustomSpecHelper   CustomSpecHelper may implement the next methods:   specificSetup  specificCleanup  specificSetupSpec  specificCleanupSpec   The behavior of these methods is equivalent to Spock conventional methods   Note  Specific method is executed after the method defined in IntegrationSpecHelper",
+            "title": "IntegrationSpecHelper"
+        },
+        {
+            "location": "/testing/#controllerintegrationspechelper",
+            "text": "This trait extends  IntegrationSpecHelper  and provides common logic\nwhich can be useful when testing controllers. So there is no need to implement IntegrationSpecHelper explicitly.\nFor example:       class   SomeSpec   extends   Specification   implements   ControllerIntegrationSpecHelper   By default it sets up mock request/response pair and injects application context bean.   ControllerIntegrationSpecHelper contains the next util methods:    getControllerName - can be overridden in the test class to return the controller name.\n     This name is appended to the request attributes. Returns null by default value.  Also, can be specified as a property:\n      String   controllerName   =   Org     autowire - autowires bean properties of a given controller and returns the controller instance   mockRender - adds mock of the  render  method to a metaclass of a given controller  getCurrentRequestAttributes - returns the current request attributes   Util methods from IntegrationSpecHelper are available as well.   Note  In case of using this trait with a custom helper trait, the setup methods will be called in the next order:\nIntegrationSpecHelper -  ControllerIntegrationSpecHelper -  CustomSpecHelper",
+            "title": "ControllerIntegrationSpecHelper"
+        },
+        {
+            "location": "/testing/#unit-testing",
+            "text": "",
+            "title": "Unit testing"
+        },
+        {
+            "location": "/testing/#datarepotest",
+            "text": "TODO",
+            "title": "DataRepoTest"
+        },
+        {
+            "location": "/testing/#domainrepocrudspec",
+            "text": "TODO",
+            "title": "DomainRepoCrudSpec"
+        },
+        {
+            "location": "/testing/#domainrepotest",
+            "text": "TODO",
+            "title": "DomainRepoTest"
+        },
+        {
+            "location": "/testing/#gormtoolsspechelper",
+            "text": "TODO",
+            "title": "GormToolsSpecHelper"
+        },
+        {
+            "location": "/testing/#gormtoolstest",
+            "text": "TODO",
+            "title": "GormToolsTest"
+        },
+        {
+            "location": "/testing/#jsonviewspecsetup",
+            "text": "TODO",
+            "title": "JsonViewSpecSetup"
+        },
+        {
+            "location": "/testing/#mockjdbcidgenerator",
+            "text": "TODO",
+            "title": "MockJdbcIdGenerator"
+        },
+        {
             "location": "/api/",
             "text": "The Groovy/Java Docs API can be found here\n\n\nhttps://yakworks.github.io/gorm-tools/api/",
             "title": "API Docs"

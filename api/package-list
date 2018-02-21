@@ -17,6 +17,7 @@ gorm.tools.repository.events
 gorm.tools.testing
 gorm.tools.testing.builder
 gorm.tools.testing.hibernate
+gorm.tools.testing.integration
 gorm.tools.testing.unit
 grails.plugin.gormtools
 org.grails.orm.hibernate.cfg

@@ -11,7 +11,7 @@
         <meta name="description" content="Helpers for gorm">
       
       
-        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/gorm-utils/">
+        <link rel="canonical" href="http://yakworks.github.io/gorm-tools/testing/">
       
       
         <meta name="author" content="Joshua Burnett">
@@ -23,7 +23,7 @@
     
     
       
-        <title>GormUtils Class - Gorm Tools</title>
+        <title>Testing - Gorm Tools</title>
       
     
     
@@ -120,12 +120,8 @@
             Gorm Tools -
             
               
-                <span class="md-header-nav__parent">
-                  Toolbox
-                </span>
-              
             
-            GormUtils Class
+            Testing
           
         </span>
       </div>
@@ -331,12 +327,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
     
     <label class="md-nav__link" for="nav-5">
       Toolbox
@@ -364,97 +358,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        GormUtils Class
-      </label>
-    
-    <a href="./" title="GormUtils Class" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../gorm-utils/" title="GormUtils Class" class="md-nav__link">
       GormUtils Class
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#gormutils" title="GormUtils" class="md-nav__link">
-    GormUtils
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#coping-properties-from-source-to-target-domain-instance" title="Coping properties from source to target domain instance" class="md-nav__link">
-    Coping properties from source to target domain instance
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#fetching-a-nested-property-using-a-string-name" title="Fetching a nested property using a string name" class="md-nav__link">
-    Fetching a nested property using a string name
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#copying-a-domain-instance" title="Copying a domain instance" class="md-nav__link">
-    Copying a domain instance
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gormmetautils" title="GormMetaUtils" class="md-nav__link">
-    GormMetaUtils
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#getting-a-domain-class" title="Getting a domain class" class="md-nav__link">
-    Getting a domain class
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#getting-a-persistent-entity" title="Getting a persistent entity" class="md-nav__link">
-    Getting a persistent entity
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -491,11 +399,125 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../testing/" title="Testing" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Testing
+      </label>
+    
+    <a href="./" title="Testing" class="md-nav__link md-nav__link--active">
       Testing
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#integration-testing" title="Integration testing" class="md-nav__link">
+    Integration testing
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#integrationspechelper" title="IntegrationSpecHelper" class="md-nav__link">
+    IntegrationSpecHelper
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#controllerintegrationspechelper" title="ControllerIntegrationSpecHelper" class="md-nav__link">
+    ControllerIntegrationSpecHelper
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unit-testing" title="Unit testing" class="md-nav__link">
+    Unit testing
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#datarepotest" title="DataRepoTest" class="md-nav__link">
+    DataRepoTest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domainrepocrudspec" title="DomainRepoCrudSpec" class="md-nav__link">
+    DomainRepoCrudSpec
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domainrepotest" title="DomainRepoTest" class="md-nav__link">
+    DomainRepoTest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gormtoolsspechelper" title="GormToolsSpecHelper" class="md-nav__link">
+    GormToolsSpecHelper
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gormtoolstest" title="GormToolsTest" class="md-nav__link">
+    GormToolsTest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jsonviewspecsetup" title="JsonViewSpecSetup" class="md-nav__link">
+    JsonViewSpecSetup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mockjdbcidgenerator" title="MockJdbcIdGenerator" class="md-nav__link">
+    MockJdbcIdGenerator
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -542,30 +564,23 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#gormutils" title="GormUtils" class="md-nav__link">
-    GormUtils
+  <a href="#integration-testing" title="Integration testing" class="md-nav__link">
+    Integration testing
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#coping-properties-from-source-to-target-domain-instance" title="Coping properties from source to target domain instance" class="md-nav__link">
-    Coping properties from source to target domain instance
+  <a href="#integrationspechelper" title="IntegrationSpecHelper" class="md-nav__link">
+    IntegrationSpecHelper
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#fetching-a-nested-property-using-a-string-name" title="Fetching a nested property using a string name" class="md-nav__link">
-    Fetching a nested property using a string name
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#copying-a-domain-instance" title="Copying a domain instance" class="md-nav__link">
-    Copying a domain instance
+  <a href="#controllerintegrationspechelper" title="ControllerIntegrationSpecHelper" class="md-nav__link">
+    ControllerIntegrationSpecHelper
   </a>
   
 </li>
@@ -576,23 +591,58 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gormmetautils" title="GormMetaUtils" class="md-nav__link">
-    GormMetaUtils
+  <a href="#unit-testing" title="Unit testing" class="md-nav__link">
+    Unit testing
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#getting-a-domain-class" title="Getting a domain class" class="md-nav__link">
-    Getting a domain class
+  <a href="#datarepotest" title="DataRepoTest" class="md-nav__link">
+    DataRepoTest
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#getting-a-persistent-entity" title="Getting a persistent entity" class="md-nav__link">
-    Getting a persistent entity
+  <a href="#domainrepocrudspec" title="DomainRepoCrudSpec" class="md-nav__link">
+    DomainRepoCrudSpec
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domainrepotest" title="DomainRepoTest" class="md-nav__link">
+    DomainRepoTest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gormtoolsspechelper" title="GormToolsSpecHelper" class="md-nav__link">
+    GormToolsSpecHelper
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gormtoolstest" title="GormToolsTest" class="md-nav__link">
+    GormToolsTest
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jsonviewspecsetup" title="JsonViewSpecSetup" class="md-nav__link">
+    JsonViewSpecSetup
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mockjdbcidgenerator" title="MockJdbcIdGenerator" class="md-nav__link">
+    MockJdbcIdGenerator
   </a>
   
 </li>
@@ -616,80 +666,109 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/gorm-utils.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/testing.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>GormUtils Class</h1>
+                  <h1>Testing</h1>
                 
                 
-                <p>Gorm-tools provides two utils to work with domains.
-See <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/GormUtils.html">GormUtils</a>
-and <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/GormMetaUtils.html">GormMetaUtils</a></p>
-<h2 id="gormutils">GormUtils<a class="headerlink" href="#gormutils" title="Permanent link">&para;</a></h2>
-<h3 id="coping-properties-from-source-to-target-domain-instance">Coping properties from source to target domain instance<a class="headerlink" href="#coping-properties-from-source-to-target-domain-instance" title="Permanent link">&para;</a></h3>
-<p>Using <code>copyProperties</code> we can copy some of properties from one domain to another:</p>
-<p><div class="codehilite"><pre><span></span>    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">firstName:</span> <span class="s1">&#39;John&#39;</span><span class="o">,</span> <span class="nl">lastName:</span> <span class="s1">&#39;Doe&#39;</span> <span class="nl">age:</span> <span class="mi">30</span><span class="o">)</span>
-    <span class="n">User</span> <span class="n">user2</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">()</span>
-    <span class="n">User</span> <span class="n">user3</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">()</span>
-
-    <span class="n">GormUtils</span><span class="o">.</span><span class="na">copyProperties</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">user2</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="s1">&#39;firstName&#39;</span><span class="o">)</span>
-    <span class="n">GormUtils</span><span class="o">.</span><span class="na">copyProperties</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">user3</span><span class="o">,</span> <span class="kc">false</span><span class="o">,</span> <span class="s1">&#39;firstName&#39;</span><span class="o">,</span> <span class="s1">&#39;age&#39;</span><span class="o">)</span>
-
-    <span class="k">assert</span> <span class="n">user2</span><span class="o">.</span><span class="na">firstName</span> <span class="o">==</span> <span class="n">user</span><span class="o">.</span><span class="na">firstName</span>
-    <span class="k">assert</span> <span class="n">user2</span><span class="o">.</span><span class="na">age</span> <span class="o">!=</span> <span class="n">user</span><span class="o">.</span><span class="na">age</span>
-
-    <span class="k">assert</span> <span class="n">user3</span><span class="o">.</span><span class="na">firstName</span> <span class="o">==</span> <span class="n">user</span><span class="o">.</span><span class="na">firstName</span>
-    <span class="k">assert</span> <span class="n">user3</span><span class="o">.</span><span class="na">age</span> <span class="o">==</span> <span class="n">user</span><span class="o">.</span><span class="na">age</span>
-</pre></div>
-In this example <code>user</code> is the source object, <code>user2</code> and <code>user3</code> are targets.
-If the 3<sup>rd</sup> argument is false the method will override a target value even if it's not null.
-Then we can specify properties to copy from the source object.</p>
-<h3 id="fetching-a-nested-property-using-a-string-name">Fetching a nested property using a string name<a class="headerlink" href="#fetching-a-nested-property-using-a-string-name" title="Permanent link">&para;</a></h3>
-<p>GormUtils allows us to get a nested property from an object using a string as a path:</p>
-<p><div class="codehilite"><pre><span></span>    <span class="n">Address</span> <span class="n">address</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Address</span><span class="o">(</span><span class="nl">street:</span> <span class="s1">&#39;street&#39;</span><span class="o">,</span> <span class="nl">city:</span> <span class="s1">&#39;city&#39;</span><span class="o">)</span>
-    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">firstName:</span> <span class="s1">&#39;John&#39;</span><span class="o">,</span> <span class="nl">lastName:</span> <span class="s1">&#39;Doe&#39;</span> <span class="nl">age:</span> <span class="mi">30</span><span class="o">,</span> <span class="nl">address:</span> <span class="n">address</span><span class="o">)</span>
-
-    <span class="n">String</span> <span class="n">street</span> <span class="o">=</span> <span class="n">GormUtils</span><span class="o">.</span><span class="na">getPropertyValue</span><span class="o">(</span><span class="n">person</span><span class="o">,</span> <span class="s1">&#39;address.street&#39;</span><span class="o">)</span>
-
-    <span class="k">assert</span> <span class="n">street</span> <span class="o">==</span> <span class="n">address</span><span class="o">.</span><span class="na">street</span>
-</pre></div>
-As you can see we can specify nested properties simply by adding a ( <code>.</code> ) symbol to a parent's property name.</p>
-<h3 id="copying-a-domain-instance">Copying a domain instance<a class="headerlink" href="#copying-a-domain-instance" title="Permanent link">&para;</a></h3>
-<p><div class="codehilite"><pre><span></span>    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">firstName:</span> <span class="s1">&#39;John&#39;</span><span class="o">,</span> <span class="nl">lastName:</span> <span class="s1">&#39;Doe&#39;</span> <span class="nl">age:</span> <span class="mi">30</span><span class="o">)</span>
-
-    <span class="n">User</span> <span class="n">copy</span> <span class="o">=</span> <span class="n">GormUtils</span><span class="o">.</span><span class="na">copyDomain</span><span class="o">(</span><span class="n">User</span><span class="o">,</span> <span class="n">user</span><span class="o">)</span>
-    <span class="k">assert</span> <span class="n">copy</span><span class="o">.</span><span class="na">firstName</span> <span class="o">==</span> <span class="s1">&#39;John&#39;</span>
-    <span class="k">assert</span> <span class="n">copy</span><span class="o">.</span><span class="na">lastName</span> <span class="o">==</span> <span class="s1">&#39;Doe&#39;</span>
-    <span class="k">assert</span> <span class="n">copy</span><span class="o">.</span><span class="na">age</span> <span class="o">==</span> <span class="mi">30</span>
-</pre></div>
-or with existing object</p>
-<div class="codehilite"><pre><span></span>    <span class="n">User</span> <span class="n">copy</span> <span class="o">=</span> <span class="n">GormUtils</span><span class="o">.</span><span class="na">copyDomain</span><span class="o">(</span><span class="k">new</span> <span class="n">User</span><span class="o">(),</span> <span class="n">user</span><span class="o">)</span>
-    <span class="k">assert</span> <span class="n">copy</span><span class="o">.</span><span class="na">firstName</span> <span class="o">==</span> <span class="s1">&#39;John&#39;</span>
-    <span class="k">assert</span> <span class="n">copy</span><span class="o">.</span><span class="na">lastName</span> <span class="o">==</span> <span class="s1">&#39;Doe&#39;</span>
-    <span class="k">assert</span> <span class="n">copy</span><span class="o">.</span><span class="na">age</span> <span class="o">==</span> <span class="mi">30</span>
+                <p>Gorm-tools provides a set of test helpers to make the testing process more convenient</p>
+<h2 id="integration-testing">Integration testing<a class="headerlink" href="#integration-testing" title="Permanent link">&para;</a></h2>
+<h3 id="integrationspechelper">IntegrationSpecHelper<a class="headerlink" href="#integrationspechelper" title="Permanent link">&para;</a></h3>
+<p>This is a base trait that contains common logic for integration tests.</p>
+<p>Test class should extend <a class="new-tab" href="http://spockframework.org/spock/javadoc/1.0/spock/lang/Specification.html">Specification</a> class explicitly and implement IntegrationSpecHelper:</p>
+<div class="codehilite"><pre><span></span>    <span class="kd">class</span> <span class="nc">SomeSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">IntegrationSpecHelper</span>
 </pre></div>
 
-<h2 id="gormmetautils">GormMetaUtils<a class="headerlink" href="#gormmetautils" title="Permanent link">&para;</a></h2>
-<h3 id="getting-a-domain-class">Getting a domain class<a class="headerlink" href="#getting-a-domain-class" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span>    <span class="c1">// using a fully qualified name with package</span>
-    <span class="n">GormMetaUtils</span><span class="o">.</span><span class="na">getDomainClass</span><span class="o">(</span><span class="s2">&quot;gorm.tools.Org&quot;</span><span class="o">)</span>
-
-    <span class="c1">// using a domain instance</span>
-    <span class="n">GormMetaUtils</span><span class="o">.</span><span class="na">getDomainClass</span><span class="o">(</span><span class="k">new</span> <span class="n">Org</span><span class="o">())</span>
-
-    <span class="c1">// using a class</span>
-    <span class="n">GormMetaUtils</span><span class="o">.</span><span class="na">getDomainClass</span><span class="o">(</span><span class="n">Org</span><span class="o">)</span>
+<p>Due to the fact that Spock conventional approach with setup/cleanup methods doesn't work with traits,
+this helper uses <code>@Before</code> / <code>@After</code> JUnit annotations to implement setup and cleanup logic.</p>
+<p>As well as setup logic, IntegrationSpecHelper provides a bunch of useful methods which can be used in tests:</p>
+<ol>
+<li>buildParams - build GrailsParameter map from a given map</li>
+<li>flushAndClear - flushes and clears the session cache, the shortcut for <a class="new-tab" href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L91">RepoUtil.flushAndClear()</a></li>
+<li>flush - flushes the session cache, the shortcut for <a class="new-tab" href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L101">RepoUtil.flush()</a></li>
+<li>clear - clears the session cache, the shortcut for <a class="new-tab" href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L111">RepoUtil.clear()</a></li>
+<li>trackMetaClassChanges - start tracking all metaclass changes made after this call, so it can all be undone later</li>
+</ol>
+<p>IntegrationSpecHelper provides an ability to execute application-specific setup/cleanup logic simply by chaining it with
+some custom trait:</p>
+<div class="codehilite"><pre><span></span>    <span class="kd">class</span> <span class="nc">SomeSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">IntegrationSpecHelper</span><span class="o">,</span> <span class="n">CustomSpecHelper</span>
 </pre></div>
 
-<h3 id="getting-a-persistent-entity">Getting a persistent entity<a class="headerlink" href="#getting-a-persistent-entity" title="Permanent link">&para;</a></h3>
-<div class="codehilite"><pre><span></span>    <span class="c1">// using a fully qualified name with package</span>
-    <span class="n">GormMetaUtils</span><span class="o">.</span><span class="na">getPersistentEntity</span><span class="o">(</span><span class="s2">&quot;gorm.tools.Org&quot;</span><span class="o">)</span>
+<p>CustomSpecHelper may implement the next methods:</p>
+<ol>
+<li>specificSetup</li>
+<li>specificCleanup</li>
+<li>specificSetupSpec</li>
+<li>specificCleanupSpec</li>
+</ol>
+<p>The behavior of these methods is equivalent to Spock conventional methods</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Specific method is executed after the method defined in IntegrationSpecHelper</p>
+</div>
+<h3 id="controllerintegrationspechelper">ControllerIntegrationSpecHelper<a class="headerlink" href="#controllerintegrationspechelper" title="Permanent link">&para;</a></h3>
+<p>This trait extends <strong>IntegrationSpecHelper</strong> and provides common logic
+which can be useful when testing controllers. So there is no need to implement IntegrationSpecHelper explicitly.
+For example:</p>
+<div class="codehilite"><pre><span></span>    <span class="kd">class</span> <span class="nc">SomeSpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">ControllerIntegrationSpecHelper</span>
+</pre></div>
 
-    <span class="c1">// using a domain instance</span>
-    <span class="n">GormMetaUtils</span><span class="o">.</span><span class="na">getPersistentEntity</span><span class="o">(</span><span class="k">new</span> <span class="n">Org</span><span class="o">())</span>
+<p>By default it sets up mock request/response pair and injects application context bean. </p>
+<p>ControllerIntegrationSpecHelper contains the next util methods:</p>
+<ol>
+<li>
+<p>getControllerName - can be overridden in the test class to return the controller name.
+     This name is appended to the request attributes. Returns null by default value.</p>
+<p>Also, can be specified as a property:
+ <div class="codehilite"><pre><span></span>   <span class="n">String</span> <span class="n">controllerName</span> <span class="o">=</span> <span class="s2">&quot;Org&quot;</span>
+</pre></div></p>
+</li>
+<li>
+<p>autowire - autowires bean properties of a given controller and returns the controller instance</p>
+</li>
+<li>mockRender - adds mock of the <code>render</code> method to a metaclass of a given controller</li>
+<li>getCurrentRequestAttributes - returns the current request attributes</li>
+</ol>
+<p>Util methods from IntegrationSpecHelper are available as well.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In case of using this trait with a custom helper trait, the setup methods will be called in the next order:
+IntegrationSpecHelper -&gt; ControllerIntegrationSpecHelper -&gt; CustomSpecHelper</p>
+</div>
+<h2 id="unit-testing">Unit testing<a class="headerlink" href="#unit-testing" title="Permanent link">&para;</a></h2>
+<h3 id="datarepotest">DataRepoTest<a class="headerlink" href="#datarepotest" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>TODO
+</pre></div>
 
-    <span class="c1">// using a class</span>
-    <span class="n">GormMetaUtils</span><span class="o">.</span><span class="na">getPersistentEntity</span><span class="o">(</span><span class="n">Org</span><span class="o">)</span>
+
+<h3 id="domainrepocrudspec">DomainRepoCrudSpec<a class="headerlink" href="#domainrepocrudspec" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>TODO
+</pre></div>
+
+
+<h3 id="domainrepotest">DomainRepoTest<a class="headerlink" href="#domainrepotest" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>TODO
+</pre></div>
+
+
+<h3 id="gormtoolsspechelper">GormToolsSpecHelper<a class="headerlink" href="#gormtoolsspechelper" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>TODO
+</pre></div>
+
+
+<h3 id="gormtoolstest">GormToolsTest<a class="headerlink" href="#gormtoolstest" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>TODO
+</pre></div>
+
+
+<h3 id="jsonviewspecsetup">JsonViewSpecSetup<a class="headerlink" href="#jsonviewspecsetup" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>TODO
+</pre></div>
+
+
+<h3 id="mockjdbcidgenerator">MockJdbcIdGenerator<a class="headerlink" href="#mockjdbcidgenerator" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span>TODO
 </pre></div>
                 
                   
@@ -709,7 +788,7 @@ or with existing object</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../id-generation/" title="Id Generation" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../working-with-dates/" title="Date Utils" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -718,19 +797,19 @@ or with existing object</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Id Generation
+                Date Utils
               </span>
             </div>
           </a>
         
         
-          <a href="../beanPathTools/" title="Bean Path Tools" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../api/" title="API Docs" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Bean Path Tools
+                API Docs
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

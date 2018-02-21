@@ -33,14 +33,16 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: ./gradlew resolveConfigurations
+      # see https://github.com/palantir/gradle-configuration-resolver-plugin
+      #- run: ./gradlew resolveConfigurations
+      - run: ./gradlew gorm-tools:dependencies
 
       - save_cache:
           paths:
             - ~/.m2
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
-          
+
       # run tests!
       - run: ./gradlew gorm-tools:test --no-daemon --max-workers=1
 

@@ -17,7 +17,16 @@ class RepoExceptionSupport {
 
     @CompileDynamic
     RuntimeException translateException(RuntimeException ex, GormEntity entity) {
-        if (ex instanceof grails.validation.ValidationException) {
+        /*
+         * We need to check for EntityValidationException first and return it back without changes,
+         * because in case "ex" is the EntityValidationException, it will be re-created with "notSaved" message.
+         * This way we can lose the original message that is stored in EntityValidationException.
+         * It happens because EntityValidationException is inherited from DataIntegrityViolationException and DataAccessException,
+         * thus checks for these exceptions also cover EntityValidationException case.
+         */
+        if (ex instanceof EntityValidationException) {
+            return ex
+        } else if (ex instanceof grails.validation.ValidationException) {
             grails.validation.ValidationException ve = (grails.validation.ValidationException) ex
             return new EntityValidationException(RepoMessage.notSaved(entity, true), entity, ve.errors, ve)
         } else if (ex instanceof DataIntegrityViolationException) {

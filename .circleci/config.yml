@@ -37,11 +37,6 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: |
-          curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-          sudo python get-pip.py
-          pip install --user -r pip-requirements.txt
-
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
       #- run: ./gradlew resolveConfigurations
       - run: ./gradlew test-app:dependencies

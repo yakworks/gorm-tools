@@ -37,7 +37,7 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
-      - run: apt install python-pip; pip install --user -r pip-requirements.txt
+      - run: sudo apt install python-pip; pip install --user -r pip-requirements.txt
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
       #- run: ./gradlew resolveConfigurations

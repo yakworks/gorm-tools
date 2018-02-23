@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 set -e
+curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+python get-pip.py
 
 # only build when its not a branch and not a pull request
 if [[ $CIRCLE_BRANCH == 'master'] && [ -z "$CIRCLE_PULL_REQUEST" ]]

@@ -14,14 +14,19 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
+    branches:
+      only:
+        - circleci
+
     working_directory: ~/repo
 
     environment:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
-      GRADLE_OPTS: "-Xmx3200m -Dorg.gradle.daemon=false"
+      GRADLE_OPTS: "-Xmx3400M -Dorg.gradle.daemon=false"
       TERM: dumb
 
+    parallelism: 1
     resource_class: large
 
     steps:
@@ -31,10 +36,10 @@ jobs:
       - restore_cache:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
 
-      - run: ./gradlew dependencies
+      # see https://github.com/palantir/gradle-configuration-resolver-plugin
+      #- run: ./gradlew resolveConfigurations
+      - run: ./gradlew test-app:dependencies
 
       - save_cache:
           paths:
@@ -43,7 +48,24 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: ./gradlew test --no-daemon --max-workers=2
+      - run: ./gradlew gorm-tools:test --max-workers=1
+
+      - store_artifacts:
+          path: plugin/build/reports/tests/test/
+          destination: test-reports/unit/
+
+      - store_artifacts:
+          path: plugin/build/reports/codenarc/
+          destination: codenarc/
 
       - store_test_results:
-          path: plugin/build/reports/tests/test
+          path: plugin/build/test-results
+
+      - run: ./gradlew test-app:check --max-workers=1
+
+      - store_artifacts:
+          path: examples/test-app/build/reports/tests
+          destination: test-reports/test-app/
+
+      - store_test_results:
+          path: examples/test-app/build/test-results

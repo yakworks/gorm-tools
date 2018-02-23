@@ -4,6 +4,7 @@ import gorm.tools.testing.unit.MockJdbcIdGenerator
 import grails.test.hibernate.HibernateSpec
 import groovyx.gpars.GParsPool
 import spock.lang.Shared
+import testing.Org
 
 class PooledIdGeneratorSpec extends HibernateSpec {
 
@@ -12,13 +13,15 @@ class PooledIdGeneratorSpec extends HibernateSpec {
     @Shared
     PooledIdGenerator batchgen
 
+    List<Class> getDomainClasses() { [Org] }
+
     void setupSpec() {
         mockdbgen = new MockJdbcIdGenerator()
         mockdbgen.table.put("table.id", 1)
         mockdbgen.table.put("table1.id", 99)
 
         batchgen = new PooledIdGenerator(mockdbgen)
-        mockdbgen.transactionManager = getTransactionManager()
+        //mockdbgen.transactionManager = getTransactionManager()
         //batchgen.setBatchSize(5)
 
     }

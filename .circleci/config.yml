@@ -14,6 +14,10 @@ jobs:
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
+    branches:
+      only:
+        - circleci
+
     working_directory: ~/repo
 
     environment:
@@ -33,6 +37,9 @@ jobs:
           keys:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
+      - run: python --version
+      - run: python3 --version
+
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
       #- run: ./gradlew resolveConfigurations
       - run: ./gradlew test-app:dependencies
@@ -44,7 +51,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: ./gradlew gorm-tools:test --no-daemon --max-workers=1
+      - run: ./gradlew gorm-tools:test --max-workers=1
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/
@@ -57,7 +64,7 @@ jobs:
       - store_test_results:
           path: plugin/build/test-results
 
-      - run: ./gradlew test-app:check --no-daemon --max-workers=1
+      - run: ./gradlew test-app:check --max-workers=1
 
       - store_artifacts:
           path: examples/test-app/build/reports/tests

@@ -70,6 +70,7 @@ subprojects {
         }
     }
 
+    apply plugin: 'com.palantir.configuration-resolver' //see above CI usage on this
     apply plugin:'groovy'
 
     sourceCompatibility = '1.8'

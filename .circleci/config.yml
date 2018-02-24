@@ -69,3 +69,5 @@ jobs:
 
       - store_test_results:
           path: examples/test-app/build/test-results
+
+      - run: pip3 install --user -r pip-requirements.txt; python3 -m mkdocs build

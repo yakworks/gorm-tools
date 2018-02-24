@@ -186,3 +186,7 @@ subprojects {
     }
 
 }
+
+//task delombok(type: Exec) {
+//    commandLine 'java', '-jar', 'build-libs/lombok.jar', 'delombok', 'src', '-d', 'build/src-delomboked'
+//}

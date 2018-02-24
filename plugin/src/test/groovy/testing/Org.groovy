@@ -42,7 +42,7 @@ class Org {
         name2    nullable: true
         secret   nullable: true, display: false
 
-        inactive nullable: false, required: false
+        inactive nullable: true, required: false
         amount   nullable: true
         amount2  nullable: true
 

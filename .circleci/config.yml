@@ -7,7 +7,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/java:8-jdk
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -16,7 +16,7 @@ jobs:
 
     branches:
       only:
-        - circleci
+        - master
 
     working_directory: ~/repo
 
@@ -27,7 +27,7 @@ jobs:
       TERM: dumb
 
     parallelism: 1
-    resource_class: large
+    # resource_class: large
 
     steps:
       - checkout
@@ -38,8 +38,8 @@ jobs:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
-      #- run: ./gradlew resolveConfigurations
-      - run: ./gradlew test-app:dependencies
+      - run: ./gradlew resolveConfigurations
+      #- run: ./gradlew test-app:dependencies
 
       - save_cache:
           paths:
@@ -48,7 +48,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: ./gradlew gorm-tools:test --max-workers=1
+      - run: ./gradlew gorm-tools:check --max-workers=1
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/
@@ -65,7 +65,7 @@ jobs:
 
       - store_artifacts:
           path: examples/test-app/build/reports/tests
-          destination: test-reports/test-app/
+          destination: test-reports/integration
 
       - store_test_results:
           path: examples/test-app/build/test-results

@@ -2,6 +2,7 @@ package testing
 
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import groovy.transform.CompileDynamic
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -41,7 +42,7 @@ class Org {
         name2    nullable: true
         secret   nullable: true, display: false
 
-        inactive nullable: true
+        inactive nullable: false, required: false
         amount   nullable: true
         amount2  nullable: true
 
@@ -58,14 +59,24 @@ class Org {
         ext  nullable: true
     }
 
-//    @CompileDynamic
-//    static getConfigs(){
-//        return {
-//            json.includes = '*'
-//            json.excludes = ['location']
-//            query.quickSearch = ["name", "name2"]
-//            audittrail.enabled = false
-//            autotest.update = [name:'foo']
-//        }
-//    }
+    static config = """{
+        json {
+            includes = '*' //should be default
+            excludes = ['location']
+        }
+        query.quickSearch = ["name", "name2"]
+        audittrail.enabled = false
+        autotest.update = [name:'foo']
+    }"""
+
+    @CompileDynamic
+    static getConfigs(){
+        return {
+            json.includes = '*' //default
+            json.excludes = ['location'] //adds to the global excludes
+            query.quickSearch = ["name", "name2"]
+            audittrail.enabled = false
+            autotest.update = [name:'foo']
+        }
+    }
 }

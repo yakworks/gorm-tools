@@ -2,15 +2,17 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
-        //maven { url 'https://palantir.bintray.com/releases/' } // for the resolveConfigurations task see below
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "org.grails:grails-docs:$grailsVersion"
         classpath 'io.github.groovylang.groovydoc:groovydoc-gradle-plugin:1.0.1'
         classpath "gradle.plugin.com.energizedwork:idea-gradle-plugins:1.4"
-        //classpath 'com.palantir.configurationresolver:gradle-configuration-resolver-plugin:0.3.0'
     }
+}
+plugins {
+    // for CI 'resolveConfigurations' task see https://github.com/palantir/gradle-configuration-resolver-plugin
+    id "com.palantir.configuration-resolver" version "0.2.0"
 }
 
 apply plugin: 'idea'
@@ -21,7 +23,6 @@ repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
 }
-
 
 //Root project and view-tools plugin uses same version.
 version project.projectVersion
@@ -36,11 +37,6 @@ ext {
     grailsApps = ['test-app', 'benchmarks']
     grailsPlugins = ['gorm-tools']
 }
-
-//allprojects {
-//    //for circleCi cacheing https://github.com/palantir/gradle-configuration-resolver-plugin
-//    apply plugin: 'com.palantir.configuration-resolver'
-//}
 
 subprojects {
 

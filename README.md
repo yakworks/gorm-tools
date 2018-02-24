@@ -21,6 +21,10 @@
 **Guide**: https://yakworks.github.io/gorm-tools/  
 **API**: https://yakworks.github.io/gorm-tools/api/
 
+Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
+This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
+Developers are free to easily customize, replace and disable these patterns when their opinions differ.
+
 ## Overview
 
 This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
@@ -28,8 +32,9 @@ domains and is the basis for the [Gorm Rest API plugin](https://yakworks.github.
 
 Gorm-Tools is the next iteration on the [DAO plugin](https://grails.org/plugin/dao) and has been in use for about 10 years processing millions of transactions per day.
 
-There are 3 primary patterns this library enables as detailed below for Repositories
-and Mango ( A mongo/graphql like query way to get gorm entity data with a Map)
+There are 3 primary patterns this library enables as detailed below for Repositories,
+Mango ( A mongo/graphql like query way to get gorm entity data with a Map) and
+Batch or Bulk inserting and updating with data binding
 
 ## Domain Repository Services
 <small>[jump to reference](repository/ref.md)</small>

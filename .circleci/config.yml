@@ -7,16 +7,16 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: dock9/oraclejdk8-circle:latest
+      - image: dock9/oraclejdk8:gradle-3.5.1
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/postgres:9.4
 
-    branches:
-      only:
-        - master
+#    branches:
+#      only:
+#        - master
 
     working_directory: ~/repo
 

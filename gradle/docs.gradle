@@ -1,41 +1,72 @@
-
 import org.apache.tools.ant.filters.*
 
+import java.text.SimpleDateFormat
+//import org.ajoberstar.grgit.Grgit
+
 //https://stackoverflow.com/questions/17465353/how-to-replace-a-string-for-a-buildvariant-with-gradle-in-android-studio/17572644#17572644
-def updateReadme(variant, fromString, toString) {
-    def updatedContent = new File('README.md').getText('UTF-8').replaceAll('Version: 3.3.1-SNAPSHOT', 'Version: 3.3.1.RELEASE')
-    new File('README.md').write(updatedContent, 'UTF-8')
-}
-
-
 task versionReadme {
     doLast {
         //updates the Version: 6.1.x-whatever in the first yakworks logo part
         def updatedContent = new File('README.md').getText('UTF-8')
             .replaceFirst(/Version:\s*[\d\.]+[^\s]+/, "version: $version")
-
+        //update the dependency example
         updatedContent = updatedContent
-            .replaceFirst(/gorm-tools:[\d\.]+[^"]+/, "gorm-tools: $version")
+            .replaceFirst(/gorm-tools:[\d\.]+[^"]+/, "gorm-tools:${version.trim()}")
 
         new File('README.md').write(updatedContent, 'UTF-8')
     }
 }
 
-//https://mrhaki.blogspot.com/2010/10/gradle-goodness-copy-files-with.html
-task copyReadme(type: Copy) {
-    from '.'
-    into 'build/mkdocs'
-    include 'README.md'
-    filter { line -> line.contains('Gradle') ? line : '' }
-    filter(ReplaceTokens, tokens: [author: 'mrhaki', gradleVersion: gradle.gradleVersion])
-    filter(PrefixLines, prepend: "<!-- README.md COPY -->")
+task copyDocs{
+    copy {
+        from 'docs'
+        into 'build/mkdocs/docs'
+    }
+    copy {
+        from '.'
+        into 'build/mkdocs/docs'
+        include 'README.md'
+        rename { 'index.md' }
+        filter { line ->
+            //replace links like [foo]( docs/foo.md ) -> [foo](foo.md) and [foo]: docs/foo.md  -> [foo]: foo.md
+            line.replaceAll(/\(\s*docs\//,'(').replaceAll(/\:\s*docs\//,': ')
+        }
+    }
+    copy {
+        from '.'
+        into 'build/mkdocs'
+        include 'mkdocs.yml'
+    }
 }
+
+//https://mrhaki.blogspot.com/2010/10/gradle-goodness-copy-files-with.html
+//task copyReadme(type: Copy) {
+//    from '.'
+//    into 'build/mkdocs'
+//    include 'README.md'
+//
+//    filter(ReplaceTokens, tokens: [author: 'mrhaki', gradleVersion: gradle.gradleVersion])
+//    filter(PrefixLines, prepend: "<!-- README.md COPY -->")
+//}
 
 //setup this https://github.com/xvik/gradle-mkdocs-plugin
 task mkdocsBuild(type: Exec) {
-    commandLine 'mkdocs', 'build', "-d", "build/mkdocs/$version"
+    workingDir 'build/mkdocs'
+    commandLine 'mkdocs', 'build'
     //commandLine "bash", "-c",  "git tag --list | grep 'keyword'"
 }
+
+//https://stackoverflow.com/questions/38275583/create-version-txt-file-in-project-dir-via-build-gradle-task
+//task versionTxt()  {
+//    doLast {
+//        new File("$projectDir/version.txt").text = """
+//Version: $version
+//Revision: ${Grgit.open(dir: '.').head().id}
+//Buildtime: ${new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())}
+//Application-name: foobarbaz app
+//"""
+//    }
+//}
 
 
 //task copyDocsToGhpages(type: Copy) {
@@ -52,6 +83,8 @@ task buildDocs(type: Exec, dependsOn: 'task3dependency') {
     commandLine 'mkdocs', 'build'
 
 }
+
+//task buildAllDocs(dependsOn: ['task1', 'task2', 'task3'])
 
 //https://stackoverflow.com/questions/44521005/gradle-groovy-command-line-grep
 

@@ -14,7 +14,7 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         Version: 3.3.1-SNAPSHOT
+         version: 6.1.0-SNAPSHOT
          
 </pre>
 
@@ -22,7 +22,7 @@
 **API**: https://yakworks.github.io/gorm-tools/api/
 
 ```
-compile "org.grails.plugins:gorm-tools:3.3.2-SNAPSHOT"
+compile "org.grails.plugins:gorm-tools:6.1.0-SNAPSHOT"
 ``` 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
@@ -41,9 +41,9 @@ Mango ( A mongo/graphql like query way to get gorm entity data with a Map) and
 Batch or Bulk inserting and updating with data binding
 
 ## Domain Repository Services
-<small>[jump to reference](repository/ref.md)</small>
+<small>[jump to reference](docs/repository/ref.md)</small>
 
-A repository is a [Domain Driven Design](usefulLinks.md#references) pattern. Used a a place logic to validate, bind, persist and query data that resides 
+A repository is a [Domain Driven Design](docs/usefulLinks.md#references) pattern. Used a a place logic to validate, bind, persist and query data that resides 
 either in a database or NoSql (via GORM usually of course).
 The design pattern here is a bit similiar to [Spring's Repository pattern]
 and Grails GORM's new [Data Services] pattern.
@@ -117,7 +117,7 @@ criteria.list {
     gt "age", 65
 }
 ```
-
+[repository docs]: docs/repository/ref.md
 [Spring's Repository pattern]:https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/
 [Data Services]:http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices
 [Restdb.io]:https://restdb.io/docs/querying-with-the-api
@@ -134,9 +134,9 @@ Run
 > ```pip install -r pip-requirements.txt```
 And then ```mkdocs serve``` see the docs if you have troubles
 
-### Publishing Releases
+### Publishing Plugin Releases
 
-See [Releases Doc](RELEASE.md) for info on our release process
+See [Developer Docs](docs/developer.md) for info on our release process
 
 Build are automatically published by travis. 
 Snapshots are published from master branch, and releases are published from tags to BinTray.

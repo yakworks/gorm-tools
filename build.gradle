@@ -13,8 +13,7 @@ buildscript {
 plugins {
     // for CI 'resolveConfigurations' task see https://github.com/palantir/gradle-configuration-resolver-plugin
     id "com.palantir.configuration-resolver" version "0.2.0"
-    //id 'ru.vyarus.use-python' version '1.0.1'
-    //id 'ru.vyarus.mkdocs' version '1.0.0'
+    id "org.ajoberstar.git-publish" version "0.3.2"
 }
 
 apply plugin: 'idea'

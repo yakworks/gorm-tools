@@ -14,7 +14,7 @@ Snapshots and releases are automatically published by travis build.
 Snapshots gets published automatically from master branch. Just pushing any commits to master will trigger a travis build and new snapshot will get published.
 
 ### Publish a new release
-New releaseses are published from tags. Follow the following steps to publish a new release.
+New releases are published from tags. Follow the following steps to publish a new release.
 
 - branch off from master
 - increment version number (projectVersion) in gradle.properties file

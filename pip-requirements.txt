@@ -1,6 +1,6 @@
 # pip install mkdocs
 mkdocs==0.16.3
-mkdocs-material-components>=1.7.9
+mkdocs-material-components>=1.10.11
 pygments>=2.2
 pymdown-extensions>=3.4
 markdown-include>=0.5.1

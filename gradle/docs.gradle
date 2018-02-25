@@ -50,7 +50,7 @@ task copyDocs{
 //}
 
 //setup this https://github.com/xvik/gradle-mkdocs-plugin
-task mkdocsBuild(type: Exec) {
+task mkdocsBuild(type: Exec, dependsOn: 'copyDocs') {
     workingDir 'build/mkdocs'
     commandLine 'mkdocs', 'build'
     //commandLine "bash", "-c",  "git tag --list | grep 'keyword'"

@@ -48,7 +48,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: gradle gorm-tools:check --max-workers=1
+      - run: gradle check --max-workers=1
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/
@@ -61,7 +61,7 @@ jobs:
       - store_test_results:
           path: plugin/build/test-results
 
-      - run: gradle test-app:check --max-workers=1
+      # - run: gradle test-app:check --max-workers=1
 
       - store_artifacts:
           path: examples/test-app/build/reports/tests
@@ -70,4 +70,8 @@ jobs:
       - store_test_results:
           path: examples/test-app/build/test-results
 
-      - run: pip3 install --user -r pip-requirements.txt; python3 -m mkdocs build
+      - run: gradle mkdocsBuild
+
+      - store_artifacts:
+          path: build/mkdocs/site
+          destination: docs

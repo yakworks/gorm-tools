@@ -2,10 +2,6 @@
 
 set -e
 
-curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
-sudo python get-pip.py
-pip install --user -r pip-requirements.txt
-
 # only build when its not a branch and not a pull request
 if [[ $CIRCLE_BRANCH == 'master'] && [ -z "$CIRCLE_PULL_REQUEST" ]]
 then

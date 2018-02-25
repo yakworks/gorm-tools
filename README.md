@@ -21,6 +21,10 @@
 **Guide**: https://yakworks.github.io/gorm-tools/  
 **API**: https://yakworks.github.io/gorm-tools/api/
 
+```
+compile "org.grails.plugins:gorm-tools:3.3.2-SNAPSHOT"
+``` 
+
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
 This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
 Developers are free to easily customize, replace and disable these patterns when their opinions differ.
@@ -158,10 +162,10 @@ repositories {
  }
 ```
 
-Add snapshot Dep, example:
+See version.properties for snapshot version
 
 ```groovy
 dependencies {
- compile("org.grails.plugins:gorm-tools:3.3.2-SNAPSHOT") { changing = true } //see gradle.properties for latest snapshot version.
+ compile('org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT') { changing = true } 
 }
 ```

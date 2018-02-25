@@ -29,7 +29,7 @@ repo_url: https://github.com/yakworks/gorm-tools
 edit_uri: edit/master/docs/
 
 # Config
-docs_dir: 'docs'
+# docs_dir: 'docs'
 theme: material-components
 
 # Options

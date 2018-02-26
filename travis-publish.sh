@@ -13,9 +13,8 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG ==
         ./gradlew gorm-tools:publish --no-daemon
     fi
 
-    if [[ $TRAVIS_BRANCH == 'master' ]]
+    if [[ $TRAVIS_BRANCH == 'master' ]] && [[ -n $(git diff --name-only $TRAVIS_COMMIT_RANGE | grep -E  "(mkdocs\.yml|docs/)") ]]
     then
-
         echo "### publishing docs"
         git config --global user.name "9cibot"
         git config --global user.email "9cibot@9ci.com"
@@ -34,18 +33,15 @@ if [[ -n $TRAVIS_TAG ]] || [[ $TRAVIS_BRANCH == 'master' && $TRAVIS_REPO_SLUG ==
         git add .
 
         #If there are any changes, do commit and push
-        if [[ -n $(git status -s) ]]
-        then
-            git commit -a -m "Update docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
-            git push origin HEAD
-        else
-            echo "### No changes to docs"
-        fi
+        git commit -a -m "Update docs for Travis build: https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID"
+        git push origin HEAD
 
         cd ..
         rm -rf gh-pages
         rm -rf site
         echo "### Done publishing docs"
+    else
+        echo "### No changes to docs"
     fi
 
 else

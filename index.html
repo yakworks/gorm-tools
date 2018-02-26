@@ -256,6 +256,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#overview" title="Overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#domain-repository-services" title="Domain Repository Services" class="md-nav__link">
     Domain Repository Services
   </a>
@@ -303,9 +310,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#getting-started" title="Getting started" class="md-nav__link">
-    Getting started
+  <a href="#developer-notes" title="Developer Notes" class="md-nav__link">
+    Developer Notes
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-mkdocs-locally" title="Running mkdocs locally" class="md-nav__link">
+    Running mkdocs locally
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-plugin-releases" title="Publishing Plugin Releases" class="md-nav__link">
+    Publishing Plugin Releases
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -529,6 +556,13 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#overview" title="Overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#domain-repository-services" title="Domain Repository Services" class="md-nav__link">
     Domain Repository Services
   </a>
@@ -576,9 +610,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#getting-started" title="Getting started" class="md-nav__link">
-    Getting started
+  <a href="#developer-notes" title="Developer Notes" class="md-nav__link">
+    Developer Notes
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-mkdocs-locally" title="Running mkdocs locally" class="md-nav__link">
+    Running mkdocs locally
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-plugin-releases" title="Publishing Plugin Releases" class="md-nav__link">
+    Publishing Plugin Releases
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -604,7 +658,8 @@
                 
                   <code>Version: 6.1-SNAPSHOT</code>
                 
-                <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
+                <p><a href="https://travis-ci.org/yakworks/gorm-tools"><img alt="Build Status" src="https://travis-ci.org/yakworks/gorm-tools.svg?branch=master" /></a></p>
+<pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
       ________                                           _.-````'-,_
      /  _____/  ___________  _____                   ,-'`           `'-.,_
@@ -618,15 +673,25 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-            v3.3.2-SNAPSHOT
+         version: 6.1.0-SNAPSHOT
 
 </pre>
 
+<p><strong>Guide</strong>: <a href="https://yakworks.github.io/gorm-tools/">https://yakworks.github.io/gorm-tools/</a><br />
+<strong>API</strong>: <a href="https://yakworks.github.io/gorm-tools/api/">https://yakworks.github.io/gorm-tools/api/</a></p>
+<div class="codehilite"><pre><span></span>compile &quot;org.grails.plugins:gorm-tools:6.1.0-SNAPSHOT&quot;
+</pre></div>
+
+<p>Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
+This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
+Developers are free to easily customize, replace and disable these patterns when their opinions differ.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
 domains and is the basis for the <a class="new-tab" href="https://yakworks.github.io/gorm-rest-api/">Gorm Rest API plugin</a>. </p>
 <p>Gorm-Tools is the next iteration on the <a href="https://grails.org/plugin/dao">DAO plugin</a> and has been in use for about 10 years processing millions of transactions per day.</p>
-<p>There are 2 primary patterns this library enables as detailed below for Repositories
-and Mango ( A mongo query like way to get data with a Map)</p>
+<p>There are 3 primary patterns this library enables as detailed below for Repositories,
+Mango ( A mongo/graphql like query way to get gorm entity data with a Map) and
+Batch or Bulk inserting and updating with data binding</p>
 <h2 id="domain-repository-services">Domain Repository Services<a class="headerlink" href="#domain-repository-services" title="Permanent link">&para;</a></h2>
 <p><small><a href="repository/ref/">jump to reference</a></small></p>
 <p>A repository is a <a href="usefulLinks/#references">Domain Driven Design</a> pattern. Used a a place logic to validate, bind, persist and query data that resides 
@@ -654,7 +719,7 @@ and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#da
   just as it does for a service. </li>
 </ul>
 <h2 id="fast-data-binder-batch-insertupdate">Fast Data Binder &amp; Batch Insert/Update<a class="headerlink" href="#fast-data-binder-batch-insertupdate" title="Permanent link">&para;</a></h2>
-<p>We process </p>
+<p>We process millions of transactions per day and needed better bniding performance.</p>
 <h3 id="goals_1">Goals<a class="headerlink" href="#goals_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>FAST Data Binding Service</strong>: databinding from maps (and thus JSON) has to be fast. 
@@ -698,14 +763,39 @@ would get converted to the equivalent criteria</p>
 <span class="p">}</span>
 </pre></div>
 
-<h2 id="getting-started">Getting started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
-<p>To use the Gorm-Tools add the dependency on the plugin to your build.gradle file:</p>
-<div class="codehilite"><pre><span></span>runtime &quot;org.grails.plugins:gorm-tools:@VERSION@&quot;
+<h2 id="developer-notes">Developer Notes<a class="headerlink" href="#developer-notes" title="Permanent link">&para;</a></h2>
+<h3 id="running-mkdocs-locally">Running mkdocs locally<a class="headerlink" href="#running-mkdocs-locally" title="Permanent link">&para;</a></h3>
+<p>Docs are built with <a href="https://yakworks.github.io/mkdocs-material-components/">https://yakworks.github.io/mkdocs-material-components/</a>
+Run </p>
+<blockquote>
+<p><code>pip install -r pip-requirements.txt</code>
+And then <code>mkdocs serve</code> see the docs if you have troubles</p>
+</blockquote>
+<h3 id="publishing-plugin-releases">Publishing Plugin Releases<a class="headerlink" href="#publishing-plugin-releases" title="Permanent link">&para;</a></h3>
+<p>See <a href="developer.md">Developer Docs</a> for info on our release process</p>
+<p>Build are automatically published by travis. 
+Snapshots are published from master branch, and releases are published from tags to BinTray.</p>
+<p>If you want to publish artifacts from your local system.</p>
+<p>Define following properties in ~/.gradle/gradle.properties</p>
+<ul>
+<li>bintrayUser</li>
+<li>bintrayKey</li>
+<li>artifactoryUsername</li>
+<li>artifactoryPassword</li>
+</ul>
+<p>bintray credentials are used for <strong>bintrayUpload</strong> task. Artifactory credentials are used for publishing snapshots to 9ci artifactory.</p>
+<p><strong>Using latests SNAPSHOT</strong>  </p>
+<p>Configure 9ci repo in build.gradle</p>
+<div class="codehilite"><pre><span></span><span class="n">repositories</span> <span class="o">{</span>
+  <span class="n">maven</span> <span class="o">{</span> <span class="n">url</span> <span class="s2">&quot;http://repo.9ci.com/artifactory/grails-plugins&quot;</span> <span class="o">}</span>
+ <span class="o">}</span>
 </pre></div>
 
-<p>And you can start using the plugin by calling the repository methods on domain classes. 
-The plugin adds several persistence methods to domain classes. Which delegates to repository classes. This includes persist(), create(params), update(update), remove()</p>
-<p>See <a href="repository/ref/">Repository</a> for more details</p>
+<p>See version.properties for snapshot version</p>
+<div class="codehilite"><pre><span></span><span class="n">dependencies</span> <span class="o">{</span>
+ <span class="n">compile</span><span class="o">(</span><span class="s1">&#39;org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT&#39;</span><span class="o">)</span> <span class="o">{</span> <span class="n">changing</span> <span class="o">=</span> <span class="kc">true</span> <span class="o">}</span> 
+<span class="o">}</span>
+</pre></div>
                 
                   
                 

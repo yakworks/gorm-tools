@@ -79,11 +79,6 @@ task mkdocsBuild(type: Exec, dependsOn: 'copyDocs') {
 //
 //}
 
-task buildDocs(type: Exec, dependsOn: 'task3dependency') {
-    commandLine 'mkdocs', 'build'
-
-}
-
 //task buildAllDocs(dependsOn: ['task1', 'task2', 'task3'])
 
 //https://stackoverflow.com/questions/44521005/gradle-groovy-command-line-grep

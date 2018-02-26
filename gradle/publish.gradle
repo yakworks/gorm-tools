@@ -1,11 +1,8 @@
-
-
-apply plugin:"org.grails.grails-plugin-publish"
-
 String binTrayUser = System.getenv("BINTRAY_USER") ?: project.hasProperty('bintrayUser') ? project.bintrayUser : null
 String binTrayKey = System.getenv("BINTRAY_KEY") ?: project.hasProperty('bintrayKey') ? project.bintrayKey : null
 String artifactoryUsername = System.getenv("ARTIFACTORY_USER") ?:  project.hasProperty('artifactoryUsername') ? project.artifactoryUsername : null
 String artifactoryPassword = System.getenv("ARTIFACTORY_PASSWORD") ?: project.hasProperty('artifactoryPassword') ? project.artifactoryPassword : null
+boolean isSnapshot = version.toString().endsWith("-SNAPSHOT")
 
 if(binTrayUser && binTrayKey) {
     grailsPublish {

@@ -1,23 +1,13 @@
 import org.apache.tools.ant.filters.*
 
-import java.text.SimpleDateFormat
-//import org.ajoberstar.grgit.Grgit
-
-//https://stackoverflow.com/questions/17465353/how-to-replace-a-string-for-a-buildvariant-with-gradle-in-android-studio/17572644#17572644
-task versionReadme {
-    doLast {
-        //updates the Version: 6.1.x-whatever in the first yakworks logo part
-        def updatedContent = new File('README.md').getText('UTF-8')
-            .replaceFirst(/Version:\s*[\d\.]+[^\s]+/, "version: $version")
-        //update the dependency example
-        updatedContent = updatedContent
-            .replaceFirst(/gorm-tools:[\d\.]+[^"]+/, "gorm-tools:${version.trim()}")
-
-        new File('README.md').write(updatedContent, 'UTF-8')
-    }
+//setup this https://github.com/xvik/gradle-mkdocs-plugin
+task mkdocsBuild(type: Exec, dependsOn: 'copyDocs') {
+    workingDir 'build/mkdocs'
+    commandLine 'mkdocs', 'build'
+    //commandLine "bash", "-c",  "git tag --list | grep 'keyword'"
 }
 
-task copyDocs{
+task copyDocs {
     copy {
         from 'docs'
         into 'build/mkdocs/docs'
@@ -36,6 +26,30 @@ task copyDocs{
         from '.'
         into 'build/mkdocs'
         include 'mkdocs.yml'
+        filter { line ->
+            def siteUrl = isSnapshot ? "${websiteUrl}/snapshot" : websiteUrl
+            def newline = line.startsWith('repo_url:') ? "repo_url: $githubUrl" : line
+            newline.startsWith('site_url:') ? "site_url: $siteUrl" : newline
+        }
+        filter(ReplaceTokens,
+            tokens: ['version', 'title',
+                     'description', 'githubSlug', 'author'].collectEntries{[it, project."$it".toString()]}
+        )
+    }
+}
+
+/** Updates the version in the README.md */
+//https://stackoverflow.com/questions/17465353/how-to-replace-a-string-for-a-buildvariant-with-gradle-in-android-studio/17572644#17572644
+task versionReadme {
+    doLast {
+        //updates the Version: 6.1.x-whatever in the first yakworks logo part
+        def updatedContent = new File('README.md').getText('UTF-8')
+            .replaceFirst(/Version:\s*[\d\.]+[^\s]+/, "version: $version")
+        //update the dependency example
+        updatedContent = updatedContent
+            .replaceFirst(/gorm-tools:[\d\.]+[^"]+/, "gorm-tools:${version.trim()}")
+
+        new File('README.md').write(updatedContent, 'UTF-8')
     }
 }
 
@@ -49,12 +63,6 @@ task copyDocs{
 //    filter(PrefixLines, prepend: "<!-- README.md COPY -->")
 //}
 
-//setup this https://github.com/xvik/gradle-mkdocs-plugin
-task mkdocsBuild(type: Exec, dependsOn: 'copyDocs') {
-    workingDir 'build/mkdocs'
-    commandLine 'mkdocs', 'build'
-    //commandLine "bash", "-c",  "git tag --list | grep 'keyword'"
-}
 
 //https://stackoverflow.com/questions/38275583/create-version-txt-file-in-project-dir-via-build-gradle-task
 //task versionTxt()  {
@@ -85,3 +93,5 @@ task mkdocsBuild(type: Exec, dependsOn: 'copyDocs') {
 
 //http://devdeeds.com/auto-increment-build-number-using-gradle-in-android/
 
+//agregate javadocs https://coderwall.com/p/evtdbw/aggregate-javadoc-in-multiproject-gradle-builds
+//agreage joccoco https://gist.github.com/aalmiray/e6f54aa4b3803be0bcac see philberts near end

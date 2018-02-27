@@ -48,7 +48,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: gradle check --max-workers=1
+      - run: gradle check --no-daemon --max-workers 2
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/
@@ -70,8 +70,9 @@ jobs:
       - store_test_results:
           path: examples/test-app/build/test-results
 
-      - run: gradle mkdocsBuild
+      - run: ./circleci/publish.sh
 
-      - store_artifacts:
-          path: build/mkdocs/site
-          destination: docs
+#      - store_artifacts:
+#          path: build/mkdocs/site
+#          destination: docs
+      - run: gradle gitPublishPush --no-daemon --max-workers 2

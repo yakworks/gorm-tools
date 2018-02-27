@@ -23,7 +23,13 @@ dependencies {
 
     console "org.grails:grails-console"
     //compile 'org.grails.plugins:grails-java8:1.2.2'
+
     testCompile "org.grails:grails-datastore-rest-client"
+    testCompile "org.grails.plugins:geb"
+    testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-firefox-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-remote-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
 bootRun {

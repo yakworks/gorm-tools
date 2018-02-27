@@ -16,7 +16,7 @@ apply plugin: 'codenarc'
 apply plugin: "jacoco"
 
 apply plugin:"org.grails.grails-plugin-publish"
-apply from: "${rootProject.projectDir}/gradle/publish.gradle"
+apply from: rootProject.file('gradle/publish.gradle')
 
 dependencies {
     profile "org.grails.profiles:web-plugin"
@@ -33,6 +33,10 @@ dependencies {
     //testCompile "org.grails.plugins:views-json-testing-support:$viewsVersion"
     codenarc 'org.codenarc:CodeNarc:0.27.0'
     codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
+
+    //these shouldn't be needed in here as there are only unit tests but they add the byte-buddy for mocking
+    testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
 //bootRepackage and maybe addResources are needed for the test-projects grails.plugin.compile depndency to work
@@ -62,18 +66,18 @@ codenarcTest {
     ignoreFailures = true
 }
 
-//this makes the groovy docs much more readable by shorting packages and providing links
-groovydoc {
-    excludes = ['**/*GrailsPlugin.groovy','**/Application.groovy' ]
-    link('http://download.oracle.com/javase/8/docs/api/', 'java.', 'org.xml', 'javax.', 'org.xml.')
-    link("https://docs.spring.io/spring/docs/4.2.x/javadoc-api/", 'org.springframework')
-    link('http://groovy.codehaus.org/api/',  'groovy.', 'org.codehaus.groovy.')
-    link('https://docs.grails.org/3.3.x/api',  'grails.', 'org.grails.')
-    link('https://testing.grails.org/latest/api',  'grails.testing.', 'org.grails.testing.')
-    link('http://gorm.grails.org/latest/hibernate/api/',  'grails.gorm', 'grails.orm', 'org.grails.datastore', 'org.grails.orm')
-}
-
 test {
     //testLogging.showStandardStreams = true
     testLogging.exceptionFormat = 'full'
+}
+task printProps {
+    doLast {
+        rootProject.ext.properties.sort { e1, e2 -> undotKeys(e1.key) <=> undotKeys(e2.key) }
+            .each { k, v -> println "${k}: ${v}" }
+    }
+}
+
+def undotKeys(key) {
+    if (!key.contains('.')) { key += 'x' }
+    key.replaceAll(/\.(\w)/) { match, group -> group.toUpperCase() }
 }

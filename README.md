@@ -70,7 +70,7 @@ and Grails GORM's new [Data Services] pattern.
 
 ## Fast Data Binder & Batch Insert/Update
 
-We process millions of transactions per day and needed better bniding performance.
+We process millions of transactions per day and needed more performant binding performance.
 
 ### Goals
 

@@ -1,42 +1,40 @@
-String binTrayUser = System.getenv("BINTRAY_USER") ?: project.hasProperty('bintrayUser') ? project.bintrayUser : null
-String binTrayKey = System.getenv("BINTRAY_KEY") ?: project.hasProperty('bintrayKey') ? project.bintrayKey : null
-String artifactoryUsername = System.getenv("ARTIFACTORY_USER") ?:  project.hasProperty('artifactoryUsername') ? project.artifactoryUsername : null
-String artifactoryPassword = System.getenv("ARTIFACTORY_PASSWORD") ?: project.hasProperty('artifactoryPassword') ? project.artifactoryPassword : null
-boolean isSnapshot = version.toString().endsWith("-SNAPSHOT")
+grailsPublish {
+    //user = binTrayUser
+    //key = binTrayKey
+    title = title
+    desc = description
+    userOrg = bintrayOrg
+    repo = bintrayRepo
+    developers = [basejump: 'Joshua Burnett']
+    githubSlug = "$githubSlug"
+    issueTrackerUrl = "$githubIssues"
+    websiteUrl = websiteUrl
+    vcsUrl = "$githubUrl"
 
-if(binTrayUser && binTrayKey) {
-    grailsPublish {
-        user = binTrayUser
-        key = binTrayKey
-
-        desc = "${project.title} - ${project.projectDesc}".toString()
-
-        developers = [joshuaB: 'Joshua B', snimavat: "Sudhir Nimavat"]
-        githubSlug = "${project.githubSlug}"
-        issueTrackerUrl = "https://github.com/${project.githubSlug}/issues"
-        vcsUrl = "https://github.com/${project.githubSlug}"
-
-        license {
-            name = 'Apache-2.0'
-        }
-
-        title = project.title
-        userOrg = '9ci'
-        repo = 'grails-plugins'
-    }
 }
 
-if(isSnapshot && artifactoryUsername && artifactoryPassword) {
+if(isSnapshot){
     publishing {
-        println "SNAPSHOT - " + project.name + ":" + version.toString()
+        println "SNAPSHOT - " + name + ":" + version.toString()
         repositories {
             maven {
-                url "http://repo.9ci.com/artifactory/grails-plugins"
+                url "http://repo.9ci.com/artifactory/oss-snapshots"
                 credentials {
                     username artifactoryUsername
                     password artifactoryPassword
                 }
             }
         }
+    }
+}
+
+task tagRelease {
+    description = 'Tags the current head with the project\'s version.'
+    doLast {
+        println grgit.status().unstaged
+//        grgit.tag.add {
+//            name = version + "test grgit"
+//            message = "Release of ${version}"
+//        }
     }
 }

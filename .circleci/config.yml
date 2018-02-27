@@ -48,8 +48,13 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
+      - add_ssh_keys:
+          fingerprints:
+            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
+
       # run tests!
-      - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2
+      # - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2
+      - run: ./.circleci/build.sh
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/
@@ -62,7 +67,7 @@ jobs:
       - store_test_results:
           path: plugin/build/test-results
 
-      - run: gradle test-app:check --no-daemon --max-workers 2
+      # - run: gradle test-app:check --no-daemon --max-workers 2
 
       - store_artifacts:
           path: examples/test-app/build/reports/tests
@@ -71,12 +76,5 @@ jobs:
       - store_test_results:
           path: examples/test-app/build/test-results
 
-      - add_ssh_keys:
-          fingerprints:
-            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
-      - run: ./.circleci/publish.sh
 
-#      - store_artifacts:
-#          path: build/mkdocs/site
-#          destination: docs
-      - run: gradle gitPublishPush --no-daemon --max-workers 2
+      # - run: ./.circleci/publish.sh

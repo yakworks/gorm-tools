@@ -14,6 +14,8 @@ then
       gradle gorm-tools:publish --no-daemon
   fi
 
+  gradle gitPublishPush --no-daemon --max-workers 2
+  
 else
   echo "nothing to do here"
 fi

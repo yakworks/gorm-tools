@@ -71,6 +71,9 @@ jobs:
       - store_test_results:
           path: examples/test-app/build/test-results
 
+      - add_ssh_keys:
+          fingerprints:
+            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
       - run: ./.circleci/publish.sh
 
 #      - store_artifacts:

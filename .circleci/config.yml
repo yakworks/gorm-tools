@@ -23,7 +23,8 @@ jobs:
     environment:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
-      GRADLE_OPTS: "-Xmx3400M -Dorg.gradle.daemon=false"
+      MALLOC_ARENA_MAX: 2
+      GRADLE_OPTS: "-Xmx1024m -Dorg.gradle.daemon=false"
       TERM: dumb
 
     parallelism: 1
@@ -48,7 +49,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: gradle check --no-daemon --max-workers 2
+      - run: gradle clean; gradle check --no-daemon --max-workers 2
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/

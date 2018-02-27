@@ -1,0 +1,1233 @@
+
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <meta name="description" content="Plugin tools Grails/Gorm - repository data services, json query language, fast data binder">
+      
+      
+        <link rel="canonical" href="https://yakworks.github.io/gorm-tools/snapshot/repository/ref/">
+      
+      
+        <meta name="author" content="Joshua Burnett">
+      
+      
+        <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-components-1.10.11">
+    
+    
+      
+        <title>Reference - Gorm Tools Grails Plugin</title>
+      
+    
+    
+      
+    
+    
+      <script src="../../assets/javascripts/modernizr-e826f8942a.js"></script>
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/application-2cd7d9ab0f.css">
+      
+        <link rel="stylesheet" href="../../assets/stylesheets/application-035c261bc5.palette.css">
+      
+      <link rel="stylesheet" href="../../assets/stylesheets/material-components-web.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/mdc-web.css">
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans:300,300i,400,400i,600,600i,700,700i,800,800i|Ubuntu+Mono">
+        <style>body,input{font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.js"></script>
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="light-green" data-md-color-accent="indigo">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+        
+      </defs>
+    </svg>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      
+        <style>.region--header{background-color:rgba(255,255,255,.9);min-height:3.25rem;width:100%;z-index:2}header.region--header{position:fixed;top:0;right:0;left:0}.region--header .region--header__wrapper{max-width:1440px;margin-left:auto;margin-right:auto;position:relative;z-index:2;box-sizing:inherit}.region--header .region--header__logo{display:inline-block;float:left;height:3.25rem;margin:0;padding-left:1rem}.site-logo{display:block;height:4.25rem;padding:1.5rem 0}.site-logo--main{display:block;height:3.25rem;margin:0;padding:0;width:4.25rem}.header-navigation{font-size:1rem;clear:none;float:right;margin-top:.75rem;padding-bottom:0;padding-right:.75rem}.header-navigation__menu{clear:both;overflow:visible;-webkit-transform-style:preserve-3d;width:100%;z-index:9999;display:inline;margin:0;padding:0}.header-navigation__menu-link{display:inline;line-height:1.5;margin-right:0;padding-right:0;width:auto;overflow:hidden;text-align:right;z-index:2}.region--header a{text-decoration:none}.header-navigation__menu-link a{padding-left:.75rem;padding-right:.75rem;color:#012b45;display:inline-block;font-weight:400;text-transform:uppercase;transition:background-color ease .2s}@media only screen and (max-width:500px){.header-navigation{font-size:.85rem}.header-navigation__menu-link a{padding-left:.25rem;padding-right:.25rem}}.header-navigation__menu-link:last-child:not(.header-navigation__active-nav-item):not(:hover):not(:focus){color:#e8650c}.header-navigation__menu-link a:focus,.header-navigation__menu-link a:hover{color:#e8650c}.md-container{padding-top:6.5rem}#header-docs{top:3.25rem}#background{display:none}#header-docs .md-logo{display:none}</style>
+<style media="print">#header-docs{top:0}#header-docs .md-logo{display:block}#header-website{display:none}.md-container{padding-top:0}.headroom--pinned{transform:translateY(0)}#background{position:fixed;top:250px;left:50px;z-index:9999999;background:0 0;min-height:30%;min-width:30%;display:block}#bg-text{color:rgba(211,211,211,.2);font-size:80px;transform:rotate(300deg);-webkit-transform:rotate(300deg)}</style>
+<div id="background">
+  <p id="bg-text">9ci Confidential</p>
+</div>
+<header id="header-website" class="region--header" role="banner">
+  <div class="region--header__wrapper">
+    <a href="/" class="region--header__logo">
+      <img src="http://www.9ci.com/assets/img/logo.svg" alt="9ci logo" class="site-logo site-logo--main">
+    </a>
+    <nav role="navigation" class="header-navigation">
+      <ul id="js-navigation-menu" class="header-navigation__menu">
+      <li class="header-navigation__menu-link">
+        <a href="http://www.9ci.com/solutions">Solutions</a>
+      </li>
+      <li class="header-navigation__menu-link">
+        <a href="http://www.9ci.com/company">Company</a>
+      </li>
+      <li class="header-navigation__menu-link">
+        <a href="http://www.9ci.com/contact">Contact</a>
+      </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<header id="header-docs" class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink md-flex__cell--vmiddle">
+        <a href="https://yakworks.github.io/gorm-tools/snapshot" title="Gorm Tools Grails Plugin" class="md-header-nav__button md-logo">
+          
+            <img src="../../assets/images/logo_white.png" width="36" height="36">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            Gorm Tools Grails Plugin -
+            
+              
+                <span class="md-header-nav__parent">
+                  Repository Pattern
+                </span>
+              
+            
+            Reference
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+
+  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      yakworks/gorm-tools
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+      
+    
+    <div class="md-container">
+      
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <div class="md-nav__button md-logo">
+      
+        <i class="md-icon md-icon--home"></i>
+      
+    </div>
+    Gorm Tools Grails Plugin
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      yakworks/gorm-tools
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="Overview" class="md-nav__link">
+      Overview
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
+    
+    <label class="md-nav__link" for="nav-2">
+      Repository Pattern
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        Repository Pattern
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../intro/" title="Quick Start" class="md-nav__link">
+      Quick Start
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Reference
+      </label>
+    
+    <a href="./" title="Reference" class="md-nav__link md-nav__link--active">
+      Reference
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-repository-artefact" title="The Repository Artefact" class="md-nav__link">
+    The Repository Artefact
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementing-a-repository" title="Implementing A Repository" class="md-nav__link">
+    Implementing A Repository
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gormrepoentity-trait" title="GormRepoEntity Trait" class="md-nav__link">
+    GormRepoEntity Trait
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instance-methods-added-to-the-domains" title="Instance methods added to the domains" class="md-nav__link">
+    Instance methods added to the domains
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statics-added-to-the-domain" title="Statics added to the domain" class="md-nav__link">
+    Statics added to the domain
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-events" title="Repository Events" class="md-nav__link">
+    Repository Events
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods" title="Methods" class="md-nav__link">
+    Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grails-events" title="Grails Events" class="md-nav__link">
+    Grails Events
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#publishing-events" title="Publishing events" class="md-nav__link">
+    Publishing events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subscribing-to-events" title="Subscribing to events" class="md-nav__link">
+    Subscribing to events
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spring-events" title="Spring Events" class="md-nav__link">
+    Spring Events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-refreshable-beans-for-events" title="External refreshable beans for Events" class="md-nav__link">
+    External refreshable beans for Events
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repoutil-repomessage-helpers" title="RepoUtil, RepoMessage Helpers" class="md-nav__link">
+    RepoUtil, RepoMessage Helpers
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#repoutil" title="RepoUtil:" class="md-nav__link">
+    RepoUtil:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repomessage-contains-bunch-of-help-methods-for-creating-text-messages" title="RepoMessage contains bunch of help methods for creating text messages" class="md-nav__link">
+    RepoMessage contains bunch of help methods for creating text messages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entityvalidationexception" title="EntityValidationException" class="md-nav__link">
+    EntityValidationException
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entitynotfoundexception" title="EntityNotFoundException" class="md-nav__link">
+    EntityNotFoundException
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#async-batch-processing-support" title="Async batch processing support" class="md-nav__link">
+    Async batch processing support
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-support" title="Testing support" class="md-nav__link">
+    Testing support
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../databinding/" title="Databinding" class="md-nav__link">
+      Databinding
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../queries-mango/" title="Mango Query" class="md-nav__link">
+      Mango Query
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../async/" title="Async" class="md-nav__link">
+      Async
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      Toolbox
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        Toolbox
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../id-generation/" title="Id Generation" class="md-nav__link">
+      Id Generation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../gorm-utils/" title="GormUtils Class" class="md-nav__link">
+      GormUtils Class
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../beanPathTools/" title="Bean Path Tools" class="md-nav__link">
+      Bean Path Tools
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../working-with-dates/" title="Date Utils" class="md-nav__link">
+      Date Utils
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../testing/" title="Testing" class="md-nav__link">
+      Testing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../api/" title="API Docs" class="md-nav__link">
+      API Docs
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../usefulLinks/" title="Useful links" class="md-nav__link">
+      Useful links
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-repository-artefact" title="The Repository Artefact" class="md-nav__link">
+    The Repository Artefact
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementing-a-repository" title="Implementing A Repository" class="md-nav__link">
+    Implementing A Repository
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gormrepoentity-trait" title="GormRepoEntity Trait" class="md-nav__link">
+    GormRepoEntity Trait
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instance-methods-added-to-the-domains" title="Instance methods added to the domains" class="md-nav__link">
+    Instance methods added to the domains
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statics-added-to-the-domain" title="Statics added to the domain" class="md-nav__link">
+    Statics added to the domain
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-events" title="Repository Events" class="md-nav__link">
+    Repository Events
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#methods" title="Methods" class="md-nav__link">
+    Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grails-events" title="Grails Events" class="md-nav__link">
+    Grails Events
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#publishing-events" title="Publishing events" class="md-nav__link">
+    Publishing events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subscribing-to-events" title="Subscribing to events" class="md-nav__link">
+    Subscribing to events
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spring-events" title="Spring Events" class="md-nav__link">
+    Spring Events
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#external-refreshable-beans-for-events" title="External refreshable beans for Events" class="md-nav__link">
+    External refreshable beans for Events
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repoutil-repomessage-helpers" title="RepoUtil, RepoMessage Helpers" class="md-nav__link">
+    RepoUtil, RepoMessage Helpers
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#repoutil" title="RepoUtil:" class="md-nav__link">
+    RepoUtil:
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#repomessage-contains-bunch-of-help-methods-for-creating-text-messages" title="RepoMessage contains bunch of help methods for creating text messages" class="md-nav__link">
+    RepoMessage contains bunch of help methods for creating text messages
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entityvalidationexception" title="EntityValidationException" class="md-nav__link">
+    EntityValidationException
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entitynotfoundexception" title="EntityNotFoundException" class="md-nav__link">
+    EntityNotFoundException
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#async-batch-processing-support" title="Async batch processing support" class="md-nav__link">
+    Async batch processing support
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-support" title="Testing support" class="md-nav__link">
+    Testing support
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div id="article-content" class="md-content"> 
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/repository/ref.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                  <h1>Reference</h1>
+                
+                
+                <h2 id="the-repository-artefact">The Repository Artefact<a class="headerlink" href="#the-repository-artefact" title="Permanent link">&para;</a></h2>
+<p>This plugin adds a new artefact type <strong>Repository</strong>. Each domain will have a spring bean setup for it if 
+one doesn't exists already.</p>
+<p>A repository bean is configured for each domain with a <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/DefaultGormRepo.html">DefaultGormRepo</a> unless explicit repository class. <br />
+The trait <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepo.html">GormRepo</a> implements the <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepositoryApi.html">RepositoryApi</a> interface and is what backs the DefaultGormRepo. 
+You'll mostly use the <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepo.html">GormRepo</a> trait when creating a custom concrete implementation of a Repository.</p>
+<p>Reference to a Repository for given domain class can be easily obtained by calling <code>MyDomainClass.repo</code> static method.</p>
+<h3 id="implementing-a-repository">Implementing A Repository<a class="headerlink" href="#implementing-a-repository" title="Permanent link">&para;</a></h3>
+<p>If you need to override the <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/DefaultGormRepo.html">DefaultGormRepo</a> that is attached to each domain then you can create your own service
+inside grails-app/repository and name it <code>YourDomainNameRepo</code> (eg <code>OrgRepo</code>). 
+Plugin will automatically lookup all Repository classes and configure them as spring service beans to be used for 
+your domain.</p>
+<p>A Repository must either implement <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepo.html">GormRepo</a> Trait or if you wish extend <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/DefaultGormRepo.html">DefaultGormRepo</a></p>
+<p><strong>Example:</strong></p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">Org</span> <span class="n">org</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
+       <span class="c1">//do some thing before create</span>
+     <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+
+<h2 id="gormrepoentity-trait">GormRepoEntity Trait<a class="headerlink" href="#gormrepoentity-trait" title="Permanent link">&para;</a></h2>
+<p>See Groovydocs api for the <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepoEntity.html">GormRepoEntity</a> that is injected onto all domains.</p>
+<h3 id="instance-methods-added-to-the-domains">Instance methods added to the domains<a class="headerlink" href="#instance-methods-added-to-the-domains" title="Permanent link">&para;</a></h3>
+<p>Every domain gets a repository which is either setup for you or setup by implementing 
+<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepo.html">GormRepo</a> 
+Each method is transactional and will prevent incomplete cascading saves.</p>
+<ul>
+<li>
+<p><strong>persist()</strong>: calls the GormRepo's persist which in turn calls domain.save(failOnError:true) 
+  Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a></p>
+</li>
+<li>
+<p><strong>remove()</strong>:  calls the GormRepo's remove. 
+  Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a></p>
+</li>
+</ul>
+<h3 id="statics-added-to-the-domain">Statics added to the domain<a class="headerlink" href="#statics-added-to-the-domain" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>create(params)</strong>:  calls the repo.create which does the bolier plate code you might find in a scaffolded controller. 
+creates a new instance, sets the params and calls the repository.save (essentially the persist()). <strong>ex:</strong> <code>Book.insertAndSave([name:'xyz',isbn:'123'])</code>
+Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a> if anything goes wrong</p>
+</li>
+<li>
+<p><strong>update(params)</strong>:  calls the repo.update which does the boiler plate code you might find in a scaffolded controller. gets the instance base in the params.id, sets the params and calls the repository.save for it. <strong>ex:</strong> Book.update([id:11,name:'aaa']) Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a> if anything goes wrong</p>
+</li>
+<li>
+<p><strong>remove(id)</strong>:  calls the repository.removeById gets the instance base in the params.id, calls the delete for it. <strong>ex:</strong> <code>Book.remove([id:11])</code>
+Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a> if anything goes wrong</p>
+</li>
+<li>
+<p><strong>repo</strong>: a quick way to get to the repository for the Domain. It will return the DefaultGormRepo that was auto created 
+  or one you defined for the domain under grails-app/repository.</p>
+</li>
+</ul>
+<h2 id="repository-events">Repository Events<a class="headerlink" href="#repository-events" title="Permanent link">&para;</a></h2>
+<h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
+<p>Each Repository can implement any of the methods listed below and they will get called during persistence operation.  </p>
+<ul>
+<li><strong>beforeBind(T instance, Map params, BindAction action)</strong> - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.</li>
+<li><strong>afterBind(T instance, Map params, BindAction action)</strong> -  Called after databinding is performed.  </li>
+<li><strong>beforePersist(T instance, Map args)</strong> - Called every time before an instance is saved.  </li>
+<li><strong>afterPersist(T instance, Map args)</strong> - Called every time after an instance is saved.</li>
+<li><strong>beforeRemove(T instance, Map args)</strong> - Called before an instance is deleted. Can be utilized to cleanup related records etc.  </li>
+<li><strong>afterRemove(T instance, Map args)</strong> -  Called After an instance is deleted.  </li>
+</ul>
+<h3 id="grails-events">Grails Events<a class="headerlink" href="#grails-events" title="Permanent link">&para;</a></h3>
+<p>The Repository also provides a possibility to handle events using Grails annotations. Please see docs for <a class="new-tab" href="http://async.grails.org/latest/guide/index.html#events">Grails Events</a>.</p>
+<h4 id="publishing-events">Publishing events<a class="headerlink" href="#publishing-events" title="Permanent link">&para;</a></h4>
+<p>Grails provides two ways for creating events - using <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Publisher.html">@Publisher</a> annotation on a method and using
+<a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> directly, please see docs for <a class="new-tab" href="http://async.grails.org/latest/guide/index.html#notifying">Event Publishing</a>.
+In case of using publisher annotation Grails takes event id from the method name (method with <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Publisher.html">@Publisher</a> annotation).
+If using <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> we should specify event id manually.</p>
+<p>By default Repository uses <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/bus/EventBus.html">EventBus</a> to create events (see <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>).
+It publishes a number of <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html">Repository Events</a> and provides it's own way to build event ids.
+All ids of repository events correspond to the format <code>&lt;domainName&gt;.&lt;eventTypeName&gt;</code>.
+As we can see there are two values separated with a dot. The first comes a name of a domain class, for which an event
+is created and the second - a type of a specific repository event. For example, in case we call <code>persist()</code> method
+on a domain entity called <code>Org</code>, the repository invokes several events, one of them is BeforePersist event with id <code>Org.beforePersist</code>.</p>
+<h4 id="subscribing-to-events">Subscribing to events<a class="headerlink" href="#subscribing-to-events" title="Permanent link">&para;</a></h4>
+<p>Grails provides several options for handling events, please see Grails docs for <a href="http://async.grails.org/latest/guide/index.html#consuming">Event Handling</a>.</p>
+<p>In case of adding <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Subscriber.html">@Subscriber</a> annotation to a method, Grails determines event id from the method name
+by default. For example, methods like <code>someEvent()</code> or <code>onSomeEvent()</code> listen to the event with id <code>someEvent</code>.</p>
+<p>Due to the fact that ids of repository events contain <code>.</code> symbol, we should pass event id to the Subscriber annotation like so:</p>
+<div class="codehilite"><pre><span></span>    <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;SomeDomain.someEvent&quot;</span><span class="o">)</span>
+    <span class="kt">void</span> <span class="nf">someMethod</span><span class="o">()</span> <span class="o">{}</span>
+</pre></div>
+
+<p>According to Grails docs, a class which contains a listener method (with <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Subscriber.html">@Subscriber</a> annotation) should be a <strong>spring bean</strong>.</p>
+<p>Please see the example with <code>OrgSubscriber</code> below:</p>
+<p><strong>Example</strong>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">grails.events.annotation.Subscriber</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforePersistEvent</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.AfterPersistEvent</span>
+
+<span class="kd">class</span> <span class="nc">OrgSubscriber</span> <span class="o">{</span>
+
+    <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.beforePersist&quot;</span><span class="o">)</span>
+    <span class="kt">void</span> <span class="nf">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+       <span class="c1">// ...</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.afterPersist&quot;</span><span class="o">)</span>
+    <span class="kt">void</span> <span class="nf">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+       <span class="c1">// ...</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+In this example we can see two listeners which handle events that occur before and after
+persisting an entity of the Org domain class.</p>
+<h3 id="spring-events">Spring Events<a class="headerlink" href="#spring-events" title="Permanent link">&para;</a></h3>
+<p>The Repository also publishes a number of 
+<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html">events as listed in the Groovydoc API</a></p>
+<p><strong>Example</strong><br />
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.event.EventListener</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforeBindEvent</span>
+
+<span class="kd">class</span> <span class="nc">OrgListener</span> <span class="o">{</span>
+
+    <span class="nd">@EventListener</span>
+    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">BeforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+       <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
+       <span class="c1">//Do some thing here.</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div></p>
+<blockquote>
+<p><img alt="📝" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
+Calling methods which trigger events inside an event listener causes an infinite loop</p>
+</blockquote>
+<h3 id="external-refreshable-beans-for-events">External refreshable beans for Events<a class="headerlink" href="#external-refreshable-beans-for-events" title="Permanent link">&para;</a></h3>
+<p>Since 2.0 Spring added support for defining beans using supported dynamic languages. Eg. groovy. 
+This makes it possible to create groovy script files outside of application which contains class definition, and use it as spring bean.
+This feature can be used to create refreshable beans, spring will watch the external script for changes and automatically reload the bean if it has changed.
+The interval can be configured using <code>refresh-check-delay</code>. This feature makes it possible to externalize the event listeners outside of application.</p>
+<p>Here is an example of how to use an external refreshable bean as event listener. </p>
+<p>Create a groovy script containing bean definition for event listener some where on file system out side of grails application directory.</p>
+<p><strong>File</strong> <code>OrgEventListener.groovy</code></p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">grails.events.annotation.Subscriber</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforePersistEvent</span>
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.AfterPersistEvent</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrgEventListener</span> <span class="o">{</span>
+
+      <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.beforePersist&quot;</span><span class="o">)</span>
+      <span class="kt">void</span> <span class="nf">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">e</span><span class="o">){</span>
+          <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="o">(</span><span class="n">Org</span><span class="o">)</span> <span class="n">e</span><span class="o">.</span><span class="na">entity</span>
+          <span class="c1">//do some thing with org</span>
+      <span class="o">}</span>
+
+      <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.afterPersist&quot;</span><span class="o">)</span>
+      <span class="kt">void</span> <span class="nf">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">e</span><span class="o">){</span>
+          <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="o">(</span><span class="n">Org</span><span class="o">)</span> <span class="n">e</span><span class="o">.</span><span class="na">entity</span>
+          <span class="c1">//do some thing with org</span>
+      <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>The above example uses <code>Subscriber</code> annotation from <a href="https://async.grails.org">Grails async</a> project. The event handler methods will get called asynchronously and does not take part in transaction.
+Repository also publishes events using spring event mechanism which can be used to define event listeners which gets called synchronously and takes part in current transaction. </p>
+<p>Following example shows how to define synchronous event listener.</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationListener</span> 
+<span class="kn">import</span> <span class="nn">gorm.tools.repository.events.BeforePersistEvent</span>
+
+<span class="kd">class</span> <span class="nc">OrgEventListener</span> <span class="kd">implements</span> <span class="n">ApplicationListener</span><span class="o">&lt;</span><span class="n">BeforePersistEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;&gt;</span>  <span class="o">{</span>
+
+    <span class="kt">void</span> <span class="nf">onApplicationEvent</span><span class="o">(</span><span class="n">BeforePersistEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
+        <span class="c1">//dome some thing with org.</span>
+    <span class="o">}</span>
+<span class="o">}</span> 
+</pre></div>
+
+<p>Define <code>OrgEventListener</code> as spring bean in <code>grails-app/conf/spring/resources.groovy</code></p>
+<div class="codehilite"><pre><span></span> <span class="n">xmlns</span> <span class="nl">lang:</span> <span class="s2">&quot;http://www.springframework.org/schema/lang&quot;</span>
+ <span class="n">lang</span><span class="o">.</span><span class="na">groovy</span><span class="o">(</span><span class="nl">id:</span> <span class="s2">&quot;orgEventListener&quot;</span><span class="o">,</span> <span class="s1">&#39;script-source&#39;</span><span class="o">:</span> <span class="s2">&quot;file:&lt;path to OrgEventListener.groovy&gt;&quot;</span><span class="o">,</span> <span class="s1">&#39;refresh-check-delay&#39;</span><span class="o">:</span> <span class="mi">1000</span><span class="o">)</span>
+</pre></div>
+
+<p>Now the <code>refreshableBean</code> can be injected into any other bean. Spring will reload it automatically if the RefreshableBean.groovy changes.</p>
+<p>See <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/languages.html#groovy">Spring dynamic languages support</a> for more details on dynamic language support.</p>
+<h2 id="repoutil-repomessage-helpers">RepoUtil, RepoMessage Helpers<a class="headerlink" href="#repoutil-repomessage-helpers" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoUtil.html">RepoUtil</a></p>
+<h4 id="repoutil">RepoUtil:<a class="headerlink" href="#repoutil" title="Permanent link">&para;</a></h4>
+<p><strong>checkFound(entity, Map params,String domainClassName)</strong> checks does the entity exists, if not throws <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a> with human readable error text</p>
+<p><strong>checkVersion(entity,ver)</strong> checks the passed in version with the version on the entity (entity.version) make sure entity.version is not greater, throws OptimisticLockingFailureException</p>
+<p><strong>flush()</strong> flushes the session</p>
+<p><strong>clear()</strong> clears session cache</p>
+<p><strong>flushAndClear()</strong> flushes the session and clears the session cache</p>
+<h4 id="repomessage-contains-bunch-of-help-methods-for-creating-text-messages">RepoMessage contains bunch of help methods for creating text messages<a class="headerlink" href="#repomessage-contains-bunch-of-help-methods-for-creating-text-messages" title="Permanent link">&para;</a></h4>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/RepoMessage.html">RepoMessage</a></p>
+<p>The example below shows how to build <code>saved</code> message for a domain:</p>
+<div class="codehilite"><pre><span></span>    <span class="n">User</span> <span class="n">user</span> <span class="o">=</span> <span class="k">new</span> <span class="n">User</span><span class="o">(</span><span class="nl">id:</span><span class="mi">100</span><span class="o">,</span><span class="nl">version:</span><span class="mi">1</span><span class="o">)</span>
+
+    <span class="n">Map</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">RepoMessage</span><span class="o">.</span><span class="na">saved</span><span class="o">(</span><span class="n">user</span><span class="o">)</span>
+    <span class="k">assert</span> <span class="s1">&#39;default.saved.message&#39;</span> <span class="o">==</span> <span class="n">msg</span><span class="o">.</span><span class="na">code</span> <span class="c1">//i18 code</span>
+    <span class="k">assert</span> <span class="mi">100</span> <span class="o">==</span> <span class="n">msg</span><span class="o">.</span><span class="na">args</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span>
+</pre></div>
+
+<p>List of available messages</p>
+<ul>
+<li>saved</li>
+<li>not saved</li>
+<li>updated</li>
+<li>not updated</li>
+<li>deleted</li>
+<li>not deleted</li>
+<li>notFound</li>
+<li>optimisticLockingFailure - Another user has updated the resource while you were editing</li>
+</ul>
+<p>Gorm-tools provides its own types of exceptions to handle errors which relate to domains.</p>
+<h2 id="entityvalidationexception">EntityValidationException<a class="headerlink" href="#entityvalidationexception" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a></p>
+<p>An extension of the default ValidationException. It is possible to pass the entity and the message map.</p>
+<h2 id="entitynotfoundexception">EntityNotFoundException<a class="headerlink" href="#entitynotfoundexception" title="Permanent link">&para;</a></h2>
+<p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a></p>
+<p>An extension of the EntityValidationException to be able to handle rest request which should respond with 404 error.</p>
+<h2 id="async-batch-processing-support">Async batch processing support<a class="headerlink" href="#async-batch-processing-support" title="Permanent link">&para;</a></h2>
+<p>Plugin makes it easy to process list of batches asynchronously with transaction using <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>. 
+<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsBatchSupport.html">GparsBatchSupport</a> is default implementation provided by the plugin.</p>
+<p><strong>batchSize</strong> - Is the batchsize used for slicing the list. The default value is obtained from <code>hibernate.jdbc.batch_size</code> configuration setting. However it can be explicitely passed in args as shown in below example.<br />
+<strong>poolSize</strong> - Is the size of Gpars thread pool used by <code>GparsBatchSupport</code>. The default value can configured using <code>gpars.poolsize</code>. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1</p>
+<p><strong>Example</strong>:
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">TestService</span> <span class="o">{</span>
+    <span class="n">AsyncBatchSupport</span> <span class="n">asyncBatchSupport</span>
+
+    <span class="kt">void</span> <span class="nf">insertBatches</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">asyncBatchSupport</span><span class="o">.</span><span class="na">parallelCollate</span><span class="o">([</span><span class="nl">batchSize:</span><span class="mi">100</span><span class="o">],</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span> <span class="n">Map</span> <span class="n">record</span><span class="o">,</span> <span class="n">Map</span> <span class="n">args</span> <span class="o">-&gt;</span>
+            <span class="n">Org</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">record</span><span class="o">)</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div></p>
+<p>The above code snippet will slice the list into batches of 100 and run each batch in parallel and wrap it in transaction. </p>
+<p>The list can be processed in parallel without it being wrapped in transaction using <code>asyncBatchSupport.parallel</code> method.</p>
+<div class="codehilite"><pre><span></span><span class="n">asyncBatchSupport</span><span class="o">.</span><span class="na">parallel</span><span class="o">(</span><span class="n">asyncBatchSupport</span><span class="o">.</span><span class="na">collate</span><span class="o">(</span><span class="n">list</span><span class="o">))</span> <span class="o">{</span> <span class="n">List</span> <span class="n">batch</span><span class="o">,</span> <span class="n">Map</span> <span class="n">args</span> <span class="o">-&gt;</span>
+    <span class="c1">//do some thing with the batch.</span>
+<span class="o">}</span>
+</pre></div>
+
+<h2 id="testing-support">Testing support<a class="headerlink" href="#testing-support" title="Permanent link">&para;</a></h2>
+<p>Plugin provides <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/GormToolsTest.html">GormToolsTest</a> and <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/GormToolsHibernateSpec.html">GormToolsHibernateSpec</a>
+To make it easy to write tests which utilizes repository.</p>
+<p><strong>Writing unit tests using GormToolsTest</strong><br />
+GormToolsTest extends grails DataTest and configures a repository bean for every mock domain.<br />
+The repository class must exist in same package as the domain class, or else, it will configure 
+DefaultGormRepo as the repository for the given domain.</p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CitySpec</span> <span class="kd">extends</span> <span class="n">Specification</span> <span class="kd">implements</span> <span class="n">GormToolsTest</span> <span class="o">{</span>
+
+   <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="o">{</span>
+     <span class="n">mockDomain</span><span class="o">(</span><span class="n">City</span><span class="o">)</span>
+   <span class="o">}</span>
+
+   <span class="kt">void</span> <span class="s2">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
+     <span class="nl">given:</span>
+     <span class="n">Map</span> <span class="n">params</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Chicago&quot;</span><span class="o">]</span>
+
+     <span class="nl">when:</span>
+     <span class="n">City</span> <span class="n">city</span> <span class="o">=</span> <span class="n">City</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
+
+     <span class="nl">then:</span>
+     <span class="n">city</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="s2">&quot;Chicago&quot;</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p><strong>GormToolsHibernateSpec</strong><br />
+GormToolsHibernateSpec extends HibernateSpec and setups repository beans for domains. 
+Can be used to unit test with full hibernate support with inmemory database.</p>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CitySpec</span> <span class="kd">extends</span> <span class="n">GormToolsHibernateSpec</span> <span class="o">{</span>
+
+  <span class="n">List</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&gt;</span> <span class="n">getDomainClasses</span><span class="o">()</span> <span class="o">{</span> <span class="o">[</span><span class="n">City</span><span class="o">]</span> <span class="o">}</span>
+
+   <span class="kt">void</span> <span class="s2">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
+     <span class="nl">given:</span>
+     <span class="n">Map</span> <span class="n">params</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Chicago&quot;</span><span class="o">]</span>
+
+     <span class="nl">when:</span>
+     <span class="n">City</span> <span class="n">city</span> <span class="o">=</span> <span class="n">City</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
+     <span class="c1">//or City.repo.create(params)</span>
+
+     <span class="nl">then:</span>
+     <span class="n">city</span><span class="o">.</span><span class="na">name</span> <span class="o">==</span> <span class="s2">&quot;Chicago&quot;</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+
+<p>When <code>getDomainClasses()</code> is overridden GormToolsHibernateSpec will try to find the repository in the same package as domain class. 
+Alternatively if <code>getPackageToScan()</code> is provided, it will find all the repository from the given package and below it. </p>
+<p><strong>DomainAutoTest</strong>
+Also plugin provides <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/DomainAutoTest.html">DomainAutoTest</a> abstract class that contains default tests cases for CRUD operations. 
+<code>DomainAutoTest</code> will mock the domain, setup and create the data for you then exercise the domain and the default repository service for you.
+See example bellow:</p>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gorm.tools.testing.hibernate.AutoHibernateSpec</span>
+<span class="kn">import</span> <span class="nn">testing.Project</span>
+
+<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">AutoHibernateSpec</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
+
+<span class="o">}</span>
+</pre></div>
+
+<p>The next methods will be added and executed for Project class:</p>
+<ul>
+<li>test_create</li>
+<li>test_update</li>
+<li>test_persist</li>
+<li>test_delete</li>
+</ul>
+<p>Each of them can be overridden by the method with the same name if needed. </p>
+<p>Test data is build with help of <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/BuildExampleHolder.html">BuildExampleData</a> and [BuildExampleHolder]. </p>
+<p>BuildExampleHolder - is a holder that stores BuildExampleData instances for domains, to avoid creating of the same values 
+several times</p>
+<p>BuildExampleData is class that builds test data based on <code>example</code> property from constraints section. If domain class has association
+that shouldn't be <code>null</code>(has constrain <code>nullable: false</code>), creates test data for it to, left null otherwise.
+Dates in <code>example</code> should be string format, they will be parsed to dates.</p>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../intro/" title="Quick Start" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Quick Start
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../databinding/" title="Databinding" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Databinding
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2017 9ci Inc
+          </div>
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://yakworks.github.io/mkdocs-material-components/" title="Material Components for MkDocs">
+          Material Components for MkDocs</a>
+      </div>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/application-68832431b5.js"></script>
+      
+      
+      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+      <script>window.mdc.autoInit()</script>
+      <script src="../../assets/javascripts/headroom.min.js"></script>
+      <script src="../../assets/javascripts/jQuery.headroom.min.js"></script>
+      <script src="../../assets/javascripts/jq-mdc-web.js"></script>
+      <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
+      <script>app.initialize({version:"0.16.3",url:{base:"../.."}})</script>
+      
+    
+    
+  </body>
+</html>

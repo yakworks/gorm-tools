@@ -1,4 +1,5 @@
 version "1.0"
+group "yakworks"
 
 buildscript {
     repositories {
@@ -11,10 +12,24 @@ buildscript {
     }
 }
 
+apply plugin:"org.grails.grails-web"
+apply plugin:"war"
+apply plugin:"org.grails.grails-gsp"
 
 dependencies {
-    compile 'org.grails.plugins:grails-java8:1.2.2'
+    profile "org.grails.profiles:web"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
+
+    console "org.grails:grails-console"
+    //compile 'org.grails.plugins:grails-java8:1.2.2'
+
     testCompile "org.grails:grails-datastore-rest-client"
+    testCompile "org.grails.plugins:geb"
+    testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-firefox-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-remote-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
 bootRun {

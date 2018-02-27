@@ -6,29 +6,22 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.1"
-        classpath "gradle.plugin.com.energizedwork:idea-gradle-plugins:1.4"
         classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
     }
 }
 
-apply plugin:"idea"
+apply plugin:"org.grails.grails-plugin"
 apply plugin:"com.energizedwork.webdriver-binaries"
-apply plugin:"com.energizedwork.idea-project-components"
 apply plugin: 'codenarc'
 apply plugin: "jacoco"
 
-repositories {
-    mavenLocal()
-    maven { url "https://repo.grails.org/grails/core" }
-    maven { url = "https://dl.bintray.com/9ci/grails-plugins"}
-    jcenter()
-}
-
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
-}
+apply plugin:"org.grails.grails-plugin-publish"
+apply from: rootProject.file('gradle/publish.gradle')
 
 dependencies {
+    profile "org.grails.profiles:web-plugin"
+    console "org.grails:grails-console"
+
     //this is for GrailsParameterMapRowMapper that uses the MockHttpServletRequest
     compileOnly "org.springframework:spring-test"
 
@@ -38,9 +31,12 @@ dependencies {
     compileOnly "org.grails.plugins:build-test-data:$buildTestDataVersion"
 
     //testCompile "org.grails.plugins:views-json-testing-support:$viewsVersion"
-
     codenarc 'org.codenarc:CodeNarc:0.27.0'
     codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
+
+    //these shouldn't be needed in here as there are only unit tests but they add the byte-buddy for mocking
+    testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
+    testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
 //bootRepackage and maybe addResources are needed for the test-projects grails.plugin.compile depndency to work
@@ -48,11 +44,12 @@ bootRun {
     jvmArgs('-Dspring.output.ansi.enabled=always')
     addResources = true
 }
+
 bootRepackage.enabled = false
 
 codenarc {
     toolVersion = '0.27.0'
-    configFile = file("${commonBuild}/codenarc-rules.groovy")//project.resources.text.fromString("${commonBuild}/codenarc-rules.groovy".toURL().text)
+    configFile = file("${rootProject.projectDir}/gradle/codenarc-rules.groovy")
     reportFormat = 'html'
     //ignoreFailures = true
 
@@ -69,34 +66,18 @@ codenarcTest {
     ignoreFailures = true
 }
 
-//this makes the groovy docs much more readable by shorting packages and providing links
-groovydoc {
-    excludes = ['**/*GrailsPlugin.groovy','**/Application.groovy' ]
-    link('http://download.oracle.com/javase/8/docs/api/', 'java.', 'org.xml', 'javax.', 'org.xml.')
-    link("https://docs.spring.io/spring/docs/4.2.x/javadoc-api/", 'org.springframework')
-    link('http://groovy.codehaus.org/api/',  'groovy.', 'org.codehaus.groovy.')
-    link('https://docs.grails.org/3.3.x/api',  'grails.', 'org.grails.')
-    link('https://testing.grails.org/latest/api',  'grails.testing.', 'org.grails.testing.')
-    link('http://gorm.grails.org/latest/hibernate/api/',  'grails.gorm', 'grails.orm', 'org.grails.datastore', 'org.grails.orm')
-}
-
-// Added to be able to see failed tests and the cause in console on test run.
-// This really helpful and needed when viewing on Travis CI or others.
-//integrationTest {
-//    testLogging {
-//        exceptionFormat = 'full'
-//        events "failed"//, "passed", "skipped", "standardOut", "standardError"
-//    }
-//
-//    // Uncomment line bellow to show in console all tests that were executed in next format:
-//    //:test-app:integrationTest
-//    //-- Test Check list(repoapp.OrgSpec)
-//    //-- Test Filter by Name eq(repoapp.OrgSpec)
-//
-//    beforeTest { descriptor -> logger.quiet " -- $descriptor" }
-//}
-
 test {
     //testLogging.showStandardStreams = true
     testLogging.exceptionFormat = 'full'
+}
+task printProps {
+    doLast {
+        rootProject.ext.properties.sort { e1, e2 -> undotKeys(e1.key) <=> undotKeys(e2.key) }
+            .each { k, v -> println "${k}: ${v}" }
+    }
+}
+
+def undotKeys(key) {
+    if (!key.contains('.')) { key += 'x' }
+    key.replaceAll(/\.(\w)/) { match, group -> group.toUpperCase() }
 }

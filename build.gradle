@@ -85,6 +85,7 @@ subprojects {
     }
 
 }
+//apply from: "gradle/spotless.gradle"
 //** doc publishing
 apply from: "gradle/mkdocs.gradle"
 apply from: "gradle/githubPublish.gradle"

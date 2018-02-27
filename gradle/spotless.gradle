@@ -1,12 +1,10 @@
 spotless {
-    java {
-        licenseHeaderFile	'spotless.license.java'			// License header file
-        importOrderFile		'spotless.importorder'			// An import ordering file, exported from Eclipse
-        eclipseFormatFile	'spotless.eclipseformat.xml'	// XML file dumped out by the Eclipse formatter
-        // Eclipse formatter puts excess whitespace after lambda blocks
-        //    funcThatTakesLambdas(x -> {} , y -> {} )	// what Eclipse does
-        //    funcThatTakesLambdas(x -> {}, y -> {})	// what I wish Eclipse did
-        custom 'Lambda fix', { it.replace('} )', '})').replace('} ,', '},') }
+    format 'groovy', {
+        target 'src/**/*.groovy'
+        trimTrailingWhitespace()
+        indentWithSpaces(2)
+        endWithNewline()
+        licenseHeaderFile project.rootProject.file('gradle/HEADER'), 'package '
     }
     format 'misc', {
         target '**/.gitignore', '**/*.gradle', '**/*.md', '**/*.sh'

@@ -24,7 +24,7 @@ jobs:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
       MALLOC_ARENA_MAX: 2
-      GRADLE_OPTS: "-Xmx1024m -Dorg.gradle.daemon=false"
+      GRADLE_OPTS: "-Xmx2048m -Dorg.gradle.daemon=false"
       TERM: dumb
 
     parallelism: 1
@@ -49,7 +49,7 @@ jobs:
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
       # run tests!
-      - run: gradle clean; gradle check --no-daemon --max-workers 2
+      - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/
@@ -62,7 +62,7 @@ jobs:
       - store_test_results:
           path: plugin/build/test-results
 
-      # - run: gradle test-app:check --max-workers=1
+      - run: gradle test-app:check --no-daemon --max-workers 2
 
       - store_artifacts:
           path: examples/test-app/build/reports/tests
@@ -71,7 +71,7 @@ jobs:
       - store_test_results:
           path: examples/test-app/build/test-results
 
-      - run: ./circleci/publish.sh
+      - run: ./.circleci/publish.sh
 
 #      - store_artifacts:
 #          path: build/mkdocs/site

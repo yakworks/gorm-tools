@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/yakworks/gorm-tools.svg?branch=master)](https://travis-ci.org/yakworks/gorm-tools)
+[![CircleCI](https://circleci.com/gh/yakworks/gorm-tools.svg?style=svg)](https://circleci.com/gh/yakworks/gorm-tools)
 
 <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 

@@ -1,22 +1,22 @@
+apply plugin: 'com.diffplug.gradle.spotless'
+
 spotless {
   groovyGradle {
     target '**/*.gradle', 'build.gradle'
     trimTrailingWhitespace()
-    indentWithSpaces(2) // or spaces. Takes an integer argument if you don't like 4
+    indentWithSpaces(2)
     endWithNewline()
-    //paddedCell()
-    //greclipse().configFile("$gradleDir/spotless/spotless.groovyformat.prefs", "$gradleDir/spotless/spotless.eclipseformat.xml")
   }
   java {
-      licenseHeader '/* Licensed under Apache-2.0 $YEAR. Copyright 9ci Inc */'
-      target fileTree('.') {
-          include 'src/main/groovy/gorm/**/*.java'
-      }
-      //googleJavaFormat() // use a specific formatter for Java files
+    licenseHeader '/* Copyright $YEAR. 9ci Inc. Licensed under the Apache License, Version 2.0 */'
+    target fileTree('.') {
+      include 'src/main/groovy/gorm/**/*.java'
+    }
+    //googleJavaFormat() // use a specific formatter for Java files
   }
   groovy {
     target 'src/main/**/*.groovy'
-    licenseHeader '/* Licensed under Apache-2.0 $YEAR. Copyright 9ci Inc */'
+    licenseHeader '/* Copyright $YEAR. 9ci Inc. Licensed under the Apache License, Version 2.0 */'
     //excludeJava() // can't be used if target is used
     //paddedCell() // some error require this
     trimTrailingWhitespace()

@@ -1,3 +1,5 @@
+apply plugin: "org.grails.grails-plugin-publish"
+
 grailsPublish {
   //user = binTrayUser
   //key = binTrayKey
@@ -10,7 +12,6 @@ grailsPublish {
   issueTrackerUrl = "$githubIssues"
   websiteUrl = websiteUrl
   vcsUrl = "$githubUrl"
-
 }
 
 if(isSnapshot){

@@ -18,24 +18,20 @@ plugins {
   //id "pl.softmate.gradle-properties-yaml-plugin" version "0.0.2"
 }
 apply plugin:"idea"
-apply plugin:"eclipse"
-
-apply from: rootProject.file('gradle/prop-defaults.gradle')
-
 apply plugin:'groovy'
-apply plugin: 'com.diffplug.gradle.spotless'
-apply from: rootProject.file("gradle/spotless.gradle")
+apply from: 'gradle/prop-defaults.gradle'
+apply from: "$gradleDir/spotless.gradle"
 
 allprojects {
+
   apply plugin:'groovy'
   apply plugin: 'com.palantir.configuration-resolver' //see above for CI usage on this
-  apply from: rootProject.file("gradle/groovydoc.gradle")
 
   repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     maven { url "https://dl.bintray.com/9ci/grails-plugins"}
-    maven { url "http://repo.9ci.com/artifactory/grails-plugins" }
+    //maven { url "http://repo.9ci.com/artifactory/oss-snapshots" }
     mavenCentral()
     jcenter()
   }
@@ -50,7 +46,6 @@ allprojects {
 }
 
 subprojects {
-
   dependencies {
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
@@ -61,7 +56,6 @@ subprojects {
 
     compile "org.grails:grails-logging"
     compile "org.grails:grails-plugin-databinding"
-    //compile "org.grails:grails-plugin-i18n"
     compile "org.grails:grails-plugin-services"
     compile 'org.grails.plugins:grails-java8:1.2.2'
 

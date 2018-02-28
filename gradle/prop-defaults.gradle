@@ -1,4 +1,5 @@
-// sets up default composed props on ext from base props in gradle.properteis
+// sets up default composed props on ext from base props in gradle.properties
+//!!!properties should go there, not here!!
 // its assumed that certain props exists already as base lines to use
 
 //** Github

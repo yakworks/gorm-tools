@@ -76,6 +76,7 @@ logs
 .idea/modules
 .idea/**/mongoSettings.xmlout/
 .idea/.name
+.idea/codeStyles
 
 
 # Crashlytics plugin (for Android Studio and IntelliJ)

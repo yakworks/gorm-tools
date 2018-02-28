@@ -15,7 +15,10 @@ spotless {
     //googleJavaFormat() // use a specific formatter for Java files
   }
   groovy {
-    target 'src/main/**/*.groovy'
+    target fileTree('.') {
+      include 'src/main/groovy/**/*.groovy', 'grails-app/**/*.groovy'
+      exclude '**/*.java','**/conf/*.groovy'
+    }
     licenseHeader '/* Copyright $YEAR. 9ci Inc. Licensed under the Apache License, Version 2.0 */'
     //excludeJava() // can't be used if target is used
     //paddedCell() // some error require this
@@ -25,11 +28,11 @@ spotless {
     //this could be cool but they have some work to do still, messes with groovy lists
     //greclipse().configFile("$gradleDir/spotless/spotless.eclipseformat.xml", "$gradleDir/spotless/spotless.groovyformat.prefs")
   }
-//  format 'markdown', {
-//      target '**/*.md'
-//      indentWithSpaces(4)
-//      //trimTrailingWhitespace()
-//      endWithNewline()
-//  }
+  //  format 'markdown', {
+  //      target '**/*.md'
+  //      indentWithSpaces(4)
+  //      //trimTrailingWhitespace()
+  //      endWithNewline()
+  //  }
   //    freshmark {}
 }

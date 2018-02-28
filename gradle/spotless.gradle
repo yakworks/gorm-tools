@@ -1,14 +1,28 @@
 spotless {
-    format 'groovy', {
-        target 'src/**/*.groovy'
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-        licenseHeaderFile project.rootProject.file('gradle/HEADER'), 'package '
+//    groovy {
+//        target 'src/**/*.groovy'
+//        trimTrailingWhitespace()
+//        indentWithSpaces(4)
+//        endWithNewline()
+//        licenseHeaderFile project.rootProject.file('gradle/HEADER'), 'package '
+//    }
+    java {
+        licenseHeaderFile "$gradleDir/spotless/spotless.license"
+        googleJavaFormat() // use a specific formatter for Java files
+    }
+    groovy {
+        licenseHeaderFile "$gradleDir/spotless/spotless.license"
+        excludeJava() // excludes all Java sources within the Groovy source dirs from formatting
+        paddedCell() // Avoid cyclic ambiguities
+        indentWithSpaces(4)
+        //removeUnusedImports()
+        // the Groovy Eclipse formatter extends the Java Eclipse formatter,
+        // so it formats Java files by default (unless `excludeJava` is used).
+        greclipse().configFile("$gradleDir/spotless/spotless.eclipseformat.xml", "$gradleDir/spotless/spotless.groovyformat.prefs")
     }
     format 'misc', {
         target '**/.gitignore', '**/*.gradle', '**/*.md', '**/*.sh'
-        indentWithTabs()
+        indentWithSpaces(2)
         trimTrailingWhitespace()
         endWithNewline()
     }

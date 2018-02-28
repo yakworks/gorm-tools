@@ -1,46 +1,35 @@
 spotless {
-    //    groovy {
-    //        target 'src/**/*.groovy'
-    //        trimTrailingWhitespace()
-    //        indentWithSpaces(4)
-    //        endWithNewline()
-    //        licenseHeaderFile project.rootProject.file('gradle/HEADER'), 'package '
-    //    }
-    groovyGradle {
-        target '**/*.gradle', 'build.gradle'
-
-        trimTrailingWhitespace()
-        indentWithSpaces(2) // or spaces. Takes an integer argument if you don't like 4
-        endWithNewline()
-        paddedCell()
-        greclipse().configFile("$gradleDir/spotless/spotless.groovyformat.prefs", "$gradleDir/spotless/spotless.eclipseformat.xml")
-    }
-    //    java {
-    //        licenseHeader '/* Licensed under Apache-2.0 $YEAR. Copyright 9ci Inc */'
-    //        target fileTree('.') {
-    //            include 'src/main/groovy/gorm/**/*.java'
-    //        }
-    //        //googleJavaFormat() // use a specific formatter for Java files
-    //    }
-    groovy {
-        target 'plugin/src/main/groovy/**/*.groovy'
-        licenseHeader '/* Licensed under Apache-2.0 $YEAR. Copyright 9ci Inc */'
-        //licenseHeaderFile "$gradleDir/spotless/spotless.license"
-        //excludeJava() // excludes all Java sources within the Groovy source dirs from formatting
-        paddedCell() // Avoid cyclic ambiguities
-        indentWithSpaces(4)
-        //custom 'noInternalDeps', noInternalDepsClosure
-        //bumpThisNumberIfACustomStepChanges(3)
-        //removeUnusedImports()
-        // the Groovy Eclipse formatter extends the Java Eclipse formatter,
-        // so it formats Java files by default (unless `excludeJava` is used).
-        greclipse().configFile("$gradleDir/spotless/spotless.eclipseformat.xml", "$gradleDir/spotless/spotless.groovyformat.prefs")
-    }
-    //    format 'misc', {
-    //        target '**/.gitignore', '**/*.gradle', '**/*.md', '**/*.sh'
-    //        indentWithSpaces(2)
-    //        trimTrailingWhitespace()
-    //        endWithNewline()
-    //    }
-    //    freshmark {}
+  groovyGradle {
+    target '**/*.gradle', 'build.gradle'
+    trimTrailingWhitespace()
+    indentWithSpaces(2) // or spaces. Takes an integer argument if you don't like 4
+    endWithNewline()
+    //paddedCell()
+    //greclipse().configFile("$gradleDir/spotless/spotless.groovyformat.prefs", "$gradleDir/spotless/spotless.eclipseformat.xml")
+  }
+  java {
+      licenseHeader '/* Licensed under Apache-2.0 $YEAR. Copyright 9ci Inc */'
+      target fileTree('.') {
+          include 'src/main/groovy/gorm/**/*.java'
+      }
+      //googleJavaFormat() // use a specific formatter for Java files
+  }
+  groovy {
+    target 'src/main/**/*.groovy'
+    licenseHeader '/* Licensed under Apache-2.0 $YEAR. Copyright 9ci Inc */'
+    //excludeJava() // can't be used if target is used
+    //paddedCell() // some error require this
+    trimTrailingWhitespace()
+    indentWithSpaces(4) // this only checks for tabs and can replace with 4 spaces it it finds them
+    endWithNewline()
+    //this could be cool but they have some work to do still, messes with groovy lists
+    //greclipse().configFile("$gradleDir/spotless/spotless.eclipseformat.xml", "$gradleDir/spotless/spotless.groovyformat.prefs")
+  }
+//  format 'markdown', {
+//      target '**/*.md'
+//      indentWithSpaces(4)
+//      //trimTrailingWhitespace()
+//      endWithNewline()
+//  }
+  //    freshmark {}
 }

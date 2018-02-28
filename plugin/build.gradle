@@ -1,18 +1,19 @@
 buildscript {
-    repositories {
-        mavenLocal()
-        maven { url "https://repo.grails.org/grails/core" }
-    }
-    dependencies {
-        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.1"
-        classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-    }
+  repositories {
+    mavenLocal()
+    maven { url "https://repo.grails.org/grails/core" }
+  }
+  dependencies {
+    classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+    classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.1"
+    classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
+  }
 }
+apply plugin:'groovy'
 
 apply plugin: "org.grails.grails-plugin"
-//apply plugin: 'com.diffplug.gradle.spotless'
-//apply from: rootProject.file("gradle/spotless.gradle")
+apply plugin: 'com.diffplug.gradle.spotless'
+apply from: rootProject.file("gradle/spotless.gradle")
 
 apply plugin: "org.grails.grails-plugin-publish"
 apply from: rootProject.file('gradle/publish.gradle')
@@ -22,65 +23,65 @@ apply plugin: 'codenarc'
 apply plugin: "jacoco"
 
 dependencies {
-    profile "org.grails.profiles:web-plugin"
-    console "org.grails:grails-console"
+  profile "org.grails.profiles:web-plugin"
+  console "org.grails:grails-console"
 
-    //this is for GrailsParameterMapRowMapper that uses the MockHttpServletRequest
-    compileOnly "org.springframework:spring-test"
+  //this is for GrailsParameterMapRowMapper that uses the MockHttpServletRequest
+  compileOnly "org.springframework:spring-test"
 
-    //used for bundled Test traits
-    compileOnly "org.grails:grails-gorm-testing-support"
-    compileOnly "org.grails:grails-web-testing-support"
-    compileOnly "org.grails.plugins:build-test-data:$buildTestDataVersion"
+  //used for bundled Test traits
+  compileOnly "org.grails:grails-gorm-testing-support"
+  compileOnly "org.grails:grails-web-testing-support"
+  compileOnly "org.grails.plugins:build-test-data:$buildTestDataVersion"
 
-    //testCompile "org.grails.plugins:views-json-testing-support:$viewsVersion"
-    codenarc 'org.codenarc:CodeNarc:0.27.0'
-    codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
+  //testCompile "org.grails.plugins:views-json-testing-support:$viewsVersion"
+  codenarc 'org.codenarc:CodeNarc:0.27.0'
+  codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
 
-    //these shouldn't be needed in here as there are only unit tests but they add the byte-buddy for mocking
-    testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
-    testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
+  //these shouldn't be needed in here as there are only unit tests but they add the byte-buddy for mocking
+  testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
+  testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
 //bootRepackage and maybe addResources are needed for the test-projects grails.plugin.compile depndency to work
 bootRun {
-    jvmArgs('-Dspring.output.ansi.enabled=always')
-    addResources = true
+  jvmArgs('-Dspring.output.ansi.enabled=always')
+  addResources = true
 }
 
 bootRepackage.enabled = false
 
 codenarc {
-    toolVersion = '0.27.0'
-    configFile = file("${rootProject.projectDir}/gradle/codenarc-rules.groovy")
-    reportFormat = 'html'
-    //ignoreFailures = true
+  toolVersion = '0.27.0'
+  configFile = file("${rootProject.projectDir}/gradle/codenarc-rules.groovy")
+  reportFormat = 'html'
+  //ignoreFailures = true
 
-    maxPriority1Violations = 0
-    maxPriority2Violations = 4
-    maxPriority3Violations = 4
+  maxPriority1Violations = 0
+  maxPriority2Violations = 4
+  maxPriority3Violations = 4
 }
 
 codenarcMain {
-    exclude '**/GormScalars.groovy'
+  exclude '**/GormScalars.groovy'
 }
 
 codenarcTest {
-    ignoreFailures = true
+  ignoreFailures = true
 }
 
 test {
-    //testLogging.showStandardStreams = true
-    testLogging.exceptionFormat = 'full'
+  //testLogging.showStandardStreams = true
+  testLogging.exceptionFormat = 'full'
 }
 task printProps {
-    doLast {
-        rootProject.ext.properties.sort { e1, e2 -> undotKeys(e1.key) <=> undotKeys(e2.key) }
-            .each { k, v -> println "${k}: ${v}" }
-    }
+  doLast {
+    rootProject.ext.properties.sort { e1, e2 -> undotKeys(e1.key) <=> undotKeys(e2.key) }
+      .each { k, v -> println "${k}: ${v}" }
+  }
 }
 
 def undotKeys(key) {
-    if (!key.contains('.')) { key += 'x' }
-    key.replaceAll(/\.(\w)/) { match, group -> group.toUpperCase() }
+  if (!key.contains('.')) { key += 'x' }
+  key.replaceAll(/\.(\w)/) { match, group -> group.toUpperCase() }
 }

@@ -2,55 +2,54 @@ import org.apache.tools.ant.filters.*
 
 //setup this https://github.com/xvik/gradle-mkdocs-plugin
 task mkdocsBuild(type: Exec, dependsOn: 'copyDocs') {
-    workingDir 'build/mkdocs'
-    commandLine 'mkdocs', 'build'
-    //commandLine "bash", "-c",  "git tag --list | grep 'keyword'"
+  workingDir 'build/mkdocs'
+  commandLine 'mkdocs', 'build'
+  //commandLine "bash", "-c",  "git tag --list | grep 'keyword'"
 }
 
 task copyDocs {
-    copy {
-        from 'docs'
-        into 'build/mkdocs/docs'
+  copy {
+    from 'docs'
+    into 'build/mkdocs/docs'
+  }
+  copy {
+    from '.'
+    into 'build/mkdocs/docs'
+    include 'README.md'
+    rename { 'index.md' }
+    filter { line ->
+      //replace links like [foo]( docs/foo.md ) -> [foo](foo.md) and [foo]: docs/foo.md  -> [foo]: foo.md
+      line.replaceAll(/\(\s*docs\//,'(').replaceAll(/\:\s*docs\//,': ')
     }
-    copy {
-        from '.'
-        into 'build/mkdocs/docs'
-        include 'README.md'
-        rename { 'index.md' }
-        filter { line ->
-            //replace links like [foo]( docs/foo.md ) -> [foo](foo.md) and [foo]: docs/foo.md  -> [foo]: foo.md
-            line.replaceAll(/\(\s*docs\//,'(').replaceAll(/\:\s*docs\//,': ')
-        }
+  }
+  copy {
+    from '.'
+    into 'build/mkdocs'
+    include 'mkdocs.yml'
+    filter { line ->
+      def siteUrl = isSnapshot ? "${websiteUrl}/snapshot" : websiteUrl
+      def newline = line.startsWith('repo_url:') ? "repo_url: $githubUrl" : line
+      newline.startsWith('site_url:') ? "site_url: $siteUrl" : newline
     }
-    copy {
-        from '.'
-        into 'build/mkdocs'
-        include 'mkdocs.yml'
-        filter { line ->
-            def siteUrl = isSnapshot ? "${websiteUrl}/snapshot" : websiteUrl
-            def newline = line.startsWith('repo_url:') ? "repo_url: $githubUrl" : line
-            newline.startsWith('site_url:') ? "site_url: $siteUrl" : newline
-        }
-        filter(ReplaceTokens,
-            tokens: ['version', 'title',
-                     'description', 'githubSlug', 'author'].collectEntries{[it, project."$it".toString()]}
-        )
-    }
+    filter(ReplaceTokens,
+      tokens: ['version', 'title', 'description', 'githubSlug', 'author'].collectEntries{[it, project."$it".toString()]}
+    )
+  }
 }
 
 /** Updates the version in the README.md */
 //https://stackoverflow.com/questions/17465353/how-to-replace-a-string-for-a-buildvariant-with-gradle-in-android-studio/17572644#17572644
 task versionReadme {
-    doLast {
-        //updates the Version: 6.1.x-whatever in the first yakworks logo part
-        def updatedContent = new File('README.md').getText('UTF-8')
-            .replaceFirst(/Version:\s*[\d\.]+[^\s]+/, "version: $version")
-        //update the dependency example
-        updatedContent = updatedContent
-            .replaceFirst(/gorm-tools:[\d\.]+[^"]+/, "gorm-tools:${version.trim()}")
+  doLast {
+    //updates the Version: 6.1.x-whatever in the first yakworks logo part
+    def updatedContent = new File('README.md').getText('UTF-8')
+      .replaceFirst(/Version:\s*[\d\.]+[^\s]+/, "version: $version")
+    //update the dependency example
+    updatedContent = updatedContent
+      .replaceFirst(/gorm-tools:[\d\.]+[^"]+/, "gorm-tools:${version.trim()}")
 
-        new File('README.md').write(updatedContent, 'UTF-8')
-    }
+    new File('README.md').write(updatedContent, 'UTF-8')
+  }
 }
 
 //https://mrhaki.blogspot.com/2010/10/gradle-goodness-copy-files-with.html

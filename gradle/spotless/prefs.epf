@@ -1,4 +1,4 @@
-#Tue Feb 27 20:17:53 CST 2018
+#Tue Feb 27 21:28:46 CST 2018
 \!/=
 /configuration/org.eclipse.buildship.ui/org.eclipse.buildship.ui.wizard.project.creation.showWelcomePage=false
 /configuration/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true
@@ -9,14 +9,26 @@
 /configuration/org.eclipse.ui.ide/SHOW_RECENT_WORKSPACES=true
 /configuration/org.eclipse.ui.ide/SHOW_WORKSPACE_SELECTION_DIALOG=false
 /instance/org.codehaus.groovy.eclipse.codeassist.completion/org.codehaus.groovy.eclipse.codeassist.completion.filtereddgms=,
+/instance/org.codehaus.groovy.eclipse.dsl/org.codehaus.groovy.eclipse.dsl.projects.ignore=test-app,gorm-tools,benchmarks,gorm-tools-root
 /instance/org.codehaus.groovy.eclipse.quickfix/groovy=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
 /instance/org.codehaus.groovy.eclipse.ui/groovy.debug.force_options=false
-/instance/org.codehaus.groovy.eclipse.ui/groovy.formatter.braces.end=same
-/instance/org.codehaus.groovy.eclipse.ui/groovy.formatter.longListLength=90
+/instance/org.codehaus.groovy.eclipse.ui/groovy.formatter.longListLength=1
+/instance/org.codehaus.groovy.eclipse.ui/groovy.formatter.multiline.indentation=3
 /instance/org.codehaus.groovy.eclipse.ui/groovy.formatter.remove.unnecessary.semicolons=true
 /instance/org.eclipse.buildship.core/gradle.build.scans=false
 /instance/org.eclipse.buildship.core/gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
 /instance/org.eclipse.buildship.core/gradle.offline.mode=false
+/instance/org.eclipse.buildship.ui/executionsView.headerDurationColumnWidth=100
+/instance/org.eclipse.buildship.ui/executionsView.headerNameColumnWidth=600
+/instance/org.eclipse.buildship.ui/tasksView.groupTasks=true
+/instance/org.eclipse.buildship.ui/tasksView.headerDescriptionColumnWidth=400
+/instance/org.eclipse.buildship.ui/tasksView.headerNameColumnWidth=200
+/instance/org.eclipse.buildship.ui/tasksView.linkToSelection=false
+/instance/org.eclipse.buildship.ui/tasksView.privateTasksVisible=false
+/instance/org.eclipse.buildship.ui/tasksView.projectTasksVisible=false
+/instance/org.eclipse.buildship.ui/tasksView.sortByType=true
+/instance/org.eclipse.buildship.ui/tasksView.sortByVisibility=true
+/instance/org.eclipse.buildship.ui/tasksView.taskSelectorsVisible=true
 /instance/org.eclipse.core.net/org.eclipse.core.net.hasMigrated=true
 /instance/org.eclipse.core.resources/version=1
 /instance/org.eclipse.debug.core/org.eclipse.debug.core.USE_STEP_FILTERS=true
@@ -422,6 +434,7 @@
 /instance/org.eclipse.m2e.discovery/org.eclipse.m2e.discovery.pref.projects=
 /instance/org.eclipse.mylyn.context.core/mylyn.attention.migrated=true
 /instance/org.eclipse.mylyn.monitor.ui/org.eclipse.mylyn.monitor.activity.tracking.enabled.checked=true
+/instance/org.eclipse.mylyn.tasks.ui/migrated.task.repositories.secure.store=true
 /instance/org.eclipse.mylyn.tasks.ui/org.eclipse.mylyn.tasks.ui.filters.nonmatching=true
 /instance/org.eclipse.mylyn.tasks.ui/org.eclipse.mylyn.tasks.ui.filters.nonmatching.encouraged=true
 /instance/org.eclipse.mylyn.tasks.ui/org.eclipse.mylyn.tasks.ui.welcome.message=true
@@ -429,14 +442,17 @@
 /instance/org.eclipse.team.ui/org.eclipse.team.ui.first_time=false
 /instance/org.eclipse.ui.editors/overviewRuler_migration=migrated_3.1
 /instance/org.eclipse.ui.ide/PROBLEMS_FILTERS_MIGRATE=true
-/instance/org.eclipse.ui.ide/platformState=1519780283843
+/instance/org.eclipse.ui.ide/platformState=1519780283853
 /instance/org.eclipse.ui.ide/quickStart=false
 /instance/org.eclipse.ui.ide/tipsAndTricks=true
+/instance/org.eclipse.ui.workbench//org.eclipse.ui.commands/state/org.eclipse.ui.navigator.resources.nested.changeProjectPresentation/org.eclipse.ui.commands.radioState=false
 /instance/org.eclipse.ui.workbench/PLUGINS_NOT_ACTIVATED_ON_STARTUP=;org.eclipse.m2e.discovery;
 @org.codehaus.groovy.eclipse.codeassist.completion=2.9.2.xx-201801041714-e47-RELEASE
+@org.codehaus.groovy.eclipse.dsl=2.9.2.xx-201801041714-e47-RELEASE
 @org.codehaus.groovy.eclipse.quickfix=2.9.2.xx-201801041714-e47-RELEASE
 @org.codehaus.groovy.eclipse.ui=2.9.2.xx-201801041714-e47-RELEASE
 @org.eclipse.buildship.core=2.1.2.v20170807-1324
+@org.eclipse.buildship.ui=2.1.2.v20170807-1324
 @org.eclipse.core.net=1.3.100.v20170516-0820
 @org.eclipse.core.resources=3.12.0.v20170417-1558
 @org.eclipse.debug.core=3.11.0.v20170605-1534

@@ -47,6 +47,7 @@ class GormUtils {
         if (target == null) throw new IllegalArgumentException("Target is null")
         if (source == null) return null
 
+        //@formatter:off
         GormMetaUtils.getPersistentEntity(target.class).persistentProperties.each { PersistentProperty dp ->
             if (IGNORED_PROPERTIES.contains(dp.name) || dp instanceof Identity) return
             if (ignoreAssociations && dp instanceof Association) return

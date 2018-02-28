@@ -1,3 +1,4 @@
+/* Copyright 2018. 9ci Inc. Licensed under the Apache License, Version 2.0 */
 package gorm.tools.hibernate.criteria
 
 import groovy.transform.CompileDynamic
@@ -76,4 +77,3 @@ class CriteriaUtils {
         return result.call()
     }
 }
-

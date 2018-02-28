@@ -1,2 +1,3 @@
 groovy.formatter.remove.unnecessary.semicolons=true
-groovy.formatter.longListLength=1
+groovy.formatter.longListLength=90
+groovy.formatter.braces.end=same

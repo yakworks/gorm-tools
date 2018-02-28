@@ -17,11 +17,18 @@ plugins {
     id 'com.diffplug.gradle.spotless' version '3.10.0'
     //id "pl.softmate.gradle-properties-yaml-plugin" version "0.0.2"
 }
+apply plugin:"idea"
+apply plugin:"eclipse"
+
 apply from: rootProject.file('gradle/prop-defaults.gradle')
+
+apply plugin:'groovy'
+apply plugin: 'com.diffplug.gradle.spotless'
+apply from: rootProject.file("gradle/spotless.gradle")
 
 allprojects {
     apply plugin:'groovy'
-    apply plugin: 'com.palantir.configuration-resolver' //see above CI usage on this
+    apply plugin: 'com.palantir.configuration-resolver' //see above for CI usage on this
     apply from: rootProject.file("gradle/groovydoc.gradle")
 
     repositories {

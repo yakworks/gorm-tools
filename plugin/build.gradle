@@ -11,15 +11,15 @@ buildscript {
 }
 
 apply plugin: "org.grails.grails-plugin"
-apply plugin: "com.energizedwork.webdriver-binaries"
-apply plugin: 'codenarc'
-apply plugin: "jacoco"
-
-apply plugin: 'com.diffplug.gradle.spotless'
-apply from: rootProject.file("gradle/spotless.gradle")
+//apply plugin: 'com.diffplug.gradle.spotless'
+//apply from: rootProject.file("gradle/spotless.gradle")
 
 apply plugin: "org.grails.grails-plugin-publish"
 apply from: rootProject.file('gradle/publish.gradle')
+
+apply plugin: "com.energizedwork.webdriver-binaries"
+apply plugin: 'codenarc'
+apply plugin: "jacoco"
 
 dependencies {
     profile "org.grails.profiles:web-plugin"

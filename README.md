@@ -158,7 +158,7 @@ Configure 9ci repo in build.gradle
 
 ```groovy
 repositories {
-  maven { url "http://repo.9ci.com/grails-plugins" }
+  maven { url "http://repo.9ci.com/oss-snapshots" }
  }
 ```
 

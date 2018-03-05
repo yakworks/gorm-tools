@@ -219,6 +219,22 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.nested.name == "test"
     }
 
+    void "binder should not create new association if its reference is not null"() {
+        TestDomain testDomain = new TestDomain()
+        Nested nested = new Nested(name2:"xxxx")
+        testDomain.nested = nested
+        Map params = [name: 'test', nested:[name:"test"]]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == "test"
+        testDomain.nested != null
+        testDomain.nested.is(nested)
+        testDomain.nested.name == "test"
+    }
+
     void "binder should load existing association if it does not belongsTo"() {
         TestDomain testDomain = new TestDomain()
         AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
@@ -234,7 +250,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.anotherDomain.name != "test" //should not be deep bound if does not belogsTo
     }
 
-    void "binder should set reference if value if of association type"() {
+    void "binder should set reference if value is of association type"() {
         TestDomain testDomain = new TestDomain()
         AnotherDomain anotherDomain = new AnotherDomain(id:1, name:"name").save()
         Map params = [name: 'test', anotherDomain:anotherDomain]
@@ -280,10 +296,12 @@ class AnotherDomain {
 @Entity
 class Nested {
     String name
+    String name2
 
     static belongsTo = [TestDomain]
 
     static constraints = {
         name nullable: false
+        name2 nullable: true
     }
 }

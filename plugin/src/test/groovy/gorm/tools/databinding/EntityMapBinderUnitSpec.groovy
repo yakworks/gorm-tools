@@ -264,6 +264,20 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.anotherDomain == anotherDomain
         testDomain.anotherDomain.name == "name"
     }
+
+    void "binder should create new association if it is bindableTo"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'outer', bindableNested: [name: 'bindableNested']]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == 'outer'
+        testDomain.bindableNested != null
+        testDomain.bindableNested.name == 'bindableNested'
+
+    }
 }
 
 
@@ -280,6 +294,7 @@ class TestDomain {
 
     AnotherDomain anotherDomain
     Nested nested
+    BindableNested bindableNested
 
     static constraints = {
         notBindable bindable: false
@@ -304,4 +319,11 @@ class Nested {
         name nullable: false
         name2 nullable: true
     }
+}
+
+@Entity
+class BindableNested {
+    static bindableTo = [TestDomain]
+
+    String name
 }

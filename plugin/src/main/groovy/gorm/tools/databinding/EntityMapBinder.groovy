@@ -22,6 +22,8 @@ import org.grails.web.databinding.DataBindingEventMulticastListener
 import org.grails.web.databinding.GrailsWebDataBindingListener
 import org.springframework.validation.BeanPropertyBindingResult
 
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -198,7 +200,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         } else if (value instanceof Map && target[association.name] != null &&  !value.containsKey('id')) {
             //use existing reference if not null
             instance = target[association.name]
-        } else if (value instanceof Map && association.isOwningSide()) {
+        } else if (value instanceof Map &&
+                (association.isOwningSide() || isBindableTo(association.associatedEntity.javaClass, association.owner.javaClass))) {
             instance = association.type.newInstance()
         } else {
             Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
@@ -207,7 +210,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             }
         }
 
-        if (value instanceof Map && instance && association.isOwningSide()) fastBind(instance, new SimpleMapDataBindingSource((Map) value))
+        if (value instanceof Map && instance &&
+                (association.isOwningSide() || isBindableTo(association.associatedEntity.javaClass, association.owner.javaClass))) {
+            fastBind(instance, new SimpleMapDataBindingSource((Map) value))
+        }
 
         target[association.name] = instance
     }
@@ -235,6 +241,15 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
 
         return whiteList
+    }
+
+    private static boolean isBindableTo(Class child, Class owner) {
+        Field bindableTo = child.declaredFields.find { it.name == 'bindableTo' }
+
+        //If owner is mentioned on the 'static bindableTo = [Owner]' property of the child.
+        bindableTo && Modifier.isStatic(bindableTo.modifiers) && (
+            (child.getMethod('getBindableTo').invoke(child) as List).contains(owner)
+        )
     }
 
     @Override

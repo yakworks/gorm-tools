@@ -201,7 +201,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             //use existing reference if not null
             instance = target[association.name]
         } else if (value instanceof Map &&
-                (association.isOwningSide() || isBindableTo(association.associatedEntity.javaClass, association.owner.javaClass))) {
+                (association.isOwningSide() || isBindable(association.associatedEntity.javaClass, association.owner.javaClass))) {
             instance = association.type.newInstance()
         } else {
             Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
@@ -211,7 +211,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
 
         if (value instanceof Map && instance &&
-                (association.isOwningSide() || isBindableTo(association.associatedEntity.javaClass, association.owner.javaClass))) {
+                (association.isOwningSide() || isBindable(association.associatedEntity.javaClass, association.owner.javaClass))) {
             fastBind(instance, new SimpleMapDataBindingSource((Map) value))
         }
 
@@ -243,12 +243,12 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         return whiteList
     }
 
-    private static boolean isBindableTo(Class child, Class owner) {
-        Field bindableTo = child.declaredFields.find { it.name == 'bindableTo' }
+    private static boolean isBindable(Class child, Class owner) {
+        Field bindable = owner.declaredFields.find { it.name == 'bindable' }
 
-        //If owner is mentioned on the 'static bindableTo = [Owner]' property of the child.
-        bindableTo && Modifier.isStatic(bindableTo.modifiers) && (
-            (child.getMethod('getBindableTo').invoke(child) as List).contains(owner)
+        //If child domain is mentioned on the 'static bindable = [Child]' property of the owner.
+        bindable && Modifier.isStatic(bindable.modifiers) && (
+                (owner.getMethod('getBindable').invoke(owner) as List).contains(child)
         )
     }
 

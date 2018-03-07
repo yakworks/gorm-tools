@@ -265,7 +265,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.anotherDomain.name == "name"
     }
 
-    void "binder should create new association if it is bindableTo"() {
+    void "binder should create new association if it is added to 'bindable' list in parent domain"() {
         TestDomain testDomain = new TestDomain()
         Map params = [name: 'outer', bindableNested: [name: 'bindableNested']]
 
@@ -296,6 +296,8 @@ class TestDomain {
     Nested nested
     BindableNested bindableNested
 
+    static bindable = [BindableNested]
+
     static constraints = {
         notBindable bindable: false
         nested nullable: false
@@ -323,7 +325,5 @@ class Nested {
 
 @Entity
 class BindableNested {
-    static bindableTo = [TestDomain]
-
     String name
 }

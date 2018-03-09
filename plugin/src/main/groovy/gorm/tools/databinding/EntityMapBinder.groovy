@@ -34,6 +34,12 @@ import java.time.LocalDateTime
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
+    /**
+     * Keyword is used to identify associations which have explicitly
+     * specified 'bindable:true' property in constraints.
+     */
+    static final String EXPLICIT_BINDING_KEY = "bindable"
+
     EntityMapBinder() {
         super(null)
     }
@@ -131,10 +137,12 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         PersistentEntity entity = gormStaticApi.gormPersistentEntity
         List<String> properties = whiteList ?: entity.persistentPropertyNames
 
+        boolean isExplicitlyBind
         for (String prop : properties) {
-            PersistentProperty perProp = entity.getPropertyByName(prop)
+            isExplicitlyBind = prop.contains(EXPLICIT_BINDING_KEY)
+            PersistentProperty perProp = entity.getPropertyByName(isExplicitlyBind ? prop.replaceAll("${EXPLICIT_BINDING_KEY}_", "") : prop)
             try {
-                setProp(target, source, perProp, listener, errors)
+                setProp(target, source, perProp, isExplicitlyBind, listener, errors)
             } catch (Exception e) {
                 if (errors) {
                     addBindingError(target, perProp.name, source.getPropertyValue(perProp.name), e, listener, errors)
@@ -145,7 +153,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
     }
 
-    void setProp(target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
+    void setProp(target, DataBindingSource source, PersistentProperty prop, boolean isExplicitlyBind, DataBindingListener listener = null, errors = null) {
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
@@ -183,23 +191,22 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             target[prop.name] = valueToAssign
 
         } else if (prop instanceof Association) {
-            bindAssociation(target, valueToAssign, (Association) prop, listener, errors)
+            bindAssociation(target, valueToAssign, (Association) prop, isExplicitlyBind, listener, errors)
         } else {
             target[prop.name] = valueToAssign
         }
 
     }
 
-    void bindAssociation(target, value, Association association, DataBindingListener listener = null, errors = null) {
+    void bindAssociation(target, value, Association association, boolean isExplicitlyBind = false, DataBindingListener listener = null, errors = null) {
         Object instance
 
-        boolean isBindable = association.isOwningSide() || isAssociationBindable(target.getClass(), association)
         if (association.getType().isAssignableFrom(value.getClass())) {
             instance = value
         } else if (value instanceof Map && target[association.name] != null &&  !value.containsKey('id')) {
             //use existing reference if not null
             instance = target[association.name]
-        } else if (value instanceof Map && isBindable) {
+        } else if (value instanceof Map && (association.isOwningSide() || isExplicitlyBind)) {
             instance = association.type.newInstance()
         } else {
             Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
@@ -208,7 +215,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             }
         }
 
-        if (value instanceof Map && instance && isBindable) {
+        if (value instanceof Map && instance && (association.isOwningSide() || isExplicitlyBind)) {
             fastBind(instance, new SimpleMapDataBindingSource((Map) value))
         }
 
@@ -231,6 +238,9 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 if (bindable == null || bindable == true) {
                     whiteList.add(prop.name)
                 }
+                if (bindable == true) {
+                    whiteList.add("${EXPLICIT_BINDING_KEY}_${prop.name}" as String)
+                }
             }
             if (!Environment.getCurrent().isReloadEnabled()) {
                 CLASS_TO_BINDING_INCLUDE_LIST.put objectClass, whiteList
@@ -238,23 +248,6 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
 
         return whiteList
-    }
-
-    /**
-     * Checks if constraints for a given association contain an explicit 'bindable:true' property and returns true if so,
-     * otherwise returns false.
-     *
-     * @param owner       an domain class which contains an association
-     * @param association an association to check whether it's bindable or not
-     * @return true if an explicit 'bindable:true' property is present in constraints
-     */
-    private static boolean isAssociationBindable(Class owner, Association association) {
-        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(owner)
-        Map constraints = GormMetaUtils.findConstrainedProperties(gormStaticApi.gormPersistentEntity)
-        DefaultConstrainedProperty constraint = (DefaultConstrainedProperty) constraints[association.name]
-
-        // checking if a constraint of a given association contains the explicit 'bindable:true' property
-        constraint?.getMetaConstraintValue("bindable") as Boolean
     }
 
     @Override

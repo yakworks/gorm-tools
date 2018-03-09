@@ -162,7 +162,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         if (propValue instanceof String) {
             String sval = propValue as String
             Class typeToConvertTo = prop.getType()
-
+            //FIXME comment here on how this (sval == null) can be true if we do propValue instanceof String above
+            //do we have tests for this?
             if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
                 if (sval != null) {
                     sval = sval.trim()
@@ -198,29 +199,38 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
-    void bindAssociation(target, value, Association association, boolean isExplicitlyBind = false, DataBindingListener listener = null, errors = null) {
-        Object instance
+    void bindAssociation(target, value, Association association, DataBindingListener listener = null, errors = null) {
+        String aprop = association.name
 
-        if (association.getType().isAssignableFrom(value.getClass())) {
-            instance = value
-        } else if (value instanceof Map && target[association.name] != null &&  !value.containsKey('id')) {
-            //use existing reference if not null
-            instance = target[association.name]
-        } else if (value instanceof Map && (association.isOwningSide() || isExplicitlyBind)) {
-            instance = association.type.newInstance()
-        } else {
-            Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
-            if (idValue != 'null' && idValue != null && idValue != '') {
-                instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+        //if value is null or they are the same instance type then just set and exit fast
+        if (value == null || association.getType().isAssignableFrom(value.getClass())) {
+            target[aprop] = value
+            return
+        }
+
+        //if value has idVal then it should be set to existing instance and everything else will be ignored
+        Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
+        idValue = idValue == 'null' ? null :  idValue
+
+        if (idValue) {
+            //check if the target[aprop].id is the same
+            if(target[aprop] && target[aprop]['id'] != idValue){ //FIXME make sure this doesn't hydrate the lazy proxy just by checking the id
+                //we are setting it to a new id so load it and assign
+                target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
+        } else if (association.isOwningSide() || isExplicitBind(target,association.name)) {
+            //FIXME we should blow and informative error here into the bindingResult errors if value is not a Map at this point
+            //if its null then set it up
+            if(target[aprop] == null) target[aprop] = association.type.newInstance()
+            //recursive call to set the associatiosn up and assume its a map
+            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
         }
-
-        if (value instanceof Map && instance && (association.isOwningSide() || isExplicitlyBind)) {
-            fastBind(instance, new SimpleMapDataBindingSource((Map) value))
-        }
-
-        target[association.name] = instance
     }
+
+    boolean isExplicitBind(target,name){
+        return false
+    }
+
 
     static List getBindingIncludeList(final Object object) {
         List<String> whiteList = []

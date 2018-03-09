@@ -31,7 +31,7 @@ allprojects {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     maven { url "https://dl.bintray.com/9ci/grails-plugins"}
-    //maven { url "http://repo.9ci.com/artifactory/oss-snapshots" }
+    //maven { url "http://repo.9ci.com/oss-snapshots" }
     mavenCentral()
     jcenter()
   }

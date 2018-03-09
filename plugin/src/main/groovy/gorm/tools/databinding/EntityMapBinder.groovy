@@ -22,8 +22,6 @@ import org.grails.web.databinding.DataBindingEventMulticastListener
 import org.grails.web.databinding.GrailsWebDataBindingListener
 import org.springframework.validation.BeanPropertyBindingResult
 
-import java.lang.reflect.Field
-import java.lang.reflect.Modifier
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -195,13 +193,13 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     void bindAssociation(target, value, Association association, DataBindingListener listener = null, errors = null) {
         Object instance
 
+        boolean isBindable = association.isOwningSide() || isAssociationBindable(target.getClass(), association)
         if (association.getType().isAssignableFrom(value.getClass())) {
             instance = value
         } else if (value instanceof Map && target[association.name] != null &&  !value.containsKey('id')) {
             //use existing reference if not null
             instance = target[association.name]
-        } else if (value instanceof Map &&
-                (association.isOwningSide() || isBindable(association.associatedEntity.javaClass, association.owner.javaClass))) {
+        } else if (value instanceof Map && isBindable) {
             instance = association.type.newInstance()
         } else {
             Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
@@ -210,8 +208,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             }
         }
 
-        if (value instanceof Map && instance &&
-                (association.isOwningSide() || isBindable(association.associatedEntity.javaClass, association.owner.javaClass))) {
+        if (value instanceof Map && instance && isBindable) {
             fastBind(instance, new SimpleMapDataBindingSource((Map) value))
         }
 
@@ -243,13 +240,21 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         return whiteList
     }
 
-    private static boolean isBindable(Class child, Class owner) {
-        Field bindable = owner.declaredFields.find { it.name == 'bindable' }
+    /**
+     * Checks if constraints for a given association contain an explicit 'bindable:true' property and returns true if so,
+     * otherwise returns false.
+     *
+     * @param owner       an domain class which contains an association
+     * @param association an association to check whether it's bindable or not
+     * @return true if an explicit 'bindable:true' property is present in constraints
+     */
+    private static boolean isAssociationBindable(Class owner, Association association) {
+        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(owner)
+        Map constraints = GormMetaUtils.findConstrainedProperties(gormStaticApi.gormPersistentEntity)
+        DefaultConstrainedProperty constraint = (DefaultConstrainedProperty) constraints[association.name]
 
-        //If child domain is mentioned on the 'static bindable = [Child]' property of the owner.
-        bindable && Modifier.isStatic(bindable.modifiers) && (
-                (owner.getMethod('getBindable').invoke(owner) as List).contains(child)
-        )
+        // checking if a constraint of a given association contains the explicit 'bindable:true' property
+        constraint?.getMetaConstraintValue("bindable") as Boolean
     }
 
     @Override

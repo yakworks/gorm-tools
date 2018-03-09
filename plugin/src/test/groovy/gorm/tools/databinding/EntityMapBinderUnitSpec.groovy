@@ -265,24 +265,46 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.anotherDomain.name == "name"
     }
 
-    void "binder should create new association if it is added to 'bindable' list in parent domain"() {
+    void "binder should create new association if constraints contain explicit bindable:true"() {
         TestDomain testDomain = new TestDomain()
-        Map params = [name: 'outer', bindableNested: [name: 'bindableNested']]
+        Map params = [name: 'outer', notBindable: 'notBindableTest', bindableNested: [name: 'bindableNested'],
+                      notBindableNested: [name: 'notBindableNested']]
 
         when:
         binder.bind(testDomain, params)
 
         then:
         testDomain.name == 'outer'
+        testDomain.notBindable == null
+
         testDomain.bindableNested != null
         testDomain.bindableNested.name == 'bindableNested'
 
+        testDomain.notBindableNested == null
+    }
+
+    void "binder shouldn't bind the association if constraints doesn't contain 'bindable' and it does not belongsTo"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'outer', notBindable: 'notBindableTest', notBindableNested: [name: 'notBindableNested']]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == 'outer'
+        //regular field
+        testDomain.notBindable == null
+
+        //association
+        testDomain.notBindableNested == null
     }
 }
 
 
 @Entity
 class TestDomain {
+    // by default binder consider regular fields as "bindable:true",
+    // so there is no need to specify constraints explicitly for that
     String name
     String notBindable
     Long age
@@ -294,14 +316,18 @@ class TestDomain {
 
     AnotherDomain anotherDomain
     Nested nested
-    BindableNested bindableNested
 
-    static bindable = [BindableNested]
+    // constraints contain explicit "bindable:true"
+    BindableNested bindableNested
+    // constraints doesn't contain bindable property and there is no cascading stuff between TestDomain and BindableNested,
+    // thus this association should not be binded by map binder.
+    BindableNested notBindableNested
 
     static constraints = {
         notBindable bindable: false
         nested nullable: false
         anotherDomain nullable: true
+        bindableNested bindable:true
     }
 }
 

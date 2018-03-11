@@ -6,10 +6,9 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.1"
-    classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
+    //classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
   }
 }
-apply plugin:'groovy'
 
 apply plugin: "org.grails.grails-plugin"
 apply from: "$gradleDir/spotless.gradle"

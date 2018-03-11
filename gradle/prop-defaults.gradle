@@ -15,7 +15,7 @@ defProp 'artifactoryPassword', envProp("ARTIFACTORY_PASSWORD")
 defProp 'isSnapshot', version.toString().endsWith("-SNAPSHOT")
 
 //** Helpful dir params
-defProp 'gradleDir', "${projectDir}/gradle"
+defProp 'gradleDir', "${rootDir}/gradle"
 
 def defProp(String propertyName, defaultValue) {
   if(!hasProperty(propertyName)) {

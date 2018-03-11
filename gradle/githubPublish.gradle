@@ -7,7 +7,6 @@
 * see http://ajoberstar.org/grgit/grgit-authentication.html
 */
 //ext['org.ajoberstar.grgit.auth.username'] = 'enter github token here or user name'
-//ext['org.ajoberstar.grgit.auth.username'] = 'enter gpassword or if token used above none is needed'
 
 gitPublish {
   // where to publish to (repo must exist)

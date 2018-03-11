@@ -5,22 +5,21 @@ buildscript {
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath 'org.yaml:snakeyaml:1.14'
   }
 }
 plugins {
   id "com.energizedwork.idea-project-components" version "1.4"
   // for CI 'resolveConfigurations' task see https://github.com/palantir/gradle-configuration-resolver-plugin
   id "com.palantir.configuration-resolver" version "0.2.0"
-  id "org.ajoberstar.git-publish" version "0.3.2"
-  id 'org.ajoberstar.grgit' version '2.1.1'
-  id 'com.diffplug.gradle.spotless' version '3.10.0'
+  //id "org.ajoberstar.git-publish" version "0.3.2"
+  //id 'org.ajoberstar.grgit' version '2.1.1'
+  //id 'com.diffplug.gradle.spotless' version '3.10.0'
   //id "pl.softmate.gradle-properties-yaml-plugin" version "0.0.2"
 }
 apply plugin:"idea"
 apply plugin:'groovy'
-apply from: 'gradle/prop-defaults.gradle'
-apply from: "$gradleDir/spotless.gradle"
+apply from: "$rootDir/gradle/prop-defaults.gradle"
+apply from: "$rootDir/gradle/spotless.gradle"
 
 allprojects {
 

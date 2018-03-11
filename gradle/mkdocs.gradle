@@ -12,6 +12,7 @@ task copyDocs {
     from 'docs'
     into 'build/mkdocs/docs'
   }
+  //Copy the README in as index
   copy {
     from '.'
     into 'build/mkdocs/docs'
@@ -22,6 +23,7 @@ task copyDocs {
       line.replaceAll(/\(\s*docs\//,'(').replaceAll(/\:\s*docs\//,': ')
     }
   }
+  //Copy the mkdocs.yml and replace the tokens
   copy {
     from '.'
     into 'build/mkdocs'

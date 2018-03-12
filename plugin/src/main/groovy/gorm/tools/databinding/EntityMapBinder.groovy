@@ -38,7 +38,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * Keyword is used to identify associations which have explicitly
      * specified 'bindable:true' property in constraints.
      */
-    static final String EXPLICIT_BINDING_KEY = "bindable"
+    static final String EXPLICIT_BINDING_KEY = '$EXPLICIT_BINDABLE_'
 
     EntityMapBinder() {
         super(null)
@@ -130,6 +130,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
     }
 
+    /**
+     * Binds properties which specified in a white list on the given entity.
+     * In case the white list is empty method takes the list of persistent properties and iterates on them.
+     *
+     * @param target    a target entity
+     * @param source    a data binding source which contains property values
+     * @param whiteList a list which contains properties for binding
+     * @param listener  DataBindingListener
+     * @param errors
+     */
     void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener = null, errors = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
@@ -137,12 +147,21 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         PersistentEntity entity = gormStaticApi.gormPersistentEntity
         List<String> properties = whiteList ?: entity.persistentPropertyNames
 
-        boolean isExplicitlyBind
-        for (String prop : properties) {
-            isExplicitlyBind = prop.contains(EXPLICIT_BINDING_KEY)
-            PersistentProperty perProp = entity.getPropertyByName(isExplicitlyBind ? prop.replaceAll("${EXPLICIT_BINDING_KEY}_", "") : prop)
+        /*
+          Excluding property names which start with EXPLICIT_BINDING_KEY prefix.
+          White list might contain both property names - original and with prefix.
+          These properties with prefix are added into white list in case
+          'bindable:true' constraint is specified explicitly.
+          We don't need to iterate on them here, but they should be in the list
+          to be able to identify if a property should be binded anyway.
+        */
+        List<String> originalProperties = properties.findAll { String propertyName ->
+            !propertyName.startsWith(EXPLICIT_BINDING_KEY)
+        }
+        for (String prop : originalProperties) {
+            PersistentProperty perProp = entity.getPropertyByName(prop)
             try {
-                setProp(target, source, perProp, isExplicitlyBind, listener, errors)
+                setProp(target, source, perProp, listener, errors)
             } catch (Exception e) {
                 if (errors) {
                     addBindingError(target, perProp.name, source.getPropertyValue(perProp.name), e, listener, errors)
@@ -153,7 +172,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
     }
 
-    void setProp(target, DataBindingSource source, PersistentProperty prop, boolean isExplicitlyBind, DataBindingListener listener = null, errors = null) {
+    /**
+     * Sets a value to a specified target's property.
+     *
+     * @param target   a target entity
+     * @param source   a data binding source which contains property values
+     * @param prop     a persistent property which should be filled with the value
+     * @param listener DataBindingListener
+     * @param errors
+     */
+    void setProp(target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
@@ -162,13 +190,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         if (propValue instanceof String) {
             String sval = propValue as String
             Class typeToConvertTo = prop.getType()
-            //FIXME comment here on how this (sval == null) can be true if we do propValue instanceof String above
             //do we have tests for this?
-            if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
-                if (sval != null) {
-                    sval = sval.trim()
-                    sval = ("" == sval) ? null : sval
-                }
+            if (String.isAssignableFrom(typeToConvertTo)) {
+                sval = sval.trim()
+                sval = ("" == sval) ? null : sval
                 valueToAssign = sval
             } else if (Date.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = IsoDateUtil.parse(sval)
@@ -192,13 +217,26 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             target[prop.name] = valueToAssign
 
         } else if (prop instanceof Association) {
-            bindAssociation(target, valueToAssign, (Association) prop, isExplicitlyBind, listener, errors)
+            bindAssociation(target, valueToAssign, (Association) prop, listener, errors)
         } else {
             target[prop.name] = valueToAssign
         }
 
     }
 
+    /**
+     * Binds a given association to the target entity.
+     * It checks if the given value contains an id and loads the associated entity.
+     * In case the id is not specified, this method checks if the given association belongs to the target entity.
+     * In case it does, or the it has the explicitly specified 'bindable:true' constraint, then a new instance is
+     * created for the association.
+     *
+     * @param target      a target entity to bind an association to
+     * @param value       an association's value
+     * @param association an association property
+     * @param listener    DataBindingListener
+     * @param errors
+     */
     void bindAssociation(target, value, Association association, DataBindingListener listener = null, errors = null) {
         String aprop = association.name
 
@@ -213,25 +251,48 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         idValue = idValue == 'null' ? null :  idValue
 
         if (idValue) {
-            //check if the target[aprop].id is the same
-            if(target[aprop] && target[aprop]['id'] != idValue){ //FIXME make sure this doesn't hydrate the lazy proxy just by checking the id
+            // check if the target[aprop].id is the same and we don't need to do anything or
+            // the target's property is null and we should bind it
+            if(!target[aprop] || target[aprop] && (target[aprop]['id'] != idValue)){ //FIXME make sure this doesn't hydrate the lazy proxy just by checking the id
                 //we are setting it to a new id so load it and assign
                 target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
         } else if (association.isOwningSide() || isExplicitBind(target,association.name)) {
-            //FIXME we should blow and informative error here into the bindingResult errors if value is not a Map at this point
+            if (!(value instanceof Map)) {
+                String msg = "Unable to create an association instance for the entity=${target}, the value=$value is not a Map"
+                throw new IllegalArgumentException(msg)
+            }
             //if its null then set it up
             if(target[aprop] == null) target[aprop] = association.type.newInstance()
-            //recursive call to set the associatiosn up and assume its a map
+            //recursive call to set the association up and assume its a map
             fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
         }
     }
 
-    boolean isExplicitBind(target,name){
-        return false
+    /**
+     * Checks if a given association is explicitly marked as bindable and should be binded in any case.
+     *
+     * It checks it the white list for this domain class contains a given association name with the prefix
+     * {@Code EXPLICIT_BINDING_KEY}, which means that this association has explicitly added 'bindable:true' constraint.
+     *
+     * @param target an entity which contains an association
+     * @param name   a name of an association to check if it should be binded
+     * @return true if the association name with prefix is present in the white list
+     */
+    static boolean isExplicitBind(Object target, String name) {
+        List<String> targetWhiteList = CLASS_TO_BINDING_INCLUDE_LIST.get(target.getClass())
+        targetWhiteList.contains(EXPLICIT_BINDING_KEY + name)
     }
 
-
+    /**
+     * Sets up a list of properties which can be binded to a given domain entity.
+     *
+     * Puts the created list to ${@code CLASS_TO_BINDING_INCLUDE_LIST} map,
+     * which caches such lists for domain classes.
+     *
+     * @param object an entity for which the list should be created
+     * @return a list of properties which can be bound to the given entity
+     */
     static List getBindingIncludeList(final Object object) {
         List<String> whiteList = []
         final Class<? extends Object> objectClass = object.getClass()
@@ -249,7 +310,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                     whiteList.add(prop.name)
                 }
                 if (bindable == true) {
-                    whiteList.add("${EXPLICIT_BINDING_KEY}_${prop.name}" as String)
+                    whiteList.add(EXPLICIT_BINDING_KEY + prop.name)
                 }
             }
             if (!Environment.getCurrent().isReloadEnabled()) {

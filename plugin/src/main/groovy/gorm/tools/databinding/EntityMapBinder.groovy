@@ -24,6 +24,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -35,10 +36,10 @@ import java.time.LocalDateTime
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     /**
-     * Keyword is used to identify associations which have explicitly
-     * specified 'bindable:true' property in constraints.
+     * A map that holds lists of properties which should be bound manually by a binder.
+     * A key represents a domain class and the value is a list with properties.
      */
-    static final String EXPLICIT_BINDING_KEY = '$EXPLICIT_BINDABLE_'
+    static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
 
     EntityMapBinder() {
         super(null)
@@ -147,18 +148,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         PersistentEntity entity = gormStaticApi.gormPersistentEntity
         List<String> properties = whiteList ?: entity.persistentPropertyNames
 
-        /*
-          Excluding property names which start with EXPLICIT_BINDING_KEY prefix.
-          White list might contain both property names - original and with prefix.
-          These properties with prefix are added into white list in case
-          'bindable:true' constraint is specified explicitly.
-          We don't need to iterate on them here, but they should be in the list
-          to be able to identify if a property should be binded anyway.
-        */
-        List<String> originalProperties = properties.findAll { String propertyName ->
-            !propertyName.startsWith(EXPLICIT_BINDING_KEY)
-        }
-        for (String prop : originalProperties) {
+        for (String prop : properties) {
             PersistentProperty perProp = entity.getPropertyByName(prop)
             try {
                 setProp(target, source, perProp, listener, errors)
@@ -253,7 +243,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         if (idValue) {
             // check if the target[aprop].id is the same and we don't need to do anything or
             // the target's property is null and we should bind it
-            if(!target[aprop] || target[aprop] && (target[aprop]['id'] != idValue)){ //FIXME make sure this doesn't hydrate the lazy proxy just by checking the id
+            if(!target[aprop] || (target[aprop] && (target[aprop]['id'] != idValue))){
                 //we are setting it to a new id so load it and assign
                 target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
@@ -272,16 +262,12 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     /**
      * Checks if a given association is explicitly marked as bindable and should be binded in any case.
      *
-     * It checks it the white list for this domain class contains a given association name with the prefix
-     * {@Code EXPLICIT_BINDING_KEY}, which means that this association has explicitly added 'bindable:true' constraint.
-     *
      * @param target an entity which contains an association
      * @param name   a name of an association to check if it should be binded
      * @return true if the association name with prefix is present in the white list
      */
     static boolean isExplicitBind(Object target, String name) {
-        List<String> targetWhiteList = CLASS_TO_BINDING_INCLUDE_LIST.get(target.getClass())
-        targetWhiteList.contains(EXPLICIT_BINDING_KEY + name)
+        EXPLICIT_BINDING_LIST.get(target.getClass()).contains(name)
     }
 
     /**
@@ -289,6 +275,9 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      *
      * Puts the created list to ${@code CLASS_TO_BINDING_INCLUDE_LIST} map,
      * which caches such lists for domain classes.
+     *
+     * The method also checks if a property has an explicitly defined 'bindable:true' constraint.
+     * In case the constraint is present, the property name is added to {@code EXPLICIT_BINDING_LIST}.
      *
      * @param object an entity for which the list should be created
      * @return a list of properties which can be bound to the given entity
@@ -303,6 +292,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             PersistentEntity entity = gormStaticApi.gormPersistentEntity
             List<PersistentProperty> properties = entity.persistentProperties
             Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
+            List explicitBindingList = EXPLICIT_BINDING_LIST.get(objectClass) ?: []
             for (PersistentProperty prop : properties) {
                 DefaultConstrainedProperty cp = (DefaultConstrainedProperty) constraints[prop.name]
                 Boolean bindable = cp?.getMetaConstraintValue("bindable") as Boolean
@@ -310,11 +300,12 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                     whiteList.add(prop.name)
                 }
                 if (bindable == true) {
-                    whiteList.add(EXPLICIT_BINDING_KEY + prop.name)
+                    explicitBindingList.add(prop.name)
                 }
             }
             if (!Environment.getCurrent().isReloadEnabled()) {
                 CLASS_TO_BINDING_INCLUDE_LIST.put objectClass, whiteList
+                if (explicitBindingList) EXPLICIT_BINDING_LIST.put(objectClass, explicitBindingList)
             }
         }
 

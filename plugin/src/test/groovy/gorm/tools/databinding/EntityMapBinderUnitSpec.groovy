@@ -10,6 +10,7 @@ import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Specification
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -297,6 +298,43 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
 
         //association
         testDomain.notBindableNested == null
+    }
+
+    void "binder shouldn't initialize proxy when checks association's id"() {
+        Nested nested = new Nested(name: 'proxy')
+        TestDomain testDomain = new TestDomain(nested: nested).save()
+
+        Map params = [name: 'test', nested: [id: nested.id, name: 'nested']]
+
+        expect:
+        // clearing the session to get TestDomain entity with a proxy for 'nested' property
+        flushAndClear()
+        TestDomain testDomainWithProxy = TestDomain.get(testDomain.id)
+
+        when:
+        binder.bind(testDomainWithProxy, params)
+
+        then:
+        // class names are not equal, because testDomainWithProxy.nested is a proxy and it has an appropriate class name,
+        // which differs from 'gorm.tools.databinding.Nested'
+        testDomainWithProxy.nested.getClass().name != testDomain.nested.getClass().name
+
+        // 'nested' property isn't initialized
+        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+
+        when:
+        Long nestedId = testDomainWithProxy.nested.id
+
+        then: "getting id shouldn't initialize the proxy"
+        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+        nestedId == nested.id
+
+        when:
+        String nestedName = testDomainWithProxy.nested.name
+
+        then: "getting name initializes the proxy"
+        GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+        nestedName == 'proxy'
     }
 }
 

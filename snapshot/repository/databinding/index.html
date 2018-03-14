@@ -583,7 +583,8 @@ then register the bean </p>
 How associations are handled depends on if the associated domain belongs to the domain which is being bound.
 If the domain being bound is owning side of association and value is of type map, a new instance of associated domain is created.
 If the association does not use belongsTo then existing instance is loaded if the map contains the id.
-The databinding on associated domain will be performed only if it belongs to the domain which is being bound</p>
+The databinding on associated domain will be performed only if it belongs to the domain which is being bound
+or the <code>bindable:true</code> property is added to constraints for this association</p>
 <p>Example</p>
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Author</span> <span class="o">{</span>
     <span class="n">String</span> <span class="n">name</span>
@@ -610,6 +611,22 @@ It will create new book and set the author and category to existing records with
 <p>So following will create a new book instance and set author.book to this new instance.</p>
 <div class="codehilite"><pre><span></span><span class="n">Author</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="nl">name:</span><span class="s2">&quot;test&quot;</span><span class="o">,</span> <span class="nl">book:</span><span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Grails in action&quot;</span><span class="o">])</span>
 </pre></div>
+
+<p>It is possible to specify the <code>bindable: true</code> property explicitly for the association in constraints of a parent domain class:</p>
+<p><div class="codehilite"><pre><span></span>    <span class="kd">class</span> <span class="nc">Book</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">name</span>
+        <span class="n">Category</span> <span class="n">category</span>
+        <span class="kd">static</span> <span class="n">constraints</span> <span class="o">=</span> <span class="o">{</span>
+            <span class="n">category</span> <span class="nl">bindable:</span><span class="kc">true</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">class</span> <span class="nc">Category</span> <span class="o">{</span>
+      <span class="n">String</span> <span class="n">name</span>
+    <span class="o">}</span>
+</pre></div>
+In this case MapBinder checks if constraints for <code>category</code> contains bindable property and then binds <code>category</code> to <code>book</code>.
+Otherwise, MapBinder consider the <code>category</code> association as not bindable.</p>
                 
                   
                 

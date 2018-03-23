@@ -18,8 +18,10 @@
          
 </pre>
 
-**Guide**: https://yakworks.github.io/gorm-tools/  
-**API**: https://yakworks.github.io/gorm-tools/api/
+| Guide | API | 
+|------|--------|
+|[Release Docs](https://yakworks.github.io/gorm-tools/) | [Release Api](https://yakworks.github.io/gorm-tools/api)
+|[snapshot](https://yakworks.github.io/gorm-tools/snapshot) | [snapshot](https://yakworks.github.io/gorm-tools/snapshot/api)
 
 ```
 compile "org.grails.plugins:gorm-tools:6.1.0-SNAPSHOT"

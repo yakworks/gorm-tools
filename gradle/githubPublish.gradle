@@ -20,7 +20,7 @@ gitPublish {
   contents {
     from "$buildDir/mkdocs/site"
     if(isSnapshot){ //put in own dir and update relative path
-      into 'snapshot'
+      into 'snapshot' //this sets the base relative dir for the rest of the inserts
     }
 
     from(project(':gorm-tools').groovydoc) {

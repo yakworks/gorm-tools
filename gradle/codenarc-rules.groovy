@@ -1,151 +1,38 @@
 ruleset {
+    ruleset('rulesets/basic.xml'){
+        'EmptyClass' doNotApplyToFilesMatching: '.*Spec.groovy'
+    }
 
-    // rulesets/basic.xml
-    AssertWithinFinallyBlock
-    AssignmentInConditional
-    BigDecimalInstantiation
-    BitwiseOperatorInConditional
-    BooleanGetBoolean
-    BrokenNullCheck
-    BrokenOddnessCheck
-    ClassForName
-    ComparisonOfTwoConstants
-    ComparisonWithSelf
-    ConstantAssertExpression
-    ConstantIfExpression
-    ConstantTernaryExpression
-    DeadCode
-    DoubleNegative
-    DuplicateCaseStatement
-    DuplicateMapKey
-    DuplicateSetValue
-    EmptyCatchBlock
-    'EmptyClass' doNotApplyToFilesMatching: '.*Spec.groovy'
-    EmptyElseBlock
-    EmptyFinallyBlock
-    EmptyForStatement
-    EmptyIfStatement
-    EmptyInstanceInitializer
-    EmptyMethod
-    EmptyStaticInitializer
-    EmptySwitchStatement
-    EmptySynchronizedStatement
-    EmptyTryBlock
-    EmptyWhileStatement
-    EqualsAndHashCode
-    EqualsOverloaded
-    ExplicitGarbageCollection
-    ForLoopShouldBeWhileLoop
-    HardCodedWindowsFileSeparator
-    HardCodedWindowsRootDirectory
-    IntegerGetInteger
-    MultipleUnaryOperators
-    RandomDoubleCoercedToZero
-    RemoveAllOnSelf
-    ReturnFromFinallyBlock
-    ThrowExceptionFromFinallyBlock
+    ruleset('rulesets/braces.xml'){
+        exclude 'IfStatementBraces'
+    }
 
-    // rulesets/braces.xml
-    ElseBlockBraces
-    ForStatementBraces
-    //IfStatementBraces
-    WhileStatementBraces
+    ruleset('rulesets/concurrency.xml')
 
-    // rulesets/concurrency.xml
-    BusyWait
-    DoubleCheckedLocking
-    InconsistentPropertyLocking
-    InconsistentPropertySynchronization
-    NestedSynchronization
-    StaticCalendarField
-    StaticConnection
-    StaticDateFormatField
-    StaticMatcherField
-    StaticSimpleDateFormatField
-    SynchronizedMethod
-    SynchronizedOnBoxedPrimitive
-    SynchronizedOnGetClass
-    SynchronizedOnReentrantLock
-    SynchronizedOnString
-    SynchronizedOnThis
-    SynchronizedReadObjectMethod
-    SystemRunFinalizersOnExit
-    ThisReferenceEscapesConstructor
-    ThreadGroup
-    ThreadLocalNotStaticFinal
-    ThreadYield
-    UseOfNotifyMethod
-    VolatileArrayField
-    VolatileLongOrDoubleField
-    WaitOutsideOfWhileLoop
+    ruleset('rulesets/convention.xml'){
+        ['CouldBeElvis', 'NoDef', 'ParameterReassignment', 'MethodParameterTypeRequired',
+         'MethodReturnTypeRequired', 'CouldBeSwitchStatement', 'InvertedCondition','TrailingComma',
+         'VariableTypeRequired'
+        ].each{
+            exclude it
+        }
+    }
+    // convention
+    NoTabCharacter
 
-    // rulesets/convention.xml
-    ConfusingTernary
-    //CouldBeElvis
-    HashtableIsObsolete
-    IfStatementCouldBeTernary
-    InvertedIfElse
-    LongLiteralWithLowerCaseL
-    //'NoDef' doNotApplyToFilesMatching: '.*Spec.groovy|.*Controller.groovy|.*GrailsPlugin.groovy'
-    //ParameterReassignment
-    TernaryCouldBeElvis
-    VectorIsObsolete
+    ruleset('rulesets/design.xml'){
+        ['BuilderMethodWithSideEffects', 'Instanceof',
+         'NestedForLoop', 'PrivateFieldCouldBeFinal', 'SimpleDateFormatMissingLocale'
+        ].each{
+            exclude it
+        }
+    }
 
-    // rulesets/design.xml
-    'AbstractClassWithPublicConstructor' enabled: false
-    AbstractClassWithoutAbstractMethod
-    BooleanMethodReturnsNull
-    //BuilderMethodWithSideEffects
-    CloneableWithoutClone
-    CloseWithoutCloseable
-    CompareToWithoutComparable
-    ConstantsOnlyInterface
-    EmptyMethodInAbstractClass
-    FinalClassWithProtectedMember
-    ImplementationAsType
-    'Instanceof' enabled: false
-    LocaleSetDefault
-    //NestedForLoop
-    'PrivateFieldCouldBeFinal' enabled: false
-    PublicInstanceField
-    ReturnsNullInsteadOfEmptyArray
-    ReturnsNullInsteadOfEmptyCollection
-    //SimpleDateFormatMissingLocale
-    StatelessSingleton
-    ToStringReturnsNull
+    //ruleset('rulesets/dry.xml')
 
-    // rulesets/dry.xml
-//    DuplicateListLiteral
-//    DuplicateMapLiteral
-//    DuplicateNumberLiteral
-//    DuplicateStringLiteral
+    //ruleset('rulesets/enhanced.xml')//FIXME try adding in the src to classpath so theese work
 
-    // rulesets/enhanced.xml
-    //CloneWithoutCloneable
-    //JUnitAssertEqualsConstantActualValue
-    //UnsafeImplementationAsMap
-
-    // rulesets/exceptions.xml
-    CatchArrayIndexOutOfBoundsException
-    CatchError
-    CatchException
-    CatchIllegalMonitorStateException
-    CatchIndexOutOfBoundsException
-    CatchNullPointerException
-    CatchRuntimeException
-    CatchThrowable
-    ConfusingClassNamedException
-    ExceptionExtendsError
-    ExceptionExtendsThrowable
-    ExceptionNotThrown
-    MissingNewInThrowStatement
-    ReturnNullFromCatchBlock
-    SwallowThreadDeath
-    ThrowError
-    ThrowException
-    ThrowNullPointerException
-    ThrowRuntimeException
-    ThrowThrowable
+    ruleset('rulesets/exceptions.xml')
 
     // rulesets/formatting.xml
     BlankLineBeforePackage
@@ -157,6 +44,7 @@ ruleset {
     //ClassJavadoc
     ClosureStatementOnOpeningLineOfMultipleLineClosure
     ConsecutiveBlankLines
+    Indentation
     //FileEndsWithoutNewline
     //'LineLength' doNotApplyToFilesMatching: '*Spec.groovy'
     MissingBlankLineAfterImports
@@ -177,209 +65,76 @@ ruleset {
     //SpaceBeforeOpeningBrace
     //TrailingWhitespace
 
-    // rulesets/generic.xml
-    IllegalClassMember
-    IllegalClassReference
-    IllegalPackageReference
-    IllegalRegex
-    IllegalString
-    IllegalSubclass
-    RequiredRegex
-    RequiredString
-    StatelessClass
+    ruleset('rulesets/generic.xml')
 
-    // rulesets/groovyism.xml
-    AssignCollectionSort
-    AssignCollectionUnique
-    ClosureAsLastMethodParameter
-    CollectAllIsDeprecated
-    ConfusingMultipleReturns
-    ExplicitArrayListInstantiation
-    ExplicitCallToAndMethod
-    ExplicitCallToCompareToMethod
-    ExplicitCallToDivMethod
-    ExplicitCallToEqualsMethod
-    ExplicitCallToGetAtMethod
-    ExplicitCallToLeftShiftMethod
-    ExplicitCallToMinusMethod
-    ExplicitCallToModMethod
-    ExplicitCallToMultiplyMethod
-    ExplicitCallToOrMethod
-    ExplicitCallToPlusMethod
-    ExplicitCallToPowerMethod
-    ExplicitCallToRightShiftMethod
-    ExplicitCallToXorMethod
-    ExplicitHashMapInstantiation
-    ExplicitHashSetInstantiation
-    ExplicitLinkedHashMapInstantiation
-    ExplicitLinkedListInstantiation
-    ExplicitStackInstantiation
-    ExplicitTreeSetInstantiation
-    GStringAsMapKey
-    GStringExpressionWithinString
-    //GetterMethodCouldBeProperty
-    GroovyLangImmutable
-    UseCollectMany
-    UseCollectNested
+    //ruleset('rulesets/grails.xml')
 
-    // rulesets/imports.xml
-    DuplicateImport
-    ImportFromSamePackage
-    ImportFromSunPackages
-    //MisorderedStaticImports
-    //'NoWildcardImports' doNotApplyToFilesMatching: '.*Spec.groovy'
-    UnnecessaryGroovyImport
-    UnusedImport
+    ruleset('rulesets/groovyism.xml'){
+        exclude 'GetterMethodCouldBeProperty'
+    }
 
-    // rulesets/jdbc.xml
-    DirectConnectionManagement
-    JdbcConnectionReference
-    JdbcResultSetReference
-    JdbcStatementReference
+    ruleset('rulesets/imports.xml'){
+        MisorderedStaticImports(comesBefore:false)
+    }
 
-    // rulesets/junit.xml
-    ChainedTest
-    CoupledTestCase
-    JUnitAssertAlwaysFails
-    JUnitAssertAlwaysSucceeds
-    JUnitFailWithoutMessage
-    JUnitLostTest
-    JUnitPublicField
-    //JUnitPublicNonTestMethod
-    //JUnitPublicProperty
-    JUnitSetUpCallsSuper
-    JUnitStyleAssertions
-    JUnitTearDownCallsSuper
-    JUnitTestMethodWithoutAssert
-    JUnitUnnecessarySetUp
-    JUnitUnnecessaryTearDown
-    JUnitUnnecessaryThrowsException
-    SpockIgnoreRestUsed
-    UnnecessaryFail
-    UseAssertEqualsInsteadOfAssertTrue
-    UseAssertFalseInsteadOfNegation
-    UseAssertNullInsteadOfAssertEquals
-    UseAssertSameInsteadOfAssertTrue
-    UseAssertTrueInsteadOfAssertEquals
-    UseAssertTrueInsteadOfNegation
+    ruleset('rulesets/jdbc.xml')
 
-    // rulesets/logging.xml
-    LoggerForDifferentClass
-    LoggerWithWrongModifiers
-    LoggingSwallowsStacktrace
-    MultipleLoggers
-    PrintStackTrace
-    //Println
-    SystemErrPrint
-    SystemOutPrint
+    ruleset('rulesets/junit.xml'){
+        exclude 'JUnitPublicNonTestMethod'
+        exclude 'JUnitPublicProperty'
+        exclude 'JUnitPublicNonTestMethod'
+    }
 
-    // rulesets/naming.xml
-    AbstractClassName
-    ClassName
-    ClassNameSameAsFilename
-    //ConfusingMethodName
-    //'FactoryMethodName' doNotApplyToFilesMatching: '.*Spec.groovy'
-    FieldName
-    InterfaceName
-    'MethodName' doNotApplyToFilesMatching: '.*Spec.groovy'
-    ObjectOverrideMisspelledMethodName
-    PackageName
-    PackageNameMatchesFilePath
-    ParameterName
-    PropertyName
-    VariableName
+    ruleset('rulesets/logging.xml'){
+        //exclude 'Println'
+    }
 
-    // rulesets/security.xml
-    FileCreateTempFile
-    InsecureRandom
-    'JavaIoPackageAccess' enabled: false
-    NonFinalPublicField
-    NonFinalSubclassOfSensitiveInterface
-    ObjectFinalize
-    PublicFinalizeMethod
-    SystemExit
-    UnsafeArrayDeclaration
+    ruleset('rulesets/naming.xml'){
+        'MethodName' doNotApplyToFilesMatching: '.*Spec.groovy'
+        PropertyName {
+            ignorePropertyNames='_*'
+        }
+        exclude 'ConfusingMethodName'
+        exclude 'FactoryMethodName'
+    }
 
-    // rulesets/serialization.xml
-    EnumCustomSerializationIgnored
-    SerialPersistentFields
-    SerialVersionUID
-    'SerializableClassMustDefineSerialVersionUID' enabled: false
+    ruleset('rulesets/security.xml'){
+        exclude 'JavaIoPackageAccess'
+    }
 
-    // rulesets/size.xml
-    AbcComplexity   // DEPRECATED: Use the AbcMetric rule instead. Requires the GMetrics jar
-    'AbcMetric' doNotApplyToFilesMatching: '.*Spec.groovy'   // Requires the GMetrics jar
-    ClassSize
-    //CrapMetric   // Requires the GMetrics jar and a Cobertura coverage file
-    //CyclomaticComplexity
-    MethodCount
-    'MethodSize' doNotApplyToFilesMatching: '.*Spec.groovy'
-    NestedBlockDepth
-    //'ParameterCount' maxParameters: 6
+    ruleset('rulesets/serialization.xml'){
+        exclude 'SerializableClassMustDefineSerialVersionUID'
+    }
 
-    // rulesets/unnecessary.xml
-    AddEmptyString
-    ConsecutiveLiteralAppends
-    //ConsecutiveStringConcatenation
-    UnnecessaryBigDecimalInstantiation
-    UnnecessaryBigIntegerInstantiation
-    'UnnecessaryBooleanExpression' doNotApplyToFilesMatching: '.*Spec.groovy'
-    UnnecessaryBooleanInstantiation
-    UnnecessaryCallForLastElement
-    UnnecessaryCallToSubstring
-    UnnecessaryCast
-    UnnecessaryCatchBlock
-    UnnecessaryCollectCall
-    UnnecessaryCollectionCall
-    UnnecessaryConstructor
-    UnnecessaryDefInFieldDeclaration
-    //UnnecessaryDefInMethodDeclaration
-    UnnecessaryDefInVariableDeclaration
-    //UnnecessaryDotClass
-    UnnecessaryDoubleInstantiation
-    UnnecessaryElseStatement
-    UnnecessaryFinalOnPrivateMethod
-    UnnecessaryFloatInstantiation
-    //UnnecessaryGString
-    //UnnecessaryGetter
-    UnnecessaryIfStatement
-    UnnecessaryInstanceOfCheck
-    UnnecessaryInstantiationToGetClass
-    UnnecessaryIntegerInstantiation
-    UnnecessaryLongInstantiation
-    UnnecessaryModOne
-    UnnecessaryNullCheck
-    UnnecessaryNullCheckBeforeInstanceOf
-    'UnnecessaryObjectReferences' doNotApplyToFilesMatching: '.*Spec.groovy'
-    UnnecessaryOverridingMethod
-    UnnecessaryPackageReference
-    UnnecessaryParenthesesForMethodCallWithClosure
-    //UnnecessaryPublicModifier
-    //UnnecessaryReturnKeyword
-    UnnecessarySafeNavigationOperator
-    UnnecessarySelfAssignment
-    UnnecessarySemicolon
-    UnnecessaryStringInstantiation
-    //UnnecessarySubstring
-    UnnecessaryTernaryExpression
-    //UnnecessaryToString
-    UnnecessaryTransientModifier
+    ruleset('rulesets/size.xml'){
+        'AbcMetric' doNotApplyToFilesMatching: '.*Spec.groovy'
+        'MethodSize' doNotApplyToFilesMatching: '.*Spec.groovy'
+        //'ParameterCount' maxParameters: 6
+        exclude 'CrapMetric'
+        //exclude 'CyclomaticComplexity'
+    }
 
-    // rulesets/unused.xml
-    UnusedArray
-    'UnusedMethodParameter' enabled: false
-    UnusedObject
-    UnusedPrivateField
-    UnusedPrivateMethod
-    UnusedPrivateMethodParameter
-    //UnusedVariable
+    ruleset('rulesets/unnecessary.xml'){
+        'UnnecessaryBooleanExpression' doNotApplyToFilesMatching: '.*Spec.groovy'
+        'UnnecessaryObjectReferences' doNotApplyToFilesMatching: '.*Spec.groovy'
+        exclude 'ConsecutiveStringConcatenation'
+        exclude 'UnnecessaryBooleanExpression'
+        exclude 'UnnecessaryGString'
+        exclude 'UnnecessaryGetter'
+        exclude 'UnnecessaryPublicModifier'
+        exclude 'UnnecessaryReturnKeyword'
+        exclude 'UnnecessaryDotClass' //FIXME this should be enabled
+        exclude 'UnnecessarySetter' //FIXME this should be enabled
+        exclude 'UnnecessarySubstring' //FIXME this should be enabled
+    }
 
-    // Formatting
-    NoTabCharacter
+    ruleset('rulesets/unused.xml'){
+        exclude 'UnusedMethodParameter' //FIXME this should be enabled
+        exclude 'UnusedVariable' //FIXME this should be enabled
+    }
 
     ruleset('rulesets/codenarc-extra.xml') {
         CompileStatic  {
-            //doNotApplyToClassNames = '*Spec,*Test,.*GrailsPlugin,Application'
             doNotApplyToFilesMatching = ".*/src/test/.*|.*GrailsPlugin.groovy|.*Application.groovy"
         }
     }

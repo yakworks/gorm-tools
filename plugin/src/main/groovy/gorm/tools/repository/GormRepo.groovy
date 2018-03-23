@@ -54,7 +54,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     Class<D> getEntityClass() {
-        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo.class)
+        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
         return entityClass
     }
 

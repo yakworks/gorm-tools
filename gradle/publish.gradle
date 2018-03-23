@@ -1,17 +1,15 @@
 apply plugin: "org.grails.grails-plugin-publish"
 
 grailsPublish {
-  //user = binTrayUser
-  //key = binTrayKey
   title = title
   desc = description
   userOrg = bintrayOrg
   repo = bintrayRepo
   developers = [basejump: 'Joshua Burnett']
-  githubSlug = "$githubSlug"
-  issueTrackerUrl = "$githubIssues"
+  githubSlug = githubSlug
+  issueTrackerUrl = githubIssues
   websiteUrl = websiteUrl
-  vcsUrl = "$githubUrl"
+  vcsUrl = githubUrl
 }
 
 if(isSnapshot){
@@ -26,16 +24,5 @@ if(isSnapshot){
         }
       }
     }
-  }
-}
-
-task tagRelease {
-  description = 'Tags the current head with the project\'s version.'
-  doLast {
-    println grgit.status().unstaged
-//        grgit.tag.add {
-//            name = version + "test grgit"
-//            message = "Release of ${version}"
-//        }
   }
 }

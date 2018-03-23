@@ -13,22 +13,22 @@ abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepo
 
     def "create tests"() {
         expect:
-            testCreate()
+        testCreate()
     }
 
     def "update tests"() {
         expect:
-            testUpdate()
+        testUpdate()
     }
 
     def "persist tests"() {
         expect:
-            testPersist()
+        testPersist()
     }
 
     def "remove tests"() {
         expect:
-            testRemove()
+        testRemove()
     }
 
 }

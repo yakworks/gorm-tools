@@ -16,7 +16,7 @@ trait QueryMangoEntity {
     @Transient
     static List<String> quickSearchFields = []
 
-    static abstract def getRepo()
+    static abstract getRepo()
 
     static DetachedCriteria buildCriteria(Map params = [:], Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).buildCriteria(params, closure)

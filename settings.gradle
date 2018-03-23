@@ -1,15 +1,22 @@
+//pluginManagement {
+//  repositories {
+//    maven { url "https://repo.grails.org/grails/core" }
+//    gradlePluginPortal()
+//  }
+//}
+
 rootProject.name = 'gorm-tools-root'
+//tests will be included in main runs but not deploy tasks and doc tasks
+include "examples:benchmarks"
+include "examples:test-app"
 
-include "benchmarks"
-include "test-app"
+//rootProject.children.each { project ->
+//  project.projectDir = new File(settingsDir, "examples/$project.name")
+//  //project.buildFileName = "${project.name}.gradle"
+//  //project.setProperty('examples',true)//so we can know not to deploy these
+//}
 
-rootProject.children.each { project ->
-  project.projectDir = new File(settingsDir, "examples/$project.name")
-  //project.buildFileName = "${project.name}.gradle"
-  //project.setProperty('examples',true)//so we can know not to deploy these
-}
-
-// Deployable projects
+// Deployable projects are any projects not in the ':example:' name space
 include 'plugin'
 findProject(':plugin').with{
   name = 'gorm-tools'

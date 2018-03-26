@@ -28,7 +28,7 @@ class ErrorMessageService {
      */
     Map buildErrorResponse(e) {
         int code = 500
-        if (e instanceof ValidationException || e instanceof ConstraintViolationException) {
+        if (e instanceof ValidationException || e instanceof ConstraintViolationException || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
             code = 422
         }
 

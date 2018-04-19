@@ -237,7 +237,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     D get(Serializable id, Long version) {
-        D entity = getStaticApi().get(id)
+        D entity = (D) getStaticApi().get(id)
         RepoUtil.checkFound(entity, [id: id], getEntityClass().name)
         if (version != null) RepoUtil.checkVersion(entity, version)
         return entity

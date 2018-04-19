@@ -11,10 +11,13 @@ apply plugin:"org.grails.grails-gsp"
 dependencies {
   profile "org.grails.profiles:web"
   //compile "org.springframework.boot:spring-boot-starter-actuator"
-  provided "org.springframework.boot:spring-boot-starter-tomcat"
-
+  //provided "org.springframework.boot:spring-boot-starter-tomcat"
   console "org.grails:grails-console"
-  //compile 'org.grails.plugins:grails-java8:1.2.2'
+
+  compile project(':gorm-tools')
+
+  //FIXME why is this needed? it doesn't flow from deps in the plugin,testing.JdbcTimeZoneSpec.$tt__$spock_feature_0_0(JdbcTimeZoneSpec.groovy:55) fails
+  compile "org.hibernate:hibernate-core:$versionHibernate"
 
   testCompile "org.grails:grails-datastore-rest-client"
   testCompile "org.grails.plugins:geb"
@@ -29,13 +32,13 @@ bootRun {
   addResources = true
 }
 
-grails {
-  exploded = true
-  plugins {
-    //println "Inside grails: $rootProject.name"
-    compile project(':gorm-tools')
-  }
-}
+//grails {
+//  exploded = true
+//  plugins {
+//    //println "Inside grails: $rootProject.name"
+//    compile project(':gorm-tools')
+//  }
+//}
 
 // Added to be able to see failed tests and the cause in console on test run.
 // This really helpful and needed when viewing on Travis CI or others.

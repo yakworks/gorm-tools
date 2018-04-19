@@ -1,17 +1,18 @@
 buildscript {
   repositories {
-    mavenLocal()
+    //jcenter() //mavenLocal()
+    maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://repo.grails.org/grails/core" }
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+    classpath "org.yakworks:gradle-plugins:0.1.3"
+    //classpath 'org.shipkit:shipkit:+'
+    //classpath "org.yakworks:gradle-plugins:0.1.2"
   }
 }
-plugins {
-  id "com.dorongold.task-tree" version "1.3"
-}
-
 apply plugin:'yakworks.defaults' //our opinionated defaults for gradle groovy & grails projects
+//apply plugin: 'org.shipkit.java'
 
 subprojects {
   apply plugin:'groovy'
@@ -20,60 +21,21 @@ subprojects {
   targetCompatibility = '1.8'
 
   dependencies {
-    compile "org.springframework.boot:spring-boot-starter-logging"
-    compile "org.springframework.boot:spring-boot-autoconfigure"
-    compile "org.grails:grails-core"
-    //compile "org.springframework.boot:spring-boot-starter-actuator"
-    compile "org.springframework.boot:spring-boot-starter-tomcat"
-    compile "org.grails:grails-web-boot"
-
-    compile "org.grails:grails-logging"
-    compile "org.grails:grails-plugin-databinding"
-    compile "org.grails:grails-plugin-services"
-    compile 'org.grails.plugins:grails-java8:1.2.2'
-
-    compile "org.grails.plugins:events"
-    compile "org.codehaus.gpars:gpars:1.2.0"
-
-    compileOnly "org.grails.plugins:views-json:$viewsVersion"
-    compileOnly "org.grails.plugins:views-json-templates:$viewsVersion"
-    compileOnly "org.grails:views-json-testing-support:$viewsVersion"
-
-    compile "org.grails.plugins:hibernate5"
-    compile "org.hibernate:hibernate-core:$hibernateVersion"
-    compile "org.hibernate:hibernate-ehcache:$hibernateVersion"
-
     testRuntime "com.h2database:h2"
     testRuntime "org.apache.tomcat:tomcat-jdbc"
 
     testCompile "org.grails:grails-gorm-testing-support"
     testCompile "org.grails:grails-web-testing-support"
-    testCompile "org.grails.plugins:build-test-data:$buildTestDataVersion"
-    testCompile "org.grails:views-json-testing-support:$viewsVersion"
-
+    testCompile "org.grails.plugins:build-test-data:$versionBuildTestData"
+    testCompile "org.grails:views-json-testing-support:$versionViews"
   }
 
-  //when using snapshots marked with {changing=true) can change this setting to check more frequently
-  //configurations.all {
-  //  resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
-  //}
-
   test {
-    //testLogging.showStandardStreams = true
+    //This way Spock/Groovy power asserts will be visible in the build log
+    //Very useful - you don't have to look at the test results to debug a test failure
     testLogging.exceptionFormat = 'full'
   }
 
 }
-
-//spotless.formats.remove 'groovyGradle'
-//spotless{
-//  groovyGradle {
-//    target 'gradle/*.gradle', 'build.gradle'
-//    trimTrailingWhitespace()
-//    indentWithTabs(2)
-//    endWithNewline()
-//  }
-//}
-//or to change one setting
 
 spotless.formats.groovyGradle.target('gradle/*.gradle', 'build.gradle')

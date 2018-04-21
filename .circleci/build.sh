@@ -30,7 +30,7 @@ if [[ $CIRCLE_BRANCH == 'master' ]]; then
     git config --global user.name "9cibot"
     git config --global user.email "9cibot@9ci.com"
     git config --global credential.helper "store --file=~/.git-credentials"
-    gradle gitPublishPush --no-daemon --max-workers 2
+    ./gradlew  gitPublishPush --no-daemon --max-workers 2
   fi
 fi
 

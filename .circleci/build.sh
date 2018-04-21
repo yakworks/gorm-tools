@@ -8,17 +8,17 @@ echo $commitRange
 #git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)"
 if [[ $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)") ]]; then
   echo "Testing - has changes that are not docs"
-  gradle clean
-  gradle gorm-tools:check --no-daemon --max-workers 2
-  gradle test-app:check --no-daemon --max-workers 2
+  ./gradlew  clean
+  ./gradlew  gorm-tools:check --no-daemon --max-workers 2
+  ./gradlew  test-app:check --no-daemon --max-workers 2
 
   if [[ $CIRCLE_BRANCH == 'master' ]]; then
     if [[ "$CIRCLE_TAG" =~ ^v[0-9].* ]]; then
       echo "### publishing release to BinTray"
-      gradle gorm-tools:bintrayUpload --no-daemon
+      ./gradlew  gorm-tools:bintrayUpload --no-daemon
     else
       echo "### publishing SNAPSHOT"
-      gradle gorm-tools:publish --no-daemon
+      ./gradlew  gorm-tools:publish --no-daemon
     fi
   fi
 fi

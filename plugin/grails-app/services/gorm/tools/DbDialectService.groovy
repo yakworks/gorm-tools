@@ -9,7 +9,9 @@ import org.springframework.util.ClassUtils
 
 import java.sql.SQLException
 
-@SuppressWarnings(['NonFinalPublicField'])
+/**
+ * Utility class to help create generic code and SQL that can work across supported databases.
+ */
 @CompileStatic
 class DbDialectService {
 

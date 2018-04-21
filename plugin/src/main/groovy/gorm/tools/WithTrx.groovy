@@ -36,7 +36,7 @@ trait WithTrx {
      * @param callable The callable The callable
      * @return The result of the callable
      */
-    def <T> T withTrx(@ClosureParams(value = SimpleType.class,
+    def <T> T withTrx(@ClosureParams(value = SimpleType,
         options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
         trxService.withTrx(callable)
     }

@@ -21,10 +21,9 @@ trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{
     D entity
     Class<D> _entityClass
 
-
     Class<D> getEntityClass() {
         if (!_entityClass)
-            this._entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), DomainRepoTest.class)
+            this._entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), DomainRepoTest)
         return _entityClass
     }
 

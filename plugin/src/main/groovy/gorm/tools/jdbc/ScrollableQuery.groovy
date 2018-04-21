@@ -17,9 +17,9 @@ import java.sql.Statement
 @CompileStatic
 class ScrollableQuery {
 
-    private DataSource dataSource
-    private RowMapper rowMapper
-    private int fetchSize
+    private final DataSource dataSource
+    private final RowMapper rowMapper
+    private final int fetchSize
 
     /**
      * Creates a ScrollableQuery instance with given parameters.

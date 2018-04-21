@@ -41,8 +41,8 @@ dependencies {
   compileOnly "org.grails:grails-web-testing-support"
   compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
 
-  codenarc 'org.codenarc:CodeNarc:1.1'
-  codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
+  //codenarc 'org.codenarc:CodeNarc:1.1'
+  //codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
 
   //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
   testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"

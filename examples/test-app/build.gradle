@@ -4,8 +4,9 @@ plugins {
 version "1.0"
 group "yakworks"
 
-apply plugin:"org.grails.grails-web"
+apply plugin:"groovy"
 apply plugin:"war"
+apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 
 dependencies {

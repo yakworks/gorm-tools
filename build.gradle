@@ -1,41 +1,37 @@
 buildscript {
   repositories {
-    //jcenter() //mavenLocal()
+    //jcenter() //
+    mavenLocal()
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://repo.grails.org/grails/core" }
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.3"
-    //classpath 'org.shipkit:shipkit:+'
-    //classpath "org.yakworks:gradle-plugins:0.1.2"
+    classpath "org.yakworks:gradle-plugins:0.1.6"
   }
 }
 apply plugin:'yakworks.defaults' //our opinionated defaults for gradle groovy & grails projects
-//apply plugin: 'org.shipkit.java'
 
 subprojects {
-  apply plugin:'groovy'
+  plugins.withId('java') {
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
-  sourceCompatibility = '1.8'
-  targetCompatibility = '1.8'
+    dependencies {
+      testRuntime "com.h2database:h2"
+      testRuntime "org.apache.tomcat:tomcat-jdbc"
 
-  dependencies {
-    testRuntime "com.h2database:h2"
-    testRuntime "org.apache.tomcat:tomcat-jdbc"
-
-    testCompile "org.grails:grails-gorm-testing-support"
-    testCompile "org.grails:grails-web-testing-support"
-    testCompile "org.grails.plugins:build-test-data:$versionBuildTestData"
-    testCompile "org.grails:views-json-testing-support:$versionViews"
+      testCompile "org.grails:grails-gorm-testing-support"
+      testCompile "org.grails:grails-web-testing-support"
+      testCompile "org.grails.plugins:build-test-data:$versionBuildTestData"
+      testCompile "org.grails:views-json-testing-support:$versionViews"
+    }
+    test {
+      //This way Spock/Groovy power asserts will be visible in the build log
+      //Very useful - you don't have to look at the test results to debug a test failure
+      testLogging.exceptionFormat = 'full'
+    }
   }
-
-  test {
-    //This way Spock/Groovy power asserts will be visible in the build log
-    //Very useful - you don't have to look at the test results to debug a test failure
-    testLogging.exceptionFormat = 'full'
-  }
-
 }
 
-spotless.formats.groovyGradle.target('gradle/*.gradle', 'build.gradle')
+//spotless.formats.groovyGradle.target('gradle/*.gradle', 'build.gradle')

@@ -30,7 +30,7 @@ import java.time.LocalDateTime
  * Explicitly checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
  *
  */
-@SuppressWarnings(['CatchException', 'VariableName'])
+@SuppressWarnings(['CatchException'])
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 

@@ -3,8 +3,8 @@ package gorm.tools.idgen
 
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang.Validate
-import org.apache.log4j.Category
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
@@ -26,9 +26,9 @@ import org.springframework.transaction.annotation.Propagation
  * @since 1.0
  *
  */
+@Slf4j
 @CompileStatic
 class JdbcIdGenerator implements IdGenerator {
-    private static Category log = Category.getInstance(JdbcIdGenerator.class)
     JdbcTemplate jdbcTemplate
 
     @Value('${gorm.tools.idGenerator.seedValue:1000}')

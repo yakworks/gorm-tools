@@ -39,7 +39,7 @@ jobs:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
-      - run: gradle resolveConfigurations
+      - run: ./gradlew resolveConfigurations
       #- run: ./gradlew test-app:dependencies
 
       - save_cache:

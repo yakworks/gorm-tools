@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat
  * custom manipulations with dates.
  * (e.g. to get a number of days between dates or to get last day of month, etc)
  */
-@SuppressWarnings(['EmptyCatchBlock', 'ExplicitCallToGetAtMethod'])
 @CompileStatic
 class DateUtil {
 
@@ -194,6 +193,7 @@ class DateUtil {
      * @param monthNumber number of a month
      * @return the first letter of a specified month
      */
+    @SuppressWarnings('ExplicitCallToGetAtMethod')
     static String getMonthLetterByNum(int monthNumber) {
         String[] monthNames = new DateFormatSymbols().getMonths()
         monthNumber in (1..12) ? monthNames[monthNumber - 1].getAt(0) : '?'
@@ -206,8 +206,9 @@ class DateUtil {
      * @param format a format
      * @return a date
      */
+    @SuppressWarnings('EmptyCatchBlock')
     static Date convertStringToDateTime(String strDt, String format) {
-        DateFormat df = new SimpleDateFormat(format)
+        DateFormat df = new SimpleDateFormat(format, Locale.US)
         Date dtTmp = null
         try {
             dtTmp = df.parse(strDt)
@@ -297,6 +298,7 @@ class DateUtil {
      * @dayNumber 1-30 for monthly, 1-7 for weekly (1 is Sunday)
      * @return is today the date for a specified period and dayInPeriod
      */
+    @SuppressWarnings('ExplicitCallToGetAtMethod')
     static boolean isTodayTheDate(String period, int dayNumber) {
         int dayOfMonth = new Date().getAt(Calendar.DAY_OF_MONTH)
         int dayOfWeek = new Date().getAt(Calendar.DAY_OF_WEEK)

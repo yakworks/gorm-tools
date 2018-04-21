@@ -6,14 +6,14 @@ import grails.buildtestdata.TestData
 import groovy.transform.CompileDynamic
 import org.springframework.core.GenericTypeResolver
 
-@SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert', 'AbstractClassWithoutAbstractMethod'])
+@SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert'])
 @CompileDynamic
 abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {
 
     private Class<D> domainClass // the domain class this is for
 
     Class<D> getEntityClass() {
-        if (!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), AutoHibernateSpec.class)
+        if (!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), AutoHibernateSpec)
         return domainClass
     }
 

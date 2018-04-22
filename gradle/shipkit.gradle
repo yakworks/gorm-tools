@@ -1,0 +1,56 @@
+//This default Shipkit configuration file was created automatically and is intended to be checked-in.
+//Default configuration is sufficient for local testing and trying out Shipkit.
+//To leverage Shipkit fully, please fix the TODO items, refer to our Getting Started Guide for help:
+//
+//     https://github.com/mockito/shipkit/blob/master/docs/getting-started.md
+//
+shipkit {
+  git.user = "9cibot"
+  git.email = "<9cibot@9ci.com>"
+  gitHub.repository = "basejump/gorm-tools"
+  gitHub.readOnlyAuthToken = "76826c9ec886612f504d12fd4268b16721c4f85d"
+  //TODO generate GitHub write token, and ensure your Travis CI has this env variable exported
+  gitHub.writeAuthToken = "0305edb725e4e9e308161755e13c0dd50f1d7e9d"
+  //gitHub.writeAuthToken = System.getenv("GH_WRITE_TOKEN")
+}
+
+//allprojects {
+//  plugins.withId("org.shipkit.bintray") {
+//    bintray {
+//      //user = bintrayUser
+//      //key = bintrayKey
+//
+//      pkg {
+//        userOrg = project.bintrayOrg
+//        name = project.name
+//        websiteUrl = project.websiteUrl
+//        issueTrackerUrl = project.githubIssues
+//        vcsUrl = project.githubUrl
+//
+//        licenses = bintrayLicense
+//        publicDownloadNumbers = true
+//        version {
+//          def artifactType = getDefaultArtifactType()
+//          attributes = [(artifactType): "$project.group:$project.name"]
+//          name = project.version
+//          gpg {
+//            sign = false
+//            passphrase = signingPassphrase
+//          }
+//          mavenCentralSync {
+//            sync = false
+//            user = sonatypeOssUsername
+//            password = sonatypeOssPassword
+//          }
+//        }
+//        //TODO configure Bintray settings per your project (https://github.com/bintray/gradle-bintray-plugin)
+//        repo = 'bootstrap'
+//        user = 'shipkit-bootstrap-bot'
+//        userOrg = 'shipkit-bootstrap'
+//        name = 'maven'
+//        licenses = ['MIT']
+//        labels = ['continuous delivery', 'release automation', 'shipkit']
+//      }
+//    }
+//  }
+//}

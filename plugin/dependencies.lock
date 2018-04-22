@@ -10,11 +10,11 @@
     "codenarc": {
         "io.9ci.yakworks:codenarc-extra": {
             "locked": "1.0.2",
-            "requested": "+"
+            "requested": "1.0.2"
         },
         "org.codenarc:CodeNarc": {
             "locked": "1.1",
-            "requested": "+"
+            "requested": "1.1"
         }
     },
     "compile": {
@@ -33,19 +33,19 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.hibernate:hibernate-core": {
             "locked": "5.2.16.Final",
@@ -56,13 +56,13 @@
             "requested": "5.2.16.Final"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     },
     "compileClasspath": {
@@ -93,22 +93,22 @@
             "requested": "1.2.7"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-gorm-testing-support": {
             "locked": "1.1.4"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-testing-support": {
             "locked": "1.1.4"
@@ -126,16 +126,16 @@
             "requested": "5.2.16.Final"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework:spring-test": {
-            "locked": "4.3.14.RELEASE"
+            "locked": "4.3.16.RELEASE"
         }
     },
     "compileOnly": {
@@ -162,12 +162,12 @@
             "requested": "1.2.7"
         },
         "org.springframework:spring-test": {
-            "locked": "4.3.14.RELEASE"
+            "locked": "4.3.16.RELEASE"
         }
     },
     "console": {
         "org.grails:grails-console": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         }
     },
     "default": {
@@ -186,19 +186,19 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.hibernate:hibernate-core": {
             "locked": "5.2.16.Final",
@@ -209,13 +209,13 @@
             "requested": "5.2.16.Final"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     },
     "profile": {
@@ -239,19 +239,19 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.hibernate:hibernate-core": {
             "locked": "5.2.16.Final",
@@ -262,13 +262,13 @@
             "requested": "5.2.16.Final"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     },
     "runtimeClasspath": {
@@ -287,19 +287,19 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.hibernate:hibernate-core": {
             "locked": "5.2.16.Final",
@@ -310,13 +310,13 @@
             "requested": "5.2.16.Final"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     },
     "testCompile": {
@@ -339,22 +339,22 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-gorm-testing-support": {
             "locked": "1.1.4"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-testing-support": {
             "locked": "1.1.4"
@@ -372,13 +372,13 @@
             "requested": "5.2.16.Final"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     },
     "testCompileClasspath": {
@@ -401,22 +401,22 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-gorm-testing-support": {
             "locked": "1.1.4"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-testing-support": {
             "locked": "1.1.4"
@@ -434,21 +434,21 @@
             "requested": "5.2.16.Final"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     },
     "testRuntime": {
         "com.h2database:h2": {
-            "locked": "1.4.196"
+            "locked": "1.4.197"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "8.5.27"
+            "locked": "8.5.29"
         },
         "org.codehaus.gpars:gpars": {
             "locked": "1.2.1",
@@ -469,22 +469,22 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-gorm-testing-support": {
             "locked": "1.1.4"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-testing-support": {
             "locked": "1.1.4"
@@ -510,21 +510,21 @@
             "requested": "3.6.0"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     },
     "testRuntimeClasspath": {
         "com.h2database:h2": {
-            "locked": "1.4.196"
+            "locked": "1.4.197"
         },
         "org.apache.tomcat:tomcat-jdbc": {
-            "locked": "8.5.27"
+            "locked": "8.5.29"
         },
         "org.codehaus.gpars:gpars": {
             "locked": "1.2.1",
@@ -545,22 +545,22 @@
             "locked": "6.1.9"
         },
         "org.grails:grails-core": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-gorm-testing-support": {
             "locked": "1.1.4"
         },
         "org.grails:grails-logging": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-databinding": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-plugin-services": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-boot": {
-            "locked": "3.3.3"
+            "locked": "3.3.5"
         },
         "org.grails:grails-web-testing-support": {
             "locked": "1.1.4"
@@ -586,13 +586,13 @@
             "requested": "3.6.0"
         },
         "org.springframework.boot:spring-boot-autoconfigure": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-logging": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         },
         "org.springframework.boot:spring-boot-starter-tomcat": {
-            "locked": "1.5.10.RELEASE"
+            "locked": "1.5.12.RELEASE"
         }
     }
 }

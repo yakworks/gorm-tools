@@ -1,7 +1,7 @@
-plugins {
-  id 'se.patrikerdes.use-latest-versions' version '0.2.1'
-  id 'com.github.ben-manes.versions' version '0.17.0'
-}
+//plugins {
+//  id 'se.patrikerdes.use-latest-versions' version '0.2.1'
+//  id 'com.github.ben-manes.versions' version '0.17.0'
+//}
 apply plugin: "yakworks.grails-plugin"
 //apply plugin: "jacoco"
 
@@ -20,6 +20,7 @@ dependencies {
   compile "org.grails:grails-logging"
   compile "org.grails:grails-plugin-databinding"
   compile "org.grails:grails-plugin-services"
+
   //FIXME comment why is this needed? without we get only here gorm.tools.testing.TestDataJsonBuildAllSpec > test includes * FAILED
   compile 'org.grails.plugins:grails-java8:1.2.3'
 

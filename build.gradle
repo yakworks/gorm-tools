@@ -34,5 +34,4 @@ subprojects {
     }
   }
 }
-
 //spotless.formats.groovyGradle.target('gradle/*.gradle', 'build.gradle')

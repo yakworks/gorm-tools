@@ -1,12 +1,13 @@
 shipkit {
-  git.user = "9cibot"
-  git.email = "<9cibot@9ci.com>"
-  gitHub.repository = githubSlug
-  gitHub.readOnlyAuthToken = "76826c9ec886612f504d12fd4268b16721c4f85d"
-  //def writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
-  gitHub.writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
-  //gitHub.writeAuthToken = "5e47536472a9c5ca3b7f40ef83ca260ad2d0970b" //"0305edb725e4e9e308161755e13c0dd50f1d7e9d"
-  //gitHub.writeAuthToken = System.getenv("GH_WRITE_TOKEN")
+  git {
+    user = "9cibot"
+    email = "9cibot@9ci.com"
+  }
+  gitHub {
+    repository = githubSlug
+    readOnlyAuthToken = "76826c9ec886612f504d12fd4268b16721c4f85d"
+    writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
+  }
 }
 
 //see https://github.com/bintray/gradle-bintray-plugin

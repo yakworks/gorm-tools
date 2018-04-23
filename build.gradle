@@ -7,10 +7,12 @@ buildscript {
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.7-SNAPSHOT"
+    classpath "org.yakworks:gradle-plugins:0.1.8"
+    //classpath 'io.spring.gradle:dependency-lock:latest.release'
   }
 }
-apply plugin:'yakworks.shipkit' //our opinionated defaults for gradle groovy & grails projects
+apply plugin: 'yakworks.shipkit' //our opinionated defaults for gradle groovy & grails projects
+//apply plugin: 'spring.lock'
 
 subprojects {
   plugins.withId('java') {

@@ -2,6 +2,9 @@
 
 set -e
 
+
+export CI_COMMIT_MESSAGE=`git log --format="%s" -n 1 $CIRCLE_SHA1`
+
 commitRange=$(echo "$CIRCLE_COMPARE_URL" | rev | cut -d/ -f1 | rev)
 echo $commitRange
 
@@ -15,13 +18,13 @@ if [[ $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|
   if [[ $CIRCLE_BRANCH == 'master' ]]; then
     # if grep -q 'snapshot=true' version.properties
     # then
-    if [[ "$CIRCLE_TAG" =~ ^v[0-9].* ]]; then
-      echo "### publishing release to BinTray"
-      ./gradlew  gorm-tools:bintrayUpload --no-daemon
-    else
-      echo "### publishing SNAPSHOT"
-      ./gradlew  gorm-tools:publish --no-daemon
-    fi
+    # if [[ "$CIRCLE_TAG" =~ ^v[0-9].* ]]; then
+    #  echo "### publishing release to BinTray"
+    #  ./gradlew  gorm-tools:bintrayUpload --no-daemon
+    #else
+    #  echo "### publishing SNAPSHOT"
+      ./gradlew publishVersion
+    #fi
   fi
 fi
 

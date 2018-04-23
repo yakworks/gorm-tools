@@ -6,24 +6,29 @@ shipkit {
   gitHub.writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
 }
 
-//see https://github.com/bintray/gradle-bintray-plugin
-//allprojects {
-//  plugins.withId("org.shipkit.bintray") {
-//    bintray {
-//      user = 'foo'
-//      key = System.getenv("BINTRAY_API_KEY")
-//      pkg {
-//        repo = 'baz'
-//        userOrg = 'buzz'
-//        githubRepo = 'bintray/gradle-bintray-plugin' //Optional Github repository
-//        githubReleaseNotesFile = 'README.md' //Optional Github readme file
-//        gpg {
-//          sign = false //default is true in shipkit, resets it to bintray defaults
-//          passphrase = signingPassphrase
-//        }
-//        mavenCentralSync {
-//          sync = true
-//      }
-//    }
-//  }
-//}
+
+allprojects {
+  plugins.withId('yakworks.grails-plugin'){
+    spotless.formats.groovy.licenseHeader "/* Copyright \$YEAR. ${author}. Licensed under the Apache License, Version 2.0 */"
+  }
+
+  //see https://github.com/bintray/gradle-bintray-plugin
+  //  plugins.withId("org.shipkit.bintray") {
+  //    bintray {
+  //      user = 'foo'
+  //      key = System.getenv("BINTRAY_API_KEY")
+  //      pkg {
+  //        repo = 'baz'
+  //        userOrg = 'buzz'
+  //        githubRepo = 'bintray/gradle-bintray-plugin' //Optional Github repository
+  //        githubReleaseNotesFile = 'README.md' //Optional Github readme file
+  //        gpg {
+  //          sign = false //default is true in shipkit, resets it to bintray defaults
+  //          passphrase = signingPassphrase
+  //        }
+  //        mavenCentralSync {
+  //          sync = true
+  //      }
+  //    }
+  //  }
+}

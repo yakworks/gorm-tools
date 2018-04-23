@@ -7,4 +7,3 @@ import grails.compiler.GrailsCompileStatic
 class JumperRepo extends DefaultGormRepo<Jumper> {
     //Class domainClas  s = Jumper
 }
-

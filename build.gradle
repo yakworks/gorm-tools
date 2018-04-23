@@ -8,7 +8,7 @@ buildscript {
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.11"
+    classpath "org.yakworks:gradle-plugins:0.1.12-SNAPSHOT"
     //classpath 'io.spring.gradle:dependency-lock:latest.release'
   }
 }

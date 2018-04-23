@@ -15,7 +15,6 @@ import org.grails.datastore.mapping.core.AbstractDatastore
  * and incorporates the TestDataBuilder from build-test-data plugin methods and adds in JsonViewSpecSetup
  * so that it possible to build json and map test data
  */
-@SuppressWarnings(['AbstractClassWithoutAbstractMethod'])
 @CompileDynamic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
 

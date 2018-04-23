@@ -34,14 +34,14 @@ class IsoDateUtil {
 
     //see https://stackoverflow.com/questions/4032967/json-date-to-java-date#4033027
     static final ThreadLocal<SimpleDateFormat> LOCAL_DATE_FORMAT = ThreadLocal.withInitial({
-        SimpleDateFormat fmatter = new SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat fmatter = new SimpleDateFormat("yyyy-MM-dd", Locale.US)
         https://stackoverflow.com/questions/2891361/how-to-set-time-zone-of-a-java-util-date
         fmatter.setTimeZone(TimeZone.getTimeZone('UTC'))
         return fmatter
     } as Supplier<SimpleDateFormat>)
 
     static final ThreadLocal<SimpleDateFormat> DATE_TIME_FORMAT = ThreadLocal.withInitial({
-        SimpleDateFormat fmatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        SimpleDateFormat fmatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
         fmatter.setTimeZone(TimeZone.getTimeZone('UTC'))
         return fmatter
     } as Supplier<SimpleDateFormat>)
@@ -122,7 +122,7 @@ class IsoDateUtil {
      * @return a string representation of a Date object or empty string
      */
     static String dateToString(Date date, String format = 'MM/dd/yyyy hh:mm:ss') {
-        DateFormat df = new SimpleDateFormat(format)
+        DateFormat df = new SimpleDateFormat(format, Locale.US)
         String dtStr = ''
         try {
             dtStr = df.format(date)

@@ -11,6 +11,7 @@ import groovy.util.logging.Slf4j
  */
 @Slf4j
 @CompileStatic
+@SuppressWarnings('ConfusingMethodName') //for max and page
 class Pager {
 
     /**

@@ -25,6 +25,6 @@ class GormRepositoryArtefactTypeTransformation extends ArtefactTypeAstTransforma
 
     @Override
     protected Class getAnnotationTypeClass() {
-        return GormRepository.class
+        return GormRepository
     }
 }

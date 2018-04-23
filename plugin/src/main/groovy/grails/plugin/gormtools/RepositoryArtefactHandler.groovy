@@ -25,7 +25,7 @@ class RepositoryArtefactHandler extends ArtefactHandlerAdapter {
         REGEX_FILE_SEPARATOR + "repository" + REGEX_FILE_SEPARATOR + "(.+)\\.(groovy)")
 
     RepositoryArtefactHandler() {
-        super(TYPE, GrailsRepositoryClass.class, DefaultGrailsRepositoryClass.class, SUFFIX, false)
+        super(TYPE, GrailsRepositoryClass, DefaultGrailsRepositoryClass, SUFFIX, false)
     }
 
 //    boolean isArtefact(ClassNode classNode) {

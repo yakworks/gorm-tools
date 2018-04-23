@@ -1,4 +1,10 @@
-[![CircleCI](https://circleci.com/gh/yakworks/gorm-tools.svg?style=svg)](https://circleci.com/gh/yakworks/gorm-tools)
+![CircleCI](https://img.shields.io/circleci/project/github/yakworks/gorm-tools.svg?longCache=true&style=for-the-badge)
+[![9ci](https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&style=for-the-badge)](http://9ci.com)
+<img src="https://forthebadge.com/images/badges/approved-by-george-costanza.svg" height="28">
+
+[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/gluten-free.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
 
 <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
@@ -18,8 +24,10 @@
          
 </pre>
 
-**Guide**: https://yakworks.github.io/gorm-tools/  
-**API**: https://yakworks.github.io/gorm-tools/api/
+| Guide | API | 
+|------|--------|
+|[Release Docs](https://yakworks.github.io/gorm-tools/) | [Release Api](https://yakworks.github.io/gorm-tools/api)
+|[snapshot](https://yakworks.github.io/gorm-tools/snapshot) | [snapshot](https://yakworks.github.io/gorm-tools/snapshot/api)
 
 ```
 compile "org.grails.plugins:gorm-tools:6.1.0-SNAPSHOT"

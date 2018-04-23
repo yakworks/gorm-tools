@@ -7,7 +7,11 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: dock9/oraclejdk8:gradle-3.5.1
+      # - image: dock9/oraclejdk8:gradle-3.5.1
+      # - image: dock9/oraclejdk8:python
+      # - image: dock9/oraclejdk8:gradle-4.6
+      # - image: gradle:4.6-alpine
+      - image: dock9/gradle:4.6
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -39,7 +43,7 @@ jobs:
           - v1-dependencies-{{ checksum "build.gradle" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
-      - run: gradle resolveConfigurations
+      - run: ./gradlew resolveConfigurations
       #- run: ./gradlew test-app:dependencies
 
       - save_cache:

@@ -4,6 +4,7 @@ package gorm.tools.testing.integration
 import gorm.tools.DbDialectService
 import grails.build.support.MetaClassRegistryCleaner
 import grails.buildtestdata.TestDataBuilder
+import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.datastore.mapping.core.Session
 import org.grails.orm.hibernate.HibernateDatastore
@@ -14,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate
  * Contains helpers for integration tests. Can be chained with some custom helper traits with the application-specific
  * initialization logic.
  */
+@CompileStatic
 trait DataIntegrationTest implements TestDataBuilder {
 
     JdbcTemplate jdbcTemplate

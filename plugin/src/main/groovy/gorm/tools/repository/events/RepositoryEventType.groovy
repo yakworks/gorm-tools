@@ -5,7 +5,6 @@ import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
 
 @CompileStatic
-@SuppressWarnings("FieldName")
 enum RepositoryEventType {
 
     BeforeRemove(BeforeRemoveEvent),

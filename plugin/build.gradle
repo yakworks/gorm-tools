@@ -1,27 +1,36 @@
-buildscript {
-  repositories {
-    mavenLocal()
-    maven { url "https://repo.grails.org/grails/core" }
-  }
-  dependencies {
-    classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "gradle.plugin.com.energizedwork.webdriver-binaries:webdriver-binaries-gradle-plugin:1.1"
-    classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-  }
-}
-apply plugin:'groovy'
+apply plugin: "yakworks.grails-plugin"
+//apply plugin: "jacoco"
 
-apply plugin: "org.grails.grails-plugin"
-apply from: "$gradleDir/spotless.gradle"
-apply from: "$gradleDir/publish.gradle"
-
-apply plugin: "com.energizedwork.webdriver-binaries"
-apply plugin: 'codenarc'
-apply plugin: "jacoco"
-
+/** dependencies versions are seat both with spring/grails BOM and dependency-lock where there is a `:+` variant
+ * `gradle updateLock` will update that file with changes when needed **/
 dependencies {
-  profile "org.grails.profiles:web-plugin"
   console "org.grails:grails-console"
+
+  compile "org.springframework.boot:spring-boot-starter-logging"
+  compile "org.springframework.boot:spring-boot-autoconfigure"
+  compile "org.grails:grails-core"
+  compile "org.springframework.boot:spring-boot-starter-tomcat"
+
+  compile "org.grails:grails-web-boot"
+
+  compile "org.grails:grails-logging"
+  compile "org.grails:grails-plugin-databinding"
+  compile "org.grails:grails-plugin-services"
+
+  //FIXME comment why is this needed? without we get only here gorm.tools.testing.TestDataJsonBuildAllSpec > test includes * FAILED
+  compile 'org.grails.plugins:grails-java8:1.2.3'
+
+  compile "org.grails.plugins:events"
+  compile "org.codehaus.gpars:gpars:1.2.1"
+
+  compile "org.grails.plugins:hibernate5"
+  compile "org.hibernate:hibernate-core:$versionHibernate"
+  compile "org.hibernate:hibernate-ehcache:$versionHibernate" //FIXME comment why this is needed, its shouldn't be but tests fail
+
+  //used for json parsing but require it to be added to project that uses this
+  compileOnly "org.grails.plugins:views-json:$versionViews"
+  compileOnly "org.grails.plugins:views-json-templates:$versionViews"
+  compileOnly "org.grails:views-json-testing-support:$versionViews"
 
   //this is for GrailsParameterMapRowMapper that uses the MockHttpServletRequest
   compileOnly "org.springframework:spring-test"
@@ -29,56 +38,38 @@ dependencies {
   //used for bundled Test traits
   compileOnly "org.grails:grails-gorm-testing-support"
   compileOnly "org.grails:grails-web-testing-support"
-  compileOnly "org.grails.plugins:build-test-data:$buildTestDataVersion"
+  compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
 
-  //testCompile "org.grails.plugins:views-json-testing-support:$viewsVersion"
-  codenarc 'org.codenarc:CodeNarc:0.27.0'
-  codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
-
-  //these shouldn't be needed in here as there are only unit tests but they add the byte-buddy for mocking
+  //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
   testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
   testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
-//bootRepackage and maybe addResources are needed for the test-projects grails.plugin.compile depndency to work
+//when using snapshots marked with {changing=true) can change this setting to check more frequently
+//configurations.all {
+//  resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
+//}
+
+//bootRepackage and maybe addResources are needed for the test/example projects grails.plugin.compile dependency to work
+//TODO can we take care of this in the yakworks.defaults plugin, I'm still not clear on what these are for and what they do?
 bootRun {
   jvmArgs('-Dspring.output.ansi.enabled=always')
   addResources = true
 }
-
 bootRepackage.enabled = false
 
-codenarc {
-  toolVersion = '0.27.0'
-  configFile = file("${rootProject.projectDir}/gradle/codenarc-rules.groovy")
-  reportFormat = 'html'
-  //ignoreFailures = true
-
-  maxPriority1Violations = 0
-  maxPriority2Violations = 4
-  maxPriority3Violations = 4
-}
-
+//main codenarc block is setup in yakworks.defaults
 codenarcMain {
-  exclude '**/GormScalars.groovy'
+  exclude '**/GormToolsGrailsPlugin.groovy'
+  exclude '**/GormToolsPluginHelper.groovy'
 }
 
 codenarcTest {
-  ignoreFailures = true
+  //don't check any of the tests right now as it just slows it down, look at enabling this in future
+  exclude '**/*'
 }
 
 test {
   //testLogging.showStandardStreams = true
   testLogging.exceptionFormat = 'full'
-}
-task printProps {
-  doLast {
-    rootProject.ext.properties.sort { e1, e2 -> undotKeys(e1.key) <=> undotKeys(e2.key) }
-      .each { k, v -> println "${k}: ${v}" }
-  }
-}
-
-def undotKeys(key) {
-  if (!key.contains('.')) { key += 'x' }
-  key.replaceAll(/\.(\w)/) { match, group -> group.toUpperCase() }
 }

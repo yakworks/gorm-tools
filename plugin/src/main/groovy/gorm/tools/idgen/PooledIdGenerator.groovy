@@ -25,9 +25,9 @@ import java.util.concurrent.atomic.AtomicReference
 class PooledIdGenerator implements IdGenerator {
 
     //holds the rows of the id generation by key.
-    private ConcurrentMap<String, AtomicReference<IdTuple>> idTupleMap = new ConcurrentHashMap<String, AtomicReference<IdTuple>>()
+    private final ConcurrentMap<String, AtomicReference<IdTuple>> idTupleMap = new ConcurrentHashMap<String, AtomicReference<IdTuple>>()
     //overrides default for the keys
-    private ConcurrentMap<String, Long> batchSizeByKey = new ConcurrentHashMap<String, Long>()
+    private final ConcurrentMap<String, Long> batchSizeByKey = new ConcurrentHashMap<String, Long>()
     //overrides all defaults for a single use next time fetching occurs with the injected generator
     //private ConcurrentMap<String, Long> batchSizeByKeyUseOnce = new ConcurrentHashMap<String, Long>()
 

@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletRequest
 @CompileStatic
 class BeanPathTools {
 
-    private static List<String> excludes = ['hasMany', 'belongsTo', 'searchable', '__timeStamp',
-                                            'constraints', 'version', 'metaClass']
+    private static final List<String> EXCLUDES = ['hasMany', 'belongsTo', 'searchable', '__timeStamp',
+                                                  'constraints', 'version', 'metaClass']
 
     private BeanPathTools() {
         throw new AssertionError()
@@ -56,7 +56,7 @@ class BeanPathTools {
         List props = []
 
         domain?.class?.properties?.declaredFields.each { field ->
-            if (!excludes.contains(field.name) && !field.name.contains("class\$") && !field.name.startsWith("__timeStamp")) {
+            if (!EXCLUDES.contains(field.name) && !field.name.contains("class\$") && !field.name.startsWith("__timeStamp")) {
                 props.add(field.name)
             }
         }
@@ -116,7 +116,7 @@ class BeanPathTools {
      * @param currentMap a destination map
      * @return a map which contains an object's property (properties)
      */
-    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CatchException'])
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity']) //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
     @CompileDynamic
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
         if (source == null) return null
@@ -124,7 +124,7 @@ class BeanPathTools {
         //no index then its just a property or its the *
         if (nestedIndex == -1) {
             if (propertyPath == '*') {
-                if (log.debugEnabled) log.debug("source:$source propertyPath:$propertyPath currentMap:$currentMap")
+                log.debug("source:$source propertyPath:$propertyPath currentMap:$currentMap")
 
                 //just get the persistentProperties
                 Object object = (source instanceof DelegatingBean) ? ((DelegatingBean) source).target : source
@@ -202,23 +202,24 @@ class BeanPathTools {
         Map p = new MapFlattener().flatten(jsonMap ?: (Map) request.JSON)
         return getGrailsParameterMap(p, request)
     }
+
     @CompileDynamic
-    static List<String> getIncludes(String className, List<String> fields){
+    static List<String> getIncludes(String className, List<String> fields) {
         List<PersistentProperty> properties = GormMetaUtils.getPersistentProperties(className)
         List<String> result = []
-        fields.each{ String field ->
-                if (field == "*"){
-                    result.addAll(properties.findAll{!(it instanceof Association)}*.name)
-                } else if(field.endsWith(".*")){
-                    String[] path = field.split("[.]")
-                    String nestedClass = properties.find{it.name == path[0]}?.getAssociatedEntity()?.getName()
-                    if (nestedClass)
-                        result = result + getIncludes(nestedClass, [path.tail().join(".")]).collect{"${path[0]}.${it}"}
-                        if (path.size() > 1) result = result + [path[0]]
-                        result = result.collect{it.toString()}
-                } else {
-                    result << field // TODO: should we check that field really exists?
-                }
+        fields.each { String field ->
+            if (field == "*") {
+                result.addAll(properties.findAll { !(it instanceof Association) }*.name)
+            } else if (field.endsWith(".*")) {
+                String[] path = field.split("[.]")
+                String nestedClass = properties.find { it.name == path[0] }?.getAssociatedEntity()?.getName()
+                if (nestedClass)
+                    result = result + getIncludes(nestedClass, [path.tail().join(".")]).collect { "${path[0]}.${it}" }
+                if (path.size() > 1) result = result + [path[0]]
+                result = result*.toString()
+            } else {
+                result << field // TODO: should we check that field really exists?
+            }
         }
         result.unique()
     }

@@ -11,13 +11,12 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
-@SuppressWarnings(['PropertyName'])
 @CompileStatic
 @Slf4j
 class MangoBuilder {
     //DetachedCriteria criteria
 
-    static final Map<String, String> compareOps = [
+    static final Map<String, String> CompareOps = [
         '$gt'    : 'gt',
         '$eq'    : 'eq',
         '$gte'   : 'ge',
@@ -31,7 +30,7 @@ class MangoBuilder {
         '$inList': 'inList'
     ]
 
-    static final Map<String, String> propertyOps = [
+    static final Map<String, String> PropertyOps = [
         '$gtf' : 'gtProperty',
         '$gtef': 'geProperty',
         '$ltf' : 'ltProperty',
@@ -40,28 +39,28 @@ class MangoBuilder {
         '$nef' : 'neProperty'
     ]
 
-    static final Map<String, String> overrideOps = [
+    static final Map<String, String> OverrideOps = [
         '$between': 'between',
         '$nin'    : 'notIn'
     ]
 
-    static final Map<String, String> junctionOps = [
+    static final Map<String, String> JunctionOps = [
         '$and': 'and',
         '$or' : 'or',
         '$not': 'not'
     ]
 
-    static final Map<String, String> existOps = [
+    static final Map<String, String> ExistOps = [
         '$isNull'   : 'isNull',
         '$isNotNull': 'isNotNull'
     ]
 
-    static final Map<String, String> quickSearchOps = [
+    static final Map<String, String> QuickSearchOps = [
         '$quickSearch': 'quickSearch',
         '$q'          : 'quickSearch'
     ]
 
-    static final Map<String, String> sortOps = [
+    static final Map<String, String> SortOps = [
         '$sort': 'order'
     ]
 
@@ -98,7 +97,7 @@ class MangoBuilder {
     static void applyMap(DetachedCriteria criteria, Map mangoMap) {
         log.debug "applyMap $mangoMap"
         for (String key : mangoMap.keySet()) {
-            String op = junctionOps[key]
+            String op = JunctionOps[key]
             if (op) {
                 //normalizer should have ensured all ops have a List for a value
                 "$op"(criteria, (List) mangoMap[key])
@@ -111,13 +110,13 @@ class MangoBuilder {
 
     @CompileDynamic
     static void applyField(DetachedCriteria criteria, String field, Object fieldVal) {
-        String qs = quickSearchOps[field]
+        String qs = QuickSearchOps[field]
         if (qs) {
             this."$qs"(criteria, fieldVal)
             return
         }
 
-        String sort = sortOps[field]
+        String sort = SortOps[field]
         if (sort) {
             order(criteria, fieldVal)
         }
@@ -144,20 +143,20 @@ class MangoBuilder {
                 //everything has to either be either a junction op or condition
                 Object opArg = fieldVal[key]
 
-                String op = junctionOps[key]
+                String op = JunctionOps[key]
                 if (op) {
                     //normalizer should have ensured all ops have a List for a value
                     this."$op"(criteria, (List) opArg)
                     continue
                 }
 
-                op = overrideOps[key]
+                op = OverrideOps[key]
                 if (op) {
                     this."$op"(criteria, field, toType(criteria, field, opArg))
                     continue
                 }
 
-                op = compareOps[key]
+                op = CompareOps[key]
                 if (op) {
                     if (opArg == null) {
                         criteria.isNull(field)
@@ -167,13 +166,13 @@ class MangoBuilder {
                     continue
                 }
 
-                op = propertyOps[key]
+                op = PropertyOps[key]
                 if (op) {
                     criteria."$op"(field, opArg)
                     continue
                 }
 
-                op = existOps[key]
+                op = ExistOps[key]
                 if (op) {
                     criteria."$op"(field)
                     continue

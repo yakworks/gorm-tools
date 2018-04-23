@@ -42,7 +42,9 @@ class MultiFormatDateConverter implements ValueConverter {
         if (value instanceof String) {
             String input = (String) value
             if (this.allowEmpty && !input) return dateValue
-            if (IsoDateUtil.GMT_MILLIS.matcher(input).matches() || IsoDateUtil.GMT_SECONDS.matcher(input).matches() || IsoDateUtil.TZ_LESS.matcher(input).matches()) {
+            if (IsoDateUtil.GMT_MILLIS.matcher(input).matches()
+                || IsoDateUtil.GMT_SECONDS.matcher(input).matches()
+                || IsoDateUtil.TZ_LESS.matcher(input).matches()) {
                 dateValue = IsoDateUtil.parse(input)
             } else {
                 dateValue = DateUtils.parseDate(input, formats)

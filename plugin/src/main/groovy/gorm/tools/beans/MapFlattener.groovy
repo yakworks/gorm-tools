@@ -160,7 +160,7 @@ class MapFlattener {
 @CompileStatic
 class KeyVersion {
 
-    private Map<String, Integer> keyVersionCount = [:]
+    private final Map<String, Integer> keyVersionCount = [:]
 
     void updateMapWithKeyValue(Map<String, String> originalMap, String key, String value) {
 

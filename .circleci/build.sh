@@ -12,7 +12,7 @@ echo commitRange $commitRange
 
 if [[ -z "$commitRange" || $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)") ]]; then
   echo "Testing - has changes that are not docs"
-  ./gradlew  check --no-daemon --max-workers 2
+  ./gradlew  check --no-daemon
   # ./gradlew  gorm-tools:check --no-daemon --max-workers 2
   # ./gradlew  test-app:check --no-daemon --max-workers 2
 

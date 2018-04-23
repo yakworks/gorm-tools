@@ -1,4 +1,4 @@
-//FOO aa
+//go go gadget gradle
 buildscript {
   repositories {
     //jcenter() //

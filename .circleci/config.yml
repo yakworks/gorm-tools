@@ -58,8 +58,8 @@ jobs:
 
       # run tests!
       # - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2
-      - run: ./gradlew check
-      #- run: ./.circleci/build.sh
+      # - run: ./gradlew check
+      - run: ./.circleci/build.sh
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/

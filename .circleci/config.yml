@@ -7,7 +7,8 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: dock9/oraclejdk8:gradle-3.5.1
+      # - image: dock9/oraclejdk8:gradle-3.5.1
+      - image: dock9/oraclejdk8:python
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -54,7 +55,8 @@ jobs:
 
       # run tests!
       # - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2
-      - run: ./.circleci/build.sh
+      - run: ./gradlew check
+      #- run: ./.circleci/build.sh
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/

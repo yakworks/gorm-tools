@@ -13,6 +13,8 @@ if [[ $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|
   ./gradlew  test-app:check --no-daemon --max-workers 2
 
   if [[ $CIRCLE_BRANCH == 'master' ]]; then
+    # if grep -q 'snapshot=true' version.properties
+    # then
     if [[ "$CIRCLE_TAG" =~ ^v[0-9].* ]]; then
       echo "### publishing release to BinTray"
       ./gradlew  gorm-tools:bintrayUpload --no-daemon

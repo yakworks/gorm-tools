@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
 set -e
+echo starting....
 
 export CI_COMMIT_MESSAGE=`git log --format="%s" -n 1 $CIRCLE_SHA1`
 
+echo CI_COMMIT_MESSAGE $CI_COMMIT_MESSAGE
+
 commitRange=$(echo "$CIRCLE_COMPARE_URL" | rev | cut -d/ -f1 | rev)
-echo $commitRange
+echo commitRange $commitRange
 
 if [[ $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)") ]]; then
   echo "Testing - has changes that are not docs"

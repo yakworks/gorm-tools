@@ -11,6 +11,7 @@ jobs:
       # - image: dock9/oraclejdk8:python
       # - image: dock9/oraclejdk8:gradle-4.6
       # - image: gradle:4.6-alpine
+      # docker image with python and mkdocs on it already as well
       - image: dock9/gradle:4.6
 
       # Specify service dependencies here if necessary
@@ -22,13 +23,13 @@ jobs:
 #      only:
 #        - master
 
-    working_directory: ~/repo
+    # working_directory: ~/repo
 
     environment:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
       MALLOC_ARENA_MAX: 2
-      GRADLE_OPTS: "-Xmx2048m -Dorg.gradle.daemon=false"
+      GRADLE_OPTS: "-Xmx3200m -Dorg.gradle.daemon=false"
       TERM: dumb
 
     parallelism: 1
@@ -43,7 +44,7 @@ jobs:
           - v2-dependencies-{{ checksum "build.gradle" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
-      - run: ./gradlew resolveConfigurations
+      - run: gradle resolveConfigurations
       #- run: ./gradlew test-app:dependencies
 
       - save_cache:
@@ -57,10 +58,9 @@ jobs:
 #            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
 
       # run tests!
-      # - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2
-      - run: ./gradlew check
+      - run: gradle check
 
-      - run: ./gradlew build -s && ./gradlew ciPublish
+      - run: gradle build -s && gradle ciPublish
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/

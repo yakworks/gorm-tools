@@ -41,7 +41,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v2-dependencies-{{ checksum "build.gradle" }}
+          - v3-gradle-{{ checksum "build.gradle" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
       - run: gradle resolveConfigurations
@@ -49,9 +49,10 @@ jobs:
 
       - save_cache:
           paths:
+            - /home/gradle # the https://hub.docker.com/_/gradle/ containter does wierd stuff for cache
             - ~/.m2
             - ~/.gradle
-          key: v2-dependencies-{{ checksum "build.gradle" }}
+          key: v3-gradle-{{ checksum "build.gradle" }}
 
 #      - add_ssh_keys:
 #          fingerprints:
@@ -60,7 +61,8 @@ jobs:
       # run tests!
       - run: gradle check
 
-      - run: gradle build -s && gradle ciPublish
+      #- run: gradle build -s && gradle ciPublish
+      - run: gradle ciPublish
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/

@@ -9,7 +9,6 @@ echo CI_COMMIT_MESSAGE $CI_COMMIT_MESSAGE
 
 commitRange=$(echo "$CIRCLE_COMPARE_URL" | rev | cut -d/ -f1 | rev)
 echo commitRange $commitRange
-git diff --name-only $commitRange
 
 if [[ -z "$commitRange" || $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)") ]]; then
   echo "Testing - has changes that are not docs"

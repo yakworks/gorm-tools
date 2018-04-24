@@ -58,9 +58,6 @@ jobs:
 #          fingerprints:
 #            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
 
-      # run tests!
-      - run: gradle check
-
       #- run: gradle build -s && gradle ciPublish
       - run: gradle ciPublish
 

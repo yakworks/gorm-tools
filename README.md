@@ -177,3 +177,4 @@ dependencies {
  compile('org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT') { changing = true } 
 }
 ```
+try doc publish only

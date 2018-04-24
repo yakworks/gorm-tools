@@ -1,6 +1,7 @@
 # Page tree
 pages:
   - Overview: index.md
+  - Release Notes: release-notes.md
   - Repository Pattern:
     - Quick Start: repository/intro.md
     - Reference: repository/ref.md
@@ -14,7 +15,7 @@ pages:
     - Date Utils: working-with-dates.md
   - Testing: testing.md
   - API Docs: api-docs.md
-  - Useful links: usefulLinks.md
+  - Useful Links: usefulLinks.md
 
 # Project information
 site_name: '@title@'
@@ -25,7 +26,7 @@ copyright: 'Copyright &copy; 2017 9ci Inc'
 
 ## edit link settings
 repo_name: '@githubSlug@'
-# gradle will replace this url
+# gradle will replace this url, has to be here for testing though
 repo_url: https://github.com/org/project
 edit_uri: edit/master/docs/
 

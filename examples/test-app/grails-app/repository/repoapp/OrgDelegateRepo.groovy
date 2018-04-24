@@ -16,4 +16,3 @@ class OrgDelegateRepo extends DefaultGormRepo<Org> {
         super.create(params)
     }
 }
-

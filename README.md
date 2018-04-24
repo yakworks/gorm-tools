@@ -1,10 +1,8 @@
 ![CircleCI](https://img.shields.io/circleci/project/github/yakworks/gorm-tools.svg?longCache=true&style=for-the-badge)
 [![9ci](https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&style=for-the-badge)](http://9ci.com)
-<img src="https://forthebadge.com/images/badges/approved-by-george-costanza.svg" height="28">
-
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/gluten-free.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
+<img src="https://forthebadge.com/images/badges/built-with-love.svg" height="28">
+<img src="https://forthebadge.com/images/badges/gluten-free.svg" height="28">
+<img src="https://forthebadge.com/images/badges/fuck-it-ship-it.svg" height="28">
 
 <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
@@ -20,17 +18,20 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         version: 6.1.0-SNAPSHOT
+         Version: 6.1.6
          
 </pre>
 
+[RELEASE NOTES](docs/release-notes.md)
+
 | Guide | API | 
 |------|--------|
-|[Release Docs](https://yakworks.github.io/gorm-tools/) | [Release Api](https://yakworks.github.io/gorm-tools/api)
+|[Released Docs](https://yakworks.github.io/gorm-tools/) | [Released Api](https://yakworks.github.io/gorm-tools/api)
 |[snapshot](https://yakworks.github.io/gorm-tools/snapshot) | [snapshot](https://yakworks.github.io/gorm-tools/snapshot/api)
 
+
 ```
-compile "org.grails.plugins:gorm-tools:6.1.0-SNAPSHOT"
+compile "org.grails.plugins:gorm-tools:6.1.6"
 ``` 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
@@ -170,7 +171,7 @@ repositories {
  }
 ```
 
-See version.properties for snapshot version
+See [version.properties](version.properties) for snapshot version
 
 ```groovy
 dependencies {

@@ -11,4 +11,3 @@ class OrgRepo extends DefaultGormRepo<Org> {
 
 
 }
-

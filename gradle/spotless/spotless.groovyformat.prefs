@@ -1,3 +1,0 @@
-groovy.formatter.remove.unnecessary.semicolons=true
-groovy.formatter.longListLength=120
-groovy.formatter.multiline.indentation=1

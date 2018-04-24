@@ -1,19 +1,17 @@
-//go go gadget gradle
+//It all starts here
 buildscript {
   repositories {
-    //jcenter() //
-    mavenLocal()
+    //jcenter()
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://repo.grails.org/grails/core" }
+    mavenLocal()
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.11"
-    //classpath 'io.spring.gradle:dependency-lock:latest.release'
+    classpath "org.yakworks:gradle-plugins:0.1.32"
   }
 }
 apply plugin: 'yakworks.shipkit' //our opinionated defaults for gradle groovy & grails projects
-//apply plugin: 'spring.lock'
 
 subprojects {
   plugins.withId('java') {

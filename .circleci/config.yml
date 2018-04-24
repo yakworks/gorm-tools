@@ -6,11 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      # - image: dock9/oraclejdk8:gradle-3.5.1
-      # - image: dock9/oraclejdk8:python
-      # - image: dock9/oraclejdk8:gradle-4.6
-      # - image: gradle:4.6-alpine
+      # docker image with python and mkdocs on it already as well, based on gradle:4.6-alpine
       - image: dock9/gradle:4.6
 
       # Specify service dependencies here if necessary
@@ -22,13 +18,13 @@ jobs:
 #      only:
 #        - master
 
-    working_directory: ~/repo
+    # working_directory: ~/repo
 
     environment:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
       MALLOC_ARENA_MAX: 2
-      GRADLE_OPTS: "-Xmx2048m -Dorg.gradle.daemon=false"
+      GRADLE_OPTS: "-Xmx3200m -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
       TERM: dumb
 
     parallelism: 1
@@ -40,7 +36,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "build.gradle" }}
+          - v3-gradle-{{ checksum "build.gradle" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
       - run: ./gradlew resolveConfigurations
@@ -48,17 +44,25 @@ jobs:
 
       - save_cache:
           paths:
+            - /home/gradle # the https://hub.docker.com/_/gradle/ containter does wierd stuff for cache
             - ~/.m2
             - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: v3-gradle-{{ checksum "build.gradle" }}
 
-      - add_ssh_keys:
-          fingerprints:
-            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
+#      - add_ssh_keys:
+#          fingerprints:
+#            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
 
-      # run tests!
-      # - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2
-      - run: ./.circleci/build.sh
+      #- run: gradle build -s && gradle ciPublish
+      - run:
+          name: gradle check tests. skips if only docs were changed
+          command: |
+            commitRange=$(echo "$CIRCLE_COMPARE_URL" | rev | cut -d/ -f1 | rev)
+            if [[ -z "$commitRange" || $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)") ]]; then
+              ./gradlew check
+            fi
+
+      - run: ./gradlew ciPublish
 
       - store_artifacts:
           path: plugin/build/reports/tests/test/

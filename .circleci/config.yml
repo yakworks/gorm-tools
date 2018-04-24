@@ -24,10 +24,10 @@ jobs:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
       MALLOC_ARENA_MAX: 2
-      GRADLE_OPTS: "-Xmx3200m -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
+      GRADLE_OPTS: "-Xmx3200m" #-Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
       TERM: dumb
 
-    parallelism: 1
+    parallelism: 2
     # resource_class: large
 
     steps:
@@ -54,6 +54,14 @@ jobs:
 #            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
 
       #- run: gradle build -s && gradle ciPublish
+      - run:
+          name: gradle check tests. skips if only docs were changed
+          command: |
+            commitRange=$(echo "$CIRCLE_COMPARE_URL" | rev | cut -d/ -f1 | rev)
+            if [[ -z "$commitRange" || $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)") ]]; then
+              gradle check
+            fi
+
       - run: gradle ciPublish
 
       - store_artifacts:

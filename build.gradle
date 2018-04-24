@@ -8,7 +8,7 @@ buildscript {
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.31"
+    classpath "org.yakworks:gradle-plugins:0.1.32"
   }
 }
 apply plugin: 'yakworks.shipkit' //our opinionated defaults for gradle groovy & grails projects

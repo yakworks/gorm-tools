@@ -15,7 +15,6 @@ gorm.tools.repository.api
 gorm.tools.repository.errors
 gorm.tools.repository.events
 gorm.tools.testing
-gorm.tools.testing.builder
 gorm.tools.testing.hibernate
 gorm.tools.testing.integration
 gorm.tools.testing.unit

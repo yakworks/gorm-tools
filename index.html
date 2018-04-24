@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://yakworks.github.io/gorm-tools/">
       
       
-        <meta name="author" content="Joshua Burnett">
+        <meta name="author" content="9ci Inc">
       
       
         <link rel="shortcut icon" href="./assets/images/favicon.png">
@@ -350,15 +350,27 @@
       
 
 
+  <li class="md-nav__item">
+    <a href="release-notes/" title="Release Notes" class="md-nav__link">
+      Release Notes
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
     
-    <label class="md-nav__link" for="nav-2">
+    <label class="md-nav__link" for="nav-3">
       Repository Pattern
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-2">
+      <label class="md-nav__title" for="nav-3">
         Repository Pattern
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -436,13 +448,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
     
-    <label class="md-nav__link" for="nav-5">
+    <label class="md-nav__link" for="nav-6">
       Toolbox
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-5">
+      <label class="md-nav__title" for="nav-6">
         Toolbox
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -519,7 +531,7 @@
 
 
   <li class="md-nav__item">
-    <a href="api/" title="API Docs" class="md-nav__link">
+    <a href="api-docs/" title="API Docs" class="md-nav__link">
       API Docs
     </a>
   </li>
@@ -531,8 +543,8 @@
 
 
   <li class="md-nav__item">
-    <a href="usefulLinks/" title="Useful links" class="md-nav__link">
-      Useful links
+    <a href="usefulLinks/" title="Useful Links" class="md-nav__link">
+      Useful Links
     </a>
   </li>
 
@@ -656,9 +668,13 @@
                   <h1>Overview</h1>
                 
                 
-                  <code>Version: 6.1.0</code>
+                  <code>Version: 6.1.2</code>
                 
-                <p><a href="https://travis-ci.org/yakworks/gorm-tools"><img alt="Build Status" src="https://travis-ci.org/yakworks/gorm-tools.svg?branch=master" /></a></p>
+                <p><img alt="CircleCI" src="https://img.shields.io/circleci/project/github/yakworks/gorm-tools.svg?longCache=true&amp;style=for-the-badge" />
+<a href="http://9ci.com"><img alt="9ci" src="https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&amp;style=for-the-badge" /></a>
+<img src="https://forthebadge.com/images/badges/built-with-love.svg" height="28">
+<img src="https://forthebadge.com/images/badges/gluten-free.svg" height="28">
+<img src="https://forthebadge.com/images/badges/fuck-it-ship-it.svg" height="28"></p>
 <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
       ________                                           _.-````'-,_
@@ -673,13 +689,30 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         version: 6.1.0-SNAPSHOT
+         Version: 6.1.2
 
 </pre>
 
-<p><strong>Guide</strong>: <a href="https://yakworks.github.io/gorm-tools/">https://yakworks.github.io/gorm-tools/</a><br />
-<strong>API</strong>: <a href="https://yakworks.github.io/gorm-tools/api/">https://yakworks.github.io/gorm-tools/api/</a></p>
-<div class="codehilite"><pre><span></span>compile &quot;org.grails.plugins:gorm-tools:6.1.0-SNAPSHOT&quot;
+<p><a href="release-notes/">RELEASE NOTES</a></p>
+<table>
+<thead>
+<tr>
+<th>Guide</th>
+<th>API</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://yakworks.github.io/gorm-tools/">Released Docs</a></td>
+<td><a href="https://yakworks.github.io/gorm-tools/api">Released Api</a></td>
+</tr>
+<tr>
+<td><a href="https://yakworks.github.io/gorm-tools/snapshot">snapshot</a></td>
+<td><a href="https://yakworks.github.io/gorm-tools/snapshot/api">snapshot</a></td>
+</tr>
+</tbody>
+</table>
+<div class="codehilite"><pre><span></span>compile &quot;org.grails.plugins:gorm-tools:6.1.2&quot;
 </pre></div>
 
 <p>Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
@@ -787,11 +820,11 @@ Snapshots are published from master branch, and releases are published from tags
 <p><strong>Using latests SNAPSHOT</strong>  </p>
 <p>Configure 9ci repo in build.gradle</p>
 <div class="codehilite"><pre><span></span><span class="n">repositories</span> <span class="o">{</span>
-  <span class="n">maven</span> <span class="o">{</span> <span class="n">url</span> <span class="s2">&quot;http://repo.9ci.com/artifactory/grails-plugins&quot;</span> <span class="o">}</span>
+  <span class="n">maven</span> <span class="o">{</span> <span class="n">url</span> <span class="s2">&quot;http://repo.9ci.com/oss-snapshots&quot;</span> <span class="o">}</span>
  <span class="o">}</span>
 </pre></div>
 
-<p>See version.properties for snapshot version</p>
+<p>See <a href="./version.properties">version.properties</a> for snapshot version</p>
 <div class="codehilite"><pre><span></span><span class="n">dependencies</span> <span class="o">{</span>
  <span class="n">compile</span><span class="o">(</span><span class="s1">&#39;org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT&#39;</span><span class="o">)</span> <span class="o">{</span> <span class="n">changing</span> <span class="o">=</span> <span class="kc">true</span> <span class="o">}</span> 
 <span class="o">}</span>
@@ -815,13 +848,13 @@ Snapshots are published from master branch, and releases are published from tags
       <nav class="md-footer-nav__inner md-grid">
         
         
-          <a href="repository/intro/" title="Quick Start" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="release-notes/" title="Release Notes" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Quick Start
+                Release Notes
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

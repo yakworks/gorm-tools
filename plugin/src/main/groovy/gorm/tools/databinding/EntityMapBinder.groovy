@@ -24,6 +24,7 @@ import org.springframework.validation.BeanPropertyBindingResult
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -33,6 +34,12 @@ import java.time.LocalDateTime
 @SuppressWarnings(['CatchException'])
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
+
+    /**
+     * A map that holds lists of properties which should be bound manually by a binder.
+     * A key represents a domain class and the value is a list with properties.
+     */
+    static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
 
     EntityMapBinder() {
         super(null)
@@ -124,6 +131,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
     }
 
+    /**
+     * Binds properties which specified in a white list on the given entity.
+     * In case the white list is empty method takes the list of persistent properties and iterates on them.
+     *
+     * @param target    a target entity
+     * @param source    a data binding source which contains property values
+     * @param whiteList a list which contains properties for binding
+     * @param listener  DataBindingListener
+     * @param errors
+     */
     void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener = null, errors = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
@@ -145,6 +162,15 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
     }
 
+    /**
+     * Sets a value to a specified target's property.
+     *
+     * @param target   a target entity
+     * @param source   a data binding source which contains property values
+     * @param prop     a persistent property which should be filled with the value
+     * @param listener DataBindingListener
+     * @param errors
+     */
     void setProp(target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
         if (!source.containsProperty(prop.name)) return
 
@@ -154,12 +180,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         if (propValue instanceof String) {
             String sval = propValue as String
             Class typeToConvertTo = prop.getType()
-
-            if (sval == null || String.isAssignableFrom(typeToConvertTo)) {
-                if (sval != null) {
-                    sval = sval.trim()
-                    sval = ("" == sval) ? null : sval
-                }
+            //do we have tests for this?
+            if (String.isAssignableFrom(typeToConvertTo)) {
+                sval = sval.trim()
+                sval = ("" == sval) ? null : sval
                 valueToAssign = sval
             } else if (Date.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = IsoDateUtil.parse(sval)
@@ -190,28 +214,74 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     }
 
+    /**
+     * Binds a given association to the target entity.
+     * It checks if the given value contains an id and loads the associated entity.
+     * In case the id is not specified, this method checks if the given association belongs to the target entity.
+     * In case it does, or the it has the explicitly specified 'bindable:true' constraint, then a new instance is
+     * created for the association.
+     *
+     * @param target      a target entity to bind an association to
+     * @param value       an association's value
+     * @param association an association property
+     * @param listener    DataBindingListener
+     * @param errors
+     */
     void bindAssociation(target, value, Association association, DataBindingListener listener = null, errors = null) {
-        Object instance
+        String aprop = association.name
 
-        if (association.getType().isAssignableFrom(value.getClass())) {
-            instance = value
-        } else if (value instanceof Map && target[association.name] != null &&  !value.containsKey('id')) {
-            //use existing reference if not null
-            instance = target[association.name]
-        } else if (value instanceof Map && association.isOwningSide()) {
-            instance = association.type.newInstance()
-        } else {
-            Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
-            if (idValue != 'null' && idValue != null && idValue != '') {
-                instance = getPersistentInstance(getDomainClassType(target, association.name), idValue)
-            }
+        //if value is null or they are the same instance type then just set and exit fast
+        if (value == null || association.getType().isAssignableFrom(value.getClass())) {
+            target[aprop] = value
+            return
         }
 
-        if (value instanceof Map && instance && association.isOwningSide()) fastBind(instance, new SimpleMapDataBindingSource((Map) value))
+        //if value has idVal then it should be set to existing instance and everything else will be ignored
+        Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
+        idValue = idValue == 'null' ? null :  idValue
 
-        target[association.name] = instance
+        if (idValue) {
+            // check if the target[aprop].id is the same and we don't need to do anything or
+            // the target's property is null and we should bind it
+            if(!target[aprop] || (target[aprop] && (target[aprop]['id'] != idValue))){
+                //we are setting it to a new id so load it and assign
+                target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
+            }
+        } else if (association.isOwningSide() || isExplicitBind(target,association.name)) {
+            if (!(value instanceof Map)) {
+                String msg = "Unable to create an association instance for the entity=${target}, the value=$value is not a Map"
+                throw new IllegalArgumentException(msg)
+            }
+            //if its null then set it up
+            if(target[aprop] == null) target[aprop] = association.type.newInstance()
+            //recursive call to set the association up and assume its a map
+            fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+        }
     }
 
+    /**
+     * Checks if a given association is explicitly marked as bindable and should be binded in any case.
+     *
+     * @param target an entity which contains an association
+     * @param name   a name of an association to check if it should be binded
+     * @return true if the association name with prefix is present in the white list
+     */
+    static boolean isExplicitBind(Object target, String name) {
+        EXPLICIT_BINDING_LIST.get(target.getClass()).contains(name)
+    }
+
+    /**
+     * Sets up a list of properties which can be binded to a given domain entity.
+     *
+     * Puts the created list to ${@code CLASS_TO_BINDING_INCLUDE_LIST} map,
+     * which caches such lists for domain classes.
+     *
+     * The method also checks if a property has an explicitly defined 'bindable:true' constraint.
+     * In case the constraint is present, the property name is added to {@code EXPLICIT_BINDING_LIST}.
+     *
+     * @param object an entity for which the list should be created
+     * @return a list of properties which can be bound to the given entity
+     */
     static List getBindingIncludeList(final Object object) {
         List<String> whiteList = []
         final Class<? extends Object> objectClass = object.getClass()
@@ -222,15 +292,20 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             PersistentEntity entity = gormStaticApi.gormPersistentEntity
             List<PersistentProperty> properties = entity.persistentProperties
             Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
+            List explicitBindingList = EXPLICIT_BINDING_LIST.get(objectClass) ?: []
             for (PersistentProperty prop : properties) {
                 DefaultConstrainedProperty cp = (DefaultConstrainedProperty) constraints[prop.name]
                 Boolean bindable = cp?.getMetaConstraintValue("bindable") as Boolean
                 if (bindable == null || bindable == true) {
                     whiteList.add(prop.name)
                 }
+                if (bindable == true) {
+                    explicitBindingList.add(prop.name)
+                }
             }
             if (!Environment.getCurrent().isReloadEnabled()) {
                 CLASS_TO_BINDING_INCLUDE_LIST.put objectClass, whiteList
+                if (explicitBindingList) EXPLICIT_BINDING_LIST.put(objectClass, explicitBindingList)
             }
         }
 

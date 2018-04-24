@@ -1,3 +1,4 @@
+//go go gadget gradle
 buildscript {
   repositories {
     //jcenter() //
@@ -7,10 +8,12 @@ buildscript {
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.6"
+    classpath "org.yakworks:gradle-plugins:0.1.11"
+    //classpath 'io.spring.gradle:dependency-lock:latest.release'
   }
 }
-apply plugin:'yakworks.defaults' //our opinionated defaults for gradle groovy & grails projects
+apply plugin: 'yakworks.shipkit' //our opinionated defaults for gradle groovy & grails projects
+//apply plugin: 'spring.lock'
 
 subprojects {
   plugins.withId('java') {
@@ -33,5 +36,4 @@ subprojects {
     }
   }
 }
-
 //spotless.formats.groovyGradle.target('gradle/*.gradle', 'build.gradle')

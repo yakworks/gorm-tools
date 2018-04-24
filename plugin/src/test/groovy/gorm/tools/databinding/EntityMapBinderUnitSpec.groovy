@@ -10,6 +10,7 @@ import org.grails.databinding.converters.DateConversionHelper
 import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Specification
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -264,11 +265,84 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.anotherDomain == anotherDomain
         testDomain.anotherDomain.name == "name"
     }
+
+    void "binder should create new association if constraints contain explicit bindable:true"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'outer', notBindable: 'notBindableTest', bindableNested: [name: 'bindableNested'],
+                      notBindableNested: [name: 'notBindableNested']]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == 'outer'
+        testDomain.notBindable == null
+
+        testDomain.bindableNested != null
+        testDomain.bindableNested.name == 'bindableNested'
+
+        testDomain.notBindableNested == null
+    }
+
+    void "binder shouldn't bind the association if constraints doesn't contain 'bindable' and it does not belongsTo"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'outer', notBindable: 'notBindableTest', notBindableNested: [name: 'notBindableNested']]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == 'outer'
+        //regular field
+        testDomain.notBindable == null
+
+        //association
+        testDomain.notBindableNested == null
+    }
+
+    void "binder shouldn't initialize proxy when checks association's id"() {
+        Nested nested = new Nested(name: 'proxy')
+        TestDomain testDomain = new TestDomain(nested: nested).save()
+
+        Map params = [name: 'test', nested: [id: nested.id, name: 'nested']]
+
+        expect:
+        // clearing the session to get TestDomain entity with a proxy for 'nested' property
+        flushAndClear()
+        TestDomain testDomainWithProxy = TestDomain.get(testDomain.id)
+
+        when:
+        binder.bind(testDomainWithProxy, params)
+
+        then:
+        // class names are not equal, because testDomainWithProxy.nested is a proxy and it has an appropriate class name,
+        // which differs from 'gorm.tools.databinding.Nested'
+        testDomainWithProxy.nested.getClass().name != testDomain.nested.getClass().name
+
+        // 'nested' property isn't initialized
+        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+
+        when:
+        Long nestedId = testDomainWithProxy.nested.id
+
+        then: "getting id shouldn't initialize the proxy"
+        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+        nestedId == nested.id
+
+        when:
+        String nestedName = testDomainWithProxy.nested.name
+
+        then: "getting name initializes the proxy"
+        GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+        nestedName == 'proxy'
+    }
 }
 
 
 @Entity
 class TestDomain {
+    // by default binder consider regular fields as "bindable:true",
+    // so there is no need to specify constraints explicitly for that
     String name
     String notBindable
     Long age
@@ -281,10 +355,17 @@ class TestDomain {
     AnotherDomain anotherDomain
     Nested nested
 
+    // constraints contain explicit "bindable:true"
+    BindableNested bindableNested
+    // constraints doesn't contain bindable property and there is no cascading stuff between TestDomain and BindableNested,
+    // thus this association should not be binded by map binder.
+    BindableNested notBindableNested
+
     static constraints = {
         notBindable bindable: false
         nested nullable: false
         anotherDomain nullable: true
+        bindableNested bindable:true
     }
 }
 
@@ -304,4 +385,9 @@ class Nested {
         name nullable: false
         name2 nullable: true
     }
+}
+
+@Entity
+class BindableNested {
+    String name
 }

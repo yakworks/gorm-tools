@@ -68,8 +68,8 @@ How associations are handled depends on if the associated domain belongs to the 
 If the domain being bound is owning side of association and value is of type map, a new instance of associated domain is created.
 If the association does not use belongsTo then existing instance is loaded if the map contains the id.
 The databinding on associated domain will be performed only if it belongs to the domain which is being bound
+or the ```bindable:true``` property is added to constraints for this association
 
-   
 Example
 
 ```groovy
@@ -88,7 +88,6 @@ class Book {
     
     static belongsTo = [author:Author]
 }
-
 ```
 
 Given the above domain model, when creating a new book. It will not create new instance of Author or category, but will set reference to existing instance if id is provided in parameter.
@@ -110,6 +109,25 @@ So following will create a new book instance and set author.book to this new ins
 Author.create(name:"test", book:[name:"Grails in action"])
 
 ```
+
+It is possible to specify the ```bindable: true``` property explicitly for the association in constraints of a parent domain class:
+
+```groovy
+    class Book {
+        String name
+        Category category
+        static constraints = {
+            category bindable:true
+        }
+    }
+    
+    class Category {
+      String name
+    }
+
+```
+In this case MapBinder checks if constraints for ```category``` contains bindable property and then binds ```category``` to ```book```.
+Otherwise, MapBinder consider the ```category``` association as not bindable.
 
 [MapBinder]: https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/MapBinder.html
 [EntityMapBinder]: https://yakworks.github.io/gorm-tools/api/gorm/tools/databinding/EntityMapBinder.html

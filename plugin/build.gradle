@@ -1,9 +1,8 @@
-//apply plugin: "nebula.dependency-lock"
 apply plugin: "yakworks.grails-plugin"
 //apply plugin: "jacoco"
 
-/** dependencies versions are seat both with spring/grails BOM and nebula.dependency-lock where there is a `:+` variant
- * See dependencies.lock. `gradle gorm-tools:generateLock gorm-tools:saveLock` will update that file with changes when needed **/
+/** dependencies versions are seat both with spring/grails BOM and dependency-lock where there is a `:+` variant
+ * `gradle updateLock` will update that file with changes when needed **/
 dependencies {
   console "org.grails:grails-console"
 
@@ -17,14 +16,14 @@ dependencies {
   compile "org.grails:grails-logging"
   compile "org.grails:grails-plugin-databinding"
   compile "org.grails:grails-plugin-services"
+
   //FIXME comment why is this needed? without we get only here gorm.tools.testing.TestDataJsonBuildAllSpec > test includes * FAILED
   compile 'org.grails.plugins:grails-java8:1.2.3'
 
   compile "org.grails.plugins:events"
-  compile "org.codehaus.gpars:gpars:+"
+  compile "org.codehaus.gpars:gpars:1.2.1"
 
   compile "org.grails.plugins:hibernate5"
-  //compile "org.hibernate:hibernate-core:latest.release"
   compile "org.hibernate:hibernate-core:$versionHibernate"
   compile "org.hibernate:hibernate-ehcache:$versionHibernate" //FIXME comment why this is needed, its shouldn't be but tests fail
 
@@ -40,9 +39,6 @@ dependencies {
   compileOnly "org.grails:grails-gorm-testing-support"
   compileOnly "org.grails:grails-web-testing-support"
   compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
-
-  //codenarc 'org.codenarc:CodeNarc:1.1'
-  //codenarc "io.9ci.yakworks:codenarc-extra:1.0.2"
 
   //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
   testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"

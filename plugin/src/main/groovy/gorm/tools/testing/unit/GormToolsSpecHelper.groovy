@@ -2,6 +2,7 @@
 package gorm.tools.testing.unit
 
 import gorm.tools.TrxService
+import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
@@ -48,6 +49,19 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             repoBeans = repoBeans << registerRepository(domainClass, repoClass)
         }
         defineBeans(repoBeans << commonBeans())
+
+        //This part is needed because we cache repo entity in domain,
+        //so if we have 2 unit tests where we create same bean for repo, then in second
+        //test class when we call repo from domain(it could be Org.repo or Org.create()) we will call repo from
+        //the first test class, and if we injected new dependencies in can break test
+        if (this.hasProperty("entityClass") && this.entityClass){
+            domainClassesToMock = [this.entityClass].toArray(Class) + domainClassesToMock
+        }
+        domainClassesToMock.each {
+            String repoBeanName = RepoUtil.getRepoBeanName(it)
+            GormRepo repo = AppCtx.get("${repoBeanName}", findRepoClass(it))
+            it.setRepo(repo)
+        }
     }
 
     /**

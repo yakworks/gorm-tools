@@ -1,0 +1,29 @@
+shipkit {
+  git.user = "9cibot"
+  git.email = "9cibot@9ci.com"
+  gitHub.repository = githubSlug
+  gitHub.readOnlyAuthToken = "76826c9ec886612f504d12fd4268b16721c4f85d"
+  gitHub.writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
+}
+
+//see https://github.com/bintray/gradle-bintray-plugin
+//allprojects {
+//  plugins.withId("org.shipkit.bintray") {
+//    bintray {
+//      user = 'foo'
+//      key = System.getenv("BINTRAY_API_KEY")
+//      pkg {
+//        repo = 'baz'
+//        userOrg = 'buzz'
+//        githubRepo = 'bintray/gradle-bintray-plugin' //Optional Github repository
+//        githubReleaseNotesFile = 'README.md' //Optional Github readme file
+//        gpg {
+//          sign = false //default is true in shipkit, resets it to bintray defaults
+//          passphrase = signingPassphrase
+//        }
+//        mavenCentralSync {
+//          sync = true
+//      }
+//    }
+//  }
+//}

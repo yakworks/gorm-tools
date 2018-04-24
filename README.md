@@ -1,10 +1,8 @@
 ![CircleCI](https://img.shields.io/circleci/project/github/yakworks/gorm-tools.svg?longCache=true&style=for-the-badge)
 [![9ci](https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&style=for-the-badge)](http://9ci.com)
 <img src="https://forthebadge.com/images/badges/built-with-love.svg" height="28">
-
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/gluten-free.svg)](https://forthebadge.com)
-[![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
+<img src="https://forthebadge.com/images/badges/gluten-free.svg" height="28">
+<img src="https://forthebadge.com/images/badges/fuck-it-ship-it.svg" height="28">
 
 <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
@@ -180,4 +178,3 @@ dependencies {
  compile('org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT') { changing = true } 
 }
 ```
-try doc publish only

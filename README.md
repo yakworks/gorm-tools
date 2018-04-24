@@ -170,7 +170,7 @@ repositories {
  }
 ```
 
-See version.properties for snapshot version
+See [version.properties](version.properties) for snapshot version
 
 ```groovy
 dependencies {

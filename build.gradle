@@ -1,14 +1,14 @@
 //It all starts here
 buildscript {
   repositories {
-    mavenLocal()
     //jcenter()
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://repo.grails.org/grails/core" }
+    mavenLocal()
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.+"
+    classpath "org.yakworks:gradle-plugins:0.1.31"
   }
 }
 apply plugin: 'yakworks.shipkit' //our opinionated defaults for gradle groovy & grails projects

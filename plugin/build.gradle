@@ -1,8 +1,6 @@
 apply plugin: "yakworks.grails-plugin"
 //apply plugin: "jacoco"
 
-/** dependencies versions are seat both with spring/grails BOM and dependency-lock where there is a `:+` variant
- * `gradle updateLock` will update that file with changes when needed **/
 dependencies {
   console "org.grails:grails-console"
 
@@ -45,7 +43,7 @@ dependencies {
   testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
-//when using snapshots marked with {changing=true) can change this setting to check more frequently
+// when using snapshots marked with {changing=true) can change this setting to check more frequently
 //configurations.all {
 //  resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
 //}

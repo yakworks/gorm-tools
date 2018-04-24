@@ -40,7 +40,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "build.gradle" }}
+          - v2-dependencies-{{ checksum "build.gradle" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
       - run: ./gradlew resolveConfigurations
@@ -50,11 +50,11 @@ jobs:
           paths:
             - ~/.m2
             - ~/.gradle
-          key: v1-dependencies-{{ checksum "build.gradle" }}
+          key: v2-dependencies-{{ checksum "build.gradle" }}
 
-      - add_ssh_keys:
-          fingerprints:
-            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
+#      - add_ssh_keys:
+#          fingerprints:
+#            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
 
       # run tests!
       # - run: gradle clean; gradle gorm-tools:check --no-daemon --max-workers 2

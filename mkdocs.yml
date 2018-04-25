@@ -25,7 +25,7 @@ site_url:
 copyright: 'Copyright &copy; 2017 9ci Inc'
 
 ## edit link settings
-repo_name: '@githubSlug@'
+repo_name: '@gitHubSlug@'
 # gradle will replace this url, has to be here for testing though
 repo_url: https://github.com/org/project
 edit_uri: edit/master/docs/

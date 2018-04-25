@@ -1,18 +1,33 @@
 shipkit {
-  git.user = "9cibot"
-  git.email = "9cibot@9ci.com"
-  gitHub.repository = githubSlug
+  git.user = gitConfigUser
+  git.email = gitConfigEmail
+  gitHub.repository = gitHubSlug
   gitHub.readOnlyAuthToken = "76826c9ec886612f504d12fd4268b16721c4f85d"
   gitHub.writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
+  releaseNotes.publicationRepository = "$mavenRepoUrl/org.grail.plugins.gradle/"
 }
 
-allprojects {
-  plugins.withId('yakworks.grails-plugin') {
-    spotless.formats.groovy.licenseHeader "/* Copyright \$YEAR. ${author}. Licensed under the Apache License, Version 2.0 */"
-  }
-}
 
-//see https://github.com/bintray/gradle-bintray-plugin
+//to override spotless use the formats
+//allprojects {
+//  plugins.withId('com.diffplug.gradle.spotless') {
+//    plugins.withId('groovy') {
+//      spotless.formats.groovy.licenseHeaderFile "$gradleDir/spotless.license.java"
+//    }
+//  }
+//}
+
+//to override codenarc defaults just add text and it will be appended to default codenarc in the plugin
+//TODO this needs to be implmeneted
+//allprojects {
+//  plugins.withId('codenarc') {
+//    ext.codenarcConfigs="""
+//      Println.enabled = false
+//    """
+//  }
+//}
+
+//see https://github.com/bintray/gradle-bintray-plugin for special config
 //allprojects {
 //  plugins.withId("org.shipkit.bintray") {
 //    bintray {

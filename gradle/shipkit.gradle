@@ -6,13 +6,25 @@ shipkit {
   gitHub.writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
 }
 
-allprojects {
-  plugins.withId('com.diffplug.gradle.spotless') {
-    if(spotless.formats.groovy) {
-      spotless.formats.groovy.licenseHeader licenseHeader
-    }
-  }
-}
+
+//to override spotless use the formats
+//allprojects {
+//  plugins.withId('com.diffplug.gradle.spotless') {
+//    plugins.withId('groovy') {
+//      spotless.formats.groovy.licenseHeaderFile "$gradleDir/spotless.license.java"
+//    }
+//  }
+//}
+
+//to override codenarc defaults just add text and it will be appended to default codenarc in the plugin
+//TODO this needs to be implmeneted
+//allprojects {
+//  plugins.withId('codenarc') {
+//    ext.codenarcConfigs="""
+//      Println.enabled = false
+//    """
+//  }
+//}
 
 //see https://github.com/bintray/gradle-bintray-plugin for special config
 //allprojects {

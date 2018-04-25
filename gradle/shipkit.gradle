@@ -4,6 +4,7 @@ shipkit {
   gitHub.repository = gitHubSlug
   gitHub.readOnlyAuthToken = "76826c9ec886612f504d12fd4268b16721c4f85d"
   gitHub.writeAuthToken = System.getenv("GRGIT_USER") ?: System.getenv("GH_WRITE_TOKEN") ?: project.findProperty("gitHubToken")
+  releaseNotes.publicationRepository = "$mavenRepoUrl/org.grail.plugins.gradle/"
 }
 
 

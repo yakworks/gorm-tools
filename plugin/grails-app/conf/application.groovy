@@ -6,4 +6,3 @@ grails {
         '*'(nullable:true)
     }
 }
-

@@ -247,7 +247,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 //we are setting it to a new id so load it and assign
                 target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
-        } else if (association.isOwningSide() || isExplicitBind(target,association.name)) {
+        } else if (association.isOwningSide() || isExplicitBind(target, association.name)) {
             if (!(value instanceof Map)) {
                 String msg = "Unable to create an association instance for the entity=${target}, the value=$value is not a Map"
                 throw new IllegalArgumentException(msg)

@@ -18,7 +18,7 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         Version: 6.1.2
+         Version: 6.1.7
          
 </pre>
 
@@ -31,7 +31,7 @@
 
 
 ```
-compile "org.grails.plugins:gorm-tools:6.1.2"
+compile "org.grails.plugins:gorm-tools:6.1.7"
 ``` 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 

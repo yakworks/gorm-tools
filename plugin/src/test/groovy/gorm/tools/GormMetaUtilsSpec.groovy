@@ -1,3 +1,4 @@
+/* Copyright 2018. 9ci Inc. Licensed under the Apache License, Version 2.0 */
 package gorm.tools
 
 import grails.gorm.annotation.Entity
@@ -43,5 +44,3 @@ class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
     }
 
 }
-
-

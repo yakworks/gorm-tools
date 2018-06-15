@@ -53,5 +53,3 @@ class JdbcIdGeneratorSpec extends Specification {
     }
 
 }
-
-

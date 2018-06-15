@@ -171,4 +171,3 @@ class DomainMethodsTests extends Specification {
 
 
 }
-

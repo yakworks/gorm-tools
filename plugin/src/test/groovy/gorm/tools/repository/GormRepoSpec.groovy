@@ -1,3 +1,4 @@
+/* Copyright 2018. 9ci Inc. Licensed under the Apache License, Version 2.0 */
 package gorm.tools.repository
 
 import gorm.tools.databinding.BindAction
@@ -422,4 +423,3 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
         throw new RuntimeException()
     }
 }
-

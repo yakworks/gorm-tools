@@ -135,10 +135,12 @@ class IsoDateUtil {
     }
 
     static LocalDate toLocalDate(Date date, ZoneId zoneId = ZoneId.systemDefault()) {
+        if(!date) return null
         return Instant.ofEpochMilli(date.getTime()).atZone(zoneId).toLocalDate()
     }
 
     static LocalDateTime toLocalDateTime(Date date, ZoneId zoneId = ZoneId.systemDefault()) {
+        if(!date) return null
         return Instant.ofEpochMilli(date.getTime()).atZone(zoneId).toLocalDateTime()
     }
 }

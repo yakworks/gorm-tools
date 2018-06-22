@@ -408,12 +408,12 @@ class DateUtil {
         return Instant.ofEpochMilli(date.getTime()).atZone(zoneId).toLocalDateTime()
     }
 
-    static Date toDate(LocalDate localDate, ZoneId zoneId = ZoneId.systemDefault()) {
+    static Date fromLocalDate(LocalDate localDate, ZoneId zoneId = ZoneId.systemDefault()) {
         if(!localDate) return null
         return Date.from(localDate.atStartOfDay(zoneId).toInstant())
     }
 
-    static Date toDate(LocalDateTime localDate, ZoneId zoneId = ZoneId.systemDefault()) {
+    static Date fromLocalDateTime(LocalDateTime localDate, ZoneId zoneId = ZoneId.systemDefault()) {
         if(!localDate) return null
         return Date.from(localDate.atZone(zoneId).toInstant())
     }

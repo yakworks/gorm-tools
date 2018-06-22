@@ -11,6 +11,10 @@ import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 /**
  * custom manipulations with dates.
@@ -393,4 +397,25 @@ class DateUtil {
         c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH))
         c.getTime().clearTime()
     }
+
+    static LocalDate toLocalDate(Date date, ZoneId zoneId = ZoneId.systemDefault()) {
+        if(!date) return null
+        return Instant.ofEpochMilli(date.getTime()).atZone(zoneId).toLocalDate()
+    }
+
+    static LocalDateTime toLocalDateTime(Date date, ZoneId zoneId = ZoneId.systemDefault()) {
+        if(!date) return null
+        return Instant.ofEpochMilli(date.getTime()).atZone(zoneId).toLocalDateTime()
+    }
+
+    static Date toDate(LocalDate localDate, ZoneId zoneId = ZoneId.systemDefault()) {
+        if(!localDate) return null
+        return Date.from(localDate.atStartOfDay(zoneId).toInstant())
+    }
+
+    static Date toDate(LocalDateTime localDate, ZoneId zoneId = ZoneId.systemDefault()) {
+        if(!localDate) return null
+        return Date.from(localDate.atZone(zoneId).toInstant())
+    }
+
 }

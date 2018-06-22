@@ -6,10 +6,8 @@ import groovy.transform.CompileStatic
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.function.Supplier
@@ -134,13 +132,4 @@ class IsoDateUtil {
         return dtStr
     }
 
-    static LocalDate toLocalDate(Date date, ZoneId zoneId = ZoneId.systemDefault()) {
-        if(!date) return null
-        return Instant.ofEpochMilli(date.getTime()).atZone(zoneId).toLocalDate()
-    }
-
-    static LocalDateTime toLocalDateTime(Date date, ZoneId zoneId = ZoneId.systemDefault()) {
-        if(!date) return null
-        return Instant.ofEpochMilli(date.getTime()).atZone(zoneId).toLocalDateTime()
-    }
 }

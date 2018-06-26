@@ -202,6 +202,17 @@ class DateUtilSpec extends Specification {
         2015 | "yyMMddHHmmss" | "151019105000"
     }
 
+    void "test getYearOf with LocalDates"() {
+        expect:
+        year == DateUtil.getYearOf(DateUtil.toLocalDate(new SimpleDateFormat(dateFormat).parse(date)))
+
+        where:
+        year | dateFormat     | date
+        2017 | "yyyy-MM-dd"   | "2017-10-19"
+        2016 | "MM/dd/yyyy"   | "10/19/2016"
+        2015 | "yyMMddHHmmss" | "151019105000"
+    }
+
     void "test shiftCurrentDateByMonths"() {
         setup:
         Calendar calendar = Calendar.getInstance()

@@ -14,7 +14,11 @@ import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Year
 import java.time.ZoneId
+import java.time.LocalDateTime
+import java.time.Month
+import java.time.temporal.TemporalAccessor
 
 /**
  * custom manipulations with dates.
@@ -229,6 +233,13 @@ class DateUtil {
         Calendar gc = new GregorianCalendar()
         gc.setTime(date)
         return gc.get(Calendar.YEAR)
+    }
+
+    /**
+     * Returns the year of the date specified.
+     */
+    static int getYearOf(TemporalAccessor date) {
+        Year.from(date).getValue()
     }
 
     /**

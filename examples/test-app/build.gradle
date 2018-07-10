@@ -15,7 +15,8 @@ dependencies {
   provided "org.springframework.boot:spring-boot-starter-tomcat"
   console "org.grails:grails-console"
 
-  compile "org.grails:grails-plugin-rest"
+  compile "org.grails:grails-plugin-controllers"
+
 
   compile project(':gorm-tools')
 

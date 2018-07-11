@@ -40,6 +40,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * A key represents a domain class and the value is a list with properties.
      */
     static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
+    protected static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
 
     EntityMapBinder() {
         super(null)

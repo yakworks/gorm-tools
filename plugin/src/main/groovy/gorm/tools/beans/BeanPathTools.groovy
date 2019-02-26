@@ -116,7 +116,8 @@ class BeanPathTools {
      * @param currentMap a destination map
      * @return a map which contains an object's property (properties)
      */
-    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity']) //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity'])
+    //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
     @CompileDynamic
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
         if (source == null) return null
@@ -145,7 +146,7 @@ class BeanPathTools {
                 } else {
                     Closure notConvert = {
                         it instanceof Map || it instanceof Collection ||
-                            it instanceof Number || it?.class in [String, Boolean, Character]
+                                it instanceof Number || it?.class in [String, Boolean, Character]
                     }
                     Map props = object.properties.findAll { it.key != 'class' }
                     props.each { String name, Object value ->
@@ -160,8 +161,11 @@ class BeanPathTools {
 
                 // I think it would be enough to check if a property exists.
                 // So it's the same as catching MissingPropertyException and do nothing if there is no property
-            } else if (source?.hasProperty(propertyPath)) {
-                currentMap[propertyPath] = source."$propertyPath"
+            } else {
+                try {
+                    currentMap[propertyPath] = source?."$propertyPath"
+                } catch (Exception e) {
+                }
             }
         } else {
             // We have at least one sub-key, so extract the first element
@@ -169,25 +173,31 @@ class BeanPathTools {
             // 'nestedKey' == "a.b.c", the prefix is "a".
             String nestedPrefix = propertyPath.substring(0, nestedIndex)
 
-            if (source?.hasProperty(nestedPrefix)) {
-                if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
-                    currentMap[nestedPrefix] = [:]
-                }
-                Object nestedObj = source."$nestedPrefix"
-                String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())
-                //recursive call
-                if (nestedObj instanceof Collection) {
-                    List l = []
-                    nestedObj.each { nestedObjItem ->
-                        Map justForItem = [:]
-                        propsToMap(nestedObjItem, remainderOfKey, justForItem)
-                        l << justForItem
-                    }
-                    currentMap[nestedPrefix] = l
-                } else {
-                    propsToMap(nestedObj, remainderOfKey, (Map) currentMap[nestedPrefix])
-                }
+
+            if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
+                currentMap[nestedPrefix] = [:]
             }
+            Object nestedObj
+
+            try {
+                nestedObj = source."$nestedPrefix"
+            } catch (Exception e) {
+            }
+
+            String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())
+            //recursive call
+            if (nestedObj instanceof Collection) {
+                List l = []
+                nestedObj.each { nestedObjItem ->
+                    Map justForItem = [:]
+                    propsToMap(nestedObjItem, remainderOfKey, justForItem)
+                    l << justForItem
+                }
+                currentMap[nestedPrefix] = l
+            } else {
+                propsToMap(nestedObj, remainderOfKey, (Map) currentMap[nestedPrefix])
+            }
+
         }
 
         return currentMap

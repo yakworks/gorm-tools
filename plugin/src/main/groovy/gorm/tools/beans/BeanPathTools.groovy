@@ -116,7 +116,7 @@ class BeanPathTools {
      * @param currentMap a destination map
      * @return a map which contains an object's property (properties)
      */
-    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity'])
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock', 'EmptyCatchBlock'])
     //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
     @CompileDynamic
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
@@ -172,16 +172,18 @@ class BeanPathTools {
             // of the nested key as the prefix. In other words, if we have
             // 'nestedKey' == "a.b.c", the prefix is "a".
             String nestedPrefix = propertyPath.substring(0, nestedIndex)
-
-
+            boolean newKey = false//check if this key is encountered first time, used to remove the key from map if property not found.
             if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
                 currentMap[nestedPrefix] = [:]
+                newKey = true
             }
             Object nestedObj
 
             try {
                 nestedObj = source."$nestedPrefix"
             } catch (Exception e) {
+                //remove the entry as the key doesnt exist and its going to be empty
+                if(newKey) currentMap.remove(nestedPrefix)
             }
 
             String remainderOfKey = propertyPath.substring(nestedIndex + 1, propertyPath.length())

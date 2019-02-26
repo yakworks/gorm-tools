@@ -65,15 +65,15 @@ class IsoDateUtil {
         DateFormat dateFormat = DATE_TIME_FORMAT.get()
 
         //if-then is slightly faster than a switch here
-        if (date.matches(GMT_MILLIS)){
+        if (date.matches(GMT_MILLIS)) {
             return dateFormat.parse(date)
-        } else if(date.matches(LOCAL_DATE)){
+        } else if (date.matches(LOCAL_DATE)) {
             dateFormat = LOCAL_DATE_FORMAT.get()
-        } else if(date.matches(GMT_SECONDS)) {
-            date =  date.replaceFirst('Z$', '.000Z')
-        } else if(date.matches(TZ_LESS)) {
+        } else if (date.matches(GMT_SECONDS)) {
+            date = date.replaceFirst('Z$', '.000Z')
+        } else if (date.matches(TZ_LESS)) {
             date = "${date}.000Z"
-        } else if(date.matches(TZ_LESS_HH_MM)) {
+        } else if (date.matches(TZ_LESS_HH_MM)) {
             date = "${date}:00.000Z"
         }
 
@@ -84,9 +84,9 @@ class IsoDateUtil {
         date = date?.trim()
         if (!date) return null
 
-        try{
+        try {
             return LocalDate.parse(date)
-        } catch (DateTimeParseException e){
+        } catch (DateTimeParseException e) {
             //try with full dateTime
             return LocalDate.parse(date, DateTimeFormatter.ISO_DATE_TIME)
         }
@@ -97,7 +97,7 @@ class IsoDateUtil {
         date = date?.trim()
         if (!date) return null
 
-        if (date.matches(LOCAL_DATE)){
+        if (date.matches(LOCAL_DATE)) {
             date = "${date}T00:00"
         }
         LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
@@ -116,7 +116,7 @@ class IsoDateUtil {
 
     static String format(LocalDate date, String format = null) {
         DateTimeFormatter formatter = format ? DateTimeFormatter.ofPattern(format) : DateTimeFormatter.ISO_LOCAL_DATE
-       return date.format(formatter)
+        return date.format(formatter)
     }
 
     /**

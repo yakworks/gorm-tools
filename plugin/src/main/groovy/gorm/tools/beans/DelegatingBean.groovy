@@ -6,7 +6,7 @@ import groovy.transform.CompileStatic
 /**
  * Used mainly by BeanPathTools
  *
- * A delegating bean delegates all its properties/method calls to the target bean unless the property/method is explicitely specified in delegating bean itself.
+ * A delegating bean delegates all its properties/method calls to the target bean unless the property/method is explicitly specified in delegating bean itself.
  * Delegating beans are specifically used to create the domains view for list screen where the screens needs domain columns
  * which are not part of the domain.
  *

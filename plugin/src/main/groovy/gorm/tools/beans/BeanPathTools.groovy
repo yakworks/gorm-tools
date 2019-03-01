@@ -116,7 +116,7 @@ class BeanPathTools {
      * @param currentMap a destination map
      * @return a map which contains an object's property (properties)
      */
-    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock', 'EmptyCatchBlock'])
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock', 'CatchException'])
     //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
     @CompileDynamic
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
@@ -165,6 +165,7 @@ class BeanPathTools {
                 try {
                     currentMap[propertyPath] = source?."$propertyPath"
                 } catch (Exception e) {
+                    //TODO handle missing property exception
                 }
             }
         } else {
@@ -182,6 +183,7 @@ class BeanPathTools {
             try {
                 nestedObj = source."$nestedPrefix"
             } catch (Exception e) {
+                //TODO handle missing property exception
                 //remove the entry as the key doesnt exist and its going to be empty
                 if(newKey) currentMap.remove(nestedPrefix)
             }

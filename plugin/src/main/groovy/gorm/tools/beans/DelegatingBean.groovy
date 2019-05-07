@@ -21,7 +21,7 @@ import groovy.transform.CompileStatic
 class DelegatingBean {
     Object target
 
-    DelegatingBean(target) {
+    DelegatingBean(Object target) {
         this.target = target
     }
 
@@ -29,7 +29,7 @@ class DelegatingBean {
         return target[name]
     }
 
-    Object methodMissing(String name, args) {
+    Object methodMissing(String name, Object args) {
         return target.invokeMethod(name, args)
     }
 }

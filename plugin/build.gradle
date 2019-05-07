@@ -56,12 +56,6 @@ bootRun {
 }
 bootRepackage.enabled = false
 
-//codenarc overrides for yakworks ruleset defaults
-ext.codenarcRuleset= '''
-  getRule('MethodParameterTypeRequired').enabled = false //FIXME this should be enabled
-  //getRule('Println').enabled = false
-'''
-
 //main codenarc block is setup in yakworks.defaults
 codenarcMain {
   exclude '**/GormToolsGrailsPlugin.groovy'

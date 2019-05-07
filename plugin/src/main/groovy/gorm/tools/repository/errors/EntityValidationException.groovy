@@ -2,6 +2,7 @@
 package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.validation.ValidationException
 import org.springframework.validation.Errors
 
@@ -31,19 +32,19 @@ class EntityValidationException extends ValidationException {
         messageMap = [code: "validationException", args: [], defaultMessage: msg]
     }
 
-    EntityValidationException(Map msgMap, entity, Errors errors) {
+    EntityValidationException(Map msgMap, Object entity, Errors errors) {
         this(msgMap, entity, errors, null)
     }
 
-    EntityValidationException(Map msgMap, entity) {
+    EntityValidationException(Map msgMap, Object entity) {
         this(msgMap, entity, null, null)
     }
 
-    EntityValidationException(Map msgMap, entity, Throwable cause) {
+    EntityValidationException(Map msgMap, Object entity, Throwable cause) {
         this(msgMap, entity, null, cause)
     }
 
-    EntityValidationException(Map msgMap, entity, Errors errors, Throwable cause) {
+    EntityValidationException(Map msgMap, Object entity, Errors errors, Throwable cause) {
         super(msgMap.defaultMessage?.toString() ?: "Save or Validation Error(s) occurred", errors ?: new EmptyErrors("empty"))
         initCause(cause)
         this.messageMap = msgMap

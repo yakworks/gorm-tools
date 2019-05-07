@@ -5,6 +5,7 @@ import gorm.tools.beans.AppCtx
 import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEntity
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.context.MessageSource
 import org.springframework.web.context.request.RequestContextHolder
@@ -35,7 +36,7 @@ class RepoMessage {
     /**
      * just a short method to return a messageMap from the vals passed in
      */
-    static Map setup(messageCode, args, defaultMessage = "") {
+    static Map setup(String messageCode, Object args, String defaultMessage = "") {
         return [code: messageCode, args: args, defaultMessage: defaultMessage]
     }
 
@@ -48,7 +49,7 @@ class RepoMessage {
      * @param entity the domain instance to build the message params from
      */
     @CompileDynamic
-    static Map buildMessageParams(entity) {
+    static Map buildMessageParams(GormEntity entity) {
         String ident = badge(entity.id, entity)
         String domainLabel = resolveDomainLabel(entity)
         List args = [domainLabel, ident]
@@ -64,60 +65,60 @@ class RepoMessage {
      * @param entity the domain instance to build the message params from
      */
     @CompileDynamic
-    static Map buildLightMessageParams(entity) {
+    static Map buildLightMessageParams(GormEntity entity) {
         String ident = entity.id
         String domainLabel = entity.class.name
         List args = [domainLabel, ident]
         return [ident: ident, domainLabel: domainLabel, args: args]
     }
 
-    static Map created(entity, boolean buildLight = false) {
+    static Map created(GormEntity entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.created.message", p.args, "${p.domainLabel} ${p.ident} created")
     }
 
-    static Map saved(entity, boolean buildLight = false) {
+    static Map saved(GormEntity entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.saved.message", p.args, "${p.domainLabel} ${p.ident} saved")
     }
 
-    static Map notSaved(entity, boolean buildLight = false) {
+    static Map notSaved(GormEntity entity, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
     //TODO:
-    static Map notSavedDataAccess(entity, boolean buildLight = false) {
+    static Map notSavedDataAccess(GormEntity entity, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
-    static Map updated(entity, boolean buildLight = false) {
+    static Map updated(GormEntity entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.updated.message", p.args, "${p.domainLabel} ${p.ident} updated")
     }
 
-    static Map notUpdated(entity, boolean buildLight = false) {
+    static Map notUpdated(GormEntity entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.not.updated.message", p.args, "${p.domainLabel} ${p.ident} update failed")
     }
 
-    static Map deleted(entity, ident, boolean buildLight = false) {
+    static Map deleted(GormEntity entity, Serializable ident, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} deleted")
     }
 
-    static Map notDeleted(entity, ident, boolean buildLight = false) {
+    static Map notDeleted(GormEntity entity, Serializable ident, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} could not be deleted")
     }
 
-    static Map optimisticLockingFailure(entity, boolean buildLight = false) {
+    static Map optimisticLockingFailure(GormEntity entity, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.optimistic.locking.failure", [domainLabel], "Another user has updated the ${domainLabel} while you were editing")
     }
 
-    static String resolveDomainLabel(entity) {
+    static String resolveDomainLabel(GormEntity entity) {
         return resolveMessage("${propName(entity.class.name)}.label", "${GrailsNameUtils.getShortName(entity.class.name)}")
     }
 
@@ -143,7 +144,7 @@ class RepoMessage {
 
     //used for messages, if the entity has a name field then use that other wise fall back on the id and return that
     @CompileDynamic
-    static String badge(id, entity) {
+    static String badge(Serializable id, GormEntity entity) {
         boolean hasName = entity?.metaClass.hasProperty(entity, 'name')
         return ((hasName && entity) ? entity.name : id)
     }

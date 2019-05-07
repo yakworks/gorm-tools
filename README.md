@@ -1,4 +1,4 @@
-![CircleCI](https://img.shields.io/circleci/project/github/yakworks/gorm-tools.svg?longCache=true&style=for-the-badge)
+[![CircleCI](https://img.shields.io/circleci/project/github/yakworks/gorm-tools/master.svg?longCache=true&style=for-the-badge&logo=circleci)](https://circleci.com/gh/yakworks/gorm-tools)
 [![9ci](https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&style=for-the-badge)](http://9ci.com)
 <img src="https://forthebadge.com/images/badges/built-with-love.svg" height="28">
 <img src="https://forthebadge.com/images/badges/gluten-free.svg" height="28">

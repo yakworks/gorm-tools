@@ -7,8 +7,8 @@
 				"stacktrace.log","*.tmproj",".classpath",".project"
 			],
 			"folder_exclude_patterns":[
-				"akismet","node_modules","target*",".grails","lib","bower_components",
-				"_site",".github",".sass-cache",".tweet-cache", "gradle"
+				"akismet","node_modules","target*",".grails","lib","build","bower_components",
+				"_site",".github",".sass-cache",".tweet-cache", "gradle",".gradle",".idea"
 			]
 		}
 	]

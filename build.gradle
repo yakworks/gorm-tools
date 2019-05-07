@@ -7,14 +7,11 @@ buildscript {
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.yakworks:gradle-plugins:0.1.45"
-
-    //FIXME, added it here explicitely, coz yakworks.shipkit uses older version which fails to resolve eclipse:jgit dependency
-    classpath "org.ajoberstar:grgit:2.2.1"
+    classpath "org.yakworks:gradle-plugins:1.1.0"
   }
 }
-apply plugin: 'yakworks.shipkit' //our opinionated defaults for gradle groovy & grails projects
 
+apply plugin: 'yakworks.shipyak' //our opinionated defaults for gradle groovy & grails projects
 
 subprojects {
   plugins.withId('java') {
@@ -37,4 +34,3 @@ subprojects {
     }
   }
 }
-//spotless.formats.groovyGradle.target('gradle/*.gradle', 'build.gradle')

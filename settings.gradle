@@ -3,12 +3,6 @@ rootProject.name = 'gorm-tools-root'
 include "examples:benchmarks"
 include "examples:test-app"
 
-//rootProject.children.each { project ->
-//  project.projectDir = new File(settingsDir, "examples/$project.name")
-//  //project.buildFileName = "${project.name}.gradle"
-//  //project.setProperty('examples',true)//so we can know not to deploy these
-//}
-
 // Deployable projects are any projects not in the ':example:' name space
 include 'plugin'
 findProject(':plugin').with{

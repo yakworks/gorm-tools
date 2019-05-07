@@ -77,6 +77,7 @@ logs
 .idea/**/mongoSettings.xmlout/
 .idea/.name
 .idea/codeStyles
+.idea/encodings.xml
 
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
@@ -153,3 +154,4 @@ Session.vim
 
 /web-app/
 /site/*
+

@@ -10,8 +10,8 @@ buildscript {
     classpath "org.yakworks:gradle-plugins:1.1.0"
   }
 }
-apply plugin: 'yakworks.shipyak' //our opinionated defaults for gradle groovy & grails projects
 
+apply plugin: 'yakworks.shipyak' //our opinionated defaults for gradle groovy & grails projects
 
 subprojects {
   plugins.withId('java') {
@@ -34,4 +34,3 @@ subprojects {
     }
   }
 }
-//spotless.formats.groovyGradle.target('gradle/*.gradle', 'build.gradle')

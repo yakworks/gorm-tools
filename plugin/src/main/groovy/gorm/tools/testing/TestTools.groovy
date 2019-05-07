@@ -44,7 +44,7 @@ class TestTools {
      * makes sure the passed in object is a list, if not then it wraps it in one
      * helpful when creating spocks data pipes
      */
-    static List ensureList(obj){
+    static List ensureList(Object obj){
         obj instanceof List ? obj : [obj]
     }
 

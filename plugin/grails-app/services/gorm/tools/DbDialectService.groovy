@@ -126,7 +126,7 @@ class DbDialectService {
         dialectName
     }
 
-    String getTop(num) {
+    String getTop(int num) {
         String top
         switch (dialect) {
             case MSSQL: top = "TOP ${num}"; break
@@ -147,7 +147,7 @@ class DbDialectService {
 
     /** hack for Oracle date formats **/
     @CompileDynamic
-    String getDateFormatForDialect(myDate) {
+    String getDateFormatForDialect(Object myDate) {
         if (getDialect() == ORACLE) {
             Date dateobj
             if (myDate instanceof String) {

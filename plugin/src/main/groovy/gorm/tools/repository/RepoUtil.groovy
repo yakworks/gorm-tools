@@ -75,7 +75,7 @@ class RepoUtil {
      * @param domainClassName - the name of the domain that will be used to build error message if thrown
      * @throws EntityNotFoundException if it not found
      */
-    static void checkFound(entity, Serializable id, String domainClassName) {
+    static void checkFound(GormEntity entity, Serializable id, String domainClassName) {
         if (!entity) {
             throw new EntityNotFoundException(id, domainClassName)
         }

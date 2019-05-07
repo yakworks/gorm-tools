@@ -121,7 +121,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
     /**
      * Dynamic method dispatch fail!
      */
-    Object methodMissing(String name, args) {
+    Object methodMissing(String name, Object args) {
         return super.invokeMethod(name, args)
     }
 

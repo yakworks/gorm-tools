@@ -87,7 +87,7 @@ trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{
         buildMap(args)
     }
 
-    D get(id){
+    D get(Serializable id){
         flushAndClear()
         entity = entityClass.get(id)
         assert entity
@@ -115,8 +115,8 @@ trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{
         return get(entity.id)
     }
 
-    def removeEntity(remId = null){
-        def id = remId ?: persistEntity().id
+    def removeEntity(Serializable remId = null){
+        Serializable id = remId ?: persistEntity().id
         get(id).remove()
         flushAndClear()
         assert entityClass.get(id) == null

@@ -24,6 +24,7 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.web.databinding.DataBindingEventMulticastListener
 import org.grails.web.databinding.GrailsWebDataBindingListener
 import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.BindingResult
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -32,16 +33,14 @@ import java.util.concurrent.ConcurrentHashMap
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
  * Explicitly checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
- *
- */
+ **/
 @SuppressWarnings(['CatchException'])
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     /**
      * A map that holds lists of properties which should be bound manually by a binder.
-     * A key represents a domain class and the value is a list with properties.
-     */
+     * A key represents a domain class and the value is a list with properties.*/
     static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
     protected static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
 
@@ -60,7 +59,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * @param source The data binding source
      */
     @Override
-    void bind(obj, DataBindingSource source) {
+    void bind(Object obj, DataBindingSource source) {
         bind obj, source, null, getBindingIncludeList(obj), null, null
     }
 
@@ -72,7 +71,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * @param listener DataBindingListener
      */
     @Override
-    void bind(obj, DataBindingSource source, DataBindingListener listener) {
+    void bind(Object obj, DataBindingSource source, DataBindingListener listener) {
         bind obj, source, null, getBindingIncludeList(obj), null, listener
     }
 
@@ -90,13 +89,14 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * @param listener DataBindingListener
      */
     @Override
-    void bind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
-        Object bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
+    void bind(Object object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener) {
+        BindingResult bindingResult = new BeanPropertyBindingResult(object, object.getClass().name)
         doBind object, source, filter, whiteList, blackList, listener, bindingResult
     }
 
     @Override
-    protected void doBind(object, DataBindingSource source, String filter, List whiteList, List blackList, DataBindingListener listener, errors) {
+    protected void doBind(Object object, DataBindingSource source, String filter, List whiteList, List blackList,
+                          DataBindingListener listener, Object errors) {
         //TODO this is where we will store errors
         BeanPropertyBindingResult bindingResult = (BeanPropertyBindingResult) errors
         GrailsWebDataBindingListener errorHandlingListener = new GrailsWebDataBindingListener(messageSource)
@@ -139,13 +139,14 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * Binds properties which specified in a white list on the given entity.
      * In case the white list is empty method takes the list of persistent properties and iterates on them.
      *
-     * @param target    a target entity
-     * @param source    a data binding source which contains property values
+     * @param target a target entity
+     * @param source a data binding source which contains property values
      * @param whiteList a list which contains properties for binding
-     * @param listener  DataBindingListener
+     * @param listener DataBindingListener
      * @param errors
      */
-    void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener = null, errors = null) {
+    void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener =
+            null, Object errors = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
         GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(target.getClass())
@@ -169,13 +170,14 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     /**
      * Sets a value to a specified target's property.
      *
-     * @param target   a target entity
-     * @param source   a data binding source which contains property values
-     * @param prop     a persistent property which should be filled with the value
+     * @param target a target entity
+     * @param source a data binding source which contains property values
+     * @param prop a persistent property which should be filled with the value
      * @param listener DataBindingListener
      * @param errors
      */
-    void setProp(target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener = null, errors = null) {
+    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener =
+            null, Object errors = null) {
         if (!source.containsProperty(prop.name)) return
 
         Object propValue = source.getPropertyValue(prop.name)
@@ -225,13 +227,14 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * In case it does, or the it has the explicitly specified 'bindable:true' constraint, then a new instance is
      * created for the association.
      *
-     * @param target      a target entity to bind an association to
-     * @param value       an association's value
+     * @param target a target entity to bind an association to
+     * @param value an association's value
      * @param association an association property
-     * @param listener    DataBindingListener
+     * @param listener DataBindingListener
      * @param errors
      */
-    void bindAssociation(target, value, Association association, DataBindingListener listener = null, errors = null) {
+    void bindAssociation(Object target, Object value, Association association, DataBindingListener listener = null,
+                         Object errors = null) {
         String aprop = association.name
 
         //if value is null or they are the same instance type then just set and exit fast
@@ -242,12 +245,12 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         //if value has idVal then it should be set to existing instance and everything else will be ignored
         Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
-        idValue = idValue == 'null' ? null :  idValue
+        idValue = idValue == 'null' ? null : idValue
 
         if (idValue) {
             // check if the target[aprop].id is the same and we don't need to do anything or
             // the target's property is null and we should bind it
-            if(!target[aprop] || (target[aprop] && (target[aprop]['id'] != idValue))){
+            if (!target[aprop] || (target[aprop] && (target[aprop]['id'] != idValue))) {
                 //we are setting it to a new id so load it and assign
                 target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
@@ -257,7 +260,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 throw new IllegalArgumentException(msg)
             }
             //if its null then set it up
-            if(target[aprop] == null) target[aprop] = association.type.newInstance()
+            if (target[aprop] == null) target[aprop] = association.type.newInstance()
             //recursive call to set the association up and assume its a map
             fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
         }
@@ -267,7 +270,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * Checks if a given association is explicitly marked as bindable and should be binded in any case.
      *
      * @param target an entity which contains an association
-     * @param name   a name of an association to check if it should be binded
+     * @param name a name of an association to check if it should be binded
      * @return true if the association name with prefix is present in the white list
      */
     static boolean isExplicitBind(Object target, String name) {
@@ -318,9 +321,9 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     @Override
     @SuppressWarnings(["EmptyCatchBlock"])
-    protected getPersistentInstance(Class<?> type, id) {
+    protected getPersistentInstance(Class<?> type, Object id) {
         try {
-            GormEnhancer.findStaticApi(type).load((Serializable) id)
+            GormEnhancer.findStaticApi(type).load((Serializable)id)
         } catch (Exception exc) {
         }
     }

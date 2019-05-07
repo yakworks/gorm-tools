@@ -29,7 +29,7 @@ class ErrorMessageService {
      *      messageCode - code of the error
      *      errors - list of errors for each entity field
      */
-    Map buildErrorResponse(e) {
+    Map buildErrorResponse(Exception e) {
         int code = 500
         if (e instanceof ValidationException || e instanceof ConstraintViolationException
             || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
@@ -82,7 +82,7 @@ class ErrorMessageService {
         return errMap
     }
 
-    String buildMsg(msgMap) {
+    String buildMsg(Map msgMap) {
         Object[] args = (msgMap.args instanceof List) ? msgMap.args as Object[] : [] as Object[]
 
         return messageSource.getMessage(msgMap.code, args, msgMap.defaultMessage, RepoMessage.defaultLocale())

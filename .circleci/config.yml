@@ -1,22 +1,13 @@
-# Java Gradle CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
+# circleCI build file
 version: 2
 jobs:
   build:
     docker:
       # docker image with python and mkdocs on it already as well, based on gradle:4.6-alpine
-      - image: dock9/gradle:4.6
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-#    branches:
-#      only:
-#        - master
+      - image: yakworks/alpine-java:gradle-4.10.3
+    #    branches:
+    #      only:
+    #        - master
 
     # working_directory: ~/repo
 
@@ -24,7 +15,7 @@ jobs:
       # Customize the JVM maximum heap limit
       # JVM_OPTS: -Xmx3200m
       MALLOC_ARENA_MAX: 2
-      GRADLE_OPTS: "-Xmx3200m -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
+      GRADLE_OPTS: "-Xmx3048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
       TERM: dumb
 
     parallelism: 1
@@ -32,57 +23,52 @@ jobs:
 
     steps:
       - checkout
-
       # Download and cache dependencies
+      - run:
+          name: cat build.gradle files for cache key
+          command: cat gradle.properties build.gradle plugin/build.gradle examples/test-app/build.gradle > cache-checksum.tmp
       - restore_cache:
           keys:
-          - v3-gradle-{{ checksum "build.gradle" }}
+            - gradle-{{ checksum "cache-checksum.tmp" }}
 
       # see https://github.com/palantir/gradle-configuration-resolver-plugin
-      - run: ./gradlew resolveConfigurations
-      #- run: ./gradlew test-app:dependencies
+      # this also kind of helps with the memory issue we keep running into by breaking it up
+      - run:
+          name: ✔︎ -- Downloads Dependencies [gradle resolveConfigurations]
+          command: gradle resolveConfigurations --no-daemon
+
+      # compiling as a seperate step before running check helps with the "finished with non-zero exit value 137" error
+      - run:
+          name: ✔︎ -- Compile [gradle classes]
+          command: gradle classes --no-daemon
 
       - save_cache:
           paths:
             - /home/gradle # the https://hub.docker.com/_/gradle/ containter does wierd stuff for cache
             - ~/.m2
             - ~/.gradle
-          key: v3-gradle-{{ checksum "build.gradle" }}
+          key: gradle-{{ checksum "cache-checksum.tmp" }}
 
-#      - add_ssh_keys:
-#          fingerprints:
-#            - "32:15:5c:47:98:e9:3f:09:f9:32:c9:22:00:cc:15:9a"
-
-      #- run: gradle build -s && gradle ciPublish
       - run:
-          name: gradle check tests. skips if only docs were changed
-          command: |
-            commitRange=$(echo "$CIRCLE_COMPARE_URL" | rev | cut -d/ -f1 | rev)
-            if [[ -z "$commitRange" || $(git diff --name-only $commitRange | grep --invert-match -E "(README\.md|mkdocs\.yml|docs/)") ]]; then
-              ./gradlew check
-            fi
-
-      - run: ./gradlew ciPublish
-
+          name: ✔︎ -- Checks Linter and Tests [gradle check]
+          command: gradle check --no-daemon --max-workers 2
       - store_artifacts:
           path: plugin/build/reports/tests/test/
           destination: test-reports/unit/
-
       - store_artifacts:
           path: plugin/build/reports/codenarc/
           destination: codenarc/
-
       - store_test_results:
           path: plugin/build/test-results
-
-      # - run: gradle test-app:check --no-daemon --max-workers 2
-
       - store_artifacts:
           path: examples/test-app/build/reports/tests
           destination: test-reports/integration
-
       - store_test_results:
           path: examples/test-app/build/test-results
 
+      ### Finally do the build and publish. ciPublish will check if this is a PR or on a branch that should not be published
+      - run:
+          name: ✔︎ -- Publish Library if needed [gradle ciPublish]
+          command: gradle ciPublish --no-daemon
 
-      # - run: ./.circleci/publish.sh
+

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+#NOT USED, SAVED HERE FOR REFERENCE ONLY
 set -e
 echo starting....
 

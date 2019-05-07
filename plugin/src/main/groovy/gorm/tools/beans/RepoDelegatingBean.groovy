@@ -40,7 +40,7 @@ class RepoDelegatingBean extends DelegatingBean {
         }
     }
 
-    Object methodMissing(String name, args) {
+    Object methodMissing(String name, Object args) {
         try {
             return target.invokeMethod(name, args)
         } catch (MissingMethodException e) {

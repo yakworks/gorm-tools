@@ -41,7 +41,7 @@ class MapFlattener {
      * @param groovyJsonObject
      * @return A Map of String,String
      */
-    Map<String, String> flatten(groovyJsonObject) {
+    Map<String, String> flatten(Object groovyJsonObject) {
 
         Map<String, String> keyValues = [:]
 

@@ -24,7 +24,7 @@ class CriteriaUtils {
      * @param closure closure that should be applyed for each column (should contain order)
      */
     @CompileDynamic
-    static Object applyOrder(Map params, delegate, List leftJoinList = null) {
+    static Object applyOrder(Map params, Object delegate, List leftJoinList = null) {
         Closure result = {
             String ordering = [params.sort, params.order].join(" ")
             delegate.and {
@@ -54,7 +54,7 @@ class CriteriaUtils {
      * @param delegate The delegate from within the createCriteria().list() structure.
      */
     @CompileDynamic
-    static List sortLeftJoin(List fieldsList, delegate, sortColumn) {
+    static List sortLeftJoin(List fieldsList, Object delegate, String sortColumn) {
         Closure result = {
             Closure leftJoin = { field ->
                 String[] path = field.split("\\.")

@@ -34,7 +34,7 @@ class BeanPathTools {
     }
 
     //@CompileDynamic
-    static Object getFieldValue(domain, String field) {
+    static Object getFieldValue(Object domain, String field) {
         GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, field)
     }
 

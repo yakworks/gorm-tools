@@ -77,7 +77,7 @@ class MangoBuilder {
         return newCriteria
     }
 
-    static void applyMapOrList(DetachedCriteria criteria, mapOrList) {
+    static void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {
         if (mapOrList instanceof Map) {
             applyMap(criteria, mapOrList)
         } else if (mapOrList instanceof List<Map>) {

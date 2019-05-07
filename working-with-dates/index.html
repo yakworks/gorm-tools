@@ -14,7 +14,7 @@
         <link rel="canonical" href="https://yakworks.github.io/gorm-tools/working-with-dates/">
       
       
-        <meta name="author" content="9ci Inc">
+        <meta name="author" content="Yak.Works">
       
       
         <link rel="shortcut icon" href="../assets/images/favicon.png">
@@ -722,9 +722,9 @@ However it is generally recommended to use UTC for storing dates in database. </
 However this forces to change the jvm default time zone which may not be possible in all cases.</p>
 <p>Another option is to use the hibernate setting <code>hibernamte.jdbc.time_zone</code></p>
 <p>With grails, the timezone which hibernate uses can be configured in <code>application.yml</code> as shown below.</p>
-<div class="codehilite"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">hibernate</span><span class="p p-Indicator">:</span>
-    <span class="l l-Scalar l-Scalar-Plain">jdbc</span><span class="p p-Indicator">:</span>
-      <span class="l l-Scalar l-Scalar-Plain">time_zone</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">UTC</span>
+<div class="codehilite"><pre><span></span><span class="nt">hibernate</span><span class="p">:</span>
+    <span class="nt">jdbc</span><span class="p">:</span>
+      <span class="nt">time_zone</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">UTC</span>
 </pre></div>
 
 <p>This will instruct hibernate to store and retrieve the dates in UTC timezone.</p>

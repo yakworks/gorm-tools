@@ -154,9 +154,9 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#applyMap(grails.gorm.DetachedCriteria, java.util.Map)" title="Method in MangoBuilder">applyMap(DetachedCriteria, Map)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block">applies the map just like running a closure.call on this.</div></dd>
-<dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#applyMapOrList(grails.gorm.DetachedCriteria, def)" title="Method in MangoBuilder">applyMapOrList(DetachedCriteria, def)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
+<dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#applyMapOrList(grails.gorm.DetachedCriteria, java.lang.Object)" title="Method in MangoBuilder">applyMapOrList(DetachedCriteria, Object)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/hibernate/criteria/CriteriaUtils.html#applyOrder(java.util.Map, def, java.util.List)" title="Method in CriteriaUtils">applyOrder(Map, def, List)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/CriteriaUtils.html">CriteriaUtils</a>
+<dt><span class="strong"><a href="gorm/tools/hibernate/criteria/CriteriaUtils.html#applyOrder(java.util.Map, java.lang.Object, java.util.List)" title="Method in CriteriaUtils">applyOrder(Map, Object, List)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/CriteriaUtils.html">CriteriaUtils</a>
 </dt><dd> <div class="block">applies sorting for several columns
  free-jqgrid that is used on frontend side has feature for multi row sorting
  By default free-jqrid prepared sorting properties with next pattern
@@ -176,7 +176,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#BACKTICK" title="Field in GrailsDomainBinder">BACKTICK</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#badge(def, def)" title="Method in RepoMessage">badge(def, def)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#badge(java.io.Serializable, org.grails.datastore.gorm.GormEntity)" title="Method in RepoMessage">badge(Serializable, GormEntity)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/api/GormBatchRepo.html#batchCreate(java.util.Map, List<Map>)" title="Method in GormBatchRepo">batchCreate(Map, List&lt;Map&gt;)</a></span> - Method in <a href="gorm/tools/repository/api/GormBatchRepo.html">GormBatchRepo</a>
 </dt><dd> <div class="block"></div></dd>
@@ -235,7 +235,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd><div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepo.html#bindAndSave(java.util.Map, D, java.util.Map, gorm.tools.databinding.BindAction)" title="Method in GormRepo">bindAndSave(Map, D, Map, BindAction)</a></span> - Method in <a href="gorm/tools/repository/GormRepo.html">GormRepo</a>
 </dt><dd> <div class="block">short cut to call <a href='#bind'>bind</a>, setup args for events then calls <a href='#doPersist'>doPersist</a></div></dd>
-<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#bindAssociation(def, def, org.grails.datastore.mapping.model.types.Association, grails.databinding.events.DataBindingListener, def)" title="Method in EntityMapBinder">bindAssociation(def, def, Association, DataBindingListener, def)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
+<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#bindAssociation(java.lang.Object, java.lang.Object, org.grails.datastore.mapping.model.types.Association, grails.databinding.events.DataBindingListener, java.lang.Object)" title="Method in EntityMapBinder">bindAssociation(Object, Object, Association, DataBindingListener, Object)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
 </dt><dd> <div class="block">Binds a given association to the target entity.
  </div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#bindClass(org.grails.datastore.mapping.model.PersistentEntity, org.hibernate.mapping.PersistentClass, org.hibernate.boot.spi.InFlightMetadataCollector)" title="Method in GrailsDomainBinder">bindClass(PersistentEntity, PersistentClass, InFlightMetadataCollector)</a></span> - Method in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
@@ -345,13 +345,13 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">Builds detached criteria for repository's domain based on mango criteria language and additional criteria</div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#buildDiscriminatorSet(org.grails.orm.hibernate.cfg.HibernatePersistentEntity)" title="Method in GrailsDomainBinder">buildDiscriminatorSet(HibernatePersistentEntity)</a></span> - Method in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="grails/plugin/gormtools/ErrorMessageService.html#buildErrorResponse(def)" title="Method in ErrorMessageService">buildErrorResponse(def)</a></span> - Method in <a href="grails/plugin/gormtools/ErrorMessageService.html">ErrorMessageService</a>
+<dt><span class="strong"><a href="grails/plugin/gormtools/ErrorMessageService.html#buildErrorResponse(java.lang.Exception)" title="Method in ErrorMessageService">buildErrorResponse(Exception)</a></span> - Method in <a href="grails/plugin/gormtools/ErrorMessageService.html">ErrorMessageService</a>
 </dt><dd> <div class="block">Builds the error response from error to make it more human readable.
  </div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/TestDataJson.html#buildJson(java.util.Map, java.lang.Class)" title="Method in TestDataJson">buildJson(Map, Class)</a></span> - Method in <a href="gorm/tools/testing/TestDataJson.html">TestDataJson</a>
 </dt><dd> <div class="block">Uses the build-test-data plugin to first build the entity with data and then converts
  to with json-views</div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#buildLightMessageParams(def)" title="Method in RepoMessage">buildLightMessageParams(def)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#buildLightMessageParams(org.grails.datastore.gorm.GormEntity)" title="Method in RepoMessage">buildLightMessageParams(GormEntity)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block">build a map of message params as @buildMessageParams, but light version to speed up it
  ident -> entity id
  domainLabel -> domain class name
@@ -367,11 +367,11 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/beans/BeanPathTools.html#buildMapFromPaths(java.lang.Object, List<String>, boolean)" title="Method in BeanPathTools">buildMapFromPaths(Object, List&lt;String&gt;, boolean)</a></span> - Method in <a href="gorm/tools/beans/BeanPathTools.html">BeanPathTools</a>
 </dt><dd> <div class="block">Provides an ability to retrieve object's fields into a map.
  </div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#buildMessageParams(def)" title="Method in RepoMessage">buildMessageParams(def)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#buildMessageParams(org.grails.datastore.gorm.GormEntity)" title="Method in RepoMessage">buildMessageParams(GormEntity)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block">build a map of message params with ident,domainLabel and args
  ident -> the value of the name field is the dom has one, or the id if not.
  </div></dd>
-<dt><span class="strong"><a href="grails/plugin/gormtools/ErrorMessageService.html#buildMsg(def)" title="Method in ErrorMessageService">buildMsg(def)</a></span> - Method in <a href="grails/plugin/gormtools/ErrorMessageService.html">ErrorMessageService</a>
+<dt><span class="strong"><a href="grails/plugin/gormtools/ErrorMessageService.html#buildMsg(java.util.Map)" title="Method in ErrorMessageService">buildMsg(Map)</a></span> - Method in <a href="grails/plugin/gormtools/ErrorMessageService.html">ErrorMessageService</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#buildOrderByClause(java.lang.String, org.hibernate.mapping.PersistentClass, java.lang.String, java.lang.String)" title="Method in GrailsDomainBinder">buildOrderByClause(String, PersistentClass, String, String)</a></span> - Method in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
@@ -402,11 +402,13 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#CASCADE_SAVE_UPDATE" title="Field in GrailsDomainBinder">CASCADE_SAVE_UPDATE</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoUtil.html#checkFound(def, java.io.Serializable, java.lang.String)" title="Method in RepoUtil">checkFound(def, Serializable, String)</a></span> - Method in <a href="gorm/tools/repository/RepoUtil.html">RepoUtil</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoUtil.html#checkFound(org.grails.datastore.gorm.GormEntity, java.io.Serializable, java.lang.String)" title="Method in RepoUtil">checkFound(GormEntity, Serializable, String)</a></span> - Method in <a href="gorm/tools/repository/RepoUtil.html">RepoUtil</a>
 </dt><dd> <div class="block">check that the passed in entity is not null and throws EntityNotFoundException if so</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoUtil.html#checkVersion(org.grails.datastore.gorm.GormEntity, java.lang.Long)" title="Method in RepoUtil">checkVersion(GormEntity, Long)</a></span> - Method in <a href="gorm/tools/repository/RepoUtil.html">RepoUtil</a>
 </dt><dd> <div class="block">checks the passed in version with the version on the entity (entity.version)
  make sure entity.version is not greater</div></dd>
+<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#CLASS_TO_BINDING_INCLUDE_LIST" title="Field in EntityMapBinder">CLASS_TO_BINDING_INCLUDE_LIST</a></span> - Field in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
+</dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/integration/DataIntegrationTest.html#cleanupRegistry()" title="Method in DataIntegrationTest">cleanupRegistry()</a></span> - Method in <a href="gorm/tools/testing/integration/DataIntegrationTest.html">DataIntegrationTest</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepo.html#clear()" title="Method in GormRepo">clear()</a></span> - Method in <a href="gorm/tools/repository/GormRepo.html">GormRepo</a>
@@ -458,7 +460,7 @@ if (location.href.indexOf('is-external=true') == -1) {
  and binds them to the Hibernate runtime meta model</div></dd>
 <dt><span class="strong"><a href="gorm/tools/jdbc/GrailsParameterMapRowMapper.html#createColumnMap(int)" title="Method in GrailsParameterMapRowMapper">createColumnMap(int)</a></span> - Method in <a href="gorm/tools/jdbc/GrailsParameterMapRowMapper.html">GrailsParameterMapRowMapper</a>
 </dt><dd> <div class="block">Returns a GrailsParameterMap instance.</div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#created(def, boolean)" title="Method in RepoMessage">created(def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#created(org.grails.datastore.gorm.GormEntity, boolean)" title="Method in RepoMessage">created(GormEntity, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/DomainRepoTest.html#createEntity(java.util.Map)" title="Method in DomainRepoTest">createEntity(Map)</a></span> - Method in <a href="gorm/tools/testing/unit/DomainRepoTest.html">DomainRepoTest</a>
 </dt><dd> <div class="block"></div></dd>
@@ -515,9 +517,9 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/DelegatingBean.html" title="Class in gorm.tools.beans">DelegatingBean</a></span> - Class in <a href="./gorm/tools/beans/package-summary.html">gorm.tools.beans</a>
 </dt><dd><div class="block">Used mainly by BeanPathTools</div></dd>
-<dt><span class="strong"><a href="gorm/tools/beans/DelegatingBean.html#DelegatingBean(def)" title="Constructor in DelegatingBean">DelegatingBean(def)</a></span> - Constructor in <a href="gorm/tools/beans/DelegatingBean.html">DelegatingBean</a>
+<dt><span class="strong"><a href="gorm/tools/beans/DelegatingBean.html#DelegatingBean(java.lang.Object)" title="Constructor in DelegatingBean">DelegatingBean(Object)</a></span> - Constructor in <a href="gorm/tools/beans/DelegatingBean.html">DelegatingBean</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#deleted(def, def, boolean)" title="Method in RepoMessage">deleted(def, def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#deleted(org.grails.datastore.gorm.GormEntity, java.io.Serializable, boolean)" title="Method in RepoMessage">deleted(GormEntity, Serializable, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doAfterBind(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map, gorm.tools.databinding.BindAction)" title="Method in RepoEventPublisher">doAfterBind(RepositoryApi, GormEntity, Map, BindAction)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
@@ -534,7 +536,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doBeforeRemove(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map)" title="Method in RepoEventPublisher">doBeforeRemove(RepositoryApi, GormEntity, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#doBind(def, grails.databinding.DataBindingSource, java.lang.String, java.util.List, java.util.List, grails.databinding.events.DataBindingListener, def)" title="Method in EntityMapBinder">doBind(def, DataBindingSource, String, List, List, DataBindingListener, def)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
+<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#doBind(java.lang.Object, grails.databinding.DataBindingSource, java.lang.String, java.util.List, java.util.List, grails.databinding.events.DataBindingListener, java.lang.Object)" title="Method in EntityMapBinder">doBind(Object, DataBindingSource, String, List, List, DataBindingListener, Object)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepo.html#doBind(java.util.Map, D, java.util.Map, gorm.tools.databinding.BindAction)" title="Method in GormRepo">doBind(Map, D, Map, BindAction)</a></span> - Method in <a href="gorm/tools/repository/GormRepo.html">GormRepo</a>
 </dt><dd> <div class="block">Main bind method that redirects call to the injected mapBinder.
@@ -588,7 +590,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd><div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/EmptyErrors.html#EmptyErrors(java.lang.String)" title="Constructor in EmptyErrors">EmptyErrors(String)</a></span> - Constructor in <a href="gorm/tools/repository/errors/EmptyErrors.html">EmptyErrors</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/testing/TestTools.html#ensureList(def)" title="Method in TestTools">ensureList(def)</a></span> - Method in <a href="gorm/tools/testing/TestTools.html">TestTools</a>
+<dt><span class="strong"><a href="gorm/tools/testing/TestTools.html#ensureList(java.lang.Object)" title="Method in TestTools">ensureList(Object)</a></span> - Method in <a href="gorm/tools/testing/TestTools.html">TestTools</a>
 </dt><dd> <div class="block">makes sure the passed in object is a list, if not then it wraps it in one
  helpful when creating spocks data pipes</div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/DomainRepoTest.html#entityContains(java.util.Map)" title="Method in DomainRepoTest">entityContains(Map)</a></span> - Method in <a href="gorm/tools/testing/unit/DomainRepoTest.html">DomainRepoTest</a>
@@ -607,7 +609,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">Constructor for DataRetrievalFailureException.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/EntityValidationException.html" title="Class in gorm.tools.repository.errors">EntityValidationException</a></span> - Class in <a href="./gorm/tools/repository/errors/package-summary.html">gorm.tools.repository.errors</a>
 </dt><dd><div class="block">an extension of the default ValidationException so you can pass the entity and the message map</div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/errors/EntityValidationException.html#EntityValidationException(java.util.Map, def, org.springframework.validation.Errors, java.lang.Throwable)" title="Constructor in EntityValidationException">EntityValidationException(Map, def, Errors, Throwable)</a></span> - Constructor in <a href="gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a>
+<dt><span class="strong"><a href="gorm/tools/repository/errors/EntityValidationException.html#EntityValidationException(java.util.Map, java.lang.Object, org.springframework.validation.Errors, java.lang.Throwable)" title="Constructor in EntityValidationException">EntityValidationException(Map, Object, Errors, Throwable)</a></span> - Constructor in <a href="gorm/tools/repository/errors/EntityValidationException.html">EntityValidationException</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#ENUM_CLASS_PROP" title="Field in GrailsDomainBinder">ENUM_CLASS_PROP</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
@@ -628,7 +630,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 <h2 class="title">F</h2>
 <dl>
 
-<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#fastBind(java.lang.Object, grails.databinding.DataBindingSource, java.util.List, grails.databinding.events.DataBindingListener, def)" title="Method in EntityMapBinder">fastBind(Object, DataBindingSource, List, DataBindingListener, def)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
+<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#fastBind(java.lang.Object, grails.databinding.DataBindingSource, java.util.List, grails.databinding.events.DataBindingListener, java.lang.Object)" title="Method in EntityMapBinder">fastBind(Object, DataBindingSource, List, DataBindingListener, Object)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
 </dt><dd> <div class="block">Binds properties which specified in a white list on the given entity.
  </div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/EntityNotFoundException.html#fillInStackTrace()" title="Method in EntityNotFoundException">fillInStackTrace()</a></span> - Method in <a href="gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a>
@@ -647,7 +649,7 @@ if (location.href.indexOf('is-external=true') == -1) {
  </div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoUtil.html#findRepository(java.lang.Class)" title="Method in RepoUtil">findRepository(Class)</a></span> - Method in <a href="gorm/tools/repository/RepoUtil.html">RepoUtil</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/beans/MapFlattener.html#flatten(def)" title="Method in MapFlattener">flatten(def)</a></span> - Method in <a href="gorm/tools/beans/MapFlattener.html">MapFlattener</a>
+<dt><span class="strong"><a href="gorm/tools/beans/MapFlattener.html#flatten(java.lang.Object)" title="Method in MapFlattener">flatten(Object)</a></span> - Method in <a href="gorm/tools/beans/MapFlattener.html">MapFlattener</a>
 </dt><dd> <div class="block">Groovy transforms JSON to either a Map or List based on the root node.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/BeanPathTools.html#flattenMap(javax.servlet.http.HttpServletRequest, java.util.Map)" title="Method in BeanPathTools">flattenMap(HttpServletRequest, Map)</a></span> - Method in <a href="gorm/tools/beans/BeanPathTools.html">BeanPathTools</a>
 </dt><dd> <div class="block">takes a request and an optional map.
@@ -668,8 +670,12 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#FOREIGN_KEY_SUFFIX" title="Field in GrailsDomainBinder">FOREIGN_KEY_SUFFIX</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/beans/IsoDateUtil.html#format(java.util.Date)" title="Method in IsoDateUtil">format(Date)</a></span> - Method in <a href="gorm/tools/beans/IsoDateUtil.html">IsoDateUtil</a>
-</dt><dd> <div class="block">Returns a string representation of a given date in the 'yyyy-MM-dd'T'HH:mm:ss.SSSZ' format. </div></dd>
+<dt><span class="strong"><a href="gorm/tools/beans/IsoDateUtil.html#format(java.time.LocalDate, java.lang.String)" title="Method in IsoDateUtil">format(LocalDate, String)</a></span> - Method in <a href="gorm/tools/beans/IsoDateUtil.html">IsoDateUtil</a>
+</dt><dd> <div class="block"></div></dd>
+<dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#fromLocalDate(java.time.LocalDate, java.time.ZoneId)" title="Method in DateUtil">fromLocalDate(LocalDate, ZoneId)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
+</dt><dd> <div class="block"></div></dd>
+<dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#fromLocalDateTime(java.time.LocalDateTime, java.time.ZoneId)" title="Method in DateUtil">fromLocalDateTime(LocalDateTime, ZoneId)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
+</dt><dd> <div class="block"></div></dd>
 </dl>
 
     
@@ -681,7 +687,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/AppCtx.html#get(java.lang.String, Class<T>)" title="Method in AppCtx">get(String, Class&lt;T&gt;)</a></span> - Method in <a href="gorm/tools/beans/AppCtx.html">AppCtx</a>
 </dt><dd> <div class="block">Preferred method as typed checked, call the ApplicationContext.getBean</div></dd>
-<dt><span class="strong"><a href="gorm/tools/testing/unit/DomainRepoTest.html#get(def)" title="Method in DomainRepoTest">get(def)</a></span> - Method in <a href="gorm/tools/testing/unit/DomainRepoTest.html">DomainRepoTest</a>
+<dt><span class="strong"><a href="gorm/tools/testing/unit/DomainRepoTest.html#get(java.io.Serializable)" title="Method in DomainRepoTest">get(Serializable)</a></span> - Method in <a href="gorm/tools/testing/unit/DomainRepoTest.html">DomainRepoTest</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepo.html#get(java.util.Map)" title="Method in GormRepo">get(Map)</a></span> - Method in <a href="gorm/tools/repository/GormRepo.html">GormRepo</a>
 </dt><dd> <div class="block">This default will redirect the call to <a href='#get(Serializable id, Long version)'>get(Serializable id, Long version)</a>.
@@ -746,7 +752,7 @@ if (location.href.indexOf('is-external=true') == -1) {
  changes dataStore to lowercase datastore for consistency</div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#getDateDifference_inHours(java.util.Date)" title="Method in DateUtil">getDateDifference_inHours(Date)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
 </dt><dd> <div class="block">Calculates a number of hours between now and the specified date.</div></dd>
-<dt><span class="strong"><a href="gorm/tools/DbDialectService.html#getDateFormatForDialect(def)" title="Method in DbDialectService">getDateFormatForDialect(def)</a></span> - Method in <a href="gorm/tools/DbDialectService.html">DbDialectService</a>
+<dt><span class="strong"><a href="gorm/tools/DbDialectService.html#getDateFormatForDialect(java.lang.Object)" title="Method in DbDialectService">getDateFormatForDialect(Object)</a></span> - Method in <a href="gorm/tools/DbDialectService.html">DbDialectService</a>
 </dt><dd> <div class="block">hack for Oracle date formats *</div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#getDaysBetween(java.util.Date, java.util.Date)" title="Method in DateUtil">getDaysBetween(Date, Date)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
 </dt><dd> <div class="block">Returns the number of days between two dates.</div></dd>
@@ -780,7 +786,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/TestDataJson.html#getFieldsToBuild(java.lang.Class, java.lang.Object, java.util.Map)" title="Method in TestDataJson">getFieldsToBuild(Class, Object, Map)</a></span> - Method in <a href="gorm/tools/testing/TestDataJson.html">TestDataJson</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/beans/BeanPathTools.html#getFieldValue(def, java.lang.String)" title="Method in BeanPathTools">getFieldValue(def, String)</a></span> - Method in <a href="gorm/tools/beans/BeanPathTools.html">BeanPathTools</a>
+<dt><span class="strong"><a href="gorm/tools/beans/BeanPathTools.html#getFieldValue(java.lang.Object, java.lang.String)" title="Method in BeanPathTools">getFieldValue(Object, String)</a></span> - Method in <a href="gorm/tools/beans/BeanPathTools.html">BeanPathTools</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#getFirstDateOfMonth()" title="Method in DateUtil">getFirstDateOfMonth()</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
 </dt><dd> <div class="block">Returns the first day of the current month and sets time to midnight.</div></dd>
@@ -879,7 +885,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">Calculates total number of pages</div></dd>
 <dt><span class="strong"><a href="gorm/tools/GormMetaUtils.html#getPersistentEntity(org.grails.datastore.gorm.GormEntity)" title="Method in GormMetaUtils">getPersistentEntity(GormEntity)</a></span> - Method in <a href="gorm/tools/GormMetaUtils.html">GormMetaUtils</a>
 </dt><dd> <div class="block">Returns a persistent entity using a domain instance.</div></dd>
-<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#getPersistentInstance(Class<?>, def)" title="Method in EntityMapBinder">getPersistentInstance(Class&lt;?&gt;, def)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
+<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#getPersistentInstance(Class<?>, java.lang.Object)" title="Method in EntityMapBinder">getPersistentInstance(Class&lt;?&gt;, Object)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/GormMetaUtils.html#getPersistentProperties(java.lang.String)" title="Method in GormMetaUtils">getPersistentProperties(String)</a></span> - Method in <a href="gorm/tools/GormMetaUtils.html">GormMetaUtils</a>
 </dt><dd> <div class="block">Returns persistent properties for persistent entity(finds by name)
@@ -933,7 +939,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">The type converter should be applied to</div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#getThreeMonthsBack()" title="Method in DateUtil">getThreeMonthsBack()</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/DbDialectService.html#getTop(def)" title="Method in DbDialectService">getTop(def)</a></span> - Method in <a href="gorm/tools/DbDialectService.html">DbDialectService</a>
+<dt><span class="strong"><a href="gorm/tools/DbDialectService.html#getTop(int)" title="Method in DbDialectService">getTop(int)</a></span> - Method in <a href="gorm/tools/DbDialectService.html">DbDialectService</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="grails/plugin/gormtools/GormRepoEntityTraitInjector.html#getTrait()" title="Method in GormRepoEntityTraitInjector">getTrait()</a></span> - Method in <a href="grails/plugin/gormtools/GormRepoEntityTraitInjector.html">GormRepoEntityTraitInjector</a>
 </dt><dd> <div class="block"></div></dd>
@@ -949,7 +955,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/json/Jsonify.html#getViewTemplate()" title="Method in Jsonify">getViewTemplate()</a></span> - Method in <a href="gorm/tools/json/Jsonify.html">Jsonify</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#getYearOf(java.util.Date)" title="Method in DateUtil">getYearOf(Date)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
+<dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#getYearOf(java.time.temporal.TemporalAccessor)" title="Method in DateUtil">getYearOf(TemporalAccessor)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
 </dt><dd> <div class="block">Returns the year of the date specified.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/api/GormBatchRepo.html" title="Trait in gorm.tools.repository.api">GormBatchRepo</a></span> - Trait in <a href="./gorm/tools/repository/api/package-summary.html">gorm.tools.repository.api</a>
 </dt><dd><div class="block">A trait add batch processing and "mass" updating methods to a Repository</div></dd>
@@ -1165,11 +1171,11 @@ if (location.href.indexOf('is-external=true') == -1) {
  Default max allowed value is 100</div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#metadataBuildingContext" title="Field in GrailsDomainBinder">metadataBuildingContext</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/beans/DelegatingBean.html#methodMissing(java.lang.String, def)" title="Method in DelegatingBean">methodMissing(String, def)</a></span> - Method in <a href="gorm/tools/beans/DelegatingBean.html">DelegatingBean</a>
+<dt><span class="strong"><a href="gorm/tools/beans/DelegatingBean.html#methodMissing(java.lang.String, java.lang.Object)" title="Method in DelegatingBean">methodMissing(String, Object)</a></span> - Method in <a href="gorm/tools/beans/DelegatingBean.html">DelegatingBean</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html#methodMissing(java.lang.String, def)" title="Method in GormHibernateCriteriaBuilder">methodMissing(String, def)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html">GormHibernateCriteriaBuilder</a>
+<dt><span class="strong"><a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html#methodMissing(java.lang.String, java.lang.Object)" title="Method in GormHibernateCriteriaBuilder">methodMissing(String, Object)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html">GormHibernateCriteriaBuilder</a>
 </dt><dd> <div class="block">Dynamic method dispatch fail!</div></dd>
-<dt><span class="strong"><a href="gorm/tools/beans/RepoDelegatingBean.html#methodMissing(java.lang.String, def)" title="Method in RepoDelegatingBean">methodMissing(String, def)</a></span> - Method in <a href="gorm/tools/beans/RepoDelegatingBean.html">RepoDelegatingBean</a>
+<dt><span class="strong"><a href="gorm/tools/beans/RepoDelegatingBean.html#methodMissing(java.lang.String, java.lang.Object)" title="Method in RepoDelegatingBean">methodMissing(String, Object)</a></span> - Method in <a href="gorm/tools/beans/RepoDelegatingBean.html">RepoDelegatingBean</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/DataRepoTest.html#mockDomains(Class<?>)" title="Method in DataRepoTest">mockDomains(Class&lt;?&gt;)</a></span> - Method in <a href="gorm/tools/testing/unit/DataRepoTest.html">DataRepoTest</a>
 </dt><dd> <div class="block"></div></dd>
@@ -1198,7 +1204,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#not(grails.gorm.DetachedCriteria, java.util.List)" title="Method in MangoBuilder">not(DetachedCriteria, List)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block">Handles a disjunction</div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notDeleted(def, def, boolean)" title="Method in RepoMessage">notDeleted(def, def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notDeleted(org.grails.datastore.gorm.GormEntity, java.io.Serializable, boolean)" title="Method in RepoMessage">notDeleted(GormEntity, Serializable, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notFound(java.lang.String, java.util.Map)" title="Method in RepoMessage">notFound(String, Map)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block">returns a messageMap not.found.message for a not found error</div></dd>
@@ -1206,11 +1212,11 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#notIn(grails.gorm.DetachedCriteria, java.lang.String, java.util.List)" title="Method in MangoBuilder">notIn(DetachedCriteria, String, List)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notSaved(def, boolean)" title="Method in RepoMessage">notSaved(def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notSaved(org.grails.datastore.gorm.GormEntity, boolean)" title="Method in RepoMessage">notSaved(GormEntity, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notSavedDataAccess(def, boolean)" title="Method in RepoMessage">notSavedDataAccess(def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notSavedDataAccess(org.grails.datastore.gorm.GormEntity, boolean)" title="Method in RepoMessage">notSavedDataAccess(GormEntity, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notUpdated(def, boolean)" title="Method in RepoMessage">notUpdated(def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#notUpdated(org.grails.datastore.gorm.GormEntity, boolean)" title="Method in RepoMessage">notUpdated(GormEntity, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 </dl>
 
@@ -1223,7 +1229,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/DataRepoTest.html#onMockDomains(Class<?>)" title="Method in DataRepoTest">onMockDomains(Class&lt;?&gt;)</a></span> - Method in <a href="gorm/tools/testing/unit/DataRepoTest.html">DataRepoTest</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#optimisticLockingFailure(def, boolean)" title="Method in RepoMessage">optimisticLockingFailure(def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#optimisticLockingFailure(org.grails.datastore.gorm.GormEntity, boolean)" title="Method in RepoMessage">optimisticLockingFailure(GormEntity, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#or(grails.gorm.DetachedCriteria, java.util.List)" title="Method in MangoBuilder">or(DetachedCriteria, List)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block">Handles a disjunction</div></dd>
@@ -1362,7 +1368,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/api/RepositoryApi.html#removeById(java.io.Serializable)" title="Method in RepositoryApi">removeById(Serializable)</a></span> - Method in <a href="gorm/tools/repository/api/RepositoryApi.html">RepositoryApi</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/testing/unit/DomainRepoTest.html#removeEntity(def)" title="Method in DomainRepoTest">removeEntity(def)</a></span> - Method in <a href="gorm/tools/testing/unit/DomainRepoTest.html">DomainRepoTest</a>
+<dt><span class="strong"><a href="gorm/tools/testing/unit/DomainRepoTest.html#removeEntity(java.io.Serializable)" title="Method in DomainRepoTest">removeEntity(Serializable)</a></span> - Method in <a href="gorm/tools/testing/unit/DomainRepoTest.html">DomainRepoTest</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/json/Jsonify.html#render(java.lang.Object, java.util.Map, groovy.lang.Closure)" title="Method in Jsonify">render(Object, Map, Closure)</a></span> - Method in <a href="gorm/tools/json/Jsonify.html">Jsonify</a>
 </dt><dd> <div class="block">Useful for testing. </div></dd>
@@ -1400,7 +1406,7 @@ if (location.href.indexOf('is-external=true') == -1) {
  </div></dd>
 <dt><span class="strong"><a href="gorm/tools/compiler/GormRepositoryArtefactTypeTransformation.html#resolveArtefactType(org.codehaus.groovy.control.SourceUnit, org.codehaus.groovy.ast.AnnotationNode, org.codehaus.groovy.ast.ClassNode)" title="Method in GormRepositoryArtefactTypeTransformation">resolveArtefactType(SourceUnit, AnnotationNode, ClassNode)</a></span> - Method in <a href="gorm/tools/compiler/GormRepositoryArtefactTypeTransformation.html">GormRepositoryArtefactTypeTransformation</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#resolveDomainLabel(def)" title="Method in RepoMessage">resolveDomainLabel(def)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#resolveDomainLabel(org.grails.datastore.gorm.GormEntity)" title="Method in RepoMessage">resolveDomainLabel(GormEntity)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#resolveMessage(java.lang.String, java.lang.String)" title="Method in RepoMessage">resolveMessage(String, String)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
@@ -1420,7 +1426,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/beans/ListParseUtil.html#sanitizeNameListForSql(java.lang.String)" title="Method in ListParseUtil">sanitizeNameListForSql(String)</a></span> - Method in <a href="gorm/tools/beans/ListParseUtil.html">ListParseUtil</a>
 </dt><dd> <div class="block">Accepts a comma separated list as a string, and converts it for safe use as a single-quoted comma separated list.
  </div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#saved(def, boolean)" title="Method in RepoMessage">saved(def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#saved(org.grails.datastore.gorm.GormEntity, boolean)" title="Method in RepoMessage">saved(GormEntity, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/GormToolsSpecHelper.html#scanRepoClasses(java.lang.String)" title="Method in GormToolsSpecHelper">scanRepoClasses(String)</a></span> - Method in <a href="gorm/tools/testing/unit/GormToolsSpecHelper.html">GormToolsSpecHelper</a>
 </dt><dd> <div class="block">No Usages Yet..., scans all repository classes in given package.
@@ -1452,7 +1458,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">@param namingStrategy Custom naming strategy to plugin into table naming</div></dd>
 <dt><span class="strong"><a href="gorm/tools/Pager.html#setParams(java.util.Map)" title="Method in Pager">setParams(Map)</a></span> - Method in <a href="gorm/tools/Pager.html">Pager</a>
 </dt><dd> <div class="block">Set params for Pager</div></dd>
-<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#setProp(def, grails.databinding.DataBindingSource, org.grails.datastore.mapping.model.PersistentProperty, grails.databinding.events.DataBindingListener, def)" title="Method in EntityMapBinder">setProp(def, DataBindingSource, PersistentProperty, DataBindingListener, def)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
+<dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#setProp(java.lang.Object, grails.databinding.DataBindingSource, org.grails.datastore.mapping.model.PersistentProperty, grails.databinding.events.DataBindingListener, java.lang.Object)" title="Method in EntityMapBinder">setProp(Object, DataBindingSource, PersistentProperty, DataBindingListener, Object)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
 </dt><dd> <div class="block">Sets a value to a specified target's property.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepoEntity.html#setRepo(RepositoryApi<D>)" title="Method in GormRepoEntity">setRepo(RepositoryApi&lt;D&gt;)</a></span> - Method in <a href="gorm/tools/repository/GormRepoEntity.html">GormRepoEntity</a>
 </dt><dd> <div class="block"></div></dd>
@@ -1466,7 +1472,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">Sets time to midnight(00:00:00) for a given date instance.</div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#setTypeForPropertyConfig(org.grails.datastore.mapping.model.PersistentProperty, org.hibernate.mapping.SimpleValue, org.grails.orm.hibernate.cfg.PropertyConfig)" title="Method in GrailsDomainBinder">setTypeForPropertyConfig(PersistentProperty, SimpleValue, PropertyConfig)</a></span> - Method in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#setup(def, def, def)" title="Method in RepoMessage">setup(def, def, def)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#setup(java.lang.String, java.lang.Object, java.lang.String)" title="Method in RepoMessage">setup(String, Object, String)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block">just a short method to return a messageMap from the vals passed in</div></dd>
 <dt><span class="strong"><a href="gorm/tools/Pager.html#setupData(java.util.List, java.util.List)" title="Method in Pager">setupData(List, List)</a></span> - Method in <a href="gorm/tools/Pager.html">Pager</a>
 </dt><dd> <div class="block">Setup totalCount property for list, if it absent and fill values that are listed in fieldList</div></dd>
@@ -1483,7 +1489,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#shouldCollectionBindWithJoinColumn(org.grails.datastore.mapping.model.types.ToMany)" title="Method in GrailsDomainBinder">shouldCollectionBindWithJoinColumn(ToMany)</a></span> - Method in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/hibernate/criteria/CriteriaUtils.html#sortLeftJoin(java.util.List, def, def)" title="Method in CriteriaUtils">sortLeftJoin(List, def, def)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/CriteriaUtils.html">CriteriaUtils</a>
+<dt><span class="strong"><a href="gorm/tools/hibernate/criteria/CriteriaUtils.html#sortLeftJoin(java.util.List, java.lang.Object, java.lang.String)" title="Method in CriteriaUtils">sortLeftJoin(List, Object, String)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/CriteriaUtils.html">CriteriaUtils</a>
 </dt><dd> <div class="block">In some cases we need to make a sorting for a field that is null for some rows, as a result rows where value is null
  wont be shown, to avoid leftjoin should be applied</div></dd>
 <dt><span class="strong"><a href="gorm/tools/hibernate/SpringBeanIdGenerator.html" title="Class in gorm.tools.hibernate">SpringBeanIdGenerator</a></span> - Class in <a href="./gorm/tools/hibernate/package-summary.html">gorm.tools.hibernate</a>
@@ -1527,6 +1533,10 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">Transforms passed params map to normalized mango criteria map</div></dd>
 <dt><span class="strong"><a href="gorm/tools/Pager.html#toInteger(java.lang.Object)" title="Method in Pager">toInteger(Object)</a></span> - Method in <a href="gorm/tools/Pager.html">Pager</a>
 </dt><dd> <div class="block">Converts object to integer</div></dd>
+<dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#toLocalDate(java.util.Date, java.time.ZoneId)" title="Method in DateUtil">toLocalDate(Date, ZoneId)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
+</dt><dd> <div class="block"></div></dd>
+<dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#toLocalDateTime(java.util.Date, java.time.ZoneId)" title="Method in DateUtil">toLocalDateTime(Date, ZoneId)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
+</dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoTidyMap.html#toMangoOperator(java.util.Map, java.util.Map)" title="Method in MangoTidyMap">toMangoOperator(Map, Map)</a></span> - Method in <a href="gorm/tools/mango/MangoTidyMap.html">MangoTidyMap</a>
 </dt><dd> <div class="block">Adds mango operators based on values types</div></dd>
 <dt><span class="strong"><a href="gorm/tools/json/Jsonify.JsonifyResult.html#toString()" title="Method in Jsonify.JsonifyResult">toString()</a></span> - Method in <a href="gorm/tools/json/Jsonify.JsonifyResult.html">Jsonify.JsonifyResult</a>
@@ -1569,7 +1579,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/api/RepositoryApi.html#update(java.util.Map, java.util.Map)" title="Method in RepositoryApi">update(Map, Map)</a></span> - Method in <a href="gorm/tools/repository/api/RepositoryApi.html">RepositoryApi</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#updated(def, boolean)" title="Method in RepoMessage">updated(def, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
+<dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#updated(org.grails.datastore.gorm.GormEntity, boolean)" title="Method in RepoMessage">updated(GormEntity, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/DomainRepoTest.html#updateEntity(java.util.Map)" title="Method in DomainRepoTest">updateEntity(Map)</a></span> - Method in <a href="gorm/tools/testing/unit/DomainRepoTest.html">DomainRepoTest</a>
 </dt><dd> <div class="block"></div></dd>

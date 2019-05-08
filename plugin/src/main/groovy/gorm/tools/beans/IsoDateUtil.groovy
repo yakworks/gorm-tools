@@ -4,8 +4,6 @@
 */
 package gorm.tools.beans
 
-import groovy.transform.CompileStatic
-
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -15,6 +13,8 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.function.Supplier
 import java.util.regex.Pattern
+
+import groovy.transform.CompileStatic
 
 /**
  * Provides a set of methods for parsing/formatting ISO 8601 dates.

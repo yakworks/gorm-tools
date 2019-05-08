@@ -4,14 +4,16 @@
 */
 package grails.plugin.gormtools
 
-import gorm.tools.repository.RepoMessage
-import grails.util.GrailsNameUtils
-import grails.validation.ValidationException
+import java.sql.BatchUpdateException
+
 import groovy.transform.CompileDynamic
+
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.MessageSource
 
-import java.sql.BatchUpdateException
+import gorm.tools.repository.RepoMessage
+import grails.util.GrailsNameUtils
+import grails.validation.ValidationException
 
 @CompileDynamic
 class ErrorMessageService {

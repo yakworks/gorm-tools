@@ -4,10 +4,11 @@
 */
 package gorm.tools.mango.api
 
-import grails.gorm.DetachedCriteria
+import javax.persistence.Transient
+
 import groovy.transform.CompileStatic
 
-import javax.persistence.Transient
+import grails.gorm.DetachedCriteria
 
 /**
  * a trait with statics for gorm domain entities that delegates the calls to the repository

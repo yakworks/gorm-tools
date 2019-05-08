@@ -4,12 +4,9 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.repository.api.RepositoryApi
-import gorm.tools.repository.errors.EntityNotFoundException
-import grails.plugin.gormtools.RepositoryArtefactHandler
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.core.Datastore
@@ -17,6 +14,11 @@ import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
+
+import gorm.tools.beans.AppCtx
+import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.errors.EntityNotFoundException
+import grails.plugin.gormtools.RepositoryArtefactHandler
 
 /**
  * A bunch of statics to support the repositories.

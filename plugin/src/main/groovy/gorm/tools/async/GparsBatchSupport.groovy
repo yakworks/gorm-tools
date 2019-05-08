@@ -4,13 +4,14 @@
 */
 package gorm.tools.async
 
+import javax.annotation.PostConstruct
+
 import groovy.transform.CompileStatic
 import groovyx.gpars.GParsPool
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.util.PoolUtils
-import org.springframework.beans.factory.annotation.Value
 
-import javax.annotation.PostConstruct
+import org.springframework.beans.factory.annotation.Value
 
 /**
  * a Gpars implementation of the AsyncBatchSupport trait

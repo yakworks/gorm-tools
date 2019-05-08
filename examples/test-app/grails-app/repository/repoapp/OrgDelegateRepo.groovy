@@ -1,8 +1,9 @@
 package repoapp
 
+import groovy.transform.CompileDynamic
+
 import gorm.tools.repository.DefaultGormRepo
 import grails.compiler.GrailsCompileStatic
-import groovy.transform.CompileDynamic
 
 @GrailsCompileStatic
 class OrgDelegateRepo extends DefaultGormRepo<Org> {

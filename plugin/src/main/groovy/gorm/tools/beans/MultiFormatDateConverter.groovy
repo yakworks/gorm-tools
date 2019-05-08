@@ -4,10 +4,12 @@
 */
 package gorm.tools.beans
 
-import grails.databinding.converters.ValueConverter
 import groovy.transform.CompileStatic
+
 import org.apache.commons.lang.time.DateUtils
 import org.springframework.core.annotation.Order
+
+import grails.databinding.converters.ValueConverter
 
 /**
  * Used for binding date properties from string

@@ -4,13 +4,15 @@
 */
 package gorm.tools
 
-import gorm.tools.beans.AppCtx
+import java.sql.SQLException
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.util.ClassUtils
 
-import java.sql.SQLException
+import gorm.tools.beans.AppCtx
 
 /**
  * Utility class to help create generic code and SQL that can work across supported databases.

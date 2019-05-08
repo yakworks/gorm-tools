@@ -4,10 +4,12 @@
 */
 package gorm.tools.testing.hibernate
 
+import groovy.transform.CompileDynamic
+
+import org.springframework.core.GenericTypeResolver
+
 import gorm.tools.testing.TestDataJson
 import grails.buildtestdata.TestData
-import groovy.transform.CompileDynamic
-import org.springframework.core.GenericTypeResolver
 
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert'])
 @CompileDynamic

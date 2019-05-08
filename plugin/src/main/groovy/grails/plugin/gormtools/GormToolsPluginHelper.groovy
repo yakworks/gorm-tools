@@ -4,6 +4,11 @@
 */
 package grails.plugin.gormtools
 
+import groovy.transform.CompileDynamic
+
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.springframework.jdbc.core.JdbcTemplate
+
 import gorm.tools.DbDialectService
 import gorm.tools.GormMetaUtils
 import gorm.tools.async.GparsBatchSupport
@@ -19,9 +24,6 @@ import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
-import groovy.transform.CompileDynamic
-import org.grails.datastore.mapping.model.PersistentEntity
-import org.springframework.jdbc.core.JdbcTemplate
 
 @SuppressWarnings(['UnnecessarySelfAssignment'])
 @CompileDynamic

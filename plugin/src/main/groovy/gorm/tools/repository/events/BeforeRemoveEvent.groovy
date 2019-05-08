@@ -4,8 +4,9 @@
 */
 package gorm.tools.repository.events
 
-import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
+
+import gorm.tools.repository.api.RepositoryApi
 
 @CompileStatic
 class BeforeRemoveEvent<D> extends RepositoryEvent<D> {

@@ -4,11 +4,13 @@
 */
 package gorm.tools.repository.events
 
-import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
+
 import org.springframework.context.ApplicationEvent
 import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
+
+import gorm.tools.repository.api.RepositoryApi
 
 //import org.springframework.core.GenericTypeResolver
 

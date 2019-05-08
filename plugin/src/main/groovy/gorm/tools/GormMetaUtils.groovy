@@ -4,18 +4,20 @@
 */
 package gorm.tools
 
-import gorm.tools.beans.AppCtx
-import grails.gorm.validation.ConstrainedEntity
-import grails.gorm.validation.ConstrainedProperty
-import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.orm.hibernate.cfg.Mapping
 import org.springframework.validation.Validator
+
+import gorm.tools.beans.AppCtx
+import grails.gorm.validation.ConstrainedEntity
+import grails.gorm.validation.ConstrainedProperty
+import grails.util.GrailsNameUtils
 
 /**
  * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.

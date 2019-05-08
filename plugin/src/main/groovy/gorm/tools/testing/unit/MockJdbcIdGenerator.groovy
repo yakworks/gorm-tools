@@ -4,13 +4,15 @@
 */
 package gorm.tools.testing.unit
 
-import gorm.tools.idgen.IdGenerator
-import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
-import org.springframework.transaction.annotation.Propagation
-
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
+
+import groovy.transform.CompileStatic
+
+import org.springframework.transaction.annotation.Propagation
+
+import gorm.tools.idgen.IdGenerator
+import grails.gorm.transactions.Transactional
 
 @SuppressWarnings('SynchronizedMethod')
 @CompileStatic

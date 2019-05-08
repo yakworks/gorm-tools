@@ -4,9 +4,10 @@
 */
 package gorm.tools.testing.unit
 
+import groovy.transform.CompileStatic
+
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
-import groovy.transform.CompileStatic
 
 /**
  * Specification trait to use as a drop in replacement for DataTest,

@@ -4,13 +4,14 @@
 */
 package gorm.tools.jdbc
 
-import groovy.sql.Sql
-import groovy.transform.CompileStatic
-import org.springframework.jdbc.core.RowMapper
-
-import javax.sql.DataSource
 import java.sql.ResultSet
 import java.sql.Statement
+import javax.sql.DataSource
+
+import groovy.sql.Sql
+import groovy.transform.CompileStatic
+
+import org.springframework.jdbc.core.RowMapper
 
 /**
  * Groovy Sql wrapper for running scrollable/streaming queries.

@@ -5,6 +5,7 @@
 package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
+
 import org.springframework.dao.DataRetrievalFailureException
 
 /**

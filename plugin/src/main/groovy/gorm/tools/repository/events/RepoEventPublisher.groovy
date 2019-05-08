@@ -4,20 +4,22 @@
 */
 package gorm.tools.repository.events
 
-import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.RepositoryApi
-import grails.core.GrailsApplication
-import grails.events.bus.EventBus
-import grails.plugin.gormtools.RepositoryArtefactHandler
+import java.lang.reflect.Method
+import java.util.concurrent.ConcurrentHashMap
+import javax.annotation.PostConstruct
+
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.util.ReflectionUtils
 
-import javax.annotation.PostConstruct
-import java.lang.reflect.Method
-import java.util.concurrent.ConcurrentHashMap
+import gorm.tools.databinding.BindAction
+import gorm.tools.repository.api.RepositoryApi
+import grails.core.GrailsApplication
+import grails.events.bus.EventBus
+import grails.plugin.gormtools.RepositoryArtefactHandler
 
 /**
  * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners

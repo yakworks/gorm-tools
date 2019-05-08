@@ -4,14 +4,16 @@
 */
 package gorm.tools.repository.errors
 
-import gorm.tools.repository.RepoMessage
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.validation.Errors
+
+import gorm.tools.repository.RepoMessage
 
 /**
  * Handler for exceptions thrown by the Repository

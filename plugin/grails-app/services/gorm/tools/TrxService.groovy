@@ -4,10 +4,11 @@
 */
 package gorm.tools
 
-import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SimpleType
+
+import grails.gorm.transactions.Transactional
 
 @Transactional
 @CompileStatic

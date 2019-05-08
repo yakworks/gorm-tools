@@ -4,14 +4,16 @@
 */
 package gorm.tools.testing.hibernate
 
+import groovy.transform.CompileDynamic
+
+import org.grails.datastore.mapping.core.AbstractDatastore
+
 import gorm.tools.testing.unit.GormToolsSpecHelper
 import gorm.tools.testing.unit.JsonViewSpecSetup
 import grails.buildtestdata.TestDataBuilder
 import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spock.OnceBefore
-import groovy.transform.CompileDynamic
-import org.grails.datastore.mapping.core.AbstractDatastore
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains

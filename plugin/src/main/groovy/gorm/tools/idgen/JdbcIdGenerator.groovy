@@ -4,15 +4,17 @@
 */
 package gorm.tools.idgen
 
-import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
 import org.apache.commons.lang.Validate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
+
+import grails.gorm.transactions.Transactional
 
 //import grails.gorm.transactions.Transactional
 /**

@@ -1,9 +1,10 @@
 package repoapp
 
-import gorm.tools.repository.events.AfterRemoveEvent
-import gorm.tools.repository.events.BeforeBindEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
+
+import gorm.tools.repository.events.AfterRemoveEvent
+import gorm.tools.repository.events.BeforeBindEvent
 
 @Component
 public class RepoEventListener {

@@ -6,6 +6,7 @@ package gorm.tools.hibernate.criteria
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+
 import org.hibernate.criterion.CriteriaSpecification
 
 /**

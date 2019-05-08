@@ -4,14 +4,16 @@
 */
 package gorm.tools.testing
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+
+import org.grails.datastore.mapping.model.EmbeddedPersistentEntity
+import org.grails.datastore.mapping.model.types.Association
+
 import gorm.tools.json.Jsonify
 import grails.buildtestdata.TestData
 import grails.buildtestdata.builders.DataBuilderContext
 import grails.buildtestdata.builders.PersistentEntityDataBuilder
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import org.grails.datastore.mapping.model.EmbeddedPersistentEntity
-import org.grails.datastore.mapping.model.types.Association
 
 /**
  * static build methods to wrap {@link TestData} and Jsonify's statics for the json-views.

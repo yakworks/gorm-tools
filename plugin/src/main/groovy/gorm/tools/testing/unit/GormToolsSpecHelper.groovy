@@ -4,6 +4,17 @@
 */
 package gorm.tools.testing.unit
 
+import groovy.transform.CompileDynamic
+
+import org.grails.datastore.mapping.core.AbstractDatastore
+import org.grails.testing.GrailsUnitTest
+import org.junit.BeforeClass
+import org.springframework.beans.factory.config.BeanDefinition
+import org.springframework.context.ConfigurableApplicationContext
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
+import org.springframework.core.type.filter.AssignableTypeFilter
+import org.springframework.util.ClassUtils
+
 import gorm.tools.TrxService
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
@@ -15,15 +26,6 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.plugin.gormtools.RepositoryArtefactHandler
-import groovy.transform.CompileDynamic
-import org.grails.datastore.mapping.core.AbstractDatastore
-import org.grails.testing.GrailsUnitTest
-import org.junit.BeforeClass
-import org.springframework.beans.factory.config.BeanDefinition
-import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AssignableTypeFilter
-import org.springframework.util.ClassUtils
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.

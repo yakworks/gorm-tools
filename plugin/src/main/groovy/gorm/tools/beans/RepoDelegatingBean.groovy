@@ -4,10 +4,12 @@
 */
 package gorm.tools.beans
 
-import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+
 import org.grails.datastore.gorm.GormEntity
+
+import gorm.tools.repository.api.RepositoryApi
 
 /**
  * Delegates missing properties as method calls to the repository for the domain class.

@@ -4,12 +4,6 @@
 */
 package gorm.tools.beans
 
-import groovy.time.TimeCategory
-import groovy.time.TimeDuration
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import org.apache.commons.lang.Validate
-
 import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
@@ -20,6 +14,13 @@ import java.time.LocalDateTime
 import java.time.Year
 import java.time.ZoneId
 import java.time.temporal.TemporalAccessor
+
+import groovy.time.TimeCategory
+import groovy.time.TimeDuration
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+
+import org.apache.commons.lang.Validate
 
 /**
  * custom manipulations with dates.

@@ -5,6 +5,7 @@
 package gorm.tools.testing.unit
 
 import groovy.transform.CompileDynamic
+
 import spock.lang.Specification
 
 /**

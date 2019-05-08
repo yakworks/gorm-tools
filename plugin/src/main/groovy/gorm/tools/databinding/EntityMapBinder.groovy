@@ -4,6 +4,22 @@
 */
 package gorm.tools.databinding
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
+
+import groovy.transform.CompileStatic
+
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
+import org.grails.datastore.mapping.model.types.Association
+import org.grails.web.databinding.DataBindingEventMulticastListener
+import org.grails.web.databinding.GrailsWebDataBindingListener
+import org.springframework.validation.BeanPropertyBindingResult
+import org.springframework.validation.BindingResult
+
 import gorm.tools.GormMetaUtils
 import gorm.tools.beans.IsoDateUtil
 import grails.core.GrailsApplication
@@ -15,20 +31,6 @@ import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
 import grails.web.databinding.GrailsWebDataBinder
-import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormStaticApi
-import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.PersistentProperty
-import org.grails.datastore.mapping.model.types.Association
-import org.grails.web.databinding.DataBindingEventMulticastListener
-import org.grails.web.databinding.GrailsWebDataBindingListener
-import org.springframework.validation.BeanPropertyBindingResult
-import org.springframework.validation.BindingResult
-
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map

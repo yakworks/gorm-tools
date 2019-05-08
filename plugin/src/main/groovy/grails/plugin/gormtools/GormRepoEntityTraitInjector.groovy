@@ -4,10 +4,12 @@
 */
 package grails.plugin.gormtools
 
+import groovy.transform.CompileStatic
+
+import org.grails.core.artefact.DomainClassArtefactHandler
+
 import gorm.tools.repository.GormRepoEntity
 import grails.compiler.traits.TraitInjector
-import groovy.transform.CompileStatic
-import org.grails.core.artefact.DomainClassArtefactHandler
 
 @CompileStatic
 class GormRepoEntityTraitInjector implements TraitInjector {

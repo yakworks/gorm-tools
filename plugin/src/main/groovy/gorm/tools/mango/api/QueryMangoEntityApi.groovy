@@ -4,10 +4,12 @@
 */
 package gorm.tools.mango.api
 
-import grails.gorm.DetachedCriteria
 import groovy.transform.CompileStatic
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+
+import grails.gorm.DetachedCriteria
 
 /**
  * For repos and concretes classes that work on a single entity

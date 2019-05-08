@@ -4,15 +4,17 @@
 */
 package gorm.tools.mango
 
-import gorm.tools.beans.IsoDateUtil
-import grails.gorm.DetachedCriteria
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
+
+import gorm.tools.beans.IsoDateUtil
+import grails.gorm.DetachedCriteria
 
 @CompileStatic
 @Slf4j

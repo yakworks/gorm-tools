@@ -4,8 +4,9 @@
 */
 package gorm.tools.repository.events
 
-import gorm.tools.repository.api.RepositoryApi
 import groovy.transform.CompileStatic
+
+import gorm.tools.repository.api.RepositoryApi
 
 /**
  * Fired After a bind and save/persist. Often used along with params to setup other domains associations

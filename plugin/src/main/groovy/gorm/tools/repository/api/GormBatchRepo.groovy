@@ -4,9 +4,11 @@
 */
 package gorm.tools.repository.api
 
-import gorm.tools.WithTrx
 import groovy.transform.CompileStatic
+
 import org.springframework.transaction.TransactionStatus
+
+import gorm.tools.WithTrx
 
 /**
  * A trait add batch processing and "mass" updating methods to a Repository

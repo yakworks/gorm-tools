@@ -4,13 +4,15 @@
 */
 package gorm.tools.testing.unit
 
-import grails.plugin.json.view.JsonViewGrailsPlugin
-import grails.testing.spock.OnceBefore
 import groovy.transform.CompileDynamic
+
 import org.grails.testing.GrailsUnitTest
 import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.web.servlet.i18n.SessionLocaleResolver
+
+import grails.plugin.json.view.JsonViewGrailsPlugin
+import grails.testing.spock.OnceBefore
 
 /**
  * Does the setup to make sure beans for json-views are setup

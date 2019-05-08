@@ -5,6 +5,7 @@
 package gorm.tools.testing
 
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEntity
 
 /**

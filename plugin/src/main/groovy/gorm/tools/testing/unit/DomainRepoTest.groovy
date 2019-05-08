@@ -4,12 +4,14 @@
 */
 package gorm.tools.testing.unit
 
+import groovy.transform.CompileDynamic
+
+import org.springframework.core.GenericTypeResolver
+
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.TestTools
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.TestData
-import groovy.transform.CompileDynamic
-import org.springframework.core.GenericTypeResolver
 
 /**
  * Should works as a drop in replacement for the Grails Testing Support's

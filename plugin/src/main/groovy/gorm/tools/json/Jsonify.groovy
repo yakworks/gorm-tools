@@ -4,6 +4,9 @@
 */
 package gorm.tools.json
 
+import groovy.json.JsonSlurper
+import groovy.transform.CompileStatic
+
 import gorm.tools.beans.AppCtx
 import gorm.tools.beans.BeanPathTools
 import grails.plugin.json.builder.JsonOutput.JsonWritable
@@ -12,8 +15,6 @@ import grails.plugin.json.view.JsonViewTemplateEngine
 import grails.plugin.json.view.JsonViewWritableScript
 import grails.plugin.json.view.api.internal.DefaultGrailsJsonViewHelper
 import grails.plugin.json.view.template.JsonViewTemplate
-import groovy.json.JsonSlurper
-import groovy.transform.CompileStatic
 
 /**
  * A helper class that uses the logic in grails json view plugin to generate json without needing

@@ -4,9 +4,9 @@
 */
 package gorm.tools.beans
 
-import groovy.transform.CompileStatic
-
 import java.text.ParseException
+
+import groovy.transform.CompileStatic
 
 /**
  * MapFlattener taken from here https://github.com/dmillett/jConfigMap

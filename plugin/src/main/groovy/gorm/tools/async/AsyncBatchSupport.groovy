@@ -4,10 +4,12 @@
 */
 package gorm.tools.async
 
-import gorm.tools.WithTrx
 import groovy.transform.CompileStatic
+
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
+
+import gorm.tools.WithTrx
 
 /**
  * a trait to be used for colating/slicing a list into "batches" to then asynchronously with Transactions

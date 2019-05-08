@@ -4,10 +4,11 @@
 */
 package gorm.tools.repository.api
 
+import org.springframework.dao.DataAccessException
+
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import grails.validation.ValidationException
-import org.springframework.dao.DataAccessException
 
 /**
  * A complete interface for the Repository.

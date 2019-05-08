@@ -4,15 +4,17 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.beans.AppCtx
-import grails.util.GrailsNameUtils
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEntity
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.context.MessageSource
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
+
+import gorm.tools.beans.AppCtx
+import grails.util.GrailsNameUtils
 
 /**
  * A bunch of statics to support the Repository artifacts.

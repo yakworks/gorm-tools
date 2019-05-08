@@ -4,11 +4,13 @@
 */
 package gorm.tools.repository
 
+import groovy.transform.CompileStatic
+
+import org.grails.datastore.gorm.GormEntity
+
 import gorm.tools.beans.AppCtx
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.api.RepositoryApi
-import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
 
 @CompileStatic
 trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {

@@ -4,14 +4,16 @@
 */
 package gorm.tools.compiler
 
-import grails.plugin.gormtools.RepositoryArtefactHandler
 import groovy.transform.CompileStatic
+
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.compiler.injection.ArtefactTypeAstTransformation
+
+import grails.plugin.gormtools.RepositoryArtefactHandler
 
 /**
  * A transformation that makes an Artefact a GormRepository

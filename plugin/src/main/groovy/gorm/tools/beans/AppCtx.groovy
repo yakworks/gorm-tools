@@ -4,11 +4,13 @@
 */
 package gorm.tools.beans
 
+import groovy.transform.CompileStatic
+
+import org.springframework.context.ApplicationContext
+
 import grails.config.Config
 import grails.core.GrailsApplication
 import grails.util.Holders
-import groovy.transform.CompileStatic
-import org.springframework.context.ApplicationContext
 
 /**
  * A static that uses the Holder to get the spring ApplicationContext it beans and the GrailsApplication

@@ -4,15 +4,17 @@
 */
 package gorm.tools.hibernate
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.idgen.IdGenerator
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
 import org.hibernate.MappingException
 import org.hibernate.engine.spi.SharedSessionContractImplementor
 import org.hibernate.id.IdentifierGenerator
 import org.hibernate.service.ServiceRegistry
 import org.hibernate.type.Type
+
+import gorm.tools.beans.AppCtx
+import gorm.tools.idgen.IdGenerator
 
 /**
  * A hibernate IdentifierGenerator that uses a Spring Bean ("idGenerator" is default) to get the id's.

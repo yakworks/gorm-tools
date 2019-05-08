@@ -4,11 +4,12 @@
 */
 package grails.plugin.gormtools
 
-import grails.core.ArtefactHandlerAdapter
-import grails.util.GrailsNameUtils
+import java.util.regex.Pattern
+
 import groovy.transform.CompileStatic
 
-import java.util.regex.Pattern
+import grails.core.ArtefactHandlerAdapter
+import grails.util.GrailsNameUtils
 
 import static org.grails.io.support.GrailsResourceUtils.GRAILS_APP_DIR
 import static org.grails.io.support.GrailsResourceUtils.REGEX_FILE_SEPARATOR

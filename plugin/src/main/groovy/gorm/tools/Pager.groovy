@@ -4,10 +4,11 @@
 */
 package gorm.tools
 
-import gorm.tools.beans.BeanPathTools
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
+import gorm.tools.beans.BeanPathTools
 
 /**
  * a holder object for paged data

@@ -4,8 +4,9 @@
 */
 package gorm.tools.repository.events
 
-import grails.util.GrailsNameUtils
 import groovy.transform.CompileStatic
+
+import grails.util.GrailsNameUtils
 
 @CompileStatic
 enum RepositoryEventType {

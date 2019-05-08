@@ -4,16 +4,18 @@
 */
 package gorm.tools.jdbc
 
-import grails.web.servlet.mvc.GrailsParameterMap
+import java.sql.ResultSet
+import java.sql.ResultSetMetaData
+import java.sql.SQLException
+import javax.servlet.http.HttpServletRequest
+
 import groovy.transform.CompileStatic
+
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.support.JdbcUtils
 import org.springframework.mock.web.MockHttpServletRequest
 
-import javax.servlet.http.HttpServletRequest
-import java.sql.ResultSet
-import java.sql.ResultSetMetaData
-import java.sql.SQLException
+import grails.web.servlet.mvc.GrailsParameterMap
 
 /**
  * Row mapper which allows to convert data from a given ResultSet instance

@@ -4,18 +4,20 @@
 */
 package gorm.tools.beans
 
-import gorm.tools.GormMetaUtils
-import grails.util.GrailsClassUtils
-import grails.web.servlet.mvc.GrailsParameterMap
+import javax.servlet.http.HttpServletRequest
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 
-import javax.servlet.http.HttpServletRequest
+import gorm.tools.GormMetaUtils
+import grails.util.GrailsClassUtils
+import grails.web.servlet.mvc.GrailsParameterMap
 
 //import org.apache.commons.logging.*
 

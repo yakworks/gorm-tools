@@ -34,7 +34,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city.eventAfter == "afterBind Create"
         city.beforePersistRepoEvent.bindAction == BindAction.Create
         city.afterPersistRepoEvent.bindAction == BindAction.Create
-        //city.beforePersistRepoEvent.args
+        city.beforePersistRepoEvent.args.foo == 'beforePersist'
         //city.beforePersistRepoEvent.data
         //city.afterPersistRepoEvent.data
 
@@ -54,6 +54,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city.afterPersistRepoEvent.bindAction == BindAction.Update
         city.beforePersistRepoEvent.data == tdata
         city.afterPersistRepoEvent.data == tdata
+        city.beforePersistRepoEvent.args.foo == 'beforePersist'
     }
 
     void "test persist events are setup properly"() {
@@ -62,13 +63,13 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         City cm = new City( name: "from scratch")
 
         then:
-        cm.persist(failOnError:true, fooBar:true)
+        cm.persist(failOnError:true, fooBar:'baz')
         cm.name == "from scratch"
         cm.beforePersistRepoEvent instanceof BeforePersistEvent
         cm.afterPersistRepoEvent instanceof AfterPersistEvent
         cm.beforePersistRepoEvent.bindAction == null
         cm.afterPersistRepoEvent.bindAction == null
-        cm.afterPersistRepoEvent.args.fooBar == true
+        cm.afterPersistRepoEvent.args.fooBar == 'baz'
     }
 
     void testInvokeEvent() {
@@ -236,12 +237,14 @@ class CityRepo implements GormRepo<City> {
 
     @RepoListener
     void beforePersist(City city, BeforePersistEvent e) {
+        e.args['foo'] = 'beforePersist'
         city.beforePersistRepoEvent = e
     }
 
 
     @RepoListener
     void afterPersist(City city, AfterPersistEvent e) {
+        assert e.args['foo'] == 'beforePersist'
         city.afterPersistRepoEvent = e
     }
 

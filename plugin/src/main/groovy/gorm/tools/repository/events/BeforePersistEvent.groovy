@@ -14,19 +14,8 @@ import gorm.tools.repository.api.RepositoryApi
 @CompileStatic
 class BeforePersistEvent<D> extends RepositoryEvent<D> {
 
-    /** the args passed into persist */
-    Map args
-
     BeforePersistEvent(RepositoryApi source, D entity, Map args) {
         super(source, entity, RepositoryEventType.BeforePersist.eventKey, args)
     }
-
-//    Map getData(){
-//        args ? args['data'] as Map : null
-//    }
-//
-//    String getBindAction(){
-//        args ? args['bindAction'] as String : null
-//    }
 
 }

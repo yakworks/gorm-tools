@@ -41,8 +41,8 @@ class RepoMessage {
     /**
      * just a short method to return a messageMap from the vals passed in
      */
-    static Map setup(String messageCode, Object args, String defaultMessage = "") {
-        return [code: messageCode, args: args, defaultMessage: defaultMessage]
+    static Map setup(String messageCode, Object arg, String defaultMessage = "") {
+        return [code: messageCode, args: arg, defaultMessage: defaultMessage]
     }
 
     /**

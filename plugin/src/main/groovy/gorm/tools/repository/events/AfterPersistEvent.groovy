@@ -6,29 +6,18 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.api.RepositoryApi
 
 /**
  * Fired after successful repository.persist
+ * may or may not have the data and bindAction set
  */
 @CompileStatic
 class AfterPersistEvent<D> extends RepositoryEvent<D> {
 
-    /** the args passed into persist */
-    Map args
-
     AfterPersistEvent(RepositoryApi repo, D entity, Map args) {
-        super(repo, entity, RepositoryEventType.AfterPersist.eventKey)
-        this.args = args
-        //setDataFromArgMap(args)
-    }
-
-    Map getData(){
-        args ? args['data'] as Map : null
-    }
-
-    String getBindAction(){
-        args ? args['bindAction'] as String : null
+        super(repo, entity, RepositoryEventType.AfterPersist.eventKey, args)
     }
 
 }

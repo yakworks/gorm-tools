@@ -18,17 +18,15 @@ class BeforePersistEvent<D> extends RepositoryEvent<D> {
     Map args
 
     BeforePersistEvent(RepositoryApi source, D entity, Map args) {
-        super(source, entity, RepositoryEventType.BeforePersist.eventKey)
-        this.args = args
-        //setDataFromArgMap(args)
+        super(source, entity, RepositoryEventType.BeforePersist.eventKey, args)
     }
 
-    Map getData(){
-        args ? args['data'] as Map : null
-    }
-
-    String getBindAction(){
-        args ? args['bindAction'] as String : null
-    }
+//    Map getData(){
+//        args ? args['data'] as Map : null
+//    }
+//
+//    String getBindAction(){
+//        args ? args['bindAction'] as String : null
+//    }
 
 }

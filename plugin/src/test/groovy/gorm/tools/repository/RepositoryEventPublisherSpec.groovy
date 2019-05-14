@@ -32,14 +32,43 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city != null
         city.event == "beforeBind Create"
         city.eventAfter == "afterBind Create"
+        city.beforePersistRepoEvent.bindAction == BindAction.Create
+        city.afterPersistRepoEvent.bindAction == BindAction.Create
+        //city.beforePersistRepoEvent.args
+        //city.beforePersistRepoEvent.data
+        //city.afterPersistRepoEvent.data
 
+    }
+
+    void "test persist events from update"() {
         when:
-        city = City.update([id: 1, name: "test update"])
+        TestDataJson.buildCreate(City) //make sure one is there
+        Map tdata = [id: 1, name: "test update"]
+        City city = City.update(tdata)
 
         then:
         city.name == "test update"
         city.event == "beforeBind Update"
         city.eventAfter == "afterBind Update"
+        city.beforePersistRepoEvent.bindAction == BindAction.Update
+        city.afterPersistRepoEvent.bindAction == BindAction.Update
+        city.beforePersistRepoEvent.data == tdata
+        city.afterPersistRepoEvent.data == tdata
+    }
+
+    void "test persist events are setup properly"() {
+
+        when:
+        City cm = new City( name: "from scratch")
+
+        then:
+        cm.persist(failOnError:true, fooBar:true)
+        cm.name == "from scratch"
+        cm.beforePersistRepoEvent instanceof BeforePersistEvent
+        cm.afterPersistRepoEvent instanceof AfterPersistEvent
+        cm.beforePersistRepoEvent.bindAction == null
+        cm.afterPersistRepoEvent.bindAction == null
+        cm.afterPersistRepoEvent.args.fooBar == true
     }
 
     void testInvokeEvent() {
@@ -48,25 +77,29 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         Map params = [name: "test"]
 
         when:
-        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeBind.eventKey, city, params, BindAction.Create)
+        BeforeBindEvent bbe = new BeforeBindEvent(City.repo, city, params, BindAction.Create, [:])
+        repoEventPublisher.publishEvents(City.repo, bbe, [city, params, bbe] as Object[])
 
         then:
         city.event == "beforeBind Create"
 
         when:
-        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterBind.eventKey, city, params, BindAction.Update)
+        AfterBindEvent abe = new AfterBindEvent(City.repo, city, params, BindAction.Update, [:])
+        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterBind.eventKey, city, params, abe)
 
         then:
         city.eventAfter == "afterBind Update"
 
         when:
-        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeRemove.eventKey, city, params)
+        BeforeRemoveEvent bre = new BeforeRemoveEvent(City.repo, city,[:])
+        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeRemove.eventKey, city, bre)
 
         then:
         city.event == "beforeRemove"
 
         when:
-        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterRemove.eventKey, city, params)
+        AfterRemoveEvent are = new AfterRemoveEvent(City.repo, city,[:])
+        repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterRemove.eventKey, city, are)
 
         then:
         city.event == "afterRemove"
@@ -181,30 +214,56 @@ class City {
     String event
     String eventAfter
     Map<String, Boolean> events = [:]
+    RepositoryEvent beforePersistRepoEvent
+    RepositoryEvent afterPersistRepoEvent
+    RepositoryEvent beforeBindRepoEvent
+    RepositoryEvent afterBindRepoEvent
 
     static constraints = {
         name2 nullable:true
         event nullable:true
         eventAfter nullable:true
+        beforePersistRepoEvent nullable:true
+        afterPersistRepoEvent nullable:true
+        beforeBindRepoEvent nullable:true
+        afterBindRepoEvent nullable:true
     }
 }
 
 @GormRepository
 class CityRepo implements GormRepo<City> {
 
-    void beforeBind(City city, Map params, BindAction ba) {
-        city.event = "beforeBind ${ba.name()}"
+
+    @RepoListener
+    void beforePersist(City city, BeforePersistEvent e) {
+        city.beforePersistRepoEvent = e
     }
 
-    void afterBind(City city, Map params, BindAction ba) {
-        city.eventAfter = "afterBind ${ba.name()}"
+
+    @RepoListener
+    void afterPersist(City city, AfterPersistEvent e) {
+        city.afterPersistRepoEvent = e
     }
 
-    void beforeRemove(City city, Map params) {
+    @RepoListener
+    void beforeBind(City city, Map data, BeforeBindEvent e) {
+        city.event = "beforeBind ${e.bindAction}"
+        city.beforeBindRepoEvent = e
+    }
+
+    @RepoListener
+    void afterBind(City city, Map data, AfterBindEvent e) {
+        city.eventAfter = "afterBind ${e.bindAction}"
+        city.afterBindRepoEvent = e
+    }
+
+    @RepoListener
+    void beforeRemove(City city, BeforeRemoveEvent e) {
         city.event = "beforeRemove"
     }
 
-    void afterRemove(City city, Map params) {
+    @RepoListener
+    void afterRemove(City city, AfterRemoveEvent e) {
         city.event = "afterRemove"
     }
 

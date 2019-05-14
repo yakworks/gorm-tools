@@ -51,7 +51,7 @@ class GparsBatchSupport implements AsyncBatchSupport {
     void parallel(Map args, List<List> batches, Closure batchClosure) {
         int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
         GParsPool.withPool(psize) {
-            GParsPoolUtil.eachParallel(batches) { List batch ->
+            GParsPoolUtil.eachParallel(batches as Collection<List>) { List batch ->
                 batchClosure.call(batch, args.clone())
             }
         }

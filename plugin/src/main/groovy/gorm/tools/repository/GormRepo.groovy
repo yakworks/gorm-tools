@@ -170,9 +170,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     void bind(Map args = [:], D entity, Map data, BindAction bindAction) {
-        getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction)
+        getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction, args)
         doBind(args, entity, data, bindAction)
-        getRepoEventPublisher().doAfterBind(this, entity, data, bindAction)
+        getRepoEventPublisher().doAfterBind(this, entity, data, bindAction, args)
     }
 
     /**

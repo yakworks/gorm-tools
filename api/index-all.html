@@ -134,15 +134,16 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/AfterBindEvent.html" title="Class in gorm.tools.repository.events">AfterBindEvent</a></span> - Class in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block">Fired After a bind and save/persist. </div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/AfterBindEvent.html#AfterBindEvent(gorm.tools.repository.api.RepositoryApi, D, java.util.Map, java.lang.String)" title="Constructor in AfterBindEvent">AfterBindEvent(RepositoryApi, D, Map, String)</a></span> - Constructor in <a href="gorm/tools/repository/events/AfterBindEvent.html">AfterBindEvent</a>
+<dt><span class="strong"><a href="gorm/tools/repository/events/AfterBindEvent.html#AfterBindEvent(gorm.tools.repository.api.RepositoryApi, D, java.util.Map, gorm.tools.databinding.BindAction, java.util.Map)" title="Constructor in AfterBindEvent">AfterBindEvent(RepositoryApi, D, Map, BindAction, Map)</a></span> - Constructor in <a href="gorm/tools/repository/events/AfterBindEvent.html">AfterBindEvent</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/AfterPersistEvent.html" title="Class in gorm.tools.repository.events">AfterPersistEvent</a></span> - Class in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
-</dt><dd><div class="block">Fired after successful repository.persist</div></dd>
+</dt><dd><div class="block">Fired after successful repository.persist
+ may or may not have the data and bindAction set</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/AfterPersistEvent.html#AfterPersistEvent(gorm.tools.repository.api.RepositoryApi, D, java.util.Map)" title="Constructor in AfterPersistEvent">AfterPersistEvent(RepositoryApi, D, Map)</a></span> - Constructor in <a href="gorm/tools/repository/events/AfterPersistEvent.html">AfterPersistEvent</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/AfterRemoveEvent.html" title="Class in gorm.tools.repository.events">AfterRemoveEvent</a></span> - Class in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block">Fired right after a repository delete</div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/AfterRemoveEvent.html#AfterRemoveEvent(gorm.tools.repository.api.RepositoryApi, D)" title="Constructor in AfterRemoveEvent">AfterRemoveEvent(RepositoryApi, D)</a></span> - Constructor in <a href="gorm/tools/repository/events/AfterRemoveEvent.html">AfterRemoveEvent</a>
+<dt><span class="strong"><a href="gorm/tools/repository/events/AfterRemoveEvent.html#AfterRemoveEvent(gorm.tools.repository.api.RepositoryApi, D, java.util.Map)" title="Constructor in AfterRemoveEvent">AfterRemoveEvent(RepositoryApi, D, Map)</a></span> - Constructor in <a href="gorm/tools/repository/events/AfterRemoveEvent.html">AfterRemoveEvent</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#and(grails.gorm.DetachedCriteria, java.util.List)" title="Method in MangoBuilder">and(DetachedCriteria, List)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block">Handles a conjunction</div></dd>
@@ -203,7 +204,7 @@ if (location.href.indexOf('is-external=true') == -1) {
  for manipulating with object's properties.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/BeforeBindEvent.html" title="Class in gorm.tools.repository.events">BeforeBindEvent</a></span> - Class in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block">Fired before a bind and save/persist. </div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/BeforeBindEvent.html#BeforeBindEvent(gorm.tools.repository.api.RepositoryApi, D, java.util.Map, java.lang.String)" title="Constructor in BeforeBindEvent">BeforeBindEvent(RepositoryApi, D, Map, String)</a></span> - Constructor in <a href="gorm/tools/repository/events/BeforeBindEvent.html">BeforeBindEvent</a>
+<dt><span class="strong"><a href="gorm/tools/repository/events/BeforeBindEvent.html#BeforeBindEvent(gorm.tools.repository.api.RepositoryApi, D, java.util.Map, gorm.tools.databinding.BindAction, java.util.Map)" title="Constructor in BeforeBindEvent">BeforeBindEvent(RepositoryApi, D, Map, BindAction, Map)</a></span> - Constructor in <a href="gorm/tools/repository/events/BeforeBindEvent.html">BeforeBindEvent</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/BeforePersistEvent.html" title="Class in gorm.tools.repository.events">BeforePersistEvent</a></span> - Class in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block">Fired right before enitity save inside repository.persist</div></dd>
@@ -211,7 +212,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/BeforeRemoveEvent.html" title="Class in gorm.tools.repository.events">BeforeRemoveEvent</a></span> - Class in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/BeforeRemoveEvent.html#BeforeRemoveEvent(gorm.tools.repository.api.RepositoryApi, D)" title="Constructor in BeforeRemoveEvent">BeforeRemoveEvent(RepositoryApi, D)</a></span> - Constructor in <a href="gorm/tools/repository/events/BeforeRemoveEvent.html">BeforeRemoveEvent</a>
+<dt><span class="strong"><a href="gorm/tools/repository/events/BeforeRemoveEvent.html#BeforeRemoveEvent(gorm.tools.repository.api.RepositoryApi, D, java.util.Map)" title="Constructor in BeforeRemoveEvent">BeforeRemoveEvent(RepositoryApi, D, Map)</a></span> - Constructor in <a href="gorm/tools/repository/events/BeforeRemoveEvent.html">BeforeRemoveEvent</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#between(grails.gorm.DetachedCriteria, java.lang.String, java.util.List)" title="Method in MangoBuilder">between(DetachedCriteria, String, List)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block"></div></dd>
@@ -521,7 +522,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#deleted(org.grails.datastore.gorm.GormEntity, java.io.Serializable, boolean)" title="Method in RepoMessage">deleted(GormEntity, Serializable, boolean)</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doAfterBind(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map, gorm.tools.databinding.BindAction)" title="Method in RepoEventPublisher">doAfterBind(RepositoryApi, GormEntity, Map, BindAction)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
+<dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doAfterBind(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map, gorm.tools.databinding.BindAction, java.util.Map)" title="Method in RepoEventPublisher">doAfterBind(RepositoryApi, GormEntity, Map, BindAction, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doAfterPersist(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map)" title="Method in RepoEventPublisher">doAfterPersist(RepositoryApi, GormEntity, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
@@ -530,7 +531,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html#doBatch(java.util.Map, java.util.List, groovy.lang.Closure)" title="Method in AsyncBatchSupport">doBatch(Map, List, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>
 </dt><dd> <div class="block">calls closure for each item in list. flush and clear is called after all items are done
  and just before commit.</div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doBeforeBind(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map, gorm.tools.databinding.BindAction)" title="Method in RepoEventPublisher">doBeforeBind(RepositoryApi, GormEntity, Map, BindAction)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
+<dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doBeforeBind(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map, gorm.tools.databinding.BindAction, java.util.Map)" title="Method in RepoEventPublisher">doBeforeBind(RepositoryApi, GormEntity, Map, BindAction, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doBeforePersist(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map)" title="Method in RepoEventPublisher">doBeforePersist(RepositoryApi, GormEntity, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
@@ -709,10 +710,6 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/idgen/PooledIdGenerator.html#getBatchSize(java.lang.String)" title="Method in PooledIdGenerator">getBatchSize(String)</a></span> - Method in <a href="gorm/tools/idgen/PooledIdGenerator.html">PooledIdGenerator</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/AfterPersistEvent.html#getBindAction()" title="Method in AfterPersistEvent">getBindAction()</a></span> - Method in <a href="gorm/tools/repository/events/AfterPersistEvent.html">AfterPersistEvent</a>
-</dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/BeforePersistEvent.html#getBindAction()" title="Method in BeforePersistEvent">getBindAction()</a></span> - Method in <a href="gorm/tools/repository/events/BeforePersistEvent.html">BeforePersistEvent</a>
-</dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/databinding/EntityMapBinder.html#getBindingIncludeList(java.lang.Object)" title="Method in EntityMapBinder">getBindingIncludeList(Object)</a></span> - Method in <a href="gorm/tools/databinding/EntityMapBinder.html">EntityMapBinder</a>
 </dt><dd> <div class="block">Sets up a list of properties which can be binded to a given domain entity.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/DateUtil.html#getCalendarInstanceByDate(java.util.Date)" title="Method in DateUtil">getCalendarInstanceByDate(Date)</a></span> - Method in <a href="gorm/tools/beans/DateUtil.html">DateUtil</a>
@@ -736,10 +733,6 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/DbDialectService.html#getCurrentDate()" title="Method in DbDialectService">getCurrentDate()</a></span> - Method in <a href="gorm/tools/DbDialectService.html">DbDialectService</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/integration/DataIntegrationTest.html#getCurrentSession()" title="Method in DataIntegrationTest">getCurrentSession()</a></span> - Method in <a href="gorm/tools/testing/integration/DataIntegrationTest.html">DataIntegrationTest</a>
-</dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/AfterPersistEvent.html#getData()" title="Method in AfterPersistEvent">getData()</a></span> - Method in <a href="gorm/tools/repository/events/AfterPersistEvent.html">AfterPersistEvent</a>
-</dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/BeforePersistEvent.html#getData()" title="Method in BeforePersistEvent">getData()</a></span> - Method in <a href="gorm/tools/repository/events/BeforePersistEvent.html">BeforePersistEvent</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/integration/DataIntegrationTest.html#getDatastore()" title="Method in DataIntegrationTest">getDatastore()</a></span> - Method in <a href="gorm/tools/testing/integration/DataIntegrationTest.html">DataIntegrationTest</a>
 </dt><dd> <div class="block">consistency with other areas of grails and other unit tests</div></dd>
@@ -1385,6 +1378,8 @@ if (location.href.indexOf('is-external=true') == -1) {
  which can be Transactional and fires Grails events that will be asynchronous</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/RepoExceptionSupport.html" title="Class in gorm.tools.repository.errors">RepoExceptionSupport</a></span> - Class in <a href="./gorm/tools/repository/errors/package-summary.html">gorm.tools.repository.errors</a>
 </dt><dd><div class="block">Handler for exceptions thrown by the Repository</div></dd>
+<dt><span class="strong"><a href="gorm/tools/repository/events/RepoListener.html" title="Annotation Type in gorm.tools.repository.events">RepoListener</a></span> - Annotation Type in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
+</dt><dd><div class="block">Annotation that marks a method in a repository as a listener for Repository events.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html" title="Class in gorm.tools.repository">RepoMessage</a></span> - Class in <a href="./gorm/tools/repository/package-summary.html">gorm.tools.repository</a>
 </dt><dd><div class="block">A bunch of statics to support the Repository artifacts.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/api/RepositoryApi.html" title="Interface in gorm.tools.repository.api">RepositoryApi</a></span> - Interface in <a href="./gorm/tools/repository/api/package-summary.html">gorm.tools.repository.api</a>
@@ -1395,7 +1390,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepositoryEvent.html" title="Class in gorm.tools.repository.events">RepositoryEvent</a></span> - Class in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block">Base event class for Repository event firing</div></dd>
-<dt><span class="strong"><a href="gorm/tools/repository/events/RepositoryEvent.html#RepositoryEvent(gorm.tools.repository.api.RepositoryApi, D, java.lang.String)" title="Constructor in RepositoryEvent">RepositoryEvent(RepositoryApi, D, String)</a></span> - Constructor in <a href="gorm/tools/repository/events/RepositoryEvent.html">RepositoryEvent</a>
+<dt><span class="strong"><a href="gorm/tools/repository/events/RepositoryEvent.html#RepositoryEvent(gorm.tools.repository.api.RepositoryApi, D, java.lang.String, java.util.Map, gorm.tools.databinding.BindAction, java.util.Map)" title="Constructor in RepositoryEvent">RepositoryEvent(RepositoryApi, D, String, Map, BindAction, Map)</a></span> - Constructor in <a href="gorm/tools/repository/events/RepositoryEvent.html">RepositoryEvent</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepositoryEventType.html" title="Enum in gorm.tools.repository.events">RepositoryEventType</a></span> - Enum in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block"></div></dd>
@@ -1596,6 +1591,9 @@ if (location.href.indexOf('is-external=true') == -1) {
 <h2 class="title">V</h2>
 <dl>
 
+<dt><span class="strong"><a href="gorm/tools/repository/events/RepoListener.html#value()" title="Method in RepoListener">value()</a></span> - Method in <a href="gorm/tools/repository/events/RepoListener.html">RepoListener</a>
+</dt><dd> <div class="block">
+ @default ]<DL><DT><B>Returns:</B></DT><DD>The types this listener listens for</DD></DL></div></dd>
 </dl>
 
     

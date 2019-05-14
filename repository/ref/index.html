@@ -372,8 +372,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#methods" title="Methods" class="md-nav__link">
-    Methods
+  <a href="#methods-for-repolistener" title="Methods for @RepoListener" class="md-nav__link">
+    Methods for @RepoListener
   </a>
   
 </li>
@@ -711,8 +711,8 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#methods" title="Methods" class="md-nav__link">
-    Methods
+  <a href="#methods-for-repolistener" title="Methods for @RepoListener" class="md-nav__link">
+    Methods for @RepoListener
   </a>
   
 </li>
@@ -897,15 +897,15 @@ Throws a <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repositor
 </li>
 </ul>
 <h2 id="repository-events">Repository Events<a class="headerlink" href="#repository-events" title="Permanent link">&para;</a></h2>
-<h3 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h3>
-<p>Each Repository can implement any of the methods listed below and they will get called during persistence operation.  </p>
+<h3 id="methods-for-repolistener">Methods for @RepoListener<a class="headerlink" href="#methods-for-repolistener" title="Permanent link">&para;</a></h3>
+<p>Each Repository can implement any of the methods listed below and they will get called during persistence operation if they have the @RepoListener annotation.  </p>
 <ul>
-<li><strong>beforeBind(T instance, Map params, BindAction action)</strong> - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.</li>
-<li><strong>afterBind(T instance, Map params, BindAction action)</strong> -  Called after databinding is performed.  </li>
-<li><strong>beforePersist(T instance, Map args)</strong> - Called every time before an instance is saved.  </li>
-<li><strong>afterPersist(T instance, Map args)</strong> - Called every time after an instance is saved.</li>
-<li><strong>beforeRemove(T instance, Map args)</strong> - Called before an instance is deleted. Can be utilized to cleanup related records etc.  </li>
-<li><strong>afterRemove(T instance, Map args)</strong> -  Called After an instance is deleted.  </li>
+<li><strong>beforeBind(T instance, Map data, BeforeBindEvent be)</strong> - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.</li>
+<li><strong>afterBind(T instance, Map data, AfterBindEvent be)</strong> -  Called after databinding is performed.  </li>
+<li><strong>beforePersist(T instance, BeforePersistEvent e)</strong> - Called every time before an instance is saved.  </li>
+<li><strong>afterPersist(T instance, AfterPersistEvent e)</strong> - Called every time after an instance is saved.</li>
+<li><strong>beforeRemove(T instance, BeforeRemoveEvent e)</strong> - Called before an instance is deleted. Can be utilized to cleanup related records etc.  </li>
+<li><strong>afterRemove(T instance, AfterRemoveEvent e)</strong> -  Called After an instance is deleted.  </li>
 </ul>
 <h3 id="grails-events">Grails Events<a class="headerlink" href="#grails-events" title="Permanent link">&para;</a></h3>
 <p>The Repository also provides a possibility to handle events using Grails annotations. Please see docs for <a class="new-tab" href="http://async.grails.org/latest/guide/index.html#events">Grails Events</a>.</p>

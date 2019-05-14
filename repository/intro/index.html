@@ -729,7 +729,8 @@ We can add a class to the <code>grails-app/repository</code> directory as in the
     <span class="nd">@Autowired</span> <span class="n">GitHubApi</span> <span class="n">gitHubApi</span>
 
     <span class="c1">//event method used to update the descriptions with the ones in github</span>
-    <span class="kt">void</span> <span class="nf">afterCreate</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">){</span>
+    <span class="nd">@RepoListener</span>
+    <span class="kt">void</span> <span class="nf">afterBind</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">,</span> <span class="n">AfterBindEvent</span> <span class="n">be</span><span class="o">){</span>
         <span class="n">Map</span> <span class="n">repoInfo</span> <span class="o">=</span> <span class="n">gitHubApi</span><span class="o">.</span><span class="na">getGitRepo</span><span class="o">(</span><span class="n">params</span><span class="o">.</span><span class="na">gitHubRepo</span><span class="o">)</span>
         <span class="c1">//check that it was found using the slug or repoId</span>
         <span class="k">if</span> <span class="o">(!</span><span class="n">repoInfo</span><span class="o">)</span> 

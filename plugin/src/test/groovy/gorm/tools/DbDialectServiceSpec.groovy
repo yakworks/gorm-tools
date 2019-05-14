@@ -32,6 +32,16 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         service.dialectName == "dialect_mysql"
         service.isMySql() == true
 
+        when: "mssql server 20**"
+        service.dialectName = null
+        config.hibernate.dialect = 'testSQLServer2012Dialect'
+        dialect = service.getDialect()
+
+        then:
+        dialect == DbDialectService.MSSQL
+        service.dialectName == "dialect_mssql"
+        service.isMsSql() == true
+
         when: "sql server"
         service.dialectName = null
         config.hibernate.dialect = 'SQLServerDialect'

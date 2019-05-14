@@ -42,6 +42,7 @@ class DbDialectService {
         if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver", getClass().classLoader))
             || dialectName.contains('H2')) result = H2
         else if (dialectName.contains("SQLServerDialect")) result = MSSQL
+        else if (dialectName.matches(".*SQLServer20\\d\\dDialect")) result = MSSQL
         else if (dialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
         else if (dialectName.contains("Oracle")) result = ORACLE
 

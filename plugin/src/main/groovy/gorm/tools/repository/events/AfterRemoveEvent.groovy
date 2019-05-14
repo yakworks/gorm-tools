@@ -14,8 +14,8 @@ import gorm.tools.repository.api.RepositoryApi
 @CompileStatic
 class AfterRemoveEvent<D> extends RepositoryEvent<D> {
 
-    AfterRemoveEvent(RepositoryApi source, D entity) {
-        super(source, entity, RepositoryEventType.AfterRemove.eventKey)
+    AfterRemoveEvent(RepositoryApi source, D entity, Map args) {
+        super(source, entity, RepositoryEventType.AfterRemove.eventKey, args)
     }
 
 }

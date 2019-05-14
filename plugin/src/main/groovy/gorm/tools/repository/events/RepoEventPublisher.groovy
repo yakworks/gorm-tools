@@ -37,6 +37,7 @@ class RepoEventPublisher {
     private ApplicationEventPublisher applicationEventPublisher
 
     private final Map<String, Map<String, Method>> repoEventMethodCache = new ConcurrentHashMap<>()
+    //private final Map<String, Map<String, Method>> repoListenerMethodCache = new ConcurrentHashMap<>()
 
     @PostConstruct
     void init() {
@@ -46,67 +47,91 @@ class RepoEventPublisher {
     }
 
     void cacheEventsMethods(Class repoClass) {
+//        Map<String, Method> listenerMethodMap = new ConcurrentHashMap<>()
+//        repoListenerMethodCache.put(repoClass.simpleName, listenerMethodMap)
+//        findAndCacheListenerAnnotations(repoClass, listenerMethodMap)
+
         Map<String, Method> eventMethodMap = new ConcurrentHashMap<>()
         repoEventMethodCache.put(repoClass.simpleName, eventMethodMap)
 
-        findAndCacheEventMethods(RepositoryEventType.BeforeBind.eventKey, repoClass, eventMethodMap)
-        findAndCacheEventMethods(RepositoryEventType.AfterBind.eventKey, repoClass, eventMethodMap)
-        findAndCacheEventMethods(RepositoryEventType.BeforeRemove.eventKey, repoClass, eventMethodMap)
-        findAndCacheEventMethods(RepositoryEventType.AfterRemove.eventKey, repoClass, eventMethodMap)
-        findAndCacheEventMethods(RepositoryEventType.BeforePersist.eventKey, repoClass, eventMethodMap)
-        findAndCacheEventMethods(RepositoryEventType.AfterPersist.eventKey, repoClass, eventMethodMap)
-
+        RepositoryEventType.values().each { RepositoryEventType et ->
+            findAndCacheEventMethods(et.eventKey, repoClass, eventMethodMap)
+        }
     }
 
     private void findAndCacheEventMethods(String eventKey, Class repoClass, Map<String, Method> events) {
         Method method = ReflectionUtils.findMethod(repoClass, eventKey, null)
-        if (method != null) events[eventKey] = method
+        RepoListener ann = method?.getAnnotation(RepoListener)
+        if (method != null && ann) events[eventKey] = method
     }
 
-    void publishEvents(RepositoryApi repo, RepositoryEvent event, Object... args) {
-        invokeEventMethod(repo, event.eventKey, args)
+    void publishEvents(RepositoryApi repo, RepositoryEvent event, Object... methodArgs) {
+        //invokeListenerMethod(repo, event)
+        invokeEventMethod(repo, event.eventKey, methodArgs)
         if (!repo.enableEvents) return
         applicationEventPublisher.publishEvent(event)
         eventBus.notify(event.routingKey, event)
     }
 
-    void invokeEventMethod(Object repo, String eventKey, Object... args) {
+//    void invokeListenerMethod(Object repo, RepositoryEvent event) {
+//        Map<String, Method> listenerMap = repoListenerMethodCache.get(repo.class.simpleName)
+//        Method method = listenerMap?.get(event.eventKey)
+//        if (!method) return
+//        ReflectionUtils.invokeMethod(method, repo, event)
+//    }
+
+    void invokeEventMethod(Object repo, String eventKey, Object... methodArgs) {
         Map<String, Method> eventMethodMap = repoEventMethodCache.get(repo.class.simpleName)
         //if (!eventMethodMap) return //eventMethodMap = cacheEventsMethods(repo.class)
         Method method = eventMethodMap?.get(eventKey)
         if (!method) return
 
-        ReflectionUtils.invokeMethod(method, repo, args)
+        ReflectionUtils.invokeMethod(method, repo, methodArgs)
     }
 
     void doBeforePersist(RepositoryApi repo, GormEntity entity, Map args) {
         BeforePersistEvent event = new BeforePersistEvent(repo, entity, args)
-        publishEvents(repo, event, [entity, args] as Object[])
+        publishEvents(repo, event, [entity, event] as Object[])
     }
 
     void doAfterPersist(RepositoryApi repo, GormEntity entity, Map args) {
         AfterPersistEvent event = new AfterPersistEvent(repo, entity, args)
-        publishEvents(repo, event, [entity, args] as Object[])
+        publishEvents(repo, event, [entity, event] as Object[])
     }
 
-    void doBeforeBind(RepositoryApi repo, GormEntity entity, Map data, BindAction bindAction) {
-        BeforeBindEvent event = new BeforeBindEvent(repo, entity, data, bindAction.name())
-        publishEvents(repo, event, [entity, data, bindAction] as Object[])
+    void doBeforeBind(RepositoryApi repo, GormEntity entity, Map data, BindAction bindAction, Map args) {
+        BeforeBindEvent event = new BeforeBindEvent(repo, entity, data, bindAction, args)
+        publishEvents(repo, event, [entity, data, event] as Object[])
     }
 
-    void doAfterBind(RepositoryApi repo, GormEntity entity, Map data, BindAction bindAction) {
-        AfterBindEvent event = new AfterBindEvent(repo, entity, data, bindAction.name())
-        publishEvents(repo, event, [entity, data, bindAction] as Object[])
+    void doAfterBind(RepositoryApi repo, GormEntity entity, Map data, BindAction bindAction, Map args) {
+        AfterBindEvent event = new AfterBindEvent(repo, entity, data, bindAction, args)
+        publishEvents(repo, event, [entity, data, event] as Object[])
     }
 
     void doBeforeRemove(RepositoryApi repo, GormEntity entity, Map args) {
-        BeforeRemoveEvent event = new BeforeRemoveEvent(repo, entity)
-        publishEvents(repo, event, [entity, args] as Object[])
+        BeforeRemoveEvent event = new BeforeRemoveEvent(repo, entity, args)
+        publishEvents(repo, event, [entity, event] as Object[])
     }
 
     void doAfterRemove(RepositoryApi repo, GormEntity entity, Map args) {
-        AfterRemoveEvent event = new AfterRemoveEvent(repo, entity)
-        publishEvents(repo, event, [entity, args] as Object[])
+        AfterRemoveEvent event = new AfterRemoveEvent(repo, entity, args)
+        publishEvents(repo, event, [entity, event] as Object[])
 
     }
+
+//    private void findAndCacheListenerAnnotations(Class repoClass, Map<String, Method> listenerMethodMad) {
+//        for(Method m in repoClass.getMethods()) {
+//            ReflectionUtils.makeAccessible(m)
+//            RepoListener sub = m.getAnnotation(RepoListener)
+//            if(sub != null) {
+//                Class[] parameterTypes = m.parameterTypes
+//                boolean hasArgument = parameterTypes.length == 1
+//                //2 params and first one is the Gorm Entity
+//                if(parameterTypes.length == 2 && repoClass.isAssignableFrom(parameterTypes[0])) {
+//                    listenerMethodMad[RepositoryEventType.BeforeBind.eventKey] = m
+//                }
+//            }
+//        }
+//    }
 }

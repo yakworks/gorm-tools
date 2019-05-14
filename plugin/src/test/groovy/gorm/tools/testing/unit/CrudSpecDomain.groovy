@@ -6,6 +6,8 @@ package gorm.tools.testing.unit
 
 import gorm.tools.compiler.GormRepository
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.events.BeforePersistEvent
+import gorm.tools.repository.events.RepoListener
 import grails.persistence.Entity
 
 @Entity
@@ -33,7 +35,9 @@ class CrudSpecAssocDomain {
 
 @GormRepository
 class CrudSpecDomainRepo implements GormRepo<CrudSpecDomain> {
-    void beforePersist(CrudSpecDomain entity, Map args) {
+
+    @RepoListener
+    void beforePersist(CrudSpecDomain entity, BeforePersistEvent e) {
         if(entity.firstName || entity.lastName) {
             entity.name = (entity.firstName + ' ' + (entity.lastName?:'')).trim()
         }

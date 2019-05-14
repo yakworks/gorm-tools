@@ -6,6 +6,7 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.api.RepositoryApi
 
 /**
@@ -16,10 +17,8 @@ import gorm.tools.repository.api.RepositoryApi
 @CompileStatic
 class AfterBindEvent<D> extends RepositoryEvent<D> {
 
-    AfterBindEvent(RepositoryApi repo, D entity, Map data, String bindAction) {
-        super(repo, entity, RepositoryEventType.AfterBind.eventKey)
-        this.data = data
-        this.bindAction = bindAction
+    AfterBindEvent(RepositoryApi repo, D entity, Map data, BindAction bindAction, Map args) {
+        super(repo, entity, RepositoryEventType.AfterBind.eventKey, data, bindAction, args)
     }
 
 }

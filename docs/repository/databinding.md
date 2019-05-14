@@ -1,5 +1,6 @@
 
 ## Data binding using MapBinder
+
 Plugin comes with a [MapBinder][]{.new-tab} Which is used by a Repository to perform databinding.
 Plugin configures [EntityMapBinder][]{.new-tab} as default implementation of [MapBinder][]{.new-tab}. [EntityMapBinder][]{.new-tab} is similar 
 to grails data binder in the sense that it uses registered value converters and fallbacks to spring ConversionService.

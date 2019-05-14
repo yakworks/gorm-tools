@@ -64,16 +64,16 @@ Throws a [EntityNotFoundException][EntityNotFoundException] if anything goes wro
 
 ## Repository Events 
 
-### Methods
+### Methods for @RepoListener
 
-Each Repository can implement any of the methods listed below and they will get called during persistence operation.  
+Each Repository can implement any of the methods listed below and they will get called during persistence operation if they have the @RepoListener annotation.  
  
-- **beforeBind(T instance, Map params, BindAction action)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.
-- **afterBind(T instance, Map params, BindAction action)** -  Called after databinding is performed.  
-- **beforePersist(T instance, Map args)** - Called every time before an instance is saved.  
-- **afterPersist(T instance, Map args)** - Called every time after an instance is saved.
-- **beforeRemove(T instance, Map args)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
-- **afterRemove(T instance, Map args)** -  Called After an instance is deleted.  
+- **beforeBind(T instance, Map data, BeforeBindEvent be)** - Called before a new instance is saved, can be used to do custom data binding or initialize the state of domain etc.
+- **afterBind(T instance, Map data, AfterBindEvent be)** -  Called after databinding is performed.  
+- **beforePersist(T instance, BeforePersistEvent e)** - Called every time before an instance is saved.  
+- **afterPersist(T instance, AfterPersistEvent e)** - Called every time after an instance is saved.
+- **beforeRemove(T instance, BeforeRemoveEvent e)** - Called before an instance is deleted. Can be utilized to cleanup related records etc.  
+- **afterRemove(T instance, AfterRemoveEvent e)** -  Called After an instance is deleted.  
   
 
 ### Grails Events

@@ -130,7 +130,8 @@ class ProjectRepo implements GormRepo<Project>{
     @Autowired GitHubApi gitHubApi
 
     //event method used to update the descriptions with the ones in github
-    void afterCreate(Project project, Map params){
+    @RepoListener
+    void afterBind(Project project, Map params, AfterBindEvent be){
         Map repoInfo = gitHubApi.getGitRepo(params.gitHubRepo)
         //check that it was found using the slug or repoId
         if (!repoInfo) 

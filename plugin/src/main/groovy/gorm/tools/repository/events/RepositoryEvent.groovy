@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEvent
 import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.api.RepositoryApi
 
 //import org.springframework.core.GenericTypeResolver
@@ -23,13 +24,18 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
 
     /** the domain instance this event is for */
     D entity
-    /** if this event fired during binding action then this is the data used */
+    /** if this event fired during binding action or a persist that is caused from it then this is the data used */
     Map data
-    /** during a binding action this can be set to the BindAction.Created, Updated*/
-    String bindAction
+    /** during a binding action, if event trickles down from a bindEvent this will be the name of the BindAction it came from*/
+    //String bindActionName
+    /** during a binding action or if event trickles down from a bindEvent this will be the BindAction that it came from*/
+    BindAction bindAction
+
+    /** the args passed into whatever method fired this. such as flush, failOnError etc */
+    Map args
 
     /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this will be 'beforePersist' */
-    String eventKey = "repoEvent"
+    String eventKey //= "repoEvent"
 
     RepositoryEvent(RepositoryApi repo, final D entity, String eventKey) {
         super(repo)
@@ -38,13 +44,23 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
         //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
     }
 
-//    RepositoryEvent(final Datastore source, final D entity, String eventKey) {
-//        super(source)
-//        MappingContext mappingContext = source.getMappingContext()
-//        this.entity = mappingContext.getProxyHandler().unwrap(entity)
-//        this.eventKey = eventKey
-//        //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
-//    }
+    RepositoryEvent(RepositoryApi repo, final D entity, String eventKey, Map args) {
+        super(repo)
+        this.entity = entity
+        this.eventKey = eventKey
+        this.args = args
+        setDataFromArgMap(args)
+        //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
+    }
+
+    RepositoryEvent(RepositoryApi repo, final D entity, String eventKey, Map data, BindAction bindAction, Map args) {
+        super(repo)
+        this.entity = entity
+        this.eventKey = eventKey
+        this.data = data
+        this.bindAction = bindAction
+        this.args = args
+    }
 
     /**
      * done per the spring docs so that listeners can bind to the generic of the event.
@@ -63,7 +79,7 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     String getRoutingKey() { "${entity.class.simpleName}.${eventKey}" }
 
     void setDataFromArgMap(Map args){
-        this.data = args ? args['data'] as Map : null
-        this.bindAction = args ? args['bindAction'] as String : null
+        this.data = args ? args['data'] as Map : [:]
+        this.bindAction = args ? args['bindAction'] as BindAction : null
     }
 }

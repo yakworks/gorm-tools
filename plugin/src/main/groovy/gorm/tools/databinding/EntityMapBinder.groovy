@@ -35,7 +35,10 @@ import grails.web.databinding.GrailsWebDataBinder
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
  * Explicitly checks and converts most common property types eg (numbers and dates). Otherwise fallbacks to value converters.
- **/
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
+ */
 @SuppressWarnings(['CatchException'])
 @CompileStatic
 class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {

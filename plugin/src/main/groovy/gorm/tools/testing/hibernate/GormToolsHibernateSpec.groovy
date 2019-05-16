@@ -19,6 +19,9 @@ import grails.testing.spock.OnceBefore
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
  * and incorporates the TestDataBuilder from build-test-data plugin methods and adds in JsonViewSpecSetup
  * so that it possible to build json and map test data
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileDynamic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {

@@ -11,6 +11,9 @@ import org.grails.core.artefact.DomainClassArtefactHandler
 import gorm.tools.repository.GormRepoEntity
 import grails.compiler.traits.TraitInjector
 
+/**
+ * @author Joshua Burnett (@basejump)
+ */
 @CompileStatic
 class GormRepoEntityTraitInjector implements TraitInjector {
 

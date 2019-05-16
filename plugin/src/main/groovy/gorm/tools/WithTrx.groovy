@@ -14,6 +14,9 @@ import org.springframework.transaction.TransactionStatus
 
 /**
  * adds transaction methods to any class. relies on Gorms transactionService.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 trait WithTrx {
@@ -41,7 +44,7 @@ trait WithTrx {
      * @return The result of the callable
      */
     def <T> T withTrx(@ClosureParams(value = SimpleType,
-        options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
+                      options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
         trxService.withTrx(callable)
     }
 

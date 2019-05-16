@@ -16,6 +16,9 @@ import grails.testing.spock.OnceBefore
 
 /**
  * Does the setup to make sure beans for json-views are setup
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileDynamic
 trait JsonViewSpecSetup implements GrailsUnitTest {

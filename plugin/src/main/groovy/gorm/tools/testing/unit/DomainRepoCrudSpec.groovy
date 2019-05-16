@@ -11,6 +11,9 @@ import spock.lang.Specification
 /**
  * executes a series automatic "sanity" checks on the domain and repo for CRUD.
  * Allow methods to be overriden for tweaks to build the binding map and asserts
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileDynamic
 abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepoTest<D> {

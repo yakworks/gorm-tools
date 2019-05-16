@@ -17,7 +17,7 @@ import static org.grails.io.support.GrailsResourceUtils.REGEX_FILE_SEPARATOR
 /**
  * Grails artefact handler for repository classes
  *
- * @author Joshua Burnett
+ * @author Joshua Burnett (@basejump)
  */
 @CompileStatic
 class RepositoryArtefactHandler extends ArtefactHandlerAdapter {

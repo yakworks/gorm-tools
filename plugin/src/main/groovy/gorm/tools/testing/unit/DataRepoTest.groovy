@@ -13,6 +13,9 @@ import grails.testing.spring.AutowiredTest
  * Spec trait to use as a drop in replacement of DataTest and GormToolsTest that has all the methods
  * from the BuildDataTest to build data for the repos
  * will set up the repositories properly for the mocked domains
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 trait DataRepoTest implements JsonViewSpecSetup, GormToolsSpecHelper, BuildDataTest, AutowiredTest{

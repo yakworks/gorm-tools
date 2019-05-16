@@ -16,6 +16,12 @@ import org.grails.datastore.mapping.query.api.QueryableCriteria
 import gorm.tools.beans.IsoDateUtil
 import grails.gorm.DetachedCriteria
 
+/**
+ * the main builder to turn Mango QL maps and json into DetachedCriteria for Gorm
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
+ */
 @CompileStatic
 @Slf4j
 class MangoBuilder {

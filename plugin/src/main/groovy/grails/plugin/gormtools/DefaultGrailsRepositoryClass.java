@@ -21,6 +21,9 @@ import org.grails.core.AbstractInjectableGrailsClass;
  * @author Joshua Burnett
  * based on the grails source DefaultGrailsServiceClass
  */
+/**
+ * @author Joshua Burnett (@basejump)
+ */
 public class DefaultGrailsRepositoryClass extends AbstractInjectableGrailsClass implements GrailsRepositoryClass {
 
     public static final String REPO = "Repo";

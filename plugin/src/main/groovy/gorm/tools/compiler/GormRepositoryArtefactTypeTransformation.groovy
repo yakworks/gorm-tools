@@ -18,7 +18,6 @@ import grails.plugin.gormtools.RepositoryArtefactHandler
 /**
  * A transformation that makes an Artefact a GormRepository
  */
-
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
 class GormRepositoryArtefactTypeTransformation extends ArtefactTypeAstTransformation {

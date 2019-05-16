@@ -8,6 +8,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Annotation that marks a Repository artifact
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @GroovyASTTransformationClass("gorm.tools.compiler.GormRepositoryArtefactTypeTransformation")

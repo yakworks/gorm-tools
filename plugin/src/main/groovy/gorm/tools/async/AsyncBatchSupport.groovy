@@ -17,7 +17,7 @@ import gorm.tools.WithTrx
  *
  * @see GparsBatchSupport  GparsBatchSupport - for a concrete implementation
  *
- * @author Joshua Burnett
+ * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileStatic

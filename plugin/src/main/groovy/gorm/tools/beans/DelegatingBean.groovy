@@ -19,7 +19,6 @@ import groovy.transform.CompileStatic
  * Example: customer list screen needs customer.calcs - calcs can be customer cals or branch calcs based on branch login
  * DelegatingBean can be used to keep customer clean of this stuff by defining getCals() in delegating bean or customer repository.
  */
-
 @CompileStatic
 class DelegatingBean {
     Object target

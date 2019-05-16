@@ -18,6 +18,9 @@ import grails.buildtestdata.TestData
  * grails.testing.gorm.DomainUnitTest for testing a single entity using Generics
  * Its walks the tree so if you have a Book that has a required Author association you only need to do
  * implement DomainRepoTest<Book> and it will take care of mocking the Author for you.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileDynamic
 trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest{

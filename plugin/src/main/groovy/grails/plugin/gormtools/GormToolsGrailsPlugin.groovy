@@ -6,6 +6,9 @@ package grails.plugin.gormtools
 
 import grails.core.ArtefactHandler
 
+/**
+ * @author Joshua Burnett (@basejump)
+ */
 class GormToolsGrailsPlugin extends grails.plugins.Plugin {
     def loadAfter = ['hibernate', 'datasources']
 

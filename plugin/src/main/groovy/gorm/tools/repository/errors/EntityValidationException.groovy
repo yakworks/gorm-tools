@@ -12,6 +12,9 @@ import org.springframework.validation.Errors
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message map
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class EntityValidationException extends ValidationException {

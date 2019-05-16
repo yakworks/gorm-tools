@@ -17,6 +17,9 @@ import gorm.tools.repository.RepoMessage
 
 /**
  * Handler for exceptions thrown by the Repository
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class RepoExceptionSupport {

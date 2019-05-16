@@ -11,6 +11,12 @@ import org.springframework.core.GenericTypeResolver
 import gorm.tools.testing.TestDataJson
 import grails.buildtestdata.TestData
 
+/**
+ * automatically runs tests on persist(), create(), update(), delete()
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
+ */
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert'])
 @CompileDynamic
 abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {

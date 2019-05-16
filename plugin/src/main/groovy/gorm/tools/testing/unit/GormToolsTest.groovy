@@ -13,6 +13,8 @@ import grails.testing.spring.AutowiredTest
  * Specification trait to use as a drop in replacement for DataTest,
  * will set up the repositories properly for the mocked domains.
  *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 trait GormToolsTest implements GormToolsSpecHelper, DataTest, AutowiredTest {

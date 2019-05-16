@@ -6,7 +6,12 @@ package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
 
-//just a concrete errors implementation for the binding errors so we can use it as a placeholder
+/**
+ * just a concrete errors implementation for the binding errors so we can use it as a placeholder
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.x
+ */
 @CompileStatic
 class EmptyErrors extends org.springframework.validation.AbstractBindingResult {
 

@@ -19,6 +19,9 @@ import grails.compiler.GrailsCompileStatic
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
  * It allows to copy domain instances, to copy separate properties of an object, etc.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @GrailsCompileStatic
 class GormUtils {

@@ -14,7 +14,7 @@ import grails.validation.ValidationException
  * A complete interface for the Repository.
  *
  * @author Joshua Burnett (@basejump)
- * @since 6.x
+ * @since 6.1
  */
 @SuppressWarnings("MethodCount")
 interface RepositoryApi<D> {

@@ -29,6 +29,9 @@ import grails.plugin.gormtools.RepositoryArtefactHandler
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileDynamic
 //@SuppressWarnings(["ClosureAsLastMethodParameter"])

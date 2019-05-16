@@ -12,6 +12,12 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.api.RepositoryApi
 
+/**
+ * Main trait for a domain. gets applied to them during startup grails artifact part
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
+ */
 @CompileStatic
 trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
 

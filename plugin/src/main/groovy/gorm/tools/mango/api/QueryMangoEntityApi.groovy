@@ -13,6 +13,9 @@ import grails.gorm.DetachedCriteria
 
 /**
  * For repos and concretes classes that work on a single entity
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 trait QueryMangoEntityApi {

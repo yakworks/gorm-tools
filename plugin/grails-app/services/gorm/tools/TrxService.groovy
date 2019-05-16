@@ -22,6 +22,7 @@ class TrxService {
      */
     def <T> T withTrx(@ClosureParams(value = SimpleType,
         options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
+        //TransactionStatus is added by the @Transactional trait
         callable.call(transactionStatus)
     }
 }

@@ -24,6 +24,9 @@ import grails.plugin.gormtools.RepositoryArtefactHandler
 /**
  * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners
  * which can be Transactional and fires Grails events that will be asynchronous
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class RepoEventPublisher {

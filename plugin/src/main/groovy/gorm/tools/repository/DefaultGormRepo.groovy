@@ -11,6 +11,12 @@ import org.springframework.core.GenericTypeResolver
 
 import grails.gorm.transactions.Transactional
 
+/**
+ * A concrete implementation of the GormRepo
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.x
+ */
 @CompileStatic
 @Transactional
 class DefaultGormRepo<D extends GormEntity> implements GormRepo<D> {

@@ -7,7 +7,10 @@ package gorm.tools.mango.api
 import grails.gorm.DetachedCriteria
 
 /**
- * For methods that
+ * Interface to be implemented by a bean
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 interface MangoQuery {
 

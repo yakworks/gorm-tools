@@ -13,6 +13,9 @@ import grails.gorm.DetachedCriteria
 /**
  * a trait with statics for gorm domain entities that delegates the calls to the repository
  * which should implement the QueryMangoEntityApi
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 trait QueryMangoEntity {

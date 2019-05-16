@@ -22,6 +22,9 @@ import grails.util.GrailsNameUtils
 /**
  * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
  * Useful methods to find the PersistentEntity and the mapping and meta fields.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class GormMetaUtils {

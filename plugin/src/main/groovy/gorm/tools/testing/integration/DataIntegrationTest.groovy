@@ -19,6 +19,9 @@ import grails.buildtestdata.TestDataBuilder
 /**
  * Contains helpers for integration tests. Can be chained with some custom helper traits with the application-specific
  * initialization logic.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 trait DataIntegrationTest implements TestDataBuilder {

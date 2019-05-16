@@ -18,6 +18,9 @@ import grails.util.GrailsNameUtils
 
 /**
  * A bunch of statics to support the Repository artifacts.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class RepoMessage {

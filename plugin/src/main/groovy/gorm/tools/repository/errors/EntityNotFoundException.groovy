@@ -11,6 +11,9 @@ import org.springframework.dao.DataRetrievalFailureException
 /**
  * an extension of the DataRetrievalFailureException that is more performant. fillInStackTrace is overriden to show nothing
  * so it will be faster and consume less memory when thrown.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class EntityNotFoundException extends DataRetrievalFailureException {

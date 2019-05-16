@@ -20,6 +20,9 @@ import grails.plugin.json.view.template.JsonViewTemplate
  * A helper class that uses the logic in grails json view plugin to generate json without needing
  * a gson file and outside the scope of and HTTP request using the JsonViewTemplateEngine
  * see http://views.grails.org/latest/#_the_jsontemplateengine
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class Jsonify {

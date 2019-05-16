@@ -14,6 +14,12 @@ import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 
+/**
+ * Default implementation of MangoQuery. Setup as spring bean that is used by all the repos
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
+ */
 @CompileStatic
 @Transactional(readOnly = true)
 class DefaultMangoQuery implements MangoQuery {

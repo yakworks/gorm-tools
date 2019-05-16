@@ -22,6 +22,9 @@ import grails.buildtestdata.builders.PersistentEntityDataBuilder
  * Note: when using this in unit test the {@link gorm.tools.testing.unit.JsonViewSpecSetup} should
  * be used to make sure the proper view-tools beans are setup. This is alrady taken care of if using
  * one of the main DataRepoTest or DomainRepoTest traits
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class TestDataJson {

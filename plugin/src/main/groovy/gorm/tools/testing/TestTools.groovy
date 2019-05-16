@@ -10,6 +10,9 @@ import org.grails.datastore.gorm.GormEntity
 
 /**
  * Misc utils for testing, asserting and "helpers" in spock tests
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 class TestTools {

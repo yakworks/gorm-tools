@@ -8,6 +8,9 @@ import grails.databinding.DataBinder
 
 /**
  * binds data from a map to a GormEntity. The map can of course be a JSONObject as is common when binding rest resources
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 interface MapBinder extends DataBinder {
 

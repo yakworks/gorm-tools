@@ -42,7 +42,7 @@ abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
         regionIds = Region.executeQuery("select id from Region")
         regionCount = Region.count()
 
-        asyncBatchSupport.parallel(cities) { List<Map> list, Map args ->
+        asyncSupport.parallel(cities) { List<Map> list, Map args ->
             repo.batchCreate(list)
             updateRows(list)
         }

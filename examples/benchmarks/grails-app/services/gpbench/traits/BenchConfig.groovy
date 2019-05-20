@@ -1,6 +1,7 @@
 package gpbench.traits
 
-import gorm.tools.async.AsyncBatchSupport
+
+import gorm.tools.async.AsyncSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
@@ -11,8 +12,7 @@ import grails.core.GrailsApplication
 import groovy.json.JsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
-import org.grails.datastore.gorm.GormEnhancer
+
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -31,7 +31,7 @@ trait BenchConfig {
     @Autowired
     EntityMapBinder entityMapBinder
     @Autowired
-    AsyncBatchSupport asyncBatchSupport
+    AsyncSupport asyncSupport
     @Autowired
     CsvReader csvReader
 

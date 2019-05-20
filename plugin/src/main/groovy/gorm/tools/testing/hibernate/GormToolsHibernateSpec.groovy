@@ -7,6 +7,8 @@ package gorm.tools.testing.hibernate
 import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.core.AbstractDatastore
+import org.grails.orm.hibernate.HibernateDatastore
+import org.grails.orm.hibernate5.support.HibernatePersistenceContextInterceptor
 
 import gorm.tools.testing.unit.GormToolsSpecHelper
 import gorm.tools.testing.unit.JsonViewSpecSetup
@@ -26,21 +28,33 @@ import grails.testing.spock.OnceBefore
 @CompileDynamic
 abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
 
-    @OnceBefore
-    void setupRepoBeans() {
+    //@OnceBefore
+    void setupSpec() {
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
         if (!ctx.containsBean("grailsDomainClassMappingContext"))
             ctx.beanFactory.registerSingleton("grailsDomainClassMappingContext", hibernateDatastore.getMappingContext())
+        if (!ctx.containsBean("persistenceInterceptor")){
+            def pci = new HibernatePersistenceContextInterceptor()
+            pci.hibernateDatastore = (HibernateDatastore)hibernateDatastore
+            ctx.beanFactory.registerSingleton("persistenceInterceptor", pci)
+        }
 
         Closure beans = {}
 
-        //finds and register repositories for all the persistentEntities that got setup
+        beans = beans << {
+            persistenceInterceptor(HibernatePersistenceContextInterceptor){
+                hibernateDatastore = (HibernateDatastore)hibernateDatastore
+            }
+        }
+
+            //finds and register repositories for all the persistentEntities that got setup
         datastore.mappingContext.persistentEntities*.javaClass.each { domainClass ->
             beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
         }
         beans = beans << GormToolsPluginHelper.doWithSpring //commonBeans()
         defineBeans(beans)
+
     }
 
     /** consistency with other areas of grails and other unit tests */

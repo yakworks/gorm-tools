@@ -36,7 +36,7 @@ class DataSetup implements BenchConfig {
     }
 
     void insert(List<List<Map>> batchList, RepositoryApi repo) {
-        asyncBatchSupport.parallel(batchList) { List<Map> list, Map args ->
+        asyncSupport.parallel(batchList) { List<Map> list, Map args ->
             repo.batchCreate(list)
         }
     }

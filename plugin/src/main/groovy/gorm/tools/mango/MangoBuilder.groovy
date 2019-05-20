@@ -8,12 +8,14 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
 import gorm.tools.beans.IsoDateUtil
+import gorm.tools.mango.api.QueryMangoEntity
 import grails.gorm.DetachedCriteria
 
 /**
@@ -80,12 +82,16 @@ class MangoBuilder {
         return build(detachedCriteria, map, callable)
     }
 
-    @CompileDynamic
     static DetachedCriteria build(DetachedCriteria criteria, Map map, Closure callable = null) {
-        DetachedCriteria newCriteria = (DetachedCriteria) criteria.clone()
+        DetachedCriteria newCriteria = cloneCriteria(criteria)
         applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
         if (callable) newCriteria.with callable
         return newCriteria
+    }
+
+    @CompileDynamic //dynamic so it can access the protected criteria.clone
+    static DetachedCriteria cloneCriteria(DetachedCriteria criteria) {
+        (DetachedCriteria) criteria.clone()
     }
 
     static void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {
@@ -104,14 +110,16 @@ class MangoBuilder {
      * applies the map just like running a closure.call on this.
      * @param mangoMap
      */
-    @CompileDynamic
     static void applyMap(DetachedCriteria criteria, Map mangoMap) {
         log.debug "applyMap $mangoMap"
         for (String key : mangoMap.keySet()) {
             String op = JunctionOps[key]
             if (op) {
                 //normalizer should have ensured all ops have a List for a value
-                "$op"(criteria, (List) mangoMap[key])
+                //List args = [criteria, (List) mangoMap[key]]
+                invoke(op, criteria, (List) mangoMap[key])
+                //MangoBuilder.metaClass.invokeStaticMethod(MangoBuilder, op, args)
+                //"$op"(criteria, (List) mangoMap[key])
                 continue
             } else { //it must be a field then
                 applyField(criteria, key, mangoMap[key])
@@ -119,11 +127,15 @@ class MangoBuilder {
         }
     }
 
-    @CompileDynamic
+    static Object invoke(String op, Object... args) {
+        InvokerHelper.invokeStaticMethod(MangoBuilder, op, args)
+    }
+
     static void applyField(DetachedCriteria criteria, String field, Object fieldVal) {
         String qs = QuickSearchOps[field]
         if (qs) {
-            this."$qs"(criteria, fieldVal)
+            invoke(qs, criteria, fieldVal)
+            //this."$qs"(criteria, fieldVal)
             return
         }
 
@@ -135,7 +147,8 @@ class MangoBuilder {
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
         if (prop instanceof Association) {
-            criteria."${field}" {
+            //invoke(field, criteria, fieldVal)
+            criteria.invokeMethod(field){
                 //the delegate is the DetachedAssocationCriteria. See methodMissing in AbstractDetachedCriteria
                 applyMapOrList((DetachedCriteria) delegate, fieldVal)
                 return
@@ -157,13 +170,15 @@ class MangoBuilder {
                 String op = JunctionOps[key]
                 if (op) {
                     //normalizer should have ensured all ops have a List for a value
-                    this."$op"(criteria, (List) opArg)
+                    invoke(op, criteria, (List) opArg)
+                    //this."$op"(criteria, (List) opArg)
                     continue
                 }
 
                 op = OverrideOps[key]
                 if (op) {
-                    this."$op"(criteria, field, toType(criteria, field, opArg))
+                    invoke(op, criteria, field, toType(criteria, field, opArg))
+                    //this."$op"(criteria, field, toType(criteria, field, opArg))
                     continue
                 }
 
@@ -173,25 +188,28 @@ class MangoBuilder {
                         criteria.isNull(field)
                         continue
                     }
-                    criteria."$op"(field, toType(criteria, field, opArg))
+                    criteria.invokeMethod(op, [field, toType(criteria, field, opArg)])
+                    //criteria."$op"(field, toType(criteria, field, opArg))
                     continue
                 }
 
                 op = PropertyOps[key]
                 if (op) {
-                    criteria."$op"(field, opArg)
+                    criteria.invokeMethod(op, [field, opArg])
+                    //criteria."$op"(field, opArg)
                     continue
                 }
 
                 op = ExistOps[key]
                 if (op) {
-                    criteria."$op"(field)
+                    criteria.invokeMethod(op, field)
+                    //criteria."$op"(field)
                     continue
                 }
             }
         }
         //I think we should not blow up an error if some field isnt in domain, just add message to log
-        log.info "MangoBuilder applyField domain ${criteria.targetClass.name} doesnt contains field $field"
+        log.info "MangoBuilder applyField domain ${getTargetClass(criteria).name} doesnt contains field $field"
 
     }
 
@@ -209,20 +227,34 @@ class MangoBuilder {
         return result
     }
 
-    @CompileDynamic
+    //@CompileDynamic
     static DetachedCriteria quickSearch(DetachedCriteria criteria, String value) {
-        Map result = MangoTidyMap.tidy(['$or': criteria.targetClass.quickSearchFields.collectEntries {
-            [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value + "%" : value)]
-        }])
+        if(QueryMangoEntity.isAssignableFrom(getTargetClass(criteria))){
+            Map<String, String> orMap = getQuickSearchFields(criteria).collectEntries {
+                [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value + "%" : value)]
+            }
+            def criteriaMap = ['$or': orMap] as Map<String, Object>
+            return applyMap(criteria, MangoTidyMap.tidy(criteriaMap))
+        }
 
-        return applyMap(criteria, result)
+    }
+
+    @CompileDynamic //dynamic so we can access the protected targetClass
+    static Class getTargetClass(DetachedCriteria criteria) {
+        criteria.targetClass
+    }
+
+    @CompileDynamic //dynamic so we can access the protected targetClass.quickSearchFields
+    static List<String>  getQuickSearchFields(DetachedCriteria criteria) {
+        criteria.targetClass.quickSearchFields
     }
 
     @CompileDynamic
     static DetachedCriteria notIn(DetachedCriteria criteria, String propertyName, List params) {
         Map val = [:]
         val[propertyName] = ['$in': params]
-        return criteria.notIn(propertyName, (build(criteria.targetClass, val)."$propertyName") as QueryableCriteria)
+        DetachedCriteria builtCrit = build(getTargetClass(criteria), val)
+        return criteria.notIn(propertyName, builtCrit."$propertyName" as QueryableCriteria)
     }
 
     /**

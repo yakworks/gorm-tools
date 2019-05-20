@@ -9,12 +9,12 @@ class MangoSpec extends Specification {
 
     def "Check list"() {
         expect:
-        Org.repo.query().size() == 10
+        Org.query().size() == 10
     }
 
     def "Filter by Name eq"() {
         when:
-        List list = Org.repo.query([criteria: [name: "Org#23"], max: 150])
+        List list = Org.query([name: "Org#23"])
         then:
         list.size() == 1
         list[0].name == "Org#23"
@@ -22,7 +22,7 @@ class MangoSpec extends Specification {
 
     def "Filter by id eq"() {
         when:
-        List list = Org.repo.query([criteria: [id: 24], max: 150])
+        List list = Org.repo.query(id: 24)
         then:
         list.size() == 1
         list[0].name == "Org#23"
@@ -293,7 +293,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `gt()`"() {
         when:
-        List list = Org.repo.query([criteria: [id: ["\$gt": 95]], max: 150]).sort { it.id }
+        List list = Org.repo.query([criteria: [id: ['$gt': 95]], max: 150]).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { gt "id", 95L }.size()
         list[0].name == Org.createCriteria().list() { gt "id", 95L }[0].name
@@ -301,7 +301,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `ge()`"() {
         when:
-        List list = Org.repo.query([criteria: [id: ['\$gte': 95]], max: 150]).sort { it.id }
+        List list = Org.repo.query([criteria: [id: ['$gte': 95]], max: 150]).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { ge "id", 95L }.size()
         list[0].name == Org.createCriteria().list() { ge "id", 95L }[0].name

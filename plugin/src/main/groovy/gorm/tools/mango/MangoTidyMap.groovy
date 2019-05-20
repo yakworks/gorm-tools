@@ -4,7 +4,6 @@
 */
 package gorm.tools.mango
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 /**
@@ -37,18 +36,21 @@ class MangoTidyMap {
      * @param map map that should be extended with the nested value
      * @return extended map
      */
-    @CompileDynamic
     static Map pathToMap(String path, Object val, Map map) {
         if (path.contains(".")) {
-            String newKey = path.split("[.]")[0]
+            String[] splitPath = path.split("[.]")
+            //get first thing in dot ex: foo.bar this will be foo
+            String newKey = splitPath[0]
             if (!map[newKey]) map[newKey] = [:]
-            pathToMap(path.split("[.]").tail().join("."), val, map[newKey] as Map)
-        } else {
+            String newPath = splitPath.tail().join(".")
+            pathToMap(newPath, val, map[newKey] as Map)
+        }
+        else {
             if (!map[path]) map[path] = [:]
             //we should check if nested values have composed keys("customer.address.id")
             if (val instanceof Map) {
-                val.each { k, v ->
-                    pathToMap(k as String, v, map[path] as Map)
+                (val as Map).each {
+                    pathToMap(it.key as String, it.value, map[path] as Map)
                 }
             } else {
                 map[path] = val
@@ -64,31 +66,33 @@ class MangoTidyMap {
      * @param result map that should contain mango results
      * @return map with mango criteria params
      */
-    @CompileDynamic
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
-            if (MangoBuilder.junctionOps.keySet().contains(key)) {
+            if (MangoBuilder.JunctionOps.keySet().contains(key)) {
                 if (val instanceof Map) {
-                    result[key] = val.collect { k, v -> tidy([(k.toString()): v]) }
+                    result[key] = (val as Map).collect { k, v -> tidy([(k.toString()): v]) }
                     return
                 }
 
                 if (val instanceof List) {
-                    result[key] = val.collect { v -> tidy(['$and': v]) }
+                    result[key] = (val as List).collect { v -> tidy(['$and': v]) }
                     return
                 }
             }
-            if (val instanceof Map && !MangoBuilder.sortOps.keySet().contains(key)) {
-                toMangoOperator(val, result[key] as Map)
+            if (val instanceof Map && !MangoBuilder.SortOps.keySet().contains(key)) {
+                toMangoOperator(val as Map, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {
                     result[key] = val; return
                 } //if we already have Mango method
                 if (val instanceof List) {
+                    List valAsList = val as List
                     // for handling case {customer: [{id:1}, {id:2}]}, transforms to {customer:{id:{'$in': [1,2]}}}
-                    if (val[0] instanceof Map) {
-                        result[key]["${val[0].keySet()[0]}"] = ['$in': val.collect { it.values()[0] }]
+                    if (valAsList[0] instanceof Map) {
+                        Map mapVal = valAsList[0]
+                        Map inMap = ['$in': valAsList.collect { (it as Map).values()[0] }]
+                        result[key]["${mapVal.keySet()[0]}"] = inMap
                         return
                     }
                     result[key]['$in'] = val
@@ -98,8 +102,8 @@ class MangoTidyMap {
                     result[key]['$ilike'] = val
                     return
                 }
-                if (MangoBuilder.existOps.keySet().contains(val)) {
-                    result[key][val] = true
+                if (MangoBuilder.ExistOps.keySet().contains(val)) {
+                    (result[key] as Map)[val] = true
                 } else {
                     result[key]['$eq'] = val
                 }

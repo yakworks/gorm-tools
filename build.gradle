@@ -34,3 +34,13 @@ subprojects {
     }
   }
 }
+
+ext.codenarcRuleset= '''
+  //getRule('Println').enabled = false
+
+  //keep these here, put these in shipyak as defaults
+  getRule('ExplicitCallToOrMethod').enabled = false
+  getRule('IfStatementCouldBeTernary').enabled = false
+  //getRule('ImplementationAsType').enabled = false
+  //getRule('UnnecessaryCast').enabled = false //doesn't work all the time when using CompileStatic
+'''

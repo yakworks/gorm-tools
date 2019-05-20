@@ -60,18 +60,10 @@ bootRepackage.enabled = false
 ext.codenarcRuleset= '''
   //getRule('MethodParameterTypeRequired').enabled = false
   //getRule('Println').enabled = false
+  getRule('ExplicitCallToOrMethod').enabled = false
+  getRule('IfStatementCouldBeTernary').enabled = false
+  getRule('UnnecessaryCast').enabled = false //doesn't work all the time when using CompileStatic
 '''
-
-//main codenarc block is setup in yakworks.defaults
-codenarcMain {
-  exclude '**/GormToolsGrailsPlugin.groovy'
-  exclude '**/GormToolsPluginHelper.groovy'
-}
-
-codenarcTest {
-  //don't check any of the tests right now as it just slows it down, look at enabling this in future
-  exclude '**/*'
-}
 
 test {
   //testLogging.showStandardStreams = true

@@ -6,7 +6,6 @@ package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.validation.ValidationException
 import org.springframework.validation.Errors
 

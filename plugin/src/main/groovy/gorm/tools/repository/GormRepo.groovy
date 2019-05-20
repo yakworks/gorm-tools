@@ -35,7 +35,7 @@ import grails.validation.ValidationException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEntityApi, WithTrx, RepositoryApi<D> {
+trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEntityApi, RepositoryApi<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder
@@ -267,7 +267,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
         return getRepoExceptionSupport().translateException(ex, entity)
     }
 
-    /** gets the dataStore for this Gorm domain instance */
+    /** gets the datastore for this Gorm domain instance */
     Datastore getDatastore() {
         getInstanceApi().datastore
     }
@@ -280,6 +280,20 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     /** cache clear on the datastore's currentSession. When possible use the transactionStatus. see WithTrx trait  */
     void clear(){
         getDatastore().currentSession.clear()
+    }
+
+    /**
+     * Executes the closure within the context of a transaction, creating one if none is present or joining
+     * an existing transaction if one is already present.
+     *
+     * @param callable The closure to call
+     * @return The result of the closure execution
+     * @see GormStaticApi#withTransaction(Map, Closure)
+     * @see GormStaticApi#withNewTransaction(Closure)
+     * @see GormStaticApi#withNewTransaction(Map, Closure)
+     */
+    public <T> T withTrx(Closure<T> callable) {
+        getStaticApi().withTransaction callable
     }
 
     GormInstanceApi<D> getInstanceApi() {

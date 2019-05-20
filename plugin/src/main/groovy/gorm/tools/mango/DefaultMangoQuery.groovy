@@ -21,7 +21,6 @@ import grails.gorm.transactions.Transactional
  * @since 6.1
  */
 @CompileStatic
-@Transactional(readOnly = true)
 class DefaultMangoQuery implements MangoQuery {
 
     @Value('${gorm.tools.mango.criteriaKeyName:criteria}')
@@ -35,17 +34,7 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    DetachedCriteria buildCriteria(Class domainClass, Map params = [:], Closure closure = null) {
-        Map criteria
-        if (params[criteriaKeyName] instanceof String) {
-            JSON.use('deep')
-            criteria = JSON.parse(params[criteriaKeyName] as String) as Map
-        } else {
-            criteria = params[criteriaKeyName] as Map ?: [:]
-        }
-        if (params.containsKey('sort')) {
-            criteria['$sort'] = params['sort']
-        }
+    DetachedCriteria buildCriteria(Class domainClass, Map criteria = [:], Closure closure = null) {
         MangoBuilder.build(domainClass, criteria, closure)
     }
 
@@ -57,7 +46,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @return query of entities restricted by mango params
      */
     List query(Class domainClass, Map params = [:], Closure closure = null) {
-        query(buildCriteria(domainClass, params, closure), params, closure)
+        Map<String, Map> p = parseParams(params)
+        DetachedCriteria dcrit = buildCriteria(domainClass, p['criteria'], closure)
+        query(dcrit, p['pager'])
     }
 
     /**
@@ -67,8 +58,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    List query(DetachedCriteria criteria, Map params = [:], Closure closure = null) {
-        Pager pager = new Pager(params)
+    @Transactional(readOnly = true)
+    List query(DetachedCriteria criteria, Map pagerParams = [:], Closure closure = null) {
+        Pager pager = new Pager(pagerParams)
         criteria.list(max: pager.max, offset: pager.offset)
     }
 
@@ -80,7 +72,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return map where keys are names of fields and value - sum for restricted entities
      */
+    @Transactional(readOnly = true)
     Map countTotals(Class domainClass, Map params = [:], List<String> sums, Closure closure = null) {
+
         DetachedCriteria mangoCriteria = buildCriteria(domainClass, params, closure)
 
         List totalList
@@ -96,6 +90,40 @@ class DefaultMangoQuery implements MangoQuery {
         Map result = [:]
         sums.eachWithIndex { String name, i ->
             result[name] = totalsData[i]
+        }
+        return result
+    }
+
+    /**
+     * returns a Map with a criteria key and a pager key containing maps for those.
+     */
+    Map<String, Map> parseParams(Map params){
+        def result = [criteria: [:], pager: [:]] as Map<String, Map>
+        Map paramCopy = [:]
+        paramCopy.putAll(params)
+
+        if(params[criteriaKeyName]) {
+            if (params[criteriaKeyName] instanceof String) {
+                JSON.use('deep')
+                result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
+            } else {
+                result['criteria'] = params[criteriaKeyName] as Map
+            }
+            paramCopy.remove(criteriaKeyName)
+            result['pager'] = paramCopy
+        }
+        else {
+            //doesn't have a criteria. pull out the max, page and offset and assume the rest is
+
+            Map pager = [:]
+            ['max', 'offset', 'page'].each{ String k ->
+                if(paramCopy[k]) pager[k] = paramCopy.remove(k)
+            }
+            result['criteria'] = paramCopy
+            result['pager'] = pager
+        }
+        if (paramCopy.containsKey('sort')) {
+            result['criteria']['$sort'] = paramCopy.remove('sort')
         }
         return result
     }

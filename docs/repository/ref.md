@@ -282,22 +282,22 @@ An extension of the EntityValidationException to be able to handle rest request 
 
 
 ## Async batch processing support
-Plugin makes it easy to process list of batches asynchronously with transaction using [AsyncBatchSupport](https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncBatchSupport.html). 
-[GparsBatchSupport](https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsBatchSupport.html) is default implementation provided by the plugin.
+Plugin makes it easy to process list of batches asynchronously with transaction using [AsyncSupport](https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncSupport.html). 
+[GparsAsyncSupport](https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsAsyncSupport.html) is default implementation provided by the plugin.
 
 
 **batchSize** - Is the batchsize used for slicing the list. The default value is obtained from ```hibernate.jdbc.batch_size``` configuration setting. However it can be explicitely passed in args as shown in below example.  
-**poolSize** - Is the size of Gpars thread pool used by ```GparsBatchSupport```. The default value can configured using ```gpars.poolsize```. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1
+**poolSize** - Is the size of Gpars thread pool used by ```GparsAsyncSupport```. The default value can configured using ```gpars.poolsize```. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1
 
 
 **Example**:
 ```groovy
 
 class TestService {
-    AsyncBatchSupport asyncBatchSupport
+    AsyncSupport asyncSupport
 
     void insertBatches(List<Map> list) {
-        asyncBatchSupport.parallelCollate([batchSize:100], list) { Map record, Map args ->
+        asyncSupport.parallelCollate([batchSize:100], list) { Map record, Map args ->
             Org.create(record)
         }
     }
@@ -308,11 +308,11 @@ class TestService {
 
 The above code snippet will slice the list into batches of 100 and run each batch in parallel and wrap it in transaction. 
 
-The list can be processed in parallel without it being wrapped in transaction using ```asyncBatchSupport.parallel``` method.
+The list can be processed in parallel without it being wrapped in transaction using ```asyncSupport.parallel``` method.
 
 ```groovy
 
-asyncBatchSupport.parallel(asyncBatchSupport.collate(list)) { List batch, Map args ->
+asyncSupport.parallel(asyncSupport.collate(list)) { List batch, Map args ->
     //do some thing with the batch.
 }
 

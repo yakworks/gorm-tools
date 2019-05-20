@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.DbDialectService
 import gorm.tools.GormMetaUtils
-import gorm.tools.async.GparsBatchSupport
+import gorm.tools.async.GparsAsyncSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
@@ -50,10 +50,11 @@ class GormToolsPluginHelper {
 
         repoExceptionSupport(RepoExceptionSupport)
 
-        asyncBatchSupport(GparsBatchSupport){ bean ->
-            bean.autowire = true
-            bean.lazyInit = true
-        }
+        asyncSupport(GparsAsyncSupport)
+//            { bean ->
+//            bean.autowire = true
+//            bean.lazyInit = true
+//        }
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 
@@ -76,7 +77,7 @@ class GormToolsPluginHelper {
         }
     }
 
-    static void onChange(event, GrailsApplication grailsApplication, Plugin plugin) {
+    static void onChange(Object event, GrailsApplication grailsApplication, Plugin plugin) {
         if (!event.source || !event.ctx) {
             return
         }
@@ -88,7 +89,7 @@ class GormToolsPluginHelper {
         }
     }
 
-    static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass, beanBuilder = null) {
+    static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass, Object beanBuilder = null) {
         def lazyInit = repoClass.hasProperty("lazyInit") ? repoClass.getPropertyValue("lazyInit") : true
 
         def bClosure = {

@@ -14,7 +14,7 @@ import groovyx.gpars.util.PoolUtils
 import org.springframework.beans.factory.annotation.Value
 
 /**
- * a Gpars implementation of the AsyncBatchSupport trait
+ * a Gpars implementation of the AsyncSupport trait
  * to be used for colating/slicing a list into "batches" to then asynchronously process with Transactions
  * insert or update for maximum performance.
  *
@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Value
  * @since 6.1
  */
 @CompileStatic
-class GparsBatchSupport implements AsyncBatchSupport {
+class GparsAsyncSupport implements AsyncSupport {
 
     /** the pool size passed to GParsPool.withPool. if gpars.poolsize is not set then it uses PoolUtils.retrieveDefaultPoolSize()*/
     @Value('${gpars.poolsize:0}')
@@ -38,7 +38,7 @@ class GparsBatchSupport implements AsyncBatchSupport {
 
     /**
      * Iterates over the batchList with GParsPoolUtil.eachParallel and calls the closure passing in the list and the args
-     * Generally you will want to use the {@link AsyncBatchSupport#parallel} method
+     * Generally you will want to use the {@link AsyncSupport#parallel} method
      * that added by the Trait as it calls the withTransaction
      *
      * @param args _optional_ arg map to be passed to the async engine such as gpars.
@@ -55,6 +55,25 @@ class GparsBatchSupport implements AsyncBatchSupport {
                 batchClosure.call(batch, args.clone())
             }
         }
+    }
+
+    /**
+     * Iterates over the batchList with GParsPoolUtil.eachParallel and calls the closure passing in the list and the args
+     * Uses withSession to make sure there is a session bound to the thread
+     *
+     * @param args _optional_ arg map to be passed to the async engine such as gpars.
+     *     can also add any other value and they will be passed down through the closure as well <br>
+     *     - poolSize : gets passed down into the GParsPool.eachParallel for example
+     * @param collection a collated list of lists. each batch list in the batches will be asynchronously passed to the provided closure
+     * @param itemClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
+     */
+    @Override
+    public <T> Collection<T> eachParallel(Map args, Collection<T> collection, Closure itemClosure){
+        int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
+        GParsPool.withPool(psize) {
+            GParsPoolUtil.eachParallel(collection, withSession(itemClosure))
+        }
+        return collection
     }
 
 }

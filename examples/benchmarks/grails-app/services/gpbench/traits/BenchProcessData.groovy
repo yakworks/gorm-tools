@@ -1,9 +1,18 @@
 package gpbench.traits
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+
 import gorm.tools.WithTrx
 import gorm.tools.databinding.BindAction
+import gorm.tools.mango.DefaultMangoQuery
+import gorm.tools.mango.MangoBuilder
+import gorm.tools.mango.MangoTidyMap
+import gorm.tools.mango.api.MangoQuery
 import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.RepoUtil
+import gpbench.Region
+import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic
@@ -14,6 +23,10 @@ import org.grails.datastore.mapping.core.Session
 
 @CompileStatic
 abstract class BenchProcessData implements BenchConfig, WithTrx  {
+
+    @Autowired
+    @Qualifier("mangoQuery")
+    DefaultMangoQuery mangoQuery
 
     //default for insert, override for updates
     Closure bindAndSaveClosure = { Class<?> domainClass, Map row ->
@@ -46,6 +59,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
             } else {
                 //it's a createAction of create, update or validate so just spin through.
                 for (Map row : dataMap) {
+
                     getBindAndSaveClosure().call(domainClass, row)
                 }
             }
@@ -55,11 +69,11 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
 
     void saveAsync(Class domainClass, List dataMap){
         //collates list into list of lists
-        List<List> collatedList = asyncBatchSupport.collate(dataMap)
+        List<List> collatedList = asyncSupport.collate(dataMap)
         if(binderType == 'gorm-tools-repo'){
-            asyncBatchSupport.parallel(collatedList, getRepoBatchClosure())
+            asyncSupport.parallel(collatedList, getRepoBatchClosure())
         } else {
-            asyncBatchSupport.parallelBatch(collatedList) { Map row, Map zargs ->
+            asyncSupport.parallelBatch(collatedList) { Map row, Map zargs ->
                 getBindAndSaveClosure().call(domainClass, row)
             }
         }
@@ -115,6 +129,58 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
                 instance.save([failOnError:true])
             }
         }
+
+        //Region.query(name: 'foo', 'country.name': 'bar')
+        //mangoQuery.query(Region,[name: 'foo', 'country.name': 'bar'], null)
+        //testQuery3(name: 'foo', 'country.name': 'bar')
+        //testQuery5(name: 'foo', 'country.name': 'bar')
+    }
+
+    @CompileDynamic
+    void testQuery(){
+        Region.createCriteria().list {
+            eq 'name', 'foo'
+            country {
+                eq 'name', 'bar'
+            }
+        }
+    }
+
+    static Map q2 = MangoTidyMap.tidy([name: 'foo', 'country.name': 'bar'] as Map<String, Object>)
+
+    //@CompileDynamic
+    void testQuery2(){
+        DetachedCriteria detachedCriteria = new DetachedCriteria(Region)
+        DetachedCriteria newCriteria = MangoBuilder.cloneCriteria(detachedCriteria)
+        MangoBuilder.applyMapOrList(newCriteria, q2)
+        newCriteria.list()
+    }
+
+    void testQuery3(Map map){
+        //Map q2 = [name: 'foo', 'country.name': 'bar'] as Map<String, Object>
+        DetachedCriteria detachedCriteria = new DetachedCriteria(Region)
+        DetachedCriteria newCriteria = MangoBuilder.cloneCriteria(detachedCriteria)
+        MangoBuilder.applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
+        newCriteria.list()
+    }
+
+    void testQuery4(Map map){
+        Map<String, Map> p = mangoQuery.parseParams(map)
+        DetachedCriteria dcrit = mangoQuery.buildCriteria(Region, p['criteria'], null)
+        mangoQuery.query(dcrit, p['pager'])
+        //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)
+        //criteria.list(max: 10, offset: 0)
+    }
+
+    //static DetachedCriteria dcrit = MangoBuilder.build(Region, [name: 'foo', 'country.name': 'bar'], null)
+
+    void testQuery5(Map map){
+        //Map<String, Map> p = mangoQuery.parseParams(map)
+        DetachedCriteria dcrit = mangoQuery.buildCriteria(Region, map, null) //MangoBuilder.build(Region, map, null)
+        dcrit.list()
+        //mangoQuery.query(dcrit, map)
+        //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)
+        //criteria.list(max: 10, offset: 0)
     }
 
     void doSettersStatic(Class domainClass, String benchKey = 'setters static'){

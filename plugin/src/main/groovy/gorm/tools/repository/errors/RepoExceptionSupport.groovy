@@ -16,7 +16,7 @@ import org.springframework.validation.Errors
 import gorm.tools.repository.RepoMessage
 
 /**
- * Handler for exceptions thrown by the Repository
+ * Handler and translator for exceptions thrown by the Repository
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
@@ -24,6 +24,15 @@ import gorm.tools.repository.RepoMessage
 @CompileStatic
 class RepoExceptionSupport {
 
+    /**
+     * Translates grails ValidationException and springs DataAccessException and DataIntegrityViolationException
+     * into our EntityValidationException so we have better information in the exception when its thrown and rolled back
+     *
+     * @param ex the RuntimeException that was thrown
+     * @param entity the entity this was thrown for
+     * @return the new EntityValidationException or the OptimisticLockingFailureException with a betters message if thats was what
+     *         was thrown originally
+     */
     @CompileDynamic
     RuntimeException translateException(RuntimeException ex, GormEntity entity) {
         /*

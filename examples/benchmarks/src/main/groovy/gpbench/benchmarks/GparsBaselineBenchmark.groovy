@@ -22,7 +22,7 @@ class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends Base
 
     @Override
     def execute() {
-        asyncBatchSupport.parallelBatch(cities) { Map row, Map zargs ->
+        asyncSupport.parallelBatch(cities) { Map row, Map zargs ->
             //println "insertingRow $row"
             insertRow(row)
         }

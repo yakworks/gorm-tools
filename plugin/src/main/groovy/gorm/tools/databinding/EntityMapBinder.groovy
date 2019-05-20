@@ -154,7 +154,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             null, Object errors = null) {
         Objects.requireNonNull(target, "Target is null")
         if (!source) return
-        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(target.getClass())
+        GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(target.getClass() as Class)
         PersistentEntity entity = gormStaticApi.gormPersistentEntity
         List<String> properties = whiteList ?: entity.persistentPropertyNames
 

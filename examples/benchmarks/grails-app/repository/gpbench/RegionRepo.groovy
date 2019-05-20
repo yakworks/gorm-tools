@@ -2,6 +2,8 @@ package gpbench
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.events.BeforeBindEvent
+import gorm.tools.repository.events.RepoListener
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
@@ -11,8 +13,9 @@ class RegionRepo implements GormRepo<Region> {
 
     RegionRepo() { entityClass = Region }
 
-    void beforeBind(Region region, Map params, BindAction bindAction) {
-        if(bindAction == BindAction.Create) region.id = params.id as Long
+    @RepoListener
+    void beforeBind(Region region, Map params, BeforeBindEvent e) {
+        if(e.bindAction == BindAction.Create) region.id = params.id as Long
     }
 
 //    @Override

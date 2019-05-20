@@ -126,7 +126,7 @@ class CityFatInsertBenchmarks extends BenchProcessData {
                     scriptinsert.insertRow(domainClass, row)
                 }
             } else if(createAction == 'save async') {
-                asyncBatchSupport.parallelCollate(data) { row, zargs ->
+                asyncSupport.parallelCollate(data) { row, zargs ->
                     scriptinsert.insertRow(domainClass, row)
                 }
             }

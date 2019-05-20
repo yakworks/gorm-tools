@@ -1,6 +1,8 @@
 package gpbench.fat
 
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.events.BeforePersistEvent
+import gorm.tools.repository.events.RepoListener
 import gpbench.SecUtil
 import gpbench.fat.CityMethodEvents
 import groovy.transform.CompileStatic
@@ -9,7 +11,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class CityMethodEventsRepo implements GormRepo<CityMethodEvents> {
 
-    void beforePersist(CityMethodEvents entity, Map args) {
+    @RepoListener
+    void beforePersist(CityMethodEvents entity, BeforePersistEvent e) {
         Long uid = SecUtil.userId
         Date dt = new Date()
         entity.createdBy = uid

@@ -1,6 +1,6 @@
 package gpbench.benchmarks
 
-import gorm.tools.async.AsyncBatchSupport
+import gorm.tools.async.AsyncSupport
 import gorm.tools.repository.RepoUtil
 import gpbench.basic.CityBasic
 import gpbench.helpers.JsonReader
@@ -14,7 +14,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
     int poolSize
     int batchSize
 
-    AsyncBatchSupport asyncBatchSupport
+    AsyncSupport asyncSupport
 
     JsonReader jsonReader
 

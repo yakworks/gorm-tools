@@ -6,7 +6,6 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.databinding.BindAction
 import gorm.tools.repository.api.RepositoryApi
 
 /**

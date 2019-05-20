@@ -4,34 +4,34 @@
 */
 package gorm.tools.async
 
-import gorm.tools.testing.unit.GormToolsTest
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationContext
-import spock.lang.Specification
-
 import java.util.concurrent.atomic.AtomicInteger
 
-class GparsBatchSupportSpec extends Specification implements GormToolsTest {
+import org.springframework.context.ApplicationContext
 
-    @Autowired
-    GparsBatchSupport asyncBatchSupport
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import grails.artefact.Artefact
+import grails.testing.spring.AutowiredTest
 
-    void setupSpec() {
-        defineBeans({
-            asyncBatchSupport(GparsBatchSupport)
-        })
+class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredTest {
+
+    GparsAsyncSupport asyncSupport
+
+    List<Class> getDomainClasses() { [Foo] }
+
+    void setup() {
+        //asyncSupport = ctx.getBean("asyncSupport")
     }
 
     void "test collate"() {
         given:
         List list = createList(100)
-        //asyncBatchSupport.transactionService = getDatastore().getService(TransactionService)
+        //asyncSupport.transactionService = getDatastore().getService(TransactionService)
 
         expect:
         list.size() == 100
 
         when:
-        list = asyncBatchSupport.collate(list, 10)
+        list = asyncSupport.collate(list, 10)
 
         then:
         list.size() == 10
@@ -47,11 +47,27 @@ class GparsBatchSupportSpec extends Specification implements GormToolsTest {
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        asyncBatchSupport.parallel(asyncBatchSupport.collate(list, 10)) { List batch, Map args ->
+        asyncSupport.parallel(asyncSupport.collate(list, 10)) { List batch, Map args ->
             count.addAndGet(batch.size())
         }
         then:
         count.get() == 100
+    }
+
+    void "test eachParallel"() {
+        given:
+        List<Map> list = createList(100)
+
+        expect:
+        list.size() == 100
+
+        when:
+        AtomicInteger count = new AtomicInteger(0)
+        asyncSupport.eachParallel(list) { Map item ->
+            new Foo(name: "name $item.name").persist()
+        }
+        then:
+        Foo.count() == 100
     }
 
 
@@ -64,7 +80,7 @@ class GparsBatchSupportSpec extends Specification implements GormToolsTest {
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        asyncBatchSupport.parallelCollate([batchSize:10], list) { Map record, Map args ->
+        asyncSupport.parallelCollate([batchSize:10], list) { Map record, Map args ->
             count.addAndGet(1)
         }
         then:
@@ -79,7 +95,7 @@ class GparsBatchSupportSpec extends Specification implements GormToolsTest {
 
         when:
         int count = 0
-        asyncBatchSupport.batchTrx([test:1], list) { Map item, Map args ->
+        asyncSupport.batchTrx([test:1], list) { Map item, Map args ->
             count = count + 1
             assert args.test == 1
         }
@@ -99,4 +115,9 @@ class GparsBatchSupportSpec extends Specification implements GormToolsTest {
 
         return result
     }
+}
+
+@Artefact("Domain")
+class Foo {
+    String name
 }

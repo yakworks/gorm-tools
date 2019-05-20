@@ -1,11 +1,9 @@
 rootProject.name = 'gorm-tools-root'
-//tests will be included in main runs but not deploy tasks and doc tasks
-include "examples:benchmarks"
-include "examples:test-app"
-
-// Deployable projects are any projects not in the ':example:' name space
 include 'plugin'
-findProject(':plugin').with{
-  name = 'gorm-tools'
-  //buildFileName = "${name}.gradle"
-}
+findProject(':plugin').name = 'gorm-tools'
+
+//tests will be included in main runs but not deploy tasks and doc tasks
+include "examples/benchmarks"
+include "examples/test-app"
+findProject(':examples/benchmarks').name = 'benchmarks'
+findProject(':examples/test-app').name = 'test-app'

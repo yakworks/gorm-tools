@@ -23,7 +23,7 @@ class GparsBaseLineUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
         List<Long> all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
-        asyncBatchSupport.parallelBatch(batches){Long id, Map args ->
+        asyncSupport.parallelBatch(batches){Long id, Map args ->
             updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
     }

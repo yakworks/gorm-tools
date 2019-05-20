@@ -12,7 +12,7 @@ import org.hibernate.criterion.CriteriaSpecification
 /**
  * For consistently searching across data types.
  */
-@SuppressWarnings(["NestedBlockDepth", "ExplicitCallToAndMethod", "ExplicitCallToOrMethod"])
+@SuppressWarnings(["NestedBlockDepth"])
 @CompileStatic
 class CriteriaUtils {
 

@@ -13,9 +13,8 @@ import java.time.LocalDateTime
 
 @Entity
 @GrailsCompileStatic
-class Org {
+class Org implements NameTrait{
     //strings
-    String name
     String name2
     String secret
     //boolean
@@ -42,7 +41,8 @@ class Org {
     static List quickSearchFields = ["name"]
 
     static constraints = {
-        name     nullable: false
+        importFrom(NameTraitConstraints)
+
         name2    nullable: true
         secret   nullable: true, display: false
 

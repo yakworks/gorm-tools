@@ -1,6 +1,7 @@
 package gpbench
 
-import gorm.tools.async.AsyncBatchSupport
+
+import gorm.tools.async.AsyncSupport
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
@@ -25,7 +26,7 @@ import org.springframework.dao.DataAccessException
 
 class DeprecatedRunnerService {
 
-    AsyncBatchSupport asyncBatchSupport
+    AsyncSupport asyncSupport
     DataSetup dataSetup
 
     @Value('${gpars.poolsize}')
@@ -233,7 +234,7 @@ class DeprecatedRunnerService {
     }
 
     void insert(List<List<Map>> batchList, RepositoryApi repo) {
-        asyncBatchSupport.parallel(batchList) { List<Map> list, Map args ->
+        asyncSupport.parallel(batchList) { List<Map> list, Map args ->
             repo.batchCreate(list)
         }
     }

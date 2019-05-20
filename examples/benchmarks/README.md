@@ -101,11 +101,12 @@ Goals:
 
 - **setters static, no assocs** - Uses the [CityFatNoTraitsNoAssoc] with no associations and does not use Traits.
   staticically compiled method with plain old setters are used as can be seen in the domain.
-- **setters static**  - uses statically compiled setters to populate the domain.
-- **setters dynamic**  - uses setters in a method that is marked with `@CompileDynamic`
+- **setters static**  - uses statically compiled setters to populate the domain. marked with `@CompileStatic`
+- **setters dynamic**  - uses dynamically compiled setters to populate the domain. marked with `@CompileDynamic`
 - **gorm-tools: repository batch** - uses the gorm-tools repository's batchCreate
 	which in turn uses the fast EntityMapBinder to bind the json data and the repository methods
  	to create persist. Uses defaults with all events enabled.
+- **gorm-tools: fast binder & persist** - TODO
 - **Grails default DataBinder, No Traits** - this benchmark uses the "out of the box"
 	binder in grails with [CityFatNoTraits] which is statically compiled.
   basically what you get when you do `someDomain.properties = jsonData`.
@@ -119,7 +120,7 @@ Goals:
 
 - **Domain @Compile** - when it static its using the [CityFat] domain that
 	had @CompileStatic or @GrailsCompileStatic and when its dynamic its using
-	the [CityFatDynamic] which is fuly dynamicaly compiled.
+	the [CityFatDynamic] which is dynamicaly compiled ( not marked with GrailsCompileStatic).
 - **create** - creates a new instance and sets or binds the json data
 	depending on the benchmark type. The 'setters ..' benchmarks will use setters,
 	the others use either gorm-tools databinding or grails etc..
@@ -127,7 +128,7 @@ Goals:
 - **save batch** - see the examples. uses the the jdb_batch size(default of 100)
 	and "chunks" or batches the saves. calls flush() after each batch of 100
 	is inserted and calls clear() to empty the hibernate/gorm cache
-- **save async** - Uses the gorm-tools helper bean [AsyncBatchSupport]
+- **save async** - Uses the gorm-tools helper bean [AsyncSupport]
 	which uses gpars by default. This also chunks or batches the inserts
   asynchronously using a pool size of 5 threads by default.
 	essentially collates the List of items from json into a list of lists(or batches)
@@ -137,7 +138,7 @@ Goals:
 [CityFat]: todo
 [CityFatDynamic]: todo
 [CityFatNoTraits]: todo
-[AsyncBatchSupport]: todo
+[AsyncSupport]: todo
 
 #### Bench Mark Results
 
@@ -413,6 +414,7 @@ The key conclusions Are as below
     * Going from 2 cores to 4 improves numbers significantly
     * Going from 4 cores to 8 numbers either degrades or improves only slightly on an intel 4 core with hyper-threading simulating 8 cores
     * from pool size 9 onward, performance defintely starts degrading as expected with threads fighting for resources.
+16. set grails.gorm.autowire=false, its about 10% faster for saving. 
 
 ### Questions answered by above conclusion.
 
@@ -421,9 +423,12 @@ Gpars batch insert without data binding and validation.
 
 **Does binding slow it down, why, can it be optimized, best alternative**
 - Yes, databinding has huge overhead on performance
-- The overhead is caused by iterating over each property of the domain for every instance that needs to be bind, calling type conversion system
-  and other stuff done by GrailsWebDataBinder.
-- There is nothing much can be done other then not using databinding
+- The overhead is caused by iterating over each property of the domain for every instance that needs to be bind, 
+  calling type conversion system and other stuff done by GrailsWebDataBinder.
+- Don't use databinding if you don't need to. Otherwise use the fast EntityMapBinder here. 
+
+**Does grails.gorm.autowire=true slow it down**
+- Yes, by anywhere from 5% to 15%
 
 **Does valiation slow it down, why, can it be optimized**
 - Yes, it has slight performance impact
@@ -440,15 +445,16 @@ Gpars batch insert without data binding and validation.
 - No, very very little effect, some thing around 1 to 1.5 seconds for 115K records.
 
 **Do custom Id generator slow it down, or improves speed**
-- The batch id generator provided by Dao plugin actually improves the performance.
+- The batch id generator provided by Dao plugin improves the performance significantly.
 
 **Do using Dataflow queue/operator make it faster**
 - No, it has no noticeable effect
 
 **Does @compileStatic speed things up**
-- Yes, compile static improves the performance as method calls are not intercepted and does not go through the metaclass.
+- YES, significantly. compile static improves the performance as method calls are not intercepted and does not go through the metaclass.
 - Putting CompileStatic on domain class improves the databinding speed.
-- It is recommended to use compile static on services, domain classes and other code as far as possible, unless the code need to use dynamic dispatch.
+- It is recommended to use compile static on services, domain classes and other code as far as possible, 
+  unless the code need to use dynamic dispatch.
 
 
 ## References and reading

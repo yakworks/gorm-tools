@@ -99,6 +99,44 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     }
 
+    def "test dirty checking works for traits"() {
+        when:
+        Org org = build(Org)//new Org(name: "get_test_version").save()
+        org.ext  = build([save: false], OrgExt)
+        org.ext.org = org
+        org.save(failOnError: true)
+        org.ext.save(failOnError: true)
+
+        then: "version should be 0"
+        org.version == 0
+        org.ext.version == 0
+
+        when: "changes happen to ext"
+        org.ext.text1 = "make dirty"
+
+        then: "Org and ext is dirty"
+        org.isDirty()
+        org.isDirty('ext')
+        org.ext.isDirty()
+        org.getDirtyPropertyNames() == ['ext']
+
+        when: "changes happen to ext"
+        RepoUtil.flushAndClear()
+        org = Org.get(3)
+        assert org.name == 'name'
+        org['name'] = "make dirty1"
+        org.name2 = "make dirty2"
+        //org.persist(flush: true)
+
+        then: "name and name2 should be dirty"
+        org.name == "make dirty1"
+        org.isDirty()
+        org.isDirty('name')
+        org.getDirtyPropertyNames() == ['name','name2']
+        org.getPersistentValue('name') == 'name'
+
+    }
+
     def "test get with non-existent id"() {
         setup:
         Org org = build(Org)

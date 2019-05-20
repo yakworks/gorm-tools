@@ -1,10 +1,12 @@
 package repoapp
 
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import testing.Student
 
 @Integration
+@Rollback
 class MangoSpec extends Specification {
 
     def "Check list"() {

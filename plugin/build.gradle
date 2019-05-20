@@ -60,9 +60,6 @@ bootRepackage.enabled = false
 ext.codenarcRuleset= '''
   //getRule('MethodParameterTypeRequired').enabled = false
   //getRule('Println').enabled = false
-  getRule('ExplicitCallToOrMethod').enabled = false
-  getRule('IfStatementCouldBeTernary').enabled = false
-  getRule('UnnecessaryCast').enabled = false //doesn't work all the time when using CompileStatic
 '''
 
 test {

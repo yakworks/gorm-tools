@@ -1058,16 +1058,16 @@ Repository also publishes events using spring event mechanism which can be used 
 <p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/errors/EntityNotFoundException.html">EntityNotFoundException</a></p>
 <p>An extension of the EntityValidationException to be able to handle rest request which should respond with 404 error.</p>
 <h2 id="async-batch-processing-support">Async batch processing support<a class="headerlink" href="#async-batch-processing-support" title="Permanent link">&para;</a></h2>
-<p>Plugin makes it easy to process list of batches asynchronously with transaction using <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>. 
-<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsBatchSupport.html">GparsBatchSupport</a> is default implementation provided by the plugin.</p>
+<p>Plugin makes it easy to process list of batches asynchronously with transaction using <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncSupport.html">AsyncSupport</a>. 
+<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsAsyncSupport.html">GparsAsyncSupport</a> is default implementation provided by the plugin.</p>
 <p><strong>batchSize</strong> - Is the batchsize used for slicing the list. The default value is obtained from <code>hibernate.jdbc.batch_size</code> configuration setting. However it can be explicitely passed in args as shown in below example.<br />
-<strong>poolSize</strong> - Is the size of Gpars thread pool used by <code>GparsBatchSupport</code>. The default value can configured using <code>gpars.poolsize</code>. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1</p>
+<strong>poolSize</strong> - Is the size of Gpars thread pool used by <code>GparsAsyncSupport</code>. The default value can configured using <code>gpars.poolsize</code>. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1</p>
 <p><strong>Example</strong>:
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">TestService</span> <span class="o">{</span>
-    <span class="n">AsyncBatchSupport</span> <span class="n">asyncBatchSupport</span>
+    <span class="n">AsyncSupport</span> <span class="n">asyncSupport</span>
 
     <span class="kt">void</span> <span class="nf">insertBatches</span><span class="o">(</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&gt;</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">asyncBatchSupport</span><span class="o">.</span><span class="na">parallelCollate</span><span class="o">([</span><span class="nl">batchSize:</span><span class="mi">100</span><span class="o">],</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span> <span class="n">Map</span> <span class="n">record</span><span class="o">,</span> <span class="n">Map</span> <span class="n">args</span> <span class="o">-&gt;</span>
+        <span class="n">asyncSupport</span><span class="o">.</span><span class="na">parallelCollate</span><span class="o">([</span><span class="nl">batchSize:</span><span class="mi">100</span><span class="o">],</span> <span class="n">list</span><span class="o">)</span> <span class="o">{</span> <span class="n">Map</span> <span class="n">record</span><span class="o">,</span> <span class="n">Map</span> <span class="n">args</span> <span class="o">-&gt;</span>
             <span class="n">Org</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">record</span><span class="o">)</span>
         <span class="o">}</span>
     <span class="o">}</span>
@@ -1075,8 +1075,8 @@ Repository also publishes events using spring event mechanism which can be used 
 <span class="o">}</span>
 </pre></div></p>
 <p>The above code snippet will slice the list into batches of 100 and run each batch in parallel and wrap it in transaction. </p>
-<p>The list can be processed in parallel without it being wrapped in transaction using <code>asyncBatchSupport.parallel</code> method.</p>
-<div class="codehilite"><pre><span></span><span class="n">asyncBatchSupport</span><span class="o">.</span><span class="na">parallel</span><span class="o">(</span><span class="n">asyncBatchSupport</span><span class="o">.</span><span class="na">collate</span><span class="o">(</span><span class="n">list</span><span class="o">))</span> <span class="o">{</span> <span class="n">List</span> <span class="n">batch</span><span class="o">,</span> <span class="n">Map</span> <span class="n">args</span> <span class="o">-&gt;</span>
+<p>The list can be processed in parallel without it being wrapped in transaction using <code>asyncSupport.parallel</code> method.</p>
+<div class="codehilite"><pre><span></span><span class="n">asyncSupport</span><span class="o">.</span><span class="na">parallel</span><span class="o">(</span><span class="n">asyncSupport</span><span class="o">.</span><span class="na">collate</span><span class="o">(</span><span class="n">list</span><span class="o">))</span> <span class="o">{</span> <span class="n">List</span> <span class="n">batch</span><span class="o">,</span> <span class="n">Map</span> <span class="n">args</span> <span class="o">-&gt;</span>
     <span class="c1">//do some thing with the batch.</span>
 <span class="o">}</span>
 </pre></div>

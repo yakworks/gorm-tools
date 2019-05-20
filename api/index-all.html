@@ -163,11 +163,11 @@ if (location.href.indexOf('is-external=true') == -1) {
  By default free-jqrid prepared sorting properties with next pattern
  sort = columnName(id, name, etc) order(asc|desc), next column order of the last column name is in `order` parametr
  Example: if user first sorted by name and then by id sort params will be look like [sort: 'name asc, id', order: 'asc']</div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html" title="Trait in gorm.tools.async">AsyncBatchSupport</a></span> - Trait in <a href="./gorm/tools/async/package-summary.html">gorm.tools.async</a>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html" title="Trait in gorm.tools.async">AsyncSupport</a></span> - Trait in <a href="./gorm/tools/async/package-summary.html">gorm.tools.async</a>
 </dt><dd><div class="block">a trait to be used for colating/slicing a list into "batches" to then asynchronously with Transactions
  insert or update for maximum performance.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/hibernate/AutoHibernateSpec.html" title="Class in gorm.tools.testing.hibernate">AutoHibernateSpec</a></span> - Class in <a href="./gorm/tools/testing/hibernate/package-summary.html">gorm.tools.testing.hibernate</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">automatically runs tests on persist(), create(), update(), delete()</div></dd>
 </dl>
 
     
@@ -191,7 +191,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/api/RepositoryApi.html#batchRemove(java.util.List)" title="Method in RepositoryApi">batchRemove(List)</a></span> - Method in <a href="gorm/tools/repository/api/RepositoryApi.html">RepositoryApi</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html#batchTrx(java.util.Map, java.util.List, groovy.lang.Closure)" title="Method in AsyncBatchSupport">batchTrx(Map, List, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#batchTrx(java.util.Map, java.util.List, groovy.lang.Closure)" title="Method in AsyncSupport">batchTrx(Map, List, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
 </dt><dd> <div class="block">runs {@link #doBatch ) in a Transaction and flush and clear is called after doBatch but before commit.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/api/GormBatchRepo.html#batchTrx(java.util.List, groovy.lang.Closure)" title="Method in GormBatchRepo">batchTrx(List, Closure)</a></span> - Method in <a href="gorm/tools/repository/api/GormBatchRepo.html">GormBatchRepo</a>
 </dt><dd> <div class="block">Transactional, Iterates over list and runs closure for each item</div></dd>
@@ -422,7 +422,9 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/integration/DataIntegrationTest.html#clearMetaClassChanges()" title="Method in DataIntegrationTest">clearMetaClassChanges()</a></span> - Method in <a href="gorm/tools/testing/integration/DataIntegrationTest.html">DataIntegrationTest</a>
 </dt><dd> <div class="block">Reverts all metaclass changes done since last call to trackMetaClassChanges()</div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html#collate(java.util.List, java.lang.Integer)" title="Method in AsyncBatchSupport">collate(List, Integer)</a></span> - Method in <a href="gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>
+<dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#cloneCriteria(grails.gorm.DetachedCriteria)" title="Method in MangoBuilder">cloneCriteria(DetachedCriteria)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
+</dt><dd> <div class="block"></div></dd>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#collate(java.util.List, java.lang.Integer)" title="Method in AsyncSupport">collate(List, Integer)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
 </dt><dd> <div class="block">Uses collate to break or slice the list into sub-lists of batches. </div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/GormToolsSpecHelper.html#commonBeans()" title="Method in GormToolsSpecHelper">commonBeans()</a></span> - Method in <a href="gorm/tools/testing/unit/GormToolsSpecHelper.html">GormToolsSpecHelper</a>
 </dt><dd> <div class="block"></div></dd>
@@ -502,7 +504,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#DEFAULT_ENUM_TYPE" title="Field in GrailsDomainBinder">DEFAULT_ENUM_TYPE</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/DefaultGormRepo.html" title="Class in gorm.tools.repository">DefaultGormRepo</a></span> - Class in <a href="./gorm/tools/repository/package-summary.html">gorm.tools.repository</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">A concrete implementation of the GormRepo</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/DefaultGormRepo.html#DefaultGormRepo(Class<D>)" title="Constructor in DefaultGormRepo">DefaultGormRepo(Class&lt;D&gt;)</a></span> - Constructor in <a href="gorm/tools/repository/DefaultGormRepo.html">DefaultGormRepo</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="grails/plugin/gormtools/DefaultGrailsRepositoryClass.html" title="Class in grails.plugin.gormtools">DefaultGrailsRepositoryClass</a></span> - Class in <a href="./grails/plugin/gormtools/package-summary.html">grails.plugin.gormtools</a>
@@ -513,7 +515,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html#defaultLocale()" title="Method in RepoMessage">defaultLocale()</a></span> - Method in <a href="gorm/tools/repository/RepoMessage.html">RepoMessage</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/DefaultMangoQuery.html" title="Class in gorm.tools.mango">DefaultMangoQuery</a></span> - Class in <a href="./gorm/tools/mango/package-summary.html">gorm.tools.mango</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">Default implementation of MangoQuery. </div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#defaultMapping" title="Field in GrailsDomainBinder">defaultMapping</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/DelegatingBean.html" title="Class in gorm.tools.beans">DelegatingBean</a></span> - Class in <a href="./gorm/tools/beans/package-summary.html">gorm.tools.beans</a>
@@ -528,9 +530,8 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doAfterRemove(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map)" title="Method in RepoEventPublisher">doAfterRemove(RepositoryApi, GormEntity, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html#doBatch(java.util.Map, java.util.List, groovy.lang.Closure)" title="Method in AsyncBatchSupport">doBatch(Map, List, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>
-</dt><dd> <div class="block">calls closure for each item in list. flush and clear is called after all items are done
- and just before commit.</div></dd>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#doBatch(java.util.Map, java.util.List, groovy.lang.Closure)" title="Method in AsyncSupport">doBatch(Map, List, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
+</dt><dd> <div class="block">calls closure for each item in list.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doBeforeBind(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map, gorm.tools.databinding.BindAction, java.util.Map)" title="Method in RepoEventPublisher">doBeforeBind(RepositoryApi, GormEntity, Map, BindAction, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#doBeforePersist(gorm.tools.repository.api.RepositoryApi, org.grails.datastore.gorm.GormEntity, java.util.Map)" title="Method in RepoEventPublisher">doBeforePersist(RepositoryApi, GormEntity, Map)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
@@ -583,12 +584,18 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">Executes the query and calls the closure for each batch of records.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/Pager.html#eachPage(groovy.lang.Closure)" title="Method in Pager">eachPage(Closure)</a></span> - Method in <a href="gorm/tools/Pager.html">Pager</a>
 </dt><dd> <div class="block">Calls passed closure for each page</div></dd>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#eachParallel(java.util.Map, Collection<T>, groovy.lang.Closure)" title="Method in AsyncSupport">eachParallel(Map, Collection&lt;T&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
+</dt><dd> <div class="block">Iterates over the lists and calls the closure passing in the list item and the args asynchronously.
+ </div></dd>
+<dt><span class="strong"><a href="gorm/tools/async/GparsAsyncSupport.html#eachParallel(java.util.Map, Collection<T>, groovy.lang.Closure)" title="Method in GparsAsyncSupport">eachParallel(Map, Collection&lt;T&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/GparsAsyncSupport.html">GparsAsyncSupport</a>
+</dt><dd> <div class="block">Iterates over the batchList with GParsPoolUtil.eachParallel and calls the closure passing in the list and the args
+ Uses withSession to make sure there is a session bound to the thread</div></dd>
 <dt><span class="strong"><a href="gorm/tools/jdbc/ScrollableQuery.html#eachRow(java.lang.String, groovy.lang.Closure)" title="Method in ScrollableQuery">eachRow(String, Closure)</a></span> - Method in <a href="gorm/tools/jdbc/ScrollableQuery.html">ScrollableQuery</a>
 </dt><dd> <div class="block">Executes the query and calls the closure for each row.</div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#EMPTY_PATH" title="Field in GrailsDomainBinder">EMPTY_PATH</a></span> - Field in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/EmptyErrors.html" title="Class in gorm.tools.repository.errors">EmptyErrors</a></span> - Class in <a href="./gorm/tools/repository/errors/package-summary.html">gorm.tools.repository.errors</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">just a concrete errors implementation for the binding errors so we can use it as a placeholder</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/EmptyErrors.html#EmptyErrors(java.lang.String)" title="Constructor in EmptyErrors">EmptyErrors(String)</a></span> - Constructor in <a href="gorm/tools/repository/errors/EmptyErrors.html">EmptyErrors</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/TestTools.html#ensureList(java.lang.Object)" title="Method in TestTools">ensureList(Object)</a></span> - Method in <a href="gorm/tools/testing/TestTools.html">TestTools</a>
@@ -737,7 +744,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/testing/integration/DataIntegrationTest.html#getDatastore()" title="Method in DataIntegrationTest">getDatastore()</a></span> - Method in <a href="gorm/tools/testing/integration/DataIntegrationTest.html">DataIntegrationTest</a>
 </dt><dd> <div class="block">consistency with other areas of grails and other unit tests</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepo.html#getDatastore()" title="Method in GormRepo">getDatastore()</a></span> - Method in <a href="gorm/tools/repository/GormRepo.html">GormRepo</a>
-</dt><dd> <div class="block">gets the dataStore for this Gorm domain instance</div></dd>
+</dt><dd> <div class="block">gets the datastore for this Gorm domain instance</div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/hibernate/GormToolsHibernateSpec.html#getDatastore()" title="Method in GormToolsHibernateSpec">getDatastore()</a></span> - Method in <a href="gorm/tools/testing/hibernate/GormToolsHibernateSpec.html">GormToolsHibernateSpec</a>
 </dt><dd> <div class="block">consistency with other areas of grails and other unit tests</div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/GormToolsSpecHelper.html#getDatastore()" title="Method in GormToolsSpecHelper">getDatastore()</a></span> - Method in <a href="gorm/tools/testing/unit/GormToolsSpecHelper.html">GormToolsSpecHelper</a>
@@ -893,13 +900,15 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/GormUtils.html#getPropertyValue(java.lang.Object, java.lang.String)" title="Method in GormUtils">getPropertyValue(Object, String)</a></span> - Method in <a href="gorm/tools/GormUtils.html">GormUtils</a>
 </dt><dd> <div class="block">Return the value of the (possibly nested) property of the specified name, for the specified source object</div></dd>
+<dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#getQuickSearchFields(grails.gorm.DetachedCriteria)" title="Method in MangoBuilder">getQuickSearchFields(DetachedCriteria)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
+</dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepoEntity.html#getRepo()" title="Method in GormRepoEntity">getRepo()</a></span> - Method in <a href="gorm/tools/repository/GormRepoEntity.html">GormRepoEntity</a>
 </dt><dd> <div class="block">Calls the findRepo(). can be overriden to return the concrete domain Repository</div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/api/QueryMangoEntity.html#getRepo()" title="Method in QueryMangoEntity">getRepo()</a></span> - Method in <a href="gorm/tools/mango/api/QueryMangoEntity.html">QueryMangoEntity</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoUtil.html#getRepo(Class<T>)" title="Method in RepoUtil">getRepo(Class&lt;T&gt;)</a></span> - Method in <a href="gorm/tools/repository/RepoUtil.html">RepoUtil</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="grails/plugin/gormtools/GormToolsPluginHelper.html#getRepoBeanClosure(grails.plugin.gormtools.GrailsRepositoryClass, def)" title="Method in GormToolsPluginHelper">getRepoBeanClosure(GrailsRepositoryClass, def)</a></span> - Method in <a href="grails/plugin/gormtools/GormToolsPluginHelper.html">GormToolsPluginHelper</a>
+<dt><span class="strong"><a href="grails/plugin/gormtools/GormToolsPluginHelper.html#getRepoBeanClosure(grails.plugin.gormtools.GrailsRepositoryClass, java.lang.Object)" title="Method in GormToolsPluginHelper">getRepoBeanClosure(GrailsRepositoryClass, Object)</a></span> - Method in <a href="grails/plugin/gormtools/GormToolsPluginHelper.html">GormToolsPluginHelper</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="grails/plugin/gormtools/RepositoryArtefactHandler.html#getRepoBeanName(java.lang.Class)" title="Method in RepositoryArtefactHandler">getRepoBeanName(Class)</a></span> - Method in <a href="grails/plugin/gormtools/RepositoryArtefactHandler.html">RepositoryArtefactHandler</a>
 </dt><dd> <div class="block"></div></dd>
@@ -927,6 +936,8 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#getTableName(org.grails.datastore.mapping.model.PersistentEntity, java.lang.String)" title="Method in GrailsDomainBinder">getTableName(PersistentEntity, String)</a></span> - Method in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block">Evaluates the table name for the given property</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/EmptyErrors.html#getTarget()" title="Method in EmptyErrors">getTarget()</a></span> - Method in <a href="gorm/tools/repository/errors/EmptyErrors.html">EmptyErrors</a>
+</dt><dd> <div class="block"></div></dd>
+<dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#getTargetClass(grails.gorm.DetachedCriteria)" title="Method in MangoBuilder">getTargetClass(DetachedCriteria)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/MultiFormatDateConverter.html#getTargetType()" title="Method in MultiFormatDateConverter">getTargetType()</a></span> - Method in <a href="gorm/tools/beans/MultiFormatDateConverter.html">MultiFormatDateConverter</a>
 </dt><dd> <div class="block">The type converter should be applied to</div></dd>
@@ -964,11 +975,11 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepo.html" title="Trait in gorm.tools.repository">GormRepo</a></span> - Trait in <a href="./gorm/tools/repository/package-summary.html">gorm.tools.repository</a>
 </dt><dd><div class="block">A trait that turns a class into a Repository</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/GormRepoEntity.html" title="Trait in gorm.tools.repository">GormRepoEntity</a></span> - Trait in <a href="./gorm/tools/repository/package-summary.html">gorm.tools.repository</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">Main trait for a domain. gets applied to them during startup grails artifact part</div></dd>
 <dt><span class="strong"><a href="grails/plugin/gormtools/GormRepoEntityTraitInjector.html" title="Class in grails.plugin.gormtools">GormRepoEntityTraitInjector</a></span> - Class in <a href="./grails/plugin/gormtools/package-summary.html">grails.plugin.gormtools</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">@author Joshua Burnett (@basejump)</div></dd>
 <dt><span class="strong"><a href="gorm/tools/compiler/GormRepository.html" title="Annotation Type in gorm.tools.compiler">GormRepository</a></span> - Annotation Type in <a href="./gorm/tools/compiler/package-summary.html">gorm.tools.compiler</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">Annotation that marks a Repository artifact</div></dd>
 <dt><span class="strong"><a href="gorm/tools/compiler/GormRepositoryArtefactTypeTransformation.html" title="Class in gorm.tools.compiler">GormRepositoryArtefactTypeTransformation</a></span> - Class in <a href="./gorm/tools/compiler/package-summary.html">gorm.tools.compiler</a>
 </dt><dd><div class="block">A transformation that makes an Artefact a GormRepository</div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/hibernate/GormToolsHibernateSpec.html" title="Class in gorm.tools.testing.hibernate">GormToolsHibernateSpec</a></span> - Class in <a href="./gorm/tools/testing/hibernate/package-summary.html">gorm.tools.testing.hibernate</a>
@@ -983,8 +994,8 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/GormUtils.html" title="Class in gorm.tools">GormUtils</a></span> - Class in <a href="./gorm/tools/package-summary.html">gorm.tools</a>
 </dt><dd><div class="block">GormUtils provides a set of static helpers for working with domain classes.
  </div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/GparsBatchSupport.html" title="Class in gorm.tools.async">GparsBatchSupport</a></span> - Class in <a href="./gorm/tools/async/package-summary.html">gorm.tools.async</a>
-</dt><dd><div class="block">a Gpars implementation of the AsyncBatchSupport trait
+<dt><span class="strong"><a href="gorm/tools/async/GparsAsyncSupport.html" title="Class in gorm.tools.async">GparsAsyncSupport</a></span> - Class in <a href="./gorm/tools/async/package-summary.html">gorm.tools.async</a>
+</dt><dd><div class="block">a Gpars implementation of the AsyncSupport trait
  to be used for colating/slicing a list into "batches" to then asynchronously process with Transactions
  insert or update for maximum performance.</div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html" title="Class in org.grails.orm.hibernate.cfg">GrailsDomainBinder</a></span> - Class in <a href="./org/grails/orm/hibernate/cfg/package-summary.html">org.grails.orm.hibernate.cfg</a>
@@ -996,7 +1007,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd><div class="block">Row mapper which allows to convert data from a given ResultSet instance
  to a grails parameter map, which can be used for databinding.</div></dd>
 <dt><span class="strong"><a href="grails/plugin/gormtools/GrailsRepositoryClass.html" title="Interface in grails.plugin.gormtools">GrailsRepositoryClass</a></span> - Interface in <a href="./grails/plugin/gormtools/package-summary.html">grails.plugin.gormtools</a>
-</dt><dd><div class="block">@author Joshua Burnett</div></dd>
+</dt><dd><div class="block">@author Joshua Burnett (@basejump)</div></dd>
 </dl>
 
     
@@ -1042,11 +1053,13 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd><div class="block">@Deprecated do not use anymore</div></dd>
 <dt><span class="strong"><a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html#ilike(java.lang.String, java.lang.Object)" title="Method in GormHibernateCriteriaBuilder">ilike(String, Object)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html">GormHibernateCriteriaBuilder</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/GparsBatchSupport.html#init()" title="Method in GparsBatchSupport">init()</a></span> - Method in <a href="gorm/tools/async/GparsBatchSupport.html">GparsBatchSupport</a>
+<dt><span class="strong"><a href="gorm/tools/async/GparsAsyncSupport.html#init()" title="Method in GparsAsyncSupport">init()</a></span> - Method in <a href="gorm/tools/async/GparsAsyncSupport.html">GparsAsyncSupport</a>
 </dt><dd> <div class="block">setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#init()" title="Method in RepoEventPublisher">init()</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html#inList(java.lang.String, java.lang.Object)" title="Method in GormHibernateCriteriaBuilder">inList(String, Object)</a></span> - Method in <a href="gorm/tools/hibernate/criteria/GormHibernateCriteriaBuilder.html">GormHibernateCriteriaBuilder</a>
+</dt><dd> <div class="block"></div></dd>
+<dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html#invoke(java.lang.String, java.lang.Object)" title="Method in MangoBuilder">invoke(String, Object)</a></span> - Method in <a href="gorm/tools/mango/MangoBuilder.html">MangoBuilder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoEventPublisher.html#invokeEventMethod(java.lang.Object, java.lang.String, java.lang.Object)" title="Method in RepoEventPublisher">invokeEventMethod(Object, String, Object)</a></span> - Method in <a href="gorm/tools/repository/events/RepoEventPublisher.html">RepoEventPublisher</a>
 </dt><dd> <div class="block"></div></dd>
@@ -1142,9 +1155,9 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dl>
 
 <dt><span class="strong"><a href="gorm/tools/mango/MangoBuilder.html" title="Class in gorm.tools.mango">MangoBuilder</a></span> - Class in <a href="./gorm/tools/mango/package-summary.html">gorm.tools.mango</a>
-</dt><dd><div class="block"></div></dd>
+</dt><dd><div class="block">the main builder to turn Mango QL maps and json into DetachedCriteria for Gorm</div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/api/MangoQuery.html" title="Interface in gorm.tools.mango.api">MangoQuery</a></span> - Interface in <a href="./gorm/tools/mango/api/package-summary.html">gorm.tools.mango.api</a>
-</dt><dd><div class="block">For methods that</div></dd>
+</dt><dd><div class="block">Interface to be implemented by a bean</div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoTidyMap.html" title="Class in gorm.tools.mango">MangoTidyMap</a></span> - Class in <a href="./gorm/tools/mango/package-summary.html">gorm.tools.mango</a>
 </dt><dd><div class="block">Utils to normalizes params map to transform it to mango language</div></dd>
 <dt><span class="strong"><a href="gorm/tools/databinding/MapBinder.html" title="Interface in gorm.tools.databinding">MapBinder</a></span> - Interface in <a href="./gorm/tools/databinding/package-summary.html">gorm.tools.databinding</a>
@@ -1218,7 +1231,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 <h2 class="title">O</h2>
 <dl>
 
-<dt><span class="strong"><a href="grails/plugin/gormtools/GormToolsPluginHelper.html#onChange(def, grails.core.GrailsApplication, grails.plugins.Plugin)" title="Method in GormToolsPluginHelper">onChange(def, GrailsApplication, Plugin)</a></span> - Method in <a href="grails/plugin/gormtools/GormToolsPluginHelper.html">GormToolsPluginHelper</a>
+<dt><span class="strong"><a href="grails/plugin/gormtools/GormToolsPluginHelper.html#onChange(java.lang.Object, grails.core.GrailsApplication, grails.plugins.Plugin)" title="Method in GormToolsPluginHelper">onChange(Object, GrailsApplication, Plugin)</a></span> - Method in <a href="grails/plugin/gormtools/GormToolsPluginHelper.html">GormToolsPluginHelper</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/DataRepoTest.html#onMockDomains(Class<?>)" title="Method in DataRepoTest">onMockDomains(Class&lt;?&gt;)</a></span> - Method in <a href="gorm/tools/testing/unit/DataRepoTest.html">DataRepoTest</a>
 </dt><dd> <div class="block"></div></dd>
@@ -1248,16 +1261,17 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd><div class="block">a holder object for paged data</div></dd>
 <dt><span class="strong"><a href="gorm/tools/Pager.html#Pager(java.util.Map)" title="Constructor in Pager">Pager(Map)</a></span> - Constructor in <a href="gorm/tools/Pager.html">Pager</a>
 </dt><dd> <div class="block">Constructor with params</div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html#parallel(java.util.Map, List<List>, groovy.lang.Closure)" title="Method in AsyncBatchSupport">parallel(Map, List&lt;List&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#parallel(java.util.Map, List<List>, groovy.lang.Closure)" title="Method in AsyncSupport">parallel(Map, List&lt;List&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
 </dt><dd> <div class="block">Iterates over the batchList of lists and calls the closure passing in the list and the args asynchronously.
  </div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/GparsBatchSupport.html#parallel(java.util.Map, List<List>, groovy.lang.Closure)" title="Method in GparsBatchSupport">parallel(Map, List&lt;List&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/GparsBatchSupport.html">GparsBatchSupport</a>
+<dt><span class="strong"><a href="gorm/tools/async/GparsAsyncSupport.html#parallel(java.util.Map, List<List>, groovy.lang.Closure)" title="Method in GparsAsyncSupport">parallel(Map, List&lt;List&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/GparsAsyncSupport.html">GparsAsyncSupport</a>
 </dt><dd> <div class="block">Iterates over the batchList with GParsPoolUtil.eachParallel and calls the closure passing in the list and the args
- Generally you will want to use the <a href='../../../gorm/tools/async/AsyncBatchSupport.html#parallel' title='AsyncBatchSupport.parallel'>AsyncBatchSupport.parallel</a> method
+ Generally you will want to use the <a href='../../../gorm/tools/async/AsyncSupport.html#parallel' title='AsyncSupport.parallel'>AsyncSupport.parallel</a> method
  that added by the Trait as it calls the withTransaction</div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html#parallelBatch(java.util.Map, List<List>, groovy.lang.Closure)" title="Method in AsyncBatchSupport">parallelBatch(Map, List&lt;List&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>
-</dt><dd> <div class="block">calls <a href='#parallel()'>parallel()</a> and passes args, batchList and the closure through to <a href='#batchTrx()'>batchTrx()</a></div></dd>
-<dt><span class="strong"><a href="gorm/tools/async/AsyncBatchSupport.html#parallelCollate(java.util.Map, java.util.List, groovy.lang.Closure)" title="Method in AsyncBatchSupport">parallelCollate(Map, List, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncBatchSupport.html">AsyncBatchSupport</a>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#parallelBatch(java.util.Map, List<List>, groovy.lang.Closure)" title="Method in AsyncSupport">parallelBatch(Map, List&lt;List&gt;, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
+</dt><dd> <div class="block">calls <a href='#parallel'>parallel</a> with the args, batches list calling <a href='#doBatch'>doBatch</a> for each batch in batches
+ passes itemClosure down through to the <a href='#doBatch'>doBatch</a></div></dd>
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#parallelCollate(java.util.Map, java.util.List, groovy.lang.Closure)" title="Method in AsyncSupport">parallelCollate(Map, List, Closure)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
 </dt><dd> <div class="block">Uses collate to break or slice the list into batches and then calls parallelBatch</div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/IsoDateUtil.html#parse(java.lang.String)" title="Method in IsoDateUtil">parse(String)</a></span> - Method in <a href="gorm/tools/beans/IsoDateUtil.html">IsoDateUtil</a>
 </dt><dd> <div class="block">Parse date sent by client (mostly JSON).
@@ -1270,6 +1284,8 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/ListParseUtil.html#parseLongList(java.lang.String)" title="Method in ListParseUtil">parseLongList(String)</a></span> - Method in <a href="gorm/tools/beans/ListParseUtil.html">ListParseUtil</a>
 </dt><dd> <div class="block">Parses a comma separated list of numbers in a given string.</div></dd>
+<dt><span class="strong"><a href="gorm/tools/mango/DefaultMangoQuery.html#parseParams(java.util.Map)" title="Method in DefaultMangoQuery">parseParams(Map)</a></span> - Method in <a href="gorm/tools/mango/DefaultMangoQuery.html">DefaultMangoQuery</a>
+</dt><dd> <div class="block">returns a Map with a criteria key and a pager key containing maps for those.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/beans/ListParseUtil.html#parseStringList(java.lang.String)" title="Method in ListParseUtil">parseStringList(String)</a></span> - Method in <a href="gorm/tools/beans/ListParseUtil.html">ListParseUtil</a>
 </dt><dd> <div class="block">Parses a comma separated list of strings in a given String instance into an actual list of strings.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/mango/MangoTidyMap.html#pathToMap(java.lang.String, java.lang.Object, java.util.Map)" title="Method in MangoTidyMap">pathToMap(String, Object, Map)</a></span> - Method in <a href="gorm/tools/mango/MangoTidyMap.html">MangoTidyMap</a>
@@ -1377,7 +1393,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd><div class="block">Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners
  which can be Transactional and fires Grails events that will be asynchronous</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/RepoExceptionSupport.html" title="Class in gorm.tools.repository.errors">RepoExceptionSupport</a></span> - Class in <a href="./gorm/tools/repository/errors/package-summary.html">gorm.tools.repository.errors</a>
-</dt><dd><div class="block">Handler for exceptions thrown by the Repository</div></dd>
+</dt><dd><div class="block">Handler and translator for exceptions thrown by the Repository</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/events/RepoListener.html" title="Annotation Type in gorm.tools.repository.events">RepoListener</a></span> - Annotation Type in <a href="./gorm/tools/repository/events/package-summary.html">gorm.tools.repository.events</a>
 </dt><dd><div class="block">Annotation that marks a method in a repository as a listener for Repository events.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/RepoMessage.html" title="Class in gorm.tools.repository">RepoMessage</a></span> - Class in <a href="./gorm/tools/repository/package-summary.html">gorm.tools.repository</a>
@@ -1473,7 +1489,7 @@ if (location.href.indexOf('is-external=true') == -1) {
 </dt><dd> <div class="block">Setup totalCount property for list, if it absent and fill values that are listed in fieldList</div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/JsonViewSpecSetup.html#setupJsonViewBeans()" title="Method in JsonViewSpecSetup">setupJsonViewBeans()</a></span> - Method in <a href="gorm/tools/testing/unit/JsonViewSpecSetup.html">JsonViewSpecSetup</a>
 </dt><dd> <div class="block"></div></dd>
-<dt><span class="strong"><a href="gorm/tools/testing/hibernate/GormToolsHibernateSpec.html#setupRepoBeans()" title="Method in GormToolsHibernateSpec">setupRepoBeans()</a></span> - Method in <a href="gorm/tools/testing/hibernate/GormToolsHibernateSpec.html">GormToolsHibernateSpec</a>
+<dt><span class="strong"><a href="gorm/tools/testing/hibernate/GormToolsHibernateSpec.html#setupSpec()" title="Method in GormToolsHibernateSpec">setupSpec()</a></span> - Method in <a href="gorm/tools/testing/hibernate/GormToolsHibernateSpec.html">GormToolsHibernateSpec</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/testing/unit/GormToolsSpecHelper.html#setupTransactionService()" title="Method in GormToolsSpecHelper">setupTransactionService()</a></span> - Method in <a href="gorm/tools/testing/unit/GormToolsSpecHelper.html">GormToolsSpecHelper</a>
 </dt><dd> <div class="block"></div></dd>
@@ -1550,7 +1566,8 @@ if (location.href.indexOf('is-external=true') == -1) {
 <dt><span class="strong"><a href="gorm/tools/beans/MapFlattener.html#transformJsonArray(java.util.List, java.lang.String)" title="Method in MapFlattener">transformJsonArray(List, String)</a></span> - Method in <a href="gorm/tools/beans/MapFlattener.html">MapFlattener</a>
 </dt><dd> <div class="block">Flatten Groovy-JSON Array objects</div></dd>
 <dt><span class="strong"><a href="gorm/tools/repository/errors/RepoExceptionSupport.html#translateException(java.lang.RuntimeException, org.grails.datastore.gorm.GormEntity)" title="Method in RepoExceptionSupport">translateException(RuntimeException, GormEntity)</a></span> - Method in <a href="gorm/tools/repository/errors/RepoExceptionSupport.html">RepoExceptionSupport</a>
-</dt><dd> <div class="block"></div></dd>
+</dt><dd> <div class="block">Translates grails ValidationException and springs DataAccessException and DataIntegrityViolationException
+ into our EntityValidationException so we have better information in the exception when its thrown and rolled back</div></dd>
 <dt><span class="strong"><a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html#trimBackTigs(java.lang.String)" title="Method in GrailsDomainBinder">trimBackTigs(String)</a></span> - Method in <a href="org/grails/orm/hibernate/cfg/GrailsDomainBinder.html">GrailsDomainBinder</a>
 </dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/TrxService.html" title="Class in gorm.tools">TrxService</a></span> - Class in <a href="./gorm/tools/package-summary.html">gorm.tools</a>
@@ -1601,8 +1618,13 @@ if (location.href.indexOf('is-external=true') == -1) {
 <h2 class="title">W</h2>
 <dl>
 
+<dt><span class="strong"><a href="gorm/tools/async/AsyncSupport.html#withSession(Closure<T>)" title="Method in AsyncSupport">withSession(Closure&lt;T&gt;)</a></span> - Method in <a href="gorm/tools/async/AsyncSupport.html">AsyncSupport</a>
+</dt><dd> <div class="block"></div></dd>
 <dt><span class="strong"><a href="gorm/tools/WithTrx.html" title="Trait in gorm.tools">WithTrx</a></span> - Trait in <a href="./gorm/tools/package-summary.html">gorm.tools</a>
 </dt><dd><div class="block">adds transaction methods to any class. relies on Gorms transactionService.</div></dd>
+<dt><span class="strong"><a href="gorm/tools/repository/GormRepo.html#withTrx(Closure<T>)" title="Method in GormRepo">withTrx(Closure&lt;T&gt;)</a></span> - Method in <a href="gorm/tools/repository/GormRepo.html">GormRepo</a>
+</dt><dd> <div class="block">Executes the closure within the context of a transaction, creating one if none is present or joining
+ an existing transaction if one is already present.</div></dd>
 <dt><span class="strong"><a href="gorm/tools/TrxService.html#withTrx(Closure<T>)" title="Method in TrxService">withTrx(Closure&lt;T&gt;)</a></span> - Method in <a href="gorm/tools/TrxService.html">TrxService</a>
 </dt><dd> <div class="block">Executes the given callable within the context of a transaction with the given definition</div></dd>
 <dt><span class="strong"><a href="gorm/tools/WithTrx.html#withTrx(Closure<T>)" title="Method in WithTrx">withTrx(Closure&lt;T&gt;)</a></span> - Method in <a href="gorm/tools/WithTrx.html">WithTrx</a>

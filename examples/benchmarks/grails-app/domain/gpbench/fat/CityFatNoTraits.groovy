@@ -134,7 +134,7 @@ class CityFatNoTraits {
     }
 
     void setAssociation(String key, Class assocClass, Map row) {
-        if (row[key]) {
+        if (row[key] != null) {
             Long id = row[key]['id'] as Long
             this[key] = GormEnhancer.findStaticApi(assocClass).load(id)
         }

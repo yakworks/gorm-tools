@@ -5,6 +5,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 trait DateUserStamp {
 
+    //These are the default grails/gorm fields to autostamp
     Date dateCreated
     Date lastUpdated
 

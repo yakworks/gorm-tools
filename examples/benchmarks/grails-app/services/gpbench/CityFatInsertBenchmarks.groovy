@@ -31,10 +31,13 @@ class CityFatInsertBenchmarks extends BenchProcessData {
             createAction = action
             println "-- createAction: $createAction --"
             //the fastest one
-            doSettersStatic(CityFatNoTraitsNoAssoc, 'static setters, no associations')
-            doSettersStatic(CityFat)
-            doSettersDynamic(CityFat)
-            doGormToolsRepoPersist(CityFat)
+            doSettersStatic(CityFatNoTraitsNoAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNoAssoc')
+            doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
+            doSettersStatic(CityFatAuditTrail, 'CompileStatic explicit setters, CityFatAuditTrail')
+            doSettersStatic(CityFatNoTraits, 'CompileStatic explicit setters, CityFatNoTraits')
+            doSettersDynamic(CityFat, 'CompileDynamic explicit setters, CityFat')
+            doGormToolsRepoPersist(CityFat, 'gorm-tools: fast binder & persist, CityFat')
+            doGormToolsRepoPersist(CityFatNoTraits, 'gorm-tools: fast binder & persist, CityFatNoTraits')
             doGormToolsRepo(CityFat)
             //grailsDataBinderNoTraits(CityFatNoTraits)
             warmup = false

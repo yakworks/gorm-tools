@@ -21,7 +21,10 @@ dependencies {
   compile project(':gorm-tools')
 
   //FIXME why is this needed? it doesn't flow from deps in the plugin,testing.JdbcTimeZoneSpec.$tt__$spock_feature_0_0(JdbcTimeZoneSpec.groovy:55) fails
+  //compile "org.hibernate:hibernate-core:$versionHibernate"
+  compile "org.grails.plugins:hibernate5"
   compile "org.hibernate:hibernate-core:$versionHibernate"
+  compile "org.hibernate:hibernate-ehcache:$versionHibernate"
 
   testCompile "org.grails:grails-datastore-rest-client"
   testCompile "org.grails.plugins:geb"

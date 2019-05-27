@@ -12,10 +12,7 @@ jobs:
     # working_directory: ~/repo
 
     environment:
-      # Customize the JVM maximum heap limit
-      # JVM_OPTS: -Xmx3200m
-      MALLOC_ARENA_MAX: 2
-      GRADLE_OPTS: "-Xmx3048m -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
+      GRADLE_OPTS: "-Xmx1536m -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
       TERM: dumb
 
     parallelism: 1
@@ -35,12 +32,17 @@ jobs:
       # this also kind of helps with the memory issue we keep running into by breaking it up
       - run:
           name: ✔︎ -- Downloads Dependencies [gradle resolveConfigurations]
-          command: gradle resolveConfigurations --no-daemon
+          command: gradle resolveConfigurations
+
+      # compiling as a seperate step before running check helps with the "finished with non-zero exit value 137" error
+      - run:
+          name: ✔︎ -- Spotless Linter [gradle spotlessCheck]
+          command: gradle spotlessCheck
 
       # compiling as a seperate step before running check helps with the "finished with non-zero exit value 137" error
       - run:
           name: ✔︎ -- Compile [gradle classes]
-          command: gradle classes --no-daemon
+          command: gradle classes
 
       - save_cache:
           paths:
@@ -50,19 +52,20 @@ jobs:
           key: gradle-{{ checksum "cache-checksum.tmp" }}
 
       - run:
-          name: ✔︎ -- Checks Linter and Tests [gradle check]
-          command: gradle check --no-daemon --max-workers 2
+          name: ✔︎ -- Checks Full Run Tests [gradle check]
+          command: gradle check --max-workers=3
+
       - store_artifacts:
           path: plugin/build/reports/tests/test/
-          destination: test-reports/unit/
+          destination: unit/
       - store_artifacts:
           path: plugin/build/reports/codenarc/
           destination: codenarc/
-      - store_test_results:
-          path: plugin/build/test-results
       - store_artifacts:
           path: examples/test-app/build/reports/tests
-          destination: test-reports/integration
+          destination: test-app/
+      - store_test_results:
+          path: plugin/build/test-results
       - store_test_results:
           path: examples/test-app/build/test-results
 

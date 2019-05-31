@@ -6,6 +6,7 @@ package gorm.tools.mango
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.Pager
@@ -34,7 +35,7 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    DetachedCriteria buildCriteria(Class domainClass, Map criteria = [:], Closure closure = null) {
+    public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map criteria = [:], Closure closure = null) {
         MangoBuilder.build(domainClass, criteria, closure)
     }
 
@@ -45,9 +46,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    List query(Class domainClass, Map params = [:], Closure closure = null) {
+    public <D> List<D> query(Class<D> domainClass, Map params = [:], Closure closure = null) {
         Map<String, Map> p = parseParams(params)
-        DetachedCriteria dcrit = buildCriteria(domainClass, p['criteria'], closure)
+        DetachedCriteria<D> dcrit = buildCriteria(domainClass, p['criteria'], closure)
         query(dcrit, p['pager'])
     }
 
@@ -59,7 +60,7 @@ class DefaultMangoQuery implements MangoQuery {
      * @return query of entities restricted by mango params
      */
     @Transactional(readOnly = true)
-    List query(DetachedCriteria criteria, Map pagerParams = [:], Closure closure = null) {
+    public <D> List<D> query(DetachedCriteria<D> criteria, Map pagerParams = [:], Closure closure = null) {
         Pager pager = new Pager(pagerParams)
         criteria.list(max: pager.max, offset: pager.offset)
     }

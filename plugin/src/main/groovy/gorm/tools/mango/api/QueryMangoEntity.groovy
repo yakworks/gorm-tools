@@ -18,15 +18,19 @@ import grails.gorm.DetachedCriteria
  * @since 6.1
  */
 @CompileStatic
-trait QueryMangoEntity {
+trait QueryMangoEntity<D> {
 
     @Transient
     static List<String> quickSearchFields = []
 
     static abstract getRepo()
 
-    static DetachedCriteria buildCriteria(Map params = [:], Closure closure = null) {
+    static DetachedCriteria<D> buildCriteria(Map params = [:], Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).buildCriteria(params, closure)
+    }
+
+    static DetachedCriteria<D> buildCriteria(Closure closure) {
+        ((QueryMangoEntityApi)getRepo()).buildCriteria([:], closure)
     }
 
     /**

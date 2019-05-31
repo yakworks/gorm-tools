@@ -190,7 +190,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         if (propValue instanceof String) {
             String sval = propValue as String
-            Class typeToConvertTo = prop.getType()
+            Class typeToConvertTo = prop.getType() as Class
             //do we have tests for this?
             if (String.isAssignableFrom(typeToConvertTo)) {
                 sval = sval.trim()
@@ -300,7 +300,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         if (CLASS_TO_BINDING_INCLUDE_LIST.containsKey(objectClass)) {
             whiteList = CLASS_TO_BINDING_INCLUDE_LIST.get objectClass
         } else {
-            GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(object.getClass())
+            GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(object.getClass() as Class)
             PersistentEntity entity = gormStaticApi.gormPersistentEntity
             List<PersistentProperty> properties = entity.persistentProperties
             Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
@@ -326,7 +326,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
     @Override
     @SuppressWarnings(["EmptyCatchBlock"])
-    protected getPersistentInstance(Class<?> type, Object id) {
+    protected getPersistentInstance(Class type, Object id) {
         try {
             GormEnhancer.findStaticApi(type).load((Serializable)id)
         } catch (Exception exc) {

@@ -150,16 +150,16 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
 
     //@CompileDynamic
     void testQuery2(){
-        DetachedCriteria detachedCriteria = new DetachedCriteria(Region)
-        DetachedCriteria newCriteria = MangoBuilder.cloneCriteria(detachedCriteria)
+        DetachedCriteria<Region> detachedCriteria = new DetachedCriteria<Region>(Region)
+        DetachedCriteria<Region> newCriteria = MangoBuilder.cloneCriteria(detachedCriteria)
         MangoBuilder.applyMapOrList(newCriteria, q2)
         newCriteria.list()
     }
 
     void testQuery3(Map map){
         //Map q2 = [name: 'foo', 'country.name': 'bar'] as Map<String, Object>
-        DetachedCriteria detachedCriteria = new DetachedCriteria(Region)
-        DetachedCriteria newCriteria = MangoBuilder.cloneCriteria(detachedCriteria)
+        DetachedCriteria<Region> detachedCriteria = new DetachedCriteria<Region>(Region)
+        DetachedCriteria<Region> newCriteria = MangoBuilder.cloneCriteria(detachedCriteria)
         MangoBuilder.applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
         newCriteria.list()
     }

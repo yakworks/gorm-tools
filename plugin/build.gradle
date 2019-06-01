@@ -22,8 +22,8 @@ dependencies {
   compile "org.codehaus.gpars:gpars:1.2.1"
 
   compile "org.grails.plugins:hibernate5"
-  compileOnly "org.hibernate:hibernate-core:$versionHibernate"
-  compileOnly "org.hibernate:hibernate-ehcache:$versionHibernate"
+  compile "org.hibernate:hibernate-core:$versionHibernate"
+  compile "org.hibernate:hibernate-ehcache:$versionHibernate"
 
   //used for json parsing but require it to be added to project that uses this
   compileOnly "org.grails.plugins:views-json:$versionViews"

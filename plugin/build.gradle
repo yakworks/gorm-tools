@@ -22,8 +22,8 @@ dependencies {
   compile "org.codehaus.gpars:gpars:1.2.1"
 
   compile "org.grails.plugins:hibernate5"
-  compileOnly "org.hibernate:hibernate-core:$versionHibernate"
-  compileOnly "org.hibernate:hibernate-ehcache:$versionHibernate"
+  compile "org.hibernate:hibernate-core:$versionHibernate"
+  compile "org.hibernate:hibernate-ehcache:$versionHibernate"
 
   //used for json parsing but require it to be added to project that uses this
   compileOnly "org.grails.plugins:views-json:$versionViews"
@@ -37,9 +37,6 @@ dependencies {
   compileOnly "org.grails:grails-gorm-testing-support"
   compileOnly "org.grails:grails-web-testing-support"
   compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
-
-  testCompile "org.hibernate:hibernate-core:$versionHibernate"
-  testCompile "org.hibernate:hibernate-ehcache:$versionHibernate"
 
   //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
   testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"

@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     //classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-    classpath "org.yakworks:gradle-plugins:1.1.8"
+    classpath "org.yakworks:gradle-plugins:1.1.13"
   }
 }
 

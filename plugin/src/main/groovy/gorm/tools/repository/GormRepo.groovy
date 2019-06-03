@@ -35,7 +35,7 @@ import grails.validation.ValidationException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEntityApi, RepositoryApi<D> {
+trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder

@@ -11,9 +11,7 @@ import grails.core.ArtefactHandler
  */
 class GormToolsGrailsPlugin extends grails.plugins.Plugin {
 
-    def loadAfter = ['hibernate', 'datasources', 'domainClass']
-    def observe = ["domainClass"]
-    def dependsOn = [hibernate: "* > 6.0"]
+    def loadAfter = ['hibernate', 'datasources']
 
     def watchedResources = [
         "file:./grails-app/repository/**/*Repo.groovy",

@@ -288,6 +288,19 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.notBindableNested == null
     }
 
+    void "will bind association even if id does not exist"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: 'outer',
+                      notBindableNested: [id: 99999]]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.name == 'outer'
+        testDomain.notBindableNested.id == 99999
+    }
+
     void "binder shouldn't bind the association if constraints doesn't contain 'bindable' and it does not belongsTo"() {
         TestDomain testDomain = new TestDomain()
         Map params = [name: 'outer', notBindable: 'notBindableTest', notBindableNested: [name: 'notBindableNested']]

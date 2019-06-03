@@ -45,7 +45,7 @@ class RepositoryArtefactHandler extends ArtefactHandlerAdapter {
 //    }
 
     boolean isArtefactClass(Class clazz) {
-        // class shouldn't be null and should ends with Job suffix
+        // class shouldn't be null and should ends with Repo suffix
         (clazz != null && clazz.getName().endsWith(SUFFIX))
     }
 

@@ -77,12 +77,12 @@ class MangoBuilder {
         '$sort': 'order'
     ]
 
-    static DetachedCriteria build(Class clazz, Map map, Closure callable = null) {
-        DetachedCriteria detachedCriteria = new DetachedCriteria(clazz)
+    static <D> DetachedCriteria<D> build(Class<D> clazz, Map map, Closure callable = null) {
+        DetachedCriteria<D> detachedCriteria = new DetachedCriteria<D>(clazz)
         return build(detachedCriteria, map, callable)
     }
 
-    static DetachedCriteria build(DetachedCriteria criteria, Map map, Closure callable = null) {
+    static <D> DetachedCriteria<D> build(DetachedCriteria<D> criteria, Map map, Closure callable = null) {
         DetachedCriteria newCriteria = cloneCriteria(criteria)
         applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
         if (callable) newCriteria.with callable
@@ -90,8 +90,8 @@ class MangoBuilder {
     }
 
     @CompileDynamic //dynamic so it can access the protected criteria.clone
-    static DetachedCriteria cloneCriteria(DetachedCriteria criteria) {
-        (DetachedCriteria) criteria.clone()
+    static <D> DetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
+        criteria.clone()
     }
 
     static void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {
@@ -213,7 +213,7 @@ class MangoBuilder {
 
     }
 
-    static DetachedCriteria between(DetachedCriteria criteria, String propertyName, List params) {
+    static <D> DetachedCriteria<D> between(DetachedCriteria<D> criteria, String propertyName, List params) {
         List p = toType(criteria, propertyName, params) as List
         return criteria.between(propertyName, p[0], p[1])
     }

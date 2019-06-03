@@ -18,7 +18,7 @@ import grails.gorm.DetachedCriteria
  * @since 6.1
  */
 @CompileStatic
-trait QueryMangoEntityApi {
+trait QueryMangoEntityApi<D> {
 
     abstract Class getEntityClass()
 
@@ -33,7 +33,7 @@ trait QueryMangoEntityApi {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    DetachedCriteria buildCriteria(Map params = [:], Closure closure = null) {
+    DetachedCriteria<D> buildCriteria(Map params = [:], Closure closure = null) {
         getMangoQuery().buildCriteria(getEntityClass(), params, closure)
     }
 

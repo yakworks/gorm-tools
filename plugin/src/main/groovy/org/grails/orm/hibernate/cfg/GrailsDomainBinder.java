@@ -82,6 +82,7 @@ import java.util.Set;
  * adds to resources.groovy in app
  * ALSO: https://github.com/grails/grails-data-mapping/issues/1104
  * RECOMMNET OUT LINE HibernateUtils.handleLazyProxy(domainClass, grailsProperty);
+ * check for org.hibernate.cfg.DefaultNamingStrategy and if set then make FOREIGN_KEY_SUFFIX "Id"
  */
 public class GrailsDomainBinder implements MetadataContributor {
     public static String FOREIGN_KEY_SUFFIX = "_id";

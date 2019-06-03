@@ -8,7 +8,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import gorm.tools.beans.BeanPathTools
+import gorm.tools.json.Jsonify
 
 /**
  * a holder object for paged data
@@ -196,7 +196,7 @@ class Pager {
 
         if (fieldList) {
             this.data = dlist.collect { obj ->
-                return BeanPathTools.buildMapFromPaths(obj, fieldList, true)
+                return Jsonify.render(obj, [includes:fieldList]).getJson()
             }
         }
         return this

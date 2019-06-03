@@ -65,7 +65,7 @@ class PagerSpec extends Specification implements GormToolsTest {
         jsonData.page == 1
         jsonData.records == 50
         jsonData.total == 5
-        jsonData.rows == (0..9 as List).collect { [id: it + 1, value: 5 * (it), version: 0] }
+        jsonData.rows == (0..9 as List).collect { [id: it + 1, value: 5 * (it)] }
     }
 
     def "test eachPage"() {

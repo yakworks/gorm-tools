@@ -39,6 +39,9 @@ class JdbcIdGenerator implements IdGenerator {
     @Value('${gorm.tools.idGenerator.seedValue:1000}')
     long seedValue//the Id to start with if it does not exist in the table
 
+    //if true then will not automatically create a row for the key and will throw an error if row does not exist
+    boolean requireKeyRow = false
+
     String table = "NEWOBJECTID"
     String keyColumn = "KeyName"
     String idColumn = "NextId"
@@ -68,8 +71,11 @@ class JdbcIdGenerator implements IdGenerator {
         try {
             oid = jdbcTemplate.queryForObject(query, Long)
         } catch (EmptyResultDataAccessException erdax) {
-            oid = createRow(table, keyColumn, idColumn, name)
-            //throw new IllegalArgumentException("The key '" + name + "' does not exist in the object ID table.")
+            if (requireKeyRow) {
+                throw erdax
+            } else {
+                oid = createRow(table, keyColumn, idColumn, name)
+            }
         } catch (BadSqlGrammarException bge) {
             log.warn("Looks like the idgen table is not found. This will do a dirty setup for the table for the JdbcIdGenerator "+
                 "for testing apps but its STRONGLY suggested you set it up properly with something like db-migration"+

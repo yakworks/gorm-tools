@@ -1,7 +1,11 @@
+/*
+* Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
 package gorm.tools.testing.unit
 
-import grails.boot.config.GrailsApplicationPostProcessor
-import grails.testing.spock.OnceBefore
+import java.lang.reflect.Constructor
+
 import org.springframework.beans.BeansException
 import org.springframework.boot.SpringApplication
 import org.springframework.context.ApplicationContext
@@ -9,7 +13,8 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 
-import java.lang.reflect.Constructor
+import grails.boot.config.GrailsApplicationPostProcessor
+import grails.testing.spock.OnceBefore
 
 trait ExternalConfigAwareSpec {
 
@@ -39,4 +44,3 @@ class ExternalConfigLoader implements ApplicationContextAware {
         }
     }
 }
-

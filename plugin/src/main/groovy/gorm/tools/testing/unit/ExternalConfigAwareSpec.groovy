@@ -6,6 +6,8 @@ package gorm.tools.testing.unit
 
 import java.lang.reflect.Constructor
 
+import groovy.transform.CompileDynamic
+
 import org.springframework.beans.BeansException
 import org.springframework.boot.SpringApplication
 import org.springframework.context.ApplicationContext
@@ -16,6 +18,7 @@ import org.springframework.core.annotation.Order
 import grails.boot.config.GrailsApplicationPostProcessor
 import grails.testing.spock.OnceBefore
 
+@CompileDynamic
 trait ExternalConfigAwareSpec {
 
     @OnceBefore
@@ -34,6 +37,7 @@ class ExternalConfigLoader implements ApplicationContextAware {
      * and then grailsApplicationPostProcessor.loadApplicationConfig
      */
     @Override
+    @SuppressWarnings(['ClassForName', 'EmptyCatchBlock'])
     void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         GrailsApplicationPostProcessor postProcessor = applicationContext.getBean('grailsApplicationPostProcessor')
 

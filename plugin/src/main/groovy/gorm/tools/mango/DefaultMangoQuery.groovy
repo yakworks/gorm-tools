@@ -6,7 +6,6 @@ package gorm.tools.mango
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.Pager

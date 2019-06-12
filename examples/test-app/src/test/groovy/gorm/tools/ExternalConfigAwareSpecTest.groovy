@@ -7,6 +7,7 @@ class ExternalConfigAwareSpecTest extends Specification implements ExternalConfi
 
     void  "test external config is loaded"() {
         expect:
-        config.grails.plugin.gormtools.test == "test"
+        applicationContext.getBean('externalConfigLoader') != null
+        config.grails.plugin.gormtools.test == "test" //this comes from a file defined in config.locations
     }
 }

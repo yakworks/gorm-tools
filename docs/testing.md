@@ -109,7 +109,7 @@ Util methods from IntegrationSpecHelper are available as well.
 ### ExternalConfigAwareSpec
 The trait makes it possible to load external config during unit tests.
 If external-config plugin is installed, the configuration defined in config.locations will be loaded and be made available to unit tests.
-
+DataRepoTest extends ExternalConfigAwareSpec so subclasses does not need to extend it explicitely. 
 
 [RepoUtil.flushAndClear()]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L91
 [RepoUtil.flush()]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L101

@@ -106,7 +106,9 @@ Util methods from IntegrationSpecHelper are available as well.
 
     TODO
 
-
+### ExternalConfigAwareSpec
+The trait makes it possible to load external config during unit tests.
+If external-config plugin is installed, the configuration defined in config.locations will be loaded and be made available to unit tests.
 
 
 [RepoUtil.flushAndClear()]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L91

@@ -29,6 +29,10 @@ trait ExternalConfigAwareSpec {
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class ExternalConfigLoader implements ApplicationContextAware {
 
+    /**
+     * Calls ExternalConfigRunListener from the plugin if installed which adds the property sources for external config
+     * and then grailsApplicationPostProcessor.loadApplicationConfig
+     */
     @Override
     void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         GrailsApplicationPostProcessor postProcessor = applicationContext.getBean('grailsApplicationPostProcessor')

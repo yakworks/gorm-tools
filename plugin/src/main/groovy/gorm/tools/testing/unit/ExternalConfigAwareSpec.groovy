@@ -18,6 +18,12 @@ import org.springframework.core.annotation.Order
 import grails.boot.config.GrailsApplicationPostProcessor
 import grails.testing.spock.OnceBefore
 
+/**
+ * The trait makes it possible to load external config during unit tests.
+ * If external-config plugin is installed, the configuration defined in config.locations will be
+ * loaded and be made available to unit tests.
+ */
+
 @CompileDynamic
 trait ExternalConfigAwareSpec {
 

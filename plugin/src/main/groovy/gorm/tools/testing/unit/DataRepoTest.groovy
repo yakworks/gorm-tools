@@ -18,7 +18,7 @@ import grails.testing.spring.AutowiredTest
  * @since 6.1
  */
 @CompileStatic
-trait DataRepoTest implements JsonViewSpecSetup, ExternalConfigAwareSpec, GormToolsSpecHelper, BuildDataTest, AutowiredTest {
+trait DataRepoTest implements JsonViewSpecSetup, GormToolsSpecHelper, BuildDataTest, AutowiredTest, ExternalConfigAwareSpec {
 
     void mockDomains(Class<?>... domainClassesToMock) {
         BuildDataTest.super.mockDomains(domainClassesToMock)

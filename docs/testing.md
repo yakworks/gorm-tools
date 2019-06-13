@@ -111,6 +111,12 @@ The trait makes it possible to load external config during unit tests.
 If external-config plugin is installed, the configuration defined in config.locations will be loaded and be made available to unit tests.
 DataRepoTest extends ExternalConfigAwareSpec so subclasses does not need to extend it explicitely. 
 
+
+**Note:** ExternalConfigAwareSpec uses doWithSpring to define ExternalConfigLoader bean, so that it runs during Grails application 
+lifecycle.
+If the test overrides doWithSpring, the method in trait will not run. So the test class should explicitely call ExternalConfigAwareSpec
+.super.doWithSpring
+
 [RepoUtil.flushAndClear()]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L91
 [RepoUtil.flush()]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L101
 [RepoUtil.clear()]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/RepoUtil.groovy#L111

@@ -109,6 +109,44 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         'right.*'           | [right: [id: 2, value: 0, version: null]]
     }
 
+    void "Check if nested object not in the db"() {
+        setup:
+        def obj = new TestClazzB(
+            left: new TestClazzA(
+                foo: '1'
+            ).save(flush: true),
+            right: new TestClazzB(
+                right: new TestClazzB(
+                    value: 2
+                ),
+                left: new TestClazzA(
+                    foo: '3',
+                    bar: 4
+                )
+            ),
+            value: 7
+        ).save()
+        TestClazzA.repo.removeById(obj.left.id)
+        TestClazzA.repo.flush()
+        expect:
+        obj.left.id != null
+        TestClazzA.get(obj.left.id) == null
+        Map act = [:]
+        exp == BeanPathTools.propsToMap(obj, path, act)
+        exp == act
+        where:
+        path                | exp
+        'value'             | [value: 7]
+        'value1'            | [:]
+        'left.foo'          | [left: [foo: '1']]
+        'left1.foo'         | [:]
+        'right.right.value' | [right: [right: [value: 2]]]
+        'right.left.value1' | [right: [left: [:]]]
+        'right.left.bar'    | [right: [left: [bar: 4]]]
+        'right.left.*'      | [right: [left: [bar: 4, foo: '3', id: 1, version: null, bazMap: null, bazList: null]]]
+        'right.*'           | [right: [id: 2, value: 0, version: null]]
+    }
+
     void "Property returns list of domains"() {
         setup:
         def obj = new TestClazzC(

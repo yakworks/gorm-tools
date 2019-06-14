@@ -146,7 +146,12 @@ class BeanPathTools {
                     currentMap[id] = source?."$id"
                     //spin through and add them to the map
                     pprops.each { property ->
-                        currentMap[property.name] = source?."$property.name"
+                        try {
+                            currentMap[property.name] = source?."$property.name"
+                        } catch(e){
+                            if (log.debugEnabled) log.debug("${source.class.name} with id ${source.id} is not in db for property ${property.name}")
+
+                        }
                     }
                 } else {
                     Closure notConvert = {

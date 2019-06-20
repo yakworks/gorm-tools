@@ -6,10 +6,7 @@ package gorm.tools.testing.hibernate
 
 import groovy.transform.CompileDynamic
 
-import org.springframework.core.GenericTypeResolver
-
-import gorm.tools.testing.TestDataJson
-import grails.buildtestdata.TestData
+import gorm.tools.testing.unit.DomainCrudSpec
 
 /**
  * automatically runs tests on persist(), create(), update(), delete()
@@ -19,86 +16,29 @@ import grails.buildtestdata.TestData
  */
 @SuppressWarnings(['JUnitPublicNonTestMethod', 'JUnitLostTest', 'JUnitTestMethodWithoutAssert'])
 @CompileDynamic
-abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec {
-
-    private Class<D> domainClass // the domain class this is for
-
-    Class<D> getEntityClass() {
-        if (!domainClass) this.domainClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), AutoHibernateSpec)
-        return domainClass
-    }
+abstract class AutoHibernateSpec<D> extends GormToolsHibernateSpec implements DomainCrudSpec<D> {
 
     @Override
-    List<Class> getDomainClasses() { [getEntityClass()] }
+    List<Class<D>> getDomainClasses() { [getEntityClass()] }
 
-    Map buildMap(Map args = [:]) {
-        TestDataJson.buildMap(args, getEntityClass())
+    void "create tests"() {
+        expect:
+        testCreate()
     }
 
-    Map buildCreateMap(Map args = [:]) {
-        buildMap(args)
+    void "update tests"() {
+        expect:
+        testUpdate()
     }
 
-    Map buildUpdateMap(Map args = [:]) {
-        buildMap(args)
+    void "persist tests"() {
+        expect:
+        testPersist()
     }
 
-    D buildCreate(Map args = [:]) {
-        buildMap(args)
-    }
-
-    void testCreate() {
-        when:
-        D entity = entityClass.create(buildCreateMap())
-        Long id = entity.id
-        flushAndClear()
-
-        then:
-        entityClass.get(id).id
-
-    }
-
-    void testUpdate() {
-        given:
-        D entity = entityClass.create(buildCreateMap())
-        assert entity.version == 0
-        Long id = entity.id
-        flushAndClear()
-
-        when:
-        Map updateMap = buildUpdateMap()
-        updateMap.id = id
-        entityClass.update(updateMap)
-        flushAndClear()
-        D upInstance = entityClass.get(id)
-
-        then:
-        upInstance.id
-        upInstance.version == 1
-    }
-
-    void testPersist() {
-        when:
-        D entity = TestData.build(entityClass, save:false)
-        entity.persist()
-        Long id = entity.id
-        flushAndClear()
-
-        then:
-        entityClass.get(id)
-    }
-
-    void testRemove() {
-        setup:
-        D entity = TestData.build(entityClass)
-        Long id = entity.id
-        flushAndClear()
-
-        when:
-        entityClass.get(id).remove()
-
-        then:
-        entityClass.get(id) == null
+    void "remove tests"() {
+        expect:
+        testRemove()
     }
 
 }

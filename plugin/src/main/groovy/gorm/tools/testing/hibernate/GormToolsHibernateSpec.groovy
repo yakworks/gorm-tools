@@ -16,6 +16,7 @@ import grails.buildtestdata.TestDataBuilder
 import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spock.OnceBefore
+import grails.testing.spring.AutowiredTest
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
@@ -26,7 +27,7 @@ import grails.testing.spock.OnceBefore
  * @since 6.1
  */
 @CompileDynamic
-abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
+abstract class GormToolsHibernateSpec extends HibernateSpec implements AutowiredTest, JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
 
     //@OnceBefore
     void setupSpec() {
@@ -48,11 +49,12 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewS
             }
         }
 
-            //finds and register repositories for all the persistentEntities that got setup
+        //finds and register repositories for all the persistentEntities that got setup
         datastore.mappingContext.persistentEntities*.javaClass.each { domainClass ->
             beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
         }
         beans = beans << GormToolsPluginHelper.doWithSpring //commonBeans()
+        beans = beans << doWithSpringFirst()
         defineBeans(beans)
 
     }
@@ -60,6 +62,15 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements JsonViewS
     /** consistency with other areas of grails and other unit tests */
     AbstractDatastore getDatastore() {
         hibernateDatastore
+    }
+
+    /**
+     * Call back to provide beans before repositories are mocked, this gives chance to define beans which may need to
+     * be injected into repositories
+     * @return
+     */
+    Closure doWithSpringFirst() {
+        return {}
     }
 
 }

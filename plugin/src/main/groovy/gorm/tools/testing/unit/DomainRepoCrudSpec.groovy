@@ -18,22 +18,22 @@ import spock.lang.Specification
 @CompileDynamic
 abstract class DomainRepoCrudSpec<D> extends Specification implements DomainRepoTest<D> {
 
-    def "create tests"() {
+    void "create tests"() {
         expect:
         testCreate()
     }
 
-    def "update tests"() {
+    void "update tests"() {
         expect:
         testUpdate()
     }
 
-    def "persist tests"() {
+    void "persist tests"() {
         expect:
         testPersist()
     }
 
-    def "remove tests"() {
+    void "remove tests"() {
         expect:
         testRemove()
     }

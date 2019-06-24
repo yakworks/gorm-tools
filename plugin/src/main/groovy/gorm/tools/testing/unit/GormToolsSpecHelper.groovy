@@ -144,6 +144,10 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         return repoClasses
     }
 
+    void flush() {
+        getDatastore().currentSession.flush()
+    }
+
     void flushAndClear(){
         getDatastore().currentSession.flush()
         getDatastore().currentSession.clear()

@@ -20,8 +20,7 @@ class EntityValidationException extends ValidationException {
 
     Object entity //the entity that the error occured on
     Map meta //any meta that can be set and passed up the chain for an error
-    Map messageMap //map with message info code,orgs and defaultMessage
-    Object otherEntity //another entity on which error occurred
+    Map messageMap //map with message info code,args and defaultMessage
 
     EntityValidationException(String msg) {
         super(msg, new EmptyErrors("empty"))

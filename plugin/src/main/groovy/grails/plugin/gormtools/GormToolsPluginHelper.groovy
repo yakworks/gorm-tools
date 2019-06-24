@@ -20,6 +20,7 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.support.MsgService
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -31,6 +32,9 @@ class GormToolsPluginHelper {
     static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
 
     static Closure doWithSpring = {
+
+        msgService(MsgService)
+
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 
         jdbcIdGenerator(JdbcIdGenerator) {

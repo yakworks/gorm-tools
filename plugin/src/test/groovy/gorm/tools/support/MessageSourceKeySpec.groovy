@@ -43,11 +43,11 @@ class MessageSourceKeySpec extends Specification implements GrailsUnitTest {
         then:
         'go fast pull' == messageSource.getMessage(msgSourceKey, Locale.default)
 
-        when: "one arg is set"
+        when: "no arg is set"
         msgSourceKey = new MessageSourceKey('sky.dive.with.args')
 
         then:
-        'pull' == messageSource.getMessage(msgSourceKey, Locale.default)
+        '{0} {1} pull' == messageSource.getMessage(msgSourceKey, Locale.default)
     }
 
     def "test with only default message"() {

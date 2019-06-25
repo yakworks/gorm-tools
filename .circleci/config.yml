@@ -27,34 +27,26 @@ jobs:
       - restore_cache:
           keys:
             - gradle-{{ checksum "cache-checksum.tmp" }}
-
-      # see https://github.com/palantir/gradle-configuration-resolver-plugin
-      # this also kind of helps with the memory issue we keep running into by breaking it up
       - run:
-          name: ✔︎ -- Downloads Dependencies [gradle resolveConfigurations]
+          name: ✔︎ Downloads Dependencies [gradle resolveConfigurations]
           command: gradle resolveConfigurations
 
       # compiling as a seperate step before running check helps with the "finished with non-zero exit value 137" error
       - run:
-          name: ✔︎ -- Spotless Linter [gradle spotlessCheck]
-          command: gradle spotlessCheck
-
-      # compiling as a seperate step before running check helps with the "finished with non-zero exit value 137" error
-      - run:
-          name: ✔︎ -- Compile [gradle classes]
+          name: ✔︎ ------ Compile [gradle classes] ------
           command: gradle classes
 
       - save_cache:
-          paths:
-            - /home/gradle # the https://hub.docker.com/_/gradle/ containter does wierd stuff for cache
-            - ~/.m2
-            - ~/.gradle
-          key: gradle-{{ checksum "cache-checksum.tmp" }}
+          paths: ["~/.m2", "~/.gradle"]
+          key: v2-gradle-{{ checksum "cache-checksum.tmp" }}
 
       - run:
           name: ✔︎ -- Checks Full Run Tests [gradle check]
-          command: gradle check --max-workers=3
+          command: gradle check --max-workers=2
 
+      - store_artifacts:
+          path: plugin/build/reports/codenarc
+          destination: codenarc/
       - store_artifacts:
           path: plugin/build/reports/tests/test/
           destination: unit/
@@ -62,17 +54,17 @@ jobs:
           path: examples/test-app/build/reports/tests
           destination: test-app/
       - store_test_results:
-          path: plugin/build/reports/codenarc/
-          destination: codenarc/
-      - store_test_results:
           path: plugin/build/test-results
       - store_test_results:
           path: examples/test-app/build/test-results
 
       ### Finally do the build and publish. ciPublish will check if this is a PR or on a branch that should not be published
+      - compare-url/reconstruct # orb to make the CIRCLE_COMPARE_URL when using workflows
       - run:
-          name: ✔︎ -- Publish Library if needed [gradle ciPublish]
-          command: gradle ciPublish --no-daemon
+          name: ✔︎ -- Publish plugin if needed [gradle ciPublish]
+          command: |
+            CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
+            gradle ciPublish --no-daemon
 
 orbs:
   compare-url: iynere/compare-url@1.0.2

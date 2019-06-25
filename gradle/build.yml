@@ -12,12 +12,10 @@ team:
 
 bintray:
   enabled: true
-  # user: ${findAnyProperty("BINTRAY_USER")} //uses System var property
-  # key: ${props.findAny("BINTRAY_KEY")} //uses System var property
   pkg:
     repo: grails-plugins
     userOrg: 9ci
 
 maven:
   # repoUrl: http://repo.9ci.com/grails-plugins
-  snapshotUrl: http://repo.9ci.com/oss-snapshots
+  snapshotUrl: http://repo.9ci.com/public-snapshots

@@ -36,7 +36,7 @@ trait MsgSourceResolvableTrait implements MessageSourceResolvable{
     }
 
     void setMessage(String code, List arguments, String defaultMessage = null) {
-        setMessage([code],arguments, defaultMessage)
+        setMessage([code], arguments, defaultMessage)
     }
 
     void setMessage(List<String> codes, List arguments, String defaultMessage = null) {
@@ -50,7 +50,7 @@ trait MsgSourceResolvableTrait implements MessageSourceResolvable{
      * the last one in the codes array.
      */
     String getCode() {
-        return (this.codes != null && this.codes.length > 0 ? this.codes[this.codes.length - 1] : null);
+        return codes?.last()
     }
 
     void setCode(String cd) {

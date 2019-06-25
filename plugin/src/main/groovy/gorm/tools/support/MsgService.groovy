@@ -96,8 +96,4 @@ class MsgService {
         return this.messageSource.getMessage(resolvable, getDefaultLocale());
     }
 
-    Results results(boolean ok, String code, Exception ge){
-
-    }
-
 }

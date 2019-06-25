@@ -28,6 +28,7 @@ subprojects {
       testCompile "org.grails.plugins:build-test-data:$versionBuildTestData"
       testCompile "org.grails:views-json-testing-support:$versionViews"
     }
+
     testlogger {
       // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
       // theme 'standard'

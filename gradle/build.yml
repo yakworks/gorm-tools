@@ -18,4 +18,4 @@ bintray:
 
 maven:
   # repoUrl: http://repo.9ci.com/grails-plugins
-  snapshotUrl: http://repo.9ci.com/public-snapshots
+  snapshotUrl: http://repo.9ci.com/oss-snapshots

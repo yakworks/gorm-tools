@@ -22,9 +22,8 @@ import gorm.tools.beans.AppCtx
  * can catch an exception and return this to contain basic status and a message of what went wrong so
  * we can be report on it, log it, etc and move on to try the next item.
  */
-@ToString(includes = ['ok', 'id', 'message', 'meta'], includeNames = true)
+@ToString(includes = ['ok', 'id', 'code', 'args', 'meta'], includeNames = true)
 @CompileStatic
-@TupleConstructor(includes = ['ok', 'code', 'args', 'defaultMessage'], includeSuperFields=true)
 class Results implements MsgSourceResolvableTrait{
     boolean ok = true
     //some or none of these may be filled in
@@ -48,6 +47,13 @@ class Results implements MsgSourceResolvableTrait{
         setMessage(code, args)
     }
 
+    Results(boolean ok, Serializable id, String code, List args = null, Exception ex = null){
+        this.ok = ok
+        this.id = id
+        this.ex = ex
+        setMessage(code, args)
+    }
+
     Results(List<Results> childList){
         this(null, childList)
     }
@@ -58,6 +64,10 @@ class Results implements MsgSourceResolvableTrait{
     Results status(boolean ok, Map msgMap){
         this.ok = ok
         setMessage(msgMap)
+    }
+
+    static Results error(Serializable id, String code, List args = null, Exception ex = null){
+        new Results(ok:false, id: id, code: code, args: args, ex: ex)
     }
 
     void setupForLists(String code, List<Results> childList){

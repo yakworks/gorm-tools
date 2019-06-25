@@ -59,11 +59,11 @@ jobs:
           path: plugin/build/reports/tests/test/
           destination: unit/
       - store_artifacts:
-          path: plugin/build/reports/codenarc/
-          destination: codenarc/
-      - store_artifacts:
           path: examples/test-app/build/reports/tests
           destination: test-app/
+      - store_test_results:
+          path: plugin/build/reports/codenarc/
+          destination: codenarc/
       - store_test_results:
           path: plugin/build/test-results
       - store_test_results:

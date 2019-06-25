@@ -15,7 +15,7 @@ import grails.util.Holders
 /**
  * A static that uses the Holder to get the spring ApplicationContext it beans and the GrailsApplication
  * when in those cases where its not practical or possible to inject them (such as Traits for a persitenceEntity)
- * Obviously it highly recommended to not use this and use DI whenever possible.
+ * Obviously its highly recommended to not use this and use DI whenever possible.
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.x

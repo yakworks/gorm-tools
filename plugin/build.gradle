@@ -43,11 +43,6 @@ dependencies {
   testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
-// when using snapshots marked with {changing=true) can change this setting to check more frequently
-//configurations.all {
-//  resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
-//}
-
 //bootRepackage and maybe addResources are needed for the test/example projects grails.plugin.compile dependency to work
 //TODO can we take care of this in the yakworks.defaults plugin, I'm still not clear on what these are for and what they do?
 bootRun {

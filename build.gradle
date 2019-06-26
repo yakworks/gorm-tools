@@ -45,6 +45,12 @@ subprojects {
       // showFailedStandardStreams true
     }
   }
+  configurations {
+    testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
+    all {
+      resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
+    }
+  }
 }
 
 ext.codenarcRuleset= '''

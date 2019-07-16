@@ -5,6 +5,7 @@
 package grails.plugin.gormtools
 
 import java.sql.BatchUpdateException
+import javax.persistence.PersistenceException
 
 import groovy.transform.CompileDynamic
 
@@ -33,13 +34,18 @@ class ErrorMessageService {
      */
     Map buildErrorResponse(Exception e) {
         int code = 500
-        if (e instanceof ValidationException || e instanceof ConstraintViolationException
-            || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
+        Throwable curr = e
+        // when constraint is on db side, for example dup key, the exception is fired on flush and wrapped into PersistenceException
+        if (e instanceof PersistenceException ){
+            curr = e.cause
+        }
+
+        if (curr instanceof ValidationException || curr instanceof ConstraintViolationException
+            || curr instanceof org.grails.datastore.mapping.validation.ValidationException) {
             code = 422
         }
 
         List<Throwable> causes = []
-        Throwable curr = e
         while (curr?.cause != null) {
             causes << curr.cause
             curr = curr.cause
@@ -48,8 +54,8 @@ class ErrorMessageService {
         Map errMap = [
             "code"       : code,
             "status"     : "error",
-            "message"    : e.hasProperty('messageMap') ? buildMsg(e.messageMap) : e.message,
-            "messageCode": e.hasProperty('messageMap') ? e.messageMap.code : 0,
+            "message"    : curr.hasProperty('messageMap') ? buildMsg(curr.messageMap) : curr.message,
+            "messageCode": curr.hasProperty('messageMap') ? curr.messageMap.code : 0,
             "errors"     : [:]
         ]
 

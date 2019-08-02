@@ -64,7 +64,7 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
 //        }
 //        assert GrailsDomainBinder.FOREIGN_KEY_SUFFIX == 'Id'
 
-        Class[] domainClasses = grailsApplication.domainClasses*.clazz
+       /* Class[] domainClasses = grailsApplication.domainClasses*.clazz
         domainClasses.each { Class dc ->
 
             if (dc.name.startsWith('grails.plugin.')) {
@@ -88,7 +88,7 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
                 log.error("No DataStore bean found for datasource $datasourceName configured in domain class $dc.simpleName")
             }
             registerCriteria(dc, extension, sessionFactory, datastore, grailsApplication)
-        }
+        }*/
 
     }
 

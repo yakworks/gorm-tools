@@ -8,8 +8,10 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.mapping.core.connections.ConnectionSource
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import org.grails.datastore.mapping.query.api.Criteria
+import org.grails.orm.hibernate.datasource.MultipleDataSourceSupport
 import org.hibernate.SessionFactory
 
 import gorm.tools.beans.AppCtx
@@ -101,8 +103,11 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
     static BuildableCriteria createCriteria() {
         BuildableCriteria builder
         //TODO: temp hack, to prevent unit tests failing
+        String datasourceName = MultipleDataSourceSupport.getDefaultDataSource(currentGormStaticApi().persistentEntity)
+        boolean isDefault = (datasourceName == ConnectionSource.DEFAULT)
+        String suffix = isDefault ? '' : '_' + datasourceName
         try {
-            builder = new GormHibernateCriteriaBuilder(this, Holders.applicationContext.getBean("sessionFactory", SessionFactory))
+            builder = new GormHibernateCriteriaBuilder(this, Holders.applicationContext.getBean("sessionFactory$suffix".toString(), SessionFactory))
             builder.conversionService = currentGormStaticApi().datastore.mappingContext.conversionService
         } catch(IllegalStateException){
             builder = currentGormStaticApi().createCriteria()

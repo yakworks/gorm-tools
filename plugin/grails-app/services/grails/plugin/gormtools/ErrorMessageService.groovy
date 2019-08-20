@@ -37,7 +37,7 @@ class ErrorMessageService {
         Throwable curr = e
         // when constraint is on db side, for example dup key, the exception is fired on flush and wrapped into PersistenceException
         if (e instanceof PersistenceException ){
-            curr = e.cause
+            e = e.cause
         }
 
         if (curr instanceof ValidationException || curr instanceof ConstraintViolationException

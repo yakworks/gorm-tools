@@ -34,28 +34,29 @@ class ErrorMessageService {
      */
     Map buildErrorResponse(Exception e) {
         int code = 500
-        Throwable curr = e
-        // when constraint is on db side, for example dup key, the exception is fired on flush and wrapped into PersistenceException
+
         if (e instanceof PersistenceException ){
             e = e.cause
         }
 
-        if (curr instanceof ValidationException || curr instanceof ConstraintViolationException
-            || curr instanceof org.grails.datastore.mapping.validation.ValidationException) {
+        if (e instanceof ValidationException || e instanceof ConstraintViolationException
+            || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
             code = 422
         }
 
         List<Throwable> causes = []
+        Throwable curr = e
         while (curr?.cause != null) {
             causes << curr.cause
             curr = curr.cause
         }
-
+        String message = e.hasProperty('messageMap') ? buildMsg(e.messageMap) : e.message
         Map errMap = [
             "code"       : code,
             "status"     : "error",
-            "message"    : curr.hasProperty('messageMap') ? buildMsg(curr.messageMap) : curr.message,
-            "messageCode": curr.hasProperty('messageMap') ? curr.messageMap.code : 0,
+            // Persistence exception hides real reason with `could not execute statement`
+            "message"    : message == "could not execute statement" && curr?.message ? curr.message: message,
+            "messageCode": e.hasProperty('messageMap') ? e.messageMap.code : 0,
             "errors"     : [:]
         ]
 

@@ -4,6 +4,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import repoapp.Address
 import repoapp.Org
+import repoapp.Person
 import spock.lang.Issue
 import spock.lang.Specification
 
@@ -33,5 +34,21 @@ class EntityMapBinderSpec extends Specification {
         then:
         address != null
         address.city == "Rajkot"
+    }
+
+    void "test bindable"() {
+        given:
+        Map params = [name: "test", age: "50", address: [city: "Delhi", testId: "1"]]
+
+        when:
+        Person p = new Person()
+        p.bind params
+
+        then:
+        p.name == "test"
+        p.age == 50
+        p.address != null
+        p.address.city == "Delhi"
+        p.address.testId == 1
     }
 }

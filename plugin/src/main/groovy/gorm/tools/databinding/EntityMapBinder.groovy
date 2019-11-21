@@ -317,8 +317,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             }
             if (!Environment.getCurrent().isReloadEnabled()) {
                 CLASS_TO_BINDING_INCLUDE_LIST.put objectClass, whiteList
-                if (explicitBindingList) EXPLICIT_BINDING_LIST.put(objectClass, explicitBindingList)
             }
+            if (explicitBindingList) EXPLICIT_BINDING_LIST.put(objectClass, explicitBindingList)
         }
 
         return whiteList

@@ -8,17 +8,13 @@ import gorm.tools.beans.IsoDateUtil
 import gorm.tools.testing.unit.DataRepoTest
 import grails.databinding.converters.ValueConverter
 import grails.persistence.Entity
-import grails.testing.gorm.DataTest
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
-import spock.lang.Specification
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
+import spock.lang.Specification
 
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     EntityMapBinder binder
@@ -318,10 +314,10 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     }
 
     void "binder shouldn't initialize proxy when checks association's id"() {
-        Nested nested = new Nested(name: 'proxy')
-        TestDomain testDomain = new TestDomain(nested: nested).save()
+        BindableNested nested = new BindableNested(name: 'proxy').save(failOnError: true)
+        TestDomain testDomain = new TestDomain(notBindableNested: nested, nested: new Nested(name:"nested-belongsTo")).save(failOnError: true)
 
-        Map params = [name: 'test', nested: [id: nested.id, name: 'nested']]
+        Map params = [name: 'test', notBindableNested: [id: nested.id, name: 'nested']]
 
         expect:
         // clearing the session to get TestDomain entity with a proxy for 'nested' property
@@ -334,23 +330,23 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         then:
         // class names are not equal, because testDomainWithProxy.nested is a proxy and it has an appropriate class name,
         // which differs from 'gorm.tools.databinding.Nested'
-        testDomainWithProxy.nested.getClass().name != testDomain.nested.getClass().name
+        testDomainWithProxy.notBindableNested.getClass().name != testDomain.notBindableNested.getClass().name
 
         // 'nested' property isn't initialized
-        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'notBindableNested')
 
         when:
         Long nestedId = testDomainWithProxy.nested.id
 
         then: "getting id shouldn't initialize the proxy"
-        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+        !GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'notBindableNested')
         nestedId == nested.id
 
         when:
-        String nestedName = testDomainWithProxy.nested.name
+        String nestedName = testDomainWithProxy.notBindableNested.name
 
         then: "getting name initializes the proxy"
-        GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'nested')
+        GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'notBindableNested')
         nestedName == 'proxy'
     }
 }

@@ -259,7 +259,14 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 //we are setting it to a new id so load it and assign
                 target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
             }
-        } else if (association.isOwningSide() || isExplicitBind(target, association.name)) {
+
+            //bind if not null, map has values other then id, and the association is owning side or bindable
+            if(target[aprop] && (value instanceof Map) && value.size() > 1 && shouldBindAssociation(target, association)) {
+                fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+            }
+
+
+        } else if (shouldBindAssociation(target, association)) {
             if (!(value instanceof Map)) {
                 String msg = "Unable to create an association instance for the entity=${target}, the value=$value is not a Map"
                 throw new IllegalArgumentException(msg)
@@ -271,6 +278,13 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         }
     }
 
+    /**
+     * Check if association is bindable.
+     * An association is bindable, if it is owning side, or if explicit bindable:true
+     */
+    private boolean shouldBindAssociation(Object target, Association association) {
+        return (association.isOwningSide() || isExplicitBind(target, association.name))
+    }
     /**
      * Checks if a given association is explicitly marked as bindable and should be binded in any case.
      *

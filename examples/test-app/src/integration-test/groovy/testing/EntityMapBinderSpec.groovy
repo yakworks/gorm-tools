@@ -36,7 +36,7 @@ class EntityMapBinderSpec extends Specification {
         address.city == "Rajkot"
     }
 
-    void "test bindable"() {
+    void "test bindable : should create new instance"() {
         given:
         Map params = [name: "test", age: "50", address: [city: "Delhi", testId: "1"]]
 
@@ -50,5 +50,29 @@ class EntityMapBinderSpec extends Specification {
         p.address != null
         p.address.city == "Delhi"
         p.address.testId == 1
+    }
+
+    void "should update existing associated instance when bindable"() {
+        given:
+        Address address = new Address(city: "Delhi", testId: 1)
+        address.save()
+
+        Person p = new Person(name: "test", age: 50, address: address)
+        p.save()
+
+        when:
+        p = Person.get(p.id)
+
+        then:
+        p != null
+
+        when:
+        Map params = [address: [id:address.id, city: "Nyc", testId: "2"]]
+        p.bind params
+
+        then:
+        p.address.id == address.id
+        p.address.city == "Nyc"
+        p.address.testId == 2
     }
 }

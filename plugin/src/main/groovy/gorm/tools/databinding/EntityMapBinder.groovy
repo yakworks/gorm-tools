@@ -293,7 +293,8 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      * @return true if the association name with prefix is present in the white list
      */
     static boolean isExplicitBind(Object target, String name) {
-        EXPLICIT_BINDING_LIST.get(target.getClass()).contains(name)
+        List explicitBindingForClass = EXPLICIT_BINDING_LIST.get(target.getClass())
+        return explicitBindingForClass && explicitBindingForClass.contains(name)
     }
 
     /**

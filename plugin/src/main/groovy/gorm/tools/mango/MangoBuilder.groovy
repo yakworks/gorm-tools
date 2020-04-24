@@ -145,6 +145,11 @@ class MangoBuilder {
         }
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
+
+        if(prop == null) {
+            log.info("invalid domain property $field")
+            return
+        }
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
         if (prop instanceof Association) {
             //invoke(field, criteria, fieldVal)

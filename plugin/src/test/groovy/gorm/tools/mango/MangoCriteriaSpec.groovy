@@ -169,6 +169,14 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         res.size() == 1
     }
 
+    def "test invalid field"() {
+        when:
+
+        List res = build((["xxx": ['$eq': 6]])).list()
+
+        then:
+        noExceptionThrown()
+    }
 
     def "test or"() {
         when:

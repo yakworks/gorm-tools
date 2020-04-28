@@ -145,6 +145,7 @@ class MangoBuilder {
         }
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
+
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
         if (prop instanceof Association) {
             //invoke(field, criteria, fieldVal)
@@ -158,9 +159,9 @@ class MangoBuilder {
         // if field ends in Id then try removing the Id postfix and see if its a property
         else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
-        } else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List)) {
+        } else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List && prop != null)) {
             criteria.eq(field, toType(criteria, field, fieldVal))
-        } else if (fieldVal instanceof Map) { // could be field=name fieldVal=['$like': 'foo%']
+        } else if (fieldVal instanceof Map && prop) { // could be field=name fieldVal=['$like': 'foo%']
             //could be 1 or more too
             //for example field=amount and fieldVal=['$lt': 100, '$gt':200]
             for (String key : (fieldVal as Map).keySet()) {

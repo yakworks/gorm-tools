@@ -58,6 +58,8 @@ logs
 .idea/modules.xml
 .idea/vcs.xml
 .idea/modules
+.idea/compiler.xml
+.idea/jarRepositories.xml
 .idea/**/mongoSettings.xmlout/
 .idea/.name
 .idea/encodings.xml
@@ -178,5 +180,4 @@ Session.vim
 
 /web-app/
 /site/*
-.idea/compiler.xml
-.idea/jarRepositories.xml
+

@@ -25,8 +25,11 @@ subprojects {
 
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"
+      testCompile "org.grails:grails-datastore-rest-client"
+      testCompile "org.grails.plugins:geb"
       testCompile "org.grails.plugins:build-test-data:$versionBuildTestData"
       testCompile "org.grails:views-json-testing-support:$versionViews"
+      testCompile "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     }
 
     testlogger {

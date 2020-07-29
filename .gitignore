@@ -178,3 +178,5 @@ Session.vim
 
 /web-app/
 /site/*
+.idea/compiler.xml
+.idea/jarRepositories.xml

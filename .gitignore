@@ -57,6 +57,8 @@ logs
 .idea/artifacts
 .idea/modules.xml
 .idea/vcs.xml
+.idea/misc.xml
+.idea/$CACHE_FILE$
 .idea/modules
 .idea/compiler.xml
 .idea/jarRepositories.xml

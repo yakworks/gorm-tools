@@ -31,8 +31,8 @@ import grails.web.servlet.mvc.GrailsParameterMap
 @CompileStatic
 class BeanPathTools {
 
-    private static final List<String> EXCLUDES = ['hasMany', 'belongsTo', 'searchable', '__timeStamp',
-                                                  'constraints', 'version', 'metaClass']
+//    private static final List<String> EXCLUDES = ['hasMany', 'belongsTo', 'searchable', '__timeStamp',
+//                                                  'constraints', 'version', 'metaClass']
 
     private BeanPathTools() {
         throw new AssertionError()
@@ -46,30 +46,29 @@ class BeanPathTools {
     /**
      * Returns the deepest nested bean
      */
-    @CompileDynamic
+    //@CompileDynamic
     static getNestedBean(Object bean, String path) {
         int i = path.lastIndexOf(".")
         if (i > -1) {
             path = path.substring(0, i)
-            path.split('\\.').each { bean = bean?."$it" }
+            path.split('\\.').each { String it -> bean = bean[it] }
         }
         return bean
     }
 
-    @CompileDynamic
-    static List getFields(Object domain) {
-        List props = []
-
-        domain?.class?.properties?.declaredFields.each { field ->
-            if (!EXCLUDES.contains(field.name) && !field.name.contains("class\$") && !field.name.startsWith("__timeStamp")) {
-                props.add(field.name)
-            }
-        }
-
-        props.sort()
-
-        return props
-    }
+//    @CompileDynamic
+//    static List getFields(Object domain) {
+//        List props = []
+//
+//        domain?.class?.properties?.declaredFields.each { field ->
+//            if (!EXCLUDES.contains(field.name) && !field.name.contains("class\$") && !field.name.startsWith("__timeStamp")) {
+//                props.add(field.name)
+//            }
+//        }
+//        props.sort()
+//
+//        return props
+//    }
 
     /**
      * Provides an ability to retrieve object's fields into a map.
@@ -82,7 +81,7 @@ class BeanPathTools {
      * @param useDelegatingBean
      * @return a map which is based on object properties
      */
-    @CompileDynamic
+    // @CompileDynamic
     static Map buildMapFromPaths(Object source, List<String> propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {
             Class delegatingBean = GrailsClassUtils.getStaticFieldValue(source.getClass(), "delegatingBean")
@@ -99,7 +98,6 @@ class BeanPathTools {
         }
         if (log.debugEnabled) log.debug(rowMap.toMapString())
         return rowMap
-
     }
 
     /**
@@ -123,7 +121,7 @@ class BeanPathTools {
      */
     @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock', 'CatchException'])
     //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
-    @CompileDynamic
+    // @CompileDynamic
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
         if (source == null) return null
         Integer nestedIndex = propertyPath.indexOf('.')
@@ -140,16 +138,16 @@ class BeanPathTools {
                     PersistentProperty[] pprops = domainClass.persistentProperties
 
                     //filter out the associations. need to explicitly add those to be included
-                    pprops = pprops.findAll { p -> !(p instanceof Association && p.associatedEntity) }
+                    pprops = pprops.findAll { PersistentProperty p -> !(p instanceof Association && p.associatedEntity) }
                     //force the the id to be included
                     String id = domainClass.identity.name
-                    currentMap[id] = source?."$id"
+                    currentMap[id] = source[id]
                     //spin through and add them to the map
-                    pprops.each { property ->
+                    pprops.each { PersistentProperty property ->
                         try {
-                            currentMap[property.name] = source?."$property.name"
+                            currentMap[property.name] = source[property.name]
                         } catch(e){
-                            if (log.debugEnabled) log.debug("${source.class.name} with id ${source.id} is not in db for property ${property.name}")
+                            if (log.debugEnabled) log.debug("${source.class.name} with id ${source[id]} is not in db for property ${property.name}")
 
                         }
                     }
@@ -158,7 +156,7 @@ class BeanPathTools {
                         it instanceof Map || it instanceof Collection ||
                                 it instanceof Number || it?.class in [String, Boolean, Character]
                     }
-                    Map props = object.properties.findAll { it.key != 'class' }
+                    Map props = object.properties.findAll { it.key != 'class' } as Map<String,?>
                     props.each { String name, Object value ->
                         if (!value || notConvert(value)) {
                             currentMap[name] = value
@@ -173,7 +171,7 @@ class BeanPathTools {
                 // So it's the same as catching MissingPropertyException and do nothing if there is no property
             } else {
                 try {
-                    currentMap[propertyPath] = source?."$propertyPath"
+                    currentMap[propertyPath] = source[propertyPath]
                 } catch (Exception e) {
                     //TODO handle missing property exception
                 }
@@ -183,7 +181,7 @@ class BeanPathTools {
             // of the nested key as the prefix. In other words, if we have
             // 'nestedKey' == "a.b.c", the prefix is "a".
             String nestedPrefix = propertyPath.substring(0, nestedIndex)
-            boolean newKey = false//check if this key is encountered first time, used to remove the key from map if property not found.
+            boolean newKey = false //check if this key is encountered first time, used to remove the key from map if property not found.
             if (!currentMap.containsKey(nestedPrefix) || !(currentMap[nestedPrefix] instanceof Map)) {
                 currentMap[nestedPrefix] = [:]
                 newKey = true
@@ -191,7 +189,7 @@ class BeanPathTools {
             Object nestedObj
 
             try {
-                nestedObj = source."$nestedPrefix"
+                nestedObj = source[nestedPrefix]
             } catch (Exception e) {
                 //TODO handle missing property exception
                 //remove the entry as the key doesnt exist and its going to be empty
@@ -227,25 +225,57 @@ class BeanPathTools {
         return getGrailsParameterMap(p, request)
     }
 
-    @CompileDynamic
+    // @CompileDynamic
     static List<String> getIncludes(String className, List<String> fields) {
         List<PersistentProperty> properties = GormMetaUtils.getPersistentProperties(className)
         List<String> result = []
         fields.each { String field ->
-            if (field == "*") {
-                result.addAll(properties.findAll { !(it instanceof Association) }*.name)
-            } else if (field.endsWith(".*")) {
-                String[] path = field.split("[.]")
-                String nestedClass = properties.find { it.name == path[0] }?.getAssociatedEntity()?.getName()
-                if (nestedClass)
-                    result = result + getIncludes(nestedClass, [path.tail().join(".")]).collect { "${path[0]}.${it}" }
-                if (path.size() > 1) result = result + [path[0]]
-                result = result*.toString()
-            } else {
-                result << field // TODO: should we check that field really exists?
+            Integer nestedIndex = field.indexOf('.')
+            //no index then its just a property or its the *
+            if (nestedIndex == -1) {
+                if (field == '*') {
+                    List<String> props = properties.findAll { !(it instanceof Association) }*.name
+                    result.addAll(props)
+                }
+                else { //normal prop
+                    // todo should add check for transient
+                    result << field
+                }
             }
+            else { // nested field
+                if (field.endsWith(".*")) {
+                    String[] path = field.split("[.]")
+                    Association pp = properties.find { it.name == path[0] } as Association
+                    String nestedClass = pp.getAssociatedEntity()?.getName()
+                    if (nestedClass) {
+                        List<String> nprops = getIncludes(nestedClass, [path.tail().join(".")])
+                        result.addAll( nprops.collect { "${path[0]}.${it}".toString() })
+                    }
+                    //if (path.size() > 1) result = result + [path[0]]
+                    result = result*.toString() //makes sure they are all strings?
+                } else {
+                    result << field // TODO: should we check that field really exists?
+                }
+            }
+            // if (field == "*") {
+            //     List<String> props = properties.findAll { !(it instanceof Association) }*.name
+            //     result.addAll(props)
+            // } else if (field.endsWith(".*")) {
+            //     String[] path = field.split("[.]")
+            //     Association pp = properties.find { it.name == path[0] } as Association
+            //     String nestedClass = pp.getAssociatedEntity()?.getName()
+            //     if (nestedClass) {
+            //         List<String> nprops = getIncludes(nestedClass, [path.tail().join(".")])
+            //         result.addAll( nprops.collect { "${path[0]}.${it}".toString() })
+            //     }
+            //     //if (path.size() > 1) result = result + [path[0]]
+            //     result = result*.toString() //makes sure they are all strings?
+            // } else {
+            //     result << field // TODO: should we check that field really exists?
+            // }
         }
         result.unique()
+
     }
 
     @CompileDynamic

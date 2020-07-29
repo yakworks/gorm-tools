@@ -88,7 +88,7 @@ class DefaultMangoQuery implements MangoQuery {
 
         List totalsData = (List) totalList[0]
         Map result = [:]
-        sums.eachWithIndex { String name, i ->
+        sums.eachWithIndex { String name, Integer i ->
             result[name] = totalsData[i]
         }
         return result
@@ -97,7 +97,7 @@ class DefaultMangoQuery implements MangoQuery {
     /**
      * returns a Map with a criteria key and a pager key containing maps for those.
      */
-    Map<String, Map> parseParams(Map params){
+    Map<String, Map> parseParams(Map<String, ?> params){
         def result = [criteria: [:], pager: [:]] as Map<String, Map>
         Map paramCopy = [:]
         paramCopy.putAll(params)

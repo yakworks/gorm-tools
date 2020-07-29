@@ -92,12 +92,12 @@ class GormToolsPluginHelper {
             // bean.autowire = 'byName'
         }
 
-        appInfoBuilder(AppInfoBuilder) { bean ->
-            // Autowiring behaviour. The other option is 'byType'. <<autowire>>
-            // bean.autowire = 'byName'
-        }
+//        appInfoBuilder(AppInfoBuilder) { bean ->
+//            // Autowiring behaviour. The other option is 'byType'. <<autowire>>
+//            // bean.autowire = 'byName'
+//        }
 
-        GrailsApplication application = grailsApplication
+        // application = grailsApplication
         registryRestApiControllers(application)
     }
 
@@ -146,6 +146,7 @@ class GormToolsPluginHelper {
         }
     }
 
+    @SuppressWarnings(['EmptyCatchBlock'])
     @CompileStatic
     static void registryRestApiControllers(GrailsApplication app) {
         for (GrailsClass grailsClass in app.getArtefacts(DomainClassArtefactHandler.TYPE)) {

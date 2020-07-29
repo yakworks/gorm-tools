@@ -21,7 +21,7 @@ subprojects {
 
     dependencies {
       testRuntime "com.h2database:h2"
-      testRuntime "org.apache.tomcat:tomcat-jdbc"
+      testRuntime "com.zaxxer:HikariCP:3.4.5"
 
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"

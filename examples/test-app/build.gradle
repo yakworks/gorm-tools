@@ -17,6 +17,8 @@ dependencies {
 
   compile "org.grails:grails-plugin-controllers"
 
+  runtime "com.h2database:h2"
+  runtime "com.zaxxer:HikariCP:3.4.5"
 
   compile project(':gorm-tools')
 

@@ -5,7 +5,10 @@
 package grails.plugin.gormtools
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
+import org.grails.core.artefact.ControllerArtefactHandler
+import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -20,6 +23,9 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.rest.JsonSchemaGenerator
+import gorm.tools.rest.RestApi
+import gorm.tools.rest.appinfo.AppInfoBuilder
 import gorm.tools.support.MsgService
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
@@ -79,6 +85,20 @@ class GormToolsPluginHelper {
                 }
             }
         }
+
+        //rest
+        jsonSchemaGenerator(JsonSchemaGenerator) { bean ->
+            // Autowiring behaviour. The other option is 'byType'. <<autowire>>
+            // bean.autowire = 'byName'
+        }
+
+        appInfoBuilder(AppInfoBuilder) { bean ->
+            // Autowiring behaviour. The other option is 'byType'. <<autowire>>
+            // bean.autowire = 'byName'
+        }
+
+        GrailsApplication application = grailsApplication
+        registryRestApiControllers(application)
     }
 
     static void onChange(Object event, GrailsApplication grailsApplication, Plugin plugin) {
@@ -91,6 +111,7 @@ class GormToolsPluginHelper {
 
             plugin.beans(getRepoBeanClosure(repoClass))
         }
+        registryRestApiControllers(grailsApplication)
     }
 
     static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass, Object beanBuilder = null) {
@@ -120,6 +141,28 @@ class GormToolsPluginHelper {
             if (fields && !domainClass.getJavaClass().quickSearchFields) {
                 domainClass.getJavaClass().quickSearchFields = fields.findAll {
                     GormMetaUtils.hasProperty(domainClass, it as String)
+                }
+            }
+        }
+    }
+
+    @CompileStatic
+    static void registryRestApiControllers(GrailsApplication app) {
+        for (GrailsClass grailsClass in app.getArtefacts(DomainClassArtefactHandler.TYPE)) {
+            final clazz = grailsClass.clazz
+            if (clazz.getAnnotation(RestApi)) {
+                //println "${clazz.name}"
+                String controllerClassName = "${clazz.name}Controller"
+                //Check if we already have such controller in app
+                if (!app.getArtefact(ControllerArtefactHandler.TYPE, controllerClassName) && !(app.getArtefacts
+                (ControllerArtefactHandler.TYPE)*.name.contains(clazz.simpleName))) {
+
+                    try {
+                        app.addArtefact(ControllerArtefactHandler.TYPE, app.classLoader.loadClass(controllerClassName))
+                        //println "added $controllerClassName"
+                    } catch (ClassNotFoundException cnfe) {
+
+                    }
                 }
             }
         }

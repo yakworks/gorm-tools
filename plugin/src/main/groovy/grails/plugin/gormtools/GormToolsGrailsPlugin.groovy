@@ -92,37 +92,37 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
 
     }
 
-    private void registerCriteria(Class dc, MetaClass extension, SessionFactory sessionFactory,
-                                  HibernateDatastore datastore, GrailsApplication grailsApplication) {
-        Class domainClassType = dc
-        ['createCriteria', 'makeCriteria'].eachWithIndex { name, idx ->
-            extension.static."$name" = { ->
-                GormHibernateCriteriaBuilder builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
-                builder.conversionService = datastore.mappingContext.conversionService
-                //builder.grailsApplication = grailsApplication
-                return builder
-            }
-        }
-        ['withCriteria', 'forCriteria'].each {
-            extension.'static'."$it" = { Closure callable ->
-                def builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
-                builder.conversionService = datastore.mappingContext.conversionService
-                //builder.grailsApplication = grailsApplication
-                builder.invokeMethod("doCall", callable)
-            }
-            extension.'static'."$it" = { Map builderArgs, Closure callable ->
-                def builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
-                builder.conversionService = datastore.mappingContext.conversionService
-                builder.grailsApplication = grailsApplication
-                def builderBean = new BeanWrapperImpl(builder)
-                for (entry in builderArgs) {
-                    if (builderBean.isWritableProperty(entry.key)) {
-                        builderBean.setPropertyValue(entry.key, entry.value)
-                    }
-                }
-                builder.invokeMethod("doCall", callable)
-            }
-        }
-    }
+    // private void registerCriteria(Class dc, MetaClass extension, SessionFactory sessionFactory,
+    //                               HibernateDatastore datastore, GrailsApplication grailsApplication) {
+    //     Class domainClassType = dc
+    //     ['createCriteria', 'makeCriteria'].eachWithIndex { name, idx ->
+    //         extension.static."$name" = { ->
+    //             GormHibernateCriteriaBuilder builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
+    //             builder.conversionService = datastore.mappingContext.conversionService
+    //             //builder.grailsApplication = grailsApplication
+    //             return builder
+    //         }
+    //     }
+    //     ['withCriteria', 'forCriteria'].each {
+    //         extension.'static'."$it" = { Closure callable ->
+    //             def builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
+    //             builder.conversionService = datastore.mappingContext.conversionService
+    //             //builder.grailsApplication = grailsApplication
+    //             builder.invokeMethod("doCall", callable)
+    //         }
+    //         extension.'static'."$it" = { Map builderArgs, Closure callable ->
+    //             def builder = new GormHibernateCriteriaBuilder(domainClassType, sessionFactory)
+    //             builder.conversionService = datastore.mappingContext.conversionService
+    //             builder.grailsApplication = grailsApplication
+    //             def builderBean = new BeanWrapperImpl(builder)
+    //             for (entry in builderArgs) {
+    //                 if (builderBean.isWritableProperty(entry.key)) {
+    //                     builderBean.setPropertyValue(entry.key, entry.value)
+    //                 }
+    //             }
+    //             builder.invokeMethod("doCall", callable)
+    //         }
+    //     }
+    // }
 
 }

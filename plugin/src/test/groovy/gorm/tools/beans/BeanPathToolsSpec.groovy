@@ -8,6 +8,8 @@ import gorm.tools.testing.unit.GormToolsTest
 import grails.persistence.Entity
 import grails.web.servlet.mvc.GrailsParameterMap
 import org.springframework.mock.web.MockHttpServletRequest
+
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import testing.Org
 
@@ -242,10 +244,20 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         result == BeanPathTools.buildMapFromPaths(object, fields)
 
         where:
-        fields          | result
-        ['foo']         | [foo: 'foo']
+        fields             | result
+        ['foo','company']  | [foo: 'foo', company: 'Tesla']
         ['*']           | [foo: 'foo', bar: 10.00, id: 1, version: null, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
         ['*', 'baz.value'] | [foo: 'foo', bar: 10.00, id: 1, version: null, baz: [[value: 23]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+    }
+
+    @IgnoreRest
+    void "test buildMapFromPaths with transient"() {
+        setup:
+        TestClazzA object = new TestClazzA(foo: 'foo', bar: 10.00)
+
+        expect:
+        [foo: 'foo', company: 'Tesla'] == BeanPathTools.buildMapFromPaths(object, ['foo','company'])
+
     }
 
     void "test buildMapFromPaths for all fields using delegating bean"() {
@@ -299,7 +311,7 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         fields          | result
         ['foo']         | ['foo']
         ['*']           | ['id', 'foo', 'version', 'bar']
-        ['baz.*']       | ['baz.id', 'baz.value', 'baz.version', 'baz']
+        ['baz.*']       | ['baz.id', 'baz.value', 'baz.version']
         //FIXME make the following work
         //['baz.id']      | ['baz.id', 'baz']
     }
@@ -314,6 +326,12 @@ class TestClazzA {
 
     TestClazzA(){
         id = 1
+    }
+
+    static transients = ['company']
+
+    String getCompany() {
+        'Tesla'
     }
 
     //See https://sysgears.com/articles/advanced-gorm-features-inheritance-embedded-data-maps-and-lists-storing/

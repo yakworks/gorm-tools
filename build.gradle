@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     //classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-    classpath "org.yakworks:gradle-plugins:1.1.13"
+    classpath "org.yakworks:gradle-plugins:1.1.14"
   }
 }
 
@@ -21,12 +21,15 @@ subprojects {
 
     dependencies {
       testRuntime "com.h2database:h2"
-      testRuntime "org.apache.tomcat:tomcat-jdbc"
+      testRuntime "com.zaxxer:HikariCP:3.4.5"
 
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"
+      testCompile "org.grails:grails-datastore-rest-client"
+      testCompile "org.grails.plugins:geb"
       testCompile "org.grails.plugins:build-test-data:$versionBuildTestData"
       testCompile "org.grails:views-json-testing-support:$versionViews"
+      testCompile "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     }
 
     testlogger {

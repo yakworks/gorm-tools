@@ -11,6 +11,7 @@ dependencies {
 
   compile "org.grails:grails-web-boot"
 
+  // compile "org.grails:grails-plugin-url-mappings"
   compile "org.grails:grails-logging"
   compile "org.grails:grails-plugin-databinding"
   compile "org.grails:grails-plugin-services"
@@ -37,6 +38,8 @@ dependencies {
   compileOnly "org.grails:grails-gorm-testing-support"
   compileOnly "org.grails:grails-web-testing-support"
   compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
+  compileOnly "org.grails.plugins:geb"
+  compileOnly "org.grails:grails-datastore-rest-client"
 
   //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
   testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"

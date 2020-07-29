@@ -57,7 +57,11 @@ logs
 .idea/artifacts
 .idea/modules.xml
 .idea/vcs.xml
+.idea/misc.xml
+.idea/$CACHE_FILE$
 .idea/modules
+.idea/compiler.xml
+.idea/jarRepositories.xml
 .idea/**/mongoSettings.xmlout/
 .idea/.name
 .idea/encodings.xml
@@ -178,3 +182,4 @@ Session.vim
 
 /web-app/
 /site/*
+

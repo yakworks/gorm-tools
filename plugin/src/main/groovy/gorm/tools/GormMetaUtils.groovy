@@ -139,7 +139,7 @@ class GormMetaUtils {
      */
     static List<PersistentProperty> getPersistentProperties(String className){
         PersistentEntity domain = findPersistentEntity(className)
-        List<PersistentProperty> result = domain.persistentProperties
+        List<PersistentProperty> result = domain.persistentProperties.collect() // collect copies it
         if(domain.compositeIdentity) result.addAll(domain.compositeIdentity)
         result.add(0, domain.getIdentity())
         result.unique()

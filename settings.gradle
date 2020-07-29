@@ -5,5 +5,11 @@ findProject(':plugin').name = 'gorm-tools'
 //tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/benchmarks"
 include "examples/test-app"
+include 'examples/restify'
+include 'examples/restify-domains'
+
+
+findProject(':examples/restify-domains').name = 'restify-domains'
+findProject(':examples/restify').name = 'restify'
 findProject(':examples/benchmarks').name = 'benchmarks'
 findProject(':examples/test-app').name = 'test-app'

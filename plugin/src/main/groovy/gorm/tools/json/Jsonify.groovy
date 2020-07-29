@@ -66,11 +66,15 @@ class Jsonify {
      */
     static JsonifyResult render(Object object, Map arguments = Collections.emptyMap(),
                                    @DelegatesTo(StreamingJsonBuilder.StreamingJsonDelegate) Closure customizer = null ) {
-        if (arguments.includes){
-            arguments.includes = BeanPathTools.getIncludes(object.class.name, arguments.includes as List<String>)
+        if (arguments.includes && object){
+            List origIncludes  = arguments.includes as List<String>
+            // println("origIncludes ${origIncludes}")
+            String className = object instanceof List ? (object as List)[0].class.name : object.class.name
+            List newIncludes = BeanPathTools.getIncludes(className, origIncludes)
+            arguments.includes = newIncludes
         }
-        JsonWritable writer = renderWritable(object, arguments, customizer)
-        return new JsonifyResult(writer: writer)
+        JsonWritable w = renderWritable(object, arguments, customizer)
+        return new JsonifyResult(writer: w)
     }
 
     @CompileStatic

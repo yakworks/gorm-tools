@@ -7,6 +7,7 @@ package restify
 import groovy.transform.CompileStatic
 
 import gorm.tools.rest.controller.RestApiRepoController
+import restify.domain.Location
 
 import static org.springframework.http.HttpStatus.CREATED
 

@@ -1,4 +1,4 @@
-package funcytown.domains.plugin
+package restifydomains
 
 class BootStrap {
 

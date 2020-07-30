@@ -11,6 +11,7 @@ import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.Pager
+import gorm.tools.beans.BeanPathTools
 import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.api.RepositoryApi
 import grails.artefact.controller.RestResponder
@@ -35,6 +36,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      * @see org.grails.datastore.mapping.model.PersistentEntity#getJavaClass() .
      */
     Class<D> entityClass // the domain class this is for
+
 
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
@@ -61,7 +63,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     def post() {
         try {
             D instance = (D) getRepo().create(getDataMap())
-            respond instance, [status: CREATED] //201
+            respond jsonObject(instance), [status: CREATED] //201
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -76,7 +78,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         data.putAll(getDataMap()) // getDataMap doesnt contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
-            respond instance, [status: OK] //200
+            respond jsonObject(instance), [status: OK] //200
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -103,7 +105,8 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     @Action
     def get() {
         try {
-            respond getRepo().get(params)
+            D instance = (D) getRepo().get(params)
+            respond jsonObject(instance)
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -131,18 +134,48 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      */
     @Action
     def list() {
-        // println "list action"
-        Pager pager = new Pager(params)
-        ['max', 'offset', 'page'].each{ String k ->
-            params[k] = pager[k]
-        }
-        // params.max = Math.min(max ?: 10, 100)
-        def dlist = query(params)
-        pager.setupData(dlist)
-        // println "list params $params"
+        Pager pager = pagedQuery(params, 'list')
         Map renderArgs = [:] //[includes: ['name']]
-        respond([view: '/object/_list'], [data: dlist, pager: pager, renderArgs: renderArgs])
+        respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
         // respond query(params)
+    }
+
+    @Action
+    def pickList() {
+        Pager pager = pagedQuery(params, 'pickList')
+        Map renderArgs = [:]
+        respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
+    }
+
+    //@CompileDynamic
+    Pager pagedQuery(Map params, String includesKey) {
+        Pager pager = new Pager(params)
+        // assert params instanceof Pager
+        // println "params ${params.class} $params"
+        List dlist = query(pager, params)
+        List incs = findIncludes(includesKey)
+        pager.setupData(dlist, incs)
+    }
+
+    /**
+     * builds the response model. if there is an includes the it will use BeanPathTools.buildMapFromPaths
+     * if no includes list (the default) then it just returns the instance
+     *
+     * @param instance the entity instance
+     * @param includeKey the key to use in the includes map, use default by default
+     * @return the object to pass on to json views
+     */
+    Object jsonObject(D instance, String includesKey = 'default'){
+        List incs = findIncludes(includesKey)
+        return incs ? BeanPathTools.buildMapFromPaths(instance, incs) : instance
+    }
+
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
+    @CompileDynamic
+    List findIncludes(String includesKey){
+        if (!hasProperty('includes')) return null
+        // def incs = getIncludes()
+        return (includes instanceof List) ? includes : includes[includesKey]
     }
 
     /**

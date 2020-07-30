@@ -3,6 +3,7 @@ package security
 import grails.compiler.GrailsCompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import static grails.gorm.hibernate.mapping.MappingBuilder.*
 
 @GrailsCompileStatic
 @EqualsAndHashCode(includes = 'authority')
@@ -17,7 +18,7 @@ class SecurityRole implements Serializable {
                 blank: false, unique: true
     }
 
-    static mapping = {
-        cache true
+    static mapping = orm {
+        cache "read-write"
     }
 }

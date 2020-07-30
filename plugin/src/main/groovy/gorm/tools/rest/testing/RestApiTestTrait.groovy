@@ -27,15 +27,17 @@ trait RestApiTestTrait {
 
     /**
      * Loosely test 2 maps for equality
-     * asserts more or less that main:[a: 1, b: 2, c: 3] == subset:[a: 1, b: 2]
-     *
-     * @param subset the full map
-     * @param full the full map
+     * asserts more or less that subset:[a: 1, b: 2] == full:[a: 1, b: 2, c: 3]
      * http://csierra.github.io/posts/2013/02/12/loosely-test-for-map-equality-using-groovy/
+     *
+     * @param subset the partial map
+     * @param full the full map
+     * @param excludes  the list of fields to exclude from the subset
      */
-    boolean subsetEquals(Map subset, Map full, List<String> exclude = []) {
+    boolean subsetEquals(Map subset, Map full, List<String> excludes = []) {
         //if (!full.keySet().containsAll(subset.keySet())) return false
-        subset.findAll { !exclude.contains(it.key) }.every { it.value == full[it.key] }
+        subset.findAll { !excludes.contains(it.key) }
+            .every { it.value == full[it.key] }
     }
 
 }

@@ -27,10 +27,10 @@ import gorm.tools.rest.controller.RestApiRepoController
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ElementType.TYPE])
 @GroovyASTTransformationClass("gorm.tools.rest.transform.RestApiTransform")
-public @interface RestApi {
+@interface RestApi {
 
     /**
-     * @return The desicription of this resource. Can be used for OpenApi or other rest docs
+     * @return The description of this resource. Can be used for OpenApi or other rest docs
      */
     String description() default ""
 

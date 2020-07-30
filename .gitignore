@@ -53,6 +53,8 @@ logs
 .mtj.tmp/
 
 # from https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore
+## Excude all idea for now
+.idea
 #### IDEA
 .idea/artifacts
 .idea/modules.xml
@@ -64,6 +66,7 @@ logs
 .idea/jarRepositories.xml
 .idea/**/mongoSettings.xmlout/
 .idea/.name
+.idea/.gitignore
 .idea/encodings.xml
 .idea/**/workspace.xml
 .idea/inspectionProfiles/Project_Default.xml

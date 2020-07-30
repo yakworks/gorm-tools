@@ -75,6 +75,8 @@ class GormToolsPluginHelper {
 
         //make sure each domain has a repository, if not set up a DefaultGormRepo for it.
         Class[] domainClasses = application.domainClasses*.clazz
+        println ("domainClasses $domainClasses")
+
         domainClasses.each { Class domainClass ->
             String repoName = RepoUtil.getRepoBeanName(domainClass)
             def hasRepo = repoClasses.find { it.propertyName == repoName }

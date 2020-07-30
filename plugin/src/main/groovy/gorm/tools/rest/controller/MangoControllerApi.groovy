@@ -4,8 +4,11 @@
 */
 package gorm.tools.rest.controller
 
-import groovy.transform.CompileDynamic
+//import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
+import gorm.tools.Pager
+import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.api.RepositoryApi
 import grails.gorm.DetachedCriteria
 
@@ -14,17 +17,29 @@ import grails.gorm.DetachedCriteria
  *
  *  Created by alexeyzvegintcev.
  */
-@CompileDynamic
+@CompileStatic
 trait MangoControllerApi {
 
     abstract RepositoryApi getRepo()
 
+    //just casts the repo to QueryMangoEntityApi
+    QueryMangoEntityApi getMangoApi(){
+        return (getRepo() as QueryMangoEntityApi)
+    }
+
     DetachedCriteria buildCriteria(Map criteriaParams = [:], Map params = [:], Closure closure = null) {
-        getRepo().buildCriteria(criteriaParams + params, closure)
+        getMangoApi().buildCriteria(criteriaParams + params, closure)
     }
 
     List query(Map criteriaParams = [:], Map params = [:], Closure closure = null) {
-        getRepo().query(criteriaParams + params, closure)
+        getMangoApi().query(criteriaParams + params, closure)
+    }
+
+    List query(Pager pager, Map params = [:]) {
+        ['max', 'offset', 'page'].each{ String k ->
+            params[k] = pager[k]
+        }
+        getMangoApi().query(params)
     }
 
 }

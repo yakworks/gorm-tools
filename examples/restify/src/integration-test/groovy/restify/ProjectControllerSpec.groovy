@@ -42,10 +42,30 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then: "The response is correct"
         response.status == OK.value()
-        println "response.json ${response.json}"
-        response.json.data.size() == 10
-        response.json.page == 1
-        response.json.total >= 1
+        def resJson = response.json
+        println "response.json ${resJson}"
+        resJson.data.size() == 10
+        resJson.page == 1
+        resJson.total >= 1
+        //check that first item in data list has the fields from listIncludes
+        resJson.data[0] == [id:1 , name: "Fooinator-1", num: "1", billable:true]
+    }
+
+    // @IgnoreRest
+    void test_pick_list() {
+        // BootStrap should have loaded up projects already
+        when: "The default index action is requested"
+        def response = restBuilder.get("$resourcePath/pickList")
+
+        then: "The response is correct"
+        response.status == OK.value()
+        def resJson = response.json
+        println "response.json ${resJson}"
+        resJson.data.size() == 10
+        resJson.page == 1
+        resJson.total >= 1
+        //check that first item in data list has the fields from listIncludes
+        resJson.data[0] == [id:1 , name: "Fooinator-1", num: "1"]
     }
 
     @Ignore
@@ -112,16 +132,13 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
     }
 
     void test_show_get() {
-        given: "The save action is executed with valid data"
-        def response = post_a_valid_resource()
-
         when: "When the show action is called to retrieve a resource"
-        def id = response.json.id
-        response = restBuilder.get("$resourcePath/$id")
+        def response = restBuilder.get("$resourcePath/1")
 
         then: "The response is correct"
         response.status == OK.value()
-        response.json.id == id
+        response.json == [activateDate:'2020-01-01T00:00:00Z', inactive:false, comments:null, endDate:null,
+                          num:'1', name:'Fooinator-1', id:1, billable:true, startDate:'2020-01-01']
     }
 
     void test_delete() {

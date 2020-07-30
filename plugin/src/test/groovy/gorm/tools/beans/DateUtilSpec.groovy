@@ -93,16 +93,16 @@ class DateUtilSpec extends Specification {
         !DateUtil.isTodayTheDate('bzzz', dayOfWeek)
     }
 
-    @Ignore //FIXME this is blowing up on daylight savings today. Adding 10 thinks it 9 days apart.
-    void "test DaysBetween"() {
-        given:
-        Date now = new Date()
-
-        expect:
-        0 == DateUtil.getDaysBetween(now, now)
-        -10 == DateUtil.getDaysBetween(now - 10, now)
-        10 == DateUtil.getDaysBetween(now + 10, now)
-    }
+    // @Ignore //FIXME this is blowing up on daylight savings today. Adding 10 thinks it 9 days apart.
+    // void "test DaysBetween"() {
+    //     given:
+    //     Date now = new Date()
+    //
+    //     expect:
+    //     0 == DateUtil.getDaysBetween(now, now)
+    //     -10 == DateUtil.getDaysBetween(now - 10, now)
+    //     10 == DateUtil.getDaysBetween(now + 10, now)
+    // }
 
     void "test getMonthDiff"() {
         given:

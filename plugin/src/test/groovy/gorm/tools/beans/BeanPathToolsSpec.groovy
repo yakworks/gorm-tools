@@ -250,7 +250,7 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         ['*', 'baz.value'] | [foo: 'foo', bar: 10.00, id: 1, version: null, baz: [[value: 23]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
     }
 
-    @IgnoreRest
+    //@IgnoreRest
     void "test buildMapFromPaths with transient"() {
         setup:
         TestClazzA object = new TestClazzA(foo: 'foo', bar: 10.00)

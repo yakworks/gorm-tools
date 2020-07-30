@@ -17,6 +17,20 @@ grails:
       # Whether to translate GORM events into Reactor events
       # Disabled by default for performance reasons
       events: false
+  config:
+    locations:
+      - classpath:rest-config.yml
+#      - classpath:myconfig.yml
+#      - classpath:myconfig.properties
+#      - file:///etc/app/myconfig.groovy
+#      - file:///etc/app/myconfig.yml
+#      - file:///etc/app/myconfig.properties
+#      - ~/.grails/myconfig.groovy
+#      - ~/.grails/myconfig.yml
+#      - ~/.grails/myconfig.properties
+#      - file:${catalina.base}/myconfig.groovy
+#      - file:${catalina.base}/myconfig.yml
+#      - file:${catalina.base}/myconfig.properties
 info:
   app:
     name: '@info.app.name@'
@@ -34,10 +48,6 @@ endpoints:
   enabled: false
   jmx:
     enabled: true
-domainFields:
-  Company:
-    list: ["name"]
-    select: ["city", "staffQuantity"]
 
 ---
 

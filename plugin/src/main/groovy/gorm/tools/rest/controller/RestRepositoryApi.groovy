@@ -4,19 +4,25 @@
 */
 package gorm.tools.rest.controller
 
+import javax.annotation.PostConstruct
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.Pager
+import gorm.tools.beans.AppCtx
 import gorm.tools.beans.BeanPathTools
 import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.api.RepositoryApi
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
+import grails.core.GrailsApplication
 import grails.databinding.SimpleMapDataBindingSource
+import grails.util.GrailsNameUtils
 import grails.web.Action
 import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBindingUtils
@@ -29,6 +35,8 @@ import static org.springframework.http.HttpStatus.OK
 @SuppressWarnings(['CatchRuntimeException', 'NoDef'])
 trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi, RestControllerErrorHandling {
 
+    Map includes = [:]
+
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
      * done in {@link gorm.tools.repository.GormRepo#getEntityClass}
@@ -38,6 +46,16 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     Class<D> entityClass // the domain class this is for
 
 
+    /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
+    // @PostConstruct
+    // void postInit() {
+    //     String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
+    //     String apiName = GrailsNameUtils.getPropertyNameRepresentation(logicalName)
+    //     //println "apiName $apiName"
+    //     includes = AppCtx.config.getProperty("api.${apiName}.includes", Map)
+    //     //println "includes $includes"
+    // }
+    //
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
@@ -153,7 +171,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         // assert params instanceof Pager
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
-        List incs = findIncludes(includesKey)
+        List incs = getIncludes(includesKey)
         pager.setupData(dlist, incs)
     }
 
@@ -166,16 +184,30 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      * @return the object to pass on to json views
      */
     Object jsonObject(D instance, String includesKey = 'default'){
-        List incs = findIncludes(includesKey)
+        List incs = getIncludes(includesKey)
         return incs ? BeanPathTools.buildMapFromPaths(instance, incs) : instance
     }
 
     @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
-    @CompileDynamic
-    List findIncludes(String includesKey){
-        if (!hasProperty('includes')) return null
-        // def incs = getIncludes()
-        return (includes instanceof List) ? includes : includes[includesKey]
+    //@CompileDynamic
+    List getIncludes(String includesKey){
+        if(!includes || !includes['_configChecked']){
+            //see if there is a config for it
+            Map cfgIncs = grailsApplication.config.getProperty("api.${getControllerName()}.includes", Map)
+            if(cfgIncs) includes = cfgIncs
+            if(includes == null) includes = [:]
+            includes['_configChecked'] = true //mark it so we don't check config again each time
+        }
+        return includes[includesKey] as List
+    }
+
+    /**
+     * getControllerName() works inisde a request and should be used, but during init or outside a request use this
+     * should give roughly what logicalName is which is used to setup the urlMappings by default
+     */
+    String getLogicalControllerName(){
+        String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
+        return GrailsNameUtils.getPropertyNameRepresentation(logicalName)
     }
 
     /**

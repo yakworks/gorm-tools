@@ -1,8 +1,6 @@
-package restify
+package restify.domain
 
 import groovy.transform.CompileStatic
-
-import grails.compiler.GrailsCompileStatic
 
 @CompileStatic
 trait NameTrait {

@@ -70,7 +70,7 @@ import static org.grails.compiler.injection.GrailsASTUtils.nonGeneric
         'ExplicitCallToEqualsMethod'])
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
-class RestApiTransform implements ASTTransformation, CompilationUnitAware {
+class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware {
     private static final ClassNode MY_TYPE = new ClassNode(RestApi)
     public static final String ATTR_READY_ONLY = "readOnly"
     public static final String ATTR_SUPER_CLASS = "superClass"
@@ -97,6 +97,10 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
         if (!(astNodes[0] instanceof AnnotationNode) || !(astNodes[1] instanceof ClassNode)) {
             throw new RuntimeException('Internal error: wrong types: $node.class / $parent.class')
         }
+        String modulePath = System.getProperty("module.path");
+        println "modulePath ${modulePath}"
+        def config = new CodeGenConfig()
+        if (modulePath) config.loadYml(new File("${modulePath}/grails-app/conf/application.yml"))
 
         ClassNode parent = (ClassNode) astNodes[1]
         // println "RestApiTransform ${parent.name}"
@@ -121,9 +125,9 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
             final ast = source.getAST()
             final newControllerClassNode = new ClassNode(className, PUBLIC, nonGeneric(superClassNode, parent))
 
-            // final transactionalAnn = new AnnotationNode(TransactionalTransform.MY_TYPE)
-            // transactionalAnn.addMember(ATTR_READY_ONLY, ConstantExpression.PRIM_TRUE)
-            // newControllerClassNode.addAnnotation(transactionalAnn)
+            final transactionalAnn = new AnnotationNode(TransactionalTransform.MY_TYPE)
+            transactionalAnn.addMember(ATTR_READY_ONLY, ConstantExpression.PRIM_TRUE)
+            newControllerClassNode.addAnnotation(transactionalAnn)
 
             final readOnlyAttr = annotationNode.getMember(ATTR_READY_ONLY)
             boolean isReadOnly = readOnlyAttr != null && ((ConstantExpression) readOnlyAttr).trueExpression
@@ -256,7 +260,7 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
             ArtefactTypeAstTransformation.performInjection(source, newControllerClassNode, injectors.findAll {
                 it instanceof ControllerActionTransformer
             })
-            // new TransactionalTransform().visit(source, transactionalAnn, newControllerClassNode)
+            new TransactionalTransform().visit(source, transactionalAnn, newControllerClassNode)
             newControllerClassNode.setModule(ast)
 
             final artefactAnnotation = new AnnotationNode(new ClassNode(Artefact))

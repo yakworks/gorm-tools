@@ -1,11 +1,11 @@
 package taskify
 
-import gorm.tools.rest.RestApi
-import grails.compiler.GrailsCompileStatic
+import java.time.LocalDate
+
 import groovy.transform.EqualsAndHashCode
 
-//import grails.rest.Resource
-import java.time.LocalDate
+import gorm.tools.rest.RestApi
+import grails.compiler.GrailsCompileStatic
 
 //import gorm.restapi.RestApiController
 @GrailsCompileStatic

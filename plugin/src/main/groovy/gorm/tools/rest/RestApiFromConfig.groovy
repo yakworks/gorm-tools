@@ -26,36 +26,8 @@ import gorm.tools.rest.controller.RestApiRepoController
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ElementType.TYPE])
-@GroovyASTTransformationClass("gorm.tools.rest.transform.RestApiTransform")
-@interface RestApi {
-
-    /**
-     * @return The description of this resource. Can be used for OpenApi or other rest docs
-     */
-    String description() default ""
-
-    /**
-     * @return if this annotation is just for docs and you don't want a controller generated
-     * then set this to false. This also used in docs and json-schema generation to find "entry points"
-     * ie, is this is true then it will create it own json-schema file instead of putting in definitions
-     */
-    boolean endpoint() default true
-
-    /**
-     * @return Whether this is a read-only resource (one that doesn't allow DELETE, POST, PUT or PATCH requests)
-     */
-    boolean readOnly() default false
-
-    /**
-     * @return The allowed response formats
-     */
-    String[] formats() default ["json"]
-
-    /**
-     * @return The URI of the resource. If specified a {@link grails.web.mapping.UrlMapping}
-     * will automatically be registered for the resource
-     */
-    String uri() default ""
+@GroovyASTTransformationClass("gorm.tools.rest.transform.RestApiConfigTransform")
+@interface RestApiFromConfig {
 
     /**
      * @return The namespace of the resource. If specified a {@link grails.web.mapping.UrlMapping}

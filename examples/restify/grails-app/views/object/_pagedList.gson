@@ -3,15 +3,15 @@ import groovy.transform.*
 import gorm.tools.Pager
 
 model {
-    List data
+    // List data
     Pager pager
     Map renderArgs = [:]
 }
 
-System.out.println "Model in _list $binding.variables"
+// System.out.println "Model in _list $binding.variables"
 json {
     page pager.page
     total pager.getPageCount()
     records pager.recordCount
-    data g.render(data, renderArgs)
+    data g.render(pager.data, renderArgs)
 }

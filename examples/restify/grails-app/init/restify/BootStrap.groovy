@@ -4,6 +4,7 @@
 */
 package restify
 
+import restify.domain.OrgType
 import taskify.Project
 import taskify.Task
 
@@ -13,12 +14,21 @@ class BootStrap {
     def init = { servletContext ->
         Project.withTransaction {
             (1..50).each {
-                def prod = new Project(name: "Fooinator-$it", num: "$it").save(flush: true, failOnError: true)
+                def prod = Project.create([
+                    name: "Fooinator-$it",
+                    num: "$it",
+                    activateDate: "2020-01-01",
+                    startDate: "2020-01-01"
+                ])
                 def task = new Task(name: "task1-$it",
                     project: prod)
                     .save(flush: true, failOnError: true)
                 def task2 = new Task(name: "task2-$it",
                     project: prod)
+                    .save(flush: true, failOnError: true)
+                new Foo(name: "OrgType-$it")
+                    .save(flush: true, failOnError: true)
+                new OrgType(name: "OrgType-$it")
                     .save(flush: true, failOnError: true)
             }
            // (1..100).each {

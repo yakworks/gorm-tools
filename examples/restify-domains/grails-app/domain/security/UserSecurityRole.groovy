@@ -1,9 +1,13 @@
 package security
 
+import groovy.transform.ToString
+
+import org.codehaus.groovy.util.HashCodeHelper
+
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
-import groovy.transform.ToString
-import org.codehaus.groovy.util.HashCodeHelper
+
+import static grails.gorm.hibernate.mapping.MappingBuilder.*
 
 @SuppressWarnings(['FactoryMethodName', 'Instanceof'])
 @GrailsCompileStatic
@@ -81,7 +85,7 @@ class UserSecurityRole implements Serializable {
         }
     }
 
-    static mapping = {
+    static mapping = orm {
         id composite: ['user', 'securityRole']
         version false
     }

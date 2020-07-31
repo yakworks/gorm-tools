@@ -1,11 +1,11 @@
 package taskify
 
-import gorm.tools.rest.RestApi
-
-import javax.persistence.Transient
 import java.time.LocalDate
+import javax.persistence.Transient
 
+import gorm.tools.rest.RestApi
 import grails.compiler.GrailsCompileStatic
+
 import static grails.gorm.hibernate.mapping.MappingBuilder.*
 
 //import gorm.restapi.RestApiController

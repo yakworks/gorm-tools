@@ -4,6 +4,7 @@
 */
 package restify
 
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.rest.controller.RestApiRepoController
@@ -18,23 +19,14 @@ class ProjectController extends RestApiRepoController<Project> {
         super(Project, false)
     }
 
+    @Override
     def post() {
-        Map q = getDataMap()
-        // println "q $q"
-        String comments = q.comments ?: ""
-        q.comments = "$comments - post was here"
-        //q.num = q.num == null ? null : "foo"
-        Project instance = getRepo().create(q)
-        respond instance, [status: CREATED] //201
-    }
-
-    /**
-     * GET /api/entity/${id}* update with params
-     */
-    def get() {
         try {
-            // println "getter 2"
-            respond getRepo().get(params)
+            Map q = getDataMap()
+            String comments = q.comments ?: ""
+            q.comments = "$comments - post was here"
+            Project instance = getRepo().create(q)
+            respond instance, [status: CREATED] //201
         } catch (RuntimeException e) {
             handleException(e)
         }

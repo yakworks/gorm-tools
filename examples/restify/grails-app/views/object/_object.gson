@@ -4,6 +4,5 @@ model {
     Object object
     Map renderArgs = [:]
 }
-// println("_object $object")
-System.out.println "Model in _object $binding.variables"
+// System.out.println "Model in _object $binding.variables"
 json g.render(object, renderArgs)

@@ -99,7 +99,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     }
 
-    @Ignore('needs to be looked at now with gorm 6.1.12')
+    //@Ignore('needs to be looked at now with gorm 6.1.12')
     def "test dirty checking works for traits"() {
         when:
         Org org = build(Org)//new Org(name: "get_test_version").save()
@@ -121,13 +121,13 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.ext.text2 = "asfasfd"
 
         then: "Org and ext is dirty"
-        //org.isDirty()
-        org.isDirty('ext')
-        org.ext.getDirtyPropertyNames() == ['text1']
-        //org.ext.isDirty()
-        org.getDirtyPropertyNames() == ['ext']
+        // org.isDirty()
+        // org.isDirty('ext')
+        org.ext.getDirtyPropertyNames() == ['text1', 'text2']
+        org.ext.isDirty()
+        // org.getDirtyPropertyNames() == ['ext']
 
-        when: "changes happen to ext"
+        when: "changes happen to org"
         RepoUtil.flushAndClear()
         org = Org.get(3)
         assert org.name == 'name'

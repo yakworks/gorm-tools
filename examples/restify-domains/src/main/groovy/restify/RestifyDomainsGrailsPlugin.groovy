@@ -1,5 +1,6 @@
-package restify.plugin
+package restify
 
+import grails.gorm.annotation.Entity
 import grails.plugins.Plugin
 
 class RestifyDomainsGrailsPlugin extends Plugin {
@@ -14,7 +15,15 @@ class RestifyDomainsGrailsPlugin extends Plugin {
 
     Closure doWithSpring() {
         { ->
-            // TODO Implement runtime spring config (optional)
+        //     xmlns context:"http://www.springframework.org/schema/context"
+        //
+        //     context.'component-scan'('base-package': 'restify')
+        //     {
+        //         context.'include-filter'(
+        //             type:       'annotation',
+        //             expression: Entity.canonicalName)
+        //     }
+        //
         }
     }
 

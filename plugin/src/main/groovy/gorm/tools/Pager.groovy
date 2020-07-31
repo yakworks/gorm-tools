@@ -180,10 +180,10 @@ class Pager {
      * Setup totalCount property for list, if it absent and fill values that are listed in fieldList
      *
      * @param dlist list of entities
-     * @param fieldList list of fields names which values should be in the result list based on dlist
+     * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
-    Pager setupData(List dlist, List fieldList = null) {
+    Pager setupData(List dlist, List includes = null) {
         setData(dlist)
         if (dlist?.size() > 0) {
             if (dlist.hasProperty('totalCount')) {
@@ -194,9 +194,9 @@ class Pager {
             }
         }
 
-        if (fieldList) {
+        if (includes) {
             this.data = dlist.collect { obj ->
-                return BeanPathTools.buildMapFromPaths(obj, fieldList, true)
+                return BeanPathTools.buildMapFromPaths(obj, includes, true)
             }
         }
         return this

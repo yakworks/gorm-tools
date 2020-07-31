@@ -56,6 +56,8 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
      */
     @Override
     void doWithDynamicMethods() {
+        // String[] entities = grailsApplication.getMappingContext().getPersistentEntities()*.name
+        // println ("entities $entities")
 //        GrailsDomainBinder.class.declaredFields.each { Field f ->
 //            if(f.name == 'FOREIGN_KEY_SUFFIX'){
 //                println "changing FOREIGN_KEY_SUFFIX"
@@ -123,6 +125,12 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
     //             builder.invokeMethod("doCall", callable)
     //         }
     //     }
+    // }
+
+    // @Override
+    // void doWithApplicationContext() {
+    //     String[] entities = grailsApplication.getMappingContext().getPersistentEntities()*.name
+    //     println ("doWithApplicationContext entities $entities")
     // }
 
 }

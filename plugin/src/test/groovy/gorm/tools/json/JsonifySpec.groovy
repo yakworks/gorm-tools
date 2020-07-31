@@ -123,6 +123,21 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
 
     }
 
+    //@IgnoreRest
+    void "test BeanPathTools.buildMapFromPaths should be rendered"() {
+        when:
+        def jdom = TestData.build(JsonifyDom, includes: ['ext'])
+        List inc = ['id', 'ext.nameExt', 'company']
+        def map = BeanPathTools.buildMapFromPaths(jdom, inc)
+        // def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
+        String incTrans = 'company'
+        def res = Jsonify.render(map)
+
+        then:
+        res.jsonText == '{"id":1,"ext":{"nameExt":"nameExt"},"company":"Tesla"}'
+
+    }
+
     void "test json includes association stock json-views"() {
         when:
         def org = build()

@@ -1,4 +1,4 @@
-package restify
+package restify.domain
 
 // import grails.buildtestdata.TestData
 

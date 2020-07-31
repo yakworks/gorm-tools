@@ -4,8 +4,8 @@
 */
 package restify.domain
 
-import taskify.Project
 import grails.persistence.Entity
+import taskify.Project
 
 @Entity
 class Nested {

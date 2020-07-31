@@ -131,6 +131,7 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
 
     }
 
+    // @IgnoreRest
     void test_show_get() {
         when: "When the show action is called to retrieve a resource"
         def response = restBuilder.get("$resourcePath/1")

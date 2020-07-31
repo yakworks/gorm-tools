@@ -7,7 +7,6 @@ package restify.domain
 // import org.grails.datastore.gorm.GormEntity
 
 import grails.compiler.GrailsCompileStatic
-//import grails.persistence.Entity
 import grails.gorm.annotation.Entity
 
 @Entity

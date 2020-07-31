@@ -13,9 +13,4 @@ import grails.gorm.transactions.Transactional
 @CompileStatic
 class BookRepo extends DefaultGormRepo<Book> {
 
-    @Override
-    Book create(Map params) {
-        super.create(params)
-    }
-
 }

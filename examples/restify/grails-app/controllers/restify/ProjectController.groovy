@@ -4,17 +4,10 @@
 */
 package restify
 
-import javax.annotation.PostConstruct
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import groovyx.gpars.util.PoolUtils
-
-import org.springframework.util.ClassUtils
 
 import gorm.tools.rest.controller.RestApiRepoController
-import grails.core.GrailsApplication
-import grails.util.GrailsNameUtils
 import taskify.Project
 
 import static org.springframework.http.HttpStatus.CREATED

@@ -1,9 +1,12 @@
 package security
 
+import groovy.transform.ToString
+
+import org.codehaus.groovy.util.HashCodeHelper
+
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
-import groovy.transform.ToString
-import org.codehaus.groovy.util.HashCodeHelper
+
 import static grails.gorm.hibernate.mapping.MappingBuilder.*
 
 @SuppressWarnings(['FactoryMethodName', 'Instanceof'])

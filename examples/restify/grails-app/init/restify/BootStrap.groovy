@@ -26,9 +26,9 @@ class BootStrap {
                 def task2 = new Task(name: "task2-$it",
                     project: prod)
                     .save(flush: true, failOnError: true)
-                def ot = new Foo(name: "OrgType-$it")
+                new Foo(name: "OrgType-$it")
                     .save(flush: true, failOnError: true)
-                def t = new OrgType(name: "OrgType-$it")
+                new OrgType(name: "OrgType-$it")
                     .save(flush: true, failOnError: true)
             }
            // (1..100).each {

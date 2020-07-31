@@ -54,8 +54,18 @@ subprojects {
       resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
     }
   }
+
+  //sets the path to sys properties so we can use it find grails-app/conf during AST
+  plugins.withId('groovy') {
+    compileGroovy {
+      groovyOptions.fork = true
+      groovyOptions.forkOptions.jvmArgs = ['-Dmodule.path=' + project.projectDir.absolutePath]
+    }
+  }
 }
 
 ext.codenarcRuleset= '''
-  //getRule('Println').enabled = false
+  getRule('Println').enabled = false
+  getRule('AbcMetric').enabled = false
+  getRule('CatchRuntimeException').enabled = false
 '''

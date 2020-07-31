@@ -4,12 +4,13 @@
 */
 package restify.domain
 
-import grails.compiler.GrailsCompileStatic
-import grails.persistence.Entity
-import groovy.transform.CompileDynamic
-
 import java.time.LocalDate
 import java.time.LocalDateTime
+
+import groovy.transform.CompileDynamic
+
+import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic

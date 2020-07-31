@@ -54,12 +54,6 @@ bootRun {
 }
 bootRepackage.enabled = false
 
-//codenarc overrides for yakworksshipyak ruleset defaults
-ext.codenarcRuleset= '''
-  //getRule('MethodParameterTypeRequired').enabled = false
-  //getRule('Println').enabled = false
-'''
-
 test {
   //testLogging.showStandardStreams = true
   testLogging.exceptionFormat = 'full'

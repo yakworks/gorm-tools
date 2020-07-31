@@ -4,23 +4,19 @@
 */
 package gorm.tools.rest.controller
 
-import javax.annotation.PostConstruct
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.Pager
-import gorm.tools.beans.AppCtx
 import gorm.tools.beans.BeanPathTools
 import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.api.RepositoryApi
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
-import grails.core.GrailsApplication
 import grails.databinding.SimpleMapDataBindingSource
 import grails.util.GrailsNameUtils
 import grails.web.Action
@@ -124,7 +120,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     def get() {
         try {
             D instance = (D) getRepo().get(params)
-            respond jsonObject(instance)
+            def renderObj = jsonObject(instance)
+            // println "renderObj $renderObj"
+            respond renderObj
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -185,6 +183,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      */
     Object jsonObject(D instance, String includesKey = 'default'){
         List incs = getIncludes(includesKey)
+        // println "incs $incs"
         return incs ? BeanPathTools.buildMapFromPaths(instance, incs) : instance
     }
 
@@ -193,11 +192,13 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     List getIncludes(String includesKey){
         if(!includes || !includes['_configChecked']){
             //see if there is a config for it
-            Map cfgIncs = grailsApplication.config.getProperty("api.${getControllerName()}.includes", Map)
+            Map cfgIncs = grailsApplication.config.getProperty("restApi.${getControllerName()}.includes", Map)
             if(cfgIncs) includes = cfgIncs
             if(includes == null) includes = [:]
             includes['_configChecked'] = true //mark it so we don't check config again each time
         }
+        List incs = includes[includesKey] as List
+        // println "incs $includesKey $incs"
         return includes[includesKey] as List
     }
 

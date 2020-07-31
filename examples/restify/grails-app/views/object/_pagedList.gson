@@ -8,7 +8,7 @@ model {
     Map renderArgs = [:]
 }
 
-System.out.println "Model in _list $binding.variables"
+// System.out.println "Model in _list $binding.variables"
 json {
     page pager.page
     total pager.getPageCount()

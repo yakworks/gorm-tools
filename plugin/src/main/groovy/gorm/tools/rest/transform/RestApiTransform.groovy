@@ -135,7 +135,7 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
             ctrlPrefixName = "${entityPackage}.${GrailsNameUtils.getNameFromScript(resourceName)}"
         }
         String className = "${ctrlPrefixName}Controller"
-        println "making className $className"
+        // println "making className $className"
         final File resource = IOUtils.findSourceFile(className)
         LinkableTransform.addLinkingMethods(entityClassNode)
 

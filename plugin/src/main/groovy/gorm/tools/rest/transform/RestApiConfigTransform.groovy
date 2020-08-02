@@ -52,7 +52,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         String projectDir = System.getProperty("gradle.projectDir", '')
         // add slash
         if (projectDir) projectDir = "${projectDir}/"
-        println "projectDir ${projectDir}"
+        // println "projectDir ${projectDir}"
         def config = new CodeGenConfig()
         config.loadYml(new File("${projectDir}grails-app/conf/restapi-config.yml"))
 

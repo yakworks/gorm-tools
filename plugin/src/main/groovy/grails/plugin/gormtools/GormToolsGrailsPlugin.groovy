@@ -6,15 +6,7 @@ package grails.plugin.gormtools
 
 import groovy.util.logging.Slf4j
 
-import org.grails.datastore.mapping.core.connections.ConnectionSource
-import org.grails.orm.hibernate.HibernateDatastore
-import org.grails.orm.hibernate.datasource.MultipleDataSourceSupport
-import org.hibernate.SessionFactory
-import org.springframework.beans.BeanWrapperImpl
-
-import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
 import grails.core.ArtefactHandler
-import grails.core.GrailsApplication
 
 /**
  * @author Joshua Burnett (@basejump)
@@ -23,6 +15,8 @@ import grails.core.GrailsApplication
 class GormToolsGrailsPlugin extends grails.plugins.Plugin {
 
     def loadAfter = ['hibernate', 'datasources']
+    //make sure we load before controllers as might be creating rest controllers
+    def loadBefore = ['controllers']
 
     def watchedResources = [
         "file:./grails-app/repository/**/*Repo.groovy",

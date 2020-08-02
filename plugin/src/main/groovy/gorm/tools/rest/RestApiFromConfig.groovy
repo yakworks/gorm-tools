@@ -29,10 +29,6 @@ import gorm.tools.rest.controller.RestApiRepoController
 @GroovyASTTransformationClass("gorm.tools.rest.transform.RestApiConfigTransform")
 @interface RestApiFromConfig {
 
-    /**
-     * @return The namespace of the resource. If specified a {@link grails.web.mapping.UrlMapping}
-     * with this namespace will automatically be registered for the resource
-     */
     String namespace() default ""
 
     /**

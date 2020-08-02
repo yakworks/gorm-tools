@@ -1,0 +1,15 @@
+---
+restApi:
+  project:
+    includes:
+      default: ['*']
+      list: ['id', 'num', 'name', 'billable']
+      pickList: ['id', 'num', 'name']
+  book:
+    entityClass: restify.Book
+    includes:
+      default: ['*']
+      list: ['id', 'num', 'name', 'billable']
+      pickList: ['id', 'num', 'name']
+  ship:
+    entityClass: restify.ShipAddress

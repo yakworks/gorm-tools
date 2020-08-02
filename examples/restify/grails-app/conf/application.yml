@@ -19,7 +19,7 @@ grails:
       events: false
   config:
     locations:
-      - classpath:rest-config.yml
+      - classpath:restapi-config.yml
 #      - classpath:myconfig.yml
 #      - classpath:myconfig.properties
 #      - file:///etc/app/myconfig.groovy

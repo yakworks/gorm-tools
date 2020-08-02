@@ -59,7 +59,7 @@ subprojects {
   plugins.withId('groovy') {
     compileGroovy {
       groovyOptions.fork = true
-      groovyOptions.forkOptions.jvmArgs = ['-Dmodule.path=' + project.projectDir.absolutePath]
+      groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
     }
   }
 }

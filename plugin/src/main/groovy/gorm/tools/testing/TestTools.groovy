@@ -28,6 +28,7 @@ class TestTools {
     /**
      * Loosely test 2 maps for equality
      * asserts more or less that every keySet in [a: 1, b: 2] exists in [a: 1, b: 2, c: 3] which is true in this example
+     * asserts more or less that subset:[a: 1, b: 2] == full:[a: 1, b: 2, c: 3]
      * mapContains([a: 1, b: 2], [a: 1, c: 3]) returns false
      * mapContains([a: 2, b: 2], [a: 1, b: 2]) also returns false
      * if subset is an empty map or null returns false

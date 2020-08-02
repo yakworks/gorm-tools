@@ -27,6 +27,6 @@ class LocationRestApiSpec extends RestApiFuncSpec {
 
     Map postData = [city: "foo"]
 
-    Map putData = [city: "city"]
+    Map putData = [city: "city2"]
 
 }

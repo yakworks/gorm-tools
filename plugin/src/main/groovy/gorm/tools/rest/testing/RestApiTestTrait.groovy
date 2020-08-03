@@ -6,6 +6,7 @@ package gorm.tools.rest.testing
 
 import groovy.transform.CompileDynamic
 
+import gorm.tools.testing.TestTools
 import grails.plugins.rest.client.RestBuilder
 
 //@CompileStatic
@@ -35,9 +36,7 @@ trait RestApiTestTrait {
      * @param excludes  the list of fields to exclude from the subset
      */
     boolean subsetEquals(Map subset, Map full, List<String> excludes = []) {
-        //if (!full.keySet().containsAll(subset.keySet())) return false
-        subset.findAll { !excludes.contains(it.key) }
-            .every { it.value == full[it.key] }
+        TestTools.mapContains(full, subset, excludes)
     }
 
 }

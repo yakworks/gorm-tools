@@ -28,9 +28,11 @@ import gorm.tools.rest.RestApi
 import gorm.tools.rest.appinfo.AppInfoBuilder
 import gorm.tools.support.MsgService
 import grails.core.ArtefactHandler
+import grails.core.ArtefactInfo
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
+import grails.util.GrailsNameUtils
 
 @SuppressWarnings(['UnnecessarySelfAssignment'])
 @CompileDynamic
@@ -73,6 +75,7 @@ class GormToolsPluginHelper {
             getRepoBeanClosure(repoClass, delegate).call()
         }
 
+
         //make sure each domain has a repository, if not set up a DefaultGormRepo for it.
         Class[] domainClasses = application.domainClasses*.clazz
         println ("domainClasses $domainClasses")
@@ -88,7 +91,30 @@ class GormToolsPluginHelper {
             }
         }
 
-        //rest
+        //controller names to be used during iterations
+        List ctrlNames = application.getArtefacts(ControllerArtefactHandler.TYPE)*.shortName
+        println ctrlNames
+
+        for (GrailsClass grailsClass in application.getArtefacts(DomainClassArtefactHandler.TYPE)) {
+            final domainClass = grailsClass.clazz
+
+            // make sure each domain has a repository, if not set up a DefaultGormRepo for it.
+            String repoName = RepoUtil.getRepoBeanName(domainClass)
+            def hasRepo = repoClasses.find { it.propertyName == repoName }
+            if (!hasRepo) {
+                "${repoName}"(DefaultGormRepo, domainClass) { bean ->
+                    bean.autowire = true
+                    bean.lazyInit = true
+                }
+            }
+            // if it has the RestApi annotation then make sure the controller that was created for it gets added
+            if (domainClass.getAnnotation(RestApi)) {
+                String controllerName = "${domainClass.name}Controller"
+                //Check if we already have such controller in app
+                addControllerWhenNotExists(application, ctrlNames, controllerName)
+            }
+        }
+
         jsonSchemaGenerator(JsonSchemaGenerator) { bean ->
             // Autowiring behaviour. The other option is 'byType'. <<autowire>>
             // bean.autowire = 'byName'
@@ -100,7 +126,7 @@ class GormToolsPluginHelper {
 //        }
 
         // application = grailsApplication
-        registryRestApiControllers(application)
+        // restApiControllersFromConfig(application)
     }
 
     static void onChange(Object event, GrailsApplication grailsApplication, Plugin plugin) {
@@ -113,7 +139,7 @@ class GormToolsPluginHelper {
 
             plugin.beans(getRepoBeanClosure(repoClass))
         }
-        registryRestApiControllers(grailsApplication)
+        //registryRestApiControllers(grailsApplication)
     }
 
     static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass, Object beanBuilder = null) {
@@ -148,28 +174,52 @@ class GormToolsPluginHelper {
         }
     }
 
-    @SuppressWarnings(['EmptyCatchBlock'])
+    /**
+     * Makes sure the controllers created from a domain with the @RestApi annotation
+     * are registered as controller artifacts
+     * @param app
+     */
     @CompileStatic
-    static void registryRestApiControllers(GrailsApplication app) {
-        for (GrailsClass grailsClass in app.getArtefacts(DomainClassArtefactHandler.TYPE)) {
-            final clazz = grailsClass.clazz
-            if (clazz.getAnnotation(RestApi)) {
-                //println "${clazz.name}"
-                String controllerClassName = "${clazz.name}Controller"
-                //Check if we already have such controller in app
-                if (!app.getArtefact(ControllerArtefactHandler.TYPE, controllerClassName) && !(app.getArtefacts
-                (ControllerArtefactHandler.TYPE)*.name.contains(clazz.simpleName))) {
+    static void restApiControllersFromConfig(GrailsApplication app) {
+        //controller names to be used during iterations
+        List ctrlNames = app.getArtefacts(ControllerArtefactHandler.TYPE)*.shortName
+        println ctrlNames
 
-                    try {
-                        app.addArtefact(ControllerArtefactHandler.TYPE, app.classLoader.loadClass(controllerClassName))
-                        //println "added $controllerClassName"
-                    } catch (ClassNotFoundException cnfe) {
-
-                    }
-                }
+        Map restApi = app.config.getProperty('restApi', Map)
+        restApi.each { k, v ->
+            Map entry = v as Map
+            if(entry?.entityClass){
+                String controllerClassName = "${entry.entityClass}Controller" //ex com.foo.FooController
+                println "adding ${controllerClassName}"
+                addControllerWhenNotExists(app, ctrlNames, controllerClassName)
             }
         }
     }
+
+    /**
+     * calls addArtefact with loadClass on className, just swallows the error if ClassNotFoundException
+     */
+    @CompileStatic
+    static void addControllerWhenNotExists(GrailsApplication app, List ctrlNames, String className) {
+        if (!controllerExists(app, ctrlNames, className)) {
+            println "adding $className"
+            try {
+                app.addArtefact(ControllerArtefactHandler.TYPE, app.classLoader.loadClass(className))
+                //println "added $controllerClassName"
+            } catch (ClassNotFoundException cnfe) {
+                println "addControllerArtifact ClassNotFoundException on classLoader.loadClass($className)"
+            }
+        }
+
+    }
+
+    @CompileStatic
+    static boolean controllerExists(GrailsApplication app, List ctrlNames, String controllerClassName) {
+        String shortName = GrailsNameUtils.getShortName(controllerClassName)
+        app.getArtefact(ControllerArtefactHandler.TYPE, controllerClassName) || ctrlNames.contains(shortName)
+    }
+
+
 
 //    static void setFinalStatic(Field field, Object newValue) throws Exception {
 //        field.setAccessible(true);

@@ -10,10 +10,9 @@ import static org.springframework.http.HttpStatus.*
 
 @Integration
 @Rollback
-//Copied all stuff here, because we cant override test cases, but need to test controller method Overriding
 class CompanyFieldsRestApiSpec extends GebSpec implements RestApiTestTrait {
 
-    Class<Book> domainClass = Company
+    Class<Company> domainClass = Company
     boolean vndHeaderOnError = false
 
     String getResourcePath() {

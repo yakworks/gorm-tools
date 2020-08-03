@@ -8,7 +8,7 @@ import gorm.tools.rest.RestApi
 import grails.compiler.GrailsCompileStatic
 
 @GrailsCompileStatic
-@RestApi(description = "Book test domain")
+// @RestApi(description = "Book test domain")
 class Book {
 
     String title

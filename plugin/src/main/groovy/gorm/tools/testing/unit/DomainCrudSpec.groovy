@@ -13,7 +13,7 @@ import gorm.tools.testing.TestTools
 import grails.buildtestdata.TestData
 
 /**
- * Provides CRUD tests for domains
+ * Provides CRUD tests to automatically unit test domains
  *
  */
 @CompileDynamic

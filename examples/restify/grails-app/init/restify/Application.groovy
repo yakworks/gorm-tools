@@ -4,12 +4,12 @@
 */
 package restify
 
-//import org.springframework.context.annotation.ComponentScan
-
+import gorm.tools.rest.RestApiFromConfig
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 
 //@ComponentScan("restify")
+@RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
@@ -25,4 +25,5 @@ class Application extends GrailsAutoConfiguration {
     // Collection<String> packageNames() {
     //     super.packageNames() + ['restify']
     // }
+
 }

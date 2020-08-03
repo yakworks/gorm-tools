@@ -14,13 +14,15 @@ class UrlMappings {
     static mappings = {
 
         for (controller in getGrailsApplication().controllerClasses) {
-            //println "controler $controller.fullName"
+            // println "controler $controller.fullName"
             String cName = controller.logicalPropertyName
             String namespace = GrailsClassUtils.getStaticPropertyValue(controller.clazz, 'namespace')
-            //println "controller $cName with namespace $namespace"
+            // println "controller $cName with namespace $namespace"
 
             if (namespace == 'api') {
                 group("/api") {
+                    println "controller $cName with namespace $namespace"
+
                     "/${cName}/schema"(controller: "schema", action: "index") {
                         id = cName
                     }

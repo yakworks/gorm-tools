@@ -47,4 +47,17 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
         !parsed['pager']
     }
 
+    def "query"() {
+        when: "Check if \$sort will cause NullPointerException"
+        def list = mangoQuery.query(Org, [name: 'joe', '$sort': 'id'])
+        then:
+        noExceptionThrown()
+        list != null
+        when: "Check if sort will cause NullPointerException"
+        list = mangoQuery.query(Org, [name: 'joe', 'sort': 'id'])
+        then:
+        noExceptionThrown()
+        list != null
+    }
+
 }

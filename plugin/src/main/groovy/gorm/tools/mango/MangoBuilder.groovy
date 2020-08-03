@@ -142,6 +142,9 @@ class MangoBuilder {
         String sort = SortOps[field]
         if (sort) {
             order(criteria, fieldVal)
+            // if prop is $sort do not go further, because in other case it will be considered as entity
+            // property and will fail entity wont have such field
+            return
         }
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)

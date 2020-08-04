@@ -21,7 +21,7 @@ class UrlMappings {
 
             if (namespace == 'api') {
                 group("/api") {
-                    println "controller $cName with namespace $namespace"
+                    // println "controller $cName with namespace $namespace"
 
                     "/${cName}/schema"(controller: "schema", action: "index") {
                         id = cName

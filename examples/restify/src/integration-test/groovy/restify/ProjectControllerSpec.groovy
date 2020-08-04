@@ -51,6 +51,27 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         resJson.data[0] == [id:1 , name: "Fooinator-1", num: "1", billable:true]
     }
 
+    void test_sort_list() {
+        // BootStrap should have loaded up projects already
+        when: "sort asc"
+        def response = restBuilder.get("${baseUrl}api/project?sort=id&order=asc")
+        def data = response.json.data
+
+        then: "The response is correct"
+        response.status == OK.value()
+        //the first id should be less than the second
+        data[0].id < data[1].id
+
+        when: "sort desc"
+        response = restBuilder.get("${baseUrl}api/project?sort=id&order=desc")
+        data = response.json.data
+
+        then: "The response is correct"
+        response.status == OK.value()
+        //the first id should be greater  than the second
+        data[0].id > data[1].id
+    }
+
     // @IgnoreRest
     void test_pick_list() {
         // BootStrap should have loaded up projects already

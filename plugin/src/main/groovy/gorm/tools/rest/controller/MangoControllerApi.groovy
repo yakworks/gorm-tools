@@ -39,6 +39,8 @@ trait MangoControllerApi {
         ['max', 'offset', 'page'].each{ String k ->
             params[k] = pager[k]
         }
+        //fix up quickSearch
+        if(params['q']) params['$q'] = params['q']
         getMangoApi().query(params)
     }
 

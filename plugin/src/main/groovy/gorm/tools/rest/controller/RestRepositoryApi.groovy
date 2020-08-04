@@ -42,7 +42,6 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     Class<D> entityClass // the domain class this is for
 
 
-    /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     // @PostConstruct
     // void postInit() {
     //     String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')

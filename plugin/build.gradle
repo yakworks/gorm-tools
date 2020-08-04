@@ -40,6 +40,7 @@ dependencies {
   compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
   compileOnly "org.grails.plugins:geb"
   compileOnly "org.grails:grails-datastore-rest-client"
+  compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc
 
   //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
   testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"

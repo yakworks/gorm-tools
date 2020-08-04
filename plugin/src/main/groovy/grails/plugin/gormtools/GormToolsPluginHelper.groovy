@@ -40,7 +40,7 @@ class GormToolsPluginHelper {
     static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
 
     static Closure doWithSpring = {
-
+        println "starting gorm-tools config"
         msgService(MsgService)
 
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
@@ -78,7 +78,7 @@ class GormToolsPluginHelper {
 
         //make sure each domain has a repository, if not set up a DefaultGormRepo for it.
         Class[] domainClasses = application.domainClasses*.clazz
-        println ("domainClasses $domainClasses")
+        // println ("domainClasses $domainClasses")
 
         domainClasses.each { Class domainClass ->
             String repoName = RepoUtil.getRepoBeanName(domainClass)
@@ -127,6 +127,7 @@ class GormToolsPluginHelper {
 
         // application = grailsApplication
         // restApiControllersFromConfig(application)
+        println "finished gorm-tools config"
     }
 
     static void onChange(Object event, GrailsApplication grailsApplication, Plugin plugin) {

@@ -18,7 +18,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
                     num: "Organisation-num#$it",
                     revenue: 100 * it,
                     isActive: (it % 2 == 0),
-                    credit: (it % 2 ? 5000 : null),
+                    credit: (it % 10),
                     refId: it * 200 as Long,
                     testDate: (new Date() + it).clearTime(),
                     address: new ShipAddress(city: "City#$it", testId: it * 3).persist()).persist()
@@ -443,6 +443,24 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
         }.json
         then:
         list.size() == 11
+
+    }
+
+    def "test sort"() {
+        when:
+        def envelope = restBuilder.get(resourcePath + "?sort=id&order=asc").json
+        then:
+        envelope.data[0].id == 1
+
+        when:
+        envelope = restBuilder.get(resourcePath + "?sort=id&order=desc").json
+        then:
+        envelope.data[0].id == 100
+
+        when:
+        envelope = restBuilder.get(resourcePath + "?sort=credit asc, id&order=desc").json
+        then:
+        envelope.data*.id == [91, 81, 71, 61, 51, 41, 31, 21, 11, 1]
 
     }
 

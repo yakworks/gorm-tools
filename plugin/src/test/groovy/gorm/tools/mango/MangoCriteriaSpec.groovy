@@ -344,4 +344,13 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         res[0].id == 4
     }
 
+    def "test multisort"() {
+        when:
+        List res = build(([id: [1, 2, 3, 4], '$sort': ['amount asc, id': "desc"]])).list()
+        then:
+        res.size() == 4
+        res[0].amount == res*.amount.sort()[0]
+        res[0].id == res.sort{"${it.amount}${it.id}"}[0].id
+    }
+
 }

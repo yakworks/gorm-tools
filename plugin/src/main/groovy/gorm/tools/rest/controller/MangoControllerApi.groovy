@@ -44,7 +44,7 @@ trait MangoControllerApi {
         //clean up sort if passed the jqgrid way
         if(p['sort'] && p['order']) {
             Map newSort = [:]
-            newSort[p.sort] = p.order
+            newSort[p.sort] = p.remove('order')
             p.sort = newSort
         }
         getMangoApi().query(p)

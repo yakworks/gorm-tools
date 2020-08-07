@@ -226,7 +226,16 @@ class MangoBuilder {
         if (sort instanceof String) return criteria.order(sort as String)
         DetachedCriteria result
         (sort as Map).each { k, v ->
-            result = criteria.order(k.toString(), v.toString())
+            //jqgrid, for example supports multisorting as `sort = id asc, num desc, name` and `order = asc` which coresponds to the last field
+            if (k.toString().contains(',')){
+                String ordering = k.toString() + " $v"
+                ordering.split(",").each { String order ->
+                    String[] sortFields = order.trim().split(" ")
+                    result = criteria.order(sortFields[0], sortFields[1])
+                }
+            } else {
+                result = criteria.order(k.toString(), v.toString())
+            }
         }
         return result
     }

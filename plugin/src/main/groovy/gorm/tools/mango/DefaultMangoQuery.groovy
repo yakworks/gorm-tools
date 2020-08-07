@@ -123,9 +123,8 @@ class DefaultMangoQuery implements MangoQuery {
             result['pager'] = pager
         }
         if (paramCopy.containsKey('sort')) {
-           Object sort = paramCopy.remove('sort')
-            if(!sort) return result // for the case when we have sort property but it is empty
-            result['criteria']['$sort'] = sort
+            Object sort = paramCopy.remove('sort')
+            if(sort) result['criteria']['$sort'] = sort // for the case when we have sort property but it is empty
         }
         return result
     }

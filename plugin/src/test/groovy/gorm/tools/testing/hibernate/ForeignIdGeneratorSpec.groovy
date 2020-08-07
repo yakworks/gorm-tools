@@ -31,6 +31,20 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
 
     }
 
+    def "test assigned id"() {
+        when:
+        def master = new FidMaster(name: 'bob1234')
+        master.id = 1234
+        master.child = new FidChild(name: 'foo1234')
+        master.persist()
+        flushAndClear()
+
+        then:
+        def mt = FidMaster.get(1234)
+        mt.name == "bob1234"
+        mt.child.name == 'foo1234'
+    }
+
     def "test validation error on child"() {
         when:
         def master = new FidMaster(name:'bob')

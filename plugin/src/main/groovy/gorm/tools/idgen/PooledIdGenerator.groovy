@@ -66,7 +66,7 @@ class PooledIdGenerator implements IdGenerator {
     long getNextId(String keyName) {
         //dummy.getAndIncrement()
         AtomicReference<IdTuple> tuple = findOrCreate(keyName)
-        getAndUpdate(keyName, tuple)
+        return getAndUpdate(keyName, tuple)
     }
 
     /**
@@ -100,21 +100,21 @@ class PooledIdGenerator implements IdGenerator {
                 nextId = idAtomic.get().getAndIncrement()
             }
         }
-        return nextId // return next; for transformAndGet
+        return nextId
     }
 
     AtomicReference<IdTuple> findOrCreate(String keyName) {
         Validate.notNull(keyName, "The row key name can't be null")
 
         if (!idTupleMap.containsKey(keyName)) {
-            //synchronize on the keyname and just let 1 thread create them. Creation should only happen once
-            // so no bottlenecks should occure.
+            // synchronize on the keyname and just let 1 thread create them. Creation should only happen once
+            // so no bottlenecks should occur.
             // Note: itern forces it to use same string in memory. see http://java-performance.info/string-intern-java-6-7-8-multithreaded-access/
             synchronized (keyName.intern()) {
-                //check again and exit if another thread was here already and created it
+                //double check again and exit if another thread was here already and created it
                 if (idTupleMap.containsKey(keyName)) return idTupleMap.get(keyName)
 
-                log.debug("Creating a BatchIDGenerator.IdTuple for " + keyName)
+                // log.debug("Creating a BatchIDGenerator.IdTuple for " + keyName)
 
                 //check to see if the size is overriden for the key, otherwise go with the default size
                 long batchSize = getBatchSize(keyName) //(batchSizeByKey.containsKey(keyName)) ? batchSizeByKey[keyName] : defaultBatchSize

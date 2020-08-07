@@ -43,7 +43,6 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         def mt = FidMaster.get(1234)
         mt.name == "bob1234"
         mt.child.name == 'foo1234'
-
     }
 
     def "test validation error on child"() {

@@ -256,9 +256,10 @@ This would produce in a round about way with criteria builders a where clause li
 }
 
 ```
-### Query or Quick Search
+### Q or Quick Search
 
-Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
+Q search - similiar to a search engine search that uses a `q` paramter, 
+ability to search by one string in criteria filters against several domain fields, the value for quick
 search can be passed in `$qSearch` or `$q` keywords. 
 There are 2 ways to specify fields that should be searched against:
 

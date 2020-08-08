@@ -21,12 +21,12 @@ import grails.util.GrailsNameUtils
  */
 //see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
 // we can get some good ideas from how that plugin does things
-@SuppressWarnings(['CatchException', 'NoDef', 'ClosureAsLastMethodParameter', 'FactoryMethodName'])
+// @SuppressWarnings(['CatchException', 'NoDef', 'ClosureAsLastMethodParameter', 'FactoryMethodName'])
 @Artefact("Controller")
 @CompileDynamic
 class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryApi<D> {
-    static allowedMethods = [list  : ["GET", "POST"], create: "POST",
-                             update: ["PUT", "PATCH"], delete: "DELETE"]
+    // static allowedMethods = [list  : ["GET", "POST"], create: "POST",
+    //                          update: ["PUT", "PATCH"], delete: "DELETE"]
 
     static responseFormats = ['json']
     static namespace = 'api'
@@ -35,7 +35,7 @@ class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryA
     String entityName
     String entityClassName
     boolean readOnly
-    MessageSource messageSource
+    //MessageSource messageSource
 
     //AppSetupService appSetupService
     GrailsApplication grailsApplication
@@ -56,7 +56,7 @@ class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryA
         if (!suffix) {
             suffix = ''
         }
-        def propName = GrailsNameUtils.getPropertyNameRepresentation(entityClass)
+        def propName = GrailsNameUtils.getPropertyName(entityClass)
         "${propName}${suffix}"
     }
 

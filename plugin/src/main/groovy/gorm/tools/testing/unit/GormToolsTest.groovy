@@ -6,6 +6,7 @@ package gorm.tools.testing.unit
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.testing.support.GormToolsSpecHelper
 import grails.testing.gorm.DataTest
 import grails.testing.spring.AutowiredTest
 

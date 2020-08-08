@@ -14,14 +14,14 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
     def "Check list"() {
         setup:
         100.times {
-            new Organisation(name: "Organisation#$it",
-                    num: "Organisation-num#$it",
+            new Organisation(name: "Org$it",
+                    num: "Org-num$it",
                     revenue: 100 * it,
                     isActive: (it % 2 == 0),
                     credit: (it % 10),
                     refId: it * 200 as Long,
                     testDate: (new Date() + it).clearTime(),
-                    address: new ShipAddress(city: "City#$it", testId: it * 3).persist()).persist()
+                    address: new ShipAddress(city: "City$it", testId: it * 3).persist()).persist()
         }
 
         when:
@@ -33,11 +33,11 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
     def "Filter by Name eq"() {
         when:
         List list = restBuilder.post(resourcePath + "/list") {
-            json([criteria: [name: "Organisation#23"]])
+            json([criteria: [name: "Org23"]])
         }.json
         then:
         list.size() == 1
-        list[0].name == "Organisation#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by id eq"() {
@@ -50,7 +50,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
         }.json
         then:
         list.size() == 1
-        list[0].name == "Organisation#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by id inList"() {
@@ -64,12 +64,12 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 2
-        list[0].name == "Organisation#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by Name ilike"() {
         given:
-        Map data = [criteria: [name: "Organisation#2%"]]
+        Map data = [criteria: [name: "Org2%"]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -78,9 +78,9 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 11
-        list[0].name == "Organisation#2"
-        list[1].name == "Organisation#20"
-        list[10].name == "Organisation#29"
+        list[0].name == "Org2"
+        list[1].name == "Org20"
+        list[10].name == "Org29"
     }
 
     def "Filter by nested id"() {
@@ -94,7 +94,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 1
-        list[0].name == "Organisation#1"
+        list[0].name == "Org1"
         list[0].address.id == 2
     }
 
@@ -109,7 +109,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 1
-        list[0].name == "Organisation#1"
+        list[0].name == "Org1"
         list[0].address.id == 2
     }
 
@@ -124,12 +124,12 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 3
-        list[0].name == "Organisation#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by nested string"() {
         given:
-        Map data = [criteria: [address: [city: "City#2"]]]
+        Map data = [criteria: [address: [city: "City2"]]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -138,13 +138,13 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 1
-        list[0].name == "Organisation#2"
+        list[0].name == "Org2"
         list[0].address.id == 3
     }
 
     def "Filter by nested string ilike"() {
         given:
-        Map data = [criteria: [address: [city: "City#2%"]]]
+        Map data = [criteria: [address: [city: "City2%"]]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -153,9 +153,9 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 11
-        list[0].name == "Organisation#2"
-        list[1].name == "Organisation#20"
-        list[10].name == "Organisation#29"
+        list[0].name == "Org2"
+        list[1].name == "Org20"
+        list[10].name == "Org29"
         list[0].address.id == 3
         list[1].address.id == 21
         list[10].address.id == 30
@@ -200,7 +200,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 1
-        list[0].name == "Organisation#2"
+        list[0].name == "Org2"
     }
 
     def "Filter by BigDecimal in list"() {
@@ -214,8 +214,8 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 2
-        list[0].name == "Organisation#2"
-        list[1].name == "Organisation#5"
+        list[0].name == "Org2"
+        list[1].name == "Org5"
     }
 
     def "Filter by Date"() {
@@ -229,7 +229,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 1
-        list[0].name == "Organisation#1"
+        list[0].name == "Org1"
     }
 
     def "Filter by Date le"() {
@@ -257,7 +257,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 1
-        list[0].name == "Organisation#1"
+        list[0].name == "Org1"
     }
 
     def "Filter by xxxId 2"() {
@@ -270,7 +270,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
         }.json
         then:
         list.size() == 1
-        list[0].name == "Organisation#3"
+        list[0].name == "Org3"
     }
 
 
@@ -285,7 +285,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 1
-        list[0].name == "Organisation#1"
+        list[0].name == "Org1"
     }
 
     def "Filter by xxxId 4"() {
@@ -299,13 +299,13 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 2
-        list[0].name == "Organisation#3"
+        list[0].name == "Org3"
     }
 
 
     def "Filter with `or` "() {
         given:
-        Map data = [criteria: ['$or': ["name": "Organisation#1", "address.id": 4]]]
+        Map data = [criteria: ['$or': ["name": "Org1", "address.id": 4]]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -314,13 +314,13 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 2
-        list[0].name == "Organisation#1"
-        list[1].name == "Organisation#3"
+        list[0].name == "Org1"
+        list[1].name == "Org3"
     }
 
     def "Filter with `or` on low level"() {
         given:
-        Map data = [criteria: [address: ['$or': ["city": "City#1", "id": 4]]]]
+        Map data = [criteria: [address: ['$or': ["city": "City1", "id": 4]]]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -329,13 +329,13 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 2
-        list[0].name == "Organisation#1"
-        list[1].name == "Organisation#3"
+        list[0].name == "Org1"
+        list[1].name == "Org3"
     }
 
     def "Filter with `or` with like"() {
         given:
-        Map data = [criteria: ["\$or": ["name": "Organisation#2%", "address.id": 4]]]
+        Map data = [criteria: ["\$or": ["name": "Org2%", "address.id": 4]]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -344,9 +344,9 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 12
-        list[0].name == "Organisation#2"
-        list[1].name == "Organisation#3"
-        list[2].name == "Organisation#20"
+        list[0].name == "Org2"
+        list[1].name == "Org3"
+        list[2].name == "Org20"
     }
 
     def "Filter with `between()`"() {
@@ -360,9 +360,9 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 9
-        list[0].name == "Organisation#1"
-        list[1].name == "Organisation#2"
-        list[-1].name == "Organisation#9"
+        list[0].name == "Org1"
+        list[1].name == "Org2"
+        list[-1].name == "Org9"
     }
 
     def "Filter with `in()`"() {
@@ -376,7 +376,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 2
-        list[0].name == "Organisation#23"
+        list[0].name == "Org23"
     }
 
     def "Filter with `inList()`"() {
@@ -390,13 +390,13 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 2
-        list[0].name == "Organisation#23"
+        list[0].name == "Org23"
     }
 
 
     def "Filter by Name ilike()"() {
         given:
-        Map data = [criteria: [name: ["\$ilike": "Organisation#2%"]]]
+        Map data = [criteria: [name: ["\$ilike": "Org2%"]]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -405,9 +405,9 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
         then:
         list.size() == 11
-        list[0].name == "Organisation#2"
-        list[1].name == "Organisation#20"
-        list[10].name == "Organisation#29"
+        list[0].name == "Org2"
+        list[1].name == "Org20"
+        list[10].name == "Org29"
     }
 
     def "test paging, defaults"() {
@@ -435,7 +435,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
 
     def "test quick search"() {
         given:
-        Map data = [criteria: ['$quickSearch': "Organisation#2%"]]
+        Map data = [criteria: ['$qSearch': "Org2%"]]
 
         when:
         List list = restBuilder.post(resourcePath + "/list?max=150") {
@@ -458,7 +458,7 @@ class OrganisationControllerSpec extends GebSpec implements RestApiTestTrait {
         envelope.data[0].id == 100
 
         when:
-        envelope = restBuilder.get(resourcePath + "?sort=credit asc, id&order=desc").json
+        envelope = restBuilder.get(resourcePath + "?sort=credit asc, id desc").json
         then:
         envelope.data*.id == [91, 81, 71, 61, 51, 41, 31, 21, 11, 1]
 

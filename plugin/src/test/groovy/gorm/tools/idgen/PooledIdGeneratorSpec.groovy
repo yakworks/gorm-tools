@@ -4,31 +4,50 @@
 */
 package gorm.tools.idgen
 
-import gorm.tools.testing.unit.MockJdbcIdGenerator
+import gorm.tools.testing.support.MockJdbcIdGenerator
+import gorm.tools.testing.unit.GormToolsTest
 import grails.test.hibernate.HibernateSpec
 import groovyx.gpars.GParsPool
 import spock.lang.Shared
+import spock.lang.Specification
 import testing.Org
 
-class PooledIdGeneratorSpec extends HibernateSpec {
+class PooledIdGeneratorSpec extends Specification implements GormToolsTest {
+
+    // @Shared
+    // MockJdbcIdGenerator jdbcIdGenerator
+    // @Shared
+    // PooledIdGenerator idGenerator
 
     @Shared
     MockJdbcIdGenerator mockdbgen
+
     @Shared
     PooledIdGenerator batchgen
 
-    List<Class> getDomainClasses() { [Org] }
+    // List<Class> getDomainClasses() { [Org] }
 
     void setupSpec() {
+        mockDomains Org
         mockdbgen = new MockJdbcIdGenerator()
         mockdbgen.table.put("table.id", 1)
         mockdbgen.table.put("table1.id", 99)
-
         batchgen = new PooledIdGenerator(mockdbgen)
+
+        //
+        // batchgen = idGenerator
         //mockdbgen.transactionManager = getTransactionManager()
         //batchgen.setBatchSize(5)
 
     }
+
+    // def setup() {
+    //     assert jdbcIdGenerator
+    //     jdbcIdGenerator.table.put("table.id", 1)
+    //     jdbcIdGenerator.table.put("table1.id", 99)
+    //     assert idGenerator
+    //     batchgen = idGenerator
+    // }
 
     void "test getNextId"() {
         setup:

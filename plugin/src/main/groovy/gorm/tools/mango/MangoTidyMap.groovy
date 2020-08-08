@@ -37,7 +37,9 @@ class MangoTidyMap {
      * @return extended map
      */
     static Map pathToMap(String path, Object val, Map map) {
-        if (path.contains(".")) {
+        if (MangoBuilder.SortOps.keySet().contains(path)) {
+            return tidySort(path, val, map)
+        } else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
             //get first thing in dot ex: foo.bar this will be foo
             String newKey = splitPath[0]
@@ -46,9 +48,9 @@ class MangoTidyMap {
             pathToMap(newPath, val, map[newKey] as Map)
         }
         else {
-            if (!map[path]) map[path] = [:]
             //we should check if nested values have composed keys("customer.address.id")
             if (val instanceof Map) {
+                if (!map[path]) map[path] = [:]
                 (val as Map).each {
                     pathToMap(it.key as String, it.value, map[path] as Map)
                 }
@@ -56,7 +58,7 @@ class MangoTidyMap {
                 map[path] = val
             }
         }
-        map
+        return map
     }
 
     /**
@@ -84,7 +86,8 @@ class MangoTidyMap {
                 toMangoOperator(val as Map, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {
-                    result[key] = val; return
+                    result[key] = val
+                    return
                 } //if we already have Mango method
                 if (val instanceof List) {
                     List valAsList = val as List
@@ -111,6 +114,20 @@ class MangoTidyMap {
         }
         result
 
+    }
+
+    static Map tidySort(String path, Object val, Map map) {
+        if (val instanceof String && (val as String).contains(',')){
+            Map<String,String> sortMap = [:]
+            val.split(",").each { String item ->
+                String[] sorting = item.trim().split(" ")
+                sortMap[(sorting[0])] = sorting[1]?:'asc'
+            }
+            map[path] = sortMap
+        } else {
+            map[path] = val
+        }
+        return map
     }
 
 }

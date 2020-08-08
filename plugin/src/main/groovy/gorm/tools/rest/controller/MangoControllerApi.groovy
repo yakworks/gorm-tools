@@ -39,7 +39,7 @@ trait MangoControllerApi {
         ['max', 'offset', 'page'].each{ String k ->
             p[k] = pager[k]
         }
-        //fix up quickSearch
+        //fix up qSearch
         if(p['q']) p['$q'] = p['q']
         //clean up sort if passed the jqgrid way
         if(p['sort'] && p['order']) {

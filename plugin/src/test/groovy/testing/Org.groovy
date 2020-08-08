@@ -14,6 +14,7 @@ import java.time.LocalDateTime
 @Entity
 @GrailsCompileStatic
 class Org implements NameTrait{
+    Integer descId // inverted order for test
     //strings
     String name2
     String secret
@@ -38,11 +39,11 @@ class Org implements NameTrait{
         //id generator:'assigned'
     }
 
-    static List quickSearchFields = ["name"]
+    static List qSearchFields = ["name"]
 
     static constraints = {
         importFrom(NameTraitConstraints)
-
+        descId   nullable: true
         name2    nullable: true
         secret   nullable: true, display: false
 

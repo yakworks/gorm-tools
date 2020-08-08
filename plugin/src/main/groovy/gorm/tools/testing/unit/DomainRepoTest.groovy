@@ -6,6 +6,7 @@ package gorm.tools.testing.unit
 
 import groovy.transform.CompileDynamic
 
+import gorm.tools.testing.support.DomainCrudSpec
 import grails.buildtestdata.BuildDataTest
 
 /**

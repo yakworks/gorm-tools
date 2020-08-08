@@ -19,7 +19,7 @@ import grails.buildtestdata.builders.PersistentEntityDataBuilder
  * static build methods to wrap {@link TestData} and Jsonify's statics for the json-views.
  * These helpers enable the easy generation of test data in Map form to test methods like the
  * repo's create and update.
- * Note: when using this in unit test the {@link gorm.tools.testing.unit.JsonViewSpecSetup} should
+ * Note: when using this in unit test the {@link gorm.tools.testing.support.JsonViewSpecSetup} should
  * be used to make sure the proper view-tools beans are setup. This is alrady taken care of if using
  * one of the main DataRepoTest or DomainRepoTest traits
  *

@@ -21,7 +21,7 @@ import grails.gorm.DetachedCriteria
 trait QueryMangoEntity<D> {
 
     @Transient
-    static List<String> quickSearchFields = []
+    static List<String> qSearchFields = []
 
     static abstract getRepo()
 

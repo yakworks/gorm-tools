@@ -298,20 +298,20 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
     def "test quickSearch"() {
         when:
 
-        List res = build((['$quickSearch': "Name%"])).list()
+        List res = build((['$qSearch': "Name%"])).list()
 
         then:
         res.size() == 10
 
         when:
 
-        res = build((['$quickSearch': "Name3"])).list()
+        res = build((['$q': "Name3"])).list()
 
         then:
         res.size() == 1
 
         when: "quick search is combined with another field"
-        res = build((['$quickSearch': "Name%", inactive: true])).list()
+        res = build((['$qSearch': "Name%", inactive: true])).list()
 
         then:
         res.size() == 5
@@ -399,13 +399,14 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         res[5].id > res[6].id
     }
 
-    def "test multisort"() {
+    def "test multisort string"() {
         when:
-        List res = build(([id: [1, 2, 3, 4], '$sort': ['amount asc, id': "desc"]])).list()
+        List res = build('$sort': 'inactive desc, id desc').list()
         then:
-        res.size() == 4
-        res[0].amount == res*.amount.sort()[0]
-        res[0].id == res.sort{"${it.amount}${it.id}"}[0].id
+        res[0].inactive == res[4].inactive
+        res[0].id > res[1].id
+        res[4].inactive > res[5].inactive
+        res[5].id > res[6].id
     }
 
 }

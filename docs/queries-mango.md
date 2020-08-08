@@ -256,19 +256,19 @@ This would produce in a round about way with criteria builders a where clause li
 }
 
 ```
-### Quick Search
+### Query or Quick Search
 
 Quick search - ability to search by one string in criteria filters against several domain fields, the value for quick
-search can be passed in `$quickSearch` or `$q` keywords. 
+search can be passed in `$qSearch` or `$q` keywords. 
 There are 2 ways to specify fields that should be searched against:
 
-1. in static property `quickSearchFields` as list of strings, see example bellow:
+1. in static property `qSearchFields` as list of strings, see example bellow:
 ```groovy
 class Org {
 	String name
     Address address
 
-    static quickSearchFields = ["name", "address.city"]
+    static qSearchFields = ["name", "address.city"]
     ...
 
 ```
@@ -288,7 +288,7 @@ So Mango criteria will add `%` automatically, if quick search string doesn't hav
 for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
-Org.repo.search([criteria: [$quickSearch: "abc"], max: 20])
+Org.repo.search([criteria: [$qSearch: "abc"], max: 20])
 
 ```
 So it is the same as:

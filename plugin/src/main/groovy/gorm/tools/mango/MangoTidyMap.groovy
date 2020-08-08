@@ -38,9 +38,7 @@ class MangoTidyMap {
      */
     static Map pathToMap(String path, Object val, Map map) {
         if (MangoBuilder.SortOps.keySet().contains(path)) {
-            //if its a $sort, leave it as is, as default criteria builder wants the dot notation
-            map[path] = val
-            return map
+            return tidySort(path, val, map)
         } else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
             //get first thing in dot ex: foo.bar this will be foo
@@ -116,6 +114,20 @@ class MangoTidyMap {
         }
         result
 
+    }
+
+    static Map tidySort(String path, Object val, Map map) {
+        if (val instanceof String && (val as String).contains(',')){
+            Map<String,String> sortMap = [:]
+            val.split(",").each { String item ->
+                String[] sorting = item.trim().split(" ")
+                sortMap[(sorting[0])] = sorting[1]?:'asc'
+            }
+            map[path] = sortMap
+        } else {
+            map[path] = val
+        }
+        return map
     }
 
 }

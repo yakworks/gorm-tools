@@ -68,9 +68,9 @@ class MangoBuilder {
         '$isNotNull': 'isNotNull'
     ]
 
-    static final Map<String, String> QuickSearchOps = [
-        '$quickSearch': 'quickSearch',
-        '$q'          : 'quickSearch'
+    static final Map<String, String> QSearchOps = [
+        '$qSearch': 'qSearch',
+        '$q'      : 'qSearch'
     ]
 
     static final Map<String, String> SortOps = [
@@ -132,10 +132,9 @@ class MangoBuilder {
     }
 
     static void applyField(DetachedCriteria criteria, String field, Object fieldVal) {
-        String qs = QuickSearchOps[field]
+        String qs = QSearchOps[field]
         if (qs) {
-            invoke(qs, criteria, fieldVal)
-            //this."$qs"(criteria, fieldVal)
+            qSearch(criteria, fieldVal as String)
             return
         }
 
@@ -151,13 +150,11 @@ class MangoBuilder {
 
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
         if (prop instanceof Association) {
-            //invoke(field, criteria, fieldVal)
             criteria.invokeMethod(field){
                 //the delegate is the DetachedAssocationCriteria. See methodMissing in AbstractDetachedCriteria
                 applyMapOrList((DetachedCriteria) delegate, fieldVal)
                 return
             }
-
         }
         // if field ends in Id then try removing the Id postfix and see if its a property
         else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
@@ -175,14 +172,12 @@ class MangoBuilder {
                 if (op) {
                     //normalizer should have ensured all ops have a List for a value
                     invoke(op, criteria, (List) opArg)
-                    //this."$op"(criteria, (List) opArg)
                     continue
                 }
 
                 op = OverrideOps[key]
                 if (op) {
                     invoke(op, criteria, field, toType(criteria, field, opArg))
-                    //this."$op"(criteria, field, toType(criteria, field, opArg))
                     continue
                 }
 
@@ -193,21 +188,18 @@ class MangoBuilder {
                         continue
                     }
                     criteria.invokeMethod(op, [field, toType(criteria, field, opArg)])
-                    //criteria."$op"(field, toType(criteria, field, opArg))
                     continue
                 }
 
                 op = PropertyOps[key]
                 if (op) {
                     criteria.invokeMethod(op, [field, opArg])
-                    //criteria."$op"(field, opArg)
                     continue
                 }
 
                 op = ExistOps[key]
                 if (op) {
                     criteria.invokeMethod(op, field)
-                    //criteria."$op"(field)
                     continue
                 }
             }
@@ -226,22 +218,12 @@ class MangoBuilder {
         if (sort instanceof String) return criteria.order(sort as String)
         DetachedCriteria result
         (sort as Map).each { k, v ->
-            //jqgrid, for example supports multisorting as `sort = id asc, num desc, name` and `order = asc` which coresponds to the last field
-            if (k.toString().contains(',')){
-                String ordering = k.toString() + " $v"
-                ordering.split(",").each { String order ->
-                    String[] sortFields = order.trim().split(" ")
-                    result = criteria.order(sortFields[0], sortFields[1])
-                }
-            } else {
-                result = criteria.order(k.toString(), v.toString())
-            }
+            result = criteria.order(k.toString(), v.toString())
         }
         return result
     }
 
-    //@CompileDynamic
-    static DetachedCriteria quickSearch(DetachedCriteria criteria, String value) {
+    static DetachedCriteria qSearch(DetachedCriteria criteria, String value) {
         if(QueryMangoEntity.isAssignableFrom(getTargetClass(criteria))){
             Map<String, String> orMap = getQuickSearchFields(criteria).collectEntries {
                 [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value + "%" : value)]

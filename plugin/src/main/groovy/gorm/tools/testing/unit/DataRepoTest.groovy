@@ -6,6 +6,9 @@ package gorm.tools.testing.unit
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.testing.support.ExternalConfigAwareSpec
+import gorm.tools.testing.support.GormToolsSpecHelper
+import gorm.tools.testing.support.JsonViewSpecSetup
 import grails.buildtestdata.BuildDataTest
 import grails.testing.spring.AutowiredTest
 

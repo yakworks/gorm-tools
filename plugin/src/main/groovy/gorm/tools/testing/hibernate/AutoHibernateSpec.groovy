@@ -6,7 +6,7 @@ package gorm.tools.testing.hibernate
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.testing.unit.DomainCrudSpec
+import gorm.tools.testing.support.DomainCrudSpec
 
 /**
  * automatically runs tests on persist(), create(), update(), delete()

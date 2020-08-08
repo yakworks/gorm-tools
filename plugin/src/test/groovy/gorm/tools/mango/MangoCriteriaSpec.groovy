@@ -4,15 +4,14 @@
 */
 package gorm.tools.mango
 
-import grails.buildtestdata.TestData
+
 import grails.gorm.DetachedCriteria
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
-import org.junit.Ignore
+import spock.lang.IgnoreRest
 import testing.Location
 import testing.Nested
 import testing.Org
-import testing.OrgType
 import testing.TestSeedData
 
 class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
@@ -50,7 +49,19 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
     def "test detached string"() {
         when:
-        List res = build([name: "Name#1"]).list()
+        List res = build([name: "Name1"]).list()
+
+        then:
+        res.size() == 1
+    }
+
+    def "test closure"() {
+        when:
+        List res = build([:],{
+            location{
+                eq 'address', 'City1'
+            }
+        }).list()
 
         then:
         res.size() == 1
@@ -59,7 +70,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
     def "test detached like"() {
         when:
 
-        List res = build([name: "Name#%"]).list()
+        List res = build([name: "Name%"]).list()
 
         then:
         res.size() == 10
@@ -138,7 +149,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
     def "test nested String"() {
         when:
 
-        List res = build((["location.address": "City#4"])).list()
+        List res = build((["location.address": "City4"])).list()
 
         then:
         res.size() == 1
@@ -184,7 +195,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
         List res = build([
             '$or': [
-                [name: "Name#7"],
+                [name: "Name7"],
                 [id: 2]
             ]
         ]).list()
@@ -287,20 +298,20 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
     def "test quickSearch"() {
         when:
 
-        List res = build((['$quickSearch': "Name#%"])).list()
+        List res = build((['$quickSearch': "Name%"])).list()
 
         then:
         res.size() == 10
 
         when:
 
-        res = build((['$quickSearch': "Name#3"])).list()
+        res = build((['$quickSearch': "Name3"])).list()
 
         then:
         res.size() == 1
 
         when: "quick search is combined with another field"
-        res = build((['$quickSearch': "Name#%", inactive: true])).list()
+        res = build((['$quickSearch': "Name%", inactive: true])).list()
 
         then:
         res.size() == 5
@@ -312,7 +323,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         when:
 
 
-        List res = build([name: "Name#%"]) { gt "id", 5 }.list()
+        List res = build([name: "Name%"]) { gt "id", 5 }.list()
 
         then:
         res.size() == 5
@@ -321,7 +332,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
     def "test with deep nested"() {
         when:
-        List res = build((["location.nested.name": "Nested#4"])).list()
+        List res = build((["location.nested.name": "Nested4"])).list()
 
         then:
         res.size() == 1
@@ -329,19 +340,63 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
     def "test with `or` on one level"() {
         when:
-        List res = build((['$or': [["location.id": 5], ["name": "Name#1", "location.id": 4]]])).list()
+        List res = build((['$or': [["location.id": 5], ["name": "Name1", "location.id": 4]]])).list()
 
         then:
         res.size() == 1
     }
 
-    def "test order"() {
+    def "test order with closure"() {
         when:
-        List res = build(([id: [1, 2, 3, 4], '$sort': [id: "desc"]])).list()
+        List res = build([:],{
+            // location {
+            //     order("address", "desc")
+            // }
+            order("location.address", "desc")
+        }).list()
 
         then:
-        res.size() == 4
-        res[0].id == 4
+        res[0].location.address > res[1].location.address
+    }
+
+    def "test order simple"() {
+        when:
+        List res = build(['$sort': 'descId']).list()
+
+        then: 'sanity check first few'
+        res[0].descId < res[1].descId
+        res[1].descId < res[2].descId
+    }
+
+    def "test order desc"() {
+        when:
+        List res = build('$sort': [id: "desc"]).list()
+
+        then:
+        res[0].id > res[1].id
+        res[1].id > res[2].id
+    }
+
+    // @IgnoreRest
+    def "test order association"() {
+        when:
+        List res = build('$sort':['location.address': 'desc'] ).list()
+
+        then:
+        res[0].location.address > res[1].location.address
+        // res[1].id > res[2].id
+    }
+
+    def "test order multi"() {
+        when:
+        List res = build('$sort': [inactive: "desc", id: "desc"]).list()
+
+        then:
+        // inactive is split 50/50 true false in test data, first 5 should be true
+        res[0].inactive == res[4].inactive
+        res[0].id > res[1].id
+        res[4].inactive > res[5].inactive
+        res[5].id > res[6].id
     }
 
     def "test multisort"() {

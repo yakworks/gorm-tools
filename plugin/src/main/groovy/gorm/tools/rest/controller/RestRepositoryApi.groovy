@@ -189,12 +189,12 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
     //@CompileDynamic
     List getIncludes(String includesKey){
-        if(!includes || !includes['_configChecked']){
+        if(!includes || !includes['__configChecked__']){
             //see if there is a config for it
             Map cfgIncs = grailsApplication.config.getProperty("restApi.${getControllerName()}.includes", Map)
             if(cfgIncs) includes = cfgIncs
             if(includes == null) includes = [:]
-            includes['_configChecked'] = true //mark it so we don't check config again each time
+            includes['__configChecked__'] = true //mark it so we don't check config again each time
         }
         List incs = includes[includesKey] as List
         // println "incs $includesKey $incs"

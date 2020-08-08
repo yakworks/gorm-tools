@@ -4,7 +4,7 @@
 */
 package gorm.tools.idgen
 
-import gorm.tools.testing.unit.MockJdbcIdGenerator
+import gorm.tools.testing.support.MockJdbcIdGenerator
 import grails.test.hibernate.HibernateSpec
 import groovyx.gpars.GParsPool
 import spock.lang.Shared

@@ -458,6 +458,6 @@ class MangoSpec extends Specification {
     def "test quick search fields"() {
         expect:
         //Student has name property, and due to the fact that Student has relation to Jumper and it has property name
-        Student.quickSearchFields == ["name", "jumper.name"]
+        Student.qSearchFields == ["name", "jumper.name"]
     }
 }

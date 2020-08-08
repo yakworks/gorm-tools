@@ -39,7 +39,7 @@ class Org implements NameTrait{
         //id generator:'assigned'
     }
 
-    static List quickSearchFields = ["name"]
+    static List qSearchFields = ["name"]
 
     static constraints = {
         importFrom(NameTraitConstraints)

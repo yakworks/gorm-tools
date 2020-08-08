@@ -225,7 +225,7 @@ class MangoBuilder {
 
     static DetachedCriteria qSearch(DetachedCriteria criteria, String value) {
         if(QueryMangoEntity.isAssignableFrom(getTargetClass(criteria))){
-            Map<String, String> orMap = getQuickSearchFields(criteria).collectEntries {
+            Map<String, String> orMap = getQSearchFields(criteria).collectEntries {
                 [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value + "%" : value)]
             }
             def criteriaMap = ['$or': orMap] as Map<String, Object>
@@ -240,8 +240,8 @@ class MangoBuilder {
     }
 
     @CompileDynamic //dynamic so we can access the protected targetClass.quickSearchFields
-    static List<String>  getQuickSearchFields(DetachedCriteria criteria) {
-        criteria.targetClass.quickSearchFields
+    static List<String>  getQSearchFields(DetachedCriteria criteria) {
+        criteria.targetClass.qSearchFields
     }
 
     @CompileDynamic

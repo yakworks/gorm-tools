@@ -277,15 +277,15 @@ class Org {
 gorm:
     tools:
         mango:
-            defaultQuickSearch: [name, num, address.city]
+            qSearchDefault: [name, num, address.city]
 
 ```
 
-On application start for all domains that doesn't have a `quickSearchFields` property, the fields from `defaultQuickSearch`
+On application start for all domains that doesn't have a `qSearchFields` property, the fields from `qSearchDefault`
 that each domain contains will be added. 
 
 So Mango criteria will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
-for each field in `quickSearchFields`. If domain field is not string type, then `eq` statement will be used.
+for each field in `qSearchFields`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
 Org.repo.search([criteria: [$qSearch: "abc"], max: 20])

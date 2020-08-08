@@ -295,7 +295,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         res.size() == 9
     }
 
-    def "test quickSearch"() {
+    def "test qSearch"() {
         when:
 
         List res = build((['$qSearch': "Name%"])).list()

@@ -14,7 +14,8 @@ class Org {
     Long refId = 0L
     String event
 
-    static quickSearchFields = ["name", "num"]
+    static qSearchFields = ["name", "num"]
+
     static constraints = {
         name blank: false
         num nullable: true

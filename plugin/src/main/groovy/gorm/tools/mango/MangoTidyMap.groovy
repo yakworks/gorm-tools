@@ -117,7 +117,7 @@ class MangoTidyMap {
     }
 
     static Map tidySort(String path, Object val, Map map) {
-        if (val instanceof String && (val as String).contains(',')){
+        if (val instanceof String && ((val as String).contains(',') || (val as String).contains(' '))){
             Map<String,String> sortMap = [:]
             val.split(",").each { String item ->
                 String[] sorting = item.trim().split(" ")

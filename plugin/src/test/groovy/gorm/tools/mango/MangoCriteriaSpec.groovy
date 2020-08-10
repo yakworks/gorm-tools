@@ -366,6 +366,13 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         then: 'sanity check first few'
         res[0].descId < res[1].descId
         res[1].descId < res[2].descId
+
+        when:
+        res = build(['$sort': 'descId asc']).list()
+
+        then: 'sanity check first few'
+        res[0].descId < res[1].descId
+        res[1].descId < res[2].descId
     }
 
     def "test order desc"() {

@@ -32,6 +32,7 @@ import static org.springframework.http.HttpStatus.OK
 trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi, RestControllerErrorHandling {
 
     Map includes = [:]
+    List qSearchFields = []
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -172,6 +173,20 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         pager.setupData(dlist, incs)
     }
 
+    List query(Pager pager, Map p = [:]) {
+        ['max', 'offset', 'page'].each{ String k ->
+            p[k] = pager[k]
+        }
+
+        //def qSearch = p.remove('q')
+        if(p.q && qSearchFields) {
+            Map qMap = ['text': p.q, 'fields': qSearchFields]
+            p['$q'] = qMap
+        }
+
+        getMangoApi().query(p)
+    }
+
     /**
      * builds the response model. if there is an includes the it will use BeanPathTools.buildMapFromPaths
      * if no includes list (the default) then it just returns the instance
@@ -198,8 +213,23 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         }
         List incs = includes[includesKey] as List
         // println "incs $includesKey $incs"
-        return includes[includesKey] as List
+        return incs
     }
+
+    boolean _qSearchConfigChecked = false
+
+    List getSearchFields(){
+        if(!qSearchFields || !_qSearchConfigChecked){
+            //see if there is a config for it
+            List cfgQSearch = grailsApplication.config.getProperty("restApi.${getControllerName()}.qSearch", List)
+            if(cfgQSearch) qSearchFields = cfgQSearch
+            if(qSearchFields == null) qSearchFields = []
+            _qSearchConfigChecked = true //mark it so we don't check config again each time
+        }
+        return qSearchFields
+    }
+
+
 
     /**
      * getControllerName() works inisde a request and should be used, but during init or outside a request use this
@@ -207,7 +237,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      */
     String getLogicalControllerName(){
         String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
-        return GrailsNameUtils.getPropertyNameRepresentation(logicalName)
+        return GrailsNameUtils.getPropertyName(logicalName)
     }
 
     /**

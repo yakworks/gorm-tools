@@ -6,6 +6,8 @@ package gorm.tools.mango
 
 import groovy.transform.CompileStatic
 
+import org.apache.commons.lang3.EnumUtils
+
 /**
  * Utils to normalizes params map to transform it to mango language
  */
@@ -37,7 +39,7 @@ class MangoTidyMap {
      * @return extended map
      */
     static Map pathToMap(String path, Object val, Map map) {
-        if (path == '$sort') {
+        if (path == MangoBuilder.SORT) {
             return tidySort(path, val, map)
         } else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
@@ -71,7 +73,7 @@ class MangoTidyMap {
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
-            if (MangoBuilder.JunctionOps.keySet().contains(key)) {
+            if (EnumUtils.isValidEnum(MangoBuilder.JunctionOp, key as String)) {
                 if (val instanceof Map) {
                     result[key] = (val as Map).collect { k, v -> tidy([(k.toString()): v]) }
                     return
@@ -82,7 +84,7 @@ class MangoTidyMap {
                     return
                 }
             }
-            if (val instanceof Map && key != '$sort') {
+            if (val instanceof Map && key != MangoBuilder.SORT) {
                 toMangoOperator(val as Map, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {
@@ -105,7 +107,8 @@ class MangoTidyMap {
                     result[key]['$ilike'] = val
                     return
                 }
-                if (MangoBuilder.ExistOps.keySet().contains(val)) {
+
+                if (EnumUtils.isValidEnum(MangoBuilder.ExistOp, val as String)) {
                     (result[key] as Map)[val] = true
                 } else {
                     result[key]['$eq'] = val

@@ -29,47 +29,75 @@ import grails.gorm.DetachedCriteria
 @CompileStatic
 @Slf4j
 class MangoBuilder {
-    //DetachedCriteria criteria
+
+    static final String SORT = '$sort'
+    static final String Q = '$q'
+    static final String QSEARCH = '$qSearch'
 
     @CompileStatic
     enum CompareOp {
         $gt, $eq, $gte, $lt, $lte, $ne, $not, $ilike, $like, $in, $inList
 
         private final String op //private for security
+        String getOp(){ return op }
 
         CompareOp() {
             this.op = name().substring(1) //remove $
         }
+    }
 
-        String getOp(){
-            return op
+    @CompileStatic
+    enum PropertyOp {
+        $gtf('gtProperty'),
+        $gtef('geProperty'),
+        $ltf('ltProperty'),
+        $ltef('leProperty'),
+        $eqf('eqProperty'),
+        $nef('neProperty')
+
+        private final String op //private for security
+        String getOp(){ return op }
+
+        PropertyOp(String op) {
+            this.op = op
         }
     }
 
-    static final Map<String, String> PropertyOps = [
-        '$gtf' : 'gtProperty',
-        '$gtef': 'geProperty',
-        '$ltf' : 'ltProperty',
-        '$ltef': 'leProperty',
-        '$eqf' : 'eqProperty',
-        '$nef' : 'neProperty'
-    ]
+    @CompileStatic
+    enum OverrideOp {
+        $between('between'),
+        $nin('notIn')
 
-    static final Map<String, String> OverrideOps = [
-        '$between': 'between',
-        '$nin'    : 'notIn'
-    ]
+        private final String op
+        String getOp(){ return op }
 
-    static final Map<String, String> JunctionOps = [
-        '$and': 'and',
-        '$or' : 'or',
-        '$not': 'not'
-    ]
+        OverrideOp(String op) {
+            this.op = op
+        }
+    }
 
-    static final Map<String, String> ExistOps = [
-        '$isNull'   : 'isNull',
-        '$isNotNull': 'isNotNull'
-    ]
+    @CompileStatic
+    enum JunctionOp {
+        $and, $or, $not
+
+        private final String op //private for security
+        String getOp(){ return op }
+
+        JunctionOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
+
+    enum ExistOp {
+        $isNull, $isNotNull
+
+        private final String op
+        String getOp(){ return op }
+
+        ExistOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
 
     static <D> DetachedCriteria<D> build(Class<D> clazz, Map map, Closure callable = null) {
         DetachedCriteria<D> detachedCriteria = new DetachedCriteria<D>(clazz)
@@ -109,20 +137,20 @@ class MangoBuilder {
         for (String key : mangoMap.keySet()) {
             def val = mangoMap[key]
 
-            if(key == '$sort') {
+            if(key == SORT) {
                 order(criteria, val)
                 continue
             }
 
-            if(key == '$qSearch' || key == '$q') {
+            if(key == QSEARCH || key == Q) {
                 qSearch(criteria, val)
                 continue
             }
 
-            String op = JunctionOps[key]
-            if (op) {
+            JunctionOp jop = EnumUtils.getEnum(JunctionOp, key)
+            if (jop) {
                 //tidyMap should have ensured all ops have a List for a value
-                invoke(op, criteria, (List) mangoMap[key])
+                invoke(jop.op, criteria, (List) val)
                 continue
             }
 
@@ -159,16 +187,16 @@ class MangoBuilder {
                 //everything has to either be either a junction op or condition
                 Object opArg = fieldVal[key]
 
-                String op = JunctionOps[key]
-                if (op) {
+                JunctionOp jop = EnumUtils.getEnum(JunctionOp, key)
+                if (jop) {
                     //normalizer should have ensured all ops have a List for a value
-                    invoke(op, criteria, (List) opArg)
+                    invoke(jop.op, criteria, (List) opArg)
                     continue
                 }
 
-                op = OverrideOps[key]
-                if (op) {
-                    invoke(op, criteria, field, toType(criteria, field, opArg))
+                OverrideOp oop = EnumUtils.getEnum(OverrideOp, key)
+                if (oop) {
+                    invoke(oop.op, criteria, field, toType(criteria, field, opArg))
                     continue
                 }
 
@@ -182,15 +210,15 @@ class MangoBuilder {
                     continue
                 }
 
-                op = PropertyOps[key]
-                if (op) {
-                    criteria.invokeMethod(op, [field, opArg])
+                PropertyOp pop = EnumUtils.getEnum(PropertyOp, key)
+                if (pop) {
+                    criteria.invokeMethod(pop.op, [field, opArg])
                     continue
                 }
 
-                op = ExistOps[key]
-                if (op) {
-                    criteria.invokeMethod(op, field)
+                ExistOp eop = EnumUtils.getEnum(ExistOp, key)
+                if (eop) {
+                    criteria.invokeMethod(eop.op, field)
                     continue
                 }
             }

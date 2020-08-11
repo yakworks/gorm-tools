@@ -48,19 +48,19 @@ class DefaultMangoQuery implements MangoQuery {
     public <D> List<D> query(Class<D> domainClass, Map params = [:], Closure closure = null) {
         Map<String, Map> p = parseParams(params)
         DetachedCriteria<D> dcrit = buildCriteria(domainClass, p['criteria'], closure)
-        query(dcrit, p['pager'])
+        Pager pager = new Pager(p['pager'])
+        list(dcrit, pager)
     }
 
     /**
-     * List of entities restricted by mango map and criteria closure
+     * call list on the criteria with the pager params inside a readOnly transaction
      *
-     * @param params mango language criteria map
-     * @param closure additional restriction for criteria
-     * @return query of entities restricted by mango params
+     * @param criteria the built detached criteria
+     * @param pagerParams the map with max, offset and page
+     * @return list of entities
      */
     @Transactional(readOnly = true)
-    public <D> List<D> query(DetachedCriteria<D> criteria, Map pagerParams = [:], Closure closure = null) {
-        Pager pager = new Pager(pagerParams)
+    public <D> List<D> list(DetachedCriteria<D> criteria, Pager pager) {
         criteria.list(max: pager.max, offset: pager.offset)
     }
 
@@ -122,8 +122,14 @@ class DefaultMangoQuery implements MangoQuery {
             result['criteria'] = paramCopy
             result['pager'] = pager
         }
-        if (paramCopy.containsKey('sort')) {
+        //clean up sort if passed the jqgrid way
+        if (paramCopy['sort']) {
             Object sort = paramCopy.remove('sort')
+            if(paramCopy['order']) {
+                Map newSort = [:]
+                newSort[sort] = paramCopy.remove('order')
+                sort = newSort
+            }
             // if sort is populated
             if(sort) result['criteria']['$sort'] = sort
         }

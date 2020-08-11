@@ -3,6 +3,7 @@ package gpbench.traits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+import gorm.tools.Pager
 import gorm.tools.WithTrx
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.DefaultMangoQuery
@@ -166,8 +167,9 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
 
     void testQuery4(Map map){
         Map<String, Map> p = mangoQuery.parseParams(map)
+        Pager pager = new Pager(p['pager'])
         DetachedCriteria dcrit = mangoQuery.buildCriteria(Region, p['criteria'], null)
-        mangoQuery.query(dcrit, p['pager'])
+        mangoQuery.list(dcrit, pager)
         //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)
         //criteria.list(max: 10, offset: 0)
     }

@@ -37,7 +37,7 @@ class MangoTidyMap {
      * @return extended map
      */
     static Map pathToMap(String path, Object val, Map map) {
-        if (MangoBuilder.SortOps.keySet().contains(path)) {
+        if (path == '$sort') {
             return tidySort(path, val, map)
         } else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
@@ -82,7 +82,7 @@ class MangoTidyMap {
                     return
                 }
             }
-            if (val instanceof Map && !MangoBuilder.SortOps.keySet().contains(key)) {
+            if (val instanceof Map && key != '$sort') {
                 toMangoOperator(val as Map, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {
@@ -117,13 +117,18 @@ class MangoTidyMap {
     }
 
     static Map tidySort(String path, Object val, Map map) {
-        if (val instanceof String && (val as String).contains(',')){
-            Map<String,String> sortMap = [:]
-            val.split(",").each { String item ->
-                String[] sorting = item.trim().split(" ")
-                sortMap[(sorting[0])] = sorting[1]?:'asc'
+        if (val instanceof String) {
+            String sval = (val as String).trim()
+            if (sval.contains(',') || sval.contains(' ')) {
+                Map<String, String> sortMap = [:]
+                sval.split(",").each { String item ->
+                    String[] sorting = item.trim().split(" ")
+                    sortMap[(sorting[0])] = sorting[1] ?: 'asc'
+                }
+                map[path] = sortMap
+            } else {
+                map[path] = sval
             }
-            map[path] = sortMap
         } else {
             map[path] = val
         }

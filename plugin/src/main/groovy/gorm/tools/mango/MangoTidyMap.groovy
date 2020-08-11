@@ -117,13 +117,18 @@ class MangoTidyMap {
     }
 
     static Map tidySort(String path, Object val, Map map) {
-        if (val instanceof String && (val as String).contains(',')){
-            Map<String,String> sortMap = [:]
-            val.split(",").each { String item ->
-                String[] sorting = item.trim().split(" ")
-                sortMap[(sorting[0])] = sorting[1]?:'asc'
+        if (val instanceof String) {
+            String sval = (val as String).trim()
+            if (sval.contains(',') || sval.contains(' ')) {
+                Map<String, String> sortMap = [:]
+                sval.split(",").each { String item ->
+                    String[] sorting = item.trim().split(" ")
+                    sortMap[(sorting[0])] = sorting[1] ?: 'asc'
+                }
+                map[path] = sortMap
+            } else {
+                map[path] = sval
             }
-            map[path] = sortMap
         } else {
             map[path] = val
         }

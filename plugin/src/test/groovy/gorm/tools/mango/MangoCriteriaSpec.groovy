@@ -299,7 +299,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
     def "test qSearch"() {
         when:
 
-        List res = build((['$qSearch': "Name"])).list()
+        List res = build((['$qSearch': "Na"])).list()
 
         then:
         res.size() == 10
@@ -312,7 +312,7 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
         res.size() == 1
 
         when: "quick search is combined with another field"
-        res = build((['$qSearch': "Name%", inactive: true])).list()
+        res = build((['$qSearch': "Nam%", inactive: true])).list()
 
         then:
         res.size() == 5

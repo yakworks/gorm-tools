@@ -22,7 +22,7 @@ jobs:
       - checkout
 
         # Download and cache dependencies
-      - run: cat gradle.properties build.gradle plugin/build.gradle examples/test-app/build.gradle > cache-checksum.tmp
+      - run: cat gradle.properties build.gradle plugin/build.gradle examples/restify/build.gradle examples/app-domains/build.gradle > cache-checksum.tmp
       - restore_cache:
           key: gradle-{{ checksum "cache-checksum.tmp" }}
 

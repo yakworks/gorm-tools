@@ -160,7 +160,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
         args['bindAction'] = bindAction
         bind(args, entity, data, bindAction)
         //set the id if it has oone in data
-        if(BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
+        if(args.remove('bindId') && BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
         args['data'] = data
         doPersist(args, entity)
     }

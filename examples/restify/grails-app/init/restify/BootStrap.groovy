@@ -22,7 +22,7 @@ class BootStrap {
                     num: "$it",
                     activateDate: "2020-01-01",
                     startDate: "2020-01-01"
-                ])
+                ], bindId: true)
                 assert prod.id == it
                 def task = new Task(name: "task1-$it",
                     project: prod)

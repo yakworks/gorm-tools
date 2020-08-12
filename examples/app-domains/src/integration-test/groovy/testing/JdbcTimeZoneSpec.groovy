@@ -13,6 +13,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 import yakworks.taskify.domain.Org
+import yakworks.taskify.domain.OrgType
 
 @Integration
 @Rollback
@@ -29,8 +30,8 @@ class JdbcTimeZoneSpec extends Specification {
         Date now = new Date()
         LocalDateTime ldt = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault())
 
-        Org org = new Org(name: "test", actDate: now, locDateTime: ldt)
-        org.save(flush: true)
+        Org org = new Org(name: "test", actDate: now, locDateTime: ldt, type: OrgType.load(1))
+        org.persist(flush: true)
 
         RepoUtil.flushAndClear()
 

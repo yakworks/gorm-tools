@@ -1,7 +1,8 @@
 package gorm.tools
 
-import gorm.tools.testing.unit.ExternalConfigAwareSpec
 import org.grails.testing.GrailsUnitTest
+
+import gorm.tools.testing.support.ExternalConfigAwareSpec
 import spock.lang.Specification
 
 class ExternalConfigAwareSpecTest extends Specification implements GrailsUnitTest, ExternalConfigAwareSpec {

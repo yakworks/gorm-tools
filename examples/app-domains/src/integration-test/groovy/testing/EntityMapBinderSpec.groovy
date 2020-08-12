@@ -2,10 +2,12 @@ package testing
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.taskify.domain.Contact
 import yakworks.taskify.domain.ContactAddress
+import yakworks.taskify.domain.ContactRepo
 import yakworks.taskify.domain.Location
 import yakworks.taskify.domain.Org
 
@@ -39,14 +41,15 @@ class EntityMapBinderSpec extends Specification {
 
     void "test bindable : should create new instance"() {
         given:
-        Map params = [name: "test", age: "50", address: [street:"123", city: "Delhi"]]
+        Map params = [firstName: "bill", age: "50", address: [street:"123", city: "Delhi"]]
 
         when:
         Contact p = new Contact()
+        p instanceof ContactRepo
         p.bind params
 
         then:
-        p.name == "test"
+        p.firstName == "bill"
         p.age == 50
         p.address != null
         p.address.city == "Delhi"
@@ -55,10 +58,10 @@ class EntityMapBinderSpec extends Specification {
     void "should update existing associated instance when bindable"() {
         given:
         ContactAddress address = new ContactAddress(city: "Delhi", street:"123")
-        address.save()
+        address.persist()
 
-        Contact p = new Contact(name: "test", age: 50, address: address)
-        p.save()
+        Contact p = new Contact(firstName: "test", age: 50, address: address)
+        p.persist()
 
         when:
         p = Contact.get(p.id)

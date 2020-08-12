@@ -1,4 +1,4 @@
-package repoapp
+package yakworks
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
@@ -19,7 +19,7 @@ class RepositoryEventsSpec extends Specification {
 
     void "check events"() {
         given:
-        Map params = [name: "test"]
+        Map params = [name: "test", type: [id: 1]]
 
         when:
         Org org = Org.create(params)

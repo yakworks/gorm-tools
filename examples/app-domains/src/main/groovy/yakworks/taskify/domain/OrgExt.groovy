@@ -11,15 +11,19 @@ import grails.persistence.Entity
 class OrgExt {
     static belongsTo = [org:Org]
 
+    Org orgParent
     String text1
     String text2
 
+
     static mapping = {
-        id generator:'foreign', params:[property:'org']
+        id column: 'id', generator: 'foreign', params: [property: 'org']
         org insertable: false, updateable: false , column:'id'
+        orgParent column: 'orgParentId'
     }
     static constraints = {
-        text1 nullable: false
+        orgParent nullable: true
+        text1 nullable: true
         text2 nullable: true
     }
 }

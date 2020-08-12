@@ -17,8 +17,9 @@ import static org.springframework.http.HttpStatus.*
 abstract class RestApiFuncSpec extends GebSpec implements RestApiTestTrait {
     boolean vndHeaderOnError = false
 
-    // TODO: add ability to pass input and output data to be able to test overidden repos
-    abstract Map getInvalidData()
+    String getResourcePath() { "${baseUrl}/${path}" }
+
+    Map getInvalidData() { return [:] }
 
     abstract Map getPostData()
 
@@ -61,20 +62,8 @@ abstract class RestApiFuncSpec extends GebSpec implements RestApiTestTrait {
     }
 
     void testPost() {
-        // "The save action is executed with no content"
-        def response = restBuilder.post(resourcePath)
-        // "The response is UNPROCESSABLE_ENTITY"
-        verify_UNPROCESSABLE_ENTITY(response)
-
-        // "The save action is executed with invalid data"
-        response = restBuilder.post(resourcePath) {
-            json invalidData
-        }
-        // "The response is UNPROCESSABLE_ENTITY"
-        verify_UNPROCESSABLE_ENTITY(response)
-
         // "The save action is executed with valid data"
-        response = restBuilder.post(resourcePath) {
+        def response = restBuilder.post(resourcePath) {
             json postData
         }
 
@@ -88,20 +77,18 @@ abstract class RestApiFuncSpec extends GebSpec implements RestApiTestTrait {
         assert TestTools.mapContains(rget.json, postData, excludes)
     }
 
+    void testPostInvalid() {
+        // "The save action is executed with invalid data"
+        def response = restBuilder.post(resourcePath) {
+            json getInvalidData()
+        }
+        // "The response is UNPROCESSABLE_ENTITY"
+        verify_UNPROCESSABLE_ENTITY(response)
+    }
+
     void testPut() {
         def response = post_a_valid_resource()
-
-        // "The update action is called with invalid data"
         def goodId = response.json.id
-        def response2 = restBuilder.put("$resourcePath/$goodId") {
-            json invalidData
-        }
-
-        // "The response is invalid"
-        verify_UNPROCESSABLE_ENTITY(response2)
-
-        // "The update action is called with valid data"
-        goodId = response.json.id
         response = restBuilder.put("$resourcePath/$goodId") {
             json putData
         }
@@ -150,7 +137,7 @@ abstract class RestApiFuncSpec extends GebSpec implements RestApiTestTrait {
 
     def post_a_valid_resource() {
         def response = restBuilder.post(resourcePath) {
-            json postData
+            json getPostData()
         }
         verifyHeaders(response)
         // println "response.json ${response.json}"
@@ -167,9 +154,7 @@ abstract class RestApiFuncSpec extends GebSpec implements RestApiTestTrait {
 
     def verify_UNPROCESSABLE_ENTITY(Object response) {
         assert response.status == UNPROCESSABLE_ENTITY.value()
-        if (vndHeaderOnError) {
-            assert response.headers.getFirst(CONTENT_TYPE) == 'application/vnd.error;charset=UTF-8'
-        }
+
         true
     }
 

@@ -67,7 +67,7 @@ dependencies {
     // compile "org.hibernate:hibernate-ehcache:$versionHibernate"
 
     compile project(":gorm-tools")
-    compile project(":restify-domains")
+    compile project(":app-domains")
 
     // runtime "com.h2database:h2"
     runtime "com.h2database:h2"

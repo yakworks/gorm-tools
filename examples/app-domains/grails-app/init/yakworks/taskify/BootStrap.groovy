@@ -9,9 +9,9 @@ class BootStrap {
 
     def init = { servletContext ->
         OrgType.withTransaction {
-            new Jumper(name: 'Bill').persist()
-            new Location(street: '123').persist()
-            new OrgType(name: 'foo').persist()
+            //new Jumper(name: 'Bill').persist()
+            //new Location(street: '123').persist()
+            //new OrgType(name: 'foo').persist()
             TestSeedData.buildOrgs(100)
         }
     }

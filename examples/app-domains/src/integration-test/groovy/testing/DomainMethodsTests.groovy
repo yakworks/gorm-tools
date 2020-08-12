@@ -25,10 +25,10 @@ class DomainMethodsTests extends Specification {
         (1..10).each {
             def jumper = new Jumper(name: "jumper$it")
             //jumper.student = new Student(name:"student$it")
-            assert jumper.persist()
+            assert jumper.persist(flush: true)
             def stud = new Student(name: "student$it")
             stud.jumper = jumper
-            assert stud.persist()
+            assert stud.persist(flush: true)
         }
         //assert dom.persist()
         assert Jumper.count() == 10
@@ -72,7 +72,7 @@ class DomainMethodsTests extends Specification {
         then:
         try {
             jump.persist()
-            fail "it was supposed to fail the save because of validationException"
+            assert "it was supposed to fail the save because of validationException" == 'foo'
         } catch (EntityValidationException e) {
             assert e.cause instanceof grails.validation.ValidationException
             assert e.entity == jump
@@ -91,7 +91,7 @@ class DomainMethodsTests extends Specification {
             jump.persist(flush: true)
             fail "it was supposed to fail the save because of OptimisticLockingFailureException"
         } catch (OptimisticLockingFailureException e) {
-            assert e.message == "Another user has updated the testing.Jumper while you were editing"
+            assert e.message == "Another user has updated the skydive.Jumper while you were editing"
         }
     }
 
@@ -157,11 +157,11 @@ class DomainMethodsTests extends Specification {
         then:
         try {
             Student.removeById(Student.last().id + 1)
-            fail "it was supposed to fail because such id doesn't exist"
+            assert "it was supposed to fail because such id doesn't exist" == 'foo'
         }catch(e){
             assert e != null
             assert e instanceof EntityNotFoundException
-            assert e.message.startsWith("testing.Student not found with id ")
+            assert e.message.startsWith("skydive.Student not found with id ")
         }
     }
 

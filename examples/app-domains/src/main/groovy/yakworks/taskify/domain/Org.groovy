@@ -24,6 +24,7 @@ class Org implements NameTrait{
     Boolean inactive = false
     //decimal
     BigDecimal revenue
+    BigDecimal creditLimit //used for gtef compares
     //dates
     Date actDate
     LocalDate locDate
@@ -35,15 +36,19 @@ class Org implements NameTrait{
     OrgType type //type is required
     Location location //belongs to whatever
     OrgExt ext //<- ext belong to org
+    // since OrgExt also has an Org property (orgParent) it gets confused and
+    // needs to know that its "belongs" to is the map and that orgParent gets set sepearatly
+    static mappedBy = [ext: "org"]
 
     //used for event testing
     String event
 
     static mapping = {
         //id generator:'assigned'
+        ext column: 'extId'
     }
 
-    static List quickSearchFields = ["name"]
+    static List qSearchFields = ["name"]
 
     static constraints = {
         importFrom(NameTraitConstraints)
@@ -66,6 +71,11 @@ class Org implements NameTrait{
         location nullable: true
         ext  nullable: true
     }
+
+    // gorm event
+    // def beforeValidate() {
+    //     if (ext && !ext.id) ext.org = this
+    // }
 
     static config = """{
         json {

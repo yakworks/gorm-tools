@@ -4,8 +4,9 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import skydive.DropZone
+import skydive.Jumper
 import spock.lang.Specification
-import yakworks.taskify.domain.Org
 
 @Integration
 @Rollback
@@ -19,7 +20,7 @@ class GparsAsyncSpec extends Specification {
 
         expect:
         //starting org count
-        Org.count() == 100
+        DropZone.count() == 0
 
         list.size() == 50
 
@@ -27,11 +28,11 @@ class GparsAsyncSpec extends Specification {
         AtomicInteger count = new AtomicInteger(0)
         asyncSupport.eachParallel(list) { Map item ->
             //Org org = Org.create([name: "name $item.name"])
-            new Org([name: "name $item.name"]).save(failOnError:true)
+            new DropZone(location: "name $item.name").persist()
         }
 
         then:
-        Org.count() == 150
+        DropZone.count() == 50
     }
 
     List<Map> createList(int num) {

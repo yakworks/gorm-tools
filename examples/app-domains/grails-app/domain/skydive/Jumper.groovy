@@ -7,6 +7,6 @@ class Jumper {
     //Student student
 
     static constraints = {
-        //student nullable:true
+        name nullable:false
     }
 }

@@ -15,13 +15,20 @@ spring:
       check-template-location: false
 
 hibernate:
+  format_sql: false
+  naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
+  show_sql: false
   cache:
     queries: false
     use_second_level_cache: true
     use_query_cache: false
+    provider_class: 'org.hibernate.cache.EhCacheProvider'
     region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+  jdbc:
+    time_zone: 'UTC'
 
 dataSource:
+  type: com.zaxxer.hikari.HikariDataSource
   pooled: true
   jmxExport: true
   driverClassName: org.h2.Driver

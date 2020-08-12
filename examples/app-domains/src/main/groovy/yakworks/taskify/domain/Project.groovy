@@ -6,11 +6,13 @@ import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.rest.RestApi
 import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
 
 //import gorm.restapi.RestApiController
 @GrailsCompileStatic
 @EqualsAndHashCode(includes = 'num,name')
 @RestApi(description = "This is a project ")
+@Entity
 class Project {
 
     static constraints = {

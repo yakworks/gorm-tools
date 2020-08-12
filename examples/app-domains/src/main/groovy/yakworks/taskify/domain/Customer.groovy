@@ -1,5 +1,8 @@
 package yakworks.taskify.domain
 
+import grails.persistence.Entity
+
+@Entity
 class Customer implements Serializable {
     String name
     String num

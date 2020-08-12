@@ -5,6 +5,7 @@ import javax.persistence.Transient
 
 import gorm.tools.rest.RestApi
 import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.*
 
@@ -16,6 +17,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.*
  */
 @GrailsCompileStatic
 @RestApi(description = "This is a task")
+@Entity
 class Task {
     //ordering of contraints flow through to json-schema and the fields plugin for automatic scaffolding
     //its not required to add fields to constraints, they just need to be here if a specifc order is needed

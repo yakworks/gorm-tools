@@ -15,6 +15,8 @@ class Contact {
     TimeZone timeZone
     LocalDateTime activateOnDate
 
+    Integer age
+
     Date dateCreated
     Date lastUpdated
     Boolean inactive

@@ -4,10 +4,8 @@
 */
 package yakworks.taskify.domain
 
-// import org.grails.datastore.gorm.GormEntity
-
 import grails.compiler.GrailsCompileStatic
-import grails.gorm.annotation.Entity
+import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic

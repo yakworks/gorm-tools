@@ -1,8 +1,10 @@
 package yakworks.taskify.domain
 
 import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
 
 @GrailsCompileStatic
+@Entity
 class TaskFlex {
     static belongsTo = [task: Task]
 

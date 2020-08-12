@@ -204,7 +204,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
                 valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
             } else if (Number.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = sval.asType(typeToConvertTo)
+                valueToAssign = sval.asType(typeToConvertTo as Class<Object>)
             } else if (conversionHelpers.containsKey(typeToConvertTo)) {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                 ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }

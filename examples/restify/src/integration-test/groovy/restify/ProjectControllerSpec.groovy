@@ -5,11 +5,14 @@ import gorm.tools.rest.testing.RestApiTestTrait
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.IgnoreRest
-import taskify.Project
+import yakworks.taskify.domain.Project
 
 import static grails.web.http.HttpHeaders.CONTENT_TYPE
 import static org.springframework.http.HttpStatus.*
 
+/**
+ * manual testing example
+ */
 @Integration
 class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
 

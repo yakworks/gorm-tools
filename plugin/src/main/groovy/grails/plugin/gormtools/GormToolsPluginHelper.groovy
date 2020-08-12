@@ -31,6 +31,7 @@ import grails.core.ArtefactHandler
 import grails.core.ArtefactInfo
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
+import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
 import grails.util.GrailsNameUtils
 
@@ -92,8 +93,9 @@ class GormToolsPluginHelper {
         }
 
         //controller names to be used during iterations
-        List ctrlNames = application.getArtefacts(ControllerArtefactHandler.TYPE)*.shortName
-        println ctrlNames
+        //List ctrlNames = application.getArtefacts(ControllerArtefactHandler.TYPE)*.shortName
+        List<GrailsControllerClass> ctrlList = getExistingControllers(application)
+        //println ctrlNames
 
         for (GrailsClass grailsClass in application.getArtefacts(DomainClassArtefactHandler.TYPE)) {
             final domainClass = grailsClass.clazz
@@ -111,7 +113,7 @@ class GormToolsPluginHelper {
             if (domainClass.getAnnotation(RestApi)) {
                 String controllerName = "${domainClass.name}Controller"
                 //Check if we already have such controller in app
-                addControllerWhenNotExists(application, ctrlNames, controllerName)
+                addControllerWhenNotExists(application, ctrlList, controllerName)
             }
         }
 
@@ -183,8 +185,8 @@ class GormToolsPluginHelper {
     @CompileStatic
     static void restApiControllersFromConfig(GrailsApplication app) {
         //controller names to be used during iterations
-        List ctrlNames = app.getArtefacts(ControllerArtefactHandler.TYPE)*.shortName
-        println ctrlNames
+        List<GrailsControllerClass> ctrlList = getExistingControllers(app)
+        // println ctrlNames
 
         Map restApi = app.config.getProperty('restApi', Map)
         restApi.each { k, v ->
@@ -192,7 +194,7 @@ class GormToolsPluginHelper {
             if(entry?.entityClass){
                 String controllerClassName = "${entry.entityClass}Controller" //ex com.foo.FooController
                 println "adding ${controllerClassName}"
-                addControllerWhenNotExists(app, ctrlNames, controllerClassName)
+                addControllerWhenNotExists(app, ctrlList, controllerClassName)
             }
         }
     }
@@ -201,23 +203,37 @@ class GormToolsPluginHelper {
      * calls addArtefact with loadClass on className, just swallows the error if ClassNotFoundException
      */
     @CompileStatic
-    static void addControllerWhenNotExists(GrailsApplication app, List ctrlNames, String className) {
-        if (!controllerExists(app, ctrlNames, className)) {
+    static void addControllerWhenNotExists(GrailsApplication app, List<GrailsControllerClass> ctrlList, String className) {
+        Class ctrlClass
+        try {
+            ctrlClass = app.classLoader.loadClass(className)
+        } catch (ClassNotFoundException cnfe) {
+            println "addControllerArtifact ClassNotFoundException on classLoader.loadClass($className)"
+        }
+        if (!controllerExists(app, ctrlList, className, ctrlClass)) {
             println "adding $className"
-            try {
-                app.addArtefact(ControllerArtefactHandler.TYPE, app.classLoader.loadClass(className))
-                //println "added $controllerClassName"
-            } catch (ClassNotFoundException cnfe) {
-                println "addControllerArtifact ClassNotFoundException on classLoader.loadClass($className)"
-            }
+            app.addArtefact(ControllerArtefactHandler.TYPE, ctrlClass)
         }
 
     }
 
     @CompileStatic
-    static boolean controllerExists(GrailsApplication app, List ctrlNames, String controllerClassName) {
+    static boolean controllerExists(GrailsApplication app, List<GrailsControllerClass> ctrlList, String controllerClassName, Class controllerClass) {
         String shortName = GrailsNameUtils.getShortName(controllerClassName)
-        app.getArtefact(ControllerArtefactHandler.TYPE, controllerClassName) || ctrlNames.contains(shortName)
+        GrailsControllerClass ctrlClass = getController(app, controllerClassName)
+        if(ctrlClass && ctrlClass.namespace == 'api') return true
+
+        return ctrlList.any {
+            it.shortName == shortName && it.namespace == 'api'
+        }
+    }
+
+    static List<GrailsControllerClass> getExistingControllers(GrailsApplication app){
+        app.getArtefacts(ControllerArtefactHandler.TYPE).collect{ it as GrailsControllerClass}
+    }
+
+    static GrailsControllerClass getController(GrailsApplication app, String controllerClassName){
+        (GrailsControllerClass) app.getArtefact(ControllerArtefactHandler.TYPE, controllerClassName)
     }
 
 

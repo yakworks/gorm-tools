@@ -63,10 +63,11 @@ class SpringBeanIdGenerator implements IdentifierGenerator, org.hibernate.id.Con
     }
 
     Serializable generate(SharedSessionContractImplementor session, Object obj) {
-        // println "obj.id ${obj['id']}"
+        // println "${obj.class.name} obj.id ${obj['id']}"
         if(idGenerator == null) idGenerator = AppCtx.get(idGeneratorBeanName, IdGenerator)
         // if the object has an assigned id then use it.
         Long id = obj['id'] ? (Long)obj['id'] : idGenerator.getNextId(keyName)
+        // println "using id $id"
         return id
     }
 

@@ -4,11 +4,13 @@
 */
 package restify
 
+import org.springframework.context.annotation.ComponentScan
+
 import gorm.tools.rest.RestApiFromConfig
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 
-//@ComponentScan("restify")
+@ComponentScan
 @RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
@@ -21,9 +23,9 @@ class Application extends GrailsAutoConfiguration {
     }
     //
     // // Shows example of how to scan and pick up the gorm domain that are marked with @entity
-    // @Override
-    // Collection<String> packageNames() {
-    //     super.packageNames() + ['restify']
-    // }
+    @Override
+    Collection<String> packageNames() {
+        super.packageNames() + ['yakworks']
+    }
 
 }

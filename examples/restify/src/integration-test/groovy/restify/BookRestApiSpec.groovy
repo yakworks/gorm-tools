@@ -7,20 +7,8 @@ import grails.transaction.Rollback
 @Integration
 @Rollback
 class BookRestApiSpec extends RestApiFuncSpec {
-
-    Class<Book> domainClass = Book
-    boolean vndHeaderOnError = false
-
-    String getResourcePath() {
-        "${baseUrl}api/book"
-    }
-
-    //data to force a post or patch failure
-    Map getInvalidData() { [title: null] }
-
-    Map postData = [title: "project"]
-
-    Map putData = [title: "project Update"]
-
+    String path = "api/book"
+    Map postData = [title: "foo"]
+    Map putData = [title: "updated foo"]
 
 }

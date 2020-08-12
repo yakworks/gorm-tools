@@ -4,9 +4,11 @@
 */
 package restify
 
-import restify.domain.OrgType
-import taskify.Project
-import taskify.Task
+import yakworks.taskify.domain.*
+
+// import restify.domain.OrgType
+// import taskify.Project
+// import taskify.Task
 
 class BootStrap {
     static Random rand = new Random()
@@ -15,21 +17,21 @@ class BootStrap {
         Project.withTransaction {
             (1..50).each {
                 def prod = Project.create([
+                    id: it,
                     name: "Fooinator-$it",
                     num: "$it",
                     activateDate: "2020-01-01",
                     startDate: "2020-01-01"
-                ])
+                ], bindId: true)
+                assert prod.id == it
                 def task = new Task(name: "task1-$it",
                     project: prod)
-                    .save(flush: true, failOnError: true)
+                    .persist()
                 def task2 = new Task(name: "task2-$it",
                     project: prod)
-                    .save(flush: true, failOnError: true)
-                new Foo(name: "OrgType-$it")
-                    .save(flush: true, failOnError: true)
+                    .persist()
                 new OrgType(name: "OrgType-$it")
-                    .save(flush: true, failOnError: true)
+                    .persist()
             }
            // (1..100).each {
            //     def task = new Task(name: "task-$it",

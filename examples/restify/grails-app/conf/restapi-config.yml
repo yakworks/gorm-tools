@@ -7,6 +7,7 @@ restApi:
       pickList: ['id', 'num', 'name']
   book:
     entityClass: restify.Book
+    qSearch: ['num', 'name']
     includes:
       default: ['*']
       list: ['id', 'num', 'name', 'billable']

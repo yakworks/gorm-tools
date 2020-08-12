@@ -160,17 +160,17 @@ class GormToolsPluginHelper {
     }
 
     /**
-     * Adds quickSearch fields to domains from config, if domain has such properties.
+     * Adds qSearch fields to domains from config, if domain has such properties.
      * Supports paths for nested domains, for example "address.city", so if domain has
      * association address and it has property city it will be added
      *
      * @param config config bean
      * @param grailsApplication grails application context
      */
-    static void addQuickSearchFields(List<String> fields, List<PersistentEntity> domains){
+    static void addQSearchFields(List<String> fields, List<PersistentEntity> domains){
         domains.each { domainClass ->
-            if (fields && !domainClass.getJavaClass().quickSearchFields) {
-                domainClass.getJavaClass().quickSearchFields = fields.findAll {
+            if (fields && !domainClass.getJavaClass().qSearchFields) {
+                domainClass.getJavaClass().qSearchFields = fields.findAll {
                     GormMetaUtils.hasProperty(domainClass, it as String)
                 }
             }

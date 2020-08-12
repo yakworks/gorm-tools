@@ -8,6 +8,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.apache.commons.lang3.EnumUtils
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -24,58 +25,79 @@ import grails.gorm.DetachedCriteria
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@SuppressWarnings(['FieldName'])
 @CompileStatic
 @Slf4j
 class MangoBuilder {
-    //DetachedCriteria criteria
 
-    static final Map<String, String> CompareOps = [
-        '$gt'    : 'gt',
-        '$eq'    : 'eq',
-        '$gte'   : 'ge',
-        '$lt'    : 'lt',
-        '$lte'   : 'le',
-        '$ne'    : 'ne',
-        '$not'   : 'not',
-        '$ilike' : 'ilike',
-        '$like'  : 'like',
-        '$in'    : 'in',
-        '$inList': 'inList'
-    ]
+    static final String SORT = '$sort'
+    static final String Q = '$q'
+    static final String QSEARCH = '$qSearch'
 
-    static final Map<String, String> PropertyOps = [
-        '$gtf' : 'gtProperty',
-        '$gtef': 'geProperty',
-        '$ltf' : 'ltProperty',
-        '$ltef': 'leProperty',
-        '$eqf' : 'eqProperty',
-        '$nef' : 'neProperty'
-    ]
+    @CompileStatic
+    enum CompareOp {
+        $gt, $eq, $gte, $lt, $lte, $ne, $not, $ilike, $like, $in, $inList
 
-    static final Map<String, String> OverrideOps = [
-        '$between': 'between',
-        '$nin'    : 'notIn'
-    ]
+        private final String op //private for security
+        String getOp(){ return op }
 
-    static final Map<String, String> JunctionOps = [
-        '$and': 'and',
-        '$or' : 'or',
-        '$not': 'not'
-    ]
+        CompareOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
 
-    static final Map<String, String> ExistOps = [
-        '$isNull'   : 'isNull',
-        '$isNotNull': 'isNotNull'
-    ]
+    @CompileStatic
+    enum PropertyOp {
+        $gtf('gtProperty'),
+        $gtef('geProperty'),
+        $ltf('ltProperty'),
+        $ltef('leProperty'),
+        $eqf('eqProperty'),
+        $nef('neProperty')
 
-    static final Map<String, String> QuickSearchOps = [
-        '$quickSearch': 'quickSearch',
-        '$q'          : 'quickSearch'
-    ]
+        private final String op //private for security
+        String getOp(){ return op }
 
-    static final Map<String, String> SortOps = [
-        '$sort': 'order'
-    ]
+        PropertyOp(String op) {
+            this.op = op
+        }
+    }
+
+    @CompileStatic
+    enum OverrideOp {
+        $between('between'),
+        $nin('notIn')
+
+        private final String op
+        String getOp(){ return op }
+
+        OverrideOp(String op) {
+            this.op = op
+        }
+    }
+
+    @CompileStatic
+    enum JunctionOp {
+        $and, $or, $not
+
+        private final String op //private for security
+        String getOp(){ return op }
+
+        JunctionOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
+
+    enum ExistOp {
+        $isNull, $isNotNull
+
+        private final String op
+        String getOp(){ return op }
+
+        ExistOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
 
     static <D> DetachedCriteria<D> build(Class<D> clazz, Map map, Closure callable = null) {
         DetachedCriteria<D> detachedCriteria = new DetachedCriteria<D>(clazz)
@@ -113,17 +135,27 @@ class MangoBuilder {
     static void applyMap(DetachedCriteria criteria, Map mangoMap) {
         log.debug "applyMap $mangoMap"
         for (String key : mangoMap.keySet()) {
-            String op = JunctionOps[key]
-            if (op) {
-                //normalizer should have ensured all ops have a List for a value
-                //List args = [criteria, (List) mangoMap[key]]
-                invoke(op, criteria, (List) mangoMap[key])
-                //MangoBuilder.metaClass.invokeStaticMethod(MangoBuilder, op, args)
-                //"$op"(criteria, (List) mangoMap[key])
+            def val = mangoMap[key]
+
+            if(key == SORT) {
+                order(criteria, val)
                 continue
-            } else { //it must be a field then
-                applyField(criteria, key, mangoMap[key])
             }
+
+            if(key == QSEARCH || key == Q) {
+                qSearch(criteria, val)
+                continue
+            }
+
+            JunctionOp jop = EnumUtils.getEnum(JunctionOp, key)
+            if (jop) {
+                //tidyMap should have ensured all ops have a List for a value
+                invoke(jop.op, criteria, (List) val)
+                continue
+            }
+
+            //it must be a field then
+            applyField(criteria, key, mangoMap[key])
         }
     }
 
@@ -132,32 +164,16 @@ class MangoBuilder {
     }
 
     static void applyField(DetachedCriteria criteria, String field, Object fieldVal) {
-        String qs = QuickSearchOps[field]
-        if (qs) {
-            invoke(qs, criteria, fieldVal)
-            //this."$qs"(criteria, fieldVal)
-            return
-        }
-
-        String sort = SortOps[field]
-        if (sort) {
-            order(criteria, fieldVal)
-            // if prop is $sort do not go further, because in other case it will be considered as entity
-            // property and will fail entity wont have such field
-            return
-        }
 
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
 
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
         if (prop instanceof Association) {
-            //invoke(field, criteria, fieldVal)
             criteria.invokeMethod(field){
                 //the delegate is the DetachedAssocationCriteria. See methodMissing in AbstractDetachedCriteria
                 applyMapOrList((DetachedCriteria) delegate, fieldVal)
                 return
             }
-
         }
         // if field ends in Id then try removing the Id postfix and see if its a property
         else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
@@ -171,43 +187,38 @@ class MangoBuilder {
                 //everything has to either be either a junction op or condition
                 Object opArg = fieldVal[key]
 
-                String op = JunctionOps[key]
-                if (op) {
+                JunctionOp jop = EnumUtils.getEnum(JunctionOp, key)
+                if (jop) {
                     //normalizer should have ensured all ops have a List for a value
-                    invoke(op, criteria, (List) opArg)
-                    //this."$op"(criteria, (List) opArg)
+                    invoke(jop.op, criteria, (List) opArg)
                     continue
                 }
 
-                op = OverrideOps[key]
-                if (op) {
-                    invoke(op, criteria, field, toType(criteria, field, opArg))
-                    //this."$op"(criteria, field, toType(criteria, field, opArg))
+                OverrideOp oop = EnumUtils.getEnum(OverrideOp, key)
+                if (oop) {
+                    invoke(oop.op, criteria, field, toType(criteria, field, opArg))
                     continue
                 }
 
-                op = CompareOps[key]
-                if (op) {
+                CompareOp cop = EnumUtils.getEnum(CompareOp, key) // CompareOp.valueOf(key)
+                if (cop) {
                     if (opArg == null) {
                         criteria.isNull(field)
                         continue
                     }
-                    criteria.invokeMethod(op, [field, toType(criteria, field, opArg)])
-                    //criteria."$op"(field, toType(criteria, field, opArg))
+                    criteria.invokeMethod(cop.op, [field, toType(criteria, field, opArg)])
                     continue
                 }
 
-                op = PropertyOps[key]
-                if (op) {
-                    criteria.invokeMethod(op, [field, opArg])
-                    //criteria."$op"(field, opArg)
+                PropertyOp pop = EnumUtils.getEnum(PropertyOp, key)
+                if (pop) {
+                    criteria.invokeMethod(pop.op, [field, opArg])
                     continue
                 }
 
-                op = ExistOps[key]
-                if (op) {
-                    criteria.invokeMethod(op, field)
-                    //criteria."$op"(field)
+                ExistOp eop = EnumUtils.getEnum(ExistOp, key)
+                if (eop) {
+                    criteria.invokeMethod(eop.op, field)
                     continue
                 }
             }
@@ -226,27 +237,40 @@ class MangoBuilder {
         if (sort instanceof String) return criteria.order(sort as String)
         DetachedCriteria result
         (sort as Map).each { k, v ->
-            //jqgrid, for example supports multisorting as `sort = id asc, num desc, name` and `order = asc` which coresponds to the last field
-            if (k.toString().contains(',')){
-                String ordering = k.toString() + " $v"
-                ordering.split(",").each { String order ->
-                    String[] sortFields = order.trim().split(" ")
-                    result = criteria.order(sortFields[0], sortFields[1])
-                }
-            } else {
-                result = criteria.order(k.toString(), v.toString())
-            }
+            result = criteria.order(k.toString(), v.toString())
         }
         return result
     }
 
-    //@CompileDynamic
-    static DetachedCriteria quickSearch(DetachedCriteria criteria, String value) {
+    static DetachedCriteria qSearch(DetachedCriteria criteria, Object val) {
+        List<String> qSearchFields
+        String qText
+        // if its a map then assume its got the text and fields to search on
+        if(val instanceof Map){
+            qText = val['text'] as String
+            qSearchFields = val['fields'] as List<String>
+        } else if (QueryMangoEntity.isAssignableFrom(getTargetClass(criteria))){
+            qText = val as String
+            qSearchFields = getQSearchFields(criteria)
+        }
+
+        if(qSearchFields) {
+            Map<String, String> orMap = qSearchFields.collectEntries {
+                [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? qText + '%' : qText)]
+            }
+            def criteriaMap = ['$or': orMap] as Map<String, Object>
+            // println "criteriaMap $criteriaMap"
+            return applyMap(criteria, MangoTidyMap.tidy(criteriaMap))
+        }
+    }
+
+    static DetachedCriteria qSearchold(DetachedCriteria criteria, String value) {
         if(QueryMangoEntity.isAssignableFrom(getTargetClass(criteria))){
-            Map<String, String> orMap = getQuickSearchFields(criteria).collectEntries {
+            Map<String, String> orMap = getQSearchFields(criteria).collectEntries {
                 [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value + "%" : value)]
             }
             def criteriaMap = ['$or': orMap] as Map<String, Object>
+            println "criteriaMap $criteriaMap"
             return applyMap(criteria, MangoTidyMap.tidy(criteriaMap))
         }
 
@@ -258,8 +282,8 @@ class MangoBuilder {
     }
 
     @CompileDynamic //dynamic so we can access the protected targetClass.quickSearchFields
-    static List<String>  getQuickSearchFields(DetachedCriteria criteria) {
-        criteria.targetClass.quickSearchFields
+    static List<String>  getQSearchFields(DetachedCriteria criteria) {
+        criteria.targetClass.qSearchFields
     }
 
     @CompileDynamic

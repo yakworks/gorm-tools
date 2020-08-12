@@ -35,19 +35,4 @@ trait MangoControllerApi {
         getMangoApi().query(criteriaParams + params, closure)
     }
 
-    List query(Pager pager, Map p = [:]) {
-        ['max', 'offset', 'page'].each{ String k ->
-            p[k] = pager[k]
-        }
-        //fix up quickSearch
-        if(p['q']) p['$q'] = p['q']
-        //clean up sort if passed the jqgrid way
-        if(p['sort'] && p['order']) {
-            Map newSort = [:]
-            newSort[p.sort] = p.remove('order')
-            p.sort = newSort
-        }
-        getMangoApi().query(p)
-    }
-
 }

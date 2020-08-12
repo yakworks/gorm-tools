@@ -6,6 +6,8 @@ package gorm.tools.mango
 
 import groovy.transform.CompileStatic
 
+import org.apache.commons.lang3.EnumUtils
+
 /**
  * Utils to normalizes params map to transform it to mango language
  */
@@ -37,7 +39,9 @@ class MangoTidyMap {
      * @return extended map
      */
     static Map pathToMap(String path, Object val, Map map) {
-        if (path.contains(".")) {
+        if (path == MangoBuilder.SORT) {
+            return tidySort(path, val, map)
+        } else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
             //get first thing in dot ex: foo.bar this will be foo
             String newKey = splitPath[0]
@@ -46,9 +50,9 @@ class MangoTidyMap {
             pathToMap(newPath, val, map[newKey] as Map)
         }
         else {
-            if (!map[path]) map[path] = [:]
             //we should check if nested values have composed keys("customer.address.id")
             if (val instanceof Map) {
+                if (!map[path]) map[path] = [:]
                 (val as Map).each {
                     pathToMap(it.key as String, it.value, map[path] as Map)
                 }
@@ -56,7 +60,7 @@ class MangoTidyMap {
                 map[path] = val
             }
         }
-        map
+        return map
     }
 
     /**
@@ -69,7 +73,7 @@ class MangoTidyMap {
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
-            if (MangoBuilder.JunctionOps.keySet().contains(key)) {
+            if (EnumUtils.isValidEnum(MangoBuilder.JunctionOp, key as String)) {
                 if (val instanceof Map) {
                     result[key] = (val as Map).collect { k, v -> tidy([(k.toString()): v]) }
                     return
@@ -80,11 +84,12 @@ class MangoTidyMap {
                     return
                 }
             }
-            if (val instanceof Map && !MangoBuilder.SortOps.keySet().contains(key)) {
+            if (val instanceof Map && key != MangoBuilder.SORT) {
                 toMangoOperator(val as Map, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {
-                    result[key] = val; return
+                    result[key] = val
+                    return
                 } //if we already have Mango method
                 if (val instanceof List) {
                     List valAsList = val as List
@@ -102,7 +107,8 @@ class MangoTidyMap {
                     result[key]['$ilike'] = val
                     return
                 }
-                if (MangoBuilder.ExistOps.keySet().contains(val)) {
+
+                if (EnumUtils.isValidEnum(MangoBuilder.ExistOp, val as String)) {
                     (result[key] as Map)[val] = true
                 } else {
                     result[key]['$eq'] = val
@@ -111,6 +117,25 @@ class MangoTidyMap {
         }
         result
 
+    }
+
+    static Map tidySort(String path, Object val, Map map) {
+        if (val instanceof String) {
+            String sval = (val as String).trim()
+            if (sval.contains(',') || sval.contains(' ')) {
+                Map<String, String> sortMap = [:]
+                sval.split(",").each { String item ->
+                    String[] sorting = item.trim().split(" ")
+                    sortMap[(sorting[0])] = sorting[1] ?: 'asc'
+                }
+                map[path] = sortMap
+            } else {
+                map[path] = sval
+            }
+        } else {
+            map[path] = val
+        }
+        return map
     }
 
 }

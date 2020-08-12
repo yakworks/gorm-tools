@@ -16,10 +16,10 @@ class MangoSpec extends Specification {
 
     def "Filter by Name eq"() {
         when:
-        List list = Org.query([name: "Org#23"])
+        List list = Org.query([name: "Org23"])
         then:
         list.size() == 1
-        list[0].name == "Org#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by id eq"() {
@@ -27,7 +27,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query(id: 24)
         then:
         list.size() == 1
-        list[0].name == "Org#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by id inList"() {
@@ -35,17 +35,17 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [id: [24, 25]], max: 150])
         then:
         list.size() == 2
-        list[0].name == "Org#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by Name ilike"() {
         when: "eq"
-        List list = Org.repo.query([criteria: [name: "Org#2%"], max: 150])
+        List list = Org.repo.query([criteria: [name: "Org2%"], max: 150])
         then:
         list.size() == 11
-        list[0].name == "Org#2"
-        list[1].name == "Org#20"
-        list[10].name == "Org#29"
+        list[0].name == "Org2"
+        list[1].name == "Org20"
+        list[10].name == "Org29"
     }
 
     def "Filter by nested id"() {
@@ -53,7 +53,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [address: [id: 2]], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#1"
+        list[0].name == "Org1"
         list[0].address.id == 2
     }
 
@@ -62,7 +62,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: ["address.id": 2], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#1"
+        list[0].name == "Org1"
         list[0].address.id == 2
     }
 
@@ -71,26 +71,26 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [address: [id: [24, 25, 26]]], max: 150])
         then:
         list.size() == 3
-        list[0].name == "Org#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by nested string"() {
         when: "eq"
-        List list = Org.repo.query([criteria: [address: [city: "City#2"]], max: 150])
+        List list = Org.repo.query([criteria: [address: [city: "City2"]], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#2"
+        list[0].name == "Org2"
         list[0].address.id == 3
     }
 
     def "Filter by nested string ilike"() {
         when: "eq"
-        List list = Org.repo.query([criteria: [address: [city: "City#2%"]], max: 150])
+        List list = Org.repo.query([criteria: [address: [city: "City2%"]], max: 150])
         then:
         list.size() == 11
-        list[0].name == "Org#2"
-        list[1].name == "Org#20"
-        list[10].name == "Org#29"
+        list[0].name == "Org2"
+        list[1].name == "Org20"
+        list[10].name == "Org29"
         list[0].address.id == 3
         list[1].address.id == 21
         list[10].address.id == 30
@@ -117,7 +117,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [revenue: 200.0], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#2"
+        list[0].name == "Org2"
     }
 
     def "Filter by BigDecimal in list"() {
@@ -125,8 +125,8 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [revenue: [200.0, 500.0]], max: 150])
         then:
         list.size() == 2
-        list[0].name == "Org#2"
-        list[1].name == "Org#5"
+        list[0].name == "Org2"
+        list[1].name == "Org5"
     }
 
     def "Filter by Date"() {
@@ -134,7 +134,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [testDate: (new Date() + 1).clearTime()], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#1"
+        list[0].name == "Org1"
     }
 
     def "Filter by Date le"() {
@@ -150,7 +150,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [refId: 200], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#1"
+        list[0].name == "Org1"
     }
 
     def "Filter by xxxId 2"() {
@@ -159,7 +159,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: ["address.testId": 9], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#3"
+        list[0].name == "Org3"
     }
 
 
@@ -168,7 +168,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [address: [testId: 3]], max: 150])
         then:
         list.size() == 1
-        list[0].name == "Org#1"
+        list[0].name == "Org1"
     }
 
     def "Filter by xxxId 4"() {
@@ -176,7 +176,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: ["address.testId": [9, 12]], max: 150])
         then:
         list.size() == 2
-        list[0].name == "Org#3"
+        list[0].name == "Org3"
     }
 
     def "Filter by xxxId 4 criteria as JSON"() {
@@ -186,31 +186,31 @@ class MangoSpec extends Specification {
         List list = Org.repo.query(params)
         then:
         list.size() == 2
-        list[0].name == "Org#3"
+        list[0].name == "Org3"
     }
 
 
     def "Filter with `or` "() {
         when:
-        List list = Org.repo.query([criteria: ['$or': ["name": "Org#1", "address.id": 4]], max: 150])
+        List list = Org.repo.query([criteria: ['$or': ["name": "Org1", "address.id": 4]], max: 150])
         then:
         list.size() == 2
-        list[0].name == "Org#1"
-        list[1].name == "Org#3"
+        list[0].name == "Org1"
+        list[1].name == "Org3"
     }
 
     def "Filter with `or` on low level"() {
         when:
-        List list = Org.repo.query([criteria: [address: ['$or': ["city": "City#1", "id": 4]]], max: 150])
+        List list = Org.repo.query([criteria: [address: ['$or': ["city": "City1", "id": 4]]], max: 150])
         then:
         list.size() == 2
-        list[0].name == "Org#1"
-        list[1].name == "Org#3"
+        list[0].name == "Org1"
+        list[1].name == "Org3"
     }
 
     def "Filter with several `or` on one level"() {
         when:
-        List list = Org.repo.query([criteria: ['$or': [["address.id": 5], ["name": "Org#1", "address.id": 4]]], max: 150])
+        List list = Org.repo.query([criteria: ['$or': [["address.id": 5], ["name": "Org1", "address.id": 4]]], max: 150])
         then:
         list.size() == Org.createCriteria().list() {
             or {
@@ -218,14 +218,14 @@ class MangoSpec extends Specification {
                     eq "id", 5L
                 }
                 and {
-                    eq "name", "Org#1"
+                    eq "name", "Org1"
                     address {
                         eq "id", 4L
                     }
                 }
             }
         }.size()
-        list[0].name == "Org#4"
+        list[0].name == "Org4"
     }
 
     def "Filter with several `or` on one level2"() {
@@ -244,17 +244,17 @@ class MangoSpec extends Specification {
             }
         }.size()
         list.size() == 2
-        list[1].name == "Org#4"
+        list[1].name == "Org4"
     }
 
     def "Filter with `or` with like"() {
         when:
-        List list = Org.repo.query([criteria: ["\$or": ["name": "Org#2%", "address.id": 4]], max: 150]).sort { it.id }
+        List list = Org.repo.query([criteria: ["\$or": ["name": "Org2%", "address.id": 4]], max: 150]).sort { it.id }
         then:
         list.size() == 12
-        list[0].name == "Org#2"
-        list[1].name == "Org#3"
-        list[2].name == "Org#20"
+        list[0].name == "Org2"
+        list[1].name == "Org3"
+        list[2].name == "Org20"
     }
 
     def "Filter with `between()`"() {
@@ -262,9 +262,9 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [id: ["\$between": [2, 10]]], max: 150]).sort { it.id }
         then:
         list.size() == 9
-        list[0].name == "Org#1"
-        list[1].name == "Org#2"
-        list[-1].name == "Org#9"
+        list[0].name == "Org1"
+        list[1].name == "Org2"
+        list[-1].name == "Org9"
     }
 
     def "Filter with `in()`"() {
@@ -272,7 +272,7 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [id: ["\$in": [24, 25]]], max: 150]).sort { it.id }
         then:
         list.size() == 2
-        list[0].name == "Org#23"
+        list[0].name == "Org23"
     }
 
     def "Filter with `inList()`"() {
@@ -280,17 +280,17 @@ class MangoSpec extends Specification {
         List list = Org.repo.query([criteria: [id: ["\$inList": [24, 25]]], max: 150]).sort { it.id }
         then:
         list.size() == 2
-        list[0].name == "Org#23"
+        list[0].name == "Org23"
     }
 
     def "Filter by Name ilike()"() {
         when:
-        List list = Org.repo.query([criteria: [name: ["\$ilike": "Org#2%"]], max: 150])
+        List list = Org.repo.query([criteria: [name: ["\$ilike": "Org2%"]], max: 150])
         then:
         list.size() == 11
-        list[0].name == "Org#2"
-        list[1].name == "Org#20"
-        list[10].name == "Org#29"
+        list[0].name == "Org2"
+        list[1].name == "Org20"
+        list[10].name == "Org29"
     }
 
     def "Filter with `gt()`"() {
@@ -442,14 +442,14 @@ class MangoSpec extends Specification {
 
         then:
         list.size() == 2
-        list[0].name == "Org#23"
-        list[1].name == "Org#24"
+        list[0].name == "Org23"
+        list[1].name == "Org24"
 
     }
 
     def "test quick search"() {
         when:
-        List list = Org.repo.query([criteria: ['$quickSearch': "Org#2%"], max: 150])
+        List list = Org.repo.query([criteria: ['$qSearch': "Org2%"], max: 150])
         then:
         list.size() == 11
 
@@ -458,6 +458,6 @@ class MangoSpec extends Specification {
     def "test quick search fields"() {
         expect:
         //Student has name property, and due to the fact that Student has relation to Jumper and it has property name
-        Student.quickSearchFields == ["name", "jumper.name"]
+        Student.qSearchFields == ["name", "jumper.name"]
     }
 }

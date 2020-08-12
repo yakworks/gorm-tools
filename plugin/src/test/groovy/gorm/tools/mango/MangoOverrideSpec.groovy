@@ -25,7 +25,7 @@ class MangoOverrideSpec extends Specification implements GormToolsTest {
     void testMangoOverride() {
         setup:
         10.times {
-            City city = new City(id: it, name: "Name#$it")
+            City city = new City(id: it, name: "Name$it")
             city.save(failOnError: true)
         }
 

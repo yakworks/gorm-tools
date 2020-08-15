@@ -12,6 +12,7 @@ import spock.lang.IgnoreRest
 import testing.Location
 import testing.Nested
 import testing.Org
+import testing.TestIdent
 import testing.TestSeedData
 
 class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
@@ -53,6 +54,51 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
         then:
         res.size() == 1
+    }
+
+    //@IgnoreRest
+    def "test enum kind"() {
+        when:
+        List res = build([kind: "CLIENT"]).list()
+
+        then:
+        res.size() == 5
+
+        when:
+        res = build([kind: ['CLIENT', 'COMPANY']]).list()
+
+        then:
+        res.size() == 10
+    }
+
+    def "test enum testIdent"() {
+        when:
+        List res = build(['testIdent': 'Num2']).list()
+
+        then:
+        res.size() == 5
+
+    }
+
+    def "test enum testIdent with id"() {
+        when: 'sanity check'
+        List res = build(['testIdent': TestIdent.Num2]).list()
+
+        then:
+        res.size() == 5
+
+        when:
+        res = build(['testIdent': 2]).list()
+
+        then:
+        res.size() == 5
+
+        when:
+        res = build(['testIdent': [2,4]]).list()
+
+        then:
+        res.size() == 10
+
     }
 
     def "test closure"() {

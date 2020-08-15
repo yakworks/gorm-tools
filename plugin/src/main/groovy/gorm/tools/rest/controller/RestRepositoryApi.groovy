@@ -170,7 +170,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List incs = getIncludes(includesKey)
-        pager.setupData(dlist, incs)
+        return pager.setupData(dlist, incs)
     }
 
     List query(Pager pager, Map p = [:]) {

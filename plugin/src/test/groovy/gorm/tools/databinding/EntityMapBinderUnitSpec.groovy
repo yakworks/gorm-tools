@@ -4,13 +4,18 @@
 */
 package gorm.tools.databinding
 
+import groovy.transform.CompileStatic
+
 import gorm.tools.beans.IsoDateUtil
 import gorm.tools.testing.unit.DataRepoTest
+import gorm.tools.traits.IdEnum
 import grails.databinding.converters.ValueConverter
 import grails.persistence.Entity
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
+
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -349,6 +354,35 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         GrailsHibernateUtil.isInitialized(testDomainWithProxy, 'notBindableNested')
         nestedName == 'proxy'
     }
+
+    void "test enums"() {
+        given:
+
+        TestDomain testDomain = new TestDomain()
+        Map params = [testEnum: "FOO", enumSub:"BAR"]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.testEnum == TestEnum.FOO
+        testDomain.enumSub == TestDomain.EnumSub.BAR
+    }
+
+    // @IgnoreRest
+    void "test enums identity"() {
+        given:
+
+        TestDomain testDomain = new TestDomain()
+        Map params = [enumIdent: 2]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        TestEnumIdent.get(2) == TestEnumIdent.Num2
+        testDomain.enumIdent == TestEnumIdent.Num2
+    }
 }
 
 
@@ -368,6 +402,10 @@ class TestDomain {
     AnotherDomain anotherDomain
     Nested nested
 
+    TestEnum testEnum
+    EnumSub enumSub
+    TestEnumIdent enumIdent
+
     // constraints contain explicit "bindable:true"
     BindableNested bindableNested
     // constraints doesn't contain bindable property and there is no cascading stuff between TestDomain and BindableNested,
@@ -380,6 +418,28 @@ class TestDomain {
         anotherDomain nullable: true
         bindableNested bindable:true
     }
+    static mapping = {
+        enumIdent enumType: 'identity'
+    }
+
+    enum EnumSub {FOO, BAR}
+
+}
+
+enum TestEnum {FOO, BAR}
+
+@CompileStatic
+enum TestEnumIdent implements IdEnum<TestEnumIdent,Long>{
+    Num2(2), Num4(4)
+    final Long id
+
+    TestEnumIdent(Long id) { this.id = id }
+
+    // static final Map map = values().collectEntries { [(it.id): it]} as TreeMap
+    //
+    // static TestEnumIdent get(Long id) {
+    //     return map[id]
+    // }
 }
 
 @Entity

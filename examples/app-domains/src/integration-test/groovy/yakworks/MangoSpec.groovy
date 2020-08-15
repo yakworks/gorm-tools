@@ -378,6 +378,22 @@ class MangoSpec extends Specification {
         list.size() == Org.createCriteria().list() { not { inList "id", [2L, 3L, 4L, 5L] } }.size()
     }
 
+    def "Filter on enums"() {
+        when:
+        List list = Org.query([criteria: [kind: ['$in': ['CLIENT', 'VENDOR']]], max: 150])
+        then:
+        list.size() == 98
+    }
+
+    def "Filter on identity enum"() {
+        when:
+        // 3 does ot exists, should show 50 as half have 1
+        List list = Org.query([criteria: [status: ['$in': [1, 3]]], max: 150])
+
+        then:
+        list.size() == 50
+    }
+
     def "test paging, defaults"() {
         when:
         List list = Org.query([:])

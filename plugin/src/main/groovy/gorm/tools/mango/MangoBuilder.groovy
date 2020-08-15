@@ -25,7 +25,7 @@ import grails.gorm.DetachedCriteria
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-@SuppressWarnings(['FieldName'])
+@SuppressWarnings(['FieldName', 'ConfusingMethodName']) //codenarc doesn't like the names we use to make this builder clean
 @CompileStatic
 @Slf4j
 class MangoBuilder {
@@ -88,6 +88,7 @@ class MangoBuilder {
         }
     }
 
+    @CompileStatic
     enum ExistOp {
         $isNull, $isNotNull
 
@@ -347,22 +348,41 @@ class MangoBuilder {
             return value.collect { toType(criteria, propertyName, it) }
         }
         PersistentProperty prop = criteria.getPersistentEntity().getPropertyByName(propertyName)
-        Class typeToConvertTo = prop?.getType()
+        Class typeToConvertTo = prop?.getType() as Class
 
-        Object valueToAssign = value
+        Object v = value
 
-        if (valueToAssign instanceof String) {
+        if (v instanceof String) {
             if (String.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = value
+                v = value
             } else if (Number.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = (value as String).asType(typeToConvertTo)
+                v = (value as String).asType(typeToConvertTo as Class<Number>)
             } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parse(value as String)
+                v = IsoDateUtil.parse(value as String)
+            } else if (typeToConvertTo.isEnum()) {
+                v = getEnum(typeToConvertTo, v)
             }
-        } else {
-            valueToAssign = valueToAssign.asType(typeToConvertTo)
+        }
+        else if (typeToConvertTo.isEnum() && v instanceof Number){
+            v = getEnumWithGet(typeToConvertTo, v)
+        }
+        else {
+            v = v.asType(typeToConvertTo)
         }
 
-        valueToAssign
+        return v
+    }
+
+    //FIXME clean this up so its a compile static
+    @CompileDynamic
+    static def getEnum(Class typeToConvertTo, Object val){
+       return EnumUtils.getEnum(typeToConvertTo, val)
+    }
+
+    //FIXME clean this up so its a compile static
+    @CompileDynamic
+    static def getEnumWithGet(Class<?> enumClass, Number id){
+        //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
+        return enumClass.get(id)
     }
 }

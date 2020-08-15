@@ -64,7 +64,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         def res = Jsonify.render(org)
 
         then:
-        res.jsonText == '{"id":1,"inactive":false,"name":"name","type":{"id":1}}'
+        res.jsonText == '{"id":1,"inactive":false,"kind":"CLIENT","testIdent":"Num2","name":"name","type":{"id":1}}'
 
     }
 
@@ -185,7 +185,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         def result = Jsonify.render(build(), [includes: ["*"]])
 
         then: //TODO: double id issue
-        result.jsonText == '{"id":1,"inactive":false,"name":"name"}'
+        result.jsonText == '{"id":1,"inactive":false,"kind":"CLIENT","testIdent":"Num2","name":"name"}'
 
     }
 

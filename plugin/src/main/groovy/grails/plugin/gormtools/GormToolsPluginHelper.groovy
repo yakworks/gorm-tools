@@ -25,10 +25,8 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.rest.JsonSchemaGenerator
 import gorm.tools.rest.RestApi
-import gorm.tools.rest.appinfo.AppInfoBuilder
 import gorm.tools.support.MsgService
 import grails.core.ArtefactHandler
-import grails.core.ArtefactInfo
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass

@@ -8,6 +8,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
@@ -133,6 +134,7 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         List includeList = (List) args["include"] ?: getBindingIncludeList(target)
         Boolean errorHandling = args["errorHandling"] == null ? true : args["errorHandling"]
+
         if (errorHandling) {
             bind target, new SimpleMapDataBindingSource(source), null, includeList, null, null
         } else {
@@ -187,10 +189,10 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         Object propValue = source.getPropertyValue(prop.name)
         Object valueToAssign = propValue
+        Class typeToConvertTo = prop.getType() as Class
 
         if (propValue instanceof String) {
             String sval = propValue as String
-            Class typeToConvertTo = prop.getType() as Class
             //do we have tests for this?
             if (String.isAssignableFrom(typeToConvertTo)) {
                 sval = sval.trim()
@@ -209,9 +211,11 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                 ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
                 if (converter) {
+                    println("using converter $converter")
                     valueToAssign = converter.convert(propValue)
                 }
             } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
+                println("in conversionService")
                 valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
 
@@ -219,10 +223,29 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
 
         } else if (prop instanceof Association) {
             bindAssociation(target, valueToAssign, (Association) prop, listener, errors)
-        } else {
+        }
+        else if (conversionHelpers.containsKey(typeToConvertTo)) {
+            List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
+            ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
+            if (converter) {
+                target[prop.name] = converter.convert(propValue)
+            }
+        }
+        else if (typeToConvertTo.isEnum() && valueToAssign instanceof Number){
+            // assume its an enum with a get(id)
+            target[prop.name] = getEnumWithGet(typeToConvertTo, valueToAssign)
+        }
+        else {
             target[prop.name] = valueToAssign
         }
 
+    }
+
+    //FIXME clean this up so its a compile static
+    @CompileDynamic
+    def getEnumWithGet(Class<?> enumClass, Number id){
+        //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
+        return enumClass.get(id)
     }
 
     /**

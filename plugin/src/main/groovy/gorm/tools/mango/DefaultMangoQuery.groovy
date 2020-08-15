@@ -102,7 +102,7 @@ class DefaultMangoQuery implements MangoQuery {
         Map paramCopy = [:]
         paramCopy.putAll(params)
 
-        if(params[criteriaKeyName]) {
+        if(params[criteriaKeyName] && params[criteriaKeyName] != 'null') {
             if (params[criteriaKeyName] instanceof String) {
                 JSON.use('deep')
                 result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map

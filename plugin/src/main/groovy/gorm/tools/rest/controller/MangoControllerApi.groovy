@@ -7,7 +7,6 @@ package gorm.tools.rest.controller
 //import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.Pager
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.api.RepositoryApi
 import grails.gorm.DetachedCriteria

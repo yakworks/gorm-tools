@@ -35,17 +35,26 @@ class Org implements NameTrait{
     //Associations
     OrgType type //type is required
     Location location //belongs to whatever
-    OrgExt ext //<- ext belong to org
+
     // since OrgExt also has an Org property (orgParent) it gets confused and
     // needs to know that its "belongs" to is the map and that orgParent gets set sepearatly
+    OrgExt ext //<- ext belong to org
     static mappedBy = [ext: "org"]
 
     //used for event testing
     String event
 
+    //enums
+    Kind kind
+    OrgStatus status
+
+    @CompileDynamic //bug in grailsCompileStatic requires this on internal enums
+    enum Kind {CLIENT, VENDOR, PARENT}
+
     static mapping = {
         //id generator:'assigned'
         ext column: 'extId'
+        status enumType: 'identity'
     }
 
     static List qSearchFields = ["name"]

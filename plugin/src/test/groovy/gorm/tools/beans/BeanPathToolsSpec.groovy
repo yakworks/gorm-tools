@@ -4,31 +4,31 @@
 */
 package gorm.tools.beans
 
-import gorm.tools.testing.unit.GormToolsTest
-import grails.persistence.Entity
-import grails.web.servlet.mvc.GrailsParameterMap
+
 import org.springframework.mock.web.MockHttpServletRequest
 
-import spock.lang.IgnoreRest
+import gorm.tools.beans.domain.*
+import gorm.tools.testing.unit.GormToolsTest
+import grails.web.servlet.mvc.GrailsParameterMap
+import spock.lang.Ignore
 import spock.lang.Specification
-import testing.Org
 
 class BeanPathToolsSpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains TestClazzA, TestClazzB, TestClazzC
+        mockDomains Bookz, BookAuthor, EnumThing
     }
 
     //List<Class> getDomainClasses() { [TestClazzA, TestClazzB, TestClazzC] }
 
     void "Can get property value for a basic class"() {
         setup:
-        def obj = new TestClazzA(
-            foo: '1111',
-            bar: -12.52,
-            baz: null,
-            bazList: ["1", "test", "foo"],
+        def obj = new Bookz(
+            name: '1111',
+            cost: -12.52,
+            enumThings: null,
+            stringList: ["1", "test", "foo"],
             bazMap: ["testKey": 1, "oneMore": 2]
         )
         expect:
@@ -36,133 +36,119 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
 
         where:
         exp                          | path
-        '1111'                       | 'foo'
-        -12.52                       | 'bar'
-        null                         | 'baz'
-        ["1", "test", "foo"]         | 'bazList'
+        '1111'                       | 'name'
+        -12.52                       | 'cost'
+        null                         | 'enumThings'
+        ["1", "test", "foo"]         | 'stringList'
         ["testKey": 1, "oneMore": 2] | 'bazMap'
+    }
+
+    BookAuthor makeBookAuthor(){
+        return new BookAuthor(
+            age: 5,
+            book: new Bookz(
+                name: 'atlas',
+                stringList: ["foo"],
+            ),
+            bookAuthor: new BookAuthor(
+                bookAuthor: new BookAuthor(
+                    age: 2
+                ),
+                book: new Bookz(
+                    name: 'shrugged',
+                    cost: 4,
+                    bazMap: ["test": 1]
+                )
+            )
+        )
     }
 
     void "Can get property value for a class hierarchy"() {
         setup:
-        def obj = new TestClazzB(
-            left: new TestClazzA(
-                foo: '1',
-                bazList: ["foo"]
-            ),
-            right: new TestClazzB(
-                right: new TestClazzB(
-                    value: 2
-                ),
-                left: new TestClazzA(
-                    foo: '3',
-                    bar: 4,
-                    bazMap: ["test": 1]
-                )
-            ),
-            value: 5
-        )
+        def obj = makeBookAuthor()
 
         expect:
         exp == BeanPathTools.getFieldValue(obj, path)
 
         where:
         exp         | path
-        5           | 'value'
-        '1'         | 'left.foo'
-        ["foo"]     | 'left.bazList'
-        2           | 'right.right.value'
-        4           | 'right.left.bar'
-        ["test": 1] | 'right.left.bazMap'
-        null        | 'right.left.bazList'
+        5           | 'age'
+        'atlas'     | 'book.name'
+        ["foo"]     | 'book.stringList'
+        2           | 'bookAuthor.bookAuthor.age'
+        4           | 'bookAuthor.book.cost'
+        ["test": 1] | 'bookAuthor.book.bazMap'
+        null        | 'bookAuthor.book.enumThings'
     }
 
     void "Get properties by path"() {
         setup:
-        def obj = new TestClazzB(
-            left: new TestClazzA(
-                foo: '1'
-            ),
-            right: new TestClazzB(
-                right: new TestClazzB(
-                    value: 2
-                ),
-                left: new TestClazzA(
-                    foo: '3',
-                    bar: 4
-                )
-            ),
-            value: 7
-        )
+        def obj = makeBookAuthor()
+
         expect:
         Map act = [:]
         exp == BeanPathTools.propsToMap(obj, path, act)
         exp == act
+
         where:
-        path                | exp
-        'value'             | [value: 7]
-        'value1'            | [:]
-        'left.foo'          | [left: [foo: '1']]
-        'left1.foo'         | [:]
-        'right.right.value' | [right: [right: [value: 2]]]
-        'right.left.value1' | [right: [left: [:]]]
-        'right.left.bar'    | [right: [left: [bar: 4]]]
-        'right.left.*'      | [right: [left: [bar: 4, foo: '3', id: 1, version: null, bazMap: null, bazList: null]]]
-        'right.*'           | [right: [id: 2, value: 0, version: null]]
+        path                        | exp
+        'age'                       | [age: 5]
+        'badField'                  | [:]
+        'book.name'                 | [book: [name: 'atlas']]
+        'bad1.foo'                  | [:]
+        'bookAuthor.bookAuthor.age' | [bookAuthor: [bookAuthor: [age: 2]]]
+        'bookAuthor.book.bad'       | [bookAuthor: [book: [:]]]
+        'bookAuthor.book.cost'      | [bookAuthor: [book: [cost: 4]]]
+        'bookAuthor.book.*'         | [bookAuthor: [book: [cost: 4, name: 'shrugged', id: 1, version: null, bazMap: [test: 1], stringList: null]]]
+        'bookAuthor.*'              | [bookAuthor: [id: 2, age: 0, version: null]]
     }
 
+    @Ignore
     void "Check if nested object not in the db"() {
         setup:
-        def obj = new TestClazzB(
-            left: new TestClazzA(
-                foo: '1'
-            ).save(flush: true),
-            right: new TestClazzB(
-                right: new TestClazzB(
-                    value: 2
-                ),
-                left: new TestClazzA(
-                    foo: '3',
-                    bar: 4
-                )
-            ),
-            value: 7
-        ).save()
-        TestClazzA.repo.removeById(obj.left.id)
-        TestClazzA.repo.flush()
+        def obj = makeBookAuthor().save(flush: true)
+        Bookz.repo.removeById(obj.book.id)
+        Bookz.repo.flush()
         expect:
-        obj.left.id != null
-        TestClazzA.get(obj.left.id) == null
+        obj.book.id != null
+        Bookz.get(obj.book.id) == null
         Map act = [:]
         exp == BeanPathTools.propsToMap(obj, path, act)
         exp == act
         where:
-        path                | exp
-        'value'             | [value: 7]
-        'value1'            | [:]
-        'left.foo'          | [left: [foo: '1']]
-        'left1.foo'         | [:]
-        'right.right.value' | [right: [right: [value: 2]]]
-        'right.left.value1' | [right: [left: [:]]]
-        'right.left.bar'    | [right: [left: [bar: 4]]]
-        'right.left.*'      | [right: [left: [bar: 4, foo: '3', id: 1, version: null, bazMap: null, bazList: null]]]
-        'right.*'           | [right: [id: 2, value: 0, version: null]]
+        path                   | exp
+        'value'                | [age: 7]
+        'value1'               | [:]
+        'book.foo'           | [book: [name: 'atlas']]
+        'left1.foo'            | [:]
+        'bookAuthor.bookAuthor.value'  | [bookAuthor: [bookAuthor: [age: 2]]]
+        'bookAuthor.book.value1' | [bookAuthor: [book: [:]]]
+        'bookAuthor.book.bar'    | [bookAuthor: [book: [cost: 4]]]
+        'bookAuthor.book.*'      | [bookAuthor: [book: [cost: 4, name: 'shrugged', id: 1, version: null, bazMap: null, stringList: null]]]
+        'bookAuthor.*'             | [bookAuthor: [id: 2, age: 0, version: null]]
     }
 
-    void "Property returns list of domains"() {
+    // @IgnoreRest
+    void "propsToMap with list and enums"() {
         setup:
-        def obj = new TestClazzC(
-            id: 9,
-            value: 10
+        def obj = new EnumThing(
+            testEnum: TestEnum.FOO,
+            enumIdent: TestEnumIdent.Num2
         )
+        obj.id = 1
+
         expect:
         Map act = [:]
         exp == BeanPathTools.propsToMap(obj, path, act)
         exp == act
+
         where:
-        path          | exp
-        'value'       | [value: 10]
-        'fooValues.*' | [fooValues: [[id: 1, bar: null, foo: 'val 1', version: null, bazMap: null, bazList: null], [id: 1, bar: null, foo: 'val 2', version: null, bazMap: null, bazList: null]]]
+        path        | exp
+        '*'         | [id: 1, testEnum: 'FOO', version:null, enumIdent: 'Num2']
+        'testEnum'  | [testEnum: 'FOO']
+        'enumIdent' | [enumIdent: 'Num2']
+        'books.*'   | [books: [[id: 1, cost: null, name: 'val 1', version: null, bazMap: null, stringList: null], [id: 1, cost: null, name: 'val 2', version: null, bazMap: null, stringList: null]]]
+
     }
 
     void "test propsToMap for a non domain"() {
@@ -235,34 +221,90 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         result == expectedMap
     }
 
+
+    void "test buildMapFromPaths entity no *"() {
+        when:
+        BookAuthor ba = makeBookAuthor()
+        def res = BeanPathTools.buildMapFromPaths(ba, ['book'])
+
+        then:
+        res == [book:[id: 1]]
+
+    }
+
     void "test buildMapFromPaths"() {
         setup:
-        TestClazzA object = new TestClazzA(foo: 'foo', bar: 10.00, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2])
-        object.addToBaz(new TestClazzC(value: 23))
+        Bookz book = new Bookz(name: 'foo', cost: 10.00, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2])
 
         expect:
-        result == BeanPathTools.buildMapFromPaths(object, fields)
+        result == BeanPathTools.buildMapFromPaths(book, fields)
 
         where:
         fields             | result
-        ['foo','company']  | [foo: 'foo', company: 'Tesla']
-        ['*']           | [foo: 'foo', bar: 10.00, id: 1, version: null, bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
-        ['*', 'baz.value'] | [foo: 'foo', bar: 10.00, id: 1, version: null, baz: [[value: 23]], bazList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+        ['name','company'] | [name: 'foo', company: 'Tesla']
+        ['*']              | [name: 'foo', cost: 10.00, id: 1, version: null, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+    }
+
+    void "test buildMapFromPaths with EnumThing list"() {
+        when:
+        Bookz book = new Bookz(name: 'foo', cost: 10.00)
+        (1..2).each{id ->
+            def et = new EnumThing(
+                testEnum: TestEnum.FOO,
+                enumIdent: TestEnumIdent.Num2
+            )
+            et.id = id
+            book.addToEnumThings(et)
+        }
+        def result = BeanPathTools.buildMapFromPaths(book, ['*', 'enumThings.*'])
+
+        then:
+        result == [
+            id: 1,
+            version: null,
+            name: 'foo',
+            cost: 10.00,
+            bazMap: null,
+            stringList: null,
+            enumThings: [
+                [id: 1, testEnum: 'FOO', version:null, enumIdent: 'Num2'],
+                [id: 2, testEnum: 'FOO', version:null, enumIdent: 'Num2']
+            ]
+        ]
+
+    }
+
+    void "test buildMapFromPaths Enum"() {
+        when:
+        EnumThing et = new EnumThing(
+            testEnum: TestEnum.FOO,
+            enumIdent: TestEnumIdent.Num2
+        )
+        def res = BeanPathTools.buildMapFromPaths(et, ['testEnum', 'enumIdent'] )
+
+        then:
+        res == [testEnum:'FOO', enumIdent:'Num2']
+
+        // result == BeanPathTools.buildMapFromPaths(et, fields)
+
+        // where:
+        // fields                             | result
+        // ['value','testEnum', 'enumIdent']  | [value:9, testEnum:'FOO', enumIdent:'Num2']
     }
 
     //@IgnoreRest
     void "test buildMapFromPaths with transient"() {
         setup:
-        TestClazzA object = new TestClazzA(foo: 'foo', bar: 10.00)
+        Bookz object = new Bookz(name: 'foo', cost: 10.00)
 
-        expect:
-        [foo: 'foo', company: 'Tesla'] == BeanPathTools.buildMapFromPaths(object, ['foo','company'])
+        expect: 'company is transient'
+        [name: 'foo', company: 'Tesla'] == BeanPathTools.buildMapFromPaths(object, ['name','company'])
 
     }
 
     void "test buildMapFromPaths for all fields using delegating bean"() {
         setup:
-        TestClazzA object = new TestClazzA(foo: 'foo', bar: 50.0, baz: null)
+        Bookz object = new Bookz(name: 'foo', cost: 50.0, enumThings: null)
         List fields = ['*']
 
         when:
@@ -270,9 +312,9 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
 
         then:
         null != result
-        result.foo == 'foo'
-        result.bar == 50.0
-        result.baz == null
+        result.name == 'foo'
+        result.cost == 50.0
+        result.enumThings == null
     }
 
     void "test flattenMap"() {
@@ -305,90 +347,14 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
 
     void "test getIncludes"(){
         expect:
-        result == BeanPathTools.getIncludes("TestClazzA", fields)
+        result == BeanPathTools.getIncludes("Bookz", fields)
 
         where:
-        fields          | result
-        ['foo']         | ['foo']
-        ['*']           | ['id', 'foo', 'version', 'bar']
-        ['baz.*']       | ['baz.id', 'baz.value', 'baz.version']
+        fields            | result
+        ['name']          | ['name']
+        ['*']             | ['id', 'version', 'name', 'cost']
+        ['enumThings.*']  | ['enumThings.id', 'enumThings.testEnum', 'enumThings.version', 'enumThings.enumIdent']
         //FIXME make the following work
         //['baz.id']      | ['baz.id', 'baz']
     }
-
-}
-
-@Entity
-class TestClazzA {
-    Long id
-    String foo
-    BigDecimal bar
-
-    TestClazzA(){
-        id = 1
-    }
-
-    static transients = ['company']
-
-    String getCompany() {
-        'Tesla'
-    }
-
-    //See https://sysgears.com/articles/advanced-gorm-features-inheritance-embedded-data-maps-and-lists-storing/
-    List<String> bazList
-
-    Map bazMap
-
-    static hasMany = [baz: TestClazzC, bazList: String]
-
-    static mapping = {
-        id generator:'assigned'
-    }
-}
-
-@Entity
-class TestClazzB {
-    TestClazzB(){
-        id = 2
-    }
-    TestClazzA left
-    TestClazzB right
-    int value
-
-    static mapping = {
-        id generator:'assigned'
-    }
-}
-
-@Entity
-class TestClazzC {
-    TestClazzC(){
-        id = 3
-    }
-    int value
-
-    static mapping = {
-        id generator:'assigned'
-    }
-
-    List getFooValues() {
-        [
-            new TestClazzA(foo: 'val 1'),
-            new TestClazzA(foo: 'val 2')
-        ]
-    }
-
-}
-
-class PropsToMapTest {
-    String field
-    long field2
-    Long field3
-    Boolean field4
-    boolean field5
-    Map field6
-    List field7
-    BigDecimal field8
-    Double field9
-    PropsToMapTest nested
 }

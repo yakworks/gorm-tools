@@ -14,7 +14,6 @@ import org.grails.datastore.mapping.model.types.Identity
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
-import grails.compiler.GrailsCompileStatic
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -23,7 +22,7 @@ import grails.compiler.GrailsCompileStatic
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-@GrailsCompileStatic
+@CompileStatic
 class GormUtils {
 
     /**
@@ -66,7 +65,7 @@ class GormUtils {
         }
 
         if (override) {
-            target.properties = override
+            setPropertiesFromMap(target, override)
         }
 
         return target
@@ -86,14 +85,26 @@ class GormUtils {
         binder.bind(target, source)
 
         if (override) {
-            override.each { String key, val ->
-                if (target.hasProperty(key)) {
-                    target[key] = val
-                }
-            }
+            setPropertiesFromMap(target, override)
         }
 
         return target
+    }
+
+    /**
+     * iterates over map and sets property to target, no conversion or error catching, just a straight forward set
+     * if target.hasProperty for the key
+     *
+     * @param target
+     * @param map
+     */
+    static void setPropertiesFromMap(Object target, Map map){
+        map.each { key, val ->
+            String skey = key as String
+            if (target.hasProperty(skey)) {
+                target[skey] = val
+            }
+        }
     }
 
     /**

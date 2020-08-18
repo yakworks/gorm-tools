@@ -6,8 +6,6 @@ package gorm.tools.testing.support
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.testing.support.ExternalConfigLoader
-
 /**
  * The trait makes it possible to load external config during unit tests.
  * If external-config plugin is installed, the configuration defined in config.locations will be

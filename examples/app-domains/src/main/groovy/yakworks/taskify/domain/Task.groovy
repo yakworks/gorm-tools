@@ -16,7 +16,6 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.*
  * by a deadline to work towards work-related goals.
  */
 @GrailsCompileStatic
-@RestApi(description = "This is a task")
 @Entity
 class Task {
     //ordering of contraints flow through to json-schema and the fields plugin for automatic scaffolding

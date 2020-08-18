@@ -145,7 +145,9 @@ class BeanPathTools {
                     //spin through and add them to the map
                     pprops.each { PersistentProperty property ->
                         try {
-                            currentMap[property.name] = source[property.name]
+                            // currentMap[property.name] = source[property.name]
+                            def val = convertValue(source, property.name)
+                            currentMap[property.name] = val
                         } catch(e){
                             if (log.debugEnabled) log.debug("${source.class.name} with id ${source[id]} is not in db for property ${property.name}")
 
@@ -154,7 +156,7 @@ class BeanPathTools {
                 } else {
                     Closure notConvert = {
                         it instanceof Map || it instanceof Collection ||
-                                it instanceof Number || it?.class in [String, Boolean, Character]
+                        it instanceof Number || it?.class in [String, Boolean, Character]
                     }
                     Map props = object.properties.findAll { it.key != 'class' } as Map<String,?>
                     props.each { String name, Object value ->
@@ -171,9 +173,9 @@ class BeanPathTools {
                 // So it's the same as catching MissingPropertyException and do nothing if there is no property
             } else {
                 try {
-                    currentMap[propertyPath] = source[propertyPath]
+                    currentMap[propertyPath] = convertValue(source, propertyPath)
                 } catch (Exception e) {
-                    //TODO handle missing property exception
+                    //TODO handle missing property exception so it can be reported
                 }
             }
         } else {
@@ -213,6 +215,28 @@ class BeanPathTools {
         }
 
         return currentMap
+    }
+
+    /**
+     * Converts value for propsToMap
+     *
+     * @param source the source object
+     * @param key the property for the source object
+     * @return the value to use
+     */
+    static Object convertValue(Object source, String propertyKey){
+        Object val = source[propertyKey]
+        // convert Enums to string
+        if( val && val.class.isEnum()) {
+            val = (val as Enum).name()
+        } else if(val instanceof GormEntity) {
+            // if it reached here then just generate the default id
+            PersistentEntity domainClass = GormMetaUtils.getPersistentEntity(val)
+            String id = domainClass.identity.name
+            Map idMap = [id: val[id]]
+            val = idMap
+        }
+        return val
     }
 
     /**
@@ -277,6 +301,7 @@ class BeanPathTools {
         result.unique()
 
     }
+
 
     @CompileDynamic
     static GrailsParameterMap getGrailsParameterMap(Map p, HttpServletRequest request) {

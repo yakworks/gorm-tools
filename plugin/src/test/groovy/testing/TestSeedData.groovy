@@ -17,6 +17,8 @@ class TestSeedData {
                 amount2: (index - 1) * (index - 1) * 0.3,
                 date: new Date().clearTime() + index,
                 name2: index % 2 == 0 ? null : "Name2-$index",
+                kind: index % 2 == 0 ? Org.Kind.CLIENT : Org.Kind.COMPANY,
+                testIdent: index % 2 == 0 ? TestIdent.Num2 : TestIdent.Num4,
                 location: (
                     new Location(
                         address: "City$index",

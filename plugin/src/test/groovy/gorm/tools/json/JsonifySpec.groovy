@@ -5,6 +5,7 @@
 package gorm.tools.json
 
 import gorm.tools.beans.BeanPathTools
+import gorm.tools.beans.EntityMapFactory
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.TestTools
 import gorm.tools.testing.unit.DomainRepoTest
@@ -64,7 +65,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         def res = Jsonify.render(org)
 
         then:
-        res.jsonText == '{"id":1,"inactive":false,"name":"name","type":{"id":1}}'
+        res.jsonText == '{"id":1,"inactive":false,"kind":"CLIENT","testIdent":"Num2","name":"name","type":{"id":1}}'
 
     }
 
@@ -128,10 +129,11 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         when:
         def jdom = TestData.build(JsonifyDom, includes: ['ext'])
         List inc = ['id', 'ext.nameExt', 'company']
-        def map = BeanPathTools.buildMapFromPaths(jdom, inc)
+        //def map = BeanPathTools.buildMapFromPaths(jdom, inc)
+        def emap = EntityMapFactory.createEntityMap(jdom,inc)
         // def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
-        String incTrans = 'company'
-        def res = Jsonify.render(map)
+        //String incTrans = 'company'
+        def res = Jsonify.render(emap)
 
         then:
         res.jsonText == '{"id":1,"ext":{"nameExt":"nameExt"},"company":"Tesla"}'
@@ -185,7 +187,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         def result = Jsonify.render(build(), [includes: ["*"]])
 
         then: //TODO: double id issue
-        result.jsonText == '{"id":1,"inactive":false,"name":"name"}'
+        result.jsonText == '{"id":1,"inactive":false,"kind":"CLIENT","testIdent":"Num2","name":"name"}'
 
     }
 

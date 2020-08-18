@@ -4,6 +4,9 @@
 */
 package testing
 
+import groovy.transform.CompileStatic
+
+import gorm.tools.traits.IdEnum
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import groovy.transform.CompileDynamic
@@ -35,8 +38,13 @@ class Org implements NameTrait{
     Location location //belongs to whatever
     OrgExt ext //<- ext belong to org
 
+    //enums
+    Kind kind = Kind.CLIENT
+    TestIdent testIdent = TestIdent.Num2
+
     static mapping = {
         //id generator:'assigned'
+        testIdent enumType: 'identity'
     }
 
     static List qSearchFields = ["name"]
@@ -74,14 +82,15 @@ class Org implements NameTrait{
         autotest.update = [name:'foo']
     }"""
 
-    @CompileDynamic
-    static getConfigs(){
-        return {
-            json.includes = '*' //default
-            json.excludes = ['location'] //adds to the global excludes
-            query.quickSearch = ["name", "name2"]
-            audittrail.enabled = false
-            autotest.update = [name:'foo']
-        }
-    }
+    @CompileDynamic //bug in grailsCompileStatic requires this on internal enums
+    enum Kind {CLIENT, COMPANY}
+
+}
+
+@CompileStatic
+enum TestIdent implements IdEnum<TestIdent,Long> {
+    Num2(2), Num4(4)
+    final Long id
+
+    TestIdent(Long id) { this.id = id }
 }

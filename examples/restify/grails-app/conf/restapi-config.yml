@@ -5,13 +5,22 @@ restApi:
       default: ['*']
       list: ['id', 'num', 'name', 'billable']
       pickList: ['id', 'num', 'name']
+
   book:
     entityClass: restify.Book
-    qSearch: ['num', 'name']
+    qSearch: ['title']
     includes:
-      default: ['*']
-      list: ['id', 'num', 'name', 'billable']
-      pickList: ['id', 'num', 'name']
+      default: ['id', 'title']
+
   org:
     entityClass: yakworks.taskify.domain.Org
     qSearch: ['num', 'name']
+    includes:
+      default: ['*', 'type.*']
+      pickList: ['id', 'name']
+
+  task:
+    entityClass: yakworks.taskify.domain.Task
+    qSearch: ['name', 'note']
+    includes:
+      default: ['*', 'project.*']

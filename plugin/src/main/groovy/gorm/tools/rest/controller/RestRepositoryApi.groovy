@@ -13,6 +13,7 @@ import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.Pager
 import gorm.tools.beans.BeanPathTools
+import gorm.tools.beans.EntityMapFactory
 import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.api.RepositoryApi
 import grails.artefact.controller.RestResponder
@@ -122,7 +123,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
             D instance = (D) getRepo().get(params)
             def renderObj = jsonObject(instance)
             // println "renderObj $renderObj"
-            respond renderObj
+            respond(renderObj)
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -166,11 +167,11 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     //@CompileDynamic
     Pager pagedQuery(Map params, String includesKey) {
         Pager pager = new Pager(params)
-        // assert params instanceof Pager
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List incs = getIncludes(includesKey)
-        pager.setupData(dlist, incs)
+        incs = incs ?: ['*']
+        return pager.setupList(dlist, incs)
     }
 
     List query(Pager pager, Map p = [:]) {
@@ -197,8 +198,10 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      */
     Object jsonObject(D instance, String includesKey = 'default'){
         List incs = getIncludes(includesKey)
-        // println "incs $incs"
-        return incs ? BeanPathTools.buildMapFromPaths(instance, incs) : instance
+        incs = incs ?: ['*']
+        // def emap = BeanPathTools.buildMapFromPaths(instance, incs)
+        def emap = EntityMapFactory.createEntityMap(instance, incs)
+        return emap
     }
 
     @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])

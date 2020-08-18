@@ -39,7 +39,8 @@ class EntityMap extends AbstractMap<String, Object> {
 
     private Set<String> _includes = []
     private EntityMapIncludes _includeMap
-
+    //WIP used to store puts as grails views puts a key with object.
+    private Map<String, Object> shadowMap = [:]
     /**
      * Constructs a new {@code EntityMap} that operates on the specified bean. The given entity
      * cant be null
@@ -133,6 +134,9 @@ class EntityMap extends AbstractMap<String, Object> {
 
         String p = name as String
 
+        // check to see if the shadow override map has on and return it as is
+        if(shadowMap.get(p)) return shadowMap.get(p)
+
         if (!getIncludes().contains(p)) {
             return null
         }
@@ -175,11 +179,18 @@ class EntityMap extends AbstractMap<String, Object> {
         return val
     }
 
+    /**
+     * put will not set keys on the object but allows to add extra props and overrides
+     */
     @Override
     Object put(final String name, final Object value) {
         // see BeanMap in http://commons.apache.org/proper/commons-beanutils/index.html
         // and grails LazyMetaPropertyMap to implement this if need be
-        throw new UnsupportedOperationException("Wrapper is read-only")
+        // throw new UnsupportedOperationException("Wrapper is read-only")
+
+        //json-views want to set an object key thats a copy of this so allow it
+        shadowMap.put(name, value)
+        _includes.add(name)
     }
 
     /**

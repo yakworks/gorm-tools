@@ -383,6 +383,21 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         TestEnumIdent.get(2) == TestEnumIdent.Num2
         testDomain.enumIdent == TestEnumIdent.Num2
     }
+
+    // @IgnoreRest
+    void "test enums identity from map"() {
+        given:
+
+        TestDomain testDomain = new TestDomain()
+        Map params = [enumIdent: [id:2]]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        TestEnumIdent.get(2) == TestEnumIdent.Num2
+        testDomain.enumIdent == TestEnumIdent.Num2
+    }
 }
 
 

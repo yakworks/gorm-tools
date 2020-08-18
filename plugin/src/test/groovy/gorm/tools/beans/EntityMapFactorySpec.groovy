@@ -119,7 +119,7 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
         def res = EntityMapFactory.createEntityMap(et, ['testEnum', 'enumIdent'] )
 
         then:
-        res == [testEnum:'FOO', enumIdent:'Num2']
+        res == [testEnum:'FOO', enumIdent:[id:2, name:'Num2']]
     }
 
     void "test createEntityBeanMap with EnumThing list"() {
@@ -142,8 +142,8 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
             name: 'foo',
             cost: 10.00,
             enumThings: [
-                [id: 1, testEnum: 'FOO', version:null, enumIdent: 'Num2'],
-                [id: 2, testEnum: 'FOO', version:null, enumIdent: 'Num2']
+                [id: 1, testEnum: 'FOO', version:null, enumIdent: [id:2, name:'Num2']],
+                [id: 2, testEnum: 'FOO', version:null, enumIdent: [id:2, name:'Num2']]
             ]
         ]
 
@@ -153,8 +153,8 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
         then:
         result == [
             enumThings: [
-                [testEnum: 'FOO', enumIdent: 'Num2'],
-                [testEnum: 'FOO', enumIdent: 'Num2']
+                [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']],
+                [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']]
             ]
         ]
     }

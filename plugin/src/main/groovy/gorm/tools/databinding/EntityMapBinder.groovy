@@ -231,9 +231,12 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 target[prop.name] = converter.convert(propValue)
             }
         }
-        else if (typeToConvertTo.isEnum() && valueToAssign instanceof Number){
+        else if (typeToConvertTo.isEnum() && (valueToAssign instanceof Number || valueToAssign instanceof Map)){
+            //if its a map then it should be in form [id:1, ...] and it will grab id
+            def idVal = valueToAssign //assume its a number
+            if(valueToAssign instanceof Map) idVal = valueToAssign['id']
             // assume its an enum with a get(id)
-            target[prop.name] = getEnumWithGet(typeToConvertTo, valueToAssign)
+            target[prop.name] = getEnumWithGet(typeToConvertTo, idVal as Number)
         }
         else {
             target[prop.name] = valueToAssign

@@ -13,6 +13,7 @@ import org.grails.datastore.mapping.model.config.GormProperties
 import org.springframework.util.Assert
 
 import gorm.tools.GormMetaUtils
+import gorm.tools.traits.IdEnum
 
 /**
  * A map implementation that wraps and objects and
@@ -155,9 +156,14 @@ class EntityMap extends AbstractMap<String, Object> {
     Object convertValue(Object source, String prop){
         Object val = source[prop]
         def incNested = getNestedIncludes()
-        // convert Enums to string
+        // convert Enums to string or id,name object if its IdEnum
         if( val && val.class.isEnum()) {
-            val = (val as Enum).name()
+            if(val instanceof IdEnum){
+                Map<String, Object> idEnumMap = [id: (val as IdEnum).id, name: (val as Enum).name()]
+                val = idEnumMap
+            } else {
+                val = (val as Enum).name()
+            }
         }
         else if(incNested[prop]){
             EntityMapIncludes incMap = incNested[prop]

@@ -7,7 +7,7 @@ package gorm.tools.beans
 
 import spock.lang.Specification
 
-class EntityBeanMapSpec extends Specification {
+class EntityMapSpec extends Specification {
 
     // void testOverridePropertiesRecursionBug() {
     //     when:
@@ -37,7 +37,7 @@ class EntityBeanMapSpec extends Specification {
 
         when:
         def tobj = new PogoBean(name:"Bart", age:11, other:"stuff")
-        def map = new EntityBeanMap(tobj)
+        def map = new EntityMap(tobj)
 
         def includes = map.getIncludes()
 
@@ -62,13 +62,13 @@ class EntityBeanMapSpec extends Specification {
 
     void testIsEmpty() {
         expect:
-        def map = new EntityBeanMap(new PogoBean())
+        def map = new EntityMap(new PogoBean())
         !map.isEmpty()
     }
 
     void testContainsKey() {
         expect:
-        def map = new EntityBeanMap(new PogoBean())
+        def map = new EntityMap(new PogoBean())
         map.containsKey("name")
         map.containsKey("age")
         !map.containsKey("fo")
@@ -76,7 +76,7 @@ class EntityBeanMapSpec extends Specification {
 
     void testContainsValue() {
         when:
-        def map = new EntityBeanMap(new PogoBean(name:"Homer", age:45))
+        def map = new EntityMap(new PogoBean(name:"Homer", age:45))
 
         then:
         map == [name:"Homer", age:45, other: null]
@@ -87,7 +87,7 @@ class EntityBeanMapSpec extends Specification {
 
     void testGet() {
         when:
-        def map = new EntityBeanMap(new PogoBean(name:"Homer", age:45))
+        def map = new EntityMap(new PogoBean(name:"Homer", age:45))
 
         then:
         "Homer" == map.get("name")
@@ -104,7 +104,7 @@ class EntityBeanMapSpec extends Specification {
     }
 
     void testPut() {
-        def map = new EntityBeanMap(new PogoBean(name:"Bart", age:11))
+        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
 
         map.name = "Homer"
         map.age = 45
@@ -120,7 +120,7 @@ class EntityBeanMapSpec extends Specification {
 
     void testKeySet() {
         when:
-        def map = new EntityBeanMap(new PogoBean(name:"Bart", age:11))
+        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
         def keys = map.keySet()
 
         then:
@@ -130,7 +130,7 @@ class EntityBeanMapSpec extends Specification {
 
     void testValues() {
         when:
-        def map = new EntityBeanMap(new PogoBean(name:"Bart", age:11))
+        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
         def values = map.values()
 
         then:
@@ -140,7 +140,7 @@ class EntityBeanMapSpec extends Specification {
 
     void "test entrySet"() {
         when:
-        def map = new EntityBeanMap(new PogoBean(name:"Bart", age:11))
+        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
         def entset = map.entrySet()
 
         then:

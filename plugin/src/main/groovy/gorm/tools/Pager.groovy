@@ -167,6 +167,7 @@ class Pager {
      *
      * @return Map with pager values
      */
+    @Deprecated
     Map getJsonData() {
         return [
             page   : this.page,

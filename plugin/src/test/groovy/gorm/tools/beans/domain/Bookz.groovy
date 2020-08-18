@@ -89,3 +89,16 @@ class PropsToMapTest {
     Double field9
     PropsToMapTest nested
 }
+
+class PogoTest {
+    String fString
+    long flong
+    Long fLong
+    Boolean fBoolean
+    boolean fboolean
+    Map fMap
+    List fList
+    BigDecimal fBigDecimal
+    Double fDouble
+    PropsToMapTest nested
+}

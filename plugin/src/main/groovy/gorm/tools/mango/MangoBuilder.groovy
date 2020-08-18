@@ -375,13 +375,13 @@ class MangoBuilder {
 
     //FIXME clean this up so its a compile static
     @CompileDynamic
-    static def getEnum(Class typeToConvertTo, Object val){
-       return EnumUtils.getEnum(typeToConvertTo, val)
+    static getEnum(Class typeToConvertTo, Object val){
+        return EnumUtils.getEnum(typeToConvertTo, val)
     }
 
     //FIXME clean this up so its a compile static
     @CompileDynamic
-    static def getEnumWithGet(Class<?> enumClass, Number id){
+    static getEnumWithGet(Class<?> enumClass, Number id){
         //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
         return enumClass.get(id)
     }

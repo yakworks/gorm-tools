@@ -1,18 +1,7 @@
 /*
- * Copyright 2004-2005 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
 package gorm.tools.beans
 
 
@@ -35,11 +24,11 @@ import gorm.tools.GormMetaUtils
  *
  * WORK IN PROGRESS - to replace BeanPathTools so we are not creating a map and then creating the json
  * @author Joshua Burnett (@basejump)
- * @since 6.12
+ * @since 6.1.12
  */
-// @SuppressWarnings({"unchecked","rawtypes"})
+@SuppressWarnings(["CompileStatic", "FieldName", "ExplicitCallToEqualsMethod"])
 @CompileStatic
-class EntityBeanMap extends AbstractMap<String, Object> {
+class EntityMap extends AbstractMap<String, Object> {
 
     private MetaClass entityMetaClass;
     private Object entity
@@ -49,37 +38,35 @@ class EntityBeanMap extends AbstractMap<String, Object> {
         'domainClass', 'dirty', GormProperties.ERRORS, 'dirtyPropertyNames']
 
     private Set<String> _includes = []
-    private Map<String, Object> _includeMap
-    private Map<String, Map> _includesNested = [:]
+    private EntityMapIncludes _includeMap
 
     /**
-     * Constructs a new {@code EntityBeanMap} that operates on the specified bean. The given entity
+     * Constructs a new {@code EntityMap} that operates on the specified bean. The given entity
      * cant be null
      * @param entity The object to inspect
      */
-    EntityBeanMap(Object entity) {
+    EntityMap(Object entity) {
         Assert.notNull(entity, "Object cannot be null")
         this.entity = entity
         entityMetaClass = GroovySystem.getMetaClassRegistry().getMetaClass(entity.getClass())
     }
 
     /**
-     * Constructs a new {@code EntityBeanMap} that operates on the specified bean. The given entity
+     * Constructs a new {@code EntityMap} that operates on the specified bean. The given entity
      * cant be null
      * @param entity The object to inspect
      * @param entity The object to inspect
      */
-    EntityBeanMap(Object entity, Map includeMap) {
+    EntityMap(Object entity, EntityMapIncludes includeMap) {
         this.entity = entity
         initialise(includeMap)
     }
 
-    private void initialise(Map includeMap) {
+    private void initialise(EntityMapIncludes includeMap) {
         entityMetaClass = GroovySystem.getMetaClassRegistry().getMetaClass(entity.getClass())
         if(includeMap){
             _includeMap = includeMap
-            _includes = includeMap['props'] as Set<String>
-            _includesNested = includeMap['nested'] ? includeMap['nested'] as Map : [:]
+            _includes = includeMap.fields as Set<String>
         }
     }
 
@@ -131,7 +118,7 @@ class EntityBeanMap extends AbstractMap<String, Object> {
     Object get(Object name) {
 
         if (name instanceof List) {
-            Map submap = new HashMap()
+            Map submap = [:]
             List propertyNames = (List)name
             for (Object currentName : propertyNames) {
                 if (currentName != null) {
@@ -163,19 +150,19 @@ class EntityBeanMap extends AbstractMap<String, Object> {
      */
     Object convertValue(Object source, String prop){
         Object val = source[prop]
-        Map incNested = getIncludesNested()
+        def incNested = getNestedIncludes()
         // convert Enums to string
         if( val && val.class.isEnum()) {
             val = (val as Enum).name()
         }
         else if(incNested[prop]){
-            def incMap = incNested[prop] as Map<String, Object>
+            EntityMapIncludes incMap = incNested[prop]
             //its has its own includes so its either an object or an iterable
             if(val instanceof Iterable){
-                val = new EntityBeanMapList<EntityBeanMap>(val as List, incMap)
+                val = new EntityMapList(val as List, incMap)
             } else {
                 //assume its an object then
-                val = new EntityBeanMap(val, incMap)
+                val = new EntityMap(val, incMap)
             }
         }
         else if(val instanceof GormEntity) {
@@ -218,7 +205,7 @@ class EntityBeanMap extends AbstractMap<String, Object> {
 
     @Override
     Collection<Object> values() {
-        Collection<Object> values = new ArrayList<>()
+        Collection<Object> values = []
         for (String p : getIncludes()) {
             values.add(entity[p])
         }
@@ -232,8 +219,8 @@ class EntityBeanMap extends AbstractMap<String, Object> {
 
     @Override
     boolean equals(Object o) {
-        if (o instanceof EntityBeanMap) {
-            EntityBeanMap other = (EntityBeanMap)o
+        if (o instanceof EntityMap) {
+            EntityMap other = (EntityMap)o
             return entity.equals(other.entity)
         }
         return false
@@ -247,27 +234,28 @@ class EntityBeanMap extends AbstractMap<String, Object> {
      * @return the unmodifiable set of mappings
      */
     @Override
-    public Set<Map.Entry<String, Object>> entrySet() {
-        return Collections.unmodifiableSet(new AbstractSet<Map.Entry<String, Object>>() {
+    Set<Map.Entry<String, Object>> entrySet() {
+        def eset = new AbstractSet<Map.Entry<String, Object>>() {
             @Override
             Iterator<Map.Entry<String, Object>> iterator() {
-                return entryIterator();
+                return entryIterator()
             }
 
             @Override
             int size() {
-                return EntityBeanMap.this.size();
+                return EntityMap.this.size()
             }
-        });
+        }
+        return Collections.unmodifiableSet(eset)
     }
 
     //------- Helper methods --------
-    Map<String, Object> getIncludeMap(){
+    EntityMapIncludes getIncludeMap(){
         return _includeMap
     }
 
-    Map<String, Map> getIncludesNested(){
-        return _includesNested
+    Map<String, EntityMapIncludes> getNestedIncludes(){
+        return (includeMap?.nestedIncludes) ?: [:] as Map<String, EntityMapIncludes>
     }
 
     boolean isIncluded(String mp) {
@@ -318,10 +306,10 @@ class EntityBeanMap extends AbstractMap<String, Object> {
             @Override
             Map.Entry<String, Object> next() {
                 final String key = iter.next()
-                final Object value = EntityBeanMap.this.get(key)
+                final Object value = EntityMap.this.get(key)
                 // This should not cause any problems; the key is actually a
                 // string, but it does no harm to expose it as Object
-                return new Entry(EntityBeanMap.this, key, value)
+                return new Entry(EntityMap.this, key, value)
             }
 
             @Override
@@ -332,21 +320,21 @@ class EntityBeanMap extends AbstractMap<String, Object> {
     }
 
     /**
-     * Map entry used by {@link EntityBeanMap}.
+     * Map entry used by {@link EntityMap}.
      */
     protected static class Entry extends AbstractMap.SimpleEntry<String, Object> {
 
         private static final long serialVersionUID = 1L;
-        private final EntityBeanMap owner;
+        private final EntityMap owner;
 
         /**
          * Constructs a new {@code Entry}.
          *
-         * @param owner the EntityBeanMap this entry belongs to
+         * @param owner the EntityMap this entry belongs to
          * @param key the key for this entry
          * @param value the value for this entry
          */
-        protected Entry(final EntityBeanMap owner, final String key, final Object value) {
+        protected Entry(final EntityMap owner, final String key, final Object value) {
             super(key, value);
             this.owner = owner;
         }

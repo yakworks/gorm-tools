@@ -4,72 +4,69 @@
 */
 package gorm.tools.beans
 
-
 import gorm.tools.beans.domain.BookAuthor
 import gorm.tools.beans.domain.Bookz
 import gorm.tools.beans.domain.EnumThing
 import gorm.tools.beans.domain.TestEnum
 import gorm.tools.beans.domain.TestEnumIdent
 import gorm.tools.testing.unit.GormToolsTest
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-class EntityBeanMapFactorySpec extends Specification implements GormToolsTest {
+class EntityMapFactorySpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
         mockDomains Bookz, BookAuthor, EnumThing
     }
 
-    void "test getIncludesForBeanMap"(){
+    void "test buildIncludesMap"(){
         when:
-        def res = EntityBeanMapFactory.getIncludesForBeanMap("Bookz", ['name'])
+        def res = EntityMapFactory.buildIncludesMap("Bookz", ['name'])
 
         then:
         res.className == 'Bookz' // [className: 'Bookz', props: ['name']]
-        res.props == ['name'] as Set
+        res.fields == ['name'] as Set
 
         when:
-        res = EntityBeanMapFactory.getIncludesForBeanMap("Bookz", ['*'])
+        res = EntityMapFactory.buildIncludesMap("Bookz", ['*'])
 
         then:
         res.className == 'Bookz' // [className: 'Bookz', props: ['name']]
-        res.props == ['id', 'version', 'name', 'cost'] as Set
+        res.fields == ['id', 'version', 'name', 'cost'] as Set
 
         when:
-        res = EntityBeanMapFactory.getIncludesForBeanMap("Bookz", ['name', 'enumThings.*'])
+        res = EntityMapFactory.buildIncludesMap("Bookz", ['name', 'enumThings.*'])
 
         then:
         res.className == 'Bookz' // [className: 'Bookz', props: ['name']]
-        res.props == ['name', 'enumThings'] as Set
-        res.nested == [enumThings: ['className': 'gorm.tools.beans.domain.EnumThing', props: ['id', 'testEnum', 'version', 'enumIdent'] as Set]]
+        res.fields == ['name', 'enumThings'] as Set
+        res.nestedIncludes.size() == 1
+        res.nestedIncludes['enumThings'].with{
+            className == 'gorm.tools.beans.domain.EnumThing'
+            fields == ['id', 'testEnum', 'version', 'enumIdent'] as Set
+        }
 
         when:
-        res = EntityBeanMapFactory.getIncludesForBeanMap("BookAuthor", ['*', 'book.*', 'bookAuthor.id', 'bookAuthor.age'])
+        res = EntityMapFactory.buildIncludesMap("BookAuthor", ['*', 'book.*', 'bookAuthor.id', 'bookAuthor.age'])
 
         then:
         res.className == 'BookAuthor' // [className: 'Bookz', props: ['name']]
-        res.props == ['id', 'age', 'version', 'book', 'bookAuthor'] as Set
-        res.nested == [
-            book: ['className': 'gorm.tools.beans.domain.Bookz', props: ['id', 'version', 'name', 'cost'] as Set],
-            bookAuthor: ['className': 'gorm.tools.beans.domain.BookAuthor', props: ['id', 'age'] as Set]
-        ]
+        res.fields == ['id', 'age', 'version', 'book', 'bookAuthor'] as Set
+        res.nestedIncludes.size() == 2
+        // res.nested == [
+        //     book: ['className': 'gorm.tools.beans.domain.Bookz', props: ['id', 'version', 'name', 'cost'] as Set],
+        //     bookAuthor: ['className': 'gorm.tools.beans.domain.BookAuthor', props: ['id', 'age'] as Set]
+        // ]
 
-        // fields            | result
-        // ['name']          | [className: 'Bookz', props: ['name']]
-        // ['*']             | [className: 'Bookz', props: ['id', 'version', 'name', 'cost']]
-        // ['name', 'enumThings.*']  | [className: 'Bookz', props: ['name', 'enumThings'], nested:[className: 'EnumThing', props: ['id', 'testEnum', 'version', 'enumIdent']]]
-        // //FIXME make the following work
-        // //['baz.id']      | ['baz.id', 'baz']
     }
 
     BookAuthor makeBookAuthor(){
-        return new BookAuthor(
+        def ba = new BookAuthor(
             age: 5,
             book: new Bookz(
                 name: 'atlas',
-                stringList: ["foo"],
+                stringList: ["foo", "bar"],
+                bazMap: ["testing": 99]
             ),
             bookAuthor: new BookAuthor(
                 bookAuthor: new BookAuthor(
@@ -78,15 +75,17 @@ class EntityBeanMapFactorySpec extends Specification implements GormToolsTest {
                 book: new Bookz(
                     name: 'shrugged',
                     cost: 4,
-                    bazMap: ["test": 1]
+                    bazMap: ["test": 1],
+                    stringList: ["buzz", "booz"]
                 )
             )
         )
+        return ba
     }
 
     void "test createEntityBeanMap"() {
         when: 'sanity check'
-        def emap = EntityBeanMapFactory.createEntityBeanMap(makeBookAuthor(), ['*', 'book.id'])
+        def emap = EntityMapFactory.createEntityMap(makeBookAuthor(), ['*', 'book.id'])
 
         then:
         4 == emap.size()
@@ -98,7 +97,7 @@ class EntityBeanMapFactorySpec extends Specification implements GormToolsTest {
         Bookz book = new Bookz(name: 'foo', cost: 10.00, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2])
 
         expect:
-        result == EntityBeanMapFactory.createEntityBeanMap(book, fields) //BeanPathTools.buildMapFromPaths(book, fields)
+        result == EntityMapFactory.createEntityMap(book, fields) //BeanPathTools.buildMapFromPaths(book, fields)
 
         where:
         fields                        | result
@@ -113,7 +112,7 @@ class EntityBeanMapFactorySpec extends Specification implements GormToolsTest {
             testEnum: TestEnum.FOO,
             enumIdent: TestEnumIdent.Num2
         )
-        def res = EntityBeanMapFactory.createEntityBeanMap(et, ['testEnum', 'enumIdent'] )
+        def res = EntityMapFactory.createEntityMap(et, ['testEnum', 'enumIdent'] )
 
         then:
         res == [testEnum:'FOO', enumIdent:'Num2']
@@ -130,7 +129,7 @@ class EntityBeanMapFactorySpec extends Specification implements GormToolsTest {
             et.id = id
             book.addToEnumThings(et)
         }
-        def result = EntityBeanMapFactory.createEntityBeanMap(book, ['*', 'enumThings.*'])
+        def result = EntityMapFactory.createEntityMap(book, ['*', 'enumThings.*'])
 
         then:
         result == [
@@ -145,13 +144,45 @@ class EntityBeanMapFactorySpec extends Specification implements GormToolsTest {
         ]
 
         when:
-        result = EntityBeanMapFactory.createEntityBeanMap(book, ['enumThings.testEnum', 'enumThings.enumIdent'])
+        result = EntityMapFactory.createEntityMap(book, ['enumThings.testEnum', 'enumThings.enumIdent'])
 
         then:
         result == [
             enumThings: [
                 [testEnum: 'FOO', enumIdent: 'Num2'],
                 [testEnum: 'FOO', enumIdent: 'Num2']
+            ]
+        ]
+    }
+
+    void "BookAuthor tests "() {
+        setup:
+        def obj = makeBookAuthor()
+
+        expect:
+        exp == EntityMapFactory.createEntityMap(obj, path)
+
+        where:
+        path                          | exp
+        ['*']                         | [id: 2, version: null, age: 5]
+        ['age']                       | [age: 5]
+        ['book.name']                 | [book: [name: 'atlas']]
+        ['bookAuthor.bookAuthor.age'] | [bookAuthor: [bookAuthor: [age: 2]]]
+        ['bookAuthor.book.cost']      | [bookAuthor: [book: [cost: 4]]]
+        ['bookAuthor.book.*']         | [bookAuthor: [book: [cost: 4, name: 'shrugged', id: 1, version: null]]]
+        ['bookAuthor.*']              | [bookAuthor: [id: 2, age: 0, version: null]]
+    }
+
+    void "BookAuthor tests complex"() {
+        when:
+        def emap = EntityMapFactory.createEntityMap(makeBookAuthor(), ['*', 'book.stringList', 'book.bazMap'])
+
+        then:
+        emap == [
+            id: 2, version: null, age: 5,
+            book: [
+                stringList: ["foo", "bar"],
+                bazMap: ["testing": 99]
             ]
         ]
 

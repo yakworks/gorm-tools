@@ -17,6 +17,7 @@ import org.grails.datastore.mapping.query.api.QueryableCriteria
 
 import gorm.tools.beans.IsoDateUtil
 import gorm.tools.mango.api.QueryMangoEntity
+import gorm.tools.traits.IdEnum
 import grails.gorm.DetachedCriteria
 
 /**
@@ -179,9 +180,15 @@ class MangoBuilder {
         // if field ends in Id then try removing the Id postfix and see if its a property
         else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
             applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
-        } else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List && prop != null)) {
+        }
+        else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List && prop != null)) {
             criteria.eq(field, toType(criteria, field, fieldVal))
-        } else if (fieldVal instanceof Map && prop) { // could be field=name fieldVal=['$like': 'foo%']
+        }
+        else if (prop && IdEnum.isAssignableFrom(prop.type) && fieldVal instanceof Map && fieldVal.containsKey('id')) {
+            //&& fieldVal instanceof Map && fieldVal.containsKey('id')
+            applyField(criteria, field, fieldVal['id'])
+        }
+        else if (fieldVal instanceof Map && prop) { // could be field=name fieldVal=['$like': 'foo%']
             //could be 1 or more too
             //for example field=amount and fieldVal=['$lt': 100, '$gt':200]
             for (String key : (fieldVal as Map).keySet()) {
@@ -351,7 +358,8 @@ class MangoBuilder {
         Class typeToConvertTo = prop?.getType() as Class
 
         Object v = value
-
+        // FIXME the type conversion here should be refactord to a common  area as the same logic
+        // is used in EntityMapBinder as well
         if (v instanceof String) {
             if (String.isAssignableFrom(typeToConvertTo)) {
                 v = value
@@ -363,8 +371,10 @@ class MangoBuilder {
                 v = getEnum(typeToConvertTo, v)
             }
         }
-        else if (typeToConvertTo.isEnum() && v instanceof Number){
-            v = getEnumWithGet(typeToConvertTo, v)
+        else if (typeToConvertTo.isEnum() && (v instanceof Number || v instanceof Map)){
+            def idVal = v //assume its a number
+            if(v instanceof Map) idVal = v['id']
+            v = getEnumWithGet(typeToConvertTo, v as Number)
         }
         else {
             v = v.asType(typeToConvertTo)

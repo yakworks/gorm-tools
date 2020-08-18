@@ -101,6 +101,27 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
     }
 
+    def "test enum testIdent with Map"() {
+        when: 'sanity check'
+        List res = build(['testIdent': TestIdent.Num2]).list()
+
+        then:
+        res.size() == 5
+
+        when:
+        res = build(['testIdent': [id:2]]).list()
+
+        then:
+        res.size() == 5
+
+        when:
+        res = build(['testIdent': [[id:2]]]).list()
+
+        then:
+        res.size() == 5
+
+    }
+
     def "test closure"() {
         when:
         List res = build([:],{

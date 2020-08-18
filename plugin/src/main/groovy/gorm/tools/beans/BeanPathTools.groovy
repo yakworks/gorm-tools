@@ -230,6 +230,7 @@ class BeanPathTools {
         if( val && val.class.isEnum()) {
             val = (val as Enum).name()
         } else if(val instanceof GormEntity) {
+            // if it reached here then just generate the default id
             PersistentEntity domainClass = GormMetaUtils.getPersistentEntity(val)
             String id = domainClass.identity.name
             Map idMap = [id: val[id]]
@@ -300,6 +301,7 @@ class BeanPathTools {
         result.unique()
 
     }
+
 
     @CompileDynamic
     static GrailsParameterMap getGrailsParameterMap(Map p, HttpServletRequest request) {

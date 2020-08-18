@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.BeanPathTools
+import gorm.tools.beans.EntityMapFactory
 
 /**
  * a holder object for paged data
@@ -184,6 +185,7 @@ class Pager {
      * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
+    @Deprecated
     Pager setupData(List dlist, List includes = null) {
         setData(dlist)
         if (dlist?.size() > 0) {
@@ -199,6 +201,23 @@ class Pager {
             this.data = dlist.collect { obj ->
                 return BeanPathTools.buildMapFromPaths(obj, includes, true)
             }
+        }
+        return this
+    }
+
+    /**
+     * Setup the list as a EntityMapList passing in the includes which prepares it to be ready for
+     * an export to json
+     *
+     * @param dlist list of entities
+     * @param includes list of fields names which values should be in the result list based on dlist
+     * @return new list with values selected from dlist based on fieldLists field names
+     */
+    Pager setupList(List dlist, List includes = null) {
+        def entityMapList = EntityMapFactory.createEntityMapList(dlist, includes)
+        if(entityMapList){
+            setRecordCount(entityMapList.getTotalCount())
+            setData(entityMapList)
         }
         return this
     }

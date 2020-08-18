@@ -11,12 +11,16 @@ import gorm.tools.beans.domain.TestEnum
 import gorm.tools.beans.domain.TestEnumIdent
 import gorm.tools.testing.unit.GormToolsTest
 import spock.lang.Specification
+import testing.Location
+import testing.Org
+import testing.OrgType
+import testing.TestSeedData
 
 class EntityMapFactorySpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains Bookz, BookAuthor, EnumThing
+        mockDomains Bookz, BookAuthor, EnumThing, Org, Location, OrgType
     }
 
     void "test buildIncludesMap"(){
@@ -186,5 +190,18 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
             ]
         ]
 
+    }
+
+    void "test createEntityMapList"() {
+        when:
+        TestSeedData.buildOrgs(5)
+        def elist = EntityMapFactory.createEntityMapList(Org.list(), ['id', 'name', 'kind', 'type.id', 'type.name'])
+
+        then:
+        elist.size() == 5
+        elist.totalCount == 5
+        elist[0] == [
+            id: 1, name: 'Name1', kind: 'COMPANY', type: [id:1, name: 'name']
+        ]
     }
 }

@@ -32,7 +32,11 @@ class EntityMapList extends AbstractList<EntityMap> {
     }
 
     int getTotalCount() {
-        return (resultList as PagedResultList).getTotalCount()
+        if(resultList instanceof PagedResultList){
+            return (resultList as PagedResultList).getTotalCount()
+        } else {
+            return resultList.size()
+        }
     }
 
     /**

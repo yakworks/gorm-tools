@@ -28,17 +28,46 @@ class EntityMapFactory {
         throw new AssertionError()
     }
 
-    static EntityMap createEntityMap(Object entity, List<String> fields) {
-        EntityMapIncludes includesMap = buildIncludesMap(entity.class.name, fields)
+    /**
+     * Wrap entity/object in EntityMap
+     *
+     * @param entity the entity to wrap in a map
+     * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
+     * @return the EntityMap object
+     */
+    static EntityMap createEntityMap(Object entity, List<String> includes) {
+        EntityMapIncludes includesMap = buildIncludesMap(entity.class.name, includes)
         return new EntityMap(entity, includesMap)
     }
 
-    static EntityMapIncludes buildIncludesMap(String className, List<String> fields) {
+    /**
+     * Wrap entity/object in EntityMap
+     *
+     * @param entity the entity to wrap in a map
+     * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
+     * @return the EntityMap object
+     */
+    static EntityMapList createEntityMapList(List entityList, List<String> includes) {
+        if(!entityList) return null
+        //use first item to get the class
+        String className = entityList[0].class.name
+        EntityMapIncludes includesMap = buildIncludesMap(className, includes)
+        return new EntityMapList(entityList, includesMap)
+    }
+
+    /**
+     * builds a EntityMapIncludes object from a sql select like list. Used in EntityMap and EntityMapList
+     *
+     * @param className the class name of the PersistentEntity
+     * @param includes
+     * @return the EntityMapIncludes object that can be passed to EntityMap
+     */
+    static EntityMapIncludes buildIncludesMap(String className, List<String> includes) {
         PersistentEntity domain = GormMetaUtils.findPersistentEntity(className)
         List<PersistentProperty> properties = GormMetaUtils.getPersistentProperties(domain)
         Set<String> rootProps = [] as Set<String>
         Map<String, Object> nestedProps = [:]
-        for (String field : fields) {
+        for (String field : includes) {
             Integer nestedIndex = field.indexOf('.')
             //no index then its just a property or its the *
             if (nestedIndex == -1) {

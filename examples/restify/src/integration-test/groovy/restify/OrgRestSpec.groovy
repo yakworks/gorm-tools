@@ -21,14 +21,14 @@ class OrgRestSpec extends RestApiFuncSpec {
 
     //@Transactional
     //Map getPostData() { return TestDataJson.buildMap(Org, type: OrgType.load(1)) }
-    Map postData = [name: "foo", type: [id: 1]]
+    Map postData = [num:'foo1', name: "foo", type: [id: 1]]
 
     Map putData = [name: "Name Update"]
 
     Map invalidData = ["name": null]
 
     @Override
-    void testPost() {
+    def testPost() {
         // "The save action is executed with valid data"
         def response = restBuilder.post(resourcePath) {
             json postData
@@ -41,6 +41,7 @@ class OrgRestSpec extends RestApiFuncSpec {
         def rget = restBuilder.get("$resourcePath/${response.json.id}")
         assert rget.json.name == 'foo'
         assert rget.json.type.id == 1
+        return rget
     }
 
 }

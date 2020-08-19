@@ -1,26 +1,22 @@
 ---
 restApi:
-  project:
+  project: # project already exists as a project controller so this just configures it
     includes:
-      default: ['*']
       list: ['id', 'num', 'name', 'billable']
       pickList: ['id', 'num', 'name']
 
-  book:
+  book: # basic example where all the defaults come either from domain or their stock
     entityClass: restify.Book
-    qSearch: ['title']
-    includes:
-      default: ['id', 'title']
 
   org:
     entityClass: yakworks.taskify.domain.Org
     qSearch: ['num', 'name']
     includes:
-      default: ['*', 'type.*']
+      get: ['*', 'type.*']
       pickList: ['id', 'name']
 
   task:
     entityClass: yakworks.taskify.domain.Task
     qSearch: ['name', 'note']
     includes:
-      default: ['*', 'project.*']
+      get: ['*', 'project.*']

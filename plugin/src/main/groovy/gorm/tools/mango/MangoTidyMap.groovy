@@ -84,7 +84,7 @@ class MangoTidyMap {
                     return
                 }
             }
-            if (val instanceof Map && key != MangoBuilder.SORT) {
+            if (val instanceof Map && key != MangoBuilder.SORT && key != MangoBuilder.Q && key != MangoBuilder.QSEARCH) {
                 toMangoOperator(val as Map, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {

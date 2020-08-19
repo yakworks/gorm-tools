@@ -4,18 +4,23 @@
 */
 package restify
 
-import gorm.tools.rest.RestApi
+import java.time.LocalDate
+
 import grails.compiler.GrailsCompileStatic
+import yakworks.taskify.domain.traits.NameDescriptionConstraints
+import yakworks.taskify.domain.traits.NameDescriptionTrait
 
 @GrailsCompileStatic
-// @RestApi(description = "Book test domain")
-class Book {
+class Book implements NameDescriptionTrait{
 
-    String title
+    BigDecimal cost
+    LocalDate publishDate
 
+    //default includes fields for json render with EntityMap
+    static List includes = ['id', 'name', 'description', 'publishDate']
 
     static constraints = {
-        title nullable: false
+        importFrom(NameDescriptionConstraints)
     }
 
 }

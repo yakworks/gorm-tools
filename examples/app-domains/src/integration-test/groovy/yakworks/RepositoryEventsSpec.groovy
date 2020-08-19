@@ -19,7 +19,7 @@ class RepositoryEventsSpec extends Specification {
 
     void "check events"() {
         given:
-        Map params = [name: "test", type: [id: 1]]
+        Map params = [num:'test1', name: "test", type: [id: 1]]
 
         when:
         Org org = Org.create(params)

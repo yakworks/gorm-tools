@@ -47,7 +47,7 @@ class EntityMapFactory {
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
-    static EntityMapList createEntityMapList(List entityList, List<String> includes) {
+    static EntityMapList createEntityMapList(List entityList, List<String> includes = []) {
         if(!entityList) return null
         //use first item to get the class
         String className = entityList[0].class.name
@@ -62,7 +62,8 @@ class EntityMapFactory {
      * @param includes
      * @return the EntityMapIncludes object that can be passed to EntityMap
      */
-    static EntityMapIncludes buildIncludesMap(String className, List<String> includes) {
+    static EntityMapIncludes buildIncludesMap(String className, List<String> includes = []) {
+        includes = includes ?: ['*'] as List<String> //default to * if nothing
         PersistentEntity domain = GormMetaUtils.findPersistentEntity(className)
         List<PersistentProperty> properties = GormMetaUtils.getPersistentProperties(domain)
         Set<String> rootProps = [] as Set<String>

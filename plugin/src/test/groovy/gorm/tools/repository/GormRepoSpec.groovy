@@ -415,22 +415,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.repo.mangoQuery.criteriaKeyName == "testCriteriaName"
     }
 
-    def "test default quick search fields"() {
-        when:
-        GormToolsPluginHelper.addQSearchFields(["name", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
-
-        then:
-        TestTrxRollback.qSearchFields == ["name"]
-
-        when:
-        TestTrxRollback.qSearchFields = []
-        GormToolsPluginHelper.addQSearchFields(["name", "notExistingField"], getDatastore().mappingContext.persistentEntities as List<PersistentEntity>)
-
-        then:
-        TestTrxRollback.qSearchFields == ["name"]
-
-
-    }
 }
 
 @Entity @GrailsCompileStatic

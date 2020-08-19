@@ -291,7 +291,7 @@ class MangoBuilder {
 
     @CompileDynamic //dynamic so we can access the protected targetClass.quickSearchFields
     static List<String>  getQSearchFields(DetachedCriteria criteria) {
-        criteria.targetClass.qSearchFields
+        criteria.targetClass.qSearchIncludes
     }
 
     @CompileDynamic

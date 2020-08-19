@@ -2,6 +2,7 @@ package restify
 
 import geb.spock.GebSpec
 import gorm.tools.rest.testing.RestApiTestTrait
+import gorm.tools.testing.TestTools
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.IgnoreRest
@@ -120,10 +121,10 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         response.status == CREATED.value()
         verifyHeaders(response)
         //response.json.id
-        subsetEquals(data, response.json as Map, excludes)
+        TestTools.mapContains(response.json, data, excludes)
         //Project.count() > 1// == 1
         def rget = restBuilder.get("$resourcePath/${response.json.id}")
-        subsetEquals(data, rget.json as Map, excludes)
+        TestTools.mapContains(rget.json, data, excludes)
     }
 
     void test_update_put() {
@@ -148,11 +149,10 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         then: "The response is correct"
         response.status == OK.value()
         //response.json
-        subsetEquals(updateData, response.json, excludes)
+        TestTools.mapContains(response.json, updateData, excludes)
         //get it and make sure
         def rget = restBuilder.get("$resourcePath/$goodId")
-        subsetEquals(updateData, rget.json, excludes)
-
+        TestTools.mapContains(rget.json, updateData, excludes)
     }
 
     // @IgnoreRest

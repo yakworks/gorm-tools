@@ -8,15 +8,14 @@ import grails.transaction.Rollback
 @Rollback
 class AppUserRestApiSpec extends RestApiFuncSpec {
 
-    Class<AppUser> domainClass = AppUser
-    // set to true if you have configured the _error.gson or controller
-    // to return application/vnd.error vs application/json
-    boolean vndHeaderOnError = false
-
     String getResourcePath() {
         "${baseUrl}api/appUser"
     }
 
+    void setup() {
+        // this does not rollback
+        new AppUser(userName: "project", magicCode: "x123").persist()
+    }
     //data to force a post or patch failure
     Map getInvalidData() { [userName: null] }
 

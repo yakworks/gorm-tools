@@ -47,7 +47,7 @@ class Org implements NameTrait{
         testIdent enumType: 'identity'
     }
 
-    static List qSearchFields = ["name"]
+    static List qSearchIncludes = ["name"]
 
     static constraints = {
         importFrom(NameTraitConstraints)

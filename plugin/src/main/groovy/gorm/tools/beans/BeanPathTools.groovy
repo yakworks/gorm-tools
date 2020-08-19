@@ -81,6 +81,7 @@ class BeanPathTools {
      * @param useDelegatingBean
      * @return a map which is based on object properties
      */
+    @Deprecated //Use EntityMap instead now
     // @CompileDynamic
     static Map buildMapFromPaths(Object source, List<String> propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {

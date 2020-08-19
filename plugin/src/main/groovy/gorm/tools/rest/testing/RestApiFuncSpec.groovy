@@ -17,7 +17,7 @@ import static org.springframework.http.HttpStatus.*
 abstract class RestApiFuncSpec extends GebSpec implements RestApiTestTrait {
     boolean vndHeaderOnError = false
 
-    String getResourcePath() { "${baseUrl}/${path}" }
+    // String getResourcePath() { "${baseUrl}/${path}" }
 
     Map getInvalidData() { return [:] }
 
@@ -53,109 +53,4 @@ abstract class RestApiFuncSpec extends GebSpec implements RestApiTestTrait {
         expect:
         testDelete()
     }
-
-    void testList() {
-        def response = post_a_valid_resource()
-        response = restBuilder.get(resourcePath)
-        assert response.status == OK.value()
-        assert response.json.size() >= 0 // == []
-    }
-
-    void testPost() {
-        // "The save action is executed with valid data"
-        def response = restBuilder.post(resourcePath) {
-            json postData
-        }
-
-        //"The response is correct"
-        assert response.status == CREATED.value()
-        verifyHeaders(response)
-        //response.json.id
-        assert TestTools.mapContains(response.json, postData, excludes)
-        //Project.count() > 1// == 1
-        def rget = restBuilder.get("$resourcePath/${response.json.id}")
-        assert TestTools.mapContains(rget.json, postData, excludes)
-    }
-
-    void testPostInvalid() {
-        // "The save action is executed with invalid data"
-        def response = restBuilder.post(resourcePath) {
-            json getInvalidData()
-        }
-        // "The response is UNPROCESSABLE_ENTITY"
-        verify_UNPROCESSABLE_ENTITY(response)
-    }
-
-    void testPut() {
-        def response = post_a_valid_resource()
-        def goodId = response.json.id
-        response = restBuilder.put("$resourcePath/$goodId") {
-            json putData
-        }
-
-        // "The response is correct"
-        assert response.status == OK.value()
-        //response.json
-        assert TestTools.mapContains(response.json, putData, excludes)
-        //get it and make sure
-        def rget = restBuilder.get("$resourcePath/$goodId")
-        assert TestTools.mapContains(rget.json, putData, excludes)
-        // subsetEquals(putData, rget.json, excludes)
-
-    }
-
-    void testGet() {
-        // "The save action is executed with valid data"
-        def response = post_a_valid_resource()
-
-        // "When the show action is called to retrieve a resource"
-        def id = response.json.id
-        response = restBuilder.get("$resourcePath/$id")
-
-        // "The response is correct"
-        assert response.status == OK.value()
-        assert response.json.id == id
-    }
-
-    void testDelete() {
-        // "The save action is executed with valid data"
-        def response = post_a_valid_resource()
-        def id = response.json.id
-
-        // "When the delete action is executed on an unknown instance"
-        response = restBuilder.delete("$resourcePath/99999")
-
-        // "The response is bad"
-        response.status == NOT_FOUND.value()
-
-        // when: "When the delete action is executed on an existing instance"
-        response = restBuilder.delete("$resourcePath/$id")
-
-        // then: "The response is correct"
-        assert response.status == NO_CONTENT.value()
-    }
-
-    def post_a_valid_resource() {
-        def response = restBuilder.post(resourcePath) {
-            json getPostData()
-        }
-        verifyHeaders(response)
-        // println "response.json ${response.json}"
-        assert response.status == CREATED.value()
-        assert response.json.id
-        return response
-    }
-
-    def verifyHeaders(Object response) {
-        //assert response.headers.getFirst(CONTENT_TYPE) == 'application/json;charset=UTF-8'
-        //assert response.headers.getFirst(HttpHeaders.LOCATION) == "$resourcePath/${response.json.id}"
-        true
-    }
-
-    def verify_UNPROCESSABLE_ENTITY(Object response) {
-        assert response.status == UNPROCESSABLE_ENTITY.value()
-
-        true
-    }
-
 }

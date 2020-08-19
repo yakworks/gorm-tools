@@ -42,6 +42,7 @@ class TestSeedData {
 
         String value = "Org" + id
         def org = new Org(
+            num: "$id",
             name: value,
             name2: id % 2 == 0 ? null : "OrgName2" + id,
             type: type,

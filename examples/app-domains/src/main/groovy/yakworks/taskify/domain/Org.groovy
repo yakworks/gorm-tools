@@ -11,12 +11,12 @@ import groovy.transform.CompileDynamic
 
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.taskify.traits.NameTrait
-import yakworks.taskify.traits.NameTraitConstraints
+import yakworks.taskify.domain.traits.NameNumConstraints
+import yakworks.taskify.domain.traits.NameNumTrait
 
 @Entity
 @GrailsCompileStatic
-class Org implements NameTrait{
+class Org implements NameNumTrait{
     //strings
     String name2
     String secret
@@ -57,10 +57,8 @@ class Org implements NameTrait{
         status enumType: 'identity'
     }
 
-    static List qSearchFields = ["name"]
-
     static constraints = {
-        importFrom(NameTraitConstraints)
+        importFrom(NameNumConstraints)
 
         name2    nullable: true
         secret   nullable: true, display: false

@@ -20,10 +20,12 @@ import gorm.tools.traits.IdEnum
  * reads properties from a gorm entity based on list of includes/excludes
  * Its used primarily for specifying a sql like select list and the feeding this into a json generator
  *
+ * Setting properties on the wrapped object is not supported but a put will write to shadow map and look there first
+ * on a get so properties can be overriden
+ *
  * Ideas taken from BeanMap in http://commons.apache.org/proper/commons-beanutils/index.html
  * and grails LazyMetaPropertyMap
  *
- * WORK IN PROGRESS - to replace BeanPathTools so we are not creating a map and then creating the json
  * @author Joshua Burnett (@basejump)
  * @since 6.1.12
  */

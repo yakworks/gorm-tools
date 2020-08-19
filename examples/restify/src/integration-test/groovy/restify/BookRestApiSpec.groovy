@@ -6,6 +6,8 @@ import grails.testing.mixin.integration.Integration
 // import grails.transaction.Rollback
 import org.springframework.test.annotation.Rollback
 
+import spock.lang.IgnoreRest
+
 import static org.springframework.http.HttpStatus.OK
 
 @Integration
@@ -53,6 +55,13 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         //test on pickList
         testPickList('galt').data.size() == 3
         testPickList('flubber').data.size() == 0
+    }
+
+    // @IgnoreRest
+    void "test get"() {
+        expect:
+        def response = restBuilder.get("$resourcePath/1")
+        response.status == OK.value()
     }
 
     void "exercise api"() {

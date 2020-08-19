@@ -263,13 +263,13 @@ ability to search by one string in criteria filters against several domain field
 search can be passed in `$qSearch` or `$q` keywords. 
 There are 2 ways to specify fields that should be searched against:
 
-1. in static property `qSearchFields` as list of strings, see example bellow:
+1. in static property `qSearchIncludes` as list of strings, see example bellow:
 ```groovy
 class Org {
 	String name
     Address address
 
-    static qSearchFields = ["name", "address.city"]
+    static qSearchIncludes = ["name", "address.city"]
     ...
 
 ```
@@ -282,14 +282,11 @@ gorm:
 
 ```
 
-On application start for all domains that doesn't have a `qSearchFields` property, the fields from `qSearchDefault`
-that each domain contains will be added. 
-
-So Mango criteria will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
-for each field in `qSearchFields`. If domain field is not string type, then `eq` statement will be used.
+Mango criteria will add `%` automatically, if quick search string doesn't have it and will apply `ilike` statement
+for each field in `qSearchIncludes`. If domain field is not string type, then `eq` statement will be used.
 
 ```groovy
-Org.repo.search([criteria: [$qSearch: "abc"], max: 20])
+Org.repo.search([criteria: [$q: "abc"], max: 20])
 
 ```
 So it is the same as:

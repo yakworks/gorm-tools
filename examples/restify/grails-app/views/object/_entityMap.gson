@@ -1,8 +1,8 @@
-import groovy.transform.Field
+import gorm.tools.beans.EntityMap
 
 model {
-    Object object
+    EntityMap entityMap
     // Map renderArgs = [:]
 }
 // System.out.println "Model in _object $binding.variables"
-json g.render(object)
+json g.render(entityMap)

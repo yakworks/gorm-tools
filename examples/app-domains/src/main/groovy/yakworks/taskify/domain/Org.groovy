@@ -57,8 +57,6 @@ class Org implements NameNumTrait{
         status enumType: 'identity'
     }
 
-    static List qSearchFields = ["name"]
-
     static constraints = {
         importFrom(NameNumConstraints)
 

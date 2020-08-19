@@ -39,10 +39,10 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
 
     @Override
     void onStartup(Map event) {
-        GormToolsPluginHelper.addQSearchFields(
-            config.gorm?.tools?.mango?.qSearchDefault ?: [],
-            grailsApplication.getMappingContext().getPersistentEntities() as List
-        )
+        // GormToolsPluginHelper.addQSearchFields(
+        //     config.gorm?.tools?.mango?.qSearchDefault ?: [],
+        //     grailsApplication.getMappingContext().getPersistentEntities() as List
+        // )
     }
 
     /**

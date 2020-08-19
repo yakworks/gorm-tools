@@ -13,6 +13,7 @@ import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.Pager
 import gorm.tools.beans.BeanPathTools
+import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapFactory
 import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.api.RepositoryApi
@@ -70,7 +71,8 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     def post() {
         try {
             D instance = (D) getRepo().create(getDataMap())
-            respond jsonObject(instance), [status: CREATED] //201
+            def entityMap = createEntityMap(instance)
+            respondWithEntityMap(entityMap, [status: CREATED])
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -85,7 +87,8 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         data.putAll(getDataMap()) // getDataMap doesnt contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
-            respond jsonObject(instance), [status: OK] //200
+            def entityMap = createEntityMap(instance)
+            respondWithEntityMap(entityMap, [status: OK])
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -113,9 +116,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     def get() {
         try {
             D instance = (D) getRepo().get(params)
-            def renderObj = jsonObject(instance)
-            // println "renderObj $renderObj"
-            respond(renderObj)
+            def entityMap = createEntityMap(instance)
+            respondWithEntityMap(entityMap)
+            // respond(jsonObject)
         } catch (RuntimeException e) {
             handleException(e)
         }
@@ -144,8 +147,8 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     @Action
     def list() {
         Pager pager = pagedQuery(params, 'list')
-        Map renderArgs = [:] //[includes: ['name']]
-        respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
+        // passing renderArgs args would be usefull for 'renderNulls' if we want to include/exclude
+        respond([view: '/object/_pagedList'], [pager: pager, renderArgs: [:]])
         // respond query(params)
     }
 
@@ -179,6 +182,12 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         getMangoApi().query(p)
     }
 
+    void respondWithEntityMap(EntityMap entityMap, Map args = [:]){
+        def resArgs = [view: '/object/_entityMap'] as Map<String, Object>
+        if(args) resArgs.putAll(args)
+        respond(resArgs, [entityMap: entityMap])
+    }
+
     /**
      * builds the response model with the EntityMap wrapper.
      *
@@ -186,10 +195,10 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      * @param includeKey the key to use in the includes map, use default by default
      * @return the object to pass on to json views
      */
-    Object jsonObject(D instance, String includesKey = 'get'){
+    EntityMap createEntityMap(D instance, String includesKey = 'get'){
         List incs = getIncludes(includesKey)
         // def emap = BeanPathTools.buildMapFromPaths(instance, incs)
-        def emap = EntityMapFactory.createEntityMap(instance, incs)
+        EntityMap emap = EntityMapFactory.createEntityMap(instance, incs)
         return emap
     }
 

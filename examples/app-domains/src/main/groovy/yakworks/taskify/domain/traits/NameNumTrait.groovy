@@ -7,6 +7,9 @@ trait NameNumTrait {
 
     String num
     String name
+
+    static List qSearchIncludes = ['num', 'name'] // quick search includes
+    static List pickListIncludes = ['id', 'num', 'name'] //for picklist
 }
 
 //@GrailsCompileStatic

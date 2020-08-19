@@ -27,7 +27,7 @@ class TaskRestApiSpec extends RestApiFuncSpec {
     }
 
     @Override
-    void testPost() {
+    def testPost() {
         // "The save action is executed with valid data"
         def response = restBuilder.post(resourcePath) {
             json postData
@@ -41,5 +41,6 @@ class TaskRestApiSpec extends RestApiFuncSpec {
         def rget = restBuilder.get("$resourcePath/${response.json.id}")
         assert rget.json.name == 'task'
         assert rget.json.project.id == 1
+        return rget
     }
 }

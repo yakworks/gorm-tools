@@ -218,6 +218,9 @@ class Pager {
         if(entityMapList){
             setRecordCount(entityMapList.getTotalCount())
             setData(entityMapList)
+        } else {
+            setRecordCount(0)
+            setData([])
         }
         return this
     }

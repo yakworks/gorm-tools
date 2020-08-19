@@ -19,6 +19,7 @@ import gorm.tools.repository.api.RepositoryApi
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.databinding.SimpleMapDataBindingSource
+import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
 import grails.web.Action
 import grails.web.api.ServletAttributes
@@ -33,7 +34,8 @@ import static org.springframework.http.HttpStatus.OK
 trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi, RestControllerErrorHandling {
 
     Map includes = [:]
-    List qSearchFields = []
+    List qSearchIncludes = []
+    boolean _qSearchConfigChecked = false
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -43,16 +45,6 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      */
     Class<D> entityClass // the domain class this is for
 
-
-    // @PostConstruct
-    // void postInit() {
-    //     String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
-    //     String apiName = GrailsNameUtils.getPropertyNameRepresentation(logicalName)
-    //     //println "apiName $apiName"
-    //     includes = AppCtx.config.getProperty("api.${apiName}.includes", Map)
-    //     //println "includes $includes"
-    // }
-    //
     /**
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
@@ -170,7 +162,6 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List incs = getIncludes(includesKey)
-        incs = incs ?: ['*']
         return pager.setupList(dlist, incs)
     }
 
@@ -181,7 +172,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
 
         //def qSearch = p.remove('q')
         if(p.q && getSearchFields()) {
-            Map qMap = ['text': p.q, 'fields': qSearchFields]
+            Map qMap = ['text': p.q, 'fields': getSearchFields()]
             p['$q'] = qMap
         }
 
@@ -189,16 +180,14 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     /**
-     * builds the response model. if there is an includes the it will use BeanPathTools.buildMapFromPaths
-     * if no includes list (the default) then it just returns the instance
+     * builds the response model with the EntityMap wrapper.
      *
      * @param instance the entity instance
      * @param includeKey the key to use in the includes map, use default by default
      * @return the object to pass on to json views
      */
-    Object jsonObject(D instance, String includesKey = 'default'){
+    Object jsonObject(D instance, String includesKey = 'get'){
         List incs = getIncludes(includesKey)
-        incs = incs ?: ['*']
         // def emap = BeanPathTools.buildMapFromPaths(instance, incs)
         def emap = EntityMapFactory.createEntityMap(instance, incs)
         return emap
@@ -211,28 +200,34 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
             //see if there is a config for it
             Map cfgIncs = grailsApplication.config.getProperty("restApi.${getControllerName()}.includes", Map)
             if(cfgIncs) includes = cfgIncs
-            if(includes == null) includes = [:]
+            if(!includes) {
+                List includesDefault = GrailsClassUtils.getStaticPropertyValue(getEntityClass(), 'includes') as List
+                includes = includesDefault ? ['get': includesDefault] : [:]
+                // look for pickList too
+                List pickListIncludes = GrailsClassUtils.getStaticPropertyValue(getEntityClass(), 'pickListIncludes') as List
+                if(pickListIncludes) includes['pickList'] = pickListIncludes
+            }
             includes['__configChecked__'] = true //mark it so we don't check config again each time
         }
         List incs = includes[includesKey] as List
+        incs = incs ?: includes['get'] as List
         // println "incs $includesKey $incs"
         return incs
     }
 
-    boolean _qSearchConfigChecked = false
-
     List getSearchFields(){
-        if(!qSearchFields || !_qSearchConfigChecked){
+        if(!qSearchIncludes || !_qSearchConfigChecked){
             //see if there is a config for it
             List cfgQSearch = grailsApplication.config.getProperty("restApi.${getControllerName()}.qSearch", List)
-            if(cfgQSearch) qSearchFields = cfgQSearch
-            if(qSearchFields == null) qSearchFields = []
-            _qSearchConfigChecked = true //mark it so we don't check config again each time
+            if(cfgQSearch) qSearchIncludes = cfgQSearch
+            if(!qSearchIncludes) {
+                List qSearchFieldsStatic = GrailsClassUtils.getStaticPropertyValue(getEntityClass(), 'qSearchIncludes') as List
+                qSearchIncludes = qSearchFieldsStatic ?: []
+            }
+            _qSearchConfigChecked = true //mark it so we don't do config setup again on each request
         }
-        return qSearchFields
+        return qSearchIncludes
     }
-
-
 
     /**
      * getControllerName() works inisde a request and should be used, but during init or outside a request use this

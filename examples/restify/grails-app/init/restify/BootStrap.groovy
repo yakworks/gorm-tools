@@ -33,6 +33,14 @@ class BootStrap {
                 new OrgType(name: "OrgType-$it")
                     .persist()
             }
+
+            (1..5).each {id ->
+                def book = new Book(description: "Shrugged$id")
+                book.name = id % 2 == 0 ? 'Atlas' : "Galt"
+                book.id = id
+                book.persist(flush: true)
+            }
+
            // (1..100).each {
            //     def task = new Task(name: "task-$it",
            //         project: Project.load(rand.nextInt(49)))

@@ -32,7 +32,7 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
         res.fields == ['name'] as Set
 
         when:
-        res = EntityMapFactory.buildIncludesMap("Bookz", ['*'])
+        res = EntityMapFactory.buildIncludesMap("Bookz")
 
         then:
         res.className == 'Bookz' // [className: 'Bookz', props: ['name']]

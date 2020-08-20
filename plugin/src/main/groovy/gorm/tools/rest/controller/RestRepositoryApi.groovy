@@ -214,14 +214,15 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     //@SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
 
     List getIncludes(String includesKey){
-        //we are in trait, need to use getter in case includes is overriden in implmenting class
-        def includesMap = restApiConfig.getIncludes(getControllerName(), getEntityClass(), getIncludes())
+        //we are in trait, always use getters in case they are overrriden in implementing class
+        def includesMap = getRestApiConfig().getIncludes(getControllerName(), getEntityClass(), getIncludes())
         List incs = (includesMap[includesKey] ?: includesMap['get'] ) as List
         return incs
     }
 
     List getSearchFields(){
-        def qincs = restApiConfig.getQSearchIncludes(getControllerName(), getEntityClass(), getqSearchIncludes())
+        //we are in trait, always use getters in case they are overrriden in implementing class
+        def qincs = getRestApiConfig().getQSearchIncludes(getControllerName(), getEntityClass(), getqSearchIncludes())
         return qincs
     }
 

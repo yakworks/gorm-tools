@@ -5,6 +5,7 @@
 package gorm.tools.rest.controller
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import org.springframework.context.MessageSource
 
@@ -23,10 +24,8 @@ import grails.util.GrailsNameUtils
 // we can get some good ideas from how that plugin does things
 // @SuppressWarnings(['CatchException', 'NoDef', 'ClosureAsLastMethodParameter', 'FactoryMethodName'])
 @Artefact("Controller")
-@CompileDynamic
+@CompileStatic
 class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryApi<D> {
-    // static allowedMethods = [list  : ["GET", "POST"], create: "POST",
-    //                          update: ["PUT", "PATCH"], delete: "DELETE"]
 
     static responseFormats = ['json']
     static namespace = 'api'
@@ -52,7 +51,7 @@ class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryA
     }
 
     protected String getDomainInstanceName() {
-        def suffix = grailsApplication.config?.grails?.scaffolding?.templates?.domainSuffix
+        String suffix = grailsApplication.config.getProperty('grails.scaffolding.templates.domainSuffix')
         if (!suffix) {
             suffix = ''
         }

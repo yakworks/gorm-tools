@@ -9,11 +9,9 @@ import groovy.transform.CompileStatic
 
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
-import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.DbDialectService
-import gorm.tools.GormMetaUtils
 import gorm.tools.async.GparsAsyncSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
@@ -25,6 +23,7 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.rest.JsonSchemaGenerator
 import gorm.tools.rest.RestApi
+import gorm.tools.rest.RestApiConfig
 import gorm.tools.support.MsgService
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
@@ -41,6 +40,8 @@ class GormToolsPluginHelper {
     static Closure doWithSpring = {
         println "starting gorm-tools config"
         msgService(MsgService)
+
+        restApiConfig(RestApiConfig)
 
         jdbcTemplate(JdbcTemplate, ref("dataSource"))
 

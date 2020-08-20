@@ -31,9 +31,10 @@ class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryA
     static namespace = 'api'
 
     Class<D> entityClass
-    String entityName
-    String entityClassName
-    boolean readOnly
+    boolean readOnly //future use
+    // String entityName
+    // String entityClassName
+
     //MessageSource messageSource
 
     //AppSetupService appSetupService
@@ -46,17 +47,17 @@ class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryA
     RestApiRepoController(Class<D> entityClass, boolean readOnly) {
         this.entityClass = entityClass
         this.readOnly = readOnly
-        entityName = entityClass.simpleName
-        entityClassName = GrailsNameUtils.getPropertyName(entityClass)
+        // entityName = entityClass.simpleName
+        // entityClassName = GrailsNameUtils.getPropertyName(entityClass)
     }
 
-    protected String getDomainInstanceName() {
-        String suffix = grailsApplication.config.getProperty('grails.scaffolding.templates.domainSuffix')
-        if (!suffix) {
-            suffix = ''
-        }
-        def propName = GrailsNameUtils.getPropertyName(entityClass)
-        "${propName}${suffix}"
-    }
+    // protected String getDomainInstanceName() {
+    //     String suffix = grailsApplication.config.getProperty('grails.scaffolding.templates.domainSuffix')
+    //     if (!suffix) {
+    //         suffix = ''
+    //     }
+    //     def propName = GrailsNameUtils.getPropertyName(entityClass)
+    //     "${propName}${suffix}"
+    // }
 
 }

@@ -26,7 +26,9 @@ class ProjectController extends RestApiRepoController<Project> {
             String comments = q.comments ?: ""
             q.comments = "$comments - post was here"
             Project instance = getRepo().create(q)
-            respond instance, [status: CREATED] //201
+            def entityMap = createEntityMap(instance)
+            respondWithEntityMap(entityMap, [status: CREATED])
+            // respond instance, [status: CREATED] //201
         } catch (RuntimeException e) {
             handleException(e)
         }

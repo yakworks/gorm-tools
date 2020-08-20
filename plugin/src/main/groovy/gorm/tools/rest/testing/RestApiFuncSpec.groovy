@@ -7,10 +7,6 @@ package gorm.tools.rest.testing
 import groovy.transform.CompileDynamic
 
 import geb.spock.GebSpec
-import gorm.tools.testing.TestTools
-
-import static grails.web.http.HttpHeaders.CONTENT_TYPE
-import static org.springframework.http.HttpStatus.*
 
 @SuppressWarnings(['NoDef', 'AbstractClassWithoutAbstractMethod', 'Indentation', 'JUnitTestMethodWithoutAssert'])
 @CompileDynamic

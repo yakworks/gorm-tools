@@ -9,34 +9,43 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 
 import gorm.tools.Pager
-import gorm.tools.beans.BeanPathTools
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapFactory
 import gorm.tools.repository.GormRepoEntity
+import gorm.tools.repository.RepoMessage
 import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.rest.RestApiConfig
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.databinding.SimpleMapDataBindingSource
-import grails.util.GrailsClassUtils
 import grails.util.GrailsNameUtils
+import grails.validation.ValidationException
 import grails.web.Action
 import grails.web.api.ServletAttributes
 import grails.web.databinding.DataBindingUtils
 
+import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException', 'NoDef'])
-trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi, RestControllerErrorHandling {
+trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi {
 
-    Map includes = [:]
-    List qSearchIncludes = []
-    boolean _qSearchConfigChecked = false
+    @Autowired
+    RestApiConfig restApiConfig
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -202,41 +211,28 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         return emap
     }
 
-    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
-    //@CompileDynamic
+    //@SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
+
     List getIncludes(String includesKey){
-        if(!includes || !includes['__configChecked__']){
-            //see if there is a config for it
-            Map cfgIncs = grailsApplication.config.getProperty("restApi.${getControllerName()}.includes", Map)
-            if(cfgIncs) includes = cfgIncs
-            if(!includes) {
-                List includesDefault = GrailsClassUtils.getStaticPropertyValue(getEntityClass(), 'includes') as List
-                includes = includesDefault ? ['get': includesDefault] : [:]
-                // look for pickList too
-                List pickListIncludes = GrailsClassUtils.getStaticPropertyValue(getEntityClass(), 'pickListIncludes') as List
-                if(pickListIncludes) includes['pickList'] = pickListIncludes
-            }
-            includes['__configChecked__'] = true //mark it so we don't check config again each time
-        }
-        List incs = includes[includesKey] as List
-        incs = incs ?: includes['get'] as List
-        // println "incs $includesKey $incs"
+        //we are in trait, need to use getter in case includes is overriden in implmenting class
+        def includesMap = restApiConfig.getIncludes(getControllerName(), getEntityClass(), getIncludes())
+        List incs = (includesMap[includesKey] ?: includesMap['get'] ) as List
         return incs
     }
 
     List getSearchFields(){
-        if(!qSearchIncludes || !_qSearchConfigChecked){
-            //see if there is a config for it
-            List cfgQSearch = grailsApplication.config.getProperty("restApi.${getControllerName()}.qSearch", List)
-            if(cfgQSearch) qSearchIncludes = cfgQSearch
-            if(!qSearchIncludes) {
-                List qSearchFieldsStatic = GrailsClassUtils.getStaticPropertyValue(getEntityClass(), 'qSearchIncludes') as List
-                qSearchIncludes = qSearchFieldsStatic ?: []
-            }
-            _qSearchConfigChecked = true //mark it so we don't do config setup again on each request
-        }
-        return qSearchIncludes
+        def qincs = restApiConfig.getQSearchIncludes(getControllerName(), getEntityClass(), getqSearchIncludes())
+        return qincs
     }
+
+    /**
+     * implementing class can provide the includes map property. using the restApi config is recomended
+     */
+    Map getIncludes(){ [:] }
+    /**
+     * implementing class can provide the qSearchIncludes property. using the restApi config is recomended
+     */
+    List getqSearchIncludes() { [] }
 
     /**
      * getControllerName() works inisde a request and should be used, but during init or outside a request use this
@@ -251,8 +247,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      * The Map object that can be bound to create or update domain entity.  Defaults whats in the request based on mime-type.
      * Subclasses may override this
      */
-    @CompileDynamic
-    //so it can access the SimpleMapDataBindingSource.map
+    @CompileDynamic //so it can access the SimpleMapDataBindingSource.map
     Map getDataMap() {
         SimpleMapDataBindingSource bsrc =
                 (SimpleMapDataBindingSource) DataBindingUtils.createDataBindingSource(grailsApplication, getEntityClass(), getRequest())
@@ -267,6 +262,10 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         ((ResponseRenderer) this).render args
     }
 
+    void callRender(Map argMap, CharSequence body){
+        ((ResponseRenderer) this).render(argMap, body)
+    }
+
     /**
      * CAst this to RestResponder and call respond
      * @param value
@@ -274,6 +273,39 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      */
     def callRespond(Object value, Map args = [:]) {
         ((RestResponder) this).respond value, args
+    }
+
+    void handleException(RuntimeException e) {
+        //log.error e.message
+        if( e instanceof EntityNotFoundException){
+            callRender(status: NOT_FOUND, e.message)
+        }
+        else if( e instanceof EntityValidationException ){
+            String m = buildMsg(e.messageMap, e.errors)
+            // log.info m
+            callRender(status: UNPROCESSABLE_ENTITY, m)
+        }
+        else if( e instanceof ValidationException ){
+            String m = buildMsg([defaultMessage: e.message], e.errors)
+            callRender(status: UNPROCESSABLE_ENTITY, m)
+        }
+        else if( e instanceof OptimisticLockingFailureException ){
+            callRender(status: CONFLICT, e.message)
+        } else {
+            throw e
+        }
+
+    }
+
+    String buildMsg(Map msgMap, Errors errors) {
+        StringBuilder result = new StringBuilder(msgMap['defaultMessage'] as String)
+        // FIXME not sure where msg comes from
+        // errors.getAllErrors().each { error ->
+        //     error =  error as FieldError
+        //     String msg = "\n${message(error: error, args: error.arguments, local: RepoMessage.defaultLocale())}"
+        //     result.append("\n" + message(error: error, args: error.arguments, local: RepoMessage.defaultLocale()))
+        // }
+        return result
     }
 
 }

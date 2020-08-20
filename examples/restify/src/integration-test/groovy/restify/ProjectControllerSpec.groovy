@@ -35,7 +35,7 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
     Map getInvalidData() { ["name": null] }
 
     Map getUpdateData() {
-        [name: "project", num: "test", inactive: true, billable: true]
+        [name: "project 123", num: "test", inactive: true, billable: true]
     }
 
     // @IgnoreRest

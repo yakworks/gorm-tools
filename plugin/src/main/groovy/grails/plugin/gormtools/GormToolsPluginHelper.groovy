@@ -63,10 +63,6 @@ class GormToolsPluginHelper {
         repoExceptionSupport(RepoExceptionSupport)
 
         asyncSupport(GparsAsyncSupport)
-//            { bean ->
-//            bean.autowire = true
-//            bean.lazyInit = true
-//        }
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 
@@ -76,23 +72,7 @@ class GormToolsPluginHelper {
         }
 
 
-        //make sure each domain has a repository, if not set up a DefaultGormRepo for it.
-        Class[] domainClasses = application.domainClasses*.clazz
-        // println ("domainClasses $domainClasses")
-
-        domainClasses.each { Class domainClass ->
-            String repoName = RepoUtil.getRepoBeanName(domainClass)
-            def hasRepo = repoClasses.find { it.propertyName == repoName }
-            if (!hasRepo) {
-                "${repoName}"(DefaultGormRepo, domainClass) { bean ->
-                    bean.autowire = true
-                    bean.lazyInit = true
-                }
-            }
-        }
-
-        //controller names to be used during iterations
-        //List ctrlNames = application.getArtefacts(ControllerArtefactHandler.TYPE)*.shortName
+        //controller names to be used during iterations, do it so we only itrate once
         List<GrailsControllerClass> ctrlList = getExistingControllers(application)
         //println ctrlNames
 

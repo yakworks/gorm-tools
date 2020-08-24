@@ -44,10 +44,10 @@ class RepositoryArtefactHandler extends ArtefactHandlerAdapter {
 //        url &&  REPO_PATH_PATTERN.matcher(url.getFile()).find()
 //    }
 
-    boolean isArtefactClass(Class clazz) {
-        // class shouldn't be null and should ends with Repo suffix
-        (clazz != null && clazz.getName().endsWith(SUFFIX))
-    }
+    // boolean isArtefactClass(Class clazz) {
+    //     // class shouldn't be null and should ends with Repo suffix
+    //     (clazz != null && clazz.getName().endsWith(SUFFIX))
+    // }
 
     @Override
     String getPluginName() {

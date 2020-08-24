@@ -2,8 +2,8 @@ rootProject.name = 'gorm-tools-root'
 include 'plugin'
 findProject(':plugin').name = 'gorm-tools'
 
-//tests will be included in main runs but not deploy tasks and doc tasks
-include "examples/benchmarks"
+// tests will be included in main runs but not deploy tasks and doc tasks
+// include "examples/benchmarks"
 include "examples/app-domains"
 include 'examples/restify'
 // include 'examples/restify-domains'
@@ -11,5 +11,5 @@ include 'examples/restify'
 
 // findProject(':examples/restify-domains').name = 'restify-domains'
 findProject(':examples/restify').name = 'restify'
-findProject(':examples/benchmarks').name = 'benchmarks'
+// findProject(':examples/benchmarks').name = 'benchmarks'
 findProject(':examples/app-domains').name = 'app-domains'

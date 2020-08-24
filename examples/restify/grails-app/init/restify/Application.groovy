@@ -10,22 +10,24 @@ import gorm.tools.rest.RestApiFromConfig
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
 
-@ComponentScan
+// the component scan here does not seem to be the same as the packageNames and is needed to pick up the
+// the services marked with @Component
+@ComponentScan("yakworks.taskify")
 @RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }
-    // example of how to scan and pick up the gorm domain that are marked with @entity in the plugin
+    // Tto scan and pick up the gorm domain that are marked with @entity in the plugin set this
     @Override
     protected boolean limitScanningToApplication() {
         false
     }
-    //
-    // // Shows example of how to scan and pick up the gorm domain that are marked with @entity
+
+    // in order to pick up the gorm domains that are marked with @Entity this needs to be set.
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['yakworks']
+        super.packageNames() + ['yakworks.taskify']
     }
 
 }

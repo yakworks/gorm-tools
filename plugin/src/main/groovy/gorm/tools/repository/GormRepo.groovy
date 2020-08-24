@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 
-import gorm.tools.WithTrx
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi

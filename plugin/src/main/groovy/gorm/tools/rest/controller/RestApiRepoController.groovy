@@ -4,15 +4,12 @@
 */
 package gorm.tools.rest.controller
 
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 
-import org.springframework.context.MessageSource
+import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepoEntity
 import grails.artefact.Artefact
 import grails.core.GrailsApplication
-import grails.util.GrailsNameUtils
 
 /**
  * Credits: took rally.BaseDomainController with core concepts from grails RestfulConroller

@@ -73,6 +73,10 @@ class Org implements NameNumTrait{
         //special
         //currency    nullable: true
 
+        //enums
+        kind nullable: false
+        status nullable: true
+
         //Associations
         type nullable: false
         location nullable: true

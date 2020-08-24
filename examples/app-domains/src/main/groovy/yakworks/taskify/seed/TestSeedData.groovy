@@ -44,10 +44,10 @@ class TestSeedData {
         def org = new Org(
             num: "$id",
             name: value,
-            name2: id % 2 == 0 ? null : "OrgName2" + id,
+            name2: (id % 2) ? "OrgName2" + id : null ,
             type: type,
-            kind: (id % 2 == 0) ? Org.Kind.CLIENT : Org.Kind.VENDOR,
-            status: (id % 2 == 0) ? OrgStatus.Active : OrgStatus.Inactive,
+            kind: (id % 2) ? Org.Kind.VENDOR : Org.Kind.CLIENT ,
+            status: (id % 2) ? OrgStatus.Inactive : OrgStatus.Active,
             inactive: (id % 2 == 0),
             revenue: (id - 1) * 1.25,
             creditLimit: (id - 1) * 1.5,

@@ -65,6 +65,18 @@ jobs:
             CIRCLE_COMPARE_URL=$(cat CIRCLE_COMPARE_URL.txt)
             ./gradlew ciPublish --no-daemon
 
+  docs:
+    docker:
+      - image: yakworks/docmark
+    steps:
+      - checkout
+      - run:
+          name: ✔︎ publish docs
+          command: |
+            ./build.sh config_bot_user
+            ./build.sh docmark_build
+            ./build.sh docmark_publish
+
 orbs:
   compare-url: iynere/compare-url@1.1.0
 
@@ -74,5 +86,10 @@ workflows:
     jobs:
       - build:
           context: bot-context #context with shared ENV vars
-
-
+      - docs:
+          context: bot-context
+          requires: [build]
+          branches:
+            only: [master,  ]
+              - master
+              - /release\/.*/

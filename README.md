@@ -136,30 +136,14 @@ criteria.list {
 
 ## Developer Notes
 
-### Running mkdocs locally
+### Running docs locally
 
-Docs are built with https://yakworks.github.io/mkdocs-material-components/
-Run 
-> ```pip install -r pip-requirements.txt```
-And then ```mkdocs serve``` see the docs if you have troubles
+Docs are built with https://yakworks.github.io/docmark/
+Run  `./build.sh dockmark-serve`
 
 ### Publishing Plugin Releases
 
 See [Developer Docs](docs/developer.md) for info on our release process
-
-Build are automatically published by travis. 
-Snapshots are published from master branch, and releases are published from tags to BinTray.
-
-If you want to publish artifacts from your local system.
- 
-Define following properties in ~/.gradle/gradle.properties
-
-- bintrayUser
-- bintrayKey
-- artifactoryUsername
-- artifactoryPassword
-
-bintray credentials are used for **bintrayUpload** task. Artifactory credentials are used for publishing snapshots to 9ci artifactory.
 
 **Using latests SNAPSHOT**  
 

@@ -24,13 +24,24 @@ A Repository must either implement [GormRepo][] Trait or if you wish extend [Def
  ```groovy
  class OrgRepo implements GormRepo<Org> {
      
-     void beforeBind(Org org, Map params) {
-        //do some thing before create
-      }
+    @RepoListener
+    void beforeBind(Org org, Map params, BeforeBindEvent be) {
+        //do some thing before bind
+        
+    }
+    
+    @Transactional
+    boolean makeInactive(Long id){
+        def org = Org.get(id)
+        ... do transactional stuff
+        org.persist()
+    }
       
  }
  ```
 
+> :memo: *@Transactional*
+> For performance reasons, @Transactional is not needed on the class 
 ## GormRepoEntity Trait
 
 See Groovydocs api for the [GormRepoEntity][] that is injected onto all domains.
@@ -135,6 +146,7 @@ persisting an entity of the Org domain class.
 
 ### Spring Events
 
+Spring events are recomended over grails.events as they are much more performant if processing large numbers of domains
 The Repository also publishes a number of 
 [events as listed in the Groovydoc API](https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/events/package-summary.html)
 

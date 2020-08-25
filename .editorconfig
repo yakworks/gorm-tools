@@ -1,32 +1,58 @@
+#################
+# Common Settings
+#################
+
+# This file is the top-most EditorConfig file
 root = true
 
+# All Files
 [*]
+charset = utf-8
 end_of_line = lf
-trim_trailing_whitespace = true
-insert_final_newline = true
 indent_style = space
-max_line_length=140
+indent_size = 2
+max_line_length = 140
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+#########################
+# File Extension Settings
+#########################
+
+# Various XML/json Configuration Files
+[*.{xml,json,json5,yml,yaml,ruleset}]
+max_line_length = off
+
+# Markdown Files
+[*.md]
+trim_trailing_whitespace = false
+
+[*.properties]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# Web Files
+[*.{htm,html,js,ts,tsx,css,sass,scss,less,svg,vue,coffee,stylintrc}]
 indent_size = 2
 
-[*.groovy]
+# java groovy
+[*.{groovy,java,gsp,jsp,kt,kts}]
 indent_style = space
 indent_size = 4
-
-[*.java]
-indent_style = space
-indent_size = 4
-
-[*.gsp]
-indent_style = space
-indent_size = 4
+continuation_indent_size = 8
 
 [*.gradle]
 indent_style = space
 indent_size = 2
 
-[*.properties]
-trim_trailing_whitespace = false
+# python
+[*.py]
+indent_style = space
+indent_size = 4
 
-[*.md]
-trim_trailing_whitespace = false
+[Makefile]
+indent_style = tab
+indent_size = 4
 
+[README.md]
+max_line_length = 80

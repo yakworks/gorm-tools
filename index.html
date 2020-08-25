@@ -141,7 +141,7 @@
             <li><a href="#goals_1">Goals</a></li>
         <li class="main "><a href="#json-query-and-filtering-mango-query">JSON Query and Filtering (Mango Query)</a></li>
         <li class="main "><a href="#developer-notes">Developer Notes</a></li>
-            <li><a href="#running-mkdocs-locally">Running mkdocs locally</a></li>
+            <li><a href="#running-docs-locally">Running docs locally</a></li>
             <li><a href="#publishing-plugin-releases">Publishing Plugin Releases</a></li>
     </ul>
 </div></div>
@@ -275,26 +275,11 @@ for example, sending a JSON search param that looks like this</p>
 </code></pre>
 
 <h2 id="developer-notes">Developer Notes</h2>
-<h3 id="running-mkdocs-locally">Running mkdocs locally</h3>
-<p>Docs are built with https://yakworks.github.io/mkdocs-material-components/
-Run </p>
-<blockquote>
-<p><code>pip install -r pip-requirements.txt</code>
-And then <code>mkdocs serve</code> see the docs if you have troubles</p>
-</blockquote>
+<h3 id="running-docs-locally">Running docs locally</h3>
+<p>Docs are built with https://yakworks.github.io/docmark/
+Run  <code>./build.sh dockmark-serve</code></p>
 <h3 id="publishing-plugin-releases">Publishing Plugin Releases</h3>
 <p>See <a href="developer.md">Developer Docs</a> for info on our release process</p>
-<p>Build are automatically published by travis. 
-Snapshots are published from master branch, and releases are published from tags to BinTray.</p>
-<p>If you want to publish artifacts from your local system.</p>
-<p>Define following properties in ~/.gradle/gradle.properties</p>
-<ul>
-<li>bintrayUser</li>
-<li>bintrayKey</li>
-<li>artifactoryUsername</li>
-<li>artifactoryPassword</li>
-</ul>
-<p>bintray credentials are used for <strong>bintrayUpload</strong> task. Artifactory credentials are used for publishing snapshots to 9ci artifactory.</p>
 <p><strong>Using latests SNAPSHOT</strong>  </p>
 <p>Configure 9ci repo in build.gradle</p>
 <pre><code class="groovy">repositories {
@@ -346,5 +331,5 @@ Snapshots are published from master branch, and releases are published from tags
 
 <!--
 MkDocs version : 0.16.3
-Build Date UTC : 2020-08-25 15:55:39
+Build Date UTC : 2020-08-25 17:02:33
 -->

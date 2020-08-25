@@ -10,10 +10,12 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.MessageSource
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
+import org.springframework.validation.ObjectError
 
 import gorm.tools.Pager
 import gorm.tools.beans.EntityMap
@@ -26,6 +28,7 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
+import grails.converters.JSON
 import grails.databinding.SimpleMapDataBindingSource
 import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
@@ -46,6 +49,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
 
     @Autowired
     RestApiConfig restApiConfig
+
+    @Autowired
+    MessageSource messageSource
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -282,13 +288,14 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
             callRender(status: NOT_FOUND, e.message)
         }
         else if( e instanceof EntityValidationException ){
-            String m = buildMsg(e.messageMap, e.errors)
+            String defaultMessage = e.messageMap.defaultMessage as String
             // log.info m
-            callRender(status: UNPROCESSABLE_ENTITY, m)
+            respond([view: '/errors/_errors'], [errors: e.errors, message: defaultMessage, renderArgs: [:]])
+            //callRender(status: UNPROCESSABLE_ENTITY, m)
         }
         else if( e instanceof ValidationException ){
-            String m = buildMsg([defaultMessage: e.message], e.errors)
-            callRender(status: UNPROCESSABLE_ENTITY, m)
+            String defaultMessage = e.message
+            respond([view: '/errors/_errors'], [errors: e.errors, message: defaultMessage, renderArgs: [:]])
         }
         else if( e instanceof OptimisticLockingFailureException ){
             callRender(status: CONFLICT, e.message)
@@ -299,14 +306,13 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     String buildMsg(Map msgMap, Errors errors) {
-        StringBuilder result = new StringBuilder(msgMap['defaultMessage'] as String)
-        // FIXME not sure where msg comes from
-        // errors.getAllErrors().each { error ->
-        //     error =  error as FieldError
-        //     String msg = "\n${message(error: error, args: error.arguments, local: RepoMessage.defaultLocale())}"
-        //     result.append("\n" + message(error: error, args: error.arguments, local: RepoMessage.defaultLocale()))
-        // }
-        return result
+        Map resultErrors = [errors: [:], message: '']
+        (errors.allErrors as List<FieldError>).each { FieldError error ->
+            String message = messageSource.getMessage(error, Locale.default)
+            (resultErrors.errors as Map).put(error.field, message)
+        }
+        resultErrors.put('message', msgMap['defaultMessage'] as String)
+        return (resultErrors as JSON).toString()
     }
 
 }

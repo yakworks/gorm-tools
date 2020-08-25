@@ -44,4 +44,24 @@ class OrgRestSpec extends RestApiFuncSpec {
         return rget
     }
 
+    void test_save_post() {
+        given:
+        def response
+        Map invalidData2 = [num:'foo1', name: "foo", type: [id: 1], link: ["name": "", num:'foo2', type: [id: 1]]]
+        when: "The save action is executed with invalid data for nested property"
+        response = restBuilder.post(resourcePath) {
+            json invalidData2
+        }
+        then: "The response is UNPROCESSABLE_ENTITY"
+        verify_UNPROCESSABLE_ENTITY(response)
+        response.json.total == 2
+        response.json.message == 'yakworks.taskify.domain.Org save failed'
+        response.json.errors[0].field == 'link.kind'
+        response.json.errors[0].message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
+        response.json.errors[1].field == 'link.name'
+        response.json.errors[1].message == 'Property [name] of class [class yakworks.taskify.domain.Org] cannot be null'
+
+    }
+
+
 }

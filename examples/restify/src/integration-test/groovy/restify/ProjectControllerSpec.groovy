@@ -93,7 +93,6 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         resJson.data[0] == [id:1 , name: "Fooinator-1", num: "1"]
     }
 
-    @Ignore
     void test_save_post() {
         given:
         def response
@@ -111,8 +110,14 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         }
         then: "The response is UNPROCESSABLE_ENTITY"
         verify_UNPROCESSABLE_ENTITY(response)
+        response.json.total == 2
+        response.json.message == 'yakworks.taskify.domain.Project save failed'
+        response.json.errors[0].message == "Property [name] of class [class yakworks.taskify.domain.Project] cannot be null"
+        response.json.errors[0].field == "name"
+        response.json.errors[1].message == "Property [num] of class [class yakworks.taskify.domain.Project] cannot be null"
+        response.json.errors[1].field == "num"
 
-        when: "The save action is executed with valid data"
+        /*when: "The save action is executed with valid data"
         response = restBuilder.post(resourcePath) {
             json insertData
         }
@@ -124,7 +129,7 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         TestTools.mapContains(response.json, data, excludes)
         //Project.count() > 1// == 1
         def rget = restBuilder.get("$resourcePath/${response.json.id}")
-        TestTools.mapContains(rget.json, data, excludes)
+        TestTools.mapContains(rget.json, data, excludes)*/
     }
 
     void test_update_put() {

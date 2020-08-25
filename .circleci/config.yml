@@ -81,7 +81,6 @@ orbs:
   compare-url: iynere/compare-url@1.1.0
 
 workflows:
-  version: 2
   build-flow:
     jobs:
       - build:
@@ -89,7 +88,5 @@ workflows:
       - docs:
           context: bot-context
           requires: [build]
-          branches:
-            only:
-              - master
-              - /release\/.*/
+          filters:
+            branches: { only: [ master, /release\/.*/ ] }

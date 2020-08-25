@@ -90,6 +90,6 @@ workflows:
           context: bot-context
           requires: [build]
           branches:
-            only: [master,  ]
+            only:
               - master
               - /release\/.*/

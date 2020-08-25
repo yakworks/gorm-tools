@@ -7,6 +7,7 @@ pages:
       - Reference: repository/ref.md
       - Databinding: repository/databinding.md
   - Mango Query: queries-mango.md
+  - Rest Api: rest.md
   - Async: async.md
   - Toolbox:
       - Id Generation: id-generation.md

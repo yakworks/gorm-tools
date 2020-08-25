@@ -69,6 +69,7 @@ jobs:
     docker:
       - image: yakworks/docmark
     steps:
+      - run: apk add openssh-client
       - checkout
       - run:
           name: ✔︎ publish docs

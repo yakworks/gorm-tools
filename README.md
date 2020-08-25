@@ -2,7 +2,7 @@
 [![9ci](https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&style=for-the-badge)](http://9ci.com)
 <img src="https://forthebadge.com/images/badges/built-with-love.svg" height="28">
 <img src="https://forthebadge.com/images/badges/gluten-free.svg" height="28">
-<img src="https://forthebadge.com/images/badges/fuck-it-ship-it.svg" height="28">
+<img src="https://forthebadge.com/images/badges/made-with-groovy.svg" height="28">
 
 <pre style="line-height: normal; background-color:#2b2929; color:#76ff00; font-family: monospace; white-space: pre;">
 
@@ -110,6 +110,7 @@ these arise more from a similarity of purpose and do not necessarily extend to c
 
 **Example**
 for example, sending a JSON search param that looks like this
+
 ``` js
 {
   "name": "Bill%",

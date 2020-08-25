@@ -31,7 +31,7 @@ class Org implements NameNumTrait{
     LocalDateTime locDateTime
     //special
     //Currency currency //FIXME creates and overflow
-
+    Org link
     //Associations
     OrgType type //type is required
     Location location //belongs to whatever
@@ -81,6 +81,7 @@ class Org implements NameNumTrait{
         type nullable: false
         location nullable: true
         ext  nullable: true
+        link bindable: true
     }
 
     // gorm event

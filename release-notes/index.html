@@ -1,495 +1,292 @@
-
 <!DOCTYPE html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <meta http-equiv="x-ua-compatible" content="ie=edge">
-      
-      
-        <meta name="description" content="Plugin tools Grails/Gorm - repository data services, json query language, fast data binder">
-      
-      
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="9ci">
         <link rel="canonical" href="https://yakworks.github.io/gorm-tools/release-notes/">
-      
-      
-        <meta name="author" content="Yak.Works">
-      
-      
-        <link rel="shortcut icon" href="../assets/images/favicon.png">
-      
-      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-components-1.10.11">
-    
-    
-      
+        <link rel="shortcut icon" href="../img/favicon.ico">
         <title>Release Notes - Gorm Tools Grails Plugin</title>
-      
-    
-    
-      
-    
-    
-      <script src="../assets/javascripts/modernizr-e826f8942a.js"></script>
-    
-    
-      <link rel="stylesheet" href="../assets/stylesheets/application-2cd7d9ab0f.css">
-      
-        <link rel="stylesheet" href="../assets/stylesheets/application-035c261bc5.palette.css">
-      
-      <link rel="stylesheet" href="../assets/stylesheets/material-components-web.min.css">
-      <link rel="stylesheet" href="../assets/stylesheets/mdc-web.css">
-    
-    
-      
-        
-        
-        
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans:300,300i,400,400i,600,600i,700,700i,800,800i|Ubuntu+Mono">
-        <style>body,input{font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
-      
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.js"></script>
-    
-  </head>
-  
-  
-  
-  
-    <body data-md-color-primary="light-green" data-md-color-accent="indigo">
-  
-    <svg class="md-svg">
-      <defs>
-        
-        
-          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
-        
-      </defs>
-    </svg>
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
-    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
-    
-      
-        <style>.region--header{background-color:rgba(255,255,255,.9);min-height:3.25rem;width:100%;z-index:2}header.region--header{position:fixed;top:0;right:0;left:0}.region--header .region--header__wrapper{max-width:1440px;margin-left:auto;margin-right:auto;position:relative;z-index:2;box-sizing:inherit}.region--header .region--header__logo{display:inline-block;float:left;height:3.25rem;margin:0;padding-left:1rem}.site-logo{display:block;height:4.25rem;padding:1.5rem 0}.site-logo--main{display:block;height:3.25rem;margin:0;padding:0;width:4.25rem}.header-navigation{font-size:1rem;clear:none;float:right;margin-top:.75rem;padding-bottom:0;padding-right:.75rem}.header-navigation__menu{clear:both;overflow:visible;-webkit-transform-style:preserve-3d;width:100%;z-index:9999;display:inline;margin:0;padding:0}.header-navigation__menu-link{display:inline;line-height:1.5;margin-right:0;padding-right:0;width:auto;overflow:hidden;text-align:right;z-index:2}.region--header a{text-decoration:none}.header-navigation__menu-link a{padding-left:.75rem;padding-right:.75rem;color:#012b45;display:inline-block;font-weight:400;text-transform:uppercase;transition:background-color ease .2s}@media only screen and (max-width:500px){.header-navigation{font-size:.85rem}.header-navigation__menu-link a{padding-left:.25rem;padding-right:.25rem}}.header-navigation__menu-link:last-child:not(.header-navigation__active-nav-item):not(:hover):not(:focus){color:#e8650c}.header-navigation__menu-link a:focus,.header-navigation__menu-link a:hover{color:#e8650c}.md-container{padding-top:6.5rem}#header-docs{top:3.25rem}#background{display:none}#header-docs .md-logo{display:none}</style>
-<style media="print">#header-docs{top:0}#header-docs .md-logo{display:block}#header-website{display:none}.md-container{padding-top:0}.headroom--pinned{transform:translateY(0)}#background{position:fixed;top:250px;left:50px;z-index:9999999;background:0 0;min-height:30%;min-width:30%;display:block}#bg-text{color:rgba(211,211,211,.2);font-size:80px;transform:rotate(300deg);-webkit-transform:rotate(300deg)}</style>
-<div id="background">
-  <p id="bg-text">9ci Confidential</p>
-</div>
-<header id="header-website" class="region--header" role="banner">
-  <div class="region--header__wrapper">
-    <a href="/" class="region--header__logo">
-      <img src="http://www.9ci.com/assets/img/logo.svg" alt="9ci logo" class="site-logo site-logo--main">
-    </a>
-    <nav role="navigation" class="header-navigation">
-      <ul id="js-navigation-menu" class="header-navigation__menu">
-      <li class="header-navigation__menu-link">
-        <a href="http://www.9ci.com/solutions">Solutions</a>
-      </li>
-      <li class="header-navigation__menu-link">
-        <a href="http://www.9ci.com/company">Company</a>
-      </li>
-      <li class="header-navigation__menu-link">
-        <a href="http://www.9ci.com/contact">Contact</a>
-      </li>
-      </ul>
-    </nav>
-  </div>
-</header>
-<header id="header-docs" class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid">
-    <div class="md-flex">
-      <div class="md-flex__cell md-flex__cell--shrink md-flex__cell--vmiddle">
-        <a href="https://yakworks.github.io/gorm-tools" title="Gorm Tools Grails Plugin" class="md-header-nav__button md-logo">
-          
-            <img src="../assets/images/logo_white.png" width="36" height="36">
-          
-        </a>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
-      </div>
-      <div class="md-flex__cell md-flex__cell--stretch">
-        <span class="md-flex__ellipsis md-header-nav__title">
-          
-            Gorm Tools Grails Plugin -
-            
-              
-            
-            Release Notes
-          
-        </span>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        
-          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
-          
-<div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="search"></label>
-  <div class="md-search__inner">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
-      <label class="md-icon md-search__icon" for="search"></label>
-      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
-          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
-            Type to start searching
-          </div>
-          <ol class="md-search-result__list"></ol>
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="..">Gorm Tools Grails Plugin</a>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-        
-      </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
-            
 
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="..">Overview</a>
+                    </li>
+                    <li class="active">
+                        <a href="./">Release Notes</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Repository Pattern <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../repository/intro/">Quick Start</a>
+</li>
+                            
+<li >
+    <a href="../repository/ref/">Reference</a>
+</li>
+                            
+<li >
+    <a href="../repository/databinding/">Databinding</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../queries-mango/">Mango Query</a>
+                    </li>
+                    <li >
+                        <a href="../async/">Async</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Toolbox <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../id-generation/">Id Generation</a>
+</li>
+                            
+<li >
+    <a href="../gorm-utils/">GormUtils Class</a>
+</li>
+                            
+<li >
+    <a href="../beanPathTools/">Bean Path Tools</a>
+</li>
+                            
+<li >
+    <a href="../working-with-dates/">Date Utils</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../testing/">Testing</a>
+                    </li>
+                    <li >
+                        <a href="../api-docs/">API Docs</a>
+                    </li>
+                    <li >
+                        <a href="../usefulLinks/">Useful Links</a>
+                    </li>
+                </ul>
 
-  
-
-
-  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      yakworks/gorm-tools
-    </div>
-  </a>
-
-          </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="..">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../repository/intro/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/yakworks/gorm-tools">yakworks/gorm-tools
+                        </a>
+                    </li>
+            </ul>
         </div>
-      
-      
     </div>
-  </nav>
-</header>
-      
-    
-    <div class="md-container">
-      
-      
-      
-      <main class="md-main">
-        <div class="md-main__inner md-grid" data-md-component="container">
-          
-            
-              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="drawer">
-    <div class="md-nav__button md-logo">
-      
-        <i class="md-icon md-icon--home"></i>
-      
-    </div>
-    Gorm Tools Grails Plugin
-  </label>
-  
-    <div class="md-nav__source">
-      
+</div>
 
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#6112-v1">6.1.12-v.1</a></li>
+        <li class="main "><a href="#6111-v14">6.1.11-v.14</a></li>
+        <li class="main "><a href="#6111-v14_1">6.1.11-v.14</a></li>
+        <li class="main "><a href="#6111-v13">6.1.11-v.13</a></li>
+        <li class="main "><a href="#6111-v12">6.1.11-v.12</a></li>
+        <li class="main "><a href="#6111-v11">6.1.11-v.11</a></li>
+        <li class="main "><a href="#216-should-be-able-to-deep-bind-nested-instance-217">216 - Should be able to deep bind nested instance (#217)</a></li>
+            <li><a href="#6111-v10">6.1.11-v.10</a></li>
+        <li class="main "><a href="#214-fix-bindable-should-work-for-reloadable-env-215">214 Fix bindable - should work for reloadable env (#215)</a></li>
+            <li><a href="#6111-v9">6.1.11-v.9</a></li>
+            <li><a href="#6111-v8">6.1.11-v.8</a></li>
+            <li><a href="#6111-v7">6.1.11-v.7</a></li>
+            <li><a href="#6111-v6">6.1.11-v.6</a></li>
+            <li><a href="#6111-v5">6.1.11-v.5</a></li>
+            <li><a href="#6111-v4">6.1.11-v.4</a></li>
+        <li class="main "><a href="#202-fix-externalconfigawarespec-204">202 Fix ExternalConfigAwareSpec (#204)</a></li>
+            <li><a href="#6111-v3">6.1.11-v.3</a></li>
+            <li><a href="#6111-v2">6.1.11-v.2</a></li>
+            <li><a href="#6111-v1">6.1.11-v.1</a></li>
+            <li><a href="#623">6.2.3</a></li>
+            <li><a href="#622">6.2.2</a></li>
+            <li><a href="#621">6.2.1</a></li>
+            <li><a href="#620">6.2.0</a></li>
+            <li><a href="#617">6.1.7</a></li>
+            <li><a href="#616">6.1.6</a></li>
+            <li><a href="#615">6.1.5</a></li>
+            <li><a href="#614">6.1.4</a></li>
+            <li><a href="#613">6.1.3</a></li>
+            <li><a href="#612">6.1.2</a></li>
+        <li class="main "><a href="#75-benchmarks-for-updates-136">75 Benchmarks for updates (#136)</a></li>
+        <li class="main "><a href="#51-update-docs-135">51 update docs (#135)</a></li>
+        <li class="main "><a href="#51-add-docs-for-refreshable-beans-131">51 Add docs for refreshable beans (#131)</a></li>
+        <li class="main "><a href="#117-add-docs-for-timezone-handling-for-dates-130">117 - Add docs for timezone handling for dates (#130)</a></li>
+        <li class="main "><a href="#127-docs-128">127 Docs: (#128)</a></li>
+        <li class="main "><a href="#117-set-hibernate-timezone-to-utc-123">117 - set hibernate timezone to utc.  (#123)</a></li>
+        <li class="main "><a href="#88-add-gormrepository-ast-transformation-108">88 Add GormRepository AST transformation (#108)</a></li>
+        <li class="main "><a href="#51-add-docs-for-external-event-listeners-93">51 Add docs for external event listeners (#93)</a></li>
+        <li class="main "><a href="#66-cleanup-and-refactor-common-code-to-be-reusable-72">66 cleanup and refactor common code to be reusable. (#72)</a></li>
+        <li class="main "><a href="#53-add-daohibernatespec-57">53 Add DaoHibernateSpec (#57)</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
 
-  
-
-
-  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      yakworks/gorm-tools
-    </div>
-  </a>
-
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href=".." title="Overview" class="md-nav__link">
-      Overview
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-      
-    
-    
-    <a href="./" title="Release Notes" class="md-nav__link md-nav__link--active">
-      Release Notes
-    </a>
-    
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
-    
-    <label class="md-nav__link" for="nav-3">
-      Repository Pattern
-    </label>
-    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-3">
-        Repository Pattern
-      </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../repository/intro/" title="Quick Start" class="md-nav__link">
-      Quick Start
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../repository/ref/" title="Reference" class="md-nav__link">
-      Reference
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../repository/databinding/" title="Databinding" class="md-nav__link">
-      Databinding
-    </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../queries-mango/" title="Mango Query" class="md-nav__link">
-      Mango Query
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../async/" title="Async" class="md-nav__link">
-      Async
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
-    
-    <label class="md-nav__link" for="nav-6">
-      Toolbox
-    </label>
-    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-6">
-        Toolbox
-      </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../id-generation/" title="Id Generation" class="md-nav__link">
-      Id Generation
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../gorm-utils/" title="GormUtils Class" class="md-nav__link">
-      GormUtils Class
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../beanPathTools/" title="Bean Path Tools" class="md-nav__link">
-      Bean Path Tools
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../working-with-dates/" title="Date Utils" class="md-nav__link">
-      Date Utils
-    </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../testing/" title="Testing" class="md-nav__link">
-      Testing
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../api-docs/" title="API Docs" class="md-nav__link">
-      API Docs
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../usefulLinks/" title="Useful Links" class="md-nav__link">
-      Useful Links
-    </a>
-  </li>
-
-    
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-          
-          <div id="article-content" class="md-content"> 
-            <article class="md-content__inner md-typeset">
-              
-                
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/release-notes.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
-                
-                
-                
-                <p><sup><sup><em>Release notes were automatically generated by <a href="http://shipkit.org/">Shipkit</a></em></sup></sup></p>
-<h4 id="623">6.2.3<a class="headerlink" href="#623" title="Permanent link">&para;</a></h4>
+<p><sup><sup><em>Release notes were automatically generated by <a href="http://shipkit.org/">Shipkit</a></em></sup></sup></p>
+<h4 id="6112-v1">6.1.12-v.1</h4>
+<ul>
+<li>2020-08-24 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.14...v6.1.12-v.1">20 commits</a> by <a href="https://github.com/basejump">Joshua B</a> (18), alexeyzvegintcev (2) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.12-v.1"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.12-v.1-green.svg" /></a></li>
+<li>added tests and beefed up rstify project. fixed @GormRepository annot… <a href="https://github.com/yakworks/gorm-tools/pull/236">(#236)</a></li>
+<li>Rest api config service <a href="https://github.com/yakworks/gorm-tools/pull/235">(#235)</a></li>
+<li>Identity enums <a href="https://github.com/yakworks/gorm-tools/pull/234">(#234)</a></li>
+<li>Q search fix <a href="https://github.com/yakworks/gorm-tools/pull/233">(#233)</a></li>
+<li>App domains <a href="https://github.com/yakworks/gorm-tools/pull/232">(#232)</a></li>
+<li>make enums for operations in mango. <a href="https://github.com/yakworks/gorm-tools/pull/231">(#231)</a></li>
+<li>Mango q search <a href="https://github.com/yakworks/gorm-tools/pull/230">(#230)</a></li>
+<li>Q search and Sorting <a href="https://github.com/yakworks/gorm-tools/pull/228">(#228)</a></li>
+<li>enable ability to assign id and have it be used instead of creating a… <a href="https://github.com/yakworks/gorm-tools/pull/227">(#227)</a></li>
+<li>Mango multisorting <a href="https://github.com/yakworks/gorm-tools/pull/226">(#226)</a></li>
+<li>Mango rest api and gorm 6.1.12 <a href="https://github.com/yakworks/gorm-tools/pull/225">(#225)</a></li>
+</ul>
+<h4 id="6111-v14">6.1.11-v.14</h4>
+<ul>
+<li>2020-08-04 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.13...v6.1.11-v.14">7 commits</a> by <a href="https://github.com/basejump">Joshua B</a> (6), <a href="https://github.com/alexeyzvegintcev">alexeyzvegintcev</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.14"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.14-green.svg" /></a></li>
+<li>test passing and examples of rest controllers created from yml <a href="https://github.com/yakworks/gorm-tools/pull/224">(#224)</a></li>
+<li>Fix mango with sort <a href="https://github.com/yakworks/gorm-tools/pull/223">(#223)</a></li>
+<li>Rest json paging <a href="https://github.com/yakworks/gorm-tools/pull/222">(#222)</a></li>
+<li>Rest merge <a href="https://github.com/yakworks/gorm-tools/pull/221">(#221)</a></li>
+</ul>
+<h4 id="6111-v14_1">6.1.11-v.14</h4>
+<ul>
+<li>2020-08-04 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.13...v6.1.11-v.14">5 commits</a> by <a href="https://github.com/basejump">Joshua B</a> (4), <a href="https://github.com/alexeyzvegintcev">alexeyzvegintcev</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.14"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.14-green.svg" /></a></li>
+<li>test passing and examples of rest controllers created from yml <a href="https://github.com/yakworks/gorm-tools/pull/224">(#224)</a></li>
+<li>Fix mango with sort <a href="https://github.com/yakworks/gorm-tools/pull/223">(#223)</a></li>
+<li>Rest json paging <a href="https://github.com/yakworks/gorm-tools/pull/222">(#222)</a></li>
+<li>Rest merge <a href="https://github.com/yakworks/gorm-tools/pull/221">(#221)</a></li>
+</ul>
+<h4 id="6111-v13">6.1.11-v.13</h4>
+<ul>
+<li>2020-04-28 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.12...v6.1.11-v.13">3 commits</a> by sudhir nimavat (2), <a href="https://github.com/jdabal">jdabal</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.13"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.13-green.svg" /></a></li>
+<li>Mongo query fix <a href="https://github.com/yakworks/gorm-tools/pull/220">(#220)</a></li>
+</ul>
+<h4 id="6111-v12">6.1.11-v.12</h4>
+<ul>
+<li>2019-11-27 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.11...v6.1.11-v.12">1 commit</a> by <a href="https://github.com/snimavat">Sudhir Nimavat</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.12"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.12-green.svg" /></a></li>
+<li>Fix NPE when class does not have any field with explicit bindable <a href="https://github.com/yakworks/gorm-tools/pull/218">(#218)</a></li>
+</ul>
+<h4 id="6111-v11">6.1.11-v.11</h4>
+<ul>
+<li>2019-11-25 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.10...v6.1.11-v.11">1 commit</a> by <a href="https://github.com/snimavat">Sudhir Nimavat</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.11"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.11-green.svg" /></a></li>
+<li>
+<h1 id="216-should-be-able-to-deep-bind-nested-instance-217">216 - Should be able to deep bind nested instance <a href="https://github.com/yakworks/gorm-tools/pull/217">(#217)</a></h1>
+</li>
+</ul>
+<h4 id="6111-v10">6.1.11-v.10</h4>
+<ul>
+<li>2019-11-21 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.9...v6.1.11-v.10">2 commits</a> by <a href="https://github.com/jdabal">jdabal</a> (1), <a href="https://github.com/snimavat">sudhir nimavat</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.10"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.10-green.svg" /></a></li>
+<li>
+<h1 id="214-fix-bindable-should-work-for-reloadable-env-215">214 Fix bindable - should work for reloadable env <a href="https://github.com/yakworks/gorm-tools/pull/215">(#215)</a></h1>
+</li>
+</ul>
+<h4 id="6111-v9">6.1.11-v.9</h4>
+<ul>
+<li>2019-08-21 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.8...v6.1.11-v.9">6 commits</a> by <a href="https://github.com/alexeyzvegintcev">alexey.zvegintcev</a> (5), <a href="https://github.com/jdabal">jdabal</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.9"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.9-green.svg" /></a></li>
+<li>Criteria improvments <a href="https://github.com/yakworks/gorm-tools/pull/212">(#212)</a></li>
+</ul>
+<h4 id="6111-v8">6.1.11-v.8</h4>
+<ul>
+<li>2019-07-16 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.7...v6.1.11-v.8">2 commits</a> by <a href="https://github.com/alexeyzvegintcev">alexey.zvegintcev</a> (1), <a href="https://github.com/snimavat">Sudhir Nimavat</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.8"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.8-green.svg" /></a></li>
+<li>ErrorMesage service handling of Persistence exception <a href="https://github.com/yakworks/gorm-tools/pull/211">(#211)</a></li>
+</ul>
+<h4 id="6111-v7">6.1.11-v.7</h4>
+<ul>
+<li>2019-06-26 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.6...v6.1.11-v.7">7 commits</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.7"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.7-green.svg" /></a></li>
+<li>Add results model <a href="https://github.com/yakworks/gorm-tools/pull/210">(#210)</a></li>
+</ul>
+<h4 id="6111-v6">6.1.11-v.6</h4>
+<ul>
+<li>2019-06-21 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.5...v6.1.11-v.6">3 commits</a> by <a href="https://github.com/snimavat">Sudhir Nimavat</a> (2), <a href="https://github.com/basejump">Joshua B</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.6"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.6-green.svg" /></a></li>
+<li>set snapshot to false <a href="https://github.com/yakworks/gorm-tools/pull/209">(#209)</a></li>
+<li>Hibernatespec cleanup <a href="https://github.com/yakworks/gorm-tools/pull/208">(#208)</a></li>
+</ul>
+<h4 id="6111-v5">6.1.11-v.5</h4>
+<ul>
+<li>2019-06-18 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.4...v6.1.11-v.5">1 commit</a> by <a href="https://github.com/alexeyzvegintcev">alexeyzvegintcev</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.5"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.5-green.svg" /></a></li>
+<li>Fixed issue in BeanPathTool when nested object is not in db rel 9ci/r… <a href="https://github.com/yakworks/gorm-tools/pull/206">(#206)</a></li>
+</ul>
+<h4 id="6111-v4">6.1.11-v.4</h4>
+<ul>
+<li>2019-06-13 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.3...v6.1.11-v.4">1 commit</a> by <a href="https://github.com/snimavat">Sudhir Nimavat</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.4"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.4-green.svg" /></a></li>
+<li>
+<h1 id="202-fix-externalconfigawarespec-204">202 Fix ExternalConfigAwareSpec <a href="https://github.com/yakworks/gorm-tools/pull/204">(#204)</a></h1>
+</li>
+</ul>
+<h4 id="6111-v3">6.1.11-v.3</h4>
+<ul>
+<li>2019-06-12 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.2...v6.1.11-v.3">1 commit</a> by <a href="https://github.com/snimavat">Sudhir Nimavat</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.3"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.3-green.svg" /></a></li>
+<li>202 external config aware test trait <a href="https://github.com/yakworks/gorm-tools/pull/203">(#203)</a></li>
+</ul>
+<h4 id="6111-v2">6.1.11-v.2</h4>
+<ul>
+<li>2019-06-07 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.1...v6.1.11-v.2">2 commits</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.2"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.2-green.svg" /></a></li>
+<li>No pull requests referenced in commit messages.</li>
+</ul>
+<h4 id="6111-v1">6.1.11-v.1</h4>
+<ul>
+<li>2019-06-04 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.2.3...v6.1.11-v.1">3 commits</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.11-v.1"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.11-v.1-green.svg" /></a></li>
+<li>Stash fubar <a href="https://github.com/yakworks/gorm-tools/pull/199">(#199)</a></li>
+</ul>
+<h4 id="623">6.2.3</h4>
 <ul>
 <li>2019-05-27 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.2.2...v6.2.3">1 commit</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.2.3"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.2.3-green.svg" /></a></li>
 <li>upgrad grails 3.3.10 and gorm 6.1.12 <a href="https://github.com/yakworks/gorm-tools/pull/198">(#198)</a></li>
 </ul>
-<h4 id="622">6.2.2<a class="headerlink" href="#622" title="Permanent link">&para;</a></h4>
+<h4 id="622">6.2.2</h4>
 <ul>
 <li>2019-05-20 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.2.1...v6.2.2">4 commits</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.2.2"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.2.2-green.svg" /></a></li>
 <li>
@@ -498,27 +295,27 @@
 </ul>
 </li>
 </ul>
-<h4 id="621">6.2.1<a class="headerlink" href="#621" title="Permanent link">&para;</a></h4>
+<h4 id="621">6.2.1</h4>
 <ul>
 <li>2019-05-14 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.2.0...v6.2.1">1 commit</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.2.1"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.2.1-green.svg" /></a></li>
 <li>Fix args not being set in BeforePersistEvent <a href="https://github.com/yakworks/gorm-tools/pull/194">(#194)</a></li>
 </ul>
-<h4 id="620">6.2.0<a class="headerlink" href="#620" title="Permanent link">&para;</a></h4>
+<h4 id="620">6.2.0</h4>
 <ul>
 <li>2019-05-14 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.7...v6.2.0">2 commits</a> by alexey.zvegintcev (1), <a href="https://github.com/basejump">Joshua B</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.2.0"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.2.0-green.svg" /></a></li>
 <li>require RepoListener annotation on event methods in the GormRepo repos…  <a href="https://github.com/yakworks/gorm-tools/pull/193">(#193)</a></li>
 </ul>
-<h4 id="617">6.1.7<a class="headerlink" href="#617" title="Permanent link">&para;</a></h4>
+<h4 id="617">6.1.7</h4>
 <ul>
 <li>2019-05-09 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.6...v6.1.7">2 commits</a> by <a href="https://github.com/alexeyzvegintcev">alexey.zvegintcev</a> (1), <a href="https://github.com/basejump">Joshua B</a> (1) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.7"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.7-green.svg" /></a></li>
 <li>Added handling for mssql dialect <a href="https://github.com/yakworks/gorm-tools/pull/190">(#190)</a></li>
 </ul>
-<h4 id="616">6.1.6<a class="headerlink" href="#616" title="Permanent link">&para;</a></h4>
+<h4 id="616">6.1.6</h4>
 <ul>
 <li>2019-05-07 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.5...v6.1.6">1 commit</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.6"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.6-green.svg" /></a></li>
 <li>No pull requests referenced in commit messages.</li>
 </ul>
-<h4 id="615">6.1.5<a class="headerlink" href="#615" title="Permanent link">&para;</a></h4>
+<h4 id="615">6.1.5</h4>
 <ul>
 <li>2019-05-07 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.4...v6.1.5">23 commits</a> by 4 authors - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.5"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.5-green.svg" /></a></li>
 <li>Commits: <a href="https://github.com/snimavat">sudhir nimavat</a> (16), <a href="https://github.com/basejump">Joshua B</a> (4), alexeyzvegintcev (2), jdabal (1)</li>
@@ -527,16 +324,16 @@
 <li>181 Fix EntityMapBinder issue <a href="https://github.com/yakworks/gorm-tools/pull/182">(#182)</a></li>
 <li>Added getYear method for localDates <a href="https://github.com/yakworks/gorm-tools/pull/180">(#180)</a></li>
 </ul>
-<h4 id="614">6.1.4<a class="headerlink" href="#614" title="Permanent link">&para;</a></h4>
+<h4 id="614">6.1.4</h4>
 <ul>
 <li>2018-05-22 - no code changes (no commits) - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.4"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.4-green.svg" /></a></li>
 </ul>
-<h4 id="613">6.1.3<a class="headerlink" href="#613" title="Permanent link">&para;</a></h4>
+<h4 id="613">6.1.3</h4>
 <ul>
 <li>2018-04-26 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.1.2...v6.1.3">1 commit</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.3"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.3-green.svg" /></a></li>
 <li>Codenarc property refactor shipkit <a href="https://github.com/yakworks/gorm-tools/pull/179">(#179)</a></li>
 </ul>
-<h4 id="612">6.1.2<a class="headerlink" href="#612" title="Permanent link">&para;</a></h4>
+<h4 id="612">6.1.2</h4>
 <ul>
 <li>2018-04-24 - 514 commits by 7 authors - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.1.2"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.1.2-green.svg" /></a></li>
 <li>Commits: <a href="https://github.com/basejump">Joshua B</a> (173), alexeyzvegintcev (139), sudhir nimavat (125), <a href="https://github.com/NickPavlov">Nikita Pavlov</a> (43), Joshua Burnett (32), jdabal (1), <a href="https://github.com/ken-roberts">Ken Roberts</a> (1)</li>
@@ -566,28 +363,28 @@
 <li>Benchmark redo <a href="https://github.com/yakworks/gorm-tools/pull/140">(#140)</a></li>
 <li>Codenarcs for @CompileStatic and grailsApplication.config <a href="https://github.com/yakworks/gorm-tools/issues/138">(#138)</a></li>
 <li>
-<h1 id="75-benchmarks-for-updates-136">75 Benchmarks for updates <a href="https://github.com/yakworks/gorm-tools/pull/136">(#136)</a><a class="headerlink" href="#75-benchmarks-for-updates-136" title="Permanent link">&para;</a></h1>
+<h1 id="75-benchmarks-for-updates-136">75 Benchmarks for updates <a href="https://github.com/yakworks/gorm-tools/pull/136">(#136)</a></h1>
 </li>
 <li>
-<h1 id="51-update-docs-135">51 update docs <a href="https://github.com/yakworks/gorm-tools/pull/135">(#135)</a><a class="headerlink" href="#51-update-docs-135" title="Permanent link">&para;</a></h1>
+<h1 id="51-update-docs-135">51 update docs <a href="https://github.com/yakworks/gorm-tools/pull/135">(#135)</a></h1>
 </li>
-<li>84 benchmarks 2<sup>nd</sup> lvl cache <a href="https://github.com/yakworks/gorm-tools/pull/134">(#134)</a></li>
+<li>84 benchmarks 2nd lvl cache <a href="https://github.com/yakworks/gorm-tools/pull/134">(#134)</a></li>
 <li>82 entity binder <a href="https://github.com/yakworks/gorm-tools/pull/133">(#133)</a></li>
 <li>129 domain test refactoring <a href="https://github.com/yakworks/gorm-tools/pull/132">(#132)</a></li>
 <li>
-<h1 id="51-add-docs-for-refreshable-beans-131">51 Add docs for refreshable beans <a href="https://github.com/yakworks/gorm-tools/pull/131">(#131)</a><a class="headerlink" href="#51-add-docs-for-refreshable-beans-131" title="Permanent link">&para;</a></h1>
+<h1 id="51-add-docs-for-refreshable-beans-131">51 Add docs for refreshable beans <a href="https://github.com/yakworks/gorm-tools/pull/131">(#131)</a></h1>
 </li>
 <li>
-<h1 id="117-add-docs-for-timezone-handling-for-dates-130">117 - Add docs for timezone handling for dates <a href="https://github.com/yakworks/gorm-tools/pull/130">(#130)</a><a class="headerlink" href="#117-add-docs-for-timezone-handling-for-dates-130" title="Permanent link">&para;</a></h1>
+<h1 id="117-add-docs-for-timezone-handling-for-dates-130">117 - Add docs for timezone handling for dates <a href="https://github.com/yakworks/gorm-tools/pull/130">(#130)</a></h1>
 </li>
 <li>DomainAutoTest questions and docs <a href="https://github.com/yakworks/gorm-tools/issues/129">(#129)</a></li>
 <li>
-<h1 id="127-docs-128">127 Docs: <a href="https://github.com/yakworks/gorm-tools/pull/128">(#128)</a><a class="headerlink" href="#127-docs-128" title="Permanent link">&para;</a></h1>
+<h1 id="127-docs-128">127 Docs: <a href="https://github.com/yakworks/gorm-tools/pull/128">(#128)</a></h1>
 </li>
 <li>DomainAutoTest associations handling #90 <a href="https://github.com/yakworks/gorm-tools/pull/126">(#126)</a></li>
 <li>Exception refactoring #74 <a href="https://github.com/yakworks/gorm-tools/pull/124">(#124)</a></li>
 <li>
-<h1 id="117-set-hibernate-timezone-to-utc-123">117 - set hibernate timezone to utc.  <a href="https://github.com/yakworks/gorm-tools/pull/123">(#123)</a><a class="headerlink" href="#117-set-hibernate-timezone-to-utc-123" title="Permanent link">&para;</a></h1>
+<h1 id="117-set-hibernate-timezone-to-utc-123">117 - set hibernate timezone to utc.  <a href="https://github.com/yakworks/gorm-tools/pull/123">(#123)</a></h1>
 </li>
 <li>Add error handling for map binder. <a href="https://github.com/yakworks/gorm-tools/pull/122">(#122)</a></li>
 <li>103 binder jb <a href="https://github.com/yakworks/gorm-tools/pull/121">(#121)</a></li>
@@ -599,7 +396,7 @@
 <li>Make date parsing more performant <a href="https://github.com/yakworks/gorm-tools/issues/111">(#111)</a></li>
 <li>106 id gen foobared <a href="https://github.com/yakworks/gorm-tools/pull/109">(#109)</a></li>
 <li>
-<h1 id="88-add-gormrepository-ast-transformation-108">88 Add GormRepository AST transformation <a href="https://github.com/yakworks/gorm-tools/pull/108">(#108)</a><a class="headerlink" href="#88-add-gormrepository-ast-transformation-108" title="Permanent link">&para;</a></h1>
+<h1 id="88-add-gormrepository-ast-transformation-108">88 Add GormRepository AST transformation <a href="https://github.com/yakworks/gorm-tools/pull/108">(#108)</a></h1>
 </li>
 <li>IdGenerator <a href="https://github.com/yakworks/gorm-tools/issues/106">(#106)</a></li>
 <li>99 tests for events <a href="https://github.com/yakworks/gorm-tools/pull/105">(#105)</a></li>
@@ -613,7 +410,7 @@
 <li>Rename dao to repository to be consistent with DDD <a href="https://github.com/yakworks/gorm-tools/pull/95">(#95)</a></li>
 <li>flush and clear to use TransactionStatus, cleaned up tests so they ha… <a href="https://github.com/yakworks/gorm-tools/pull/94">(#94)</a></li>
 <li>
-<h1 id="51-add-docs-for-external-event-listeners-93">51 Add docs for external event listeners <a href="https://github.com/yakworks/gorm-tools/pull/93">(#93)</a><a class="headerlink" href="#51-add-docs-for-external-event-listeners-93" title="Permanent link">&para;</a></h1>
+<h1 id="51-add-docs-for-external-event-listeners-93">51 Add docs for external event listeners <a href="https://github.com/yakworks/gorm-tools/pull/93">(#93)</a></h1>
 </li>
 <li>86 async batch support <a href="https://github.com/yakworks/gorm-tools/pull/92">(#92)</a></li>
 <li>finished adding batch methods to domains, refactored out WithTrx <a href="https://github.com/yakworks/gorm-tools/pull/91">(#91)</a></li>
@@ -634,7 +431,7 @@
 <li>Refactor Exceptions <a href="https://github.com/yakworks/gorm-tools/issues/74">(#74)</a></li>
 <li>63 event performance benchmarks <a href="https://github.com/yakworks/gorm-tools/pull/73">(#73)</a></li>
 <li>
-<h1 id="66-cleanup-and-refactor-common-code-to-be-reusable-72">66 cleanup and refactor common code to be reusable. <a href="https://github.com/yakworks/gorm-tools/pull/72">(#72)</a><a class="headerlink" href="#66-cleanup-and-refactor-common-code-to-be-reusable-72" title="Permanent link">&para;</a></h1>
+<h1 id="66-cleanup-and-refactor-common-code-to-be-reusable-72">66 cleanup and refactor common code to be reusable. <a href="https://github.com/yakworks/gorm-tools/pull/72">(#72)</a></h1>
 </li>
 <li>Mango docs <a href="https://github.com/yakworks/gorm-tools/pull/71">(#71)</a></li>
 <li>Added Pager docs and specs #55 <a href="https://github.com/yakworks/gorm-tools/pull/70">(#70)</a></li>
@@ -648,7 +445,7 @@
 <li>49 mango query refactored <a href="https://github.com/yakworks/gorm-tools/pull/59">(#59)</a></li>
 <li>Docs: Id Generator <a href="https://github.com/yakworks/gorm-tools/issues/58">(#58)</a></li>
 <li>
-<h1 id="53-add-daohibernatespec-57">53 Add DaoHibernateSpec <a href="https://github.com/yakworks/gorm-tools/pull/57">(#57)</a><a class="headerlink" href="#53-add-daohibernatespec-57" title="Permanent link">&para;</a></h1>
+<h1 id="53-add-daohibernatespec-57">53 Add DaoHibernateSpec <a href="https://github.com/yakworks/gorm-tools/pull/57">(#57)</a></h1>
 </li>
 <li>Pager spec tests are virtually non-existant <a href="https://github.com/yakworks/gorm-tools/issues/55">(#55)</a></li>
 <li>Resolved fixmes for BeanPathTools #47 <a href="https://github.com/yakworks/gorm-tools/pull/54">(#54)</a></li>
@@ -683,89 +480,40 @@
 <li>upgrade to grails 2.5.5 hibernate 4 <a href="https://github.com/yakworks/gorm-tools/issues/6">(#6)</a></li>
 <li>DaoMessage.notFound fails when null id is passed in params. <a href="https://github.com/yakworks/gorm-tools/issues/4">(#4)</a></li>
 <li>Remove formatParams method <a href="https://github.com/yakworks/gorm-tools/pull/3">(#3)</a></li>
-</ul>
-                
-                  
-                
-              
-              
-                
-              
-            </article>
-          </div>
+</ul></div>
         </div>
-      </main>
-      
-        
-<footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href=".." title="Overview" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2020 9ci Inc</p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
             </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Overview
-              </span>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
             </div>
-          </a>
-        
-        
-          <a href="../repository/intro/" title="Quick Start" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Quick Start
-              </span>
+            <div class="modal-footer">
             </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
+        </div>
     </div>
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-          <div class="md-footer-copyright__highlight">
-            Copyright &copy; 2017 9ci Inc
-          </div>
-        
-        powered by
-        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
-        and
-        <a href="http://yakworks.github.io/mkdocs-material-components/" title="Material Components for MkDocs">
-          Material Components for MkDocs</a>
-      </div>
-    </div>
-  </div>
-</footer>
-      
-    </div>
-    
-      <script src="../assets/javascripts/application-68832431b5.js"></script>
-      
-      
-      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-      <script>window.mdc.autoInit()</script>
-      <script src="../assets/javascripts/headroom.min.js"></script>
-      <script src="../assets/javascripts/jQuery.headroom.min.js"></script>
-      <script src="../assets/javascripts/jq-mdc-web.js"></script>
-      <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
-      <script>app.initialize({version:"0.16.3",url:{base:".."}})</script>
-      
-    
-    
-  </body>
+</div>
+
+    </body>
 </html>

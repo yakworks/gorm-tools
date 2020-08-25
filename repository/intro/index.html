@@ -1,717 +1,242 @@
-
 <!DOCTYPE html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      <meta http-equiv="x-ua-compatible" content="ie=edge">
-      
-      
-        <meta name="description" content="Plugin tools Grails/Gorm - repository data services, json query language, fast data binder">
-      
-      
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <meta name="author" content="9ci">
         <link rel="canonical" href="https://yakworks.github.io/gorm-tools/repository/intro/">
-      
-      
-        <meta name="author" content="Yak.Works">
-      
-      
-        <link rel="shortcut icon" href="../../assets/images/favicon.png">
-      
-      <meta name="generator" content="mkdocs-0.16.3, mkdocs-material-components-1.10.11">
-    
-    
-      
+        <link rel="shortcut icon" href="../../img/favicon.ico">
         <title>Quick Start - Gorm Tools Grails Plugin</title>
-      
-    
-    
-      
-    
-    
-      <script src="../../assets/javascripts/modernizr-e826f8942a.js"></script>
-    
-    
-      <link rel="stylesheet" href="../../assets/stylesheets/application-2cd7d9ab0f.css">
-      
-        <link rel="stylesheet" href="../../assets/stylesheets/application-035c261bc5.palette.css">
-      
-      <link rel="stylesheet" href="../../assets/stylesheets/material-components-web.min.css">
-      <link rel="stylesheet" href="../../assets/stylesheets/mdc-web.css">
-    
-    
-      
-        
-        
-        
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open Sans:300,300i,400,400i,600,600i,700,700i,800,800i|Ubuntu+Mono">
-        <style>body,input{font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
-      
-      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.js"></script>
-    
-  </head>
-  
-  
-  
-  
-    <body data-md-color-primary="light-green" data-md-color-accent="indigo">
-  
-    <svg class="md-svg">
-      <defs>
-        
-        
-          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
-        
-      </defs>
-    </svg>
-    
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
-    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
-    
-      
-        <style>.region--header{background-color:rgba(255,255,255,.9);min-height:3.25rem;width:100%;z-index:2}header.region--header{position:fixed;top:0;right:0;left:0}.region--header .region--header__wrapper{max-width:1440px;margin-left:auto;margin-right:auto;position:relative;z-index:2;box-sizing:inherit}.region--header .region--header__logo{display:inline-block;float:left;height:3.25rem;margin:0;padding-left:1rem}.site-logo{display:block;height:4.25rem;padding:1.5rem 0}.site-logo--main{display:block;height:3.25rem;margin:0;padding:0;width:4.25rem}.header-navigation{font-size:1rem;clear:none;float:right;margin-top:.75rem;padding-bottom:0;padding-right:.75rem}.header-navigation__menu{clear:both;overflow:visible;-webkit-transform-style:preserve-3d;width:100%;z-index:9999;display:inline;margin:0;padding:0}.header-navigation__menu-link{display:inline;line-height:1.5;margin-right:0;padding-right:0;width:auto;overflow:hidden;text-align:right;z-index:2}.region--header a{text-decoration:none}.header-navigation__menu-link a{padding-left:.75rem;padding-right:.75rem;color:#012b45;display:inline-block;font-weight:400;text-transform:uppercase;transition:background-color ease .2s}@media only screen and (max-width:500px){.header-navigation{font-size:.85rem}.header-navigation__menu-link a{padding-left:.25rem;padding-right:.25rem}}.header-navigation__menu-link:last-child:not(.header-navigation__active-nav-item):not(:hover):not(:focus){color:#e8650c}.header-navigation__menu-link a:focus,.header-navigation__menu-link a:hover{color:#e8650c}.md-container{padding-top:6.5rem}#header-docs{top:3.25rem}#background{display:none}#header-docs .md-logo{display:none}</style>
-<style media="print">#header-docs{top:0}#header-docs .md-logo{display:block}#header-website{display:none}.md-container{padding-top:0}.headroom--pinned{transform:translateY(0)}#background{position:fixed;top:250px;left:50px;z-index:9999999;background:0 0;min-height:30%;min-width:30%;display:block}#bg-text{color:rgba(211,211,211,.2);font-size:80px;transform:rotate(300deg);-webkit-transform:rotate(300deg)}</style>
-<div id="background">
-  <p id="bg-text">9ci Confidential</p>
-</div>
-<header id="header-website" class="region--header" role="banner">
-  <div class="region--header__wrapper">
-    <a href="/" class="region--header__logo">
-      <img src="http://www.9ci.com/assets/img/logo.svg" alt="9ci logo" class="site-logo site-logo--main">
-    </a>
-    <nav role="navigation" class="header-navigation">
-      <ul id="js-navigation-menu" class="header-navigation__menu">
-      <li class="header-navigation__menu-link">
-        <a href="http://www.9ci.com/solutions">Solutions</a>
-      </li>
-      <li class="header-navigation__menu-link">
-        <a href="http://www.9ci.com/company">Company</a>
-      </li>
-      <li class="header-navigation__menu-link">
-        <a href="http://www.9ci.com/contact">Contact</a>
-      </li>
-      </ul>
-    </nav>
-  </div>
-</header>
-<header id="header-docs" class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid">
-    <div class="md-flex">
-      <div class="md-flex__cell md-flex__cell--shrink md-flex__cell--vmiddle">
-        <a href="https://yakworks.github.io/gorm-tools" title="Gorm Tools Grails Plugin" class="md-header-nav__button md-logo">
-          
-            <img src="../../assets/images/logo_white.png" width="36" height="36">
-          
-        </a>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
-      </div>
-      <div class="md-flex__cell md-flex__cell--stretch">
-        <span class="md-flex__ellipsis md-header-nav__title">
-          
-            Gorm Tools Grails Plugin -
-            
-              
-                <span class="md-header-nav__parent">
-                  Repository Pattern
-                </span>
-              
-            
-            Quick Start
-          
-        </span>
-      </div>
-      <div class="md-flex__cell md-flex__cell--shrink">
-        
-          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
-          
-<div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="search"></label>
-  <div class="md-search__inner">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
-      <label class="md-icon md-search__icon" for="search"></label>
-      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
-          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
-            Type to start searching
-          </div>
-          <ol class="md-search-result__list"></ol>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.5.0.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+	
+	<script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="../..">Gorm Tools Grails Plugin</a>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-        
-      </div>
-      
-        <div class="md-flex__cell md-flex__cell--shrink">
-          <div class="md-header-nav__source">
-            
 
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+                <!-- Main navigation -->
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="../..">Overview</a>
+                    </li>
+                    <li >
+                        <a href="../../release-notes/">Release Notes</a>
+                    </li>
+                    <li class="dropdown active">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Repository Pattern <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li class="active">
+    <a href="./">Quick Start</a>
+</li>
+                            
+<li >
+    <a href="../ref/">Reference</a>
+</li>
+                            
+<li >
+    <a href="../databinding/">Databinding</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../../queries-mango/">Mango Query</a>
+                    </li>
+                    <li >
+                        <a href="../../async/">Async</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Toolbox <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            
+<li >
+    <a href="../../id-generation/">Id Generation</a>
+</li>
+                            
+<li >
+    <a href="../../gorm-utils/">GormUtils Class</a>
+</li>
+                            
+<li >
+    <a href="../../beanPathTools/">Bean Path Tools</a>
+</li>
+                            
+<li >
+    <a href="../../working-with-dates/">Date Utils</a>
+</li>
+                        </ul>
+                    </li>
+                    <li >
+                        <a href="../../testing/">Testing</a>
+                    </li>
+                    <li >
+                        <a href="../../api-docs/">API Docs</a>
+                    </li>
+                    <li >
+                        <a href="../../usefulLinks/">Useful Links</a>
+                    </li>
+                </ul>
 
-  
-
-
-  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      yakworks/gorm-tools
-    </div>
-  </a>
-
-          </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                        <i class="fa fa-search"></i> Search
+                    </a>
+                </li>
+                    <li >
+                        <a rel="next" href="../../release-notes/">
+                            <i class="fa fa-arrow-left"></i> Previous
+                        </a>
+                    </li>
+                    <li >
+                        <a rel="prev" href="../ref/">
+                            Next <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/yakworks/gorm-tools">yakworks/gorm-tools
+                        </a>
+                    </li>
+            </ul>
         </div>
-      
-      
     </div>
-  </nav>
-</header>
-      
-    
-    <div class="md-container">
-      
-      
-      
-      <main class="md-main">
-        <div class="md-main__inner md-grid" data-md-component="container">
-          
-            
-              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    <nav class="md-nav md-nav--primary" data-md-level="0">
-  <label class="md-nav__title md-nav__title--site" for="drawer">
-    <div class="md-nav__button md-logo">
-      
-        <i class="md-icon md-icon--home"></i>
-      
-    </div>
-    Gorm Tools Grails Plugin
-  </label>
-  
-    <div class="md-nav__source">
-      
+</div>
 
-
-  
-
-
-  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
-    
-      <div class="md-source__icon">
-        <svg viewBox="0 0 24 24" width="24" height="24">
-          <use xlink:href="#github" width="24" height="24"></use>
-        </svg>
-      </div>
-    
-    <div class="md-source__repository">
-      yakworks/gorm-tools
-    </div>
-  </a>
-
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../.." title="Overview" class="md-nav__link">
-      Overview
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../release-notes/" title="Release Notes" class="md-nav__link">
-      Release Notes
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-    
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
-    
-    <label class="md-nav__link" for="nav-3">
-      Repository Pattern
-    </label>
-    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-3">
-        Repository Pattern
-      </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Quick Start
-      </label>
-    
-    <a href="./" title="Quick Start" class="md-nav__link md-nav__link--active">
-      Quick Start
-    </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start-example" title="Quick Start Example" class="md-nav__link">
-    Quick Start Example
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#domain-setup" title="Domain setup" class="md-nav__link">
-    Domain setup
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stock-grails-gorm" title="Stock Grails Gorm" class="md-nav__link">
-    Stock Grails Gorm
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-the-repository" title="Using the Repository" class="md-nav__link">
-    Using the Repository
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-the-domain" title="Testing the Domain" class="md-nav__link">
-    Testing the Domain
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#implementing-projectrepo-service" title="Implementing ProjectRepo Service" class="md-nav__link">
-    Implementing ProjectRepo Service
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-the-projectrepo-changes" title="Testing the ProjectRepo Changes" class="md-nav__link">
-    Testing the ProjectRepo Changes
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#quick-start-example">Quick Start Example</a></li>
+            <li><a href="#domain-setup">Domain setup</a></li>
+            <li><a href="#stock-grails-gorm">Stock Grails Gorm</a></li>
+            <li><a href="#using-the-repository">Using the Repository</a></li>
+            <li><a href="#testing-the-domain">Testing the Domain</a></li>
+            <li><a href="#implementing-projectrepo-service">Implementing ProjectRepo Service</a></li>
+            <li><a href="#testing-the-projectrepo-changes">Testing the ProjectRepo Changes</a></li>
     </ul>
-  
-</nav>
-    
-  </li>
+</div></div>
+                <div class="col-md-9" role="main">
 
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../ref/" title="Reference" class="md-nav__link">
-      Reference
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../databinding/" title="Databinding" class="md-nav__link">
-      Databinding
-    </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../queries-mango/" title="Mango Query" class="md-nav__link">
-      Mango Query
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../async/" title="Async" class="md-nav__link">
-      Async
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
-    
-    <label class="md-nav__link" for="nav-6">
-      Toolbox
-    </label>
-    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-6">
-        Toolbox
-      </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../id-generation/" title="Id Generation" class="md-nav__link">
-      Id Generation
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../gorm-utils/" title="GormUtils Class" class="md-nav__link">
-      GormUtils Class
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../beanPathTools/" title="Bean Path Tools" class="md-nav__link">
-      Bean Path Tools
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../working-with-dates/" title="Date Utils" class="md-nav__link">
-      Date Utils
-    </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../testing/" title="Testing" class="md-nav__link">
-      Testing
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../api-docs/" title="API Docs" class="md-nav__link">
-      API Docs
-    </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../usefulLinks/" title="Useful Links" class="md-nav__link">
-      Useful Links
-    </a>
-  </li>
-
-    
-  </ul>
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start-example" title="Quick Start Example" class="md-nav__link">
-    Quick Start Example
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#domain-setup" title="Domain setup" class="md-nav__link">
-    Domain setup
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stock-grails-gorm" title="Stock Grails Gorm" class="md-nav__link">
-    Stock Grails Gorm
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#using-the-repository" title="Using the Repository" class="md-nav__link">
-    Using the Repository
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-the-domain" title="Testing the Domain" class="md-nav__link">
-    Testing the Domain
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#implementing-projectrepo-service" title="Implementing ProjectRepo Service" class="md-nav__link">
-    Implementing ProjectRepo Service
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#testing-the-projectrepo-changes" title="Testing the ProjectRepo Changes" class="md-nav__link">
-    Testing the ProjectRepo Changes
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
-          
-          <div id="article-content" class="md-content"> 
-            <article class="md-content__inner md-typeset">
-              
-                
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/repository/intro.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
-                
-                
-                  <h1>Quick Start</h1>
-                
-                
-                <h2 id="quick-start-example">Quick Start Example<a class="headerlink" href="#quick-start-example" title="Permanent link">&para;</a></h2>
+<h2 id="quick-start-example">Quick Start Example</h2>
 <p>To show what Repository data services are all about let’s walk through an example.</p>
-<h4 id="domain-setup">Domain setup<a class="headerlink" href="#domain-setup" title="Permanent link">&para;</a></h4>
+<h4 id="domain-setup">Domain setup</h4>
 <p>Lets assume we are setting up a way to track details for this Project. We might setup a couple of domains like this. </p>
-<div class="codehilite"><pre><span></span><span class="c1">//change the default contraints to be nullable:true</span>
-<span class="n">gorm</span><span class="o">.</span><span class="na">default</span><span class="o">.</span><span class="na">constraints</span> <span class="o">=</span> <span class="o">{</span>
-    <span class="s1">&#39;*&#39;</span><span class="o">(</span><span class="nl">nullable:</span><span class="kc">true</span><span class="o">)</span>
-<span class="o">}</span>
+<pre><code class="groovy">//change the default contraints to be nullable:true
+gorm.default.constraints = {
+    '*'(nullable:true)
+}
 
-<span class="nd">@GrailsCompileStatic</span>
-<span class="kd">class</span> <span class="nc">Project</span> <span class="o">{</span>
-    <span class="n">String</span> <span class="n">name</span>
-    <span class="n">String</span> <span class="n">description</span>
+@GrailsCompileStatic
+class Project {
+    String name
+    String description
 
-    <span class="n">GitHubInfo</span> <span class="n">gitHubInfo</span> 
+    GitHubInfo gitHubInfo 
 
 
-<span class="o">}</span>
+}
 
-<span class="nd">@GrailsCompileStatic</span>
-<span class="kd">class</span> <span class="nc">GitHubInfo</span> <span class="o">{</span>
-    <span class="n">Long</span> <span class="n">repId</span>         <span class="c1">//1829344</span>
-    <span class="n">String</span> <span class="n">slug</span>         <span class="c1">//yakworks/gorm-tools</span>
-    <span class="n">String</span> <span class="n">description</span>  <span class="c1">//gorm tools for a clean shaved yak</span>
-<span class="o">}</span>
-</pre></div>
+@GrailsCompileStatic
+class GitHubInfo {
+    Long repId         //1829344
+    String slug         //yakworks/gorm-tools
+    String description  //gorm tools for a clean shaved yak
+}
+</code></pre>
 
 <p>and lets say we have a map, perhaps that came from a restful json request or some other service, test data etc...</p>
-<div class="codehilite"><pre><span></span><span class="n">params</span> <span class="o">=</span> <span class="o">[</span>
-    <span class="nl">name:</span> <span class="s1">&#39;gorm-tools&#39;</span><span class="o">,</span>
-    <span class="nl">gitHubInfo:</span> <span class="o">[</span>
-        <span class="nl">repId:</span> <span class="mi">1829344</span><span class="o">,</span>
-        <span class="nl">slug:</span> <span class="s1">&#39;yakworks/gorm-tools&#39;</span><span class="o">,</span>
-    <span class="o">]</span>
-<span class="o">]</span>
-</pre></div>
+<pre><code class="groovy">params = [
+    name: 'gorm-tools',
+    gitHubInfo: [
+        repId: 1829344,
+        slug: 'yakworks/gorm-tools',
+    ]
+]
+</code></pre>
 
-<h3 id="stock-grails-gorm">Stock Grails Gorm<a class="headerlink" href="#stock-grails-gorm" title="Permanent link">&para;</a></h3>
-<p><strong>Using stock Grails</strong> <a class="new-tab" href="http://gorm.grails.org/latest/hibernate/manual/index.html">Gorm</a> we would probably implement something like the following 
+<h3 id="stock-grails-gorm">Stock Grails Gorm</h3>
+<p><strong>Using stock Grails</strong> <a href="http://gorm.grails.org/latest/hibernate/manual/index.html">Gorm</a>{.new-tab} we would probably implement something like the following 
 simplified boiler plate design pattern for the <strong>C</strong> in CRUD</p>
-<p><div class="codehilite"><pre><span></span><span class="nd">@GrailsCompileStatic</span> <span class="nd">@Transactional</span>
-<span class="kd">class</span> <span class="nc">ProjectService</span> <span class="o">{</span>
+<pre><code class="groovy">@GrailsCompileStatic @Transactional
+class ProjectService {
 
-    <span class="n">Project</span> <span class="nf">createNew</span><span class="o">(</span><span class="n">Map</span> <span class="n">data</span><span class="o">){</span>
-        <span class="kt">def</span> <span class="n">project</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Project</span><span class="o">()</span>
-        <span class="n">project</span><span class="o">.</span><span class="na">properties</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="n">project</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="nl">failOnError:</span><span class="kc">true</span><span class="o">)</span> <span class="c1">//throw runtime to roll back if error</span>
-    <span class="o">}</span>
+    Project createNew(Map data){
+        def project = new Project()
+        project.properties = data
+        project.save(failOnError:true) //throw runtime to roll back if error
+    }
 
-    <span class="c1">//.... other imps</span>
-<span class="o">}</span>
+    //.... other imps
+}
 
-<span class="c1">// elsewhwere, probably in a controller action, we would inject the service and use it to save</span>
-<span class="nd">@Autowired</span> <span class="n">ProjectService</span> <span class="n">projectService</span>
-<span class="o">...</span>
-<span class="n">projectService</span><span class="o">.</span><span class="na">createNew</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
-</pre></div>
- or perhaps we would do it with the new Data Services</p>
-<h3 id="using-the-repository">Using the Repository<a class="headerlink" href="#using-the-repository" title="Permanent link">&para;</a></h3>
+// elsewhwere, probably in a controller action, we would inject the service and use it to save
+@Autowired ProjectService projectService
+...
+projectService.createNew(params)
+
+</code></pre>
+
+<p>or perhaps we would do it with the new Data Services</p>
+<h3 id="using-the-repository">Using the Repository</h3>
 <p><strong>With this Gorm repository plugin</strong>, we have shaved the yak for you and each domain has a Repository automatically 
 setup for this pattern. So with this plugin all the boiler plate from above can be replaced with 1 line!</p>
-<div class="codehilite"><pre><span></span><span class="c1">// elsewhere, probably in a controller action. </span>
-<span class="n">Project</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
-</pre></div>
+<pre><code class="groovy">// elsewhere, probably in a controller action. 
+Project.create(params)
+</code></pre>
 
 <p>Thats it. The <code>Project.create()</code> actually delegates to the Default<a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepo.html">GormRepo</a>.create(). The <code>create</code> is wrapped in a transaction, creates the intance,
 binds the data and defaults to saving with <code>failOnError:true</code>. 
 Like all transactional methods if the method is called from inside another transaction it will use it
 otherwise it creates a new one. </p>
 <blockquote>
-<p><img alt="💡" class="gemoji" src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4a1.png" title=":bulb:" /> <strong>Other Repository Domain Methods</strong><br />
+<p>:bulb: <strong>Other Repository Domain Methods</strong><br />
 You can do the same thing as above for an <code>update</code> or <code>delete</code>. 
-The details of whats available can be seen in the <a class="new-tab" href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepoEntity.html">GormRepoEntity</a> trait or in the <a class="new-tab" href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/GormRepoEntity.groovy">GormRepoEntity source</a> and are outlined below</p>
+The details of whats available can be seen in the <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/GormRepoEntity.html">GormRepoEntity</a>{.new-tab} trait or in the <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/repository/GormRepoEntity.groovy">GormRepoEntity source</a>{.new-tab} and are outlined below</p>
 </blockquote>
-<h3 id="testing-the-domain">Testing the Domain<a class="headerlink" href="#testing-the-domain" title="Permanent link">&para;</a></h3>
+<h3 id="testing-the-domain">Testing the Domain</h3>
 <p>If you used the script to create the domains then the tests will already be in place for us or you can add one manually like so.</p>
-<div class="codehilite"><pre><span></span><span class="kn">package</span> <span class="n">testing</span>
+<pre><code class="groovy">package testing
 
-<span class="kn">import</span> <span class="nn">gorm.tools.testing.hibernate.AutoHibernateSpec</span>
-<span class="kn">import</span> <span class="nn">spock.lang.Specification</span>
+import gorm.tools.testing.hibernate.AutoHibernateSpec
+import spock.lang.Specification
 
-<span class="kd">class</span> <span class="nc">ProjectSpec</span> <span class="kd">extends</span> <span class="n">AutoHibernateSpec</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
-    <span class="cm">/** automatically runs tests on persist(), create(), update(), delete().*/</span>
-<span class="o">}</span>
-</pre></div>
+class ProjectSpec extends AutoHibernateSpec&lt;Project&gt; {
+    /** automatically runs tests on persist(), create(), update(), delete().*/
+}
+</code></pre>
 
 <p>Notice the absence of test methods? Running with the the mantra of "convetion over configuration" and "intelligent defaults"
 <code>DomainAutoTest</code> will mock the domain, setup and create the data for you then exercise the domain and the default repository service for you.
 We'll see in the next section how to override the automated tests in the DomainAutoTest. </p>
-<h3 id="implementing-projectrepo-service">Implementing ProjectRepo Service<a class="headerlink" href="#implementing-projectrepo-service" title="Permanent link">&para;</a></h3>
+<h3 id="implementing-projectrepo-service">Implementing ProjectRepo Service</h3>
 <p>The <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/repository/DefaultGormRepo.html">DefaultGormRepo</a> that is setup for the Project domain will of course not always be adequate for the business logic.
 Again running with the "intelligent defaults but easy to override" mantra we can easily and selectively override the defaults in the repository. 
 Lets say we want to do something more advanced during the create such as validate and retrieve info from GitHub. 
@@ -721,56 +246,57 @@ Such as <code>beforeCreate</code> inside the Project domain and deal with flushi
 <p>We can abstract out the logic into a ProjectRepo. </p>
 <p>Lets say we wanted to use a service to validate Github repo and retrieve the description on create.
 We can add a class to the <code>grails-app/repository</code> directory as in the following example.</p>
-<div class="codehilite"><pre><span></span><span class="kn">package</span> <span class="n">tracker</span>
+<pre><code class="groovy">package tracker
 
-<span class="nd">@CompileStatic</span>
-<span class="kd">class</span> <span class="nc">ProjectRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;{</span>
+@CompileStatic
+class ProjectRepo implements GormRepo&lt;Project&gt;{
 
-    <span class="nd">@Autowired</span> <span class="n">GitHubApi</span> <span class="n">gitHubApi</span>
+    @Autowired GitHubApi gitHubApi
 
-    <span class="c1">//event method used to update the descriptions with the ones in github</span>
-    <span class="nd">@RepoListener</span>
-    <span class="kt">void</span> <span class="nf">afterBind</span><span class="o">(</span><span class="n">Project</span> <span class="n">project</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">,</span> <span class="n">AfterBindEvent</span> <span class="n">be</span><span class="o">){</span>
-        <span class="n">Map</span> <span class="n">repoInfo</span> <span class="o">=</span> <span class="n">gitHubApi</span><span class="o">.</span><span class="na">getGitRepo</span><span class="o">(</span><span class="n">params</span><span class="o">.</span><span class="na">gitHubRepo</span><span class="o">)</span>
-        <span class="c1">//check that it was found using the slug or repoId</span>
-        <span class="k">if</span> <span class="o">(!</span><span class="n">repoInfo</span><span class="o">)</span> 
-            <span class="k">throw</span> <span class="k">new</span> <span class="nf">DataRetrievalFailureException</span><span class="o">(</span><span class="s2">&quot;Github Repo is invalid for ${params.gitHubInfo}&quot;</span><span class="o">)</span>
+    //event method used to update the descriptions with the ones in github
+    @RepoListener
+    void afterBind(Project project, Map params, AfterBindEvent be){
+        Map repoInfo = gitHubApi.getGitRepo(params.gitHubRepo)
+        //check that it was found using the slug or repoId
+        if (!repoInfo) 
+            throw new DataRetrievalFailureException(&quot;Github Repo is invalid for ${params.gitHubInfo}&quot;)
 
-        <span class="k">if</span><span class="o">(</span><span class="n">repoInfo</span><span class="o">.</span><span class="na">description</span><span class="o">){</span>
-            <span class="c1">//force the gitHubRepo.description to be whats in github</span>
-            <span class="n">project</span><span class="o">.</span><span class="na">gitHubInfo</span><span class="o">.</span><span class="na">description</span> <span class="o">=</span> <span class="n">repoInfo</span><span class="o">.</span><span class="na">description</span>
-            <span class="c1">//update project.description to be the same if its null</span>
-            <span class="n">project</span><span class="o">.</span><span class="na">description</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="na">description</span> <span class="o">?:</span> <span class="n">repoInfo</span><span class="o">.</span><span class="na">description</span>
-            <span class="n">project</span><span class="o">.</span><span class="na">persist</span><span class="o">()</span> <span class="c1">//optional</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span>
+        if(repoInfo.description){
+            //force the gitHubRepo.description to be whats in github
+            project.gitHubInfo.description = repoInfo.description
+            //update project.description to be the same if its null
+            project.description = project.description ?: repoInfo.description
+            project.persist() //optional
+        }
+    }
+}
 
-<span class="c1">// elsewhere, you can call and it will be automatically taken care of</span>
-<span class="n">Project</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
-</pre></div>
+// elsewhere, you can call and it will be automatically taken care of
+Project.create(params)
+
+</code></pre>
 
 <p>Events methods and fired spring events are run inside the inherited transaction and as usual an uncaught runtime exception will rollback.
 The <code>persist</code> methods is another addition to the domains added by the GormRepoEntity trait. In the example above its not really needed as 
 the changes will be flushed during the transaction commit. They are here to doc whats happening 
 and so that validation failures can be easily seen.</p>
-<h3 id="testing-the-projectrepo-changes">Testing the ProjectRepo Changes<a class="headerlink" href="#testing-the-projectrepo-changes" title="Permanent link">&para;</a></h3>
+<h3 id="testing-the-projectrepo-changes">Testing the ProjectRepo Changes</h3>
 <p><a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/testing/DomainAutoTest.html">DomainAutoTest</a> already contains default tests for <code>create</code>, <code>update</code>, <code>persist</code>, <code>delete</code> methods, that are called from 
 repo. So if, for example, any changes were made for create method for ProjectRepo:</p>
-<p><div class="codehilite"><pre><span></span><span class="nd">@Artefact</span><span class="o">(</span><span class="s2">&quot;Repository&quot;</span><span class="o">)</span>
-<span class="nd">@Transactional</span>
-<span class="kd">class</span> <span class="nc">ProjectRepo</span> <span class="kd">extends</span> <span class="n">DefaultGormRepo</span><span class="o">&lt;</span><span class="n">Project</span><span class="o">&gt;</span> <span class="o">{</span>
+<pre><code class="groovy">@GormRepository
+class ProjectRepo implements GormRepo&lt;Project&gt; {
 
-    <span class="nd">@Override</span>
-    <span class="nd">@CompileDynamic</span>
-    <span class="n">Org</span> <span class="nf">create</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">params</span><span class="o">.</span><span class="na">name</span> <span class="o">=</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="n">params</span><span class="o">.</span><span class="na">name</span> 
-        <span class="kd">super</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">params</span><span class="o">)</span>
-     <span class="o">}</span>
-<span class="o">}</span>
-</pre></div>
-then you can override test case to check specific value </p>
-<div class="codehilite"><pre><span></span>class ProjectSpec extends DomainAutoTest&lt;Project&gt; {
+    @Override
+    @CompileDynamic
+    Org create(Map params) {
+        params.name = &quot;#&quot; + params.name 
+        super.create(params)
+     }
+}
+</code></pre>
+
+<p>then you can override test case to check specific value </p>
+<pre><code class="groovy">class ProjectSpec extends DomainAutoTest&lt;Project&gt; {
 
     void test_create() {
             when:
@@ -781,89 +307,40 @@ then you can override test case to check specific value </p>
         }
 
 }
-</pre></div>
-                
-                  
-                
-              
-              
-                
-              
-            </article>
-          </div>
+</code></pre></div>
         </div>
-      </main>
-      
-        
-<footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid">
-        
-          <a href="../../release-notes/" title="Release Notes" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+
+        <footer class="col-md-12">
+            <hr>
+                <p>Copyright &copy; 2020 9ci Inc</p>
+            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
             </div>
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Previous
-                </span>
-                Release Notes
-              </span>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
             </div>
-          </a>
-        
-        
-          <a href="../ref/" title="Reference" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
-              <span class="md-flex__ellipsis">
-                <span class="md-footer-nav__direction">
-                  Next
-                </span>
-                Reference
-              </span>
+            <div class="modal-footer">
             </div>
-            <div class="md-flex__cell md-flex__cell--shrink">
-              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
-            </div>
-          </a>
-        
-      </nav>
+        </div>
     </div>
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-          <div class="md-footer-copyright__highlight">
-            Copyright &copy; 2017 9ci Inc
-          </div>
-        
-        powered by
-        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
-        and
-        <a href="http://yakworks.github.io/mkdocs-material-components/" title="Material Components for MkDocs">
-          Material Components for MkDocs</a>
-      </div>
-    </div>
-  </div>
-</footer>
-      
-    </div>
-    
-      <script src="../../assets/javascripts/application-68832431b5.js"></script>
-      
-      
-      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-      <script>window.mdc.autoInit()</script>
-      <script src="../../assets/javascripts/headroom.min.js"></script>
-      <script src="../../assets/javascripts/jQuery.headroom.min.js"></script>
-      <script src="../../assets/javascripts/jq-mdc-web.js"></script>
-      <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
-      <script>app.initialize({version:"0.16.3",url:{base:"../.."}})</script>
-      
-    
-    
-  </body>
+</div>
+
+    </body>
 </html>

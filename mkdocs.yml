@@ -3,84 +3,54 @@ pages:
   - Overview: index.md
   - Release Notes: release-notes.md
   - Repository Pattern:
-    - Quick Start: repository/intro.md
-    - Reference: repository/ref.md
-    - Databinding: repository/databinding.md
+      - Quick Start: repository/intro.md
+      - Reference: repository/ref.md
+      - Databinding: repository/databinding.md
   - Mango Query: queries-mango.md
   - Async: async.md
   - Toolbox:
-    - Id Generation: id-generation.md
-    - GormUtils Class: gorm-utils.md
-    - Bean Path Tools: beanPathTools.md
-    - Date Utils: working-with-dates.md
+      - Id Generation: id-generation.md
+      - GormUtils Class: gorm-utils.md
+      - Bean Path Tools: beanPathTools.md
+      - Date Utils: working-with-dates.md
   - Testing: testing.md
   - API Docs: api-docs.md
   - Useful Links: usefulLinks.md
 
 # Project information
-site_name: '@title@'
-site_description: '@description@'
-site_author: '@author@'
-site_url:
-copyright: 'Copyright &copy; 2017 9ci Inc'
+site_name: Gorm Tools Grails Plugin
+site_description: Plugin tools Grails/Gorm - repository data services, json query language, fast data binder
+site_author: 9ci
+site_url: https://yakworks.github.io/gorm-tools/
+copyright: 'Copyright &copy; 2020 9ci Inc'
 
 ## edit link settings
-repo_name: '@gitHubSlug@'
-# gradle will replace this url, has to be here for testing though
-repo_url: https://github.com/org/project
+repo_name: yakworks/gorm-tools
+repo_url: https://github.com/yakworks/gorm-tools
 edit_uri: edit/master/docs/
 
-# Config
-docs_dir: 'docs'
-theme: material-components
-
-# Options
 extra:
-  version: '@version@'
+  version: '6.1.12-v.1' #'@version@'
   # adds <meta name="robots" content="noindex,nofollow"> to keep search engines from indexing this
   # noindex: true
-  feature:
-    tabs: false
   palette:
     primary: 'light green'
     accent: indigo
-  # social:
-  #   - type: globe
-  #     link: http://struct.cc
-  #   - type: github-alt
-  #     link: https://github.com/9ci
-  #   - type: twitter
-  #     link: https://twitter.com/9ci
-  #   - type: linkedin
-  #     link: https://de.linkedin.com/in/basejump
 
-# Extensions
-markdown_extensions:
-  - pymdownx.extra # replacement for markdown.extensions.extra see https://facelessuser.github.io/pymdown-extensions/extensions/extra/
-  - markdown.extensions.admonition
-  - markdown.extensions.codehilite(guess_lang=false)
-  - markdown.extensions.def_list
-  - markdown.extensions.footnotes
-  - markdown.extensions.meta
-  - markdown.extensions.toc(permalink=true)
-  - markdown_include.include:
-      base_path: 'docs'
-  - pymdownx.arithmatex
-  - pymdownx.betterem(smart_enable=all)
-  - pymdownx.caret
-  - pymdownx.critic
-  - pymdownx.emoji:
-      #emoji_generator: !!python/name:pymdownx.emoji.to_svg
-      emoji_index: !!python/name:pymdownx.emoji.gemoji
-  - pymdownx.inlinehilite
-  - pymdownx.magiclink
-  - pymdownx.mark
-  - pymdownx.smartsymbols
-  - pymdownx.superfences
-  - pymdownx.tasklist(custom_checkbox=true)
-  - pymdownx.tilde
 
-# Google Analytics
-# google_analytics:
-#   - !!python/object/apply:os.getenv ["GOOGLE_ANALYTICS_KEY"]
-#   - auto
+# Project information
+#site_name: '@title@'
+#site_description: '@description@'
+#site_author: '@author@'
+#site_url:
+#copyright: 'Copyright &copy; 2017 9ci Inc'
+
+## edit link settings
+# repo_name: '@gitHubSlug@'
+# gradle will replace this url, has to be here for testing though
+# repo_url: https://github.com/org/project
+# edit_uri: edit/master/docs/
+
+# Config
+#docs_dir: 'docs'
+#theme: material-components

@@ -163,9 +163,8 @@ and so that validation failures can be easily seen.
 repo. So if, for example, any changes were made for create method for ProjectRepo:
 
 ```groovy
-@Artefact("Repository")
-@Transactional
-class ProjectRepo extends DefaultGormRepo<Project> {
+@GormRepository
+class ProjectRepo implements GormRepo<Project> {
 
     @Override
     @CompileDynamic
@@ -177,7 +176,7 @@ class ProjectRepo extends DefaultGormRepo<Project> {
 ```
 then you can override test case to check specific value 
 
-```
+```groovy
 class ProjectSpec extends DomainAutoTest<Project> {
     
     void test_create() {

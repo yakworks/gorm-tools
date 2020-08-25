@@ -1,153 +1,703 @@
+
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
         <meta name="description" content="Plugin tools Grails/Gorm - repository data services, json query language, fast data binder">
-        <meta name="author" content="9ci">
+      
+      
         <link rel="canonical" href="https://yakworks.github.io/gorm-tools/">
-        <link rel="shortcut icon" href="./img/favicon.ico">
+      
+      
+        <meta name="author" content="9ci">
+      
+      
+        <link rel="shortcut icon" href="./assets/images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-docmark-1.10.14">
+    
+    
+      
         <title>Gorm Tools Grails Plugin</title>
-        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="./css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="./css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="./css/highlight.css">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-	
-	<script src="./js/jquery-1.10.2.min.js"></script>
-        <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/highlight.pack.js"></script> 
-    </head>
-
-    <body class="homepage">
-
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href=".">Gorm Tools Grails Plugin</a>
+      
+    
+    
+      
+    
+    
+      <script src="./assets/javascripts/modernizr-2b68990d09.js"></script>
+    
+    
+      <link rel="stylesheet" href="./assets/stylesheets/application-5d6ec42b57.css">
+      
+        <link rel="stylesheet" href="./assets/stylesheets/application-4b0996440c.palette.css">
+      
+      <link rel="stylesheet" href="./assets/stylesheets/material-components-web.min.css">
+      <link rel="stylesheet" href="./assets/stylesheets/mdc-web.css">
+    
+    
+      
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,600,600i,700,700i,800,800i|Roboto+Slab:400,500,600,700|Ubuntu+Mono">
+        <style>body,input{font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif}h1,h2,h3,h4,h5,h6{font-family:"Roboto Slab",Georgia,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.js"></script>
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="light-green" data-md-color-accent="indigo">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      
+        <style>.region--header{background-color:rgba(255,255,255,.9);min-height:3.25rem;width:100%;z-index:2}header.region--header{position:fixed;top:0;right:0;left:0}.region--header .region--header__wrapper{max-width:1440px;margin-left:auto;margin-right:auto;position:relative;z-index:2;box-sizing:inherit}.region--header .region--header__logo{display:inline-block;float:left;height:3.25rem;margin:0;padding-left:1rem}.site-logo{display:block;height:4.25rem;padding:1.5rem 0}.site-logo--main{display:block;height:3.25rem;margin:0;padding:0;width:4.25rem}.header-navigation{font-size:1rem;clear:none;float:right;margin-top:.75rem;padding-bottom:0;padding-right:.75rem}.header-navigation__menu{clear:both;overflow:visible;-webkit-transform-style:preserve-3d;width:100%;z-index:9999;display:inline;margin:0;padding:0}.header-navigation__menu-link{display:inline;line-height:1.5;margin-right:0;padding-right:0;width:auto;overflow:hidden;text-align:right;z-index:2}.region--header a{text-decoration:none}.header-navigation__menu-link a{padding-left:.75rem;padding-right:.75rem;color:#012b45;display:inline-block;font-weight:400;text-transform:uppercase;transition:background-color ease .2s}@media only screen and (max-width:500px){.header-navigation{font-size:.85rem}.header-navigation__menu-link a{padding-left:.25rem;padding-right:.25rem}}.header-navigation__menu-link:last-child:not(.header-navigation__active-nav-item):not(:hover):not(:focus){color:#e8650c}.header-navigation__menu-link a:focus,.header-navigation__menu-link a:hover{color:#e8650c}.md-container{padding-top:6.5rem}#header-docs{top:3.25rem}#background{display:none}#header-docs .md-logo{display:none}</style>
+<style media="print">#header-docs{top:0}#header-docs .md-logo{display:block}#header-website{display:none}.md-container{padding-top:0}.headroom--pinned{transform:translateY(0)}#background{position:fixed;top:250px;left:50px;z-index:9999999;background:0 0;min-height:30%;min-width:30%;display:block}#bg-text{color:rgba(211,211,211,.2);font-size:80px;transform:rotate(300deg);-webkit-transform:rotate(300deg)}</style>
+<header id="header-website" class="region--header" role="banner">
+  <div class="region--header__wrapper">
+    <a href="/" class="region--header__logo">
+      <img src="https://www.9ci.com/assets/img/logo.svg" alt="9ci logo" class="site-logo site-logo--main">
+    </a>
+    <nav role="navigation" class="header-navigation">
+      <ul id="js-navigation-menu" class="header-navigation__menu">
+      <li class="header-navigation__menu-link">
+        <a href="https://www.9ci.com/solutions">Solutions</a>
+      </li>
+      <li class="header-navigation__menu-link">
+        <a href="https://www.9ci.com/company">Company</a>
+      </li>
+      <li class="header-navigation__menu-link">
+        <a href="https://www.9ci.com/contact">Contact</a>
+      </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<header id="header-docs" class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink md-flex__cell--vmiddle">
+        <a href="https://yakworks.github.io/gorm-tools/" title="Gorm Tools Grails Plugin" class="md-header-nav__button md-logo">
+          
+            <img src="./assets/images/logo_white.png" width="36" height="36">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            Gorm Tools Grails Plugin -
+            
+              
+            
+            Overview
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
         </div>
-
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                    <li class="active">
-                        <a href=".">Overview</a>
-                    </li>
-                    <li >
-                        <a href="release-notes/">Release Notes</a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Repository Pattern <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            
-<li >
-    <a href="repository/intro/">Quick Start</a>
-</li>
-                            
-<li >
-    <a href="repository/ref/">Reference</a>
-</li>
-                            
-<li >
-    <a href="repository/databinding/">Databinding</a>
-</li>
-                        </ul>
-                    </li>
-                    <li >
-                        <a href="queries-mango/">Mango Query</a>
-                    </li>
-                    <li >
-                        <a href="async/">Async</a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Toolbox <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            
-<li >
-    <a href="id-generation/">Id Generation</a>
-</li>
-                            
-<li >
-    <a href="gorm-utils/">GormUtils Class</a>
-</li>
-                            
-<li >
-    <a href="beanPathTools/">Bean Path Tools</a>
-</li>
-                            
-<li >
-    <a href="working-with-dates/">Date Utils</a>
-</li>
-                        </ul>
-                    </li>
-                    <li >
-                        <a href="testing/">Testing</a>
-                    </li>
-                    <li >
-                        <a href="api-docs/">API Docs</a>
-                    </li>
-                    <li >
-                        <a href="usefulLinks/">Useful Links</a>
-                    </li>
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                        <i class="fa fa-search"></i> Search
-                    </a>
-                </li>
-                    <li class="disabled">
-                        <a rel="next" >
-                            <i class="fa fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="prev" href="release-notes/">
-                            Next <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/yakworks/gorm-tools">yakworks/gorm-tools
-                        </a>
-                    </li>
-            </ul>
-        </div>
+      </div>
     </div>
+  </div>
 </div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
 
-        <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#overview">Overview</a></li>
-        <li class="main "><a href="#domain-repository-services">Domain Repository Services</a></li>
-            <li><a href="#goals">Goals</a></li>
-        <li class="main "><a href="#fast-data-binder-batch-insertupdate">Fast Data Binder &amp; Batch Insert/Update</a></li>
-            <li><a href="#goals_1">Goals</a></li>
-        <li class="main "><a href="#json-query-and-filtering-mango-query">JSON Query and Filtering (Mango Query)</a></li>
-        <li class="main "><a href="#developer-notes">Developer Notes</a></li>
-            <li><a href="#running-docs-locally">Running docs locally</a></li>
-            <li><a href="#publishing-plugin-releases">Publishing Plugin Releases</a></li>
+
+  
+
+
+  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      yakworks/gorm-tools
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+      
+    
+    <div class="md-container">
+      
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <div class="md-nav__button md-logo">
+      
+        <i class="md-icon md-icon--home"></i>
+      
+    </div>
+    Gorm Tools Grails Plugin
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      yakworks/gorm-tools
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Overview
+      </label>
+    
+    <a href="." title="Overview" class="md-nav__link md-nav__link--active">
+      Overview
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" title="Overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domain-repository-services" title="Domain Repository Services" class="md-nav__link">
+    Domain Repository Services
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goals" title="Goals" class="md-nav__link">
+    Goals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fast-data-binder-batch-insertupdate" title="Fast Data Binder &amp; Batch Insert/Update" class="md-nav__link">
+    Fast Data Binder &amp; Batch Insert/Update
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goals_1" title="Goals" class="md-nav__link">
+    Goals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-query-and-filtering-mango-query" title="JSON Query and Filtering (Mango Query)" class="md-nav__link">
+    JSON Query and Filtering (Mango Query)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#developer-notes" title="Developer Notes" class="md-nav__link">
+    Developer Notes
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-docs-locally" title="Running docs locally" class="md-nav__link">
+    Running docs locally
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-plugin-releases" title="Publishing Plugin Releases" class="md-nav__link">
+    Publishing Plugin Releases
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
     </ul>
-</div></div>
-                <div class="col-md-9" role="main">
+  
+</nav>
+    
+  </li>
 
-<p><a href="https://circleci.com/gh/yakworks/gorm-tools"><img alt="CircleCI" src="https://img.shields.io/circleci/project/github/yakworks/gorm-tools/master.svg?longCache=true&amp;style=for-the-badge&amp;logo=circleci" /></a>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="release-notes/" title="Release Notes" class="md-nav__link">
+      Release Notes
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Repository Pattern
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Repository Pattern
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="repository/intro/" title="Quick Start" class="md-nav__link">
+      Quick Start
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="repository/ref/" title="Reference" class="md-nav__link">
+      Reference
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="repository/databinding/" title="Databinding" class="md-nav__link">
+      Databinding
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="queries-mango/" title="Mango Query" class="md-nav__link">
+      Mango Query
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="rest/" title="Rest Api" class="md-nav__link">
+      Rest Api
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="async/" title="Async" class="md-nav__link">
+      Async
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Toolbox
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Toolbox
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="id-generation/" title="Id Generation" class="md-nav__link">
+      Id Generation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="gorm-utils/" title="GormUtils Class" class="md-nav__link">
+      GormUtils Class
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="beanPathTools/" title="Bean Path Tools" class="md-nav__link">
+      Bean Path Tools
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="working-with-dates/" title="Date Utils" class="md-nav__link">
+      Date Utils
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="testing/" title="Testing" class="md-nav__link">
+      Testing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="api-docs/" title="API Docs" class="md-nav__link">
+      API Docs
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="usefulLinks/" title="Useful Links" class="md-nav__link">
+      Useful Links
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" title="Overview" class="md-nav__link">
+    Overview
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domain-repository-services" title="Domain Repository Services" class="md-nav__link">
+    Domain Repository Services
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goals" title="Goals" class="md-nav__link">
+    Goals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fast-data-binder-batch-insertupdate" title="Fast Data Binder &amp; Batch Insert/Update" class="md-nav__link">
+    Fast Data Binder &amp; Batch Insert/Update
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#goals_1" title="Goals" class="md-nav__link">
+    Goals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-query-and-filtering-mango-query" title="JSON Query and Filtering (Mango Query)" class="md-nav__link">
+    JSON Query and Filtering (Mango Query)
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#developer-notes" title="Developer Notes" class="md-nav__link">
+    Developer Notes
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-docs-locally" title="Running docs locally" class="md-nav__link">
+    Running docs locally
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#publishing-plugin-releases" title="Publishing Plugin Releases" class="md-nav__link">
+    Publishing Plugin Releases
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div id="article-content" class="md-content"> 
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/index.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                  <h1>Overview</h1>
+                
+                
+                  <code>Version: 6.1.12-v.1</code>
+                
+                <p><a href="https://circleci.com/gh/yakworks/gorm-tools"><img alt="CircleCI" src="https://img.shields.io/circleci/project/github/yakworks/gorm-tools/master.svg?longCache=true&amp;style=for-the-badge&amp;logo=circleci" /></a>
 <a href="http://9ci.com"><img alt="9ci" src="https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&amp;style=for-the-badge" /></a>
 <img src="https://forthebadge.com/images/badges/built-with-love.svg" height="28">
 <img src="https://forthebadge.com/images/badges/gluten-free.svg" height="28">
@@ -189,26 +739,26 @@
 </tr>
 </tbody>
 </table>
-<pre><code>compile &quot;org.grails.plugins:gorm-tools:6.1.12-v.1&quot;
-</code></pre>
+<div class="codehilite"><pre><span></span>compile &quot;org.grails.plugins:gorm-tools:6.1.12-v.1&quot;
+</pre></div>
 
 <p>Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
 This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
 Developers are free to easily customize, replace and disable these patterns when their opinions differ.</p>
-<h2 id="overview">Overview</h2>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>This is a library of tools to help standardize and simplify the service and Restful controller layer business logic for 
-domains and is the basis for the <a href="https://yakworks.github.io/gorm-rest-api/">Gorm Rest API plugin</a>{.new-tab}. </p>
+domains and is the basis for the <a class="new-tab" href="https://yakworks.github.io/gorm-rest-api/">Gorm Rest API plugin</a>. </p>
 <p>Gorm-Tools is the next iteration on the <a href="https://grails.org/plugin/dao">DAO plugin</a> and has been in use for about 10 years processing millions of transactions per day.</p>
 <p>There are 3 primary patterns this library enables as detailed below for Repositories,
 Mango ( A mongo/graphql like query way to get gorm entity data with a Map) and
 Batch or Bulk inserting and updating with data binding</p>
-<h2 id="domain-repository-services">Domain Repository Services</h2>
+<h2 id="domain-repository-services">Domain Repository Services<a class="headerlink" href="#domain-repository-services" title="Permanent link">&para;</a></h2>
 <p><small><a href="repository/ref/">jump to reference</a></small></p>
 <p>A repository is a <a href="usefulLinks/#references">Domain Driven Design</a> pattern. Used a a place logic to validate, bind, persist and query data that resides 
 either in a database or NoSql (via GORM usually of course).
 The design pattern here is a bit similiar to <a href="https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/">Spring's Repository pattern</a>
 and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices">Data Services</a> pattern.</p>
-<h3 id="goals">Goals</h3>
+<h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Standardization</strong>: a clean common pattern across our apps for domain service layer logic that 
   reduces boiler plate in both services as well as controllers.</li>
@@ -228,9 +778,9 @@ and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#da
   logic to validate address. I can then implement a CustomerRepo in an application and it will override the spring bean
   just as it does for a service. </li>
 </ul>
-<h2 id="fast-data-binder-batch-insertupdate">Fast Data Binder &amp; Batch Insert/Update</h2>
+<h2 id="fast-data-binder-batch-insertupdate">Fast Data Binder &amp; Batch Insert/Update<a class="headerlink" href="#fast-data-binder-batch-insertupdate" title="Permanent link">&para;</a></h2>
 <p>We process millions of transactions per day and needed more performant binding performance.</p>
-<h3 id="goals_1">Goals</h3>
+<h3 id="goals_1">Goals<a class="headerlink" href="#goals_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>FAST Data Binding Service</strong>: databinding from maps (and thus JSON) has to be fast. 
   We sacrfice a small amount of functionality for a big performance gain
@@ -239,7 +789,7 @@ and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#da
 <li><strong>Asynchronous batch processing PERFORMANCE</strong>: GORM insert and updates can be chunked and processed in parrallel 
   using GPARS or RxJava making it easy to processes millions of records from JSON, CSV or Excel</li>
 </ul>
-<h2 id="json-query-and-filtering-mango-query">JSON Query and Filtering (Mango Query)</h2>
+<h2 id="json-query-and-filtering-mango-query">JSON Query and Filtering (Mango Query)<a class="headerlink" href="#json-query-and-filtering-mango-query" title="Permanent link">&para;</a></h2>
 <p>The primary motive here is to create an easy dynamic map based way to query any Gorm Datastore (SQL or NoSQL). 
 Using a simple map that can come from json, yaml, groovy config etc... 
 A huge motivating factor being able is to be able to have a powerful and flexible way to query using json from a REST 
@@ -253,83 +803,112 @@ list of entities restricted by the properties in the <code>criteriaMap</code>.</
 <li>Also inspired by <a href="https://github.com/2do2go/json-sql/">json-sql</a></li>
 </ul>
 <blockquote>
-<p>:memo: 
+<p><img alt="📝" class="gemoji" src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
 Whilst selectors have many similarities with MongoDB query documents, 
 these arise more from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
 </blockquote>
 <p><strong>Example</strong>
 for example, sending a JSON search param that looks like this</p>
-<pre><code class="js">{
-  &quot;name&quot;: &quot;Bill%&quot;,
-  &quot;type&quot;: &quot;New&quot;,
-  &quot;age&quot;: {&quot;$gt&quot;: 65}
-}
-</code></pre>
+<p><div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Bill%&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;New&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;age&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mi">65</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+would get converted to the equivalent criteria</p>
+<div class="codehilite"><pre><span></span><span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span> <span class="p">{</span>
+    <span class="nx">ilike</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill%&quot;</span>
+    <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
+    <span class="nx">gt</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="mi">65</span>
+<span class="p">}</span>
+</pre></div>
 
-<p>would get converted to the equivalent criteria</p>
-<pre><code class="javascript">criteria.list {
-    ilike &quot;name&quot;, &quot;Bill%&quot;
-    eq &quot;type&quot;, &quot;New&quot;
-    gt &quot;age&quot;, 65
-}
-</code></pre>
-
-<h2 id="developer-notes">Developer Notes</h2>
-<h3 id="running-docs-locally">Running docs locally</h3>
-<p>Docs are built with https://yakworks.github.io/docmark/
+<h2 id="developer-notes">Developer Notes<a class="headerlink" href="#developer-notes" title="Permanent link">&para;</a></h2>
+<h3 id="running-docs-locally">Running docs locally<a class="headerlink" href="#running-docs-locally" title="Permanent link">&para;</a></h3>
+<p>Docs are built with <a href="https://yakworks.github.io/docmark/">https://yakworks.github.io/docmark/</a>
 Run  <code>./build.sh dockmark-serve</code></p>
-<h3 id="publishing-plugin-releases">Publishing Plugin Releases</h3>
+<h3 id="publishing-plugin-releases">Publishing Plugin Releases<a class="headerlink" href="#publishing-plugin-releases" title="Permanent link">&para;</a></h3>
 <p>See <a href="developer.md">Developer Docs</a> for info on our release process</p>
 <p><strong>Using latests SNAPSHOT</strong>  </p>
 <p>Configure 9ci repo in build.gradle</p>
-<pre><code class="groovy">repositories {
-  maven { url &quot;http://repo.9ci.com/oss-snapshots&quot; }
- }
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">repositories</span> <span class="o">{</span>
+  <span class="n">maven</span> <span class="o">{</span> <span class="n">url</span> <span class="s2">&quot;http://repo.9ci.com/oss-snapshots&quot;</span> <span class="o">}</span>
+ <span class="o">}</span>
+</pre></div>
 
 <p>See <a href="./version.properties">version.properties</a> for snapshot version</p>
-<pre><code class="groovy">dependencies {
- compile('org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT') { changing = true } 
-}
-</code></pre></div>
+<div class="codehilite"><pre><span></span><span class="n">dependencies</span> <span class="o">{</span>
+ <span class="n">compile</span><span class="o">(</span><span class="s1">&#39;org.grails.plugins:gorm-tools:x.y.z-SNAPSHOT&#39;</span><span class="o">)</span> <span class="o">{</span> <span class="n">changing</span> <span class="o">=</span> <span class="kc">true</span> <span class="o">}</span> 
+<span class="o">}</span>
+</pre></div>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
         </div>
-
-        <footer class="col-md-12">
-            <hr>
-                <p>Copyright &copy; 2020 9ci Inc</p>
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script>var base_url = '.';</script>
-        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
-        <script src="./js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+        
+          <a href="release-notes/" title="Release Notes" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Release Notes
+              </span>
             </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
             </div>
-            <div class="modal-footer">
-            </div>
-        </div>
+          </a>
+        
+      </nav>
     </div>
-</div>
-
-    </body>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 9ci Inc
+          </div>
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://yakworks.github.io/docmark/" title="MkDocs Docmark Theme">
+          Material Components for MkDocs</a>
+      </div>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="./assets/javascripts/application-ea76b28b63.js"></script>
+      
+      
+      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+      <script>window.mdc.autoInit()</script>
+      <script src="./assets/javascripts/headroom.min.js"></script>
+      <script src="./assets/javascripts/jQuery.headroom.min.js"></script>
+      <script src="./assets/javascripts/jq-mdc-web.js"></script>
+      <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
+      <script>app.initialize({version:"0.16.3",url:{base:"."}})</script>
+      
+    
+    
+  </body>
 </html>
-
-<!--
-MkDocs version : 0.16.3
-Build Date UTC : 2020-08-25 18:17:37
--->

@@ -1,202 +1,979 @@
+
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        <meta name="author" content="9ci">
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+        <meta name="description" content="Plugin tools Grails/Gorm - repository data services, json query language, fast data binder">
+      
+      
         <link rel="canonical" href="https://yakworks.github.io/gorm-tools/queries-mango/">
-        <link rel="shortcut icon" href="../img/favicon.ico">
+      
+      
+        <meta name="author" content="9ci">
+      
+      
+        <link rel="shortcut icon" href="../assets/images/favicon.png">
+      
+      <meta name="generator" content="mkdocs-0.16.3, mkdocs-docmark-1.10.14">
+    
+    
+      
         <title>Mango Query - Gorm Tools Grails Plugin</title>
-        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../css/font-awesome-4.5.0.css" rel="stylesheet">
-        <link href="../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="../css/highlight.css">
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-	
-	<script src="../js/jquery-1.10.2.min.js"></script>
-        <script src="../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../js/highlight.pack.js"></script> 
-    </head>
-
-    <body>
-
-        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-
-        <!-- Collapsed navigation -->
-        <div class="navbar-header">
-            <!-- Expander button -->
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="..">Gorm Tools Grails Plugin</a>
+      
+    
+    
+      
+    
+    
+      <script src="../assets/javascripts/modernizr-2b68990d09.js"></script>
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application-5d6ec42b57.css">
+      
+        <link rel="stylesheet" href="../assets/stylesheets/application-4b0996440c.palette.css">
+      
+      <link rel="stylesheet" href="../assets/stylesheets/material-components-web.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/mdc-web.css">
+    
+    
+      
+        
+        
+        
+        
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,600,600i,700,700i,800,800i|Roboto+Slab:400,500,600,700|Ubuntu+Mono">
+        <style>body,input{font-family:"Lato","Helvetica Neue",Helvetica,Arial,sans-serif}h1,h2,h3,h4,h5,h6{font-family:"Roboto Slab",Georgia,Arial,sans-serif}code,kbd,pre{font-family:"Ubuntu Mono","Courier New",Courier,monospace}</style>
+      
+      <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.1.20/jquery.fancybox.min.js"></script>
+    
+  </head>
+  
+  
+  
+  
+    <body data-md-color-primary="light-green" data-md-color-accent="indigo">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+          <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448"
+    viewBox="0 0 416 448" id="github">
+  <path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19-18.125
+        8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19 18.125-8.5
+        18.125 8.5 10.75 19 3.125 20.5zM320 304q0 10-3.125 20.5t-10.75
+        19-18.125 8.5-18.125-8.5-10.75-19-3.125-20.5 3.125-20.5 10.75-19
+        18.125-8.5 18.125 8.5 10.75 19 3.125 20.5zM360
+        304q0-30-17.25-51t-46.75-21q-10.25 0-48.75 5.25-17.75 2.75-39.25
+        2.75t-39.25-2.75q-38-5.25-48.75-5.25-29.5 0-46.75 21t-17.25 51q0 22 8
+        38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0
+        37.25-1.75t35-7.375 30.5-15 20.25-25.75 8-38.375zM416 260q0 51.75-15.25
+        82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5-41.75
+        1.125q-19.5 0-35.5-0.75t-36.875-3.125-38.125-7.5-34.25-12.875-30.25-20.25-21.5-28.75q-15.5-30.75-15.5-82.75
+        0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25
+        30.875q36.75-8.75 77.25-8.75 37 0 70 8 26.25-20.5
+        46.75-30.25t47.25-9.75q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34
+        99.5z" />
+</svg>
+        
+      </defs>
+    </svg>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="drawer">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="search">
+    <label class="md-overlay" data-md-component="overlay" for="drawer"></label>
+    
+      
+        <style>.region--header{background-color:rgba(255,255,255,.9);min-height:3.25rem;width:100%;z-index:2}header.region--header{position:fixed;top:0;right:0;left:0}.region--header .region--header__wrapper{max-width:1440px;margin-left:auto;margin-right:auto;position:relative;z-index:2;box-sizing:inherit}.region--header .region--header__logo{display:inline-block;float:left;height:3.25rem;margin:0;padding-left:1rem}.site-logo{display:block;height:4.25rem;padding:1.5rem 0}.site-logo--main{display:block;height:3.25rem;margin:0;padding:0;width:4.25rem}.header-navigation{font-size:1rem;clear:none;float:right;margin-top:.75rem;padding-bottom:0;padding-right:.75rem}.header-navigation__menu{clear:both;overflow:visible;-webkit-transform-style:preserve-3d;width:100%;z-index:9999;display:inline;margin:0;padding:0}.header-navigation__menu-link{display:inline;line-height:1.5;margin-right:0;padding-right:0;width:auto;overflow:hidden;text-align:right;z-index:2}.region--header a{text-decoration:none}.header-navigation__menu-link a{padding-left:.75rem;padding-right:.75rem;color:#012b45;display:inline-block;font-weight:400;text-transform:uppercase;transition:background-color ease .2s}@media only screen and (max-width:500px){.header-navigation{font-size:.85rem}.header-navigation__menu-link a{padding-left:.25rem;padding-right:.25rem}}.header-navigation__menu-link:last-child:not(.header-navigation__active-nav-item):not(:hover):not(:focus){color:#e8650c}.header-navigation__menu-link a:focus,.header-navigation__menu-link a:hover{color:#e8650c}.md-container{padding-top:6.5rem}#header-docs{top:3.25rem}#background{display:none}#header-docs .md-logo{display:none}</style>
+<style media="print">#header-docs{top:0}#header-docs .md-logo{display:block}#header-website{display:none}.md-container{padding-top:0}.headroom--pinned{transform:translateY(0)}#background{position:fixed;top:250px;left:50px;z-index:9999999;background:0 0;min-height:30%;min-width:30%;display:block}#bg-text{color:rgba(211,211,211,.2);font-size:80px;transform:rotate(300deg);-webkit-transform:rotate(300deg)}</style>
+<header id="header-website" class="region--header" role="banner">
+  <div class="region--header__wrapper">
+    <a href="/" class="region--header__logo">
+      <img src="https://www.9ci.com/assets/img/logo.svg" alt="9ci logo" class="site-logo site-logo--main">
+    </a>
+    <nav role="navigation" class="header-navigation">
+      <ul id="js-navigation-menu" class="header-navigation__menu">
+      <li class="header-navigation__menu-link">
+        <a href="https://www.9ci.com/solutions">Solutions</a>
+      </li>
+      <li class="header-navigation__menu-link">
+        <a href="https://www.9ci.com/company">Company</a>
+      </li>
+      <li class="header-navigation__menu-link">
+        <a href="https://www.9ci.com/contact">Contact</a>
+      </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<header id="header-docs" class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink md-flex__cell--vmiddle">
+        <a href="https://yakworks.github.io/gorm-tools/" title="Gorm Tools Grails Plugin" class="md-header-nav__button md-logo">
+          
+            <img src="../assets/images/logo_white.png" width="36" height="36">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <span class="md-flex__ellipsis md-header-nav__title">
+          
+            Gorm Tools Grails Plugin -
+            
+              
+            
+            Mango Query
+          
+        </span>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+          <label class="md-icon md-icon--search md-header-nav__button" for="search"></label>
+          
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="search"></label>
+  <div class="md-search__inner">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" required placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="query">
+      <label class="md-icon md-search__icon" for="search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset">&#xE5CD;</button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result" data-md-lang-search="" data-md-lang-tokenizer="[\s\-]+">
+          <div class="md-search-result__meta" data-md-lang-result-none="No matching documents" data-md-lang-result-one="1 matching document" data-md-lang-result-other="# matching documents">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
         </div>
-
-        <!-- Expanded navigation -->
-        <div class="navbar-collapse collapse">
-                <!-- Main navigation -->
-                <ul class="nav navbar-nav">
-                    <li >
-                        <a href="..">Overview</a>
-                    </li>
-                    <li >
-                        <a href="../release-notes/">Release Notes</a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Repository Pattern <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            
-<li >
-    <a href="../repository/intro/">Quick Start</a>
-</li>
-                            
-<li >
-    <a href="../repository/ref/">Reference</a>
-</li>
-                            
-<li >
-    <a href="../repository/databinding/">Databinding</a>
-</li>
-                        </ul>
-                    </li>
-                    <li class="active">
-                        <a href="./">Mango Query</a>
-                    </li>
-                    <li >
-                        <a href="../async/">Async</a>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Toolbox <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            
-<li >
-    <a href="../id-generation/">Id Generation</a>
-</li>
-                            
-<li >
-    <a href="../gorm-utils/">GormUtils Class</a>
-</li>
-                            
-<li >
-    <a href="../beanPathTools/">Bean Path Tools</a>
-</li>
-                            
-<li >
-    <a href="../working-with-dates/">Date Utils</a>
-</li>
-                        </ul>
-                    </li>
-                    <li >
-                        <a href="../testing/">Testing</a>
-                    </li>
-                    <li >
-                        <a href="../api-docs/">API Docs</a>
-                    </li>
-                    <li >
-                        <a href="../usefulLinks/">Useful Links</a>
-                    </li>
-                </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                        <i class="fa fa-search"></i> Search
-                    </a>
-                </li>
-                    <li >
-                        <a rel="next" href="../repository/databinding/">
-                            <i class="fa fa-arrow-left"></i> Previous
-                        </a>
-                    </li>
-                    <li >
-                        <a rel="prev" href="../async/">
-                            Next <i class="fa fa-arrow-right"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/yakworks/gorm-tools">yakworks/gorm-tools
-                        </a>
-                    </li>
-            </ul>
-        </div>
+      </div>
     </div>
+  </div>
 </div>
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
 
-        <div class="container">
-                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
-        <li class="main active"><a href="#mango-overview">Mango Overview</a></li>
-            <li><a href="#restful-api-query">Restful API query</a></li>
-            <li><a href="#mango-ql">Mango QL</a></li>
-            <li><a href="#mango-query">Mango query</a></li>
-            <li><a href="#q-or-quick-search">Q or Quick Search</a></li>
-            <li><a href="#configuration">Configuration</a></li>
-            <li><a href="#mango-api">Mango API</a></li>
-            <li><a href="#count-totals">Count totals</a></li>
-        <li class="main "><a href="#scrollablequery">ScrollableQuery</a></li>
-            <li><a href="#execute-a-closure-for-each-record">Execute a closure for each record</a></li>
-            <li><a href="#execute-a-closure-for-each-batch-of-records">Execute a closure for each batch of records</a></li>
-            <li><a href="#fetching-a-list-of-all-records">Fetching a list of all records:</a></li>
-        <li class="main "><a href="#grailsparametermaprowmapper">GrailsParameterMapRowMapper</a></li>
+
+  
+
+
+  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      yakworks/gorm-tools
+    </div>
+  </a>
+
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+      
+    
+    <div class="md-container">
+      
+      
+      
+      <main class="md-main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="drawer">
+    <div class="md-nav__button md-logo">
+      
+        <i class="md-icon md-icon--home"></i>
+      
+    </div>
+    Gorm Tools Grails Plugin
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+
+  <a href="https://github.com/yakworks/gorm-tools" title="Go to repository" class="md-source" data-md-source="github">
+    
+      <div class="md-source__icon">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <use xlink:href="#github" width="24" height="24"></use>
+        </svg>
+      </div>
+    
+    <div class="md-source__repository">
+      yakworks/gorm-tools
+    </div>
+  </a>
+
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Overview" class="md-nav__link">
+      Overview
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../release-notes/" title="Release Notes" class="md-nav__link">
+      Release Notes
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Repository Pattern
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        Repository Pattern
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../repository/intro/" title="Quick Start" class="md-nav__link">
+      Quick Start
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../repository/ref/" title="Reference" class="md-nav__link">
+      Reference
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../repository/databinding/" title="Databinding" class="md-nav__link">
+      Databinding
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Mango Query
+      </label>
+    
+    <a href="./" title="Mango Query" class="md-nav__link md-nav__link--active">
+      Mango Query
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mango-overview" title="Mango Overview" class="md-nav__link">
+    Mango Overview
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restful-api-query" title="Restful API query" class="md-nav__link">
+    Restful API query
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mango-ql" title="Mango QL" class="md-nav__link">
+    Mango QL
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#logical" title="Logical" class="md-nav__link">
+    Logical
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparison" title="Comparison" class="md-nav__link">
+    Comparison
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fields" title="Fields" class="md-nav__link">
+    Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert-to-mango-ql" title="Convert to Mango QL" class="md-nav__link">
+    Convert to Mango QL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mango-query" title="Mango query" class="md-nav__link">
+    Mango query
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" title="Examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#associations" title="Associations" class="md-nav__link">
+    Associations
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-clause" title="IN Clause" class="md-nav__link">
+    IN Clause
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fields-comparison-examples" title="Fields Comparison Examples" class="md-nav__link">
+    Fields Comparison Examples
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logical-operators" title="Logical operators" class="md-nav__link">
+    Logical operators
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q-or-quick-search" title="Q or Quick Search" class="md-nav__link">
+    Q or Quick Search
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" title="Configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mango-api" title="Mango API" class="md-nav__link">
+    Mango API
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mango-in-the-repository" title="Mango in the Repository" class="md-nav__link">
+    Mango in the Repository
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-mango-criteria" title="Build Mango criteria" class="md-nav__link">
+    Build Mango criteria
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#count-totals" title="Count totals" class="md-nav__link">
+    Count totals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scrollablequery" title="ScrollableQuery" class="md-nav__link">
+    ScrollableQuery
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#execute-a-closure-for-each-record" title="Execute a closure for each record" class="md-nav__link">
+    Execute a closure for each record
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute-a-closure-for-each-batch-of-records" title="Execute a closure for each batch of records" class="md-nav__link">
+    Execute a closure for each batch of records
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetching-a-list-of-all-records" title="Fetching a list of all records:" class="md-nav__link">
+    Fetching a list of all records:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grailsparametermaprowmapper" title="GrailsParameterMapRowMapper" class="md-nav__link">
+    GrailsParameterMapRowMapper
+  </a>
+  
+</li>
+      
+      
+      
     </ul>
-</div></div>
-                <div class="col-md-9" role="main">
+  
+</nav>
+    
+  </li>
 
-<p>Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL query.</p>
-<h2 id="mango-overview">Mango Overview</h2>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../rest/" title="Rest Api" class="md-nav__link">
+      Rest Api
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../async/" title="Async" class="md-nav__link">
+      Async
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-7" type="checkbox" id="nav-7">
+    
+    <label class="md-nav__link" for="nav-7">
+      Toolbox
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-7">
+        Toolbox
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../id-generation/" title="Id Generation" class="md-nav__link">
+      Id Generation
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gorm-utils/" title="GormUtils Class" class="md-nav__link">
+      GormUtils Class
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../beanPathTools/" title="Bean Path Tools" class="md-nav__link">
+      Bean Path Tools
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../working-with-dates/" title="Date Utils" class="md-nav__link">
+      Date Utils
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../testing/" title="Testing" class="md-nav__link">
+      Testing
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../api-docs/" title="API Docs" class="md-nav__link">
+      API Docs
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../usefulLinks/" title="Useful Links" class="md-nav__link">
+      Useful Links
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mango-overview" title="Mango Overview" class="md-nav__link">
+    Mango Overview
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restful-api-query" title="Restful API query" class="md-nav__link">
+    Restful API query
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mango-ql" title="Mango QL" class="md-nav__link">
+    Mango QL
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#logical" title="Logical" class="md-nav__link">
+    Logical
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparison" title="Comparison" class="md-nav__link">
+    Comparison
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fields" title="Fields" class="md-nav__link">
+    Fields
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#convert-to-mango-ql" title="Convert to Mango QL" class="md-nav__link">
+    Convert to Mango QL
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mango-query" title="Mango query" class="md-nav__link">
+    Mango query
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#examples" title="Examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#associations" title="Associations" class="md-nav__link">
+    Associations
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-clause" title="IN Clause" class="md-nav__link">
+    IN Clause
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fields-comparison-examples" title="Fields Comparison Examples" class="md-nav__link">
+    Fields Comparison Examples
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#logical-operators" title="Logical operators" class="md-nav__link">
+    Logical operators
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#q-or-quick-search" title="Q or Quick Search" class="md-nav__link">
+    Q or Quick Search
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" title="Configuration" class="md-nav__link">
+    Configuration
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mango-api" title="Mango API" class="md-nav__link">
+    Mango API
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mango-in-the-repository" title="Mango in the Repository" class="md-nav__link">
+    Mango in the Repository
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-mango-criteria" title="Build Mango criteria" class="md-nav__link">
+    Build Mango criteria
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#count-totals" title="Count totals" class="md-nav__link">
+    Count totals
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scrollablequery" title="ScrollableQuery" class="md-nav__link">
+    ScrollableQuery
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#execute-a-closure-for-each-record" title="Execute a closure for each record" class="md-nav__link">
+    Execute a closure for each record
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute-a-closure-for-each-batch-of-records" title="Execute a closure for each batch of records" class="md-nav__link">
+    Execute a closure for each batch of records
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fetching-a-list-of-all-records" title="Fetching a list of all records:" class="md-nav__link">
+    Fetching a list of all records:
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#grailsparametermaprowmapper" title="GrailsParameterMapRowMapper" class="md-nav__link">
+    GrailsParameterMapRowMapper
+  </a>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div id="article-content" class="md-content"> 
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/queries-mango.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                  <h1>Mango Query</h1>
+                
+                
+                <p>Gorm-tools provides a convenient way for iterating over records which correspond to a given SQL query.</p>
+<h2 id="mango-overview">Mango Overview<a class="headerlink" href="#mango-overview" title="Permanent link">&para;</a></h2>
 <p>The primary motive here is to create an easy dynamic way to query via a rest api or using a simple map.
 The repository comes with a <code>query(criteriaMap, closure)</code> method. It allows to get paged list of entities restricted by
 the properties in the <code>criteriaMap</code>. The map could be passed as JSON string or Map. All restrictions should be under 
 <code>criteria</code> keyword by default, but it can be changed with <a href="./#configuration">config</a>.</p>
 <p>Anything in the optional closure will be passed into Gorm/Hibernate criteria closure</p>
 <ul>
-<li>A lot of inspiration was drawn from <a href="https://restdb.io/docs/querying-with-the-api">Restdb.io</a>{.new-tab}</li>
-<li>the query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a>{.new-tab}</li>
-<li>and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a>{.new-tab}</li>
-<li>Also inspired by <a href="https://github.com/2do2go/json-sql/">json-sql</a>{.new-tab}</li>
+<li>A lot of inspiration was drawn from <a class="new-tab" href="https://restdb.io/docs/querying-with-the-api">Restdb.io</a></li>
+<li>the query language is similar to <a class="new-tab" href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a></li>
+<li>and CouchDB's new <a class="new-tab" href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a></li>
+<li>Also inspired by <a class="new-tab" href="https://github.com/2do2go/json-sql/">json-sql</a></li>
 </ul>
 <blockquote>
-<p>:memo: 
+<p><img alt="📝" class="gemoji" src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> 
 Whilst selectors have many similarities with MongoDB query documents, 
 these arise more from a similarity of purpose and do not necessarily extend to commonality of function or result.</p>
 </blockquote>
 <p><strong>Basic example</strong></p>
-<pre><code class="java">Org.repo.query([
-  criteria: [name: &quot;Bill%&quot;, type: &quot;New&quot;],
-  sort: [name:&quot;asc&quot;],
-  max: 20
-]){
-  gt &quot;id&quot;, 5
-}
-
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="p">.</span><span class="na">repo</span><span class="p">.</span><span class="na">query</span><span class="p">(</span><span class="o">[</span>
+  <span class="n">criteria</span><span class="p">:</span> <span class="o">[</span><span class="n">name</span><span class="p">:</span> <span class="s">&quot;Bill%&quot;</span><span class="p">,</span> <span class="n">type</span><span class="p">:</span> <span class="s">&quot;New&quot;</span><span class="o">]</span><span class="p">,</span>
+  <span class="n">sort</span><span class="p">:</span> <span class="o">[</span><span class="n">name</span><span class="p">:</span><span class="s">&quot;asc&quot;</span><span class="o">]</span><span class="p">,</span>
+  <span class="n">max</span><span class="p">:</span> <span class="mi">20</span>
+<span class="o">]</span><span class="p">){</span>
+  <span class="n">gt</span> <span class="s">&quot;id&quot;</span><span class="p">,</span> <span class="mi">5</span>
+<span class="p">}</span>
+</pre></div>
 
 <p>The same result can be reached with criteria:</p>
-<pre><code class="javascript">Criteria criteria = Org.createCriteria()
-criteria.list(max: 20) {
-    ilike &quot;name&quot;, &quot;Bill%&quot;
-    eq &quot;type&quot;, &quot;New&quot;
-    gt &quot;id&quot;, 5
-    order(&quot;name&quot;, &quot;asc&quot;)
-}
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="nx">Criteria</span> <span class="nx">criteria</span> <span class="o">=</span> <span class="nx">Org</span><span class="p">.</span><span class="nx">createCriteria</span><span class="p">()</span>
+<span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="nx">max</span><span class="o">:</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">ilike</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill%&quot;</span>
+    <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
+    <span class="nx">gt</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="mi">5</span>
+    <span class="nx">order</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
 
-<h3 id="restful-api-query">Restful API query</h3>
-<p>See the docs here for more examples and info https://yakworks.github.io/gorm-rest-api/</p>
-<h3 id="mango-ql">Mango QL</h3>
+<h3 id="restful-api-query">Restful API query<a class="headerlink" href="#restful-api-query" title="Permanent link">&para;</a></h3>
+<p>See the docs here for more examples and info <a href="https://yakworks.github.io/gorm-rest-api/">https://yakworks.github.io/gorm-rest-api/</a></p>
+<h3 id="mango-ql">Mango QL<a class="headerlink" href="#mango-ql" title="Permanent link">&para;</a></h3>
 <p>The Mango query language is similar to <a href="https://docs.mongodb.com/manual/reference/operator/query/">Mongo's</a>
 and CouchDB's new <a href="http://docs.couchdb.org/en/latest/api/database/find.html#selector-syntax">Mango selector-syntax</a>
 with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sql</a> as well</p>
-<h4 id="logical">Logical</h4>
+<h4 id="logical">Logical<a class="headerlink" href="#logical" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -209,26 +986,26 @@ with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sq
 <tr>
 <td>$and</td>
 <td>default</td>
-<td><code>$and: [ {"name": "Belak"}, {"status": "D"} ]</code> <br> equivalent to <code>"name": "Belak", "status": "D"</code></td>
+<td><code>$and: [ {&quot;name&quot;: &quot;Belak&quot;}, {&quot;status&quot;: &quot;D&quot;} ]</code> <br> equivalent to <code>&quot;name&quot;: &quot;Belak&quot;, &quot;status&quot;: &quot;D&quot;</code></td>
 </tr>
 <tr>
 <td>$or</td>
 <td>"ors" them all</td>
-<td><code>$or: [ {"name": "Belak"}, {"fork": true} ]</code> <br> <code>$or: {"name": "Belak", "fork": true }</code></td>
+<td><code>$or: [ {&quot;name&quot;: &quot;Belak&quot;}, {&quot;fork&quot;: true} ]</code> <br> <code>$or: {&quot;name&quot;: &quot;Belak&quot;, &quot;fork&quot;: true }</code></td>
 </tr>
 <tr>
 <td>$not</td>
 <td>ALL not equal, !=, &lt;&gt;</td>
-<td><code>$not:{ "status": "Destroyed", "dateStatus": "2371" }</code></td>
+<td><code>$not:{ &quot;status&quot;: &quot;Destroyed&quot;, &quot;dateStatus&quot;: &quot;2371&quot; }</code></td>
 </tr>
 <tr>
 <td>$nor</td>
 <td>ANY one is not equal</td>
-<td><code>$nor:{ "name": "Romulan", "fork": 12</code>}</td>
+<td><code>$nor:{ &quot;name&quot;: &quot;Romulan&quot;, &quot;fork&quot;: 12</code>}</td>
 </tr>
 </tbody>
 </table>
-<h4 id="comparison">Comparison</h4>
+<h4 id="comparison">Comparison<a class="headerlink" href="#comparison" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -241,71 +1018,71 @@ with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sq
 <tr>
 <td>$gt</td>
 <td>&gt;  greater than</td>
-<td><code>"cargo": {"$gt": 10000}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$gt&quot;: 10000}</code></td>
 </tr>
 <tr>
 <td>$gte</td>
 <td>&gt;= greater than or equal</td>
-<td><code>"cargo": {"$gte": 10000}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$gte&quot;: 10000}</code></td>
 </tr>
 <tr>
 <td>$lt</td>
 <td>&lt;  less than</td>
-<td><code>"cargo": {"$lt": 10000}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$lt&quot;: 10000}</code></td>
 </tr>
 <tr>
 <td>$lte</td>
 <td>&lt;= less than or equal</td>
-<td><code>"cargo": {"$lte": 10000}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$lte&quot;: 10000}</code></td>
 </tr>
 <tr>
 <td>$between</td>
 <td>between two distinct values</td>
-<td><code>"dateStatus": {"$between": [2300, 2400]}</code></td>
+<td><code>&quot;dateStatus&quot;: {&quot;$between&quot;: [2300, 2400]}</code></td>
 </tr>
 <tr>
 <td>$like</td>
 <td>like expression</td>
-<td><code>"name": {"$like": "Rom%"}</code></td>
+<td><code>&quot;name&quot;: {&quot;$like&quot;: &quot;Rom%&quot;}</code></td>
 </tr>
 <tr>
 <td>$ilike</td>
 <td>like auto-append %</td>
-<td><code>"name": {"$ilike": "rom"}</code></td>
+<td><code>&quot;name&quot;: {&quot;$ilike&quot;: &quot;rom&quot;}</code></td>
 </tr>
 <tr>
 <td>$eq</td>
 <td>= equal, concieince for builders</td>
-<td><code>"salary": {"$eq": 10}</code> | <code>"salary": 10</code></td>
+<td><code>&quot;salary&quot;: {&quot;$eq&quot;: 10}</code> | <code>&quot;salary&quot;: 10</code></td>
 </tr>
 <tr>
 <td>$ne</td>
 <td>not equal, !=, &lt;&gt;</td>
-<td><code>"age" : {"$ne" : 12}}</code></td>
+<td><code>&quot;age&quot; : {&quot;$ne&quot; : 12}}</code></td>
 </tr>
 <tr>
 <td>$in</td>
 <td>Match any value in array</td>
-<td><code>"field" : {"$in" : [value1, value2, ...]</code></td>
+<td><code>&quot;field&quot; : {&quot;$in&quot; : [value1, value2, ...]</code></td>
 </tr>
 <tr>
 <td>$nin</td>
 <td>Not match any value in array</td>
-<td><code>"field" : {"$nin" : [value1, value2, ...]}</code></td>
+<td><code>&quot;field&quot; : {&quot;$nin&quot; : [value1, value2, ...]}</code></td>
 </tr>
 <tr>
 <td>$isNull</td>
 <td>Value is null</td>
-<td><code>"name": "$isNull" \|</code>"name": null</td>
+<td><code>&quot;name&quot;: &quot;$isNull&quot; \|</code>"name": null</td>
 </tr>
 <tr>
 <td>$isNotNull</td>
 <td>Value is not null</td>
-<td><code>"name": "$isNotNull" \|</code>"name":{$ne: null}</td>
+<td><code>&quot;name&quot;: &quot;$isNotNull&quot; \|</code>"name":{$ne: null}</td>
 </tr>
 </tbody>
 </table>
-<h4 id="fields">Fields</h4>
+<h4 id="fields">Fields<a class="headerlink" href="#fields" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
@@ -318,251 +1095,237 @@ with some inspiration from <a href="https://github.com/2do2go/json-sql/">json-sq
 <tr>
 <td>$gtf</td>
 <td>&gt;  another field</td>
-<td><code>"cargo": {"$gtf": "maxCargo"}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$gtf&quot;: &quot;maxCargo&quot;}</code></td>
 </tr>
 <tr>
 <td>$gtef</td>
 <td>&gt;= field</td>
-<td><code>"cargo": {"$gtef": "maxCargo"}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$gtef&quot;: &quot;maxCargo&quot;}</code></td>
 </tr>
 <tr>
 <td>$ltf</td>
 <td>&lt;  field</td>
-<td><code>"cargo": {"$ltf": "maxCargo"}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$ltf&quot;: &quot;maxCargo&quot;}</code></td>
 </tr>
 <tr>
 <td>$ltef</td>
 <td>&lt;= field</td>
-<td><code>"cargo": {"$ltef": "maxCargo"}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$ltef&quot;: &quot;maxCargo&quot;}</code></td>
 </tr>
 <tr>
 <td>$eqf</td>
 <td>= field</td>
-<td><code>"cargo": {"$eqf": "controlTotal"}</code></td>
+<td><code>&quot;cargo&quot;: {&quot;$eqf&quot;: &quot;controlTotal&quot;}</code></td>
 </tr>
 <tr>
 <td>$nef</td>
 <td>not equal, !=, &lt;&gt;</td>
-<td><code>"cargo" : {"$nef" : "controlTotal"}}</code></td>
+<td><code>&quot;cargo&quot; : {&quot;$nef&quot; : &quot;controlTotal&quot;}}</code></td>
 </tr>
 </tbody>
 </table>
-<h4 id="convert-to-mango-ql">Convert to Mango QL</h4>
+<h4 id="convert-to-mango-ql">Convert to Mango QL<a class="headerlink" href="#convert-to-mango-ql" title="Permanent link">&para;</a></h4>
 <p>The <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/MangoTidyMap.html">MangoTidyMap utility</a>
 transforms parameters map to Mango QL criteria map. 
 Here is several examples of usage:</p>
-<pre><code class="java">assert MangoTidyMap.tidy([a:5]) == [a:['$eq':5]]
-assert MangoTidyMap.tidy([b:&quot;Bill%&quot;]) == [b:['$ilike':5]]
-assert MangoTidyMap.tidy([c: [1,2,3]]) == [c:['$in':[1,2,3]]]
+<div class="codehilite"><pre><span></span><span class="k">assert</span> <span class="n">MangoTidyMap</span><span class="p">.</span><span class="na">tidy</span><span class="p">(</span><span class="o">[</span><span class="n">a</span><span class="p">:</span><span class="mi">5</span><span class="o">]</span><span class="p">)</span> <span class="o">==</span> <span class="o">[</span><span class="n">a</span><span class="p">:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">$eq</span><span class="err">&#39;</span><span class="p">:</span><span class="mi">5</span><span class="o">]]</span>
+<span class="k">assert</span> <span class="n">MangoTidyMap</span><span class="p">.</span><span class="na">tidy</span><span class="p">(</span><span class="o">[</span><span class="n">b</span><span class="p">:</span><span class="s">&quot;Bill%&quot;</span><span class="o">]</span><span class="p">)</span> <span class="o">==</span> <span class="o">[</span><span class="n">b</span><span class="p">:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">$ilike</span><span class="err">&#39;</span><span class="p">:</span><span class="mi">5</span><span class="o">]]</span>
+<span class="k">assert</span> <span class="n">MangoTidyMap</span><span class="p">.</span><span class="na">tidy</span><span class="p">(</span><span class="o">[</span><span class="n">c</span><span class="p">:</span> <span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">]]</span><span class="p">)</span> <span class="o">==</span> <span class="o">[</span><span class="n">c</span><span class="p">:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">$in</span><span class="err">&#39;</span><span class="p">:</span><span class="o">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="o">]]]</span>
+</pre></div>
 
-</code></pre>
-
-<p>One of the useful features of the MangoTidyMap is that it converts path to nested map which is required by <a href="./#mango-query">mangoQuery</a>  </p>
-<pre><code class="java">assert MangoTidyMap.tidy['a.b.c': 3]) == [a:[b:[c:['$eq':3]]]]
-</code></pre>
-
-<p>For more example take a look on <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/test/groovy/gorm/tools/mango/MangoTidyMapSpec.groovy">MangoTidyMapSpec</a> </p>
-<h3 id="mango-query">Mango query</h3>
+<p>One of the useful features of the MangoTidyMap is that it converts path to nested map which is required by <a href="./#mango-query">mangoQuery</a><br />
+<div class="codehilite"><pre><span></span><span class="k">assert</span> <span class="n">MangoTidyMap</span><span class="p">.</span><span class="na">tidy</span><span class="o">[</span><span class="err">&#39;</span><span class="n">a</span><span class="p">.</span><span class="na">b</span><span class="p">.</span><span class="na">c</span><span class="err">&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="o">]</span><span class="p">)</span> <span class="o">==</span> <span class="o">[</span><span class="n">a</span><span class="p">:</span><span class="o">[</span><span class="n">b</span><span class="p">:</span><span class="o">[</span><span class="n">c</span><span class="p">:</span><span class="o">[</span><span class="err">&#39;</span><span class="n">$eq</span><span class="err">&#39;</span><span class="p">:</span><span class="mi">3</span><span class="o">]]]]</span>
+</pre></div>
+For more example take a look on <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/test/groovy/gorm/tools/mango/MangoTidyMapSpec.groovy">MangoTidyMapSpec</a> </p>
+<h3 id="mango-query">Mango query<a class="headerlink" href="#mango-query" title="Permanent link">&para;</a></h3>
 <p>The repository by default does not have all the features of mango service, just <code>buildCriteria</code> and <code>query</code> methods, but both automatically
 convert map params to mango map, so just <code>params</code> or <code>request.JSON</code> can be passed. </p>
 <p>See <a href="./#mango-api">Mango Api</a> to know all features that are provided.</p>
-<h4 id="examples">Examples</h4>
+<h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
 <p>Bellow will be a list of supported syntax for params in json format, which is supported:
-Assume we are running these on star trek characters http://stapi.co/api/v1/rest/character?uid=CHMA0000128908</p>
-<pre><code class="js">{
-  &quot;criteria&quot;: {
-    &quot;name&quot;: &quot;Kira%&quot;, /* if it ends with % then it will us an ilike */
-    &quot;gender&quot;: &quot;F&quot;, //no % its straight up
-    &quot;placeOfBirth&quot;: {&quot;$ilike&quot;: &quot;bajor%&quot;}, /* a case-insensitive 'like' expression appends the % */
-    &quot;hologram&quot;: true, /* boolean */
-    &quot;createdDate&quot;: &quot;1993-05-16T00:00:00.000Z&quot;, // dates
-    &quot;dateOfBirth&quot;: &quot;1957-07-26&quot; // dates
-    &quot;placeOfBirth&quot;: {&quot;$eqf&quot;: &quot;$placeOfDeath&quot;} //equals another field in set
-  },
-  &quot;sort&quot;:&quot;name&quot; // asc by default
-}
-</code></pre>
+Assume we are running these on star trek characters <a href="http://stapi.co/api/v1/rest/character?uid=CHMA0000128908">http://stapi.co/api/v1/rest/character?uid=CHMA0000128908</a></p>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Kira%&quot;</span><span class="p">,</span> <span class="cm">/* if it ends with % then it will us an ilike */</span>
+    <span class="s2">&quot;gender&quot;</span><span class="o">:</span> <span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="c1">//no % its straight up</span>
+    <span class="s2">&quot;placeOfBirth&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;bajor%&quot;</span><span class="p">},</span> <span class="cm">/* a case-insensitive &#39;like&#39; expression appends the % */</span>
+    <span class="s2">&quot;hologram&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="cm">/* boolean */</span>
+    <span class="s2">&quot;createdDate&quot;</span><span class="o">:</span> <span class="s2">&quot;1993-05-16T00:00:00.000Z&quot;</span><span class="p">,</span> <span class="c1">// dates</span>
+    <span class="s2">&quot;dateOfBirth&quot;</span><span class="o">:</span> <span class="s2">&quot;1957-07-26&quot;</span> <span class="c1">// dates</span>
+    <span class="s2">&quot;placeOfBirth&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$eqf&quot;</span><span class="o">:</span> <span class="s2">&quot;$placeOfDeath&quot;</span><span class="p">}</span> <span class="c1">//equals another field in set</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;sort&quot;</span><span class="o">:</span><span class="s2">&quot;name&quot;</span> <span class="c1">// asc by default</span>
+<span class="p">}</span>
+</pre></div>
 
 <p>This would produce in a round about way with criteria builders a where clause like this</p>
-<pre><code class="sql">  .. name like &quot;Kira%&quot; AND gender=&quot;F&quot; AND placeOfBirth like &quot;bajor%&quot; AND hologram = true
-  AND createdDate = ??? AND dateOfBirth = ??? AND placeOfBirth = placeOfDeath
-  ORDER BY name ASC, dateOfBirth DESC;
-</code></pre>
+<div class="codehilite"><pre><span></span>  <span class="p">..</span> <span class="n">name</span> <span class="k">like</span> <span class="ss">&quot;Kira%&quot;</span> <span class="k">AND</span> <span class="n">gender</span><span class="o">=</span><span class="ss">&quot;F&quot;</span> <span class="k">AND</span> <span class="n">placeOfBirth</span> <span class="k">like</span> <span class="ss">&quot;bajor%&quot;</span> <span class="k">AND</span> <span class="n">hologram</span> <span class="o">=</span> <span class="k">true</span>
+  <span class="k">AND</span> <span class="n">createdDate</span> <span class="o">=</span> <span class="o">???</span> <span class="k">AND</span> <span class="n">dateOfBirth</span> <span class="o">=</span> <span class="o">???</span> <span class="k">AND</span> <span class="n">placeOfBirth</span> <span class="o">=</span> <span class="n">placeOfDeath</span>
+  <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">name</span> <span class="k">ASC</span><span class="p">,</span> <span class="n">dateOfBirth</span> <span class="k">DESC</span><span class="p">;</span>
+</pre></div>
 
-<h4 id="associations">Associations</h4>
-<pre><code class="js">{
-  &quot;criteria&quot;: {
-    &quot;customer.id&quot;: 101,
-    &quot;customerId&quot;: 101, /* check if domain has customerId property, if not then uses customer.id 101 above */
-    &quot;customer&quot;: { /* nested object way */
-      &quot;id&quot;: 101,
-      &quot;name&quot;: &quot;Wal%&quot;
-    }
-  }
-  &quot;sort&quot;: {
-    &quot;customer.name&quot;: &quot;asc&quot;,
-    &quot;tranDate&quot;: &quot;desc&quot;
-  }
-}
-</code></pre>
+<h4 id="associations">Associations<a class="headerlink" href="#associations" title="Permanent link">&para;</a></h4>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span>
+    <span class="s2">&quot;customerId&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span> <span class="cm">/* check if domain has customerId property, if not then uses customer.id 101 above */</span>
+    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="cm">/* nested object way */</span>
+      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span>
+      <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Wal%&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="s2">&quot;sort&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;asc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tranDate&quot;</span><span class="o">:</span> <span class="s2">&quot;desc&quot;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
-<h4 id="in-clause">IN Clause</h4>
-<pre><code class="js">{
-  &quot;criteria&quot;: {
-    &quot;customer.id&quot;: [101,102,103], /* an array means it will use in/inList */
-    &quot;customer&quot;: [{&quot;id&quot;:101},{&quot;id&quot;:102},{&quot;id&quot;:103}], //can be in summarized object form as well
-    &quot;customer.id&quot;: [101,102,103], /* an array means it will use in/inList */
-    //the 3 above are different ways to do this
-    &quot;customer.id&quot;: {&quot;$in&quot;: [101,102,103]},
-    &quot;customer&quot;: {
-      &quot;id&quot;: {&quot;$in&quot;: [101,102,103]}
-    },
+<h4 id="in-clause">IN Clause<a class="headerlink" href="#in-clause" title="Permanent link">&para;</a></h4>
+<div class="codehilite"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
+    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">101</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">102</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">103</span><span class="p">}],</span> <span class="c1">//can be in summarized object form as well</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
+    <span class="c1">//the 3 above are different ways to do this</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span>
+    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]}</span>
+    <span class="p">},</span>
 
-    &quot;customer.id&quot;: {&quot;$nin&quot;: [101,102,103]}, /* an array means it will use `not { in/inList }`*/
-  }
-}
-</code></pre>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span> <span class="cm">/* an array means it will use `not { in/inList }`*/</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
-<h4 id="fields-comparison-examples">Fields Comparison Examples</h4>
-<pre><code class="js">  &quot;amount&quot;: {&quot;$ne&quot;: 50}, /*not equal*/
-  &quot;amount&quot;: {&quot;$gt&quot;: 100}, /* greater than value */
-  &quot;amount.$gt&quot;: 100 /* another form of the above one, can be useful when json is build, for example from angular model, where  you can't right in object form*/
-  &quot;amount&quot;: {&quot;$ge&quot;: 100}, /* greater or equal than value */
+<h4 id="fields-comparison-examples">Fields Comparison Examples<a class="headerlink" href="#fields-comparison-examples" title="Permanent link">&para;</a></h4>
+<div class="codehilite"><pre><span></span>  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ne&quot;</span><span class="o">:</span> <span class="mi">50</span><span class="p">},</span> <span class="cm">/*not equal*/</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mi">100</span><span class="p">},</span> <span class="cm">/* greater than value */</span>
+  <span class="s2">&quot;amount.$gt&quot;</span><span class="o">:</span> <span class="mi">100</span> <span class="cm">/* another form of the above one, can be useful when json is build, for example from angular model, where  you can&#39;t right in object form*/</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ge&quot;</span><span class="o">:</span> <span class="mi">100</span><span class="p">},</span> <span class="cm">/* greater or equal than value */</span>
 
-  &quot;amount&quot;: {&quot;$lt&quot;: &quot;$origAmount&quot;}, /* less than value of another field*/
-  &quot;amount&quot;: {&quot;$le&quot;: &quot;$origAmount&quot;}, /* less or equal than value */
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="s2">&quot;$origAmount&quot;</span><span class="p">},</span> <span class="cm">/* less than value of another field*/</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$le&quot;</span><span class="o">:</span> <span class="s2">&quot;$origAmount&quot;</span><span class="p">},</span> <span class="cm">/* less or equal than value */</span>
 
-  &quot;amount&quot;:{ //all these will get anded together
-    &quot;$gt&quot;: 5.0,
-    &quot;$lt&quot;: 15.50,
-    &quot;$ne&quot;: 9.99
-  },
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span><span class="p">{</span> <span class="c1">//all these will get anded together</span>
+    <span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mf">5.0</span><span class="p">,</span>
+    <span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mf">15.50</span><span class="p">,</span>
+    <span class="s2">&quot;$ne&quot;</span><span class="o">:</span> <span class="mf">9.99</span>
+  <span class="p">},</span>
 
-  &quot;amount&quot;: {&quot;$between&quot;: [0,100]}, /* between value */
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$between&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">]},</span> <span class="cm">/* between value */</span>
 
-  &quot;status&quot;: &quot;$isNull&quot; /* translates to isNull*/
-  &quot;status&quot;: {&quot;$isNull&quot;: true}, /* translates to isNull*/
-  &quot;status&quot;: {&quot;$isNull&quot;: false}, /* translates to not{ isNull}*/
-  &quot;status&quot;: null /* translates to isNull*/
-</code></pre>
+  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="s2">&quot;$isNull&quot;</span> <span class="cm">/* translates to isNull*/</span>
+  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$isNull&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">},</span> <span class="cm">/* translates to isNull*/</span>
+  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$isNull&quot;</span><span class="o">:</span> <span class="kc">false</span><span class="p">},</span> <span class="cm">/* translates to not{ isNull}*/</span>
+  <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="kc">null</span> <span class="cm">/* translates to isNull*/</span>
+</pre></div>
 
-<h4 id="logical-operators">Logical operators</h4>
-<pre><code class="js">    &quot;$or&quot;: { // if a single or then it can be done like this
-      &quot;customer.name&quot;:{&quot;$ilike&quot;: &quot;wal&quot;},
-      &quot;customer.num&quot;:{&quot;$ilike&quot;: &quot;wal&quot;}
-    },
-    &quot;$and&quot;:[ // multiple ors would need to look like this in an array. only one and can be present too
-      {
-        &quot;$or&quot;: {
-          &quot;customer.name&quot;: &quot;John&quot;,
-          &quot;customer.name&quot;: &quot;Jon&quot;
-        }
-      },
-      {
-        &quot;$or&quot;: {
-          &quot;customer.name&quot;: &quot;Mark&quot;,
-          &quot;customer.name&quot;: &quot;Marc&quot;
-        }
-      }
-    ], /* this would end up generating `.... and ( (customer.name = 'John' or customer.name = 'Jon')
-          AND (customer.name = 'Mark' or customer.name = 'Mark') ) ....` */
+<h4 id="logical-operators">Logical operators<a class="headerlink" href="#logical-operators" title="Permanent link">&para;</a></h4>
+<div class="codehilite"><pre><span></span>    <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// if a single or then it can be done like this</span>
+      <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">},</span>
+      <span class="s2">&quot;customer.num&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;$ilike&quot;</span><span class="o">:</span> <span class="s2">&quot;wal&quot;</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;$and&quot;</span><span class="o">:</span><span class="p">[</span> <span class="c1">// multiple ors would need to look like this in an array. only one and can be present too</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Jon&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Mark&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Marc&quot;</span>
+        <span class="p">}</span>
+      <span class="p">}</span>
+    <span class="p">],</span> <span class="cm">/* this would end up generating `.... and ( (customer.name = &#39;John&#39; or customer.name = &#39;Jon&#39;)</span>
+<span class="cm">          AND (customer.name = &#39;Mark&#39; or customer.name = &#39;Mark&#39;) ) ....` */</span>
 
-    &quot;$or&quot;:[ // again you can only have one of these
-      { // the and is default and optional and this accomplishes the same thing as example sbelow
-        &quot;customer.name&quot;: &quot;Mark&quot;,
-        &quot;$or&quot;: {
-          &quot;customer.sales&quot;: {&quot;$lt&quot;: 10},
-          &quot;customer.sales&quot;: &quot;$isNull&quot;
-        }
-      },
-      {
-        &quot;$and&quot;: { //the and can be explicitly specified too if you wish
-          &quot;customer.name&quot;: &quot;Jim&quot;,
-          &quot;customer.sales&quot;: {&quot;$lt&quot;: 15}
-        }
-      },
-    ], /* this would end up generating
-        ....
-        AND
-        (
-          (customer.name = 'mark' and ( customer.sales &lt; 10 or customer.sales IS NULL))
-          OR
-          (customer.name = 'jim' and customer.sales &lt; 15 )
-        )
-        .... */
-  }
-}
+    <span class="s2">&quot;$or&quot;</span><span class="o">:</span><span class="p">[</span> <span class="c1">// again you can only have one of these</span>
+      <span class="p">{</span> <span class="c1">// the and is default and optional and this accomplishes the same thing as example sbelow</span>
+        <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Mark&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">},</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="s2">&quot;$isNull&quot;</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+      <span class="p">{</span>
+        <span class="s2">&quot;$and&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="c1">//the and can be explicitly specified too if you wish</span>
+          <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Jim&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mi">15</span><span class="p">}</span>
+        <span class="p">}</span>
+      <span class="p">},</span>
+    <span class="p">],</span> <span class="cm">/* this would end up generating</span>
+<span class="cm">        ....</span>
+<span class="cm">        AND</span>
+<span class="cm">        (</span>
+<span class="cm">          (customer.name = &#39;mark&#39; and ( customer.sales &lt; 10 or customer.sales IS NULL))</span>
+<span class="cm">          OR</span>
+<span class="cm">          (customer.name = &#39;jim&#39; and customer.sales &lt; 15 )</span>
+<span class="cm">        )</span>
+<span class="cm">        .... */</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
-</code></pre>
-
-<h3 id="q-or-quick-search">Q or Quick Search</h3>
+<h3 id="q-or-quick-search">Q or Quick Search<a class="headerlink" href="#q-or-quick-search" title="Permanent link">&para;</a></h3>
 <p>Q search - similiar to a search engine search that uses a <code>q</code> paramter, 
 ability to search by one string in criteria filters against several domain fields, the value for quick
 search can be passed in <code>$qSearch</code> or <code>$q</code> keywords. 
 There are 2 ways to specify fields that should be searched against:</p>
 <ol>
-<li>in static property <code>qSearchIncludes</code> as list of strings, see example bellow:</li>
+<li>in static property <code>qSearchIncludes</code> as list of strings, see example bellow:
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Org</span> <span class="o">{</span>
+    <span class="n">String</span> <span class="n">name</span>
+    <span class="n">Address</span> <span class="n">address</span>
+
+    <span class="kd">static</span> <span class="n">qSearchIncludes</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">,</span> <span class="s2">&quot;address.city&quot;</span><span class="o">]</span>
+    <span class="o">...</span>
+</pre></div></li>
+<li>default fields in config
+<div class="codehilite"><pre><span></span><span class="nt">gorm</span><span class="p">:</span>
+    <span class="nt">tools</span><span class="p">:</span>
+        <span class="nt">mango</span><span class="p">:</span>
+            <span class="nt">qSearchDefault</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">name</span><span class="p p-Indicator">,</span> <span class="nv">num</span><span class="p p-Indicator">,</span> <span class="nv">address.city</span><span class="p p-Indicator">]</span>
+</pre></div></li>
 </ol>
-<pre><code class="groovy">class Org {
-    String name
-    Address address
-
-    static qSearchIncludes = [&quot;name&quot;, &quot;address.city&quot;]
-    ...
-
-</code></pre>
-
-<ol>
-<li>default fields in config</li>
-</ol>
-<pre><code class="yaml">gorm:
-    tools:
-        mango:
-            qSearchDefault: [name, num, address.city]
-
-</code></pre>
-
 <p>Mango criteria will add <code>%</code> automatically, if quick search string doesn't have it and will apply <code>ilike</code> statement
 for each field in <code>qSearchIncludes</code>. If domain field is not string type, then <code>eq</code> statement will be used.</p>
-<pre><code class="groovy">Org.repo.search([criteria: [$q: &quot;abc&quot;], max: 20])
+<p><div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">repo</span><span class="o">.</span><span class="na">search</span><span class="o">([</span><span class="nl">criteria:</span> <span class="o">[</span><span class="n">$q</span><span class="o">:</span> <span class="s2">&quot;abc&quot;</span><span class="o">],</span> <span class="nl">max:</span> <span class="mi">20</span><span class="o">])</span>
+</pre></div>
+So it is the same as:</p>
+<div class="codehilite"><pre><span></span><span class="n">Criteria</span> <span class="n">criteria</span> <span class="o">=</span> <span class="n">Org</span><span class="o">.</span><span class="na">createCriteria</span><span class="o">()</span>
+<span class="n">criteria</span><span class="o">.</span><span class="na">list</span><span class="o">(</span><span class="nl">max:</span> <span class="mi">20</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">or</span> <span class="o">{</span>
+        <span class="n">ilike</span> <span class="s2">&quot;name&quot;</span><span class="o">,</span> <span class="s2">&quot;abc%&quot;</span>
+        <span class="n">ilike</span> <span class="s2">&quot;address.city&quot;</span><span class="o">,</span> <span class="s2">&quot;abc%&quot;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
 
-</code></pre>
-
-<p>So it is the same as:</p>
-<pre><code class="groovy">Criteria criteria = Org.createCriteria()
-criteria.list(max: 20) {
-    or {
-        ilike &quot;name&quot;, &quot;abc%&quot;
-        ilike &quot;address.city&quot;, &quot;abc%&quot;
-    }
-}
-</code></pre>
-
-<h3 id="configuration">Configuration</h3>
-<p>The default <code>criteria</code> keyword for the restriction map can be changed in config:</p>
-<pre><code class="yml">gorm:
+<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
+<p>The default <code>criteria</code> keyword for the restriction map can be changed in config:
+<div class="codehilite"><pre><span></span>gorm:
     tools:
         mango:
             criteriaKeyName: filters
-</code></pre>
-
+</pre></div></p>
 <p>With such configuration restrictions for Mango criteria should be under <code>filters</code> keyword.</p>
-<h3 id="mango-api">Mango API</h3>
-<h4 id="mango-in-the-repository">Mango in the Repository</h4>
+<h3 id="mango-api">Mango API<a class="headerlink" href="#mango-api" title="Permanent link">&para;</a></h3>
+<h4 id="mango-in-the-repository">Mango in the Repository<a class="headerlink" href="#mango-in-the-repository" title="Permanent link">&para;</a></h4>
 <p><a href="../repository/ref/">The Repository</a> implements <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/api/MangoQueryTrait.html">MangoQueryTrait</a> Trait
 which contains implementation for two query methods:</p>
-<pre><code class="groovy">DetachedCriteria buildCriteria( Map params=[:], Closure closure=null) {
-        mangoQuery.buildCriteria(getDomainClass(), params, closure)
-    }
-</code></pre>
-
-<p>see docs for <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria">DetachedCriteria</a></p>
-<pre><code class="groovy"> List query(Map params=[:], Closure closure=null){
-         mangoQuery.query(getDomainClass(), params, closure)
-     }
-</code></pre>
-
-<p>returns list of entities with pagination. For pagination take a look at <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/Pager.html">Pager</a></p>
+<p><div class="codehilite"><pre><span></span><span class="n">DetachedCriteria</span> <span class="nf">buildCriteria</span><span class="o">(</span> <span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">mangoQuery</span><span class="o">.</span><span class="na">buildCriteria</span><span class="o">(</span><span class="n">getDomainClass</span><span class="o">(),</span> <span class="n">params</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span>
+    <span class="o">}</span>
+</pre></div>
+see docs for <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria">DetachedCriteria</a></p>
+<p><div class="codehilite"><pre><span></span> <span class="n">List</span> <span class="nf">query</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">){</span>
+         <span class="n">mangoQuery</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">getDomainClass</span><span class="o">(),</span> <span class="n">params</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span>
+     <span class="o">}</span>
+</pre></div>
+returns list of entities with pagination. For pagination take a look at <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/Pager.html">Pager</a></p>
 <p>If one need to override mango bean for a certain repo it can be achieved in two ways:</p>
 <ol>
 <li>
@@ -572,121 +1335,164 @@ which contains implementation for two query methods:</p>
 <p>register a new bean for custom criteria, and set it for the repo with <code>@Qualifier</code> annotation</p>
 </li>
 </ol>
-<pre><code class="java">beans = {
-    newMangoQuery(NewMangoQuery) 
-}
+<div class="codehilite"><pre><span></span><span class="n">beans</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">newMangoQuery</span><span class="p">(</span><span class="n">NewMangoQuery</span><span class="p">)</span> 
+<span class="p">}</span>
+</pre></div>
 
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">NewMangoQuery</span> <span class="kd">implements</span> <span class="n">MangoQueryApi</span> <span class="p">{</span>
 
-<pre><code class="java">class NewMangoQuery implements MangoQueryApi {
+    <span class="nd">@Override</span>
+    <span class="n">DetachedCriteria</span> <span class="nf">buildCriteria</span><span class="p">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="p">,</span> <span class="n">Map</span> <span class="n">params</span><span class="p">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+       <span class="k">return</span> <span class="kc">null</span>
+    <span class="p">}</span>
 
-    @Override
-    DetachedCriteria buildCriteria(Class domainClass, Map params, Closure closure = null) {
-       return null
-    }
+    <span class="nd">@Override</span>
+    <span class="n">List</span> <span class="nf">query</span><span class="p">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="p">,</span> <span class="n">Map</span> <span class="n">params</span><span class="p">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+       <span class="k">return</span> <span class="o">[]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
 
-    @Override
-    List query(Class domainClass, Map params, Closure closure = null) {
-       return []
-    }
-}
-</code></pre>
+<div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">CityRepo</span> <span class="kd">extends</span> <span class="n">DefaultGormRepo</span><span class="o">&lt;</span><span class="n">City</span><span class="o">&gt;</span> <span class="p">{</span>
 
-<pre><code class="java">class CityRepo extends DefaultGormRepo&lt;City&gt; {
+    <span class="nd">@Autowired</span>
+    <span class="nd">@Qualifier</span><span class="p">(</span><span class="s">&quot;newMangoQuery&quot;</span><span class="p">)</span>
+    <span class="n">NewMangoQuery</span> <span class="n">mangoQuery</span>
+<span class="p">}</span>
+</pre></div>
 
-    @Autowired
-    @Qualifier(&quot;newMangoQuery&quot;)
-    NewMangoQuery mangoQuery
-}
-</code></pre>
-
-<h4 id="build-mango-criteria">Build Mango criteria</h4>
+<h4 id="build-mango-criteria">Build Mango criteria<a class="headerlink" href="#build-mango-criteria" title="Permanent link">&para;</a></h4>
 <p>Under the hood Mango uses <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria">DetachedCriteria</a> take a look on main <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoBuilder.groovy#L73">build method</a>
 One can see that it normalizes params map to make it Mango QL and then adds restrictions to detached criteria based on map,
 if closure is passed then applies it too. </p>
-<h3 id="count-totals">Count totals</h3>
+<h3 id="count-totals">Count totals<a class="headerlink" href="#count-totals" title="Permanent link">&para;</a></h3>
 <p>If one needs to compute totals for some fields, <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/MangoQuery.html">MangoQuery</a> 
 has <code>countTotals</code> method. Restrictions for it are working in the same way as for query method, so it can be specified 
 with params map and criteria closure.</p>
 <p>But the repository beans don't contain this method, so one can call it on mangoQuery bean.
 To specify what fields sums should be computed for, the list with fields name should be passed.
-See example:</p>
-<pre><code class="groovy">Org.repo.mangoQuery.countTotals(domainClass, [
-  criteria: [name: &quot;Virgin%&quot;, type: &quot;New&quot;]
-], [&quot;amount&quot;, credit]){
-  gt &quot;id&quot;, 5
-}
-</code></pre>
-
-<p>Result will be look like: <code>[amount: 1500, credit: 440]</code>, it doesn't take into account pagination.</p>
-<h2 id="scrollablequery">ScrollableQuery</h2>
+See example:
+<div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">repo</span><span class="o">.</span><span class="na">mangoQuery</span><span class="o">.</span><span class="na">countTotals</span><span class="o">(</span><span class="n">domainClass</span><span class="o">,</span> <span class="o">[</span>
+  <span class="nl">criteria:</span> <span class="o">[</span><span class="nl">name:</span> <span class="s2">&quot;Virgin%&quot;</span><span class="o">,</span> <span class="nl">type:</span> <span class="s2">&quot;New&quot;</span><span class="o">]</span>
+<span class="o">],</span> <span class="o">[</span><span class="s2">&quot;amount&quot;</span><span class="o">,</span> <span class="n">credit</span><span class="o">]){</span>
+  <span class="n">gt</span> <span class="s2">&quot;id&quot;</span><span class="o">,</span> <span class="mi">5</span>
+<span class="o">}</span>
+</pre></div>
+Result will be look like: <code>[amount: 1500, credit: 440]</code>, it doesn't take into account pagination.</p>
+<h2 id="scrollablequery">ScrollableQuery<a class="headerlink" href="#scrollablequery" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/jdbc/ScrollableQuery.html">ScrollableQuery</a></p>
-<h3 id="execute-a-closure-for-each-record">Execute a closure for each record</h3>
+<h3 id="execute-a-closure-for-each-record">Execute a closure for each record<a class="headerlink" href="#execute-a-closure-for-each-record" title="Permanent link">&para;</a></h3>
 <p>As you can see in the example below, we can specify the SQL query and provide the closure which is called for each record:</p>
-<pre><code class="groovy">    ScrollableQuery scrollableQuery = new ScrollableQuery(new ColumnMapRowMapper(), dataSource, 50)
+<div class="codehilite"><pre><span></span>    <span class="n">ScrollableQuery</span> <span class="n">scrollableQuery</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ScrollableQuery</span><span class="o">(</span><span class="k">new</span> <span class="n">ColumnMapRowMapper</span><span class="o">(),</span> <span class="n">dataSource</span><span class="o">,</span> <span class="mi">50</span><span class="o">)</span>
 
-    scrollableQuery.eachRow(&quot;select * from ScrollableQueryTest&quot;) { Object row -&gt;
-        println row
-    }
-</code></pre>
+    <span class="n">scrollableQuery</span><span class="o">.</span><span class="na">eachRow</span><span class="o">(</span><span class="s2">&quot;select * from ScrollableQueryTest&quot;</span><span class="o">)</span> <span class="o">{</span> <span class="n">Object</span> <span class="n">row</span> <span class="o">-&gt;</span>
+        <span class="n">println</span> <span class="n">row</span>
+    <span class="o">}</span>
+</pre></div>
 
-<h3 id="execute-a-closure-for-each-batch-of-records">Execute a closure for each batch of records</h3>
+<h3 id="execute-a-closure-for-each-batch-of-records">Execute a closure for each batch of records<a class="headerlink" href="#execute-a-closure-for-each-batch-of-records" title="Permanent link">&para;</a></h3>
 <p>Using <code>eachBatch</code> we can execute a closure for a batch of records.
 This closure is called for a specified number of records. For example, code below prints size of each batch
 (which is 5) to console:</p>
-<pre><code class="groovy">
-    scrollableQuery.eachBatch(&quot;select * from ScrollableQueryTest&quot;, 5) { List batch -&gt;
-        println &quot;batchSize=${batch.size()}&quot;
-    }
+<div class="codehilite"><pre><span></span>    <span class="n">scrollableQuery</span><span class="o">.</span><span class="na">eachBatch</span><span class="o">(</span><span class="s2">&quot;select * from ScrollableQueryTest&quot;</span><span class="o">,</span> <span class="mi">5</span><span class="o">)</span> <span class="o">{</span> <span class="n">List</span> <span class="n">batch</span> <span class="o">-&gt;</span>
+        <span class="n">println</span> <span class="s2">&quot;batchSize=${batch.size()}&quot;</span>
+    <span class="o">}</span>
+</pre></div>
 
-</code></pre>
-
-<h3 id="fetching-a-list-of-all-records">Fetching a list of all records:</h3>
+<h3 id="fetching-a-list-of-all-records">Fetching a list of all records:<a class="headerlink" href="#fetching-a-list-of-all-records" title="Permanent link">&para;</a></h3>
 <blockquote>
-<p>:memo: This method holds all rows in memory, so this should not be used if there is going to be large number of rows.</p>
+<p><img alt="📝" class="gemoji" src="https://github.githubassets.com/images/icons/emoji/unicode/1f4dd.png" title=":memo:" /> This method holds all rows in memory, so this should not be used if there is going to be large number of rows.</p>
 </blockquote>
-<pre><code class="groovy">
-    List values = scrollableQuery.rows(&quot;select * from ScrollableQueryTest where value='test'&quot;)
+<div class="codehilite"><pre><span></span>    <span class="n">List</span> <span class="n">values</span> <span class="o">=</span> <span class="n">scrollableQuery</span><span class="o">.</span><span class="na">rows</span><span class="o">(</span><span class="s2">&quot;select * from ScrollableQueryTest where value=&#39;test&#39;&quot;</span><span class="o">)</span>
+</pre></div>
 
-</code></pre>
-
-<h2 id="grailsparametermaprowmapper">GrailsParameterMapRowMapper</h2>
+<h2 id="grailsparametermaprowmapper">GrailsParameterMapRowMapper<a class="headerlink" href="#grailsparametermaprowmapper" title="Permanent link">&para;</a></h2>
 <p>See <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/jdbc/GrailsParameterMapRowMapper.html">GrailsParameterMapRowMapper</a></p>
 <p>Row mapper which allows to convert data from a given ResultSet instance
-to a grails parameter map, which can be used for databinding.</p></div>
+to a grails parameter map, which can be used for databinding.</p>
+                
+                  
+                
+              
+              
+                
+              
+            </article>
+          </div>
         </div>
-
-        <footer class="col-md-12">
-            <hr>
-                <p>Copyright &copy; 2020 9ci Inc</p>
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
-        </footer>
-        <script>var base_url = '..';</script>
-        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
-        <script src="../js/base.js"></script><div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../repository/databinding/" title="Databinding" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
-            <div class="modal-body">
-                <p>
-                    From here you can search these documents. Enter
-                    your search terms below.
-                </p>
-                <form role="form">
-                    <div class="form-group">
-                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                    </div>
-                </form>
-                <div id="mkdocs-search-results"></div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Databinding
+              </span>
             </div>
-            <div class="modal-footer">
+          </a>
+        
+        
+          <a href="../rest/" title="Rest Api" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Rest Api
+              </span>
             </div>
-        </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
     </div>
-</div>
-
-    </body>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 9ci Inc
+          </div>
+        
+        powered by
+        <a href="http://www.mkdocs.org" title="MkDocs">MkDocs</a>
+        and
+        <a href="http://yakworks.github.io/docmark/" title="MkDocs Docmark Theme">
+          Material Components for MkDocs</a>
+      </div>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application-ea76b28b63.js"></script>
+      
+      
+      <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+      <script>window.mdc.autoInit()</script>
+      <script src="../assets/javascripts/headroom.min.js"></script>
+      <script src="../assets/javascripts/jQuery.headroom.min.js"></script>
+      <script src="../assets/javascripts/jq-mdc-web.js"></script>
+      <script src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
+      <script>app.initialize({version:"0.16.3",url:{base:".."}})</script>
+      
+    
+    
+  </body>
 </html>

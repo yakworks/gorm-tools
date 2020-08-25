@@ -21,6 +21,42 @@ hr {
   font-weight: 600;
 }
 
+/* hide the 3rd level and below down */
+.md-nav--secondary > .md-nav__list > .md-nav__item > .md-nav > 
+.md-nav__list > .md-nav__item > .md-nav 
+{
+  display: none;
+}
+
+/* make toc title smaller and italic */
+.md-nav--secondary .md-nav__title.md-nav__toc {
+  font-size: 1.1rem;
+  padding-top: 0px;
+  border-bottom: 1px solid rgba(0,0,0,.07);
+  font-style: italic;
+}
+
+/* don't wrap the overflow on the TOC */
+.md-nav.md-nav--secondary .md-nav__item {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* fix the location of the edit icon */
+article.md-content__inner {
+  /* make the container relative so we can move the icon*/
+  position: relative;
+  padding-top: 1rem;
+}
+
+/* fix the location of the edit icon */
+article.md-content__inner > a.md-icon.md-content__icon:first-child {
+  position: absolute;
+  right: -12px;
+  top: -5px;
+  font-size: 20px
+}
 
 /** remove defaults on admonitions **/
 /*.admonition:before{

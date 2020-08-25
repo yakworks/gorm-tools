@@ -11,7 +11,7 @@
         <meta name="description" content="Plugin tools Grails/Gorm - repository data services, json query language, fast data binder">
       
       
-        <link rel="canonical" href="https://yakworks.github.io/gorm-tools/usefulLinks/">
+        <link rel="canonical" href="https://yakworks.github.io/gorm-tools/rest/">
       
       
         <meta name="author" content="9ci">
@@ -23,7 +23,7 @@
     
     
       
-        <title>Useful Links - Gorm Tools Grails Plugin</title>
+        <title>Rest Api - Gorm Tools Grails Plugin</title>
       
     
     
@@ -136,7 +136,7 @@
             
               
             
-            Useful Links
+            Rest Api
           
         </span>
       </div>
@@ -342,11 +342,94 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../rest/" title="Rest Api" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="toc">
+        Rest Api
+      </label>
+    
+    <a href="./" title="Rest Api" class="md-nav__link md-nav__link--active">
       Rest Api
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#install" title="Install" class="md-nav__link">
+    Install
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-generation" title="JSON Generation" class="md-nav__link">
+    JSON Generation
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#supporting-links" title="supporting links" class="md-nav__link">
+    supporting links
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-the-domains" title="Setting up the domains" class="md-nav__link">
+    Setting up the domains
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restapi-annotation" title="@RestApi annotation" class="md-nav__link">
+    @RestApi annotation
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openapi-and-json-schema" title="OpenAPI and json-schema" class="md-nav__link">
+    OpenAPI and json-schema
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -462,63 +545,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="toc">
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="toc">
-        Useful Links
-      </label>
-    
-    <a href="./" title="Useful Links" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../usefulLinks/" title="Useful Links" class="md-nav__link">
       Useful Links
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-  
-    <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#ddd" title="DDD" class="md-nav__link">
-    DDD
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#references" title="References" class="md-nav__link">
-    References
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#repository" title="Repository" class="md-nav__link">
-    Repository
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -536,28 +567,57 @@
 <nav class="md-nav md-nav--secondary">
   
   
+    
+  
   
     <label class="md-nav__title md-nav__toc" for="toc">Table of contents</label>
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#ddd" title="DDD" class="md-nav__link">
-    DDD
+  <a href="#install" title="Install" class="md-nav__link">
+    Install
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#json-generation" title="JSON Generation" class="md-nav__link">
+    JSON Generation
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#references" title="References" class="md-nav__link">
-    References
+  <a href="#supporting-links" title="supporting links" class="md-nav__link">
+    supporting links
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-the-domains" title="Setting up the domains" class="md-nav__link">
+    Setting up the domains
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#restapi-annotation" title="@RestApi annotation" class="md-nav__link">
+    @RestApi annotation
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#repository" title="Repository" class="md-nav__link">
-    Repository
+  <a href="#openapi-and-json-schema" title="OpenAPI and json-schema" class="md-nav__link">
+    OpenAPI and json-schema
   </a>
   
 </li>
@@ -581,22 +641,179 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/usefulLinks.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                  <a href="https://github.com/yakworks/gorm-tools/edit/master/docs/rest.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
                 
                 
-                  <h1>Useful Links</h1>
                 
-                
-                <h2 id="ddd">DDD<a class="headerlink" href="#ddd" title="Permanent link">&para;</a></h2>
-<h3 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h3>
-<p><a href="http://blog.sapiensworks.com/post/2015/05/25/DDD-Concepts-As-One-Liners">http://blog.sapiensworks.com/post/2015/05/25/DDD-Concepts-As-One-Liners</a></p>
-<p><a href="https://stackoverflow.com/questions/2378069/ddd-with-grails">https://stackoverflow.com/questions/2378069/ddd-with-grails</a>)</p>
-<p><a href="http://static.olivergierke.de/lectures/ddd-and-spring/">http://static.olivergierke.de/lectures/ddd-and-spring/</a></p>
-<p><a href="https://www.slideshare.net/cyriux/ddd-patterns-that-were-not-in-the-book">https://www.slideshare.net/cyriux/ddd-patterns-that-were-not-in-the-book</a></p>
-<h3 id="repository">Repository<a class="headerlink" href="#repository" title="Permanent link">&para;</a></h3>
-<p><a href="https://martinfowler.com/eaaCatalog/repository.html">https://martinfowler.com/eaaCatalog/repository.html</a>
-<a href="http://blog.sapiensworks.com/post/2014/06/02/The-Repository-Pattern-For-Dummies.aspx">http://blog.sapiensworks.com/post/2014/06/02/The-Repository-Pattern-For-Dummies.aspx</a>
-<a href="http://gorodinski.com/blog/2012/04/14/services-in-domain-driven-design-ddd/">http://gorodinski.com/blog/2012/04/14/services-in-domain-driven-design-ddd/</a></p>
+                <h1 id="out-of-the-box-restful-api-for-grails">Out of the box Restful API for grails.<a class="headerlink" href="#out-of-the-box-restful-api-for-grails" title="Permanent link">&para;</a></h1>
+<p>This is a library and [Grails] plugin to enhance [Gorm] to provide and expose a somewhat <em>opinionated</em>, <mark>well documented restful API</mark> with intelligent out of the box defaults and minimal tweaking. It also keeps it easy to configure and customize on the fly at a deployed client site without the need to recompile.</p>
+<p>While its somewhat opinionated it frames out Rest best practices outlined in the [Rest Design Principles] section.  It uses the <a href="https://github.com/OAI/OpenAPI-Specification">OpenAPI</a> spec (formerly <a href="https://swagger.io/announcing-openapi-3-0/">Swagger</a>) as well as how it maps the Gorm domains into that spec. Its accepts and returns only JSON and eschews the complexity of XML</p>
+<p>While REST is not CRUD a lot of it really is. This project aims to makes it easy and quick to setup the common use cases that are really just CRUD Controller over the [GORM] domains so you can focus on the unique business logic use cases that are hard.</p>
+<p><strong>Key features and goals of this plugin include:</strong></p>
+<ul>
+<li><strong>The simple stuff should be simple and automatic</strong></li>
+<li>DRY : Don't repeat yourself.</li>
+<li>Autogenerated code is evil. This includes tests</li>
+<li>Use AST, traits and tanspiling where possible</li>
+</ul>
+<hr />
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Near zero configuration to expose <a href="https://swagger.io/announcing-openapi-3-0/">Swagger</a> documented resources (the Gorm domains)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Rely on the domain's contraints as much as possible for configurations and docs.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Out of the box CRUD Controller modified from Grails <a href="http://docs.grails.org/latest/guide/REST.html#domainResources">@Resource annotation and RestfulController</a> 
+      that can delegate to transactional Services (Repositories, Data Services) flavored services based on naming 
+      convention or configuration. Uses the [gorm-tools] plugin by deafault for this.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Custom schema selects for retruned JSON fields that can be confiugured at runtime by a customer (does not require recompiling views)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Consistent documented use of HTTP status codes and headers</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Uses <a href="https://github.com/grails-plugins/cache-headers">cache-headers</a> for faster loading</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Use [Repository] pattern by defualt to keep the CRUD code in its own transactional service</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Ability to 'query by POST' (to allow query criteria to be provided within the request body)</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Intelligent defaults for security plugin with OATH and JWT.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Tools to ease GEB functional tests with Spock</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Extensive regression tests</li>
+</ul>
+<h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span>
+</pre></div>
+
+<h2 id="json-generation">JSON Generation<a class="headerlink" href="#json-generation" title="Permanent link">&para;</a></h2>
+<p>There are 3 ways to generate json.</p>
+<ol>
+<li>using renderers, <a href="http://docs.grails.org/latest/guide/REST.html#renderers">Customizing Response Rendering</a></li>
+<li>using the <a href="https://github.com/grails/grails-views/">grails-views plugin</a>.</li>
+<li>using JSON.ObjectMarshaller which seems to be out of favor in the docs and is not longer mentioned
+but remains in the grails-plugin-converter's main <a href="https://github.com/grails-plugins/grails-plugin-converters/blob/master/src/main/groovy/grails/converters/JSON.java">JSON</a>.
+<a href="https://kylewbanks.com/blog/Customizing-JSON-Grails-Object-Marshalling">this is a good overview</a> 
+and this for using <a href="https://stackoverflow.com/questions/25573270/grails-2-4-named-configuration-for-json-not-working">name config</a> 
+with <a href="https://stackoverflow.com/questions/24604747/how-do-i-unit-test-named-configurations-for-object-marshallers">unit testing example</a>
+and <a href="http://mrhaki.blogspot.com/2014/07/grails-goodness-using-converter-named.html">mrhaki's write up on name configurtions</a></li>
+</ol>
+<p><a href="https://jlstrater.github.io/restful-grails3/">https://jlstrater.github.io/restful-grails3/</a></p>
+<p>This <a href="https://www.slideshare.net/clatimer/building-awesome-apis-in-grails">slide show</a>
+is a must preview does a good job of explaining the different options towards the end.</p>
+<p>The goal is to provide the fastest way to render and object or collection
+that allows custom includes or excludes.</p>
+<p>A <code>static includes = ...</code> can be set on the domain, the repository or the controller.
+An gets overriden in that order. For example: if I set excludes on the domain
+if I set in on a Repository CRUD controller for that domain the it uses that. A setting
+in the AppSetupConfig overides them all and a includes param sent into the endpoint
+will be used above all others.
+I would be nice to put the grails-views into this picture as well so that if there is a <code>*.gson</code> file
+it gets used. Will need to figure out the resolution order.</p>
+<p>There is a way to register a name wigh JSON.createNamedConfig and then they can be used with <code>JSON.use(name){...}</code>
+This might be something we want to look into as an option as it may be really easy to incorporate our AppSetupConfig.</p>
+<h3 id="supporting-links">supporting links<a class="headerlink" href="#supporting-links" title="Permanent link">&para;</a></h3>
+<p><a href="https://stackoverflow.com/questions/23940641/render-metadata-for-pagination-from-grails-restfulcontroller-index-search-action">https://stackoverflow.com/questions/23940641/render-metadata-for-pagination-from-grails-restfulcontroller-index-search-action</a></p>
+<p>Explains that is <code>views/object/_object.gson</code> is present then its not picking up ObjectMarshallers
+<a href="https://stackoverflow.com/questions/43357469/grails-3-respond-method-doesnt-use-defined-json-marshaller-format">https://stackoverflow.com/questions/43357469/grails-3-respond-method-doesnt-use-defined-json-marshaller-format</a>
+<a href="https://kylewbanks.com/blog/Customizing-JSON-Grails-Object-Marshalling">https://kylewbanks.com/blog/Customizing-JSON-Grails-Object-Marshalling</a></p>
+<p>older 2.x plugin but has some good ideas.<br />
+<a href="https://github.com/danveloper/grails-rest-renderers">https://github.com/danveloper/grails-rest-renderers</a></p>
+<p>include class and include version config options in the marshallers are exaplained a bit here
+<a href="https://github.com/grails-plugins/grails-plugin-converters/commit/d7ef874a59e19abc03821181ff33e11f612c63a6">https://github.com/grails-plugins/grails-plugin-converters/commit/d7ef874a59e19abc03821181ff33e11f612c63a6</a></p>
+<p>shows an example of pumping a pdf through the response.outputStream
+<a href="http://grails.1312388.n4.nabble.com/Grails-REST-Web-Services-Using-custom-Renderer-to-render-PDF-td4654403.html">http://grails.1312388.n4.nabble.com/Grails-REST-Web-Services-Using-custom-Renderer-to-render-PDF-td4654403.html</a></p>
+<p>DefaultRendererRegistry in org.grails.plugins.web.rest.render is where the defaults
+aer registered.</p>
+<h2 id="setting-up-the-domains">Setting up the domains<a class="headerlink" href="#setting-up-the-domains" title="Permanent link">&para;</a></h2>
+<p>most of a rest api can be setup and documented with nothing more than just the domains</p>
+<h3 id="restapi-annotation">@RestApi annotation<a class="headerlink" href="#restapi-annotation" title="Permanent link">&para;</a></h3>
+<p>inspired by the Grails <a href="../provide link">@Resource annotation</a>
+Adding this to your domains with create a controller using AST under the <code>api</code> namespace with common actions
+and UrlMappings for a rest api. It uses a transactional Repository data service by default.</p>
+<table>
+<thead>
+<tr>
+<th>attribute</th>
+<th>desc</th>
+<th>default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>description</td>
+<td>information to appear to a dev and in the Open api docs</td>
+<td>""</td>
+</tr>
+<tr>
+<td>endpoint</td>
+<td>if this annotation only for api docs and you don't want a controller generated then set this to false.</td>
+<td>true</td>
+</tr>
+<tr>
+<td>readOnly</td>
+<td>Whether this is a read-only endpoint (one that doesn't allow DELETE, POST, PUT or PATCH requests)</td>
+<td>false</td>
+</tr>
+<tr>
+<td>controllerClass</td>
+<td>The Controller class to generate. Can be set to null to skip the generation</td>
+<td>RestApiRepoController</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example</strong>
+<div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">gorm.restapi.RestApi</span>
+
+<span class="nd">@RestApi</span><span class="o">(</span><span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;The user for the restify application&quot;</span><span class="o">)</span>
+<span class="kd">class</span> <span class="nc">AppUser</span> <span class="o">{</span>
+</pre></div></p>
+<p>see the section on the <a href="../insert link here">RestApiRepoController</a> for more details about the controller setup</p>
+<h3 id="openapi-and-json-schema">OpenAPI and json-schema<a class="headerlink" href="#openapi-and-json-schema" title="Permanent link">&para;</a></h3>
+<p>We use additional constraints on the domain to help with the json-schema and Open API docs as well as for DRY testing.</p>
+<p><strong>added meta-contraints</strong>
+| contraints  |                                  desc                                   |
+| ----------- | ----------------------------------------------------------------------- |
+| description | information to appear to a dev and in the Open api docs                 |
+| title       | override the title. converts camel case to word with spaces by defaults |
+| example     | used in docs as well as auto mocking out test data                      |</p>
+<p><strong>Example</strong>
+<div class="codehilite"><pre><span></span><span class="kd">static</span> <span class="n">constraints</span> <span class="o">=</span> <span class="o">{</span>
+    <span class="n">userName</span>  <span class="nl">description:</span> <span class="s1">&#39;The login name&#39;</span><span class="o">,</span>
+              <span class="nl">title:</span> <span class="s1">&#39;Login Name&#39;</span><span class="o">,</span>
+              <span class="nl">example:</span><span class="s2">&quot;billy1&quot;</span>
+</pre></div></p>
+<table>
+<thead>
+<tr>
+<th>contraint</th>
+<th>json-schema</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>min</td>
+<td>minimum</td>
+<td></td>
+</tr>
+<tr>
+<td>max</td>
+<td>maximum</td>
+<td></td>
+</tr>
+<tr>
+<td>maxSize</td>
+<td>maxLength</td>
+<td></td>
+</tr>
+<tr>
+<td>minSize</td>
+<td>minLength</td>
+<td></td>
+</tr>
+<tr>
+<td>scale</td>
+<td>multipleOf</td>
+<td>= 1/Math.pow(10, constraints.scale))</td>
+</tr>
+<tr>
+<td>email</td>
+<td>format='email'</td>
+<td></td>
+</tr>
+</tbody>
+</table>
                 
                   
                 
@@ -615,7 +832,7 @@
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../api-docs/" title="API Docs" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../queries-mango/" title="Mango Query" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -624,11 +841,25 @@
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                API Docs
+                Mango Query
               </span>
             </div>
           </a>
         
+        
+          <a href="../async/" title="Async" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Async
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
         
       </nav>
     </div>

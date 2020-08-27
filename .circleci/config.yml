@@ -13,7 +13,6 @@ jobs:
 
     steps:
       - checkout
-
       - compare-url/reconstruct
       - run:
           name: ✔︎ -- Publish plugin if on releasable branch

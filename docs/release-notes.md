@@ -1,7 +1,3 @@
-#### v6.1.12-v.2
-
-[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v6.1.12-v.1...v6.1.12-v.2)
-
 
 #### 6.1.12-v.1
  - 2020-08-24 - [20 commits](https://github.com/yakworks/gorm-tools/compare/v6.1.11-v.14...v6.1.12-v.1) by [Joshua B](https://github.com/basejump) (18), alexeyzvegintcev (2) - published to [![Bintray](https://img.shields.io/badge/Bintray-6.1.12-v.1-green.svg)](https://bintray.com/null/null/org.grails.plugins/6.1.12-v.1)

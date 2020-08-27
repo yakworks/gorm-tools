@@ -63,4 +63,4 @@ workflows:
           context: bot-context
           requires: [build]
           filters:
-            branches: { only: [ publish_test, /release\/.*/ ] }
+            branches: { only: [ master, /release\/.*/ ] }

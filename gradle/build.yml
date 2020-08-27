@@ -7,7 +7,7 @@ group: org.grails.plugins
 github:
   fullName: yakworks/gorm-tools
 git:
-  releasableBranchRegex: publish_test|release/.+
+  releasableBranchRegex: master|release/.+
 
 team:
   developers: ['basejump: Joshua Burnett', 'snimavat: Sudhir Nimavat', 'alexeyzvegintcev: Alexey']

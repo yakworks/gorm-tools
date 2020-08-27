@@ -756,14 +756,14 @@ Batch or Bulk inserting and updating with data binding</p>
 <p><small><a href="repository/ref/">jump to reference</a></small></p>
 <p>A repository is a <a href="usefulLinks/#references">Domain Driven Design</a> pattern. Used a a place logic to validate, bind, persist and query data that resides 
 either in a database or NoSql (via GORM usually of course).
-The design pattern here is a little bit similiar to <a href="https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/">Spring's Repository pattern</a>
+The design pattern here is a bit similiar to <a href="https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/">Spring's Repository pattern</a>
 and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#dataServices">Data Services</a> pattern.</p>
 <h3 id="goals">Goals<a class="headerlink" href="#goals" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>DRY</strong> : Don't repeat yourself, reduces copy/paste boiler plate code for domain logic</li>
-<li><strong>DRY</strong> : Don't repeat yourself, reduces copy/paste boiler plate code for domain logic ;-)</li>
 <li><strong>Standardization</strong>: a clean common pattern across our apps for domain service layer logic that 
   reduces boiler plate in both services as well as controllers.</li>
+<li><strong>Transactional Saves</strong>: every save() or persist() is wrapped in a transaction if one doesn't already exist. 
+  This is critical when there are cascading saves and updates.</li>
 <li><strong>RuntimeException Rollback by default</strong>: saves or <code>persist()</code> always occur with failOnError:true so a RuntimeException is 
   thrown for both DataAccessExceptions as well a validation exceptions.
   This is critical for deeply nested domain logic dealing with saving multiple domains chains.</li>
@@ -773,10 +773,10 @@ and Grails GORM's new <a href="http://gorm.grails.org/6.1.x/hibernate/manual/#da
 <li><strong>Events with Flushing</strong>: As mentioned in the Gorm docs, "Do not attempt to flush the session within an event 
   (such as with obj.save(flush:true)). Since events are fired during flushing this will cause a StackOverflowError.". 
   Putting the event business logic in the Repository keeps it all in a normal transaction and a flush is perfectly fine.  </li>
-<li><strong>Transactional Saves</strong>: every persist() is wrapped in a transaction if one doesn't already exist.</li>
 <li><strong>Easy Override/Replace Plugin's Domain Logic</strong>: Since the Repository is a service this also easily allows default logic in a provided 
   plugin to be overriden in an application. For example, I may have a CustomerRepo in a plugin that deals with deault common 
-  logic to validate address. You can then implement a CustomerRepo in an application and it will override the spring bean just as it does for a service. </li>
+  logic to validate address. I can then implement a CustomerRepo in an application and it will override the spring bean
+  just as it does for a service. </li>
 </ul>
 <h2 id="fast-data-binder-batch-insertupdate">Fast Data Binder &amp; Batch Insert/Update<a class="headerlink" href="#fast-data-binder-batch-insertupdate" title="Permanent link">&para;</a></h2>
 <p>We process millions of transactions per day and needed more performant binding performance.</p>

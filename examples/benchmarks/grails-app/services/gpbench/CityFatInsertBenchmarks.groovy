@@ -5,6 +5,7 @@ import gpbench.fat.CityFat
 import gpbench.fat.CityFatAuditTrail
 import gpbench.fat.CityFatDynamic
 import gpbench.fat.CityFatNoTraits
+import gpbench.fat.CityFatNoTraitsDynamic
 import gpbench.fat.CityFatNoTraitsNoAssoc
 import gpbench.fat.CityMethodEvents
 import gpbench.fat.CitySpringEvents
@@ -26,43 +27,47 @@ class CityFatInsertBenchmarks extends BenchProcessData {
 
         muteConsole = true
         warmup = true
+        println "\n**** The slower CompileDynamic ones first ****"
         //"save async" is in twice as the first pass is a warmup run
+        ["save async", "create", "validate", "save async"].each{
+            createAction = it
+            println "-- createAction: $createAction --"
+            //doSettersDynamic(CityFat, 'CompileDynamic on explicit setters, CityFat')
+            doSettersStatic(CityFatDynamic, 'CompileStatic on explicit setters, CityFatDynamic')
+            doSettersDynamic(CityFatDynamic, 'CompileDynamic on explicit setters, CityFatDynamic')
+            doSettersDynamic(CityFatNoTraitsDynamic, 'CompileDynamic on explicit setters, CityFatNoTraitsDynamic')
+            doGormToolsRepo(CityFatDynamic, 'gorm-tools: repo batch methods, CityFatDynamic')
+            warmup = false
+            println "\n" + statsToMarkdownTable()
+        }
+        warmup = true // tells it to load a smaller number of items
+        //"save async" is in twice as the first pass is a warmup run
+        println "\n**** the CompileStatics fast ones now****"
         ["save async", "create", "validate", "save batch", "save async"].each{ action ->
             createAction = action
             println "-- createAction: $createAction --"
-            //the fastest one
+            //the fastest one is one without associations and everything is compile static
             doSettersStatic(CityFatNoTraitsNoAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNoAssoc')
             doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
             doSettersStatic(CityFatAuditTrail, 'CompileStatic explicit setters, CityFatAuditTrail')
             doSettersStatic(CityFatNoTraits, 'CompileStatic explicit setters, CityFatNoTraits')
-            doSettersDynamic(CityFat, 'CompileDynamic explicit setters, CityFat')
             doGormToolsRepoPersist(CityFat, 'gorm-tools: fast binder & persist, CityFat')
             doGormToolsRepoPersist(CityFatNoTraits, 'gorm-tools: fast binder & persist, CityFatNoTraits')
-            doGormToolsRepo(CityFat)
+            doGormToolsRepo(CityFat, 'gorm-tools: repo batch methods, CityFat')
             //grailsDataBinderNoTraits(CityFatNoTraits)
             warmup = false
             println "\n" + statsToMarkdownTable()
         }
 
-        println "\n**** The slower ones ****"
-        ["create", "validate", "save batch", "save async"].each{
-            createAction = it
-            println "-- createAction: $createAction --"
-            //settersStaticNoAssoc() //this is fast and kept here for reference
-            doSettersStatic(CityFatDynamic)
-            doSettersDynamic(CityFatDynamic)
-            doGormToolsRepo(CityFatDynamic)
-            println "\n" + statsToMarkdownTable()
-        }
 
         //logMessage statsToMarkdownTable()
 
         createAction = "create"
         println "\n-- Grails default DataBinder --"
-        processData(CityFatNoTraits, 'grails', 'Grails: default dataBinder, No Traits')
+        processData(CityFatNoTraits, 'grails', 'Grails: default dataBinder, CompileStatic CityFatNoTraits')
 
         println "*** Using traits with the Grails default DataBinder is super slow, see bug report"
-        processData(CityFat, 'grails', 'Grails: default dataBinder w/Traits')
+        processData(CityFat, 'grails', 'Grails: default dataBinder CompileStatic CityFat w/Traits')
 
         println "\n**Stats to insert ${dataList.size()} items on City Domains with 32+ fields**"
         println statsToMarkdownTable()
@@ -89,11 +94,11 @@ class CityFatInsertBenchmarks extends BenchProcessData {
             doGormToolsRepo(CitySpringEventsRefreshable, 'Repository Refreshable Bean Spring Events')
             doGormToolsRepo(CityMethodEvents, 'Repository Method Events')
             scriptEngine(CityFat)
-            doGormToolsRepo(CityFatAuditTrail, 'audit-trail: @AuditStamp')
+            // doGormToolsRepo(CityFatAuditTrail, 'audit-trail: @AuditStamp')
             muteConsole = false
         }
 
-        println "\n**Stats to insert ${dataList.size()} items on City Domains with 32+ fields**"
+        println "\n**Stats with Events to insert ${dataList.size()} items on City Domains with 32+ fields**"
         println statsToMarkdownTable(['Benchmark'] , ['save batch', 'save async'] )
 
     }

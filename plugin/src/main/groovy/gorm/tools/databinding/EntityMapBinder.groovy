@@ -186,7 +186,9 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener =
             null, Object errors = null) {
         if (!source.containsProperty(prop.name)) return
-
+        // if (prop.name == 'latitude'){
+        //     println "latitude"
+        // }
         Object propValue = source.getPropertyValue(prop.name)
         Object valueToAssign = propValue
         Class typeToConvertTo = prop.getType() as Class
@@ -224,13 +226,6 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         } else if (prop instanceof Association) {
             bindAssociation(target, valueToAssign, (Association) prop, listener, errors)
         }
-        else if (conversionHelpers.containsKey(typeToConvertTo)) {
-            List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
-            ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
-            if (converter) {
-                target[prop.name] = converter.convert(propValue)
-            }
-        }
         else if (typeToConvertTo.isEnum() && (valueToAssign instanceof Number || valueToAssign instanceof Map)){
             //if its a map then it should be in form [id:1, ...] and it will grab id
             def idVal = valueToAssign //assume its a number
@@ -239,7 +234,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
             target[prop.name] = getEnumWithGet(typeToConvertTo, idVal as Number)
         }
         else {
-            target[prop.name] = valueToAssign
+            ValueConverter converter
+            if (conversionHelpers.containsKey(typeToConvertTo)) {
+                List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
+                converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
+            }
+            if (converter) {
+                target[prop.name] = converter.convert(propValue)
+            } else {
+                target[prop.name] = valueToAssign
+            }
         }
 
     }

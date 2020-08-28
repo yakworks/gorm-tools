@@ -151,10 +151,10 @@ Gorm 6.1.9
  gradle assemble; java -server -jar -DmultiplyData=3 -Dgpars.poolsize=5 build/libs/benchmarks.war
 --- Environment info ---
 Available processors: 8
-Gpars pool size (gpars.poolsize): 5
+Gpars pool size (gpars.poolsize): 4
 binderType: gorm-tools
-hibernate.jdbc.batch_size (jdbcBatchSize): 100
-batchSliceSize: 100
+hibernate.jdbc.batch_size (jdbcBatchSize): 255
+batchSliceSize: 255
 auditTrailEnabled: true
 refreshableBeansEnabled (eventListenerCount): 0
 - Gorm -----------------------------------
@@ -163,28 +163,40 @@ refreshableBeansEnabled (eventListenerCount): 0
   Second Level Cache: false
 -----------------------------------------
  ```
- 
-**Stats to insert 111690 items on City Domains with 32+ fields**
 
-| Benchmark                             | Domain @Compile | create | validate | save batch | save async |
-|---------------------------------------|-----------------|-------:|---------:|-----------:|-----------:|
-| static setters, no associations       | static          |  1.59s |    4.13s |      7.42s |      2.75s |
-| setters static                        | static          |  2.17s |    5.16s |     12.63s |      6.35s |
-| gorm-tools: repository batch methods  | static          |  4.72s |    8.01s |     15.99s |      5.41s |
-| gorm-tools: fast binder & persist     | static          |  4.83s |    8.06s |     16.39s |      6.28s |
-| setters dynamic                       | static          |  4.94s |    8.29s |     16.11s |      6.16s |
-| setters static                        | dynamic         |  6.50s |   10.09s |     19.79s |      7.41s |
-| setters dynamic                       | dynamic         |  9.52s |   13.56s |     24.15s |      8.39s |
-| gorm-tools: repository batch methods  | dynamic         | 12.80s |   18.65s |     28.73s |      9.32s |
-| Grails: default dataBinder, No Traits | static          | 37.00s |          |            |            |
-| Grails: default dataBinder w/Traits   | static          | 63.99s |          |            |            |
+**Stats to insert 111,690 items on City Domains with 32+ fields**
 
+| Benchmark                                                  | Domain @Compile | create | validate | save batch | save async |
+|------------------------------------------------------------|-----------------|-------:|---------:|-----------:|-----------:|
+| CompileStatic explicit setters, CityFatNoTraitsNoAssoc     | static          |  1.47s |    3.96s |      6.82s |      2.25s |
+| CompileStatic explicit setters, CityFatNoTraits            | static          |  2.17s |    5.43s |     14.95s |      4.94s |
+| CompileStatic explicit setters, CityFatAuditTrail          | static          |  2.60s |    6.24s |     11.65s |      4.54s |
+| CompileStatic explicit setters, CityFat                    | static          |  2.61s |    5.48s |     11.03s |      3.98s |
+| gorm-tools: fast binder & persist, CityFatNoTraits         | static          |  5.58s |    8.81s |     20.88s |      7.32s |
+| gorm-tools: fast binder & persist, CityFat                 | static          |  6.25s |    9.68s |     16.43s |      5.69s |
+| gorm-tools: repo batch methods, CityFat                    | static          |  6.26s |    9.57s |     15.68s |      5.11s |
+| CompileStatic on explicit setters, CityFatDynamic          | dynamic         |  6.94s |   11.27s |            |      5.38s |
+| CompileDynamic on explicit setters, CityFatNoTraitsDynamic | dynamic         |  9.17s |   12.94s |            |      7.50s |
+| CompileDynamic on explicit setters, CityFatDynamic         | dynamic         |  9.95s |   18.62s |            |      7.17s |
+| gorm-tools: repo batch methods, CityFatDynamic             | dynamic         | 13.97s |   18.22s |            |      6.76s |
+| Grails: default dataBinder, CompileStatic CityFatNoTraits  | static          | 34.77s |          |            |            |
+| Grails: default dataBinder CompileStatic CityFat w/Traits  | static          | 58.90s |          |            |            |
+
+**Stats with Events to insert 111690 items on City Domains with 32+ fields**
+
+| Benchmark                                 | save batch | save async |
+|-------------------------------------------|-----------:|-----------:|
+| gorm-tools: repository batch methods      |     15.78s |      5.51s |
+| Repository Spring Events                  |     15.63s |      5.14s |
+| Repository Refreshable Bean Spring Events |     16.30s |      5.31s |
+| Repository Method Events                  |     16.30s |      5.34s |
+| Repository runs script each row           |     17.77s |      5.69s |
 
 ### Batching inserts and updates with hibernate
 JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.
 
 **hibernate.jdbc.batch_size**
-This is the most important setting which tells hibernate to enable batching of statements and configures the batch size used by hibernate.
+This is an important setting which tells hibernate to enable batching of statements and configures the batch size used by hibernate.
 
 **hibernate.order_inserts** and **hibernate.order_updates**
 By default hibernate executes each statement in the same order it appears. However it affects the batching. Batching can target one table at a time.
@@ -430,22 +442,22 @@ Gpars batch insert without data binding and validation.
 **Does grails.gorm.autowire=true slow it down**
 - Yes, by anywhere from 5% to 15%
 
-**Does valiation slow it down, why, can it be optimized**
+**Does validation slow it down, why, can it be optimized**
 - Yes, it has slight performance impact
 - That is because Grails validation (GrailsDomainClassValidator) has to iterate over each constrained property of domain class
   and invoke validators on it for every instance.
 
 **Does Auditstamp slow it down, can it be optimized**
-- Yes
+- Not significantly. Barely noticable as in 2-3%
 - Thats because audit trail plugin hooks into validation and gets called every time when the domain is validated.
   It does some reflection to check for properties/value and checks in hibernate persistence context if the instance is being inserted or being updated. All this makes it little slower.
 - Need to try what can be done in audit trail plugin to improve performance.
 
 **Do daos slow it down**
-- No, very very little effect, some thing around 1 to 1.5 seconds for 115K records.
+- No, very little effect, some thing around 1 to 1.5 seconds for 115K records.
 
 **Do custom Id generator slow it down, or improves speed**
-- The batch id generator provided by Dao plugin improves the performance significantly.
+- The batch id generator provided by Dao plugin improves the performance **significantly***.
 
 **Do using Dataflow queue/operator make it faster**
 - No, it has no noticeable effect

@@ -1,24 +1,24 @@
 # GORM : batch bulk inserts benchmarking
 
-<!-- TOC depthFrom:2 depthTo:4 withLinks:1 updateOnSave:1 orderedList:0 -->
+<!-- TOC depthfrom:2 depthto:4 withlinks:false updateonsave:false orderedlist:false -->
 
-- [Overview](#overview)
-	- [Running the benchmarks](#running-the-benchmarks)
-- [Batch or Bulk Data Inserts with large datasets](#batch-or-bulk-data-inserts-with-large-datasets)
-	- [CityFatBenchInsert Benchmarks](#cityfatbenchinsert-benchmarks)
-		- [Bench Mark Results](#bench-mark-results)
-	- [CPU Load during Gparse batch insert](#cpu-load-during-gparse-batch-insert)
-	- [Batching inserts and updates with hibernate](#batching-inserts-and-updates-with-hibernate)
-	- [Optimum setting for Gpars pool size.](#optimum-setting-for-gpars-pool-size)
-- [Second level cache](#second-level-cache)
-	- [Overview](#overview)
-		- [Caching strategies](#caching-strategies)
-		- [EhCache configuration](#ehcache-configuration)
-		- [Using MySQL database.](#using-mysql-database)
-	- [Benchmarks for Second Level Cache](#benchmarks-for-second-level-cache)
-- [Conclusions](#conclusions)
-	- [Questions answered by above conclusion.](#questions-answered-by-above-conclusion)
-- [References and reading](#references-and-reading)
+- Overview
+    - Running the benchmarks
+- Batch or Bulk Data Inserts with large datasets
+    - CityFatBenchInsert Benchmarks
+        - Bench Mark Results
+    - Batching inserts and updates with hibernate
+    - Optimum setting for Gpars pool size.
+    - Reference
+- Second level cache
+    - Overview
+        - Caching strategies
+        - EhCache configuration
+        - Using MySQL database.
+    - Benchmarks for Second Level Cache
+- Conclusions
+    - Questions answered by above conclusion.
+- References and reading
 
 <!-- /TOC -->
 
@@ -38,6 +38,26 @@ The goal is to have good benchmarks to measure and answer the following question
 - Does AuditTrail's Auditstamp slow it down, can it be optimized
 - Does Repositories slow it down
 - Do custom Id generator slow it down, or improve speed
+
+**The key conclusions are..**
+
+- Use @CompileStatic and @GrailsCompileStatic everywhere as it has the one of the biggest impacts in performance improvements
+- Use Async/Gpars batch insert/updates is the optimum way to do large batch inserts 
+  and is the other biggest impact on performance improvement.
+- use small transaction batches whenever possbile (100-255 items) and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
+- Use Gorm-Tools fast Databinding. The stock Grails databinding has BIG (10-20x slower) performance penalty and an even bigger hit when using Traits for fields on the domain.
+   See [grails issue #10862](https://github.com/grails/grails-core/issues/10862)
+- Inserting each record in separate transaction or flushing on each items has a  performance penalty and should be avoided when updating or inserting data.
+- Disabling validation improves performance slightly and performs well eg. ```domain.save(false)```
+- Grails Date stamp fields has a negligible effect on performance.
+- AuditTrail has a negligible effect on performance.
+- Repo does not have any major noticable effect on performance.
+- Using custom [idgenerator](https://yakworks.github.io/gorm-tools/id-generation/) improves saves by up to 50% over auto/native
+   as it allows hibernate to use the jdbc.batch_size.
+- Using listeners and grails @Listener events can slow it down by 20-50%. 
+  With our specs about 3 seconds for synchronous single thread processing 100k+ records.
+  which drops to <1 second when doing the same thing asyncronously (gpars parralel batches)
+- set grails.gorm.autowire=false, its about 10% faster for saving. 
 
 ### Running the benchmarks
 
@@ -66,7 +86,7 @@ def saveBigData(List reallyLargeData) {
 ```
 
 ```
-//The Better way
+//The Best way
 def saveBigData(List reallyLargeData) {
     //collate the reallyLargeData into batch(chunks) of lists. batchSize can equal the jdbc.batch_size
     List<List> collatedList = reallyLargeData.collate(batchSize)
@@ -83,7 +103,6 @@ void saveBatchChunk(List smallerData){
     }
     //or inject the hibernateDatastore
     Session session = GormEnhancer.findStaticApi(domainClass).datastore.currentSession
-    session.flush() //probably redundant as it automatically gets flushed at end of transaction
     session.clear() //clear the cache
 }
 ```
@@ -94,7 +113,7 @@ The latter is essentially what the `save batch` is doing below.
 
 Goals: 
 * compare Domains with @CompileStatic vs letting it be dynamic
-* static and dynamic setters vs data binding
+* static and dynamic compiled setters vs fast EntityMapBinder
 * Gorm-tools binder vs Grails binder
 * asyncronous saving vs single thread
 
@@ -106,11 +125,11 @@ Goals:
 - **gorm-tools: repository batch** - uses the gorm-tools repository's batchCreate
 	which in turn uses the fast EntityMapBinder to bind the json data and the repository methods
  	to create persist. Uses defaults with all events enabled.
-- **gorm-tools: fast binder & persist** - TODO
+- **gorm-tools: fast binder & persist** - uses the repo bind method and then persists
 - **Grails default DataBinder, No Traits** - this benchmark uses the "out of the box"
 	binder in grails with [CityFatNoTraits] which is statically compiled.
   basically what you get when you do `someDomain.properties = jsonData`.
-	Its only run with the "create" method as its sufficient to show that its much slower.
+	Its only run with the "create" and "validate" methods as its sufficient to show that its much slower.
 - **Grails DataBinder w/Traits** - this benchmark uses the "out of the box"
 	binder in grails with [CityFat] like the others.
   Its only run with the "create" method as its sufficient to show that its
@@ -164,33 +183,39 @@ refreshableBeansEnabled (eventListenerCount): 0
 -----------------------------------------
  ```
 
-**Stats to insert 111,690 items on City Domains with 32+ fields**
+**Stats to insert 111690 items on City Domains with 32+ fields**
 
-| Benchmark                                                  | Domain @Compile | create | validate | save batch | save async |
-|------------------------------------------------------------|-----------------|-------:|---------:|-----------:|-----------:|
-| CompileStatic explicit setters, CityFatNoTraitsNoAssoc     | static          |  1.47s |    3.96s |      6.82s |      2.25s |
-| CompileStatic explicit setters, CityFatNoTraits            | static          |  2.17s |    5.43s |     14.95s |      4.94s |
-| CompileStatic explicit setters, CityFatAuditTrail          | static          |  2.60s |    6.24s |     11.65s |      4.54s |
-| CompileStatic explicit setters, CityFat                    | static          |  2.61s |    5.48s |     11.03s |      3.98s |
-| gorm-tools: fast binder & persist, CityFatNoTraits         | static          |  5.58s |    8.81s |     20.88s |      7.32s |
-| gorm-tools: fast binder & persist, CityFat                 | static          |  6.25s |    9.68s |     16.43s |      5.69s |
-| gorm-tools: repo batch methods, CityFat                    | static          |  6.26s |    9.57s |     15.68s |      5.11s |
-| CompileStatic on explicit setters, CityFatDynamic          | dynamic         |  6.94s |   11.27s |            |      5.38s |
-| CompileDynamic on explicit setters, CityFatNoTraitsDynamic | dynamic         |  9.17s |   12.94s |            |      7.50s |
-| CompileDynamic on explicit setters, CityFatDynamic         | dynamic         |  9.95s |   18.62s |            |      7.17s |
-| gorm-tools: repo batch methods, CityFatDynamic             | dynamic         | 13.97s |   18.22s |            |      6.76s |
-| Grails: default dataBinder, CompileStatic CityFatNoTraits  | static          | 34.77s |          |            |            |
-| Grails: default dataBinder CompileStatic CityFat w/Traits  | static          | 58.90s |          |            |            |
+| Benchmark                                                   | Domain @Compile | create | validate | save batch | save async |
+|-------------------------------------------------------------|-----------------|-------:|---------:|-----------:|-----------:|
+| CompileStatic explicit setters, CityFatNoTraitsNullAssoc    | static          |  1.26s |    4.09s |      8.02s |      2.67s |
+| CompileStatic explicit setters, CityFatNoTraitsNoAssoc      | static          |  1.29s |    3.67s |      6.29s |      2.01s |
+| CompileStatic explicit setters, CityFatNoTraitsIdAssoc      | static          |  1.55s |    4.25s |      6.86s |      2.60s |
+| CompileStatic explicit setters, CityFatNoTraits             | static          |  2.22s |    5.15s |     10.21s |      3.39s |
+| CompileStatic explicit setters, CityFatNativeIdGen          | static          |  2.33s |    5.32s |     15.24s |      5.67s |
+| CompileStatic explicit setters, CityFat                     | static          |  2.34s |    5.30s |     10.54s |      3.56s |
+| CompileStatic explicit setters, CityFatAuditTrail           | static          |  2.36s |    5.84s |     11.66s |      3.82s |
+| gorm-tools: fast binder & persist, CityFatNoTraitsNoAssoc   | static          |  3.30s |    5.96s |     10.16s |      3.35s |
+| gorm-tools: fast binder & persist, CityFatNoTraitsIdAssoc   | static          |  3.96s |    7.03s |     12.25s |      3.76s |
+| gorm-tools: fast binder & persist, CityFatNoTraitsNullAssoc | static          |  5.32s |    8.66s |     15.87s |      5.41s |
+| gorm-tools: fast binder & persist, CityFatNoTraits          | static          |  5.41s |    8.68s |     15.39s |      5.55s |
+| gorm-tools: repo batch methods, CityFat                     | static          |  6.09s |    9.37s |     15.24s |      5.84s |
+| gorm-tools: fast binder & persist, CityFat                  | static          |  6.10s |    9.35s |     16.70s |      5.41s |
+| CompileStatic on explicit setters, CityFatDynamic           | dynamic         |  6.46s |    9.73s |     15.36s |      5.66s |
+| CompileDynamic on explicit setters, CityFatNoTraitsDynamic  | dynamic         |  8.78s |   12.52s |     18.60s |      6.58s |
+| CompileDynamic on explicit setters, CityFatDynamic          | dynamic         |  9.14s |   12.75s |     18.98s |      7.23s |
+| gorm-tools: repo batch methods, CityFatDynamic              | dynamic         | 13.03s |   17.56s |     24.31s |      7.98s |
+| Grails: default dataBinder, CompileStatic CityFatNoTraits   | static          | 45.25s |          |            |            |
+| Grails: default dataBinder CompileStatic CityFat w/Traits   | static          | 77.33s |          |            |            |
 
 **Stats with Events to insert 111690 items on City Domains with 32+ fields**
 
 | Benchmark                                 | save batch | save async |
 |-------------------------------------------|-----------:|-----------:|
-| gorm-tools: repository batch methods      |     15.78s |      5.51s |
-| Repository Spring Events                  |     15.63s |      5.14s |
-| Repository Refreshable Bean Spring Events |     16.30s |      5.31s |
-| Repository Method Events                  |     16.30s |      5.34s |
-| Repository runs script each row           |     17.77s |      5.69s |
+| gorm-tools: repo batch methods, CityFat   |     16.76s |      5.62s |
+| Repository Spring Events                  |     16.87s |      5.29s |
+| Repository Refreshable Bean Spring Events |     18.53s |      5.52s |
+| @RepoListener Repo Method Events          |     16.61s |      5.39s |
+| Repository runs script each row           |     17.48s |      5.74s |
 
 ### Batching inserts and updates with hibernate
 JDBC API supports batching for DML operations, however by default Hibernate does not use JDBC batching support. Below are the settings which can be used to enable batching of insert/updates with hibernate.
@@ -215,22 +240,22 @@ This setting tells hibernate to enable batching for versioned entities and is re
 
 ### Optimum setting for Gpars pool size.
 
-It is observed that 5 cores gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four(4) physical cores. Intel hyper-threading simulates to the OS and Java a total of 8 cores and uses Hyper threading.
+It is observed that 4 or 5 cores gave the best results for [i7-4870HQ](https://ark.intel.com/products/83504) which has four(4) physical cores and shows 8 with Hyper threading. 
 
-Gparse does not seem to benefit if it is given 8 cores when there are just four physical cores and four virtual cores.
+Gpars does not seem to benefit if it is given 8 cores when there are just four physical cores and four virtual cores.
 
 The default Gpars pool size is Runtime.getRuntime().availableProcessors() + 1
 see [here](https://github.com/vaclav/GPars/blob/master/src/main/groovy/groovyx/gpars/util/PoolUtils.java#L43)
-But since the hyper-threading shows 8 cores this needs to be overriden manually on such systems
+But since the hyper-threading shows 8 cores **this needs to be overriden manually on such systems**
 
 As per Gpars performance tips [here](http://www.gpars.org/1.0.0/guide/guide/tips.html)
 > In many scenarios changing the pool size from the default value may give you performance benefits. Especially if your tasks perform IO operations, like file or database access, networking and such, increasing the number of threads in the pool is likely to help performance.
 
 ### Reference
-https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html
-https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate
-https://stackoverflow.com/questions/35791383/spring-data-jpa-batch-insert-for-nested-entities#35794220
-https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
+- [Hibernate Batching](https://docs.jboss.org/hibernate/stable/orm/userguide/html_single/chapters/batch/Batching.html)
+- [how-do-you-enable-batch-inserts-in-hibernate](https://stackoverflow.com/questions/12011343/how-do-you-enable-batch-inserts-in-hibernate)
+- https://stackoverflow.com/questions/35791383/spring-data-jpa-batch-insert-for-nested-entities#35794220
+- https://vladmihalcea.com/2015/03/18/how-to-batch-insert-and-update-statements-with-hibernate/
 https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
 
 ## Second level cache
@@ -395,7 +420,7 @@ Tested with MySQL 5.7.20.
 
 **Conclusions**
 
-  1. According to benchmarks there is no profit of using Second Level cache with insert operations.
+  1. According to benchmarks there is no benefit or significant hit when using Second Level cache with insert operations.
      The results of the tests are ambiguous and in most cases show the worst performance when using Second level cache.
      There is an option to disable cache for the current session by adding ignore cache property.
      For example, ```session.setCacheMode(CacheMode.IGNORE)```. See [Disable cache for a session]{.new-tab} article.
@@ -408,11 +433,11 @@ Tested with MySQL 5.7.20.
 The key conclusions Are as below
 
 1. Gpars with batch insert is the optimum way to do large batch inserts.
-2. Grails Databinding has BIG (2-6x slower) performance penalty and an even bigger hit when using Traits for fields on the domain.
+2. Grails Databinding has BIG (10-20x slower) performance penalty and an even bigger hit when using Traits for fields on the domain.
    See [grails issue #10862](https://github.com/grails/grails-core/issues/10862)
 3. Inserting each record in seperate transaction has a BIG performance penalty and should be avoided when updating or inserting data.
-5. use small transaction batches (50-100 items) and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
-7. Disabling validation improves performance only slightly and performs well eg. ```domain.save(false)```
+5. use small transaction batches (100-255 items) and keep them the same size as the jdbc.batch_size. DO NOT (auto)commit on every insert
+7. Disabling validation improves performance slightly and performs well eg. ```domain.save(false)```
 8. Grails Date stamp fields has a negligible effect on performance.
 9. AuditTrail stamp affects performance (see below for details)
 10. Did not see any noticeable difference if Domain autowiring is enabled or disabled. (Domain with dependency on one service).

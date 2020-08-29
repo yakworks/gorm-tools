@@ -12,18 +12,22 @@ import grails.compiler.GrailsCompileStatic
  *
  */
 @GrailsCompileStatic
-class CityFat implements CityTraitFat, DateUserStamp {
+class CityFatNativeIdGen implements CityTraitFat, DateUserStamp {
 
     // static belongsTo = [region : Region, country: Country,
     //                     region2: Region, country2: Country,
     //                     region3: Region, country3: Country]
 
-   Region region
-   Country country
-   Region region2
-   Country country2
-   Region region3
-   Country country3
+    Region region
+    Country country
+    Region region2
+    Country country2
+    Region region3
+    Country country3
+
+    static mapping = {
+        id generator: "native"
+    }
 
     //@CompileStatic(TypeCheckingMode.SKIP)
     static constraints = {

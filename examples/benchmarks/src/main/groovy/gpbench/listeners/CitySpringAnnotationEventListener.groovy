@@ -7,6 +7,9 @@ import groovy.transform.CompileStatic
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
+/**
+ * for Spring Event Listener Bean for CitySpringEvents repo events
+ */
 @Component
 @CompileStatic
 class CitySpringAnnotationEventListener {

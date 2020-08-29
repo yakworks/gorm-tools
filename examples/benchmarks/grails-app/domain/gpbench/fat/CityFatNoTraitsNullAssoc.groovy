@@ -1,16 +1,20 @@
 package gpbench.fat
 
-import gorm.tools.beans.IsoDateUtil
-import grails.compiler.GrailsCompileStatic
-
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+import org.grails.datastore.gorm.GormEnhancer
+
+import gorm.tools.beans.IsoDateUtil
+import gpbench.Country
+import gpbench.Region
+import grails.compiler.GrailsCompileStatic
+
 /**
- * Without traits and without city/region associations fields
+ * Without traits and nullable:true associations, not set in static setProps
  */
 @GrailsCompileStatic
-class CityFatNoTraitsNoAssoc {
+class CityFatNoTraitsNullAssoc {
     String name
     String shortCode
     BigDecimal latitude
@@ -46,12 +50,13 @@ class CityFatNoTraitsNoAssoc {
     LocalDateTime date3
     LocalDate date4
 
-    // Long regionId
-    // Long region2Id
-    // Long region3Id
-    // Long countryId
-    // Long country2Id
-    // Long country3Id
+    Region region
+    Region region2
+    Region region3
+
+    Country country
+    Country country2
+    Country country3
 
     static constraints = {
         name blank: false, nullable: false
@@ -72,7 +77,6 @@ class CityFatNoTraitsNoAssoc {
         shortCode3 blank: false, nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
-
         state3 nullable: true
         countryName3 nullable: true
 
@@ -86,17 +90,17 @@ class CityFatNoTraitsNoAssoc {
         date3 nullable: true
         date4 nullable: true
 
-        // regionId nullable: false
-        // countryId nullable: false
-        // region3Id nullable: false
-        // country3Id nullable: false
-        // region2Id nullable: false
-        // country2Id nullable: false
+        region nullable: true
+        country nullable: true
+        region2 nullable: true
+        country2 nullable: true
+        region3 nullable: true
+        country3 nullable: true
     }
 
-    static mapping = {
-        //id generator: "native"
-    }
+    // static mapping = {
+    //     id generator: "native"
+    // }
 
     String toString() { name }
 
@@ -127,12 +131,19 @@ class CityFatNoTraitsNoAssoc {
         date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
         date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
 
-        // regionId = row['region']['id'] as Long
-        // region2Id = row['region2']['id'] as Long
-        // region3Id = row['region3']['id'] as Long
-
-        // countryId = row['country']['id'] as Long
-        // country2Id = row['country2']['id'] as Long
-        // country3Id = row['country3']['id'] as Long
+        // setAssociation("region", Region, row)
+        // setAssociation("region2", Region, row)
+        // setAssociation("region3", Region, row)
+        // setAssociation("country", Country, row)
+        // setAssociation("country2", Country, row)
+        // setAssociation("country3", Country, row)
     }
+
+    void setAssociation(String key, Class assocClass, Map row) {
+        if (row[key] != null) {
+            Long id = row[key]['id'] as Long
+            this[key] = GormEnhancer.findStaticApi(assocClass).load(id)
+        }
+    }
+
 }

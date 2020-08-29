@@ -3,11 +3,11 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: yakworks/alpine-java:jdk8-builder
+      - image: yakworks/alpine-jdk:builder8
 
     environment:
       GRADLE_OPTS: "-Xmx1536m -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
-      TERM: dumb
+      # TERM: dumb
 
     parallelism: 1
 
@@ -43,8 +43,6 @@ jobs:
     docker:
       - image: yakworks/docmark
     steps:
-      # add the openssh so circle can check out and curl so compare-url/reconstruct works
-      - run: apk add openssh-client curl
       - checkout
       - restore_cache: # prior Build job run
           key: build-{{ .Branch }}-{{ .Revision }}

@@ -1,15 +1,7 @@
 package gpbench
 
 import gorm.tools.beans.IsoDateUtil
-import gpbench.fat.CityFat
-import gpbench.fat.CityFatAuditTrail
-import gpbench.fat.CityFatDynamic
-import gpbench.fat.CityFatNoTraits
-import gpbench.fat.CityFatNoTraitsDynamic
-import gpbench.fat.CityFatNoTraitsNoAssoc
-import gpbench.fat.CityMethodEvents
-import gpbench.fat.CitySpringEvents
-import gpbench.fat.CitySpringEventsRefreshable
+import gpbench.fat.*
 import gpbench.traits.BenchProcessData
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -29,7 +21,7 @@ class CityFatInsertBenchmarks extends BenchProcessData {
         warmup = true
         println "\n**** The slower CompileDynamic ones first ****"
         //"save async" is in twice as the first pass is a warmup run
-        ["save async", "create", "validate", "save async"].each{
+        ["save async", "create", "validate", "save batch", "save async"].each{
             createAction = it
             println "-- createAction: $createAction --"
             //doSettersDynamic(CityFat, 'CompileDynamic on explicit setters, CityFat')
@@ -48,9 +40,15 @@ class CityFatInsertBenchmarks extends BenchProcessData {
             println "-- createAction: $createAction --"
             //the fastest one is one without associations and everything is compile static
             doSettersStatic(CityFatNoTraitsNoAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNoAssoc')
-            doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
-            doSettersStatic(CityFatAuditTrail, 'CompileStatic explicit setters, CityFatAuditTrail')
+            doSettersStatic(CityFatNoTraitsIdAssoc, 'CompileStatic explicit setters, CityFatNoTraitsIdAssoc')
+            doSettersStatic(CityFatNoTraitsNullAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNullAssoc')
             doSettersStatic(CityFatNoTraits, 'CompileStatic explicit setters, CityFatNoTraits')
+            doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
+            doSettersStatic(CityFatNativeIdGen, 'CompileStatic explicit setters, CityFatNativeIdGen')
+            doSettersStatic(CityFatAuditTrail, 'CompileStatic explicit setters, CityFatAuditTrail')
+            doGormToolsRepoPersist(CityFatNoTraitsNoAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNoAssoc')
+            doGormToolsRepoPersist(CityFatNoTraitsNullAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNullAssoc')
+            doGormToolsRepoPersist(CityFatNoTraitsIdAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsIdAssoc')
             doGormToolsRepoPersist(CityFat, 'gorm-tools: fast binder & persist, CityFat')
             doGormToolsRepoPersist(CityFatNoTraits, 'gorm-tools: fast binder & persist, CityFatNoTraits')
             doGormToolsRepo(CityFat, 'gorm-tools: repo batch methods, CityFat')
@@ -89,10 +87,10 @@ class CityFatInsertBenchmarks extends BenchProcessData {
 
         ["save batch", "save async"].each{ action ->
             createAction = action
-            doGormToolsRepo(CityFat)
-            doGormToolsRepo(CitySpringEvents, 'Repository Spring Events')
+            doGormToolsRepo(CityFat, 'gorm-tools: repo batch methods, CityFat') //same as above for comparison
+            doGormToolsRepo(CitySpringEvents, 'Repo Spring Events, CitySpringEvents')
             doGormToolsRepo(CitySpringEventsRefreshable, 'Repository Refreshable Bean Spring Events')
-            doGormToolsRepo(CityMethodEvents, 'Repository Method Events')
+            doGormToolsRepo(CityMethodEvents, '@RepoListener Repo Method Events')
             scriptEngine(CityFat)
             // doGormToolsRepo(CityFatAuditTrail, 'audit-trail: @AuditStamp')
             muteConsole = false

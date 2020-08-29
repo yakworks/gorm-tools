@@ -5,6 +5,9 @@ import gpbench.SecUtil
 import groovy.transform.CompileStatic
 import org.springframework.context.ApplicationListener
 
+/**
+ * for the refreshable groovy spring bean and CitySpringEventsRefreshable
+ */
 @CompileStatic
 class CitySpringEventsBean implements ApplicationListener<RepositoryEvent<CitySpringEventsRefreshable>> {
 

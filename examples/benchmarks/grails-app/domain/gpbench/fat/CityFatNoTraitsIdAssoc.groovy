@@ -7,10 +7,10 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
- * Without traits and without city/region associations fields
+ * Without traits and Long id for city/region associations
  */
 @GrailsCompileStatic
-class CityFatNoTraitsNoAssoc {
+class CityFatNoTraitsIdAssoc {
     String name
     String shortCode
     BigDecimal latitude
@@ -46,12 +46,12 @@ class CityFatNoTraitsNoAssoc {
     LocalDateTime date3
     LocalDate date4
 
-    // Long regionId
-    // Long region2Id
-    // Long region3Id
-    // Long countryId
-    // Long country2Id
-    // Long country3Id
+    Long regionId
+    Long region2Id
+    Long region3Id
+    Long countryId
+    Long country2Id
+    Long country3Id
 
     static constraints = {
         name blank: false, nullable: false
@@ -86,12 +86,12 @@ class CityFatNoTraitsNoAssoc {
         date3 nullable: true
         date4 nullable: true
 
-        // regionId nullable: false
-        // countryId nullable: false
-        // region3Id nullable: false
-        // country3Id nullable: false
-        // region2Id nullable: false
-        // country2Id nullable: false
+        regionId nullable: false
+        countryId nullable: false
+        region3Id nullable: false
+        country3Id nullable: false
+        region2Id nullable: false
+        country2Id nullable: false
     }
 
     static mapping = {
@@ -127,12 +127,12 @@ class CityFatNoTraitsNoAssoc {
         date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
         date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
 
-        // regionId = row['region']['id'] as Long
-        // region2Id = row['region2']['id'] as Long
-        // region3Id = row['region3']['id'] as Long
+        regionId = row['region']['id'] as Long
+        region2Id = row['region2']['id'] as Long
+        region3Id = row['region3']['id'] as Long
 
-        // countryId = row['country']['id'] as Long
-        // country2Id = row['country2']['id'] as Long
-        // country3Id = row['country3']['id'] as Long
+        countryId = row['country']['id'] as Long
+        country2Id = row['country2']['id'] as Long
+        country3Id = row['country3']['id'] as Long
     }
 }

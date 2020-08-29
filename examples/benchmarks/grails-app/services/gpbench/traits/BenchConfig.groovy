@@ -3,6 +3,7 @@ package gpbench.traits
 
 import gorm.tools.async.AsyncSupport
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.api.RepositoryApi
 import gpbench.fat.CityFat
@@ -71,7 +72,7 @@ trait BenchConfig {
     Map<String,Map> stats
 
 
-    RepositoryApi<?> repository
+    GormRepo repository
 
     void loadData() { }
 
@@ -82,8 +83,8 @@ trait BenchConfig {
     }
 
 
-    void setRepo(Class<?> domainClass){
-        repository = RepoUtil.getRepo(CityFat) //domainClass.repo
+    void setRepo(Class domainClass){
+        repository = (GormRepo) RepoUtil.getRepo(domainClass) //domainClass.repo
     }
 
     void setup() {

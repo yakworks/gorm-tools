@@ -43,8 +43,6 @@ dependencies {
   compile "org.grails.plugins:async"
   compile "org.grails.plugins:scaffolding"
   compile "org.grails.plugins:events"
-  compile "org.grails.plugins:async"
-  //runtime "org.grails:grails-async-gpars"
 
   //gorm
   compile "org.grails.plugins:hibernate5"

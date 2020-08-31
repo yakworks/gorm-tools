@@ -140,7 +140,7 @@ criteria.list {
 ### Running docs locally
 
 Docs are built with https://yakworks.github.io/docmark/
-Run  `./build.sh dockmark-serve`
+Run  `./build.sh dockmark-serve` or `make dockmark-serve`
 
 ### Publishing Plugin Releases
 

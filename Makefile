@@ -41,5 +41,5 @@ dockmark-serve: ## run the docs server locally
 .PHONY: clean
 clean: ## removes build dir
 	./gradlew clean
-	rm -rf build
+	# rm -rf build
 

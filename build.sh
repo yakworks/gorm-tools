@@ -16,6 +16,7 @@ setVar PROJECT_NAME 'gorm-tools'
 
 create_yml_variables gradle/build.yml
 setVar RELEASABLE_BRANCHES "$git_releasableBranchRegex"
+setVar GITHUB_FULLNAME "$github_fullName"
 setVar CHANGELOG_NAME "docs/release-notes.md"
 
 # cats key files into a cache-checksum.tmp file for circle to use as key

@@ -17,15 +17,15 @@ grails {
 }
 
 grails.gorm.autowire = Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
-hibernate.jdbc.batch_size = System.getProperty("jdbcBatchSize", "100").toInteger()
-gpars.poolsize = 5
+hibernate.jdbc.batch_size = System.getProperty("jdbcBatchSize", "255").toInteger()
+gpars.poolsize = 4
 
 /** Custome config for benchmarks **/
 
 benchmark {
     //#items per transation. used to collate the rows into lists of lists of batchSliceSize.
     def bss = System.getProperty("batchSliceSize", "0").toInteger()
-    bss = bss ?: System.getProperty("jdbcBatchSize", "100").toInteger()
+    bss = bss ?: System.getProperty("jdbcBatchSize", "255").toInteger()
     batchSliceSize = bss
     //number of times to load the file of 36k rows. the default of 3 is equal to 111k rows for example
     multiplyData = System.getProperty("multiplyData", "3").toInteger()

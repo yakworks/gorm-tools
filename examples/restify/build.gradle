@@ -72,8 +72,7 @@ dependencies {
     compile project(":app-domains")
 
     // runtime "com.h2database:h2"
-    runtime "com.h2database:h2"
-    runtime "com.zaxxer:HikariCP:3.4.5"
+    // runtime "com.zaxxer:HikariCP:3.4.5"
 
     testCompile "org.grails:grails-datastore-rest-client"
     testCompile "org.grails.plugins:geb"

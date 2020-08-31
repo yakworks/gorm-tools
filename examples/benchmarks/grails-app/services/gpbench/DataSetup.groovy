@@ -49,9 +49,9 @@ class DataSetup implements BenchConfig {
     }
 
     void truncateTables() {
-        jdbcTemplate.update("DELETE FROM origin")
+        jdbcTemplate.update("DELETE FROM Origin")
         //jdbcTemplate.update("DELETE FROM city")
-        jdbcTemplate.update("DELETE FROM region")
-        jdbcTemplate.update("DELETE FROM country")
+        jdbcTemplate.update("DELETE FROM Region")
+        jdbcTemplate.update("DELETE FROM Country")
     }
 }

@@ -31,9 +31,6 @@ class BootStrap {
         cityFatInsertBenchmarks.runEvents()
         cityFatInsertBenchmarks.runIssues()
 
-//        if(runBenchmarks)
-//            benchmarkRunnerService.runBenchMarks()
-
         System.exit(0)
     }
 

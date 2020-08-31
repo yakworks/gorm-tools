@@ -109,7 +109,10 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
             //logMessage "insertRow setProperties"
             ((WebDataBinding)instance).setProperties(row)
         } else if(binderType.startsWith('gorm-tools')) {
+            //println "row"
+            //println row
             repository.bind([:], instance, row, BindAction.Create)
+            // println "instance.latitude ${instance["latitude"]}"
             //entityMapBinder.bind(instance, row)
         } else if(binderType == 'settersStatic') {
             instance.invokeMethod('setProps', row)
@@ -206,7 +209,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
     void cleanup(Class domainClass, Integer dataSize) {
         if(createAction.startsWith('save')){
             Integer rowCount = GormEnhancer.findStaticApi(domainClass).count()
-            assert dataSize == rowCount
+            // assert dataSize == rowCount
             withTrx { status ->
                 domainClass.executeUpdate("delete from ${domainClass.getSimpleName()}".toString())
                 flushAndClear(status)

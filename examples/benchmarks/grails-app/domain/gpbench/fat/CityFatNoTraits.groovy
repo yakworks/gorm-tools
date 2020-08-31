@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
- * Single version of without traits
+ * Without traits and nullable: false on associations
  */
 @GrailsCompileStatic
 class CityFatNoTraits {
@@ -92,9 +92,9 @@ class CityFatNoTraits {
         date4 nullable: true
     }
 
-    static mapping = {
-        id generator: "native"
-    }
+    // static mapping = {
+    //     id generator: "native"
+    // }
 
     String toString() { name }
 

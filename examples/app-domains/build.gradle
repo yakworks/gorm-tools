@@ -30,8 +30,6 @@ dependencies {
 
   compile project(":gorm-tools")
 
-  runtime "com.h2database:h2"
-  runtime "com.zaxxer:HikariCP:3.4.5"
 }
 
 bootRun {

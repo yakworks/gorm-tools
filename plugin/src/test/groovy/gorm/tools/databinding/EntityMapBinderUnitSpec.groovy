@@ -160,6 +160,71 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.active == true
     }
 
+    void "test bind boolean val"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [active: true]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.active == true
+
+        when:
+        params = [active: false]
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.active == false
+
+        when:
+        params = [active: 0]
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.active == false
+
+        when:
+        params = [active: 1]
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.active == true
+    }
+
+    @IgnoreRest
+    void "test bind BigDecimal"() {
+        TestDomain testDomain = new TestDomain()
+        Map params = [amount: '99.999']
+
+        when:
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.amount == 99.999
+
+        when:
+        params = [amount: 99.999]
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.amount == 99.999
+
+        when:
+        params = [amount: 99]
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.amount == 99.00
+
+        when:
+        params = [amount: '99']
+        binder.bind(testDomain, params)
+
+        then:
+        testDomain.amount == 99.00
+    }
+
     void "test trimStrings and convertEmptyStringsToNull"() {
         given:
         TestDomain testDomain = new TestDomain()
@@ -408,6 +473,7 @@ class TestDomain {
     String name
     String notBindable
     Long age
+    BigDecimal amount
     Date dobDate
     LocalDate localDate
     LocalDateTime localDateTime

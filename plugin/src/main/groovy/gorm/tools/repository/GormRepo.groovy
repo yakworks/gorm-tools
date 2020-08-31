@@ -158,7 +158,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     void bindAndSave(Map args, D entity, Map data, BindAction bindAction){
         args['bindAction'] = bindAction
         bind(args, entity, data, bindAction)
-        //set the id if it has oone in data
+        //set the id if it has one in data and bindId arg is passed in as true
         if(args.remove('bindId') && BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
         args['data'] = data
         doPersist(args, entity)

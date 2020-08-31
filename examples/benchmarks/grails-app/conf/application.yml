@@ -6,11 +6,6 @@ grails:
     spring:
         transactionManagement:
             proxies: false
-    gorm:
-        reactor:
-            # Whether to translate GORM events into Reactor events
-            # Disabled by default for performance reasons
-            events: false
     databinding:
         dateFormats: ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd'] #, 'yyyy-MM-dd', 'yyyy-MM-dd HH:mm:ss.S',"yyyy-MM-dd'T'HH:mm:ss'Z'","yyyy-MM-dd HH:mm:ss.S z","yyyy-MM-dd'T'HH:mm:ss.SSSX
 info:
@@ -106,6 +101,7 @@ hibernate:
         batch_versioned_data: true
 
 dataSource:
+    type: com.zaxxer.hikari.HikariDataSource
     pooled: true
     jmxExport: false
     driverClassName: org.h2.Driver
@@ -130,21 +126,9 @@ environments:
             # url: jdbc:h2:./prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
             properties:
                 jmxEnabled: true
-                initialSize: 5
-                maxActive: 50
-                minIdle: 5
-                maxIdle: 25
-                maxWait: 10000
-                maxAge: 600000
-                timeBetweenEvictionRunsMillis: 5000
-                minEvictableIdleTimeMillis: 60000
-                validationQuery: SELECT 1
-                validationQueryTimeout: 3
-                validationInterval: 15000
-                testOnBorrow: true
-                testWhileIdle: true
-                testOnReturn: false
-                jdbcInterceptors: ConnectionState
+                connectionTimeout: 10000 # Default: 30000 (30 seconds)
+                maxLifetime: 900000 # Default: 1800000 (30 minutes) should match DB's connection time limit
+                # connectionTestQuery: SELECT 1 # If your driver supports JDBC4 we strongly recommend not setting this property.
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
 
 # Config for MySQL
@@ -155,7 +139,6 @@ environments:
 #        dataSource:
 #            dbCreate: create-drop
 #            url: jdbc:mysql://localhost:3306/benchmarks
-#
 #            driverClassName: com.mysql.jdbc.Driver
 #            username: root
 #            password: ''

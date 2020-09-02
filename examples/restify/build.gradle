@@ -55,9 +55,9 @@ dependencies {
 
     //runtime "org.glassfish.web:el-impl:2.1.2-b03"
 
-    compile 'org.grails.plugins:grails-java8:1.2.3'
-
-    compile "org.codehaus.gpars:gpars:1.2.0"
+    // compile 'org.grails.plugins:grails-java8:1.2.3'
+    //
+    // compile "org.codehaus.gpars:gpars:1.2.0"
 
     // compileOnly "org.grails.plugins:views-json:$versionViews"
     // compileOnly "org.grails.plugins:views-json-templates:$versionViews"

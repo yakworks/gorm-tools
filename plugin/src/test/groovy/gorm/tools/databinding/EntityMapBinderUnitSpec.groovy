@@ -192,7 +192,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.active == true
     }
 
-    @IgnoreRest
+    // @IgnoreRest
     void "test bind BigDecimal"() {
         TestDomain testDomain = new TestDomain()
         Map params = [amount: '99.999']

@@ -8,6 +8,8 @@ github:
   fullName: yakworks/gorm-tools
 git:
   releasableBranchRegex: master|release/.+
+releaseNotes:
+  file: docs/release-notes.md
 
 team:
   developers: ['basejump: Joshua Burnett', 'snimavat: Sudhir Nimavat', 'alexeyzvegintcev: Alexey']
@@ -25,6 +27,3 @@ maven:
 codenarc:
   main:
     excludes: ['**/BootStrap.*', '**/UrlMappings.*']
-# using bash scripts to do`docs so disable in shipyak
-docs:
-  enabled: false

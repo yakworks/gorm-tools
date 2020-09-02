@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     //classpath "org.grails.plugins:hibernate5:${gormVersion-".RELEASE"}"
-    classpath "org.yakworks:gradle-plugins:1.1.14"
+    classpath "org.yakworks:gradle-plugins:1.2.0"
   }
 }
 
@@ -20,6 +20,29 @@ subprojects {
     targetCompatibility = '1.8'
 
     dependencies {
+      compile "org.springframework.boot:spring-boot-starter-logging"
+      compile "org.springframework.boot:spring-boot-autoconfigure"
+      compile "org.grails:grails-core"
+      compile "org.springframework.boot:spring-boot-starter-tomcat"
+
+      compile "org.grails:grails-web-boot"
+
+      // compile "org.grails:grails-plugin-url-mappings"
+      compile "org.grails:grails-logging"
+      compile "org.grails:grails-plugin-databinding"
+      compile "org.grails:grails-plugin-services"
+
+      compile 'org.grails.plugins:grails-java8:1.2.3'
+
+      compile "org.grails.plugins:events"
+
+      compile "org.grails.plugins:hibernate5"
+      compile "org.hibernate:hibernate-core:$versionHibernate"
+      compile "org.hibernate:hibernate-ehcache:$versionHibernate"
+
+      compile "org.codehaus.gpars:gpars:1.2.1"
+      compile "org.apache.commons:commons-lang3:3.11"
+
       runtime "com.h2database:h2"
       runtime "com.zaxxer:HikariCP:3.4.5"
       // testRuntime "com.h2database:h2"

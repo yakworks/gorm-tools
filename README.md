@@ -32,7 +32,7 @@
 
 
 ```
-compile "org.grails.plugins:gorm-tools:6.1.12-v.1"
+compile "org.grails.plugins:gorm-tools:6.1.12-v.2"
 ``` 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 

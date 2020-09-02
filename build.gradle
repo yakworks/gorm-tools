@@ -45,8 +45,6 @@ subprojects {
 
       runtime "com.h2database:h2"
       runtime "com.zaxxer:HikariCP:3.4.5"
-      // testRuntime "com.h2database:h2"
-      // testRuntime "com.zaxxer:HikariCP:3.4.5"
 
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"

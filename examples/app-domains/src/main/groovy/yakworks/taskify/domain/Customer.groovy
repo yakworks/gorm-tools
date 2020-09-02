@@ -10,6 +10,7 @@ class Customer implements Serializable {
     String timezone
 
     static quickSearchFields = ["name", "num"]
+
     static constraints = {
         name nullable: false
     }

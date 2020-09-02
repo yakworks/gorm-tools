@@ -31,7 +31,7 @@ repo_url: https://github.com/yakworks/gorm-tools
 edit_uri: edit/master/docs/
 
 extra:
-  version: '6.1.12-v.1' #'@version@'
+  version: '6.1.12-v.2' #'@version@'
   # adds <meta name="robots" content="noindex,nofollow"> to keep search engines from indexing this
   # noindex: true
   palette:

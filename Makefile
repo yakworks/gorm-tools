@@ -3,7 +3,8 @@ MAKEFLAGS += -rR
 # -- bin and sh scripts --
 build.sh := ./build.sh
 DB_VENDOR := h2
-
+# call it first to git clone the build/bn
+shResults := $(shell $(build.sh))
 # include boilerplate to set BUILD_ENV and DB from targets
 include ./build/bin/Makefile-env-db.make
 # calls the build.sh makeEnvFile to build the vairables file for make, recreates each make run

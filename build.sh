@@ -11,13 +11,9 @@ set -e
 # import build_functions.sh which has the the other source imports for functions
 source build/bin/all.sh
 
-# build vars
-setVar PROJECT_NAME 'gorm-tools'
-
-create_yml_variables gradle/build.yml
-setVar RELEASABLE_BRANCHES "$git_releasableBranchRegex"
-setVar GITHUB_FULLNAME "$github_fullName"
-setVar CHANGELOG_NAME "docs/release-notes.md"
+# default init from yml file
+init_from_build_yml "gradle/build.yml"
+# echo "PROJECT_NAME $PROJECT_NAME"
 
 # cats key files into a cache-checksum.tmp file for circle to use as key
 # change this based on how project is structured

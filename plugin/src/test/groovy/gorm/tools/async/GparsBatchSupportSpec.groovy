@@ -19,6 +19,7 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
     List<Class> getDomainClasses() { [Foo] }
 
     void setup() {
+
         //asyncSupport = ctx.getBean("asyncSupport")
     }
 

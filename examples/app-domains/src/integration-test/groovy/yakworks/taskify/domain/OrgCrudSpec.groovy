@@ -7,7 +7,7 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
-class OrgSpec extends Specification implements DataIntegrationTest {
+class OrgCrudSpec extends Specification implements DataIntegrationTest {
 
     def "test Contact create"(){
         when:

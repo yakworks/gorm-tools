@@ -1,3 +1,4 @@
+
 [![CircleCI](https://img.shields.io/circleci/project/github/yakworks/gorm-tools/master.svg?longCache=true&style=for-the-badge&logo=circleci)](https://circleci.com/gh/yakworks/gorm-tools)
 [![9ci](https://img.shields.io/badge/BUILT%20BY-9ci%20Inc-blue.svg?longCache=true&style=for-the-badge)](http://9ci.com)
 <img src="https://forthebadge.com/images/badges/built-with-love.svg" height="28">
@@ -31,7 +32,7 @@
 
 
 ```
-compile "org.grails.plugins:gorm-tools:6.1.12-v.1"
+compile "org.grails.plugins:gorm-tools:6.1.12-v.2"
 ``` 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 

@@ -99,6 +99,7 @@ class GormUtils {
      * @param map
      */
     static void setPropertiesFromMap(Object target, Map map){
+
         map.each { key, val ->
             String skey = key as String
             if (target.hasProperty(skey)) {

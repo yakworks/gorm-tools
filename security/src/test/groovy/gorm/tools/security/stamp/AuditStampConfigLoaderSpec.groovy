@@ -1,6 +1,6 @@
 package gorm.tools.security.stamp
 
-import gorm.AuditStampConfigLoader
+import gorm.tools.compiler.stamp.AuditStampConfigLoader
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -16,7 +16,7 @@ class AuditStampConfigLoaderSpec extends Specification {
         Files.copy(source.toPath(), destination.toPath())
         assert destination.exists()
 
-        loader._CO = null
+        loader.stampConfig = null
 
         when: "Load from classpath"
         Map config = loader.load()
@@ -36,7 +36,7 @@ class AuditStampConfigLoaderSpec extends Specification {
 
         Files.copy(source.toPath(), destination.toPath())
 
-        loader._CO = null
+        loader.stampConfig = null
 
         when: "Load from conf/audit-trail-config.groovy"
         Map config = loader.load()
@@ -53,7 +53,7 @@ class AuditStampConfigLoaderSpec extends Specification {
         setup: "Move audit-trail-config.groovy to classpath"
         File source = new File("src/test/resources/test-config.groovy")
 
-        loader._CO = null
+        loader.stampConfig = null
 
         when: "Load from application.groovy"
         Map config = loader.load()

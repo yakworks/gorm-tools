@@ -4,21 +4,13 @@
 */
 package gorm.tools.security
 
-import gorm.AuditStampConfigLoader
-import gorm.FieldProps
+import gorm.tools.compiler.stamp.AuditStampConfigLoader
+import gorm.tools.compiler.stamp.FieldProps
+import gorm.tools.security.stamp.GormToolsAuditStampListener
 import grails.plugin.springsecurity.SpringSecurityUtils
-import gorm.tools.security.stamp.AuditStampEventListener
 import grails.plugins.Plugin
 
 class GormToolsSecurityGrailsPlugin extends Plugin {
-    def grailsVersion = "3.3.10 > *"
-
-    def title = "Rally Security"
-    def author = "Your name"
-    def authorEmail = ""
-    def description = "Brief summary/description of the plugin."
-
-    def documentation = "http://grails.org/plugin/rally-security"
 
     def loadAfter = ['spring-security-core', 'spring-security-ldap', 'spring-security-rest', 'gorm-tools', 'datasource']
     def pluginExcludes = ["**/init/**"]
@@ -45,7 +37,7 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
             if (grailsApplication.config.grails.plugin.audittrail.enabled ){
                 Map fprops = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
 
-                auditStampEventListener(AuditStampEventListener, ref('hibernateDatastore')) {
+                gormToolsAuditStampListener(GormToolsAuditStampListener, ref('hibernateDatastore')) {
                     grailsApplication = grailsApplication
                     springSecurityService = ref("springSecurityService")
                     fieldProps = fprops

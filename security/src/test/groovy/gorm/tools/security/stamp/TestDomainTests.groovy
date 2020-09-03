@@ -1,11 +1,11 @@
 package gorm.tools.security.stamp
 
-import gorm.AuditStamp
+import gorm.tools.AuditStamp
+import gorm.tools.testing.unit.DomainRepoTest
 import grails.persistence.Entity
-import grails.testing.gorm.DomainUnitTest
 import spock.lang.Specification
 
-class TestDomainTests extends Specification implements DomainUnitTest<TestDomain> {
+class TestDomainTests extends Specification implements DomainRepoTest<TestDomain> {
 
     void testBasics() {
         when:
@@ -21,7 +21,7 @@ class TestDomainTests extends Specification implements DomainUnitTest<TestDomain
     void test_new_bindable_SanityCheck() {
         when: "binding occurs"
         TestDomain d = new TestDomain()
-        d.prperties = [name:'test', createdBy:99, editedBy:99]
+        d.properties = [name: 'test', createdBy:99, editedBy:99]
 
         then: "should not have been bound"
         //assert config.grails.plugin.audittrail

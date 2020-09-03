@@ -9,10 +9,16 @@ import gorm.tools.security.domain.SecUser
 import gorm.tools.security.testing.SecuritySpecUnitTestHelper
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.hibernate.AutoHibernateSpec
+import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.Specification
 
-class UserSpec extends AutoHibernateSpec<SecUser> implements SecuritySpecUnitTestHelper {
+class UserSpec extends Specification implements DomainRepoTest<SecUser>, SecuritySpecUnitTestHelper {
 
-    List<Class> getDomainClasses() { [SecUser, SecRole, SecRoleUser] }
+    // List<Class> getDomainClasses() { [SecUser, SecRole, SecRoleUser] }
+    void setupSpec() {
+        //mockDomain Person
+        mockDomains SecUser, SecRole, SecRoleUser
+    }
 
     String genRandomEmail(){
         String ename = RandomStringUtils.randomAlphabetic(10)

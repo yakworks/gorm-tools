@@ -22,15 +22,15 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.context.ApplicationEvent
 import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.AuditStamp
-import gorm.FieldProps
+import gorm.tools.AuditStamp
+import gorm.tools.compiler.stamp.FieldProps
 import grails.core.GrailsApplication
-import grails.core.GrailsDomainClass
+import grails.core.GrailsClass
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.util.GrailsClassUtils
 
 @CompileStatic
-class AuditStampEventListener extends AbstractPersistenceEventListener {
+class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditTrailStamp'
 
     GrailsApplication grailsApplication
@@ -41,14 +41,14 @@ class AuditStampEventListener extends AbstractPersistenceEventListener {
 
     private Closure<Serializable> currentUserClosure
 
-    protected AuditStampEventListener(Datastore datastore) {
+    protected GormToolsAuditStampListener(Datastore datastore) {
         super(datastore)
     }
 
     @PostConstruct
     void init() {
-        GrailsDomainClass[] domains = grailsApplication.getArtefacts(DomainClassArtefactHandler.TYPE) as GrailsDomainClass[]
-        for (GrailsDomainClass domain : domains) {
+        GrailsClass[] domains = grailsApplication.getArtefacts(DomainClassArtefactHandler.TYPE)
+        for (GrailsClass domain : domains) {
             if (isAuditStamped(domain.clazz)) auditStampedEntities << domain.clazz.name
         }
 

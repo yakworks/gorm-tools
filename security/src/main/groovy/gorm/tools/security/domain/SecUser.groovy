@@ -8,11 +8,12 @@ import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
+import gorm.tools.AuditStamp
 import gorm.tools.beans.AppCtx
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@gorm.AuditStamp
+@AuditStamp
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='login', useCanEqual=false)
 @ToString(includes='login', includeNames=true, includePackage=false)

@@ -4,7 +4,7 @@ package gorm.tools.security.stamp
 import org.grails.config.PropertySourcesConfig
 import org.grails.testing.GrailsUnitTest
 
-import gorm.FieldProps
+import gorm.tools.compiler.stamp.FieldProps
 import spock.lang.Specification
 
 class FieldPropsTests extends Specification implements GrailsUnitTest {
@@ -25,7 +25,9 @@ class FieldPropsTests extends Specification implements GrailsUnitTest {
         assert fmap.get("createdBy").name == "blah"
         assert fmap.get("createdBy").type == Long
 
-        assert fmap.get("createdDate") == null
+        // these come from defaults as they are not in the config
+        assert fmap.get("createdDate").name == "createdDate"
+        assert fmap.get("createdDate").type == Date
         //FieldProps.buildFieldMap()
     }
 

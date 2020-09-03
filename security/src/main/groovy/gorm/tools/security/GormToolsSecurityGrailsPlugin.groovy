@@ -5,7 +5,9 @@
 package gorm.tools.security
 
 import gorm.AuditStampConfigLoader
+import gorm.FieldProps
 import grails.plugin.springsecurity.SpringSecurityUtils
+import gorm.tools.security.stamp.AuditStampEventListener
 import grails.plugins.Plugin
 
 class GormToolsSecurityGrailsPlugin extends Plugin {
@@ -41,7 +43,7 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
 
             //dont register beans if audit trail is disabled.
             if (grailsApplication.config.grails.plugin.audittrail.enabled ){
-                Map fprops = gorm.FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
+                Map fprops = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
 
                 auditStampEventListener(AuditStampEventListener, ref('hibernateDatastore')) {
                     grailsApplication = grailsApplication

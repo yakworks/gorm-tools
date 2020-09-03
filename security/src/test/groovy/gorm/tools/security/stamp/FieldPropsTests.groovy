@@ -1,8 +1,10 @@
 package gorm.tools.security.stamp
 
-import gorm.FieldProps
+
 import org.grails.config.PropertySourcesConfig
 import org.grails.testing.GrailsUnitTest
+
+import gorm.FieldProps
 import spock.lang.Specification
 
 class FieldPropsTests extends Specification implements GrailsUnitTest {

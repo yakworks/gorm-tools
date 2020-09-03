@@ -1,4 +1,4 @@
-package gorm;
+package gorm.tools.compiler.stamp;
 
 import java.util.HashMap;
 import java.util.Map;

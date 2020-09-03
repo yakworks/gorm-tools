@@ -1,4 +1,4 @@
-package gorm;
+package gorm.tools.compiler.stamp;
 
 import groovy.util.ConfigObject;
 import org.codehaus.groovy.ast.*;
@@ -56,7 +56,7 @@ public class AuditStampASTTransformation implements ASTTransformation {
     }
 
     public void addDisableAuditStampField(ClassNode classNode) {
-        classNode.addField("disableAuditTrailStamp", Modifier.PUBLIC | Modifier.STATIC, new ClassNode(java.lang.Boolean.class), ConstantExpression.FALSE);
+        classNode.addField("disableAuditTrailStamp", Modifier.PUBLIC | Modifier.STATIC, new ClassNode(Boolean.class), ConstantExpression.FALSE);
     }
 
     public void createUserField(ClassNode classNode, FieldProps fieldProps) {
@@ -99,7 +99,7 @@ public class AuditStampASTTransformation implements ASTTransformation {
     }
 
     public void createStaticClosure(ClassNode classNode, String name) {
-        FieldNode field = new FieldNode(name, ACC_PUBLIC | ACC_STATIC, new ClassNode(java.lang.Object.class), new ClassNode(classNode.getClass()), null);
+        FieldNode field = new FieldNode(name, ACC_PUBLIC | ACC_STATIC, new ClassNode(Object.class), new ClassNode(classNode.getClass()), null);
         ClosureExpression expr = new ClosureExpression(Parameter.EMPTY_ARRAY, new BlockStatement());
         expr.setVariableScope(new VariableScope());
         field.setInitialValueExpression(expr);

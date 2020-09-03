@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package grails.plugin.audittrail
+package gorm.tools.security.stamp
 
 import javax.annotation.PostConstruct
 
@@ -127,6 +127,7 @@ class AuditStampEventListener extends AbstractPersistenceEventListener {
         return value == null
     }
 
+    @CompileDynamic
     Serializable getCurrentUserId() {
         return currentUserClosure(grailsApplication.mainContext)
     }

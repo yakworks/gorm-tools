@@ -1,8 +1,6 @@
 package gorm.tools.security.stamp
 
 import gorm.AuditStampConfigLoader
-import org.springframework.util.FileCopyUtils
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import java.nio.file.Files

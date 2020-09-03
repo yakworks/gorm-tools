@@ -7,3 +7,5 @@ grails {
         '*'(nullable:true)
     }
 }
+
+gorm.tools.security.user.table = 'Users'

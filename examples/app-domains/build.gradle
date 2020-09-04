@@ -19,6 +19,7 @@ dependencies {
   compile 'org.grails.plugins:external-config:1.2.2'
 
   compile project(":gorm-tools")
+  compile project(":gorm-tools-security")
 
 }
 

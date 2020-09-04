@@ -19,27 +19,23 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
         { ->
             def securityConf = SpringSecurityUtils.securityConfig
             if (securityConf.active) {
-                passwordValidator(PasswordValidator){ bean ->
-                    bean.autowire = "byName"
-                }
+                passwordValidator(PasswordValidator)
+
                 passwordEncoder(grails.plugin.springsecurity.authentication.encoding.BCryptPasswordEncoder, 10)
+                //overrrides the spring sec's userDetailsService
+                userDetailsService(SecUserDetailsService)
 
-                userDetailsService(RallyUserDetailsService)
-
-                nineLoginHandler(RallyLoginHandler) { bean ->
-                    bean.autowire = "byName"
-                }
-                rallyLogoutHandler(RallyLogoutHandler)
-                authenticationDetailsSource(RallyAuthenticationDetailsSource)
+                secLoginHandler(SecLoginHandler)
+                secLogoutHandler(SecLogoutHandler)
+                // authenticationDetailsSource(RallyAuthenticationDetailsSource)
             }
 
             //dont register beans if audit trail is disabled.
-            if (grailsApplication.config.grails.plugin.audittrail.enabled ){
+            if (config.getProperty('grails.plugin.audittrail.enabled', Boolean, true)) {
                 Map fprops = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
 
-                gormToolsAuditStampListener(GormToolsAuditStampListener, ref('hibernateDatastore')) {
-                    grailsApplication = grailsApplication
-                    springSecurityService = ref("springSecurityService")
+                gormToolsAuditStampListener(GormToolsAuditStampListener, ref('hibernateDatastore')) { bean ->
+                    bean.lazyInit = true
                     fieldProps = fprops
                 }
             }

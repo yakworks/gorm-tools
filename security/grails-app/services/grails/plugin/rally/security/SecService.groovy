@@ -10,6 +10,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.web.util.WebUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.AuthenticationTrustResolver
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -34,7 +35,9 @@ import grails.plugin.springsecurity.userdetails.GrailsUser
 @CompileStatic
 class SecService {
 
+    @Autowired
     SpringSecurityService springSecurityService
+    @Autowired
     AuthenticationTrustResolver authenticationTrustResolver
 
     /**
@@ -65,9 +68,11 @@ class SecService {
     /**
      * Gets the currently logged in user id from principal
      */
-    @CompileDynamic
+    //@CompileDynamic
     Long getUserId() {
-        springSecurityService.getPrincipal()?.id?.toLong()
+        if (principal instanceof GrailsUser) {
+            return (principal as GrailsUser).id as Long
+        }
     }
 
     /**
@@ -76,7 +81,11 @@ class SecService {
      * @return the user
      */
     SecUser getUser() {
-        return (SecUser) springSecurityService.getCurrentUser()
+        if (!isLoggedIn()) {
+            return null
+        }
+        Long userId = getUserId()
+        return SecUser.get(userId)
     }
 
     /**
@@ -187,8 +196,8 @@ class SecService {
     static void loginAsSystemUser() {
         SecUser user = SecUser.get(1)
         List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMINISTRATOR] as String[])
-        GrailsUser grailsUser = new GrailsUser(user.login, user.passwd, user.enabled, true, !user.mustChangePassword, true, authorities, user.id)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwd, authorities)
+        GrailsUser grailsUser = new GrailsUser(user.login, user.password, user.enabled, true, !user.mustChangePassword, true, authorities, user.id)
+        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.password, authorities)
     }
 
     @CompileDynamic

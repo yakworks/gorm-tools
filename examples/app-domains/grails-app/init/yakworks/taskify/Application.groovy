@@ -19,4 +19,10 @@ class Application extends GrailsAutoConfiguration {
         false
     }
 
+    // in order to pick up the gorm domains that are marked with @Entity this needs to be set.
+    @Override
+    Collection<String> packageNames() {
+        super.packageNames() + ['gorm.tools.security']
+    }
+
 }

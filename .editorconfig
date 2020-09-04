@@ -39,7 +39,7 @@ indent_size = 2
 [*.{groovy,java,gsp,jsp,kt,kts}]
 indent_style = space
 indent_size = 4
-continuation_indent_size = 8
+continuation_indent_size = 4
 
 [*.gradle]
 indent_style = space

@@ -6,7 +6,6 @@ package gorm.tools.security.stamp
 
 import javax.annotation.PostConstruct
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.core.artefact.DomainClassArtefactHandler
@@ -19,6 +18,7 @@ import org.grails.datastore.mapping.engine.event.PreInsertEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
 import org.grails.datastore.mapping.engine.event.ValidationEvent
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
 import org.springframework.core.annotation.AnnotationUtils
 
@@ -26,20 +26,19 @@ import gorm.tools.AuditStamp
 import gorm.tools.compiler.stamp.FieldProps
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
-import grails.plugin.springsecurity.SpringSecurityService
+import grails.plugin.rally.security.SecService
 import grails.util.GrailsClassUtils
 
 @CompileStatic
 class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditTrailStamp'
 
-    GrailsApplication grailsApplication
-    SpringSecurityService springSecurityService
+
+    @Autowired GrailsApplication grailsApplication
+    @Autowired SecService secService
 
     final Set<String> auditStampedEntities = [] as Set
     Map<String, FieldProps> fieldProps
-
-    private Closure<Serializable> currentUserClosure
 
     protected GormToolsAuditStampListener(Datastore datastore) {
         super(datastore)
@@ -51,8 +50,7 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
         for (GrailsClass domain : domains) {
             if (isAuditStamped(domain.clazz)) auditStampedEntities << domain.clazz.name
         }
-
-        initCurrentUserClosure()
+        //initCurrentUserClosure()
     }
 
     //check if the given domain class should be audit stamped.
@@ -127,26 +125,8 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
         return value == null
     }
 
-    @CompileDynamic
     Serializable getCurrentUserId() {
-        return currentUserClosure(grailsApplication.mainContext)
-    }
-
-    @CompileDynamic
-    void initCurrentUserClosure() {
-        Closure configClosure = grailsApplication.config.getProperty(FieldProps.CONFIG_KEY + ".currentUserClosure", Closure)
-        if (configClosure) {
-            currentUserClosure = configClosure
-        }
-        else {
-            currentUserClosure = {
-                if (springSecurityService.isLoggedIn()) {
-                    return springSecurityService.principal.id
-                } else {
-                    return 0L //fall back
-                }
-            }
-        }
+        return secService.getUserId()
     }
 
     @Override

@@ -4,9 +4,10 @@
 */
 package gorm.tools.security
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
@@ -14,11 +15,15 @@ import org.springframework.security.authentication.encoding.PasswordEncoder
 
 import gorm.tools.security.domain.SecPasswordHistory
 import gorm.tools.security.domain.SecUser
+import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 
 @CompileStatic
 class PasswordValidator {
+    @Autowired
     MessageSource messageSource
+    @Autowired
+    PasswordEncoder passwordEncoder
 
     @Value('${grails.plugin.rally.security.password.minLength:4}')
     Integer passwordMinLength
@@ -40,8 +45,6 @@ class PasswordValidator {
 
     @Value('${grails.plugin.rally.security.password.historyLength:4}')
     int passwordHistoryLength
-
-    PasswordEncoder passwordEncoder
 
     private String message(String key, def ...args) {
         messageSource.getMessage(key, args as Object[], key, LocaleContextHolder.locale)
@@ -83,7 +86,7 @@ class PasswordValidator {
     /**
      * Check if the password exists in user's password history
      */
-    @CompileDynamic
+    @GrailsCompileStatic
     @Transactional(readOnly = true)
     boolean passwordExistInHistory(SecUser user, String password) {
         List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.findAllByUser(user)

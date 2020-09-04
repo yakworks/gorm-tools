@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.web.util.WebUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.security.authentication.event.AbstractAuthenticationEvent
@@ -23,7 +24,8 @@ import grails.plugin.springsecurity.userdetails.GrailsUser
  * tracks user logins and sets flag if password expiry warning should be displayed.
  */
 @CompileStatic
-class RallyLoginHandler implements ApplicationListener<AbstractAuthenticationEvent> {
+class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent> {
+    @Autowired
     UserService userService
 
     @Value('${grails.plugin.rally.security.password.expireEnabled:false}')

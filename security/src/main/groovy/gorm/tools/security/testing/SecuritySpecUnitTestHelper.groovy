@@ -38,8 +38,8 @@ trait SecuritySpecUnitTestHelper {
         roles = roles.collect { "ROLE_" + it}
         List authorities = AuthorityUtils.createAuthorityList(roles)
 
-        GrailsUser grailsUser = new GrailsUser(user.login, user.passwd, user.enabled, true, !user.mustChangePassword, true, authorities, user.id)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwd, authorities)
+        GrailsUser grailsUser = new GrailsUser(user.login, user.password, user.enabled, true, !user.mustChangePassword, true, authorities, user.id)
+        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.password, authorities)
     }
 
 }

@@ -9,7 +9,7 @@ grails {
             userLookup.authoritiesPropertyName = 'roles'
             userLookup.authorityJoinClassName = 'gorm.tools.security.domain.SecRoleUser'
             userLookup.enabledPropertyName = 'enabled'
-            userLookup.passwordPropertyName = 'passwd'
+            userLookup.passwordPropertyName = 'password'
             userLookup.userDomainClassName = 'gorm.tools.security.domain.SecUser'
             userLookup.usernamePropertyName = 'login'
             userLookup.accountExpiredPropertyName = null
@@ -20,7 +20,7 @@ grails {
             password.algorithm = 'MD5'
             securityConfigType = "InterceptUrlMap"
             adh.errorPage = null //null out so it can be custom
-            logout.handlerNames = ['rememberMeServices', 'rallyLogoutHandler']
+            logout.handlerNames = ['rememberMeServices', 'secLogoutHandler']
 
             //events
             useSecurityEventListener = true

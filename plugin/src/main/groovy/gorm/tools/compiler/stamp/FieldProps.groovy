@@ -35,7 +35,7 @@ class FieldProps {
 
     private static Object getConfigValue(Map config, String key, Object defaultValue) {
         //System.out.println(key + ":" + defaultValue.toString() + ":" + config.get(key))
-        return (config.containsKey(key)) ? config.get(key) : defaultValue
+        return (config?.containsKey(key)) ? config.get(key) : defaultValue
     }
 
     static FieldProps init(String defaultName, String defaultType, String defaultCons, String defaultMapping, Map configObj) {
@@ -62,12 +62,12 @@ class FieldProps {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Class " + className + " could not be found for audittrail setting " + defaultName)
         }
-        if (map.containsKey("constraints")) {
+        if (map?.containsKey("constraints")) {
             newField.constraints = (String) map.get("constraints")
         } else {
             newField.constraints = defaultCons
         }
-        if (map.containsKey("mapping")) {
+        if (map?.containsKey("mapping")) {
             newField.mapping = (String) map.get("mapping")
         }
         // System.out.println("newField: " + newField)
@@ -90,6 +90,7 @@ class FieldProps {
         Map map = configMap
         for (String key : keys) {
             Object val = map.get(key)
+            // println "key: $key , val: $val"
             if (val != null) {
                 //System.out.println("got a key for are " +key)
                 if (val instanceof Map) {
@@ -98,7 +99,7 @@ class FieldProps {
                     return val
                 }
             } else {
-                return Collections.emptyMap()
+                return null
             }
         }
         return map

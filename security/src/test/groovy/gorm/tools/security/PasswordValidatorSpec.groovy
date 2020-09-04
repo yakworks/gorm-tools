@@ -10,7 +10,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
     void setup() {
         mockDomain(SecUser)
-        new SecUser(name: "admin", login:"admin", email:"admin@9ci.com", passwd: "test").save()
+        new SecUser(name: "admin", login:"admin", email:"admin@9ci.com", password: "test").save()
     }
 
     void test_validate() {

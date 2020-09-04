@@ -12,11 +12,10 @@ import gorm.tools.testing.hibernate.AutoHibernateSpec
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
-class UserSpec extends Specification implements DomainRepoTest<SecUser>, SecuritySpecUnitTestHelper {
+class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, SecuritySpecUnitTestHelper {
 
     // List<Class> getDomainClasses() { [SecUser, SecRole, SecRoleUser] }
     void setupSpec() {
-        //mockDomain Person
         mockDomains SecUser, SecRole, SecRoleUser
     }
 
@@ -41,9 +40,9 @@ class UserSpec extends Specification implements DomainRepoTest<SecUser>, Securit
         args = buildMap(args)
         args << [password:'secretStuff', repassword:'secretStuff']
         entity = SecUser.create(args)
-        //We have to add 'passwd' field manually, because it has the "bindable: false" constraint
-        entity.passwd = 'test_pass_123'
-        entity.persist()
+        //We have to add 'password' field manually, because it has the "bindable: false" constraint
+        entity.password = 'test_pass_123'
+        entity.persist(flush: true)
 
         get(entity.id)
     }
@@ -51,7 +50,7 @@ class UserSpec extends Specification implements DomainRepoTest<SecUser>, Securit
     @Override
     SecUser persistEntity(Map args){
         args.get('save', false) //adds save:false if it doesn't exists
-        args['passwd'] = "test"
+        args['password'] = "test"
         entity = build(buildMap(args))
         assert entity.persist(flush: true)
         return get(entity.id)

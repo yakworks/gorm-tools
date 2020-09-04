@@ -1,6 +1,6 @@
 package gorm.tools.security
 
-import gorm.tools.security.RallyUserDetailsService
+
 import gorm.tools.security.domain.SecUser
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.plugin.springsecurity.userdetails.GrailsUser
@@ -10,12 +10,13 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
-class RallyUserDetailsServiceSpec extends Specification implements DataIntegrationTest {
-    RallyUserDetailsService userDetailsService
+class SecUserDetailsServiceSpec extends Specification implements DataIntegrationTest {
+    SecUserDetailsService userDetailsService
 
     void testLoadUserByUsername() {
         when:
         SecUser.repo.create([name:"Karen", login:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])
+        flush()
         GrailsUser gUser = userDetailsService.loadUserByUsername('karen')
 
         then:

@@ -9,11 +9,13 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
+import gorm.tools.AuditStamp
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.taskify.domain.traits.NameNumConstraints
 import yakworks.taskify.domain.traits.NameNumTrait
 
+@AuditStamp
 @Entity
 @GrailsCompileStatic
 class Org implements NameNumTrait{
@@ -43,6 +45,7 @@ class Org implements NameNumTrait{
 
     //used for event testing
     String event
+    String stampEvent
 
     //enums
     Kind kind

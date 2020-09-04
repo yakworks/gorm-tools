@@ -21,7 +21,7 @@ import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
 
 @Slf4j
 @GrailsCompileStatic
-class RallyUserDetailsService implements GrailsUserDetailsService, GrailsApplicationAware {
+class SecUserDetailsService implements GrailsUserDetailsService, GrailsApplicationAware {
     GrailsApplication grailsApplication
 
     @Value('${grails.plugin.rally.security.password.expireDays:30}')
@@ -38,7 +38,7 @@ class RallyUserDetailsService implements GrailsUserDetailsService, GrailsApplica
             if (!user) {
                 throw new UsernameNotFoundException("User not found: $username")
             }
-            log.debug "Found user ${user} in the 9ci database"
+            log.debug "Found user ${user} in the database"
             Boolean mustChange = user.mustChangePassword
 
             if (passwordExpireEnabled) {
@@ -59,7 +59,7 @@ class RallyUserDetailsService implements GrailsUserDetailsService, GrailsApplica
             }
             // default
             // new GrailsUser(username, password, enabled, !accountExpired, !passwordExpired, !accountLocked, authorities, user.id)
-            new GrailsUser(user.login, user.passwd, user.enabled, true, !mustChange, true, authorities, user.id)
+            new GrailsUser(user.login, user.password, user.enabled, true, !mustChange, true, authorities, user.id)
         }
 
     }

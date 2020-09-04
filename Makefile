@@ -34,3 +34,9 @@ gorm-tools-security-check: ## run the docs server locally
 
 gorm-tools-security-int-test: ## runs ./gradlew integrationTest
 	./gradlew gorm-tools-security:integrationTest $(testArg)
+
+app-domain-unit-test: ## runs ./gradlew integrationTest
+	./gradlew app-domains:test $(testArg)
+
+app-domain-int-test: ## runs ./gradlew integrationTest
+	./gradlew app-domains:integrationTest $(testArg)

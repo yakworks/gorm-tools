@@ -6,11 +6,15 @@ package gorm.tools.compiler.stamp
 
 import java.lang.reflect.Modifier
 
+import groovy.transform.CompilationUnitAware
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.ast.ASTNode
+import org.codehaus.groovy.ast.AnnotationNode
+import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
+import org.codehaus.groovy.ast.GenericsType
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.PropertyNode
 import org.codehaus.groovy.ast.VariableScope
@@ -22,10 +26,15 @@ import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
 import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.control.CompilationUnit
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
+import org.grails.compiler.injection.GrailsASTUtils
+
+import gorm.tools.AuditStamp
+import gorm.tools.traits.AuditStampTrait
 
 import static org.codehaus.groovy.ast.MethodNode.ACC_PUBLIC
 import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
@@ -35,35 +44,77 @@ import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
  * properties to the subject class.
  */
 @CompileStatic
+@SuppressWarnings(['ThrowRuntimeException', 'CatchThrowable'])
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
-class AuditStampASTTransformation implements ASTTransformation {
+class AuditStampASTTransformation implements ASTTransformation, CompilationUnitAware  {
+    private static final ClassNode MY_TYPE = new ClassNode(AuditStamp)
     private ConfigObject stampCfg
 
     AuditStampASTTransformation() {
         stampCfg = new AuditStampConfigLoader().load()
     }
 
+    private CompilationUnit unit
+
+    // implements CompilationUnitAware
+    void setCompilationUnit(CompilationUnit unit) {
+        this.unit = unit
+    }
+
     void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
+        // println("stampCfg: " + stampCfg)
         Boolean enabled = (Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "enabled")
-        // System.out.println("AuditStampAST enabled: " + enabled)
+        //println("AuditStampAST enabled: " + enabled)
         if (enabled != null && enabled == false) return
 
-        Map<String, FieldProps> fprops = FieldProps.buildFieldMap(stampCfg)
-        // System.out.println("fprops: " + fprops)
-        for (ASTNode astNode : astNodes) {
-            if (astNode instanceof ClassNode) {
-                ClassNode classNode = (ClassNode) astNode
-                addDisableAuditStampField(classNode)
-                //debugFieldNodes(classNode)
-
-                createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
-                createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
-
-                createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
-                createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
-
-            }
+        if (!(astNodes[0] instanceof AnnotationNode) || !(astNodes[1] instanceof ClassNode)) {
+            throw new RuntimeException('Internal error: wrong types: $node.class / $parent.class')
         }
+
+        ClassNode classNode = (ClassNode) astNodes[1]
+        // println("AuditStampAST classNode: " + classNode)
+        AnnotationNode annotationNode = (AnnotationNode) astNodes[0]
+        if (MY_TYPE != annotationNode.getClassNode()) {
+            return
+        }
+        final ast = sourceUnit.getAST()
+        addTrait(classNode, AuditStampTrait)
+        addDisableAuditStampField(classNode)
+        //debugFieldNodes(classNode)
+        Map<String, FieldProps> fprops = FieldProps.buildFieldMap(stampCfg)
+        createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
+        createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
+
+        createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
+        createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
+
+    }
+
+    private static boolean addTrait(ClassNode classNode, Class traitClass) {
+        boolean traitsAdded = false;
+        boolean implementsTrait = false;
+        boolean traitNotLoaded = false;
+        ClassNode traitClassNode = ClassHelper.make(traitClass);
+        try {
+            implementsTrait = classNode.declaresInterface(traitClassNode);
+        } catch (Throwable e) {
+            // if we reach this point, the trait injector could not be loaded due to missing dependencies
+            // (for example missing servlet-api). This is ok, as we want to be able to compile against non-servlet
+            // environments.
+            traitNotLoaded = true;
+        }
+        if (!implementsTrait && !traitNotLoaded) {
+            final GenericsType[] genericsTypes = traitClassNode.getGenericsTypes();
+            final parameterNameToParameterValue = [:] as Map<String, ClassNode>
+            if(genericsTypes != null) {
+                for(GenericsType gt : genericsTypes) {
+                    parameterNameToParameterValue.put(gt.getName(), classNode);
+                }
+            }
+            classNode.addInterface(GrailsASTUtils.replaceGenericsPlaceholders(traitClassNode, parameterNameToParameterValue, classNode));
+            traitsAdded = true;
+        }
+        return traitsAdded;
     }
 
     public void addDisableAuditStampField(ClassNode classNode) {

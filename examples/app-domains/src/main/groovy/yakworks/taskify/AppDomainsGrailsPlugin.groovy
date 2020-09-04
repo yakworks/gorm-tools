@@ -3,7 +3,7 @@ package restify
 import grails.gorm.annotation.Entity
 import grails.plugins.Plugin
 
-class RestifyDomainsGrailsPlugin extends Plugin {
+class AppDomainsGrailsPlugin extends Plugin {
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.2.11 > *"

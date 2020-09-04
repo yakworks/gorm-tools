@@ -4,7 +4,6 @@
 */
 package gorm.tools.security.domain
 
-import groovy.transform.CompileDynamic
 
 import gorm.tools.compiler.GormRepository
 import gorm.tools.databinding.BindAction
@@ -12,6 +11,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoMessage
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
+import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import grails.compiler.GrailsCompileStatic
@@ -24,11 +24,45 @@ class SecUserRepo implements GormRepo<SecUser> {
     SecService secService
 
     /**
+     * overrides the create method as its more clear whats going on than trying to do role logic with events
+     * this will already be transactional as its called from create
+     */
+    @Override
+    SecUser doCreate(Map args, Map data) {
+        SecUser user = new SecUser()
+        String pwd = data.remove('newPassword')
+        if(pwd) user.newPassword = pwd
+        bindAndSave(args, user, data, BindAction.Create)
+        if(data['roles']) setUserRoles(user.id, data['roles'] as List)
+        return user
+    }
+
+    /**
+     * overrides the doUpdate method as its more clear whats going on than trying to do role logic with events
+     */
+    @Override
+    SecUser doUpdate(Map args, Map data) {
+        SecUser user = GormRepo.super.doUpdate(args, data)
+        if(data['roles']) setUserRoles(user.id, data['roles'] as List)
+        return user
+    }
+
+    /**
      * Event method called beforeRemove to get rid of the SecRoleUser.
      */
     @RepoListener
     void beforeRemove(SecUser user, BeforeRemoveEvent be) {
         SecRoleUser.removeAll(user)
+    }
+
+    /**
+     * before persist, do the password encoding
+     */
+    @RepoListener
+    void beforePersist(SecUser user, BeforePersistEvent e) {
+        if(user.newPassword) {
+            user.password = encodePassword(user.newPassword)
+        }
     }
 
     /**
@@ -40,15 +74,7 @@ class SecUserRepo implements GormRepo<SecUser> {
      */
     @RepoListener
     void afterBind(SecUser user, Map p, AfterBindEvent ae) {
-        String password = p['password'] as String
-        String repeatedPassword = p['repassword'] as String
-        List roles = p['roles'] as List
-
-        if(password) doPassword(user, password, repeatedPassword)
-
-        //the persist will be called
-        if(ae.bindAction == BindAction.Create) user.persist(flush: true)
-        if(roles) setUserRoles(user.id, roles)
+        checkPasswordChange(user, p['password'] as String, p['repassword'] as String)
     }
 
     /**
@@ -61,12 +87,12 @@ class SecUserRepo implements GormRepo<SecUser> {
 
     /**
      * checks params to see if password exists, that is matches repassword and encodes it if so
-     * finally setting it to the passwd field on User.
+     * finally setting it to the password field on User.
      */
-    private void doPassword(SecUser user, String pass, String rePass){
-        if(!pass?.trim()) return
-        isSamePass(pass, rePass, user)
-        user.passwd = encodePassword(pass)
+    private void checkPasswordChange(SecUser user, String newPassword, String repassword){
+        if(!newPassword?.trim()) return
+        isSamePass(newPassword, repassword, user)
+        user.newPassword = newPassword
     }
 
     String encodePassword(String pass) {
@@ -84,7 +110,11 @@ class SecUserRepo implements GormRepo<SecUser> {
     @Transactional
     void setUserRoles(Long userId, List rolesId) {
         // Transform both arrays to ListArray<Long> to have ability to compare them
-        List<Long> incomeRoles = rolesId.collect { it as long }
+        List<Long> incomeRoles = rolesId.collect {
+            // if the list is a map then assume its object map with and id key
+            // other wise convert value to long and assume it s list of ids
+            (it instanceof Map) ? it['id'] as Long : it as Long
+        }
         List<Long> existingRoles = SecRoleUser.getByUser(userId)*.role.id
 
         List<Long> deleting

@@ -20,26 +20,22 @@ import grails.persistence.Entity
 @Entity
 class SecUser implements Serializable {
 
-    static transients = ['pass', 'primaryRole', 'editedByName', 'enabled']
+    static transients = ['newPassword', 'primaryRole', 'editedByName', 'enabled']
 
     String login // the login name
     String name // the display name, may come from contact
     String email // users email for login or lost password
-    String passwd // the password
+    String password // the password
     Boolean mustChangePassword = false // passwordExpired
-    Date    passwordChangedDate // FIXME whats this user for?
+    Date    passwordChangedDate //date when password was changed. passwordExpireDays is added to this to see if its time to change again
     Boolean inactive = false // !enabled
-
     String  resetPasswordToken // temp token for a password reset, TODO move to userToken once we have that setup?
-    Date    resetPasswordDate // FIXME whats this for
+    Date    resetPasswordDate // //date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid
 
     void setEnabled(Boolean val) { inactive = !val }
     boolean getEnabled() { !inactive }
 
-    // FIXME change this design
-    // temporary holder for unencrypted password before it gets encrypted and saved to passwd
-    String pass
-
+    String newPassword //temp pwd before encode
     // default fields
     // boolean accountExpired = false //not used right now
     // boolean accountLocked = false //not used right now
@@ -48,7 +44,7 @@ class SecUser implements Serializable {
     static mapping = {
         cache true
         table 'Users'// AppCtx.config.getProperty('gorm.tools.security.user.table', 'Users')
-        passwd column: '`password`'
+        password column: '`password`'
         // password column: '`password`'
     }
 
@@ -56,27 +52,16 @@ class SecUser implements Serializable {
         login blank: false, nullable: false, unique: true, maxSize: 50
         name blank: false, nullable: false, maxSize: 50
         email nullable: false, blank: false, email: true, unique: true
-        passwd blank: false, nullable: false, maxSize: 60, bindable: false, password: true
+        password blank: false, nullable: false, maxSize: 60, bindable: false, password: true
         passwordChangedDate nullable: true, bindable: false
         mustChangePassword bindable: false
         resetPasswordToken nullable: true, bindable: false
         resetPasswordDate nullable: true, bindable: false
     }
 
-    // XXX this seems funky, it just grabs the first role and thats the primary?
-    SecRole getPrimaryRole() {
-        if (!id) return null
-        SecRoleUser.findByUser(this)?.role
-    }
-
     @CompileDynamic
     Set<SecRole> getRoles() {
         SecRoleUser.findAllByUser(this)*.role as Set
-    }
-
-    @CompileDynamic
-    void encodePassword() {
-        passwd = repo.encodePassword(pass)
     }
 
     @CompileDynamic

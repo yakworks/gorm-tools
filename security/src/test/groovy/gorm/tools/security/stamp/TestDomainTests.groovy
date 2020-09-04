@@ -30,12 +30,14 @@ class TestDomainTests extends Specification implements DomainRepoTest<TestDomain
 
         when: "new binding occurs"
         TestDomain d2 = new TestDomain()
-        d2.bind([name:'test', createdBy:99, editedBy:99])
+        d2.bind([name:'test', createdBy:99, createdDate: new Date(), editedBy:99, editedDate: new Date()])
 
         then: "should not have been bound"
         //assert config.grails.plugin.audittrail
         d2.createdBy == null
+        d2.createdDate == null
         d2.editedBy == null
+        d2.editedDate == null
     }
 }
 

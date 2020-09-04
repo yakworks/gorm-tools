@@ -46,4 +46,8 @@ class SecPasswordHistory {
         passwordHistory.save(flush: false)
         return passwordHistory
     }
+
+    static List<SecPasswordHistory> findAllByUser(SecUser user){
+        SecPasswordHistory.findAllByUser(user)
+    }
 }

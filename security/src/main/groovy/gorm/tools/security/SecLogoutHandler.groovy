@@ -7,23 +7,23 @@ package gorm.tools.security
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 
+import gorm.tools.beans.AppCtx
 import grails.plugin.rally.security.UserService
-import grails.util.Holders
 
 /**
  * Tracks user logout
  */
-@CompileDynamic
-class RallyLogoutHandler extends SecurityContextLogoutHandler {
+@CompileStatic
+class SecLogoutHandler extends SecurityContextLogoutHandler {
 
     @Override
     void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        UserService userService = Holders.grailsApplication.mainContext.getBean('userService')
+        UserService userService = AppCtx.get('userService', UserService)
         if (authentication) {
             userService.trackUserLogout()
         }

@@ -81,7 +81,7 @@ class UserService {
      * @param newPwd
      */
     void updatePassword(SecUser user, String newPwd) {
-        user.passwd = newPwd //must be hased password
+        user.password = newPwd //must be hased password
         user.mustChangePassword = false
         user.passwordChangedDate = new Date()
         user.save()
@@ -98,6 +98,6 @@ class UserService {
      * @return
      */
     boolean passwordExistInHistory(SecUser user, String password) {
-       return passwordValidator.passwordExistInHistory(user, password)
+        return passwordValidator.passwordExistInHistory(user, password)
     }
 }

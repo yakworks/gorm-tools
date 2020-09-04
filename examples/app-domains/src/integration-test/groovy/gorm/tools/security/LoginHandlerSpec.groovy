@@ -1,6 +1,6 @@
 package gorm.tools.security
 
-import gorm.tools.security.RallyLoginHandler
+
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.plugin.rally.security.UserService
 import grails.plugin.springsecurity.userdetails.GrailsUser
@@ -10,10 +10,10 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
-class RallyLoginHandlerSpec extends Specification implements DataIntegrationTest {
+class LoginHandlerSpec extends Specification implements DataIntegrationTest {
     void "test shouldWarnAboutPasswordExpiry"() {
         setup:
-        RallyLoginHandler loginHandler = new RallyLoginHandler()
+        SecLoginHandler loginHandler = new SecLoginHandler()
         UserService userService = Mock()
         loginHandler.userService = userService
 

@@ -13,10 +13,6 @@ grails:
     # Whether to autowire entities.
     # Disabled by default for performance reasons.
     autowire: false
-    reactor:
-      # Whether to translate GORM events into Reactor events
-      # Disabled by default for performance reasons
-      events: false
   config:
     locations:
       - classpath:restapi-config.yml

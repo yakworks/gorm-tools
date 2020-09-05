@@ -24,10 +24,10 @@ class Application extends GrailsAutoConfiguration {
         false
     }
 
-    // in order to pick up the gorm domains that are marked with @Entity this needs to be set.
+    // in order to pick up the gorm domains that are marked with @Entity, need to add packages here
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['yakworks.taskify']
+        super.packageNames() + ['yakworks.taskify', 'gorm.tools.security.domain']
     }
 
 }

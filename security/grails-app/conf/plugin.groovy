@@ -3,7 +3,8 @@ grails {
         springsecurity {
             active = true
             interceptUrlMap = [
-                    [pattern: '/**', access: ['IS_AUTHENTICATED_REMEMBERED']]
+                // all accesible anoymously by default
+                [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
             ]
             //MAPPING and AUTH
             userLookup.authoritiesPropertyName = 'roles'

@@ -24,7 +24,8 @@ class AuditStampOrgSpec extends Specification implements DataIntegrationTest, Se
         o.createdBy == 1
         o.editedDate
         o.editedBy == 1
-        DateUtils.isSameInstant(o.createdDate, o.editedDate)
+        o.createdDate == o.editedDate
+        //DateUtils.isSameInstant(o.createdDate, o.editedDate)
 
         when: 'its edited then edited should be updated'
         sleep(500)
@@ -35,7 +36,7 @@ class AuditStampOrgSpec extends Specification implements DataIntegrationTest, Se
         o.refresh()
         o.num == '999'
         o.createdDate < o.editedDate
-        !DateUtils.isSameInstant(o.createdDate, o.editedDate)
+        //!DateUtils.isSameInstant(o.createdDate, o.editedDate)
         o.editedBy == 1
     }
 }

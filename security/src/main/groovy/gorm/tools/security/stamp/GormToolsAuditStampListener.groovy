@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
+import org.codehaus.groovy.runtime.DefaultGroovyMethods
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.engine.EntityAccess
@@ -20,10 +21,9 @@ import org.grails.datastore.mapping.engine.event.ValidationEvent
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
-import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.tools.AuditStamp
 import gorm.tools.compiler.stamp.FieldProps
+import gorm.tools.traits.AuditStampTrait
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugin.rally.security.SecService
@@ -55,7 +55,7 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
 
     //check if the given domain class should be audit stamped.
     boolean isAuditStamped(Class domainClass) {
-        return AnnotationUtils.findAnnotation(domainClass, AuditStamp) && !isAuditStampDisabled(domainClass)
+        return ( AuditStampTrait.isAssignableFrom(domainClass) && !isAuditStampDisabled(domainClass) )
     }
 
     boolean isAuditStampDisabled(Class clazz) {
@@ -76,14 +76,11 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     }
 
     private void beforeInsert(EntityAccess ea) {
-        setDateField(FieldProps.CREATED_DATE_KEY, ea)
-        setUserField(FieldProps.CREATED_BY_KEY, ea)
-        setDateField(FieldProps.EDITED_DATE_KEY, ea)
-        setUserField(FieldProps.EDITED_BY_KEY, ea)
+        setDefaults(ea)
     }
 
     private void beforeUpdate(EntityAccess ea) {
-        setDateField(FieldProps.EDITED_DATE_KEY, ea)
+        setTimestampField(FieldProps.EDITED_DATE_KEY, ea, null)
         setUserField(FieldProps.EDITED_BY_KEY, ea)
     }
 
@@ -93,6 +90,21 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
         }
     }
 
+    void setTimestampField(String prop, EntityAccess ea, Object date) {
+        String datePropName = fieldProps[prop].name
+        Object timestamp = date
+        if(!timestamp){
+            Class<?> dateTimeClass = ea.getPropertyType(datePropName)
+            timestamp = createTimestamp(dateTimeClass)
+        }
+        ea.setProperty(datePropName, timestamp)
+    }
+
+    public <T> T createTimestamp(Class<?> dateTimeClass) {
+        return (T) DefaultGroovyMethods.invokeMethod(dateTimeClass, "now", null);
+    }
+
+    @Deprecated
     void setDateField(String prop, EntityAccess ea, Date date = new Date()) {
         ea.setProperty(fieldProps[prop].name, date)
     }
@@ -102,10 +114,12 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     }
 
     void setDefaults(EntityAccess ea) {
-        Date now = new Date()
+        // LocalDateTime now = LocalDateTime.now()
+        Class<?> dateTimeClass = ea.getPropertyType(fieldProps[FieldProps.CREATED_DATE_KEY].name)
+        Object timestamp = createTimestamp(dateTimeClass)
 
-        setDateField(FieldProps.CREATED_DATE_KEY, ea, now)
-        setDateField(FieldProps.EDITED_DATE_KEY, ea, now)
+        setTimestampField(FieldProps.CREATED_DATE_KEY, ea, timestamp)
+        setTimestampField(FieldProps.EDITED_DATE_KEY, ea, timestamp)
 
         setUserField(FieldProps.CREATED_BY_KEY, ea)
         setUserField(FieldProps.EDITED_BY_KEY, ea)

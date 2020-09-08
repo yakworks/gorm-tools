@@ -59,7 +59,7 @@ class SecUserDetailsService implements GrailsUserDetailsService, GrailsApplicati
             }
             // default
             // new GrailsUser(username, password, enabled, !accountExpired, !passwordExpired, !accountLocked, authorities, user.id)
-            new GrailsUser(user.login, user.password, user.enabled, true, !mustChange, true, authorities, user.id)
+            new GrailsUser(user.login, user.passwordHash, user.enabled, true, !mustChange, true, authorities, user.id)
         }
 
     }

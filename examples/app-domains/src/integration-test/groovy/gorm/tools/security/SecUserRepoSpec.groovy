@@ -28,7 +28,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
             repassword:'secretStuff',
         ]
         //baseParams.putAll params
-        return (baseParams << params)
+        return ([:] << baseParams << params)
     }
 
     def "test create"() {
@@ -42,7 +42,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         user.login == 'galt'
         user.email == params.email
         user.name == params.name
-        passwordEncoder.isPasswordValid(user.password, params.password, null)
+        passwordEncoder.isPasswordValid(user.passwordHash, params.password, null)
     }
 
     def "test create with roles ids"() {

@@ -30,8 +30,8 @@ class SecUserRepo implements GormRepo<SecUser> {
     @Override
     SecUser doCreate(Map args, Map data) {
         SecUser user = new SecUser()
-        String pwd = data.remove('newPassword')
-        if(pwd) user.newPassword = pwd
+        String pwd = data['password']// data.remove('password')
+        if(pwd) user.password = pwd
         bindAndSave(args, user, data, BindAction.Create)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
         return user
@@ -60,8 +60,8 @@ class SecUserRepo implements GormRepo<SecUser> {
      */
     @RepoListener
     void beforePersist(SecUser user, BeforePersistEvent e) {
-        if(user.newPassword) {
-            user.password = encodePassword(user.newPassword)
+        if(user.password) {
+            user.passwordHash = encodePassword(user.password)
         }
     }
 
@@ -74,7 +74,7 @@ class SecUserRepo implements GormRepo<SecUser> {
      */
     @RepoListener
     void afterBind(SecUser user, Map p, AfterBindEvent ae) {
-        checkPasswordChange(user, p['password'] as String, p['repassword'] as String)
+        checkPasswordChange(user, p['newPassword'] as String, p['repassword'] as String)
     }
 
     /**
@@ -92,7 +92,7 @@ class SecUserRepo implements GormRepo<SecUser> {
     private void checkPasswordChange(SecUser user, String newPassword, String repassword){
         if(!newPassword?.trim()) return
         isSamePass(newPassword, repassword, user)
-        user.newPassword = newPassword
+        user.password = newPassword
     }
 
     String encodePassword(String pass) {

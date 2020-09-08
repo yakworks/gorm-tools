@@ -10,7 +10,7 @@ grails {
             userLookup.authoritiesPropertyName = 'roles'
             userLookup.authorityJoinClassName = 'gorm.tools.security.domain.SecRoleUser'
             userLookup.enabledPropertyName = 'enabled'
-            userLookup.passwordPropertyName = 'password'
+            userLookup.passwordPropertyName = 'passwordHash'
             userLookup.userDomainClassName = 'gorm.tools.security.domain.SecUser'
             userLookup.usernamePropertyName = 'login'
             userLookup.accountExpiredPropertyName = null

@@ -80,8 +80,8 @@ class FieldProps {
         map.put(EDITED_BY_KEY, FieldProps.init(EDITED_BY_KEY, "java.lang.Long", USER_CONS, null, config))
 
 
-        map.put(EDITED_DATE_KEY, FieldProps.init(EDITED_DATE_KEY, "java.util.Date", DATE_CONS, null, config))
-        map.put(CREATED_DATE_KEY, FieldProps.init(CREATED_DATE_KEY, "java.util.Date", DATE_CONS, null, config))
+        map.put(EDITED_DATE_KEY, FieldProps.init(EDITED_DATE_KEY, "java.time.LocalDateTime", DATE_CONS, null, config))
+        map.put(CREATED_DATE_KEY, FieldProps.init(CREATED_DATE_KEY, "java.time.LocalDateTime", DATE_CONS, null, config))
         return map
     }
 

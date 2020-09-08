@@ -18,7 +18,7 @@ class BootStrap {
             TestSeedData.buildOrgs(100)
         }
         SecUser.withTransaction {
-            SecUser user = SecUser.create([id: 1, name: "admin", login: "admin", email: "admin@9ci.com", newPassword:"admin"], bindId: true)
+            SecUser user = SecUser.create([id: 1, name: "admin", login: "admin", email: "admin@9ci.com", password:"admin"], bindId: true)
             assert user.id == 1
 
             SecRole admin = SecRole.create([id:1, name: SecRole.ADMINISTRATOR], bindId: true)

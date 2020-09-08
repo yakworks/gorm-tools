@@ -17,7 +17,7 @@ class SecLoginHistory implements Serializable {
 
     static mapping = {
         table 'SecLoginHistory'
-        user column: 'UserId'
+        user column: 'userId'
         version false
     }
 

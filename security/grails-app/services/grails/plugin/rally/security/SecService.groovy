@@ -195,9 +195,10 @@ class SecService {
      */
     static void loginAsSystemUser() {
         SecUser user = SecUser.get(1)
+        assert user
         List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMINISTRATOR] as String[])
-        GrailsUser grailsUser = new GrailsUser(user.login, user.password, user.enabled, true, !user.mustChangePassword, true, authorities, user.id)
-        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.password, authorities)
+        GrailsUser grailsUser = new GrailsUser(user.login, user.passwordHash, user.enabled, true, !user.mustChangePassword, true, authorities, user.id)
+        SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwordHash, authorities)
     }
 
     @CompileDynamic

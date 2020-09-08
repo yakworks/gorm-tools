@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 /**
  * flags a domain entity as stampable for events
- * the @AuditStamp add this
+ * the @AuditStamp ann adds this and can also be extended for events to pick
  */
 @CompileStatic
 trait AuditStampTrait {

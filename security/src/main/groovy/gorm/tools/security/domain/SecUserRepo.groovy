@@ -5,18 +5,18 @@
 package gorm.tools.security.domain
 
 
-import gorm.tools.compiler.GormRepository
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.GormRepository
 import gorm.tools.repository.RepoMessage
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.security.services.SecService
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
-import grails.plugin.rally.security.SecService
 
 @GormRepository
 @GrailsCompileStatic
@@ -63,6 +63,7 @@ class SecUserRepo implements GormRepo<SecUser> {
         if(user.password) {
             user.passwordHash = encodePassword(user.password)
         }
+        if(!user.name) user.name = user.login
     }
 
     /**

@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component
 
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
-import gorm.tools.repository.events.BeforePersistEvent
-import gorm.tools.traits.AuditStampTrait
 import yakworks.taskify.domain.Org
 
 // used to test spring events with RepositoryEventsSpec

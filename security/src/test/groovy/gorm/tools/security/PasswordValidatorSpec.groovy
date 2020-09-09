@@ -1,6 +1,5 @@
 package gorm.tools.security
 
-import gorm.tools.security.PasswordValidator
 import gorm.tools.security.domain.SecUser
 import gorm.tools.security.testing.SecuritySpecUnitTestHelper
 import gorm.tools.testing.unit.DataRepoTest
@@ -10,7 +9,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
     void setup() {
         mockDomain(SecUser)
-        new SecUser(name: "admin", login:"admin", email:"admin@9ci.com", password: "test").save()
+        new SecUser(name: "admin", login:"admin", email:"admin@9ci.com", password: "test").persist()
     }
 
     void test_validate() {
@@ -26,7 +25,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
         then:
         result.ok == false
-        result.message == "rally.security.password.minlength"
+        result.message == "gorm.tools.security.password.minlength"
 
         when: "password match"
         validator.passwordMinLength = 3
@@ -34,7 +33,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
         then:
         result.ok == false
-        result.message == "rally.security.password.match"
+        result.message == "gorm.tools.security.password.match"
 
         when: "require lowercase"
         validator.passwordMinLength = 4
@@ -43,7 +42,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
         then:
         result.ok == false
-        result.message == "rally.security.password.mustcontain.lowercase"
+        result.message == "gorm.tools.security.password.mustcontain.lowercase"
 
         when: "require uppercase"
         validator.passwordMinLength = 4
@@ -52,7 +51,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
         then:
         result.ok == false
-        result.message == "rally.security.password.mustcontain.uppercase"
+        result.message == "gorm.tools.security.password.mustcontain.uppercase"
 
         when: "require numbers"
         validator.passwordMinLength = 4
@@ -61,7 +60,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
         then:
         result.ok == false
-        result.message == "rally.security.password.mustcontain.numbers"
+        result.message == "gorm.tools.security.password.mustcontain.numbers"
 
 
         when: "require symbol"
@@ -71,7 +70,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
         then:
         result.ok == false
-        result.message == "rally.security.password.mustcontain.symbol"
+        result.message == "gorm.tools.security.password.mustcontain.symbol"
 
         when: "all good"
         validator.passwordMinLength = 4

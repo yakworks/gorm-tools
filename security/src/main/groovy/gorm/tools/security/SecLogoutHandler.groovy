@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 
 import gorm.tools.beans.AppCtx
-import grails.plugin.rally.security.UserService
+import gorm.tools.security.services.UserService
 
 /**
  * Tracks user logout

@@ -2,7 +2,7 @@ package gorm.tools.security
 
 
 import gorm.tools.testing.integration.DataIntegrationTest
-import grails.plugin.rally.security.UserService
+import gorm.tools.security.services.UserService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback

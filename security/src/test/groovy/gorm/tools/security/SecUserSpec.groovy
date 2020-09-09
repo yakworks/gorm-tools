@@ -14,6 +14,11 @@ import spock.lang.Specification
 
 class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, SecuritySpecUnitTestHelper {
 
+    // Closure doWithConfig() {
+    //     return { cfg ->
+    //         cfg.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
+    //     }
+    // }
     // List<Class> getDomainClasses() { [SecUser, SecRole, SecRoleUser] }
     void setupSpec() {
         mockDomains SecUser, SecRole, SecRoleUser

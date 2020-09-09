@@ -4,7 +4,7 @@ import gorm.tools.security.domain.SecUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
-import grails.plugin.rally.security.SecService
+import gorm.tools.security.services.SecService
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Specification

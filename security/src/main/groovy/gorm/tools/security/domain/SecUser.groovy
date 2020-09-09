@@ -4,37 +4,39 @@
 */
 package gorm.tools.security.domain
 
+import javax.persistence.Transient
+
 import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
-import groovy.transform.ToString
 
-import gorm.tools.AuditStamp
-import gorm.tools.beans.AppCtx
+import gorm.tools.security.stamp.AuditStampTrait
+import gorm.tools.security.stamp.AuditStampTraitConstraints
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import grails.util.Holders
 
-@AuditStamp
+@Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='login', useCanEqual=false)
-@ToString(includes='login', includeNames=true, includePackage=false)
-@Entity
-class SecUser implements Serializable {
+class SecUser implements Serializable, AuditStampTrait {
 
-    static transients = ['password', 'primaryRole', 'editedByName', 'enabled']
+    static transients = ['password'] //@Transient not working when mapping has same column name for passwordHash?
 
-    String login // the login name
-    String name // the display name, may come from contact
-    String email // users email for login or lost password
-    String passwordHash // the password hash
-    Boolean mustChangePassword = false // passwordExpired
+    String  login // the login name
+    String  name // the display name, may come from contact or defaults to login if not populated
+    String  email // users email for login or lost password
+    String  passwordHash // the password hash
+    Boolean passwordExpired = false // passwordExpired
     Date    passwordChangedDate //date when password was changed. passwordExpireDays is added to this to see if its time to change again
     Boolean inactive = false // !enabled
     String  resetPasswordToken // temp token for a password reset, TODO move to userToken once we have that setup?
     Date    resetPasswordDate // //date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid
 
-    void setEnabled(Boolean val) { inactive = !val }
+    @Transient
     boolean getEnabled() { !inactive }
+    void setEnabled(Boolean val) { inactive = !val }
 
+    @Transient
     String password // raw password used to makehash, temporary transient, does not get saved,
 
     // other default fields
@@ -43,20 +45,24 @@ class SecUser implements Serializable {
 
     static mapping = {
         cache true
-        table 'Users'// AppCtx.config.getProperty('gorm.tools.security.user.table', 'Users')
-        passwordHash column: '`password`'
-        // password column: '`password`'
+        //table 'Users'// AppCtx.config.getProperty('gorm.tools.security.user.table', 'Users')
+        table Holders.config.getProperty('gorm.tools.security.user.table', 'Users')
+        passwordHash column: "`password`"
+        passwordExpired column: "mustChangePassword" // TODO change the column name in nine-db
     }
 
+    //@CompileDynamic
     static constraints = {
+        importFrom AuditStampTraitConstraints, include: AuditStampTraitConstraints.includes
         login blank: false, nullable: false, unique: true, maxSize: 50
         name blank: false, nullable: false, maxSize: 50
         email nullable: false, blank: false, email: true, unique: true
         passwordHash blank: false, nullable: false, maxSize: 60, bindable: false, password: true
         passwordChangedDate nullable: true, bindable: false
-        mustChangePassword bindable: false
+        passwordExpired bindable: false
         resetPasswordToken nullable: true, bindable: false
         resetPasswordDate nullable: true, bindable: false
+
     }
 
     @CompileDynamic
@@ -64,8 +70,4 @@ class SecUser implements Serializable {
         SecRoleUser.findAllByUser(this)*.role as Set
     }
 
-    @CompileDynamic
-    String getEditedByName() {
-        SecUser.get(this.editedBy)?.name
-    }
 }

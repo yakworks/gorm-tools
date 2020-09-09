@@ -1,6 +1,6 @@
 package gorm.tools.security.stamp
 
-import gorm.tools.AuditStamp
+import gorm.tools.audit.AuditStamp
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.persistence.Entity
 import spock.lang.Specification

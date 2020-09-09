@@ -47,7 +47,7 @@ class DbDialectService {
         else if (dialectName.contains("Oracle")) result = ORACLE
 
         if (result == UNKNOWN) {
-            throw new SQLException("Unknown dialect ${dialectName} in nine.rally.DbDialectService.\n"
+            throw new SQLException("Unknown dialect ${dialectName} in gorm.tools.DbDialectService.\n"
                     + "Please use a known dialect or make accommodation for a new dialect.")
         }
 

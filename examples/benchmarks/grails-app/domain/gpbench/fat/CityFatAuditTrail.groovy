@@ -11,7 +11,7 @@ import grails.compiler.GrailsCompileStatic
 /**
  * Event methods exist in the repository
  */
-@gorm.tools.AuditStamp
+//@gorm.tools.AuditStamp
 @GrailsCompileStatic
 class CityFatAuditTrail implements CityTraitFat {
 

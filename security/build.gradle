@@ -10,6 +10,7 @@ repositories {
 dependencies {
   console "org.grails:grails-console"
 
+  // compile "org.grails:grails-plugin-validation"
   compile "org.grails.plugins:spring-security-core:$vSpringSecurity"
   // compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
   // compileOnly "org.grails.plugins:audit-trail:$vAuditTrail"
@@ -38,6 +39,6 @@ test {
 }
 
 //dont need to bundle up bootstrap
-jar {
-  exclude('grails/plugin/rally/security/init/**')
-}
+// jar {
+//   exclude('grails/plugin/rally/security/init/**')
+// }

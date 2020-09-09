@@ -13,7 +13,7 @@ import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 
 import gorm.tools.security.domain.SecUser
-import grails.plugin.rally.security.SecService
+import gorm.tools.security.services.SpringSecService
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 
@@ -27,10 +27,7 @@ trait SecuritySpecUnitTestHelper {
                 bean.autowire = "byName"
             }
             authenticationTrustResolver(AuthenticationTrustResolverImpl)
-            secService(SecService) { bean ->
-                bean.autowire = "byName"
-            }
-
+            secService(SpringSecService, SecUser)
         }
     }
 

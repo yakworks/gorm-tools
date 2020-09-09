@@ -4,7 +4,7 @@
 */
 package gorm.tools.testing.unit
 
-import gorm.tools.compiler.GormRepository
+import gorm.tools.repository.GormRepository
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener

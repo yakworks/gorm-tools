@@ -4,11 +4,9 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.compiler.GormRepository
+
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.events.*
-import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.events.RepositoryEventType
 import gorm.tools.testing.TestDataJson
 import static gorm.tools.testing.TestDataJson.buildCreate
 import gorm.tools.testing.unit.DataRepoTest

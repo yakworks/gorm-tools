@@ -13,13 +13,16 @@ class Application extends GrailsAutoConfiguration {
         GrailsApp.run(Application, args)
     }
 
-    // example of how to scan and pick up the gorm domain that are marked with @entity in the plugin
+    /**
+     * To scan and pick up the gorm artifacts such as domains that are marked with @entity
+     * outside of the package this Application class is in then this needs to be set to true
+     */
     @Override
-    protected boolean limitScanningToApplication() {
-        false
-    }
+    protected boolean limitScanningToApplication() { false }
 
-    // in order to pick up the gorm domains that are marked with @Entity this needs to be set.
+    /**
+     * add packages here where the other grails artifacts exist such as domains marked with @Entity
+     */
     @Override
     Collection<String> packageNames() {
         super.packageNames() + ['gorm.tools.security']

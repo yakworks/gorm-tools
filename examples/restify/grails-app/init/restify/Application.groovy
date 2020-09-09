@@ -18,13 +18,17 @@ class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }
-    // Tto scan and pick up the gorm domain that are marked with @entity in the plugin set this
-    @Override
-    protected boolean limitScanningToApplication() {
-        false
-    }
 
-    // in order to pick up the gorm domains that are marked with @Entity, need to add packages here
+    /**
+     * To scan and pick up the gorm domains that are marked with @entity
+     * outside of the package this Application class is in then this needs to be set to true
+     */
+    @Override
+    protected boolean limitScanningToApplication() { false }
+
+    /**
+     * add packages here where the other grails artifacts exist such as domains marked with @Entity
+     */
     @Override
     Collection<String> packageNames() {
         super.packageNames() + ['yakworks.taskify', 'gorm.tools.security.domain']

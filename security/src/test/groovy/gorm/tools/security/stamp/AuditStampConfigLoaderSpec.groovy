@@ -1,6 +1,6 @@
 package gorm.tools.security.stamp
 
-import gorm.tools.compiler.stamp.AuditStampConfigLoader
+import gorm.tools.audit.ast.AuditStampConfigLoader
 import spock.lang.Specification
 
 import java.nio.file.Files

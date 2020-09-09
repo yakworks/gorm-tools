@@ -35,7 +35,7 @@ class SecUserDetailsServiceSpec extends Specification implements DataIntegration
         SecUser user = SecUser.first()
         userDetailsService.passwordExpireEnabled = true
         userDetailsService.passwordExpireDays = 10
-        user.mustChangePassword = true
+        user.passwordExpired = true
         user.passwordChangedDate = now - 11
         user.save()
 

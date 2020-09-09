@@ -16,7 +16,7 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent
 
 import gorm.tools.security.domain.SecUser
-import grails.plugin.rally.security.UserService
+import gorm.tools.security.services.UserService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 
 /**
@@ -28,10 +28,10 @@ class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent
     @Autowired
     UserService userService
 
-    @Value('${grails.plugin.rally.security.password.expireEnabled:false}')
+    @Value('${gorm.tools.security.password.expireEnabled:false}')
     boolean passwordExpiryEnabled
 
-    @Value('${grails.plugin.rally.security.password.warnDays:30}')
+    @Value('${gorm.tools.security.password.warnDays:30}')
     int passwordWarnDays
 
     void onApplicationEvent(AbstractAuthenticationEvent event) {

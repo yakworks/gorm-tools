@@ -4,8 +4,11 @@
 */
 package gorm.tools.security
 
-import gorm.tools.compiler.stamp.AuditStampConfigLoader
-import gorm.tools.compiler.stamp.FieldProps
+import gorm.tools.audit.ast.AuditStampConfigLoader
+import gorm.tools.audit.ast.FieldProps
+import gorm.tools.security.domain.SecUser
+import gorm.tools.security.services.SpringSecService
+import gorm.tools.security.services.UserService
 import gorm.tools.security.stamp.GormToolsAuditStampListener
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
@@ -19,6 +22,9 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
         { ->
             def securityConf = SpringSecurityUtils.securityConfig
             if (securityConf.active) {
+                secService(SpringSecService, SecUser)
+                userService(UserService)
+
                 passwordValidator(PasswordValidator)
 
                 passwordEncoder(grails.plugin.springsecurity.authentication.encoding.BCryptPasswordEncoder, 10)

@@ -21,12 +21,13 @@ import org.grails.datastore.mapping.engine.event.ValidationEvent
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
+import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.tools.compiler.stamp.FieldProps
-import gorm.tools.traits.AuditStampTrait
+import gorm.tools.audit.AuditStamp
+import gorm.tools.audit.ast.FieldProps
+import gorm.tools.security.services.SecService
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
-import grails.plugin.rally.security.SecService
 import grails.util.GrailsClassUtils
 
 @CompileStatic
@@ -55,7 +56,8 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
 
     //check if the given domain class should be audit stamped.
     boolean isAuditStamped(Class domainClass) {
-        return ( AuditStampTrait.isAssignableFrom(domainClass) && !isAuditStampDisabled(domainClass) )
+        return ( AuditStampTrait.isAssignableFrom(domainClass) || AnnotationUtils.findAnnotation(domainClass, AuditStamp)) &&
+            !isAuditStampDisabled(domainClass)
     }
 
     boolean isAuditStampDisabled(Class clazz) {

@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.AuditStamp
+import gorm.tools.audit.AuditStamp
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.taskify.domain.traits.NameNumConstraints

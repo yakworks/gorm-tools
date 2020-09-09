@@ -25,25 +25,25 @@ class PasswordValidator {
     @Autowired
     PasswordEncoder passwordEncoder
 
-    @Value('${grails.plugin.rally.security.password.minLength:4}')
+    @Value('${gorm.tools.security.password.minLength:4}')
     Integer passwordMinLength
 
-    @Value('${grails.plugin.rally.security.password.mustContainNumbers:false}')
+    @Value('${gorm.tools.security.password.mustContainNumbers:false}')
     boolean passwordMustContainNumbers
 
-    @Value('${grails.plugin.rally.security.password.mustContainSymbols:false}')
+    @Value('${gorm.tools.security.password.mustContainSymbols:false}')
     boolean passwordMustContainSymbols
 
-    @Value('${grails.plugin.rally.security.password.mustContainUpperaseLetter:false}')
+    @Value('${gorm.tools.security.password.mustContainUpperaseLetter:false}')
     boolean passwordMustContainUpperaseLetter
 
-    @Value('${grails.plugin.rally.security.password.password.mustContainLowercaseLetter:false}')
+    @Value('${gorm.tools.security.password.password.mustContainLowercaseLetter:false}')
     boolean passwordMustContainLowercaseLetter
 
-    @Value('${grails.plugin.rally.security.password.historyEnabled:false}')
+    @Value('${gorm.tools.security.password.historyEnabled:false}')
     boolean passwordHistoryEnabled
 
-    @Value('${grails.plugin.rally.security.password.historyLength:4}')
+    @Value('${gorm.tools.security.password.historyLength:4}')
     int passwordHistoryLength
 
     private String message(String key, def ...args) {
@@ -53,31 +53,31 @@ class PasswordValidator {
     @SuppressWarnings(['IfStatementCouldBeTernary'])
     Map validate(SecUser user, String pass, String passConfirm) {
         if (!pass || (pass.length() < passwordMinLength)) {
-            return [ok: false, message: message("rally.security.password.minlength", passwordMinLength)]
+            return [ok: false, message: message("gorm.tools.security.password.minlength", passwordMinLength)]
         }
 
         if (passConfirm != pass) {
-            return [ok: false, message: message("rally.security.password.match")]
+            return [ok: false, message: message("gorm.tools.security.password.match")]
         }
 
         if (passwordMustContainLowercaseLetter && !(pass =~ /^.*[a-z].*$/)) {
-            return [ok: false, message: message("rally.security.password.mustcontain.lowercase")]
+            return [ok: false, message: message("gorm.tools.security.password.mustcontain.lowercase")]
         }
 
         if (passwordMustContainUpperaseLetter && !(pass =~ /^.*[A-Z].*$/)) {
-            return [ok: false, message: message("rally.security.password.mustcontain.uppercase")]
+            return [ok: false, message: message("gorm.tools.security.password.mustcontain.uppercase")]
         }
 
         if (passwordMustContainNumbers && !(pass =~ /^.*[0-9].*$/)) {
-            return [ok: false, message: message("rally.security.password.mustcontain.numbers")]
+            return [ok: false, message: message("gorm.tools.security.password.mustcontain.numbers")]
         }
 
         if (passwordMustContainSymbols && !(pass =~ /^.*\W.*$/)) {
-            return [ok: false, message: message("rally.security.password.mustcontain.symbol")]
+            return [ok: false, message: message("gorm.tools.security.password.mustcontain.symbol")]
         }
 
         if (passwordHistoryEnabled && passwordExistInHistory(user, pass)) {
-            return [ok: false, message: message("rally.security.password.existsinhistory", passwordHistoryLength)]
+            return [ok: false, message: message("gorm.tools.security.password.existsinhistory", passwordHistoryLength)]
         }
 
         return [ok: true]

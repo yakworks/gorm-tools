@@ -24,10 +24,10 @@ import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
 class SecUserDetailsService implements GrailsUserDetailsService, GrailsApplicationAware {
     GrailsApplication grailsApplication
 
-    @Value('${grails.plugin.rally.security.password.expireDays:30}')
+    @Value('${gorm.tools.security.password.expireDays:30}')
     int passwordExpireDays
 
-    @Value('${grails.plugin.rally.security.password.expireEnabled:false}')
+    @Value('${gorm.tools.security.password.expireEnabled:false}')
     boolean passwordExpireEnabled
 
     @CompileDynamic
@@ -39,7 +39,7 @@ class SecUserDetailsService implements GrailsUserDetailsService, GrailsApplicati
                 throw new UsernameNotFoundException("User not found: $username")
             }
             log.debug "Found user ${user} in the database"
-            Boolean mustChange = user.mustChangePassword
+            Boolean mustChange = user.passwordExpired
 
             if (passwordExpireEnabled) {
                 int expireDays = passwordExpireDays

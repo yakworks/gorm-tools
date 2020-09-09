@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package grails.plugin.gormtools
+package gorm.tools.support
 
 import java.sql.BatchUpdateException
 import javax.persistence.PersistenceException
@@ -10,6 +10,7 @@ import javax.persistence.PersistenceException
 import groovy.transform.CompileDynamic
 
 import org.hibernate.exception.ConstraintViolationException
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 
 import gorm.tools.repository.RepoMessage
@@ -19,6 +20,7 @@ import grails.validation.ValidationException
 @CompileDynamic
 class ErrorMessageService {
 
+    @Autowired
     MessageSource messageSource
 
     /**

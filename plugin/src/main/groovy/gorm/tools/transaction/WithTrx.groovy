@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools
+package gorm.tools.transaction
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -11,6 +11,8 @@ import groovy.transform.stc.SimpleType
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
+
+import gorm.tools.transaction.TrxService
 
 /**
  * adds transaction methods to any class. relies on Gorms transactionService.

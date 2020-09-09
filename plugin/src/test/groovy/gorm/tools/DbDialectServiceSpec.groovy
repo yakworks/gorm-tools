@@ -4,6 +4,7 @@
 */
 package gorm.tools
 
+import gorm.tools.jdbc.DbDialectService
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Specification
 

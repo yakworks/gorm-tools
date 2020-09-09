@@ -1,6 +1,6 @@
 package gpbench.benchmarks.concept
 
-import gorm.tools.WithTrx
+import gorm.tools.transaction.WithTrx
 import gpbench.basic.CityBasic
 import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark

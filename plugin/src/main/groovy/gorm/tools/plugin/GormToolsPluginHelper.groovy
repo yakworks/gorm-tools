@@ -11,11 +11,11 @@ import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.DbDialectService
 import gorm.tools.async.GparsAsyncSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
+import gorm.tools.jdbc.DbDialectService
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
@@ -26,7 +26,9 @@ import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.rest.JsonSchemaGenerator
 import gorm.tools.rest.RestApi
 import gorm.tools.rest.RestApiConfig
+import gorm.tools.support.ErrorMessageService
 import gorm.tools.support.MsgService
+import gorm.tools.transaction.TrxService
 import grails.core.ArtefactHandler
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -42,6 +44,7 @@ class GormToolsPluginHelper {
     static Closure doWithSpring = {
         println "starting gorm-tools config"
         msgService(MsgService)
+        errorMessageService(ErrorMessageService)
 
         restApiConfig(RestApiConfig)
 
@@ -67,6 +70,10 @@ class GormToolsPluginHelper {
         asyncSupport(GparsAsyncSupport)
 
         DbDialectService.dialectName = application.config.hibernate.dialect
+
+        dbDialectService(DbDialectService)
+
+        trxService(TrxService)
 
         def repoClasses = application.repositoryClasses
         repoClasses.each { repoClass ->

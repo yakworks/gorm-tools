@@ -4,10 +4,9 @@
 */
 package gorm.tools
 
-import grails.gorm.annotation.Entity
+import gorm.tools.utils.GormMetaUtils
 import grails.test.hibernate.HibernateSpec
 import grails.testing.gorm.DomainUnitTest
-import org.grails.datastore.mapping.model.PersistentEntity
 import testing.Org
 
 class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {

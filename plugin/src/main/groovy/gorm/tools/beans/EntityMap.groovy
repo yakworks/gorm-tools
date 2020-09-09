@@ -12,8 +12,8 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.config.GormProperties
 import org.springframework.util.Assert
 
-import gorm.tools.GormMetaUtils
 import gorm.tools.traits.IdEnum
+import gorm.tools.utils.GormMetaUtils
 
 /**
  * A map implementation that wraps and objects and

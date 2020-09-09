@@ -18,7 +18,7 @@ import org.grails.orm.hibernate.cfg.Mapping
 import org.grails.validation.discovery.ConstrainedDiscovery
 import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.tools.GormMetaUtils
+import gorm.tools.utils.GormMetaUtils
 import grails.core.DefaultGrailsApplication
 import grails.gorm.validation.ConstrainedProperty
 import grails.util.GrailsNameUtils

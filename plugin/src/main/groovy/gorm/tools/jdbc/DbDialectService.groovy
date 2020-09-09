@@ -2,13 +2,14 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools
+package gorm.tools.jdbc
 
 import java.sql.SQLException
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.util.ClassUtils
 
@@ -27,6 +28,7 @@ class DbDialectService {
     static final int H2 = 4
 
     //GrailsApplication grailsApplication
+    @Autowired
     JdbcTemplate jdbcTemplate
 
     static String dialectName
@@ -47,7 +49,7 @@ class DbDialectService {
         else if (dialectName.contains("Oracle")) result = ORACLE
 
         if (result == UNKNOWN) {
-            throw new SQLException("Unknown dialect ${dialectName} in gorm.tools.DbDialectService.\n"
+            throw new SQLException("Unknown dialect ${dialectName} in gorm.tools.jdbc.DbDialectService.\n"
                     + "Please use a known dialect or make accommodation for a new dialect.")
         }
 

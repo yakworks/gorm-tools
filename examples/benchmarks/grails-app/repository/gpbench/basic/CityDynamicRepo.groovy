@@ -1,10 +1,9 @@
 package gpbench.basic
 
-import gorm.tools.GormUtils
+import gorm.tools.utils.GormUtils
 import gorm.tools.repository.DefaultGormRepo
 import gpbench.Country
 import gpbench.Region
-import gpbench.basic.CityDynamic
 import grails.gorm.transactions.Transactional
 
 /**

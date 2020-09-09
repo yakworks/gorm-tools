@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Value
 
-import gorm.tools.Pager
+import gorm.tools.beans.Pager
 import gorm.tools.mango.api.MangoQuery
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria

@@ -17,9 +17,9 @@ import org.springframework.util.ReflectionUtils
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import grails.core.GrailsApplication
 import grails.events.bus.EventBus
-import grails.plugin.gormtools.RepositoryArtefactHandler
 
 /**
  * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners

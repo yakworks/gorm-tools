@@ -10,10 +10,10 @@ import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.orm.hibernate5.support.HibernatePersistenceContextInterceptor
 
+import gorm.tools.plugin.GormToolsPluginHelper
 import gorm.tools.testing.support.GormToolsSpecHelper
 import gorm.tools.testing.support.JsonViewSpecSetup
 import grails.buildtestdata.TestDataBuilder
-import grails.plugin.gormtools.GormToolsPluginHelper
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
 

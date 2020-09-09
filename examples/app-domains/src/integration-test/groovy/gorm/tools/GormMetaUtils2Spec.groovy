@@ -1,5 +1,6 @@
 package gorm.tools
 
+import gorm.tools.utils.GormMetaUtils
 import yakworks.taskify.domain.Org
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

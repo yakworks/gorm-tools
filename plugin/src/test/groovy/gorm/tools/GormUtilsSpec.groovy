@@ -4,6 +4,7 @@
 */
 package gorm.tools
 
+import gorm.tools.utils.GormUtils
 import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
 import spock.lang.Specification

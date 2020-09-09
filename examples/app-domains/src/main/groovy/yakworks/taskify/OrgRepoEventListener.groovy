@@ -7,6 +7,7 @@ import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import yakworks.taskify.domain.Org
 
+// used to test spring events with RepositoryEventsSpec
 @Component
 public class OrgRepoEventListener {
 
@@ -21,4 +22,13 @@ public class OrgRepoEventListener {
         Org org = event.entity
         org.event = "AfterRemoveEvent"
     }
+
+    // @EventListener
+    // void befPer(BeforePersistEvent event) {
+    //     if(event.entity instanceof AuditStampTrait) {
+    //         def ent = event.entity
+    //         ent['editedBy'] = 999
+    //         // ent.stampEvent = "BeforePersistEvent Stamp"
+    //     }
+    // }
 }

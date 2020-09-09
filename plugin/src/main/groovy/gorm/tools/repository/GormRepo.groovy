@@ -97,7 +97,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
         try {
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             getRepoEventPublisher().doBeforePersist(this, entity, args)
-            entity.save(args)
+            getInstanceApi().save entity, args
+            // entity.save()
             getRepoEventPublisher().doAfterPersist(this, entity, args)
             return entity
         }

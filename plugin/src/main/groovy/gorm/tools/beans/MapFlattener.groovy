@@ -155,7 +155,7 @@ class MapFlattener {
             }
         }
 
-        return keyValues
+        return keyValues as Map<String, String>
     }
 
 }
@@ -195,9 +195,9 @@ class KeyVersion {
         }
     }
 
-    Map buildMapFromOriginal(Map original, Map additional) {
+    Map buildMapFromOriginal(Map original, Map<String, String> additional) {
 
-        Map combinedMap = [:]
+        Map combinedMap = [:] as Map<String, String>
         combinedMap.putAll(original)
         updateMapWithKeyValues(combinedMap, additional)
 

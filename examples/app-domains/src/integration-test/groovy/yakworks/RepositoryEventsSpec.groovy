@@ -27,6 +27,7 @@ class RepositoryEventsSpec extends Specification {
 
         then: "Event listener should have been called"
         org.event == "BeforeBindEvent Create"
+        // org.stampEvent == "BeforePersistEvent Stamp"
         org.id != null
 
         when:

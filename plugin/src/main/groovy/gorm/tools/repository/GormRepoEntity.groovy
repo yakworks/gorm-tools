@@ -60,6 +60,14 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
         getRepo().persist(args, (D) this)
     }
 
+    // D save(Map args = [:]) {
+    //     getRepo().persist(args, (D) this)
+    // }
+    //
+    // D saveApi(Map args = [:]) {
+    //     getRepo().saveApi(args, (D) this)
+    // }
+
     void remove(Map args = [:]) {
         getRepo().remove(args, (D) this)
     }

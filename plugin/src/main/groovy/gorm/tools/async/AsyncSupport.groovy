@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
 
-import gorm.tools.WithTrx
+import gorm.tools.transaction.WithTrx
 import grails.persistence.support.PersistenceContextInterceptor
 
 /**

@@ -15,7 +15,6 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.util.ClassUtils
 
-import gorm.tools.TrxService
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
@@ -23,9 +22,10 @@ import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import grails.plugin.gormtools.RepositoryArtefactHandler
+import gorm.tools.transaction.TrxService
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.

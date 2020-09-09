@@ -15,7 +15,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 
-import gorm.tools.GormMetaUtils
+import gorm.tools.utils.GormMetaUtils
 import grails.util.GrailsClassUtils
 import grails.web.servlet.mvc.GrailsParameterMap
 
@@ -38,7 +38,6 @@ class BeanPathTools {
         throw new AssertionError()
     }
 
-    //@CompileDynamic
     static Object getFieldValue(Object domain, String field) {
         GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, field)
     }
@@ -46,7 +45,6 @@ class BeanPathTools {
     /**
      * Returns the deepest nested bean
      */
-    //@CompileDynamic
     static getNestedBean(Object bean, String path) {
         int i = path.lastIndexOf(".")
         if (i > -1) {
@@ -82,7 +80,6 @@ class BeanPathTools {
      * @return a map which is based on object properties
      */
     @Deprecated //Use EntityMap instead now
-    // @CompileDynamic
     static Map buildMapFromPaths(Object source, List<String> propList, boolean useDelegatingBean = false) {
         if (useDelegatingBean) {
             Class delegatingBean = GrailsClassUtils.getStaticFieldValue(source.getClass(), "delegatingBean")
@@ -122,7 +119,6 @@ class BeanPathTools {
      */
     @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock', 'CatchException'])
     //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
-    // @CompileDynamic
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
         if (source == null) return null
         Integer nestedIndex = propertyPath.indexOf('.')
@@ -250,7 +246,6 @@ class BeanPathTools {
         return getGrailsParameterMap(p, request)
     }
 
-    // @CompileDynamic
     static List<String> getIncludes(String className, List<String> fields) {
         List<PersistentProperty> properties = GormMetaUtils.getPersistentProperties(className)
         List<String> result = []

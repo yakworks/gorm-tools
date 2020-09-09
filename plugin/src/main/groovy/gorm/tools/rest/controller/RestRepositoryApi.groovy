@@ -4,7 +4,6 @@
 */
 package gorm.tools.rest.controller
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -15,13 +14,11 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
-import org.springframework.validation.ObjectError
 
-import gorm.tools.Pager
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapFactory
+import gorm.tools.beans.Pager
 import gorm.tools.repository.GormRepoEntity
-import gorm.tools.repository.RepoMessage
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
@@ -41,7 +38,6 @@ import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException', 'NoDef'])

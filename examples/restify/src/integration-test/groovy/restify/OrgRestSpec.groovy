@@ -56,10 +56,10 @@ class OrgRestSpec extends RestApiFuncSpec {
         verify_UNPROCESSABLE_ENTITY(response)
         response.json.total == 2
         response.json.message == 'yakworks.taskify.domain.Org save failed'
-        response.json.errors[0].field == 'link.kind'
-        response.json.errors[0].message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
-        response.json.errors[1].field == 'link.name'
-        response.json.errors[1].message == 'Property [name] of class [class yakworks.taskify.domain.Org] cannot be null'
+        response.json.errors[1].field == 'link.kind'
+        response.json.errors[1].message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
+        response.json.errors[0].field == 'link.name'
+        response.json.errors[0].message == 'Property [name] of class [class yakworks.taskify.domain.Org] cannot be null'
 
     }
 

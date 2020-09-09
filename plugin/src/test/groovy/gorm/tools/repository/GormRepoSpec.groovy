@@ -14,8 +14,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 //import static grails.buildtestdata.TestData.build
-import grails.plugin.gormtools.GormToolsPluginHelper
-import org.grails.datastore.mapping.model.PersistentEntity
+
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Ignore
 import testing.*

@@ -12,7 +12,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 
-import gorm.tools.GormMetaUtils
+import gorm.tools.utils.GormMetaUtils
 
 //import org.apache.commons.logging.*
 

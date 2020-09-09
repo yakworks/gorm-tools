@@ -12,7 +12,7 @@ import org.grails.orm.hibernate.HibernateDatastore
 import org.junit.After
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.DbDialectService
+import gorm.tools.jdbc.DbDialectService
 import grails.build.support.MetaClassRegistryCleaner
 import grails.buildtestdata.TestDataBuilder
 

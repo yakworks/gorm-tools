@@ -53,7 +53,7 @@ dependencies {
 
   compile "org.grails:grails-async-gpars"
   compile "org.grails:grails-events-gpars"
-  compile 'org.grails.plugins:spring-security-core:3.2.0'
+  // compile 'org.grails.plugins:spring-security-core:3.2.0'
 
   runtime "org.glassfish.web:el-impl:2.1.2-b03"
 
@@ -62,7 +62,6 @@ dependencies {
 
   // Required for MySql db
   //runtime 'mysql:mysql-connector-java:5.1.42'
-  // runtime "org.apache.tomcat:tomcat-jdbc"
   runtime "com.bertramlabs.plugins:asset-pipeline-grails:2.14.6"
 
   testCompile "org.grails:grails-gorm-testing-support"
@@ -75,13 +74,12 @@ dependencies {
 
   //runtime 'mysql:mysql-connector-java:5.1.5'
   compile project(':gorm-tools')
-  compile("org.grails.plugins:audit-trail:3.0.8") //{ changing = true }
+  compile project(':gorm-tools-security')
+  // compile("org.grails.plugins:audit-trail:3.0.8") //{ changing = true }
   compile 'org.grails.plugins:csv:1.0'
 
   compile "io.reactivex.rxjava2:rxjava:2.1.6"
   compile "org.codehaus.gpars:gpars:1.2.0"
-
-  compile 'org.grails.plugins:spring-security-core:3.2.0'
 
   //compile "org.springframework:spring-test:4.3.7.RELEASE"
 }

@@ -3,15 +3,13 @@ package gpbench.traits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.Pager
-import gorm.tools.WithTrx
+import gorm.tools.beans.Pager
+import gorm.tools.transaction.WithTrx
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoTidyMap
-import gorm.tools.mango.api.MangoQuery
 import gorm.tools.repository.GormRepoEntity
-import gorm.tools.repository.RepoUtil
 import gpbench.Region
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional

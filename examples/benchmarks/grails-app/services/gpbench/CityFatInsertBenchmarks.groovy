@@ -18,8 +18,68 @@ class CityFatInsertBenchmarks extends BenchProcessData {
         setup()
 
         muteConsole = true
+
+        run_CompileStatic_doGormToolsRepoPersist()
+
+        println "\n**** the CompileStatics fast ones now****"
+        run_CompileStatic_doSettersStatic()
+
+        println "\n**** The slower CompileDynamic ****"
+        runDynamicCompile()
+
+        createAction = "create"
+        println "\n-- Grails default DataBinder is very slow--"
+        processData(CityFatNoTraits, 'grails', 'Grails: default dataBinder, CompileStatic CityFatNoTraits')
+
+        println "*** Using traits with the Grails default DataBinder is super slow, see bug report"
+        processData(CityFat, 'grails', 'Grails: default dataBinder CompileStatic CityFat w/Traits')
+
+        println "\n**Stats to insert ${dataList.size()} items on City Domains with 32+ fields**"
+        println statsToMarkdownTable()
+
+    }
+
+    // dynamically compiled domain entities
+    void run_CompileStatic_doSettersStatic() {
+        warmup = true // tells it to load a smaller number of items
+        //"save async" is in twice as the first pass is a warmup run
+        ["save async", "create", "validate", "save batch", "save async"].each{ action ->
+            createAction = action
+            println "-- createAction: $createAction --"
+            //the fastest one is one without associations and everything is compile static
+            doSettersStatic(CityFatNoTraitsNoAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNoAssoc')
+            doSettersStatic(CityFatNoTraitsIdAssoc, 'CompileStatic explicit setters, CityFatNoTraitsIdAssoc')
+            doSettersStatic(CityFatNoTraitsNullAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNullAssoc')
+            doSettersStatic(CityFatNoTraits, 'CompileStatic explicit setters, CityFatNoTraits')
+            doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
+            doSettersStatic(CityFatNativeIdGen, 'CompileStatic explicit setters, CityFatNativeIdGen')
+            doSettersStatic(CityFatAuditTrail, 'CompileStatic explicit setters, CityFatAuditTrail')
+            warmup = false
+            println "\n" + statsToMarkdownTable()
+        }
+    }
+
+    // dynamically compiled domain entities
+    void run_CompileStatic_doGormToolsRepoPersist() {
         warmup = true
-        println "\n**** The slower CompileDynamic ones first ****"
+        ["save async", "create", "validate", "save batch", "save async"].each{ action ->
+            createAction = action
+            println "-- createAction: $createAction --"
+            doGormToolsRepoPersist(CityFatNoTraitsNoAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNoAssoc')
+            doGormToolsRepoPersist(CityFatNoTraitsNullAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNullAssoc')
+            doGormToolsRepoPersist(CityFatNoTraitsIdAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsIdAssoc')
+            doGormToolsRepoPersist(CityFat, 'gorm-tools: fast binder & persist, CityFat')
+            doGormToolsRepoPersist(CityFatNoTraits, 'gorm-tools: fast binder & persist, CityFatNoTraits')
+            doGormToolsRepo(CityFat, 'gorm-tools: repo batch methods, CityFat')
+            //grailsDataBinderNoTraits(CityFatNoTraits)
+            warmup = false
+            println "\n" + statsToMarkdownTable()
+        }
+    }
+
+    // dynamically compiled domain entities
+    void runDynamicCompile() {
+        warmup = true
         //"save async" is in twice as the first pass is a warmup run
         ["save async", "create", "validate", "save batch", "save async"].each{
             createAction = it
@@ -32,44 +92,6 @@ class CityFatInsertBenchmarks extends BenchProcessData {
             warmup = false
             println "\n" + statsToMarkdownTable()
         }
-        warmup = true // tells it to load a smaller number of items
-        //"save async" is in twice as the first pass is a warmup run
-        println "\n**** the CompileStatics fast ones now****"
-        ["save async", "create", "validate", "save batch", "save async"].each{ action ->
-            createAction = action
-            println "-- createAction: $createAction --"
-            //the fastest one is one without associations and everything is compile static
-            doSettersStatic(CityFatNoTraitsNoAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNoAssoc')
-            doSettersStatic(CityFatNoTraitsIdAssoc, 'CompileStatic explicit setters, CityFatNoTraitsIdAssoc')
-            doSettersStatic(CityFatNoTraitsNullAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNullAssoc')
-            doSettersStatic(CityFatNoTraits, 'CompileStatic explicit setters, CityFatNoTraits')
-            doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
-            doSettersStatic(CityFatNativeIdGen, 'CompileStatic explicit setters, CityFatNativeIdGen')
-            doSettersStatic(CityFatAuditTrail, 'CompileStatic explicit setters, CityFatAuditTrail')
-            doGormToolsRepoPersist(CityFatNoTraitsNoAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNoAssoc')
-            doGormToolsRepoPersist(CityFatNoTraitsNullAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNullAssoc')
-            doGormToolsRepoPersist(CityFatNoTraitsIdAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsIdAssoc')
-            doGormToolsRepoPersist(CityFat, 'gorm-tools: fast binder & persist, CityFat')
-            doGormToolsRepoPersist(CityFatNoTraits, 'gorm-tools: fast binder & persist, CityFatNoTraits')
-            doGormToolsRepo(CityFat, 'gorm-tools: repo batch methods, CityFat')
-            //grailsDataBinderNoTraits(CityFatNoTraits)
-            warmup = false
-            println "\n" + statsToMarkdownTable()
-        }
-
-
-        //logMessage statsToMarkdownTable()
-
-        createAction = "create"
-        println "\n-- Grails default DataBinder --"
-        processData(CityFatNoTraits, 'grails', 'Grails: default dataBinder, CompileStatic CityFatNoTraits')
-
-        println "*** Using traits with the Grails default DataBinder is super slow, see bug report"
-        processData(CityFat, 'grails', 'Grails: default dataBinder CompileStatic CityFat w/Traits')
-
-        println "\n**Stats to insert ${dataList.size()} items on City Domains with 32+ fields**"
-        println statsToMarkdownTable()
-
     }
 
     @CompileDynamic

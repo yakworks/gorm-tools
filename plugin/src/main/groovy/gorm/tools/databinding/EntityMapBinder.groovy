@@ -21,8 +21,8 @@ import org.grails.web.databinding.GrailsWebDataBindingListener
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.BindingResult
 
-import gorm.tools.GormMetaUtils
 import gorm.tools.beans.IsoDateUtil
+import gorm.tools.utils.GormMetaUtils
 import grails.core.GrailsApplication
 import grails.databinding.DataBindingSource
 import grails.databinding.SimpleMapDataBindingSource

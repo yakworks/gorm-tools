@@ -20,7 +20,7 @@ class Book implements NameDescriptionTrait{
     static List includes = ['id', 'name', 'description', 'publishDate']
 
     static constraints = {
-        importFrom(NameDescriptionConstraints)
+        importFrom NameDescriptionConstraints
     }
 
 }

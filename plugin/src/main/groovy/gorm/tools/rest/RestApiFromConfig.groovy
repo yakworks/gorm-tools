@@ -26,7 +26,7 @@ import gorm.tools.rest.controller.RestApiRepoController
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ElementType.TYPE])
-@GroovyASTTransformationClass("gorm.tools.rest.transform.RestApiConfigTransform")
+@GroovyASTTransformationClass("gorm.tools.rest.ast.RestApiConfigTransform")
 @interface RestApiFromConfig {
 
     String namespace() default ""

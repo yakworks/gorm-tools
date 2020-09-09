@@ -12,7 +12,8 @@ import gorm.tools.beans.BeanPathTools
 import gorm.tools.beans.EntityMapFactory
 
 /**
- * a holder object for paged data
+ * a holder object for paged data, used mostly in the rest and views
+ * but can also be used for paging through and processing data
  */
 @Slf4j
 @CompileStatic
@@ -185,7 +186,7 @@ class Pager {
      * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
-    @Deprecated
+    @Deprecated //use setupList
     Pager setupData(List dlist, List includes = null) {
         setData(dlist)
         if (dlist?.size() > 0) {

@@ -71,7 +71,9 @@ class GormToolsPluginHelper {
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 
-        dbDialectService(DbDialectService)
+        dbDialectService(DbDialectService) {
+            jdbcTemplate = ref('jdbcTemplate')
+        }
 
         trxService(TrxService)
 

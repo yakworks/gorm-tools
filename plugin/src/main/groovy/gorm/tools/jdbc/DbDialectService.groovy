@@ -9,9 +9,8 @@ import java.sql.SQLException
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
+import org.grails.datastore.mapping.reflect.ClassUtils
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.util.ClassUtils
 
 import gorm.tools.beans.AppCtx
 
@@ -27,21 +26,19 @@ class DbDialectService {
     static final int ORACLE = 3
     static final int H2 = 4
 
-    //GrailsApplication grailsApplication
-    @Autowired
+    // injected in bean setup
     JdbcTemplate jdbcTemplate
 
     static String dialectName
 
     //need this static so that getGlobalVariables can be accessed from doWithSpring in rally plugin
-    @CompileDynamic
     private static int setupDialect() {
         int result = UNKNOWN
         // just to make the stuff below easier to read.
-        if (!dialectName) dialectName = AppCtx.config.hibernate.dialect
+        if (!dialectName) dialectName = AppCtx.config.getProperty('hibernate.dialect')
 
         //fallback to H2 just like how Datasources plugin does. if H2 is present in classpath
-        if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver", getClass().classLoader))
+        if ((dialectName == null && ClassUtils.isPresent("org.h2.Driver"))
             || dialectName.contains('H2')) result = H2
         else if (dialectName.contains("SQLServerDialect")) result = MSSQL
         else if (dialectName.matches(".*SQLServer20\\d\\dDialect")) result = MSSQL

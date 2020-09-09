@@ -4,6 +4,7 @@
 */
 package gorm.tools
 
+import gorm.tools.beans.Pager
 import gorm.tools.testing.unit.GormToolsTest
 import grails.persistence.Entity
 import spock.lang.Specification

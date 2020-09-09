@@ -3,7 +3,7 @@ package gpbench.traits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.Pager
+import gorm.tools.beans.Pager
 import gorm.tools.transaction.WithTrx
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.DefaultMangoQuery

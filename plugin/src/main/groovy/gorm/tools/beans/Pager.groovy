@@ -2,14 +2,11 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools
+package gorm.tools.beans
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
-
-import gorm.tools.beans.BeanPathTools
-import gorm.tools.beans.EntityMapFactory
 
 /**
  * a holder object for paged data, used mostly in the rest and views

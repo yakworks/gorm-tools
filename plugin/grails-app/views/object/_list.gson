@@ -1,6 +1,4 @@
-import groovy.transform.*
-
-import gorm.tools.Pager
+import gorm.tools.beans.Pager
 
 model {
     List data

@@ -20,7 +20,7 @@ import gorm.tools.security.services.UserService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 
 /**
- * Springsecurity login handler
+ * Springsecurity username handler
  * tracks user logins and sets flag if password expiry warning should be displayed.
  */
 @CompileStatic

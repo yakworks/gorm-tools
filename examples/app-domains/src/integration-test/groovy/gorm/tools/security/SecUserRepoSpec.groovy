@@ -1,6 +1,6 @@
 package gorm.tools.security
 
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.security.authentication.encoding.PasswordEncoder
 
 import gorm.tools.security.domain.SecRoleUser
@@ -10,7 +10,6 @@ import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 @Integration
@@ -23,7 +22,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         Map baseParams = [
             name:"John Galt",
             email:"test@9ci.com",
-            login:'galt',
+            username:'galt',
             password:'secretStuff',
             repassword:'secretStuff',
         ]
@@ -39,7 +38,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
         then:
         SecUser user = SecUser.get(id)
-        user.login == 'galt'
+        user.username == 'galt'
         user.email == params.email
         user.name == params.name
         passwordEncoder.isPasswordValid(user.passwordHash, params.password, null)
@@ -54,7 +53,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
         then:
         SecUser user = SecUser.get(id)
-        user.login == 'galt'
+        user.username == 'galt'
         SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
 
     }
@@ -63,7 +62,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         when:
         // use objects that may get passed in from json in this format
         def params = getUserParams([
-            login: 'galt2',
+            username: 'galt2',
             email: 'test2@9ci.com',
             roles: [
                 [id: 2 ], [id: 3]
@@ -74,7 +73,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
         then:
         SecUser user2 = SecUser.get(id2)
-        user2.login == 'galt2'
+        user2.username == 'galt2'
         SecRoleUser.findAllByUser(user2)*.role.id == [2L, 3L]
     }
 
@@ -142,11 +141,11 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
     void printDiffs(Map params, SecUser user, Map result) {
         println "          key                    params - result"
         def format = '    %7s.%-10s: %15s - %-15s\n'
-        printf(format, 'user', 'login', params.login, user.login)
+        printf(format, 'user', 'username', params.login, user.username)
         ['firstName', 'lastName', 'name', 'email'].each { key ->
             printf(format, 'contact', key, params.contact[key], user.contact[key])
         }
         println "result is ${result}"
-        println "user id: ${user.id}, login: ${user.login}, contact id: ${user.contact.id}, firstName: ${user.contact.firstName}"
+        println "user id: ${user.id}, username: ${user.username}, contact id: ${user.contact.id}, firstName: ${user.contact.firstName}"
     }
 }

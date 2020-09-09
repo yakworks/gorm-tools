@@ -34,7 +34,7 @@ class SecUserDetailsService implements GrailsUserDetailsService, GrailsApplicati
     UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
         log.debug "loadUserByName(${username}, ${loadRoles})"
         SecUser.withTransaction { status ->
-            SecUser user = SecUser.findByLogin(username.trim())
+            SecUser user = SecUser.findByUsername(username.trim())
             if (!user) {
                 throw new UsernameNotFoundException("User not found: $username")
             }
@@ -59,7 +59,7 @@ class SecUserDetailsService implements GrailsUserDetailsService, GrailsApplicati
             }
             // default
             // new GrailsUser(username, password, enabled, !accountExpired, !passwordExpired, !accountLocked, authorities, user.id)
-            new GrailsUser(user.login, user.passwordHash, user.enabled, true, !mustChange, true, authorities, user.id)
+            new GrailsUser(user.username, user.passwordHash, user.enabled, true, !mustChange, true, authorities, user.id)
         }
 
     }

@@ -34,7 +34,7 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
         args.get('save', false)
         args.email = genRandomEmail()
         args.name = "test-user-${System.currentTimeMillis()}"
-        args.login = "some_login_123"
+        args.username = "some_login_123"
         args.email = genRandomEmail()
         args
     }
@@ -64,7 +64,7 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
     def "test update fail"() {
         when:
         SecUser user = createEntity()
-        Map params = [id: user.id, login: null]
+        Map params = [id: user.id, username: null]
         SecUser.update(params)
 
         then:

@@ -12,13 +12,12 @@ grails {
             userLookup.enabledPropertyName = 'enabled'
             userLookup.passwordPropertyName = 'passwordHash'
             userLookup.userDomainClassName = 'gorm.tools.security.domain.SecUser'
-            userLookup.usernamePropertyName = 'login'
+            userLookup.usernamePropertyName = 'username'
             userLookup.accountExpiredPropertyName = null
             userLookup.accountLockedPropertyName = null
             userLookup.passwordExpiredPropertyName = null
 
             authority.nameField = 'springSecRole'
-            password.algorithm = 'MD5'
             securityConfigType = "InterceptUrlMap"
             adh.errorPage = null //null out so it can be custom
             logout.handlerNames = ['rememberMeServices', 'secLogoutHandler']

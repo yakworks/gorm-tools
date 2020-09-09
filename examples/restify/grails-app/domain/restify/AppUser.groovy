@@ -21,7 +21,7 @@ class AppUser {
     Date lastUpdated
 
     static constraints = {
-        userName description: 'The login name',
+        userName description: 'The username name',
                 example: "billy1",
                 nullable: false, maxSize: 50
 

@@ -63,7 +63,7 @@ class SecUserRepo implements GormRepo<SecUser> {
         if(user.password) {
             user.passwordHash = encodePassword(user.password)
         }
-        if(!user.name) user.name = user.login
+        if(!user.name) user.name = user.username
     }
 
     /**

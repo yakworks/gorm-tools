@@ -25,8 +25,8 @@ class AuditStampOrgSpec extends Specification implements DataIntegrationTest, Se
         o.editedDate
         o.editedBy == 1
         o.createdDate == o.editedDate
-        o.createdByName == 'bot'
-        o.editedByName == 'bot'
+        o.createdByName == 'admin'
+        o.editedByName == 'admin'
         //DateUtils.isSameInstant(o.createdDate, o.editedDate)
 
         when: 'its edited then edited should be updated'

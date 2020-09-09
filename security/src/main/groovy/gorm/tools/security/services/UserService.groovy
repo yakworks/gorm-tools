@@ -20,7 +20,7 @@ import grails.gorm.transactions.Transactional
 
 /**
  * UserService is for user level helpers, such as sending emails to user,
- * tracking user login/logout And operations relating to passwords, contacts and org levels
+ * tracking user username/logout And operations relating to passwords, contacts and org levels
  * Seurity related methods should go to SecService and not here.
  */
 @CompileStatic

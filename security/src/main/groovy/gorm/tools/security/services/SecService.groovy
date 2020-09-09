@@ -44,7 +44,7 @@ trait SecService<D> {
     abstract String encodePassword(String password)
 
     /**
-     * Used in automation to login a bot/system user, also used for tests
+     * Used in automation to username a bot/system user, also used for tests
      */
     abstract void loginAsSystemUser()
 

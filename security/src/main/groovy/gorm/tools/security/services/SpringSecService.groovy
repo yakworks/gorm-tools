@@ -95,14 +95,14 @@ class SpringSecService<D> implements SecService<D>{
     }
 
     /**
-     * Used in automation to login a bot/system user, also used for tests
+     * Used in automation to username a bot/system user, also used for tests
      */
     @Override
     void loginAsSystemUser() {
         SecUser user = SecUser.get(1)
         assert user
         List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMINISTRATOR] as String[])
-        GrailsUser grailsUser = new GrailsUser(user.login, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
+        GrailsUser grailsUser = new GrailsUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwordHash, authorities)
     }
 
@@ -118,10 +118,10 @@ class SpringSecService<D> implements SecService<D>{
      * Rebuild an Authentication for the given username and register it in the security context.
      * Typically used after updating a user's authorities or other auth-cached info.
      * <p/>
-     * Also removes the user from the user cache to force a refresh at next login.
+     * Also removes the user from the user cache to force a refresh at next username.
      * calls same on springSecurityService
      *
-     * @param username the user's login name
+     * @param username the user's username name
      * @param password optional
      */
     void reauthenticate(String username, String password = null) {

@@ -15,7 +15,7 @@ class SecUserDetailsServiceSpec extends Specification implements DataIntegration
 
     void testLoadUserByUsername() {
         when:
-        SecUser.repo.create([name:"Karen", login:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])
+        SecUser.repo.create([username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])
         flush()
         GrailsUser gUser = userDetailsService.loadUserByUsername('karen')
 
@@ -26,7 +26,7 @@ class SecUserDetailsServiceSpec extends Specification implements DataIntegration
         SecUser user = SecUser.get(gUser.id)
 
         then:
-        user.name== 'Karen'
+        user.name== 'karen'
     }
 
     void "test expired password"() {
@@ -40,7 +40,7 @@ class SecUserDetailsServiceSpec extends Specification implements DataIntegration
         user.save()
 
         when:
-        GrailsUser nineUser = userDetailsService.loadUserByUsername(user.login, false)
+        GrailsUser nineUser = userDetailsService.loadUserByUsername(user.username, false)
 
         then:
         nineUser.credentialsNonExpired == false

@@ -17,14 +17,18 @@ import grails.util.Holders
 
 @Entity
 @GrailsCompileStatic
-@EqualsAndHashCode(includes='login', useCanEqual=false)
+@EqualsAndHashCode(includes='username', useCanEqual=false)
 class SecUser implements Serializable, AuditStampTrait {
 
     static transients = ['password'] //@Transient not working when mapping has same column name for passwordHash?
 
-    String  login // the login name
-    String  name // the display name, may come from contact or defaults to login if not populated
-    String  email // users email for login or lost password
+    // username –– also known as your handle –– begins with the “@” symbol to reference others in comments or notes,
+    // is unique to your account, and appears in your profile URL. username is used to log in to your account,
+    // and is visible when sending and receiving. all lowercase and no spaces or special characters
+    String username
+    // lowercase property to be consitent as thats how everyone does it (twitter, facefck, github etc)
+    String  name // the display name, may come from contact or defaults to username if not populated
+    String  email // users email for username or lost password
     String  passwordHash // the password hash
     Boolean passwordExpired = false // passwordExpired
     Date    passwordChangedDate //date when password was changed. passwordExpireDays is added to this to see if its time to change again
@@ -49,12 +53,13 @@ class SecUser implements Serializable, AuditStampTrait {
         table Holders.config.getProperty('gorm.tools.security.user.table', 'Users')
         passwordHash column: "`password`"
         passwordExpired column: "mustChangePassword" // TODO change the column name in nine-db
+        username column: "login"
     }
 
     //@CompileDynamic
     static constraints = {
         importFrom AuditStampTraitConstraints, include: AuditStampTraitConstraints.includes
-        login blank: false, nullable: false, unique: true, maxSize: 50
+        username blank: false, nullable: false, unique: true, maxSize: 50
         name blank: false, nullable: false, maxSize: 50
         email nullable: false, blank: false, email: true, unique: true
         passwordHash blank: false, nullable: false, maxSize: 60, bindable: false, password: true

@@ -44,7 +44,7 @@ class SecUtils {
     }
 
     /**
-     * Used in automation to login a bot/system user, also used for tests
+     * Used in automation to username a bot/system user, also used for tests
      */
     static void loginAsSystemUser() {
         getSecService().loginAsSystemUser()

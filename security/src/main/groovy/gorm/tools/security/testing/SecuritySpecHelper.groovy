@@ -33,7 +33,7 @@ trait SecuritySpecHelper {
         roles = roles.collect { "ROLE_" + it}
         List authorities = AuthorityUtils.createAuthorityList(roles)
 
-        GrailsUser grailsUser = new GrailsUser(user.login, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
+        GrailsUser grailsUser = new GrailsUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)
         SecurityContextHolder.context.authentication = new UsernamePasswordAuthenticationToken(grailsUser, user.passwordHash, authorities)
     }
 

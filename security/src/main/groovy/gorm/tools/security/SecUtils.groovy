@@ -4,10 +4,18 @@
 */
 package gorm.tools.security
 
+import groovy.transform.CompileStatic
+
 import gorm.tools.beans.AppCtx
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.security.services.SecService
 
+/**
+ * a wrapper around SecService with statics for areas that can't get bean injected such as in an Entity
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1.12
+ */
+@CompileStatic
 class SecUtils {
 
     private static SecService cachedSecService
@@ -16,8 +24,23 @@ class SecUtils {
         // statics only
     }
 
-    static String getUserName(userId) {
-        return getSecService().getUserName(userId)
+    static String getUserFullName(Serializable userId) {
+        return getSecService().getUserFullName(userId)
+    }
+
+    static String getUserFullName() {
+        getSecService().getUserFullName()
+    }
+
+    static String getUsername(Serializable userId) {
+        return getSecService().getUsername(userId)
+    }
+
+    /**
+     * gets the currently logged in username
+     */
+    static String getUsername() {
+        getSecService().getUsername()
     }
 
     /**
@@ -25,13 +48,6 @@ class SecUtils {
      */
     static Serializable getUserId() {
         getSecService().getUserId()
-    }
-
-    /**
-     * gets the currently logged in user display name
-     */
-    static String getUserName() {
-        getSecService().getUserName()
     }
 
     /**

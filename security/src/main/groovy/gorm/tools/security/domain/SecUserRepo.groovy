@@ -4,6 +4,7 @@
 */
 package gorm.tools.security.domain
 
+import org.springframework.security.authentication.encoding.PasswordEncoder
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
@@ -14,14 +15,15 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.security.services.SecService
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 
 @GormRepository
 @GrailsCompileStatic
 class SecUserRepo implements GormRepo<SecUser> {
-    SecService secService
+    /** dependency injection for the password encoder */
+    PasswordEncoder passwordEncoder
+    // SecService secService
 
     /**
      * overrides the create method as its more clear whats going on than trying to do role logic with events
@@ -97,7 +99,7 @@ class SecUserRepo implements GormRepo<SecUser> {
     }
 
     String encodePassword(String pass) {
-        secService.encodePassword(pass)
+        passwordEncoder.encodePassword pass, null
     }
 
     /** throws EntityValidationException if not. NOTE: keep the real pas**ord name out so scanners dont pick this up */

@@ -9,12 +9,11 @@ import spock.lang.Specification
 
 class LocationSpec extends Specification implements DomainRepoTest<Location> {
 
-    void "crud tests"() {
+    void "CRUD tests"() {
         expect:
-        testCreate()
-        testUpdate()
-        testPersist()
-        testRemove()
+        createEntity().id
+        persistEntity().id
+        updateEntity().version > 0
+        removeEntity()
     }
-
 }

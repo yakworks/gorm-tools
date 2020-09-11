@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.audit.AuditStamp
+import gorm.tools.security.audit.AuditStamp
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.taskify.domain.traits.NameNumConstraints
@@ -51,7 +51,9 @@ class Org implements NameNumTrait{
     Kind kind
     OrgStatus status
 
-    @CompileDynamic //bug in grailsCompileStatic requires this on internal enums
+    //bug in grailsCompileStatic requires this on internal enums
+    //also, internal enums must always come before the static constraints or it doesn't get set
+    @CompileDynamic
     enum Kind {CLIENT, VENDOR, PARENT}
 
     static mapping = {

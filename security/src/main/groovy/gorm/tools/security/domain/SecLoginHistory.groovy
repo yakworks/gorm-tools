@@ -4,6 +4,8 @@
 */
 package gorm.tools.security.domain
 
+import java.time.LocalDateTime
+
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -12,8 +14,8 @@ import grails.persistence.Entity
 class SecLoginHistory implements Serializable {
 
     SecUser user
-    Date loginDate
-    Date logoutDate
+    LocalDateTime loginDate
+    LocalDateTime logoutDate
 
     static mapping = {
         table 'SecLoginHistory'

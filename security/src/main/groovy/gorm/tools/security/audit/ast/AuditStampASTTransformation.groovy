@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.audit.ast
+package gorm.tools.security.audit.ast
 
 import java.lang.reflect.Modifier
 
@@ -11,15 +11,22 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.AnnotationNode
+import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
+import org.codehaus.groovy.ast.GenericsType
 import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.PropertyNode
 import org.codehaus.groovy.ast.VariableScope
 import org.codehaus.groovy.ast.builder.AstBuilder
+import org.codehaus.groovy.ast.expr.ArgumentListExpression
+import org.codehaus.groovy.ast.expr.ClassExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.ListExpression
+import org.codehaus.groovy.ast.expr.MapExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
@@ -29,9 +36,11 @@ import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
+import org.grails.compiler.injection.GrailsASTUtils
 import org.grails.datastore.mapping.reflect.AstUtils
 
-import gorm.tools.audit.AuditStamp
+import gorm.tools.security.audit.AuditStampTrait
+import gorm.tools.security.audit.AuditStampTraitConstraints
 
 import static org.codehaus.groovy.ast.MethodNode.ACC_PUBLIC
 import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
@@ -42,9 +51,9 @@ import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
  */
 @CompileStatic
 @SuppressWarnings(['ThrowRuntimeException', 'CatchThrowable'])
-@GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
+@GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS) //use SEMANTIC_ANALYSIS so its picked up before the gorm ones
 class AuditStampASTTransformation implements ASTTransformation, CompilationUnitAware  {
-    private static final ClassNode MY_TYPE = new ClassNode(AuditStamp)
+    private static final ClassNode MY_TYPE = new ClassNode(gorm.tools.security.audit.AuditStamp)
     private ConfigObject stampCfg
 
     AuditStampASTTransformation() {
@@ -89,50 +98,54 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
             createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
         } else {
             //use the default trait
-            String auditStampTrait = (String) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "auditStampTrait")
-            addTrait(classNode, auditStampTrait)
-            // TODO we add the fields as well as implement trait as the ordering of AST fires the gorm transformations first
-            // and if we only add the trait the fields dont get wrapped in the dirty check processing
+            AstUtils.injectTrait(classNode, AuditStampTrait)
+            // addImportFrom(classNode)
+            // addMappingAndConstraints(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
+            // addMappingAndConstraints(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
+            // addMappingAndConstraints(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
+            // addMappingAndConstraints(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
+
+            // add fields too so the constraints can be added instead of messing with importFrom
             createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
             createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
-
             createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
             createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
-            // addImportFrom(classNode)
         }
     }
 
-    private boolean addTrait(ClassNode classNode, String traitClassName) {
-        String auditStampTrait = traitClassName ?: 'gorm.tools.security.stamp.AuditStampTrait'
-        def trtClass = getClass().classLoader.loadClass(auditStampTrait)
-        AstUtils.injectTrait(classNode, trtClass)
-        // boolean traitsAdded = false;
-        // boolean implementsTrait = false;
-        // boolean traitNotLoaded = false;
-        // classNode.getModule().addImport("AuditStampTrait", ClassHelper.make("gorm.tools.security.stamp.AuditStampTrait"))
-        // // ClassNode traitClassNode = ClassHelper.make(getClass().classLoader.loadClass('gorm.tools.security.stamp.AuditStampTrait'))
+    // using AstUtils.injectTrait(classNode, AuditStampTrait) directly now
+    boolean addTrait(ClassNode classNode, String traitClassName) {
+        //String auditStampTrait = traitClassName ?: 'gorm.tools.security.audit.AuditStampTrait'
+        //def trtClass = getClass().classLoader.loadClass(auditStampTrait)
+        // AstUtils.injectTrait(classNode, AuditStampTrait)
+        boolean traitsAdded = false;
+        boolean implementsTrait = false;
+        boolean traitNotLoaded = false;
+        // classNode.getModule().addImport("AuditStampTrait", ClassHelper.make("gorm.tools.security.audit.AuditStampTrait"))
+        // // ClassNode traitClassNode = ClassHelper.make(getClass().classLoader.loadClass('gorm.tools.security.audit.AuditStampTrait'))
         // ClassNode traitClassNode = ClassHelper.make('AuditStampTrait')
         //
-        // try {
-        //     implementsTrait = classNode.declaresInterface(traitClassNode);
-        // } catch (Throwable e) {
-        //     // if we reach this point, the trait injector could not be loaded due to missing dependencies
-        //     // (for example missing servlet-api). This is ok, as we want to be able to compile against non-servlet
-        //     // environments.
-        //     traitNotLoaded = true;
-        // }
-        // if (!implementsTrait && !traitNotLoaded) {
-        //     final GenericsType[] genericsTypes = traitClassNode.getGenericsTypes();
-        //     final parameterNameToParameterValue = [:] as Map<String, ClassNode>
-        //     if(genericsTypes != null) {
-        //         for(GenericsType gt : genericsTypes) {
-        //             parameterNameToParameterValue.put(gt.getName(), classNode);
-        //         }
-        //     }
-        //     classNode.addInterface(GrailsASTUtils.replaceGenericsPlaceholders(traitClassNode, parameterNameToParameterValue, classNode));
-        //     traitsAdded = true;
-        // }
-        // return traitsAdded;
+        ClassNode traitClassNode = new ClassNode(AuditStampTrait)
+        try {
+            implementsTrait = classNode.declaresInterface(traitClassNode);
+        } catch (Throwable e) {
+            // if we reach this point, the trait injector could not be loaded due to missing dependencies
+            // (for example missing servlet-api). This is ok, as we want to be able to compile against non-servlet
+            // environments.
+            traitNotLoaded = true;
+        }
+        if (!implementsTrait && !traitNotLoaded) {
+            final GenericsType[] genericsTypes = traitClassNode.getGenericsTypes();
+            final parameterNameToParameterValue = [:] as Map<String, ClassNode>
+            if(genericsTypes != null) {
+                for(GenericsType gt : genericsTypes) {
+                    parameterNameToParameterValue.put(gt.getName(), classNode);
+                }
+            }
+            classNode.addInterface(GrailsASTUtils.replaceGenericsPlaceholders(traitClassNode, parameterNameToParameterValue, classNode));
+            traitsAdded = true;
+        }
+        return traitsAdded;
     }
 
     public void addDisableAuditStampField(ClassNode classNode) {
@@ -152,7 +165,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
     }
 
     public void addMappingAndConstraints(ClassNode classNode, FieldProps fieldProps) {
-        addSettings("mapping", classNode, fieldProps.name, fieldProps.mapping)
+        //addSettings("mapping", classNode, fieldProps.name, fieldProps.mapping)
         addSettings("constraints", classNode, fieldProps.name, fieldProps.constraints)
     }
 
@@ -181,31 +194,57 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         assert hasFieldInClosure(closure, fieldName) == true
     }
 
-    // public void addImportFrom(ClassNode classNode) {
-    //     String name = "constraints"
-    //     //String configStr = "importFrom(AuditStampTraitConstraints)"
-    //
-    //     //BlockStatement newConfig = (BlockStatement) new AstBuilder().buildFromString(configStr).get(0)
-    //
-    //     FieldNode closure = classNode.getField(name)
-    //     if (closure == null) {
-    //         createStaticClosure(classNode, name)
-    //         closure = classNode.getField(name)
-    //         assert closure != null
-    //     }
-    //     def ce = new ClassExpression(new ClassNode(AuditStampTraitConstraints))
-    //     def arguments = new ArgumentListExpression(ce)
-    //     def importFromMethodCall = new MethodCallExpression(new VariableExpression("this"),"importFrom", arguments)
-    //     def methodCallStatement = new ExpressionStatement(importFromMethodCall)
-    //
-    //     //classNode.getModule().addImport("AuditStampTraitConstraints", ClassHelper.make("gorm.tools.traits.AuditStampTraitConstraints"))
-    //
-    //     //ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)
-    //     //ExpressionStatement exStatment = new ExpressionStatement(returnStatement.getExpression())
-    //     ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
-    //     BlockStatement block = (BlockStatement) exp.getCode()
-    //     block.addStatement(methodCallStatement)
-    // }
+    void addImportFrom(ClassNode classNode) {
+        String name = "constraints"
+        String configStr = "importFrom(AuditStampTraitConstraints)"
+
+        //classNode.getModule().addImport("AuditStampTraitConstraints", new ClassNode(AuditStampTraitConstraints))
+
+        //BlockStatement newConfig = (BlockStatement) new AstBuilder().buildFromString(configStr).get(0)
+
+        // BlockStatement newConfig = (BlockStatement) new AstBuilder().buildFromString(configStr).get(0)
+        //
+        // FieldNode closure = classNode.getField(name)
+        // ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)
+        // ExpressionStatement exStatment = new ExpressionStatement(returnStatement.getExpression())
+        // ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
+        // BlockStatement block = (BlockStatement) exp.getCode()
+        // block.addStatement(exStatment)
+
+        def constNode = ClassHelper.make(AuditStampTraitConstraints) //new ClassNode(AuditStampTraitConstraints)
+        def ce = new ClassExpression(constNode)
+        println "includes field ${constNode.getField('includes')}"
+        //def incList = (ListExpression) constNode.getField("includes").getInitialExpression()
+        def lexp = new ListExpression()
+        AuditStampTraitConstraints.props.each {
+            lexp.addExpression(new ConstantExpression(it))
+        }
+        //def incList = new FieldExpression(constNode.getField('includes'))
+        assert lexp
+        def me = new MapExpression()
+        me.addMapEntryExpression(new ConstantExpression("include"), lexp)
+        //def namedarg = new MapExpression(new ConstantExpression("include"), incList)
+        assert me
+        def arguments = new ArgumentListExpression(ce, me)
+        println "arguments ${arguments}"
+        //def arguments = new ArgumentListExpression(ce)
+        //include: AuditStampTraitConstraints.includes
+
+        def importFromMethodCall = new MethodCallExpression(new VariableExpression("this"), "importFrom", arguments)
+        def methodCallStatement = new ExpressionStatement(importFromMethodCall)
+
+        ClosureExpression exp = (ClosureExpression) classNode.getField(name).getInitialExpression()
+        BlockStatement block = (BlockStatement) exp.getCode()
+        block.addStatement(methodCallStatement)
+
+        //classNode.getModule().addImport("AuditStampTraitConstraints", ClassHelper.make("gorm.tools.traits.AuditStampTraitConstraints"))
+
+        //ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)
+        //ExpressionStatement exStatment = new ExpressionStatement(returnStatement.getExpression())
+        // ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
+        // BlockStatement block = (BlockStatement) exp.getCode()
+        // block.addStatement(methodCallStatement)
+    }
 
     void createStaticClosure(ClassNode classNode, String name) {
         FieldNode field = new FieldNode(name, ACC_PUBLIC | ACC_STATIC, new ClassNode(Object), new ClassNode(classNode.getClass()), null)
@@ -215,7 +254,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         classNode.addField(field)
     }
 
-    public boolean hasFieldInClosure(FieldNode closure, String fieldName) {
+    boolean hasFieldInClosure(FieldNode closure, String fieldName) {
         if (closure != null) {
             ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
             BlockStatement block = (BlockStatement) exp.getCode()

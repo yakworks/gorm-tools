@@ -1,4 +1,4 @@
-grails.plugin.audittrail.enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled", "true"))
+gorm.tools.security.audit.enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled", "true"))
 // grails.plugin.audittrail.enabled = false
 
 grails.gorm.autowire = Boolean.valueOf(System.getProperty("autowire.enabled", "false"))

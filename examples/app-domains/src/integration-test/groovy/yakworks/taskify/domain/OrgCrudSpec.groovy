@@ -10,7 +10,7 @@ import gorm.tools.security.testing.SecuritySpecHelper
 @Rollback
 class OrgCrudSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
 
-    def "test Contact create"(){
+    def "test Org create"(){
         when:
         Long id = Org.create([num:'123', name:"Wyatt Oil"]).id
         flushAndClear()
@@ -24,5 +24,16 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
         c.editedDate
         c.editedBy == 1
 
+    }
+
+    def "test NameNum constraints got added"(){
+        when:
+        def conProps = Org.constrainedProperties
+
+        then:
+        conProps.num.property.nullable == false
+        conProps['num'].property.blank == false
+        conProps['num'].property.maxSize == 50
+        conProps['name'].property.nullable == false
     }
 }

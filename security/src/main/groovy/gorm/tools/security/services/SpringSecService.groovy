@@ -152,6 +152,7 @@ class SpringSecService<D> implements SecService<D>{
     /**
      * Check if current user has any of the specified roles
      */
+    @Override
     boolean ifAnyGranted(String... roles) {
         return SpringSecurityUtils.ifAnyGranted(parseAuthoritiesString(roles))
     }
@@ -159,6 +160,7 @@ class SpringSecService<D> implements SecService<D>{
     /**
      * Check if current user has all of the specified roles
      */
+    @Override
     boolean ifAllGranted(String... roles) {
         return SpringSecurityUtils.ifAllGranted(parseAuthoritiesString(roles))
     }

@@ -13,7 +13,16 @@ import gorm.tools.testing.TestTools
 import grails.buildtestdata.TestData
 
 /**
- * Provides CRUD tests to automatically unit test domains
+ * Provides simple CRUD methods to sanity check domain and exercise the repo.
+ * Use like so ...
+ *
+ * void "CRUD tests"() {
+ *   expect:
+ *   createEntity().id
+ *   persistEntity().id
+ *   updateEntity().version > 0
+ *   removeEntity()
+ * }
  *
  */
 @CompileDynamic
@@ -28,19 +37,6 @@ trait DomainCrudSpec<D> {
 
         assert _entityClass != null, "No Generic type found for ${getClass().simpleName}"
         return _entityClass
-    }
-
-    void testCreate(){
-        assert createEntity().id
-    }
-    void testUpdate(){
-        assert updateEntity().version > 0
-    }
-    void testPersist(){
-        assert persistEntity().id
-    }
-    void testRemove(){
-        assert removeEntity()
     }
 
     /************************ Helpers Methods for expect or then spock blocks *************/

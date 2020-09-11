@@ -4,63 +4,51 @@
 */
 package gorm.tools.security
 
-import groovy.transform.CompileDynamic
+
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 import gorm.tools.security.domain.SecUser
+import gorm.tools.security.services.UserService
 import grails.compiler.GrailsCompileStatic
-import grails.core.GrailsApplication
-import grails.core.support.GrailsApplicationAware
+import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
 
 @Slf4j
 @GrailsCompileStatic
-class SecUserDetailsService implements GrailsUserDetailsService, GrailsApplicationAware {
-    GrailsApplication grailsApplication
+class SecUserDetailsService implements GrailsUserDetailsService {
 
-    @Value('${gorm.tools.security.password.expireDays:30}')
-    int passwordExpireDays
+    @Autowired
+    UserService userService
 
-    @Value('${gorm.tools.security.password.expireEnabled:false}')
-    boolean passwordExpireEnabled
-
-    @CompileDynamic
+    @Transactional
     UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
         log.debug "loadUserByName(${username}, ${loadRoles})"
-        SecUser.withTransaction { status ->
-            SecUser user = SecUser.findByUsername(username.trim())
-            if (!user) {
-                throw new UsernameNotFoundException("User not found: $username")
-            }
-            log.debug "Found user ${user} in the database"
-            Boolean mustChange = user.passwordExpired
 
-            if (passwordExpireEnabled) {
-                int expireDays = passwordExpireDays
-                Date now = new Date()
-
-                //check if user's password has expired
-                if (!user.passwordChangedDate || (now - expireDays >= user.passwordChangedDate)) {
-                    mustChange = true
-                }
-
-            }
-
-            List<SimpleGrantedAuthority> authorities = []
-
-            if (loadRoles) {
-                authorities = user.roles.collect { new SimpleGrantedAuthority(it.springSecRole) }
-            }
-            // default
-            // new GrailsUser(username, password, enabled, !accountExpired, !passwordExpired, !accountLocked, authorities, user.id)
-            new GrailsUser(user.username, user.passwordHash, user.enabled, true, !mustChange, true, authorities, user.id)
+        SecUser user = SecUser.getByUsername(username.trim())
+        if (!user) {
+            throw new UsernameNotFoundException("User not found: $username")
         }
+        log.debug "Found user ${user} in the database"
+
+        Boolean mustChange = userService.isPasswordExpired(user)
+
+        List<SimpleGrantedAuthority> authorities = []
+
+        if (loadRoles) {
+            authorities = user.roles.collect { new SimpleGrantedAuthority(it.springSecRole) }
+        }
+        new GrailsUser(user.username, user.passwordHash,
+            user.enabled, true, !mustChange, true,
+            authorities as Collection<GrantedAuthority>,
+            user.id)
+
 
     }
 

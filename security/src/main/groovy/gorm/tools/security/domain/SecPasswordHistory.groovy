@@ -4,6 +4,8 @@
 */
 package gorm.tools.security.domain
 
+import java.time.LocalDateTime
+
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -13,7 +15,7 @@ class SecPasswordHistory {
     static belongsTo = [user: SecUser]
     String password
 
-    Date dateCreated
+    LocalDateTime dateCreated
 
     static constraints = {
         user nullable: false

@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import org.grails.config.PropertySourcesConfig
 import org.grails.testing.GrailsUnitTest
 
-import gorm.tools.audit.ast.FieldProps
+import gorm.tools.security.audit.ast.FieldProps
 import spock.lang.Specification
 
 class FieldPropsTests extends Specification implements GrailsUnitTest {

@@ -48,6 +48,13 @@ trait SecService<D> {
      */
     abstract void loginAsSystemUser()
 
+    abstract boolean ifAnyGranted(String... roles)
+
+    /**
+     * Check if current user has all of the specified roles
+     */
+    abstract boolean ifAllGranted(String... roles)
+
     /**
      * Get the domain class instance associated with the current authentication.
      */
@@ -59,12 +66,37 @@ trait SecService<D> {
     }
 
     /**
-     * returns the user display name for the passed in id
-     * @return the user name
+     * returns the name property from the SecUser for logged in user
+     * @return the username
      */
-    String getUserName(Serializable uid) {
+    String getUserFullName() {
+        return getUserFullName(getUserId())
+    }
+
+    /**
+     * returns the name
+     * @return the full name / display name
+     */
+    String getUserFullName(Serializable uid) {
         D usr = getUser(uid)
         return usr ? usr['name'] : null
+    }
+
+    /**
+     * returns the username handle for logged in user
+     * @return the username
+     */
+    String getUsername() {
+        return getUsername(getUserId())
+    }
+
+    /**
+     * returns the username handle for the passed in id
+     * @return the username
+     */
+    String getUsername(Serializable uid) {
+        D usr = getUser(uid)
+        return usr ? usr['username'] : null
     }
 
     /**
@@ -73,7 +105,7 @@ trait SecService<D> {
      * @return the user entity
      */
     D getUser(Serializable uid) {
-        GormEnhancer.findStaticApi(getEntityClass()).load(uid)
+        GormEnhancer.findStaticApi(getEntityClass()).get(uid)
     }
 
 }

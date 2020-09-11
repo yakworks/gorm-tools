@@ -4,7 +4,10 @@
 */
 package gorm.tools.security.services
 
-import groovy.time.TimeCategory
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -15,7 +18,6 @@ import gorm.tools.security.PasswordValidator
 import gorm.tools.security.domain.SecLoginHistory
 import gorm.tools.security.domain.SecPasswordHistory
 import gorm.tools.security.domain.SecUser
-import gorm.tools.security.services.SecService
 import grails.gorm.transactions.Transactional
 
 /**
@@ -32,6 +34,12 @@ class UserService {
 
     @Value('${gorm.tools.security.password.expireDays:90}')
     int passwordExpireDays
+
+    @Value('${gorm.tools.security.password.expireEnabled:false}')
+    boolean passwordExpiryEnabled
+
+    @Value('${gorm.tools.security.password.warnDays:30}')
+    int passwordWarnDays
 
     SecService<SecUser> secService
     PasswordValidator passwordValidator
@@ -69,11 +77,31 @@ class UserService {
         return passwordValidator.validate(user, pass, passConfirm)
     }
 
-    int remainingDaysForPasswordExpiry(SecUser u = null) {
+    /**
+     * checks if password is expired. first checks the passwordExpired field and then if expireEnabled
+     * it adds the expireDays to see if we are under that date
+     * @param user is optional, will look in the security context if not passed in
+     * @return
+     */
+    //FIXME make sure we have good integration tests for this
+    boolean isPasswordExpired(SecUser user = null) {
+        if(!user) user = (SecUser)secService.getUser()
+        //can always force a password change by setting passwordExpired field to true
+        if(user.passwordExpired) return true
+        if (passwordExpiryEnabled) {
+            LocalDate expireDate = user.passwordChangedDate?.plusDays(passwordExpireDays).toLocalDate()
+            //check if user's password has expired
+            if (!expireDate || LocalDate.now() >= expireDate) {
+                return true
+            }
+        }
+        return false
+    }
+
+    Integer remainingDaysForPasswordExpiry(SecUser u = null) {
         SecUser user = u ?: (SecUser)secService.getUser()
-        Date now = new Date()
-        int expiresInDaysFromNow = TimeCategory.minus(user.passwordChangedDate + (passwordExpireDays), now).days
-        return expiresInDaysFromNow
+        LocalDateTime pExpire = user.passwordChangedDate.plusDays(passwordExpireDays)
+        return Duration.between(LocalDateTime.now(), pExpire).toDays().toInteger()
     }
 
     /**
@@ -84,7 +112,7 @@ class UserService {
     void updatePassword(SecUser user, String newPwd) {
         user.password = newPwd //must be hased password
         user.passwordExpired = false
-        user.passwordChangedDate = new Date()
+        user.passwordChangedDate = LocalDateTime.now()
         user.save()
 
         if (passwordHistoryEnabled) {

@@ -56,9 +56,8 @@ class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent
         boolean result = false
         SecUser.withTransaction {
             if (passwordExpiryEnabled) {
-                int warnBeforeDays = passwordWarnDays
                 int remainingDays = userService.remainingDaysForPasswordExpiry(SecUser.get((Long) principal.id))
-                if (warnBeforeDays >= remainingDays) result = true
+                if (passwordWarnDays >= remainingDays) result = true
             }
         }
 

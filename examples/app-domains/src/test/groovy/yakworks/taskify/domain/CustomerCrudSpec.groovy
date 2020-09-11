@@ -4,8 +4,16 @@
 */
 package yakworks.taskify.domain
 
-import gorm.tools.testing.unit.DomainRepoCrudSpec
+import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.Specification
 
-class CustomerCrudSpec extends DomainRepoCrudSpec<Customer> {
+class CustomerCrudSpec extends Specification implements DomainRepoTest<Customer> {
 
+    void "CRUD tests"() {
+        expect:
+        createEntity().id
+        persistEntity().id
+        updateEntity().version > 0
+        removeEntity()
+    }
 }

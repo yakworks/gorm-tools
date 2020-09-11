@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.security.stamp
+package gorm.tools.security.audit
 
 import javax.annotation.PostConstruct
 
@@ -23,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
 import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.tools.audit.AuditStamp
-import gorm.tools.audit.ast.FieldProps
+import gorm.tools.security.audit.ast.AuditStampConfigLoader
+import gorm.tools.security.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -47,6 +47,8 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
 
     @PostConstruct
     void init() {
+        if(!fieldProps) fieldProps = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
+        println "GormToolsAuditStampListener Init datastore: $datastore"
         GrailsClass[] domains = grailsApplication.getArtefacts(DomainClassArtefactHandler.TYPE)
         for (GrailsClass domain : domains) {
             if (isAuditStamped(domain.clazz)) auditStampedEntities << domain.clazz.name
@@ -68,7 +70,7 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     protected void onPersistenceEvent(AbstractPersistenceEvent event) {
         EntityAccess ea = event.entityAccess
         PersistentEntity entity = event.entity
-
+        //println "GormToolsAuditStampListener onPersistenceEvent $entity"
         if (entity == null || !auditStampedEntities.contains(entity.name)) return
 
         if (event.getEventType() == EventType.PreInsert) beforeInsert(ea)
@@ -142,7 +144,8 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     }
 
     Serializable getCurrentUserId() {
-        return secService.getUserId()
+        Serializable uid = secService.getUserId()
+        return uid ?: 0L
     }
 
     @Override

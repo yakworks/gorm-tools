@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.security.stamp
+package gorm.tools.security.audit
 
 import java.time.LocalDateTime
 import javax.persistence.Transient
@@ -26,23 +26,25 @@ trait AuditStampTrait {
 
     @Transient
     String getEditedByName() {
-        SecUtils.getUserName(getEditedBy())
+        SecUtils.getUsername(getEditedBy())
     }
 
     @Transient
     String getCreatedByName() {
-        SecUtils.getUserName(getCreatedBy())
+        SecUtils.getUsername(getCreatedBy())
     }
+
 }
 
 @CompileDynamic
 class AuditStampTraitConstraints implements AuditStampTrait {
-    static includes = ['createdDate', 'editedDate', 'createdBy', 'editedBy']
+    // use the props when doing importFrom so that it doesn't pick up the getCreatedByName and getEditedByName
+    static props = ['createdDate', 'editedDate', 'createdBy', 'editedBy']
 
     static constraints = {
-        createdDate nullable:true, display:false, editable:false, bindable:false
-        editedDate nullable:true, display:false, editable:false, bindable:false
-        createdBy nullable:true, display:false, editable:false, bindable:false
-        editedBy nullable:true, display:false, editable:false, bindable:false
+        createdDate nullable:false, display:false, editable:false, bindable:false
+        editedDate nullable:false, display:false, editable:false, bindable:false
+        createdBy nullable:false, display:false, editable:false, bindable:false
+        editedBy nullable:false, display:false, editable:false, bindable:false
     }
 }

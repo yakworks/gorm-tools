@@ -9,12 +9,12 @@ import spock.lang.Specification
 
 class TaskSpec extends Specification implements DomainRepoTest<Task> {
 
-    void "crud tests"() {
+    void "CRUD tests"() {
         expect:
-        testCreate()
-        testUpdate()
-        testPersist()
-        testRemove()
+        createEntity().id
+        persistEntity().id
+        updateEntity().version > 0
+        removeEntity()
     }
 
 }

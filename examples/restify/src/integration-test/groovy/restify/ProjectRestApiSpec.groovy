@@ -1,12 +1,13 @@
 package restify
 
-import gorm.tools.rest.testing.RestApiFuncSpec
+import geb.spock.GebSpec
+import gorm.tools.rest.testing.RestApiTestTrait
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
 @Integration
 @Rollback
-class ProjectRestApiSpec extends RestApiFuncSpec {
+class ProjectRestApiSpec extends GebSpec implements RestApiTestTrait {
 
     String path = "api/project"
 
@@ -16,4 +17,11 @@ class ProjectRestApiSpec extends RestApiFuncSpec {
 
     Map invalidData = ["name": null]
 
+    void "exercise api"() {
+        expect:
+        testGet()
+        testPost()
+        testPut()
+        testDelete()
+    }
 }

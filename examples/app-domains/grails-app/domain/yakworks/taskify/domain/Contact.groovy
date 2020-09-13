@@ -6,8 +6,6 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.security.audit.AuditStamp
-import gorm.tools.security.audit.AuditStampTrait
-import gorm.tools.security.audit.AuditStampTraitConstraints
 import grails.compiler.GrailsCompileStatic
 
 @AuditStamp
@@ -31,7 +29,6 @@ class Contact { // implements AuditStampTrait {
     static hasOne = [address: ContactAddress]
 
     static constraints = {
-        // importFrom AuditStampTraitConstraints, include: AuditStampTraitConstraints.props
         firstName nullable: false
         dateOfBirth nullable: true
         inactive bindable: false, display: false, editable: false

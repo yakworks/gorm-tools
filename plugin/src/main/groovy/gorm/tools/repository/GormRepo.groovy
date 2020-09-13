@@ -264,6 +264,10 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
         return get(params.id as Serializable, params.version as Long)
     }
 
+    void publishBeforeValidate(Object entity) {
+        getRepoEventPublisher().doBeforeValidate(this, entity, [:])
+    }
+
     @Override
     RuntimeException handleException(RuntimeException ex, D entity) {
         return getRepoExceptionSupport().translateException(ex, entity)

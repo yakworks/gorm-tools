@@ -14,6 +14,7 @@ class AuditStampOrgSpec extends Specification implements DataIntegrationTest, Se
 
     def "test create"(){
         when:
+        println "AuditStampOrgSpec"
         Long id = Org.create([num:'123', name:"Wyatt Oil"]).id
         flushAndClear()
 

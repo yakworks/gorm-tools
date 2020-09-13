@@ -6,12 +6,12 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
 import gorm.tools.security.domain.SecUser
-import gorm.tools.security.testing.SecuritySpecUnitTestHelper
+import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
-class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, SecuritySpecUnitTestHelper {
+class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, SecurityTest {
 
     // Closure doWithConfig() {
     //     return { cfg ->
@@ -73,26 +73,16 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
         conProps.passwordHash.display == false
         conProps['passwordHash'].property.display == false
 
-        // conProps['editedBy'].nullable == false
-        // conProps['editedDate'].nullable == false
         conProps['editedBy'].property.metaConstraints["bindable"] == false
-        // conProps['editedBy'].property.metaConstraints == [:]
-        // conProps['editedBy'].editable == false
-        // conProps['editedBy'].property.editable == false
-        // conProps['editedBy'].property.display == false
+        conProps['editedBy'].property.metaConstraints["description"] == "edited by user id"
 
         ['editedBy','createdBy', 'editedDate','createdDate'].each {
             assert con.hasProperty(it)
             def conProp = conProps[it].property
             conProp.metaConstraints["bindable"] == false
             assert conProp.nullable == false
-            // assert !conProp.display
-            // assert !conProp.editable
+            assert !conProp.editable
         }
-
-        // Contact.constrainedProperties.collect {
-        //     [it.value.getPropertyName(), it.value.property.appliedConstraints]
-        // } == []
 
     }
 

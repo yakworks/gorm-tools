@@ -1,17 +1,14 @@
 package restify
 
-import gorm.tools.rest.testing.RestApiFuncSpec
-import gorm.tools.testing.TestDataJson
-import grails.gorm.transactions.Transactional
+import geb.spock.GebSpec
+import gorm.tools.rest.testing.RestApiTestTrait
 import grails.testing.mixin.integration.Integration
-import yakworks.taskify.domain.Project
-import yakworks.taskify.domain.Task
 
 import static org.springframework.http.HttpStatus.CREATED
 
 // @Integration(applicationClass = Application)
 @Integration
-class TaskRestApiSpec extends RestApiFuncSpec {
+class TaskRestApiSpec extends GebSpec implements RestApiTestTrait {
     String path = "api/task"
 
     //@Transactional
@@ -24,6 +21,14 @@ class TaskRestApiSpec extends RestApiFuncSpec {
 
     List<String> getExcludes() {
         ['lastUpdated', 'dateCreated']
+    }
+
+    void "exercise api"() {
+        expect:
+        testGet()
+        testPost()
+        testPut()
+        testDelete()
     }
 
     @Override

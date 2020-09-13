@@ -9,7 +9,7 @@ import spock.lang.Specification
 @Rollback
 class OrgSpec extends Specification implements DataIntegrationTest {
 
-    def "test Contact create"(){
+    def "test Org create"(){
         when:
         Long id = Org.create([num:'123', name:"Wyatt Oil"]).id
         flushAndClear()

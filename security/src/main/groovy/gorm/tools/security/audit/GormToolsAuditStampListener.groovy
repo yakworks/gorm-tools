@@ -70,13 +70,11 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     protected void onPersistenceEvent(AbstractPersistenceEvent event) {
         EntityAccess ea = event.entityAccess
         PersistentEntity entity = event.entity
-        //println "GormToolsAuditStampListener onPersistenceEvent $entity"
+        println "GormToolsAuditStampListener onPersistenceEvent ${event.eventType}"
         if (entity == null || !auditStampedEntities.contains(entity.name)) return
 
         if (event.getEventType() == EventType.PreInsert) beforeInsert(ea)
         else if (event.getEventType() == EventType.PreUpdate) beforeUpdate(ea)
-        else if (event.getEventType() == EventType.Validation) beforeValidate(ea)
-
     }
 
     private void beforeInsert(EntityAccess ea) {
@@ -86,12 +84,6 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     private void beforeUpdate(EntityAccess ea) {
         setTimestampField(FieldProps.EDITED_DATE_KEY, ea, null)
         setUserField(FieldProps.EDITED_BY_KEY, ea)
-    }
-
-    private void beforeValidate(EntityAccess ea) {
-        if (isNewEntity(ea)) {
-            setDefaults(ea)
-        }
     }
 
     void setTimestampField(String prop, EntityAccess ea, Object date) {
@@ -137,9 +129,9 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
      * @param entity
      * @return boolean
      */
-    private boolean isNewEntity(EntityAccess ea) {
+    private boolean isNewEntity(Object entity) {
         String createdDateFieldName = fieldProps.get(FieldProps.CREATED_DATE_KEY).name
-        def value = ea.getPropertyValue(createdDateFieldName)
+        def value = entity[createdDateFieldName]
         return value == null
     }
 

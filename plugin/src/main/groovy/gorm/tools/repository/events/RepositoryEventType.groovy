@@ -14,6 +14,7 @@ enum RepositoryEventType {
     BeforeRemove(BeforeRemoveEvent),
     BeforeBind(BeforeBindEvent),
     BeforePersist(BeforePersistEvent),
+    BeforeValidate(BeforeValidateEvent),
     AfterRemove(AfterRemoveEvent),
     AfterBind(AfterBindEvent),
     AfterPersist(AfterPersistEvent)

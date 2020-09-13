@@ -1,11 +1,11 @@
 package gorm.tools.security
 
 import gorm.tools.security.domain.SecUser
-import gorm.tools.security.testing.SecuritySpecUnitTestHelper
+import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 
-class PasswordValidatorSpec extends Specification implements  DataRepoTest, SecuritySpecUnitTestHelper {
+class PasswordValidatorSpec extends Specification implements  DataRepoTest, SecurityTest {
 
     void setup() {
         mockDomain(SecUser)

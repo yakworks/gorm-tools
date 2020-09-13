@@ -1,8 +1,10 @@
 package yakworks.taskify.domain
 
+import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import gorm.tools.security.testing.SecuritySpecHelper
 
@@ -24,6 +26,17 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
         c.editedDate
         c.editedBy == 1
 
+    }
+
+    @IgnoreRest
+    def "test Org create fail"(){
+        when:
+        Map invalidData2 = [num:'foo1', name: "foo", type: [id: 1], link: ["name": "", num:'foo2', type: [id: 1]]]
+        Org.create(invalidData2)
+
+        then:
+        def ex = thrown(EntityValidationException)
+        ex.errors.getErrorCount() == 2
     }
 
     def "test NameNum constraints got added"(){

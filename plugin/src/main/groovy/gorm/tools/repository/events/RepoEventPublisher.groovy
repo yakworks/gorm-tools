@@ -92,6 +92,11 @@ class RepoEventPublisher {
         ReflectionUtils.invokeMethod(method, repo, methodArgs)
     }
 
+    void doBeforeValidate(RepositoryApi repo, Object entity, Map args) {
+        BeforeValidateEvent event = new BeforeValidateEvent(repo, entity, args)
+        publishEvents(repo, event, [entity, event] as Object[])
+    }
+
     void doBeforePersist(RepositoryApi repo, GormEntity entity, Map args) {
         BeforePersistEvent event = new BeforePersistEvent(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])

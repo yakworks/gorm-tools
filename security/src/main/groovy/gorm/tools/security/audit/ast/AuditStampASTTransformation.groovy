@@ -40,7 +40,6 @@ import org.grails.compiler.injection.GrailsASTUtils
 import org.grails.datastore.mapping.reflect.AstUtils
 
 import gorm.tools.security.audit.AuditStampTrait
-import gorm.tools.security.audit.AuditStampTraitConstraints
 
 import static org.codehaus.groovy.ast.MethodNode.ACC_PUBLIC
 import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
@@ -99,6 +98,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         } else {
             //use the default trait
             AstUtils.injectTrait(classNode, AuditStampTrait)
+            addConstraints(classNode)
             // addImportFrom(classNode)
             // addMappingAndConstraints(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
             // addMappingAndConstraints(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
@@ -106,10 +106,10 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
             // addMappingAndConstraints(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
 
             // add fields too so the constraints can be added instead of messing with importFrom
-            createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
-            createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
-            createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
-            createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
+            // createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
+            // createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
+            // createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
+            // createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
         }
     }
 
@@ -194,6 +194,22 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         assert hasFieldInClosure(closure, fieldName) == true
     }
 
+    void addConstraints(ClassNode classNode) {
+        String name = "constraints"
+        String configStr = "AuditStampTraitConstraints(delegate)"
+        def builder = new AstBuilder().buildFromString(configStr)
+
+        BlockStatement newConfig = (BlockStatement) new AstBuilder().buildFromString(configStr).get(0)
+        // ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)
+        // ExpressionStatement exStatment = new ExpressionStatement(returnStatement.getExpression())
+
+        FieldNode closure = classNode.getField(name)
+        ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
+        BlockStatement block = (BlockStatement) exp.getCode()
+        block.addStatement(newConfig)
+        //block.statements.add(0, newConfig)
+    }
+
     void addImportFrom(ClassNode classNode) {
         String name = "constraints"
         String configStr = "importFrom(AuditStampTraitConstraints)"
@@ -211,14 +227,14 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         // BlockStatement block = (BlockStatement) exp.getCode()
         // block.addStatement(exStatment)
 
-        def constNode = ClassHelper.make(AuditStampTraitConstraints) //new ClassNode(AuditStampTraitConstraints)
+        def constNode = ClassHelper.make(AuditStampTrait) //new ClassNode(AuditStampTraitConstraints)
         def ce = new ClassExpression(constNode)
         println "includes field ${constNode.getField('includes')}"
         //def incList = (ListExpression) constNode.getField("includes").getInitialExpression()
         def lexp = new ListExpression()
-        AuditStampTraitConstraints.props.each {
-            lexp.addExpression(new ConstantExpression(it))
-        }
+        // AuditStampTraitConstraints.props.each {
+        //     lexp.addExpression(new ConstantExpression(it))
+        // }
         //def incList = new FieldExpression(constNode.getField('includes'))
         assert lexp
         def me = new MapExpression()

@@ -4,9 +4,8 @@
 */
 package gorm.tools.security
 
-import gorm.tools.security.audit.GormToolsAuditStampListener
-import gorm.tools.security.audit.ast.AuditStampConfigLoader
-import gorm.tools.security.audit.ast.FieldProps
+import gorm.tools.security.audit.AuditStampEventListener
+import gorm.tools.security.audit.AuditStampSupport
 import gorm.tools.security.domain.SecUser
 import gorm.tools.security.services.SpringSecService
 import gorm.tools.security.services.UserService
@@ -42,12 +41,8 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
 
             //dont register beans if audit trail is disabled.
             if (config.getProperty('gorm.tools.security.audit.enabled', Boolean, true)) {
-                Map fprops = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
-
-                gormToolsAuditStampListener(GormToolsAuditStampListener, ref('hibernateDatastore')) { bean ->
-                    bean.lazyInit = true
-                    fieldProps = fprops
-                }
+                auditStampEventListener(AuditStampEventListener)
+                auditStampSupport(AuditStampSupport)
             }
 
 

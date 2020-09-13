@@ -19,12 +19,11 @@ class TestingAuditStampListener implements ApplicationListener<BeforePersistEven
     @Override
     void onApplicationEvent(BeforePersistEvent event) {
         def ent = event.entity
-        println "BeforePersistEvent ent $ent"
         if(ent instanceof AuditStampTrait){
-            ent['createdBy'] = 1
-            ent['editedBy'] = 1
-            ent['editedDate'] = LocalDateTime.now()
-            ent['createdDate'] = LocalDateTime.now()
+            if(!ent['createdBy']) ent['createdBy'] = 1
+            if(!ent['editedBy']) ent['editedBy'] = 1
+            if(!ent['editedDate']) ent['editedDate'] = LocalDateTime.now()
+            if(!ent['createdDate']) ent['createdDate'] = LocalDateTime.now()
         }
         // println "TestingAuditStampListener event ${event.eventKey}"
     }

@@ -1,12 +1,13 @@
 package restify
 
-import gorm.tools.rest.testing.RestApiFuncSpec
+import geb.spock.GebSpec
+import gorm.tools.rest.testing.RestApiTestTrait
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 
 @Integration
 @Rollback
-class AppUserRestApiSpec extends RestApiFuncSpec {
+class AppUserRestApiSpec extends GebSpec implements RestApiTestTrait {
 
     String getResourcePath() {
         "${baseUrl}api/appUser"

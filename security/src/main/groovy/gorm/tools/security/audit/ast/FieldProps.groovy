@@ -18,7 +18,7 @@ class FieldProps {
     // editedBy.constraints = "nullable:true,display:false,editable:false,bindable:false"
     // editedDate.field = "editedDate"
     // editedDate.constraints = "nullable:true,display:false,editable:false,bindable:false"
-    static final String CONFIG_KEY = "grails.plugin.audittrail"
+    static final String CONFIG_KEY = "gorm.tools.audit"
     static final String DATE_CONS = "nullable:true, display:false, editable:false, bindable:false"
     static final String USER_CONS = "nullable:true, display:false, editable:false, bindable:false"
 

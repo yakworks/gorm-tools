@@ -8,16 +8,28 @@ import groovy.transform.CompileDynamic
 
 import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder
 
+import gorm.tools.security.audit.AuditStampEventListener
+import gorm.tools.security.audit.AuditStampListener
+import gorm.tools.security.audit.AuditStampSupport
+import gorm.tools.security.audit.GormToolsAuditStampListener
 import gorm.tools.security.domain.SecUser
 
+/**
+ * adds mock spring beans for passwordEncoder, and secService and
+ * AuditStampEventListener for created/edited fields. During and entity.create it converts test data to a map
+ * and since the created/edited fields are not bindable they dont get set so needs a listener
+ */
 @CompileDynamic
-trait SecuritySpecUnitTestHelper {
+trait SecurityTest {
 
     Closure doWithSpringFirst() {
         return {
             passwordEncoder(PlaintextPasswordEncoder)
             secService(TestingSecService, SecUser)
-            testingAuditStampListener(TestingAuditStampListener)
+            auditStampEventListener(AuditStampEventListener)
+            auditStampSupport(AuditStampSupport)
+            // auditStampListener(AuditStampListener)
+            // gormToolsAuditStampListener(GormToolsAuditStampListener, getDatastore())
         }
     }
 

@@ -30,10 +30,11 @@ trait RestApiTestTrait {
 
     List<String> getExcludes() { [] }
 
+    Map getInvalidData() { return [:] }
 
     def testList(String qSearch) {
         qSearch = qSearch ? "?q=${qSearch}" : ""
-        def res = restBuilder.get("${resourcePath}${qSearch}")
+        def res = restBuilder.get("${getResourcePath()}${qSearch}")
         assert res.status == OK.value()
         def pageMap = res.json
         return pageMap
@@ -41,7 +42,7 @@ trait RestApiTestTrait {
 
     def testPickList(String qSearch) {
         qSearch = qSearch ? "?q=${qSearch}" : ""
-        def res = restBuilder.get("${resourcePath}/pickList${qSearch}")
+        def res = restBuilder.get("${getResourcePath()}/pickList${qSearch}")
         assert res.status == OK.value()
         def pageMap = res.json
         return pageMap
@@ -49,8 +50,8 @@ trait RestApiTestTrait {
 
     def testPost() {
         // "The save action is executed with valid data"
-        def response = restBuilder.post(resourcePath) {
-            json postData
+        def response = restBuilder.post(getResourcePath()) {
+            json getPostData()
         }
 
         //"The response is correct"
@@ -59,14 +60,14 @@ trait RestApiTestTrait {
         //response.json.id
         assert TestTools.mapContains(response.json, postData, excludes)
         //Project.count() > 1// == 1
-        def rget = restBuilder.get("$resourcePath/${response.json.id}")
+        def rget = restBuilder.get("${getResourcePath()}/${response.json.id}")
         assert TestTools.mapContains(rget.json, postData, excludes)
         return rget
     }
 
     def testPostInvalid() {
         // "The save action is executed with invalid data"
-        def response = restBuilder.post(resourcePath) {
+        def response = restBuilder.post(getResourcePath()) {
             json getInvalidData()
         }
         // "The response is UNPROCESSABLE_ENTITY"
@@ -77,7 +78,7 @@ trait RestApiTestTrait {
     def testPut() {
         def response = post_a_valid_resource()
         def goodId = response.json.id
-        response = restBuilder.put("$resourcePath/$goodId") {
+        response = restBuilder.put("${getResourcePath()}/$goodId") {
             json putData
         }
 
@@ -86,7 +87,7 @@ trait RestApiTestTrait {
         //response.json
         assert TestTools.mapContains(response.json, putData, excludes)
         //get it and make sure
-        def rget = restBuilder.get("$resourcePath/$goodId")
+        def rget = restBuilder.get("${getResourcePath()}/$goodId")
         assert TestTools.mapContains(rget.json, putData, excludes)
         // subsetEquals(putData, rget.json, excludes)
         return rget
@@ -98,7 +99,7 @@ trait RestApiTestTrait {
 
         // "When the show action is called to retrieve a resource"
         def id = response.json.id
-        response = restBuilder.get("$resourcePath/$id")
+        response = restBuilder.get("${getResourcePath()}/$id")
 
         // "The response is correct"
         assert response.status == OK.value()
@@ -112,7 +113,7 @@ trait RestApiTestTrait {
         def id = response.json.id
 
         // "When the delete action is executed on an unknown instance"
-        response = restBuilder.delete("$resourcePath/99999")
+        response = restBuilder.delete("${getResourcePath()}/99999")
 
         // "The response is bad"
         response.status == NOT_FOUND.value()
@@ -126,7 +127,7 @@ trait RestApiTestTrait {
     }
 
     def post_a_valid_resource() {
-        def response = restBuilder.post(resourcePath) {
+        def response = restBuilder.post(getResourcePath()) {
             json getPostData()
         }
         verifyHeaders(response)

@@ -10,8 +10,9 @@ import javax.persistence.Transient
 import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
 
+import org.grails.datastore.gorm.validation.constraints.builder.ConstrainedPropertyBuilder
+
 import gorm.tools.security.audit.AuditStampTrait
-import gorm.tools.security.audit.AuditStampTraitConstraints
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -22,7 +23,8 @@ class SecUser implements AuditStampTrait { //, Serializable {
 
     static transients = ['password'] //@Transient not working when mapping has same column name for passwordHash?
 
-    // username –– also known as your handle –– begins with the “@” symbol to reference others in comments or notes,
+    // username –– also known as your handle –– what you put after the “@” symbol ala github or twitter
+    // to mention others in comments or notes,
     // is unique to your account, and appears in your profile URL. username is used to log in to your account,
     // and is visible when sending and receiving. all lowercase and no spaces or special characters
     String username
@@ -58,7 +60,9 @@ class SecUser implements AuditStampTrait { //, Serializable {
 
     //@CompileDynamic
     static constraints = {
-        importFrom AuditStampTraitConstraints, include: AuditStampTraitConstraints.props
+        AuditStampTraitConstraints(delegate)
+        //importFrom AuditStampTraitConstraints, include: AuditStampTraitConstraints.props
+        // assert delegate instanceof ConstrainedPropertyBuilder
         username blank: false, nullable: false, unique: true, maxSize: 50
         name blank: false, nullable: false, maxSize: 50
         email nullable: false, blank: false, email: true, unique: true

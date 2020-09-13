@@ -17,6 +17,7 @@ import org.hibernate.SessionFactory
 import gorm.tools.beans.AppCtx
 import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
 import gorm.tools.mango.api.QueryMangoEntity
+import gorm.tools.repository.api.EntityMethodEvents
 import gorm.tools.repository.api.RepositoryApi
 import grails.util.Holders
 
@@ -27,11 +28,11 @@ import grails.util.Holders
  * @since 6.1
  */
 @CompileStatic
-trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
+trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity, EntityMethodEvents {
 
     Class getEntityClass(){ getClass() }
 
-    private static RepositoryApi cachedRepo
+    private static GormRepo cachedRepo
 
     abstract private static GormStaticApi<D> currentGormStaticApi()
 
@@ -39,8 +40,8 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
      * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set
      * @return The repository
      */
-    static RepositoryApi<D> findRepo() {
-        if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), RepositoryApi)
+    static GormRepo<D> findRepo() {
+        if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
         return cachedRepo
     }
 
@@ -48,11 +49,11 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
      * Calls the findRepo(). can be overriden to return the concrete domain Repository
      * @return The repository
      */
-    transient static RepositoryApi<D> getRepo() {
+    transient static GormRepo<D> getRepo() {
         return findRepo()
     }
 
-    transient static void setRepo(RepositoryApi<D> repo) {
+    transient static void setRepo(GormRepo<D> repo) {
         cachedRepo = repo
     }
 
@@ -90,6 +91,13 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity {
 
     static void removeById(Map args = [:], Serializable id) {
         getRepo().removeById(args, id)
+    }
+
+    // this will fire and event and call beforeValidate on the repo.
+    // when child associations are being validated in by grail's gorm it doesn't seem to fire and event
+    // se we fire our own here.
+    void beforeValidate() {
+        getRepo().publishBeforeValidate(this)
     }
 
     /**

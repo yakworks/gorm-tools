@@ -10,6 +10,9 @@ import javax.persistence.Transient
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import gorm.tools.beans.AppCtx
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.api.EntityMethodEvents
 import gorm.tools.security.SecUtils
 
 /**
@@ -17,12 +20,21 @@ import gorm.tools.security.SecUtils
  * the @AuditStamp ann adds this and can also be extended for events to pick
  */
 @CompileStatic
-trait AuditStampTrait {
+trait AuditStampTrait implements EntityMethodEvents{
     LocalDateTime createdDate
     LocalDateTime editedDate
 
     Long createdBy
     Long editedBy
+
+    // abstract private static GormRepo getRepo()
+
+    // private static AuditStampSupport _auditStampSupport
+    //
+    // transient static AuditStampSupport getAuditStampSupport() {
+    //     if(!_auditStampSupport) _auditStampSupport = AppCtx.get('auditStampSupport', AuditStampSupport)
+    //     return (AuditStampSupport)_auditStampSupport
+    // }
 
     @Transient
     String getEditedByName() {
@@ -34,17 +46,24 @@ trait AuditStampTrait {
         SecUtils.getUsername(getCreatedBy())
     }
 
-}
+    // void beforeValidate() {
+    //     getRepo().publishBeforeValidate(this)
+    // }
 
-@CompileDynamic
-class AuditStampTraitConstraints implements AuditStampTrait {
-    // use the props when doing importFrom so that it doesn't pick up the getCreatedByName and getEditedByName
-    static props = ['createdDate', 'editedDate', 'createdBy', 'editedBy']
-
-    static constraints = {
-        createdDate nullable:false, display:false, editable:false, bindable:false
-        editedDate nullable:false, display:false, editable:false, bindable:false
-        createdBy nullable:false, display:false, editable:false, bindable:false
-        editedBy nullable:false, display:false, editable:false, bindable:false
+    @CompileDynamic
+    static AuditStampTraitConstraints(delegate) {
+        def c = {
+            createdDate description: "created date/time",
+                        nullable: false, editable: false, bindable: false
+            createdBy   description: "created by user id",
+                        nullable: false, editable: false, bindable: false
+            editedDate  description: "last edit date/time",
+                        nullable: false, editable: false, bindable: false
+            editedBy    description: "edited by user id",
+                        nullable: false, editable: false, bindable: false
+        }
+        c.delegate = delegate
+        c()
     }
+
 }

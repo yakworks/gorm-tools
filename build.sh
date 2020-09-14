@@ -18,7 +18,7 @@ init_from_build_yml "gradle/build.yml"
 # cats key files into a cache-checksum.tmp file for circle to use as key
 # change this based on how project is structured
 function catKeyFiles {
-  cat gradle.properties build.gradle plugin/build.gradle examples/restify/build.gradle examples/app-domains/build.gradle > cache-checksum.tmp
+  cat gradle.properties build.gradle gorm-tools/build.gradle gorm-tools-security/build.gradle examples/restify/build.gradle examples/test-domain/build.gradle > cache-checksum.tmp
 }
 
 # compile used for circle

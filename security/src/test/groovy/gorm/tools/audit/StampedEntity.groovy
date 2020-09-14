@@ -1,6 +1,5 @@
-package gorm.tools.security.stamp
+package gorm.tools.audit
 
-import gorm.tools.security.audit.AuditStamp
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

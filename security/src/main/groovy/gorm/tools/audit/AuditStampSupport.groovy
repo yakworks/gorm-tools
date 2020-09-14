@@ -2,36 +2,31 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.security.audit
+package gorm.tools.audit
 
 import java.time.LocalDateTime
 import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
-import org.grails.core.artefact.DomainClassArtefactHandler
 import org.grails.datastore.mapping.engine.EntityAccess
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.PersistentProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.tools.repository.GormRepoEntity
-import gorm.tools.security.audit.ast.AuditStampConfigLoader
-import gorm.tools.security.audit.ast.FieldProps
+import gorm.tools.audit.ast.AuditStampConfigLoader
+import gorm.tools.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
-import grails.core.GrailsApplication
-import grails.core.GrailsClass
 import grails.util.GrailsClassUtils
 
 @CompileStatic
 class AuditStampSupport {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditStamp'
 
-    @Autowired GrailsApplication grailsApplication
+    @Autowired MappingContext grailsDomainClassMappingContext
     @Autowired SecService secService
 
     Map<String, FieldProps> fieldProps
@@ -41,9 +36,8 @@ class AuditStampSupport {
     void init() {
         if(!fieldProps) fieldProps = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
         println "GormToolsAuditStampListener Init"
-        GrailsClass[] domains = grailsApplication.getArtefacts(DomainClassArtefactHandler.TYPE)
-        for (GrailsClass domain : domains) {
-            if (isClassAuditStamped(domain.clazz)) auditStampedEntities << domain.clazz.name
+        for (PersistentEntity persistentEntity : grailsDomainClassMappingContext.getPersistentEntities()) {
+            if (isClassAuditStamped(persistentEntity.javaClass)) auditStampedEntities << persistentEntity.name
         }
         //initCurrentUserClosure()
     }

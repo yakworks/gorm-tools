@@ -1,7 +1,8 @@
-package gorm.tools.security.stamp
+package gorm.tools.audit
 
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedEntity>, SecurityTest {
@@ -56,7 +57,23 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
         d2.editedDate == null
     }
 
-    def "test create"(){
+    def "test create"() {
+        when:
+        Long id = StampedEntity.create([name: "Wyatt Oil"]).id
+        //flushAndClear()
+
+        then:
+        def o = StampedEntity.get(id)
+        o.name == "Wyatt Oil"
+        o.createdDate
+        o.createdBy == 1
+        o.editedDate
+        o.editedBy == 1
+        o.createdDate == o.editedDate
+    }
+
+    @Ignore
+    def "test update"(){
         when:
         Long id = StampedEntity.create([name:"Wyatt Oil"]).id
         flushAndClear()
@@ -78,9 +95,10 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
         o.persist(flush:true)
 
         then:
-        o.refresh()
-        o.name == '999'
-        o.createdDate < o.editedDate
+        def o2 = StampedEntity.get(id)
+        //o.refresh()
+        o2.name == '999'
+        o2.createdDate < o2.editedDate
         //!DateUtils.isSameInstant(o.createdDate, o.editedDate)
         o.editedBy == 1
     }

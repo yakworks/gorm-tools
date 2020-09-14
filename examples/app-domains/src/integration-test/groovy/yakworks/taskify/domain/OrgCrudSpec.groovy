@@ -14,6 +14,7 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
 
     def "test Org create"(){
         when:
+        println "test Org create"
         Long id = Org.create([num:'123', name:"Wyatt Oil"]).id
         flushAndClear()
 
@@ -28,7 +29,7 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
 
     }
 
-    @IgnoreRest
+
     def "test Org create fail"(){
         when:
         Map invalidData2 = [num:'foo1', name: "foo", type: [id: 1], link: ["name": "", num:'foo2', type: [id: 1]]]

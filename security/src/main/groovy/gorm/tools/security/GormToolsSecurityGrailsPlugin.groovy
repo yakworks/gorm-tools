@@ -4,8 +4,8 @@
 */
 package gorm.tools.security
 
-import gorm.tools.security.audit.AuditStampEventListener
-import gorm.tools.security.audit.AuditStampSupport
+import gorm.tools.audit.AuditStampEventListener
+import gorm.tools.audit.AuditStampSupport
 import gorm.tools.security.domain.SecUser
 import gorm.tools.security.services.SpringSecService
 import gorm.tools.security.services.UserService
@@ -40,7 +40,7 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
             }
 
             //dont register beans if audit trail is disabled.
-            if (config.getProperty('gorm.tools.security.audit.enabled', Boolean, true)) {
+            if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
                 auditStampEventListener(AuditStampEventListener)
                 auditStampSupport(AuditStampSupport)
             }

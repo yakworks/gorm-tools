@@ -1,4 +1,4 @@
-package gorm.tools.security.stamp
+package gorm.tools.audit
 
 import org.codehaus.groovy.ast.builder.AstBuilder
 import org.codehaus.groovy.ast.stmt.BlockStatement

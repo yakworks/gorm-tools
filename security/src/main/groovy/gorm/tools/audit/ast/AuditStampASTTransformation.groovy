@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.security.audit.ast
+package gorm.tools.audit.ast
 
 import java.lang.reflect.Modifier
 
@@ -39,7 +39,7 @@ import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.compiler.injection.GrailsASTUtils
 import org.grails.datastore.mapping.reflect.AstUtils
 
-import gorm.tools.security.audit.AuditStampTrait
+import gorm.tools.audit.AuditStampTrait
 
 import static org.codehaus.groovy.ast.MethodNode.ACC_PUBLIC
 import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
@@ -52,7 +52,7 @@ import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
 @SuppressWarnings(['ThrowRuntimeException', 'CatchThrowable'])
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS) //use SEMANTIC_ANALYSIS so its picked up before the gorm ones
 class AuditStampASTTransformation implements ASTTransformation, CompilationUnitAware  {
-    private static final ClassNode MY_TYPE = new ClassNode(gorm.tools.security.audit.AuditStamp)
+    private static final ClassNode MY_TYPE = new ClassNode(gorm.tools.audit.AuditStamp)
     private ConfigObject stampCfg
 
     AuditStampASTTransformation() {
@@ -115,14 +115,14 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
 
     // using AstUtils.injectTrait(classNode, AuditStampTrait) directly now
     boolean addTrait(ClassNode classNode, String traitClassName) {
-        //String auditStampTrait = traitClassName ?: 'gorm.tools.security.audit.AuditStampTrait'
+        //String auditStampTrait = traitClassName ?: 'gorm.tools.audit.AuditStampTrait'
         //def trtClass = getClass().classLoader.loadClass(auditStampTrait)
         // AstUtils.injectTrait(classNode, AuditStampTrait)
         boolean traitsAdded = false;
         boolean implementsTrait = false;
         boolean traitNotLoaded = false;
-        // classNode.getModule().addImport("AuditStampTrait", ClassHelper.make("gorm.tools.security.audit.AuditStampTrait"))
-        // // ClassNode traitClassNode = ClassHelper.make(getClass().classLoader.loadClass('gorm.tools.security.audit.AuditStampTrait'))
+        // classNode.getModule().addImport("AuditStampTrait", ClassHelper.make("gorm.tools.audit.AuditStampTrait"))
+        // // ClassNode traitClassNode = ClassHelper.make(getClass().classLoader.loadClass('gorm.tools.audit.AuditStampTrait'))
         // ClassNode traitClassNode = ClassHelper.make('AuditStampTrait')
         //
         ClassNode traitClassNode = new ClassNode(AuditStampTrait)

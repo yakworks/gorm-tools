@@ -1,4 +1,4 @@
-package gorm.tools.security
+package gorm.tools.audit
 
 import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest

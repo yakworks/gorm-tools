@@ -1,4 +1,4 @@
-package gorm.tools.security.audit;
+package gorm.tools.audit;
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 
@@ -13,6 +13,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-@GroovyASTTransformationClass("gorm.tools.security.audit.ast.AuditStampASTTransformation")
+@GroovyASTTransformationClass("gorm.tools.audit.ast.AuditStampASTTransformation")
 public @interface AuditStamp {
 }

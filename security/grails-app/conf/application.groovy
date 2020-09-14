@@ -9,11 +9,4 @@ grails {
         '*'(nullable:true)
     }
 }
-gorm.tools.auditStamp.enabled = true
-grails{
-    plugin{
-        audittrail{
-            enabled = true
-        }
-    }
-}
+gorm.tools.audit.enabled = true

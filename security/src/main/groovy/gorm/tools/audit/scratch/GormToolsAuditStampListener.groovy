@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.security.audit
+package gorm.tools.audit.scratch
 
 import javax.annotation.PostConstruct
 
@@ -23,8 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
 import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.tools.security.audit.ast.AuditStampConfigLoader
-import gorm.tools.security.audit.ast.FieldProps
+import gorm.tools.audit.AuditStamp
+import gorm.tools.audit.AuditStampTrait
+import gorm.tools.audit.ast.AuditStampConfigLoader
+import gorm.tools.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -129,11 +131,11 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
      * @param entity
      * @return boolean
      */
-    private boolean isNewEntity(Object entity) {
-        String createdDateFieldName = fieldProps.get(FieldProps.CREATED_DATE_KEY).name
-        def value = entity[createdDateFieldName]
-        return value == null
-    }
+    // private boolean isNewEntity(Object entity) {
+    //     String createdDateFieldName = fieldProps.get(FieldProps.CREATED_DATE_KEY).name
+    //     def value = entity[createdDateFieldName]
+    //     return value == null
+    // }
 
     Serializable getCurrentUserId() {
         Serializable uid = secService.getUserId()

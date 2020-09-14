@@ -1,1 +1,1 @@
-grails.plugin.audittrail.test = "test"
+gorm.tools.audit.stamp = "test"

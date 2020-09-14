@@ -13,7 +13,6 @@ import spock.lang.Specification
 
 class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
 
-    @Ignore
     void "CRUD tests"() {
         expect:
         createEntity().id

@@ -1,11 +1,11 @@
-package gorm.tools.security.stamp
+package gorm.tools.audit
 
 import java.time.LocalDateTime
 
 import org.grails.config.PropertySourcesConfig
 import org.grails.testing.GrailsUnitTest
 
-import gorm.tools.security.audit.ast.FieldProps
+import gorm.tools.audit.ast.FieldProps
 import spock.lang.Specification
 
 class FieldPropsTests extends Specification implements GrailsUnitTest {
@@ -16,9 +16,9 @@ class FieldPropsTests extends Specification implements GrailsUnitTest {
         ConfigObject co = new ConfigSlurper().parse(testConfig);
 
         then:
-        assert co.grails.plugin.audittrail
-        assert FieldProps.getMap(co, "grails.plugin.audittrail.createdBy")
-        assert !FieldProps.getMap(co, "grails.plugin.audittrail.xxx")
+        assert co.gorm.tools.audit.stamp
+        assert FieldProps.getMap(co, "gorm.tools.audit.stamp.createdBy")
+        assert !FieldProps.getMap(co, "gorm.tools.audit.stamp.xxx")
         //assert co.getProperty("grails.plugin.audittrail")
         def fmap = FieldProps.buildFieldMap(new PropertySourcesConfig(co))
         assert fmap
@@ -35,20 +35,17 @@ class FieldPropsTests extends Specification implements GrailsUnitTest {
     }
 
     def testConfig = """
-        grails{
-            plugin{
-                audittrail{
-                    //this should have all the defaults
-                    createdBy.field   = "blah"
+        gorm {
+            tools {
+                audit {
+                    stamp {
+                        //this should have all the defaults
+                        createdBy.field   = "blah"
 
-                    editedBy.type   = "java.lang.String"
-                    editedBy.constraints = "nullable:true,bindable:false"
+                        editedBy.type   = "java.lang.String"
+                        editedBy.constraints = "nullable:true,bindable:false"
 
-                    editedDate.type  = "java.time.Instant"
-
-
-                    currentUserClosure = {ctx->
-                        return "RON"
+                        editedDate.type  = "java.time.Instant"
                     }
                 }
             }

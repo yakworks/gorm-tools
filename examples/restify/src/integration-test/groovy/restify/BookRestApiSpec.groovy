@@ -18,14 +18,6 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
     Map postData = [name: "foo"]
     Map putData = [name: "updated foo"]
 
-    void "exercise api"() {
-        expect:
-        testGet()
-        testPost()
-        testPut()
-        testDelete()
-    }
-
     void "get index list"() {
         when:
         def pageMap = testList()
@@ -65,13 +57,19 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         testPickList('flubber').data.size() == 0
     }
 
-    // @IgnoreRest
     void "test get"() {
         expect:
         def response = restBuilder.get("$resourcePath/1")
         response.status == OK.value()
     }
 
+    void "exercise api"() {
+        expect:
+        testGet()
+        testPost()
+        testPut()
+        testDelete()
+    }
 
 
 

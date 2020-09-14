@@ -4,10 +4,10 @@
 */
 package gorm.tools.hibernate.criteria
 
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.persistence.Entity
-import grails.test.hibernate.HibernateSpec
 
-class CriteriaUtilsSpec extends HibernateSpec {
+class CriteriaUtilsSpec extends GormToolsHibernateSpec {
 
     List<Class> getDomainClasses() { [Test, Test2] }
 

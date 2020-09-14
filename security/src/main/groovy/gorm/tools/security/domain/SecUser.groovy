@@ -12,7 +12,7 @@ import groovy.transform.EqualsAndHashCode
 
 import org.grails.datastore.gorm.validation.constraints.builder.ConstrainedPropertyBuilder
 
-import gorm.tools.security.audit.AuditStampTrait
+import gorm.tools.audit.AuditStampTrait
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

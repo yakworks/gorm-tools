@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.security.audit.ast
+package gorm.tools.audit.ast
 
 import groovy.transform.CompileStatic
 
@@ -18,7 +18,7 @@ class FieldProps {
     // editedBy.constraints = "nullable:true,display:false,editable:false,bindable:false"
     // editedDate.field = "editedDate"
     // editedDate.constraints = "nullable:true,display:false,editable:false,bindable:false"
-    static final String CONFIG_KEY = "gorm.tools.audit"
+    static final String CONFIG_KEY = "gorm.tools.audit.stamp"
     static final String DATE_CONS = "nullable:true, display:false, editable:false, bindable:false"
     static final String USER_CONS = "nullable:true, display:false, editable:false, bindable:false"
 

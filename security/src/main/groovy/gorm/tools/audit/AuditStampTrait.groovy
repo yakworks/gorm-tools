@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.security.audit
+package gorm.tools.audit
 
 import java.time.LocalDateTime
 import javax.persistence.Transient
@@ -10,8 +10,6 @@ import javax.persistence.Transient
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.api.EntityMethodEvents
 import gorm.tools.security.SecUtils
 
@@ -19,6 +17,7 @@ import gorm.tools.security.SecUtils
  * flags a domain entity as stampable for events
  * the @AuditStamp ann adds this and can also be extended for events to pick
  */
+@SuppressWarnings(['MethodName'])
 @CompileStatic
 trait AuditStampTrait implements EntityMethodEvents{
     LocalDateTime createdDate
@@ -51,7 +50,7 @@ trait AuditStampTrait implements EntityMethodEvents{
     // }
 
     @CompileDynamic
-    static AuditStampTraitConstraints(delegate) {
+    static AuditStampTraitConstraints(Object delegate) {
         def c = {
             createdDate description: "created date/time",
                         nullable: false, editable: false, bindable: false

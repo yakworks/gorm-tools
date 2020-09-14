@@ -45,6 +45,7 @@ class Org implements NameNumTrait{
 
     //used for event testing
     String event
+    String beforeValidateCheck
     String stampEvent
 
     //enums

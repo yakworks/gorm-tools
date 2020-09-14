@@ -94,7 +94,7 @@ class RepoEventPublisher {
 
     void doBeforeValidate(RepositoryApi repo, Object entity, Map args) {
         BeforeValidateEvent event = new BeforeValidateEvent(repo, entity, args)
-        publishEvents(repo, event, [entity, event] as Object[])
+        publishEvents(repo, event, [entity] as Object[])
     }
 
     void doBeforePersist(RepositoryApi repo, GormEntity entity, Map args) {

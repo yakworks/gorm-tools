@@ -12,6 +12,10 @@ import grails.gorm.transactions.Transactional
 @CompileStatic
 class OrgRepo implements GormRepo<Org> {
 
+    @RepoListener
+    void beforeValidate(Org o) {
+        o.beforeValidateCheck = "got it"
+    }
 
     @RepoListener
     void beforePersist(Org o, BeforePersistEvent e) {

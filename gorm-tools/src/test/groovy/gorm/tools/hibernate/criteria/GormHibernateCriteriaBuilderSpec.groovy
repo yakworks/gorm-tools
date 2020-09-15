@@ -4,9 +4,9 @@
 */
 package gorm.tools.hibernate.criteria
 
-import grails.test.hibernate.HibernateSpec
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 
-class GormHibernateCriteriaBuilderSpec extends HibernateSpec { //c DataTest {//implements DataTest{
+class GormHibernateCriteriaBuilderSpec extends GormToolsHibernateSpec { //c DataTest {//implements DataTest{
 
 //    void setupSpec() {
 //        mockDomain Test

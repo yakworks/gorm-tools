@@ -9,6 +9,7 @@ import groovy.transform.CompileDynamic
 import org.codehaus.groovy.util.HashCodeHelper
 
 import grails.compiler.GrailsCompileStatic
+import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
@@ -20,14 +21,32 @@ class SecRoleUser implements Serializable {
     SecUser user
     SecRole role
 
-    static transients = ['roleName', 'userName', 'id']
+    static transients = ['roleName', 'userName'] //, 'id']
 
-    static mapping = orm {
+    // static mapping = orm {
+    //     id composite: ['user', 'role']
+    //     version false
+    //     property 'user', [column:'userId']
+    //     property 'role', [column:'secRoleId']
+    //
+    // }
+    static mapping = {
         id composite: ['user', 'role']
         version false
-        property 'user', [column:'userId']
-        property 'role', [column:'secRoleId']
+        user column:'userId'
+        role column:'secRoleId'
+    }
 
+    static constraints = {
+        role validator: { SecRole r, SecRoleUser ur ->
+            if (ur.user?.id) {
+                SecRoleUser.withNewSession {
+                    if (SecRoleUser.exists(ur.user.id, r.id)) {
+                        return ['userRole.exists']
+                    }
+                }
+            }
+        }
     }
 
     String getRoleName() {
@@ -48,11 +67,13 @@ class SecRoleUser implements Serializable {
     }
 
     static SecRoleUser get(long userId, long roleId) {
-        find 'from SecRoleUser where user.id=:userId and role.id=:roleId', [userId: userId, roleId: roleId]
+        criteriaFor(userId, roleId).get()
     }
 
     static SecRoleUser create(SecUser user, SecRole role, boolean flush = false) {
-        new SecRoleUser(user: user, role: role).save(flush: flush, insert: true)
+        def instance = new SecRoleUser(user: user, role: role)
+        instance.save(flush: flush, insert: true)
+        instance
     }
 
     static boolean remove(SecUser user, SecRole role, boolean flush = false) {
@@ -71,6 +92,17 @@ class SecRoleUser implements Serializable {
 
     static void removeAll(SecRole role) {
         executeUpdate 'DELETE FROM SecRoleUser WHERE role=:role', [role: role]
+    }
+
+    static boolean exists(long userId, long securityRoleId) {
+        criteriaFor(userId, securityRoleId).count()
+    }
+
+    private static DetachedCriteria criteriaFor(long userId, long securityRoleId) {
+        SecRoleUser.where {
+            user == SecUser.load(userId) &&
+                role == SecRole.load(securityRoleId)
+        }
     }
 
     @CompileDynamic
@@ -108,5 +140,6 @@ class SecRoleUser implements Serializable {
         }
         hashCode
     }
+
 
 }

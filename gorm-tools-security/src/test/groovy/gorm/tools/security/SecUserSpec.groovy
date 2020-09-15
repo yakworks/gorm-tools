@@ -119,6 +119,8 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
         user != null
         SecRoleUser.count() == 2
         SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
+        user.getRoles().size() == 2
+
     }
 
     def "user name"() {

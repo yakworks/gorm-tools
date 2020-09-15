@@ -21,15 +21,8 @@ class SecRoleUser implements Serializable {
     SecUser user
     SecRole role
 
-    static transients = ['roleName', 'userName'] //, 'id']
+    static transients = ['roleName', 'userName']
 
-    // static mapping = orm {
-    //     id composite: ['user', 'role']
-    //     version false
-    //     property 'user', [column:'userId']
-    //     property 'role', [column:'secRoleId']
-    //
-    // }
     static mapping = {
         id composite: ['user', 'role']
         version false
@@ -38,15 +31,7 @@ class SecRoleUser implements Serializable {
     }
 
     static constraints = {
-        role validator: { SecRole r, SecRoleUser ur ->
-            if (ur.user?.id) {
-                SecRoleUser.withNewSession {
-                    if (SecRoleUser.exists(ur.user.id, r.id)) {
-                        return ['userRole.exists']
-                    }
-                }
-            }
-        }
+
     }
 
     String getRoleName() {

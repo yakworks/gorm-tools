@@ -4,6 +4,7 @@
 */
 package gorm.tools.security.domain
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.encoding.PasswordEncoder
 
 import gorm.tools.databinding.BindAction
@@ -22,6 +23,7 @@ import grails.gorm.transactions.Transactional
 @GrailsCompileStatic
 class SecUserRepo implements GormRepo<SecUser> {
     /** dependency injection for the password encoder */
+    @Autowired
     PasswordEncoder passwordEncoder
     // SecService secService
 

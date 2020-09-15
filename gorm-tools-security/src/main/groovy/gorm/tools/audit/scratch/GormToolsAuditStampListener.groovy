@@ -36,7 +36,6 @@ import grails.util.GrailsClassUtils
 class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditTrailStamp'
 
-
     @Autowired GrailsApplication grailsApplication
     @Autowired SecService secService
 

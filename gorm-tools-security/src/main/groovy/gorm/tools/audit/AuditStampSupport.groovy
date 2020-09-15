@@ -89,9 +89,8 @@ class AuditStampSupport {
         entity[userPropName] =  getCurrentUserId()
     }
 
-    void stampPreUpdateEvent(PreUpdateEvent event, Class<?> dateTimeClass = LocalDateTime) {
+    void stampPreUpdateEvent(EntityAccess ea, Class<?> dateTimeClass = LocalDateTime) {
         Object timestamp = createTimestamp(dateTimeClass)
-        EntityAccess ea = event.entityAccess
         String datePropName = fieldProps[FieldProps.EDITED_DATE_KEY].name
         String userPropName = fieldProps[FieldProps.EDITED_BY_KEY].name
         ea.setProperty(datePropName, timestamp)

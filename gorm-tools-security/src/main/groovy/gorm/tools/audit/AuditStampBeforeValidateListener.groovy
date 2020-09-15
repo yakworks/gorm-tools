@@ -12,7 +12,7 @@ import org.springframework.context.ApplicationListener
 import gorm.tools.repository.events.BeforeValidateEvent
 
 /**
- * intercepts the
+ * listens for the BeforeValidateEvent so it can get set and nullable errors are not fired
  */
 @CompileStatic
 class AuditStampBeforeValidateListener implements ApplicationListener<BeforeValidateEvent> {

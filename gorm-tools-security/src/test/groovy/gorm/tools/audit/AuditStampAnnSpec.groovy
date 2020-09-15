@@ -72,7 +72,6 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
         o.createdDate == o.editedDate
     }
 
-    @Ignore
     def "test update"(){
         when:
         Long id = StampedEntity.create([name:"Wyatt Oil"]).id

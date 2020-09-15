@@ -32,11 +32,11 @@ dockmark-serve: ## run the docs server locally
 gorm-tools-security-check: ## run the docs server locally
 	./gradlew gorm-tools-security:check
 
-gorm-tools-security-int-test: ## runs ./gradlew integrationTest
-	./gradlew gorm-tools-security:integrationTest $(testArg)
+gorm-tools-security-test: ## runs ./gradlew integrationTest
+	./gradlew gorm-tools-security:test $(testArg)
 
-app-domain-unit-test: ## runs ./gradlew integrationTest
+test-domain-unit-test: ## runs ./gradlew integrationTest
 	./gradlew app-domains:test $(testArg)
 
-app-domain-int-test: ## runs ./gradlew integrationTest
+test-domain-int-test: ## runs ./gradlew integrationTest
 	./gradlew app-domains:integrationTest $(testArg)

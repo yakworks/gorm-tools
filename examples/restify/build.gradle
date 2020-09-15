@@ -69,7 +69,8 @@ dependencies {
     // compile "org.hibernate:hibernate-ehcache:$versionHibernate"
 
     compile project(":gorm-tools")
-    compile project(":app-domains")
+    compile project(":gorm-tools-security")
+    compile project(":test-domain")
 
     // runtime "com.h2database:h2"
     // runtime "com.zaxxer:HikariCP:3.4.5"

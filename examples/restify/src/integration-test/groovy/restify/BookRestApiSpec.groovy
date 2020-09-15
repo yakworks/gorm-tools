@@ -57,7 +57,6 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         testPickList('flubber').data.size() == 0
     }
 
-    // @IgnoreRest
     void "test get"() {
         expect:
         def response = restBuilder.get("$resourcePath/1")
@@ -71,6 +70,7 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         testPut()
         testDelete()
     }
+
 
 
 }

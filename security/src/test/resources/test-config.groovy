@@ -1,1 +1,0 @@
-grails.plugin.audittrail.test = "test"

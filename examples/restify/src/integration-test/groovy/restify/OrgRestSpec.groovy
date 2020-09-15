@@ -1,21 +1,16 @@
 package restify
 
 import geb.spock.GebSpec
-import gorm.tools.rest.testing.RestApiFuncSpec
 import gorm.tools.rest.testing.RestApiTestTrait
-import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.TestTools
 import grails.gorm.transactions.Rollback
-import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
-import yakworks.taskify.domain.Org
-import yakworks.taskify.domain.OrgType
+import spock.lang.Ignore
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @Integration
 @Rollback
-class OrgRestSpec extends RestApiFuncSpec {
+class OrgRestSpec extends GebSpec implements RestApiTestTrait {
 
     String path = "api/org"
 
@@ -26,6 +21,14 @@ class OrgRestSpec extends RestApiFuncSpec {
     Map putData = [name: "Name Update"]
 
     Map invalidData = ["name": null]
+
+    void "exercise api"() {
+        expect:
+        //testGet()
+        testPost()
+        //testPut()
+        //testDelete()
+    }
 
     @Override
     def testPost() {

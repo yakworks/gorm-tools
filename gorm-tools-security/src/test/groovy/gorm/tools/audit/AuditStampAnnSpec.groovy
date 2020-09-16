@@ -1,11 +1,15 @@
 package gorm.tools.audit
 
+
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedEntity>, SecurityTest {
+
+    void setupSpec(){
+        mockDomains(StampedNoConstraintsClosure)
+    }
 
     void "did it get the audit stamp fields"() {
         when:
@@ -22,6 +26,27 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
 
         conProps['editedBy'].property.metaConstraints["bindable"] == false
         conProps['editedBy'].property.metaConstraints["description"] == "edited by user id"
+
+        ['editedBy','createdBy', 'editedDate','createdDate'].each {
+            assert con.hasProperty(it)
+            def conProp = conProps[it].property
+            conProp.metaConstraints["bindable"] == false
+            assert !conProp.nullable
+            assert !conProp.editable
+        }
+
+    }
+
+    void "test when no constraints closure is defined"() {
+        when:
+        def con = build(StampedNoConstraintsClosure)
+        con.validate()
+
+        def conProps = StampedNoConstraintsClosure.constrainedProperties
+        then:
+        ['createdDate','editedDate','createdBy','editedBy'].each{key->
+            assert con.hasProperty(key)
+        }
 
         ['editedBy','createdBy', 'editedDate','createdDate'].each {
             assert con.hasProperty(it)

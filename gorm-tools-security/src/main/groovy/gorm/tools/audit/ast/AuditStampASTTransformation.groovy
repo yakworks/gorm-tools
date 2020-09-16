@@ -196,6 +196,14 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
 
     void addConstraints(ClassNode classNode) {
         String name = "constraints"
+
+        FieldNode closure = classNode.getField(name)
+        if (closure == null) {
+            createStaticClosure(classNode, name)
+            closure = classNode.getField(name)
+            assert closure != null
+        }
+
         String configStr = "AuditStampTraitConstraints(delegate)"
         def builder = new AstBuilder().buildFromString(configStr)
 
@@ -203,7 +211,6 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         // ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)
         // ExpressionStatement exStatment = new ExpressionStatement(returnStatement.getExpression())
 
-        FieldNode closure = classNode.getField(name)
         ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
         BlockStatement block = (BlockStatement) exp.getCode()
         block.addStatement(newConfig)

@@ -21,7 +21,7 @@ import grails.gorm.transactions.Transactional
 
 @GormRepository
 @GrailsCompileStatic
-class SecUserRepo implements GormRepo<SecUser> {
+class AppUserRepo implements GormRepo<AppUser> {
     /** dependency injection for the password encoder */
     @Autowired
     PasswordEncoder passwordEncoder
@@ -32,8 +32,8 @@ class SecUserRepo implements GormRepo<SecUser> {
      * this will already be transactional as its called from create
      */
     @Override
-    SecUser doCreate(Map args, Map data) {
-        SecUser user = new SecUser()
+    AppUser doCreate(Map args, Map data) {
+        AppUser user = new AppUser()
         String pwd = data['password']// data.remove('password')
         if(pwd) user.password = pwd
         bindAndSave(args, user, data, BindAction.Create)
@@ -45,8 +45,8 @@ class SecUserRepo implements GormRepo<SecUser> {
      * overrides the doUpdate method as its more clear whats going on than trying to do role logic with events
      */
     @Override
-    SecUser doUpdate(Map args, Map data) {
-        SecUser user = GormRepo.super.doUpdate(args, data)
+    AppUser doUpdate(Map args, Map data) {
+        AppUser user = GormRepo.super.doUpdate(args, data)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
         return user
     }
@@ -55,7 +55,7 @@ class SecUserRepo implements GormRepo<SecUser> {
      * Event method called beforeRemove to get rid of the SecRoleUser.
      */
     @RepoListener
-    void beforeRemove(SecUser user, BeforeRemoveEvent be) {
+    void beforeRemove(AppUser user, BeforeRemoveEvent be) {
         SecRoleUser.removeAll(user)
     }
 
@@ -63,7 +63,7 @@ class SecUserRepo implements GormRepo<SecUser> {
      * before persist, do the password encoding
      */
     @RepoListener
-    void beforePersist(SecUser user, BeforePersistEvent e) {
+    void beforePersist(AppUser user, BeforePersistEvent e) {
         if(user.password) {
             user.passwordHash = encodePassword(user.password)
         }
@@ -78,14 +78,14 @@ class SecUserRepo implements GormRepo<SecUser> {
      * @param bindAction
      */
     @RepoListener
-    void afterBind(SecUser user, Map p, AfterBindEvent ae) {
+    void afterBind(AppUser user, Map p, AfterBindEvent ae) {
         checkPasswordChange(user, p['newPassword'] as String, p['repassword'] as String)
     }
 
     /**
      * Adds roles to the user
      */
-    SecUser addUserRole(SecUser user, String role) {
+    AppUser addUserRole(AppUser user, String role) {
         SecRoleUser.create(user, SecRole.findByName(role))
         return user
     }
@@ -94,7 +94,7 @@ class SecUserRepo implements GormRepo<SecUser> {
      * checks params to see if password exists, that is matches repassword and encodes it if so
      * finally setting it to the password field on User.
      */
-    private void checkPasswordChange(SecUser user, String newPassword, String repassword){
+    private void checkPasswordChange(AppUser user, String newPassword, String repassword){
         if(!newPassword?.trim()) return
         isSamePass(newPassword, repassword, user)
         user.password = newPassword
@@ -105,7 +105,7 @@ class SecUserRepo implements GormRepo<SecUser> {
     }
 
     /** throws EntityValidationException if not. NOTE: keep the real pas**ord name out so scanners dont pick this up */
-    void isSamePass(String pass, String rePass, SecUser user) {
+    void isSamePass(String pass, String rePass, AppUser user) {
         if (pass.trim() != rePass.trim()) {
             Map msg = RepoMessage.setup("password.mismatch", [0], "The passwords you entered do not match")
             throw new EntityValidationException(msg, user)
@@ -126,7 +126,7 @@ class SecUserRepo implements GormRepo<SecUser> {
         List<Long> addition
 
         // Get the User instance
-        SecUser user = SecUser.get(userId)
+        AppUser user = AppUser.get(userId)
 
         // Compare existing role(s) with incoming
         if (existingRoles && incomeRoles) {

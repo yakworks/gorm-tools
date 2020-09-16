@@ -13,7 +13,7 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 class SecLoginHistory implements Serializable {
 
-    SecUser user
+    AppUser user
     LocalDateTime loginDate
     LocalDateTime logoutDate
 

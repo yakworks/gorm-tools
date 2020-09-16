@@ -66,7 +66,7 @@ trait SecService<D> {
     }
 
     /**
-     * returns the name property from the SecUser for logged in user
+     * returns the name property from the AppUser for logged in user
      * @return the username
      */
     String getUserFullName() {

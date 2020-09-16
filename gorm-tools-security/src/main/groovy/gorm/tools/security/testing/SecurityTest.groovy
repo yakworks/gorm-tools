@@ -11,7 +11,7 @@ import org.springframework.security.authentication.encoding.PlaintextPasswordEnc
 import gorm.tools.audit.AuditStampBeforeValidateListener
 import gorm.tools.audit.AuditStampPersistenceEventListener
 import gorm.tools.audit.AuditStampSupport
-import gorm.tools.security.domain.SecUser
+import gorm.tools.security.domain.AppUser
 
 /**
  * adds mock spring beans for passwordEncoder, and secService and
@@ -26,7 +26,7 @@ trait SecurityTest {
         // do these beans first so that they can get injected into the repos
         defineBeans {
             passwordEncoder(PlaintextPasswordEncoder)
-            secService(TestingSecService, SecUser)
+            secService(TestingSecService, AppUser)
         }
         // now mock the domains
         super.onMockDomains(entityClasses)

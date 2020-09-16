@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.security.services.UserService
+import gorm.tools.security.services.AppUserService
 
 /**
  * Tracks user logout
@@ -23,7 +23,7 @@ class SecLogoutHandler extends SecurityContextLogoutHandler {
 
     @Override
     void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        UserService userService = AppCtx.get('userService', UserService)
+        AppUserService userService = AppCtx.get('userService', AppUserService)
         if (authentication) {
             userService.trackUserLogout()
         }

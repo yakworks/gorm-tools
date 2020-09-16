@@ -1,10 +1,9 @@
 package yakworks.taskify
 
+
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.domain.SecUser
-import skydive.Jumper
-import yakworks.taskify.domain.Location
 import yakworks.taskify.domain.OrgType
 import yakworks.taskify.seed.TestSeedData
 
@@ -17,8 +16,8 @@ class BootStrap {
             //new OrgType(name: 'foo').persist()
             TestSeedData.buildOrgs(100)
         }
-        SecUser.withTransaction {
-            SecUser user = SecUser.create([id: 1, username: "admin", email: "admin@9ci.com", password:"admin"], bindId: true)
+        AppUser.withTransaction {
+            AppUser user = AppUser.create([id: 1, username: "admin", email: "admin@9ci.com", password:"admin"], bindId: true)
             assert user.id == 1
 
             SecRole admin = SecRole.create([id:1, name: SecRole.ADMINISTRATOR], bindId: true)

@@ -12,13 +12,11 @@ import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
-import static grails.gorm.hibernate.mapping.MappingBuilder.orm
-
 @Entity
 @GrailsCompileStatic
 class SecRoleUser implements Serializable {
 
-    SecUser user
+    AppUser user
     SecRole role
 
     static transients = ['roleName', 'userName']
@@ -55,13 +53,13 @@ class SecRoleUser implements Serializable {
         criteriaFor(userId, roleId).get()
     }
 
-    static SecRoleUser create(SecUser user, SecRole role, boolean flush = false) {
+    static SecRoleUser create(AppUser user, SecRole role, boolean flush = false) {
         def instance = new SecRoleUser(user: user, role: role)
         instance.save(flush: flush, insert: true)
         instance
     }
 
-    static boolean remove(SecUser user, SecRole role, boolean flush = false) {
+    static boolean remove(AppUser user, SecRole role, boolean flush = false) {
         SecRoleUser instance = SecRoleUser.findByUserAndRole(user, role)
         if (!instance) {
             return false
@@ -71,7 +69,7 @@ class SecRoleUser implements Serializable {
         true
     }
 
-    static void removeAll(SecUser user) {
+    static void removeAll(AppUser user) {
         executeUpdate 'DELETE FROM SecRoleUser WHERE user=:user', [user: user]
     }
 
@@ -85,13 +83,13 @@ class SecRoleUser implements Serializable {
 
     private static DetachedCriteria criteriaFor(long userId, long securityRoleId) {
         SecRoleUser.where {
-            user == SecUser.load(userId) &&
+            user == AppUser.load(userId) &&
                 role == SecRole.load(securityRoleId)
         }
     }
 
     @CompileDynamic
-    static getRoleMap(SecUser userInstance) {
+    static getRoleMap(AppUser userInstance) {
         List roles = SecRole.list()
         Set userRoleNames = []
         if (userInstance.id) {

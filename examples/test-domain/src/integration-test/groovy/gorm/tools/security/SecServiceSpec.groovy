@@ -1,6 +1,7 @@
 package gorm.tools.security
 
-import gorm.tools.security.domain.SecUser
+
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
@@ -16,7 +17,7 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
     SecService secService
 
     def setup() {
-        authenticate(SecUser.get(1), SecRole.ADMINISTRATOR)
+        authenticate(AppUser.get(1), SecRole.ADMINISTRATOR)
     }
 
     def testGetPrincipal() {
@@ -36,7 +37,7 @@ public class SecServiceSpec extends Specification implements SecuritySpecHelper,
 
     def testGetUser() {
         expect:
-        SecUser.get(1) == secService.user
+        AppUser.get(1) == secService.user
     }
 
     def testIsLoggedIn() {

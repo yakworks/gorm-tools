@@ -7,9 +7,9 @@ package gorm.tools.security
 import gorm.tools.audit.AuditStampBeforeValidateListener
 import gorm.tools.audit.AuditStampPersistenceEventListener
 import gorm.tools.audit.AuditStampSupport
-import gorm.tools.security.domain.SecUser
+import gorm.tools.security.domain.AppUser
+import gorm.tools.security.services.AppUserService
 import gorm.tools.security.services.SpringSecService
-import gorm.tools.security.services.UserService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugins.Plugin
 
@@ -22,8 +22,8 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
         { ->
             def securityConf = SpringSecurityUtils.securityConfig
             if (securityConf.active) {
-                secService(SpringSecService, SecUser)
-                userService(UserService)
+                secService(SpringSecService, AppUser)
+                userService(AppUserService)
 
                 passwordValidator(PasswordValidator)
 
@@ -33,7 +33,7 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
                 passwordEncoder(grails.plugin.springsecurity.authentication.encoding.BCryptPasswordEncoder, 10)
 
                 //overrrides the spring sec's userDetailsService
-                userDetailsService(SecUserDetailsService)
+                userDetailsService(AppUserDetailsService)
 
                 secLoginHandler(SecLoginHandler)
                 secLogoutHandler(SecLogoutHandler)

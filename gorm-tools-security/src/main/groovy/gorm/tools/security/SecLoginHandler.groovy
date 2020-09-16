@@ -15,8 +15,8 @@ import org.springframework.security.authentication.event.AbstractAuthenticationE
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent
 
-import gorm.tools.security.domain.SecUser
-import gorm.tools.security.services.UserService
+import gorm.tools.security.domain.AppUser
+import gorm.tools.security.services.AppUserService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 
 /**
@@ -26,7 +26,7 @@ import grails.plugin.springsecurity.userdetails.GrailsUser
 @CompileStatic
 class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent> {
     @Autowired
-    UserService userService
+    AppUserService userService
 
     @Value('${gorm.tools.security.password.expireEnabled:false}')
     boolean passwordExpiryEnabled
@@ -54,9 +54,9 @@ class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent
 
     boolean shouldWarnAboutPasswordExpiry(GrailsUser principal) {
         boolean result = false
-        SecUser.withTransaction {
+        AppUser.withTransaction {
             if (passwordExpiryEnabled) {
-                int remainingDays = userService.remainingDaysForPasswordExpiry(SecUser.get((Long) principal.id))
+                int remainingDays = userService.remainingDaysForPasswordExpiry(AppUser.get((Long) principal.id))
                 if (passwordWarnDays >= remainingDays) result = true
             }
         }

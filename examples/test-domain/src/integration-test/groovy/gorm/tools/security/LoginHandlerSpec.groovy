@@ -2,7 +2,7 @@ package gorm.tools.security
 
 
 import gorm.tools.testing.integration.DataIntegrationTest
-import gorm.tools.security.services.UserService
+import gorm.tools.security.services.AppUserService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
@@ -14,7 +14,7 @@ class LoginHandlerSpec extends Specification implements DataIntegrationTest {
     void "test shouldWarnAboutPasswordExpiry"() {
         setup:
         SecLoginHandler loginHandler = new SecLoginHandler()
-        UserService userService = Mock()
+        AppUserService userService = Mock()
         loginHandler.userService = userService
 
         loginHandler.passwordExpiryEnabled = true

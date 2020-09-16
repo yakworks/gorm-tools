@@ -15,19 +15,19 @@ import org.grails.datastore.mapping.query.api.Criteria
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.security.PasswordValidator
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecLoginHistory
 import gorm.tools.security.domain.SecPasswordHistory
-import gorm.tools.security.domain.SecUser
 import grails.gorm.transactions.Transactional
 
 /**
- * UserService is for user level helpers, such as sending emails to user,
+ * AppUserService is for user level helpers, such as sending emails to user,
  * tracking user username/logout And operations relating to passwords, contacts and org levels
  * Seurity related methods should go to SecService and not here.
  */
 @CompileStatic
 @Transactional
-class UserService {
+class AppUserService {
 
     @Value('${gorm.tools.security.password.historyEnabled:false}')
     boolean passwordHistoryEnabled
@@ -41,20 +41,20 @@ class UserService {
     @Value('${gorm.tools.security.password.warnDays:30}')
     int passwordWarnDays
 
-    SecService<SecUser> secService
+    SecService<AppUser> secService
     PasswordValidator passwordValidator
 
     /**
      * Create new record in secLoginHistory with logged in user and date
      */
     void trackUserLogin() {
-        SecUser user = secService.user
+        AppUser user = secService.user
         SecLoginHistory secLoginHistory = SecLoginHistory.create([user: user, loginDate: new Date()])
     }
 
     @CompileDynamic //doesn't pick up maxResults with GrCompStatic
     void trackUserLogout() {
-        SecUser user = secService.user
+        AppUser user = secService.user
         if (!user) return
         Criteria criteria = SecLoginHistory.createCriteria()
         List secLoginHistoryList = criteria.list {
@@ -73,7 +73,7 @@ class UserService {
     /**
      * Validate presented user passwords against config to ensure it meets password requirements.
      */
-    Map validatePassword(SecUser user, String pass, String passConfirm) {
+    Map validatePassword(AppUser user, String pass, String passConfirm) {
         return passwordValidator.validate(user, pass, passConfirm)
     }
 
@@ -84,8 +84,8 @@ class UserService {
      * @return
      */
     //FIXME make sure we have good integration tests for this
-    boolean isPasswordExpired(SecUser user = null) {
-        if(!user) user = (SecUser)secService.getUser()
+    boolean isPasswordExpired(AppUser user = null) {
+        if(!user) user = (AppUser)secService.getUser()
         //can always force a password change by setting passwordExpired field to true
         if(user.passwordExpired) return true
         if (passwordExpiryEnabled) {
@@ -98,8 +98,8 @@ class UserService {
         return false
     }
 
-    Integer remainingDaysForPasswordExpiry(SecUser u = null) {
-        SecUser user = u ?: (SecUser)secService.getUser()
+    Integer remainingDaysForPasswordExpiry(AppUser u = null) {
+        AppUser user = u ?: (AppUser)secService.getUser()
         LocalDateTime pExpire = user.passwordChangedDate.plusDays(passwordExpireDays)
         return Duration.between(LocalDateTime.now(), pExpire).toDays().toInteger()
     }
@@ -109,7 +109,7 @@ class UserService {
      * @param user
      * @param newPwd
      */
-    void updatePassword(SecUser user, String newPwd) {
+    void updatePassword(AppUser user, String newPwd) {
         user.password = newPwd //must be hased password
         user.passwordExpired = false
         user.passwordChangedDate = LocalDateTime.now()
@@ -126,7 +126,7 @@ class UserService {
      * @param password
      * @return
      */
-    boolean passwordExistInHistory(SecUser user, String password) {
+    boolean passwordExistInHistory(AppUser user, String password) {
         return passwordValidator.passwordExistInHistory(user, password)
     }
 }

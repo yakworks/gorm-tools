@@ -2,7 +2,7 @@ package gorm.tools.security
 
 import java.time.LocalDateTime
 
-import gorm.tools.security.domain.SecUser
+import gorm.tools.security.domain.AppUser
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.mixin.integration.Integration
@@ -12,12 +12,12 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
-class SecUserDetailsServiceSpec extends Specification implements DataIntegrationTest {
-    SecUserDetailsService userDetailsService
+class AppUserDetailsServiceSpec extends Specification implements DataIntegrationTest {
+    AppUserDetailsService userDetailsService
 
     void testLoadUserByUsername() {
         when:
-        SecUser.repo.create([username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])
+        AppUser.repo.create([username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com"])
         flush()
         GrailsUser gUser = userDetailsService.loadUserByUsername('karen')
 
@@ -25,7 +25,7 @@ class SecUserDetailsServiceSpec extends Specification implements DataIntegration
         gUser != null
 
         when:
-        SecUser user = SecUser.get(gUser.id)
+        AppUser user = AppUser.get(gUser.id)
 
         then:
         user.name== 'karen'
@@ -34,7 +34,7 @@ class SecUserDetailsServiceSpec extends Specification implements DataIntegration
     @Ignore //FIXME config is in userService now so fix test, also add a test for when credentialsNonExpired = true
     void "test expired password"() {
         given:
-        SecUser user = SecUser.first()
+        AppUser user = AppUser.first()
         userDetailsService.passwordExpireEnabled = true
         userDetailsService.passwordExpireDays = 10
         user.passwordExpired = true

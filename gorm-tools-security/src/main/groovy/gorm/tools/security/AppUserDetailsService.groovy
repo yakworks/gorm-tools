@@ -13,8 +13,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 
-import gorm.tools.security.domain.SecUser
-import gorm.tools.security.services.UserService
+import gorm.tools.security.domain.AppUser
+import gorm.tools.security.services.AppUserService
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.userdetails.GrailsUser
@@ -22,16 +22,16 @@ import grails.plugin.springsecurity.userdetails.GrailsUserDetailsService
 
 @Slf4j
 @GrailsCompileStatic
-class SecUserDetailsService implements GrailsUserDetailsService {
+class AppUserDetailsService implements GrailsUserDetailsService {
 
     @Autowired
-    UserService userService
+    AppUserService userService
 
     @Transactional
     UserDetails loadUserByUsername(String username, boolean loadRoles) throws UsernameNotFoundException {
         log.debug "loadUserByName(${username}, ${loadRoles})"
 
-        SecUser user = SecUser.getByUsername(username.trim())
+        AppUser user = AppUser.getByUsername(username.trim())
         if (!user) {
             throw new UsernameNotFoundException("User not found: $username")
         }

@@ -12,7 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 
-import gorm.tools.security.domain.SecUser
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.SecService
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.spock.OnceBefore
@@ -29,7 +29,7 @@ trait SecuritySpecHelper {
         secService.loginAsSystemUser()
     }
 
-    void authenticate(SecUser user, String... roles) {
+    void authenticate(AppUser user, String... roles) {
         roles = roles.collect { "ROLE_" + it}
         List authorities = AuthorityUtils.createAuthorityList(roles)
 

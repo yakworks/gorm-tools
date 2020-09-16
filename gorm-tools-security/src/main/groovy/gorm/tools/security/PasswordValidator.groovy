@@ -13,8 +13,8 @@ import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.authentication.encoding.PasswordEncoder
 
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecPasswordHistory
-import gorm.tools.security.domain.SecUser
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 
@@ -51,7 +51,7 @@ class PasswordValidator {
     }
 
     @SuppressWarnings(['IfStatementCouldBeTernary'])
-    Map validate(SecUser user, String pass, String passConfirm) {
+    Map validate(AppUser user, String pass, String passConfirm) {
         if (!pass || (pass.length() < passwordMinLength)) {
             return [ok: false, message: message("gorm.tools.security.password.minlength", passwordMinLength)]
         }
@@ -88,7 +88,7 @@ class PasswordValidator {
      */
     @GrailsCompileStatic
     @Transactional(readOnly = true)
-    boolean passwordExistInHistory(SecUser user, String password) {
+    boolean passwordExistInHistory(AppUser user, String password) {
         List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.findAllByUser(user)
         passwordHistoryList.any { passwordEncoder.isPasswordValid(it.password, password, null) }
     }

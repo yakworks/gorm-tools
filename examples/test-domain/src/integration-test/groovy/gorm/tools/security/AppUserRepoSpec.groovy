@@ -4,8 +4,8 @@ package gorm.tools.security
 import org.springframework.security.authentication.encoding.PasswordEncoder
 
 import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.domain.SecUser
-import gorm.tools.security.domain.SecUserRepo
+import gorm.tools.security.domain.AppUser
+import gorm.tools.security.domain.AppUserRepo
 import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
@@ -14,8 +14,8 @@ import spock.lang.Specification
 
 @Integration
 @Rollback
-class SecUserRepoSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
-    SecUserRepo secUserRepo
+class AppUserRepoSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
+    AppUserRepo appUserRepo
     PasswordEncoder passwordEncoder
 
     Map getUserParams(Map params = [:]){
@@ -33,11 +33,11 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
     def "test create"() {
         when:
         Map params = getUserParams()
-        Long id = SecUser.create(params).id
+        Long id = AppUser.create(params).id
         flushAndClear()
 
         then:
-        SecUser user = SecUser.get(id)
+        AppUser user = AppUser.get(id)
         user.username == 'galt'
         user.email == params.email
         user.name == params.name
@@ -48,11 +48,11 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         when:
         // should convert the strings to long
         Map params = getUserParams([roles: [1, "2"]])
-        Long id = SecUser.create(params).id
+        Long id = AppUser.create(params).id
         flushAndClear()
 
         then:
-        SecUser user = SecUser.get(id)
+        AppUser user = AppUser.get(id)
         user.username == 'galt'
         SecRoleUser.findAllByUser(user)*.role.id == [1L, 2L]
 
@@ -68,11 +68,11 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
                 [id: 2 ], [id: 3]
             ]
         ])
-        Long id2 = SecUser.create(params).id
+        Long id2 = AppUser.create(params).id
         flushAndClear()
 
         then:
-        SecUser user2 = SecUser.get(id2)
+        AppUser user2 = AppUser.get(id2)
         user2.username == 'galt2'
         SecRoleUser.findAllByUser(user2)*.role.id == [2L, 3L]
     }
@@ -86,29 +86,29 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
             id:1,
             roles: [2, 3]
         ]
-        SecUser.update(params)
+        AppUser.update(params)
         flush()
-        SecUser user = SecUser.get(1)
+        AppUser user = AppUser.get(1)
 
         then:
-        SecRoleUser.findAllByUser(SecUser.get(1))*.role.id == [2L, 3L]
+        SecRoleUser.findAllByUser(AppUser.get(1))*.role.id == [2L, 3L]
 
         when:
         Map params2 = [
             id:1,
             roles: [1]
         ]
-        SecUser.update(params2)
+        AppUser.update(params2)
         flush()
 
         then:
-        SecRoleUser.findAllByUser(SecUser.get(1))*.role.id == [1L]
+        SecRoleUser.findAllByUser(AppUser.get(1))*.role.id == [1L]
     }
 
     def "remove roles when user is removed"() {
         setup:
         Map params = getUserParams([roles: ["1", "2"]])
-        SecUser user = SecUser.create(params)
+        AppUser user = AppUser.create(params)
         flushAndClear()
 
         expect:
@@ -116,7 +116,7 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         SecRoleUser.get(user.id, 2)
 
         when:
-        secUserRepo.remove(user)
+        appUserRepo.remove(user)
 
         then:
         !SecRoleUser.get(user.id, 1)
@@ -125,20 +125,20 @@ class SecUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
     def testRemove() {
         setup:
-        SecUser user = secUserRepo.create(getUserParams())
+        AppUser user = appUserRepo.create(getUserParams())
 
         expect:
-        SecUser.get(user.id) != null
+        AppUser.get(user.id) != null
 
         when:
-        secUserRepo.remove(user)
+        appUserRepo.remove(user)
 
         then:
-        SecUser.get(user.id) == null
+        AppUser.get(user.id) == null
     }
 
     /** printDiffs prints the pertinent params and final data for the test for debugging purposes. */
-    void printDiffs(Map params, SecUser user, Map result) {
+    void printDiffs(Map params, AppUser user, Map result) {
         println "          key                    params - result"
         def format = '    %7s.%-10s: %15s - %-15s\n'
         printf(format, 'user', 'username', params.login, user.username)

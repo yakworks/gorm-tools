@@ -10,8 +10,6 @@ import javax.persistence.Transient
 import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
 
-import org.grails.datastore.gorm.validation.constraints.builder.ConstrainedPropertyBuilder
-
 import gorm.tools.audit.AuditStampTrait
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -19,7 +17,7 @@ import grails.persistence.Entity
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class SecUser implements AuditStampTrait { //, Serializable {
+class AppUser implements AuditStampTrait { //, Serializable {
 
     static transients = ['password'] //@Transient not working when mapping has same column name for passwordHash?
 
@@ -73,13 +71,13 @@ class SecUser implements AuditStampTrait { //, Serializable {
         resetPasswordDate nullable: true, bindable: false
     }
 
-    transient static SecUserRepo getRepo() {
-        return (SecUserRepo)findRepo()
+    transient static AppUserRepo getRepo() {
+        return (AppUserRepo)findRepo()
     }
 
     @CompileDynamic
-    static SecUser getByUsername(String uname) {
-        SecUser.findByUsername(uname.trim())
+    static AppUser getByUsername(String uname) {
+        AppUser.findByUsername(uname.trim())
     }
 
     @CompileDynamic

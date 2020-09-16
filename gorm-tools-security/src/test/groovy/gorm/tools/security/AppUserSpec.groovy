@@ -5,22 +5,22 @@ import org.apache.commons.lang.RandomStringUtils
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.domain.SecUser
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
-class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, SecurityTest {
+class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, SecurityTest {
 
     // Closure doWithConfig() {
     //     return { cfg ->
     //         cfg.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
     //     }
     // }
-    // List<Class> getDomainClasses() { [SecUser, SecRole, SecRoleUser] }
+    // List<Class> getDomainClasses() { [AppUser, SecRole, SecRoleUser] }
     void setupSpec() {
-        mockDomains SecUser, SecRole, SecRoleUser
+        mockDomains AppUser, SecRole, SecRoleUser
     }
 
     String genRandomEmail(){
@@ -39,11 +39,11 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
     }
 
     @Override
-    SecUser createEntity(Map args){
-        entity = new SecUser()
+    AppUser createEntity(Map args){
+        entity = new AppUser()
         args = buildMap(args)
         args << [password:'secretStuff', repassword:'secretStuff']
-        entity = SecUser.create(args)
+        entity = AppUser.create(args)
         //We have to add 'password' field manually, because it has the "bindable: false" constraint
         entity.password = 'test_pass_123'
         entity.persist(flush: true)
@@ -52,7 +52,7 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
     }
 
     @Override
-    SecUser persistEntity(Map args){
+    AppUser persistEntity(Map args){
         args.get('save', false) //adds save:false if it doesn't exists
         args['password'] = "test"
         entity = build(buildMap(args))
@@ -65,7 +65,7 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
         def con = build()
         con.validate()
 
-        def conProps = SecUser.constrainedProperties
+        def conProps = AppUser.constrainedProperties
         then:
         //sanity check the main ones
         conProps.username.nullable == false
@@ -88,9 +88,9 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
 
     def "test update fail"() {
         when:
-        SecUser user = createEntity()
+        AppUser user = createEntity()
         Map params = [id: user.id, username: null]
-        SecUser.update(params)
+        AppUser.update(params)
 
         then:
         thrown EntityValidationException
@@ -112,7 +112,7 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
         Map data = buildMap([:])
         data.roles = ["1", "2"]
         data << [password:'secretStuff', repassword:'secretStuff']
-        SecUser user = SecUser.create(data)
+        AppUser user = AppUser.create(data)
         flush()
 
         then:
@@ -127,7 +127,7 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
         when:
         Map data = buildMap([:])
         data << [password:'secretStuff', repassword:'secretStuff']
-        SecUser user = SecUser.create(data)
+        AppUser user = AppUser.create(data)
         flush()
 
         then:
@@ -136,8 +136,8 @@ class SecUserSpec extends Specification implements DomainRepoTest<SecUser>, Secu
 
     // def "statics test"() {
     //     expect:
-    //     SecUser.constraints instanceof Closure
-    //     SecUser.AuditStampTrait__buzz == true
+    //     AppUser.constraints instanceof Closure
+    //     AppUser.AuditStampTrait__buzz == true
     //     // def o = new Object() as AuditStampTrait
     //     // o.constraints == [foo:'bar']
     // }

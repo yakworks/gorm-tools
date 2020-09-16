@@ -20,8 +20,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.WebAttributes
 
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
-import gorm.tools.security.domain.SecUser
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import grails.plugin.springsecurity.userdetails.GrailsUser
@@ -99,7 +99,7 @@ class SpringSecService<D> implements SecService<D>{
      */
     @Override
     void loginAsSystemUser() {
-        SecUser user = SecUser.get(1)
+        AppUser user = AppUser.get(1)
         assert user
         List<GrantedAuthority> authorities = parseAuthoritiesString([SecRole.ADMINISTRATOR] as String[])
         GrailsUser grailsUser = new GrailsUser(user.username, user.passwordHash, user.enabled, true, !user.passwordExpired, true, authorities, user.id)

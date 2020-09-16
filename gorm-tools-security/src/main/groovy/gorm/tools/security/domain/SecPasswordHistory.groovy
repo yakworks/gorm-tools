@@ -12,7 +12,7 @@ import grails.persistence.Entity
 @Entity
 @GrailsCompileStatic
 class SecPasswordHistory {
-    static belongsTo = [user: SecUser]
+    static belongsTo = [user: AppUser]
     String password
 
     LocalDateTime dateCreated
@@ -38,7 +38,7 @@ class SecPasswordHistory {
      * @param passwordHash
      * @return
      */
-    static SecPasswordHistory create(SecUser user, String passwordHash) {
+    static SecPasswordHistory create(AppUser user, String passwordHash) {
         Integer historyLength = 10//AppParam.value('passwordHistoryLength').toInteger()
         if (SecPasswordHistory.countByUser(user) >= historyLength) {
             SecPasswordHistory lastRecord = SecPasswordHistory.list(max: 1, sort: 'dateCreated', order: 'asc')[0]
@@ -49,7 +49,7 @@ class SecPasswordHistory {
         return passwordHistory
     }
 
-    static List<SecPasswordHistory> findAllByUser(SecUser user){
+    static List<SecPasswordHistory> findAllByUser(AppUser user){
         SecPasswordHistory.findAllByUser(user)
     }
 }

@@ -17,7 +17,7 @@ trait NameDescriptionTrait {
             description description: "the description for this entity",
                 nullable: true, maxSize: 255
             name description: "the name of this entity",
-                nullable: false, maxSize: 50
+                nullable: false, blank: false, maxSize: 50
         }
         c.delegate = delegate
         c()

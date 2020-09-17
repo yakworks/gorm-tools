@@ -16,9 +16,9 @@ trait NameNumTrait {
     static NameNumTraitConstraints(Object delegate) {
         def c = {
             num description: "unique alpha-numeric identifier for this entity",
-                nullable: false, maxSize: 50
+                nullable: false, blank: false, maxSize: 50
             name description: "the full name of this entity",
-                nullable: false, maxSize: 50
+                nullable: false, blank: false, maxSize: 50
         }
         c.delegate = delegate
         c()

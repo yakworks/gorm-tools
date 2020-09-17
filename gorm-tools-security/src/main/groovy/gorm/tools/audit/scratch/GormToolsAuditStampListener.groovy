@@ -32,6 +32,7 @@ import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.util.GrailsClassUtils
 
+// the old one, kept for refernce for now
 @CompileStatic
 class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditTrailStamp'
@@ -49,7 +50,6 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     @PostConstruct
     void init() {
         if(!fieldProps) fieldProps = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
-        println "GormToolsAuditStampListener Init datastore: $datastore"
         GrailsClass[] domains = grailsApplication.getArtefacts(DomainClassArtefactHandler.TYPE)
         for (GrailsClass domain : domains) {
             if (isAuditStamped(domain.clazz)) auditStampedEntities << domain.clazz.name
@@ -71,7 +71,6 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     protected void onPersistenceEvent(AbstractPersistenceEvent event) {
         EntityAccess ea = event.entityAccess
         PersistentEntity entity = event.entity
-        println "GormToolsAuditStampListener onPersistenceEvent ${event.eventType}"
         if (entity == null || !auditStampedEntities.contains(entity.name)) return
 
         if (event.getEventType() == EventType.PreInsert) beforeInsert(ea)

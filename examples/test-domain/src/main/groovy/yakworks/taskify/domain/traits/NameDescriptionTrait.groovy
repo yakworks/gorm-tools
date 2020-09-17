@@ -1,5 +1,6 @@
 package yakworks.taskify.domain.traits
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -9,13 +10,16 @@ trait NameDescriptionTrait {
 
     static List qSearchIncludes = ['name', 'description'] // quick search includes
     static List pickListIncludes = ['id', 'name'] //for picklist
-}
 
-//@GrailsCompileStatic
-class NameDescriptionConstraints implements NameDescriptionTrait {
-
-    static constraints = {
-        description nullable: true, maxSize: 255
-        name blank: false, nullable: false, maxSize: 50
+    @CompileDynamic
+    static NameDescriptionTraitConstraints(Object delegate) {
+        def c = {
+            description description: "the description for this entity",
+                nullable: true, maxSize: 255
+            name description: "the name of this entity",
+                nullable: false, maxSize: 50
+        }
+        c.delegate = delegate
+        c()
     }
 }

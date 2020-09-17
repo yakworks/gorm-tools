@@ -14,7 +14,6 @@ import org.grails.datastore.mapping.model.types.Identity
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.utils.GormMetaUtils
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.

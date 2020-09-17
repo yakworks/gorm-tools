@@ -278,7 +278,6 @@ class MangoBuilder {
                 [(it.toString()): (criteria.persistentEntity.getPropertyByName(it).type == String ? value + "%" : value)]
             }
             def criteriaMap = ['$or': orMap] as Map<String, Object>
-            println "criteriaMap $criteriaMap"
             return applyMap(criteria, MangoTidyMap.tidy(criteriaMap))
         }
 

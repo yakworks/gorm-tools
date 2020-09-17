@@ -12,8 +12,6 @@ import groovy.transform.stc.SimpleType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
-import gorm.tools.transaction.TrxService
-
 /**
  * adds transaction methods to any class. relies on Gorms transactionService.
  *

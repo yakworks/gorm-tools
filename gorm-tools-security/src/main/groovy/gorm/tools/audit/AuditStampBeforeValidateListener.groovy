@@ -20,7 +20,7 @@ class AuditStampBeforeValidateListener implements ApplicationListener<BeforeVali
 
     @Override
     void onApplicationEvent(BeforeValidateEvent event) {
-        println "AuditStampEventListener beforeValidate"
+        // println "AuditStampEventListener beforeValidate"
         if(isAuditStamped(event.entity))
             auditStampSupport.stampIfNew(event.entity)
     }

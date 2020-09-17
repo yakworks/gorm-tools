@@ -18,7 +18,6 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.api.EntityMethodEvents
-import gorm.tools.repository.api.RepositoryApi
 import grails.util.Holders
 
 /**

@@ -186,9 +186,6 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener =
             null, Object errors = null) {
         if (!source.containsProperty(prop.name)) return
-        // if (prop.name == 'latitude'){
-        //     println "latitude"
-        // }
         Object propValue = source.getPropertyValue(prop.name)
         Object valueToAssign = propValue
         Class typeToConvertTo = prop.getType() as Class
@@ -213,11 +210,9 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                 ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
                 if (converter) {
-                    println("using converter $converter")
                     valueToAssign = converter.convert(propValue)
                 }
             } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
-                println("in conversionService")
                 valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
 

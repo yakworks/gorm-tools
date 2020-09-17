@@ -217,58 +217,6 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         //block.statements.add(0, newConfig)
     }
 
-    void addImportFrom(ClassNode classNode) {
-        String name = "constraints"
-        String configStr = "importFrom(AuditStampTraitConstraints)"
-
-        //classNode.getModule().addImport("AuditStampTraitConstraints", new ClassNode(AuditStampTraitConstraints))
-
-        //BlockStatement newConfig = (BlockStatement) new AstBuilder().buildFromString(configStr).get(0)
-
-        // BlockStatement newConfig = (BlockStatement) new AstBuilder().buildFromString(configStr).get(0)
-        //
-        // FieldNode closure = classNode.getField(name)
-        // ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)
-        // ExpressionStatement exStatment = new ExpressionStatement(returnStatement.getExpression())
-        // ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
-        // BlockStatement block = (BlockStatement) exp.getCode()
-        // block.addStatement(exStatment)
-
-        def constNode = ClassHelper.make(AuditStampTrait) //new ClassNode(AuditStampTraitConstraints)
-        def ce = new ClassExpression(constNode)
-        println "includes field ${constNode.getField('includes')}"
-        //def incList = (ListExpression) constNode.getField("includes").getInitialExpression()
-        def lexp = new ListExpression()
-        // AuditStampTraitConstraints.props.each {
-        //     lexp.addExpression(new ConstantExpression(it))
-        // }
-        //def incList = new FieldExpression(constNode.getField('includes'))
-        assert lexp
-        def me = new MapExpression()
-        me.addMapEntryExpression(new ConstantExpression("include"), lexp)
-        //def namedarg = new MapExpression(new ConstantExpression("include"), incList)
-        assert me
-        def arguments = new ArgumentListExpression(ce, me)
-        println "arguments ${arguments}"
-        //def arguments = new ArgumentListExpression(ce)
-        //include: AuditStampTraitConstraints.includes
-
-        def importFromMethodCall = new MethodCallExpression(new VariableExpression("this"), "importFrom", arguments)
-        def methodCallStatement = new ExpressionStatement(importFromMethodCall)
-
-        ClosureExpression exp = (ClosureExpression) classNode.getField(name).getInitialExpression()
-        BlockStatement block = (BlockStatement) exp.getCode()
-        block.addStatement(methodCallStatement)
-
-        //classNode.getModule().addImport("AuditStampTraitConstraints", ClassHelper.make("gorm.tools.traits.AuditStampTraitConstraints"))
-
-        //ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)
-        //ExpressionStatement exStatment = new ExpressionStatement(returnStatement.getExpression())
-        // ClosureExpression exp = (ClosureExpression) closure.getInitialExpression()
-        // BlockStatement block = (BlockStatement) exp.getCode()
-        // block.addStatement(methodCallStatement)
-    }
-
     void createStaticClosure(ClassNode classNode, String name) {
         FieldNode field = new FieldNode(name, ACC_PUBLIC | ACC_STATIC, new ClassNode(Object), new ClassNode(classNode.getClass()), null)
         ClosureExpression expr = new ClosureExpression(Parameter.EMPTY_ARRAY, new BlockStatement())

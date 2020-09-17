@@ -1,5 +1,6 @@
 package yakworks.taskify.domain.traits
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -10,13 +11,16 @@ trait NameNumTrait {
 
     static List qSearchIncludes = ['num', 'name'] // quick search includes
     static List pickListIncludes = ['id', 'num', 'name'] //for picklist
-}
 
-//@GrailsCompileStatic
-class NameNumConstraints implements NameNumTrait {
-
-    static constraints = {
-        num blank: false, nullable: false, maxSize: 50
-        name blank: false, nullable: false, maxSize: 50
+    @CompileDynamic
+    static NameNumTraitConstraints(Object delegate) {
+        def c = {
+            num description: "unique alpha-numeric identifier for this entity",
+                nullable: false, maxSize: 50
+            name description: "the full name of this entity",
+                nullable: false, maxSize: 50
+        }
+        c.delegate = delegate
+        c()
     }
 }

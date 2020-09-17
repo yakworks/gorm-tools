@@ -12,7 +12,6 @@ import groovy.transform.CompileDynamic
 import gorm.tools.audit.AuditStamp
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.taskify.domain.traits.NameNumConstraints
 import yakworks.taskify.domain.traits.NameNumTrait
 
 @AuditStamp
@@ -64,7 +63,7 @@ class Org implements NameNumTrait{
     }
 
     static constraints = {
-        importFrom(NameNumConstraints)
+        NameNumTraitConstraints(delegate)
 
         name2    nullable: true
         secret   nullable: true, display: false

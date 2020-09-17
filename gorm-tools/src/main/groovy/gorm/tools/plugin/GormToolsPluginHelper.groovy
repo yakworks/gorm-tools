@@ -36,7 +36,7 @@ import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
 import grails.util.GrailsNameUtils
 
-@SuppressWarnings(['UnnecessarySelfAssignment'])
+@SuppressWarnings(['UnnecessarySelfAssignment', 'Println'])
 @CompileDynamic
 class GormToolsPluginHelper {
     static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
@@ -183,7 +183,7 @@ class GormToolsPluginHelper {
             println "addControllerArtifact ClassNotFoundException on classLoader.loadClass($className)"
         }
         if (!controllerExists(app, ctrlList, className, ctrlClass)) {
-            println "adding $className"
+            println "adding controller $className"
             app.addArtefact(ControllerArtefactHandler.TYPE, ctrlClass)
         }
 

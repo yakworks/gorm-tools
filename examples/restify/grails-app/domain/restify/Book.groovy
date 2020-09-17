@@ -7,11 +7,10 @@ package restify
 import java.time.LocalDate
 
 import grails.compiler.GrailsCompileStatic
-import yakworks.taskify.domain.traits.NameDescriptionConstraints
 import yakworks.taskify.domain.traits.NameDescriptionTrait
 
 @GrailsCompileStatic
-class Book implements NameDescriptionTrait{
+class Book implements NameDescriptionTrait {
 
     BigDecimal cost
     LocalDate publishDate
@@ -20,7 +19,7 @@ class Book implements NameDescriptionTrait{
     static List includes = ['id', 'name', 'description', 'publishDate']
 
     static constraints = {
-        importFrom NameDescriptionConstraints
+        NameDescriptionTraitConstraints(delegate)
     }
 
 }

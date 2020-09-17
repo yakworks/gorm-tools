@@ -8,6 +8,7 @@ import org.springframework.test.annotation.Rollback
 
 import spock.lang.IgnoreRest
 
+import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.OK
 
 @Integration
@@ -70,7 +71,5 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         testPut()
         testDelete()
     }
-
-
 
 }

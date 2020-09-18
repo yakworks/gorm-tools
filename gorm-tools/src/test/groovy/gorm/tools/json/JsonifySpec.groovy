@@ -52,7 +52,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         ['id','name']           | ['id','name']
         ['id','name','ext']     | ['id','name','ext']
         ['id', 'company']       | ['id', 'company']
-        ['*']                   | ['id', 'localDate', 'isActive', 'date', 'secret', 'version', 'localDateTime', 'name', 'amount', 'name2']
+        ['*']                   | ['id', 'localDate', 'isActive', 'date', 'secret', 'version', 'localDateTime', 'currency', 'name', 'amount', 'name2']
         ['id','name', 'ext.*']  | ['id', 'name', 'ext.id', 'ext.version', 'ext.nameExt']
 
         ['id','name', 'ext.*', 'ext.nested.name']  | ['id', 'name', 'ext.id', 'ext.version', 'ext.nameExt', 'ext.nested.name']
@@ -105,6 +105,17 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
 
         then: 'ext fields should be shown'
         res.jsonText == '{"id":1,"ext":{"id":1,"nameExt":"nameExt"},"name":"name","name2":null}'
+
+    }
+
+    void "currency converter should work"() {
+        when:
+        def jdom = TestData.build(JsonifyDom, currency: Currency.getInstance('USD'))
+        def args = [includes: ['id', 'currency']]
+        def res = Jsonify.render(jdom, args)
+
+        then:
+        res.jsonText == '{"id":1,"currency":"USD"}'
 
     }
 
@@ -213,7 +224,7 @@ class JsonifyDom {
     Date date
     LocalDate localDate
     LocalDateTime localDateTime
-    //Currency currency
+    Currency currency
     String secret
 
     JsonifyDomExt ext
@@ -232,7 +243,7 @@ class JsonifyDom {
         date        nullable: false, example: "2018-01-26T01:36:02Z"
         localDate   nullable: false, example: "2018-01-25"
 
-        //currency nullable: true
+        currency nullable: true
         localDateTime nullable: true, example: "2018-01-01T01:01:01"
         secret   nullable: true, display: false
         ext      nullable: true

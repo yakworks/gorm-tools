@@ -13,7 +13,6 @@ dependencies {
   // compile "org.grails:grails-plugin-validation"
   compile "org.grails.plugins:spring-security-core:$vSpringSecurity"
   // compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
-  // compileOnly "org.grails.plugins:audit-trail:$vAuditTrail"
 
   compile project(":gorm-tools")
 

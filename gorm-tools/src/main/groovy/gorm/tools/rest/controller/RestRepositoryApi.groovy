@@ -164,8 +164,8 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     @Action
-    def pickList() {
-        Pager pager = pagedQuery(params, 'pickList')
+    def picklist() {
+        Pager pager = pagedQuery(params, 'picklist')
         Map renderArgs = [:]
         respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
     }

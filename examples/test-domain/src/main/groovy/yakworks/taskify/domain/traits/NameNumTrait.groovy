@@ -10,7 +10,7 @@ trait NameNumTrait {
     String name
 
     static List qSearchIncludes = ['num', 'name'] // quick search includes
-    static List pickListIncludes = ['id', 'num', 'name'] //for picklist
+    static List picklistIncludes = ['id', 'num', 'name'] //for picklist
 
     @CompileDynamic
     static NameNumTraitConstraints(Object delegate) {

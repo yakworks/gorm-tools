@@ -9,7 +9,7 @@ trait NameDescriptionTrait {
     String description
 
     static List qSearchIncludes = ['name', 'description'] // quick search includes
-    static List pickListIncludes = ['id', 'name'] //for picklist
+    static List picklistIncludes = ['id', 'name'] //for picklist
 
     @CompileDynamic
     static NameDescriptionTraitConstraints(Object delegate) {

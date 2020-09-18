@@ -62,9 +62,9 @@ class RestApiConfig {
                     List includesGet = GrailsClassUtils.getStaticPropertyValue(entityClass, 'includes') as List
                     if (includesGet) includesMap['get'] = includesGet
                 }
-                if (!includesMap['pickList']) {
-                    List pickListIncludes = GrailsClassUtils.getStaticPropertyValue(entityClass, 'pickListIncludes') as List
-                    if (pickListIncludes) includesMap['pickList'] = pickListIncludes
+                if (!includesMap['picklist']) {
+                    List picklistIncludes = GrailsClassUtils.getStaticPropertyValue(entityClass, 'picklistIncludes') as List
+                    if (picklistIncludes) includesMap['picklist'] = picklistIncludes
                 }
                 includesMap['__configMerged__'] = true //mark it so we don't check config again each time
                 includesCache[controllerKey] = includesMap

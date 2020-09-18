@@ -42,7 +42,7 @@ trait RestApiTestTrait {
 
     def testPickList(String qSearch) {
         qSearch = qSearch ? "?q=${qSearch}" : ""
-        def res = restBuilder.get("${getResourcePath()}/pickList${qSearch}")
+        def res = restBuilder.get("${getResourcePath()}/picklist${qSearch}")
         assert res.status == OK.value()
         def pageMap = res.json
         return pageMap

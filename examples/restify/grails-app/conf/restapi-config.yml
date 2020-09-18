@@ -3,7 +3,7 @@ restApi:
   project: # project already exists as a project controller so this just configures it
     includes:
       list: ['id', 'num', 'name', 'billable']
-      pickList: ['id', 'num', 'name']
+      picklist: ['id', 'num', 'name']
 
   book: # basic example where all the defaults come either from domain or their stock
     entityClass: restify.Book
@@ -13,7 +13,7 @@ restApi:
     qSearch: ['num', 'name']
     includes:
       get: ['*', 'type.*']
-      pickList: ['id', 'name']
+      picklist: ['id', 'name']
 
   task:
     entityClass: yakworks.taskify.domain.Task

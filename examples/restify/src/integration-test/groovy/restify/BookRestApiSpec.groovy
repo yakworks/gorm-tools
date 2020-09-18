@@ -31,7 +31,7 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         book.keySet().containsAll(Book.includes)
     }
 
-    void "get pickList"() {
+    void "get picklist"() {
         when:
         def pageMap = testPickList()
         def data = pageMap.data
@@ -53,7 +53,7 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         pmap.data.size() == 1
         pmap.data[0].description == 'Shrugged1'
 
-        //test on pickList
+        //test on picklist
         testPickList('galt').data.size() == 3
         testPickList('flubber').data.size() == 0
     }

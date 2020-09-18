@@ -80,7 +80,7 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
     void test_pick_list() {
         // BootStrap should have loaded up projects already
         when: "The default index action is requested"
-        def response = restBuilder.get("$resourcePath/pickList")
+        def response = restBuilder.get("$resourcePath/picklist")
 
         then: "The response is correct"
         response.status == OK.value()

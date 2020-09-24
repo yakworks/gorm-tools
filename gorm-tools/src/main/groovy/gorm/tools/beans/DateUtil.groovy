@@ -432,4 +432,10 @@ class DateUtil {
         return Date.from(localDate.atZone(zoneId).toInstant())
     }
 
+    static boolean isSameDay(Date date1, Date date2){
+        def ld1 = LocalDateTime.ofInstant(date1.toInstant(), ZoneId.systemDefault()).toLocalDate()
+        def ld2 = LocalDateTime.ofInstant(date2.toInstant(), ZoneId.systemDefault()).toLocalDate()
+        return ld1 == ld2
+    }
+
 }

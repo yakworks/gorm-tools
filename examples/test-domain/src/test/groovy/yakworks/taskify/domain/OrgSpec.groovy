@@ -21,6 +21,16 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         removeEntity()
     }
 
+    def "validation fails on num"(){
+        when:
+        Map invalidData2 = [name: "foo", type: [id: 1]]
+        def o = Org.create(invalidData2)
+
+        then:
+        def ex = thrown(EntityValidationException)
+        ex.errors.getErrorCount() == 1
+    }
+
     def "test Org create fail"(){
         when:
         Map invalidData2 = [num:'foo1', name: "foo", type: [id: 1], link: ["name": "", num:'foo2', type: [id: 1]]]

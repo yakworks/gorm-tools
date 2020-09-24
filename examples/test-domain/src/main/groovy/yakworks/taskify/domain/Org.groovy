@@ -10,14 +10,20 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.taskify.domain.traits.NameNumTrait
 
+
 @AuditStamp
+@IdEqualsHashCode
+//@IdEqualsHashCode(hashKey=['num', 'name'])
+// @EqualsAndHashCode(includes = ['name2', 'secret'])
 @Entity
 @GrailsCompileStatic
 class Org implements NameNumTrait{
+
     //strings
     String name2
     String secret
@@ -89,10 +95,6 @@ class Org implements NameNumTrait{
         link bindable: true
     }
 
-    // gorm event
-    // def beforeValidate() {
-    //     if (ext && !ext.id) ext.org = this
-    // }
 
     static config = """{
         json {
@@ -104,4 +106,51 @@ class Org implements NameNumTrait{
         autotest.update = [name:'foo']
     }"""
 
+    // @Override
+    // boolean equals(Object o) {
+    //     if (o == null) return false
+    //     if (this.is(o)) return true
+    //     if (!(o instanceof Org)) return false
+    //     Org other = (Org) o
+    //     //if (id != null && other.id !=null) return id == other.id
+    //     return id == other.id
+    //     //return false
+    // }
+
+
+
+    // @Override
+    // int hashCode() {
+    //     int _result = HashCodeHelper.initHash();
+    //     _result = HashCodeHelper.updateHash(_result, num)
+    //     return HashCodeHelper.updateHash(_result, name)
+    //     // if (this.getId() != this) {
+    //     //     int var2 = HashCodeHelper.updateHash(_result, this.getId());
+    //     //     _result = var2;
+    //     // }
+    //     //
+    //     // return _result;
+    //     // return new HashCodeBuilder()
+    //     //     .append(num)
+    //     //     .append(name)
+    //     //     .toHashCode()
+    // }
+
+    // boolean equals(Object other) {
+    //     if (other == null) {
+    //         return false;
+    //     } else if (this == other) {
+    //         return true;
+    //     } else if (!(other instanceof Org)) {
+    //         return false;
+    //     } else {
+    //         Org otherTyped = (Org)other;
+    //         return ScriptBytecodeAdapter.compareEqual(this.getId(), otherTyped.getId());
+    //     }
+    // }
+
+    // @Override
+    // int hashCode() {
+    //     return 31 //when using id for equals then this is fine unless collection is large, like 10,000 items
+    // }
 }

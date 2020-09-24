@@ -3,9 +3,7 @@ package gpbench.fat
 import gpbench.Country
 import gpbench.Region
 import gpbench.model.CityTraitFat
-import gpbench.model.CityTraitFatConstraints
 import gpbench.model.DateUserStamp
-import gpbench.model.DateUserStampConstraints
 
 /**
  * Without @GrailsCompileStatic, fully dynamic
@@ -18,8 +16,8 @@ class CityFatDynamic implements CityTraitFat, DateUserStamp {
 
     //@CompileStatic(TypeCheckingMode.SKIP)
     static constraints = {
-        importFrom(CityTraitFatConstraints)
-        importFrom DateUserStampConstraints
+        CityTraitFatConstraints(delegate)
+        DateUserStampConstraints(delegate)
 //        region nullable: false
 //        country nullable: false
 //        region2 nullable: false

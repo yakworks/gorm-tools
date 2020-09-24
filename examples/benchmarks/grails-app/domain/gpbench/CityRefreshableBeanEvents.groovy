@@ -23,8 +23,7 @@ class CityRefreshableBeanEvents implements CityTrait {
     }
 
     static constraints = {
-        importFrom(CityTraitConstraints)
-
+        CityTraitConstraints(delegate)
         dateCreated nullable: false, display: false, editable: false, bindable: false
         lastUpdated nullable: false, display: false, editable: false, bindable: false
         dateCreatedUser nullable: false, display: false, editable: false, bindable: false

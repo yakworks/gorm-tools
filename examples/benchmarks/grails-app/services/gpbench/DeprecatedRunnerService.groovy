@@ -42,7 +42,7 @@ class DeprecatedRunnerService {
     @Value('${benchmark.eventListenerCount}')
     int eventListenerCount
 
-    @Value('${grails.plugin.audittrail.enabled}')
+    @Value('${gorm.tools.audit.enabled}')
     boolean auditTrailEnabled
 
     @Value('${benchmark.binder.type}')

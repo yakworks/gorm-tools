@@ -3,11 +3,7 @@ package gpbench.fat
 import gpbench.Country
 import gpbench.Region
 import gpbench.model.AuditStamp
-import gpbench.model.AuditStampConstraints
-import gpbench.model.CityTrait
-import gpbench.model.CityTraitConstraints
 import gpbench.model.CityTraitFat
-import gpbench.model.CityTraitFatConstraints
 import grails.compiler.GrailsCompileStatic
 
 /**
@@ -22,8 +18,8 @@ class CitySpringEventsRefreshable implements CityTraitFat, AuditStamp {
                         region3: Region, country3: Country]
 
     static constraints = {
-        importFrom CityTraitFatConstraints
-        importFrom AuditStampConstraints
+        CityTraitFatConstraints(delegate)
+        AuditStampConstraints(delegate)
     }
 
     String toString() { name }

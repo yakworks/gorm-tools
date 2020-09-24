@@ -1,8 +1,10 @@
 package yakworks.taskify.domain
 
+import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
+@IdEqualsHashCode
 @GrailsCompileStatic
 @Entity
 class TaskFlex {

@@ -48,7 +48,7 @@ trait BenchConfig {
     @Value('${benchmark.eventListenerCount}')
     int eventListenerCount
 
-    @Value('${grails.plugin.audittrail.enabled}')
+    @Value('${gorm.tools.audit.enabled:true}')
     boolean auditTrailEnabled
 
     @Value('${benchmark.binder.type}')

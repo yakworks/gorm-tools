@@ -4,9 +4,11 @@
 */
 package yakworks.taskify.domain
 
+import gorm.tools.transform.IdEqualsHashCode
 import grails.persistence.Entity
 
 @Entity
+@IdEqualsHashCode
 class Location {
     // address fields
     String street

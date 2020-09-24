@@ -3,9 +3,7 @@ package gpbench.basic
 import gpbench.Country
 import gpbench.Region
 import gpbench.model.CityTrait
-import gpbench.model.CityTraitConstraints
 import gpbench.model.DateUserStamp
-import gpbench.model.DateUserStampConstraints
 import grails.compiler.GrailsCompileStatic
 
 /**
@@ -21,8 +19,8 @@ class CityBasic implements CityTrait, DateUserStamp {
 //    }
 
     static constraints = {
-        importFrom CityTraitConstraints
-        importFrom DateUserStampConstraints
+        CityTraitConstraints(delegate)
+        DateUserStampConstraints(delegate)
     }
 
     String toString() { name }

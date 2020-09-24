@@ -4,6 +4,7 @@ import java.time.LocalDate
 import javax.persistence.Transient
 
 import gorm.tools.rest.RestApi
+import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -15,6 +16,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.*
  * A task is an activity that **needs** to be accomplished within a defined period of time or
  * by a deadline to work towards work-related goals.
  */
+@IdEqualsHashCode
 @GrailsCompileStatic
 @Entity
 class Task {

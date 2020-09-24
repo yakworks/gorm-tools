@@ -2,6 +2,7 @@ package gpbench.model
 
 import gpbench.Country
 import gpbench.Region
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -16,6 +17,22 @@ trait CityTrait2 {
 
     Region region2
     Country country2
+
+    @CompileDynamic
+    static CityTrait2Constraints(Object delegate) {
+        def c = {
+            name2 blank: false, nullable: false
+            shortCode2 blank: false, nullable: false
+            latitude2 nullable: false, scale: 4, max: 90.00
+            longitude2 nullable: false, scale: 4, max: 380.00
+            region2 nullable: false
+            country2 nullable: false
+            state2 nullable: true
+            countryName2 nullable: true
+        }
+        c.delegate = delegate
+        c()
+    }
 }
 
 class CityTrait2Constraints implements CityTrait2 {

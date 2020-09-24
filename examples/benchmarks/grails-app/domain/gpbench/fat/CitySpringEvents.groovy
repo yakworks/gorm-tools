@@ -22,8 +22,8 @@ class CitySpringEvents implements CityTraitFat, AuditStamp {
                         region3: Region, country3: Country]
 
     static constraints = {
-        importFrom CityTraitFatConstraints
-        importFrom AuditStampConstraints
+        CityTraitFatConstraints(delegate)
+        AuditStampConstraints(delegate)
     }
 
     String toString() { name }

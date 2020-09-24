@@ -1,5 +1,10 @@
 package gpbench
 
+import grails.compiler.GrailsCompileStatic
+import gorm.tools.transform.IdEqualsHashCode
+
+@IdEqualsHashCode
+@GrailsCompileStatic
 class Country {
     String name
     String capital

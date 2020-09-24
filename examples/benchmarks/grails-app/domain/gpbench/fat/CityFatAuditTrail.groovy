@@ -2,8 +2,7 @@ package gpbench.fat
 
 import gpbench.Country
 import gpbench.Region
-// import gpbench.model.AuditStamp
-// import gpbench.model.AuditStampConstraints
+import gorm.tools.audit.AuditStamp
 import gpbench.model.CityTraitFat
 import gpbench.model.CityTraitFatConstraints
 import grails.compiler.GrailsCompileStatic
@@ -11,7 +10,7 @@ import grails.compiler.GrailsCompileStatic
 /**
  * Event methods exist in the repository
  */
-//@gorm.tools.AuditStamp
+@AuditStamp
 @GrailsCompileStatic
 class CityFatAuditTrail implements CityTraitFat {
 
@@ -20,8 +19,7 @@ class CityFatAuditTrail implements CityTraitFat {
                         region3: Region, country3: Country]
 
     static constraints = {
-        importFrom CityTraitFatConstraints
-        // importFrom AuditStampConstraints
+        CityTraitFatConstraints(delegate)
     }
 
     String toString() { name }

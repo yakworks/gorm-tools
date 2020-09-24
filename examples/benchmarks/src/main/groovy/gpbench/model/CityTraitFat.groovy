@@ -3,6 +3,7 @@ package gpbench.model
 import gorm.tools.beans.IsoDateUtil
 import gpbench.Country
 import gpbench.Region
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 
@@ -55,6 +56,14 @@ trait CityTraitFat implements CityTrait, CityTrait2, CityTrait3, DatesTrait {
             Long id = row[key]['id'] as Long
             this[key] = GormEnhancer.findStaticApi(assocClass).load(id)
         }
+    }
+
+    @CompileDynamic
+    static CityTraitFatConstraints(Object delegate) {
+        CityTraitConstraints(delegate)
+        CityTrait2Constraints(delegate)
+        CityTrait3Constraints(delegate)
+        DatesTraitConstraints(delegate)
     }
 }
 

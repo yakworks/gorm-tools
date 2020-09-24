@@ -19,10 +19,9 @@ class CityFatInsertBenchmarks extends BenchProcessData {
 
         muteConsole = true
 
-        run_CompileStatic_doGormToolsRepoPersist()
-
         println "\n**** the CompileStatics fast ones now****"
         run_CompileStatic_doSettersStatic()
+        run_CompileStatic_doGormToolsRepoPersist()
 
         println "\n**** The slower CompileDynamic ****"
         runDynamicCompile()

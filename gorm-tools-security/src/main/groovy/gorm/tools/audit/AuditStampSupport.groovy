@@ -61,8 +61,24 @@ class AuditStampSupport {
      */
     void stampIfNew(Object entity, Class<?> dateTimeClass = LocalDateTime) {
         //if its not new then just exit as we will assume an updated entity is initialized correctly
-        if (!isNewEntity(entity)) return
-        stampDefaults(entity, dateTimeClass)
+        // if (!isNewEntity(entity)) return
+        // FIXME temp fix for bad data
+        if (hasCreatedDate(entity)){
+            //if it has createDate then its not new but might have bad data
+            ensureEditedDate(entity)
+        } else {
+            stampDefaults(entity, dateTimeClass)
+        }
+
+    }
+
+    void ensureEditedDate(Object entity) {
+        //assumes that createdDateProperty != null at this point
+        String createdDateName = fieldProps[FieldProps.CREATED_DATE_KEY].name
+        String editedDateName = fieldProps[FieldProps.EDITED_DATE_KEY].name
+        if(!entity[editedDateName]) {
+            entity[editedDateName] = entity[createdDateName]
+        }
     }
 
     void stampDefaults(Object entity, Class<?> dateTimeClass = LocalDateTime) {
@@ -108,14 +124,14 @@ class AuditStampSupport {
      * @param entity
      * @return boolean
      */
-    boolean isNewEntity(Object entity) {
+    boolean hasCreatedDate(Object entity) {
         String createdDateFieldName = fieldProps[FieldProps.CREATED_DATE_KEY].name
         MetaProperty createdDateProperty = entity.hasProperty(createdDateFieldName)
 
         //see issue#41
         if(createdDateProperty != null) {
             def existingValue = createdDateProperty.getProperty(entity)
-            return (existingValue == null)
+            return existingValue != null
         }
         // else {
         //     def session = applicationContext.sessionFactory.currentSession

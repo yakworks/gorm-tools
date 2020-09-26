@@ -292,7 +292,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
 
     void "binder should not create new association if its reference is not null"() {
         TestDomain testDomain = new TestDomain()
-        Nested nested = new Nested(name2:"xxxx")
+        Nest nested = new Nest(name2:"xxxx")
         testDomain.nested = nested
         Map params = [name: 'test', nested:[name:"test"]]
 
@@ -385,7 +385,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
 
     void "binder shouldn't initialize proxy when checks association's id"() {
         BindableNested nested = new BindableNested(name: 'proxy').save(failOnError: true)
-        TestDomain testDomain = new TestDomain(notBindableNested: nested, nested: new Nested(name:"nested-belongsTo")).save(failOnError: true)
+        TestDomain testDomain = new TestDomain(notBindableNested: nested, nested: new Nest(name:"nested-belongsTo")).save(failOnError: true)
 
         Map params = [name: 'test', notBindableNested: [id: nested.id, name: 'nested']]
 
@@ -481,7 +481,7 @@ class TestDomain {
     Boolean active
 
     AnotherDomain anotherDomain
-    Nested nested
+    Nest nested
 
     TestEnum testEnum
     EnumSub enumSub
@@ -529,7 +529,7 @@ class AnotherDomain {
 }
 
 @Entity
-class Nested {
+class Nest {
     String name
     String name2
 

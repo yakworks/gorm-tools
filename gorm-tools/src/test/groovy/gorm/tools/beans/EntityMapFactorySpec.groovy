@@ -12,6 +12,7 @@ import gorm.tools.beans.domain.TestEnumIdent
 import gorm.tools.testing.unit.GormToolsTest
 import spock.lang.Specification
 import testing.Location
+import testing.Nested
 import testing.Org
 import testing.OrgType
 import testing.TestSeedData
@@ -20,7 +21,7 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains Bookz, BookAuthor, EnumThing, Org, Location, OrgType
+        mockDomains Bookz, BookAuthor, EnumThing, Org, Location, OrgType, Nested
     }
 
     void "test buildIncludesMap"(){
@@ -94,6 +95,15 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
         then:
         4 == emap.size()
         ['id', 'age', 'version', 'book'].containsAll(emap.getIncludes())
+    }
+
+    void "test null assoc"() {
+        when:
+        def ba = new BookAuthor( age: 5)
+        def result = EntityMapFactory.createEntityMap(ba, ['age', 'book.id'])
+
+        then:
+        result == [ age: 5, book: null ]
     }
 
     void "test bookz"() {

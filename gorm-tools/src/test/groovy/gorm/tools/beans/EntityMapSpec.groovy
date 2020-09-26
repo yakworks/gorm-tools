@@ -150,6 +150,19 @@ class EntityMapSpec extends Specification {
         }
 
     }
+
+    void "test nested bean"() {
+        when:
+        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
+        def entset = map.entrySet()
+
+        then:
+        entset.size() == 3
+        for(entry in map.entrySet()) {
+            map.getIncludes().contains(entry.key)
+        }
+
+    }
 }
 
 class PogoBean{

@@ -157,9 +157,10 @@ class EntityMap extends AbstractMap<String, Object> {
      */
     Object convertValue(Object source, String prop){
         Object val = source[prop]
+        if(val == null) return null
         def incNested = getNestedIncludes()
         // convert Enums to string or id,name object if its IdEnum
-        if( val && val.class.isEnum()) {
+        if( val.class.isEnum()) {
             if(val instanceof IdEnum){
                 Map<String, Object> idEnumMap = [id: (val as IdEnum).id, name: (val as Enum).name()]
                 val = idEnumMap

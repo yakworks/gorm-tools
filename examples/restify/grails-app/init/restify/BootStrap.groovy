@@ -36,6 +36,7 @@ class BootStrap {
 
             (1..5).each {id ->
                 def book = new Book(description: "Shrugged$id")
+                book.cost = id % 2 == 0 ? (-1.45) : 9.99
                 book.name = id % 2 == 0 ? 'Atlas' : "Galt"
                 book.id = id
                 book.persist(flush: true)

@@ -19,8 +19,6 @@ import grails.persistence.Entity
 @EqualsAndHashCode(includes='username', useCanEqual=false)
 class AppUser implements AuditStampTrait { //, Serializable {
 
-    static transients = ['password'] //@Transient not working when mapping has same column name for passwordHash?
-
     // username –– also known as your handle –– what you put after the “@” symbol ala github or twitter
     // to mention others in comments or notes,
     // is unique to your account, and appears in your profile URL. username is used to log in to your account,
@@ -42,6 +40,12 @@ class AppUser implements AuditStampTrait { //, Serializable {
 
     @Transient
     String password // raw password used to makehash, temporary transient, does not get saved,
+
+    static transients = ['password', 'roles'] //@Transient not working when mapping has same column name for passwordHash?
+
+    // getter is overriden but field is needed so EntityMap for json can get access to the SecRole generic type
+    // @Transient
+    // Set<SecRole> roles // here so
 
     // other default fields
     // boolean accountExpired = false //not used right now

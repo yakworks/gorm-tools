@@ -7,15 +7,15 @@ import grails.transaction.Rollback
 
 @Integration
 @Rollback
-class AppUserRestApiSpec extends GebSpec implements RestApiTestTrait {
+class ExampleUserRestApiSpec extends GebSpec implements RestApiTestTrait {
 
     String getResourcePath() {
-        "${baseUrl}api/appUser"
+        "${baseUrl}api/exampleUser"
     }
 
     void setup() {
         // this does not rollback
-        new AppUser(userName: "project", magicCode: "x123").persist()
+        new ExampleUser(userName: "project", magicCode: "x123").persist()
     }
     //data to force a post or patch failure
     Map getInvalidData() { [userName: null] }

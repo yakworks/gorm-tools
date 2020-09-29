@@ -25,6 +25,10 @@ class BootStrap {
             SecRole guest = SecRole.create([id:3, name: "Guest"], bindId: true)
 
             SecRoleUser.create(user, admin, true)
+            SecRoleUser.create(user, power, true)
+
+            AppUser noRoleUser = AppUser.create([id: 2, username: "noroles", email: "noroles@9ci.com", password:"admin"], bindId: true)
+            assert noRoleUser.id == 2
             return
         }
     }

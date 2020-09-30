@@ -4,11 +4,7 @@
 */
 package gorm.tools.beans
 
-import gorm.tools.beans.domain.BookAuthor
-import gorm.tools.beans.domain.Bookz
-import gorm.tools.beans.domain.EnumThing
-import gorm.tools.beans.domain.TestEnum
-import gorm.tools.beans.domain.TestEnumIdent
+import gorm.tools.beans.domain.*
 import gorm.tools.testing.unit.GormToolsTest
 import spock.lang.Specification
 import testing.Location
@@ -21,7 +17,7 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains Bookz, BookAuthor, EnumThing, Org, Location, OrgType, Nested
+        mockDomains Bookz, BookTag, BookAuthor, EnumThing, Org, Location, OrgType, Nested
     }
 
     void "test buildIncludesMap"(){
@@ -117,6 +113,8 @@ class EntityMapFactorySpec extends Specification implements GormToolsTest {
         fields                        | result
         ['*']                         | [id: 1, version: null, name: 'foo', cost: 10.00]
         ['name', 'company']           | [name: 'foo', company: 'Tesla']
+        ['name', 'simplePogo.name']   | [name: 'foo', simplePogo: [ name: 'fly']]
+        ['name', 'bookTags.name']     | [ name: 'foo', bookTags: [[ name: 'red'], [ name: 'green']] ]
         ['*', 'stringList', 'bazMap'] | [name: 'foo', cost: 10.00, id: 1, version: null, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
     }
 

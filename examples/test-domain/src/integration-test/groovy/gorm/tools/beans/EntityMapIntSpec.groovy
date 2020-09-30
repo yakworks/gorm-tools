@@ -40,7 +40,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
         return ([:] << baseParams << params)
     }
 
-    @IgnoreRest
+    // @IgnoreRest
     void "test AppUser generics"() {
         when:
         def user = AppUser.get(1)

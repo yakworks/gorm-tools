@@ -18,7 +18,7 @@ class UserRestApiSpec extends GebSpec implements RestApiTestTrait {
         def data = pageMap.data
 
         then:
-        data.size() == 1
+        data.size() == 2
     }
 
 }

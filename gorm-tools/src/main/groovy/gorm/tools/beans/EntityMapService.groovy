@@ -15,8 +15,7 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 
 import gorm.tools.utils.GormMetaUtils
-
-//import org.apache.commons.logging.*
+import grails.plugin.cache.Cacheable
 
 /**
  * EntityMapFactory contains a set of helpers, which will create the EntityMap and Lists
@@ -24,11 +23,8 @@ import gorm.tools.utils.GormMetaUtils
  */
 @Slf4j
 @CompileStatic
-class EntityMapFactory {
+class EntityMapService {
 
-    private EntityMapFactory() {
-        throw new AssertionError()
-    }
 
     /**
      * Wrap entity/object in EntityMap
@@ -37,7 +33,7 @@ class EntityMapFactory {
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
-    static EntityMap createEntityMap(Object entity, List<String> includes) {
+    EntityMap createEntityMap(Object entity, List<String> includes) {
         EntityMapIncludes includesMap = buildIncludesMap(entity.class.name, includes)
         return new EntityMap(entity, includesMap)
     }
@@ -49,12 +45,24 @@ class EntityMapFactory {
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
-    static EntityMapList createEntityMapList(List entityList, List<String> includes = []) {
+    EntityMapList createEntityMapList(List entityList, List<String> includes = []) {
         if(!entityList) return null
         //use first item to get the class
         Class entityClass = entityList[0].class.name
         EntityMapIncludes includesMap = buildIncludesMap(entityClass.name, includes)
         return new EntityMapList(entityList, includesMap)
+    }
+
+    /**
+     * wrapper around buildIncludesMap that uses a cache
+     *
+     * @param entityClassName the entity to wrap in a map
+     * @param includes
+     * @return
+     */
+    @Cacheable('entityMapIncludes')
+    EntityMapIncludes getEntityMapIncludes(String entityClassName, List<String> includes = []) {
+        return buildIncludesMap(entityClassName, includes)
     }
 
     /**
@@ -64,7 +72,7 @@ class EntityMapFactory {
      * @param includes
      * @return the EntityMapIncludes object that can be passed to EntityMap
      */
-    static EntityMapIncludes buildIncludesMap(String entityClassName, List<String> includes = []) {
+    EntityMapIncludes buildIncludesMap(String entityClassName, List<String> includes = []) {
         includes = includes ?: ['*'] as List<String> //default to * if nothing
         // if(!entityClass && entity) entityClass = entity.class
         PersistentEntity domain = GormMetaUtils.findPersistentEntity(entityClassName)

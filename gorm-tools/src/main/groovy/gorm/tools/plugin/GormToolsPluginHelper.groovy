@@ -12,6 +12,7 @@ import org.grails.core.artefact.DomainClassArtefactHandler
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.async.GparsAsyncSupport
+import gorm.tools.beans.EntityMapService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
@@ -68,6 +69,8 @@ class GormToolsPluginHelper {
         repoExceptionSupport(RepoExceptionSupport)
 
         asyncSupport(GparsAsyncSupport)
+
+        entityMapService(EntityMapService)
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 

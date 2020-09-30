@@ -16,7 +16,8 @@ import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
 import gorm.tools.beans.EntityMap
-import gorm.tools.beans.EntityMapFactory
+import gorm.tools.beans.EntityMapList
+import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.repository.GormRepoEntity
 import gorm.tools.repository.api.RepositoryApi
@@ -48,6 +49,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
 
     @Autowired
     MessageSource messageSource
+
+    @Autowired
+    EntityMapService entityMapService
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -176,7 +180,8 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List incs = getIncludes(includesKey)
-        return pager.setupList(dlist, incs)
+        EntityMapList entityMapList = entityMapService.createEntityMapList(dlist, incs)
+        return pager.setEntityMapList(entityMapList)
     }
 
     List query(Pager pager, Map p = [:]) {
@@ -209,7 +214,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     EntityMap createEntityMap(D instance, String includesKey = 'get'){
         List incs = getIncludes(includesKey)
         // def emap = BeanPathTools.buildMapFromPaths(instance, incs)
-        EntityMap emap = EntityMapFactory.createEntityMap(instance, incs)
+        EntityMap emap = entityMapService.createEntityMap(instance, incs)
         return emap
     }
 

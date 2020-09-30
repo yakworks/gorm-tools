@@ -40,6 +40,7 @@ subprojects {
       compile "org.hibernate:hibernate-core:$versionHibernate"
       compile "org.hibernate:hibernate-ehcache:$versionHibernate"
 
+      compile "org.grails.plugins:cache:$vGrailsCache"
       compile "org.codehaus.gpars:gpars:1.2.1"
       compile "org.apache.commons:commons-lang3:3.11"
 

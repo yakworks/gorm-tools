@@ -41,14 +41,13 @@ class PagerSpec extends Specification implements GormToolsTest {
 
         when:
         pager.setupData(40..50 as List)
-        Map jsonData = pager.getJsonData()
 
         then:
         pager.recordCount == 11
-        jsonData.page == 3
-        jsonData.total == 1
-        jsonData.records == 11
-        jsonData.rows == 40..50 as List
+        pager.page == 3
+        pager.pageCount == 1
+        pager.recordCount == 11
+        pager.data == 40..50 as List
     }
 
     def "test setupData with fields"() {
@@ -61,12 +60,12 @@ class PagerSpec extends Specification implements GormToolsTest {
         }
         when:
         pager.setupData(ClassB.list(max: pager.max, offset: pager.offset), ["*"])
-        Map jsonData = pager.jsonData
+
         then:
-        jsonData.page == 1
-        jsonData.records == 50
-        jsonData.total == 5
-        jsonData.rows == (0..9 as List).collect { [id: it + 1, value: 5 * (it), version: 0] }
+        pager.page == 1
+        pager.recordCount == 50
+        pager.pageCount == 5
+        pager.data == (0..9 as List).collect { [id: it + 1, value: 5 * (it), version: 0] }
     }
 
     def "test eachPage"() {

@@ -14,34 +14,10 @@ import spock.lang.Specification
 @Rollback
 class EntityMapIntSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
 
-    String dataType(Class<?> c) {
-        return c.simpleName
-    }
-    List<String> dataTypes(Class<?> c) {
-        return c.metaClass.properties.findAll {MetaProperty metaProperty ->
-            metaProperty?.field != null
-        }
-            //.collect {findGenerics(it.type)}
-
-    }
-    void findGenerics(CachedField t) {
-        t.field.genericType?.actualTypeArguments.collect {dataType(it)}
-    }
-
-    Map getUserParams(Map params = [:]){
-        Map baseParams = [
-            name:"John Galt",
-            email:"test@9ci.com",
-            username:'galt',
-            password:'secretStuff',
-            repassword:'secretStuff',
-        ]
-        //baseParams.putAll params
-        return ([:] << baseParams << params)
-    }
+    EntityMapService entityMapService
 
     // @IgnoreRest
-    void "test AppUser generics"() {
+    void "MetaBeanProperty playground"() {
         when:
         def user = AppUser.get(1)
 
@@ -82,7 +58,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
         def user = AppUser.get(1)
         assert user.roles.size() == 2
         // def emap = EntityMapFactory.createEntityMap(user, ['username', 'stringList'])
-        def emap = EntityMapFactory.createEntityMap(user, ['username', 'roles.id', 'roles.name'])
+        def emap = entityMapService.createEntityMap(user, ['username', 'roles.id', 'roles.name'])
 
         then:
         emap['roles'] == [ [id:1, name:'Administrator'] , [id:2, name:'Power User']]
@@ -94,7 +70,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
         def user = AppUser.get(2)
         assert user.roles.size() == 0
         // def emap = EntityMapFactory.createEntityMap(user, ['username', 'stringList'])
-        def emap = EntityMapFactory.createEntityMap(user, ['username', 'roles.id', 'roles.name'])
+        def emap = entityMapService.createEntityMap(user, ['username', 'roles.id', 'roles.name'])
 
         then:
         emap['roles'] == []

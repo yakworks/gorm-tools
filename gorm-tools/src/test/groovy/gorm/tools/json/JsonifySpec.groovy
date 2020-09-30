@@ -5,7 +5,7 @@
 package gorm.tools.json
 
 import gorm.tools.beans.BeanPathTools
-import gorm.tools.beans.EntityMapFactory
+import gorm.tools.beans.EntityMapService
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.TestTools
 import gorm.tools.testing.unit.DomainRepoTest
@@ -141,7 +141,8 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         def jdom = TestData.build(JsonifyDom, includes: ['ext'])
         List inc = ['id', 'ext.nameExt', 'company']
         //def map = BeanPathTools.buildMapFromPaths(jdom, inc)
-        def emap = EntityMapFactory.createEntityMap(jdom,inc)
+        def entityMapService = new EntityMapService()
+        def emap = entityMapService.createEntityMap(jdom,inc)
         // def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
         //String incTrans = 'company'
         def res = Jsonify.render(emap)

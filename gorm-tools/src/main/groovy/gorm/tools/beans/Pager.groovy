@@ -157,24 +157,6 @@ class Pager {
 
     }
 
-    /**
-     * Returns formatted page with next values
-     *  page is the page we are on,
-     *  total is the total number f pages based on max per page setting
-     *  records is the total # of records we have
-     *  rows are the data
-     *
-     * @return Map with pager values
-     */
-    @Deprecated
-    Map getJsonData() {
-        return [
-            page   : this.page,
-            total  : this.getPageCount(),
-            records: this.recordCount,
-            rows   : data
-        ]
-    }
 
     /**
      * Setup totalCount property for list, if it absent and fill values that are listed in fieldList
@@ -211,8 +193,7 @@ class Pager {
      * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
-    Pager setupList(List dlist, List includes = null) {
-        def entityMapList = EntityMapFactory.createEntityMapList(dlist, includes)
+    Pager setEntityMapList(EntityMapList entityMapList) {
         if(entityMapList){
             setRecordCount(entityMapList.getTotalCount())
             setData(entityMapList)

@@ -144,7 +144,7 @@ class GormMetaUtils {
 
     /**
      * Returns persistent properties for persistent entity(finds by name)
-     * Adds composite identeties, which are not in persistent properties by default
+     * Adds composite identities, which are not in persistent properties by default
      *
      * @param className name of the Persistent entity
      * @return list of PersistentProperties, includes composite Identities and identity

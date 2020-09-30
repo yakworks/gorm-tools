@@ -20,3 +20,9 @@ restApi:
     qSearch: ['name', 'note']
     includes:
       get: ['*', 'project.*']
+
+  user:
+    entityClass: gorm.tools.security.domain.AppUser
+    qSearch: [ 'username', 'name' ]
+    includes:
+      get: [ '*', 'roles.id', 'roles.name' ]

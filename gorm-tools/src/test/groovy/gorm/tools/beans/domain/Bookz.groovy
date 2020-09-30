@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.traits.IdEnum
 import grails.persistence.Entity
 
+
 @Entity
 class Bookz {
     Long id
@@ -32,6 +33,14 @@ class Bookz {
 
     Map bazMap
 
+    SimplePogo getSimplePogo(){
+        return new SimplePogo(name: 'fly')
+    }
+
+    List<BookTag> getBookTags(){
+        return [new BookTag(name: 'red'), new BookTag(name: 'green')] as List<BookTag>
+    }
+
     static mapping = {
         id generator:'assigned'
     }
@@ -49,6 +58,16 @@ class BookAuthor {
     static mapping = {
         id generator:'assigned'
     }
+}
+
+class SimplePogo {
+    String name
+}
+
+
+@Entity
+class BookTag {
+    String name
 }
 
 @Entity

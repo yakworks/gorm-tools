@@ -80,8 +80,8 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
 
     def "test updating roles"() {
         when:
-        //assert current admin has 1 role id:1
-        assert SecRoleUser.getByUser(1)*.role.id == [1L]
+        //assert current admin has 2 roles id:1
+        assert SecRoleUser.getByUser(1)*.role.id == [1,2]
         Map params = [
             id:1,
             roles: [2, 3]

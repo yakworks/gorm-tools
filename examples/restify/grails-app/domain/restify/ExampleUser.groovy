@@ -11,7 +11,7 @@ import grails.compiler.GrailsCompileStatic
 //@ToString(includes='fooName', includeNames=true, includePackage=false)
 @GrailsCompileStatic
 @RestApi(description = "The user for the restify application")
-class AppUser {
+class ExampleUser {
 
     String userName
     String magicCode

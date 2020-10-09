@@ -134,11 +134,7 @@ public class IdEqualsHashASTTransformation extends AbstractASTTransformation {
         body.addStatement(ifS(equalsNullX(other), returnS(constX(Boolean.FALSE, true))));
         body.addStatement(ifS(sameX(varX("this"), other), returnS(constX(Boolean.TRUE, true))));
 
-        // if (useCanEqual) {
-            body.addStatement(ifS(notX(isInstanceOfX(other, GenericsUtils.nonGeneric(cNode))), returnS(constX(Boolean.FALSE, true))));
-        // } else {
-        //    body.addStatement(ifS(notX(hasClassX(other, GenericsUtils.nonGeneric(cNode))), returnS(constX(Boolean.FALSE,true))));
-        // }
+        body.addStatement(ifS(notX(isInstanceOfX(other, GenericsUtils.nonGeneric(cNode))), returnS(constX(Boolean.FALSE, true))));
 
         VariableExpression otherTyped = varX("otherTyped", GenericsUtils.nonGeneric(cNode));
         CastExpression castExpression = new CastExpression(GenericsUtils.nonGeneric(cNode), other);

@@ -11,8 +11,7 @@ import org.springframework.context.MessageSourceResolvable
 /**
  * Trait implementation of the {@link MessageSourceResolvable} interface.
  * similiar to {@link org.springframework.context.support.DefaultMessageSourceResolvable} but as a Trait that can
- * easily be applied to any class
- * Offers an easy way to store all the necessary values needed to resolve
+ * easily be applied to any class offers an easy way to store all the necessary values needed to resolve
  * a message via a {@link org.springframework.context.MessageSource}.
  * @see org.springframework.context.MessageSource#getMessage(MessageSourceResolvable, java.util.Locale)
  */

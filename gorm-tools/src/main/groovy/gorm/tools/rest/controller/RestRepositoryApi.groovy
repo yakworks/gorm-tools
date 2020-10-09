@@ -190,8 +190,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         }
 
         //def qSearch = p.remove('q')
-        if(p.q && getSearchFields()) {
-            Map qMap = ['text': p.q, 'fields': getSearchFields()]
+        List qsFields = getSearchFields()
+        if(p.q && qsFields) {
+            Map qMap = ['text': p.q, 'fields': qsFields]
             p['$q'] = qMap
         }
 

@@ -22,30 +22,30 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
         { ->
             def securityConf = SpringSecurityUtils.securityConfig
             if (securityConf.active) {
-                secService(SpringSecService, AppUser)
-                userService(AppUserService)
+                secService(SpringSecService, AppUser){ bean -> bean.lazyInit = true}
+                userService(AppUserService){ bean -> bean.lazyInit = true}
 
-                passwordValidator(PasswordValidator)
+                passwordValidator(PasswordValidator){ bean -> bean.lazyInit = true}
 
                 // spring security uses an older deprecated interface security.authentication.encoding.PasswordEncoder
                 // this one wraps the new one in the old interface as spring sec's DaoAuthenticationProvider needs it
                 // once thats upgraded then we can fix this
-                passwordEncoder(grails.plugin.springsecurity.authentication.encoding.BCryptPasswordEncoder, 10)
+                passwordEncoder(grails.plugin.springsecurity.authentication.encoding.BCryptPasswordEncoder, 10){ bean -> bean.lazyInit = true}
 
                 //overrrides the spring sec's userDetailsService
-                userDetailsService(AppUserDetailsService)
+                userDetailsService(AppUserDetailsService){ bean -> bean.lazyInit = true}
 
-                secLoginHandler(SecLoginHandler)
-                secLogoutHandler(SecLogoutHandler)
+                secLoginHandler(SecLoginHandler){ bean -> bean.lazyInit = true}
+                secLogoutHandler(SecLogoutHandler){ bean -> bean.lazyInit = true}
                 // authenticationDetailsSource(RallyAuthenticationDetailsSource)
             }
 
             //dont register beans if audit trail is disabled.
             if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
                 //auditStampEventListener(AuditStampEventListener)
-                auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
-                auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
-                auditStampSupport(AuditStampSupport)
+                auditStampBeforeValidateListener(AuditStampBeforeValidateListener){ bean -> bean.lazyInit = true}
+                auditStampPersistenceEventListener(AuditStampPersistenceEventListener){ bean -> bean.lazyInit = true}
+                auditStampSupport(AuditStampSupport){ bean -> bean.lazyInit = true}
             }
 
 

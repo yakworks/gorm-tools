@@ -39,18 +39,21 @@ class EntityMapService {
     }
 
     /**
-     * Wrap entity/object in EntityMap
+     * Wrap list in EntityMapList
      *
      * @param entity the entity to wrap in a map
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
     EntityMapList createEntityMapList(List entityList, List<String> includes = []) {
-        if(!entityList) return null
-        //use first item to get the class
-        Class entityClass = entityList[0].class.name
-        EntityMapIncludes includesMap = buildIncludesMap(entityClass.name, includes)
-        return new EntityMapList(entityList, includesMap)
+        if(entityList) {
+            //use first item to get the class
+            Class entityClass = entityList[0].class.name
+            EntityMapIncludes includesMap = buildIncludesMap(entityClass.name, includes)
+            return new EntityMapList(entityList, includesMap)
+        }
+        // return empty list
+        return new EntityMapList([])
     }
 
     /**

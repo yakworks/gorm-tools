@@ -45,40 +45,42 @@ class GormToolsPluginHelper {
     static Closure doWithSpring = {
         println "starting gorm-tools config"
         msgService(MsgService)
-        errorMessageService(ErrorMessageService)
+        errorMessageService(ErrorMessageService){ bean -> bean.lazyInit = true}
 
-        restApiConfig(RestApiConfig)
+        restApiConfig(RestApiConfig){ bean -> bean.lazyInit = true}
 
-        jdbcTemplate(JdbcTemplate, ref("dataSource"))
+        jdbcTemplate(JdbcTemplate, ref("dataSource")){ bean -> bean.lazyInit = true}
 
-        jdbcIdGenerator(JdbcIdGenerator) {
+        jdbcIdGenerator(JdbcIdGenerator) { bean ->
+            bean.lazyInit = true
             jdbcTemplate = jdbcTemplate
             table = "NewObjectId"
             keyColumn = "KeyName"
             idColumn = "NextId"
         }
 
-        idGenerator(PooledIdGenerator, jdbcIdGenerator)
+        idGenerator(PooledIdGenerator, jdbcIdGenerator){ bean -> bean.lazyInit = true}
 
-        mangoQuery(DefaultMangoQuery)
+        mangoQuery(DefaultMangoQuery){ bean -> bean.lazyInit = true}
 
-        entityMapBinder(EntityMapBinder, ref('grailsApplication'))
+        entityMapBinder(EntityMapBinder, ref('grailsApplication')){ bean -> bean.lazyInit = true}
+        entityMapService(EntityMapService){ bean -> bean.lazyInit = true}
 
-        repoEventPublisher(RepoEventPublisher)
+        repoEventPublisher(RepoEventPublisher){ bean -> bean.lazyInit = true}
 
-        repoExceptionSupport(RepoExceptionSupport)
+        repoExceptionSupport(RepoExceptionSupport){ bean -> bean.lazyInit = true}
 
-        asyncSupport(GparsAsyncSupport)
+        asyncSupport(GparsAsyncSupport){ bean -> bean.lazyInit = true}
 
-        entityMapService(EntityMapService)
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 
-        dbDialectService(DbDialectService) {
+        dbDialectService(DbDialectService) { bean ->
+            bean.lazyInit = true
             jdbcTemplate = ref('jdbcTemplate')
         }
 
-        trxService(TrxService)
+        trxService(TrxService){ bean -> bean.lazyInit = true}
 
         def repoClasses = application.repositoryClasses
         repoClasses.each { repoClass ->
@@ -113,6 +115,7 @@ class GormToolsPluginHelper {
         jsonSchemaGenerator(JsonSchemaGenerator) { bean ->
             // Autowiring behaviour. The other option is 'byType'. <<autowire>>
             // bean.autowire = 'byName'
+            bean.lazyInit = true
         }
 
 //        appInfoBuilder(AppInfoBuilder) { bean ->

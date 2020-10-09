@@ -197,8 +197,10 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     void removeById( Map args = [:], Serializable id) {
-        D entity = get([id: id])
-        doRemove(entity)
+        withTrx {
+            D entity = get([id: id])
+            doRemove(entity)
+        }
     }
 
     /**

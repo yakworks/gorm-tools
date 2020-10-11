@@ -25,11 +25,11 @@ trait QueryMangoEntity<D> {
 
     static abstract getRepo()
 
-    static DetachedCriteria<D> buildCriteria(Map params = [:], Closure closure = null) {
+    static DetachedCriteria<D> buildCriteria(Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).buildCriteria(params, closure)
     }
 
-    static DetachedCriteria<D> buildCriteria(Closure closure) {
+    static DetachedCriteria<D> buildCriteria(@DelegatesTo(DetachedCriteria) Closure closure) {
         ((QueryMangoEntityApi)getRepo()).buildCriteria([:], closure)
     }
 
@@ -40,7 +40,7 @@ trait QueryMangoEntity<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    static List query(Map params = [:], Closure closure = null) {
+    static List query(Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).query(params, closure)
     }
 }

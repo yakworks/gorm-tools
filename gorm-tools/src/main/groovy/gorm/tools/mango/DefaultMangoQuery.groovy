@@ -34,7 +34,8 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map criteria = [:], Closure closure = null) {
+    public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map criteria = [:],
+                                                 @DelegatesTo(DetachedCriteria) Closure closure = null) {
         MangoBuilder.build(domainClass, criteria, closure)
     }
 
@@ -45,7 +46,7 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    public <D> List<D> query(Class<D> domainClass, Map params = [:], Closure closure = null) {
+    public <D> List<D> query(Class<D> domainClass, Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
         Map<String, Map> p = parseParams(params)
         DetachedCriteria<D> dcrit = buildCriteria(domainClass, p['criteria'], closure)
         Pager pager = new Pager(p['pager'])

@@ -101,12 +101,13 @@ class MangoBuilder {
         }
     }
 
-    static <D> DetachedCriteria<D> build(Class<D> clazz, Map map, Closure callable = null) {
+    static <D> DetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(DetachedCriteria) Closure callable = null) {
         DetachedCriteria<D> detachedCriteria = new DetachedCriteria<D>(clazz)
         return build(detachedCriteria, map, callable)
     }
 
-    static <D> DetachedCriteria<D> build(DetachedCriteria<D> criteria, Map map, Closure callable = null) {
+    static <D> DetachedCriteria<D> build(DetachedCriteria<D> criteria, Map map,
+                                         @DelegatesTo(DetachedCriteria) Closure callable = null) {
         DetachedCriteria newCriteria = cloneCriteria(criteria)
         applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
         if (callable) newCriteria.with callable

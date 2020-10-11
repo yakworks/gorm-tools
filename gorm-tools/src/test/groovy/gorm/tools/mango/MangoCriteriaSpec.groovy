@@ -4,6 +4,7 @@
 */
 package gorm.tools.mango
 
+import java.time.LocalDate
 
 import grails.gorm.DetachedCriteria
 import grails.test.hibernate.HibernateSpec
@@ -202,6 +203,15 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
         then:
         res.size() == 9
+    }
+
+    def "test nested obj"() {
+        when:
+        def loc = Location.get(6)
+        List res = build(location: loc).list()
+
+        then:
+        res.size() == 1
     }
 
     def "test nested"() {

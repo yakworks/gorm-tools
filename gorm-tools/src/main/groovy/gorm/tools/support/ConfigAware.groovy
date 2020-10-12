@@ -4,6 +4,8 @@
 */
 package gorm.tools.support
 
+import groovy.transform.CompileStatic
+
 import grails.config.Config
 import grails.core.support.GrailsConfigurationAware
 
@@ -13,6 +15,7 @@ import grails.core.support.GrailsConfigurationAware
  * @author Joshua Burnett (@basejump)
  * @since 6.1.12
  */
+@CompileStatic
 trait ConfigAware implements GrailsConfigurationAware {
 
     Config config

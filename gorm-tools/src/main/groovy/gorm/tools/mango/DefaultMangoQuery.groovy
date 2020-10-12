@@ -6,6 +6,7 @@ package gorm.tools.mango
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.beans.Pager
@@ -23,6 +24,9 @@ import grails.gorm.transactions.Transactional
 @CompileStatic
 class DefaultMangoQuery implements MangoQuery {
 
+    @Autowired
+    MangoBuilder mangoBuilder
+
     @Value('${gorm.tools.mango.criteriaKeyName:criteria}')
     //gets criteria keyword from config, if there is no, then uses 'criteria'
     String criteriaKeyName
@@ -36,7 +40,7 @@ class DefaultMangoQuery implements MangoQuery {
      */
     public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map criteria = [:],
                                                  @DelegatesTo(DetachedCriteria) Closure closure = null) {
-        MangoBuilder.build(domainClass, criteria, closure)
+        mangoBuilder.build(domainClass, criteria, closure)
     }
 
     /**
@@ -74,7 +78,7 @@ class DefaultMangoQuery implements MangoQuery {
      * @return map where keys are names of fields and value - sum for restricted entities
      */
     @Transactional(readOnly = true)
-    Map countTotals(Class domainClass, Map params = [:], List<String> sums, Closure closure = null) {
+    Map countTotals(Class domainClass, Map params = [:], List<String> sums, @DelegatesTo(DetachedCriteria) Closure closure = null) {
 
         DetachedCriteria mangoCriteria = buildCriteria(domainClass, params, closure)
 

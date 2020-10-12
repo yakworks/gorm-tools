@@ -18,6 +18,7 @@ import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.mango.DefaultMangoQuery
+import gorm.tools.mango.MangoBuilder
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.GrailsRepositoryClass
@@ -62,6 +63,7 @@ class GormToolsPluginHelper {
         idGenerator(PooledIdGenerator, jdbcIdGenerator){ bean -> bean.lazyInit = true}
 
         mangoQuery(DefaultMangoQuery){ bean -> bean.lazyInit = true}
+        mangoBuilder(MangoBuilder){ bean -> bean.lazyInit = true}
 
         entityMapBinder(EntityMapBinder, ref('grailsApplication')){ bean -> bean.lazyInit = true}
         entityMapService(EntityMapService){ bean -> bean.lazyInit = true}

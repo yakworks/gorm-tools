@@ -5,9 +5,10 @@
 package gorm.tools.mango
 
 
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.gorm.DetachedCriteria
-import grails.test.hibernate.HibernateSpec
-import grails.testing.spring.AutowiredTest
+import grails.testing.spock.OnceBefore
+import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import testing.Location
 import testing.Nested
@@ -15,16 +16,19 @@ import testing.Org
 import testing.TestIdent
 import testing.TestSeedData
 
-class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
+class MangoCriteriaSpec extends GormToolsHibernateSpec {
+
+    MangoBuilder mangoBuilder
 
     List<Class> getDomainClasses() { [Org, Location, Nested] }
 
-    static DetachedCriteria build(map, Closure closure = null) {
+    DetachedCriteria build(map, Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
-        return MangoBuilder.build(Org, map, closure)
+        return mangoBuilder.build(Org, map, closure)
     }
 
     void setupSpec() {
+        //super.setupSpec()
         Org.withTransaction {
             TestSeedData.buildOrgs(10)
         }
@@ -202,6 +206,23 @@ class MangoCriteriaSpec extends HibernateSpec implements AutowiredTest {
 
         then:
         res.size() == 9
+    }
+
+    def "test nested obj"() {
+        // when:
+        // def loc = Location.get(6)
+        // List res = build(locationId: loc.id).list()
+        //
+        // then:
+        // res.size() == 1
+
+        when:
+        def loc = Location.get(6)
+        def res = build(location: loc).list()
+
+        then:
+        res.size() == 1
+
     }
 
     def "test nested"() {

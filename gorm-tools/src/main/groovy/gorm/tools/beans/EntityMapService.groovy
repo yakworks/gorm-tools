@@ -123,8 +123,12 @@ class EntityMapService {
             List incProps = initMap['props'] as List
             String assocClass = initMap['className'] as String
             EntityMapIncludes nestedItem
+
+            if(assocClass) {
+                nestedItem = buildIncludesMap(assocClass, incProps)
+            }
             // if no nestClassName then it wasn't a gorm association from above so try by getting value through meta reflection
-            if(!assocClass) {
+            else {
                 Class entityClass = loadClass(entityClassName)
                 MetaBeanProperty mbp = getMetaBeanProp(entityClass, prop)
                 Class returnType = mbp.getter.returnType
@@ -136,8 +140,6 @@ class EntityMapService {
                 } else {
                     nestedItem = buildIncludesMap(returnType.name, incProps)
                 }
-            } else {
-                nestedItem = buildIncludesMap(assocClass, incProps)
             }
             if(!nestedMap[prop]) nestedMap[prop] = nestedItem
         }

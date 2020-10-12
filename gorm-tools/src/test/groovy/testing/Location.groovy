@@ -4,8 +4,10 @@
 */
 package testing
 
+import gorm.tools.transform.IdEqualsHashCode
 import grails.persistence.Entity
 
+@IdEqualsHashCode
 @Entity
 class Location {
     String address

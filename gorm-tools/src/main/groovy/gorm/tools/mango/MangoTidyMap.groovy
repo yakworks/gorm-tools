@@ -39,7 +39,7 @@ class MangoTidyMap {
      * @return extended map
      */
     static Map pathToMap(String path, Object val, Map map) {
-        if (path == MangoBuilder.SORT) {
+        if (path == MangoOps.SORT) {
             return tidySort(path, val, map)
         } else if (path.contains(".")) {
             String[] splitPath = path.split("[.]")
@@ -73,7 +73,7 @@ class MangoTidyMap {
     static Map toMangoOperator(Map map, Map result = [:]) {
         map.each { key, val ->
             result[key] = [:]
-            if (EnumUtils.isValidEnum(MangoBuilder.JunctionOp, key as String)) {
+            if (EnumUtils.isValidEnum(MangoOps.JunctionOp, key as String)) {
                 if (val instanceof Map) {
                     result[key] = (val as Map).collect { k, v -> tidy([(k.toString()): v]) }
                     return
@@ -84,7 +84,7 @@ class MangoTidyMap {
                     return
                 }
             }
-            if (val instanceof Map && key != MangoBuilder.SORT && key != MangoBuilder.Q && key != MangoBuilder.QSEARCH) {
+            if (val instanceof Map && key != MangoOps.SORT && key != MangoOps.Q && key != MangoOps.QSEARCH) {
                 toMangoOperator(val as Map, result[key] as Map)
             } else {
                 if (key.toString().startsWith('$')) {
@@ -108,7 +108,7 @@ class MangoTidyMap {
                     return
                 }
 
-                if (EnumUtils.isValidEnum(MangoBuilder.ExistOp, val as String)) {
+                if (EnumUtils.isValidEnum(MangoOps.ExistOp, val as String)) {
                     (result[key] as Map)[val] = true
                 } else {
                     result[key]['$eq'] = val

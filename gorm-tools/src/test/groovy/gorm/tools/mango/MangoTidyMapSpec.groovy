@@ -5,6 +5,10 @@
 package gorm.tools.mango
 
 import spock.lang.Specification
+import testing.Location
+
+import static gorm.tools.mango.MangoTidyMap.tidy
+
 
 class MangoTidyMapSpec extends Specification {
 
@@ -17,13 +21,14 @@ class MangoTidyMapSpec extends Specification {
 
     void "test tidy method for equal"() {
         expect:
-        [a: [b: [c: ['$eq': 1]]]] == MangoTidyMap.tidy(["a.b.c": 1])
-        [a: [b: [c: ['$eq': 1]]], d: ['$eq': 2]] == MangoTidyMap.tidy(["a.b.c": 1, d: ['$eq': 2]])
-        [a: ['$eq': 1], d: ['$eq': 2]] == MangoTidyMap.tidy(["a": 1, d: 2])
-        [a: [b: [c: ['$eq': 1]]]] == MangoTidyMap.tidy([a: [b: [c: 1]]])
+        [a: [b: [c: ['$eq': 1]]]] == tidy(["a.b.c": 1])
+        [a: [b: [c: ['$eq': 1]]], d: ['$eq': 2]] == tidy(["a.b.c": 1, d: ['$eq': 2]])
+        [a: ['$eq': 1], d: ['$eq': 2]] == tidy(["a": 1, d: 2])
+        [a: [b: [c: ['$eq': 1]]]] == tidy([a: [b: [c: 1]]])
     }
 
     void "test in"() {
+
         when:
         def mmap = tidy([
             'foo.id'     : [1, 2, 3],
@@ -79,8 +84,16 @@ class MangoTidyMapSpec extends Specification {
     }
 
     void "test eq"() {
+
+        when: "object is assigned"
+        def loc = new Location()
+        def mmap = tidy('location': loc)
+
+        then:
+        mmap == [location: ['$eq': loc]]
+
         when:
-        def mmap = tidy([
+        mmap = tidy([
             'foo.name': "Name"
         ])
 
@@ -137,18 +150,18 @@ class MangoTidyMapSpec extends Specification {
         flatten(mmap) == flatten([
             '$or': [
                 [
-                    '$and': [[address: [
-                        id: ['$eq': 5]
-                    ]]]],
-                ['$and': [
-                    [name: ['$eq': "Org#1"]],
-                    [address: [
-                        id: ['$eq': 4]
-                    ]]
+                    '$and': [
+                        [ address: [ id: ['$eq': 5] ] ]
+                    ]
+                ],
+                [
+                    '$and': [
+                        [name: ['$eq': "Org#1"] ],
+                        [address: [ id: ['$eq': 4] ] ]
+                    ]
                 ]
-                ]]
-        ]
-        )
+            ]
+        ])
     }
 
 
@@ -212,10 +225,6 @@ class MangoTidyMapSpec extends Specification {
 
         then:
         mmap == ['$sort':[name: 'asc', foo: 'desc']]
-    }
-
-    Map tidy(Map m) {
-        MangoTidyMap.tidy(m)
     }
 
     Map flatten(Map m, String separator = '.') {

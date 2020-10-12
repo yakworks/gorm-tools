@@ -6,6 +6,7 @@ package gorm.tools.mango
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.beans.Pager
@@ -23,6 +24,9 @@ import grails.gorm.transactions.Transactional
 @CompileStatic
 class DefaultMangoQuery implements MangoQuery {
 
+    @Autowired
+    MangoBuilder mangoBuilder
+
     @Value('${gorm.tools.mango.criteriaKeyName:criteria}')
     //gets criteria keyword from config, if there is no, then uses 'criteria'
     String criteriaKeyName
@@ -34,8 +38,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map criteria = [:], Closure closure = null) {
-        MangoBuilder.build(domainClass, criteria, closure)
+    public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map criteria = [:],
+                                                 @DelegatesTo(DetachedCriteria) Closure closure = null) {
+        mangoBuilder.build(domainClass, criteria, closure)
     }
 
     /**
@@ -45,7 +50,7 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    public <D> List<D> query(Class<D> domainClass, Map params = [:], Closure closure = null) {
+    public <D> List<D> query(Class<D> domainClass, Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
         Map<String, Map> p = parseParams(params)
         DetachedCriteria<D> dcrit = buildCriteria(domainClass, p['criteria'], closure)
         Pager pager = new Pager(p['pager'])
@@ -73,7 +78,7 @@ class DefaultMangoQuery implements MangoQuery {
      * @return map where keys are names of fields and value - sum for restricted entities
      */
     @Transactional(readOnly = true)
-    Map countTotals(Class domainClass, Map params = [:], List<String> sums, Closure closure = null) {
+    Map countTotals(Class domainClass, Map params = [:], List<String> sums, @DelegatesTo(DetachedCriteria) Closure closure = null) {
 
         DetachedCriteria mangoCriteria = buildCriteria(domainClass, params, closure)
 

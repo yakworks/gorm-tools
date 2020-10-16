@@ -30,7 +30,7 @@ class MangoOverrideSpec extends Specification implements GormToolsTest {
         }
 
         when:
-        List list = City.repo.query()
+        List list = City.repo.queryList()
         then:
         list.size() == 1
         list[0].id == 2
@@ -46,13 +46,13 @@ class City {
 class NewMangoQuery implements MangoQuery {
 
     @Override
-    DetachedCriteria buildCriteria(Class domainClass, Map params, Closure closure = null) {
+    DetachedCriteria query(Class domainClass, Map params, Closure closure = null) {
         new DetachedCriteria(domainClass).build { eq "id", 2 }
     }
 
     @Override
-    List query(Class domainClass, Map params, Closure closure = null) {
-        buildCriteria(domainClass, [:]).list()
+    List queryList(Class domainClass, Map params, Closure closure = null) {
+        query(domainClass, [:], null).list()
     }
 }
 

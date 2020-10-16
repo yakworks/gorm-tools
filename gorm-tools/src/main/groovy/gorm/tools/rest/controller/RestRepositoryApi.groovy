@@ -149,10 +149,10 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      *
      * returns the list of domain objects
      */
-    @Action
-    def listPost() {
-        respond query((request.JSON ?: [:]) as Map, params)
-    }
+    // @Action
+    // def listPost() {
+    //     respond query((request.JSON ?: [:]) as Map, params)
+    // }
 
     /**
      * request type is handled in urlMapping
@@ -196,7 +196,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
             p['$q'] = qMap
         }
 
-        getMangoApi().query(p)
+        getMangoApi().queryList(p)
     }
 
     void respondWithEntityMap(EntityMap entityMap, Map args = [:]){

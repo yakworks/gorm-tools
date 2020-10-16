@@ -27,7 +27,7 @@ import grails.util.Holders
  * @since 6.1
  */
 @CompileStatic
-trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity, EntityMethodEvents {
+trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D>, EntityMethodEvents {
 
     Class getEntityClass(){ getClass() }
 

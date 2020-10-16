@@ -112,7 +112,7 @@ For more example take a look on [MangoTidyMapSpec][MangoTidyMapSpec]
 
 ### Mango query
 
-The repository by default does not have all the features of mango service, just `buildCriteria` and `query` methods, but both automatically
+The repository by default does not have all the features of mango service, just `query` and `queryList` methods, but both automatically
 convert map params to mango map, so just `params` or `request.JSON` can be passed. 
 
 See [Mango Api](queries-mango.md#mango-api) to know all features that are provided.
@@ -321,15 +321,15 @@ With such configuration restrictions for Mango criteria should be under `filters
 which contains implementation for two query methods:
 
 ```groovy
-DetachedCriteria buildCriteria( Map params=[:], Closure closure=null) {
-        mangoQuery.buildCriteria(getDomainClass(), params, closure)
+DetachedCriteria query( Map params=[:], Closure closure=null) {
+        mangoQuery.query(getDomainClass(), params, closure)
     }
 ```
 see docs for [DetachedCriteria][DetachedCriteria]
 
 ```groovy
- List query(Map params=[:], Closure closure=null){
-         mangoQuery.query(getDomainClass(), params, closure)
+ List queryList(Map params=[:], Closure closure=null){
+         mangoQuery.queryList(getDomainClass(), params, closure)
      }
 ```
 returns list of entities with pagination. For pagination take a look at [Pager][Pager]
@@ -351,12 +351,12 @@ beans = {
 class NewMangoQuery implements MangoQueryApi {
 
     @Override
-    DetachedCriteria buildCriteria(Class domainClass, Map params, Closure closure = null) {
+    DetachedCriteria query(Class domainClass, Map params, Closure closure = null) {
        return null
     }
 
     @Override
-    List query(Class domainClass, Map params, Closure closure = null) {
+    List queryList(Class domainClass, Map params, Closure closure = null) {
        return []
     }
 }

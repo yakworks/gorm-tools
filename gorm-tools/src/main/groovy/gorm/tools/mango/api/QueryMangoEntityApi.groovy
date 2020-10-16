@@ -33,8 +33,8 @@ trait QueryMangoEntityApi<D> {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    DetachedCriteria<D> buildCriteria(Map params = [:], Closure closure = null) {
-        getMangoQuery().buildCriteria(getEntityClass(), params, closure)
+    DetachedCriteria<D> query(Map params = [:],  @DelegatesTo(DetachedCriteria)Closure closure = null) {
+        getMangoQuery().query(getEntityClass(), params, closure)
     }
 
     /**
@@ -44,7 +44,7 @@ trait QueryMangoEntityApi<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    List query(Map params = [:], Closure closure = null) {
-        getMangoQuery().query(getEntityClass(), params, closure)
+    List<D> queryList(Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
+        getMangoQuery().queryList(getEntityClass(), params, closure)
     }
 }

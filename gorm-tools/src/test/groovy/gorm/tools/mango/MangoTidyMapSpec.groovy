@@ -37,15 +37,11 @@ class MangoTidyMapSpec extends Specification {
 
         then:
         mmap == [
-            foo     : [
-                id: [
-                    '$in': [1, 2, 3]
-                ]
+            'foo.id' : [
+                '$in': [1, 2, 3]
             ],
-            customer: [
-                id: [
-                    '$in': [1, 2, 3]
-                ]
+            'customer.id': [
+                '$in': [1, 2, 3]
             ]
         ]
 
@@ -151,13 +147,13 @@ class MangoTidyMapSpec extends Specification {
             '$or': [
                 [
                     '$and': [
-                        [ address: [ id: ['$eq': 5] ] ]
+                        [ 'address.id': ['$eq': 5] ]
                     ]
                 ],
                 [
                     '$and': [
                         [name: ['$eq': "Org#1"] ],
-                        [address: [ id: ['$eq': 4] ] ]
+                        ['address.id': ['$eq': 4] ]
                     ]
                 ]
             ]

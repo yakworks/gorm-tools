@@ -52,7 +52,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.name == newOrg.name
 
         when:
-        newOrg = Org.repo.get([id: org.id])
+        newOrg = Org.repo.get(org.id)
 
         then:
         null != newOrg
@@ -82,14 +82,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when: "test get() with valid version"
         Org newOrg = Org.repo.get(org.id, 1)
-
-        then:
-        noExceptionThrown()
-        1 == newOrg.version
-        org.id == newOrg.id
-
-        when: "check get() passing map of params"
-        newOrg = Org.repo.get([id: org.id, version: 1])
 
         then:
         noExceptionThrown()

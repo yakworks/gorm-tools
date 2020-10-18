@@ -34,7 +34,7 @@ class RepoExceptionSupport {
      *         was thrown originally
      */
     @CompileDynamic
-    RuntimeException translateException(RuntimeException ex, GormEntity entity) {
+    RuntimeException translateException(RuntimeException ex, Object entity) {
         /*
          * We need to check for EntityValidationException first and return it back without changes,
          * because in case "ex" is the EntityValidationException, it will be re-created with "notSaved" message.

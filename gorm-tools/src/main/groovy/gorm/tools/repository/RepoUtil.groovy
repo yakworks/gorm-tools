@@ -58,7 +58,7 @@ class RepoUtil {
      * @param ver the version this used to be (entity will have the )
      * @throws OptimisticLockingFailureException
      */
-    static void checkVersion(GormEntity entity, Long oldVersion) {
+    static void checkVersion(Object entity, Long oldVersion) {
         if (oldVersion == null) return
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
@@ -77,7 +77,7 @@ class RepoUtil {
      * @param domainClassName - the name of the domain that will be used to build error message if thrown
      * @throws EntityNotFoundException if it not found
      */
-    static void checkFound(GormEntity entity, Serializable id, String domainClassName) {
+    static void checkFound(Object entity, Serializable id, String domainClassName) {
         if (!entity) {
             throw new EntityNotFoundException(id, domainClassName)
         }

@@ -100,6 +100,8 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D>, En
     }
 
     /**
+     * Deprecated USE QUERY or WHERE INSTEAD
+     *
      * Creates a improved  criteria builder instance
      * make it easier to build criteria with domain bean paths
      * allows
@@ -114,6 +116,7 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D>, En
      * simliar with eq, like and in
      *
      */
+    @Deprecated
     @Override
     static BuildableCriteria createCriteria() {
         BuildableCriteria builder

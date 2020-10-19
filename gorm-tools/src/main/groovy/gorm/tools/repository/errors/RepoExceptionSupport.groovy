@@ -7,7 +7,6 @@ package gorm.tools.repository.errors
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.OptimisticLockingFailureException
@@ -34,7 +33,7 @@ class RepoExceptionSupport {
      *         was thrown originally
      */
     @CompileDynamic
-    RuntimeException translateException(RuntimeException ex, GormEntity entity) {
+    RuntimeException translateException(RuntimeException ex, Object entity) {
         /*
          * We need to check for EntityValidationException first and return it back without changes,
          * because in case "ex" is the EntityValidationException, it will be re-created with "notSaved" message.

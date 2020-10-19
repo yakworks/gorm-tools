@@ -61,4 +61,93 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
         list != null
     }
 
+    void "query eq check"() {
+        when:
+        def qlist = Org.query {
+            eq 'location.id', 1l
+        }.list()
+
+        then:
+        qlist.size() == 1
+
+        when:
+        qlist = Org.query {
+            eq 'location.address', 'City1'
+        }.list()
+
+        then:
+        qlist.size() == 1
+
+        when:
+        qlist = Org.query {
+            invokeMethod('location') {
+                eq 'address', 'City1'
+            }
+        }.list()
+
+        then:
+        qlist.size() == 1
+
+        when:
+        qlist = Org.query {
+            assoc('location') {
+                eq 'address', 'City1'
+            }
+        }.list()
+
+        then:
+        qlist.size() == 1
+
+        // when:
+        // qlist = Org.query {
+        //     assoc('location') {
+        //         assoc('nested') {
+        //             eq 'value', 1.0
+        //         }
+        //     }
+        // }.list()
+        //
+        // then:
+        // qlist.size() == 1
+    }
+
+    void "query inlist check"() {
+        when:
+        def qlist = Org.query {
+            inList 'id', [1l, 2l]
+        }.list()
+
+        then:
+        qlist.size() == 2
+
+        when:
+        qlist = Org.query {
+            inList 'location.address', ['City1', 'City2']
+        }.list()
+
+        then:
+        qlist.size() == 2
+
+    }
+
+    void "query get check"() {
+        when:
+        def o = Org.query {
+            eq 'location.id', 1l
+        }.get()
+
+        then:
+        o.id == 1
+
+        when:
+        o = Org.query {
+            eq 'location.address', 'City2'
+        }.get()
+
+        then:
+        o.id == 2
+        o.location.address == 'City2'
+
+    }
+
 }

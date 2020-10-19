@@ -19,8 +19,8 @@ import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepoEntity
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
@@ -73,9 +73,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      * Gets the repository for the entityClass
      * @return The repository
      */
-    RepositoryApi<D> getRepo() {
+    GormRepo<D> getRepo() {
         //GrailsClassUtils.getStaticPropertyValue(getEntityClass(),'repo')
-        (RepositoryApi<D>) InvokerHelper.invokeStaticMethod(getEntityClass(), 'getRepo', null)
+        (GormRepo<D>) InvokerHelper.invokeStaticMethod(getEntityClass(), 'getRepo', null)
     }
 
     /**
@@ -111,7 +111,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     /**
-     * DELETE /api/entity/${id}* update with params
+     * DELETE /api/entity/${id}
      */
     @Action
     def delete() {
@@ -125,12 +125,12 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     /**
-     * GET /api/entity/${id}* update with params
+     * GET /api/entity/${id}
      */
     @Action
     def get() {
         try {
-            D instance = (D) getRepo().get(params)
+            D instance = (D) getRepo().read(params.id as Serializable)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap)
             // respond(jsonObject)
@@ -149,10 +149,10 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
      *
      * returns the list of domain objects
      */
-    @Action
-    def listPost() {
-        respond query((request.JSON ?: [:]) as Map, params)
-    }
+    // @Action
+    // def listPost() {
+    //     respond query((request.JSON ?: [:]) as Map, params)
+    // }
 
     /**
      * request type is handled in urlMapping
@@ -196,7 +196,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
             p['$q'] = qMap
         }
 
-        getMangoApi().query(p)
+        getMangoApi().queryList(p)
     }
 
     void respondWithEntityMap(EntityMap entityMap, Map args = [:]){

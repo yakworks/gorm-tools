@@ -88,6 +88,14 @@ class GormMetaUtils {
     }
 
     /**
+     * the mapping grailsDomainClassMappingContext. This is the main holder for the persistentEntities
+     * @return
+     */
+    static Object unwrap(Object entity) {
+        getMappingContext().getProxyHandler().unwrap(entity)
+    }
+
+    /**
      * Returns the mapping for the entity to DB.
      *
      * @param pe the PersistentEntity can found using the loolup statics above

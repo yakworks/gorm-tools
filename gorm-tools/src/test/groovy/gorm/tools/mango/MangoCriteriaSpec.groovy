@@ -22,7 +22,7 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
 
     List<Class> getDomainClasses() { [Org, Location, Nested] }
 
-    DetachedCriteria build(map, Closure closure = null) {
+    MangoDetachedCriteria build(map, Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
         return mangoBuilder.build(Org, map, closure)
     }
@@ -225,10 +225,11 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
 
     }
 
+    //@IgnoreRest
     def "test nested"() {
         when:
 
-        List res = build((["location.id": ['$eq': 6]])).list()
+        List res = build("location.id": ['$eq': 6]).list()
 
         then:
         res.size() == 1
@@ -259,11 +260,10 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         res.size() == 1
     }
 
-
     def "test nestedId"() {
         when:
 
-        List res = build((["locationId": ['$eq': 6]])).list()
+        List res = build(locationId: 6 ).list()
 
         then:
         res.size() == 1

@@ -11,6 +11,7 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
@@ -34,7 +35,7 @@ import grails.validation.ValidationException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, RepositoryApi<D> {
+trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder
@@ -74,8 +75,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     @Override
     D persist(Map args = [:], D entity) {
         withTrx {
-            return doPersist(args, entity)
+            doPersist(args, entity)
         }
+        return entity
     }
 
     /**
@@ -96,10 +98,10 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     D doPersist(Map args = [:], D entity) {
         try {
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
-            getRepoEventPublisher().doBeforePersist(this, entity, args)
-            getInstanceApi().save entity, args
+            getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
+            gormInstanceApi().save entity, args
             // entity.save()
-            getRepoEventPublisher().doAfterPersist(this, entity, args)
+            getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args)
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
@@ -113,13 +115,15 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     @Override
     D create(Map args = [:], Map data) {
         withTrx {
-            return doCreate(args, data)
+            doCreate(args, data)
         }
     }
 
     /**
-     * Creates entity using the data from params. calls the {@link #bind} with bindMethod='Create'
+     * Creates entity using the data from params. Not wrapped in a transaction.
+     * calls the {@link #bind} with bindMethod='Create'
      *
+     * @param args the variable args that would get passed to save
      * @param data the data to bind onto the entity
      * @return the created domain entity
      * @see #doPersist
@@ -137,7 +141,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     @Override
     D update(Map args = [:], Map data) {
         withTrx {
-            return doUpdate(args, data)
+            doUpdate(args, data)
         }
     }
 
@@ -150,7 +154,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     D doUpdate(Map args, Map data) {
-        D entity = get(data)
+        D entity = get(data['id'] as Serializable, data['version'] as Long)
         bindAndSave(args, entity, data, BindAction.Update)
         return entity
     }
@@ -172,9 +176,9 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     void bind(Map args = [:], D entity, Map data, BindAction bindAction) {
-        getRepoEventPublisher().doBeforeBind(this, entity, data, bindAction, args)
+        getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(args, entity, data, bindAction)
-        getRepoEventPublisher().doAfterBind(this, entity, data, bindAction, args)
+        getRepoEventPublisher().doAfterBind(this, (GormEntity)entity, data, bindAction, args)
     }
 
     /**
@@ -197,8 +201,8 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     void removeById( Map args = [:], Serializable id) {
-        withTrx {
-            D entity = get([id: id])
+        gormStaticApi().withTransaction {
+            D entity = get(id, null)
             doRemove(entity)
         }
     }
@@ -211,7 +215,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     void remove(Map args = [:], D entity) {
-        withTrx {
+        gormStaticApi().withTransaction {
             doRemove(args, entity)
         }
     }
@@ -223,11 +227,10 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      * @param args - args passed to delete
      */
     void doRemove(Map args = [:], D entity) {
-        RepoUtil.checkFound(entity, entity?.ident(), getEntityClass().name)
         try {
-            getRepoEventPublisher().doBeforeRemove(this, entity, args)
-            entity.delete(args)
-            getRepoEventPublisher().doAfterRemove(this, entity, args)
+            getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
+            gormInstanceApi().delete(entity, args)
+            getRepoEventPublisher().doAfterRemove(this, (GormEntity)entity, args)
         }
         catch (DataAccessException ex) {
             throw handleException(ex, entity)
@@ -235,7 +238,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     }
 
     /**
-     * gets and verifies that the entity can be retrieved and version matches.
+     * gets and verifies that the entity can be retrieved and version matches throwing error if not.
      *
      * @param id required, the id to get
      * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
@@ -246,24 +249,34 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
      */
     @Override
     D get(Serializable id, Long version) {
-        D entity = (D) getStaticApi().get(id)
+        D entity = get(id)
         RepoUtil.checkFound(entity, [id: id], getEntityClass().name)
         if (version != null) RepoUtil.checkVersion(entity, version)
         return entity
     }
 
     /**
-     * This default will redirect the call to {@link #get(Serializable id, Long version)}.
-     * Implementing classes can override this and add custom finders
-     * using another unique lookup key other than id, such as customer number or invoice number. Unlike the normal get(id)
-     * This throws a EntityNotFoundException if nothing is found instead of returning a null.
+     * a get wrapped in a transaction.
      *
-     * @param params - expects a Map with an id key and optionally a version, implementation classes can customize to work with more.
-     * @return the entity. Won't return null, instead it throws an exception
+     * @param id required, the id to get
+     * @return the retrieved entity
      */
-    @Override
-    D get(Map params) {
-        return get(params.id as Serializable, params.version as Long)
+    D get(Serializable id) {
+        withTrx {
+            (D) gormStaticApi().get(id)
+        }
+    }
+
+    /**
+     * a read wrapped in a read-only transaction.
+     *
+     * @param id required, the id to get
+     * @return the retrieved entity
+     */
+    D read(Serializable id) {
+        withReadOnlyTrx {
+            (D) gormStaticApi().read(id)
+        }
     }
 
     void publishBeforeValidate(Object entity) {
@@ -277,7 +290,7 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
 
     /** gets the datastore for this Gorm domain instance */
     Datastore getDatastore() {
-        getInstanceApi().datastore
+        gormInstanceApi().datastore
     }
 
     /** flush on the datastore's currentSession. When possible use the transactionStatus.flush(). see WithTrx trait */
@@ -291,24 +304,36 @@ trait GormRepo<D extends GormEntity> implements GormBatchRepo<D>, QueryMangoEnti
     }
 
     /**
-     * Executes the closure within the context of a transaction, creating one if none is present or joining
-     * an existing transaction if one is already present.
+     * modification of gorm's default to make it more like the @Transactional annotation which uses CustomizableRollbackTransactionAttribute
+     * Specifically for wrapping something that will return the domain entity for this (such as a get, create or update)
+     * like withTransaction this creates one if none is present or joins an existing transaction if one is already present.
      *
      * @param callable The closure to call
-     * @return The result of the closure execution
-     * @see GormStaticApi#withTransaction(Map, Closure)
-     * @see GormStaticApi#withNewTransaction(Closure)
-     * @see GormStaticApi#withNewTransaction(Map, Closure)
+     * @return The entity that was run in the closure
      */
-    public <T> T withTrx(Closure<T> callable) {
-        getStaticApi().withTransaction callable
+    D withTrx(Closure<D> callable) {
+        def trxAttr = new CustomizableRollbackTransactionAttribute()
+        gormStaticApi().withTransaction(trxAttr, callable)
     }
 
-    GormInstanceApi<D> getInstanceApi() {
-        (GormInstanceApi<D>) GormEnhancer.findInstanceApi(getEntityClass())
+    /**
+     * Read-only specifically for wrapping something that will return the domain entity for this (such as a get or read)
+     * like withTransaction this creates one if none is present or joins an existing transaction if one is already present.
+     *
+     * @param callable The closure to call
+     * @return The entity that was run in the closure
+     */
+    D withReadOnlyTrx(Closure<D> callable) {
+        def trxAttr = new CustomizableRollbackTransactionAttribute()
+        trxAttr.readOnly = true
+        gormStaticApi().withTransaction(trxAttr, callable)
     }
 
-    GormStaticApi<D> getStaticApi() {
-        (GormStaticApi<D>) GormEnhancer.findStaticApi(getEntityClass())
+    GormInstanceApi<D> gormInstanceApi() {
+        (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())
+    }
+
+    GormStaticApi<D> gormStaticApi() {
+        (GormStaticApi<D>)GormEnhancer.findStaticApi(getEntityClass())
     }
 }

@@ -26,12 +26,12 @@ trait MangoControllerApi {
         return (getRepo() as QueryMangoEntityApi)
     }
 
-    DetachedCriteria buildCriteria(Map criteriaParams = [:], Map params = [:], Closure closure = null) {
-        getMangoApi().buildCriteria(criteriaParams + params, closure)
-    }
-
-    List query(Map criteriaParams = [:], Map params = [:], Closure closure = null) {
-        getMangoApi().query(criteriaParams + params, closure)
-    }
+    // DetachedCriteria buildCriteria(Map criteriaParams = [:], Map params = [:], Closure closure = null) {
+    //     getMangoApi().buildCriteria(criteriaParams + params, closure)
+    // }
+    //
+    // List query(Map criteriaParams = [:], Map params = [:], Closure closure = null) {
+    //     getMangoApi().query(criteriaParams + params, closure)
+    // }
 
 }

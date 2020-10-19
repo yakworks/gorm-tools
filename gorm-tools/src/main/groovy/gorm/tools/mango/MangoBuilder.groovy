@@ -40,22 +40,23 @@ import static gorm.tools.mango.MangoOps.SORT
 @Slf4j
 class MangoBuilder {
 
-    public <D> DetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(DetachedCriteria) Closure callable = null) {
-        DetachedCriteria<D> detachedCriteria = new DetachedCriteria<D>(clazz)
+    public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
         return build(detachedCriteria, map, callable)
     }
 
-    public <D> DetachedCriteria<D> build(DetachedCriteria<D> criteria, Map map,
-                                         @DelegatesTo(DetachedCriteria) Closure callable = null) {
-        DetachedCriteria newCriteria = cloneCriteria(criteria)
-        applyMapOrList(newCriteria, MangoTidyMap.tidy(map))
+    public <D> MangoDetachedCriteria<D> build(MangoDetachedCriteria<D> criteria, Map map,
+                                         @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
+        def tidyMap = MangoTidyMap.tidy(map)
+        applyMapOrList(newCriteria, tidyMap)
         if (callable) newCriteria.with callable
         return newCriteria
     }
 
     @CompileDynamic //dynamic so it can access the protected criteria.clone
-    static <D> DetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
-        criteria.clone()
+    static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
+        (MangoDetachedCriteria)criteria.clone()
     }
 
     void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {
@@ -129,7 +130,8 @@ class MangoBuilder {
         }
         // if field ends in Id then try removing the Id postfix and see if its a property
         else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
-            applyField(criteria, field.replaceAll("Id\$", ""), ['id': fieldVal])
+            applyFieldMap(criteria, field.replaceAll("Id\$", ".id"), fieldVal as Map)
+            //applyField(criteria, field.replaceAll("Id\$", ".id"), fieldVal)
         }
         else if (!(fieldVal instanceof Map) && !(fieldVal instanceof List && prop != null)) {
             criteria.eq(field, toType(criteria, field, fieldVal))
@@ -138,7 +140,8 @@ class MangoBuilder {
             //&& fieldVal instanceof Map && fieldVal.containsKey('id')
             applyField(criteria, field, fieldVal['id'])
         }
-        else if (fieldVal instanceof Map && prop) { // field=name fieldVal=['$like': 'foo%']
+        //just pass it on through, prop might be null but that might be because its a dot notation ending in id ex: "foo.id"
+        else if (fieldVal instanceof Map && (prop || field.endsWith('.id'))) { // field=name fieldVal=['$like': 'foo%']
             applyFieldMap(criteria, field, fieldVal)
         }
         //I think we should not blow up an error if some field isnt in domain, just add message to log
@@ -190,8 +193,6 @@ class MangoBuilder {
             }
         }
     }
-
-
 
     public <D> DetachedCriteria<D> between(DetachedCriteria<D> criteria, String propertyName, List params) {
         List p = toType(criteria, propertyName, params) as List
@@ -304,7 +305,13 @@ class MangoBuilder {
         Class typeToConvertTo = prop?.getType() as Class
 
         //if typeToConvertTo is null then return just return obj
-        if(!typeToConvertTo) return value
+        if(!typeToConvertTo) {
+            if(value instanceof Integer){
+                //almost always long so cast it do we dont get weird cast error
+                return value as Long
+            }
+            return value
+        }
 
         Object v = value
         // FIXME the type conversion here should be refactord to a common  area as the same logic

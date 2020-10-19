@@ -131,17 +131,12 @@ interface RepositoryApi<D> {
     D get(Serializable id, Long version)
 
     /**
-     * This default will redirect the call to {@link #get(Serializable id, Long version)}.
-     * Implementing classes can override this and add custom finders
-     * using another unique lookup key other than id, such as customer number or invoice number. Unlike the normal get(id)
-     * This throws a EntityNotFoundException if nothing is found instead of returning a null.
+     * a get wrapped in a transaction.
      *
-     * @param args - name params expects at least and [id] key and optionally a version,
-     *    implementation classes can customize to work with more.
-     *
-     * @return the entity. Won't return null, instead it throws an exception
+     * @param id required, the id to get
+     * @return the retrieved entity
      */
-    D get(Map params)
+    D get(Serializable id)
 
     RuntimeException handleException(RuntimeException e, D entity)
 

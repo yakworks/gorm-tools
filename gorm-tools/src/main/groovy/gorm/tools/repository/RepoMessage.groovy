@@ -57,7 +57,7 @@ class RepoMessage {
      * @param entity the domain instance to build the message params from
      */
     @CompileDynamic
-    static Map buildMessageParams(GormEntity entity) {
+    static Map buildMessageParams(Object entity) {
         String ident = badge(entity.id, entity)
         String domainLabel = resolveDomainLabel(entity)
         List args = [domainLabel, ident]
@@ -73,14 +73,14 @@ class RepoMessage {
      * @param entity the domain instance to build the message params from
      */
     @CompileDynamic
-    static Map buildLightMessageParams(GormEntity entity) {
+    static Map buildLightMessageParams(Object entity) {
         String ident = entity.id
         String domainLabel = entity.class.name
         List args = [domainLabel, ident]
         return [ident: ident, domainLabel: domainLabel, args: args]
     }
 
-    static Map created(GormEntity entity, boolean buildLight = false) {
+    static Map created(Object entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.created.message", p.args, "${p.domainLabel} ${p.ident} created")
     }
@@ -90,43 +90,43 @@ class RepoMessage {
         return setup("default.saved.message", p.args, "${p.domainLabel} ${p.ident} saved")
     }
 
-    static Map notSaved(GormEntity entity, boolean buildLight = false) {
+    static Map notSaved(Object entity, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
     //TODO:
-    static Map notSavedDataAccess(GormEntity entity, boolean buildLight = false) {
+    static Map notSavedDataAccess(Object entity, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.saved.message", [domainLabel], "${domainLabel} save failed")
     }
 
-    static Map updated(GormEntity entity, boolean buildLight = false) {
+    static Map updated(Object entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.updated.message", p.args, "${p.domainLabel} ${p.ident} updated")
     }
 
-    static Map notUpdated(GormEntity entity, boolean buildLight = false) {
+    static Map notUpdated(Object entity, boolean buildLight = false) {
         Map p = buildLight ? buildLightMessageParams(entity) : buildMessageParams(entity)
         return setup("default.not.updated.message", p.args, "${p.domainLabel} ${p.ident} update failed")
     }
 
-    static Map deleted(GormEntity entity, Serializable ident, boolean buildLight = false) {
+    static Map deleted(Object entity, Serializable ident, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} deleted")
     }
 
-    static Map notDeleted(GormEntity entity, Serializable ident, boolean buildLight = false) {
+    static Map notDeleted(Object entity, Serializable ident, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.not.deleted.message", [domainLabel, ident], "${domainLabel} ${ident} could not be deleted")
     }
 
-    static Map optimisticLockingFailure(GormEntity entity, boolean buildLight = false) {
+    static Map optimisticLockingFailure(Object entity, boolean buildLight = false) {
         String domainLabel = buildLight ? entity.class.name : resolveDomainLabel(entity)
         return setup("default.optimistic.locking.failure", [domainLabel], "Another user has updated the ${domainLabel} while you were editing")
     }
 
-    static String resolveDomainLabel(GormEntity entity) {
+    static String resolveDomainLabel(Object entity) {
         return resolveMessage("${propName(entity.class.name)}.label", "${GrailsNameUtils.getShortName(entity.class.name)}")
     }
 

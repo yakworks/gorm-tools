@@ -4,7 +4,7 @@
 */
 package gorm.tools.mango.api
 
-import grails.gorm.DetachedCriteria
+import gorm.tools.mango.MangoDetachedCriteria
 
 /**
  * Interface to be implemented by a bean
@@ -21,7 +21,7 @@ interface MangoQuery {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map params, Closure closure)
+    public <D> MangoDetachedCriteria<D> query(Class<D> domainClass, Map params, Closure closure)
 
     /**
      * List of entities restricted by mango map and criteria closure
@@ -30,5 +30,5 @@ interface MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    public <D> List<D> query(Class<D> domainClass, Map params, Closure closure)
+    public <D> List<D> queryList(Class<D> domainClass, Map params, Closure closure)
 }

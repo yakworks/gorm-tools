@@ -38,8 +38,8 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    public <D> DetachedCriteria<D> buildCriteria(Class<D> domainClass, Map criteria = [:],
-                                                 @DelegatesTo(DetachedCriteria) Closure closure = null) {
+    public <D> MangoDetachedCriteria<D> query(Class<D> domainClass, Map criteria = [:],
+                                              @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         mangoBuilder.build(domainClass, criteria, closure)
     }
 
@@ -50,9 +50,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    public <D> List<D> query(Class<D> domainClass, Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
+    public <D> List<D> queryList(Class<D> domainClass, Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         Map<String, Map> p = parseParams(params)
-        DetachedCriteria<D> dcrit = buildCriteria(domainClass, p['criteria'], closure)
+        DetachedCriteria<D> dcrit = query(domainClass, p['criteria'], closure)
         Pager pager = new Pager(p['pager'])
         list(dcrit, pager)
     }
@@ -78,9 +78,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @return map where keys are names of fields and value - sum for restricted entities
      */
     @Transactional(readOnly = true)
-    Map countTotals(Class domainClass, Map params = [:], List<String> sums, @DelegatesTo(DetachedCriteria) Closure closure = null) {
+    Map countTotals(Class domainClass, Map params = [:], List<String> sums, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
 
-        DetachedCriteria mangoCriteria = buildCriteria(domainClass, params, closure)
+        DetachedCriteria mangoCriteria = query(domainClass, params, closure)
 
         List totalList
         totalList = mangoCriteria.list {

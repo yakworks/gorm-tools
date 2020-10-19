@@ -8,6 +8,7 @@ import javax.persistence.Transient
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.mango.MangoDetachedCriteria
 import grails.gorm.DetachedCriteria
 
 /**
@@ -25,12 +26,25 @@ trait QueryMangoEntity<D> {
 
     static abstract getRepo()
 
-    static DetachedCriteria<D> buildCriteria(Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
-        ((QueryMangoEntityApi)getRepo()).buildCriteria(params, closure)
+    /**
+     * Builds detached criteria for repository's domain based on mango criteria language and additional optional criteria
+     * call get or list on returned object to fire it
+     * @param params the mango criteria language map
+     * @param closure optional closure
+     * @return
+     */
+    static MangoDetachedCriteria<D> query(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        ((QueryMangoEntityApi)getRepo()).query(params, closure)
     }
 
-    static DetachedCriteria<D> buildCriteria(@DelegatesTo(DetachedCriteria) Closure closure) {
-        ((QueryMangoEntityApi)getRepo()).buildCriteria([:], closure)
+    /**
+     * Builds detached criteria for domain, call get or list on it.
+     *
+     * @param closure
+     * @return a DetachedCriteria instance
+     */
+    static MangoDetachedCriteria<D> query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
+        ((QueryMangoEntityApi)getRepo()).query([:], closure)
     }
 
     /**
@@ -40,7 +54,7 @@ trait QueryMangoEntity<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    static List query(Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
-        ((QueryMangoEntityApi)getRepo()).query(params, closure)
+    static List<D> queryList(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        ((QueryMangoEntityApi)getRepo()).queryList(params, closure)
     }
 }

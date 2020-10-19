@@ -12,15 +12,17 @@ import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
+import org.grails.datastore.mapping.transactions.TransactionObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.DefaultTransactionStatus
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
-import gorm.tools.repository.api.GormBatchRepo
 import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
@@ -35,7 +37,7 @@ import grails.validation.ValidationException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, RepositoryApi<D> {
+trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder
@@ -74,7 +76,7 @@ trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, Repositor
      */
     @Override
     D persist(Map args = [:], D entity) {
-        withTrx {
+        entityTrx {
             doPersist(args, entity)
         }
         return entity
@@ -114,7 +116,7 @@ trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, Repositor
      */
     @Override
     D create(Map args = [:], Map data) {
-        withTrx {
+        entityTrx {
             doCreate(args, data)
         }
     }
@@ -140,7 +142,7 @@ trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, Repositor
      */
     @Override
     D update(Map args = [:], Map data) {
-        withTrx {
+        entityTrx {
             doUpdate(args, data)
         }
     }
@@ -262,7 +264,7 @@ trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, Repositor
      * @return the retrieved entity
      */
     D get(Serializable id) {
-        withTrx {
+        entityTrx {
             (D) gormStaticApi().get(id)
         }
     }
@@ -274,7 +276,7 @@ trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, Repositor
      * @return the retrieved entity
      */
     D read(Serializable id) {
-        withReadOnlyTrx {
+        entityReadOnlyTrx {
             (D) gormStaticApi().read(id)
         }
     }
@@ -311,7 +313,7 @@ trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, Repositor
      * @param callable The closure to call
      * @return The entity that was run in the closure
      */
-    D withTrx(Closure<D> callable) {
+    D entityTrx(Closure<D> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         gormStaticApi().withTransaction(trxAttr, callable)
     }
@@ -323,10 +325,59 @@ trait GormRepo<D> implements GormBatchRepo<D>, QueryMangoEntityApi<D>, Repositor
      * @param callable The closure to call
      * @return The entity that was run in the closure
      */
-    D withReadOnlyTrx(Closure<D> callable) {
+    D entityReadOnlyTrx(Closure<D> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         trxAttr.readOnly = true
         gormStaticApi().withTransaction(trxAttr, callable)
+    }
+
+    void flushAndClear(TransactionStatus status) {
+        status.flush()
+        clear(status)
+    }
+
+    //@CompileDynamic
+    void clear(TransactionStatus status) {
+        TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
+        txObject.sessionHolder.getSession().clear()
+    }
+
+    /* -- batch methods -- */
+
+    /**
+     * Transactional, Iterates over list and runs closure for each item
+     */
+    void batchTrx(List list, Closure closure) {
+        gormStaticApi().withTransaction { TransactionStatus status ->
+            for (Object item : list) {
+                closure(item)
+            }
+            flushAndClear(status)
+        }
+    }
+
+    void batchPersist(Map args = [:], List<D> list) {
+        batchTrx(list) { D item ->
+            doPersist(args, item)
+        }
+    }
+
+    void batchCreate(Map args = [:], List<Map> list) {
+        batchTrx(list) { Map item ->
+            doCreate(args, item)
+        }
+    }
+
+    void batchUpdate(Map args = [:], List<Map> list) {
+        batchTrx(list) { Map item ->
+            doUpdate(args, item)
+        }
+    }
+
+    void batchRemove(Map args = [:], List list) {
+        batchTrx(list) { Serializable item ->
+            removeById(args, item)
+        }
     }
 
     GormInstanceApi<D> gormInstanceApi() {

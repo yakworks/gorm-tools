@@ -18,8 +18,7 @@ import grails.gorm.transactions.Transactional
  * @since 6.x
  */
 @CompileStatic
-@Transactional
-class DefaultGormRepo<D extends GormEntity> implements GormRepo<D> {
+class DefaultGormRepo<D> implements GormRepo<D> {
 
     DefaultGormRepo() {
         this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)

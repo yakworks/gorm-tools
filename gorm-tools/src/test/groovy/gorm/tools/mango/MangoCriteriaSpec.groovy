@@ -269,6 +269,15 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         res.size() == 1
     }
 
+    def "test nestedId when vale is String"() {
+        when:
+
+        List res = build(locationId: "6" ).list()
+
+        then:
+        res.size() == 1
+    }
+
     def "test invalid field"() {
         when:
 

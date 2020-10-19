@@ -21,7 +21,6 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepoEntity
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig

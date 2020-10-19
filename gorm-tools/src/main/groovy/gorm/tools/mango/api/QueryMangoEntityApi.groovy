@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import grails.gorm.DetachedCriteria
+import gorm.tools.mango.MangoDetachedCriteria
 
 /**
  * For repos and concretes classes that work on a single entity
@@ -33,7 +33,7 @@ trait QueryMangoEntityApi<D> {
      * @param closure additional restriction for criteria
      * @return Detached criteria build based on mango language params and criteria closure
      */
-    DetachedCriteria<D> query(Map params = [:],  @DelegatesTo(DetachedCriteria)Closure closure = null) {
+    MangoDetachedCriteria<D> query(Map params = [:], @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
         getMangoQuery().query(getEntityClass(), params, closure)
     }
 
@@ -44,7 +44,7 @@ trait QueryMangoEntityApi<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    List<D> queryList(Map params = [:], @DelegatesTo(DetachedCriteria) Closure closure = null) {
+    List<D> queryList(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         getMangoQuery().queryList(getEntityClass(), params, closure)
     }
 }

@@ -22,7 +22,7 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
 
     List<Class> getDomainClasses() { [Org, Location, Nested] }
 
-    DetachedCriteria build(map, Closure closure = null) {
+    MangoDetachedCriteria build(map, Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
         return mangoBuilder.build(Org, map, closure)
     }

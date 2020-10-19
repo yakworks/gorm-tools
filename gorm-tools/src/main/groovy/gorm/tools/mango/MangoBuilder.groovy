@@ -40,14 +40,14 @@ import static gorm.tools.mango.MangoOps.SORT
 @Slf4j
 class MangoBuilder {
 
-    public <D> DetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(DetachedCriteria) Closure callable = null) {
-        DetachedCriteria<D> detachedCriteria = new DetachedCriteria<D>(clazz)
+    public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
         return build(detachedCriteria, map, callable)
     }
 
-    public <D> DetachedCriteria<D> build(DetachedCriteria<D> criteria, Map map,
-                                         @DelegatesTo(DetachedCriteria) Closure callable = null) {
-        DetachedCriteria newCriteria = cloneCriteria(criteria)
+    public <D> MangoDetachedCriteria<D> build(MangoDetachedCriteria<D> criteria, Map map,
+                                         @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
         def tidyMap = MangoTidyMap.tidy(map)
         applyMapOrList(newCriteria, tidyMap)
         if (callable) newCriteria.with callable
@@ -55,8 +55,8 @@ class MangoBuilder {
     }
 
     @CompileDynamic //dynamic so it can access the protected criteria.clone
-    static <D> DetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
-        criteria.clone()
+    static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
+        (MangoDetachedCriteria)criteria.clone()
     }
 
     void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {

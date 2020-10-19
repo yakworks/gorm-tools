@@ -8,7 +8,6 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 import org.springframework.dao.OptimisticLockingFailureException

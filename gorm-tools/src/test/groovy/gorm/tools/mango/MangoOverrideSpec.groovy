@@ -46,8 +46,8 @@ class City {
 class NewMangoQuery implements MangoQuery {
 
     @Override
-    DetachedCriteria query(Class domainClass, Map params, Closure closure = null) {
-        new DetachedCriteria(domainClass).build { eq "id", 2 }
+    MangoDetachedCriteria query(Class domainClass, Map params, Closure closure = null) {
+        new MangoDetachedCriteria(domainClass).build { eq "id", 2 }
     }
 
     @Override

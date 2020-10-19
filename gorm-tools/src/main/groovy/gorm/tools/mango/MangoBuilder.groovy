@@ -306,7 +306,7 @@ class MangoBuilder {
 
         //if typeToConvertTo is null then return just return obj
         if(!typeToConvertTo) {
-            if(value instanceof Integer){
+            if(value instanceof Integer || (value instanceof String && value.isLong())){
                 //almost always long so cast it do we dont get weird cast error
                 return value as Long
             }

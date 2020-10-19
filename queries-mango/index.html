@@ -1138,7 +1138,7 @@ Here is several examples of usage:</p>
 </pre></div>
 For more example take a look on <a href="https://github.com/yakworks/gorm-tools/blob/master/plugin/src/test/groovy/gorm/tools/mango/MangoTidyMapSpec.groovy">MangoTidyMapSpec</a> </p>
 <h3 id="mango-query">Mango query<a class="headerlink" href="#mango-query" title="Permanent link">&para;</a></h3>
-<p>The repository by default does not have all the features of mango service, just <code>buildCriteria</code> and <code>query</code> methods, but both automatically
+<p>The repository by default does not have all the features of mango service, just <code>query</code> and <code>queryList</code> methods, but both automatically
 convert map params to mango map, so just <code>params</code> or <code>request.JSON</code> can be passed. </p>
 <p>See <a href="./#mango-api">Mango Api</a> to know all features that are provided.</p>
 <h4 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h4>
@@ -1316,13 +1316,13 @@ So it is the same as:</p>
 <h4 id="mango-in-the-repository">Mango in the Repository<a class="headerlink" href="#mango-in-the-repository" title="Permanent link">&para;</a></h4>
 <p><a href="../repository/ref/">The Repository</a> implements <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/api/MangoQueryTrait.html">MangoQueryTrait</a> Trait
 which contains implementation for two query methods:</p>
-<p><div class="codehilite"><pre><span></span><span class="n">DetachedCriteria</span> <span class="nf">buildCriteria</span><span class="o">(</span> <span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">mangoQuery</span><span class="o">.</span><span class="na">buildCriteria</span><span class="o">(</span><span class="n">getDomainClass</span><span class="o">(),</span> <span class="n">params</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span>
+<p><div class="codehilite"><pre><span></span><span class="n">DetachedCriteria</span> <span class="nf">query</span><span class="o">(</span> <span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">mangoQuery</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">getDomainClass</span><span class="o">(),</span> <span class="n">params</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span>
     <span class="o">}</span>
 </pre></div>
 see docs for <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria">DetachedCriteria</a></p>
-<p><div class="codehilite"><pre><span></span> <span class="n">List</span> <span class="nf">query</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">){</span>
-         <span class="n">mangoQuery</span><span class="o">.</span><span class="na">query</span><span class="o">(</span><span class="n">getDomainClass</span><span class="o">(),</span> <span class="n">params</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span>
+<p><div class="codehilite"><pre><span></span> <span class="n">List</span> <span class="nf">queryList</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">){</span>
+         <span class="n">mangoQuery</span><span class="o">.</span><span class="na">queryList</span><span class="o">(</span><span class="n">getDomainClass</span><span class="o">(),</span> <span class="n">params</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span>
      <span class="o">}</span>
 </pre></div>
 returns list of entities with pagination. For pagination take a look at <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/Pager.html">Pager</a></p>
@@ -1343,12 +1343,12 @@ returns list of entities with pagination. For pagination take a look at <a href=
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">NewMangoQuery</span> <span class="kd">implements</span> <span class="n">MangoQueryApi</span> <span class="p">{</span>
 
     <span class="nd">@Override</span>
-    <span class="n">DetachedCriteria</span> <span class="nf">buildCriteria</span><span class="p">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="p">,</span> <span class="n">Map</span> <span class="n">params</span><span class="p">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">DetachedCriteria</span> <span class="nf">query</span><span class="p">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="p">,</span> <span class="n">Map</span> <span class="n">params</span><span class="p">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
        <span class="k">return</span> <span class="kc">null</span>
     <span class="p">}</span>
 
     <span class="nd">@Override</span>
-    <span class="n">List</span> <span class="nf">query</span><span class="p">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="p">,</span> <span class="n">Map</span> <span class="n">params</span><span class="p">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">List</span> <span class="nf">queryList</span><span class="p">(</span><span class="n">Class</span> <span class="n">domainClass</span><span class="p">,</span> <span class="n">Map</span> <span class="n">params</span><span class="p">,</span> <span class="n">Closure</span> <span class="n">closure</span> <span class="o">=</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
        <span class="k">return</span> <span class="o">[]</span>
     <span class="p">}</span>
 <span class="p">}</span>

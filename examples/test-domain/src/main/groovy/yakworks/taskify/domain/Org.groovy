@@ -66,6 +66,7 @@ class Org implements NameNumTrait{
         //id generator:'assigned'
         ext column: 'extId'
         status enumType: 'identity'
+        type column: 'orgTypeId', enumType: 'identity'
     }
 
     static constraints = {

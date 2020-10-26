@@ -4,13 +4,13 @@ package yakworks.taskify
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import yakworks.taskify.domain.OrgType
+import yakworks.taskify.domain.Org
 import yakworks.taskify.seed.TestSeedData
 
 class BootStrap {
 
     def init = { servletContext ->
-        OrgType.withTransaction {
+        Org.withTransaction {
             //new Jumper(name: 'Bill').persist()
             //new Location(street: '123').persist()
             //new OrgType(name: 'foo').persist()

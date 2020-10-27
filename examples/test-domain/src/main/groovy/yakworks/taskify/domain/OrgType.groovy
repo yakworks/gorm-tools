@@ -4,41 +4,15 @@
 */
 package yakworks.taskify.domain
 
-import groovy.transform.CompileStatic
+import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
 
-import gorm.tools.traits.IdEnum
-import grails.util.GrailsNameUtils
+@Entity
+@GrailsCompileStatic
+class OrgType {
+    String name
 
-@CompileStatic
-enum OrgType implements IdEnum<OrgType, Long> {
-    Customer(1),
-    CustAccount(2),
-    Branch(3),
-
-    final Long id
-
-    OrgType(Long id) {
-        this.id = id
-    }
-
-    /**
-     * get the property name for this, will follow normal java bean prop names
-     */
-    String getPropertyName(){
-        GrailsNameUtils.getPropertyName(name())
-    }
-
-    /**
-     * get the property name with Id appended for the field name
-     */
-    String getIdFieldName(){
-        getPropertyName() + "Id"
-    }
-
-    /**
-     * case insensitive find
-     */
-    static OrgType findByName (String key ){
-        return values().find { it.name().toLowerCase() == key.toLowerCase()}
+    static constraints = {
+        name blank: false, nullable: false
     }
 }

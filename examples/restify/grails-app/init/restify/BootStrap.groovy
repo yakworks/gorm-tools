@@ -30,8 +30,8 @@ class BootStrap {
                 def task2 = new Task(name: "task2-$it",
                     project: prod)
                     .persist()
-               /* new OrgType(name: "OrgType-$it")
-                    .persist()*/
+                new OrgType(name: "OrgType-$it")
+                    .persist()
             }
 
             (1..5).each {id ->

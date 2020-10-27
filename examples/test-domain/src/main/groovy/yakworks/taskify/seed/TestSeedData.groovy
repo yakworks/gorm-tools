@@ -14,7 +14,9 @@ import yakworks.taskify.domain.OrgType
 class TestSeedData {
 
     static void buildOrgs(int count){
-        def type = OrgType.Customer
+        def type = new OrgType(name: 'customer')
+        type.id = 1 as Long
+        type.persist()//TestData.build(OrgType)
         (1..2).each{
             def porg = createOrg(it , type)
             porg.kind = Org.Kind.PARENT

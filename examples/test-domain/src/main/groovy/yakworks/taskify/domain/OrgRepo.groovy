@@ -19,7 +19,7 @@ class OrgRepo implements GormRepo<Org> {
 
     @RepoListener
     void beforePersist(Org o, BeforePersistEvent e) {
-        if(!o.type) o.type = OrgType.Customer
+        if(!o.type) o.type = OrgType.load(1)
         if(!o.kind) o.kind = Org.Kind.CLIENT
     }
 

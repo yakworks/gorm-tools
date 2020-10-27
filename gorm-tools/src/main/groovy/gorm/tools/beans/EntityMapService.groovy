@@ -105,6 +105,7 @@ class EntityMapService {
                 if(!nestedProps[nestedProp]) {
                     PersistentProperty pp = properties.find { it.name == nestedProp }
                     String nestedClass
+                    // IdEnum could be nested(with dot), but it is not Association
                     if (pp instanceof Association) {
                         nestedClass = (pp as Association)?.getAssociatedEntity()?.name
                     } else {

@@ -1,3 +1,4 @@
+apply plugin: 'groovy'
 apply plugin:"org.grails.grails-plugin"
 
 repositories {
@@ -22,6 +23,11 @@ dependencies {
   // compileOnly "org.grails.plugins:geb"
   // compileOnly "org.grails:grails-datastore-rest-client"
   // compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc
+}
+
+compileGroovy {
+  groovyOptions.fork = true
+  groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
 }
 
 bootRun {

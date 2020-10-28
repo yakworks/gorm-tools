@@ -38,7 +38,7 @@ subprojects {
       compile "org.grails:grails-logging"
       compile "org.grails:grails-plugin-databinding"
       compile "org.grails:grails-plugin-services"
-      compile "org.grails:grails-plugin-interceptors"
+      // compile "org.grails:grails-plugin-interceptors"
 
       // compile 'org.grails.plugins:grails-java8:1.2.3'
 
@@ -55,10 +55,6 @@ subprojects {
 
       runtime "com.h2database:h2"
       runtime "com.zaxxer:HikariCP:3.4.5"
-
-      compileOnly('org.grails:grails-datastore-rest-client:6.1.9.RELEASE'){
-        exclude group:'org.grails', module:'grails-plugin-converters'
-      }
 
       compileOnly "io.micronaut:micronaut-inject-groovy"
 

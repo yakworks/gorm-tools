@@ -56,7 +56,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
     private ConfigObject stampCfg
 
     AuditStampASTTransformation() {
-        stampCfg = new AuditStampConfigLoader().load()
+        //stampCfg = new AuditStampConfigLoader().load()
     }
 
     private CompilationUnit unit
@@ -68,7 +68,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
 
     void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
         // println("stampCfg: " + stampCfg)
-        Boolean enabled = (Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "enabled")
+        Boolean enabled = true //(Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "enabled")
         //println("AuditStampAST enabled: " + enabled)
         if (enabled != null && enabled == false) return
 
@@ -83,19 +83,19 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
             return
         }
         final ast = sourceUnit.getAST()
-        Map<String, FieldProps> fprops = FieldProps.buildFieldMap(stampCfg)
-
-        Boolean useAuditStampTrait = (Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "useAuditStampTrait")
-
-        if (useAuditStampTrait != null && useAuditStampTrait == false) {
-            addDisableAuditStampField(classNode)
-            //debugFieldNodes(classNode)
-            createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
-            createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
-
-            createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
-            createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
-        } else {
+        // Map<String, FieldProps> fprops = FieldProps.buildFieldMap(stampCfg)
+        //
+        // Boolean useAuditStampTrait = (Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "useAuditStampTrait")
+        //
+        // if (useAuditStampTrait != null && useAuditStampTrait == false) {
+        //     addDisableAuditStampField(classNode)
+        //     //debugFieldNodes(classNode)
+        //     createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
+        //     createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
+        //
+        //     createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
+        //     createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
+        // } else {
             //use the default trait
             AstUtils.injectTrait(classNode, AuditStampTrait)
             addConstraints(classNode)
@@ -110,7 +110,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
             // createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
             // createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
             // createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
-        }
+        //}
     }
 
     // using AstUtils.injectTrait(classNode, AuditStampTrait) directly now

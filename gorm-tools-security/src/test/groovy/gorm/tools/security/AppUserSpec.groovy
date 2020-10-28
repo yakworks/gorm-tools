@@ -2,6 +2,9 @@ package gorm.tools.security
 
 import org.apache.commons.lang.RandomStringUtils
 
+import gorm.tools.audit.AuditStampBeforeValidateListener
+import gorm.tools.audit.AuditStampPersistenceEventListener
+import gorm.tools.audit.AuditStampSupport
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
@@ -9,16 +12,11 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, SecurityTest {
 
-    // Closure doWithConfig() {
-    //     return { cfg ->
-    //         cfg.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
-    //     }
-    // }
-    // List<Class> getDomainClasses() { [AppUser, SecRole, SecRoleUser] }
     void setupSpec() {
         mockDomains AppUser, SecRole, SecRoleUser
     }
@@ -86,6 +84,18 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     }
 
+    //@IgnoreRest
+    void "simple persist"() {
+        when:
+        def con = build()
+        con.persist(flush: true)
+
+        then:
+        con.editedBy == 1
+        con.editedDate
+
+    }
+
     def "test update fail"() {
         when:
         AppUser user = createEntity()
@@ -123,6 +133,7 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     }
 
+    //@IgnoreRest
     def "user name"() {
         when:
         Map data = buildMap([:])

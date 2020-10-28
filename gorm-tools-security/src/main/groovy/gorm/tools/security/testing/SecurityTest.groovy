@@ -6,7 +6,7 @@ package gorm.tools.security.testing
 
 import groovy.transform.CompileDynamic
 
-import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder
+import org.springframework.security.crypto.password.NoOpPasswordEncoder
 
 import gorm.tools.audit.AuditStampBeforeValidateListener
 import gorm.tools.audit.AuditStampPersistenceEventListener
@@ -25,7 +25,7 @@ trait SecurityTest {
     void onMockDomains(Class<?>... entityClasses) {
         // do these beans first so that they can get injected into the repos
         defineBeans {
-            passwordEncoder(PlaintextPasswordEncoder)
+            passwordEncoder(NoOpPasswordEncoder)
             secService(TestingSecService, AppUser)
         }
         // now mock the domains

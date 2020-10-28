@@ -4,6 +4,7 @@
 */
 package gorm.tools.traits
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 /**
@@ -18,13 +19,14 @@ import groovy.transform.CompileStatic
 trait IdEnum<E,T> {
 
     abstract T getId()
+    // static abstract IdEnum[] values()
 
-    static final Map IdMap = values().collectEntries { [(it.id): it]}
+    static Map IdMap // = values().collectEntries { [(it.getId()): it]}
 
+    @CompileDynamic
     static E get(T id) {
+        if(!IdMap) IdMap = values().collectEntries { [(it.getId()): it]}
         return IdMap[id]
     }
-
-    static abstract IdEnum[] values()
 
 }

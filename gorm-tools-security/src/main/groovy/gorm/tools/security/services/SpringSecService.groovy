@@ -81,7 +81,7 @@ class SpringSecService<D> implements SecService<D>{
      */
     @Override
     String encodePassword(String password) {
-        springSecurityService.encodePassword(password, null)
+        springSecurityService.encodePassword(password)
     }
 
     /**

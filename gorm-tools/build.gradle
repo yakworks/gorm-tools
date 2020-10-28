@@ -1,5 +1,6 @@
-apply plugin: "yakworks.grails-plugin"
-//apply plugin: "jacoco"
+// apply plugin: "yakworks.grails-plugin"
+apply plugin:"idea"
+apply plugin:"org.grails.grails-plugin"
 
 dependencies {
   console "org.grails:grails-console"
@@ -17,7 +18,7 @@ dependencies {
   compileOnly "org.grails:grails-web-testing-support"
   compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
   compileOnly "org.grails.plugins:geb"
-  compileOnly "org.grails:grails-datastore-rest-client"
+  // compileOnly "org.grails:grails-datastore-rest-client"
   compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc
 
   //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
@@ -25,13 +26,17 @@ dependencies {
   testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
 }
 
-//bootRepackage and maybe addResources are needed for the test/example projects grails.plugin.compile dependency to work
-//TODO can we take care of this in the yakworks.defaults plugin, I'm still not clear on what these are for and what they do?
 bootRun {
-  jvmArgs('-Dspring.output.ansi.enabled=always')
-  addResources = true
+  ignoreExitValue true
+  jvmArgs(
+    '-Dspring.output.ansi.enabled=always',
+    '-noverify',
+    '-XX:TieredStopAtLevel=1',
+    '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
-bootRepackage.enabled = false
 
 test {
   //testLogging.showStandardStreams = true

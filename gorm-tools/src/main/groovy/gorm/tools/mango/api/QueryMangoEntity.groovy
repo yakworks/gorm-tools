@@ -9,6 +9,7 @@ import javax.persistence.Transient
 import groovy.transform.CompileStatic
 
 import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.repository.GormRepo
 import grails.gorm.DetachedCriteria
 
 /**
@@ -18,13 +19,13 @@ import grails.gorm.DetachedCriteria
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-@CompileStatic
+// @CompileStatic
 trait QueryMangoEntity<D> {
 
     @Transient
     static List<String> qSearchIncludes = []
 
-    static abstract getRepo()
+    // static abstract GormRepo<D> getRepo()
 
     /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional optional criteria

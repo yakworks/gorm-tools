@@ -8,7 +8,7 @@ import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
-import org.grails.orm.hibernate5.support.HibernatePersistenceContextInterceptor
+import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 
 import gorm.tools.plugin.GormToolsPluginHelper
 import gorm.tools.testing.support.GormToolsSpecHelper

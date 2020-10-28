@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.security.authentication.encoding.PasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecPasswordHistory
@@ -90,7 +90,7 @@ class PasswordValidator {
     @Transactional(readOnly = true)
     boolean passwordExistInHistory(AppUser user, String password) {
         List<SecPasswordHistory> passwordHistoryList = SecPasswordHistory.findAllByUser(user)
-        passwordHistoryList.any { passwordEncoder.isPasswordValid(it.password, password, null) }
+        passwordHistoryList.any { passwordEncoder.matches(it.password, password) }
     }
 
 }

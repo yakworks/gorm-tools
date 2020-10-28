@@ -51,6 +51,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
      * The domains should be mocked before this is called
      */
     void mockRepositories(Class<?>... domainClassesToMock) {
+
         Closure repoBeans = {}
 
         domainClassesToMock.each { Class domainClass ->
@@ -71,6 +72,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             GormRepo repo = AppCtx.get("${repoBeanName}", findRepoClass(it))
             it.setRepo(repo)
         }
+
     }
 
     /**
@@ -90,7 +92,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     @CompileDynamic
     Closure commonBeans() {
         return {
-            entityMapBinder(EntityMapBinder, grailsApplication)
+            //entityMapBinder(EntityMapBinder, grailsApplication)
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
             repoExceptionSupport(RepoExceptionSupport)

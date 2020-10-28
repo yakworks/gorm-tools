@@ -4,6 +4,7 @@
 */
 package gorm.tools.repository
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
@@ -27,7 +28,7 @@ import grails.util.Holders
  * @since 6.1
  */
 @CompileStatic
-trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D>, EntityMethodEvents {
+trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
 
     Class getEntityClass(){ getClass() }
 
@@ -118,6 +119,7 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D>, En
      */
     @Deprecated
     @Override
+    @CompileDynamic
     static BuildableCriteria createCriteria() {
         BuildableCriteria builder
         //TODO: temp hack, to prevent unit tests failing
@@ -134,8 +136,8 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D>, En
         return builder
     }
 
-    static withCriteria(@DelegatesTo(Criteria) Closure callable) {
-        createCriteria().invokeMethod("doCall", callable)
-    }
+    // static withCriteria(@DelegatesTo(Criteria) Closure callable) {
+    //     createCriteria().invokeMethod("doCall", callable)
+    // }
 
 }

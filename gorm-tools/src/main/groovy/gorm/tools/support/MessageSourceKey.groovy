@@ -18,7 +18,7 @@ import org.springframework.context.MessageSourceResolvable
 @SuppressWarnings("serial")
 @CompileStatic
 @EqualsAndHashCode
-@ToString(includes = ['msgCodes', 'msgArgs', 'defaultMessage'], includeNames = true)
+@ToString(includes = ['msgCodes', 'args', 'defaultMessage'], includeNames = true)
 class MessageSourceKey implements MsgSourceResolvableTrait, Serializable {
 
     /**

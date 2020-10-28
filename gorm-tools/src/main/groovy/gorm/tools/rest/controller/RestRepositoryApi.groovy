@@ -41,7 +41,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
-@SuppressWarnings(['CatchRuntimeException', 'NoDef'])
+@SuppressWarnings(['CatchRuntimeException'])
 trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi {
 
     @Autowired
@@ -200,9 +200,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     void respondWithEntityMap(EntityMap entityMap, Map args = [:]){
-        def resArgs = [view: '/object/_entityMap'] as Map<String, Object>
+        def resArgs = [view: '/object/_entityMap'] // as Map<String, Object>
         if(args) resArgs.putAll(args)
-        respond(resArgs, [entityMap: entityMap])
+        respond(resArgs as Map, [entityMap: entityMap] as Map)
     }
 
     /**

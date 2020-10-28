@@ -92,7 +92,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     @CompileDynamic
     Closure commonBeans() {
         return {
-            //entityMapBinder(EntityMapBinder, grailsApplication)
+            entityMapBinder(EntityMapBinder, grailsApplication)
             repoEventPublisher(RepoEventPublisher)
             repoUtilBean(RepoUtil)
             repoExceptionSupport(RepoExceptionSupport)

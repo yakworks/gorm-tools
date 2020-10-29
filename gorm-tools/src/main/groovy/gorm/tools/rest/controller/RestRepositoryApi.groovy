@@ -85,9 +85,7 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     @Action
     def post() {
         try {
-            Map dataMap = getDataMap()
-            dataMap.putAll(idProps()) //nested resources id transform fooId: 123 -> foo: [id: 123] so it can be bind
-            D instance = (D) getRepo().create(dataMap)
+            D instance = (D) getRepo().create(getDataMap())
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap, [status: CREATED])
         } catch (RuntimeException e) {

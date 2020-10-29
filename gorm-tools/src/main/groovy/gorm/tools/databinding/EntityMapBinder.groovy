@@ -185,8 +185,11 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
      */
     void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener =
             null, Object errors = null) {
-        if (!source.containsProperty(prop.name)) return
+        if (!source.containsProperty(prop.name) && !source.containsProperty(prop.name+'Id')) return
         Object propValue = source.getPropertyValue(prop.name)
+        if (source.containsProperty(prop.name+'Id')){
+            propValue = [id: source.getPropertyValue(prop.name+'Id')] as Map
+        }
         Object valueToAssign = propValue
         Class typeToConvertTo = prop.getType() as Class
 

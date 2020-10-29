@@ -101,7 +101,6 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     @Action
     def put() {
         Map data = [id: params.id]
-        data.putAll(idProps())
         data.putAll(getDataMap()) // getDataMap doesnt contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
@@ -318,19 +317,6 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         }
         resultErrors.put('message', msgMap['defaultMessage'] as String)
         return (resultErrors as JSON).toString()
-    }
-
-    Map idProps() {
-        Map result = [:]
-        params.each { key, value ->
-            String keyString = key.toString()
-            if(keyString.matches(/.*[^.]Id/)){
-                result.put(keyString.replaceAll("Id\$", ""), ["id": value])
-            }
-
-        }
-        result
-
     }
 
 }

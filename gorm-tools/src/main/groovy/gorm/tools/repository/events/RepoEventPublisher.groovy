@@ -36,7 +36,7 @@ class RepoEventPublisher {
     @Autowired
     private EventBus eventBus
 
-    @Autowired
+    // @Autowired
     private ApplicationEventPublisher applicationEventPublisher
 
     private final Map<String, Map<String, Method>> repoEventMethodCache = new ConcurrentHashMap<>()
@@ -47,6 +47,8 @@ class RepoEventPublisher {
         for (Class repoClass : grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz) {
             cacheEventsMethods(repoClass)
         }
+        def mainContext = grailsApplication.mainContext
+        applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
     }
 
     void cacheEventsMethods(Class repoClass) {

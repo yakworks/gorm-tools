@@ -14,6 +14,8 @@ dependencies {
   compile "org.grails.plugins:spring-security-core:$vSpringSecurity"
   // compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
 
+  compileOnly "io.micronaut:micronaut-inject-groovy"
+
   compile project(":gorm-tools")
 
   // used for bundled Test traits
@@ -23,11 +25,6 @@ dependencies {
   // compileOnly "org.grails.plugins:geb"
   // compileOnly "org.grails:grails-datastore-rest-client"
   // compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc
-}
-
-compileGroovy {
-  groovyOptions.fork = true
-  groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
 }
 
 bootRun {

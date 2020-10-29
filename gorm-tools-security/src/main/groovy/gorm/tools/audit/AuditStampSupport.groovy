@@ -15,12 +15,14 @@ import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.AnnotationUtils
+import org.springframework.stereotype.Component
 
 import gorm.tools.audit.ast.AuditStampConfigLoader
 import gorm.tools.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
 import grails.util.GrailsClassUtils
 
+@Component
 @CompileStatic
 class AuditStampSupport {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditStamp'

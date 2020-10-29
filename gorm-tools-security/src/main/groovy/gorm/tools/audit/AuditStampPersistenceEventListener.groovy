@@ -10,15 +10,18 @@ import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PreInsertEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+import org.grails.datastore.mapping.engine.event.ValidationEvent
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.event.GenericApplicationListener
 import org.springframework.core.ResolvableType
+import org.springframework.stereotype.Component
 
 /**
  * An event listener that adds support for auto-timestamping with userId for edits and updates
  * concepts taken from the AutoTimeStampingListener in gorm
  */
+@Component
 @CompileStatic
 class AuditStampPersistenceEventListener implements GenericApplicationListener {
     int order = (Integer.MAX_VALUE / 2) as Integer
@@ -28,7 +31,7 @@ class AuditStampPersistenceEventListener implements GenericApplicationListener {
     @Override
     boolean supportsEventType(ResolvableType resolvableType) {
         Class<?> eventType = resolvableType.getRawClass()
-        return PreInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType)
+        return PreInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType) || ValidationEvent.isAssignableFrom(eventType)
     }
 
     @Override

@@ -40,13 +40,8 @@ class SecRoleUser implements Serializable {
         this.user.name
     }
 
-    @CompileDynamic
     static List<SecRoleUser> getByUser(long userId) {
-        SecRoleUser.createCriteria().list {
-            user{
-                eq("id", userId)
-            }
-        } as List<SecRoleUser>
+        SecRoleUser.query('user.id': userId).list()
     }
 
     static SecRoleUser get(long userId, long roleId) {

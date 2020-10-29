@@ -13,7 +13,7 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 //@EqualsAndHashCode(includes = 'num,name')
 @IdEqualsHashCode
-@RestApi(description = "This is a project ")
+//@RestApi(description = "This is a project ")
 @Entity
 class Project {
 

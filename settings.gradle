@@ -6,11 +6,11 @@ include 'gorm-tools-security'
 //findProject(':security').name = 'gorm-tools-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks
-// include "examples/test-domain"
+include "examples/test-domain"
 // include 'examples/restify'
 // include 'examples/benchmarks'
 //
 // // findProject(':examples/restify-domains').name = 'restify-domains'
 // findProject(':examples/restify').name = 'restify'
-// findProject(':examples/test-domain').name = 'test-domain'
+findProject(':examples/test-domain').name = 'test-domain'
 // findProject(':examples/benchmarks').name = 'benchmarks'

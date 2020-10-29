@@ -4,13 +4,17 @@
 */
 package gorm.tools.security
 
+import org.grails.datastore.mapping.core.Datastore
+
 import gorm.tools.audit.AuditStampBeforeValidateListener
 import gorm.tools.audit.AuditStampPersistenceEventListener
+import gorm.tools.audit.AuditStampPersistenceListener
 import gorm.tools.audit.AuditStampSupport
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.AppUserService
 import gorm.tools.security.services.SpringSecService
 import grails.plugin.springsecurity.SpringSecurityUtils
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import grails.plugins.Plugin
 
 class GormToolsSecurityGrailsPlugin extends Plugin {
@@ -30,7 +34,7 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
                 // spring security uses an older deprecated interface security.authentication.encoding.PasswordEncoder
                 // this one wraps the new one in the old interface as spring sec's DaoAuthenticationProvider needs it
                 // once thats upgraded then we can fix this
-                passwordEncoder(grails.plugin.springsecurity.authentication.encoding.BCryptPasswordEncoder, 10){ bean -> bean.lazyInit = true}
+                passwordEncoder(BCryptPasswordEncoder){ bean -> bean.lazyInit = true}
 
                 //overrrides the spring sec's userDetailsService
                 userDetailsService(AppUserDetailsService){ bean -> bean.lazyInit = true}
@@ -41,14 +45,30 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
             }
 
             //dont register beans if audit trail is disabled.
-            if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
+            //if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
                 //auditStampEventListener(AuditStampEventListener)
-                auditStampBeforeValidateListener(AuditStampBeforeValidateListener){ bean -> bean.lazyInit = true}
-                auditStampPersistenceEventListener(AuditStampPersistenceEventListener){ bean -> bean.lazyInit = true}
-                auditStampSupport(AuditStampSupport){ bean -> bean.lazyInit = true}
-            }
+                // auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
+                // auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
+                // auditStampSupport(AuditStampSupport)
+            //}
 
 
         }
+    }
+
+    @Override
+    void doWithApplicationContext() {
+        // def persList = applicationContext.getBean('auditStampPersistenceEventListener', AuditStampPersistenceEventListener)
+        // applicationContext.addApplicationListener(persList)
+        // datastore.applicationEventPublisher.addApplicationListener(ctx.getBean("auditStampPersistenceEventListener"))
+
+        // applicationContext.getBeansOfType(Datastore).each { String key, Datastore datastore ->
+        //     println "key $key datastore $datastore"
+        //     // def persList = applicationContext.getBean('auditStampPersistenceEventListener', AuditStampPersistenceEventListener)
+        //     // assert persList
+        //     def evPublisher = datastore.applicationEventPublisher
+        //     evPublisher.addApplicationListener(new AuditStampPersistenceListener(datastore))
+        // }
+
     }
 }

@@ -29,6 +29,7 @@ class TaskRestApiSpec extends GebSpec implements RestApiTestTrait {
         testPost()
         testPut()
         testDelete()
+        testPostWithNestedId()
     }
 
     @Override
@@ -45,6 +46,24 @@ class TaskRestApiSpec extends GebSpec implements RestApiTestTrait {
 
         def rget = restBuilder.get("$resourcePath/${response.json.id}")
         assert rget.json.name == 'task'
+        assert rget.json.project.id == 1
+        return rget
+    }
+
+    def testPostWithNestedId() {
+         Map data = [name: 'task2']
+        //we are passing project id as param as projectId
+        def response = restBuilder.post("$resourcePath?projectId=1") {
+            json data
+        }
+
+        assert response.status == CREATED.value()
+        //response.json.id
+        assert response.json.name == 'task2'
+        assert response.json.project.id == 1
+
+        def rget = restBuilder.get("$resourcePath/${response.json.id}")
+        assert rget.json.name == 'task2'
         assert rget.json.project.id == 1
         return rget
     }

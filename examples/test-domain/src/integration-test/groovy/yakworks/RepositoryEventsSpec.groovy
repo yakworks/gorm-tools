@@ -4,6 +4,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.taskify.domain.Org
 

@@ -20,7 +20,7 @@ import yakworks.taskify.domain.traits.NameNumTrait
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class Org implements NameNumTrait{
+class Org implements NameNumTrait {
 
     //strings
     String name2

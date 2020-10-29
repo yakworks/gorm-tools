@@ -41,7 +41,7 @@ class SecRoleUser implements Serializable {
     }
 
     static List<SecRoleUser> getByUser(long userId) {
-        SecRoleUser.query('user.id': userId).list()
+        SecRoleUser.query([user:[id: userId]]).list()
     }
 
     static SecRoleUser get(long userId, long roleId) {

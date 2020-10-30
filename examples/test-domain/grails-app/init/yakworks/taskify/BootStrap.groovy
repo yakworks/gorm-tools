@@ -20,6 +20,7 @@ class BootStrap {
 
     void buildOrgs(){
         Org.withTransaction {
+            println "BootStrap inserting 100 orgs"
             TestSeedData.buildOrgs(100)
         }
     }

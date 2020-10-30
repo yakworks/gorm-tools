@@ -2,16 +2,12 @@ package yakworks.taskify.domain
 
 import java.time.LocalDate
 
-import groovy.transform.EqualsAndHashCode
-
-import gorm.tools.rest.RestApi
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-//import gorm.restapi.RestApiController
+
 @GrailsCompileStatic
-//@EqualsAndHashCode(includes = 'num,name')
 @IdEqualsHashCode
 //@RestApi(description = "This is a project ")
 @Entity

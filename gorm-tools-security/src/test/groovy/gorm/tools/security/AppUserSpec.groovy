@@ -1,6 +1,6 @@
 package gorm.tools.security
 
-import org.apache.commons.lang.RandomStringUtils
+import org.apache.commons.lang3.RandomStringUtils
 
 import gorm.tools.audit.AuditStampBeforeValidateListener
 import gorm.tools.audit.AuditStampPersistenceEventListener

@@ -15,6 +15,7 @@ import groovy.transform.CompileStatic
  * @param <E> the enum
  * @param <T> the id type
  */
+@SuppressWarnings(['PropertyName'])
 @CompileStatic
 trait IdEnum<E,T> {
 

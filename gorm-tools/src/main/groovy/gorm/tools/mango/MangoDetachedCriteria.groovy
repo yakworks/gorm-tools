@@ -6,10 +6,6 @@ package gorm.tools.mango
 
 import groovy.transform.CompileDynamic
 
-import org.codehaus.groovy.runtime.InvokerHelper
-import org.grails.datastore.mapping.query.Restrictions
-import org.grails.datastore.mapping.query.api.Criteria
-
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 

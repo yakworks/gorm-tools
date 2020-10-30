@@ -15,7 +15,7 @@ dependencies {
 
   // compile "org.grails.plugins:cache"
   compile "org.grails:grails-plugin-domain-class"
-  compile "org.grails.plugins:external-config:$versionExternalConfig"
+  compile "org.grails.plugins:external-config:$vExternalConfig"
 
   compile project(":gorm-tools")
   compile project(":gorm-tools-security")

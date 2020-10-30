@@ -1,7 +1,7 @@
 package restify
 
 import geb.spock.GebSpec
-import gorm.tools.rest.testing.RestApiTestTrait
+import gorm.tools.rest.client.RestApiTestTrait
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 

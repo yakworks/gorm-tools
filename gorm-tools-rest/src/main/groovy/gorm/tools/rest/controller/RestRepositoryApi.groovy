@@ -4,6 +4,8 @@
 */
 package gorm.tools.rest.controller
 
+import javax.annotation.Resource
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -47,8 +49,8 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     @Autowired
     RestApiConfig restApiConfig
 
-    @Autowired
-    MessageSource messageSource
+    // @Resource
+    // MessageSource messageSource
 
     @Autowired
     EntityMapService entityMapService
@@ -307,14 +309,14 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
 
     }
 
-    String buildMsg(Map msgMap, Errors errors) {
-        Map resultErrors = [errors: [:], message: '']
-        (errors.allErrors as List<FieldError>).each { FieldError error ->
-            String message = messageSource.getMessage(error, Locale.default)
-            (resultErrors.errors as Map).put(error.field, message)
-        }
-        resultErrors.put('message', msgMap['defaultMessage'] as String)
-        return (resultErrors as JSON).toString()
-    }
+    // String buildMsg(Map msgMap, Errors errors) {
+    //     Map resultErrors = [errors: [:], message: '']
+    //     (errors.allErrors as List<FieldError>).each { FieldError error ->
+    //         String message = messageSource.getMessage(error, Locale.default)
+    //         (resultErrors.errors as Map).put(error.field, message)
+    //     }
+    //     resultErrors.put('message', msgMap['defaultMessage'] as String)
+    //     return (resultErrors as JSON).toString()
+    // }
 
 }

@@ -1,0 +1,20 @@
+grails:
+  profile: web-plugin
+  codegen:
+    defaultPackage: gorm.tools.rest
+info:
+  app:
+    name: '@info.app.name@'
+    version: '@info.app.version@'
+    grailsVersion: '@info.app.grailsVersion@'
+spring:
+  jmx:
+    unique-names: true
+  main:
+    banner-mode: "off"
+  groovy:
+    template:
+      check-template-location: false
+management:
+  endpoints:
+    enabled-by-default: false

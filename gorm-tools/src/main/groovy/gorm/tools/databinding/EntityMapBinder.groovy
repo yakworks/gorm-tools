@@ -377,7 +377,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         return whiteList
     }
 
-    protected getIdentifierValueFrom(source) {
+    protected getIdentifierValueFrom(Object source) {
         def idValue = null
         if(source instanceof DataBindingSource && ((DataBindingSource)source).hasIdentifier()) {
             idValue = source.getIdentifierValue()
@@ -403,7 +403,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      * @param propName the name of a property on obj
      * @return the Class of the domain class referenced by propName, null if propName does not reference a domain class
      */
-    protected Class getDomainClassType(obj, String propName) {
+    protected Class getDomainClassType(Object obj, String propName) {
         def domainClassType
         def objClass = obj.getClass()
         def propertyType = GrailsClassUtils.getPropertyType(objClass, propName)
@@ -413,7 +413,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         domainClassType
     }
 
-    protected populateErrors(obj, BindingResult bindingResult) {
+    @SuppressWarnings(['NestedBlockDepth'])
+    protected populateErrors(Object obj, BindingResult bindingResult) {
         PersistentEntity domain = getPersistentEntity(obj.getClass())
 
         if (domain != null && bindingResult != null) {
@@ -421,11 +422,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             for (Object error : bindingResult.getAllErrors()) {
                 if (error instanceof FieldError) {
                     def fieldError = (FieldError)error
-                    final boolean isBlank = ''.equals(fieldError.getRejectedValue())
-                    if (!isBlank) {
-                        newResult.addError(fieldError)
-                    }
-                    else {
+                    final boolean isBlank = '' == fieldError.getRejectedValue()
+                    if (isBlank) {
                         PersistentProperty prop = domain.getPropertyByName(fieldError.getField())
                         if (prop != null) {
                             final boolean isOptional = prop.isNullable()
@@ -436,6 +434,9 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
                         else {
                             newResult.addError(fieldError)
                         }
+                    }
+                    else {
+                        newResult.addError(fieldError)
                     }
                 }
                 else {
@@ -448,10 +449,11 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         if (mc.hasProperty(obj, "errors")!=null && bindingResult!=null) {
             def errors = new ValidationErrors(obj)
             errors.addAllErrors(bindingResult)
-            mc.setProperty(obj,"errors", errors)
+            mc.setProperty(obj, "errors", errors)
         }
     }
 
+    @SuppressWarnings(['EmptyCatchBlock'])
     private PersistentEntity getPersistentEntity(Class clazz) {
         if (grailsApplication != null) {
             try {

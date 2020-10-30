@@ -11,14 +11,12 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.connections.ConnectionSource
 import org.grails.datastore.mapping.query.api.BuildableCriteria
-import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.orm.hibernate.datasource.MultipleDataSourceSupport
 import org.hibernate.SessionFactory
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
 import gorm.tools.mango.api.QueryMangoEntity
-import gorm.tools.repository.api.EntityMethodEvents
 import grails.util.Holders
 
 /**

@@ -15,13 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.event.GenericApplicationListener
 import org.springframework.core.ResolvableType
-import org.springframework.stereotype.Component
 
 /**
  * An event listener that adds support for auto-timestamping with userId for edits and updates
  * concepts taken from the AutoTimeStampingListener in gorm
  */
-@Component
 @CompileStatic
 class AuditStampPersistenceEventListener implements GenericApplicationListener {
     int order = (Integer.MAX_VALUE / 2) as Integer

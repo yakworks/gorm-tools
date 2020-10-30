@@ -1,48 +1,18 @@
-// apply plugin: "yakworks.grails-plugin"
-apply plugin:"idea"
-apply plugin: 'groovy'
-apply plugin:"org.grails.grails-plugin"
+apply plugin: "yakworks.grails-plugin"
+// apply plugin:"idea"
+// apply plugin: 'groovy'
+// apply plugin:"org.grails.grails-plugin"
 
 dependencies {
   console "org.grails:grails-console"
 
   //used for json parsing but require it to be added to project that uses this
-  compileOnly "org.grails.plugins:views-json:$versionViews"
-  compileOnly "org.grails.plugins:views-json-templates:$versionViews"
-  compileOnly "org.grails:views-json-testing-support:$versionViews"
-
-  //this is for GrailsParameterMapRowMapper that uses the MockHttpServletRequest
-  compileOnly "org.springframework:spring-test"
+  compileOnly "org.grails.plugins:views-json:$vViews"
+  compileOnly "org.grails.plugins:views-json-templates:$vViews"
 
   //used for bundled Test traits
   compileOnly "org.grails:grails-gorm-testing-support"
-  compileOnly "org.grails:grails-web-testing-support"
-  compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
-  compileOnly "org.grails.plugins:geb"
-  // compileOnly "org.grails:grails-datastore-rest-client"
-  compileOnly('org.grails:grails-datastore-rest-client:6.1.9.RELEASE'){
-    exclude group:'org.grails', module:'grails-plugin-converters'
-  }
+  compileOnly "org.grails.plugins:build-test-data:$vBuildTestData"
 
-  compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc
-  //these shouldn't be needed in here as there are only unit tests but they seem to add the byte-buddy? for mocking
-  testRuntime "org.seleniumhq.selenium:selenium-chrome-driver:3.6.0"
-  testRuntime "org.seleniumhq.selenium:selenium-api:3.6.0"
-}
-
-bootRun {
-  ignoreExitValue true
-  jvmArgs(
-    '-Dspring.output.ansi.enabled=always',
-    '-noverify',
-    '-XX:TieredStopAtLevel=1',
-    '-Xmx1024m')
-  sourceResources sourceSets.main
-  String springProfilesActive = 'spring.profiles.active'
-  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
-}
-
-test {
-  //testLogging.showStandardStreams = true
-  testLogging.exceptionFormat = 'full'
+  // compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc?
 }

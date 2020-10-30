@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.lang.Validate
+import org.apache.commons.lang3.Validate
 
 /**
  * An Thread safe implementation that caches a range of values in memory by the key name (ie: "tablename.id")

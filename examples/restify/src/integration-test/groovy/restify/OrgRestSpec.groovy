@@ -46,6 +46,20 @@ class OrgRestSpec extends GebSpec implements RestApiTestTrait {
         assert rget.json.type.id == 1
         return rget
     }
+    def testPostWithNestedId() {
+        given:
+        def response
+        Map data = [num:'foo1', name: "foo"]
+        // "The save action is executed with valid data"
+        when:
+        response = restBuilder.post(resourcePath+'?typeId=1') {
+            json data
+        }
+        then:
+        response.status == CREATED.value()
+        response.json.name == 'foo'
+        response.json.type.id == 1
+    }
 
     void test_save_post() {
         given:

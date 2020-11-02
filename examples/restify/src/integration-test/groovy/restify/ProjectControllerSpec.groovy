@@ -1,7 +1,7 @@
 package restify
 
 import geb.spock.GebSpec
-import gorm.tools.rest.testing.RestApiTestTrait
+import gorm.tools.rest.client.RestApiTestTrait
 import gorm.tools.testing.TestTools
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
@@ -168,7 +168,7 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         then: "The response is correct"
         response.status == OK.value()
         response.json == [activateDate:'2020-01-01T00:00:00Z', inactive:false, comments:null, endDate:null,
-                          num:'1', name:'Fooinator-1', id:1, billable:true, startDate:'2020-01-01']
+                          num:'1', name:'Fooinator-1', id:1, billable:true, startDate:'2020-01-01', version: 0]
     }
 
     void test_delete() {

@@ -5,7 +5,7 @@
 package gorm.tools.security.domain
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.authentication.encoding.PasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
@@ -101,7 +101,7 @@ class AppUserRepo implements GormRepo<AppUser> {
     }
 
     String encodePassword(String pass) {
-        passwordEncoder.encodePassword pass, null
+        passwordEncoder.encode pass
     }
 
     /** throws EntityValidationException if not. NOTE: keep the real pas**ord name out so scanners dont pick this up */

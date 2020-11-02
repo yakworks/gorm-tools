@@ -19,11 +19,12 @@ class CriteriaSpec extends Specification {
         list.size() == 1
     }
 
-    def "test nested withCriteria"() {
+    def "test nested query"() {
         when:
-        List list = Org.withCriteria {
+        List list = Org.query {
             eq "location.city", "City22"
-        }
+        }.list()
+
         then:
         list.size() == 1
     }

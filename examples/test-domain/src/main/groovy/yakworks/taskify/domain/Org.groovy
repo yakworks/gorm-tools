@@ -18,11 +18,9 @@ import yakworks.taskify.domain.traits.NameNumTrait
 
 @AuditStamp
 @IdEqualsHashCode
-//@IdEqualsHashCode(hashKey=['num', 'name'])
-// @EqualsAndHashCode(includes = ['name2', 'secret'])
 @Entity
 @GrailsCompileStatic
-class Org implements NameNumTrait{
+class Org implements NameNumTrait {
 
     //strings
     String name2

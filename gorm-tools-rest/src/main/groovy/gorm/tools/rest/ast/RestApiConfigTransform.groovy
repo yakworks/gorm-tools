@@ -68,7 +68,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         // Class entityClass = ClassHelper.make(ctrlConfig['entityClass'])
         ClassNode entityClassNode = ClassHelper.make((String)ctrlConfig['entityClass'])
 
-        ClassNode<?> superClassNode
+        ClassNode superClassNode
         String superClassName = (String)ctrlConfig['controllerClass']
         if (superClassName) {
             superClassNode = ClassHelper.make(getClass().classLoader.loadClass(superClassName))

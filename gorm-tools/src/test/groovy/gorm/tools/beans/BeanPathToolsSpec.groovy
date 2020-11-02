@@ -347,10 +347,10 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
 
     void "test getIncludes"(){
         expect:
-        result == BeanPathTools.getIncludes("Bookz", fields)
+        res == BeanPathTools.getIncludes("Bookz", fields)
 
         where:
-        fields            | result
+        fields            | res
         ['name']          | ['name']
         ['*']             | ['id', 'version', 'name', 'cost']
         ['enumThings.*']  | ['enumThings.id', 'enumThings.testEnum', 'enumThings.version', 'enumThings.enumIdent']

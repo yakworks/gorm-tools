@@ -1,9 +1,8 @@
-package restify
+package yakworks.taskify
 
-import grails.gorm.annotation.Entity
 import grails.plugins.Plugin
 
-class AppDomainsGrailsPlugin extends Plugin {
+class TestDomainGrailsPlugin extends Plugin {
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.2.11 > *"

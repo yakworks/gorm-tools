@@ -6,10 +6,6 @@ package gorm.tools.mango
 
 import groovy.transform.CompileDynamic
 
-import org.codehaus.groovy.runtime.InvokerHelper
-import org.grails.datastore.mapping.query.Restrictions
-import org.grails.datastore.mapping.query.api.Criteria
-
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 
@@ -106,9 +102,9 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             return super."$critName"(propertyName, propertyValue)
         }
         List props = propertyName.split(/\./) as List
-        String last = props.pop()
+        String last = props.removeLast()
         Closure toDo = { "$critName"(last, propertyValue) }
-        Closure newCall = props.reverse().inject(toDo) { acc, prop ->
+        Closure newCall = props.reverse().inject(toDo) { Closure acc, String prop ->
             { -> "$prop"(acc) }
         }
         newCall.call()

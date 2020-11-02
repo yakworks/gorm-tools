@@ -41,6 +41,7 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         ex.errors.getErrorCount() == 2
     }
 
+    @IgnoreRest
     def "test validate"(){
         when:
         def o = build()

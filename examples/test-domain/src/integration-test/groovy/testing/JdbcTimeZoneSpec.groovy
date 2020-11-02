@@ -2,7 +2,7 @@ package testing
 
 import gorm.tools.repository.RepoUtil
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 

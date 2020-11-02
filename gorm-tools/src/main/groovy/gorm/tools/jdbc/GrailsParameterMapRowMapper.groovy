@@ -54,7 +54,7 @@ class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
      * Returns a GrailsParameterMap instance.
      */
     @Override
-    protected Map<String, Object> createColumnMap(int columnCount) {
+    protected Map createColumnMap(int columnCount) {
         HttpServletRequest request = new MockHttpServletRequest()
         return new GrailsParameterMap(request)
     }

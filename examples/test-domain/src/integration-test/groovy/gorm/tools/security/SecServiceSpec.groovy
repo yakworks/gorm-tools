@@ -7,7 +7,7 @@ import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import gorm.tools.security.services.SecService
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 
 @Integration

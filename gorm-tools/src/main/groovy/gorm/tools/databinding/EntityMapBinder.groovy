@@ -11,6 +11,9 @@ import java.util.concurrent.ConcurrentHashMap
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.grails.core.artefact.AnnotationDomainClassArtefactHandler
+import org.grails.core.artefact.DomainClassArtefactHandler
+import org.grails.core.exceptions.GrailsConfigurationException
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -18,20 +21,26 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.web.databinding.DataBindingEventMulticastListener
 import org.grails.web.databinding.GrailsWebDataBindingListener
+import org.grails.web.databinding.SpringConversionServiceAdapter
+import org.springframework.context.MessageSource
 import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.BindingResult
+import org.springframework.validation.FieldError
+import org.springframework.validation.ObjectError
 
 import gorm.tools.beans.IsoDateUtil
 import gorm.tools.utils.GormMetaUtils
 import grails.core.GrailsApplication
 import grails.databinding.DataBindingSource
+import grails.databinding.SimpleDataBinder
 import grails.databinding.SimpleMapDataBindingSource
 import grails.databinding.converters.ValueConverter
 import grails.databinding.events.DataBindingListener
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
-import grails.web.databinding.GrailsWebDataBinder
+import grails.util.GrailsClassUtils
+import grails.validation.ValidationErrors
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map
@@ -42,7 +51,7 @@ import grails.web.databinding.GrailsWebDataBinder
  */
 @SuppressWarnings(['CatchException'])
 @CompileStatic
-class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
+class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
     /**
      * A map that holds lists of properties which should be bound manually by a binder.
@@ -50,12 +59,16 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
     static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
     protected static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
 
-    EntityMapBinder() {
-        super(null)
-    }
+    protected GrailsApplication grailsApplication
+    protected MessageSource messageSource
+    boolean trimStrings = true
+    boolean convertEmptyStringsToNull = true
+    protected List<DataBindingListener> listeners = []
 
     EntityMapBinder(GrailsApplication grailsApplication) {
-        super(grailsApplication)
+        this.grailsApplication = grailsApplication
+        this.conversionService = new SpringConversionServiceAdapter()
+        // registerConverter new ByteArrayMultipartFileValueConverter()
     }
 
     /**
@@ -367,7 +380,95 @@ class EntityMapBinder extends GrailsWebDataBinder implements MapBinder {
         return whiteList
     }
 
-    @Override
+    protected getIdentifierValueFrom(Object source) {
+        def idValue = null
+        if(source instanceof DataBindingSource && ((DataBindingSource)source).hasIdentifier()) {
+            idValue = source.getIdentifierValue()
+        } else if(source instanceof CharSequence){
+            idValue = source
+        } else if(source instanceof Map && ((Map)source).containsKey('id')) {
+            idValue = source['id']
+        } else if(source instanceof Number) {
+            idValue = source.toString()
+        }
+        if (idValue instanceof GString) {
+            idValue = idValue.toString()
+        }
+        idValue
+    }
+
+    protected boolean isDomainClass(final Class<?> clazz) {
+        return DomainClassArtefactHandler.isDomainClass(clazz) || AnnotationDomainClassArtefactHandler.isJPADomainClass(clazz)
+    }
+
+    /**
+     * @param obj any object
+     * @param propName the name of a property on obj
+     * @return the Class of the domain class referenced by propName, null if propName does not reference a domain class
+     */
+    protected Class getDomainClassType(Object obj, String propName) {
+        def domainClassType
+        def objClass = obj.getClass()
+        def propertyType = GrailsClassUtils.getPropertyType(objClass, propName)
+        if(propertyType && isDomainClass(propertyType)) {
+            domainClassType = propertyType
+        }
+        domainClassType
+    }
+
+    @SuppressWarnings(['NestedBlockDepth'])
+    protected populateErrors(Object obj, BindingResult bindingResult) {
+        PersistentEntity domain = getPersistentEntity(obj.getClass())
+
+        if (domain != null && bindingResult != null) {
+            def newResult = new ValidationErrors(obj)
+            for (Object error : bindingResult.getAllErrors()) {
+                if (error instanceof FieldError) {
+                    def fieldError = (FieldError)error
+                    final boolean isBlank = '' == fieldError.getRejectedValue()
+                    if (isBlank) {
+                        PersistentProperty prop = domain.getPropertyByName(fieldError.getField())
+                        if (prop != null) {
+                            final boolean isOptional = prop.isNullable()
+                            if (!isOptional) {
+                                newResult.addError(fieldError)
+                            }
+                        }
+                        else {
+                            newResult.addError(fieldError)
+                        }
+                    }
+                    else {
+                        newResult.addError(fieldError)
+                    }
+                }
+                else {
+                    newResult.addError((ObjectError)error)
+                }
+            }
+            bindingResult = newResult
+        }
+        def mc = GroovySystem.getMetaClassRegistry().getMetaClass(obj.getClass())
+        if (mc.hasProperty(obj, "errors")!=null && bindingResult!=null) {
+            def errors = new ValidationErrors(obj)
+            errors.addAllErrors(bindingResult)
+            mc.setProperty(obj, "errors", errors)
+        }
+    }
+
+    @SuppressWarnings(['EmptyCatchBlock'])
+    private PersistentEntity getPersistentEntity(Class clazz) {
+        if (grailsApplication != null) {
+            try {
+                return grailsApplication.mappingContext.getPersistentEntity(clazz.name)
+            } catch (GrailsConfigurationException e) {
+                //no-op
+            }
+        }
+        null
+    }
+
+    //@Override
     @SuppressWarnings(["EmptyCatchBlock"])
     protected getPersistentInstance(Class type, Object id) {
         try {

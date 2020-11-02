@@ -93,7 +93,7 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
         }
         final ast = source.getAST()
 
-        ClassNode<?> superClassNode
+        ClassNode superClassNode
         Expression superClassAttribute = annotationNode.getMember(ATTR_SUPER_CLASS)
         if (superClassAttribute instanceof ClassExpression) {
             superClassNode = ((ClassExpression) superClassAttribute).getType()

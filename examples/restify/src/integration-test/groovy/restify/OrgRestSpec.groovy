@@ -1,12 +1,14 @@
 package restify
 
 import geb.spock.GebSpec
-import gorm.tools.rest.testing.RestApiTestTrait
+import gorm.tools.rest.client.RestApiTestTrait
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.OK
 
 @Integration
 @Rollback
@@ -16,15 +18,36 @@ class OrgRestSpec extends GebSpec implements RestApiTestTrait {
 
     //@Transactional
     //Map getPostData() { return TestDataJson.buildMap(Org, type: OrgType.load(1)) }
-    Map postData = [num:'foo1', name: "foo", type: [id: 1]]
+    // Map postData = [num:'foo1', name: "foo", type: [id: 1]]
+    //
+    // Map putData = [name: "Name Update"]
+    //
+    // Map invalidData = ["name": null]
 
-    Map putData = [name: "Name Update"]
+    @IgnoreRest
+    void "test get"() {
+        when:
+        String resPath = getResourcePath()
+        def response = restBuilder.get("${getResourcePath()}/1")
 
-    Map invalidData = ["name": null]
+        then:
+        response.status == OK.value()
+        // resPath == 'foo'
 
+        // String baseUrl = "http://localhost:$serverPort"
+        // this.client = HttpClient.create(baseUrl.toURL())
+        // HttpRequest request = HttpRequest.GET('/api/book')
+        // HttpResponse<List<Map>> resp = client.toBlocking().exchange(request, Argument.of(List, Map))
+        //
+        // then:
+        // HttpClientResponseException ex = thrown()
+        // ex.message == "Access Denied"
+    }
+
+    @Ignore
     void "exercise api"() {
         expect:
-        //testGet()
+        testGet()
         testPost()
         //testPut()
         //testDelete()

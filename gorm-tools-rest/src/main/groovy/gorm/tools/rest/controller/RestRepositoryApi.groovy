@@ -4,6 +4,8 @@
 */
 package gorm.tools.rest.controller
 
+import javax.annotation.Resource
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -41,14 +43,14 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
-@SuppressWarnings(['CatchRuntimeException', 'NoDef'])
+@SuppressWarnings(['CatchRuntimeException'])
 trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi {
 
     @Autowired
     RestApiConfig restApiConfig
 
-    @Autowired
-    MessageSource messageSource
+    // @Resource
+    // MessageSource messageSource
 
     @Autowired
     EntityMapService entityMapService
@@ -200,9 +202,9 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     void respondWithEntityMap(EntityMap entityMap, Map args = [:]){
-        def resArgs = [view: '/object/_entityMap'] as Map<String, Object>
+        def resArgs = [view: '/object/_entityMap'] // as Map<String, Object>
         if(args) resArgs.putAll(args)
-        respond(resArgs, [entityMap: entityMap])
+        respond(resArgs as Map, [entityMap: entityMap] as Map)
     }
 
     /**
@@ -307,14 +309,14 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
 
     }
 
-    String buildMsg(Map msgMap, Errors errors) {
-        Map resultErrors = [errors: [:], message: '']
-        (errors.allErrors as List<FieldError>).each { FieldError error ->
-            String message = messageSource.getMessage(error, Locale.default)
-            (resultErrors.errors as Map).put(error.field, message)
-        }
-        resultErrors.put('message', msgMap['defaultMessage'] as String)
-        return (resultErrors as JSON).toString()
-    }
+    // String buildMsg(Map msgMap, Errors errors) {
+    //     Map resultErrors = [errors: [:], message: '']
+    //     (errors.allErrors as List<FieldError>).each { FieldError error ->
+    //         String message = messageSource.getMessage(error, Locale.default)
+    //         (resultErrors.errors as Map).put(error.field, message)
+    //     }
+    //     resultErrors.put('message', msgMap['defaultMessage'] as String)
+    //     return (resultErrors as JSON).toString()
+    // }
 
 }

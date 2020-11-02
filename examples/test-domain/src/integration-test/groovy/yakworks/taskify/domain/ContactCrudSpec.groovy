@@ -2,7 +2,7 @@ package yakworks.taskify.domain
 
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Ignore
 import spock.lang.Specification
 

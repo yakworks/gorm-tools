@@ -10,6 +10,7 @@ import org.grails.datastore.mapping.engine.event.AbstractPersistenceEvent
 import org.grails.datastore.mapping.engine.event.EventType
 import org.grails.datastore.mapping.engine.event.PreInsertEvent
 import org.grails.datastore.mapping.engine.event.PreUpdateEvent
+import org.grails.datastore.mapping.engine.event.ValidationEvent
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.event.GenericApplicationListener
@@ -28,7 +29,7 @@ class AuditStampPersistenceEventListener implements GenericApplicationListener {
     @Override
     boolean supportsEventType(ResolvableType resolvableType) {
         Class<?> eventType = resolvableType.getRawClass()
-        return PreInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType)
+        return PreInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType) || ValidationEvent.isAssignableFrom(eventType)
     }
 
     @Override
@@ -38,7 +39,7 @@ class AuditStampPersistenceEventListener implements GenericApplicationListener {
     void onApplicationEvent(final ApplicationEvent event) {
         if(event instanceof AbstractPersistenceEvent && event.entity) {
 
-            if (event.eventType == EventType.PreInsert) {
+            if (event.eventType == EventType.PreInsert || event.eventType == EventType.Validation) {
                 if(isAuditStamped(event.entity.name)){
                     auditStampSupport.stampIfNew(event.entityObject)
                 }

@@ -1,0 +1,13 @@
+// apply plugin: 'groovy'
+// apply plugin: 'org.grails.grails-plugin'
+apply plugin: "yakworks.grails-plugin"
+
+dependencies {
+  compile 'commons-codec:commons-codec:1.5'
+  compile 'org.grails.plugins:converters:4.0.1'
+  compile "org.grails:grails-plugin-rest"
+  compile "org.grails:grails-plugin-url-mappings"
+  compile "org.grails:grails-plugin-interceptors"
+
+  compile project(":gorm-tools")
+}

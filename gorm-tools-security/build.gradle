@@ -1,5 +1,6 @@
+// apply plugin: 'groovy'
+// apply plugin:"org.grails.grails-plugin"
 apply plugin: "yakworks.grails-plugin"
-//apply plugin: "jacoco"
 
 repositories {
   //yakworks.grails-plugin adds the repos we need
@@ -10,31 +11,15 @@ repositories {
 dependencies {
   console "org.grails:grails-console"
 
-  // compile "org.grails:grails-plugin-validation"
+  compile 'org.grails:grails-plugin-domain-class' // add DomainClass trait with getConstrainedProperties to domains
   compile "org.grails.plugins:spring-security-core:$vSpringSecurity"
+
   // compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
 
   compile project(":gorm-tools")
 
   // used for bundled Test traits
-  compileOnly "org.grails:grails-gorm-testing-support"
-  // compileOnly "org.grails:grails-web-testing-support"
-  // compileOnly "org.grails.plugins:build-test-data:$versionBuildTestData"
-  // compileOnly "org.grails.plugins:geb"
-  // compileOnly "org.grails:grails-datastore-rest-client"
-  // compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc
-}
-
-//bootRepackage and maybe addResources are needed for the test/example projects grails.plugin.compile dependency to work
-bootRun {
-  jvmArgs('-Dspring.output.ansi.enabled=always')
-  addResources = true
-}
-bootRepackage.enabled = false
-
-test {
-  //testLogging.showStandardStreams = true
-  testLogging.exceptionFormat = 'full'
+  compileOnly "org.grails:grails-testing-support"
 }
 
 //dont need to bundle up bootstrap

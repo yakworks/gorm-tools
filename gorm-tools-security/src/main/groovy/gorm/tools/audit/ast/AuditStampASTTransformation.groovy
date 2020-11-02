@@ -11,7 +11,6 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.AnnotationNode
-import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.GenericsType
@@ -19,14 +18,9 @@ import org.codehaus.groovy.ast.Parameter
 import org.codehaus.groovy.ast.PropertyNode
 import org.codehaus.groovy.ast.VariableScope
 import org.codehaus.groovy.ast.builder.AstBuilder
-import org.codehaus.groovy.ast.expr.ArgumentListExpression
-import org.codehaus.groovy.ast.expr.ClassExpression
 import org.codehaus.groovy.ast.expr.ClosureExpression
 import org.codehaus.groovy.ast.expr.ConstantExpression
-import org.codehaus.groovy.ast.expr.ListExpression
-import org.codehaus.groovy.ast.expr.MapExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression
-import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
@@ -53,11 +47,11 @@ import static org.codehaus.groovy.ast.MethodNode.ACC_STATIC
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS) //use SEMANTIC_ANALYSIS so its picked up before the gorm ones
 class AuditStampASTTransformation implements ASTTransformation, CompilationUnitAware  {
     private static final ClassNode MY_TYPE = new ClassNode(gorm.tools.audit.AuditStamp)
-    private ConfigObject stampCfg
+    //private ConfigObject stampCfg
 
-    AuditStampASTTransformation() {
-        stampCfg = new AuditStampConfigLoader().load()
-    }
+    // AuditStampASTTransformation() {
+    //     stampCfg = new AuditStampConfigLoader().load()
+    // }
 
     private CompilationUnit unit
 
@@ -68,7 +62,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
 
     void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
         // println("stampCfg: " + stampCfg)
-        Boolean enabled = (Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "enabled")
+        Boolean enabled = true //(Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "enabled")
         //println("AuditStampAST enabled: " + enabled)
         if (enabled != null && enabled == false) return
 
@@ -83,22 +77,22 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
             return
         }
         final ast = sourceUnit.getAST()
-        Map<String, FieldProps> fprops = FieldProps.buildFieldMap(stampCfg)
-
-        Boolean useAuditStampTrait = (Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "useAuditStampTrait")
-
-        if (useAuditStampTrait != null && useAuditStampTrait == false) {
-            addDisableAuditStampField(classNode)
-            //debugFieldNodes(classNode)
-            createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
-            createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
-
-            createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
-            createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
-        } else {
+        // Map<String, FieldProps> fprops = FieldProps.buildFieldMap(stampCfg)
+        //
+        // Boolean useAuditStampTrait = (Boolean) FieldProps.getMap(stampCfg, FieldProps.CONFIG_KEY + "." + "useAuditStampTrait")
+        //
+        // if (useAuditStampTrait != null && useAuditStampTrait == false) {
+        //     addDisableAuditStampField(classNode)
+        //     //debugFieldNodes(classNode)
+        //     createUserField(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
+        //     createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
+        //
+        //     createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
+        //     createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
+        // } else {
             //use the default trait
-            AstUtils.injectTrait(classNode, AuditStampTrait)
-            addConstraints(classNode)
+        AstUtils.injectTrait(classNode, AuditStampTrait)
+        addConstraints(classNode)
             // addImportFrom(classNode)
             // addMappingAndConstraints(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
             // addMappingAndConstraints(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
@@ -110,7 +104,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
             // createUserField(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
             // createDateField(classNode, fprops.get(FieldProps.EDITED_DATE_KEY))
             // createDateField(classNode, fprops.get(FieldProps.CREATED_DATE_KEY))
-        }
+        //}
     }
 
     // using AstUtils.injectTrait(classNode, AuditStampTrait) directly now

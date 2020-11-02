@@ -3,7 +3,7 @@ package yakworks.taskify.domain
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 import gorm.tools.security.testing.SecuritySpecHelper

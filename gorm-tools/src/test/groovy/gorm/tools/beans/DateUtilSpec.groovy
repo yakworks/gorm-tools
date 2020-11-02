@@ -10,6 +10,7 @@ import spock.lang.Specification
 
 import java.text.SimpleDateFormat
 
+@Ignore
 class DateUtilSpec extends Specification {
     @Shared SimpleDateFormat tester = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 

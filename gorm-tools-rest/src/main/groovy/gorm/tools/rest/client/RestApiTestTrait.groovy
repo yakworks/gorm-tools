@@ -2,12 +2,11 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.rest.testing
+package gorm.tools.rest.client
 
 import groovy.transform.CompileDynamic
 
 import gorm.tools.testing.TestTools
-import grails.plugins.rest.client.RestBuilder
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -22,7 +21,7 @@ trait RestApiTestTrait {
     //private static GrailsApplication _grailsApplication
     //private static Object _servletContext
 
-    String getResourcePath() { "${baseUrl}/${path}" }
+    String getResourcePath() { "${baseUrl}${path}" }
 
     RestBuilder getRestBuilder() {
         new RestBuilder()

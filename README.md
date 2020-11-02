@@ -23,6 +23,10 @@
          
 </pre>
 
+**6.1.x is for grails 3.3.x and gorm 6.1.x**
+
+**7.0.x is for grails 4.x and gorm 7.0.x**
+
 > *DOCS ARE OUT OF DATE AND BEING UPDATED FOR BREAKING CHANGES IN 6.1.12-v.X*
 > *ALSO MERGING IN DOCS FOR THE REST-API AND AUDITSTAMP THAT WAS MERGED INTO HERE*
 

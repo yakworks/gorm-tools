@@ -12,6 +12,7 @@ import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import grails.plugin.json.view.JsonViewGrailsPlugin
 import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Specification
@@ -29,6 +30,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
         mockDomains(OrgExt, Location, JsonifyDom, JsonifyDomExt, NestedDom)
+        //defineBeans(new JsonViewGrailsPlugin())
     }
 
     void "sanity check TestData.build"() {

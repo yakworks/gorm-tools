@@ -9,7 +9,7 @@ buildscript {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     classpath "org.grails.plugins:hibernate5:7.0.4"
     //classpath "org.grails.plugins:views-gradle:2.0.2"
-    classpath "org.yakworks:gradle-plugins:2.0.1"
+    classpath "org.yakworks:gradle-plugins:2.0.2"
   }
 }
 

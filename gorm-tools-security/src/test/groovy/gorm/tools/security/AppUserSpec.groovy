@@ -84,7 +84,6 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     }
 
-    //@IgnoreRest
     void "simple persist"() {
         when:
         def con = build()
@@ -133,7 +132,6 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     }
 
-    //@IgnoreRest
     def "user name"() {
         when:
         Map data = buildMap([:])

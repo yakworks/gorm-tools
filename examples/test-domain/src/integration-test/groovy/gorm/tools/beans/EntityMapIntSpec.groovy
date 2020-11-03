@@ -16,7 +16,6 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
 
     EntityMapService entityMapService
 
-    // @IgnoreRest
     void "MetaBeanProperty playground"() {
         when:
         def user = AppUser.get(1)

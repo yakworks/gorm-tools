@@ -40,3 +40,7 @@ test-domain-unit-test: ## runs ./gradlew integrationTest
 
 test-domain-int-test: ## runs ./gradlew integrationTest
 	./gradlew app-domains:integrationTest $(testArg)
+
+show-compile-dependencies: ## shows gorm-tools:dependencies --configuration compile
+	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
+	./gradlew gorm-tools:dependencies --configuration compile

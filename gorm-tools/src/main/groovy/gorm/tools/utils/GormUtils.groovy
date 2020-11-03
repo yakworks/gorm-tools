@@ -6,7 +6,7 @@ package gorm.tools.utils
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.lang.Validate
+import org.apache.commons.lang3.Validate
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association

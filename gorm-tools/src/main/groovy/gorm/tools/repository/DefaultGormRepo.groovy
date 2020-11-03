@@ -6,10 +6,7 @@ package gorm.tools.repository
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.core.GenericTypeResolver
-
-import grails.gorm.transactions.Transactional
 
 /**
  * A concrete implementation of the GormRepo

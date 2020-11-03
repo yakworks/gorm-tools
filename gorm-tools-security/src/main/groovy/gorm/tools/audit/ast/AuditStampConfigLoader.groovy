@@ -25,17 +25,19 @@ class AuditStampConfigLoader {
      * @return config
      */
     ConfigObject load() {
-        if (stampConfig ) return stampConfig
-        else {
+        if (!stampConfig ) {
             File file = loadFileFromConfigDir(CONFIG_GROOVY) // conf/audit-trail-config.groovy
-            if (file.exists()) stampConfig = new ConfigSlurper().parse(getContents(file))
+            if (file.exists()) {
+                stampConfig = new ConfigSlurper().parse(getContents(file))
+            }
             else {
                 URL cfgIn = getClass().getResource("/" + CONFIG_GROOVY) //from classpath
                 if (cfgIn) {
                     stampConfig = new ConfigSlurper().parse(cfgIn)
                 } else {
                     file = loadFileFromConfigDir(APP_GROOVY)
-                    stampConfig = new ConfigSlurper().parse(getContents(file))
+                    String cnts = getContents(file)
+                    stampConfig = new ConfigSlurper().parse(cnts)
                 }
             }
         }
@@ -47,8 +49,8 @@ class AuditStampConfigLoader {
      * See README for module.path
      */
     private File loadFileFromConfigDir(String name) {
-        //need the module.path - when the plugin is used as inplace.
-        String modulePath = System.getProperty("module.path")
+        String modulePath = System.getProperty("gradle.projectDir")
+        //assert modulePath
         String configPath
         if (modulePath != null){
             configPath = modulePath + "/grails-app/conf/" + name

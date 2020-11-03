@@ -6,7 +6,7 @@ package gorm.tools.beans
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.lang.time.DateUtils
+import org.apache.commons.lang3.time.DateUtils
 import org.springframework.core.annotation.Order
 
 import grails.databinding.converters.ValueConverter

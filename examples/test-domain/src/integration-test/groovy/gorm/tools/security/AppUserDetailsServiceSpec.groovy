@@ -6,7 +6,7 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Ignore
 import spock.lang.Specification
 

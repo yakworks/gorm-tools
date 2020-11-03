@@ -1,7 +1,6 @@
 package gorm.tools.security
 
-
-import org.springframework.security.authentication.encoding.PasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 
 import gorm.tools.security.domain.SecRoleUser
 import gorm.tools.security.domain.AppUser
@@ -9,7 +8,7 @@ import gorm.tools.security.domain.AppUserRepo
 import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 
 @Integration
@@ -41,7 +40,7 @@ class AppUserRepoSpec extends Specification implements DataIntegrationTest, Secu
         user.username == 'galt'
         user.email == params.email
         user.name == params.name
-        passwordEncoder.isPasswordValid(user.passwordHash, params.password, null)
+        passwordEncoder.matches(params.password, user.passwordHash)
     }
 
     def "test create with roles ids"() {

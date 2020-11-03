@@ -4,14 +4,23 @@
 */
 package gorm.tools.repository
 
+import org.springframework.util.ReflectionUtils
+
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
 import grails.persistence.Entity
 import grails.testing.gorm.DataTest
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
+import testing.Org
 
 class RepoUtilsSpec extends Specification implements DataTest {
+
+    void 'instanceControllersDomainBindingApi'() {
+        expect:
+        ReflectionUtils.findField(Org, 'instanceControllersDomainBindingApi')
+        //Org.hasProperty('instanceControllersDomainBindingApi')
+    }
 
     void testCheckVersion() {
         when:

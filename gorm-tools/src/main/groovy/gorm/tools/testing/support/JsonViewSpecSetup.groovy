@@ -34,7 +34,9 @@ trait JsonViewSpecSetup implements GrailsUnitTest {
             }
         }
         //calls the doWithSpring in the JsonViewGrailsPlugin class
-        defineBeans(new JsonViewGrailsPlugin())
+        def jsvPlugin = new JsonViewGrailsPlugin()
+        jsvPlugin.applicationContext = applicationContext
+        defineBeans(jsvPlugin)
     }
 
 }

@@ -69,7 +69,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
             return super.order(propertyName, direction)
         }
         List props = propertyName.split(/\./) as List
-        String last = props.pop()
+        String last = props.removeLast()
         Closure toDo = { order(last, direction) }
         Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
             { -> "$prop"(acc) }
@@ -111,7 +111,7 @@ class GormHibernateCriteriaBuilder extends HibernateCriteriaBuilder {
             return super."$critName"(propertyName, propertyValue)
         }
         List props = propertyName.split(/\./) as List
-        String last = props.pop()
+        String last = props.removeLast()
         Closure toDo = { "$critName"(last, propertyValue) }
         Closure newCall = props.reverse().inject(toDo) { acc, prop ->
             { -> "$prop"(acc) }

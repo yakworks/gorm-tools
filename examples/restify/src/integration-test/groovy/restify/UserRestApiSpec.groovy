@@ -1,10 +1,10 @@
 package restify
 
 import geb.spock.GebSpec
-import gorm.tools.rest.testing.RestApiTestTrait
+import gorm.tools.rest.client.RestApiTestTrait
 import gorm.tools.security.domain.AppUser
 import grails.testing.mixin.integration.Integration
-import grails.transaction.Rollback
+import grails.gorm.transactions.Rollback
 
 @Integration
 @Rollback

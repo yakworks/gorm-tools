@@ -3,7 +3,6 @@ package yakworks.taskify.domain
 import java.time.LocalDate
 import javax.persistence.Transient
 
-import gorm.tools.rest.RestApi
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -104,8 +103,4 @@ class Task {
 
     //void setFooHide( String blah) {}
 
-}
-
-enum TaskType {
-    Todo, Call, Meeting, Review, Development
 }

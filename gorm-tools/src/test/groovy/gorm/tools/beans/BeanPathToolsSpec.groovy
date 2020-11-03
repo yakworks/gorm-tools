@@ -128,7 +128,6 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         'bookAuthor.*'             | [bookAuthor: [id: 2, age: 0, version: null]]
     }
 
-    // @IgnoreRest
     void "propsToMap with list and enums"() {
         setup:
         def obj = new EnumThing(
@@ -292,7 +291,6 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         // ['value','testEnum', 'enumIdent']  | [value:9, testEnum:'FOO', enumIdent:'Num2']
     }
 
-    //@IgnoreRest
     void "test buildMapFromPaths with transient"() {
         setup:
         Bookz object = new Bookz(name: 'foo', cost: 10.00)

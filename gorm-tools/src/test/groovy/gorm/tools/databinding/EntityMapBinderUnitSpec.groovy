@@ -213,7 +213,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.active == true
     }
 
-    // @IgnoreRest
     void "test bind BigDecimal"() {
         TestDomain testDomain = new TestDomain()
         Map params = [amount: '99.999']
@@ -455,7 +454,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.enumSub == TestDomain.EnumSub.BAR
     }
 
-    // @IgnoreRest
     void "test enums identity"() {
         given:
 
@@ -470,7 +468,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.enumIdent == TestEnumIdent.Num2
     }
 
-    // @IgnoreRest
     void "test enums identity from map"() {
         given:
 

@@ -60,7 +60,6 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         res.size() == 1
     }
 
-    //@IgnoreRest
     def "test enum kind"() {
         when:
         List res = build([kind: "CLIENT"]).list()

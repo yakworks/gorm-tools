@@ -38,7 +38,6 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         [name: "project 123", num: "test", inactive: true, billable: true]
     }
 
-    // @IgnoreRest
     void test_get_index() {
         // BootStrap should have loaded up projects already
         when: "The default index action is requested"
@@ -76,7 +75,6 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         data[0].id > data[1].id
     }
 
-    // @IgnoreRest
     void test_pick_list() {
         // BootStrap should have loaded up projects already
         when: "The default index action is requested"
@@ -160,7 +158,6 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         TestTools.mapContains(rget.json, updateData, excludes)
     }
 
-    // @IgnoreRest
     void test_show_get() {
         when: "When the show action is called to retrieve a resource"
         def response = restBuilder.get("$resourcePath/1")

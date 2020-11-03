@@ -159,17 +159,20 @@ class EntityMap extends AbstractMap<String, Object> {
         Object val = source[prop]
         if(val == null) return null
         def incNested = getNestedIncludes()
-        // convert Enums to string or id,name object if its IdEnum
-        if( val.class.isEnum()) {
+        EntityMapIncludes incMap = incNested[prop]
+        // if its an enum and doesnt have any include field specifed (which it normally should not)
+        if( val.class.isEnum() && !(incMap?.fields)) {
             if(val instanceof IdEnum){
+                // convert Enums to string or id,name object if its IdEnum
                 Map<String, Object> idEnumMap = [id: (val as IdEnum).id, name: (val as Enum).name()]
                 val = idEnumMap
             } else {
+                // then just get normal string name()
                 val = (val as Enum).name()
             }
         }
-        else if(incNested[prop]){
-            EntityMapIncludes incMap = incNested[prop]
+        else if(incMap){
+            //EntityMapIncludes incMap = incNested[prop]
             //its has its own includes so its either an object or an iterable
             if(val instanceof Iterable){
                 val = new EntityMapList(val as List, incMap)

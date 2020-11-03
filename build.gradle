@@ -33,13 +33,9 @@ subprojects {
 
       compile "org.grails:grails-web-boot"
 
-      // compile "org.grails:grails-plugin-url-mappings"
       compile "org.grails:grails-logging"
       compile "org.grails:grails-plugin-databinding"
       compile "org.grails:grails-plugin-services"
-      // compile "org.grails:grails-plugin-interceptors"
-
-      // compile 'org.grails.plugins:grails-java8:1.2.3'
 
       compile "org.grails.plugins:events"
 

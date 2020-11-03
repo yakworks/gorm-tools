@@ -12,7 +12,7 @@ restApi:
     entityClass: yakworks.taskify.domain.Org
     qSearch: ['num', 'name']
     includes:
-      get: ['*', 'type.*']
+      get: ['*', 'type.*', 'status.*']
       picklist: ['id', 'name']
 
   task:

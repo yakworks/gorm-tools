@@ -94,6 +94,9 @@ enum TestEnumIdent implements IdEnum<TestEnumIdent,Long> {
 
     TestEnumIdent(Long id) { this.id = id }
 
+    String getNum(){
+        "$id-${this.name()}"
+    }
 }
 
 class PropsToMapTest {

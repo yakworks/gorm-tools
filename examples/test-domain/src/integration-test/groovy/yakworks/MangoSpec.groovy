@@ -16,7 +16,6 @@ class MangoSpec extends Specification {
         Org.queryList().size() == 10
     }
 
-    // @IgnoreRest
     def "Filter by Name eq"() {
         when:
         List list = Org.query([name: "Org23"]).list()
@@ -26,7 +25,6 @@ class MangoSpec extends Specification {
         list[0].id == 23
     }
 
-    // @IgnoreRest
     def "Filter by id eq"() {
         when:
         List list = Org.query(id: 24).list()

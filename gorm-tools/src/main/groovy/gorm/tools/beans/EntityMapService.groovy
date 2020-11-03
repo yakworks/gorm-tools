@@ -103,8 +103,14 @@ class EntityMapService {
                 rootProps.add(nestedProp)
 
                 if(!nestedProps[nestedProp]) {
-                    Association pp = properties.find { it.name == nestedProp } as Association
-                    String nestedClass = pp?.getAssociatedEntity()?.name
+                    PersistentProperty pp = properties.find { it.name == nestedProp }
+                    String nestedClass
+                    // IdEnum could be nested(with dot), but it is not Association
+                    if (pp instanceof Association) {
+                        nestedClass = (pp as Association)?.getAssociatedEntity()?.name
+                    } else {
+                        nestedClass = pp?.type?.name
+                    }
                     Map<String,Object> initMap = ['className': nestedClass, 'props': [] as Set]
                     nestedProps[nestedProp] = initMap
                 }

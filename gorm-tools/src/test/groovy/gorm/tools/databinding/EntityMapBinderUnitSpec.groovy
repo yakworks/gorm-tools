@@ -135,6 +135,27 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         domain.anotherDomain == assoc
     }
 
+    void "bind association field ending in Id"() {
+        setup:
+        TestDomain domain = new TestDomain()
+        def assoc = new AnotherDomain(id: 1, name: "test").persist(flush: true)
+        def assoc2 = new AnotherDomain(id: 2, name: "test2").persist(flush: true)
+
+        Map params = ["anotherDomainId": 1]
+
+        when: 'assigns a new id'
+        binder.bind(domain, ["anotherDomainId": 1])
+
+        then:
+        domain.anotherDomain == assoc
+
+        when: 'assigns a different id'
+        binder.bind(domain, ["anotherDomainId": 2])
+
+        then:
+        domain.anotherDomain == assoc2
+    }
+
     void "test bind boolean"() {
         TestDomain testDomain = new TestDomain()
         Map params = [active: "true"]

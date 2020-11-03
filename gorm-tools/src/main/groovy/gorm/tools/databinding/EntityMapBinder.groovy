@@ -196,10 +196,14 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      * @param listener DataBindingListener
      * @param errors
      */
-    void setProp(Object target, DataBindingSource source, PersistentProperty prop, DataBindingListener listener =
-            null, Object errors = null) {
-        if (!source.containsProperty(prop.name)) return
-        Object propValue = source.getPropertyValue(prop.name)
+    void setProp(Object target, DataBindingSource source, PersistentProperty prop,
+                 DataBindingListener listener = null, Object errors = null) {
+
+        String propName = getPropertyNameToUse(source, prop)
+        if (!propName) return
+
+        Object propValue = source.getPropertyValue(propName)
+
         Object valueToAssign = propValue
         Class typeToConvertTo = prop.getType() as Class
 
@@ -242,6 +246,8 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             target[prop.name] = getEnumWithGet(typeToConvertTo, idVal as Number)
         }
         else {
+            //its a something other than string, or enum and its not an association.
+            // First see if there is a value converter
             ValueConverter converter
             if (conversionHelpers.containsKey(typeToConvertTo)) {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
@@ -261,6 +267,19 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     def getEnumWithGet(Class<?> enumClass, Number id){
         //See the repoEvents code, we can use ReflectionUtils and cache the the get method, then use CompileStatic
         return enumClass.get(id)
+    }
+
+    /**
+     * checks is DataBindingSource containsProperty
+     * and if PersistentProperty instanceof Association appends Id to see if it exists and uses that
+     * @return
+     */
+    String getPropertyNameToUse(DataBindingSource source, PersistentProperty prop) {
+        boolean hasIt = source.containsProperty(prop.name)
+        if (!hasIt && prop instanceof Association && source.containsProperty("${prop.name}Id")) {
+            return "${prop.name}Id"
+        }
+        return hasIt ? prop.name : null
     }
 
     /**
@@ -285,26 +304,29 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             target[aprop] = value
             return
         }
+        // if its a number then its the identifier so set it
+        if (value instanceof Number) {
+            bindNewAssociationIfNeeded(target, aprop, value)
+            return
+        }
 
-        //if value has idVal then it should be set to existing instance and everything else will be ignored
         Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
         idValue = idValue == 'null' ? null : idValue
 
         if (idValue) {
             // check if the target[aprop].id is the same and we don't need to do anything or
             // the target's property is null and we should bind it
-            if (!target[aprop] || (target[aprop] && (target[aprop]['id'] != idValue))) {
-                //we are setting it to a new id so load it and assign
-                target[aprop] = getPersistentInstance(getDomainClassType(target, association.name), idValue)
-            }
+            bindNewAssociationIfNeeded(target, aprop, idValue as Serializable)
 
             //bind if not null, map has values other then id, and the association is owning side or bindable
-            if(target[aprop] && (value instanceof Map) && value.size() > 1 && shouldBindAssociation(target, association)) {
+            if(target[aprop] && value instanceof Map && value.size() > 1 && shouldBindAssociation(target, association)) {
                 fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
             }
 
+        }
+        //else no id the setup new association use the value's map
+        else if (shouldBindAssociation(target, association)) {
 
-        } else if (shouldBindAssociation(target, association)) {
             if (!(value instanceof Map)) {
                 String msg = "Unable to create an association instance for the entity=${target}, the value=$value is not a Map"
                 throw new IllegalArgumentException(msg)
@@ -313,6 +335,17 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             if (target[aprop] == null) target[aprop] = association.type.newInstance()
             //recursive call to set the association up and assume its a map
             fastBind(target[aprop], new SimpleMapDataBindingSource((Map) value))
+        }
+    }
+
+    /**
+     * if target prop is null or id is different then load and assign it
+     */
+    void bindNewAssociationIfNeeded(Object target, String assocName, Serializable ident){
+        def assocProp = target[assocName]
+        if (!assocProp || (assocProp && (target["${assocName}Id"] != ident))) {
+            //we are setting it to a new id so load it and assign
+            target[assocName] = getPersistentInstance(getDomainClassType(target, assocName), ident)
         }
     }
 

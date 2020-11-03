@@ -3,8 +3,8 @@
 apply plugin: "yakworks.grails-plugin"
 
 dependencies {
-  compile 'commons-codec:commons-codec:1.5'
-  compile 'org.grails.plugins:converters:4.0.1'
+  compile "commons-codec:commons-codec:$vCommonsCodec"
+  compile "org.grails.plugins:converters:$vConverters"
   compile "org.grails:grails-plugin-rest"
   compile "org.grails:grails-plugin-url-mappings"
   compile "org.grails:grails-plugin-interceptors"

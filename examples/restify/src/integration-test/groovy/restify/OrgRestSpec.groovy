@@ -24,7 +24,6 @@ class OrgRestSpec extends GebSpec implements RestApiTestTrait {
     //
     // Map invalidData = ["name": null]
 
-    @IgnoreRest
     void "test get"() {
         when:
         String resPath = getResourcePath()

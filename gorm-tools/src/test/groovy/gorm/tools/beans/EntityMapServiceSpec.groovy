@@ -6,6 +6,7 @@ package gorm.tools.beans
 
 import gorm.tools.beans.domain.*
 import gorm.tools.testing.unit.GormToolsTest
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import testing.Location
 import testing.Nested
@@ -121,15 +122,22 @@ class EntityMapServiceSpec extends Specification implements GormToolsTest {
     }
 
     void "test buildMapFromPaths Enum"() {
-        when:
+        setup:
         EnumThing et = new EnumThing(
             testEnum: TestEnum.FOO,
             enumIdent: TestEnumIdent.Num2
         )
-        def res = entityMapService.createEntityMap(et, ['testEnum', 'enumIdent'] )
 
-        then:
-        res == [testEnum:'FOO', enumIdent:[id:2, name:'Num2']]
+        expect:
+        exp == entityMapService.createEntityMap(et, path)
+
+        where:
+
+        path                                | exp
+        ['enumIdent.*']                     | [enumIdent:[id:2, name:'Num2']]
+        ['enumIdent.id', 'enumIdent.num']   | [enumIdent:[id:2, num:'2-Num2']]
+        ['testEnum', 'enumIdent']           | [testEnum:'FOO', enumIdent:[id:2, name:'Num2']]
+
     }
 
     void "test createEntityBeanMap with EnumThing list"() {

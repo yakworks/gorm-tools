@@ -7,9 +7,9 @@ buildscript {
   }
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-    classpath "org.grails.plugins:hibernate5:7.0.4"
+    classpath "org.grails.plugins:hibernate5:$vGormHibernate"
     //classpath "org.grails.plugins:views-gradle:2.0.2"
-    classpath "org.yakworks:gradle-plugins:2.0.2"
+    classpath "org.yakworks:gradle-plugins:$vShipyak"
   }
 }
 
@@ -44,12 +44,12 @@ subprojects {
       compile "org.grails.plugins:events"
 
       compile "org.grails.plugins:hibernate5"
-      compile "org.hibernate:hibernate-core:$versionHibernate"
-      compile "org.hibernate:hibernate-ehcache:$versionHibernate"
+      compile "org.hibernate:hibernate-core:$vHibernate"
+      compile "org.hibernate:hibernate-ehcache:$vHibernate"
 
       compile "org.grails.plugins:cache:$vGrailsCache"
-      compile "org.codehaus.gpars:gpars:1.2.1"
-      compile "org.apache.commons:commons-lang3:3.11"
+      compile "org.codehaus.gpars:gpars:$vGpars"
+      compile "org.apache.commons:commons-lang3:$vCommonsLang3"
       compile 'org.codehaus.groovy:groovy-dateutil'
 
       runtime "com.h2database:h2"

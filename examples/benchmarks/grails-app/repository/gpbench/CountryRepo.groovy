@@ -7,7 +7,6 @@ import gorm.tools.repository.events.RepoListener
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 
-@Transactional
 @CompileStatic
 class CountryRepo implements GormRepo<Country> {
 

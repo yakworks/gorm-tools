@@ -4,9 +4,8 @@ import gpbench.basic.CityBasicRepo
 import gpbench.basic.CityBasic
 import gpbench.benchmarks.legacy.BaseBenchmark
 import groovyx.gpars.GParsPool
-import org.springframework.transaction.annotation.Transactional
+import grails.gorm.transactions.Transactional
 
-@Transactional
 class UpdateBenchmark extends BaseBenchmark {
 
     CityBasicRepo cityRepo
@@ -47,7 +46,7 @@ class UpdateBenchmark extends BaseBenchmark {
             ids.eachParallel { Long id -> update(id) }
         }
     }
-
+    @Transactional
     void update(Long id) {
         CityBasic.withNewSession {
             cityRepo.update([flush: true], [id: id, name: "cityId=${id}"])

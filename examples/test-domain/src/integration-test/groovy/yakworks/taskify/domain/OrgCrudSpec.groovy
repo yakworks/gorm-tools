@@ -29,15 +29,34 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
 
     }
 
-
     def "test Org create fail"(){
+        when:
+        Map invalidData2 = [num:'foo1', name: "foo", type: [id: 1], link: ["name": "", num:'foo2', type: [id: 1]]]
+        def org = new Org()
+
+        org.bind(invalidData2)
+        org.validate()
+        //Org.create(invalidData2)
+
+        then:
+        //def ex = thrown(EntityValidationException)
+        org.errors.errorCount == 3
+        org.errors['kind']
+        org.errors['link.kind']
+        org.errors['link.name']
+    }
+
+    def "test Org create validation fail"(){
         when:
         Map invalidData2 = [num:'foo1', name: "foo", type: [id: 1], link: ["name": "", num:'foo2', type: [id: 1]]]
         Org.create(invalidData2)
 
         then:
         def ex = thrown(EntityValidationException)
-        ex.errors.getErrorCount() == 2
+        //its only 2 on this one as kind is set during create
+        ex.errors.errorCount == 2
+        ex.errors['link.kind']
+        ex.errors['link.name']
     }
 
     def "test NameNum constraints got added"(){

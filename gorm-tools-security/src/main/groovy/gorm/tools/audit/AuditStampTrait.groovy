@@ -10,7 +10,6 @@ import javax.persistence.Transient
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.api.EntityMethodEvents
 import gorm.tools.security.SecUtils
 
 /**
@@ -19,21 +18,12 @@ import gorm.tools.security.SecUtils
  */
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait AuditStampTrait implements EntityMethodEvents{
+trait AuditStampTrait {
     LocalDateTime createdDate
     LocalDateTime editedDate
 
     Long createdBy
     Long editedBy
-
-    // abstract private static GormRepo getRepo()
-
-    // private static AuditStampSupport _auditStampSupport
-    //
-    // transient static AuditStampSupport getAuditStampSupport() {
-    //     if(!_auditStampSupport) _auditStampSupport = AppCtx.get('auditStampSupport', AuditStampSupport)
-    //     return (AuditStampSupport)_auditStampSupport
-    // }
 
     @Transient
     String getEditedByName() {
@@ -44,10 +34,6 @@ trait AuditStampTrait implements EntityMethodEvents{
     String getCreatedByName() {
         SecUtils.getUsername(getCreatedBy())
     }
-
-    // void beforeValidate() {
-    //     getRepo().publishBeforeValidate(this)
-    // }
 
     @CompileDynamic
     static AuditStampTraitConstraints(Object delegate) {

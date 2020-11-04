@@ -305,6 +305,11 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         getDatastore().currentSession.clear()
     }
 
+    void flushAndClear() {
+        flush()
+        clear()
+    }
+
     /**
      * modification of gorm's default to make it more like the @Transactional annotation which uses CustomizableRollbackTransactionAttribute
      * Specifically for wrapping something that will return the domain entity for this (such as a get, create or update)
@@ -352,7 +357,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
             for (Object item : list) {
                 closure(item)
             }
-            flushAndClear(status)
+            flushAndClear()
         }
     }
 

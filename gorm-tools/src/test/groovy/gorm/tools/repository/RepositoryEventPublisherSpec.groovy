@@ -12,6 +12,7 @@ import static gorm.tools.testing.TestDataJson.buildCreate
 import gorm.tools.testing.unit.DataRepoTest
 import grails.events.annotation.Subscriber
 import grails.persistence.Entity
+import org.springframework.context.event.EventListener
 import spock.lang.Specification
 
 class RepositoryEventPublisherSpec extends Specification implements DataRepoTest {
@@ -123,7 +124,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city2.events.afterPersist
     }
 
-    void "test events are not raised if using default save()"() {
+    void "test events are not raised if using default .save"() {
         setup:
         City city = new City(name: "test")
 
@@ -268,25 +269,25 @@ class CityRepo implements GormRepo<City> {
         city.event = "afterRemove"
     }
 
-    @Subscriber("City.beforeBind")
+    @EventListener
     void beforeBindSub(BeforeBindEvent e){
         City city = (City) e.entity
         city.events.beforeBind = true
     }
 
-    @Subscriber("City.afterBind")
+    @EventListener
     void afterBindSub(AfterBindEvent e){
         City city = (City) e.entity
         city.events.afterBind = true
     }
 
-    @Subscriber("City.beforePersist")
+    @EventListener
     void beforePersistSub(BeforePersistEvent e){
         City city = (City) e.entity
         city.events.beforePersist = true
     }
 
-    @Subscriber("City.afterPersist")
+    @EventListener
     void afterPersistSub(AfterPersistEvent e){
         City city = (City) e.entity
         city.name2 = "name2"
@@ -295,13 +296,13 @@ class CityRepo implements GormRepo<City> {
         city.save()
     }
 
-    @Subscriber("City.beforeRemove")
+    @EventListener
     void beforeRemoveSub(BeforeRemoveEvent e){
         City city = (City) e.entity
         city.events.beforeRemove = true
     }
 
-    @Subscriber("City.afterRemove")
+    @EventListener
     void afterRemoveSub(AfterRemoveEvent e){
         City city = (City) e.entity
         city.events.afterRemove = true

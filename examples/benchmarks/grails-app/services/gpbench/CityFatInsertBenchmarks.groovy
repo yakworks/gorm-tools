@@ -48,7 +48,7 @@ class CityFatInsertBenchmarks extends BenchProcessData {
             //the fastest one is one without associations and everything is compile static
             doSettersStatic(CityFatNoTraitsNoAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNoAssoc')
             doSettersStatic(CityFatNoTraitsIdAssoc, 'CompileStatic explicit setters, CityFatNoTraitsIdAssoc')
-            doSettersStatic(CityFatNoTraitsNullAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNullAssoc')
+            // doSettersStatic(CityFatNoTraitsNullAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNullAssoc')
             doSettersStatic(CityFatNoTraits, 'CompileStatic explicit setters, CityFatNoTraits')
             doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
             doSettersStatic(CityFatNativeIdGen, 'CompileStatic explicit setters, CityFatNativeIdGen')
@@ -64,12 +64,11 @@ class CityFatInsertBenchmarks extends BenchProcessData {
         ["save async", "create", "validate", "save batch", "save async"].each{ action ->
             createAction = action
             println "-- createAction: $createAction --"
-            doGormToolsRepoPersist(CityFatNoTraitsNoAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNoAssoc')
-            doGormToolsRepoPersist(CityFatNoTraitsNullAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsNullAssoc')
-            doGormToolsRepoPersist(CityFatNoTraitsIdAssoc, 'gorm-tools: fast binder & persist, CityFatNoTraitsIdAssoc')
-            doGormToolsRepoPersist(CityFat, 'gorm-tools: fast binder & persist, CityFat')
-            doGormToolsRepoPersist(CityFatNoTraits, 'gorm-tools: fast binder & persist, CityFatNoTraits')
-            doGormToolsRepo(CityFat, 'gorm-tools: repo batch methods, CityFat')
+            doGormToolsRepo(CityFatNoTraitsNoAssoc, 'gorm-tools: repo and binder, CityFatNoTraitsNoAssoc')
+            doGormToolsRepo(CityFatNoTraitsIdAssoc, 'gorm-tools: repo and binder, CityFatNoTraitsIdAssoc')
+            // doGormToolsRepo(CityFatNoTraitsNullAssoc, 'gorm-tools: repo and binder, CityFatNoTraitsNullAssoc')
+            doGormToolsRepo(CityFatNoTraits, 'gorm-tools: repo and binder, CityFatNoTraits')
+            doGormToolsRepo(CityFat, 'gorm-tools: repo and binder, CityFat')
             //grailsDataBinderNoTraits(CityFatNoTraits)
             warmup = false
             println "\n" + statsToMarkdownTable()

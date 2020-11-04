@@ -2,7 +2,7 @@ import grails.util.GrailsNameUtils
 import groovy.io.FileType
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
 
-GrailsDomainBinder.FOREIGN_KEY_SUFFIX = 'Id'
+// GrailsDomainBinder.FOREIGN_KEY_SUFFIX = 'Id'
 
 // Place your Spring DSL code here
 beans = {

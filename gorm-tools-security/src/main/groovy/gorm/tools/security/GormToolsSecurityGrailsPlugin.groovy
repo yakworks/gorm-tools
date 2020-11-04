@@ -45,7 +45,7 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
 
         //dont register beans if audit trail is disabled.
         if (config.getProperty('gorm.tools.audit.enabled', Boolean, true)) {
-            //auditStampEventListener(AuditStampEventListener)
+            // auditStampEventListener(AuditStampEventListener)
             auditStampBeforeValidateListener(AuditStampBeforeValidateListener)
             auditStampPersistenceEventListener(AuditStampPersistenceEventListener)
             auditStampSupport(AuditStampSupport)

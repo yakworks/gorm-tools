@@ -4,12 +4,11 @@ import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.legacy.BaseBenchmark
 import groovyx.gpars.GParsPool
 import gpbench.basic.CityBasic
-import org.springframework.transaction.annotation.Transactional
+import grails.gorm.transactions.Transactional
 
 /**
  * Runs batch 'reads' in parallel.
  */
-@Transactional
 class ReadBenchmark extends BaseBenchmark {
 
     CityBasicRepo cityRepo
@@ -63,6 +62,7 @@ class ReadBenchmark extends BaseBenchmark {
         }
     }
 
+    @Transactional
     void read() {
         CityBasic currentRecord
 

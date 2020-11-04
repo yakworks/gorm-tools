@@ -18,7 +18,7 @@ import org.springframework.core.ResolvableType
 
 /**
  * An event listener that adds support for auto-timestamping with userId for edits and updates
- * concepts taken from the AutoTimeStampingListener in gorm
+ * concepts taken from the AutoTimeStampingListener in gorm. FIXME problem is on
  */
 @CompileStatic
 class AuditStampPersistenceEventListener implements GenericApplicationListener {
@@ -29,7 +29,9 @@ class AuditStampPersistenceEventListener implements GenericApplicationListener {
     @Override
     boolean supportsEventType(ResolvableType resolvableType) {
         Class<?> eventType = resolvableType.getRawClass()
-        return PreInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType) || ValidationEvent.isAssignableFrom(eventType)
+        return PreInsertEvent.isAssignableFrom(eventType) || PreUpdateEvent.isAssignableFrom(eventType)
+            //TODO see note above,
+            // || ValidationEvent.isAssignableFrom(eventType)
     }
 
     @Override
@@ -39,7 +41,8 @@ class AuditStampPersistenceEventListener implements GenericApplicationListener {
     void onApplicationEvent(final ApplicationEvent event) {
         if(event instanceof AbstractPersistenceEvent && event.entity) {
 
-            if (event.eventType == EventType.PreInsert || event.eventType == EventType.Validation) {
+            //if (event.eventType == EventType.PreInsert || event.eventType == EventType.Validation) {
+            if (event.eventType == EventType.PreInsert) {
                 if(isAuditStamped(event.entity.name)){
                     auditStampSupport.stampIfNew(event.entityObject)
                 }

@@ -90,7 +90,7 @@ class Org implements NameNumTrait {
         type nullable: false
         location nullable: true
         ext  nullable: true
-        link bindable: true
+        link nullable: true, bindable: true
     }
 
 

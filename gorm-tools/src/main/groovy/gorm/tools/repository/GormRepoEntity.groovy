@@ -92,8 +92,8 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
     }
 
     // this will fire and event and call beforeValidate on the repo.
-    // when child associations are being validated in by grail's gorm it doesn't seem to fire and event
-    // se we fire our own here.
+    // when cascading to child associations while validated in grail's gorm it doesn't fire a ValidationEvent
+    // so we fire our own here. FIXME see line 231 in PersistentEntityValidator where it should fire event and issue PR
     void beforeValidate() {
         getRepo().publishBeforeValidate(this)
     }

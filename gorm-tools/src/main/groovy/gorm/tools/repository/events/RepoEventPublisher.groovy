@@ -75,7 +75,7 @@ class RepoEventPublisher {
         invokeEventMethod(repo, event.eventKey, methodArgs)
         if (!repo.enableEvents) return
         applicationEventPublisher.publishEvent(event)
-        eventBus.notify(event.routingKey, event)
+        //eventBus.notify(event.routingKey, event)
     }
 
 //    void invokeListenerMethod(Object repo, RepositoryEvent event) {

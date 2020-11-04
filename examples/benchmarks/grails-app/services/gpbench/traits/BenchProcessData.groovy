@@ -42,7 +42,6 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
         processData( domainClass, data(), binderType, benchKey)
     }
 
-    @CompileStatic
     void processData(Class domainClass, List<Map> dataMap, String binderType, String benchKey) {
         this.binderType = binderType
         this.benchKey = benchKey
@@ -109,7 +108,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
         } else if(binderType.startsWith('gorm-tools')) {
             //println "row"
             //println row
-            repository.bind([:], instance, row, BindAction.Create)
+            repository.bind(instance, row, BindAction.Create)
             // println "instance.latitude ${instance["latitude"]}"
             //entityMapBinder.bind(instance, row)
         } else if(binderType == 'settersStatic') {

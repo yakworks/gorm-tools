@@ -1,135 +1,135 @@
 ---
 grails:
-    profile: web
-    codegen:
-        defaultPackage: gpbench
-    spring:
-        transactionManagement:
-            proxies: false
-    databinding:
-        dateFormats: ["yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd'] #, 'yyyy-MM-dd', 'yyyy-MM-dd HH:mm:ss.S',"yyyy-MM-dd'T'HH:mm:ss'Z'","yyyy-MM-dd HH:mm:ss.S z","yyyy-MM-dd'T'HH:mm:ss.SSSX
+  profile: web
+  codegen:
+    defaultPackage: gpbench
+  spring:
+    transactionManagement:
+      proxies: false
+  databinding:
+    dateFormats: [ "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", 'yyyy-MM-dd' ] #, 'yyyy-MM-dd', 'yyyy-MM-dd HH:mm:ss.S',"yyyy-MM-dd'T'HH:mm:ss'Z'","yyyy-MM-dd HH:mm:ss.S z","yyyy-MM-dd'T'HH:mm:ss.SSSX
 info:
-    app:
-        name: '@info.app.name@'
-        version: '@info.app.version@'
-        grailsVersion: '@info.app.grailsVersion@'
+  app:
+    name: '@info.app.name@'
+    version: '@info.app.version@'
+    grailsVersion: '@info.app.grailsVersion@'
 spring:
-    main:
-        banner-mode: "off"
-    groovy:
-        template:
-            check-template-location: false
+  main:
+    banner-mode: "off"
+  groovy:
+    template:
+      check-template-location: false
 
 # Spring Actuator Endpoints are Disabled by Default
 endpoints:
-    enabled: false
-    jmx:
-        enabled: true
+  enabled: false
+  jmx:
+    enabled: true
 
 ---
 grails:
-    mime:
-        disable:
-            accept:
-                header:
-                    userAgents:
-                        - Gecko
-                        - WebKit
-                        - Presto
-                        - Trident
-        types:
-            all: '*/*'
-            atom: application/atom+xml
-            css: text/css
-            csv: text/csv
-            form: application/x-www-form-urlencoded
-            html:
-              - text/html
-              - application/xhtml+xml
-            js: text/javascript
-            json:
-              - application/json
-              - text/json
-            multipartForm: multipart/form-data
-            pdf: application/pdf
-            rss: application/rss+xml
-            text: text/plain
-            hal:
-              - application/hal+json
-              - application/hal+xml
-            xml:
-              - text/xml
-              - application/xml
-    urlmapping:
-        cache:
-            maxsize: 1000
-    controllers:
-        defaultScope: singleton
-    converters:
-        encoding: UTF-8
-    views:
-        default:
-            codec: html
-        gsp:
-            encoding: UTF-8
-            htmlcodec: xml
-            codecs:
-                expression: html
-                scriptlets: html
-                taglib: none
-                staticparts: none
+  mime:
+    disable:
+      accept:
+        header:
+          userAgents:
+            - Gecko
+            - WebKit
+            - Presto
+            - Trident
+    types:
+      all: '*/*'
+      atom: application/atom+xml
+      css: text/css
+      csv: text/csv
+      form: application/x-www-form-urlencoded
+      html:
+        - text/html
+        - application/xhtml+xml
+      js: text/javascript
+      json:
+        - application/json
+        - text/json
+      multipartForm: multipart/form-data
+      pdf: application/pdf
+      rss: application/rss+xml
+      text: text/plain
+      hal:
+        - application/hal+json
+        - application/hal+xml
+      xml:
+        - text/xml
+        - application/xml
+  urlmapping:
+    cache:
+      maxsize: 1000
+  controllers:
+    defaultScope: singleton
+  converters:
+    encoding: UTF-8
+  views:
+    default:
+      codec: html
+    gsp:
+      encoding: UTF-8
+      htmlcodec: xml
+      codecs:
+        expression: html
+        scriptlets: html
+        taglib: none
+        staticparts: none
 endpoints:
-    jmx:
-        unique-names: true
+  jmx:
+    unique-names: true
 
 ---
 hibernate:
-#    flush:
-#        mode: AUTO
-    generate_statistics: true
-    naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
-    cache:
-        queries: false
-        use_query_cache: false
-        provider_class: net.sf.ehcache.hibernate.EhCacheProvider
-        region:
-            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
-    jdbc:
-        # batch_size: 100 # this is set in application.groovy using system prop
-        order_inserts: true
-        order_updates: true
-        batch_versioned_data: true
+  #    flush:
+  #        mode: AUTO
+  generate_statistics: true
+  naming_strategy: org.hibernate.cfg.DefaultNamingStrategy
+  cache:
+    queries: false
+    use_query_cache: false
+    provider_class: net.sf.ehcache.hibernate.EhCacheProvider
+    region:
+      factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+  jdbc:
+    # batch_size: 100 # this is set in application.groovy using system prop
+    order_inserts: true
+    order_updates: true
+    batch_versioned_data: true
 
 dataSource:
-    type: com.zaxxer.hikari.HikariDataSource
-    pooled: true
-    jmxExport: false
-    driverClassName: org.h2.Driver
-    username: sa
-    password: ''
+  type: com.zaxxer.hikari.HikariDataSource
+  pooled: true
+  jmxExport: false
+  driverClassName: org.h2.Driver
+  username: sa
+  password: ''
 
 environments:
-    development:
-        dataSource:
-            dbCreate: create-drop
-            url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;DATABASE_TO_UPPER=FALSE
-            # url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-    test:
-        dataSource:
-            dbCreate: update
-            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-    production:
-        dataSource:
-            # dbCreate: none
-            dbCreate: create-drop
-            url: jdbc:h2:mem:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;DATABASE_TO_UPPER=FALSE
-            # url: jdbc:h2:./prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
-            properties:
-                jmxEnabled: true
-                connectionTimeout: 10000 # Default: 30000 (30 seconds)
-                maxLifetime: 900000 # Default: 1800000 (30 minutes) should match DB's connection time limit
-                # connectionTestQuery: SELECT 1 # If your driver supports JDBC4 we strongly recommend not setting this property.
-                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+  development:
+    dataSource:
+      dbCreate: create-drop
+      url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;DATABASE_TO_UPPER=FALSE
+      # url: jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+  test:
+    dataSource:
+      dbCreate: update
+      url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+  production:
+    dataSource:
+      # dbCreate: none
+      dbCreate: create-drop
+      url: jdbc:h2:mem:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;DATABASE_TO_UPPER=FALSE
+      # url: jdbc:h2:./prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE
+      properties:
+        jmxEnabled: true
+        connectionTimeout: 10000 # Default: 30000 (30 seconds)
+        maxLifetime: 900000 # Default: 1800000 (30 minutes) should match DB's connection time limit
+        # connectionTestQuery: SELECT 1 # If your driver supports JDBC4 we strongly recommend not setting this property.
+        defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
 
 # Config for MySQL
 

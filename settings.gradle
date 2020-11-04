@@ -9,10 +9,8 @@ include 'gorm-tools-rest'
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/test-domain"
 include 'examples/restify'
-// include 'examples/benchmarks'
-//
-// // findProject(':examples/restify-domains').name = 'restify-domains'
+include 'examples/benchmarks'
+
 findProject(':examples/test-domain').name = 'test-domain'
 findProject(':examples/restify').name = 'restify'
-
-// findProject(':examples/benchmarks').name = 'benchmarks'
+findProject(':examples/benchmarks').name = 'benchmarks'

@@ -4,6 +4,7 @@
 */
 package gorm.tools.mango
 
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +15,8 @@ import gorm.tools.mango.api.MangoQuery
 import grails.converters.JSON
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
+
+import static gorm.tools.mango.MangoOps.CRITERIA
 
 /**
  * Default implementation of MangoQuery. Setup as spring bean that is used by all the repos
@@ -103,41 +106,53 @@ class DefaultMangoQuery implements MangoQuery {
      * returns a Map with a criteria key and a pager key containing maps for those.
      */
     Map<String, Map> parseParams(Map<String, ?> params){
-        def result = [criteria: [:], pager: [:]] as Map<String, Map>
-        Map paramCopy = [:]
-        paramCopy.putAll(params)
+        Map pager = [:]
+        //def result = [criteria: [:], pager: [:]] as Map<String, Map>
 
-        if(params[criteriaKeyName] && params[criteriaKeyName] != 'null') {
-            if (params[criteriaKeyName] instanceof String) {
-                JSON.use('deep')
-                result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
-            } else {
-                result['criteria'] = params[criteriaKeyName] as Map
-            }
-            paramCopy.remove(criteriaKeyName)
-            result['pager'] = paramCopy
+        Map criteria = [:]
+        criteria.putAll(params)
+        //pull out the max, page and offset and assume the rest is criteria
+        Map pagerMap = [:]
+        ['max', 'offset', 'page'].each{ String k ->
+            if(criteria.containsKey(k)) pagerMap[k] = criteria.remove(k)
         }
-        else {
-            //doesn't have a criteria. pull out the max, page and offset and assume the rest is
+        if(pagerMap) pager = pagerMap
 
-            Map pager = [:]
-            ['max', 'offset', 'page'].each{ String k ->
-                if(paramCopy[k]) pager[k] = paramCopy.remove(k)
-            }
-            result['criteria'] = paramCopy
-            result['pager'] = pager
-        }
-        //clean up sort if passed the jqgrid way
-        if (paramCopy['sort']) {
-            Object sort = paramCopy.remove('sort')
-            if(paramCopy['order']) {
+        //pull out the sort if its there
+        //clean up sort
+        def sort
+        if (criteria['sort']) {
+            sort = criteria.remove('sort')
+            if(criteria['order']) {
                 Map newSort = [:]
-                newSort[sort] = paramCopy.remove('order')
+                newSort[sort] = criteria.remove('order')
                 sort = newSort
             }
-            // if sort is populated
-            if(sort) result['criteria']['$sort'] = sort
         }
-        return result
+
+        // check for q param or citeria, if it has it then it overrides whats in the map
+        def qCriteria = criteria.q ? criteria.remove('q') : criteria.remove(CRITERIA)
+        String qString
+
+        if(qCriteria) {
+            if (qCriteria instanceof String) {
+                qString = qCriteria as String
+                if (qString.trim().startsWith('{')) {
+                    criteria = new JsonSlurper().parseText(qString) as Map
+                    // JSON.use('deep')
+                    // result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
+                }
+                else if(params.containsKey('qSearchFields')) { //if it has a qsFields then set up the map
+                    Map qMap = ['text': qString, 'fields': criteria.remove('qSearchFields')]
+                    criteria['$q'] = qMap
+                }
+            } else {
+                criteria = qCriteria as Map
+            }
+        }
+        // if sort is populated
+        if(sort) criteria['$sort'] = sort
+
+        return [criteria: criteria, pager: pager]
     }
 }

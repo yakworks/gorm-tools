@@ -187,18 +187,17 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     List query(Pager pager, Map p = [:]) {
-        ['max', 'offset', 'page'].each{ String k ->
-            p[k] = pager[k]
+        //copy the params into new map
+        def qryParams = p.findAll {
+            //not if its in the the pager or the controller params
+            !(it.key in ['max', 'offset', 'page', 'controller', 'action'])
         }
-
-        //def qSearch = p.remove('q')
+        qryParams.pager = pager
+        //setup quick search
         List qsFields = getSearchFields()
-        if(p.q && qsFields) {
-            Map qMap = ['text': p.q, 'fields': qsFields]
-            p['$q'] = qMap
-        }
+        if(qsFields) qryParams.qSearchFields = qsFields
 
-        getMangoApi().queryList(p)
+        getMangoApi().queryList(qryParams)
     }
 
     void respondWithEntityMap(EntityMap entityMap, Map args = [:]){

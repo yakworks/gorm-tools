@@ -25,7 +25,7 @@ class Pager {
     /**
      * Max rows to show
      */
-    Integer max = 10
+    Integer max = 20
 
     /**
      * the max rows the user can set it to
@@ -67,18 +67,18 @@ class Pager {
     }
 
     /**
-     * Computes max value, if max not specified, then 10
+     * Computes max value, if max not specified, then 20
      * Default max allowed value is 100
      *
      * @param p map of params that may contain max value
      * @param defaultMax default max value if max in params isnt set
      * @return max value for pagination
      */
-    static Integer max(Map p, Integer defaultMax = 100) {
-        Integer defmin = p.max ? toInteger(p.max) : 10
-        p.max = Math.min(defmin, defaultMax)
-        return p.max as Integer
-    }
+    // static Integer max(Map p, Integer defaultMax = 100) {
+    //     Integer defmin = p.max ? toInteger(p.max) : 20
+    //     p.max = Math.min(defmin, defaultMax)
+    //     return p.max as Integer
+    // }
 
     /**
      * Computes page number, if not passed then 1
@@ -98,7 +98,7 @@ class Pager {
      */
     void setParams(Map params) {
         page = params.page = params.page ? toInteger(params.page) : 1
-        max = params.max = Math.min(params.max ? toInteger(params.max) : 10, allowedMax)
+        max = params.max = Math.min(params.max ? toInteger(params.max) : 20, allowedMax)
         this.params = params
     }
 
@@ -167,21 +167,8 @@ class Pager {
      */
     @Deprecated //use setupList
     Pager setupData(List dlist, List includes = null) {
-        setData(dlist)
-        if (dlist?.size() > 0) {
-            if (dlist.hasProperty('totalCount')) {
-                setRecordCount(dlist.getProperties().totalCount as Integer)
-            } else {
-                log.warn("Cannot get totalCount for ${dlist.class}")
-                setRecordCount(dlist.size())
-            }
-        }
-
-        if (includes) {
-            this.data = dlist.collect { obj ->
-                return BeanPathTools.buildMapFromPaths(obj, includes, true)
-            }
-        }
+        EntityMapList entityMapList = AppCtx.get('entityMapService', EntityMapService).createEntityMapList(dlist, includes)
+        setEntityMapList(entityMapList)
         return this
     }
 

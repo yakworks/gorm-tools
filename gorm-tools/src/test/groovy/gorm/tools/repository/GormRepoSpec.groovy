@@ -23,12 +23,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     List<Class> getDomainClasses() { [Org,OrgExt, TestTrxRollback] }
 
-    Closure doWithConfig() {
-        { config ->
-            config.gorm.tools.mango.criteriaKeyName = "testCriteriaName"
-        }
-    }
-
     def "assert proper repos are setup"() {
         expect:
         Org.repo instanceof DefaultGormRepo
@@ -395,15 +389,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         then:
         thrown RuntimeException
         TestTrxRollback.findByName("test_remove_withTrx") != null
-    }
-
-    @Ignore //FIXME this seems to work locally but not on circleCI
-    def "test criteria name config"() {
-        when:
-        Org org = new Org(name: "test")
-
-        then:
-        org.repo.mangoQuery.criteriaKeyName == "testCriteriaName"
     }
 
 }

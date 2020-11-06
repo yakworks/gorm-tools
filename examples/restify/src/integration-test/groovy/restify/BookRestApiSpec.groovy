@@ -44,6 +44,7 @@ class BookRestApiSpec extends GebSpec implements RestApiTestTrait {
         book['name']
     }
 
+    @IgnoreRest
     void "test qSearch"() {
         expect:
         testList('galt').data.size() == 3

@@ -1,5 +1,7 @@
 package gorm.tools.rest.client
 
+import groovy.json.JsonSlurper
+
 import grails.converters.JSON
 import grails.web.JSONBuilder
 import grails.web.http.HttpHeaders
@@ -30,6 +32,16 @@ class RestBuilderSpec extends Specification {
 
     def cleanup() {
         ConvertersConfigurationHolder.clear()
+    }
+
+    void "jsonSluper sanity check"() {
+        setup:
+        def slurper = new JsonSlurper()
+        expect:
+        'foo' == slurper.parseText('"foo"')
+        '123' == slurper.parseText('"123"')
+        ['foo'] == slurper.parseText('["foo"]')
+        [name: 'Dagny'] == slurper.parseText('{"name": "Dagny"}')
     }
 
     @Issue('https://github.com/grails/grails-data-mapping/issues/932')

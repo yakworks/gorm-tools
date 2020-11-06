@@ -18,7 +18,7 @@ import gorm.tools.utils.GormMetaUtils
 import grails.plugin.cache.Cacheable
 
 /**
- * EntityMapFactory contains a set of helpers, which will create the EntityMap and Lists
+ * EntityMapService contains a set of helpers, which will create the EntityMap and Lists
  * from Gorm Domains
  */
 @Slf4j

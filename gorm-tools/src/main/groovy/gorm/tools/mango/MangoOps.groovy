@@ -20,6 +20,7 @@ import org.apache.commons.lang3.EnumUtils
 @Slf4j
 class MangoOps {
 
+    public static final String CRITERIA = 'criteria'
     public static final String SORT = '$sort'
     public static final String Q = '$q'
     public static final String QSEARCH = '$qSearch'

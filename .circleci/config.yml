@@ -6,7 +6,7 @@ jobs:
       - image: yakworks/alpine-jdk:builder8
 
     environment:
-      GRADLE_OPTS: "-Xmx1536m -Dorg.gradle.daemon=false" #daemon false doesn't seem to get picked up by fork
+      GRADLE_OPTS: "-Xmx1536m"
       # TERM: dumb
 
     parallelism: 1
@@ -33,6 +33,17 @@ jobs:
       - run:
           name: ✔︎ -- Publish plugin if on releasable branch
           command: ./build.sh ciPublishLib
+
+      - store_test_results:
+          path: gorm-tools/build/test-results/
+      - store_test_results:
+          path: gorm-tools-rest/build/test-results/
+      - store_test_results:
+          path: gorm-tools-security/build/test-results/
+      - store_test_results:
+          path: examples/restify/build/test-results/
+      - store_test_results:
+          path: examples/test-domain/build/test-results/
 
       # saves the build for for next job
       - save_cache:

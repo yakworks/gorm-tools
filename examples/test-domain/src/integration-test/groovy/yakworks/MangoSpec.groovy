@@ -11,9 +11,9 @@ import yakworks.taskify.domain.Org
 @Rollback
 class MangoSpec extends Specification {
 
-    def "Check list"() {
+    def "sanity Check list"() {
         expect:
-        Org.queryList().size() == 10
+        Org.queryList().size() == 20
     }
 
     def "Filter by Name eq"() {
@@ -51,9 +51,19 @@ class MangoSpec extends Specification {
         list[10].name == "Org29"
     }
 
+    def "Filter by Name wildcard"() {
+        when: "eq"
+        List list = Org.queryList(name: "Org2*", max: 20)
+        then:
+        list.size() == 11
+        list[0].name == "Org2"
+        list[1].name == "Org20"
+        list[10].name == "Org29"
+    }
+
     def "Filter by nested id"() {
         when: "eq"
-        List list = Org.repo.queryList([criteria: [location: [id: 2]]])
+        List list = Org.repo.queryList(q: [location: [id: 2]])
         then:
         list.size() == 1
         list[0].name == "Org2"
@@ -62,7 +72,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested.id"() {
         when: "eq"
-        List list = Org.repo.queryList([criteria: ["location.id": 2]])
+        List list = Org.repo.queryList(q: ["location.id": 2])
         then:
         list.size() == 1
         list[0].name == "Org2"
@@ -348,7 +358,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `isNull` when val"() {
         when:
-        List list = Org.repo.queryList([criteria: [name2: '$isNull'], max: 100]).sort { it.id }
+        List list = Org.repo.queryList(q: [name2: '$isNull'], max: 100).sort { it.id }
         then:
         list.size() == 50
     }
@@ -371,7 +381,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `not in()` with ids in array"() {
         when:
-        List list = Org.repo.queryList([criteria: [id: ["\$nin": [2, 3, 4, 5]]], max: 150])
+        List list = Org.repo.queryList([criteria: [id: ['$nin': [2, 3, 4, 5]]], max: 150])
         then:
         list.size() == Org.createCriteria().list() { not { inList "id", [2L, 3L, 4L, 5L] } }.size()
     }
@@ -394,9 +404,9 @@ class MangoSpec extends Specification {
 
     def "test paging, defaults"() {
         when:
-        List list = Org.queryList([:])
+        List list = Org.queryList()
         then:
-        list.size() == 10
+        list.size() == 20
     }
 
     def "test paging"() {
@@ -419,7 +429,7 @@ class MangoSpec extends Specification {
 
     def "test closure with params"() {
         when:
-        List list = Org.repo.queryList([criteria: [id: ['$in': [24, 25, 18, 19]]], max: 150]) {
+        List list = Org.repo.queryList(id: ['$in': [24, 25, 18, 19]]) {
             gt "id", 19L
         }
 
@@ -430,7 +440,15 @@ class MangoSpec extends Specification {
 
     def "test quick search"() {
         when:
-        List list = Org.repo.queryList([criteria: ['$q': "Org2"], max: 150])
+        List list = Org.repo.queryList(criteria: ['$q': "Org2"])
+        then:
+        list.size() == 11
+
+    }
+
+    def "test quick search with q"() {
+        when:
+        List list = Org.repo.queryList(q: "Org2")
         then:
         list.size() == 11
 

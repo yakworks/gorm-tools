@@ -54,10 +54,9 @@ class DefaultMangoQuery implements MangoQuery {
      * @return query of entities restricted by mango params
      */
     public <D> List<D> queryList(Class<D> domainClass, Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        Map<String, Map> p = parseParams(params)
-        DetachedCriteria<D> dcrit = query(domainClass, p['criteria'], closure)
-        Pager pager = new Pager(p['pager'])
-        list(dcrit, pager)
+        Map<String, Object> p = parseParams(params)
+        DetachedCriteria<D> dcrit = query(domainClass, p.criteria as Map, closure)
+        list(dcrit, p.pager as Pager)
     }
 
     /**
@@ -105,18 +104,25 @@ class DefaultMangoQuery implements MangoQuery {
     /**
      * returns a Map with a criteria key and a pager key containing maps for those.
      */
-    Map<String, Map> parseParams(Map<String, ?> params){
-        Map pager = [:]
+    Map<String, Object> parseParams(Map<String, ?> params){
+        def pager
         //def result = [criteria: [:], pager: [:]] as Map<String, Map>
 
         Map criteria = [:]
-        criteria.putAll(params)
-        //pull out the max, page and offset and assume the rest is criteria
+        criteria.putAll(params) //copies params into criteria
+
+        //pull out the max, page and offset and assume the rest is criteria,
+        // these should not be here if pager is already set but do anyway to make sure they are removed
         Map pagerMap = [:]
         ['max', 'offset', 'page'].each{ String k ->
             if(criteria.containsKey(k)) pagerMap[k] = criteria.remove(k)
         }
-        if(pagerMap) pager = pagerMap
+        //see if it already has a pager
+        pager = criteria.remove('pager')
+        //if not then assign pagerMap which will either have the params or be empty
+        if(!pager) pager = pagerMap
+
+        Pager pagerObj = (pager instanceof Pager ) ? pager as Pager : new Pager(pager as Map)
 
         //pull out the sort if its there
         //clean up sort
@@ -134,25 +140,27 @@ class DefaultMangoQuery implements MangoQuery {
         def qCriteria = criteria.q ? criteria.remove('q') : criteria.remove(CRITERIA)
         String qString
 
-        if(qCriteria) {
-            if (qCriteria instanceof String) {
-                qString = qCriteria as String
-                if (qString.trim().startsWith('{')) {
-                    criteria = new JsonSlurper().parseText(qString) as Map
-                    // JSON.use('deep')
-                    // result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
-                }
-                else if(params.containsKey('qSearchFields')) { //if it has a qsFields then set up the map
-                    Map qMap = ['text': qString, 'fields': criteria.remove('qSearchFields')]
-                    criteria['$q'] = qMap
-                }
+        if(qCriteria && qCriteria instanceof String) {
+            qString = qCriteria as String
+            //if it start with { then assume its json and parse it
+            if (qString.trim().startsWith('{')) {
+                criteria = new JsonSlurper().parseText(qString) as Map
+                // JSON.use('deep')
+                // result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
+            } else if (params.containsKey('qSearchFields')) {
+                //if it has a qsFields then set up the map
+                Map qMap = ['text': qString, 'fields': criteria.remove('qSearchFields')]
+                criteria['$q'] = qMap
             } else {
-                criteria = qCriteria as Map
+                criteria['$q'] = qString
             }
+        }
+        else if(qCriteria && qCriteria instanceof Map){
+            criteria = qCriteria as Map
         }
         // if sort is populated
         if(sort) criteria['$sort'] = sort
 
-        return [criteria: criteria, pager: pager]
+        return [criteria: criteria, pager: pagerObj]
     }
 }

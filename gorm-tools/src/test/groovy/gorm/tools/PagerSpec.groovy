@@ -4,6 +4,8 @@
 */
 package gorm.tools
 
+import gorm.tools.beans.EntityMapList
+import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.testing.unit.GormToolsTest
 import grails.persistence.Entity
@@ -20,8 +22,8 @@ class PagerSpec extends Specification implements GormToolsTest {
         when:
         Pager pager = new Pager()
 
-        then:
-        pager.max == 10
+        then: 'defaults should be as follows'
+        pager.max == 20
         pager.page == 1
         pager.recordCount == 0
         pager.data == null
@@ -39,15 +41,6 @@ class PagerSpec extends Specification implements GormToolsTest {
         pager.recordCount == 0
         pager.data == null
 
-        when:
-        pager.setupData(40..50 as List)
-
-        then:
-        pager.recordCount == 11
-        pager.page == 3
-        pager.pageCount == 1
-        pager.recordCount == 11
-        pager.data == 40..50 as List
     }
 
     def "test setupData with fields"() {
@@ -58,14 +51,17 @@ class PagerSpec extends Specification implements GormToolsTest {
                 value: 5 * it
             ).save(failOnError: true)
         }
+        def entityMapService = new EntityMapService()
+        def dlist = ClassB.list(max: pager.max, offset: pager.offset)
+        EntityMapList entityMapList = entityMapService.createEntityMapList(dlist, ["*"])
+
         when:
-        pager.setupData(ClassB.list(max: pager.max, offset: pager.offset), ["*"])
+        pager.setEntityMapList(entityMapList)
 
         then:
         pager.page == 1
         pager.recordCount == 50
-        pager.pageCount == 5
-        pager.data == (0..9 as List).collect { [id: it + 1, value: 5 * (it), version: 0] }
+        pager.pageCount == 3
     }
 
     def "test eachPage"() {

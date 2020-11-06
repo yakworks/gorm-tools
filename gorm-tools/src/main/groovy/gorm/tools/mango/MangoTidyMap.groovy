@@ -105,8 +105,14 @@ class MangoTidyMap {
                     result[key]['$in'] = val
                     return
                 }
+                //be smart about wildcards
                 if (val instanceof String && val.contains("%")) {
                     result[key]['$ilike'] = val
+                    return
+                }
+
+                if (val instanceof String && val.endsWith("*")) {
+                    result[key]['$ilike'] = val.substring(0, val.length() - 1) + '%'
                     return
                 }
 

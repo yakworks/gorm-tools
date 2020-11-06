@@ -26,6 +26,8 @@ class GormToolsRestGrailsPlugin extends Plugin {
     Closure doWithSpring() {
         {->
 
+            tomcatWebServerCustomizer(RestTomcatWebServerCustomizer)
+
             restApiConfig(RestApiConfig){ bean -> bean.lazyInit = true}
 
             //controller names to be used during iterations, do it so we only itrate once

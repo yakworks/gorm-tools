@@ -29,22 +29,44 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
 
     def "parseParams"() {
         when:
-        def parsed = mangoQuery.parseParams([criteria: [id: 24], max: 10, sort:'foo', page: 2, offset: 10])
+        Map parsed = mangoQuery.parseParams([criteria: [id: 24], max: 10, sort:'foo', page: 2, offset: 10])
         then:
-        parsed['criteria'] == [id: 24, '$sort': 'foo']
-        parsed['pager'] == [max: 10, offset: 10, page: 2]
+        //parsed.criteria.id == 24
+        parsed.criteria == [id: 24, '$sort': 'foo']
+        parsed.pager.with {
+            max == 10
+            offset == 10
+            page == 2
+        }
 
-        when:
-        parsed = mangoQuery.parseParams(name: 'joe', max: 10, sort:'foo', page: 2)
+        when: 'q is used and reserved pager is passed'
+        parsed = mangoQuery.parseParams(q: [id: 24, offset: 'testing'], max: 10, sort:'foo', page: 2, offset: 10)
+
+        then: 'it should have them in criteria'
+        //parsed.criteria.id == 24
+        parsed.criteria == [id: 24, offset: 'testing', '$sort': 'foo']
+        parsed.pager.with {
+            max == 10
+            offset == 10
+            page == 2
+        }
+
+        when: 'not using q or criteria'
+        parsed = mangoQuery.parseParams(name: 'joe', max: 10, sort:'foo', page: 2, offset: 10)
+
         then:
         parsed['criteria'] == [name: 'joe', '$sort': 'foo']
-        parsed['pager'] == [max: 10, page: 2]
+        parsed.pager.with {
+            max == 10
+            offset == 10
+            page == 2
+        }
 
         when:
         parsed = mangoQuery.parseParams(name: 'joe')
         then:
         parsed['criteria'] == [name: 'joe']
-        !parsed['pager']
+        parsed.pager
     }
 
     def "sort check"() {

@@ -47,7 +47,7 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         response.status == OK.value()
         def resJson = response.json
         println "response.json ${resJson}"
-        resJson.data.size() == 10
+        resJson.data.size() == 20
         resJson.page == 1
         resJson.total >= 1
         //check that first item in data list has the fields from listIncludes
@@ -84,7 +84,7 @@ class ProjectControllerSpec extends GebSpec implements RestApiTestTrait {
         response.status == OK.value()
         def resJson = response.json
         println "response.json ${resJson}"
-        resJson.data.size() == 10
+        resJson.data.size() == 20
         resJson.page == 1
         resJson.total >= 1
         //check that first item in data list has the fields from listIncludes

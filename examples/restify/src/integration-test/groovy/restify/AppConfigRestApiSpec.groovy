@@ -18,12 +18,12 @@ class AppConfigRestApiSpec extends GebSpec implements RestApiTestTrait {
 
     void "test config values"() {
         when:
-        def response = restBuilder.get("${baseUrl}api/appConfig/project")
+        def response = restBuilder.get("${baseUrl}api/appConfig/org")
 
         then:
-        response.json.includes.list == ['id', 'num', 'name', 'billable']
-        response.json.includes.picklist == ['id', 'num', 'name']
-        response.json.includes."list[0]" == null
+        response.json.includes.get == ['*', 'type.*', 'status.*']
+        response.json.includes.picklist == ['id', 'name']
+        response.json.includes."get[0]" == null
         response.json.includes."picklist[0]" == null
     }
 

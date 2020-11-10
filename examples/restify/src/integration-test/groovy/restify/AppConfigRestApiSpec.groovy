@@ -25,6 +25,8 @@ class AppConfigRestApiSpec extends GebSpec implements RestApiTestTrait {
         response.json.includes.picklist == ['id', 'name']
         response.json.includes."get[0]" == null
         response.json.includes."picklist[0]" == null
+        response.json.form[0].selectOptions.dataApiParams.or != null
+        response.json.form[0].selectOptions.dataApiParams."or[0]" == null
     }
 
 

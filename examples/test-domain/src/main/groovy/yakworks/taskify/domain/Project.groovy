@@ -1,6 +1,7 @@
 package yakworks.taskify.domain
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
@@ -12,6 +13,7 @@ import grails.persistence.Entity
 //@RestApi(description = "This is a project ")
 @Entity
 class Project {
+    static List qSearchIncludes = ['num', 'name']
 
     static constraints = {
         num description: "The project short code or unique identifier", example: "client-123",
@@ -41,5 +43,5 @@ class Project {
     Boolean billable = true
     LocalDate startDate
     LocalDate endDate
-    Date activateDate
+    LocalDateTime activateDate
 }

@@ -4,6 +4,7 @@
 */
 package gorm.tools.mango
 
+import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
@@ -33,6 +34,8 @@ class DefaultMangoQuery implements MangoQuery {
     @Value('${gorm.tools.mango.criteriaKeyName:criteria}')
     //gets criteria keyword from config, if there is no, then uses 'criteria'
     String criteriaKeyName
+
+    JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
 
     /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
@@ -144,7 +147,7 @@ class DefaultMangoQuery implements MangoQuery {
             qString = qCriteria as String
             //if it start with { then assume its json and parse it
             if (qString.trim().startsWith('{')) {
-                criteria = new JsonSlurper().parseText(qString) as Map
+                criteria = jsonSlurper.parseText(qString) as Map
                 // JSON.use('deep')
                 // result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
             } else if (params.containsKey('qSearchFields')) {
@@ -163,4 +166,6 @@ class DefaultMangoQuery implements MangoQuery {
 
         return [criteria: criteria, pager: pagerObj]
     }
+
+
 }

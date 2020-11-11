@@ -20,7 +20,7 @@ class LocationController extends RestApiRepoController<Location> {
 
     def post() {
         Map q = getDataMap()
-        q.city = q.city == null ? null : "foo"
+        q.street = q.street == null ? null : "foo street"
         Location instance = getRepo().create(q)
         respond instance, [status: CREATED] //201
     }

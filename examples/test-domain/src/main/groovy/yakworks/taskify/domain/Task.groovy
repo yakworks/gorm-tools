@@ -19,6 +19,8 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.*
 @GrailsCompileStatic
 @Entity
 class Task {
+    static List qSearchIncludes = ['name'] // quick search includes
+
     //ordering of contraints flow through to json-schema and the fields plugin for automatic scaffolding
     //its not required to add fields to constraints, they just need to be here if a specifc order is needed
     //if they should not be shown then add with display:false

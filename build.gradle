@@ -56,16 +56,17 @@ subprojects {
       testCompile "org.mockito:mockito-core"
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"
-      // testCompile "org.grails:grails-datastore-rest-client"
-      testCompile "org.grails.plugins:geb"
       testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
       testCompile "org.grails:views-json-testing-support:$vViews"
+
       //html unit for geb rest testing
-      testCompile "org.seleniumhq.selenium:htmlunit-driver:$vHtmlunit"
-      testCompile "net.sourceforge.htmlunit:htmlunit:$vHtmlunit"
-      testCompile "org.seleniumhq.selenium:selenium-api:$vSelenium"
-      testCompile "org.seleniumhq.selenium:selenium-support:$vSelenium"
-      testCompile "org.seleniumhq.selenium:selenium-remote-driver:$vSelenium"
+      // testCompile "org.grails:grails-datastore-rest-client"
+      // testCompile "org.grails.plugins:geb"
+      // testCompile "org.seleniumhq.selenium:htmlunit-driver:$vHtmlunit"
+      // testCompile "net.sourceforge.htmlunit:htmlunit:$vHtmlunit"
+      // testCompile "org.seleniumhq.selenium:selenium-api:$vSelenium"
+      // testCompile "org.seleniumhq.selenium:selenium-support:$vSelenium"
+      // testCompile "org.seleniumhq.selenium:selenium-remote-driver:$vSelenium"
     }
 
     //testlogger {

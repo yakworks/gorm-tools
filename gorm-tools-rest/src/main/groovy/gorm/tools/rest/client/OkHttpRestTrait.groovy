@@ -70,6 +70,10 @@ trait OkHttpRestTrait {
         return getHttpClient().newCall(request).execute()
     }
 
+    Response get(String uriPath, Object id) {
+        return get("$uriPath/$id")
+    }
+
     Response get(String uriPath) {
         Request request = new Request.Builder().url(getUrl(uriPath))
             .get()

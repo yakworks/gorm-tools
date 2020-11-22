@@ -10,9 +10,11 @@ import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 
+import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.plugin.GormToolsPluginHelper
 import gorm.tools.testing.support.GormToolsSpecHelper
 import gorm.tools.testing.support.JsonViewSpecSetup
+import gorm.tools.testing.support.MockJdbcIdGenerator
 import grails.buildtestdata.TestDataBuilder
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
@@ -46,6 +48,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             persistenceInterceptor(HibernatePersistenceContextInterceptor){
                 hibernateDatastore = (HibernateDatastore)hibernateDatastore
             }
+            jdbcIdGenerator(MockJdbcIdGenerator)
+            idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
         }
 
         //finds and register repositories for all the persistentEntities that got setup

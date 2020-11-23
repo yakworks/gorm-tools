@@ -9,6 +9,8 @@ import gorm.tools.testing.unit.GormToolsTest
 import grails.artefact.Artefact
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+
+import grails.core.GrailsApplication
 import spock.lang.Ignore
 import spock.lang.Specification
 
@@ -37,6 +39,9 @@ class City {
 
 class CustomBinder extends EntityMapBinder {
 
+    CustomBinder(GrailsApplication grailsApplication) {
+        super(grailsApplication)
+    }
 }
 
 @Artefact("Repository")

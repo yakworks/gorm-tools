@@ -33,8 +33,8 @@ class RepoEventPublisher {
     @Autowired
     private GrailsApplication grailsApplication
 
-    @Autowired
-    private EventBus eventBus
+    // @Autowired
+    // private EventBus eventBus
 
     // @Autowired
     private ApplicationEventPublisher applicationEventPublisher

@@ -4,22 +4,30 @@
 */
 package gorm.tools.repository
 
+import java.beans.Introspector
+
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.gorm.GormValidateable
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
+import org.grails.datastore.mapping.validation.ValidationErrors
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
+import org.springframework.validation.FieldError
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
@@ -28,6 +36,7 @@ import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import grails.gorm.validation.ConstrainedProperty
 import grails.validation.ValidationException
 
 /**
@@ -283,6 +292,44 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     void publishBeforeValidate(Object entity) {
         getRepoEventPublisher().doBeforeValidate(this, entity, [:])
+    }
+
+    void addFieldError(GormValidateable target, String propName, String code, String defaultCode, Object args){
+        if(!args) args = [propName, getEntityClass()]
+        def newCodes = [] as Set<String>
+        def errors = target.errors as ValidationErrors
+        String classShortName = Introspector.decapitalize(getEntityClass().getSimpleName())
+        newCodes.add("${getEntityClass().getName()}.${propName}.${code}".toString())
+        newCodes.add("${classShortName}.${propName}.${code}".toString())
+        newCodes.add("${code}.${propName}".toString())
+        newCodes.add(code)
+
+        FieldError error = new FieldError(
+            errors.objectName,
+            errors.nestedPath + propName,
+            target[propName], //reject value
+            false, //bind failure
+            newCodes as String[],
+            args as Object[],
+            getDefaultMessage(defaultCode)
+        )
+        errors.addError(error)
+    }
+
+    String getDefaultMessage(String code) {
+        try {
+            if (getMessageSource() != null) {
+                return getMessageSource().getMessage(code, null, LocaleContextHolder.getLocale())
+            }
+            return ConstrainedProperty.DEFAULT_MESSAGES.get(code)
+        }
+        catch (e) {
+            return ConstrainedProperty.DEFAULT_MESSAGES.get(code)
+        }
+    }
+
+    MessageSource getMessageSource(){
+        AppCtx.getCtx()
     }
 
     @Override

@@ -9,14 +9,15 @@ import org.springframework.core.convert.support.DefaultConversionService
 import org.springframework.validation.DataBinder
 
 /**
- * Use DataBinder and RelaxedConversionService for Pogo/Pojo binding
+ * Use Springs DataBinder and the RelaxedConversionService to bind maps and PropertyValues
+ * to an object
  */
 @CompileStatic
-class ObjectBinder {
+class BasicDataBinder {
 
     ConversionService conversionService
 
-    ObjectBinder(){
+    BasicDataBinder(){
         conversionService = new RelaxedConversionService(new DefaultConversionService())
     }
 

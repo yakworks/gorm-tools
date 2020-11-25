@@ -28,11 +28,11 @@ import grails.util.Holders
 @CompileStatic
 trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
 
+    //abstract private static GormStaticApi<D> currentGormStaticApi()
+
+    private static GormRepo<D> cachedRepo
+
     Class getEntityClass(){ getClass() }
-
-    private static GormRepo cachedRepo
-
-    abstract private static GormStaticApi<D> currentGormStaticApi()
 
     /**
      * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set
@@ -43,20 +43,12 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
         return cachedRepo
     }
 
-    /**
-     * Calls the findRepo(). can be overriden to return the concrete domain Repository
-     * @return The repository
-     */
-    transient static GormRepo<D> getRepo() {
-        return findRepo()
-    }
-
-    transient static void setRepo(GormRepo<D> repo) {
-        cachedRepo = repo
-    }
+    //getting compile errors when trying to use the static getRepo in RepoGetter
+    static GormRepo<D> getRepo() { return findRepo() }
+    static void setRepo(GormRepo<D> repo) { cachedRepo = repo }
 
     D persist(Map args = [:]) {
-        getRepo().persist(args, (D) this)
+        return getRepo().persist(args, (D) this)
     }
 
     // D save(Map args = [:]) {
@@ -80,7 +72,7 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
      * @return The created instance
      */
     static D create(Map args = [:], Map data) {
-        getRepo().create(args, data)
+        return getRepo().create(args, data)
     }
 
     static D update(Map args = [:], Map data) {

@@ -84,4 +84,33 @@ class Maps {
         return newCfgMap
     }
 
+    /**
+     * Loosely test 2 maps for equality
+     * asserts more or less that every keySet in [a: 1, b: 2] exists in [a: 1, b: 2, c: 3] which is true in this example
+     * asserts more or less that subset:[a: 1, b: 2] == full:[a: 1, b: 2, c: 3]
+     * mapContains([a: 1, b: 2], [a: 1, c: 3]) returns false
+     * mapContains([a: 2, b: 2], [a: 1, b: 2]) also returns false
+     * if subset is an empty map or null returns false
+     *
+     * @param full the map to look in
+     * @param subset the subset of values to make sure are in the full
+     * @param exclude optional list of keys to exclude from the subset
+     * http://csierra.github.io/posts/2013/02/12/loosely-test-for-map-equality-using-groovy/
+     */
+    static boolean mapContains(Map full, Map subset, List<String> exclude=[]) {
+        //println "subset: $subset"
+        //println "full: $full"
+        if(!subset) return false
+        return subset.findAll{
+            !exclude.contains(it.key)
+        }.every {
+            def val = it.value
+            if(val instanceof Map){
+                return mapContains(full[it.key] as Map, val)
+            } else {
+                return val == full[it.key]
+            }
+        }
+    }
+
 }

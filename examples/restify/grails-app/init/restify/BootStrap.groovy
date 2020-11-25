@@ -42,11 +42,6 @@ class BootStrap {
                 book.persist(flush: true)
             }
 
-           // (1..100).each {
-           //     def task = new Task(name: "task-$it",
-           //         project: Project.load(rand.nextInt(49)))
-           //         .save(flush: true, failOnError: true)
-           // }
         }
 //        def data = new JsonSlurper().parse(new File("../resources/Contacts.json"))
 //        data.each{
@@ -67,7 +62,7 @@ class BootStrap {
     }
 
     static String randomID() {
-        int num = rand.nextInt(49)
+        int num = rand.nextInt(49)+1
 
     }
 

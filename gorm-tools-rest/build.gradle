@@ -10,4 +10,7 @@ dependencies {
   compile "org.grails:grails-plugin-interceptors"
 
   compile project(":gorm-tools")
+
+  //for rest train
+  compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
 }

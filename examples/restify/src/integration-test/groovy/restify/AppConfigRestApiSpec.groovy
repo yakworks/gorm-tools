@@ -1,32 +1,24 @@
 package restify
 
-import org.springframework.test.annotation.Rollback
-
-import geb.spock.GebSpec
-import gorm.tools.rest.client.RestApiTestTrait
+import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
+import okhttp3.Response
+import spock.lang.Specification
 
 // import grails.gorm.transactions.Rollback
 
-import static org.springframework.http.HttpStatus.OK
-
 @Integration
-@Rollback
-class AppConfigRestApiSpec extends GebSpec implements RestApiTestTrait {
-
-    String path = "api/appConfig"
+class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test config values"() {
         when:
-        def response = restBuilder.get("${baseUrl}api/appConfig/org")
+        Response resp = get('/api/appConfig/org')
+        Map body = bodyToMap(resp)
 
-        then:
-        response.json.includes.get == ['*', 'type.*', 'status.*']
-        response.json.includes.picklist == ['id', 'name']
-        response.json.includes."get[0]" == null
-        response.json.includes."picklist[0]" == null
-        response.json.form[0].selectOptions.dataApiParams.or != null
-        response.json.form[0].selectOptions.dataApiParams."or[0]" == null
+        then: "should have exluded the flattened spring array keys"
+        body.includes.get == ['*', 'type.*', 'status.*']
+        body.includes.picklist == ['id', 'name']
+        !body.includes.containsKey("get[0]")
     }
 
 

@@ -92,6 +92,7 @@ class RelaxedConversionService implements ConversionService {
             return new StringToEnum(enumType)
         }
 
+        @CompileStatic
         private class StringToEnum<T extends Enum> implements Converter<String, T> {
 
             private final Class<T> enumType

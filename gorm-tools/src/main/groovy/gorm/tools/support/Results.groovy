@@ -5,9 +5,12 @@
 package gorm.tools.support
 
 import groovy.transform.CompileStatic
+import groovy.transform.MapConstructor
 import groovy.transform.ToString
 
+import org.springframework.context.MessageSource
 import org.springframework.context.MessageSourceResolvable
+import org.springframework.context.i18n.LocaleContextHolder
 
 import gorm.tools.beans.AppCtx
 
@@ -19,7 +22,9 @@ import gorm.tools.beans.AppCtx
  * can catch an exception and return this to contain basic status and a message of what went wrong so
  * we can be report on it, log it, etc and move on to try the next item.
  */
+@SuppressWarnings(['ConfusingMethodName', 'MethodName'])
 @ToString(includes = ['ok', 'id', 'code', 'args', 'meta'], includeNames = true)
+//@MapConstructor(noArg=true)
 @CompileStatic
 class Results implements MsgSourceResolvableTrait{
     boolean ok = true
@@ -39,8 +44,24 @@ class Results implements MsgSourceResolvableTrait{
 
     Results(){}
 
+    Results(boolean ok, String code){
+        this.ok = ok
+        setMessage(code, null)
+    }
+
     Results(boolean ok, String code, List args){
         this.ok = ok
+        setMessage(code, args)
+    }
+
+    Results(boolean ok, String code, List args, String defaultMessage){
+        this.ok = ok
+        setMessage(code, args, defaultMessage)
+    }
+
+    Results(boolean ok, String code, List args, Exception ex){
+        this.ok = ok
+        this.ex = ex
         setMessage(code, args)
     }
 
@@ -64,7 +85,63 @@ class Results implements MsgSourceResolvableTrait{
     }
 
     static Results error(Serializable id, String code, List args = null, Exception ex = null){
-        new Results(ok:false, id: id, code: code, args: args, ex: ex)
+        new Results(false, id, code, args, ex)
+    }
+
+    static Results error(String code, List args = null, Exception ex = null){
+        new Results(false, code, args, ex)
+    }
+
+    static Results error(String code, List args, String defMessage){
+        new Results(false, code, args, defMessage)
+    }
+
+    /**
+     * creates ok false with no messages. can be used like Result.error().message('foo bar')
+     */
+    static Results error(){
+        new Results(ok: false)
+    }
+
+    static Results getError(){
+        new Results(ok: false)
+    }
+
+    static Results OK(){
+        new Results()
+    }
+
+    static Results getOK(){
+        new Results()
+    }
+
+    static Results OK(String code, List args = null, String defaultMessage = null){
+        new Results(true, code, args, defaultMessage)
+    }
+
+    /**
+     * sets the default message
+     * allows builder syntax like Results.OK().message('some foo')
+     */
+    Results message(String defaultMessage){
+        this.defaultMessage = defaultMessage
+        return this
+    }
+
+    /**
+     * builder syntax for setting id
+     */
+    Results id(Serializable id){
+        this.id = id
+        return this
+    }
+
+    /**
+     * builder syntax for setting code
+     */
+    Results code(String code){
+        setCode(code)
+        return this
     }
 
     void setupForLists(String code, List<Results> childList){
@@ -97,7 +174,7 @@ class Results implements MsgSourceResolvableTrait{
                 msr = new MessageSourceKey(ex['messageMap'] as Map)
             }
         }
-        return AppCtx.get("msgService", MsgService).getMessage(msr)
+        return AppCtx.get("messageSource", MessageSource).getMessage(msr, LocaleContextHolder.getLocale())
     }
 
 }

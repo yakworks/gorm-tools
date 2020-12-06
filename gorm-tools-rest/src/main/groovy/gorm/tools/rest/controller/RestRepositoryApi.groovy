@@ -176,6 +176,15 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
         respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
     }
 
+    @Action
+    @CompileDynamic
+    def massUpdate() {
+        Map json = request.getJSON() as Map
+        List<Map> data = json.ids.collect { [id: it] + json.data }
+        getRepo().batchUpdate(data)
+        respond([data: data])
+    }
+
     //@CompileDynamic
     Pager pagedQuery(Map params, String includesKey) {
         Pager pager = new Pager(params)

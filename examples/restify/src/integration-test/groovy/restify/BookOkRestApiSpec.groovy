@@ -160,4 +160,16 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
 
     }
 
+    void "testing massUpdate"() {
+        when:
+        Response resp = post("$path/massUpdate", [ids: [1, 2], data: [name: "mass Updated"]])
+
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body.data == [[id:1, name: 'mass Updated'], [id:2, name: 'mass Updated']]
+
+    }
+
 }

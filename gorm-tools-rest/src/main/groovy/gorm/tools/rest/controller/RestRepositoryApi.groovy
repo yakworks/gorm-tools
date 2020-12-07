@@ -177,10 +177,13 @@ trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, Serv
     }
 
     @Action
-    @CompileDynamic
     def massUpdate() {
         Map json = request.getJSON() as Map
-        List<Map> data = json.ids.collect { [id: it] + json.data }
+        List<Map> data = json.ids.collect {
+            Map result = [id: it]
+            result.putAll(json.data as Map)
+            result
+        } as List<Map>
         getRepo().batchUpdate(data)
         respond([data: data])
     }

@@ -4,12 +4,15 @@
 */
 package gorm.tools.repository
 
+import groovy.transform.CompileDynamic
+
 /**
  * Helper for compileStatic and IDE to type the getRepo
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.0.3
  */
+@CompileDynamic
 trait RepoProperty<T extends GormRepo> {
 
     static T getRepo() {

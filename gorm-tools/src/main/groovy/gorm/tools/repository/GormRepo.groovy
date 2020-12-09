@@ -142,8 +142,12 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
     @Override
     D doCreate(Map args, Map data) {
         D entity = (D) getEntityClass().newInstance()
-        bindAndSave(args, entity, data, BindAction.Create)
+        bindAndCreate(entity, data, args)
         return entity
+    }
+
+    void bindAndCreate(D entity, Map data, Map args = [:]) {
+        bindAndSave(args, entity, data, BindAction.Create)
     }
 
     /**
@@ -166,8 +170,12 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
     @Override
     D doUpdate(Map args, Map data) {
         D entity = get(data['id'] as Serializable, data['version'] as Long)
-        bindAndSave(args, entity, data, BindAction.Update)
+        bindAndUpdate(entity, data, args)
         return entity
+    }
+
+    void bindAndUpdate(D entity, Map data, Map args = [:]) {
+        bindAndSave(args, entity, data, BindAction.Update)
     }
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
@@ -246,6 +254,30 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         catch (DataAccessException ex) {
             throw handleException(ex, entity)
         }
+    }
+
+    /**
+     * creates, removes or updates the location based on params
+     * if params has an id then its considered an update
+     * if params has an id and params.op == remove then it will delete it
+     * otherwise create it
+     * XXX needs tests
+     */
+    D createOrUpdate(Map data){
+        if(!data) return
+
+        D entity
+        String op = data.op as String  //add, update, delete really only needed for delete
+        if(data.id){
+            if(op == 'remove') {
+                removeById(data.id as Long)
+            } else {
+                entity = update(data)
+            }
+        } else {
+            entity = create(data)
+        }
+        return entity
     }
 
     /**

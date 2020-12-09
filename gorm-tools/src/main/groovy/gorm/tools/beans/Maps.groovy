@@ -71,14 +71,29 @@ class Maps {
      * @returns a new copied map with the fixes
      */
     static Map removePropertyListKeys(Map<String, Object> cfgMap){
+        // for deeply nested array  like `foo: [1,2]`config can transform to [foo[0]: 1, foo[1]: 2], without `foo: [1,2]` in final result
+        // so need to find such values and transform back to array
+        List<String> array = cfgMap.keySet().findAll{ (it.matches(/.*\[\d*\]/) && !it.contains('.')) && !cfgMap.keySet().contains(it.split('\\[')[0])} as List
         def newCfgMap = cfgMap.findAll {
-            !it.key.matches(/.*\[\d*\]/)
+            !it.key.matches(/.*\[\d*\]/) && !it.key.contains('.')
         } as Map<String, Object>
-
+        if (array) {
+            array.reverse().each{
+                String key = it.split('\\[')[0]
+                if (newCfgMap[key] instanceof List) {
+                    newCfgMap[key].push(cfgMap[it])
+                } else {
+                    newCfgMap[key] = [cfgMap[it]]
+                }
+            }
+        }
         for (String key : newCfgMap.keySet()) {
             def val = newCfgMap[key]
             if(val instanceof Map){
                 newCfgMap[key] = removePropertyListKeys(val as Map)
+            }
+            if (val instanceof List) {
+                newCfgMap[key] = val.collect{it instanceof Map ? removePropertyListKeys(it) : it}
             }
         }
         return newCfgMap

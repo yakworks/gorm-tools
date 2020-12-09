@@ -277,22 +277,25 @@ class MapsSpec extends Specification {
     void "test removePropertyListKeys"(){
         when:
         def mp = [
-            foo: 'thud',
+            foobar: 'thud',
+            foo: [1, 12],
             'foo[0]': 0,
-            'foo[12]': 12,
+            'foo[1]': 12,
             baz: [
                 quux: 'corge',
                 'foo[0]': 0,
-                'foo[12]': 12,
+                'foo[1]': 12,
             ]
         ]
 
         def m1 = Maps.removePropertyListKeys(mp)
 
         def expected = [
-            foo: 'thud',
+            foobar: 'thud',
+            foo: [1, 12],
             baz: [
-                quux: 'corge'
+                quux: 'corge',
+                foo: [0, 12]
             ]
         ]
 

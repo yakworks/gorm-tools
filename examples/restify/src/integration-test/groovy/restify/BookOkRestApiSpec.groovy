@@ -168,7 +168,8 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data == [[id:1, name: 'mass Updated'], [id:2, name: 'mass Updated']]
+        body.data[0].name == 'mass Updated'
+        body.data[1].name == 'mass Updated'
 
     }
 

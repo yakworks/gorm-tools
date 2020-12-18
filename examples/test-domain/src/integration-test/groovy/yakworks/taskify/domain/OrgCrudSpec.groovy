@@ -46,7 +46,6 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
         org.errors['link.name'].code == 'nullable'
     }
 
-    //@IgnoreRest
     void "org and orgext validation success"(){
         when:
         def org = new Org(num:'foo1', name: "foo", type: OrgType.get(1), kind: Org.Kind.CLIENT)

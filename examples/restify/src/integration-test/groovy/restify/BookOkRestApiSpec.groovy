@@ -120,7 +120,6 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.name.toString().startsWith('Galt')
     }
 
-    //@IgnoreRest
     void "testing post"() {
         when:
         Response resp = post(path, [name: "foobie"])

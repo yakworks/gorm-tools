@@ -10,6 +10,7 @@ import grails.persistence.Entity
 @Entity
 @IdEqualsHashCode
 class Location {
+    // static belongsTo = [Org]
     static List qSearchIncludes = ['street', 'city']
     // address fields
     String street
@@ -21,5 +22,6 @@ class Location {
     static constraints = {
         // city nullable: false
         // address nullable: true
+        country maxSize:2
     }
 }

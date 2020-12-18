@@ -20,7 +20,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.total == 2
-        body.message == 'yakworks.taskify.domain.Org save failed'
+        body.message == 'Org validation errors'
         body.errors.find{ it.field == 'link.kind' }.message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
         body.errors.find{ it.field == 'link.name' }
     }
@@ -37,7 +37,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.total == 2
-        body.message == 'yakworks.taskify.domain.Project save failed'
+        body.message == 'Project validation errors'
         body.errors[0].message == "Property [name] of class [class yakworks.taskify.domain.Project] cannot be null"
         body.errors[0].field == "name"
         body.errors[1].message == "Property [num] of class [class yakworks.taskify.domain.Project] cannot be null"

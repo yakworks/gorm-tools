@@ -62,8 +62,8 @@ class RepoUtil {
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
             if (currentVersion > oldVersion) {
-                Map msgMap = RepoMessage.optimisticLockingFailure(entity, false)
-                throw new OptimisticLockingFailureException(msgMap.defaultMessage as String)
+                def msgKey = RepoMessage.optimisticLockingFailure(entity)
+                throw new OptimisticLockingFailureException(msgKey.defaultMessage)
             }
         }
     }

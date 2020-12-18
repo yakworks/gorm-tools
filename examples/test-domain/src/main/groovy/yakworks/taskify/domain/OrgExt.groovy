@@ -17,7 +17,7 @@ class OrgExt {
     Org orgParent
     String text1
     String text2
-
+    String textMax
 
     static mapping = {
         id column: 'id', generator: 'foreign', params: [property: 'org']
@@ -28,5 +28,6 @@ class OrgExt {
         orgParent nullable: true
         text1 nullable: true
         text2 nullable: true
+        textMax maxSize: 2
     }
 }

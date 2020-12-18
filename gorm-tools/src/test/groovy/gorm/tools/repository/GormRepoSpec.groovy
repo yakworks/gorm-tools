@@ -17,6 +17,7 @@ import grails.persistence.Entity
 
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {

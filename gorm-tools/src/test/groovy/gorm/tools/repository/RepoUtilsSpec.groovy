@@ -59,11 +59,11 @@ class RepoUtilsSpec extends Specification implements DataTest {
 
     void "test notFound"() {
         when:
-        Map r = RepoMessage.notFound("xxx.MockDomain", [id: "2"])
+        def r = RepoMessage.notFoundId(MockDomain, 2)
 
         then:
         r.code == "default.not.found.message"
-        r.args == ["MockDomain", "2"]
+        r.args == ['MockDomain', 2]
         r.defaultMessage == "MockDomain not found with id 2"
     }
 

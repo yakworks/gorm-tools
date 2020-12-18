@@ -91,7 +91,8 @@ class DomainMethodsTests extends Specification {
             jump.persist(flush: true)
             fail "it was supposed to fail the save because of OptimisticLockingFailureException"
         } catch (OptimisticLockingFailureException e) {
-            assert e.message == "Another user has updated the skydive.Jumper while you were editing"
+            //assert e.message == "Another user has updated the skydive.Jumper while you were editing"
+            assert e.message.contains('optimistic locking failed')
         }
     }
 

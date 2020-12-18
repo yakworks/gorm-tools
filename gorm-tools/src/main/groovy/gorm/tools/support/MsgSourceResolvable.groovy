@@ -16,7 +16,7 @@ import org.springframework.context.MessageSourceResolvable
  * @see org.springframework.context.MessageSource#getMessage(MessageSourceResolvable, java.util.Locale)
  */
 @CompileStatic
-trait MsgSourceResolvableTrait implements MessageSourceResolvable{
+trait MsgSourceResolvable implements MessageSourceResolvable{
 
     List<String> msgCodes
     List args
@@ -45,8 +45,7 @@ trait MsgSourceResolvableTrait implements MessageSourceResolvable{
     }
 
     /**
-     * Return the default code of this resolvable, that is,
-     * the last one in the codes array.
+     * Return the default code of this resolvable, that is, the last one in the codes array.
      */
     String getCode() {
         return codes?.last()
@@ -68,5 +67,9 @@ trait MsgSourceResolvableTrait implements MessageSourceResolvable{
     @Override //MessageSourceResolvable
     Object[] getArguments() {
         return this.args as Object[]
+    }
+
+    Map getMessageMap(){
+        [code: getCode(), args: getArgs(), defaultMessage: getDefaultMessage()]
     }
 }

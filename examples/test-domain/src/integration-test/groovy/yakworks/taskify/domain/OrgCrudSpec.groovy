@@ -41,9 +41,55 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
         then:
         //def ex = thrown(EntityValidationException)
         org.errors.errorCount == 3
-        org.errors['kind']
-        org.errors['link.kind']
-        org.errors['link.name']
+        org.errors['kind'].code == 'nullable'
+        org.errors['link.kind'].code == 'nullable'
+        org.errors['link.name'].code == 'nullable'
+    }
+
+    //@IgnoreRest
+    void "org and orgext validation success"(){
+        when:
+        def org = new Org(num:'foo1', name: "foo", type: OrgType.get(1), kind: Org.Kind.CLIENT)
+        org.ext = new OrgExt(org: org, textMax: 'fo')
+        org.persist()
+
+        then:
+        org.id
+        org.ext.id
+    }
+
+    void "rejectValue only in LocationRepo beforeValidate"(){
+        when:
+        def org = new Org(num:'foo1', name: "foo", type: OrgType.get(1), kind: Org.Kind.CLIENT)
+        org.location = new Location(city: "LocationRepoVille")
+        org.persist(flush: true)
+        //flushAndClear()
+
+        then:
+        def ex = thrown(EntityValidationException)
+        ex.errors.errorCount == 1
+        org.location.errors['city'].code == 'from.LocationRepo'
+        //TODO need somethign to make this work
+        // org.errors.errorCount == 1
+    }
+
+    void "org and orgext rejectValue in beforeValidate"(){
+        when:
+        def org = new Org(num:'foo1', name: "foo", type: OrgType.get(1), kind: Org.Kind.CLIENT)
+        org.location = new Location(city: "LocationRepoVille", country: 'USA', street: 'OrgRepoStreet')
+        org.ext = new OrgExt(org: org, textMax: 'foo') //foo is 3 chars and should fail validation
+        org.persist()
+        //flushAndClear()
+
+        then:
+        def ex = thrown(EntityValidationException)
+        //normal validation errors
+        org.errors['ext.textMax'].code == 'maxSize.exceeded'
+        org.errors['location.country'].code == 'maxSize.exceeded'
+        //since its in orgRepo beforeValidate it shows up as nested
+        org.errors['location.street'].code == 'from.OrgRepo'
+        //error is on the association for rejects in beforeValidation
+        org.location.errors['city'].code == 'from.LocationRepo'
     }
 
     def "test Org create validation fail"(){
@@ -53,10 +99,10 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
 
         then:
         def ex = thrown(EntityValidationException)
-        //its only 2 on this one as kind is set during create
+        //its only 2 on this one as a default kind is set in the repo during create
         ex.errors.errorCount == 2
         ex.errors['link.kind']
-        ex.errors['link.name']
+        ex.errors['link.name'].code == 'nullable'
     }
 
     def "test NameNum constraints got added"(){

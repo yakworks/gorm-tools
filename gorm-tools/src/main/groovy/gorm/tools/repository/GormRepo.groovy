@@ -13,10 +13,10 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.GormValidateable
+import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
-import org.grails.datastore.mapping.validation.ValidationErrors
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.MessageSource
@@ -25,6 +25,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
+import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.FieldError
 
 import gorm.tools.beans.AppCtx
@@ -326,10 +327,16 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         getRepoEventPublisher().doBeforeValidate(this, entity, [:])
     }
 
-    void addFieldError(GormValidateable target, String propName, String code, String defaultCode, Object args){
-        if(!args) args = [propName, getEntityClass()]
+    //copied in from AbstractConstraint to keep it consistent
+    void rejectValue(GormValidateable target, String propName, Object val, String code, String defaultMessageCode = null, Object argsOverride = null) {
+        rejectValueWithMessage(target, propName, val, code, getDefaultMessage(defaultMessageCode), argsOverride)
+    }
+
+    //copied in from AbstractConstraint to keep it consistent
+    void rejectValueWithMessage(GormValidateable target, String propName, Object val, String code, String defaultMessage = null, Object argsOverride = null){
+        if(argsOverride == null) argsOverride = [propName, getEntityClass(), val]
         def newCodes = [] as Set<String>
-        def errors = target.errors as ValidationErrors
+        def errors = target.errors as BeanPropertyBindingResult
         String classShortName = Introspector.decapitalize(getEntityClass().getSimpleName())
         newCodes.add("${getEntityClass().getName()}.${propName}.${code}".toString())
         newCodes.add("${classShortName}.${propName}.${code}".toString())
@@ -339,11 +346,11 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         FieldError error = new FieldError(
             errors.objectName,
             errors.nestedPath + propName,
-            target[propName], //reject value
+            val, //reject value
             false, //bind failure
             newCodes as String[],
-            args as Object[],
-            getDefaultMessage(defaultCode)
+            argsOverride as Object[],
+            defaultMessage
         )
         errors.addError(error)
     }
@@ -470,5 +477,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     GormStaticApi<D> gormStaticApi() {
         (GormStaticApi<D>)GormEnhancer.findStaticApi(getEntityClass())
+    }
+
+    GormValidationApi gormValidationApi() {
+        GormEnhancer.findValidationApi(getEntityClass())
     }
 }

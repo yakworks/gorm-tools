@@ -6,13 +6,7 @@ package gorm.tools.support
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.validation.ValidationException
 import org.springframework.core.NestedRuntimeException
-import org.springframework.validation.Errors
-
-import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.support.MsgKey
-import gorm.tools.support.MsgSourceResolvable
 
 /**
  * A general RuntimeException that uses Message Source Keys to indicate the error

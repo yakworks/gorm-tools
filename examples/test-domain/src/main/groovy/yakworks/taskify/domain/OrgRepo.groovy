@@ -15,6 +15,13 @@ class OrgRepo implements GormRepo<Org> {
     @RepoListener
     void beforeValidate(Org o) {
         o.beforeValidateCheck = "got it"
+        //test rejectValue
+        if(o.location?.street == 'OrgRepoStreet'){
+            rejectValue(o, 'location.street', o.location.street, 'from.OrgRepo')
+        }
+        if(o.name == 'foos'){
+            rejectValue(o, 'name', o.name, 'no.foos')
+        }
     }
 
     @RepoListener

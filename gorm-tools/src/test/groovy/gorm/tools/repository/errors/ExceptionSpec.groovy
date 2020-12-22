@@ -15,7 +15,7 @@ class ExceptionSpec extends Specification {
             RepoUtil.checkFound(null, 1, "Bla")
         then:
             def e = thrown(EntityNotFoundException)
-            e.message == "Bla not found with id 1"
+            e.message == "Bla not found for id:1"
 
     }
 

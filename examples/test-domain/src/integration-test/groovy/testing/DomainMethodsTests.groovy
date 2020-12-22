@@ -91,7 +91,8 @@ class DomainMethodsTests extends Specification {
             jump.persist(flush: true)
             fail "it was supposed to fail the save because of OptimisticLockingFailureException"
         } catch (OptimisticLockingFailureException e) {
-            assert e.message == "Another user has updated the skydive.Jumper while you were editing"
+            //assert e.message == "Another user has updated the skydive.Jumper while you were editing"
+            assert e.message.contains('optimistic locking failed')
         }
     }
 
@@ -161,7 +162,7 @@ class DomainMethodsTests extends Specification {
         }catch(e){
             assert e != null
             assert e instanceof EntityNotFoundException
-            assert e.message.startsWith("skydive.Student not found with id ")
+            assert e.message.startsWith("skydive.Student not found for id:")
         }
     }
 

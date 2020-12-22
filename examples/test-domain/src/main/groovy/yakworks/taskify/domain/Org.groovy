@@ -62,7 +62,8 @@ class Org implements NameNumTrait {
 
     static mapping = {
         //id generator:'assigned'
-        ext column: 'extId'
+        ext column: 'extId' //, cascade: 'none'
+        location column: 'locationId'
         status enumType: 'identity'
     }
 

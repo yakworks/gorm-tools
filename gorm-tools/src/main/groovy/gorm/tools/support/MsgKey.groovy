@@ -11,26 +11,27 @@ import groovy.transform.ToString
 import org.springframework.context.MessageSourceResolvable
 
 /**
- * Gorm Tools default implementation of the MsgSourceResolvableTrait and thus the {@link MessageSourceResolvable} interface.
- * similiar to {@link org.springframework.context.support.DefaultMessageSourceResolvable}
+ * A concrete implementation of the MsgSourceResolvableTrait
+ * and thus the {@link MessageSourceResolvable} interface.
+ * similiar to {@link org.springframework.context.support.DefaultMessageSourceResolvable} but groovified
  * @see org.springframework.context.MessageSource#getMessage(MessageSourceResolvable, java.util.Locale)
  */
 @SuppressWarnings("serial")
 @CompileStatic
 @EqualsAndHashCode
 @ToString(includes = ['msgCodes', 'args', 'defaultMessage'], includeNames = true)
-class MessageSourceKey implements MsgSourceResolvableTrait, Serializable {
+class MsgKey implements MsgSourceResolvable, Serializable {
 
     /**
      * Create a new empty MessageSourceKey.
      */
-    MessageSourceKey() {}
+    MsgKey() {}
 
     /**
      * Create a new MessageSourceKey.
      * @param code the code to be used to resolve this message
      */
-    MessageSourceKey(String code) {
+    MsgKey(String code) {
         this([code], null, null)
     }
 
@@ -38,26 +39,30 @@ class MessageSourceKey implements MsgSourceResolvableTrait, Serializable {
      * Create a new MessageSourceKey.
      * @param codes the codes to be used to resolve this message
      */
-    MessageSourceKey(List<String> codes) {
+    MsgKey(List<String> codes) {
         this(codes, null, null)
     }
 
-    MessageSourceKey(String code, String defaultMessage) {
+    MsgKey(String code, String defaultMessage) {
         this([code], null, defaultMessage)
     }
 
-    MessageSourceKey(String code, List arguments, String defaultMessage) {
+    MsgKey(String code, List arguments) {
+        this([code], arguments, null)
+    }
+
+    MsgKey(String code, List arguments, String defaultMessage) {
         this([code], arguments, defaultMessage)
     }
 
-    MessageSourceKey(Map msgMap) {
+    MsgKey(Map msgMap) {
         this([msgMap.code as String], msgMap.args as List, msgMap.defaultMessage as String)
     }
     /**
      * Copy constructor: Create a new instance from another resolvable.
      * @param resolvable the resolvable to copy from
      */
-    MessageSourceKey(MessageSourceResolvable resolvable) {
+    MsgKey(MessageSourceResolvable resolvable) {
         this(resolvable.codes.toList(), resolvable.arguments.toList(), resolvable.defaultMessage)
     }
 
@@ -67,7 +72,7 @@ class MessageSourceKey implements MsgSourceResolvableTrait, Serializable {
      * @param arguments the array of arguments to be used to resolve this message
      * @param defaultMessage the default message to be used to resolve this message
      */
-    MessageSourceKey(List<String> codes, List arguments, String defaultMessage) {
+    MsgKey(List<String> codes, List arguments, String defaultMessage) {
         this.msgCodes = codes
         this.args = arguments
         this.defaultMessage = defaultMessage

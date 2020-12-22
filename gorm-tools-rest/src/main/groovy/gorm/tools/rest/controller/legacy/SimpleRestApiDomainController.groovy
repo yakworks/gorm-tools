@@ -160,4 +160,7 @@ class SimpleRestApiDomainController<T, ID extends Serializable> implements CoreC
         render status: NO_CONTENT
     }
 
+    String getClassMessageArg() {
+        message(code: "${resourceName}.label".toString(), default: resourceClassName)
+    }
 }

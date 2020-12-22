@@ -4,13 +4,10 @@
 */
 package gorm.tools.repository.errors
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataAccessException
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.validation.Errors
 
 import gorm.tools.repository.RepoMessage
 
@@ -32,7 +29,6 @@ class RepoExceptionSupport {
      * @return the new EntityValidationException or the OptimisticLockingFailureException with a betters message if thats was what
      *         was thrown originally
      */
-    @CompileDynamic
     RuntimeException translateException(RuntimeException ex, Object entity) {
         /*
          * We need to check for EntityValidationException first and return it back without changes,
@@ -43,20 +39,25 @@ class RepoExceptionSupport {
          */
         if (ex instanceof EntityValidationException) {
             return ex
-        } else if (ex instanceof grails.validation.ValidationException) {
-            grails.validation.ValidationException ve = (grails.validation.ValidationException) ex
-            return new EntityValidationException(RepoMessage.notSaved(entity, true), entity, ve.errors, ve)
-        } else if (ex instanceof DataIntegrityViolationException) {
-            //see http://www.baeldung.com/spring-dataIntegrityviolationexception
-            String ident = RepoMessage.badge(entity.ident(), entity)
-            //log.error("repository delete error on ${entity.id} of ${entity.class.name}",dae)
-            Errors errors = ex.hasProperty('errors') ? ex.errors : new EmptyErrors("empty")
-            return new EntityValidationException(RepoMessage.notSaved(entity), entity, errors, ex)
-        } else if (ex instanceof OptimisticLockingFailureException) {
-            return new OptimisticLockingFailureException(RepoMessage.optimisticLockingFailure(entity, true).defaultMessage as String)
-        } else if (ex instanceof DataAccessException) {
-            return new EntityValidationException(RepoMessage.notSavedDataAccess(entity, true), entity, ex)
         }
-        throw ex
+        else if (ex instanceof grails.validation.ValidationException) {
+            def ve = (grails.validation.ValidationException) ex
+            return new EntityValidationException(RepoMessage.validationError(entity), entity, ve.errors, ve)
+        }
+        else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
+            // Gorm's stock ValidationException
+            def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
+            return new EntityValidationException(RepoMessage.validationError(entity), entity, ve.errors, ve)
+        }
+        else if (ex instanceof OptimisticLockingFailureException) {
+            return ex //just return unchanged
+            // return new OptimisticLockingFailureException(RepoMessage.optimisticLockingFailure(entity, true).defaultMessage as String)
+        }
+        else if (ex instanceof DataAccessException) {
+            // Root of the hierarchy of data access exceptions
+            return new EntityValidationException(RepoMessage.notSaved(entity), entity, null, ex)
+        }
+        return ex
     }
+
 }

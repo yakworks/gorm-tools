@@ -17,6 +17,7 @@ import grails.persistence.Entity
 
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
@@ -84,7 +85,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     }
 
-    //@Ignore('needs to be looked at now with gorm 6.1.12')
     def "test dirty checking works for traits"() {
         when:
         Org org = build(Org)//new Org(name: "get_test_version").save()

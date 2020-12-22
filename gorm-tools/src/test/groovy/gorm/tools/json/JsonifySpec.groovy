@@ -121,7 +121,6 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
 
     }
 
-    // @IgnoreRest
     void "transients should be rendered"() {
         when:
         def jdom = TestData.build(JsonifyDom, includes: ['ext'])
@@ -137,7 +136,6 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
 
     }
 
-    //@IgnoreRest
     void "test BeanPathTools.buildMapFromPaths should be rendered"() {
         when:
         def jdom = TestData.build(JsonifyDom, includes: ['ext'])
@@ -170,7 +168,6 @@ class JsonifySpec extends Specification implements DomainRepoTest<Org> {
         res.jsonText == '{"id":1,"name":"name","type":{"id":1}}'
     }
 
-    // @IgnoreRest
     void "test list"() {
         when:
         def org = build()

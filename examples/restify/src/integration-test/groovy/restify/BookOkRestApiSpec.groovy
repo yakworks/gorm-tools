@@ -120,7 +120,6 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.name.toString().startsWith('Galt')
     }
 
-    //@IgnoreRest
     void "testing post"() {
         when:
         Response resp = post(path, [name: "foobie"])
@@ -143,7 +142,7 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.total == 1
-        body.message == 'restify.Book save failed'
+        body.message == 'Book validation errors'
         body.errors.find{ it.field == 'name' }.message == 'Property [name] of class [class restify.Book] cannot be null'
     }
 

@@ -162,7 +162,7 @@ class DomainMethodsTests extends Specification {
         }catch(e){
             assert e != null
             assert e instanceof EntityNotFoundException
-            assert e.message.startsWith("skydive.Student not found with id ")
+            assert e.message.startsWith("skydive.Student not found for id:")
         }
     }
 

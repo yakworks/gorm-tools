@@ -14,24 +14,24 @@ class EntityValidationExceptionSpec extends Specification {
         def e = new EntityValidationException("fubar", new EmptyErrors("blah"))
 
         then:
-        "validationException" == e.messageMap.code
-        def args = []
-        args == e.messageMap.args
-        "fubar" == e.messageMap.defaultMessage
+        //"validation.error" == e.code
+        !e.args
+        "fubar" == e.defaultMessage
+        e.message.contains('fubar')
     }
 
     void testNoErrors() {
         setup:
         Map entity = [someEntity: "go cubs"]
-        def msg = new MsgKey('vtest', 'defmsg')
+        def msgKey = new MsgKey('vtest', 'defmsg')
 
         when:
-        def e = new EntityValidationException(msg, entity)
+        def e = new EntityValidationException(msgKey, entity)
 
         then:
-        "vtest" == e.messageKey.code
-        !e.messageKey.args
-        "defmsg" == e.messageKey.defaultMessage
+        "vtest" == e.code
+        !e.args
+        "defmsg" == e.defaultMessage
         entity == e.entity
     }
 

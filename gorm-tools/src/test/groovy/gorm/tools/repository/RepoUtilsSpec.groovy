@@ -46,7 +46,8 @@ class RepoUtilsSpec extends Specification implements DataTest {
 
         then:
         EntityNotFoundException e = thrown(EntityNotFoundException)
-        e.message == 'xxx not found with id 99'
+        e.code == 'default.not.found.message'
+        e.message == 'xxx not found for id:99'
     }
 
     void "test propName"() {
@@ -64,7 +65,7 @@ class RepoUtilsSpec extends Specification implements DataTest {
         then:
         r.code == "default.not.found.message"
         r.args == ['MockDomain', 2]
-        r.defaultMessage == "MockDomain not found with id 2"
+        r.defaultMessage == "MockDomain not found for id:2"
     }
 
     void "test defaultLocale"() {

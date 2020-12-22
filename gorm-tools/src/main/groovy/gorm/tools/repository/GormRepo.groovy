@@ -294,7 +294,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
     @Override
     D get(Serializable id, Long version) {
         D entity = get(id)
-        RepoUtil.checkFound(entity, [id: id], getEntityClass().name)
+        RepoUtil.checkFound(entity, id, getEntityClass().name)
         if (version != null) RepoUtil.checkVersion(entity, version)
         return entity
     }

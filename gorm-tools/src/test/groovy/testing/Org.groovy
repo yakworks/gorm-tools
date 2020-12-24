@@ -6,7 +6,7 @@ package testing
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import groovy.transform.CompileDynamic

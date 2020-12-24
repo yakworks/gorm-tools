@@ -4,18 +4,14 @@
 */
 package gorm.tools.rest.controller
 
-import javax.annotation.Resource
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.MessageSource
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
@@ -28,7 +24,6 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
-import grails.converters.JSON
 import grails.databinding.SimpleMapDataBindingSource
 import grails.util.GrailsNameUtils
 import grails.validation.ValidationException

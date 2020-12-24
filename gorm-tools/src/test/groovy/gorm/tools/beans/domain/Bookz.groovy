@@ -6,7 +6,7 @@ package gorm.tools.beans.domain
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
 import grails.persistence.Entity
 
 

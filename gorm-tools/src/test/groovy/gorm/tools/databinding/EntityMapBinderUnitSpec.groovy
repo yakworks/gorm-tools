@@ -8,14 +8,13 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.beans.IsoDateUtil
 import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
 import grails.databinding.converters.ValueConverter
 import grails.persistence.Entity
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import java.time.LocalDate

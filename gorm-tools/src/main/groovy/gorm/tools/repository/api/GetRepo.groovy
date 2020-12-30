@@ -2,9 +2,11 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository
+package gorm.tools.repository.api
 
 import groovy.transform.CompileDynamic
+
+import gorm.tools.repository.GormRepo
 
 /**
  * Helper for compileStatic and IDE to type the getRepo
@@ -13,7 +15,7 @@ import groovy.transform.CompileDynamic
  * @since 7.0.3
  */
 @CompileDynamic
-trait RepoProperty<T extends GormRepo> {
+trait GetRepo<T extends GormRepo> {
 
     static T getRepo() {
         return findRepo() as T

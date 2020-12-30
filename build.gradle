@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
-    //classpath "org.grails.plugins:views-gradle:2.0.2"
+    // classpath "org.grails.plugins:views-gradle:2.0.2"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
   }
 }
@@ -39,7 +39,11 @@ subprojects {
 
       compile "org.grails.plugins:events"
 
-      compile "org.grails.plugins:hibernate5"
+      // compile "org.grails:grails-datastore-gorm:7.0.8.RELEASE"
+      compile ("org.grails.plugins:hibernate5")
+      //   {
+      //   exclude group: 'org.grails', module: 'grails-datastore-gorm'
+      // }
       compile "org.hibernate:hibernate-core:$vHibernate"
       compile "org.hibernate:hibernate-ehcache:$vHibernate"
 
@@ -96,7 +100,7 @@ subprojects {
     }
   }
 
-  //sets the path to sys properties so we can use it find grails-app/conf during AST
+  // sets the path to sys properties so we can use it find grails-app/conf during AST
   plugins.withId('groovy') {
     compileGroovy {
       groovyOptions.fork = true

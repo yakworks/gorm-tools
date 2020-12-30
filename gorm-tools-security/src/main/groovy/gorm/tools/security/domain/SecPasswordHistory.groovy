@@ -6,10 +6,11 @@ package gorm.tools.security.domain
 
 import java.time.LocalDateTime
 
+import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity
+@Entity @RepoEntity
 @GrailsCompileStatic
 class SecPasswordHistory {
     static belongsTo = [user: AppUser]

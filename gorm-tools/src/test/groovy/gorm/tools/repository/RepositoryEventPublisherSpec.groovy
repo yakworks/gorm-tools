@@ -4,13 +4,12 @@
 */
 package gorm.tools.repository
 
-
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.RepoEntity
 import gorm.tools.repository.events.*
 import gorm.tools.testing.TestDataJson
 import static gorm.tools.testing.TestDataJson.buildCreate
 import gorm.tools.testing.unit.DataRepoTest
-import grails.events.annotation.Subscriber
 import grails.persistence.Entity
 import org.springframework.context.event.EventListener
 import spock.lang.Specification
@@ -207,7 +206,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 }
 
 
-@Entity
+@Entity @RepoEntity
 class City {
     String name
     String name2

@@ -3,6 +3,7 @@ package yakworks.taskify.domain
 import java.time.LocalDate
 import javax.persistence.Transient
 
+import gorm.tools.repository.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -17,7 +18,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.*
  */
 @IdEqualsHashCode
 @GrailsCompileStatic
-@Entity
+@Entity @RepoEntity
 class Task {
     static List qSearchIncludes = ['name'] // quick search includes
 

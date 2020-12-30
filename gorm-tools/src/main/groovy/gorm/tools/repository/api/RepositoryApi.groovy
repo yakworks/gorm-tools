@@ -36,7 +36,7 @@ interface RepositoryApi<D> {
     /**
      * Transactional wrap for {@link #doPersist} with arguments to pass to save
      */
-    D persist(Map args, D entity)
+    D persist(D entity, Map args)
 
     /**
      * Transactional wrap for {@link #doPersist}
@@ -51,13 +51,13 @@ interface RepositoryApi<D> {
      * @param args the arguments to pass to save
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D doPersist(Map args, D entity)
+    D doPersist(D entity, Map args)
 
     /**
      * Transactional wrap for {@link #doCreate}
      */
     D create(Map data)
-    D create(Map args, Map data)
+    D create(Map data, Map args)
 
     /**
      * Creates entity using the data from params. calls the {@link #bind} with BindAction.Create
@@ -66,7 +66,7 @@ interface RepositoryApi<D> {
      * @return the created domain entity
      * @see #doPersist
      */
-    D doCreate(Map args, Map data)
+    D doCreate(Map data, Map args)
 
     /**
      * Transactional wrap for {@link #doUpdate}
@@ -81,7 +81,7 @@ interface RepositoryApi<D> {
      * @return the updated domain entity
      * @see #doPersist
      */
-    D doUpdate(Map args, Map data)
+    D doUpdate(Map data, Map args)
 
     /**
      * binds by calling {@link #doBind} and fires before and after events
@@ -104,7 +104,7 @@ interface RepositoryApi<D> {
      *
      * @throws gorm.tools.repository.errors.EntityValidationException if its not found or if a DataIntegrityViolationException is thrown
      */
-    void removeById(Map args, Serializable id)
+    void removeById(Serializable id, Map args)
     void removeById(Serializable id)
 
     /**
@@ -113,9 +113,9 @@ interface RepositoryApi<D> {
      * @param entity the domain entity
      */
     void remove(D entity)
-    void remove(Map args, D entity)
+    void remove(D entity, Map args)
 
-    void doRemove(Map args, D entity)
+    void doRemove(D entity, Map args)
     void doRemove(D entity)
 
     /**

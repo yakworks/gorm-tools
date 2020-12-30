@@ -6,6 +6,7 @@ package gorm.tools.security.domain
 
 import groovy.transform.EqualsAndHashCode
 
+import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -15,7 +16,7 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
  * SecRole class for Authority.
  */
 
-@Entity
+@Entity @RepoEntity
 @EqualsAndHashCode(includes='name', useCanEqual=false)
 @GrailsCompileStatic
 class SecRole implements Serializable {

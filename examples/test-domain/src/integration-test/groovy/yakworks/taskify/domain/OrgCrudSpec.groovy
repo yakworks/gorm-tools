@@ -26,7 +26,6 @@ class OrgCrudSpec extends Specification implements DataIntegrationTest, Security
         c.createdBy == 1
         c.editedDate
         c.editedBy == 1
-
     }
 
     def "test Org create fail"(){

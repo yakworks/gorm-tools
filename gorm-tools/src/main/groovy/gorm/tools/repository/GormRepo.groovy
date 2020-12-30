@@ -85,9 +85,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     @Override
-    D persist(Map args = [:], D entity) {
+    D persist(D entity, Map args = [:]) {
         entityTrx {
-            doPersist(args, entity)
+            doPersist(entity, args)
         }
         return entity
     }
@@ -107,7 +107,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     @Override
-    D doPersist(Map args = [:], D entity) {
+    D doPersist(D entity, Map args) {
         try {
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
@@ -125,9 +125,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * Transactional wrap for {@link #doCreate}
      */
     @Override
-    D create(Map args = [:], Map data) {
+    D create(Map data, Map args = [:]) {
         entityTrx {
-            doCreate(args, data)
+            doCreate(data, args)
         }
     }
 
@@ -141,7 +141,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @see #doPersist
      */
     @Override
-    D doCreate(Map args, Map data) {
+    D doCreate(Map data, Map args) {
         D entity = (D) getEntityClass().newInstance()
         bindAndCreate(entity, data, args)
         return entity
@@ -155,9 +155,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * Transactional wrap for {@link #doUpdate}
      */
     @Override
-    D update(Map args = [:], Map data) {
+    D update(Map data, Map args = [:]) {
         entityTrx {
-            doUpdate(args, data)
+            doUpdate(data, args)
         }
     }
 
@@ -169,7 +169,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @see #doPersist
      */
     @Override
-    D doUpdate(Map args, Map data) {
+    D doUpdate(Map data, Map args) {
         D entity = get(data['id'] as Serializable, data['version'] as Long)
         bindAndUpdate(entity, data, args)
         return entity
@@ -186,7 +186,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         //set the id if it has one in data and bindId arg is passed in as true
         if(args.remove('bindId') && BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
         args['data'] = data
-        doPersist(args, entity)
+        doPersist(entity, args)
     }
 
     /**
@@ -220,7 +220,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws EntityNotFoundException if its not found or if a DataIntegrityViolationException is thrown
      */
     @Override
-    void removeById( Map args = [:], Serializable id) {
+    void removeById(Serializable id, Map args = [:]) {
         gormStaticApi().withTransaction {
             D entity = get(id, null)
             doRemove(entity)
@@ -234,9 +234,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
      */
     @Override
-    void remove(Map args = [:], D entity) {
+    void remove(D entity, Map args = [:]) {
         gormStaticApi().withTransaction {
-            doRemove(args, entity)
+            doRemove(entity, args)
         }
     }
 
@@ -246,7 +246,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @param entity - the domain instance to delete
      * @param args - args passed to delete
      */
-    void doRemove(Map args = [:], D entity) {
+    void doRemove(D entity, Map args = [:]) {
         try {
             getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
             gormInstanceApi().delete(entity, args)
@@ -449,25 +449,25 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     void batchPersist(Map args = [:], List<D> list) {
         batchTrx(list) { D item ->
-            doPersist(args, item)
+            doPersist(item, args)
         }
     }
 
     void batchCreate(Map args = [:], List<Map> list) {
         batchTrx(list) { Map item ->
-            doCreate(args, item)
+            doCreate(item, args)
         }
     }
 
     void batchUpdate(Map args = [:], List<Map> list) {
         batchTrx(list) { Map item ->
-            doUpdate(args, item)
+            doUpdate(item, args)
         }
     }
 
     void batchRemove(Map args = [:], List list) {
         batchTrx(list) { Serializable item ->
-            removeById(args, item)
+            removeById(item, args)
         }
     }
 

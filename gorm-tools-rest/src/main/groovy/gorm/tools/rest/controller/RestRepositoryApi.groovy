@@ -4,7 +4,6 @@
 */
 package gorm.tools.rest.controller
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -18,7 +17,7 @@ import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.GormRepoEntity
+import gorm.tools.repository.api.GormRepoEntity
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig

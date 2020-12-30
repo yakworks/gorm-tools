@@ -1,9 +1,10 @@
 package yakworks.taskify.domain
 
+import gorm.tools.repository.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.persistence.Entity
 
-@Entity
+@Entity @RepoEntity
 @IdEqualsHashCode
 class Customer implements Serializable {
     String name

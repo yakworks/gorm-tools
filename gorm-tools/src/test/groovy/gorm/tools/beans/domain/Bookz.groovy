@@ -7,12 +7,12 @@ package gorm.tools.beans.domain
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.IdEnum
+import gorm.tools.repository.RepoEntity
 import grails.persistence.Entity
 
 
-@Entity
+@Entity @RepoEntity
 class Bookz {
-    Long id
     String name
     BigDecimal cost
 
@@ -46,7 +46,7 @@ class Bookz {
     }
 }
 
-@Entity
+@Entity @RepoEntity
 class BookAuthor {
     BookAuthor(){
         id = 2
@@ -65,12 +65,12 @@ class SimplePogo {
 }
 
 
-@Entity
+@Entity @RepoEntity
 class BookTag {
     String name
 }
 
-@Entity
+@Entity @RepoEntity
 class EnumThing {
     TestEnum testEnum
     TestEnumIdent enumIdent

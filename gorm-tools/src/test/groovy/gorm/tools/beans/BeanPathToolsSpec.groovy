@@ -343,6 +343,7 @@ class BeanPathToolsSpec extends Specification implements GormToolsTest {
         result.'param2.param4.param5' == 'value5'
     }
 
+    @Ignore
     void "test getIncludes"(){
         expect:
         res == BeanPathTools.getIncludes("Bookz", fields)

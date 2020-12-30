@@ -7,6 +7,7 @@ package gorm.tools.databinding
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.IsoDateUtil
+import gorm.tools.repository.RepoEntity
 import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.model.IdEnum
 import grails.databinding.converters.ValueConverter
@@ -483,7 +484,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
 }
 
 
-@Entity
+@Entity @RepoEntity
 class TestDomain {
     // by default binder consider regular fields as "bindable:true",
     // so there is no need to specify constraints explicitly for that
@@ -540,12 +541,12 @@ enum TestEnumIdent implements IdEnum<TestEnumIdent,Long>{
     // }
 }
 
-@Entity
+@Entity @RepoEntity
 class AnotherDomain {
     String name
 }
 
-@Entity
+@Entity @RepoEntity
 class Nest {
     String name
     String name2
@@ -558,7 +559,7 @@ class Nest {
     }
 }
 
-@Entity
+@Entity @RepoEntity
 class BindableNested {
     String name
 }

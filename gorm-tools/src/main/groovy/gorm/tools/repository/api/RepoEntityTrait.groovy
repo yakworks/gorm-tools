@@ -2,13 +2,13 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository
+package gorm.tools.repository.api
+
+import javax.persistence.Transient
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.connections.ConnectionSource
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import org.grails.orm.hibernate.datasource.MultipleDataSourceSupport
@@ -16,39 +16,51 @@ import org.hibernate.SessionFactory
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
-import gorm.tools.mango.api.QueryMangoEntity
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
 import grails.util.Holders
 
 /**
- * Main trait for a domain. gets applied to them during startup grails artifact part
+ * core trait for repo methods to add to entity.
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileStatic
-trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
+trait RepoEntityTrait<D> {
 
-    //abstract private static GormStaticApi<D> currentGormStaticApi()
+    abstract Serializable getId()
+    abstract Serializable getVersion()
+    abstract boolean isAttached()
 
-    private static GormRepo<D> cachedRepo
-
-    Class getEntityClass(){ getClass() }
+    /**
+     * Returns if the {@code Persistable} is new or was persisted already.
+     * The default checks if version is set and if not then its new
+     *
+     * @return if {@literal true} the entity is new.
+     */
+    @Transient
+    boolean isNew(){
+        // if no id then its new, if version is null then its new but version can be null
+        // if its not flushed so check if its attached into the session
+        return getId() == null || (getVersion() == null && !isAttached())
+    }
 
     /**
      * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set
      * @return The repository
      */
     static GormRepo<D> findRepo() {
-        if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
-        return cachedRepo
+        // if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
+        // return cachedRepo
+        AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
     }
 
     //getting compile errors when trying to use the static getRepo in RepoGetter
     static GormRepo<D> getRepo() { return findRepo() }
-    static void setRepo(GormRepo<D> repo) { cachedRepo = repo }
 
     D persist(Map args = [:]) {
-        return getRepo().persist(args, (D) this)
+        return getRepo().persist((D) this, args)
     }
 
     // D save(Map args = [:]) {
@@ -60,7 +72,7 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
     // }
 
     void remove(Map args = [:]) {
-        getRepo().remove(args, (D) this)
+        getRepo().remove((D) this, args)
     }
 
     void bind(Map args = [:], Map data) {
@@ -72,15 +84,15 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
      * @return The created instance
      */
     static D create(Map args = [:], Map data) {
-        return getRepo().create(args, data)
+        return getRepo().create(data, args)
     }
 
     static D update(Map args = [:], Map data) {
-        getRepo().update(args, data)
+        getRepo().update(data, args)
     }
 
     static void removeById(Map args = [:], Serializable id) {
-        getRepo().removeById(args, id)
+        getRepo().removeById(id, args)
     }
 
     // this will fire and event and call beforeValidate on the repo.
@@ -125,9 +137,4 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
 
         return builder
     }
-
-    // static withCriteria(@DelegatesTo(Criteria) Closure callable) {
-    //     createCriteria().invokeMethod("doCall", callable)
-    // }
-
 }

@@ -1,10 +1,11 @@
 package gorm.tools.audit
 
+import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @AuditStamp
-@Entity
+@Entity @RepoEntity
 @GrailsCompileStatic
 class StampedNoConstraintsClosure {
 

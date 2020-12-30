@@ -20,11 +20,11 @@ import grails.gorm.DetachedCriteria
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-@CompileStatic
+@CompileDynamic
 trait QueryMangoEntity<D> {
 
-    @Transient
-    static List<String> qSearchIncludes = []
+    //@Transient
+    //static List<String> qSearchIncludes = []
 
     // static abstract GormRepo<D> getRepo()
 
@@ -35,7 +35,6 @@ trait QueryMangoEntity<D> {
      * @param closure optional closure
      * @return
      */
-    @CompileDynamic
     static MangoDetachedCriteria<D> query(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).query(params, closure)
     }
@@ -46,7 +45,6 @@ trait QueryMangoEntity<D> {
      * @param closure
      * @return a DetachedCriteria instance
      */
-    @CompileDynamic
     static MangoDetachedCriteria<D> query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
         ((QueryMangoEntityApi)getRepo()).query([:], closure)
     }
@@ -58,7 +56,6 @@ trait QueryMangoEntity<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    @CompileDynamic
     static List<D> queryList(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).queryList(params, closure)
     }

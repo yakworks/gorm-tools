@@ -4,25 +4,32 @@
 */
 package testing
 
+import javax.persistence.Transient
+
 import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity @RepoEntity
 @GrailsCompileStatic
-class Project {
+class CompositeNoVersion implements Serializable {
 
+    Long linkedId
     String name
-    String description
-    boolean isActive
-    Nested nested
-    Date testDate
+
+    static mapping = {
+        version false
+        id composite: ['linkedId', 'name']
+    }
 
     static constraints = {
-        name        nullable: false, example: 'project name'
-        description nullable: true,  example: 'project description'
-        nested nullable: false
-        testDate nullable: false, example: "2017-01-01"
-        isActive nullable: false, example: 'false'
+        linkedId nullable: false
+        name nullable: false
+    }
+
+    @Transient
+    @Override
+    boolean isNew(){
+        return !isAttached()
     }
 }

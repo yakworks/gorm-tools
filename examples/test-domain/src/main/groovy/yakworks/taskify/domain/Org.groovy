@@ -10,15 +10,15 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.repository.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.taskify.domain.traits.NameNumTrait
 
-
 @AuditStamp
 @IdEqualsHashCode
-@Entity
+@Entity @RepoEntity
 @GrailsCompileStatic
 class Org implements NameNumTrait {
 

@@ -4,11 +4,11 @@
 */
 package restify
 
+import gorm.tools.repository.RepoEntity
 import gorm.tools.rest.RestApi
 import grails.compiler.GrailsCompileStatic
 
-//@EqualsAndHashCode(includes='fooName') //natural key
-//@ToString(includes='fooName', includeNames=true, includePackage=false)
+@RepoEntity
 @GrailsCompileStatic
 @RestApi(description = "The user for the restify application")
 class ExampleUser {

@@ -4,10 +4,11 @@
 */
 package yakworks.taskify.domain
 
+import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity
+@Entity @RepoEntity
 @GrailsCompileStatic
 class OrgType {
     String name

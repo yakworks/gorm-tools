@@ -4,7 +4,7 @@
 */
 package gorm.tools.repository
 
-
+import gorm.tools.repository.api.IdGeneratorRepo
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.IdGenTest
 

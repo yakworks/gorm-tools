@@ -3,10 +3,12 @@ package security
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
+import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.*
 
+@RepoEntity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes = 'authority')
 @ToString(includes = 'authority', includeNames = true, includePackage = false)

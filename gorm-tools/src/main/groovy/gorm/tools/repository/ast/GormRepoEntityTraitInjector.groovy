@@ -6,16 +6,19 @@ package gorm.tools.repository.ast
 
 import groovy.transform.CompileStatic
 
+import org.codehaus.groovy.ast.ClassNode
+import org.grails.compiler.injection.GrailsASTUtils
 import org.grails.core.artefact.DomainClassArtefactHandler
 
-import gorm.tools.repository.GormRepoEntity
+import gorm.tools.repository.api.GormRepoEntity
+import grails.compiler.ast.SupportsClassNode
 import grails.compiler.traits.TraitInjector
 
 /**
  * @author Joshua Burnett (@basejump)
  */
 @CompileStatic
-class GormRepoEntityTraitInjector implements TraitInjector {
+class GormRepoEntityTraitInjector implements TraitInjector { //, SupportsClassNode {
 
     @Override
     Class getTrait() {
@@ -26,4 +29,9 @@ class GormRepoEntityTraitInjector implements TraitInjector {
     String[] getArtefactTypes() {
         [DomainClassArtefactHandler.TYPE] as String[]
     }
+
+    // @Override
+    // boolean supports(ClassNode classNode) {
+    //     return GrailsASTUtils.hasAnnotation(classNode, gorm.tools.repository.RepoEntity)
+    // }
 }

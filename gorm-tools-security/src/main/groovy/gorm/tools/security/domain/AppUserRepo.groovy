@@ -33,11 +33,11 @@ class AppUserRepo implements GormRepo<AppUser> {
      * this will already be transactional as its called from create
      */
     @Override
-    AppUser doCreate(Map args, Map data) {
+    AppUser doCreate(Map data, Map args) {
         AppUser user = new AppUser()
         String pwd = data['password']// data.remove('password')
         if(pwd) user.password = pwd
-        bindAndSave(args, user, data, BindAction.Create)
+        bindAndCreate(user, data, args)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
         return user
     }
@@ -46,8 +46,8 @@ class AppUserRepo implements GormRepo<AppUser> {
      * overrides the doUpdate method as its more clear whats going on than trying to do role logic with events
      */
     @Override
-    AppUser doUpdate(Map args, Map data) {
-        AppUser user = GormRepo.super.doUpdate(args, data)
+    AppUser doUpdate(Map data, Map args) {
+        AppUser user = GormRepo.super.doUpdate(data, args)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
         return user
     }

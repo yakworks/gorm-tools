@@ -3,8 +3,10 @@ package security
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
+import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 
+@RepoEntity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes = 'username')
 @ToString(includes = 'username', includeNames = true, includePackage = false)

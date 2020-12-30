@@ -1,12 +1,13 @@
 package yakworks.taskify.domain
 
+import gorm.tools.repository.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @IdEqualsHashCode
 @GrailsCompileStatic
-@Entity
+@Entity @RepoEntity
 class TaskFlex {
     static belongsTo = [task: Task]
 

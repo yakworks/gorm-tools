@@ -4,10 +4,9 @@
 */
 package gorm.tools.rest.controller
 
-
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.GormRepoEntity
+import gorm.tools.repository.api.GormRepoEntity
 import grails.artefact.Artefact
 import grails.core.GrailsApplication
 

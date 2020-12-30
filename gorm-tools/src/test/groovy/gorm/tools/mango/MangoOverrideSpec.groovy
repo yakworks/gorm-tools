@@ -4,15 +4,14 @@
 */
 package gorm.tools.mango
 
-import gorm.tools.mango.api.MangoQuery
-import gorm.tools.repository.DefaultGormRepo
-import gorm.tools.testing.unit.GormToolsTest
-import grails.artefact.Artefact
-import grails.gorm.DetachedCriteria
-import grails.gorm.transactions.Transactional
-import grails.persistence.Entity
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
+
+import gorm.tools.mango.api.MangoQuery
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.GormRepository
+import gorm.tools.repository.RepoEntity
+import gorm.tools.testing.unit.GormToolsTest
+import grails.persistence.Entity
 import spock.lang.Specification
 
 class MangoOverrideSpec extends Specification implements GormToolsTest {
@@ -38,7 +37,7 @@ class MangoOverrideSpec extends Specification implements GormToolsTest {
 
 }
 
-@Entity
+@Entity @RepoEntity
 class City {
     String name
 }
@@ -56,9 +55,8 @@ class NewMangoQuery implements MangoQuery {
     }
 }
 
-@Artefact("Repository")
-@Transactional
-class CityRepo extends DefaultGormRepo<City> {
+@GormRepository
+class CityRepo implements GormRepo<City> {
 
     @Autowired
     NewMangoQuery newMangoQuery

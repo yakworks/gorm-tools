@@ -70,7 +70,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         domainClassesToMock.each {
             String repoBeanName = RepoUtil.getRepoBeanName(it)
             GormRepo repo = AppCtx.get("${repoBeanName}", findRepoClass(it))
-            it.setRepo(repo)
+            // it.setRepo(repo)
         }
 
     }

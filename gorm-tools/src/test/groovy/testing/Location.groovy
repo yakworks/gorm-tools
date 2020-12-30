@@ -4,11 +4,14 @@
 */
 package testing
 
+import gorm.tools.repository.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
+import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @IdEqualsHashCode
-@Entity
+@Entity @RepoEntity
+@GrailsCompileStatic
 class Location {
     String address
     Nested nested

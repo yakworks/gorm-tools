@@ -4,12 +4,13 @@
 */
 package yakworks.taskify.domain
 
+import gorm.tools.repository.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @IdEqualsHashCode
-@Entity
+@Entity @RepoEntity
 @GrailsCompileStatic
 class OrgExt {
     static belongsTo = [org:Org]

@@ -6,11 +6,9 @@ package restify
 
 import java.time.LocalDate
 
-import gorm.tools.repository.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import yakworks.taskify.domain.traits.NameDescriptionTrait
 
-@RepoEntity
 @GrailsCompileStatic
 class Book implements NameDescriptionTrait {
 

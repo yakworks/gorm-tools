@@ -10,7 +10,7 @@ import org.codehaus.groovy.ast.ClassNode
 import org.grails.compiler.injection.GrailsASTUtils
 import org.grails.core.artefact.DomainClassArtefactHandler
 
-import gorm.tools.repository.api.GormRepoEntity
+import gorm.tools.repository.api.RepoEntity
 import grails.compiler.ast.SupportsClassNode
 import grails.compiler.traits.TraitInjector
 
@@ -18,18 +18,18 @@ import grails.compiler.traits.TraitInjector
  * @author Joshua Burnett (@basejump)
  */
 @CompileStatic
-class GormRepoEntityTraitInjector implements TraitInjector { //, SupportsClassNode {
+class RepoEntityTraitInjector { //implements TraitInjector, SupportsClassNode {
 
-    @Override
-    Class getTrait() {
-        GormRepoEntity
-    }
-
-    @Override
-    String[] getArtefactTypes() {
-        [DomainClassArtefactHandler.TYPE] as String[]
-    }
-
+    // @Override
+    // Class getTrait() {
+    //     RepoEntity
+    // }
+    //
+    // @Override
+    // String[] getArtefactTypes() {
+    //     [DomainClassArtefactHandler.TYPE] as String[]
+    // }
+    //
     // @Override
     // boolean supports(ClassNode classNode) {
     //     return GrailsASTUtils.hasAnnotation(classNode, gorm.tools.repository.RepoEntity)

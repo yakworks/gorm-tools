@@ -8,14 +8,14 @@ import groovy.transform.CompileDynamic
 
 import org.codehaus.groovy.util.HashCodeHelper
 
-import gorm.tools.repository.api.GormRepoEntity
+import gorm.tools.repository.api.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class SecRoleUser implements GormRepoEntity<SecRoleUser>, Serializable {
+class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
 
     AppUser user
     SecRole role

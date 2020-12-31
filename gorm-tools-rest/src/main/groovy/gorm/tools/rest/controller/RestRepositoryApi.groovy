@@ -17,7 +17,7 @@ import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.api.GormRepoEntity
+import gorm.tools.repository.api.RepoEntity
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
@@ -38,7 +38,7 @@ import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
-trait RestRepositoryApi<D extends GormRepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi {
+trait RestRepositoryApi<D extends RepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi {
 
     @Autowired
     RestApiConfig restApiConfig

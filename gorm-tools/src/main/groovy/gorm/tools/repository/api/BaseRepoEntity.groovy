@@ -27,24 +27,7 @@ import grails.util.Holders
  * @since 6.1
  */
 @CompileStatic
-trait RepoEntityTrait<D> {
-
-    abstract Serializable getId()
-    abstract Serializable getVersion()
-    abstract boolean isAttached()
-
-    /**
-     * Returns if the {@code Persistable} is new or was persisted already.
-     * The default checks if version is set and if not then its new
-     *
-     * @return if {@literal true} the entity is new.
-     */
-    @Transient
-    boolean isNew(){
-        // if no id then its new, if version is null then its new but version can be null
-        // if its not flushed so check if its attached into the session
-        return getId() == null || (getVersion() == null && !isAttached())
-    }
+trait BaseRepoEntity<D> {
 
     /**
      * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set

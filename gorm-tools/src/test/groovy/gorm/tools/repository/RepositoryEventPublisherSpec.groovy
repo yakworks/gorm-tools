@@ -5,7 +5,7 @@
 package gorm.tools.repository
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.api.RepoEntity
 import gorm.tools.repository.events.*
 import gorm.tools.testing.TestDataJson
 import static gorm.tools.testing.TestDataJson.buildCreate
@@ -206,8 +206,8 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 }
 
 
-@Entity @RepoEntity
-class City {
+@Entity
+class City implements RepoEntity<City>{
     String name
     String name2
     String event

@@ -1,5 +1,7 @@
 package yakworks.taskify.domain
 
+import groovy.transform.CompileStatic
+
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.events.BeforeBindEvent
@@ -18,6 +20,7 @@ class ContactRepo implements GormRepo<Contact> {
         }
     }
 
+    @CompileStatic
     @Transactional
     Contact inactivate(Long id) {
         Contact contact = Contact.get(id)

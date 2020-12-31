@@ -11,7 +11,7 @@ import org.grails.datastore.gorm.GormEntity
 import java.util.concurrent.atomic.AtomicInteger
 
 @CompileStatic
-class RepoUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpdateBenchmark<T>{
+class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
 
     RepositoryApi<T> repo
 
@@ -22,7 +22,7 @@ class RepoUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseUpd
 
     @Override
     protected execute() {
-        List<Long> all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString())
+        List all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString()) as List<Long>
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
         asyncSupport.parallelBatch(batches){Long id, Map args ->

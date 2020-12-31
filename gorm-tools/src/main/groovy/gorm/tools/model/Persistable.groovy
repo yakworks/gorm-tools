@@ -4,7 +4,11 @@
 */
 package gorm.tools.model
 
+import javax.persistence.Transient
+
 import groovy.transform.CompileStatic
+
+import org.springframework.lang.Nullable
 
 /**
  * An opinionated trait implementation of Spring Data's Persistable for Long id and version property
@@ -14,9 +18,24 @@ import groovy.transform.CompileStatic
  * @since 7.0.x
  */
 @CompileStatic
-interface Persistable<ID> extends Ident<ID> {
-    // ID getId();
-    // void setId(ID theid);
-    boolean isNew();
-    Serializable getVersion();
+trait Persistable<PK> implements IPersistable<PK>, Ident<PK> {
+    abstract boolean isAttached()
+    abstract Serializable getVersion()
+
+    @Nullable
+    abstract PK getId()
+    abstract void setId(@Nullable PK id)
+
+    /**
+     * Returns if the {@code Persistable} is new or was persisted already.
+     * The default checks if version is set and if not then its new
+     *
+     * @return if {@literal true} the entity is new.
+     */
+    @Transient
+    boolean isNew(){
+        // if no id then its new, if version is null then its new but version can be null
+        // if its not flushed so check if its attached into the session
+        return getId() == null || (getVersion() == null && !isAttached())
+    }
 }

@@ -6,7 +6,7 @@ package gorm.tools.rest.controller
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.api.GormRepoEntity
+import gorm.tools.repository.api.RepoEntity
 import grails.artefact.Artefact
 import grails.core.GrailsApplication
 
@@ -21,7 +21,7 @@ import grails.core.GrailsApplication
 // @SuppressWarnings(['CatchException', 'NoDef', 'ClosureAsLastMethodParameter', 'FactoryMethodName'])
 @Artefact("Controller")
 @CompileStatic
-class RestApiRepoController<D extends GormRepoEntity> implements RestRepositoryApi<D> {
+class RestApiRepoController<D extends RepoEntity> implements RestRepositoryApi<D> {
 
     static responseFormats = ['json']
     static namespace = 'api'

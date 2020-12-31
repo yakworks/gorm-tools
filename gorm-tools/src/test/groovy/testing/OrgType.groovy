@@ -4,13 +4,13 @@
 */
 package testing
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.api.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity @RepoEntity
+@Entity
 @GrailsCompileStatic
-class OrgType {
+class OrgType implements RepoEntity<OrgType> {
     String name
 
     static constraints = {

@@ -8,15 +8,14 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.Persistable
-import gorm.tools.repository.GormRepo
 
 /**
- * Trait where second generic is the repository spring bean and will create a typed getRepo
+ * Default trait for a domain that has a default Long id and the mango query methods.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
-trait GormRepoEntity<D, R extends GormRepo> implements BaseRepoEntity<D>, QueryMangoEntity<D>, Persistable<Long> { //PersistableTrait<Long> {
+trait RepoEntity<D> implements BaseRepoEntity<D>, QueryMangoEntity<D>, Persistable<Long> { //PersistableTrait<Long> {
 
-    static R getRepo() {
-        return findRepo() as R
-    }
 }

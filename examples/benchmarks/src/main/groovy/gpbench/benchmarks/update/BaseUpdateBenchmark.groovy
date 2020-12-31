@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom
  */
 
 @CompileStatic
-abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseBatchInsertBenchmark<T> {
+abstract class BaseUpdateBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
     EntityMapBinder entityMapBinder
     RepositoryApi<T> repo
@@ -60,7 +60,7 @@ abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
 
             if(latitude < 89.00) latitude = latitude + 1
             if(longitude < 378.00) longitude = longitude + 1
-            
+
             row.latitude = latitude.toString()
             row.longitude = longitude.toString()
             row.name = row.name + "-Updated"

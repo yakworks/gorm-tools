@@ -6,13 +6,13 @@ package testing
 
 import javax.persistence.Transient
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.api.CompositeRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity @RepoEntity
+@Entity
 @GrailsCompileStatic
-class CompositeNoVersion implements Serializable {
+class CompositeNoVersion implements CompositeRepoEntity<CompositeNoVersion>, Serializable {
 
     Long linkedId
     String name
@@ -28,7 +28,6 @@ class CompositeNoVersion implements Serializable {
     }
 
     @Transient
-    @Override
     boolean isNew(){
         return !isAttached()
     }

@@ -1,7 +1,6 @@
 package gpbench
 
 import gpbench.model.CityTrait
-import gpbench.model.CityTraitConstraints
 import grails.compiler.GrailsCompileStatic
 
 /*

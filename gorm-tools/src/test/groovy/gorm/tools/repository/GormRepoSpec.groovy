@@ -5,7 +5,7 @@
 package gorm.tools.repository
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.GormRepoEntity
+import gorm.tools.repository.api.RepoEntity
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
@@ -394,7 +394,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 }
 
 @Entity @GrailsCompileStatic
-class TestTrxRollback implements GormRepoEntity<TestTrxRollback> {
+class TestTrxRollback implements RepoEntity<TestTrxRollback> {
     String name
     BigDecimal amount
 

@@ -13,12 +13,13 @@ import groovy.transform.CompileStatic
 import gorm.tools.model.IdEnum
 import gorm.tools.repository.RepoEntity
 import gorm.tools.repository.api.GetRepo
+import gorm.tools.repository.api.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity @RepoEntity
+@Entity
 @GrailsCompileStatic
-class Org implements NameTrait, GetRepo<OrgRepo> {
+class Org implements NameTrait, GormRepoEntity<Org, OrgRepo> {
     Integer descId // inverted order for test
     //strings
     String name2

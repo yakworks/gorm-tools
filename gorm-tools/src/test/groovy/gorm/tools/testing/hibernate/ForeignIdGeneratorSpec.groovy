@@ -4,7 +4,7 @@
 */
 package gorm.tools.testing.hibernate
 
-import gorm.tools.repository.api.GormRepoEntity
+import gorm.tools.repository.api.RepoEntity
 import gorm.tools.repository.errors.EntityValidationException
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -69,7 +69,7 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
 }
 
 @Entity @GrailsCompileStatic
-class FidMaster implements GormRepoEntity<FidMaster> {
+class FidMaster implements RepoEntity<FidMaster> {
     String name
 
     FidChild child
@@ -84,7 +84,7 @@ class FidMaster implements GormRepoEntity<FidMaster> {
 }
 
 @Entity @GrailsCompileStatic
-class FidChild implements GormRepoEntity<FidChild>{
+class FidChild implements RepoEntity<FidChild>{
     static belongsTo = [master:FidMaster]
 
     String name

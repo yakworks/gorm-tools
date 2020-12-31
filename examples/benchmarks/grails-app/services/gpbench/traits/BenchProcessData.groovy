@@ -9,7 +9,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoTidyMap
-import gorm.tools.repository.api.RepoEntityTrait
+import gorm.tools.repository.api.BaseRepoEntity
 import gpbench.Region
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
@@ -124,7 +124,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
             assert instance.validate()
         } else if(createAction.startsWith('save')) {
             if(binderType.startsWith('gorm-tools')) {
-                ((RepoEntityTrait)instance).persist()
+                ((BaseRepoEntity)instance).persist()
                 //instance.save([failOnError:true])
             } else {
                 instance.save([failOnError:true])

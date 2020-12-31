@@ -8,15 +8,11 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.Persistable
-import gorm.tools.repository.GormRepo
 
 /**
- * Trait where second generic is the repository spring bean and will create a typed getRepo
+ * A trait for an entity that has a composite id.
  */
 @CompileStatic
-trait GormRepoEntity<D, R extends GormRepo> implements BaseRepoEntity<D>, QueryMangoEntity<D>, Persistable<Long> { //PersistableTrait<Long> {
+trait CompositeRepoEntity<D> implements BaseRepoEntity<D>, QueryMangoEntity<D>{
 
-    static R getRepo() {
-        return findRepo() as R
-    }
 }

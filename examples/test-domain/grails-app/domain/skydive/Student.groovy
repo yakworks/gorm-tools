@@ -1,9 +1,8 @@
 package skydive
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 
-@RepoEntity
-class Student {
+class Student implements RepoEntity<Student>{
     Jumper jumper
     String name
 

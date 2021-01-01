@@ -11,15 +11,15 @@ import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.audit.AuditStampTrait
-import gorm.tools.repository.RepoEntity
-import gorm.tools.repository.api.GetRepo
+import gorm.tools.repository.model.GetRepo
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity @RepoEntity
+@Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class AppUser implements AuditStampTrait, GetRepo<AppUserRepo>, Serializable {
+class AppUser implements AuditStampTrait, RepoEntity<AppUser>, GetRepo<AppUserRepo>, Serializable {
 
     // username –– also known as your handle –– what you put after the “@” symbol ala github or twitter
     // to mention others in comments or notes,

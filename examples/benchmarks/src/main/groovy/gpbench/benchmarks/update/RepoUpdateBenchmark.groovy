@@ -1,7 +1,7 @@
 package gpbench.benchmarks.update
 
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 import gpbench.basic.CityBasic
 import grails.web.databinding.WebDataBinding
 import groovy.transform.CompileDynamic

@@ -6,11 +6,12 @@ package restify
 
 import java.time.LocalDate
 
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import yakworks.taskify.domain.traits.NameDescriptionTrait
 
 @GrailsCompileStatic
-class Book implements NameDescriptionTrait {
+class Book implements NameDescriptionTrait, RepoEntity<Book> {
 
     BigDecimal cost
     LocalDate publishDate

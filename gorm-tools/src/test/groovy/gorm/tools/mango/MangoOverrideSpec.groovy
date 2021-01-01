@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.mango.api.MangoQuery
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.api.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.GormToolsTest
 import grails.persistence.Entity
 import spock.lang.Specification

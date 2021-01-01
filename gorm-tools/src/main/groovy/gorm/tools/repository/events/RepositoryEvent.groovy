@@ -11,7 +11,7 @@ import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 
 //import org.springframework.core.GenericTypeResolver
 

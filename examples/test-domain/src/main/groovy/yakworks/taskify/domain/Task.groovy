@@ -3,12 +3,12 @@ package yakworks.taskify.domain
 import java.time.LocalDate
 import javax.persistence.Transient
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-import static grails.gorm.hibernate.mapping.MappingBuilder.*
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 //import gorm.restapi.RestApiController
 /**
@@ -18,8 +18,8 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.*
  */
 @IdEqualsHashCode
 @GrailsCompileStatic
-@Entity @RepoEntity
-class Task {
+@Entity
+class Task implements RepoEntity<Task>{
     static List qSearchIncludes = ['name'] // quick search includes
 
     //ordering of contraints flow through to json-schema and the fields plugin for automatic scaffolding

@@ -8,7 +8,7 @@ import groovy.transform.CompileDynamic
 
 import org.codehaus.groovy.util.HashCodeHelper
 
-import gorm.tools.repository.api.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity

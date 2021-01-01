@@ -6,7 +6,7 @@ package gorm.tools.rest.controller
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.api.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.artefact.Artefact
 import grails.core.GrailsApplication
 

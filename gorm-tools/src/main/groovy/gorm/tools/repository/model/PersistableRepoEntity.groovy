@@ -2,9 +2,8 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.api
+package gorm.tools.repository.model
 
-import javax.persistence.Transient
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -16,31 +15,32 @@ import org.hibernate.SessionFactory
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
+import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import grails.util.Holders
 
 /**
- * core trait for repo methods to add to entity.
+ * core trait for repo methods that use the repo for persistance
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileStatic
-trait BaseRepoEntity<D> {
+trait PersistableRepoEntity<D, R extends GormRepo<D>, PK> implements Persistable<PK> {
 
     /**
      * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set
      * @return The repository
      */
-    static GormRepo<D> findRepo() {
+    static R findRepo() {
         // if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
         // return cachedRepo
-        AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
+        AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo) as R
     }
 
     //getting compile errors when trying to use the static getRepo in RepoGetter
-    static GormRepo<D> getRepo() { return findRepo() }
+    static R getRepo() { return findRepo() }
 
     D persist(Map args = [:]) {
         return getRepo().persist((D) this, args)
@@ -74,8 +74,12 @@ trait BaseRepoEntity<D> {
         getRepo().update(data, args)
     }
 
-    static void removeById(Map args = [:], Serializable id) {
-        getRepo().removeById(id, args)
+    static void removeById(Map args, PK id) {
+        getRepo().removeById(id as Serializable, args)
+    }
+
+    static void removeById(PK id) {
+        getRepo().removeById(id as Serializable)
     }
 
     // this will fire and event and call beforeValidate on the repo.

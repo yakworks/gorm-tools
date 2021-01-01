@@ -10,7 +10,7 @@ import org.codehaus.groovy.ast.ClassNode
 import org.grails.compiler.injection.GrailsASTUtils
 import org.grails.core.artefact.DomainClassArtefactHandler
 
-import gorm.tools.repository.api.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.ast.SupportsClassNode
 import grails.compiler.traits.TraitInjector
 

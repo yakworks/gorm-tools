@@ -6,7 +6,7 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 
 /**
  * BeforeValidateEvent is fired from the beforeValidate method as its more reliably called

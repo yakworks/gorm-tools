@@ -5,7 +5,7 @@
 package gorm.tools.repository
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.repository.events.*
 import gorm.tools.testing.TestDataJson
 import static gorm.tools.testing.TestDataJson.buildCreate

@@ -3,14 +3,13 @@ package security
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 
-@RepoEntity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes = 'username')
 @ToString(includes = 'username', includeNames = true, includePackage = false)
-class User implements Serializable {
+class User implements RepoEntity<User>, Serializable {
     private static final long serialVersionUID = 1
 
     String username

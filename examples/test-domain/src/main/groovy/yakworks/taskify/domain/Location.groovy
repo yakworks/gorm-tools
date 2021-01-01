@@ -4,13 +4,13 @@
 */
 package yakworks.taskify.domain
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.persistence.Entity
 
-@Entity @RepoEntity
+@Entity
 @IdEqualsHashCode
-class Location {
+class Location implements RepoEntity<Location>{
     // static belongsTo = [Org]
     static List qSearchIncludes = ['street', 'city']
     // address fields

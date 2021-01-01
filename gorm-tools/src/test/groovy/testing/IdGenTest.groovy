@@ -6,8 +6,9 @@ package testing
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.api.GormRepoEntity
-import gorm.tools.repository.api.IdGeneratorRepo
+import gorm.tools.repository.model.GetRepo
+import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -18,7 +19,7 @@ import grails.persistence.Entity
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class IdGenTest implements GormRepoEntity<IdGenTest, IdGenTestRepo> { //, GetRepo<IdGenTestRepo> {
+class IdGenTest implements RepoEntity<IdGenTest>, GetRepo<IdGenTestRepo> { //, GetRepo<IdGenTestRepo> {
     String name
 
     static mapping = {

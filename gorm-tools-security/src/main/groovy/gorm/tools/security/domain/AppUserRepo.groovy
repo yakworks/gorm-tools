@@ -7,10 +7,8 @@ package gorm.tools.security.domain
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 
-import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.RepoMessage
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent

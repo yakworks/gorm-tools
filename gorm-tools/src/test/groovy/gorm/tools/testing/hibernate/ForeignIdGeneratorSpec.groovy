@@ -4,7 +4,7 @@
 */
 package gorm.tools.testing.hibernate
 
-import gorm.tools.repository.api.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.repository.errors.EntityValidationException
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity

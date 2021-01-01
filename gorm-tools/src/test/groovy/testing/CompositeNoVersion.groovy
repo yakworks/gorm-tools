@@ -6,7 +6,7 @@ package testing
 
 import javax.persistence.Transient
 
-import gorm.tools.repository.api.CompositeRepoEntity
+import gorm.tools.repository.model.CompositeRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

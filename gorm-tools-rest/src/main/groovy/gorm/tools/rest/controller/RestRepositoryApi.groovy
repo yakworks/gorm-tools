@@ -17,9 +17,9 @@ import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.api.RepoEntity
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.rest.RestApiConfig
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer

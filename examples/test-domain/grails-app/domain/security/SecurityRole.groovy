@@ -3,16 +3,15 @@ package security
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 
-import static grails.gorm.hibernate.mapping.MappingBuilder.*
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
-@RepoEntity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes = 'authority')
 @ToString(includes = 'authority', includeNames = true, includePackage = false)
-class SecurityRole implements Serializable {
+class SecurityRole implements RepoEntity<SecurityRole>, Serializable {
 
     private static final long serialVersionUID = 1
     String authority

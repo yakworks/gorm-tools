@@ -9,7 +9,7 @@ import groovy.transform.TypeCheckingMode
 
 import org.grails.datastore.gorm.GormEntity
 
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 
 /**
  * Delegates missing properties as method calls to the repository for the domain class.

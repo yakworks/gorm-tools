@@ -7,7 +7,7 @@ package gorm.tools.databinding
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.IsoDateUtil
-import gorm.tools.repository.api.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.model.IdEnum
 import grails.databinding.converters.ValueConverter

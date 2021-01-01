@@ -11,9 +11,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.IdEnum
-import gorm.tools.repository.RepoEntity
-import gorm.tools.repository.api.GetRepo
-import gorm.tools.repository.api.GormRepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

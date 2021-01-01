@@ -1,11 +1,10 @@
 package skydive
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 
-@RepoEntity
 @GrailsCompileStatic
-class DropZone {
+class DropZone implements RepoEntity<DropZone>{
     String location
 
     static constraints = {

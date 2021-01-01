@@ -8,7 +8,7 @@ package gorm.tools.rest.controller
 import groovy.transform.CompileStatic
 
 import gorm.tools.mango.api.QueryMangoEntityApi
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 import grails.gorm.DetachedCriteria
 
 /**

@@ -4,17 +4,16 @@ import groovy.transform.ToString
 
 import org.codehaus.groovy.util.HashCodeHelper
 
-import gorm.tools.repository.RepoEntity
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 
-import static grails.gorm.hibernate.mapping.MappingBuilder.*
+import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 @SuppressWarnings(['FactoryMethodName', 'Instanceof'])
-@RepoEntity
 @GrailsCompileStatic
 @ToString(cache = true, includeNames = true, includePackage = false)
-class UserSecurityRole implements Serializable {
+class UserSecurityRole implements RepoEntity<UserSecurityRole>, Serializable {
 
     private static final long serialVersionUID = 1
 

@@ -32,11 +32,11 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.RepositoryApi
 import grails.gorm.validation.ConstrainedProperty
 import grails.validation.ValidationException
 

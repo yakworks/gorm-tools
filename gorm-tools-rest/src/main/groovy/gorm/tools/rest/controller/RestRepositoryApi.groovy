@@ -16,10 +16,11 @@ import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
+import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.rest.RestApiConfig
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
@@ -38,7 +39,7 @@ import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
-trait RestRepositoryApi<D extends RepoEntity> implements RestResponder, ServletAttributes, MangoControllerApi {
+trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponder, ServletAttributes {
 
     @Autowired
     RestApiConfig restApiConfig
@@ -180,7 +181,7 @@ trait RestRepositoryApi<D extends RepoEntity> implements RestResponder, ServletA
         return pager.setEntityMapList(entityMapList)
     }
 
-    List query(Pager pager, Map p = [:]) {
+    List<D> query(Pager pager, Map p = [:]) {
         //copy the params into new map
         def qryParams = p.findAll {
             //not if its in the the pager or the controller params
@@ -191,7 +192,7 @@ trait RestRepositoryApi<D extends RepoEntity> implements RestResponder, ServletA
         List qsFields = getSearchFields()
         if(qsFields) qryParams.qSearchFields = qsFields
 
-        getMangoApi().queryList(qryParams)
+        ((QueryMangoEntityApi)getRepo()).queryList(qryParams)
     }
 
     void respondWithEntityMap(EntityMap entityMap, Map args = [:]){

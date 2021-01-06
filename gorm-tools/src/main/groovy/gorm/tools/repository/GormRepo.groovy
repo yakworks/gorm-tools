@@ -147,8 +147,8 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         return entity
     }
 
-    void bindAndCreate(D entity, Map data, Map args = [:]) {
-        bindAndSave(args, entity, data, BindAction.Create)
+    void bindAndCreate(D entity, Map data, Map args) {
+        bindAndSave(entity, data, BindAction.Create, args)
     }
 
     /**
@@ -175,14 +175,14 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         return entity
     }
 
-    void bindAndUpdate(D entity, Map data, Map args = [:]) {
-        bindAndSave(args, entity, data, BindAction.Update)
+    void bindAndUpdate(D entity, Map data, Map args) {
+        bindAndSave(entity, data, BindAction.Update, args)
     }
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
-    void bindAndSave(Map args, D entity, Map data, BindAction bindAction){
+    void bindAndSave(D entity, Map data, BindAction bindAction, Map args){
         args['bindAction'] = bindAction
-        bind(args, entity, data, bindAction)
+        bind(entity, data, bindAction, args)
         //set the id if it has one in data and bindId arg is passed in as true
         if(args.remove('bindId') && BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
         args['data'] = data
@@ -195,9 +195,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * Or even better implement the beforeBind|afterBind event methods
      */
     @Override
-    void bind(Map args = [:], D entity, Map data, BindAction bindAction) {
+    void bind(D entity, Map data, BindAction bindAction, Map args = [:]) {
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
-        doBind(args, entity, data, bindAction)
+        doBind(entity, data, bindAction, args)
         getRepoEventPublisher().doAfterBind(this, (GormEntity)entity, data, bindAction, args)
     }
 
@@ -207,7 +207,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * can also call this if you do NOT want the before/after Bind events to fire
      */
     @Override
-    void doBind(Map args, D entity, Map data, BindAction bindAction) {
+    void doBind(D entity, Map data, BindAction bindAction, Map args) {
         getMapBinder().bind(args, entity, data)
     }
 

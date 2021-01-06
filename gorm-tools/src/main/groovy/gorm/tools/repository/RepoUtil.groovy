@@ -15,9 +15,9 @@ import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.model.RepositoryApi
 
 /**
  * A bunch of statics to support the repositories.

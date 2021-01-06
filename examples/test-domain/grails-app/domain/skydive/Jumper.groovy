@@ -1,6 +1,8 @@
 package skydive
 
-class Jumper {
+import gorm.tools.repository.model.RepoEntity
+
+class Jumper implements RepoEntity<Jumper>{
 
     String name
     Long skydives = 0

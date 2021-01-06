@@ -12,7 +12,7 @@ import org.grails.datastore.gorm.GormEntity
  */
 
 @CompileStatic
-class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends BaseBatchInsertBenchmark<T> {
+class GparsBaselineBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
     EntityMapBinder entityMapBinder
 
@@ -35,7 +35,7 @@ class GparsBaselineBenchmark<T extends GormEntity & WebDataBinding> extends Base
         } else {
             entityMapBinder.bind(c, row)
         }
-        c.save(failOnError: true, validate: validate)
+        ((GormEntity) c).save(failOnError: true, validate: validate)
     }
 
     @CompileDynamic

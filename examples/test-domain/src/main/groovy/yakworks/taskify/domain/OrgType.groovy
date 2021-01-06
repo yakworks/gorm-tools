@@ -4,12 +4,13 @@
 */
 package yakworks.taskify.domain
 
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class OrgType {
+class OrgType implements RepoEntity<OrgType>{
     String name
 
     static constraints = {

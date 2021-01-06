@@ -7,7 +7,7 @@ package gorm.tools.repository.events
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 
 /**
  * Fired before a bind and save/persist. Allows modification to params used in the binding

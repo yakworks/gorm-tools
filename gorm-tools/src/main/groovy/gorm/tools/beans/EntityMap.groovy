@@ -12,7 +12,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.config.GormProperties
 import org.springframework.util.Assert
 
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
 import gorm.tools.utils.GormMetaUtils
 
 /**

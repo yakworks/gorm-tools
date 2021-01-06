@@ -1,6 +1,8 @@
 package yakworks.taskify.domain
 
-class ContactAddress {
+import gorm.tools.repository.model.RepoEntity
+
+class ContactAddress implements RepoEntity<ContactAddress> {
     static belongsTo = [contact: Contact]
     String street
     String city

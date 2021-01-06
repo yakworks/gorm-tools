@@ -2,13 +2,12 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository
+package gorm.tools.repository.model
+
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.connections.ConnectionSource
 import org.grails.datastore.mapping.query.api.BuildableCriteria
 import org.grails.orm.hibernate.datasource.MultipleDataSourceSupport
@@ -16,39 +15,35 @@ import org.hibernate.SessionFactory
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
-import gorm.tools.mango.api.QueryMangoEntity
+import gorm.tools.model.Persistable
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
 import grails.util.Holders
 
 /**
- * Main trait for a domain. gets applied to them during startup grails artifact part
+ * core trait for repo methods that use the repo for persistance
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileStatic
-trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
-
-    //abstract private static GormStaticApi<D> currentGormStaticApi()
-
-    private static GormRepo<D> cachedRepo
-
-    Class getEntityClass(){ getClass() }
+trait PersistableRepoEntity<D, R extends GormRepo<D>, PK> implements Persistable<PK> {
 
     /**
      * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set
      * @return The repository
      */
-    static GormRepo<D> findRepo() {
-        if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
-        return cachedRepo
+    static R findRepo() {
+        // if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
+        // return cachedRepo
+        AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo) as R
     }
 
     //getting compile errors when trying to use the static getRepo in RepoGetter
-    static GormRepo<D> getRepo() { return findRepo() }
-    static void setRepo(GormRepo<D> repo) { cachedRepo = repo }
+    static R getRepo() { return findRepo() }
 
     D persist(Map args = [:]) {
-        return getRepo().persist(args, (D) this)
+        return getRepo().persist((D) this, args)
     }
 
     // D save(Map args = [:]) {
@@ -60,7 +55,7 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
     // }
 
     void remove(Map args = [:]) {
-        getRepo().remove(args, (D) this)
+        getRepo().remove((D) this, args)
     }
 
     void bind(Map args = [:], Map data) {
@@ -72,15 +67,19 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
      * @return The created instance
      */
     static D create(Map args = [:], Map data) {
-        return getRepo().create(args, data)
+        return getRepo().create(data, args)
     }
 
     static D update(Map args = [:], Map data) {
-        getRepo().update(args, data)
+        getRepo().update(data, args)
     }
 
-    static void removeById(Map args = [:], Serializable id) {
-        getRepo().removeById(args, id)
+    static void removeById(Map args, PK id) {
+        getRepo().removeById(id as Serializable, args)
+    }
+
+    static void removeById(PK id) {
+        getRepo().removeById(id as Serializable)
     }
 
     // this will fire and event and call beforeValidate on the repo.
@@ -125,9 +124,4 @@ trait GormRepoEntity<D extends GormEntity<D>> implements QueryMangoEntity<D> {
 
         return builder
     }
-
-    // static withCriteria(@DelegatesTo(Criteria) Closure callable) {
-    //     createCriteria().invokeMethod("doCall", callable)
-    // }
-
 }

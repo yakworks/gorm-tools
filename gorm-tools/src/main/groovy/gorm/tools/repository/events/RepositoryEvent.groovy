@@ -11,7 +11,7 @@ import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 
 //import org.springframework.core.GenericTypeResolver
 
@@ -81,5 +81,13 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     void setDataFromArgMap(Map args){
         this.data = args ? args['data'] as Map : [:]
         this.bindAction = args ? args['bindAction'] as BindAction : null
+    }
+
+    boolean isBindCreate(){
+        BindAction.Create == bindAction
+    }
+
+    boolean isBindUpdate(){
+        BindAction.Update == bindAction
     }
 }

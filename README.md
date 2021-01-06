@@ -29,6 +29,7 @@
 
 > *DOCS ARE OUT OF DATE AND BEING UPDATED FOR BREAKING CHANGES IN 6.1.12-v.X*
 > *ALSO MERGING IN DOCS FOR THE REST-API AND AUDITSTAMP THAT WAS MERGED INTO HERE*
+> More breaking changes in 7.0.8-v6. is required on domain entity now or it needs to implement @GormRepoEntity
 
 [RELEASE NOTES](docs/release-notes.md)
 

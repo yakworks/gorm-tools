@@ -7,6 +7,7 @@ import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 
@@ -16,6 +17,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
 
     EntityMapService entityMapService
 
+    @Ignore
     void "MetaBeanProperty playground"() {
         when:
         def user = AppUser.get(1)

@@ -6,11 +6,12 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 
 @AuditStamp
 @GrailsCompileStatic
-class Contact { // implements AuditStampTrait {
+class Contact implements RepoEntity<Contact>{ // implements AuditStampTrait {
     String firstName
     String lastName
     String email

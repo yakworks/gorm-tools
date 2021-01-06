@@ -3,11 +3,7 @@ package gpbench.fat
 import gpbench.Country
 import gpbench.Region
 import gpbench.model.AuditStamp
-import gpbench.model.AuditStampConstraints
-import gpbench.model.CityTrait
-import gpbench.model.CityTraitConstraints
 import gpbench.model.CityTraitFat
-import gpbench.model.CityTraitFatConstraints
 import grails.compiler.GrailsCompileStatic
 
 /**

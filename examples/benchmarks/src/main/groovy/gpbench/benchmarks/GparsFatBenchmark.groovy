@@ -8,7 +8,7 @@ import org.grails.datastore.gorm.GormEntity
  */
 
 //@GrailsCompileStatic
-class GparsFatBenchmark<T extends GormEntity> extends GparsBaselineBenchmark<T> {
+class GparsFatBenchmark<T> extends GparsBaselineBenchmark<T> {
 
     GparsFatBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)

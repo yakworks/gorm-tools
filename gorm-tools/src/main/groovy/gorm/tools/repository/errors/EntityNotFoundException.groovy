@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
 
-import gorm.tools.support.MsgKey
 import gorm.tools.support.MsgSourceResolvable
 
 /**

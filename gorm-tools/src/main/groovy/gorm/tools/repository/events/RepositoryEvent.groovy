@@ -82,4 +82,12 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
         this.data = args ? args['data'] as Map : [:]
         this.bindAction = args ? args['bindAction'] as BindAction : null
     }
+
+    boolean isBindCreate(){
+        BindAction.Create == bindAction
+    }
+
+    boolean isBindUpdate(){
+        BindAction.Update == bindAction
+    }
 }

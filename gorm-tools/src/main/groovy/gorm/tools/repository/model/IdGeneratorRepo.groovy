@@ -42,7 +42,7 @@ trait IdGeneratorRepo {
      * if entity.id is already set then it just returns it
      * @param entity
      */
-    Long generateId(Persistable<Long> entity){
+    Long generateId(Persistable entity){
         if (entity.id == null) entity.id = generateId()
         return entity.id
     }

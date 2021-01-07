@@ -16,6 +16,6 @@ import gorm.tools.repository.GormRepo
  * @since 6.1
  */
 @CompileStatic
-trait RepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, Long>, QueryMangoEntity<D> {
+trait RepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>>, QueryMangoEntity<D> {
 
 }

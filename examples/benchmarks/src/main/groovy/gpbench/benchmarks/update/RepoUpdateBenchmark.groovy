@@ -17,7 +17,7 @@ class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
 
     RepoUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
-        repo = RepoUtil.findRepository(clazz)
+        repo = RepoUtil.findRepo(clazz)
     }
 
     @Override

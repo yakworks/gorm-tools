@@ -29,7 +29,7 @@ abstract class BaseUpdateBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
     BaseUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
-        repo = RepoUtil.findRepository(clazz)
+        repo = RepoUtil.findRepo(clazz)
     }
 
     //region ids are not sequential, so we need to keep reference of list of region ids to select one of it randomly)

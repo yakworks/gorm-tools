@@ -15,7 +15,7 @@ class GparsRepoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<
 
     GparsRepoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {
         super(clazz, bindingMethod)
-        repo = RepoUtil.findRepository(clazz)
+        repo = RepoUtil.findRepo(clazz)
     }
 
     @Override

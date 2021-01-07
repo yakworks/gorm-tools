@@ -53,7 +53,7 @@ subprojects {
       compile 'org.codehaus.groovy:groovy-dateutil'
 
       runtime "com.h2database:h2"
-      runtimeOnly "com.zaxxer:HikariCP:3.4.5"
+      testRuntime "com.zaxxer:HikariCP:$vHikari"
 
       compileOnly "io.micronaut:micronaut-inject-groovy"
 

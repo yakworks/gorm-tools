@@ -6,6 +6,8 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileDynamic
 
+import gorm.tools.repository.RepoUtil
+
 /**
  * Helper for compileStatic and IDE to type the getRepo
  *
@@ -15,8 +17,6 @@ import groovy.transform.CompileDynamic
 @CompileDynamic
 trait GetRepo<T> {
 
-    static T getRepo() {
-        return findRepo() as T
-    }
+    static T getRepo() { return RepoUtil.findRepo(this) as T }
 
 }

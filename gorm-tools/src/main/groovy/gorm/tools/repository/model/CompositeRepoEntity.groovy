@@ -13,6 +13,6 @@ import gorm.tools.repository.GormRepo
  * A trait for an entity that has a composite id.
  */
 @CompileStatic
-trait CompositeRepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, Long>, QueryMangoEntity<D>{
+trait CompositeRepoEntity<D> implements PersistableRepoEntity<D, GormRepo<D>, Long>, QueryMangoEntity<D> {
 
 }

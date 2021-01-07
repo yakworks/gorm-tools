@@ -35,9 +35,11 @@ class IdGenRepoSpec extends GormToolsHibernateSpec {
     def "test generateId(Ent)"() {
         when:
         def ent = new IdGenTest()
-        IdGenTest.repo.generateId(ent)
 
         then:
+        2 == IdGenTest.repo.generateId(ent)
+        //should be same if called again as it checks if id is null
+        2 == IdGenTest.repo.generateId(ent)
         ent.id == 2
     }
 }

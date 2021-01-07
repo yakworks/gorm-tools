@@ -4,21 +4,11 @@
 */
 package gorm.tools.repository.model
 
-
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.core.connections.ConnectionSource
-import org.grails.datastore.mapping.query.api.BuildableCriteria
-import org.grails.orm.hibernate.datasource.MultipleDataSourceSupport
-import org.hibernate.SessionFactory
-
-import gorm.tools.beans.AppCtx
-import gorm.tools.hibernate.criteria.GormHibernateCriteriaBuilder
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import grails.util.Holders
 
 /**
  * core trait for repo methods that use the repo for persistance
@@ -30,29 +20,13 @@ import grails.util.Holders
 trait PersistableRepoEntity<D, R extends GormRepo<D>, PK> implements Persistable<PK> {
 
     /**
-     * finds the repo bean in the appctx if cachedRepo is null. returns the cachedRepo if its already set
-     * @return The repository
+     * static prop that returns the repo for this entity, calls RepoUtil.findRepo(this) by default
      */
-    static R findRepo() {
-        // if(!cachedRepo) cachedRepo = AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo)
-        // return cachedRepo
-        AppCtx.get(RepoUtil.getRepoBeanName(this), GormRepo) as R
-    }
-
-    //getting compile errors when trying to use the static getRepo in RepoGetter
-    static R getRepo() { return findRepo() }
+    static R getRepo() { RepoUtil.findRepo(this) as R }
 
     D persist(Map args = [:]) {
         return getRepo().persist((D) this, args)
     }
-
-    // D save(Map args = [:]) {
-    //     getRepo().persist(args, (D) this)
-    // }
-    //
-    // D saveApi(Map args = [:]) {
-    //     getRepo().saveApi(args, (D) this)
-    // }
 
     void remove(Map args = [:]) {
         getRepo().remove((D) this, args)
@@ -87,41 +61,5 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, PK> implements Persistable
     // so we fire our own here. FIXME see line 231 in PersistentEntityValidator where it should fire event and issue PR
     void beforeValidate() {
         getRepo().publishBeforeValidate(this)
-    }
-
-    /**
-     * Deprecated USE QUERY or WHERE INSTEAD
-     *
-     * Creates a improved  criteria builder instance
-     * make it easier to build criteria with domain bean paths
-     * allows
-     * eq('invoice.customer.name', 'foo')
-     *
-     * instead of
-     * invoice {
-     *      customer {
-     *          eq(name)
-     *      }
-     *  }
-     * simliar with eq, like and in
-     *
-     */
-    @Deprecated
-    @Override
-    @CompileDynamic
-    static BuildableCriteria createCriteria() {
-        BuildableCriteria builder
-        //TODO: temp hack, to prevent unit tests failing
-        String datasourceName = MultipleDataSourceSupport.getDefaultDataSource(currentGormStaticApi().persistentEntity)
-        boolean isDefault = (datasourceName == ConnectionSource.DEFAULT)
-        String suffix = isDefault ? '' : '_' + datasourceName
-        try {
-            builder = new GormHibernateCriteriaBuilder(this, Holders.applicationContext.getBean("sessionFactory$suffix".toString(), SessionFactory))
-            builder.conversionService = currentGormStaticApi().datastore.mappingContext.conversionService
-        } catch(IllegalStateException){
-            builder = currentGormStaticApi().createCriteria()
-        }
-
-        return builder
     }
 }

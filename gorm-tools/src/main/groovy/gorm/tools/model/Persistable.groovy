@@ -18,13 +18,13 @@ import org.springframework.lang.Nullable
  * @since 7.0.x
  */
 @CompileStatic
-trait Persistable<PK> implements IPersistable<PK>, Ident<PK> {
+trait Persistable implements IPersistable<Long>, Ident<Long> {
     abstract boolean isAttached()
     abstract Serializable getVersion()
 
     @Nullable
-    abstract PK getId()
-    abstract void setId(@Nullable PK id)
+    abstract Long getId()
+    abstract void setId(@Nullable Long id)
 
     /**
      * Returns if the {@code Persistable} is new or was persisted already.

@@ -17,7 +17,7 @@ import gorm.tools.repository.RepoUtil
  * @since 6.1
  */
 @CompileStatic
-trait PersistableRepoEntity<D, R extends GormRepo<D>, PK> implements Persistable<PK> {
+trait PersistableRepoEntity<D, R extends GormRepo<D>> implements Persistable {
 
     /**
      * static prop that returns the repo for this entity, calls RepoUtil.findRepo(this) by default
@@ -48,12 +48,8 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>, PK> implements Persistable
         getRepo().update(data, args)
     }
 
-    static void removeById(Map args, PK id) {
-        getRepo().removeById(id as Serializable, args)
-    }
-
-    static void removeById(PK id) {
-        getRepo().removeById(id as Serializable)
+    static void removeById(Map args = [:], Serializable id) {
+        getRepo().removeById(id, args)
     }
 
     // this will fire and event and call beforeValidate on the repo.

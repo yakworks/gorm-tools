@@ -5,8 +5,8 @@ jobs:
     docker:
       - image: yakworks/alpine-jdk:builder8
 
-    environment:
-      GRADLE_OPTS: "-Xmx1536m"
+    # environment:
+      # GRADLE_OPTS: "-Xmx1036m"
       # TERM: dumb
 
     parallelism: 1

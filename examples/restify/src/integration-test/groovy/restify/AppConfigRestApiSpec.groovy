@@ -19,6 +19,8 @@ class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
         body.includes.get == ['*', 'type.*', 'status.*']
         body.includes.picklist == ['id', 'name']
         !body.includes.containsKey("get[0]")
+        body.form[0].selectOptions.dataApiParams.or != null
+        body.form[0].selectOptions.dataApiParams."or[0]" == null
     }
 
 

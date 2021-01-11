@@ -4,11 +4,13 @@
 */
 package testing
 
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity @GrailsCompileStatic
-class OrgExt {
+@Entity
+@GrailsCompileStatic
+class OrgExt implements RepoEntity<OrgExt> {
     static belongsTo = [org:Org]
 
     String text1

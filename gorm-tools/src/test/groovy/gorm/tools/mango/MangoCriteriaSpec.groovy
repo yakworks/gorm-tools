@@ -224,7 +224,6 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
 
     }
 
-    //@IgnoreRest
     def "test nested"() {
         when:
 
@@ -391,7 +390,6 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         res.size() == 9
     }
 
-    // @IgnoreRest
     def "test qSearch"() {
         when:
 
@@ -485,7 +483,6 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         res[1].id > res[2].id
     }
 
-    // @IgnoreRest
     def "test order association"() {
         when:
         List res = build('$sort':['location.address': 'desc'] ).list()

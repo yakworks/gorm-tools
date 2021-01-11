@@ -4,20 +4,23 @@
 */
 package gorm.tools.repository
 
+import java.util.concurrent.ConcurrentHashMap
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
+import org.grails.datastore.mapping.reflect.NameUtils
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.repository.model.RepositoryApi
 
 /**
  * A bunch of statics to support the repositories.
@@ -29,6 +32,25 @@ import gorm.tools.repository.errors.EntityNotFoundException
 @CompileStatic
 class RepoUtil {
 
+    private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
+
+    // TODO getting a GenericWebApplicationContext@15057559 has been closed already error with this cached one
+    // could just be for tests, needs more invesitgation
+    static <D> GormRepo<D> findRepoCached(Class<D> entity) {
+        String className = NameUtils.getClassName(entity)
+        def repo = REPO_CACHE.get(className)
+        if(repo == null) {
+            repo = AppCtx.get(getRepoBeanName(entity), GormRepo)
+            REPO_CACHE.put(className, repo)
+        }
+        return repo as GormRepo<D>
+    }
+
+    static <D> GormRepo<D> findRepo(Class<D> entity) {
+        AppCtx.get(getRepoBeanName(entity), GormRepo) as GormRepo<D>
+        //return repo as GormRepo<D>
+    }
+
     static String getRepoClassName(Class domainClass) {
         RepositoryArtefactHandler.getRepoClassName(domainClass)
     }
@@ -37,12 +59,8 @@ class RepoUtil {
         RepositoryArtefactHandler.getRepoBeanName(domainClass)
     }
 
-    static RepositoryApi findRepository(Class domainClass) {
-        return AppCtx.get(getRepoBeanName(domainClass), RepositoryApi)
-    }
-
-    static <T> RepositoryApi<T> getRepo(Class<T> domainClass) {
-        return ClassPropertyFetcher.getStaticPropertyValue(domainClass, 'repo', RepositoryApi)
+    static <T> GormRepo<T> getRepoStaticProperty(Class<T> domainClass) {
+        return ClassPropertyFetcher.getStaticPropertyValue(domainClass, 'repo', GormRepo)
     }
 
     static List<Class<RepositoryApi>> getRepositoryClasses() {
@@ -62,8 +80,8 @@ class RepoUtil {
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
             if (currentVersion > oldVersion) {
-                Map msgMap = RepoMessage.optimisticLockingFailure(entity, false)
-                throw new OptimisticLockingFailureException(msgMap.defaultMessage as String)
+                def msgKey = RepoMessage.optimisticLockingFailure(entity)
+                throw new OptimisticLockingFailureException(msgKey.defaultMessage)
             }
         }
     }

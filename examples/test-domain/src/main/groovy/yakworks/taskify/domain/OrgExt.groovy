@@ -4,6 +4,7 @@
 */
 package yakworks.taskify.domain
 
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -11,13 +12,13 @@ import grails.persistence.Entity
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class OrgExt {
+class OrgExt implements RepoEntity<OrgExt>{
     static belongsTo = [org:Org]
 
     Org orgParent
     String text1
     String text2
-
+    String textMax
 
     static mapping = {
         id column: 'id', generator: 'foreign', params: [property: 'org']
@@ -28,5 +29,6 @@ class OrgExt {
         orgParent nullable: true
         text1 nullable: true
         text2 nullable: true
+        textMax maxSize: 2
     }
 }

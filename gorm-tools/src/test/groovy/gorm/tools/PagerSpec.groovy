@@ -7,15 +7,20 @@ package gorm.tools
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
-import gorm.tools.testing.unit.GormToolsTest
-import grails.persistence.Entity
-import spock.lang.Specification
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import testing.Location
+import testing.Nested
+import testing.Org
+import testing.TestSeedData
 
-class PagerSpec extends Specification implements GormToolsTest {
+class PagerSpec extends GormToolsHibernateSpec {
+
+    List<Class> getDomainClasses() { [Org, Location, Nested] }
 
     void setupSpec() {
-        //mockDomain Person
-        mockDomains ClassB
+        Org.withTransaction {
+            TestSeedData.buildOrgs(50)
+        }
     }
 
     def "test default values"() {
@@ -46,13 +51,8 @@ class PagerSpec extends Specification implements GormToolsTest {
     def "test setupData with fields"() {
         setup:
         Pager pager = new Pager()
-        50.times {
-            new ClassB(
-                value: 5 * it
-            ).save(failOnError: true)
-        }
         def entityMapService = new EntityMapService()
-        def dlist = ClassB.list(max: pager.max, offset: pager.offset)
+        def dlist = Org.list(max: pager.max, offset: pager.offset)
         EntityMapList entityMapList = entityMapService.createEntityMapList(dlist, ["*"])
 
         when:
@@ -83,11 +83,4 @@ class PagerSpec extends Specification implements GormToolsTest {
         90 == pages[9].offset
         10 == pages[9].max
     }
-}
-
-
-@Entity
-class ClassB {
-    int value
-    int version = 0
 }

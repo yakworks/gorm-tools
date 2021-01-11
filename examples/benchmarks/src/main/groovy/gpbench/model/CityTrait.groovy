@@ -34,18 +34,3 @@ trait CityTrait {
         c()
     }
 }
-
-//@GrailsCompileStatic
-class CityTraitConstraints implements CityTrait {
-
-    static constraints = {
-        name blank: false, nullable: false
-        shortCode blank: false, nullable: false
-        latitude nullable: false, scale: 4, max: 90.00
-        longitude nullable: false, scale: 4, max: 380.00
-        region nullable: false
-        country nullable: false
-        state nullable: true
-        countryName nullable: true
-    }
-}

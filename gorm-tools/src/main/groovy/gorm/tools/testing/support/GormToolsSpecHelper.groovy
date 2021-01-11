@@ -64,14 +64,14 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         //so if we have 2 unit tests where we create same bean for repo, then in second
         //test class when we call repo from domain(it could be Org.repo or Org.create()) we will call repo from
         //the first test class, and if we injected new dependencies in can break test
-        if (this.hasProperty("entityClass") && this.entityClass){
-            domainClassesToMock = [this.entityClass].toArray(Class) + domainClassesToMock
-        }
-        domainClassesToMock.each {
-            String repoBeanName = RepoUtil.getRepoBeanName(it)
-            GormRepo repo = AppCtx.get("${repoBeanName}", findRepoClass(it))
-            it.setRepo(repo)
-        }
+        // if (this.hasProperty("entityClass") && this.entityClass){
+        //     domainClassesToMock = [this.entityClass].toArray(Class) + domainClassesToMock
+        // }
+        // domainClassesToMock.each {
+        //     String repoBeanName = RepoUtil.getRepoBeanName(it)
+        //     GormRepo repo = AppCtx.get("${repoBeanName}", findRepoClass(it))
+        //     // it.setRepo(repo)
+        // }
 
     }
 
@@ -109,11 +109,17 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
      * Finds repository class in same package as domain class.
      * returns a default DefaultGormRepo if no explicit ones are found
      */
-    Class findRepoClass(Class domainClass) {
-        String repoClassName = RepoUtil.getRepoClassName(domainClass)
+    Class findRepoClass(Class entityClass) {
+        String repoClassName = RepoUtil.getRepoClassName(entityClass)
         //println "finding $repoClassName"
         if (ClassUtils.isPresent(repoClassName, grailsApplication.classLoader)) {
             return ClassUtils.forName(repoClassName)
+        }
+        // if its can't be found in same package then see if entityClass has the getRepo static
+        def mbp = entityClass.metaClass.properties.find{ it.name == 'repo'} as MetaBeanProperty
+        Class repoClass = mbp?.getter?.returnType
+        if(repoClass && repoClass != GormRepo){
+            return repoClass
         }
         return DefaultGormRepo
     }

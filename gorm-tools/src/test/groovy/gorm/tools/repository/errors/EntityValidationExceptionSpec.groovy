@@ -4,6 +4,7 @@
 */
 package gorm.tools.repository.errors
 
+import gorm.tools.support.MsgKey
 import spock.lang.Specification
 
 class EntityValidationExceptionSpec extends Specification {
@@ -13,41 +14,24 @@ class EntityValidationExceptionSpec extends Specification {
         def e = new EntityValidationException("fubar", new EmptyErrors("blah"))
 
         then:
-        "validationException" == e.messageMap.code
-        def args = []
-        args == e.messageMap.args
-        "fubar" == e.messageMap.defaultMessage
-    }
-
-    void testMessageMap() {
-        setup:
-        Map m = [code: "vtest", args: [0], defaultMessage: "defmsg"]
-        Map entity = [someEntity: "go cubs"]
-
-        when:
-        def e = new EntityValidationException(m, entity, new EmptyErrors("blah"))
-
-        then:
-        "vtest" == e.messageMap.code
-        def args = [0]
-        args == e.messageMap.args
-        "defmsg" == e.messageMap.defaultMessage
-        entity == e.entity
+        //"validation.error" == e.code
+        !e.args
+        "fubar" == e.defaultMessage
+        e.message.contains('fubar')
     }
 
     void testNoErrors() {
         setup:
-        Map m = [code: "vtest", args: [0], defaultMessage: "defmsg"]
         Map entity = [someEntity: "go cubs"]
+        def msgKey = new MsgKey('vtest', 'defmsg')
 
         when:
-        def e = new EntityValidationException(m, entity)
+        def e = new EntityValidationException(msgKey, entity)
 
         then:
-        "vtest" == e.messageMap.code
-        def args = [0]
-        args == e.messageMap.args
-        "defmsg" == e.messageMap.defaultMessage
+        "vtest" == e.code
+        !e.args
+        "defmsg" == e.defaultMessage
         entity == e.entity
     }
 

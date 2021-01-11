@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.api
+package gorm.tools.repository.model
 
 import org.springframework.dao.DataAccessException
 
@@ -36,7 +36,7 @@ interface RepositoryApi<D> {
     /**
      * Transactional wrap for {@link #doPersist} with arguments to pass to save
      */
-    D persist(Map args, D entity)
+    D persist(D entity, Map args)
 
     /**
      * Transactional wrap for {@link #doPersist}
@@ -51,13 +51,13 @@ interface RepositoryApi<D> {
      * @param args the arguments to pass to save
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D doPersist(Map args, D entity)
+    D doPersist(D entity, Map args)
 
     /**
      * Transactional wrap for {@link #doCreate}
      */
     D create(Map data)
-    D create(Map args, Map data)
+    D create(Map data, Map args)
 
     /**
      * Creates entity using the data from params. calls the {@link #bind} with BindAction.Create
@@ -66,7 +66,7 @@ interface RepositoryApi<D> {
      * @return the created domain entity
      * @see #doPersist
      */
-    D doCreate(Map args, Map data)
+    D doCreate(Map data, Map args)
 
     /**
      * Transactional wrap for {@link #doUpdate}
@@ -81,20 +81,21 @@ interface RepositoryApi<D> {
      * @return the updated domain entity
      * @see #doPersist
      */
-    D doUpdate(Map args, Map data)
+    D doUpdate(Map data, Map args)
 
     /**
      * binds by calling {@link #doBind} and fires before and after events
      * better to override doBind in implementing classes for custom logic.
      * Or just implement the beforeBind|afterBind event methods
      */
-    void bind(Map args, D entity, Map data, BindAction bindAction)
+    void bind(D entity, Map data, BindAction bindAction)
+    void bind(D entity, Map data, BindAction bindAction, Map args)
 
     /**
      * Main bind method that redirects call to the injected mapBinder. see {@link #getMapBinder}
      * override this one in implementing classes. can also call this if you don't want events to fire
      */
-    void doBind(Map args, D entity, Map data, BindAction bindAction)
+    void doBind(D entity, Map data, BindAction bindAction, Map args)
 
     /**
      * Remove by ID. Wrapping this in a Transaction in an implementing class here is optional
@@ -104,7 +105,7 @@ interface RepositoryApi<D> {
      *
      * @throws gorm.tools.repository.errors.EntityValidationException if its not found or if a DataIntegrityViolationException is thrown
      */
-    void removeById(Map args, Serializable id)
+    void removeById(Serializable id, Map args)
     void removeById(Serializable id)
 
     /**
@@ -113,9 +114,9 @@ interface RepositoryApi<D> {
      * @param entity the domain entity
      */
     void remove(D entity)
-    void remove(Map args, D entity)
+    void remove(D entity, Map args)
 
-    void doRemove(Map args, D entity)
+    void doRemove(D entity, Map args)
     void doRemove(D entity)
 
     /**

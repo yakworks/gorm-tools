@@ -5,7 +5,7 @@ apply plugin: "yakworks.grails-plugin"
 
 dependencies {
   console "org.grails:grails-console"
-
+  // compile "org.grails:grails-datastore-gorm:7.0.8.RELEASE"
   //used for json parsing but require it to be added to project that uses this
   compileOnly "org.grails.plugins:views-json:$vViews"
   compileOnly "org.grails.plugins:views-json-templates:$vViews"

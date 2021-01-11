@@ -4,11 +4,13 @@
 */
 package testing
 
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
-@Entity @GrailsCompileStatic
-class Project {
+@Entity
+@GrailsCompileStatic
+class Project implements RepoEntity<Project> {
 
     String name
     String description

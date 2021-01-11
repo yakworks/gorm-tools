@@ -8,13 +8,14 @@ import groovy.transform.CompileDynamic
 
 import org.codehaus.groovy.util.HashCodeHelper
 
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class SecRoleUser implements Serializable {
+class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
 
     AppUser user
     SecRole role
@@ -41,7 +42,7 @@ class SecRoleUser implements Serializable {
     }
 
     static List<SecRoleUser> getByUser(long userId) {
-        SecRoleUser.query([user:[id: userId]]).list()
+        query([user:[id: userId]]).list()
     }
 
     static SecRoleUser get(long userId, long roleId) {

@@ -34,17 +34,3 @@ trait CityTrait2 {
         c()
     }
 }
-
-class CityTrait2Constraints implements CityTrait2 {
-
-    static constraints = {
-        name2 blank: false, nullable: false
-        shortCode2 blank: false, nullable: false
-        latitude2 nullable: false, scale: 4, max: 90.00
-        longitude2 nullable: false, scale: 4, max: 380.00
-        region2 nullable: false
-        country2 nullable: false
-        state2 nullable: true
-        countryName2 nullable: true
-    }
-}

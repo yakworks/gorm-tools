@@ -5,7 +5,7 @@ import gorm.tools.async.AsyncSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 import gpbench.fat.CityFat
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
@@ -84,7 +84,7 @@ trait BenchConfig {
 
 
     void setRepo(Class domainClass){
-        repository = (GormRepo) RepoUtil.getRepo(domainClass) //domainClass.repo
+        repository = (GormRepo) RepoUtil.getRepoStaticProperty(domainClass) //domainClass.repo
     }
 
     void setup() {

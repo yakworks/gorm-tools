@@ -1,4 +1,4 @@
-package gorm.tools.eventlog
+package yakworks.domain.eventlog
 
 import gorm.tools.repository.RepoUtil
 import gorm.tools.testing.unit.DomainRepoTest
@@ -8,7 +8,7 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
 
     final String JOB_NAME  = 'EventLogHelperTests'
     final String COMPONENT = 'service/method'
-    final String APP_NAME  = 'gorm-tools-eventlog'
+    final String APP_NAME  = 'yakworks-domain'
 
     void setupSpec() {
         defineBeans {

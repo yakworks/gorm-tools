@@ -5,6 +5,7 @@ include 'gorm-tools'
 include 'gorm-tools-security'
 include 'gorm-tools-rest'
 include 'yakworks-domain'
+include 'commons'
 //findProject(':security').name = 'gorm-tools-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks

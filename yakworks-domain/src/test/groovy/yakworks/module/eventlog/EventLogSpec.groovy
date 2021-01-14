@@ -1,4 +1,4 @@
-package yakworks.domain.eventlog
+package yakworks.module.eventlog
 
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification

@@ -1,4 +1,4 @@
-package gorm.tools.transform;
+package yakworks.commons.transform;
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
 
@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Equals and hash code annotation for Gorm entites when you want it based on id.
+ * Equals and hash code annotation for Gorm and JPA entites when you want it based on id.
  * doesn't hydrate the proxy when checking it
  * roughtly based on the following
  * https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @java.lang.annotation.Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
-@GroovyASTTransformationClass("gorm.tools.transform.IdEqualsHashASTTransformation")
+@GroovyASTTransformationClass("yakworks.commons.transform.ast.IdEqualsHashASTTransformation")
 public @interface IdEqualsHashCode {
 
     /**

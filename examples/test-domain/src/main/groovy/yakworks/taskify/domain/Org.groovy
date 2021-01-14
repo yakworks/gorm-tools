@@ -12,9 +12,9 @@ import groovy.transform.CompileDynamic
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.taskify.domain.traits.NameNumTrait
 
 @AuditStamp

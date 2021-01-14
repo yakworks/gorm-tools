@@ -6,7 +6,6 @@ package gorm.tools.utils
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.lang3.Validate
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -14,6 +13,7 @@ import org.grails.datastore.mapping.model.types.Identity
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
+import yakworks.commons.lang.Validate
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -150,8 +150,8 @@ class GormUtils {
      * @return value of the specified property or null if any of the intermediate objects are null
      */
     static Object getPropertyValue(Object source, String property) {
-        Validate.notNull(source)
-        Validate.notEmpty(property)
+        Validate.notNull(source, 'source')
+        Validate.notEmpty(property, 'property')
 
         Object result = property.tokenize('.').inject(source) { Object obj, String prop ->
             Object value = null

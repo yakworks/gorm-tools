@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.beans
+package yakworks.commons.map
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -81,7 +81,7 @@ class Maps {
             array.reverse().each{
                 String key = it.split('\\[')[0]
                 if (newCfgMap[key] instanceof List) {
-                    newCfgMap[key].push(cfgMap[it])
+                    (newCfgMap[key] as List).push(cfgMap[it])
                 } else {
                     newCfgMap[key] = [cfgMap[it]]
                 }

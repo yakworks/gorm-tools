@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.beans
+package yakworks.commons.lang
 
 import java.text.DateFormat
 import java.text.DateFormatSymbols
@@ -19,8 +19,6 @@ import groovy.time.TimeCategory
 import groovy.time.TimeDuration
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-
-import org.apache.commons.lang3.Validate
 
 /**
  * custom manipulations with dates.
@@ -367,8 +365,8 @@ class DateUtil {
      */
     @CompileDynamic
     static int getDaysBetween(Date start, Date end) {
-        Validate.notNull(start, "Start date is null")
-        Validate.notNull(end, "End date is null")
+        Validate.notNull(start, "Start date")
+        Validate.notNull(end, "End date")
 
         int days
 

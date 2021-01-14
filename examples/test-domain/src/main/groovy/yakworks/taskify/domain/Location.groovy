@@ -5,8 +5,8 @@
 package yakworks.taskify.domain
 
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.transform.IdEqualsHashCode
 import grails.persistence.Entity
+import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
 @IdEqualsHashCode

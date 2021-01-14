@@ -4,9 +4,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.transform.IdEqualsHashCode
 
 @GrailsCompileStatic
 @IdEqualsHashCode

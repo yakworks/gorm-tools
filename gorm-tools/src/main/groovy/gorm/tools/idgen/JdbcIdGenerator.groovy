@@ -7,7 +7,6 @@ package gorm.tools.idgen
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.lang3.Validate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.jdbc.BadSqlGrammarException
@@ -15,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.transaction.annotation.Propagation
 
 import grails.gorm.transactions.Transactional
+import yakworks.commons.lang.Validate
 
 //import grails.gorm.transactions.Transactional
 /**
@@ -60,11 +60,10 @@ class JdbcIdGenerator implements IdGenerator {
     // methods.
     private long updateIncrement(String name, long increment) {
         //println "updateIncrement $name $increment"
-        Validate.notNull(idColumn, "The idColumn is undefined")
-        Validate.notNull(keyColumn, "The keyColumn is undefined")
-        Validate.notNull(table, "The table is undefined")
-        Validate.notNull(name, "The name is undefined")
-        Validate.notEmpty(name, "The name is empty")
+        Validate.notEmpty(idColumn, 'idColumn')
+        Validate.notEmpty(keyColumn, 'keyColumn')
+        Validate.notEmpty(table, 'table')
+        Validate.notEmpty(name, 'name argument')
 
         String query = "Select " + idColumn + " from " + table + " where " + keyColumn + " ='" + name + "'"
         long oid = 0

@@ -14,7 +14,7 @@ import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.web.multipart.MultipartFile
+//import org.springframework.web.multipart.MultipartFile
 
 import yakworks.commons.lang.DateUtil
 
@@ -77,17 +77,17 @@ class FileUtil {
     /**
      * Gets extension from file name
      */
-    static String extractExtension(MultipartFile file) {
-        String filename = file.getOriginalFilename()
-        return extractExtension(filename)
-    }
-
-    /**
-     * Gets mime type from file
-     */
-    static String extractMimeType(MultipartFile file) {
-        return file.getContentType()
-    }
+    // static String extractExtension(MultipartFile file) {
+    //     String filename = file.getOriginalFilename()
+    //     return extractExtension(filename)
+    // }
+    //
+    // /**
+    //  * Gets mime type from file
+    //  */
+    // static String extractMimeType(MultipartFile file) {
+    //     return file.getContentType()
+    // }
 
     /**
      * Gets mime type from file

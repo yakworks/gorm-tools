@@ -1,0 +1,11 @@
+apply plugin: "yakworks.grails-plugin"
+
+group = "org.yakworks"
+
+dependencies {
+  //libs
+  compile "commons-io:commons-io:$vCommonsIO"
+  //jasper uses itext 2.1.7 which uses bouncy 138, so until we sort that out we keep it stuck there
+  //used only in commons password stuff
+  compileOnly "bouncycastle:bcprov-jdk14:138"
+}

@@ -5,7 +5,7 @@
 package testing
 
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.transform.IdEqualsHashCode
+import yakworks.commons.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

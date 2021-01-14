@@ -8,7 +8,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.repository.model.IdGeneratorRepo
-import gorm.tools.transform.IdEqualsHashCode
+import yakworks.commons.transform.IdEqualsHashCode
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

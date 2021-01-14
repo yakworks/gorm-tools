@@ -1,0 +1,16 @@
+apply plugin: "yakworks.groovy-lib"
+
+group = "org.yakworks"
+
+dependencies {
+  compileOnly "org.codehaus.groovy:groovy-all:$groovyVersion"
+  compileOnly "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+  //libs
+  compile "commons-io:commons-io:$vCommonsIO"
+  //jasper uses itext 2.1.7 which uses bouncy 138, so until we sort that out we keep it stuck there
+  //used only in commons password stuff
+  compileOnly "bouncycastle:bcprov-jdk14:138"
+  compileOnly "org.slf4j:slf4j-api:1.7.30"
+
+  testCompile "org.spockframework:spock-core:1.3-groovy-2.5"
+}

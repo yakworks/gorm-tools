@@ -15,10 +15,10 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
-import gorm.tools.beans.IsoDateUtil
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.IdEnum
 import grails.gorm.DetachedCriteria
+import yakworks.commons.lang.IsoDateUtil
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp

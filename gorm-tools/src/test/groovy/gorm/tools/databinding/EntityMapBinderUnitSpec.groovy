@@ -6,7 +6,7 @@ package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.IsoDateUtil
+import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.model.IdEnum

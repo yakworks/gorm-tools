@@ -1,7 +1,7 @@
 package gpbench
 
 import grails.compiler.GrailsCompileStatic
-import gorm.tools.transform.IdEqualsHashCode
+import yakworks.commons.transform.IdEqualsHashCode
 
 @IdEqualsHashCode
 @GrailsCompileStatic

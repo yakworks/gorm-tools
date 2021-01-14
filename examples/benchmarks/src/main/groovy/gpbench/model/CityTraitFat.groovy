@@ -1,9 +1,9 @@
 package gpbench.model
 
-import gorm.tools.beans.IsoDateUtil
+import yakworks.commons.lang.IsoDateUtil
 import gpbench.Country
 import gpbench.Region
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 

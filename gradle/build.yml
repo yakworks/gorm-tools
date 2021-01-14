@@ -2,7 +2,7 @@
 title: Gorm Tools Grails Plugin
 description: Plugin tools Grails/Gorm - repository data services, json query language, fast data binder
 author: Yak.Works
-group: org.grails.plugins
+# group: org.grails.plugins
 
 github:
   fullName: yakworks/gorm-tools

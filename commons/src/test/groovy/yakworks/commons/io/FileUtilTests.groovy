@@ -1,7 +1,6 @@
 package yakworks.commons.io
 
 import yakworks.commons.lang.DateUtil
-import org.springframework.mock.web.MockMultipartFile
 import spock.lang.Specification
 
 class FileUtilTests extends Specification {
@@ -76,16 +75,13 @@ class FileUtilTests extends Specification {
     }
 
     def addTempFileAndGetFileName(){
-        FileInputStream inputFile = new FileInputStream(new File(System.getProperty("gradle.rootProjectDir"), "resources/attachments/test.txt"))
-        MockMultipartFile multiPartFile = new MockMultipartFile("file", "test.txt", "multipart/form-data", inputFile)
         File dir = tempDir
         if (!dir.exists()) {
             dir.mkdirs();
         }
         def filename = UUID.randomUUID()?.toString()
-        File file = new File(tempDir,filename)
-        multiPartFile.transferTo(file)
-        return filename
+        File file = FileUtil.generateTxtFile('foo', filename, tempDir)
+        return file.name
     }
 
     void testUnzip() {

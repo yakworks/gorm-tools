@@ -22,7 +22,8 @@ subprojects {
     maven { url "https://repo.grails.org/grails/core" }
   }
 
-  plugins.withId('java') {
+  ['org.grails.grails-plugin', 'org.grails.grails-web'].each { plugId -> plugins.withId(plugId) {
+
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 
@@ -51,7 +52,6 @@ subprojects {
 
       compile "org.grails.plugins:cache:$vGrailsCache"
       compile "org.codehaus.gpars:gpars:$vGpars"
-      compile "org.apache.commons:commons-lang3:$vCommonsLang3"
       compile 'org.codehaus.groovy:groovy-dateutil'
 
       runtime "com.h2database:h2"
@@ -90,7 +90,8 @@ subprojects {
       // showSkippedStandardStreams true
       // showFailedStandardStreams true
     //}
-  }
+  }}
+
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
     all {

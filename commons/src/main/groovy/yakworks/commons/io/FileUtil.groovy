@@ -14,8 +14,6 @@ import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-//import org.springframework.web.multipart.MultipartFile
-
 import yakworks.commons.lang.DateUtil
 
 /*
@@ -110,7 +108,8 @@ class FileUtil {
         return name.substring(0, name.lastIndexOf('.'))
     }
 
-    /** Accepts a string which is formatted like a GString, and a binding map for values.  Parses the values and
+    /**
+     * Accepts a string which is formatted like a GString, and a binding map for values.  Parses the values and
      * returns a string based on those values.  An example of where this would be used is Config.groovy, where the
      * values of the GString have not yet been created.
      */
@@ -126,7 +125,14 @@ class FileUtil {
      */
     @SuppressWarnings(['CatchException'])
     static File generateTxtFile(String content, String fileName, String fileLocation) {
-        def fileDirectory = new File(fileLocation)
+        generateTxtFile(content, fileName, new File(fileLocation))
+    }
+
+    /**
+     * Generates txt file, swallows any Exception and returns null if error
+     */
+    @SuppressWarnings(['CatchException'])
+    static File generateTxtFile(String content, String fileName, File fileDirectory) {
         if (!fileDirectory.exists()) {
             fileDirectory.mkdir()
         }

@@ -1,11 +1,8 @@
 package yakworks.commons.crypto
 
-import org.grails.testing.GrailsUnitTest
-
 import spock.lang.Specification
-import yakworks.commons.crypto.PasswordEncryptionUtil
 
-class PasswordEncryptionUtilSpec extends Specification implements GrailsUnitTest {
+class PasswordEncryptionUtilSpec extends Specification {
 
     static ENCRYPTED_PASSWORD = 'v4sFb3vBOrjHplcy3UJJ7Q=='
     static DECRYPTED_PASSWORD = 'greenbill'

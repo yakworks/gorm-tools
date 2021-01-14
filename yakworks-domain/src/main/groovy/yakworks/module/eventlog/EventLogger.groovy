@@ -11,6 +11,8 @@ import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.query.api.Criteria
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 
 import gorm.tools.beans.Pager
@@ -20,6 +22,7 @@ import grails.gorm.transactions.Transactional
 import grails.util.Metadata
 
 @Slf4j
+@Service @Lazy
 @CompileStatic
 class EventLogger {
 

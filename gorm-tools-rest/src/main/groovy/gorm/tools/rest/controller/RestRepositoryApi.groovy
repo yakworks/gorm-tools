@@ -172,9 +172,9 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
     }
 
     @Action
-    def massUpdate() {
+    def bulkUpdate() {
         Map json = request.getJSON() as Map
-        List<Map> data = getRepo().massUpdate(json.ids as List, json.data as Map)
+        List<Map> data = getRepo().bulkUpdate(json.ids as List, json.data as Map)
         respond([data: data])
     }
 

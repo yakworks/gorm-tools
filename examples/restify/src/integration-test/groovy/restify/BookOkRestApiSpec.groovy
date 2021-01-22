@@ -159,9 +159,9 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
 
     }
 
-    void "testing massUpdate"() {
+    void "testing bulkUpdate"() {
         when:
-        Response resp = post("$path/massUpdate", [ids: [1, 2], data: [name: "mass Updated"]])
+        Response resp = post("$path/bulkUpdate", [ids: [1, 2], data: [name: "mass Updated"]])
 
         Map body = bodyToMap(resp)
 

@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 
 import org.grails.datastore.gorm.GormEnhancer
 
-import gorm.tools.beans.IsoDateUtil
+import yakworks.commons.lang.IsoDateUtil
 import gpbench.Country
 import gpbench.Region
 import grails.compiler.GrailsCompileStatic

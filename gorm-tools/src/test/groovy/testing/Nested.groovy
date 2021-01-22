@@ -4,10 +4,13 @@
 */
 package testing
 
+import gorm.tools.repository.model.RepoEntity
+import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
-class Nested {
+@GrailsCompileStatic
+class Nested implements RepoEntity<Nested> {
     String name
     BigDecimal value
 

@@ -4,19 +4,20 @@
 */
 package testing
 
-import groovy.transform.CompileStatic
-
-import gorm.tools.traits.IdEnum
-import grails.compiler.GrailsCompileStatic
-import grails.persistence.Entity
-import groovy.transform.CompileDynamic
-
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+
+import gorm.tools.model.IdEnum
+import gorm.tools.repository.model.GormRepoEntity
+import grails.compiler.GrailsCompileStatic
+import grails.persistence.Entity
+
 @Entity
 @GrailsCompileStatic
-class Org implements NameTrait{
+class Org implements NameTrait, GormRepoEntity<Org, OrgRepo> {
     Integer descId // inverted order for test
     //strings
     String name2
@@ -41,6 +42,9 @@ class Org implements NameTrait{
     //enums
     Kind kind = Kind.CLIENT
     TestIdent testIdent = TestIdent.Num2
+
+    // event and repo testing
+    String beforeValidateCheck
 
     static mapping = {
         //id generator:'assigned'
@@ -70,6 +74,7 @@ class Org implements NameTrait{
         type nullable: false
         location nullable: true
         ext  nullable: true
+
     }
 
     static config = """{
@@ -85,10 +90,15 @@ class Org implements NameTrait{
     @CompileDynamic //bug in grailsCompileStatic requires this on internal enums
     enum Kind {CLIENT, COMPANY}
 
+    static boolean staticeRepoCall() {
+        getRepo().sampleRepoCall()
+    }
+
+    boolean intstanceRepoCall() { getRepo().intstanceRepoCall(this) }
 }
 
 @CompileStatic
-enum TestIdent implements IdEnum<TestIdent,Long> {
+enum TestIdent implements IdEnum<TestIdent, Long> {
     Num2(2), Num4(4)
     final Long id
 

@@ -13,10 +13,10 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.GormValidateable
+import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
-import org.grails.datastore.mapping.validation.ValidationErrors
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.MessageSource
@@ -25,17 +25,18 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
+import org.springframework.validation.BeanPropertyBindingResult
 import org.springframework.validation.FieldError
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.RepositoryApi
 import grails.gorm.validation.ConstrainedProperty
 import grails.validation.ValidationException
 
@@ -84,9 +85,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     @Override
-    D persist(Map args = [:], D entity) {
+    D persist(D entity, Map args = [:]) {
         entityTrx {
-            doPersist(args, entity)
+            doPersist(entity, args)
         }
         return entity
     }
@@ -106,7 +107,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
     @Override
-    D doPersist(Map args = [:], D entity) {
+    D doPersist(D entity, Map args) {
         try {
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
             getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
@@ -124,9 +125,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * Transactional wrap for {@link #doCreate}
      */
     @Override
-    D create(Map args = [:], Map data) {
+    D create(Map data, Map args = [:]) {
         entityTrx {
-            doCreate(args, data)
+            doCreate(data, args)
         }
     }
 
@@ -140,19 +141,23 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @see #doPersist
      */
     @Override
-    D doCreate(Map args, Map data) {
+    D doCreate(Map data, Map args) {
         D entity = (D) getEntityClass().newInstance()
-        bindAndSave(args, entity, data, BindAction.Create)
+        bindAndCreate(entity, data, args)
         return entity
+    }
+
+    void bindAndCreate(D entity, Map data, Map args) {
+        bindAndSave(entity, data, BindAction.Create, args)
     }
 
     /**
      * Transactional wrap for {@link #doUpdate}
      */
     @Override
-    D update(Map args = [:], Map data) {
+    D update(Map data, Map args = [:]) {
         entityTrx {
-            doUpdate(args, data)
+            doUpdate(data, args)
         }
     }
 
@@ -164,20 +169,24 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @see #doPersist
      */
     @Override
-    D doUpdate(Map args, Map data) {
+    D doUpdate(Map data, Map args) {
         D entity = get(data['id'] as Serializable, data['version'] as Long)
-        bindAndSave(args, entity, data, BindAction.Update)
+        bindAndUpdate(entity, data, args)
         return entity
     }
 
+    void bindAndUpdate(D entity, Map data, Map args) {
+        bindAndSave(entity, data, BindAction.Update, args)
+    }
+
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
-    void bindAndSave(Map args, D entity, Map data, BindAction bindAction){
+    void bindAndSave(D entity, Map data, BindAction bindAction, Map args){
         args['bindAction'] = bindAction
-        bind(args, entity, data, bindAction)
+        bind(entity, data, bindAction, args)
         //set the id if it has one in data and bindId arg is passed in as true
         if(args.remove('bindId') && BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
         args['data'] = data
-        doPersist(args, entity)
+        doPersist(entity, args)
     }
 
     /**
@@ -186,9 +195,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * Or even better implement the beforeBind|afterBind event methods
      */
     @Override
-    void bind(Map args = [:], D entity, Map data, BindAction bindAction) {
+    void bind(D entity, Map data, BindAction bindAction, Map args = [:]) {
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
-        doBind(args, entity, data, bindAction)
+        doBind(entity, data, bindAction, args)
         getRepoEventPublisher().doAfterBind(this, (GormEntity)entity, data, bindAction, args)
     }
 
@@ -198,7 +207,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * can also call this if you do NOT want the before/after Bind events to fire
      */
     @Override
-    void doBind(Map args, D entity, Map data, BindAction bindAction) {
+    void doBind(D entity, Map data, BindAction bindAction, Map args) {
         getMapBinder().bind(args, entity, data)
     }
 
@@ -211,7 +220,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws EntityNotFoundException if its not found or if a DataIntegrityViolationException is thrown
      */
     @Override
-    void removeById( Map args = [:], Serializable id) {
+    void removeById(Serializable id, Map args = [:]) {
         gormStaticApi().withTransaction {
             D entity = get(id, null)
             doRemove(entity)
@@ -225,9 +234,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
      */
     @Override
-    void remove(Map args = [:], D entity) {
+    void remove(D entity, Map args = [:]) {
         gormStaticApi().withTransaction {
-            doRemove(args, entity)
+            doRemove(entity, args)
         }
     }
 
@@ -237,7 +246,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
      * @param entity - the domain instance to delete
      * @param args - args passed to delete
      */
-    void doRemove(Map args = [:], D entity) {
+    void doRemove(D entity, Map args = [:]) {
         try {
             getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
             gormInstanceApi().delete(entity, args)
@@ -246,6 +255,30 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         catch (DataAccessException ex) {
             throw handleException(ex, entity)
         }
+    }
+
+    /**
+     * creates, removes or updates the location based on params
+     * if params has an id then its considered an update
+     * if params has an id and params.op == remove then it will delete it
+     * otherwise create it
+     * XXX needs tests
+     */
+    D createOrUpdate(Map data){
+        if(!data) return
+
+        D entity
+        String op = data.op as String  //add, update, delete really only needed for delete
+        if(data.id){
+            if(op == 'remove') {
+                removeById(data.id as Long)
+            } else {
+                entity = update(data)
+            }
+        } else {
+            entity = create(data)
+        }
+        return entity
     }
 
     /**
@@ -261,7 +294,7 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
     @Override
     D get(Serializable id, Long version) {
         D entity = get(id)
-        RepoUtil.checkFound(entity, [id: id], getEntityClass().name)
+        RepoUtil.checkFound(entity, id, getEntityClass().name)
         if (version != null) RepoUtil.checkVersion(entity, version)
         return entity
     }
@@ -309,10 +342,16 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         getRepoEventPublisher().doBeforeValidate(this, entity, [:])
     }
 
-    void addFieldError(GormValidateable target, String propName, String code, String defaultCode, Object args){
-        if(!args) args = [propName, getEntityClass()]
+    //copied in from AbstractConstraint to keep it consistent
+    void rejectValue(GormValidateable target, String propName, Object val, String code, String defaultMessageCode = null, Object argsOverride = null) {
+        rejectValueWithMessage(target, propName, val, code, getDefaultMessage(defaultMessageCode), argsOverride)
+    }
+
+    //copied in from AbstractConstraint to keep it consistent
+    void rejectValueWithMessage(GormValidateable target, String propName, Object val, String code, String defaultMessage = null, Object argsOverride = null){
+        if(argsOverride == null) argsOverride = [propName, getEntityClass(), val]
         def newCodes = [] as Set<String>
-        def errors = target.errors as ValidationErrors
+        def errors = target.errors as BeanPropertyBindingResult
         String classShortName = Introspector.decapitalize(getEntityClass().getSimpleName())
         newCodes.add("${getEntityClass().getName()}.${propName}.${code}".toString())
         newCodes.add("${classShortName}.${propName}.${code}".toString())
@@ -322,11 +361,11 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         FieldError error = new FieldError(
             errors.objectName,
             errors.nestedPath + propName,
-            target[propName], //reject value
+            val, //reject value
             false, //bind failure
             newCodes as String[],
-            args as Object[],
-            getDefaultMessage(defaultCode)
+            argsOverride as Object[],
+            defaultMessage
         )
         errors.addError(error)
     }
@@ -425,25 +464,25 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     void batchPersist(Map args = [:], List<D> list) {
         batchTrx(list) { D item ->
-            doPersist(args, item)
+            doPersist(item, args)
         }
     }
 
     void batchCreate(Map args = [:], List<Map> list) {
         batchTrx(list) { Map item ->
-            doCreate(args, item)
+            doCreate(item, args)
         }
     }
 
     void batchUpdate(Map args = [:], List<Map> list) {
         batchTrx(list) { Map item ->
-            doUpdate(args, item)
+            doUpdate(item, args)
         }
     }
 
     void batchRemove(Map args = [:], List list) {
         batchTrx(list) { Serializable item ->
-            removeById(args, item)
+            removeById(item, args)
         }
     }
 
@@ -453,5 +492,9 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     GormStaticApi<D> gormStaticApi() {
         (GormStaticApi<D>)GormEnhancer.findStaticApi(getEntityClass())
+    }
+
+    GormValidationApi gormValidationApi() {
+        GormEnhancer.findValidationApi(getEntityClass())
     }
 }

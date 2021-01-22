@@ -2,6 +2,8 @@
 // apply plugin: 'org.grails.grails-plugin'
 apply plugin: "yakworks.grails-plugin"
 
+group = "org.grails.plugins"
+
 dependencies {
   compile "commons-codec:commons-codec:$vCommonsCodec"
   compile "org.grails.plugins:converters:$vConverters"

@@ -32,7 +32,7 @@ function compile {
 
 # check used for circle
 function check {
-  ./gradlew check
+  ./gradlew check --max-workers=2
 }
 
 # helper/debug function ex: `build.sh logVars test sqlserver`

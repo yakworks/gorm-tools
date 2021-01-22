@@ -4,7 +4,6 @@ import gpbench.Country
 import gpbench.Region
 import gorm.tools.audit.AuditStamp
 import gpbench.model.CityTraitFat
-import gpbench.model.CityTraitFatConstraints
 import grails.compiler.GrailsCompileStatic
 
 /**

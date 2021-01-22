@@ -28,7 +28,6 @@ import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
-import gorm.tools.beans.IsoDateUtil
 import gorm.tools.utils.GormMetaUtils
 import grails.core.GrailsApplication
 import grails.databinding.DataBindingSource
@@ -41,6 +40,7 @@ import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
 import grails.util.GrailsClassUtils
 import grails.validation.ValidationErrors
+import yakworks.commons.lang.IsoDateUtil
 
 /**
  * Faster data binder for PersistentEntity.persistentProperties. Uses the persistentProperties to assign values from the Map

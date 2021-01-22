@@ -26,13 +26,3 @@ trait DatesTrait {
         c()
     }
 }
-
-class DatesTraitConstraints implements DatesTrait {
-
-    static constraints = {
-        date1 nullable: true
-        date2 nullable: true
-        date3 nullable: true
-        date4 nullable: true
-    }
-}

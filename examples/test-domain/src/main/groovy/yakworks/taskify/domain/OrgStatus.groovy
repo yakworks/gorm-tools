@@ -2,7 +2,7 @@ package yakworks.taskify.domain
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
 
 @CompileStatic
 enum OrgStatus implements IdEnum<OrgStatus,Integer> {

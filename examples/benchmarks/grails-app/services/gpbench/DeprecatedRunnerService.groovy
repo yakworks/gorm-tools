@@ -2,7 +2,7 @@ package gpbench
 
 
 import gorm.tools.async.AsyncSupport
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gpbench.basic.*

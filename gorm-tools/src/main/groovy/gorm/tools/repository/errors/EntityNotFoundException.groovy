@@ -8,6 +8,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
 
+import gorm.tools.support.MsgSourceResolvable
+
 /**
  * an extension of the DataRetrievalFailureException that is more performant. fillInStackTrace is overriden to show nothing
  * so it will be faster and consume less memory when thrown.
@@ -16,14 +18,28 @@ import org.springframework.dao.DataRetrievalFailureException
  * @since 6.1
  */
 @CompileStatic
-class EntityNotFoundException extends DataRetrievalFailureException {
+class EntityNotFoundException extends DataRetrievalFailureException implements MsgSourceResolvable {
 
     EntityNotFoundException(String msg) {
         super(msg)
+        defaultMessage = msg
     }
 
     EntityNotFoundException(Serializable id, String domainName) {
-        super("${domainName} not found with id ${id}")
+        this('default.not.found.message',
+            [domainName, (id instanceof Number ? "id:$id" : id.toString())],
+            "${domainName} not found for ${id instanceof Number ? "id:$id" : id.toString()}"
+        )
+    }
+
+    EntityNotFoundException(String code, List args, String defaultMsg = null) {
+        super(defaultMsg ?: code)
+        setMessage(code, args, defaultMsg)
+    }
+
+    EntityNotFoundException(MsgSourceResolvable msgKey) {
+        super(msgKey.defaultMessage ?: msgKey.code)
+        setMessage(msgKey)
     }
 
     /**

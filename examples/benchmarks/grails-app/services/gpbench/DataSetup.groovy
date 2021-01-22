@@ -1,6 +1,6 @@
 package gpbench
 
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 import gpbench.traits.BenchConfig
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic

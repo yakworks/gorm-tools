@@ -1,9 +1,9 @@
 package gpbench.model
 
-import gorm.tools.beans.IsoDateUtil
+import yakworks.commons.lang.IsoDateUtil
 import gpbench.Country
 import gpbench.Region
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 
@@ -32,10 +32,10 @@ trait CityTraitFat implements CityTrait, CityTrait2, CityTrait3, DatesTrait {
         this.latitude3 = row['latitude3'] as BigDecimal
         this.longitude3 = row['longitude3'] as BigDecimal
         //this.properties = row
-        date1 = IsoDateUtil.parse(row['date1'] as String)
-        date2 = IsoDateUtil.parseLocalDate(row['date2'] as String) //DateUtil.parse(row['date2'] as String)
-        date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
-        date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
+        this.date1 = IsoDateUtil.parse(row['date1'] as String)
+        this.date2 = IsoDateUtil.parseLocalDate(row['date2'] as String) //DateUtil.parse(row['date2'] as String)
+        this.date3 = IsoDateUtil.parseLocalDateTime(row['date3'] as String)
+        this.date4 = IsoDateUtil.parseLocalDate(row['date4'] as String)
 
 //        region = Region.load(row['region']['id'] as Long)
 //        region2 = Region.load(row['region2']['id'] as Long)
@@ -58,21 +58,10 @@ trait CityTraitFat implements CityTrait, CityTrait2, CityTrait3, DatesTrait {
         }
     }
 
-    @CompileDynamic
-    static CityTraitFatConstraints(Object delegate) {
+    static void CityTraitFatConstraints(Object delegate) {
         CityTraitConstraints(delegate)
         CityTrait2Constraints(delegate)
         CityTrait3Constraints(delegate)
         DatesTraitConstraints(delegate)
-    }
-}
-
-class CityTraitFatConstraints implements CityTraitFat {
-
-    static constraints = {
-        importFrom(CityTraitConstraints)
-        importFrom(CityTrait2Constraints)
-        importFrom(CityTrait3Constraints)
-        importFrom DatesTraitConstraints
     }
 }

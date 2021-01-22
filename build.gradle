@@ -8,10 +8,12 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
-    //classpath "org.grails.plugins:views-gradle:2.0.2"
+    // classpath "org.grails.plugins:views-gradle:2.0.2"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
   }
 }
+
+group = "org.grails.plugins"
 
 apply plugin: 'yakworks.shipyak' //our opinionated defaults for gradle groovy & grails projects
 
@@ -20,7 +22,8 @@ subprojects {
     maven { url "https://repo.grails.org/grails/core" }
   }
 
-  plugins.withId('java') {
+  ['org.grails.grails-plugin', 'org.grails.grails-web'].each { plugId -> plugins.withId(plugId) {
+
     sourceCompatibility = '1.8'
     targetCompatibility = '1.8'
 
@@ -39,17 +42,20 @@ subprojects {
 
       compile "org.grails.plugins:events"
 
-      compile "org.grails.plugins:hibernate5"
+      // compile "org.grails:grails-datastore-gorm:7.0.8.RELEASE"
+      compile ("org.grails.plugins:hibernate5")
+      //   {
+      //   exclude group: 'org.grails', module: 'grails-datastore-gorm'
+      // }
       compile "org.hibernate:hibernate-core:$vHibernate"
       compile "org.hibernate:hibernate-ehcache:$vHibernate"
 
       compile "org.grails.plugins:cache:$vGrailsCache"
       compile "org.codehaus.gpars:gpars:$vGpars"
-      compile "org.apache.commons:commons-lang3:$vCommonsLang3"
       compile 'org.codehaus.groovy:groovy-dateutil'
 
       runtime "com.h2database:h2"
-      runtimeOnly "com.zaxxer:HikariCP:3.4.5"
+      testRuntime "com.zaxxer:HikariCP:$vHikari"
 
       compileOnly "io.micronaut:micronaut-inject-groovy"
 
@@ -84,7 +90,8 @@ subprojects {
       // showSkippedStandardStreams true
       // showFailedStandardStreams true
     //}
-  }
+  }}
+
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
     all {
@@ -96,12 +103,16 @@ subprojects {
     }
   }
 
-  //sets the path to sys properties so we can use it find grails-app/conf during AST
+  // sets the path to sys properties so we can use it find grails-app/conf during AST
   plugins.withId('groovy') {
     compileGroovy {
       groovyOptions.fork = true
       groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
     }
+  }
+  tasks.withType(Test) {
+    //so that we can use in config and share resources/rootlocation across projects for testing
+    systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
   }
 }
 

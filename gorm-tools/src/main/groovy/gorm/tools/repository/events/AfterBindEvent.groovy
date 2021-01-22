@@ -7,7 +7,7 @@ package gorm.tools.repository.events
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 
 /**
  * Fired After a bind and save/persist. Often used along with params to setup other domains associations

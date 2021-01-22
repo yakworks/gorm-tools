@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.lang3.Validate
+import yakworks.commons.lang.Validate
 
 /**
  * An Thread safe implementation that caches a range of values in memory by the key name (ie: "tablename.id")
@@ -104,7 +104,7 @@ class PooledIdGenerator implements IdGenerator {
     }
 
     AtomicReference<IdTuple> findOrCreate(String keyName) {
-        Validate.notNull(keyName, "The row key name can't be null")
+        Validate.notEmpty(keyName, "keyName arg")
 
         if (!idTupleMap.containsKey(keyName)) {
             // synchronize on the keyname and just let 1 thread create them. Creation should only happen once
@@ -167,7 +167,7 @@ class PooledIdGenerator implements IdGenerator {
     }
 
     void setGenerator(IdGenerator generator) {
-        Validate.isTrue(this.generator == null, "IdGenerator is already created, no hot swapping")
+        if(this.generator) throw new IllegalArgumentException("IdGenerator is already assigned, no hot swapping")
         this.generator = generator
     }
 

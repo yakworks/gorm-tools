@@ -26,13 +26,3 @@ trait DateUserStamp {
         c()
     }
 }
-
-class DateUserStampConstraints implements DateUserStamp {
-
-    static constraints = {
-        dateCreated nullable: true, display: false, editable: false, bindable: false
-        lastUpdated nullable: true, display: false, editable: false, bindable: false
-        dateCreatedUser nullable: true, display: false, editable: false, bindable: false
-        lastUpdatedUser nullable: true, display: false, editable: false, bindable: false
-    }
-}

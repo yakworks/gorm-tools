@@ -6,16 +6,16 @@ package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.beans.IsoDateUtil
+import yakworks.commons.lang.IsoDateUtil
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
 import grails.databinding.converters.ValueConverter
 import grails.persistence.Entity
 import org.grails.databinding.converters.ConversionService
 import org.grails.databinding.converters.DateConversionHelper
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -485,7 +485,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
 
 
 @Entity
-class TestDomain {
+class TestDomain implements RepoEntity<TestDomain> {
     // by default binder consider regular fields as "bindable:true",
     // so there is no need to specify constraints explicitly for that
     String name
@@ -542,12 +542,12 @@ enum TestEnumIdent implements IdEnum<TestEnumIdent,Long>{
 }
 
 @Entity
-class AnotherDomain {
+class AnotherDomain implements RepoEntity<AnotherDomain>{
     String name
 }
 
 @Entity
-class Nest {
+class Nest implements RepoEntity<Nest>{
     String name
     String name2
 
@@ -560,6 +560,6 @@ class Nest {
 }
 
 @Entity
-class BindableNested {
+class BindableNested implements RepoEntity<BindableNested>{
     String name
 }

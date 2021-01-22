@@ -8,8 +8,7 @@ package gorm.tools
 import groovy.transform.CompileStatic
 
 import gorm.tools.json.Jsonify
-import gorm.tools.testing.unit.DomainRepoTest
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Rollback
 import grails.persistence.Entity

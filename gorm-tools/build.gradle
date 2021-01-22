@@ -3,9 +3,15 @@ apply plugin: "yakworks.grails-plugin"
 // apply plugin: 'groovy'
 // apply plugin:"org.grails.grails-plugin"
 
+group = "org.grails.plugins"
+
 dependencies {
   console "org.grails:grails-console"
 
+  compile project(":commons")
+
+  compile "org.apache.commons:commons-lang3:$vCommonsLang3"
+  // compile "org.grails:grails-datastore-gorm:7.0.8.RELEASE"
   //used for json parsing but require it to be added to project that uses this
   compileOnly "org.grails.plugins:views-json:$vViews"
   compileOnly "org.grails.plugins:views-json-templates:$vViews"

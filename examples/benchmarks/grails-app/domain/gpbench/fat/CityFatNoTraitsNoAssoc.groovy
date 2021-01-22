@@ -1,6 +1,6 @@
 package gpbench.fat
 
-import gorm.tools.beans.IsoDateUtil
+import yakworks.commons.lang.IsoDateUtil
 import grails.compiler.GrailsCompileStatic
 
 import java.time.LocalDate

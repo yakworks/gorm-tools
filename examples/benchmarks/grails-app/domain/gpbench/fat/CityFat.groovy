@@ -5,7 +5,7 @@ import gpbench.Region
 import gpbench.model.CityTraitFat
 import gpbench.model.DateUserStamp
 import grails.compiler.GrailsCompileStatic
-import gorm.tools.transform.IdEqualsHashCode
+import yakworks.commons.transform.IdEqualsHashCode
 
 @IdEqualsHashCode
 @GrailsCompileStatic

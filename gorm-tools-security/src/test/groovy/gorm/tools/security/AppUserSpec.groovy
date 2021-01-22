@@ -38,10 +38,10 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
 
     @Override
     AppUser createEntity(Map args){
-        entity = new AppUser()
+        //def entity = new AppUser()
         args = buildMap(args)
         args << [password:'secretStuff', repassword:'secretStuff']
-        entity = AppUser.create(args)
+        def entity = AppUser.create(args)
         //We have to add 'password' field manually, because it has the "bindable: false" constraint
         entity.password = 'test_pass_123'
         entity.persist(flush: true)
@@ -53,7 +53,7 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
     AppUser persistEntity(Map args){
         args.get('save', false) //adds save:false if it doesn't exists
         args['password'] = "test"
-        entity = build(buildMap(args))
+        def entity = build(buildMap(args))
         assert entity.persist(flush: true)
         return get(entity.id)
     }

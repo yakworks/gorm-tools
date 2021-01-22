@@ -4,12 +4,14 @@
 */
 package yakworks.taskify.domain
 
-import gorm.tools.transform.IdEqualsHashCode
+import gorm.tools.repository.model.RepoEntity
 import grails.persistence.Entity
+import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
 @IdEqualsHashCode
-class Location {
+class Location implements RepoEntity<Location>{
+    // static belongsTo = [Org]
     static List qSearchIncludes = ['street', 'city']
     // address fields
     String street
@@ -21,5 +23,6 @@ class Location {
     static constraints = {
         // city nullable: false
         // address nullable: true
+        country maxSize:2
     }
 }

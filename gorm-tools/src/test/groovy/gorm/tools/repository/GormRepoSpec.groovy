@@ -5,6 +5,7 @@
 package gorm.tools.repository
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
@@ -16,7 +17,7 @@ import grails.persistence.Entity
 //import static grails.buildtestdata.TestData.build
 
 import org.springframework.dao.OptimisticLockingFailureException
-import spock.lang.Ignore
+
 import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
@@ -25,7 +26,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "assert proper repos are setup"() {
         expect:
-        Org.repo instanceof DefaultGormRepo
+        Org.repo instanceof OrgRepo
         Org.repo.entityClass == Org
         Location.repo instanceof DefaultGormRepo
         Location.repo.entityClass == Location
@@ -84,7 +85,6 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     }
 
-    //@Ignore('needs to be looked at now with gorm 6.1.12')
     def "test dirty checking works for traits"() {
         when:
         Org org = build(Org)//new Org(name: "get_test_version").save()
@@ -196,7 +196,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when:
         Map p = [id: org.id, name: 'foo']
-        org = Org.repo.update(p, flush: true)
+        org = Org.repo.update(p, [flush: true])
 
         then:
         org.name == "foo"
@@ -227,7 +227,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Org org = build(Org)
 
         when:
-        Org.repo.removeById([:], org.id)
+        Org.repo.removeById(org.id)
 
         then:
         Org.get(org.id) == null
@@ -394,7 +394,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 }
 
 @Entity @GrailsCompileStatic
-class TestTrxRollback {
+class TestTrxRollback implements RepoEntity<TestTrxRollback> {
     String name
     BigDecimal amount
 
@@ -408,7 +408,7 @@ class TestTrxRollback {
 class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
 
     @Override
-    TestTrxRollback doPersist(Map args, TestTrxRollback entity) {
+    TestTrxRollback doPersist(TestTrxRollback entity, Map args) {
         args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
         getRepoEventPublisher().doBeforePersist(this, entity, args)
         entity.save(args)
@@ -422,7 +422,7 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
     }
 
     @Override
-    void doRemove(Map args, TestTrxRollback entity) {
+    void doRemove(TestTrxRollback entity, Map args) {
         getRepoEventPublisher().doBeforeRemove(this, entity)
         entity.delete(args)
         getRepoEventPublisher().doAfterRemove(this, entity)

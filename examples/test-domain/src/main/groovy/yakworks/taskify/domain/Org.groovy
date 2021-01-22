@@ -10,17 +10,18 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStamp
-import gorm.tools.transform.IdEqualsHashCode
+import gorm.tools.hibernate.criteria.CreateCriteriaSupport
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.taskify.domain.traits.NameNumTrait
-
 
 @AuditStamp
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class Org implements NameNumTrait {
+class Org implements NameNumTrait, RepoEntity<Org>, CreateCriteriaSupport {
 
     //strings
     String name2
@@ -62,7 +63,8 @@ class Org implements NameNumTrait {
 
     static mapping = {
         //id generator:'assigned'
-        ext column: 'extId'
+        ext column: 'extId' //, cascade: 'none'
+        location column: 'locationId'
         status enumType: 'identity'
     }
 

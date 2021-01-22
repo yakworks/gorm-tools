@@ -14,6 +14,15 @@ restApi:
     includes:
       get: ['*', 'type.*', 'status.*']
       picklist: ['id', 'name']
+    form:
+      - key: reasonCode
+        type: select
+        selectOptions:
+          dataApiKey: orgType
+          dataApiParams:
+            or:
+              - name: 'name'
+              - name: 'name2'
 
   task:
     entityClass: yakworks.taskify.domain.Task

@@ -7,10 +7,11 @@ package restify
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.GormRepo
 import grails.gorm.transactions.Transactional
 
 @Transactional
 @CompileStatic
-class BookRepo extends DefaultGormRepo<Book> {
+class BookRepo implements GormRepo<Book> {
 
 }

@@ -16,8 +16,8 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.util.ReflectionUtils
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.api.RepositoryApi
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
+import gorm.tools.repository.model.RepositoryApi
 import grails.core.GrailsApplication
 import grails.events.bus.EventBus
 

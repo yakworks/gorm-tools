@@ -3,16 +3,16 @@ package yakworks.taskify.domain
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-import gorm.tools.transform.IdEqualsHashCode
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-
+import yakworks.commons.transform.IdEqualsHashCode
 
 @GrailsCompileStatic
 @IdEqualsHashCode
 //@RestApi(description = "This is a project ")
 @Entity
-class Project {
+class Project implements RepoEntity<Project>{
     static List qSearchIncludes = ['num', 'name']
 
     static constraints = {

@@ -1,7 +1,7 @@
 package restify
 
-import gorm.tools.beans.Maps
 import grails.core.GrailsApplication
+import yakworks.commons.map.Maps
 
 class AppConfigController {
     static namespace = 'api'

@@ -2,12 +2,11 @@ package testing
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.taskify.domain.Contact
 import yakworks.taskify.domain.ContactAddress
-import yakworks.taskify.domain.ContactRepo
+import yakworks.taskify.repo.ContactRepo
 import yakworks.taskify.domain.Location
 import yakworks.taskify.domain.Org
 

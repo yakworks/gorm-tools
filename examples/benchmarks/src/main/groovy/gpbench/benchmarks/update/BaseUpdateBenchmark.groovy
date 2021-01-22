@@ -2,7 +2,7 @@ package gpbench.benchmarks.update
 
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.api.RepositoryApi
+import gorm.tools.repository.model.RepositoryApi
 import gpbench.Country
 import gpbench.Region
 import gpbench.benchmarks.BaseBatchInsertBenchmark
@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom
  */
 
 @CompileStatic
-abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extends BaseBatchInsertBenchmark<T> {
+abstract class BaseUpdateBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
     EntityMapBinder entityMapBinder
     RepositoryApi<T> repo
@@ -29,7 +29,7 @@ abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
 
     BaseUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
-        repo = RepoUtil.findRepository(clazz)
+        repo = RepoUtil.findRepo(clazz)
     }
 
     //region ids are not sequential, so we need to keep reference of list of region ids to select one of it randomly)
@@ -60,7 +60,7 @@ abstract class BaseUpdateBenchmark<T extends GormEntity & WebDataBinding> extend
 
             if(latitude < 89.00) latitude = latitude + 1
             if(longitude < 378.00) longitude = longitude + 1
-            
+
             row.latitude = latitude.toString()
             row.longitude = longitude.toString()
             row.name = row.name + "-Updated"

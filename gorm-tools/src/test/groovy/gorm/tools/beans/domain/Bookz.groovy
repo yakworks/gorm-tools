@@ -6,13 +6,12 @@ package gorm.tools.beans.domain
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.traits.IdEnum
+import gorm.tools.model.IdEnum
+import gorm.tools.repository.model.RepoEntity
 import grails.persistence.Entity
 
-
 @Entity
-class Bookz {
-    Long id
+class Bookz implements RepoEntity<Bookz> {
     String name
     BigDecimal cost
 

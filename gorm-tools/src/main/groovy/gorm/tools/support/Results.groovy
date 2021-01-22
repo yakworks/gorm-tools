@@ -5,7 +5,6 @@
 package gorm.tools.support
 
 import groovy.transform.CompileStatic
-import groovy.transform.MapConstructor
 import groovy.transform.ToString
 
 import org.springframework.context.MessageSource
@@ -26,7 +25,7 @@ import gorm.tools.beans.AppCtx
 @ToString(includes = ['ok', 'id', 'code', 'args', 'meta'], includeNames = true)
 //@MapConstructor(noArg=true)
 @CompileStatic
-class Results implements MsgSourceResolvableTrait{
+class Results implements MsgSourceResolvable{
     boolean ok = true
     //some or none of these may be filled in
     //the optional identifier of the entity this is for
@@ -171,7 +170,7 @@ class Results implements MsgSourceResolvableTrait{
                 //setMessage(ex as MessageSourceResolvable)
             }
             else if(ex.hasProperty('messageMap')){
-                msr = new MessageSourceKey(ex['messageMap'] as Map)
+                msr = new MsgKey(ex['messageMap'] as Map)
             }
         }
         return AppCtx.get("messageSource", MessageSource).getMessage(msr, LocaleContextHolder.getLocale())

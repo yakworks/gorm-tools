@@ -18,6 +18,7 @@ import org.grails.datastore.mapping.model.types.Association
 import gorm.tools.utils.GormMetaUtils
 import grails.util.GrailsClassUtils
 import grails.web.servlet.mvc.GrailsParameterMap
+import yakworks.commons.map.MapFlattener
 
 //import org.apache.commons.logging.*
 

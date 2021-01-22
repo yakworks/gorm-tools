@@ -8,5 +8,5 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 enum BindAction {
-    Create, Update, Delete, Generic
+    Create, Update
 }

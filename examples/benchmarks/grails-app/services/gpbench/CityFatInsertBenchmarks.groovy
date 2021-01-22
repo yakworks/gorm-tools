@@ -1,6 +1,6 @@
 package gpbench
 
-import gorm.tools.beans.IsoDateUtil
+import yakworks.commons.lang.IsoDateUtil
 import gpbench.fat.*
 import gpbench.traits.BenchProcessData
 import groovy.transform.CompileDynamic

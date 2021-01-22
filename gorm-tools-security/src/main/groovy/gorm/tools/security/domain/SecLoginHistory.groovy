@@ -6,12 +6,13 @@ package gorm.tools.security.domain
 
 import java.time.LocalDateTime
 
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class SecLoginHistory implements Serializable {
+class SecLoginHistory implements RepoEntity<SecLoginHistory>, Serializable {
 
     AppUser user
     LocalDateTime loginDate

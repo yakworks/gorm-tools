@@ -33,7 +33,8 @@ class AuditStampSupport {
 
     @PostConstruct
     void init() {
-        if(!fieldProps) fieldProps = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
+        // if(!fieldProps) fieldProps = FieldProps.buildFieldMap(new AuditStampConfigLoader().load())
+        if(!fieldProps) fieldProps = FieldProps.buildFieldMap([:])
         for (PersistentEntity persistentEntity : grailsDomainClassMappingContext.getPersistentEntities()) {
             if (isClassAuditStamped(persistentEntity.javaClass)) auditStampedEntities << persistentEntity.name
         }

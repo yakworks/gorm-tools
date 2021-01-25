@@ -13,11 +13,15 @@ import org.springframework.transaction.TransactionStatus
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
+import gorm.tools.support.Results
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLinkTrait
 
 @Slf4j
 @CompileStatic
 trait AttachmentLinkRepoTrait<D> implements GormRepo<D> {
+
+    AttachmentRepo attachmentRepo
 
     Map getKeyMap(long linkedId, String linkedEntity, Attachment attachment){
         [linkedId: linkedId, linkedEntity: linkedEntity, attachment: attachment]
@@ -112,6 +116,29 @@ trait AttachmentLinkRepoTrait<D> implements GormRepo<D> {
         } else if (attachParams instanceof Map &&  attachParams['op'] == 'remove') {
             removeAll(entity)
         }
+    }
+
+    /**
+     * Copies Attachments from the source to target
+     *
+     * @param fromEntity entity to copy attachments from
+     * @param toEntity entity to copy attachments to
+     * @return the Results which will be ok or have errors if problem occured with IO
+     */
+    //XXX needs good test from 9ci rally
+    Results copy(Persistable fromEntity, Persistable toEntity) {
+        Results results = Results.OK
+        List attachLinks = list(fromEntity) as List<AttachmentLinkTrait>
+        for(AttachmentLinkTrait attachLink : attachLinks){
+            //catch exceptions and move on in case attachment has a bad link we dont want to fail the whole thing
+            try {
+                Attachment attachmentCopy = attachmentRepo.copy(attachLink.attachment)
+                if (attachmentCopy) create(toEntity, attachmentCopy)
+            } catch (ex){
+                results.addError(ex)
+            }
+        }
+        return results
     }
 
 }

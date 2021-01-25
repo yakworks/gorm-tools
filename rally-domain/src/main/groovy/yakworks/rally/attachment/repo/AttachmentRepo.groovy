@@ -13,8 +13,6 @@ import org.springframework.core.io.Resource
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.web.multipart.MultipartFile
 
-import gorm.tools.idgen.IdGenerator
-import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
@@ -22,14 +20,11 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import gorm.tools.support.Results
 import grails.gorm.transactions.Transactional
 import grails.plugin.viewtools.AppResourceLoader
 import grails.web.mapping.LinkGenerator
 import yakworks.commons.io.FileUtil
-import yakworks.commons.map.MapFlattener
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
 
 /**
  * Attachments are not as simple as they might be in this application.  Please read this documentation before messing
@@ -290,46 +285,4 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
     }
 
-    /**
-     * Copies OrgAttachments and Attachments from the source customer to target
-     *
-     * @param source customer to copy attachments from
-     * @param target customer to copy attachments from
-     * @return the list of new OrgAttachments
-     */
-    //XXX needs good test from 9ci rally
-    @Transactional
-    Results copyAttachments(Persistable fromEntity, Persistable toEntity) {
-        Results results = Results.OK
-        List<AttachmentLink> attachLinks = attachmentLinkRepo.list(fromEntity)
-        for(AttachmentLink attachLink : attachLinks){
-            Attachment sourceAttachment = attachLink.attachment
-
-            // XXX this needs redesign to get rid of the hacks below
-            Map attachmentConfig = new MapFlattener().flatten(appResourceLoader.getResourceConfig("attachments"))
-            String attachmentsRoot = attachmentConfig.get("location")
-            String location = null
-
-            //
-            // searching for the appropriate attachment location in appconfig
-            // for example, there is separate config for attachment and attachment.creditFiles
-            attachmentConfig.each { k, v ->
-                String path = v.replaceAll("${attachmentsRoot}/", "")
-                if (path && sourceAttachment.location.startsWith(path)) {
-                    location = k
-                }
-            }
-
-            location = location ? "attachments.$location" : null
-
-            Attachment attachmentCopy
-            try {
-                attachmentCopy = copy(sourceAttachment)
-                if (attachmentCopy) AttachmentLink.create(toEntity, attachmentCopy)
-            } catch (ex){
-                results.addError(ex)
-            }
-        }
-        return results
-    }
 }

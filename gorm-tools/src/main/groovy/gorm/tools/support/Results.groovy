@@ -83,6 +83,10 @@ class Results implements MsgSourceResolvable{
         setMessage(msgMap)
     }
 
+    static Results of(List<Results> childList){
+        new Results(null, childList)
+    }
+
     static Results error(Serializable id, String code, List args = null, Exception ex = null){
         new Results(false, id, code, args, ex)
     }
@@ -93,6 +97,10 @@ class Results implements MsgSourceResolvable{
 
     static Results error(String code, List args, String defMessage){
         new Results(false, code, args, defMessage)
+    }
+
+    static Results error(Exception ex){
+        Results.error().message(ex.message)
     }
 
     /**
@@ -141,6 +149,16 @@ class Results implements MsgSourceResolvable{
     Results code(String code){
         setCode(code)
         return this
+    }
+
+    Results addError(Results res){
+        this.ok = false
+        this.failed.add(res)
+        return this
+    }
+
+    Results addError(Exception ex){
+        addError(Results.error(ex))
     }
 
     void setupForLists(String code, List<Results> childList){

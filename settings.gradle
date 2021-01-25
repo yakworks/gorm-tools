@@ -4,15 +4,17 @@ include 'gorm-tools'
 // findProject(':plugin').name = 'gorm-tools' // the name that will be published
 include 'gorm-tools-security'
 include 'gorm-tools-rest'
-include 'yakworks-domain'
+include 'rally-domain'
 include 'commons'
 //findProject(':security').name = 'gorm-tools-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "examples/test-domain"
+include "examples/rally-domain-test"
 include 'examples/restify'
 include 'examples/benchmarks'
 
 findProject(':examples/test-domain').name = 'test-domain'
+findProject(':examples/rally-domain-test').name = 'rally-domain-test'
 findProject(':examples/restify').name = 'restify'
 findProject(':examples/benchmarks').name = 'benchmarks'

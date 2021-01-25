@@ -1,0 +1,13 @@
+apply plugin:"groovy"
+apply plugin:"org.grails.grails-plugin"
+
+dependencies {
+  console "org.grails:grails-console"
+  profile "org.grails.profiles:rest-api"
+
+  compileOnly "org.grails.plugins:view-tools:$vViewTools"
+  compile project(":gorm-tools")
+  compile project(":gorm-tools-security")
+  compile project(":rally-domain")
+
+}

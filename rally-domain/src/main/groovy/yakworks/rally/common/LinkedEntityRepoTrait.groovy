@@ -4,7 +4,6 @@
 */
 package yakworks.rally.common
 
-import java.beans.Introspector
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -14,7 +13,6 @@ import org.springframework.transaction.TransactionStatus
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
-import gorm.tools.support.Results
 
 /**
  *
@@ -32,6 +30,7 @@ trait LinkedEntityRepoTrait<D, I> implements GormRepo<D> {
     /**
      * override in implementation to throw IllegalArgumentException if the tag.entityName does not match
      */
+    @SuppressWarnings(['EmptyMethod'])
     void validateCreate(Persistable entity, I item){ }
 
     Map getKeyMap(long linkedId, String linkedEntity, I item){

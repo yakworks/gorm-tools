@@ -4,11 +4,9 @@
 */
 package yakworks.rally.tag.model
 
-
 import gorm.tools.repository.model.GetRepo
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.repo.TagLinkRepo
 
 /**

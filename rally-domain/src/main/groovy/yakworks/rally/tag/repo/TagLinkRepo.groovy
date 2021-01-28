@@ -10,8 +10,6 @@ import groovy.util.logging.Slf4j
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.support.Results
-import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.common.LinkedEntityRepoTrait
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink

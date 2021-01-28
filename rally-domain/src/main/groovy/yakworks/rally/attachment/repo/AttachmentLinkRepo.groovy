@@ -26,6 +26,20 @@ class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attach
     @Override
     Attachment loadItem(Long id) { Attachment.load(id)}
 
+    List<AttachmentLink> listByAttachment(Attachment attach) {
+        query(attachment: attach).list()
+    }
+
+    void removeAllByAttachment(Attachment attach) {
+        listByAttachment(attach).each {
+            it.remove()
+        }
+    }
+
+    boolean exists(Attachment attach) {
+        query(attachment: attach).count()
+    }
+
     /**
      * Copies Attachments from the source to target
      *

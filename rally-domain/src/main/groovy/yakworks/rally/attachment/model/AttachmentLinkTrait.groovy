@@ -14,7 +14,7 @@ import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
-import yakworks.rally.attachment.repo.AttachmentLinkRepoTrait
+import yakworks.rally.common.LinkedEntityRepoTrait
 
 /**
  * common trait that a concrete composite entity can implement if the stock AttachmentLink will not suffice
@@ -35,8 +35,8 @@ trait AttachmentLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, Q
     @Transient
     Long getAttachmentId() { (Long)this.getAssociationId("tag") }
 
-    static AttachmentLinkRepoTrait<D> getAttachmentLinkRepo() {
-        getRepo() as AttachmentLinkRepoTrait<D>
+    static LinkedEntityRepoTrait<D,Attachment> getAttachmentLinkRepo() {
+        getRepo() as LinkedEntityRepoTrait<D,Attachment>
     }
 
     static D create(Persistable entity, Attachment attach, Map args = [:]) {
@@ -53,7 +53,7 @@ trait AttachmentLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, Q
     }
 
     static List<Attachment> listAttachments(Persistable entity) {
-        getAttachmentLinkRepo().listAttachments(entity)
+        getAttachmentLinkRepo().listItems(entity)
     }
 
     static boolean exists(Persistable entity, Attachment attach) {

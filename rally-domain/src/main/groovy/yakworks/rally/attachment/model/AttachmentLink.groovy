@@ -19,9 +19,6 @@ class AttachmentLink implements AttachmentLinkTrait<AttachmentLink>, GetRepo<Att
     String linkedEntity
     Long linkedId
 
-    //@CompileDynamic
-    //static enum LinkedEntity { ArTran, Customer, CustAccount, Payment }
-
     static mapping = {
         id composite: ['attachment', 'linkedId', 'linkedEntity']
         version false
@@ -31,5 +28,17 @@ class AttachmentLink implements AttachmentLinkTrait<AttachmentLink>, GetRepo<Att
     static constraints = {
         linkedEntity nullable: false, blank: false
         linkedId nullable: false
+    }
+
+    static List<AttachmentLink> listByAttachment(Attachment attach) {
+        getRepo().listByAttachment(attach)
+    }
+
+    static void removeAllByAttachment(Attachment attach) {
+        getRepo().removeAllByAttachment(attach)
+    }
+
+    static boolean exists(Attachment attach) {
+        getRepo().exists(attach)
     }
 }

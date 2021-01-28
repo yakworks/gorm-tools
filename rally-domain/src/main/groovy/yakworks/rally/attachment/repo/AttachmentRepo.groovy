@@ -10,7 +10,6 @@ import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.springframework.core.io.Resource
-import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.web.multipart.MultipartFile
 
 import gorm.tools.repository.GormRepo
@@ -71,7 +70,6 @@ import yakworks.rally.attachment.model.Attachment
 class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
 
     AppResourceLoader appResourceLoader
-    JdbcTemplate jdbcTemplate
     LinkGenerator grailsLinkGenerator
     AttachmentLinkRepo attachmentLinkRepo
 
@@ -92,43 +90,43 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         if (ev.isBindCreate()) {
             //**setup defaults
             //id early so we have it for parent child relationships
-            if (!p['id']) p['id'] = generateId()
-            if (!p['name']) p['name'] = p['originalFileName'] ?: p['subject']
+            if (!p.id) p.id = generateId()
+            if (!p.name) p.name = p.originalFileName ?: p.subject
 
             //if its null then try to get the proper extension, try name first, then originalFileName
-            if (!p['extension']) {
+            if (!p.extension) {
                 ['name', 'originalFileName', 'tempFileName'].each {
-                    if (!p['extension']) p['extension'] = FilenameUtils.getExtension(p[it] as String)
+                    if (!p.extension) p.extension = FilenameUtils.getExtension(p[it] as String)
                 }
             }
 
             def data
             //if its has a tempFile property then its was already loaded and now needs to be grabbed and linked
-            if (p['tempFileName']) {
+            if (p.tempFileName) {
                 data = new File(appResourceLoader.getLocation('tempDir') as String, p['tempFileName'] as String)
                 if (!data.exists()) throw new FileNotFoundException("Could not find temp file: ${p.tempFileName} , path: ${data.absolutePath}")
-            } else if (p['bytes'] && p['bytes'] instanceof byte[]) {
-                data = p['bytes']
+            } else if (p.bytes && p.bytes instanceof byte[]) {
+                data = p.bytes
             }
 
-            String fname = FilenameUtils.getBaseName(p['name'] as String)
+            String fname = FilenameUtils.getBaseName(p.name as String)
 
             String location = null
 
             //FIXME hard coded design needs to be refactored out
-            if (p['isCreditFile']) location = "attachments.creditFiles.location"
+            if (p.isCreditFile) location = "attachments.creditFiles.location"
 
             //Map createResult = appResourceLoader.createAttachmentFile(params.id, fname, params.extension, data, location)
-            Map createResult = appResourceLoader.createAttachmentFile(p['id'] as Long, fname, p['extension'] as String, data, location as String)
+            Map createResult = appResourceLoader.createAttachmentFile(p.id as Long, fname, p.extension as String, data, location as String)
             if (createResult) {
                 File createdFile = createResult['file'] as File
                 if (createdFile) {
-                    p['file'] = createdFile
-                    p['mimeType'] = FileUtil.extractMimeType(createdFile) ?: p['mimeType']
+                    p.file = createdFile
+                    p.mimeType = FileUtil.extractMimeType(createdFile) ?: p.mimeType
                 }
 
-                p['location'] = createResult['location']
-                p['contentLength'] = createdFile?.size()
+                p.location = createResult['location']
+                p.contentLength = createdFile?.size()
 
                 if (log.debugEnabled) log.debug("Created an attachment at ${createdFile.absolutePath}")
             }
@@ -137,7 +135,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         if (ev.isBindUpdate()) {
             if (p['fileData.data'] && p['fileData.data'] instanceof String) {
                 String fdata = (p['fileData.data'] as String)
-                p['contentLength'] = fdata.getBytes().size()
+                p.contentLength = fdata.getBytes().size()
                 p['fileData.data'] = fdata.getBytes()
             }
         }
@@ -151,7 +149,8 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
 
         Attachment attachment
         try {
-            attachment = GormRepo.super.doCreate(data, args)
+            attachment = new Attachment()
+            bindAndCreate(attachment, data, args)
         } catch (e) {
             // the file may have been created in beforeBind so delete it if exception fires
             File file = data['file'] as File
@@ -249,6 +248,17 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         create(params)
     }
 
+
+    Resource getResource(Attachment attachment){
+        File f = appResourceLoader.getFile(attachment.location)
+        log.debug "File location is ${f.canonicalPath} which ${f.exists()?'exists.':'does not exist.'}"
+        appResourceLoader.getResource("file:${f.canonicalPath}")
+    }
+
+    String getDownloadUrl(Attachment attachment) {
+        grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
+    }
+
     /**
      * Create a copy of the given attachment
      *
@@ -273,16 +283,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         assert copy.id != source.id
 
         return copy
-    }
-
-    Resource getResource(Attachment attachment){
-        File f = appResourceLoader.getFile(attachment.location)
-        log.debug "File location is ${f.canonicalPath} which ${f.exists()?'exists.':'does not exist.'}"
-        appResourceLoader.getResource("file:${f.canonicalPath}")
-    }
-
-    String getDownloadUrl(Attachment attachment) {
-        grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
     }
 
 }

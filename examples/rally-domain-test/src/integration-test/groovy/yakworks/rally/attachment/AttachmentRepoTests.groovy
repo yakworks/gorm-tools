@@ -74,10 +74,10 @@ class AttachmentRepoTests extends Specification implements SecuritySpecHelper {
         "text/plain" == attachment.mimeType
         'txt' == FilenameUtils.getExtension(attachedFile.name)
 
-        //cleanup:
-        //attachedFile.delete()
-        //tmpFile.delete()
-
+        cleanup:
+        attachments.each {
+            it.remove()
+        }
     }
 
     def testInsertListOneFail() {

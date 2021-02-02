@@ -147,7 +147,8 @@ class DefaultMangoQuery implements MangoQuery {
             qString = qCriteria as String
             //if it start with { then assume its json and parse it
             if (qString.trim().startsWith('{')) {
-                criteria = jsonSlurper.parseText(qString) as Map
+                // parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key
+                criteria = new HashMap(jsonSlurper.parseText(qString) as Map)
                 // JSON.use('deep')
                 // result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
             } else if (params.containsKey('qSearchFields')) {

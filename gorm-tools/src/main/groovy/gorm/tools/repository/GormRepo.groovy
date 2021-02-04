@@ -323,6 +323,21 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         }
     }
 
+    /**
+     *
+     * @param ids list of ids to update
+     * @param values data to apply to selected rows
+     * @return
+     */
+    List<Map> bulkUpdate(List ids, Map values){
+        List<Map> data = ids.collect {
+            values.id = it
+            values
+        } as List<Map>
+        batchUpdate(data)
+        data
+    }
+
     void publishBeforeValidate(Object entity) {
         getRepoEventPublisher().doBeforeValidate(this, entity, [:])
     }

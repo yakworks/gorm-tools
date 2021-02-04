@@ -179,10 +179,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * makes sure the associations are wired to the org
      */
     void wireAssociations(Org org) {
-        org.with {
-            if (flex && !flex.id) flex.id = org.id
-            if (info && !info.id) info.id = org.id
-        }
+        if (org.flex && !org.flex.id) org.flex.id = org.id
+        if (org.info && !org.info.id) org.info.id = org.id
     }
 
     //util method that creates the OrgSource from num and assigns to the source record (if originator)

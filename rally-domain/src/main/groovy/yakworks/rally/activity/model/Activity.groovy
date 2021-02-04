@@ -6,7 +6,7 @@ package yakworks.rally.activity.model
 
 import groovy.transform.CompileDynamic
 
-import org.apache.commons.lang3.Validate
+import yakworks.commons.lang.Validate
 
 import gorm.tools.audit.AuditStampTrait
 import gorm.tools.model.Persistable
@@ -112,7 +112,7 @@ class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<Activit
     }
 
     AttachmentLink addAttachment(Attachment att) {
-        Validate.notNull(this.id, "Activity id must be set first")
+        Validate.notNull(this.id, "Activity.id")
         return getRepo().linkAttachment(this, att)
     }
 

@@ -34,20 +34,4 @@ class ActivityLinkRepo implements LinkedEntityRepoTrait<ActivityLink, Activity> 
             it.remove()
         }
     }
-
-    //We do this in afterBind, coz EntityMapBinder wont bind properties which are part of composite id
-    // @RepoListener
-    // void afterBind(ActivityLink activityLink, Map p, AfterBindEvent e) {
-    //     if (p.linkedEntity) activityLink.linkedEntity = p.linkedEntity
-    //     if (p.linkedId) activityLink.linkedId = p.linkedId as Long
-    //     if (p.activity != null) {
-    //         def activityParam = p.activity
-    //         if (activityParam.getClass().isAssignableFrom(Activity)) activityLink.activity = (Activity) p.activity
-    //         else if (activityParam instanceof Map) activityLink.activity = Activity.load(activityParam['id'] as Long)
-    //         else {
-    //             activityLink.activity = Activity.load(activityParam as Long)
-    //         } //assume that its an id
-    //     }
-    // }
-
 }

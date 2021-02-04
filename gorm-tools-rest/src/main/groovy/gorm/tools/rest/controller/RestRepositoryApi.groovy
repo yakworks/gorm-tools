@@ -171,6 +171,13 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
         respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
     }
 
+    @Action
+    def bulkUpdate() {
+        Map json = request.getJSON() as Map
+        List<Map> data = getRepo().bulkUpdate(json.ids as List, json.data as Map)
+        respond([data: data])
+    }
+
     //@CompileDynamic
     Pager pagedQuery(Map params, String includesKey) {
         Pager pager = new Pager(params)

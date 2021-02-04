@@ -47,11 +47,7 @@ subprojects {
       //   {
       //   exclude group: 'org.grails', module: 'grails-datastore-gorm'
       // }
-      compile "org.hibernate:hibernate-core:$vHibernate"
-      compile "org.hibernate:hibernate-ehcache:$vHibernate"
 
-      compile "org.grails.plugins:cache:$vGrailsCache"
-      compile "org.codehaus.gpars:gpars:$vGpars"
       compile 'org.codehaus.groovy:groovy-dateutil'
 
       runtime "com.h2database:h2"

@@ -5,20 +5,24 @@ group = "org.yakworks"
 dependencies {
   //console "org.grails:grails-console"
   //compile "org.springframework.boot:spring-boot-starter-logging"
-  compile project(":gorm-tools")
-  compile project(":gorm-tools-security")
-
+  compileOnly project(":gorm-tools")
+  compileOnly project(":gorm-tools-security")
+  compileOnly "org.grails.plugins:converters:$vConverters"
   //plugins
   compileOnly "org.grails.plugins:view-tools:$vViewTools"
 
   //libs
-  compile "commons-io:commons-io:$vCommonsIO"
+  compileOnly "commons-io:commons-io:$vCommonsIO"
   //jasper uses itext 2.1.7 which uses bouncy 138, so until we sort that out we keep it stuck there
   //used only in commons password stuff
   compileOnly "bouncycastle:bcprov-jdk14:138"
 }
 
+// FIXME for now exlude the Orgs and force and implementation of them in app until we figure out how to use shadowJar
+// and not have it mess with intellij
 jar {
-  // exclude('yakworks/module/tag/entity/Tag.class')
-  // exclude('yakworks/module/tag/entity/Tag$*.class') //also the closure ones
+  exclude('yakworks/rally/orgs/model/Org.class')
+  exclude('yakworks/rally/orgs/repo/OrgRepo.class')
+  exclude('yakworks/rally/orgs/repo/OrgRepo$*.class')
+  exclude('yakworks/rally/orgs/model/Org$*.class') //also the closure ones
 }

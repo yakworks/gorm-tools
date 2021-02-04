@@ -2,25 +2,29 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.tag.repo
+package yakworks.rally.activity.repo
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
-import gorm.tools.support.Results
+import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityTag
 import yakworks.rally.common.LinkedEntityRepoTrait
 import yakworks.rally.tag.model.Tag
-import yakworks.rally.tag.model.TagLink
 
-@Slf4j
 @GormRepository
+@Slf4j
 @CompileStatic
-class TagLinkRepo implements LinkedEntityRepoTrait<TagLink, Tag> {
+class ActivityTagRepo implements LinkedEntityRepoTrait<ActivityTag, Tag> {
 
     @Override
     String getItemPropName() {'tag'}
+
+    @Override
+    Tag loadItem(Long id) { Tag.load(id)}
 
     /**
      * override in implementation to throw IllegalArgumentException if the tag.entityName does not match
@@ -32,29 +36,17 @@ class TagLinkRepo implements LinkedEntityRepoTrait<TagLink, Tag> {
             throw new IllegalArgumentException("Tag [${tag.name}] not valid for $entName, restricted with entityName:${tag.entityName}")
     }
 
+    /**
+     * Copies all tags from given Activity to target Activity
+     */
+    void copyToActivity(Activity from, Activity to) {
+        List<Long> tags = listItemIds(from)
+        if (tags) add(to, tags)
+    }
+
     @Override
-    Tag loadItem(Long id) { Tag.load(id)}
-
-    List<TagLink> listByTag(Tag tag) {
-        query(tag: tag).list()
-    }
-
-    void removeAllByTag(Tag tag) {
-        listByTag(tag).each {
-            it.remove()
-        }
-    }
-
-    boolean exists(Tag tag) {
-        query(tag: tag).count()
-    }
-
-    void copy(Persistable fromEntity, Persistable toEntity) {
-        Results results = Results.OK
-        List links = list(fromEntity)
-        for(TagLink tagLink : links){
-            create(toEntity, tagLink.tag)
-        }
+    MangoDetachedCriteria<ActivityTag> queryFor(Persistable entity){
+        query(linkedId: entity.id)
     }
 
 }

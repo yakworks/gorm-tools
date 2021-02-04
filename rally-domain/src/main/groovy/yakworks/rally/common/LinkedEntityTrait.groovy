@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.tag.model
+package yakworks.rally.common
 
 import javax.persistence.Transient
 
@@ -14,14 +14,14 @@ import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
-import yakworks.rally.common.LinkedEntityRepoTrait
+import yakworks.rally.tag.model.Tag
 
 /**
  * common trait that a concrete composite entity can implement if the stock TagLink will not suffice
  * for example, Org has its own OrgTag lining table
  */
 @CompileStatic
-trait TagLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, QueryMangoEntity<D> {
+trait LinkedEntityTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, QueryMangoEntity<D> {
 
     Long linkedId
     String linkedEntity
@@ -63,7 +63,7 @@ trait TagLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, QueryMan
     boolean equals(Object other) {
         if (other == null) return false
         if (this.is(other)) return true
-        if (other instanceof TagLinkTrait<D>) {
+        if (other instanceof LinkedEntityTrait<D>) {
             return other.getLinkedId() == getLinkedId() && other.getLinkedEntity() == getLinkedEntity() && other.getTagId() == getTagId()
         }
         return false

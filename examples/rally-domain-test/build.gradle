@@ -9,5 +9,5 @@ dependencies {
   compile project(":gorm-tools")
   compile project(":gorm-tools-security")
   compile project(":rally-domain")
-
+  compile "org.grails.plugins:converters:$vConverters"
 }

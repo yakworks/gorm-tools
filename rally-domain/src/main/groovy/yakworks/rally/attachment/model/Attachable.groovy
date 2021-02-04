@@ -6,32 +6,26 @@ package yakworks.rally.attachment.model
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
-import org.springframework.core.GenericTypeResolver
-
 import gorm.tools.model.Persistable
+import gorm.tools.repository.RepoUtil
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
 
 @CompileStatic
-trait Attachable<D> {
+trait Attachable {
 
     List<Attachment> getAttachments() {
-        getAttachmentLinkRepo().listAttachments(this as Persistable)
+        getAttachmentLinkRepo().listItems(this as Persistable)
     }
 
     boolean hasAttachment(Attachment attachment) {
         return getAttachmentLinkRepo().exists(this as Persistable, attachment)
     }
 
-    Class<D> getAttachmentLinkClass() {
-        (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), Attachable)
-    }
-
     @SuppressWarnings(['FieldName'])
     private static AttachmentLinkRepo _attachmentLinkRepo
 
     AttachmentLinkRepo getAttachmentLinkRepo() {
-        if (!_attachmentLinkRepo) this._attachmentLinkRepo = ClassPropertyFetcher.getStaticPropertyValue(getAttachmentLinkClass(), 'repo', AttachmentLinkRepo)
+        if (!_attachmentLinkRepo) this._attachmentLinkRepo = RepoUtil.findRepo(AttachmentLink) as AttachmentLinkRepo
         return _attachmentLinkRepo
     }
 }

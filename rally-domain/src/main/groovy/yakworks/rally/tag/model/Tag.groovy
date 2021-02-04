@@ -4,7 +4,6 @@
 */
 package yakworks.rally.tag.model
 
-import javax.persistence.Transient
 
 import groovy.transform.EqualsAndHashCode
 

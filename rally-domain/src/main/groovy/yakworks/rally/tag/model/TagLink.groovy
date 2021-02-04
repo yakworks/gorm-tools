@@ -4,7 +4,6 @@
 */
 package yakworks.rally.tag.model
 
-
 import gorm.tools.repository.model.GetRepo
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -29,6 +28,18 @@ class TagLink implements TagLinkTrait<TagLink>, GetRepo<TagLinkRepo>, Serializab
     static constraints = {
         linkedEntity nullable: false, blank: false
         linkedId nullable: false
+    }
+
+    static List<TagLink> listByTag(Tag tag) {
+        getRepo().listByTag(tag)
+    }
+
+    static void removeAllByTag(Tag tag) {
+        getRepo().removeAllByTag(tag)
+    }
+
+    static boolean exists(Tag tag) {
+        getRepo().exists(tag)
     }
 
 }

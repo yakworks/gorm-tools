@@ -10,13 +10,13 @@ import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.model.Persistable
-import yakworks.rally.tag.repo.TagLinkRepoTrait
+import yakworks.rally.common.LinkedEntityRepoTrait
 
 @CompileStatic
 trait Taggable<D> {
 
     List<Tag> getTags() {
-        getTagLinkRepo().listTags(this as Persistable)
+        getTagLinkRepo().listItems(this as Persistable)
     }
 
     boolean hasTag(Tag tag) {
@@ -28,10 +28,10 @@ trait Taggable<D> {
     }
 
     @SuppressWarnings(['FieldName'])
-    private static TagLinkRepoTrait _entityTagRepo
+    private static LinkedEntityRepoTrait _entityTagRepo
 
-    TagLinkRepoTrait getTagLinkRepo() {
-        if (!_entityTagRepo) this._entityTagRepo = ClassPropertyFetcher.getStaticPropertyValue(getTagLinkClass(), 'repo', TagLinkRepoTrait)
+    LinkedEntityRepoTrait getTagLinkRepo() {
+        if (!_entityTagRepo) this._entityTagRepo = ClassPropertyFetcher.getStaticPropertyValue(getTagLinkClass(), 'repo', LinkedEntityRepoTrait)
         return _entityTagRepo
     }
 }

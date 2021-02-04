@@ -6,14 +6,13 @@ package yakworks.rally.activity.model
 
 import groovy.transform.CompileDynamic
 
-import yakworks.commons.lang.Validate
-
 import gorm.tools.audit.AuditStampTrait
 import gorm.tools.model.Persistable
 import gorm.tools.repository.model.GetRepo
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.lang.Validate
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.model.Attachment

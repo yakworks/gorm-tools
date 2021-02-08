@@ -12,6 +12,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.query.api.Criteria
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.security.PasswordValidator
@@ -41,7 +42,9 @@ class AppUserService {
     @Value('${gorm.tools.security.password.warnDays:30}')
     int passwordWarnDays
 
+    @Autowired
     SecService<AppUser> secService
+    @Autowired(required = false) //required = false so in case spring sec is not working
     PasswordValidator passwordValidator
 
     /**

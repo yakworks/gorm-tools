@@ -39,7 +39,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
     public static final String ATTR_NAMESPACE = "namespace"
     public static final ClassNode AUTOWIRED_CLASS_NODE = new ClassNode(Autowired).getPlainNodeReference()
 
-    private CompilationUnit unit
+    private CompilationUnit compilationUnit
 
     @Override
     void visit(ASTNode[] astNodes, SourceUnit source) {
@@ -65,8 +65,19 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
     }
 
     void generateController(SourceUnit source, String resourceName, Map ctrlConfig) {
-        // Class entityClass = ClassHelper.make(ctrlConfig['entityClass'])
-        ClassNode entityClassNode = ClassHelper.make((String)ctrlConfig['entityClass'])
+        String entityClassName = (String)ctrlConfig['entityClass']
+        ClassNode entityClassNode
+        try {
+            //first checks for already compiled classes from libs
+            Class entityClass = getClass().classLoader.loadClass((String)ctrlConfig['entityClass'])
+            entityClassNode = ClassHelper.make(entityClass)
+        } catch(e){
+            //looks for source files in the current project
+            entityClassNode = compilationUnit.getClassNode(entityClassName)
+        }
+
+        ///ClassNode entityClassNode = compilationUnit.getClassNode(entityClassName)
+        assert entityClassNode, "entityClass not found with name: ${entityClassName}"
 
         ClassNode superClassNode
         String superClassName = (String)ctrlConfig['controllerClass']
@@ -76,13 +87,13 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
             superClassNode = ClassHelper.make(RestApiRepoController)
         }
         String namespace = (String)ctrlConfig['controllerClass']
-        RestApiTransform.makeController(unit, source, resourceName, superClassNode, entityClassNode, namespace, false)
+        RestApiTransform.makeController(compilationUnit, source, resourceName, superClassNode, entityClassNode, namespace, false)
 
     }
 
     // implements CompilationUnitAware
     void setCompilationUnit(CompilationUnit unit) {
-        this.unit = unit
+        this.compilationUnit = unit
     }
 
 }

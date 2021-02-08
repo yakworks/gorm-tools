@@ -7,14 +7,17 @@ package yakworks.rally
 import grails.plugin.springsecurity.SpringSecurityUtils
 import yakworks.rally.orgs.UserOrgService
 
+@SuppressWarnings('Indentation')
 class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
-    Closure doWithSpring() {
-        { ->
-            def securityConf = SpringSecurityUtils.securityConfig
-            if (securityConf.active) {
-                userOrgService(UserOrgService)
 
-            }
+    def loadAfter = ['gorm-tools-security']
+
+    Closure doWithSpring() { {->
+        //FIXME not sure this is needed, hack to get rest app working but not sure why its not picked up
+        // as its already defined in gorm-tools-security
+        def securityConf = SpringSecurityUtils.securityConfig
+        if (securityConf.active) {
+            userOrgService(UserOrgService)
         }
-    }
+    }}
 }

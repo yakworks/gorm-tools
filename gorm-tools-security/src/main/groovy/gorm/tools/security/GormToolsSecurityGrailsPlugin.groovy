@@ -23,10 +23,11 @@ class GormToolsSecurityGrailsPlugin extends Plugin {
     def pluginExcludes = ["**/init/**"]
 
     Closure doWithSpring() { { ->
+        secService(SpringSecService, AppUser){ bean -> bean.lazyInit = true}
+        userService(AppUserService){ bean -> bean.lazyInit = true}
+
         def securityConf = SpringSecurityUtils.securityConfig
         if (securityConf.active) {
-            secService(SpringSecService, AppUser){ bean -> bean.lazyInit = true}
-            userService(AppUserService){ bean -> bean.lazyInit = true}
 
             passwordValidator(PasswordValidator){ bean -> bean.lazyInit = true}
 

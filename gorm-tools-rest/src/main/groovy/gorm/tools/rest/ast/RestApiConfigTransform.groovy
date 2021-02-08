@@ -65,9 +65,6 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
     }
 
     void generateController(SourceUnit source, String resourceName, Map ctrlConfig) {
-        // Class entityClass = ClassHelper.make(ctrlConfig['entityClass'])
-        //ClassNode entityClassNode = ClassHelper.make((String)ctrlConfig['entityClass'])
-        //Class entityClass = getClass().classLoader.loadClass((String)ctrlConfig['entityClass'])
         String entityClassName = (String)ctrlConfig['entityClass']
         ClassNode entityClassNode
         try {
@@ -80,7 +77,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         }
 
         ///ClassNode entityClassNode = compilationUnit.getClassNode(entityClassName)
-        assert entityClassNode, "entityClassNode ${entityClassName}"
+        assert entityClassNode, "entityClass not found with name: ${entityClassName}"
 
         ClassNode superClassNode
         String superClassName = (String)ctrlConfig['controllerClass']

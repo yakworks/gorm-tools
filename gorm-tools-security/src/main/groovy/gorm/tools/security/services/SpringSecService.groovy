@@ -32,9 +32,9 @@ import grails.plugin.springsecurity.userdetails.GrailsUser
 @CompileStatic
 class SpringSecService<D> implements SecService<D>{
 
-    @Autowired
+    @Autowired(required = false) //required = false so this bean works in case security. active is false
     SpringSecurityService springSecurityService
-    @Autowired
+    @Autowired(required = false)
     AuthenticationTrustResolver authenticationTrustResolver
 
     SpringSecService(Class<D> clazz) {

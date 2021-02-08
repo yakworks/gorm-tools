@@ -4,6 +4,17 @@
 */
 package yakworks.rally
 
-class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
+import grails.plugin.springsecurity.SpringSecurityUtils
+import yakworks.rally.orgs.UserOrgService
 
+class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
+    Closure doWithSpring() {
+        { ->
+            def securityConf = SpringSecurityUtils.securityConfig
+            if (securityConf.active) {
+                userOrgService(UserOrgService)
+
+            }
+        }
+    }
 }

@@ -17,7 +17,7 @@ import gorm.tools.repository.RepoUtil
  * @since 6.1
  */
 @CompileStatic
-trait PersistableRepoEntity<D, R extends GormRepo<D>> implements Persistable {
+trait PersistableRepoEntity<D, R extends GormRepo<D>, ID> implements Persistable<ID> {
 
     /**
      * static prop that returns the repo for this entity, calls RepoUtil.findRepo(this) by default

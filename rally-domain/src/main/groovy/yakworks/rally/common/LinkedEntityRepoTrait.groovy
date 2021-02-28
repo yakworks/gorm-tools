@@ -31,13 +31,13 @@ trait LinkedEntityRepoTrait<D, I> implements GormRepo<D> {
      * override in implementation to throw IllegalArgumentException if the tag.entityName does not match
      */
     @SuppressWarnings(['EmptyMethod'])
-    void validateCreate(Persistable entity, I item){ }
+    void validateCreate(Persistable<Long> entity, I item){ }
 
     Map getKeyMap(long linkedId, String linkedEntity, I item){
         [linkedId: linkedId, linkedEntity: linkedEntity, (getItemPropName()): item]
     }
 
-    D create(Persistable entity, I item, Map args = [:]) {
+    D create(Persistable<Long> entity, I item, Map args = [:]) {
         validateCreate(entity, item)
         //checkCreditTag(entity.creditInfo, tag)
         create(entity.id, entity.class.simpleName, item, args)

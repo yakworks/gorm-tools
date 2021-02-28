@@ -21,7 +21,7 @@ import yakworks.rally.common.LinkedEntityRepoTrait
  * for example, Org has its own OrgAttachment
  */
 @CompileStatic
-trait AttachmentLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, QueryMangoEntity<D> {
+trait AttachmentLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>, Long>, QueryMangoEntity<D> {
 
     Long linkedId
     String linkedEntity

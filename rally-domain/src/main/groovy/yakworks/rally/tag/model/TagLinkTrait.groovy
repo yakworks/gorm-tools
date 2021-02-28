@@ -21,7 +21,7 @@ import yakworks.rally.common.LinkedEntityRepoTrait
  * for example, Org has its own OrgTag lining table
  */
 @CompileStatic
-trait TagLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, QueryMangoEntity<D> {
+trait TagLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>, Long>, QueryMangoEntity<D> {
 
     Long linkedId
     String linkedEntity

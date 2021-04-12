@@ -4,7 +4,6 @@
 */
 package gorm.tools.rest.controller
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -21,15 +20,14 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.model.PersistableRepoEntity
+import gorm.tools.rest.JsonParserTrait
 import gorm.tools.rest.RestApiConfig
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
-import grails.databinding.SimpleMapDataBindingSource
 import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import grails.web.Action
 import grails.web.api.ServletAttributes
-import grails.web.databinding.DataBindingUtils
 
 import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
@@ -39,13 +37,12 @@ import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
-trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponder, ServletAttributes {
+trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTrait, RestResponder, ServletAttributes {
 
     @Autowired
     RestApiConfig restApiConfig
 
-    // @Resource
-    // MessageSource messageSource
+    // @Resource MessageSource messageSource
 
     @Autowired
     EntityMapService entityMapService
@@ -82,7 +79,8 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
     @Action
     def post() {
         try {
-            D instance = (D) getRepo().create(getDataMap())
+            Map dataMap = parseJson(request)
+            D instance = (D) getRepo().create(dataMap)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap, [status: CREATED])
         } catch (RuntimeException e) {
@@ -91,12 +89,14 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
     }
 
     /**
-     * PUT /api/entity/${id}* Update with data
+     * PUT /api/entity/${id}
+     * Update with data
      */
     @Action
     def put() {
+        Map dataMap = parseJson(request)
         Map data = [id: params.id]
-        data.putAll(getDataMap()) // getDataMap doesnt contains id because it passed in params
+        data.putAll(dataMap) // json data may not contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
             def entityMap = createEntityMap(instance)
@@ -146,16 +146,6 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
      *
      * returns the list of domain objects
      */
-    // @Action
-    // def listPost() {
-    //     respond query((request.JSON ?: [:]) as Map, params)
-    // }
-
-    /**
-     * request type is handled in urlMapping
-     *
-     * returns the list of domain objects
-     */
     @Action
     def list() {
         Pager pager = pagedQuery(params, 'list')
@@ -173,8 +163,8 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
 
     @Action
     def bulkUpdate() {
-        Map json = request.getJSON() as Map
-        List<Map> data = getRepo().bulkUpdate(json.ids as List, json.data as Map)
+        Map dataMap = parseJson(request)
+        List<Map> data = getRepo().bulkUpdate(dataMap.ids as List, dataMap.data as Map)
         respond([data: data])
     }
 
@@ -223,7 +213,6 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
     }
 
     //@SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
-
     List getIncludes(String includesKey){
         //we are in trait, always use getters in case they are overrriden in implementing class
         def includesMap = getRestApiConfig().getIncludes(getControllerName(), getEntityClass(), getIncludes())
@@ -256,18 +245,19 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
     }
 
     /**
-     * The Map object that can be bound to create or update domain entity.  Defaults whats in the request based on mime-type.
-     * Subclasses may override this
+     * Deprecated, just calls parseJson(getRequest())
+     * TODO maybe keep this one and have it be the one that merges the json body with params
      */
-    @CompileDynamic //so it can access the SimpleMapDataBindingSource.map
     Map getDataMap() {
-        SimpleMapDataBindingSource bsrc =
-                (SimpleMapDataBindingSource) DataBindingUtils.createDataBindingSource(grailsApplication, getEntityClass(), getRequest())
-        return bsrc.map
+        return parseJson(getRequest())
     }
 
     /**
      * Cast this to ResponseRenderer and call render
+     * this allows us to call the render, keeping compile static without implementing the Trait
+     * as the trait get implemented with AST magic by grails.
+     * This is how the RestResponder does it but its private there
+     *
      * @param args
      */
     void callRender(Map args) {
@@ -279,7 +269,8 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements RestResponde
     }
 
     /**
-     * CAst this to RestResponder and call respond
+     * Cast this to RestResponder and call respond
+     * FIXME I dont think this is needed? whats the purpose here?
      * @param value
      * @param args
      */

@@ -65,15 +65,6 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Se
     }
 
     /**
-     * quick shortcut to create an Org. return the unsaved new entity
-     */
-    static Org create(String num, String name, OrgType orgType) {
-        def o = new Org(num: num, name: name)
-        o.type = orgType
-        return o
-    }
-
-    /**
      * shortcut to create the OrgSource for this. See the OrgSourceRepo.createSource
      */
     OrgSource createSource(SourceType sourceType = SourceType.App) {
@@ -86,6 +77,22 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Se
 
     List<Location> getLocations(){
         Location.listByOrgOnly(this)
+    }
+
+    /**
+     * quick shortcut to create an Org. return the unsaved new entity
+     */
+    static Org create(String num, String name, Long orgTypeId, Long companyId = Company.DEFAULT_COMPANY_ID) {
+        create(num, name, OrgType.get(orgTypeId), companyId)
+    }
+
+    /**
+     * quick shortcut to create an Org. return the unsaved new entity
+     */
+    static Org create(String num, String name, OrgType orgType, Long companyId = Company.DEFAULT_COMPANY_ID) {
+        def o = new Org(num: num, name: name, companyId: companyId)
+        o.type = orgType
+        return o
     }
 
 }

@@ -1,27 +1,25 @@
-
+// THIS IS ALL HERE FOR TESTING/DEV RALLY.. DOES NOT GET DEPLOYED ANYWHERE OVERRIDES Plugin.groovy configs
 grails {
+    //gorm.flushMode = 'AUTO'
     gorm.failOnError = true
     gorm.default.mapping = {
         id generator: 'gorm.tools.hibernate.SpringBeanIdGenerator'
         '*'(cascadeValidate: 'dirty')
-        //cache usage: System.getProperty("cacheStrategy", "read-write").toString()
     }
     gorm.default.constraints = {
-        '*'(nullable:true)
+        '*'(nullable: true)
     }
 }
 
-grails.config.locations =  ["classpath:yakworks/test-config.groovy"]
-
-String projectRoot = System.getProperty('gradle.rootProjectDir')
 app {
     resources {
         currentTenant = {
             return [num: 'virgin', id: 2]
         }
         rootLocation = { args ->
-            File root = new File("${projectRoot}/examples/resources")
-            return root.canonicalPath
+            File file = new File("./build/rootLocation/${args.tenantSubDomain}-${args.tenantId}")
+            if (!file.exists()) file.mkdirs()
+            return file.canonicalPath
         }
         tempDir = {
             File file = new File("./build/rootLocation/tempDir")

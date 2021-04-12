@@ -6,7 +6,6 @@ package yakworks.rally.attachment.model
 
 import groovy.transform.CompileDynamic
 
-import org.apache.commons.io.FileUtils
 import org.springframework.core.io.Resource
 
 import gorm.tools.audit.AuditStamp
@@ -15,6 +14,7 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.io.FileUtil
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.common.NameDescription
@@ -41,6 +41,7 @@ import yakworks.rally.common.NameDescription
 @Entity
 @GrailsCompileStatic
 class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachment>, Serializable {
+    static final String DEFAULT_LOCATION_KEY = "attachments.location"
 
     //non persistable
     static transients = ["text", "resource", "linkGenerator", "downloadUrl", "createdByUser"]
@@ -52,10 +53,12 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     // String name // in the NameDescription trait
     // String description // in the NameDescription trait
 
-    //the full or relative path to the file this is the location of the file. ex: 2012-02/somepdf.pdf or views/reports/arReport.ftl
+    //the relative path to the locationKey, this is the name of the file. ex: 2012-02/somepdf.pdf or views/reports/arReport.ftl
     String location
+    //the appResource config key to get the base directory that location is relative to
+    String locationKey = DEFAULT_LOCATION_KEY
     //the file size/contentLength in bytes
-    Integer contentLength
+    Long contentLength
     //the extension the file should have, can be
     String extension
     //The mime type of the file. most often this will be what you want the browser to see. Use "text/ftl" for freemarker
@@ -69,7 +72,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
 
     String source = "9ci" //FIXME JD Ken - what is this for and why do we need it here?
 
-    @CompileDynamic //Angry monkey, as of 4.0 GrailsCompileStatic bug needs this and it needs to come before constraints
+    @CompileDynamic //Angry monkey? as of 4.0 GrailsCompileStatic bug needs this and it needs to come before constraints
     static enum Kind {
         Activity, Collection, Invoice, Report
     }
@@ -85,7 +88,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     /** if the file/data is text then this returns the String/Text */
     String getText() {
         if (getResource()?.exists()) {
-            return FileUtils.readFileToString(getResource().file)
+            return FileUtil.readFileToString(getResource().file)
         } else if (fileData?.data) {
             return new String(fileData.data, 'UTF-8')
         } else {

@@ -2,7 +2,7 @@
 grails:
     profile: plugin
     codegen:
-        defaultPackage: grails.plugin.eventlog
+        defaultPackage: yakworks.rally
 info:
     app:
         name: '@info.app.name@'

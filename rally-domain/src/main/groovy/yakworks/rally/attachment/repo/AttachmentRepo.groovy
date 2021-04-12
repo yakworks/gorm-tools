@@ -4,9 +4,14 @@
 */
 package yakworks.rally.attachment.repo
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.springframework.core.io.Resource
@@ -15,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
@@ -23,6 +29,7 @@ import grails.gorm.transactions.Transactional
 import grails.plugin.viewtools.AppResourceLoader
 import grails.web.mapping.LinkGenerator
 import yakworks.commons.io.FileUtil
+import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 
 /**
@@ -68,8 +75,10 @@ import yakworks.rally.attachment.model.Attachment
 @GormRepository
 @CompileStatic
 class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
+    public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
     AppResourceLoader appResourceLoader
+    AttachmentSupport attachmentSupport
     LinkGenerator grailsLinkGenerator
     AttachmentLinkRepo attachmentLinkRepo
 
@@ -78,60 +87,24 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * and before persisting this entity to a database.
      *
      * @param attachment an entity on which the bind operation was performed
-     * @param p     data that will be bound to the entity
+     * @param p params data that will be bound to the entity
      * @param ev type of the action before which bind is performed, e.g. Create or Update
      */
     @RepoListener
     void beforeBind(Attachment attachment, Map p, BeforeBindEvent ev) {
-        // p params loosely follows props in springs MultipartFile
-        // originalFileName* - the original filename in the client's filesystem.
-        // name* - the name of the attachment, will default to originalFileName if not sent
-        //
         if (ev.isBindCreate()) {
             //**setup defaults
             //id early so we have it for parent child relationships
             if (!p.id) p.id = generateId()
-            if (!p.name) p.name = p.originalFileName ?: p.subject
-
-            //if its null then try to get the proper extension, try name first, then originalFileName
-            if (!p.extension) {
-                ['name', 'originalFileName', 'tempFileName'].each {
-                    if (!p.extension) p.extension = FilenameUtils.getExtension(p[it] as String)
-                }
-            }
-
-            def data
-            //if its has a tempFile property then its was already loaded and now needs to be grabbed and linked
-            if (p.tempFileName) {
-                data = new File(appResourceLoader.getLocation('tempDir') as String, p['tempFileName'] as String)
-                if (!data.exists()) throw new FileNotFoundException("Could not find temp file: ${p.tempFileName} , path: ${data.absolutePath}")
-            } else if (p.bytes && p.bytes instanceof byte[]) {
-                data = p.bytes
-            }
-
-            String fname = FilenameUtils.getBaseName(p.name as String)
-
-            String location = null
-
-            //FIXME hard coded design needs to be refactored out
-            if (p.isCreditFile) location = "attachments.creditFiles.location"
-
-            //Map createResult = appResourceLoader.createAttachmentFile(params.id, fname, params.extension, data, location)
-            Map createResult = appResourceLoader.createAttachmentFile(p.id as Long, fname, p.extension as String, data, location as String)
-            if (createResult) {
-                File createdFile = createResult['file'] as File
-                if (createdFile) {
-                    p.file = createdFile
-                    p.mimeType = FileUtil.extractMimeType(createdFile) ?: p.mimeType
-                }
-
-                p.location = createResult['location']
-                p.contentLength = createdFile?.size()
-
-                if (log.debugEnabled) log.debug("Created an attachment at ${createdFile.absolutePath}")
-            }
+            if (!p.name) p.name = p.originalFileName
+            if (!p.originalFileName) p.originalFileName = p.name
+            if (!p.mimeType) p.mimeType = FileUtil.extractMimeType(p.originalFileName as String)
+            if (!p.extension) p.extension = FileUtil.getExtension(p.originalFileName as String)
+            //XXX hard coded design needs to be refactored out and simplified
+            if (p.isCreditFile) p.locationKey = "attachments.creditFiles.location"
         }
 
+        //DEPRECATED logic for storing data in db
         if (ev.isBindUpdate()) {
             if (p['fileData.data'] && p['fileData.data'] instanceof String) {
                 String fdata = (p['fileData.data'] as String)
@@ -141,8 +114,42 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         }
     }
 
+    @RepoListener
+    void afterBind(Attachment attachment, Map p, AfterBindEvent ev) {
+        if (ev.isBindCreate()) {
+            Path attachedFile = createFile(attachment, p)
+            assert Files.exists(attachedFile)
+            assert attachment.locationKey
+            p.attachedFile = attachedFile //used later in exeption handling to delete the file
+            attachment.location = attachmentSupport.getRelativePath(attachment.locationKey, attachedFile)
+            attachment.contentLength = Files.size(attachedFile)
+        }
+    }
+
     /**
-     * wraps super.doCreate in try catch so that on any exception it will delete the file reference in the data params
+     * 3 ways a file can be set via params
+     *   1. with tempFileName key, where its a name of a file that has been uploaded
+     *      to the tempDir location key for appResourceLoader
+     *   2. with sourcePath, this should be a absolute path object or string
+     *   3. with bytes, similiar to MultiPartFile. if this is the case then name should have the info for the file
+     * @return the path object for the file to link in location
+     */
+    Path createFile(Attachment attachment, Map p){
+        String originalFileName = p.originalFileName as String
+
+        if (p.tempFileName) { //this would be primary way to upload files via UI and api
+            return attachmentSupport.createFileFromTempFile(attachment.id, originalFileName, p.tempFileName as String, attachment.locationKey)
+        }
+        else if (p.sourcePath) { //used mostly for testing
+            return attachmentSupport.createFile(attachment.id, p.sourcePath as Path, attachment.locationKey)
+        }
+        else if (p.bytes && p.bytes instanceof byte[]) { //used mostly for testing but also for string templates
+            return attachmentSupport.createFileFromBytes(attachment.id, originalFileName, p.bytes as byte[], attachment.locationKey)
+        }
+    }
+
+    /**
+     * wraps super.bindAndCreate in try catch so that on any exception it will delete the file reference in the data params
      */
     @Override
     Attachment doCreate(Map data, Map args) {
@@ -152,11 +159,9 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
             attachment = new Attachment()
             bindAndCreate(attachment, data, args)
         } catch (e) {
-            // the file may have been created in beforeBind so delete it if exception fires
-            File file = data['file'] as File
-            if (file?.exists()){
-                file.delete()
-            }
+            // the file may have been created in afterBind so delete it if exception fires
+            Path attachedFile = data['attachedFile'] as Path
+            Files.deleteIfExists(attachedFile)
             throw e
         }
 
@@ -179,14 +184,12 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
 
     /**
      * Inserts the list of files into Attachments, and returns the attachments as a list
-     * @param fileDetailsList a list of maps, see below
+     * @param fileDetailsList a list of maps, Each list entry (which is a map) represents a file.
+     * The map has keys as follows: <br>
+     *  - originalFileName: The name of the file the user sent. <br>
+     *  - tempFileName: The name of the temp file the app server created to store it when uploaded. <br>
+     *  - extension: The file extension <br>
      * @return the list of attachments
-     * <p>
-     * fileDetailsList is a list of maps.  Each list entry (which is a map) represents a file.
-     * The map has keys as follows:
-     *    originalFileName: The name of the file the user sent.
-     *    tempFileName: The name of the temp file the app server created to store it when uploaded.
-     *    extension: The file extension
      */
     @Transactional
     List<Attachment> insertList(List<Map> fileDetailsList) {
@@ -194,8 +197,8 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         List<Attachment> resultList = []
         fileDetailsList.each { Map fileDetails ->
             Map fileParams = [
-                name:fileDetails['originalFileName'],
-                tempFileName:fileDetails['tempFileName'],
+                name: fileDetails['originalFileName'],
+                tempFileName: fileDetails['tempFileName'],
                 extension: FilenameUtils.getExtension(fileDetails['originalFileName'] as String)
             ]
             Attachment attachment
@@ -229,10 +232,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         create(params)
     }
 
-    Attachment insertMultipartFileCreditFile(MultipartFile multipartFile, Map params) {
-        insertMultipartFile(multipartFile, params)
-    }
-
     /**
      * Inserts an attachment with a FileData record as the data holder.  This is used exclusively for invoice templates.
      * expects a fileData.data param that has the data in it and makes that the data in the FileData to save
@@ -247,7 +246,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         params['data'] = null
         create(params)
     }
-
 
     Resource getResource(Attachment attachment){
         File f = appResourceLoader.getFile(attachment.location)

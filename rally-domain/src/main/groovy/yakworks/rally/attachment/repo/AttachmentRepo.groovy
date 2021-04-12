@@ -6,12 +6,10 @@ package yakworks.rally.attachment.repo
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.springframework.core.io.Resource
@@ -26,8 +24,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import grails.gorm.transactions.Transactional
-import grails.plugin.viewtools.AppResourceLoader
-import grails.web.mapping.LinkGenerator
 import yakworks.commons.io.FileUtil
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
@@ -35,41 +31,6 @@ import yakworks.rally.attachment.model.Attachment
 /**
  * Attachments are not as simple as they might be in this application.  Please read this documentation before messing
  * with it.
- *
- * There are three modes for attachments in this application:
- *   1.  fileData.data contains the file contents.  In this case, location is null when the attachment is saved.
- *   2.  location contains an absolute path starting with '/', which references the inside of the war file.
- *   3.  location contains a relative path, which places the file in the attachments directory.  This is described
- *       below.
- *
- * Attachment Directory Grand Strategy:
- * The production attachments directory is defined in Config.groovy or the external configuration file, defined by
- * nine.resources.attachments.location and will have a value looking something like this:
- * '${System.properties.getProperty('catalina.base')}/9ci-app/companies/${client.sourceId}-${client.id}/attachments'
- *
- * A test/demo Config.groovy (and likewise any external configuration on a Tomcat server) will contain:
- * nine.attachments.directory = "../database/resources/demo/companies/\${client.sourceId}-\${client.id}/attachments"
- *
- * This is the attachments directory for any given client.  The client cannot
- * escape from this directory through the application.  It's based on the sourceId of the client, plus the OID of the
- * client.  For example, it contains 'demo-2' for demo.
- *
- * Inside that, you get a directory named after the date and month that the attachment was created.  These directories
- * are automatically created when you insert an attachment into the Attachments directory.  Again, the users cannot
- * escape that once the attachment is created.  Here is an example path for an attachment for client 2:
- * ${catalina.base}/9ci-app/companies/demo-2/attachments/2010-11/214256.ftl
- * This would be for an attachment belonging to client 2 inserted on November of 2010.  The file name is the OID of
- * the attachment record plus the original extension of the file.
- *
- * For data which we want to be in Subversion for test or demo, we are handcrafting an Attachment row.  That means we can put the
- * actual files in 0000-00 and everyone will know that this is revisioned data.  Nothing else should be committed inside the
- * client's directory.  Here is an example file name for something we would check into Subversion:
- * ${catalina.base}/9ci-app/companies/demo-2/attachments/0000-00/214256.ftl
- *
- * Tests and demos can create new attachments.  If you are running in run-app or run-war, then those attachments will
- * go into this directory structure.  We DO NOT WANT to commit these files!  Please do not commit anything which is
- * not in a 0000-00 directory!
- * @author Ken Roberts
  */
 @Slf4j
 @GormRepository
@@ -77,9 +38,7 @@ import yakworks.rally.attachment.model.Attachment
 class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
-    AppResourceLoader appResourceLoader
     AttachmentSupport attachmentSupport
-    LinkGenerator grailsLinkGenerator
     AttachmentLinkRepo attachmentLinkRepo
 
     /**
@@ -140,8 +99,8 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         if (p.tempFileName) { //this would be primary way to upload files via UI and api
             return attachmentSupport.createFileFromTempFile(attachment.id, originalFileName, p.tempFileName as String, attachment.locationKey)
         }
-        else if (p.sourcePath) { //used mostly for testing
-            return attachmentSupport.createFile(attachment.id, p.sourcePath as Path, attachment.locationKey)
+        else if (p.sourcePath) { //used for copying attachments and testing
+            return attachmentSupport.createFileFromSource(attachment.id, originalFileName, p.sourcePath as Path, attachment.locationKey)
         }
         else if (p.bytes && p.bytes instanceof byte[]) { //used mostly for testing but also for string templates
             return attachmentSupport.createFileFromBytes(attachment.id, originalFileName, p.bytes as byte[], attachment.locationKey)
@@ -153,7 +112,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      */
     @Override
     Attachment doCreate(Map data, Map args) {
-
         Attachment attachment
         try {
             attachment = new Attachment()
@@ -176,10 +134,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      */
     @RepoListener
     void beforeRemove(Attachment attachment, BeforeRemoveEvent e) {
-        File file = attachment.location ? appResourceLoader.getFile(attachment.location) : null
-        if (file?.exists()) {
-            file.delete()
-        }
+        attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
     }
 
     /**
@@ -190,6 +145,8 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      *  - tempFileName: The name of the temp file the app server created to store it when uploaded. <br>
      *  - extension: The file extension <br>
      * @return the list of attachments
+     *
+     * FIXME refactor this to be closer to the stock batch insert
      */
     @Transactional
     List<Attachment> insertList(List<Map> fileDetailsList) {
@@ -248,13 +205,15 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     }
 
     Resource getResource(Attachment attachment){
-        File f = appResourceLoader.getFile(attachment.location)
-        log.debug "File location is ${f.canonicalPath} which ${f.exists()?'exists.':'does not exist.'}"
-        appResourceLoader.getResource("file:${f.canonicalPath}")
+        attachmentSupport.getResource(attachment)
+    }
+
+    Path getFile(Attachment attachment){
+        attachmentSupport.getFile(attachment.location, attachment.locationKey)
     }
 
     String getDownloadUrl(Attachment attachment) {
-        grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
+        attachmentSupport.getDownloadUrl(attachment)
     }
 
     /**
@@ -266,17 +225,15 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     @Transactional
     Attachment copy(Attachment source) {
         if(source == null) return null
-        InputStream inputStream = source.inputStream as InputStream
-        if (!inputStream) throw new FileNotFoundException("Attachment ${source.location}")
-        byte[] data = IOUtils.toByteArray(inputStream)
-        if (data.length == 0) {
-            throw new IOException("Attachment ${source.location} ByteArray is empty")
-        }
-
-        Map params = [name: source.name, bytes: data, extension: source.extension, description: source.description]
+        Path sourcePath = getFile(source)
+        Map params = [
+            name: source.name, description: source.description,
+            mimeType: source.mimeType, kind: source.kind, subject: source.subject,
+            locationKey: source.locationKey,
+            sourcePath: sourcePath
+        ]
         Attachment copy = create(params)
 
-        assert copy != null
         assert copy.id != null
         assert copy.id != source.id
 

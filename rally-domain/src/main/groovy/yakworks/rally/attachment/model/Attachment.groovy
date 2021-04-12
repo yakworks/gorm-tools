@@ -49,8 +49,9 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     //cached copy of resource
     transient Resource resource //need transient modifier, so cache doesnt try to serialize it, see #rcm#4499
 
-    //this is the name of the file or view. for a view, it may have the controller prefix such as 'reports/someReport.ftl
-    // String name // in the NameDescription trait
+    //this should be the file display name without dir; foo.txt, bar.pdf, etc.
+    // location has the relative path and unique name. Use description for any other display info
+    String name
     // String description // in the NameDescription trait
 
     //the relative path to the locationKey, this is the name of the file. ex: 2012-02/somepdf.pdf or views/reports/arReport.ftl

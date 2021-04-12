@@ -6,19 +6,18 @@ package yakworks.rally.attachment
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
 import grails.plugin.viewtools.AppResourceLoader
+import grails.web.mapping.LinkGenerator
 import yakworks.rally.attachment.model.Attachment
 
 /**
@@ -30,9 +29,10 @@ class AttachmentSupport {
     public static final String ATTACHMENTS_LOCATION_KEY = "attachments.location"
 
     AppResourceLoader appResourceLoader
+    LinkGenerator grailsLinkGenerator
 
     /**
-     * takes a temp file name that will be in the tempDir locationKey as the
+     * Copy from temp file. takes a temp file name that will be in the tempDir locationKey as the
      * source for the linked attachment file.
      *
      * @param attachmentId the ID of the Attachment record this file is going into.
@@ -66,12 +66,14 @@ class AttachmentSupport {
      * Copies source/temp file for a Attachment linked file to the attachment dir.
      *
      * @param attachmentId the ID of the Attachment record this file is going into.
+     * @param originalFileName The file name to use and concat with attachmentId, can be null and will use name of sourceFile
      * @param sourceFile The absolute path of the file or temp file to be copied and linked.
      * @param locationKey defaults to 'attachments.location' but can be another config key to pass to appResourceLoader
      * @return the Path for the created attachment file.
      */
-    Path createFile(Long id, Path sourceFile, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        Path attachmentFile = getAttachmentsPath(id, sourceFile.getFileName().toString(), locationKey)
+    Path createFileFromSource(Long id, String originalFileName, Path sourceFile, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+        if(!originalFileName) originalFileName = sourceFile.getFileName().toString()
+        Path attachmentFile = getAttachmentsPath(id, originalFileName, locationKey)
         return Files.copy(sourceFile, attachmentFile)
     }
 
@@ -116,6 +118,38 @@ class AttachmentSupport {
         appResourceLoader.getTempDir().toPath()
     }
 
+    Path getFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+        Path rootPath = appResourceLoader.getLocation(locationKey).toPath()
+        Path attachmentPath = rootPath.resolve(location)
+        return attachmentPath
+    }
+
+    /**
+     * Deletes a file if it exists.
+     *
+     * @param   path
+     *          the path to the file to delete
+     *
+     * @return  {@code true} if the file was deleted by this method; {@code
+     *          false} if the file could not be deleted because it did not
+     *          exist
+     */
+    boolean deleteFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+        Path attachedFile = getFile(location, locationKey)
+        return Files.deleteIfExists(attachedFile)
+    }
+
+
+    Resource getResource(Attachment attachment){
+        File f = appResourceLoader.getFile(attachment.location)
+        log.debug "File location is ${f.canonicalPath} which ${f.exists()?'exists.':'does not exist.'}"
+        appResourceLoader.getResource("file:${f.canonicalPath}")
+    }
+
+    String getDownloadUrl(Attachment attachment) {
+        grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
+    }
+
     /**
      *  builds a unique file name for the file by appending the id to the name.
      *  for example, with baseName: foo.txt , attachmentId: 123, would return foo_123.txt
@@ -130,55 +164,9 @@ class AttachmentSupport {
     }
 
     /**
-     * Creates (or move) file relative to the MonthDirectory.
-     * If the data param is a File then its the temp file, rename and move.
-     * If data is a byte[] or a String then write to the new file
-     *
-     * @param attachmentId the ID of the Attachment record this file is going into.
-     * @param name optional name of the file
-     * @param extension The file extension to use.
-     * @param locationKey The app.resources config key that points to the dir to store file,
-     *                    should default to attachments.location
-     * @param data The contents of the file as a File(temp file), String, byte array or null.
-     *             If its null then returns null
-     * @return A map
-     *        location:(string of the location relative to rootLocation),
-     *        file: the File instace that we put in that directory
-     */
-    Path createAttachmentFile(Long attachmentId, String name, String extension, String locationKey, Object data) {
-        if (!data) return null
-
-        String prefix = ""
-        if (name) {
-            prefix = "${name}_"
-        } else if (data instanceof File) {
-            //TODO we should have an option pass in a name so we can name it logically like we are doing with file
-            prefix = "${data.name}_"
-        }
-        String destFileName = extension ? "${prefix}${attachmentId}.${extension}" : "${prefix}${attachmentId}"
-
-        //setup the monthly dir for attachments
-        File monthDir = appResourceLoader.getMonthDirectory(locationKey)
-        File file = new File(monthDir, destFileName)
-
-        Path p = Paths.get("/$destFileName");
-        Files.createFile(p)
-
-        if (data) {
-            if (data instanceof File) FileUtils.moveFile(data, file)
-            if (data instanceof byte[]) FileUtils.writeByteArrayToFile(file, data)
-            if (data instanceof String) FileUtils.writeStringToFile(file, data)
-        }
-        //
-        // String relPath = appResourceLoader.getRelativePath(locationKey, file)
-        // return [location: relPath, file: file]
-        return null
-    }
-
-    /**
      * updates params with the MultipartFile data
      */
-    Map mergeMultipartFileParams(MultipartFile multipartFile, Map params) {
+    static Map mergeMultipartFileParams(MultipartFile multipartFile, Map params) {
         params['name'] = params.name ?: multipartFile.originalFilename
         params['originalFileName'] = multipartFile.originalFilename
         params['mimeType'] = multipartFile.contentType

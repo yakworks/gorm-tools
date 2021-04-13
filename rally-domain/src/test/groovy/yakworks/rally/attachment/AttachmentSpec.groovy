@@ -18,6 +18,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
 
 class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>, SecurityTest {
@@ -36,6 +37,10 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
             }
             attachmentSupport(AttachmentSupport)
         }
+    }
+
+    def setupSpec() {
+        mockDomains(FileData)
     }
 
     void cleanupSpec() {
@@ -120,6 +125,25 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         //location should have date prefixed
         attachment.location.endsWith("grails_logo_${attachment.id}.jpg")
         attachment.resource.exists()
+    }
+
+    void "create with fileData bytes"() {
+        when:
+        def fileName = 'hello.txt'
+        byte[] data = 'blah blah blah'.getBytes()
+        Map params = [name: fileName, fileData: [data: data]]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.id
+        attachment.name
+        attachment.version != null
+        "text/plain" == attachment.mimeType
+        14 == attachment.contentLength
+        'txt' == attachment.extension
+        attachment.location == null
+        !attachment.resource
+        attachment.fileData.data
     }
 
     void "bulkCreate test"() {
@@ -223,6 +247,19 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         !res.exists()
     }
 
+    void "test remove when fileData"() {
+        when:
+        Map params = [name: 'hello.txt', fileData: [data: 'blah blah blah'.getBytes()]]
+        Attachment attachment = Attachment.create(params)
+        def id = attachment.id
+        flush()
+        attachment.remove()
+
+        then:
+        null == Attachment.get(id)
+
+    }
+
     void "test copy"() {
         when:
         Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
@@ -239,6 +276,24 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         copy.extension != null
         copy.resource.exists()
         copy.resource.filename != attachment.resource.filename
+
+    }
+
+    void "test copy when fileData"() {
+        when:
+        Map params = [name: 'hello.txt', fileData: [data: 'blah blah blah'.getBytes()]]
+        Attachment attachment = Attachment.create(params)
+        Attachment copy = attachmentRepo.copy(attachment)
+
+        then:
+        copy != null
+        !copy.is(attachment)
+        copy.id != null
+        attachment.name == copy.name
+        attachment.description == copy.description
+        copy.fileData.data
+        !copy.location
+        !copy.resource
 
     }
 

@@ -80,11 +80,15 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     void afterBind(Attachment attachment, Map p, AfterBindEvent ev) {
         if (ev.isBindCreate()) {
             Path attachedFile = createFile(attachment, p)
-            assert Files.exists(attachedFile)
-            assert attachment.locationKey
-            p.attachedFile = attachedFile //used later in exeption handling to delete the file
-            attachment.location = attachmentSupport.getRelativePath(attachedFile, attachment.locationKey)
-            attachment.contentLength = Files.size(attachedFile)
+            if(attachedFile){
+                p.attachedFile = attachedFile //used later in exeption handling to delete the file
+                attachment.location = attachmentSupport.getRelativePath(attachedFile, attachment.locationKey)
+                attachment.contentLength = Files.size(attachedFile)
+            } else if(attachment.fileData?.data) {
+                attachment.contentLength = attachment.fileData.data.size()
+            }
+            // assert Files.exists(attachedFile)
+            // assert attachment.locationKey
         }
     }
 
@@ -144,7 +148,9 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      */
     @RepoListener
     void beforeRemove(Attachment attachment, BeforeRemoveEvent e) {
-        attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
+        if(attachment.location) {
+            attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
+        }
     }
 
     /**
@@ -206,7 +212,12 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         ['name', 'description', 'mimeType', 'kind', 'subject', 'locationKey'].each {String prop ->
             params[prop] = source[prop]
         }
-        if(source.location) params.sourcePath = getFile(source)
+        if(source.location) {
+            params.sourcePath = getFile(source)
+        }
+        else if(source.fileData?.data) {
+            params.fileData = [data: source.fileData.data] as Map
+        }
         Attachment copy = create(params)
         return copy
     }

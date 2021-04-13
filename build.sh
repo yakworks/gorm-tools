@@ -24,8 +24,8 @@ function catKeyFiles {
 # compile used for circle
 function compile {
   # Downloads Dependencies
-  ./gradlew resolveConfigurations
-  ./gradlew classes
+  ./gradlew resolveConfigurations --no-daemon
+  ./gradlew classes --no-daemon
 #  ./gradlew testClasses
 #  ./gradlew integrationTestClasses
 }

@@ -1,13 +1,15 @@
 package gpbench.helpers
 
-import grails.converters.JSON
-import grails.core.GrailsApplication
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+
 import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
+
+import grails.converters.JSON
+import grails.core.GrailsApplication
 
 @Component
 @CompileStatic

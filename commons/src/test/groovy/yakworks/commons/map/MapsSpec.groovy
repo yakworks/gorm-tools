@@ -305,7 +305,6 @@ class MapsSpec extends Specification {
     }
 
     // A couple rather crude map equality testers.
-
     private void assertMapsEqual(expected, actual) {
         compareMapsWithAssertions(expected, actual)
         compareMapsWithAssertions(actual, expected)

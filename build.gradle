@@ -71,10 +71,10 @@ subprojects {
       // testCompile "org.seleniumhq.selenium:selenium-remote-driver:$vSelenium"
     }
 
-    //testlogger {
+    testlogger {
       // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
       // theme 'standard'
-      // showExceptions true
+      showExceptions true
       // slowThreshold 2000
       // showSummary true
       // showSimpleNames false
@@ -85,7 +85,7 @@ subprojects {
       // showPassedStandardStreams true
       // showSkippedStandardStreams true
       // showFailedStandardStreams true
-    //}
+    }
   }}
 
   configurations {

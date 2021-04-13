@@ -1,12 +1,14 @@
 /*
-* Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.plugin
+package gorm.tools
 
 import groovy.transform.CompileDynamic
+import groovy.util.logging.Slf4j
 
 import org.grails.core.artefact.DomainClassArtefactHandler
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.async.GparsAsyncSupport
@@ -26,22 +28,32 @@ import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.support.ErrorMessageService
 import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
-import grails.core.ArtefactHandler
+import grails.config.Config
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
 
-@SuppressWarnings(['UnnecessarySelfAssignment', 'Println'])
-@CompileDynamic
-class GormToolsPluginHelper {
-    static List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
+@Slf4j
+@CompileDynamic //ok
+@SuppressWarnings(['Println', 'Indentation'])
+class GormToolsBeanConfig {
+    Config config
+    ConfigurableApplicationContext applicationContext
 
-    static Closure doWithSpring = {
-        println "starting gorm-tools config"
+    GormToolsBeanConfig(ConfigurableApplicationContext appCtx){
+        applicationContext = appCtx
+    }
+
+    GormToolsBeanConfig(Config config, ConfigurableApplicationContext appCtx){
+        this.config = config
+        applicationContext = appCtx
+    }
+
+    Closure getBeanDefinitions() {{->
         msgService(MsgService)
-        errorMessageService(ErrorMessageService){ bean -> bean.lazyInit = true}
+        errorMessageService(ErrorMessageService, lazy())
 
-        jdbcTemplate(JdbcTemplate, ref("dataSource")){ bean -> bean.lazyInit = true}
+        jdbcTemplate(JdbcTemplate, ref("dataSource"), lazy())
 
         jdbcIdGenerator(JdbcIdGenerator) { bean ->
             bean.lazyInit = true
@@ -51,19 +63,19 @@ class GormToolsPluginHelper {
             idColumn = "NextId"
         }
 
-        idGenerator(PooledIdGenerator, jdbcIdGenerator){ bean -> bean.lazyInit = true}
+        idGenerator(PooledIdGenerator, jdbcIdGenerator, lazy())
 
-        mangoQuery(DefaultMangoQuery){ bean -> bean.lazyInit = true}
-        mangoBuilder(MangoBuilder){ bean -> bean.lazyInit = true}
+        mangoQuery(DefaultMangoQuery, lazy())
+        mangoBuilder(MangoBuilder, lazy())
 
-        entityMapBinder(EntityMapBinder, ref('grailsApplication')){ bean -> bean.lazyInit = true}
-        entityMapService(EntityMapService){ bean -> bean.lazyInit = true}
+        entityMapBinder(EntityMapBinder, ref('grailsApplication'), lazy())
+        entityMapService(EntityMapService, lazy())
 
-        repoEventPublisher(RepoEventPublisher){ bean -> bean.lazyInit = true}
+        repoEventPublisher(RepoEventPublisher, lazy())
 
-        repoExceptionSupport(RepoExceptionSupport){ bean -> bean.lazyInit = true}
+        repoExceptionSupport(RepoExceptionSupport, lazy())
 
-        asyncSupport(GparsAsyncSupport){ bean -> bean.lazyInit = true}
+        asyncSupport(GparsAsyncSupport, lazy())
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 
@@ -72,11 +84,13 @@ class GormToolsPluginHelper {
             jdbcTemplate = ref('jdbcTemplate')
         }
 
-        trxService(TrxService){ bean -> bean.lazyInit = true}
+        trxService(TrxService, lazy())
 
         def repoClasses = application.repositoryClasses
-        repoClasses.each { repoClass ->
-            getRepoBeanClosure(repoClass, delegate).call()
+        for(GrailsRepositoryClass repoClass : repoClasses){
+            def beanClosure = getRepoBeanClosure(repoClass)
+            beanClosure.delegate = delegate
+            beanClosure()
         }
 
         for (GrailsClass grailsClass in application.getArtefacts(DomainClassArtefactHandler.TYPE)) {
@@ -92,8 +106,18 @@ class GormToolsPluginHelper {
                 }
             }
         }
+    }}
 
-        println "finished gorm-tools config"
+    static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass) {
+        def lazyInit = repoClass.hasProperty("lazyInit") ? repoClass.getPropertyValue("lazyInit") : true
+
+        Closure bClosure = {
+            "${repoClass.propertyName}"(repoClass.getClazz()) { bean ->
+                bean.autowire = true
+                bean.lazyInit = lazyInit
+            }
+        }
+        return bClosure
     }
 
     static void onChange(Object event, GrailsApplication grailsApplication, Plugin plugin) {
@@ -109,18 +133,18 @@ class GormToolsPluginHelper {
         //registryRestApiControllers(grailsApplication)
     }
 
-    static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass, Object beanBuilder = null) {
-        def lazyInit = repoClass.hasProperty("lazyInit") ? repoClass.getPropertyValue("lazyInit") : true
+    Closure autowireLazy() {{ bean ->
+        bean.lazyInit = true
+        bean.autowire = true
+    }}
 
-        def bClosure = {
-            "${repoClass.propertyName}"(repoClass.getClazz()) { bean ->
-                bean.autowire = true
-                bean.lazyInit = lazyInit
-            }
-        }
-        if (beanBuilder) bClosure.delegate = beanBuilder
+    Closure lazy() {{ bean ->
+        bean.lazyInit = true
+    }}
 
-        return bClosure
+    void registerBeans(Closure beanClosure, Object delegate) {
+        beanClosure.delegate = delegate
+        beanClosure()
     }
 
 }

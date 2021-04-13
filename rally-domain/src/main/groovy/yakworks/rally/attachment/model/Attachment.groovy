@@ -6,7 +6,6 @@ package yakworks.rally.attachment.model
 
 import groovy.transform.CompileDynamic
 
-import org.apache.commons.io.FileUtils
 import org.springframework.core.io.Resource
 
 import gorm.tools.audit.AuditStamp
@@ -15,11 +14,13 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.io.FileUtil
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.common.NameDescription
 
-/** Attachments refer to an externally created file, which could be a letter template, an image, text document or anything else.
+/**
+ * Attachments refer to an externally created file, which could be a letter template, an image, text document or anything else.
  * We store attachments differently based on what type of attachment it is.
  * There are 3 types as yet:
  *   1.  Contained in the database in the FileData table.  This has a populated fileDataId and no location.  Invoice templates.
@@ -30,32 +31,36 @@ import yakworks.rally.common.NameDescription
  *       contains the path relative to the Attachments directory which is defined in
  *       grailsApplication.config.nine.resources.attachments.location.
  * see AppResourceService for details.
+ *
+ * TODO Attachment may not be the best name, rename this to FileResource, **AppResource**, ResourceEntity)
+ *  and have it implement the standard Spring Resource interface
  * @author Ken Roberts
  */
-
-//TODO Attachment may not be the best name, rename this to
-// FileDataResource(or.. FileResource, DocumentResource, FileDocResource, **AppResource** ?)
-//and have it implement the standard Spring Resource interface
 @IdEqualsHashCode
 @AuditStamp
 @Entity
 @GrailsCompileStatic
 class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachment>, Serializable {
+    static final String DEFAULT_LOCATION_KEY = "attachments.location"
 
     //non persistable
-    static transients = ["text", "resource", "linkGenerator", "downloadUrl", "createdByUser"]
+    //TODO remove locationKey from transients when db is updated
+    static transients = ["text", "resource", "linkGenerator", "downloadUrl", "createdByUser", 'locationKey']
 
     //cached copy of resource
     transient Resource resource //need transient modifier, so cache doesnt try to serialize it, see #rcm#4499
 
-    //this is the name of the file or view. for a view, it may have the controller prefix such as 'reports/someReport.ftl
-    // String name // in the NameDescription trait
+    //this should be the file display name without dir; foo.txt, bar.pdf, etc.
+    // location has the relative path and unique name. Use description for any other display info
+    String name
     // String description // in the NameDescription trait
 
-    //the full or relative path to the file this is the location of the file. ex: 2012-02/somepdf.pdf or views/reports/arReport.ftl
+    //the relative path to the locationKey, this is the name of the file. ex: 2012-02/somepdf.pdf or views/reports/arReport.ftl
     String location
+    //the appResource config key to get the base directory that location is relative to
+    String locationKey = DEFAULT_LOCATION_KEY
     //the file size/contentLength in bytes
-    Integer contentLength
+    Long contentLength
     //the extension the file should have, can be
     String extension
     //The mime type of the file. most often this will be what you want the browser to see. Use "text/ftl" for freemarker
@@ -69,7 +74,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
 
     String source = "9ci" //FIXME JD Ken - what is this for and why do we need it here?
 
-    @CompileDynamic //Angry monkey, as of 4.0 GrailsCompileStatic bug needs this and it needs to come before constraints
+    @CompileDynamic //Angry monkey? as of 4.0 GrailsCompileStatic bug needs this and it needs to come before constraints
     static enum Kind {
         Activity, Collection, Invoice, Report
     }
@@ -85,7 +90,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     /** if the file/data is text then this returns the String/Text */
     String getText() {
         if (getResource()?.exists()) {
-            return FileUtils.readFileToString(getResource().file)
+            return FileUtil.readFileToString(getResource().file)
         } else if (fileData?.data) {
             return new String(fileData.data, 'UTF-8')
         } else {
@@ -122,13 +127,8 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
 
     static constraints = {
         NameDescriptionConstraints(delegate)
-        mimeType nullable: true
-        fileData nullable: true
-        location nullable: true
+        // location nullable: false
         subject nullable: true, maxSize: 255
-        extension nullable: true
-        contentLength nullable: true
-        kind nullable: true
     }
 
 }

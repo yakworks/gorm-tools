@@ -86,7 +86,7 @@ class FileUtilTests extends Specification {
 
     void testUnzip() {
         setup:
-        File zip = new File(System.getProperty("gradle.rootProjectDir"), "resources/attachments/zip-test.zip")
+        File zip = new File(System.getProperty("gradle.rootProjectDir"), "examples/resources/attachments/zip-test.zip")
         File tempDir = new File(System.getProperty("java.io.tmpdir"))
 
         when:
@@ -103,14 +103,14 @@ class FileUtilTests extends Specification {
     void testZip() {
         when:
         File tempDir = new File(System.getProperty("java.io.tmpdir"))
-        File test = new File(System.getProperty("gradle.rootProjectDir"),"resources/attachments/test.txt")
+        File test = new File(System.getProperty("gradle.rootProjectDir"),"examples/resources/attachments/test.txt")
         File zip = FileUtil.zip(test)
 
         then:
         zip.exists()
 
         when:
-        String extension = FileUtil.extractExtension(zip.name)
+        String extension = FileUtil.getExtension(zip.name)
 
         then:
         "zip".equalsIgnoreCase(extension)
@@ -127,4 +127,19 @@ class FileUtilTests extends Specification {
         zip.delete()
     }
 
+    void "test extractMimeType"() {
+        expect:
+        mimeType == FileUtil.extractMimeType(fileName)
+
+        where:
+        fileName     |  mimeType
+        'foo.pdf'    |  'application/pdf'
+        'foo.png'    |  'image/png'
+        'foo.txt'    |  'text/plain'
+        'foo.doc'    |  'application/msword'
+        'foo.docx'   |  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        'foo.xls'    |  'application/vnd.ms-excel'
+        'foo.xlsx'    |  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        'foo.flub'    |  'application/octet-stream'
+    }
 }

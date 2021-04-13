@@ -22,7 +22,7 @@ class ProjectController extends RestApiRepoController<Project> {
     @Override
     def post() {
         try {
-            Map q = getDataMap()
+            Map q = parseJson(request)
             String comments = q.comments ?: ""
             q.comments = "$comments - post was here"
             Project instance = getRepo().create(q)

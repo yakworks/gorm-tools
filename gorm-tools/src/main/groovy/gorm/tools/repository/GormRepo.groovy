@@ -37,6 +37,7 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.RepositoryApi
+import grails.gorm.transactions.Transactional
 import grails.gorm.validation.ConstrainedProperty
 import grails.validation.ValidationException
 
@@ -321,6 +322,24 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         entityReadOnlyTrx {
             (D) gormStaticApi().read(id)
         }
+    }
+
+    /**
+     * batch creates a list of items in a trx
+     *
+     * @param dataList the list of data maps to create
+     * @param args args to pass to doCreate
+     * @return the list of created entities
+     */
+    List<D> bulkCreate(List<Map> dataList, Map args = [:]){
+        List resultList = [] as List<D>
+        gormStaticApi().withTransaction { TransactionStatus status ->
+            for (Map item : dataList) {
+                D entity = doCreate(item, args)
+                resultList.add(entity)
+            }
+        }
+        return resultList
     }
 
     /**

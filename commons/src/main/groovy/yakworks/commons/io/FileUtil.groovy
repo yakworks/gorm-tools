@@ -5,6 +5,7 @@
 package yakworks.commons.io
 
 import java.nio.channels.FileLock
+import java.nio.charset.Charset
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -13,6 +14,9 @@ import java.util.zip.ZipOutputStream
 import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.FilenameUtils
 
 import yakworks.commons.lang.DateUtil
 
@@ -68,37 +72,33 @@ class FileUtil {
     /**
      * Gets extension from name
      */
-    static String extractExtension(String name) {
-        return name.substring(name.lastIndexOf('.') + 1)
+    static String getExtension(String name) {
+        FilenameUtils.getExtension(name)
     }
-
-    /**
-     * Gets extension from file name
-     */
-    // static String extractExtension(MultipartFile file) {
-    //     String filename = file.getOriginalFilename()
-    //     return extractExtension(filename)
-    // }
-    //
-    // /**
-    //  * Gets mime type from file
-    //  */
-    // static String extractMimeType(MultipartFile file) {
-    //     return file.getContentType()
-    // }
 
     /**
      * Gets mime type from file
      */
     static String extractMimeType(File file) {
-        return URLConnection.guessContentTypeFromName(file.name)
+        return extractMimeType(file.name)
     }
 
     /**
      * Gets mime type from file name
      */
     static String extractMimeType(String fileName) {
-        return URLConnection.guessContentTypeFromName(fileName)
+
+        String mimeType = URLConnection.guessContentTypeFromName(fileName)
+        if(!mimeType) {
+            // see if its word or excel as they are the most common that are not mapped
+            Map mimeMap = [
+                doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                xls: 'application/vnd.ms-excel', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            ]
+            String exten = getExtension(fileName)
+            if(mimeMap.containsKey(exten)) return mimeMap[exten]
+        }
+        return mimeType ?: 'application/octet-stream'
     }
 
     /**
@@ -212,5 +212,30 @@ class FileUtil {
             }
         }
         // TODO Finish this
+    }
+
+    /**
+     * Reads the contents of a file into a String using the default encoding for the VM.
+     * The file is always closed.
+     *
+     * @param file the file to read, must not be {@code null}
+     * @return the file contents, never {@code null}
+     * @throws IOException in case of an I/O error
+     */
+    static String readFileToString(final File file) throws IOException {
+        return readFileToString(file, Charset.defaultCharset())
+    }
+
+    /**
+     * Reads the contents of a file into a String.
+     * The file is always closed.
+     *
+     * @param file     the file to read, must not be {@code null}
+     * @param charsetName the name of the requested charset, {@code null} means platform default
+     * @return the file contents, never {@code null}
+     * @throws IOException in case of an I/O error
+     */
+    static String readFileToString(final File file, final Charset charsetName) throws IOException {
+        return FileUtils.readFileToString(file, charsetName)
     }
 }

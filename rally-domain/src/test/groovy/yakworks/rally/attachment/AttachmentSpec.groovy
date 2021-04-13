@@ -1,0 +1,253 @@
+package yakworks.rally.activity
+
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
+import org.apache.commons.io.FileUtils
+import org.grails.web.mapping.DefaultLinkGenerator
+import org.grails.web.mapping.UrlMappingsHolderFactoryBean
+import org.springframework.mock.web.MockMultipartFile
+
+import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.unit.DomainRepoTest
+import grails.plugin.viewtools.AppResourceLoader
+import spock.lang.Ignore
+import spock.lang.Shared
+import spock.lang.Specification
+import yakworks.rally.attachment.AttachmentSupport
+import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.repo.AttachmentRepo
+
+class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>, SecurityTest {
+
+    @Shared
+    AppResourceLoader appResourceLoader
+    AttachmentRepo attachmentRepo
+
+    // doWithSpringFirst makes sure they are setup so they canbe injected in the repo
+    Closure doWithSpringFirst() {
+        return {
+            grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
+            grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
+            appResourceLoader(AppResourceLoader) {
+                grailsApplication = grailsApplication
+            }
+            attachmentSupport(AttachmentSupport)
+        }
+    }
+
+    void cleanupSpec() {
+        FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
+    }
+
+    // gets a file from example/resources
+    Path getFile(String name){
+        Paths.get(System.getProperty("gradle.rootProjectDir"), "examples/resources/$name")
+    }
+
+    Path createTempFile(String sourceFile){
+        byte[] data = Files.readAllBytes(getFile(sourceFile))
+        appResourceLoader.createTempFile(sourceFile, data).toPath()
+    }
+
+    void "create with byte data"() {
+        when:
+        def fileName = 'hello.txt'
+        byte[] data = 'blah blah blah'.getBytes()
+        Map params = [name: fileName, bytes: data]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.id
+        attachment.name
+        attachment.version != null
+        "text/plain" == attachment.mimeType
+        14 == attachment.contentLength
+        'txt' == attachment.extension
+        //location should have date prefixed
+        attachment.location.endsWith("hello_${attachment.id}.txt")
+        attachment.resource.exists()
+    }
+
+    void "create with byte data origfileName different"() {
+        when:
+        def fileName = 'hello.txt'
+        byte[] data = 'blah blah blah'.getBytes()
+        Map params = [name:'foo.bar', originalFileName:'hello.txt', bytes: data]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.name == 'foo.bar'
+        "text/plain" == attachment.mimeType
+        14 == attachment.contentLength
+        'txt' == attachment.extension
+        //location should have date prefixed
+        attachment.location.endsWith("hello_${attachment.id}.txt")
+        attachment.resource.exists()
+    }
+
+    void "create with sourcePath"() {
+        when:
+        def fileName = 'test.txt'
+        Path sourcePath = getFile(fileName)
+        Map params = [name: fileName, sourcePath: sourcePath]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.name == fileName
+        "text/plain" == attachment.mimeType
+        11 == attachment.contentLength
+        'txt' == attachment.extension
+        //location should have date prefixed
+        attachment.location.endsWith("test_${attachment.id}.txt")
+        attachment.resource.exists()
+    }
+
+    void "create from temp file"() {
+        when:
+        def fileName = 'grails_logo.jpg'
+        Path tempFile = createTempFile(fileName)
+        Map params = [name: fileName, tempFileName: tempFile.fileName]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.name == fileName
+        "image/jpeg" == attachment.mimeType
+        8065 == attachment.contentLength
+        'jpg' == attachment.extension
+        //location should have date prefixed
+        attachment.location.endsWith("grails_logo_${attachment.id}.jpg")
+        attachment.resource.exists()
+    }
+
+    void "bulkCreate test"() {
+        setup:
+        def fileName = 'grails_logo.jpg'
+        Path tempFile = createTempFile(fileName)
+        def origFileSize = Files.size(tempFile)
+        Path tempFile2 = createTempFile(fileName)
+
+        List list = []
+        list.add([tempFileName:tempFile.fileName, originalFileName:'grails_logo.jpg'])
+        list.add([tempFileName:tempFile2.fileName, originalFileName:'grails_logo2.jpg'])
+
+        when:
+        List attachments = attachmentRepo.bulkCreate(list)
+
+        then:
+        2 == attachments.size()
+
+        when:
+        Attachment attachment = attachments[0]
+        File attachedFile = appResourceLoader.getFile(attachment.location)
+
+        then:
+        attachment.location != null
+        attachedFile.exists()
+        origFileSize == attachment.contentLength
+
+        origFileSize == attachedFile.size()
+        'grails_logo.jpg' == attachment.name
+        'jpg'== attachment.extension
+        "image/jpeg" == attachment.mimeType
+
+    }
+
+    @Ignore
+    def "test create file in creditFile"() {
+        byte[] bytes = "A test string".bytes
+        Map params = [name:"test", extension:"jpg", bytes:bytes, isCreditFile: true]
+
+        when:
+        Attachment entity = attachmentRepo.create(params)
+        File attachedFile = appResourceLoader.getFile(entity.location)
+
+        then:
+        entity != null
+        entity instanceof Attachment
+        entity.name == "test"
+        entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
+        attachedFile.absolutePath.startsWith appResourceLoader.getLocation("attachments.creditFiles.location").absolutePath
+
+        cleanup:
+        attachedFile.delete()
+    }
+
+    void testDeleteFileIfInsert_fail() {
+        when:
+        Path tempFile = createTempFile('grails_logo.jpg')
+        Map params = [tempFileName: tempFile.fileName]
+        Attachment result = attachmentRepo.create(params)
+
+        then: "will fail on name"
+        EntityValidationException g = thrown()
+        'validation.error' == g.messageMap.code
+        // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
+        // File monthDir = appResourceLoader.getMonthDirectory("attachments.location")
+        // File testFile = new File(monthDir.path, destFileName)
+        // assert !testFile.exists()
+    }
+
+    def "test create from MultipartFile"() {
+        when:
+        byte[] bytes = Files.readAllBytes(getFile('grails_logo.jpg'))
+        MockMultipartFile file = new MockMultipartFile("file", "grails_logo.jpg", "image/jpeg", bytes);
+        Attachment entity = attachmentRepo.create(file, [:]);
+        File attachedFile = appResourceLoader.getFile(entity.location)
+
+        then:
+        entity
+        'jpg' == entity.extension
+        "image/jpeg" == entity.mimeType
+
+        entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
+
+        cleanup:
+        attachmentRepo.remove(entity)
+    }
+
+    void "test remove"() {
+        when:
+        Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
+        def id = attachment.id
+        flushAndClear()
+        def attached = Attachment.get(id)
+        def res = attached.resource
+        assert res.exists()
+        attached.remove()
+
+        then:
+        null == Attachment.get(id)
+        !res.exists()
+    }
+
+    void "test copy"() {
+        when:
+        Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
+        Attachment copy = attachmentRepo.copy(attachment)
+
+        then:
+        copy != null
+        !copy.is(attachment)
+        copy.id != null
+        attachment.name == copy.name
+        attachment.description == copy.description
+        copy.location != null
+        copy.location != attachment.location
+        copy.extension != null
+        copy.resource.exists()
+        copy.resource.filename != attachment.resource.filename
+
+    }
+
+    void testGetDownloadUrl(){
+        given:
+        Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
+
+        expect:
+        attachment.downloadUrl.contains('/attachment/download/1')
+    }
+
+}

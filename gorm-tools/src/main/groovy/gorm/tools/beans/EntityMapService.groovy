@@ -25,7 +25,6 @@ import grails.plugin.cache.Cacheable
 @CompileStatic
 class EntityMapService {
 
-
     /**
      * Wrap entity/object in EntityMap
      *

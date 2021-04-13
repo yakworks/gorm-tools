@@ -20,10 +20,12 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
 import yakworks.commons.io.FileUtil
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.orgs.model.ContactPhone
 
 /**
  * Attachments are not as simple as they might be in this application.  Please read this documentation before messing
@@ -197,21 +199,15 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * @param source  attachment which should be copied
      * @return a new attachment, which is copied from the source, in case 'source' is null - returns null
      */
-    @Transactional
+    // @Transactional create is already in a trx and is enough
     Attachment copy(Attachment source) {
         if(source == null) return null
-        Path sourcePath = getFile(source)
-        Map params = [
-            name: source.name, description: source.description,
-            mimeType: source.mimeType, kind: source.kind, subject: source.subject,
-            locationKey: source.locationKey,
-            sourcePath: sourcePath
-        ]
+        Map params = [:]
+        ['name', 'description', 'mimeType', 'kind', 'subject', 'locationKey'].each {String prop ->
+            params[prop] = source[prop]
+        }
+        params.sourcePath = getFile(source)
         Attachment copy = create(params)
-
-        assert copy.id != null
-        assert copy.id != source.id
-
         return copy
     }
 

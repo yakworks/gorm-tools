@@ -6,7 +6,7 @@ package gorm.tools
 
 import groovy.util.logging.Slf4j
 
-import gorm.tools.plugin.GormToolsPluginHelper
+import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import grails.core.ArtefactHandler
 
 /**
@@ -27,15 +27,19 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
         "file:./plugins/*/grails-app/services/**/*Repo.groovy"
     ]
 
-    List<ArtefactHandler> artefacts = GormToolsPluginHelper.artefacts
+    List<ArtefactHandler> artefacts = [new RepositoryArtefactHandler()]
+
+    GormToolsBeanConfig getBeanConfig(){
+        new GormToolsBeanConfig(getConfig(), getApplicationContext())
+    }
 
     Closure doWithSpring() {
-        return GormToolsPluginHelper.doWithSpring
+        return beanConfig.getBeanDefinitions()
     }
 
     @Override
     void onChange(Map<String, Object> event) {
-        GormToolsPluginHelper.onChange(event, grailsApplication, this)
+        GormToolsBeanConfig.onChange(event, grailsApplication, this)
     }
 
     @Override

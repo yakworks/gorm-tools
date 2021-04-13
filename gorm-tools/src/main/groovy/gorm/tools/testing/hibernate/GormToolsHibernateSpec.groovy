@@ -10,8 +10,8 @@ import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 
+import gorm.tools.GormToolsBeanConfig
 import gorm.tools.idgen.PooledIdGenerator
-import gorm.tools.plugin.GormToolsPluginHelper
 import gorm.tools.testing.support.GormToolsSpecHelper
 import gorm.tools.testing.support.JsonViewSpecSetup
 import gorm.tools.testing.support.MockJdbcIdGenerator
@@ -42,6 +42,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             ctx.beanFactory.registerSingleton("persistenceInterceptor", pci)
         }
 
+        defineBeans(new GormToolsBeanConfig(ctx).getBeanDefinitions())
+
         Closure beans = {}
 
         beans = beans << {
@@ -56,10 +58,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
         datastore.mappingContext.persistentEntities*.javaClass.each { domainClass ->
             beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
         }
-        beans = beans << GormToolsPluginHelper.doWithSpring //commonBeans()
         beans = beans << doWithSpringFirst()
         defineBeans(beans)
-
     }
 
     /** consistency with other areas of grails and other unit tests */

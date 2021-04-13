@@ -44,7 +44,8 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     static final String DEFAULT_LOCATION_KEY = "attachments.location"
 
     //non persistable
-    static transients = ["text", "resource", "linkGenerator", "downloadUrl", "createdByUser"]
+    //TODO remove locationKey from transients when db is updated
+    static transients = ["text", "resource", "linkGenerator", "downloadUrl", "createdByUser", 'locationKey']
 
     //cached copy of resource
     transient Resource resource //need transient modifier, so cache doesnt try to serialize it, see #rcm#4499

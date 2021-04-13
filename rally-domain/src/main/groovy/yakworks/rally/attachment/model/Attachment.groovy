@@ -66,7 +66,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     //The mime type of the file. most often this will be what you want the browser to see. Use "text/ftl" for freemarker
     String mimeType
     //the file data record if this bytes are stored in the database instead of a file location
-    FileData fileData // MOSTLY DISCOURAGED!!! TODO Deprecate?, use the Attachments directory when possible.
+    FileData fileData // MOSTLY DISCOURAGED!!! used for templates.
     //the kind of attachment. used to discern a template, used in reports too.
     Kind kind
     //optional value for a email template or collectionStep this is the generally the subject of an email or fax cover page.

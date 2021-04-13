@@ -127,7 +127,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
 
     static constraints = {
         NameDescriptionConstraints(delegate)
-        location nullable: false
+        // location nullable: false
         subject nullable: true, maxSize: 255
     }
 

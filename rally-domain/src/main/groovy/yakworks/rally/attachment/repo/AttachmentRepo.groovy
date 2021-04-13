@@ -175,7 +175,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      */
     Attachment create(MultipartFile multipartFile, Map params) {
         params['originalFileName'] = multipartFile.originalFilename
-        params['mimeType'] = multipartFile.contentType
+        //params['mimeType'] = multipartFile.contentType
         params['multipartFile'] = multipartFile
 
         create(params)
@@ -206,7 +206,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         ['name', 'description', 'mimeType', 'kind', 'subject', 'locationKey'].each {String prop ->
             params[prop] = source[prop]
         }
-        params.sourcePath = getFile(source)
+        if(source.location) params.sourcePath = getFile(source)
         Attachment copy = create(params)
         return copy
     }

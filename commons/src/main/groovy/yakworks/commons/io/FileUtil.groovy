@@ -10,16 +10,13 @@ import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-import javax.activation.MimetypesFileTypeMap
 
 import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.io.Charsets
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
-import org.apache.commons.io.IOUtils
 
 import yakworks.commons.lang.DateUtil
 
@@ -94,11 +91,14 @@ class FileUtil {
         String mimeType = URLConnection.guessContentTypeFromName(fileName)
         if(!mimeType) {
             // see if its word or excel as they are the most common that are not mapped
-            if(fileName.endsWith('doc') || fileName.endsWith('docx')) mimeType = 'application/msword'
-            else if(fileName.endsWith('xls') || fileName.endsWith('xlsx')) mimeType = 'application/vnd.ms-excel'
-            else mimeType = 'application/octet-stream'
+            Map mimeMap = [
+                doc: 'application/msword', docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                xls: 'application/vnd.ms-excel', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            ]
+            String exten = getExtension(fileName)
+            if(mimeMap.containsKey(exten)) return mimeMap[exten]
         }
-        return mimeType
+        return mimeType ?: 'application/octet-stream'
     }
 
     /**

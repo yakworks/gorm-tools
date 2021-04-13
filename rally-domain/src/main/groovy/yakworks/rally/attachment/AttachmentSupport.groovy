@@ -24,7 +24,7 @@ import grails.web.mapping.LinkGenerator
 import yakworks.rally.attachment.model.Attachment
 
 /**
- * Support for working with Attachment files
+ * Support for working with Attachment files, much of it calls out to AppResourceLoader and converts to nio2 Path objects
  */
 @Service @Lazy
 @Slf4j
@@ -36,7 +36,7 @@ class AttachmentSupport {
     @Autowired LinkGenerator grailsLinkGenerator
 
     /**
-     * Copy from temp file. takes a temp file name that will be in the tempDir locationKey as the
+     * Move a temp file. takes a temp file name that will be in the tempDir locationKey as the
      * source for the linked attachment file.
      *
      * @param attachmentId the ID of the Attachment record this file is going into.
@@ -49,7 +49,7 @@ class AttachmentSupport {
         Path attachmentFile = getAttachmentsPath(id, originalFileName, locationKey)
         Path tempFile = getTempPath().resolve(tempFileName)
         if(!Files.exists(tempFile)) throw new FileNotFoundException("Could not find temp file: ${tempFile.toString()}")
-        return Files.copy(tempFile, attachmentFile)
+        return Files.move(tempFile, attachmentFile)
     }
 
     /**
@@ -119,6 +119,17 @@ class AttachmentSupport {
      */
     Path getTempPath() {
         appResourceLoader.getTempDir().toPath()
+    }
+
+    /**
+     * use appResourceLoader to create a temp file
+     *
+     * @param originalFileName the name of the file that was uploaded
+     * @param data is the file contents, and can be String, byte[], or null.
+     * @return a Path instance pointing to file
+     */
+    Path createTempFile(String originalFileName, Object data){
+        appResourceLoader.createTempFile(originalFileName, data).toPath()
     }
 
     Path getFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {

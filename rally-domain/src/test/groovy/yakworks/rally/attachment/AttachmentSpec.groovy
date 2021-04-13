@@ -18,7 +18,6 @@ import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
 
 class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>, SecurityTest {
@@ -123,7 +122,7 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         attachment.resource.exists()
     }
 
-    void "insertList test"() {
+    void "bulkCreate test"() {
         setup:
         def fileName = 'grails_logo.jpg'
         Path tempFile = createTempFile(fileName)
@@ -135,7 +134,7 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         list.add([tempFileName:tempFile2.fileName, originalFileName:'grails_logo2.jpg'])
 
         when:
-        List attachments = attachmentRepo.insertList(list)
+        List attachments = attachmentRepo.bulkCreate(list)
 
         then:
         2 == attachments.size()
@@ -195,7 +194,7 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         when:
         byte[] bytes = Files.readAllBytes(getFile('grails_logo.jpg'))
         MockMultipartFile file = new MockMultipartFile("file", "grails_logo.jpg", "image/jpeg", bytes);
-        Attachment entity = attachmentRepo.insertMultipartFile(file, [:]);
+        Attachment entity = attachmentRepo.create(file, [:]);
         File attachedFile = appResourceLoader.getFile(entity.location)
 
         then:

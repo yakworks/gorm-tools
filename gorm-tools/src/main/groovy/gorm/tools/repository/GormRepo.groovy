@@ -324,6 +324,22 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
     }
 
     /**
+     * batch creates a list of items in a trx
+     *
+     * @param dataList the list of data maps to create
+     * @param args args to pass to doCreate
+     * @return the list of created entities
+     */
+    List<D> bulkCreate(List<Map> dataList, Map args = [:]){
+        List resultList = [] as List<D>
+        batchTrx(dataList) { Map item ->
+            D entity = doCreate(item, args)
+            resultList.add(entity)
+        }
+        return resultList
+    }
+
+    /**
      *
      * @param ids list of ids to update
      * @param values data to apply to selected rows

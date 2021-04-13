@@ -137,9 +137,9 @@ class FileUtilTests extends Specification {
         'foo.png'    |  'image/png'
         'foo.txt'    |  'text/plain'
         'foo.doc'    |  'application/msword'
-        'foo.docx'   |  'application/msword'
+        'foo.docx'   |  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         'foo.xls'    |  'application/vnd.ms-excel'
-        'foo.xlsx'    |  'application/vnd.ms-excel'
+        'foo.xlsx'    |  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         'foo.flub'    |  'application/octet-stream'
     }
 }

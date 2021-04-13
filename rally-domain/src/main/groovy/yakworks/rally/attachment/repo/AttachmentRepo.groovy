@@ -10,7 +10,6 @@ import java.nio.file.Path
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
@@ -88,11 +87,12 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     }
 
     /**
-     * 3 ways a file can be set via params
+     * 4 ways a file can be set via params
      *   1. with tempFileName key, where its a name of a file that has been uploaded
      *      to the tempDir location key for appResourceLoader
      *   2. with sourcePath, this should be a absolute path object or string
-     *   3. with bytes, similiar to MultiPartFile. if this is the case then name should have the info for the file
+     *   3. with MultipartFile
+     *   4. with bytes, similiar to MultiPartFile. if this is the case then name should have the info for the file
      * @return the path object for the file to link in location
      */
     Path createFile(Attachment attachment, Map p){
@@ -103,6 +103,12 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         }
         else if (p.sourcePath) { //used for copying attachments and testing
             return attachmentSupport.createFileFromSource(attachment.id, originalFileName, p.sourcePath as Path, attachment.locationKey)
+        }
+        else if (p.multipartFile) { //multipartFile from a ui
+            MultipartFile multipartFile = p.multipartFile as MultipartFile
+            Path tempFile = attachmentSupport.createTempFile(originalFileName, null)
+            multipartFile.transferTo(tempFile) //do this instead of bytes as it is more memory efficient for big files
+            return attachmentSupport.createFileFromTempFile(attachment.id, originalFileName, tempFile.fileName.toString(), attachment.locationKey)
         }
         else if (p.bytes && p.bytes instanceof byte[]) { //used mostly for testing but also for string templates
             return attachmentSupport.createFileFromBytes(attachment.id, originalFileName, p.bytes as byte[], attachment.locationKey)
@@ -146,27 +152,29 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      *  - originalFileName: The name of the file the user sent. <br>
      *  - tempFileName: The name of the temp file the app server created to store it when uploaded. <br>
      * @return the list of attachments
-     *
-     * FIXME refactor this to be closer to the stock batch insert
      */
-    @Transactional
-    List<Attachment> insertList(List<Map> fileDetailsList) {
-        log.debug("*******-->File details list: ${fileDetailsList}")
-        List<Attachment> resultList = []
-        fileDetailsList.each { Map fileDetails ->
-            Attachment attachment = create(fileDetails)
-            resultList.add(attachment)
-        }
-        resultList
-    }
+    // @Transactional
+    // List<Attachment> insertList(List<Map> fileDetailsList) {
+    //     log.debug("*******-->File details list: ${fileDetailsList}")
+    //     List<Attachment> resultList = []
+    //     fileDetailsList.each { Map fileDetails ->
+    //         Attachment attachment = create(fileDetails)
+    //         resultList.add(attachment)
+    //     }
+    //     resultList
+    // }
 
     /**
-     * Saves a multipart file as an attachment. Used in LogoService for example.
+     * creates from a multipart file as an attachment. Used in LogoService for example.
+     *
+     * @param multipartFile the MultipartFile that has the bytes and info
+     * @param params any extra params for the Activity
+     * @return
      */
-    Attachment insertMultipartFile(MultipartFile multipartFile, Map params) {
+    Attachment create(MultipartFile multipartFile, Map params) {
         params['originalFileName'] = multipartFile.originalFilename
         params['mimeType'] = multipartFile.contentType
-        params['bytes'] = multipartFile.bytes
+        params['multipartFile'] = multipartFile
 
         create(params)
     }

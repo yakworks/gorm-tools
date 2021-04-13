@@ -20,6 +20,7 @@ import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
+import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Org
@@ -36,16 +37,14 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         return {
             grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
             grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
+            appResourceLoader(AppResourceLoader) {
+                grailsApplication = grailsApplication
+            }
+            attachmentSupport(AttachmentSupport)
         }
     }
 
     def setupSpec() {
-        defineBeans({
-            appResourceLoader(AppResourceLoader) {
-                grailsApplication = grailsApplication
-                resourcesConfigRootKey = "app.resources"
-            }
-        })
         mockDomains(Customer, Activity, ActivityNote, ActivityLink)
         mockDomains(Org, OrgTypeSetup, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus)
     }

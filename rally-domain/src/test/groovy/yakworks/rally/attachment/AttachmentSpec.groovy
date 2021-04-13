@@ -1,29 +1,25 @@
 package yakworks.rally.activity
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+
 import org.apache.commons.io.FileUtils
-import org.apache.commons.io.FilenameUtils
+import org.grails.web.mapping.DefaultLinkGenerator
+import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.mock.web.MockMultipartFile
 
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
-import grails.gorm.transactions.Rollback
 import grails.plugin.viewtools.AppResourceLoader
-import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
-import spock.lang.IgnoreRest
-import spock.lang.Issue
 import spock.lang.Shared
 import spock.lang.Specification
-import yakworks.rally.activity.model.Task
-import yakworks.rally.activity.model.TaskStatus
-import yakworks.rally.activity.model.TaskType
+import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgTypeSetup
 
 class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>, SecurityTest {
 
@@ -31,11 +27,16 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
     AppResourceLoader appResourceLoader
     AttachmentRepo attachmentRepo
 
-    def setupSpec() {
-        defineBeans({
-            appResourceLoader(AppResourceLoader)
-        })
-        mockDomains(Org, OrgTypeSetup, AttachmentLink, Attachment, Task, TaskType, TaskStatus)
+    // doWithSpringFirst makes sure they are setup so they canbe injected in the repo
+    Closure doWithSpringFirst() {
+        return {
+            grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
+            grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
+            appResourceLoader(AppResourceLoader) {
+                grailsApplication = grailsApplication
+            }
+            attachmentSupport(AttachmentSupport)
+        }
     }
 
     void cleanupSpec() {
@@ -43,15 +44,20 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
     }
 
     // gets a file from example/resources
-    File getFile(String name){
-        new File(System.getProperty("gradle.rootProjectDir"), "examples/resources/$name")
+    Path getFile(String name){
+        Paths.get(System.getProperty("gradle.rootProjectDir"), "examples/resources/$name")
     }
 
-    @IgnoreRest
-    def "create with byte data"() {
+    Path createTempFile(String sourceFile){
+        byte[] data = Files.readAllBytes(getFile(sourceFile))
+        appResourceLoader.createTempFile(sourceFile, data).toPath()
+    }
+
+    void "create with byte data"() {
         when:
+        def fileName = 'hello.txt'
         byte[] data = 'blah blah blah'.getBytes()
-        Map params = [name:'hello.txt', originalFileName:'hello.txt', bytes: data]
+        Map params = [name: fileName, bytes: data]
         Attachment attachment = attachmentRepo.create(params)
 
         then:
@@ -62,22 +68,71 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         14 == attachment.contentLength
         'txt' == attachment.extension
         //location should have date prefixed
-        'txt' == attachment.location
-
+        attachment.location.endsWith("hello_${attachment.id}.txt")
+        attachment.resource.exists()
     }
 
-    def "insertList test"() {
+    void "create with byte data origfileName different"() {
+        when:
+        def fileName = 'hello.txt'
+        byte[] data = 'blah blah blah'.getBytes()
+        Map params = [name:'foo.bar', originalFileName:'hello.txt', bytes: data]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.name == 'foo.bar'
+        "text/plain" == attachment.mimeType
+        14 == attachment.contentLength
+        'txt' == attachment.extension
+        //location should have date prefixed
+        attachment.location.endsWith("hello_${attachment.id}.txt")
+        attachment.resource.exists()
+    }
+
+    void "create with sourcePath"() {
+        when:
+        def fileName = 'test.txt'
+        Path sourcePath = getFile(fileName)
+        Map params = [name: fileName, sourcePath: sourcePath]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.name == fileName
+        "text/plain" == attachment.mimeType
+        11 == attachment.contentLength
+        'txt' == attachment.extension
+        //location should have date prefixed
+        attachment.location.endsWith("test_${attachment.id}.txt")
+        attachment.resource.exists()
+    }
+
+    void "create from temp file"() {
+        when:
+        def fileName = 'grails_logo.jpg'
+        Path tempFile = createTempFile(fileName)
+        Map params = [name: fileName, tempFileName: tempFile.fileName]
+        Attachment attachment = attachmentRepo.create(params)
+
+        then:
+        attachment.name == fileName
+        "image/jpeg" == attachment.mimeType
+        8065 == attachment.contentLength
+        'jpg' == attachment.extension
+        //location should have date prefixed
+        attachment.location.endsWith("grails_logo_${attachment.id}.jpg")
+        attachment.resource.exists()
+    }
+
+    void "insertList test"() {
         setup:
-        byte[] data = FileUtils.readFileToByteArray(getFile('grails_logo.jpg'))
-        File origFile = appResourceLoader.createTempFile('grails_logo.jpg', data)
-        def origFileSize = origFile.size()
-        //assert origFile.size() == 8064
-        File origFile2 = appResourceLoader.createTempFile('grails_logo2.jpg', data)
+        def fileName = 'grails_logo.jpg'
+        Path tempFile = createTempFile(fileName)
+        def origFileSize = Files.size(tempFile)
+        Path tempFile2 = createTempFile(fileName)
 
         List list = []
-        list.add([tempFileName:"${origFile.name}", originalFileName:'grails_logo.jpg'])
-
-        list.add([tempFileName:"${origFile2.name}", originalFileName:'grails_logo2.jpg'])
+        list.add([tempFileName:tempFile.fileName, originalFileName:'grails_logo.jpg'])
+        list.add([tempFileName:tempFile2.fileName, originalFileName:'grails_logo2.jpg'])
 
         when:
         List attachments = attachmentRepo.insertList(list)
@@ -87,15 +142,10 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
 
         when:
         Attachment attachment = attachments[0]
-
-        then:
-        attachment.fileData == null
-        attachment.location != null
-
-        when:
         File attachedFile = appResourceLoader.getFile(attachment.location)
 
         then:
+        attachment.location != null
         attachedFile.exists()
         origFileSize == attachment.contentLength
 
@@ -103,31 +153,10 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         'grails_logo.jpg' == attachment.name
         'jpg'== attachment.extension
         "image/jpeg" == attachment.mimeType
-        'jpg' == FilenameUtils.getExtension(attachedFile.name)
 
     }
 
-    def "insertList failure"() {
-        when:
-        byte[] data = FileUtils.readFileToByteArray(getFile('grails_logo.jpg'))
-        File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', data)
-        tmpFile.deleteOnExit()
-        File tmpFile2 = appResourceLoader.createTempFile('grails_logo2.jpg', data)
-        tmpFile2.deleteOnExit()
-        Map map1 = [tempFileName:"${tmpFile.name}",originalFileName:'grails_logo.jpg',extension:'jpg',filesQueued:'0']
-        List list = [map1]
-        list.add( [tempFileName:"${tmpFile2.name}",extension:'jpg',filesQueued:'0'])
-
-        attachmentRepo.insertList(list)
-
-        then: "should fail on name"
-        EntityValidationException g = thrown()
-        'validation.error' == g.code
-
-        cleanup:
-        if (tmpFile?.exists()) tmpFile.delete()
-    }
-
+    @Ignore
     def "test create file in creditFile"() {
         byte[] bytes = "A test string".bytes
         Map params = [name:"test", extension:"jpg", bytes:bytes, isCreditFile: true]
@@ -143,32 +172,29 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
         attachedFile.absolutePath.startsWith appResourceLoader.getLocation("attachments.creditFiles.location").absolutePath
 
-
         cleanup:
         attachedFile.delete()
     }
 
-    def testDeleteFileIfInsert_fail() {
+    void testDeleteFileIfInsert_fail() {
         when:
-        byte[] data = FileUtils.readFileToByteArray(getFile('grails_logo.jpg'))
-        File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', data)
-        assert tmpFile.exists()
-        Map params = [tempFileName: tmpFile.name, id:12345999999L]
+        Path tempFile = createTempFile('grails_logo.jpg')
+        Map params = [tempFileName: tempFile.fileName]
         Attachment result = attachmentRepo.create(params)
 
-        then:
+        then: "will fail on name"
         EntityValidationException g = thrown()
         'validation.error' == g.messageMap.code
-        String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
-        File monthDir = appResourceLoader.getMonthDirectory("attachments.location")
-        File testFile = new File(monthDir.path, destFileName)
-        assert !testFile.exists()
+        // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
+        // File monthDir = appResourceLoader.getMonthDirectory("attachments.location")
+        // File testFile = new File(monthDir.path, destFileName)
+        // assert !testFile.exists()
     }
 
-    def "insertMultipartFile works"() {
+    def "test create from MultipartFile"() {
         when:
-        byte[] bytes = FileUtils.readFileToByteArray(getFile('grails_logo.jpg'))
-        MockMultipartFile file = new MockMultipartFile("file", "grails_logo.jpg", "multipart/form-data", bytes);
+        byte[] bytes = Files.readAllBytes(getFile('grails_logo.jpg'))
+        MockMultipartFile file = new MockMultipartFile("file", "grails_logo.jpg", "image/jpeg", bytes);
         Attachment entity = attachmentRepo.insertMultipartFile(file, [:]);
         File attachedFile = appResourceLoader.getFile(entity.location)
 
@@ -183,168 +209,46 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         attachmentRepo.remove(entity)
     }
 
-    def "insertToDbFileData works"() {
+    void "test remove"() {
         when:
-        Map params = [subject:'TestTemplateAttachment', name:'TestTemplateAttachment', extension:'ftl', mimeType:'application/freemarker','fileData.data':'test content']
-        Attachment attachment = attachmentRepo.insertToDbFileData(params)
+        Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
+        def id = attachment.id
+        flushAndClear()
+        def attached = Attachment.get(id)
+        def res = attached.resource
+        assert res.exists()
+        attached.remove()
 
         then:
-        attachment
-        params.name == attachment.name
-        params.subject == attachment.subject
+        null == Attachment.get(id)
+        !res.exists()
     }
 
-    def testInsertToDbFileData_fail_no_filedata() {
+    void "test copy"() {
         when:
-        Map params = [subject:'TestTemplateAttachment', name:'TestTemplateAttachment', extension:'ftl', mimeType:'application/freemarker']
-        Attachment result = attachmentRepo.insertToDbFileData(params)
-
-        then:
-        EntityValidationException ge = thrown()
-        ge.message.contains('Missing fileData.data')
-
-    }
-
-    def "test remove"() {
-        when:
-        Attachment attachment = Attachment.get(1005) //Existing Attachments id in test d/b
-        attachmentRepo.remove(attachment)
-
-        then:
-        null == Attachment.get(1005)
-    }
-
-    def testCopyCreatesNewAttachment() {
-        when:
-        Attachment old = Attachment.get(1005)
-        old.description = 'test desc'
-        old.persist(flush: true)
-
-        then:
-        old != null
-
-        when:
-        Attachment copy = attachmentRepo.copy(old)
+        Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
+        Attachment copy = attachmentRepo.copy(attachment)
 
         then:
         copy != null
-        !copy.is(old)
+        !copy.is(attachment)
         copy.id != null
-        old.name == copy.name
-        old.description == copy.description
+        attachment.name == copy.name
+        attachment.description == copy.description
         copy.location != null
-        copy.location != old.location
+        copy.location != attachment.location
         copy.extension != null
+        copy.resource.exists()
+        copy.resource.filename != attachment.resource.filename
 
-        when:
-        File file = appResourceLoader.getFile(copy.location)
-
-        then:
-        copy.extension ==  old.extension
-        file != null
-        file.exists()
-        file.delete()
-        //verfiy it doesnt change old attachment
-        old.inputStream != null
-    }
-
-
-
-    // FIXME com.microsoft.sqlserver.jdbc.SQLServerException: Operand type clash: varbinary is incompatible with text
-    @Issue("https://github.com/9ci/domain9/issues/47")
-    void testSave_with_fileData() {
-        setup:
-        File origFile = new File(System.getProperty("gradle.rootProjectDir"), "examples/resources/test.txt")
-        byte[] bytes = FileUtils.readFileToByteArray(origFile)
-        def template = new Attachment(fileData: new FileData())
-        template.fileData.data = bytes
-        template.subject = "test subject"
-        template.name = "test name"
-        template.extension = "txt"
-        template.contentLength = f.size()
-
-        when:
-        def result = template.persist(flush: true)
-        if(!result) {
-            template.errors.allErrors.each {
-                throw new RuntimeException("${it} errors occured")
-            }
-        }
-
-        then:
-        "test subject" == template.subject
-        "test name" == template.name
-    }
-
-    void testSaveWithParams() {
-        File f = new File(appResourceLoader.rootLocation, "freemarker/test.txt")
-        FileInputStream fio = new FileInputStream(f)
-        byte[] bytes = new byte[fio.available()]
-        fio.read(bytes)
-        fio.close()
-        Map params = [subject:'test subject', name:'test name', extension:'txt',
-                      size:f.size(), 'fileData.data': bytes]
-
-        Attachment template = new Attachment()
-        template.bind(params)
-
-        when:
-        def result = template.persist(flush:true)
-        if(!result) {
-            template.errors.allErrors.each {
-                throw new RuntimeException("${it} errors occured")
-            }
-        }
-
-        then:
-        "test subject" == template.subject
-        "test name" == template.name
-    }
-
-    void testDataString_fileData() {
-        given:
-        Attachment attachment = Attachment.get(17)
-
-        expect:
-        attachment != null
-
-        when:
-        def data = attachment.text
-
-        then:
-        data != null
-        1600 == data.size()
-    }
-
-    // void testDataString_attachmentsDir() {
-    // 	def attachment = Attachment.get(1080)
-    // 	assertEquals('0000-00/1080.ftl', attachment.location)
-    // 	def data = attachment.text
-    // 	assertNotNull(data)
-    // 	assertTrue(data.contains('<p>This file is here to test the Attachments directory code.</p>'))
-    // }
-
-    void testDataString_webApp() {
-        given:
-        Attachment attachment = Attachment.get(1090)
-
-        expect:
-        '/templates/freemarker/test.ftl' == attachment.location
-
-        when:
-        def data = attachment.text
-
-        then:
-        data != null
-        //assertTrue(data.contains('<p>This file is here to test the Attachments code relative to web-app.</p>')) why???
     }
 
     void testGetDownloadUrl(){
         given:
-        def attachment = Attachment.get(1090)
+        Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
 
         expect:
-        attachment.downloadUrl.contains('/attachment/download/1090')
+        attachment.downloadUrl.contains('/attachment/download/1')
     }
 
 }

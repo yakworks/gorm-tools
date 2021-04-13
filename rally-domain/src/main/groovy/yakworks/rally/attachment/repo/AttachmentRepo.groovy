@@ -10,14 +10,12 @@ import java.nio.file.Path
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.io.FilenameUtils
-import org.apache.commons.io.IOUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -54,8 +52,12 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         if (ev.isBindCreate()) {
             //**setup defaults
             //id early so we have it for parent child relationships
-            if (!p.id) p.id = generateId()
+            generateId(attachment)
             if (!p.name) p.name = p.originalFileName
+            if (!p.name) {
+                rejectValue(attachment, 'name', null, 'default.null.message')
+                return
+            }
             if (!p.originalFileName) p.originalFileName = p.name
             if (!p.mimeType) p.mimeType = FileUtil.extractMimeType(p.originalFileName as String)
             if (!p.extension) p.extension = FileUtil.getExtension(p.originalFileName as String)
@@ -80,7 +82,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
             assert Files.exists(attachedFile)
             assert attachment.locationKey
             p.attachedFile = attachedFile //used later in exeption handling to delete the file
-            attachment.location = attachmentSupport.getRelativePath(attachment.locationKey, attachedFile)
+            attachment.location = attachmentSupport.getRelativePath(attachedFile, attachment.locationKey)
             attachment.contentLength = Files.size(attachedFile)
         }
     }
@@ -119,7 +121,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         } catch (e) {
             // the file may have been created in afterBind so delete it if exception fires
             Path attachedFile = data['attachedFile'] as Path
-            Files.deleteIfExists(attachedFile)
+            if(attachedFile) Files.deleteIfExists(attachedFile)
             throw e
         }
 
@@ -143,7 +145,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * The map has keys as follows: <br>
      *  - originalFileName: The name of the file the user sent. <br>
      *  - tempFileName: The name of the temp file the app server created to store it when uploaded. <br>
-     *  - extension: The file extension <br>
      * @return the list of attachments
      *
      * FIXME refactor this to be closer to the stock batch insert
@@ -153,26 +154,9 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         log.debug("*******-->File details list: ${fileDetailsList}")
         List<Attachment> resultList = []
         fileDetailsList.each { Map fileDetails ->
-            Map fileParams = [
-                name: fileDetails['originalFileName'],
-                tempFileName: fileDetails['tempFileName'],
-                extension: FilenameUtils.getExtension(fileDetails['originalFileName'] as String)
-            ]
-            Attachment attachment
-            try{
-                attachment = create(fileParams)
-            }catch(e){
-                resultList.each{
-                    File file = new File(it.location)
-                    if (file?.exists())
-                        file.delete()
-                }
-                throw e
-            }
-
+            Attachment attachment = create(fileDetails)
             resultList.add(attachment)
         }
-
         resultList
     }
 
@@ -180,27 +164,10 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * Saves a multipart file as an attachment. Used in LogoService for example.
      */
     Attachment insertMultipartFile(MultipartFile multipartFile, Map params) {
-        params['name'] = params.name ?: multipartFile.originalFilename
         params['originalFileName'] = multipartFile.originalFilename
         params['mimeType'] = multipartFile.contentType
         params['bytes'] = multipartFile.bytes
-        params['extension'] = FilenameUtils.getExtension(multipartFile.originalFilename)
 
-        create(params)
-    }
-
-    /**
-     * Inserts an attachment with a FileData record as the data holder.  This is used exclusively for invoice templates.
-     * expects a fileData.data param that has the data in it and makes that the data in the FileData to save
-     * should also have size,extension and mimeType populated
-     */
-    Attachment insertToDbFileData(Map params) {
-        if(params['fileData.data'] == null) {
-            throw new EntityValidationException("Missing fileData.data")
-        }
-
-        params['contentLength'] = ((String)params['fileData.data']).getBytes().size()
-        params['data'] = null
         create(params)
     }
 

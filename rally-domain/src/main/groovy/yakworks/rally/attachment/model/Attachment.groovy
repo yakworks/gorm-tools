@@ -19,7 +19,8 @@ import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.common.NameDescription
 
-/** Attachments refer to an externally created file, which could be a letter template, an image, text document or anything else.
+/**
+ * Attachments refer to an externally created file, which could be a letter template, an image, text document or anything else.
  * We store attachments differently based on what type of attachment it is.
  * There are 3 types as yet:
  *   1.  Contained in the database in the FileData table.  This has a populated fileDataId and no location.  Invoice templates.
@@ -30,12 +31,11 @@ import yakworks.rally.common.NameDescription
  *       contains the path relative to the Attachments directory which is defined in
  *       grailsApplication.config.nine.resources.attachments.location.
  * see AppResourceService for details.
+ *
+ * TODO Attachment may not be the best name, rename this to FileResource, **AppResource**, ResourceEntity)
+ *  and have it implement the standard Spring Resource interface
  * @author Ken Roberts
  */
-
-//TODO Attachment may not be the best name, rename this to
-// FileDataResource(or.. FileResource, DocumentResource, FileDocResource, **AppResource** ?)
-//and have it implement the standard Spring Resource interface
 @IdEqualsHashCode
 @AuditStamp
 @Entity
@@ -126,13 +126,8 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
 
     static constraints = {
         NameDescriptionConstraints(delegate)
-        mimeType nullable: true
-        fileData nullable: true
-        location nullable: true
+        location nullable: false
         subject nullable: true, maxSize: 255
-        extension nullable: true
-        contentLength nullable: true
-        kind nullable: true
     }
 
 }

@@ -6,11 +6,13 @@ import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
+import grails.plugin.viewtools.AppResourceLoader
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.activity.model.ActivityTag
+import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
@@ -24,11 +26,17 @@ import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 class ActivitySpec extends Specification implements DomainRepoTest<Activity>, SecurityTest { //implements SecuritySpecUnitTestHelper{
     //Sanity checks and auto runs DomainRepoCrudSpec tests
 
-    void setupSpec(){
-        defineBeans({
+    Closure doWithSpringFirst() {
+        return {
             grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
             grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
-        })
+            appResourceLoader(AppResourceLoader) {
+                grailsApplication = grailsApplication
+            }
+            attachmentSupport(AttachmentSupport)
+        }
+    }
+    void setupSpec(){
         // mockDomains(Org, User, Task, Attachment, Activity,
         mockDomains(Activity, ActivityLink, AttachmentLink, Attachment, ActivityNote, ActivityTag, OrgTypeSetup)
     }
@@ -213,6 +221,7 @@ class ActivitySpec extends Specification implements DomainRepoTest<Activity>, Se
     def "test removeActivityAttachment"() {
         setup:
         Attachment attachment = build(Attachment) //new Attachment(TestDataJson.buildMap([:], Attachment))
+        attachment.location = "foo/bar"
         attachment.persist()
         Activity activity = build(Activity)
         activity.addAttachment attachment

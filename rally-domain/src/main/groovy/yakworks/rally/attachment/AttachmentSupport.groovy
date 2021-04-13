@@ -13,7 +13,10 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.apache.commons.io.FilenameUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.core.io.Resource
+import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 import grails.plugin.viewtools.AppResourceLoader
@@ -23,13 +26,14 @@ import yakworks.rally.attachment.model.Attachment
 /**
  * Support for working with Attachment files
  */
+@Service @Lazy
 @Slf4j
 @CompileStatic
 class AttachmentSupport {
     public static final String ATTACHMENTS_LOCATION_KEY = "attachments.location"
 
-    AppResourceLoader appResourceLoader
-    LinkGenerator grailsLinkGenerator
+    @Autowired AppResourceLoader appResourceLoader
+    @Autowired LinkGenerator grailsLinkGenerator
 
     /**
      * Copy from temp file. takes a temp file name that will be in the tempDir locationKey as the
@@ -91,10 +95,9 @@ class AttachmentSupport {
      * gets the directory for attachments using appResourceLoader.getLocation and appending the
      * date yyyy-MM sub-directory.
      */
-    Path getAttachmentsPath(String locationKey) {
-        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))
+    Path getAttachmentsPath(String locationKey = ATTACHMENTS_LOCATION_KEY) {
         Path rootPath = appResourceLoader.getLocation(locationKey).toPath()
-        Path attachmentPath = rootPath.resolve(datePart)
+        Path attachmentPath = rootPath.resolve(getMonthDir())
         //make sure it exists
         if(!Files.exists(attachmentPath)) Files.createDirectories(attachmentPath)
         return attachmentPath
@@ -105,7 +108,7 @@ class AttachmentSupport {
      * so if locationKey='attachments' and appResourceLoader.getLocation returns '/var/9ci/attachments'
      * and the file is '/var/9ci/attachments/2020-12/foo123.jpg' this will return '2020-12/foo123.jpg'
      */
-    String getRelativePath(String locationKey, Path file) {
+    String getRelativePath(Path file, String locationKey = ATTACHMENTS_LOCATION_KEY) {
         Path rootPath = appResourceLoader.getLocation(locationKey).toPath()
         Path relativePath = rootPath.relativize(file)
         return relativePath.toString()
@@ -136,7 +139,7 @@ class AttachmentSupport {
      */
     boolean deleteFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
         Path attachedFile = getFile(location, locationKey)
-        return Files.deleteIfExists(attachedFile)
+        if(attachedFile) return Files.deleteIfExists(attachedFile)
     }
 
 
@@ -148,6 +151,15 @@ class AttachmentSupport {
 
     String getDownloadUrl(Attachment attachment) {
         grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
+    }
+
+    /****** STATICS ********/
+
+    /**
+     * returns a yyyy-MM sub-directory from current date
+     */
+    static String getMonthDir(){
+        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))
     }
 
     /**

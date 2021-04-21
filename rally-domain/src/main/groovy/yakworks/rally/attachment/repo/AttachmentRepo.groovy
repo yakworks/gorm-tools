@@ -137,12 +137,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         attachment
     }
 
-    /**
-     * A listener, which is called before an Attachment entity removed.
-     *
-     * @param attachment the attachment which will be removed
-     * @param params
-     */
     @RepoListener
     void beforeRemove(Attachment attachment, BeforeRemoveEvent e) {
         if(attachment.location) {
@@ -174,7 +168,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      *
      * @param multipartFile the MultipartFile that has the bytes and info
      * @param params any extra params for the Activity
-     * @return
      */
     Attachment create(MultipartFile multipartFile, Map params) {
         params['originalFileName'] = multipartFile.originalFilename

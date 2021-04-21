@@ -58,11 +58,11 @@ class Jsonify {
      * Useful for testing. Returns the result with the json object (map or collection) and the jsonText
      * see {@link grails.plugin.json.view.api.internal.DefaultGrailsJsonViewHelper#render} for arguments
      *
-     * @param object
+     * @param object the object to render
      * @param arguments [includes, excludes, deep, associations, expand]
      *   see {@link grails.plugin.json.view.api.internal.DefaultGrailsJsonViewHelper#render} and json-views for more details
-     * @param customizer
-     * @return
+     * @param customizer the customizer closure to pass on to DefaultGrailsJsonViewHelper#render
+     * @return the JsonifyResult that has the writer
      */
     static JsonifyResult render(Object object, Map arguments = Collections.emptyMap(),
                                    @DelegatesTo(StreamingJsonBuilder.StreamingJsonDelegate) Closure customizer = null ) {

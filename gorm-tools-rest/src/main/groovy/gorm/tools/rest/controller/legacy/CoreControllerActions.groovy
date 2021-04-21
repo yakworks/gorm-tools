@@ -16,7 +16,6 @@ import grails.web.http.HttpHeaders
 import static org.springframework.http.HttpStatus.NOT_FOUND
 
 /**
- *
  * Helper methods for looks ups using the standard gorm domain statics
  *
  * @author Joshua Burnett

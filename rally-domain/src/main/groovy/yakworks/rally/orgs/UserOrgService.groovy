@@ -26,7 +26,6 @@ class UserOrgService {
 
     /**
      * gets the org from contact for the currently logged in user
-     * @return
      */
     Org getUserOrg(){
         getUserOrg(secService.getUser())
@@ -34,7 +33,6 @@ class UserOrgService {
 
     /**
      * gets the org from contact for the passed in AppUser
-     * @return
      */
     Org getUserOrg(AppUser appUser){
         Contact contact = Contact.findByUser(appUser)

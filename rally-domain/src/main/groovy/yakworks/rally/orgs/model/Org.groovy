@@ -36,7 +36,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
     OrgSource source //originator source record
 
     static constraints = {
-        NameNumConstraints(delegate,[
+        NameNumConstraints(delegate, [
             num: [description: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
             name: [description: 'The full name for this organization', example: 'SpaceX Corp.']
         ])

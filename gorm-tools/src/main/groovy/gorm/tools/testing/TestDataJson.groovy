@@ -34,7 +34,6 @@ class TestDataJson {
      * to with json-views
      *
      * @param args see {@link #parseArgs}
-     * @param entityClass
      * @return the JsonifyResult
      */
     static Jsonify.JsonifyResult buildJson(Map args = [:], Class entityClass) {
@@ -82,8 +81,8 @@ class TestDataJson {
     /**
      * buildMap test data and passes to the create() method from the domain repo
      *
-     * @param args
-     * @param clazz
+     * @param args overrides
+     * @param clazz the gorm class
      * @return the new entity from the create
      */
     @CompileDynamic

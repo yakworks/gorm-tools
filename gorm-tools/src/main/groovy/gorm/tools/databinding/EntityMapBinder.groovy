@@ -163,7 +163,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      * @param source a data binding source which contains property values
      * @param whiteList a list which contains properties for binding
      * @param listener DataBindingListener
-     * @param errors
+     * @param errors the errors object to add binding to
      */
     void fastBind(Object target, DataBindingSource source, List whiteList = null, DataBindingListener listener =
             null, Object errors = null) {
@@ -222,7 +222,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      * @param source a data binding source which contains property values
      * @param prop a persistent property which should be filled with the value
      * @param listener DataBindingListener
-     * @param errors
+     * @param errors the erros object to add the binding errors to
      */
     void setProp(Object target, DataBindingSource source, PersistentProperty prop,
                  DataBindingListener listener = null, Object errors = null) {
@@ -291,7 +291,6 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     /**
      * checks is DataBindingSource containsProperty
      * and if PersistentProperty instanceof Association appends Id to see if it exists and uses that
-     * @return
      */
     String getPropertyNameToUse(DataBindingSource source, PersistentProperty prop) {
         boolean hasIt = source.containsProperty(prop.name)
@@ -312,7 +311,6 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      * @param value an association's value
      * @param association an association property
      * @param listener DataBindingListener
-     * @param errors
      */
     void bindAssociation(Object target, Object value, Association association, DataBindingListener listener = null,
                          Object errors = null) {

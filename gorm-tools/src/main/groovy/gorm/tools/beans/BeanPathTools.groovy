@@ -77,7 +77,7 @@ class BeanPathTools {
      *
      * @param source a source object
      * @param propList a query of properties to include to a map
-     * @param useDelegatingBean
+     * @param useDelegatingBean if it has a delegating bean
      * @return a map which is based on object properties
      */
     @Deprecated //Use EntityMap instead now
@@ -111,7 +111,6 @@ class BeanPathTools {
      *   propsToMap(object, '*', map)                // [id: 1, value: 10, nested: [foo: 1]]
      *   propsToMap(object, 'id', map)               // [id: 1]
      *   propsToMap(object, 'nested.foo', map)       // [nested: [foo: 1]]
-     *
      *
      * @param source a source object
      * @param propertyPath a property name, e.g. 'someField', 'someField.nestedField', '*' (for all properties)

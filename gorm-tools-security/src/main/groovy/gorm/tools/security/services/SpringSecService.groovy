@@ -108,7 +108,6 @@ class SpringSecService<D> implements SecService<D>{
 
     /**
      * Verify that user has logged in fully (ie has presented username/password) and is not logged in using rememberMe cookie
-     * @return
      */
     boolean isAuthenticatedFully() {
         return (isLoggedIn() && !isRememberMe())
@@ -130,7 +129,6 @@ class SpringSecService<D> implements SecService<D>{
 
     /**
      * Check if user is logged in using rememberMe cookie.
-     * @return
      */
     boolean isRememberMe() {
         return authenticationTrustResolver.isRememberMe(SecurityContextHolder.context?.authentication)

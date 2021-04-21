@@ -4,6 +4,9 @@
 */
 package gorm.tools.idgen
 
+/**
+ * not used but interface for a generator that uses strings
+ */
 interface StringIdGenerator {
 
     String getNewId(String tranTypeName)

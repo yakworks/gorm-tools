@@ -343,10 +343,11 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
     }
 
     /**
+     * Mass update a list of ids
      *
      * @param ids list of ids to update
      * @param values data to apply to selected rows
-     * @return
+     * @return the converted list of maps that was used to update
      */
     List<Map> bulkUpdate(List ids, Map values){
         List<Map> data = ids.collect {

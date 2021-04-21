@@ -48,13 +48,10 @@ import static java.lang.reflect.Modifier.PUBLIC
 import static java.lang.reflect.Modifier.STATIC
 import static org.grails.compiler.injection.GrailsASTUtils.ZERO_PARAMETERS
 
-//import grails.rest.Resource
-//import grails.rest.RestfulController
 /**
  * The  transform automatically exposes a domain class as a RESTful resource. In effect the transform adds a
  * controller to a Grails application
  * that performs CRUD operations on the domain. See the grails Resource annotation for more details
- *
  *
  * This is modified from {@link org.grails.plugins.web.rest.transform.ResourceTransform}
  * to use the RestApiController and get rid of the bits that mess with the URL mapping
@@ -63,7 +60,6 @@ import static org.grails.compiler.injection.GrailsASTUtils.ZERO_PARAMETERS
  * @author Graeme Rocher
  *
  */
-// @SuppressWarnings(['VariableName', 'AbcMetric', 'ThrowRuntimeException', 'MethodSize'])
 @SuppressWarnings(['ThrowRuntimeException'])
 @CompileStatic
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)

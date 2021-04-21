@@ -257,8 +257,6 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTr
      * this allows us to call the render, keeping compile static without implementing the Trait
      * as the trait get implemented with AST magic by grails.
      * This is how the RestResponder does it but its private there
-     *
-     * @param args
      */
     void callRender(Map args) {
         ((ResponseRenderer) this).render args
@@ -271,8 +269,6 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTr
     /**
      * Cast this to RestResponder and call respond
      * FIXME I dont think this is needed? whats the purpose here?
-     * @param value
-     * @param args
      */
     def callRespond(Object value, Map args = [:]) {
         ((RestResponder) this).respond value, args

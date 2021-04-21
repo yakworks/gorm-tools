@@ -141,8 +141,7 @@ class AttachmentSupport {
     /**
      * Deletes a file if it exists.
      *
-     * @param   path
-     *          the path to the file to delete
+     * @param location the path to the file to delete
      *
      * @return  {@code true} if the file was deleted by this method; {@code
      *          false} if the file could not be deleted because it did not

@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Propagation
 import gorm.tools.idgen.IdGenerator
 import grails.gorm.transactions.Transactional
 
+/** testing stub for the IdGenerator
+ */
 @SuppressWarnings('SynchronizedMethod')
 @CompileStatic
 class MockJdbcIdGenerator implements IdGenerator {

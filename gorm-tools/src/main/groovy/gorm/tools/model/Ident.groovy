@@ -6,7 +6,6 @@ package gorm.tools.model
 
 /**
  * id property
- * @param <ID>
  */
 interface Ident<ID> {
 

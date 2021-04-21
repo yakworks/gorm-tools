@@ -32,7 +32,9 @@ import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.util.GrailsClassUtils
 
-// the old one, kept for refernce for now
+/**
+ * the old way, kept for refernce for now
+ */
 @CompileStatic
 class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditTrailStamp'
@@ -120,20 +122,6 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
         setUserField(FieldProps.CREATED_BY_KEY, ea)
         setUserField(FieldProps.EDITED_BY_KEY, ea)
     }
-
-    /**
-     * Checks if the given domain instance is new
-     *
-     * it first checks for the createdDate property, if property exists and is not null, returns false, true if null
-     *
-     * @param entity
-     * @return boolean
-     */
-    // private boolean isNewEntity(Object entity) {
-    //     String createdDateFieldName = fieldProps.get(FieldProps.CREATED_DATE_KEY).name
-    //     def value = entity[createdDateFieldName]
-    //     return value == null
-    // }
 
     Serializable getCurrentUserId() {
         Serializable uid = secService.getUserId()

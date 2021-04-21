@@ -33,6 +33,9 @@ import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.plugins.Plugin
 
+/**
+ * main area to setup beans with the bean builder
+ */
 @Slf4j
 @CompileDynamic //ok
 @SuppressWarnings(['Println', 'Indentation'])
@@ -57,7 +60,7 @@ class GormToolsBeanConfig {
 
         jdbcIdGenerator(JdbcIdGenerator) { bean ->
             bean.lazyInit = true
-            jdbcTemplate = jdbcTemplate
+            jdbcTemplate = ref('jdbcTemplate')
             table = "NewObjectId"
             keyColumn = "KeyName"
             idColumn = "NextId"

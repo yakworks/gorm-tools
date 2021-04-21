@@ -29,7 +29,6 @@ import yakworks.commons.lang.Validate
  *
  * @author Joshua Burnett (@basejump)
  * @since 1.0
- *
  */
 @Slf4j
 @CompileStatic

@@ -296,7 +296,6 @@ class DateUtil {
      * @param minutes minutes, by default is 0
      * @param seconds seconds, by default is 0
      * @param milliseconds milliseconds, by default is 0
-     * @return
      */
     static Calendar setTime(Calendar cal, int hours = 0, int minutes = 0,
                             int seconds = 0, int milliseconds = 0) {
@@ -337,10 +336,6 @@ class DateUtil {
      * one.month = two.month : 0
      * one.month = (two.month - 1) : 1
      * one.month = (two.month + 1) : -1
-     *
-     * @param one
-     * @param two
-     * @return
      */
     static int getMonthDiff(Date one, Date two) {
         Calendar start = Calendar.getInstance()
@@ -359,7 +354,6 @@ class DateUtil {
      *  start == end : 0
      *  start is 10 days after end : 10
      *  start is 10 days before end: -10
-     *
      *
      * @return int number of days
      */

@@ -108,9 +108,9 @@ class AppInfoBuilder {
         }
     }
 
-    float formatMB(long value) {
+    BigDecimal formatMB(long value) {
         String formatted = new DecimalFormat('.000', new DecimalFormatSymbols(Locale.ENGLISH)).format(value / 1024.0 / 1024.0)
-        formatted.toFloat()
+        formatted.toBigDecimal()
     }
 
 }

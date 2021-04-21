@@ -94,9 +94,6 @@ class GormUtils {
     /**
      * iterates over map and sets property to target, no conversion or error catching, just a straight forward set
      * if target.hasProperty for the key
-     *
-     * @param target
-     * @param map
      */
     static void setPropertiesFromMap(Object target, Map map){
 

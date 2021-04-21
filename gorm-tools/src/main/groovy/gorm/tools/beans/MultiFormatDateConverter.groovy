@@ -17,7 +17,6 @@ import yakworks.commons.lang.IsoDateUtil
  *
  * So if property is Date and the value that should be bind to it is string, then it will be converted by default before
  * binding
- *
  */
 @Order(value = 1)
 @CompileStatic

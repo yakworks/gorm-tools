@@ -70,7 +70,6 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
     /**
      * Call back to provide beans before repositories are mocked, this gives chance to define beans which may need to
      * be injected into repositories
-     * @return
      */
     Closure doWithSpringFirst() {
         return {}

@@ -28,7 +28,6 @@ trait QueryMangoEntity<D> {
      * call get or list on returned object to fire it
      * @param params the mango criteria language map
      * @param closure optional closure
-     * @return
      */
     static MangoDetachedCriteria<D> query(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).query(params, closure)

@@ -19,7 +19,6 @@ import gorm.tools.beans.AppCtx
 import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
 import grails.util.GrailsNameUtils
-import grails.util.Holders
 import grails.validation.Constrained
 
 /**
@@ -84,7 +83,6 @@ class GormMetaUtils {
 
     /**
      * the mapping grailsDomainClassMappingContext. This is the main holder for the persistentEntities
-     * @return
      */
     static MappingContext getMappingContext() {
         AppCtx.get("grailsDomainClassMappingContext", MappingContext)
@@ -92,7 +90,6 @@ class GormMetaUtils {
 
     /**
      * the mapping grailsDomainClassMappingContext. This is the main holder for the persistentEntities
-     * @return
      */
     static Object unwrap(Object entity) {
         getMappingContext().getProxyHandler().unwrap(entity)

@@ -17,6 +17,9 @@ import gorm.tools.repository.RepoMessage
 import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 
+/**
+ * creates a Map from errors so it can be converted to json and sent to client
+ */
 @CompileDynamic
 class ErrorMessageService {
 

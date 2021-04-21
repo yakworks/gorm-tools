@@ -9,8 +9,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Validate {
 
-    private static final String DEFAULT_NOT_EMPTY =  "The validated object must not be null, blank or empty";
-    private static final String DEFAULT_NOT_NULL = "The validated object must not be null";
+    //private static final String DEFAULT_NOT_EMPTY =  "The validated object must not be null, blank or empty";
+    //private static final String DEFAULT_NOT_NULL = "The validated object must not be null";
 
     /**
      * Validate that the specified argument is no {@code null}

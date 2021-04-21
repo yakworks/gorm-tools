@@ -24,6 +24,7 @@ class RallySeedData {
         }
     }
 
+    @SuppressWarnings('BuilderMethodWithSideEffects')
     static void buildOrgs(int count){
         createOrgTypeSetups()
         (1..2).each{

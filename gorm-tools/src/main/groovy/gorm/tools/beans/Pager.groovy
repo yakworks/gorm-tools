@@ -59,8 +59,6 @@ class Pager {
 
     /**
      * Constructor with params
-     *
-     * @param params
      */
     Pager(Map params) {
         setParams(params)

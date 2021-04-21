@@ -8,10 +8,10 @@ import java.time.LocalDate
 
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
-import yakworks.taskify.domain.traits.NameDescriptionTrait
+import yakworks.rally.common.NameDescription
 
 @GrailsCompileStatic
-class Book implements NameDescriptionTrait, RepoEntity<Book> {
+class Book implements NameDescription, RepoEntity<Book> {
 
     BigDecimal cost
     LocalDate publishDate
@@ -20,7 +20,7 @@ class Book implements NameDescriptionTrait, RepoEntity<Book> {
     static List includes = ['id', 'name', 'description', 'publishDate']
 
     static constraints = {
-        NameDescriptionTraitConstraints(delegate)
+        NameDescriptionConstraints(delegate)
     }
 
 }

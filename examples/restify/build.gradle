@@ -55,7 +55,8 @@ dependencies {
   compile project(":gorm-tools")
   compile project(":gorm-tools-security")
   compile project(":gorm-tools-rest")
-  compile project(":test-domain")
+  compile project(":rally-domain")
+  compile project(":testify")
 
   // runtime "com.h2database:h2"
   // runtime "com.zaxxer:HikariCP:3.4.5"

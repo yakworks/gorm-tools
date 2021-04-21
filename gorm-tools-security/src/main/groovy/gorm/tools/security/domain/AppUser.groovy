@@ -21,12 +21,31 @@ import grails.persistence.Entity
 @EqualsAndHashCode(includes='username', useCanEqual=false)
 class AppUser implements AuditStampTrait, RepoEntity<AppUser>, GetRepo<AppUserRepo>, Serializable {
 
-    // username –– also known as your handle –– what you put after the “@” symbol ala github or twitter
-    // to mention others in comments or notes,
-    // is unique to your account, and appears in your profile URL. username is used to log in to your account,
-    // and is visible when sending and receiving. all lowercase and no spaces or special characters
+    static constraints = {
+        AuditStampTraitConstraints(delegate)
+        username description: '''\
+            The unique user name, also known as your handle –– what you put after the “@” symbol ala github or twitter
+            to mention others in comments or notes. appears in your profile URL. username is used to log in to your account,
+            and is visible when sending and receiving. All lowercase and no spaces or special characters.
+            ''',
+            blank: false, nullable: false, unique: true, maxSize: 50
+        name description: "The full name or display name, may come from contact or defaults to username if not populated",
+             blank: false, nullable: false, maxSize: 50
+        email description: "The email",
+              nullable: false, blank: false, email: true, unique: true
+        passwordHash description: "The pwd hash, internal use only, never show this",
+                     blank: false, nullable: false, maxSize: 60, bindable: false, display:false, password: true
+        passwordChangedDate description: "The date password was changed",
+            nullable: true, bindable: false
+        passwordExpired description: "The password expired",
+            bindable: false
+        resetPasswordToken description: "temp token for a password reset, internal use only",
+            nullable: true, bindable: false, display:false
+        resetPasswordDate description: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",
+            nullable: true, bindable: false, display:false
+    }
+
     String username
-    // lowercase property to be consitent as thats how everyone does it (twitter, facefck, github etc)
     String  name // the full name or display name, may come from contact or defaults to username if not populated
     String  email // users email for username or lost password
     String  passwordHash // the password hash
@@ -60,21 +79,6 @@ class AppUser implements AuditStampTrait, RepoEntity<AppUser>, GetRepo<AppUserRe
         passwordHash column: "`password`"
         passwordExpired column: "mustChangePassword" // TODO change the column name in nine-db
         username column: "login"
-    }
-
-    //@CompileDynamic
-    static constraints = {
-        AuditStampTraitConstraints(delegate)
-        //importFrom AuditStampTraitConstraints, include: AuditStampTraitConstraints.props
-        // assert delegate instanceof ConstrainedPropertyBuilder
-        username blank: false, nullable: false, unique: true, maxSize: 50
-        name blank: false, nullable: false, maxSize: 50
-        email nullable: false, blank: false, email: true, unique: true
-        passwordHash blank: false, nullable: false, maxSize: 60, bindable: false, display:false, password: true
-        passwordChangedDate nullable: true, bindable: false
-        passwordExpired bindable: false
-        resetPasswordToken nullable: true, bindable: false
-        resetPasswordDate nullable: true, bindable: false
     }
 
     @CompileDynamic

@@ -7,19 +7,18 @@ import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
+import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.activity.model.ActivityTag
+import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.OrgTypeSetup
-import yakworks.rally.testing.MockHelper
-import spock.lang.Specification
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.rally.testing.MockHelper
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
@@ -39,11 +38,6 @@ class ActivitySpec extends Specification implements DomainRepoTest<Activity>, Se
     void setupSpec(){
         // mockDomains(Org, User, Task, Attachment, Activity,
         mockDomains(Activity, ActivityLink, AttachmentLink, Attachment, ActivityNote, ActivityTag, OrgTypeSetup)
-    }
-
-    void setup(){
-        new OrgTypeSetup(name: 'Customer').persist(flush:true)
-        assert OrgType.Customer.typeSetup
     }
 
     Map buildUpdateMap(Map args) {

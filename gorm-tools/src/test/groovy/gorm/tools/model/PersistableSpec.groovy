@@ -3,20 +3,20 @@ package gorm.tools.model
 import groovy.transform.CompileStatic
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import testing.Org
+import testing.Cust
 
 class PersistableSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org] }
+    List<Class> getDomainClasses() { [Cust] }
 
     @CompileStatic
-    void nullOutID(Org o){
+    void nullOutID(Cust o){
         o.id = null
     }
 
     def "Persistable"() {
         when:
-        Org orgNew = new Org()
+        Cust orgNew = new Cust()
         Persistable persistable = orgNew as Persistable
         nullOutID(orgNew)
 
@@ -27,7 +27,7 @@ class PersistableSpec extends GormToolsHibernateSpec {
         orgNew.isNew()
 
         when:
-        def org = build(Org)
+        def org = build(Cust)
         Persistable persistable2 = org as Persistable
 
         then:

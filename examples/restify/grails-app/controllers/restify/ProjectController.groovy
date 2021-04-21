@@ -8,7 +8,7 @@ package restify
 import groovy.transform.CompileStatic
 
 import gorm.tools.rest.controller.RestApiRepoController
-import yakworks.taskify.domain.*
+import yakworks.testify.model.Project
 
 import static org.springframework.http.HttpStatus.CREATED
 

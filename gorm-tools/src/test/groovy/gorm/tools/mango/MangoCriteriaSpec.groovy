@@ -4,15 +4,12 @@
 */
 package gorm.tools.mango
 
+import java.time.LocalDate
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import grails.gorm.DetachedCriteria
-import grails.testing.spock.OnceBefore
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
-import testing.Location
+import testing.Address
 import testing.Nested
-import testing.Org
+import testing.Cust
 import testing.TestIdent
 import testing.TestSeedData
 
@@ -20,17 +17,17 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
 
     MangoBuilder mangoBuilder
 
-    List<Class> getDomainClasses() { [Org, Location, Nested] }
+    List<Class> getDomainClasses() { [Cust, Address, Nested] }
 
     MangoDetachedCriteria build(map, Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)
-        return mangoBuilder.build(Org, map, closure)
+        return mangoBuilder.build(Cust, map, closure)
     }
 
     void setupSpec() {
         //super.setupSpec()
-        Org.withTransaction {
-            TestSeedData.buildOrgs(10)
+        Cust.withTransaction {
+            TestSeedData.buildCustomers(10)
         }
     }
 
@@ -187,6 +184,66 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         res.size() == 3
     }
 
+    def "test LocalDate"() {
+        when:
+
+        List res = build(([locDate: LocalDate.now().plusDays(2)])).list()
+
+        then:
+        res.size() == 1
+
+        when:
+        res = build(([locDate: ['$gt': LocalDate.now().plusDays(7)]])).list()
+
+        then:
+        res.size() == 3
+    }
+
+    def "test LocalDate from string"() {
+        when:
+
+        List res = build(([locDate: LocalDate.now().plusDays(2).toString() ])).list()
+
+        then:
+        res.size() == 1
+
+        when:
+        res = build(([locDate: ['$gt': LocalDate.now().plusDays(7).toString() ]])).list()
+
+        then:
+        res.size() == 3
+    }
+
+    def "test LocalDateTime"() {
+        when:
+
+        List res = build(([locDateTime: LocalDate.now().plusDays(2).atStartOfDay()])).list()
+
+        then:
+        res.size() == 1
+
+        when:
+        res = build(([locDateTime: ['$gt': LocalDate.now().plusDays(7).atStartOfDay()]])).list()
+
+        then:
+        res.size() == 3
+    }
+
+    def "test LocalDateTime from string"() {
+        when:
+
+        List res = build(([locDateTime: LocalDate.now().plusDays(2).atStartOfDay().toString() ])).list()
+
+        then:
+        res.size() == 1
+
+        when:
+        res = build(([locDateTime: ['$gt': LocalDate.now().plusDays(7).atStartOfDay().toString() ]])).list()
+
+        then:
+        res.size() == 3
+    }
+
     def "test gt"() {
         when:
 
@@ -216,7 +273,7 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         // res.size() == 1
 
         when:
-        def loc = Location.get(6)
+        def loc = Address.get(6)
         def res = build(location: loc).list()
 
         then:

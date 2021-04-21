@@ -2,9 +2,7 @@ package gorm.tools.support
 
 import org.grails.testing.GrailsUnitTest
 
-import gorm.tools.repository.RepoMessage
 import spock.lang.Specification
-import testing.OrgType
 
 class ResultsSpec extends Specification implements GrailsUnitTest {
 

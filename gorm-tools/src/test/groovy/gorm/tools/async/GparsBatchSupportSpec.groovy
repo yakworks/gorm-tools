@@ -9,15 +9,14 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.springframework.context.ApplicationContext
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import grails.artefact.Artefact
 import grails.testing.spring.AutowiredTest
-import testing.OrgType
+import testing.CustType
 
 class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredTest {
 
     GparsAsyncSupport asyncSupport
 
-    List<Class> getDomainClasses() { [OrgType] }
+    List<Class> getDomainClasses() { [CustType] }
 
     void setup() {
 
@@ -66,10 +65,10 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
         when:
         AtomicInteger count = new AtomicInteger(0)
         asyncSupport.eachParallel(list) { Map item ->
-            new OrgType(name: "name $item.name").persist()
+            new CustType(name: "name $item.name").persist()
         }
         then:
-        OrgType.count() == 100
+        CustType.count() == 100
     }
 
 

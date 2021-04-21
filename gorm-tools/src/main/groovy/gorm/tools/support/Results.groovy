@@ -122,12 +122,15 @@ class Results implements MsgSourceResolvable{
         new Results()
     }
 
+    /**
+     * OK results with a
+     */
     static Results OK(String code, List args = null, String defaultMessage = null){
         new Results(true, code, args, defaultMessage)
     }
 
     /**
-     * sets the default message
+     * sets the default message if not setting a message code
      * allows builder syntax like Results.OK().message('some foo')
      */
     Results message(String defaultMessage){

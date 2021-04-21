@@ -10,15 +10,17 @@ import groovy.util.logging.Slf4j
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.rally.orgs.model.Location
 
 @GormRepository
 @Slf4j
 @CompileStatic
-class LocationRepo implements GormRepo<Location> {
+class LocationRepo implements GormRepo<Location>, IdGeneratorRepo {
 
     @RepoListener
     void beforeValidate(Location location) {
+        if(location.isNew()) generateId(location)
         if(!location.org && location.contact) location.org = location.contact.org
     }
 

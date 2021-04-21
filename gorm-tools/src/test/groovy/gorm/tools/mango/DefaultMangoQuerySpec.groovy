@@ -5,25 +5,21 @@
 package gorm.tools.mango
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import grails.buildtestdata.TestData
-import grails.gorm.DetachedCriteria
-import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
-import testing.Location
+import testing.Address
 import testing.Nested
-import testing.Org
-import testing.OrgType
+import testing.Cust
 import testing.TestSeedData
 
 class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredTest {
 
     DefaultMangoQuery mangoQuery
 
-    List<Class> getDomainClasses() { [Org, Location, Nested] }
+    List<Class> getDomainClasses() { [Cust, Address, Nested] }
 
     void setupSpec() {
-        Org.withTransaction {
-            TestSeedData.buildOrgs(100)
+        Cust.withTransaction {
+            TestSeedData.buildCustomers(100)
         }
     }
 
@@ -83,13 +79,13 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
 
     def "sort check"() {
         when: "Check if \$sort will cause NullPointerException"
-        def list = mangoQuery.query(Org, [name: 'joe', '$sort': 'id'])
+        def list = mangoQuery.query(Cust, [name: 'joe', '$sort': 'id'])
         then:
         noExceptionThrown()
         list != null
 
         when: "Check if sort will cause NullPointerException"
-        list = mangoQuery.query(Org, [name: 'joe', 'sort': 'id'])
+        list = mangoQuery.query(Cust, [name: 'joe', 'sort': 'id'])
         then:
         noExceptionThrown()
         list != null
@@ -97,7 +93,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
 
     void "query eq check"() {
         when:
-        def qlist = Org.query {
+        def qlist = Cust.query {
             eq 'location.id', 1l
         }.list()
 
@@ -105,7 +101,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
         qlist.size() == 1
 
         when:
-        qlist = Org.query {
+        qlist = Cust.query {
             eq 'location.address', 'City1'
         }.list()
 
@@ -113,7 +109,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
         qlist.size() == 1
 
         when:
-        qlist = Org.query {
+        qlist = Cust.query {
             invokeMethod('location') {
                 eq 'address', 'City1'
             }
@@ -123,7 +119,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
         qlist.size() == 1
 
         when:
-        qlist = Org.query {
+        qlist = Cust.query {
             assoc('location') {
                 eq 'address', 'City1'
             }
@@ -147,7 +143,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
 
     void "query inlist check"() {
         when:
-        def qlist = Org.query {
+        def qlist = Cust.query {
             inList 'id', [1l, 2l]
         }.list()
 
@@ -155,7 +151,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
         qlist.size() == 2
 
         when:
-        qlist = Org.query {
+        qlist = Cust.query {
             inList 'location.address', ['City1', 'City2']
         }.list()
 
@@ -166,7 +162,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
 
     void "query get check"() {
         when:
-        def o = Org.query {
+        def o = Cust.query {
             eq 'location.id', 1l
         }.get()
 
@@ -174,7 +170,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
         o.id == 1
 
         when:
-        o = Org.query {
+        o = Cust.query {
             eq 'location.address', 'City2'
         }.get()
 

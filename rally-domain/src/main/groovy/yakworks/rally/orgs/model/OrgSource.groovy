@@ -32,6 +32,23 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, Serializabl
     // denormalized orgType so we can have unique index within org type (source, sourceId and orgType)
     OrgType orgType
 
+    static constraints = {
+        orgId description: 'The id of the org this is for', example: '954',
+            nullable: false
+        orgType description: 'denormalized orgType so we can have unique index within org type (sourceType, sourceId and orgType)',
+            nullable: false, example: 'Customer'
+        source description: 'A descriptiion of where this came from',
+            nullable: true, example: 'Oracle'
+        sourceType description: 'Enum, defaults to SourceType.App',
+            nullable: false, example: 'App'
+        sourceId description: 'the unique key for this within sourceType and orgType',
+            nullable: false, example: 'AR-123-A64'
+        sourceVersion description: 'the version of the last edit in source system',
+            nullable: true, example: '912'
+        originator description: 'indicates this source was the creator of this org, should only be 1 per Org',
+            nullable: false, required: false
+    }
+
     //unique index within org type (source, sourceId and orgType)
     static mapping = {
         id generator: 'assigned'
@@ -39,12 +56,6 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, Serializabl
         orgType column: 'orgTypeId', enumType: 'identity'
     }
 
-    static constraints = {
-        orgId nullable: false
-        sourceType nullable: false
-        sourceId nullable: false
-        orgType nullable: false
-    }
 
     //just in case validation and repo are bypassed during creation make sure its gets an id
     def beforeInsert() {

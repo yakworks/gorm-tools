@@ -6,30 +6,26 @@ package gorm.tools.json
 
 import gorm.tools.beans.BeanPathTools
 import gorm.tools.beans.EntityMapService
-import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.TestTools
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import grails.plugin.json.view.JsonViewGrailsPlugin
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Specification
-import testing.Location
-import testing.Org
-import testing.OrgExt
+import testing.Address
+import testing.Cust
+import testing.CustExt
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
-class JsonifySpec extends Specification implements DomainRepoTest<Org> {
+class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
-        mockDomains(OrgExt, Location, JsonifyDom, JsonifyDomExt, NestedDom)
+        mockDomains(CustExt, Address, JsonifyDom, JsonifyDomExt, NestedDom)
         //defineBeans(new JsonViewGrailsPlugin())
     }
 

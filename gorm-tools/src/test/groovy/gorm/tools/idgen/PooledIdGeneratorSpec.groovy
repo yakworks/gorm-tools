@@ -6,11 +6,10 @@ package gorm.tools.idgen
 
 import gorm.tools.testing.support.MockJdbcIdGenerator
 import gorm.tools.testing.unit.GormToolsTest
-import grails.test.hibernate.HibernateSpec
 import groovyx.gpars.GParsPool
 import spock.lang.Shared
 import spock.lang.Specification
-import testing.Org
+import testing.Cust
 
 class PooledIdGeneratorSpec extends Specification implements GormToolsTest {
 
@@ -28,7 +27,7 @@ class PooledIdGeneratorSpec extends Specification implements GormToolsTest {
     // List<Class> getDomainClasses() { [Org] }
 
     void setupSpec() {
-        mockDomains Org
+        mockDomains Cust
         mockdbgen = new MockJdbcIdGenerator()
         mockdbgen.table.put("table.id", 1)
         mockdbgen.table.put("table1.id", 99)

@@ -18,17 +18,18 @@ trait NameNum {
     static List picklistIncludes = ['id', 'num', 'name'] //for picklist
 
     @CompileDynamic //ok, for gorm constraints
-    static NameNumConstraints(Object delegate, Map numConstraint = null, Map nameConstraint = null) {
-        def numDefault = [description: "unique alpha-numeric identifier for this entity",
+    static NameNumConstraints(Object delegate, Map overrideProps = null) {
+        def numDefault = [description: "Unique alpha-numeric identifier for this entity",
                           nullable: false, blank: false, maxSize: 50]
 
-        def nameDefault = [description: "the full name of this entity",
+        def nameDefault = [description: "The full name for this entity",
                            nullable: false, blank: false, maxSize: 100]
 
         //use default, but allow to override
-        if(numConstraint) numDefault << numConstraint
-        if(nameConstraint) nameDefault << nameConstraint
-
+        if(overrideProps){
+            if(overrideProps.num) numDefault << overrideProps.num as Map
+            if(overrideProps.name) nameDefault << overrideProps.name as Map
+        }
 
         Closure c = {
             num numDefault

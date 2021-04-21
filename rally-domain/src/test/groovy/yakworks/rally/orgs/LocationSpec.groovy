@@ -3,17 +3,15 @@ package yakworks.rally.orgs
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgTypeSetup
-import spock.lang.Specification
 
 class LocationSpec extends Specification implements DomainRepoTest<Location>, SecurityTest {
 
     void setupSpec() {
-        mockDomains(Org, Contact, OrgTypeSetup)
-        new OrgTypeSetup(name: 'Customer').persist()
+        mockDomains(Org, Contact)
     }
 
     @Override

@@ -6,12 +6,11 @@ package gorm.tools.beans
 
 import gorm.tools.beans.domain.*
 import gorm.tools.testing.unit.GormToolsTest
-import spock.lang.IgnoreRest
 import spock.lang.Specification
-import testing.Location
+import testing.Address
 import testing.Nested
-import testing.Org
-import testing.OrgType
+import testing.Cust
+import testing.CustType
 import testing.TestSeedData
 
 class EntityMapServiceSpec extends Specification implements GormToolsTest {
@@ -20,7 +19,7 @@ class EntityMapServiceSpec extends Specification implements GormToolsTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains Bookz, BookTag, BookAuthor, EnumThing, Org, Location, OrgType, Nested
+        mockDomains Bookz, BookTag, BookAuthor, EnumThing, Cust, Address, CustType, Nested
     }
 
     void "test buildIncludesMap"(){
@@ -212,8 +211,8 @@ class EntityMapServiceSpec extends Specification implements GormToolsTest {
 
     void "test createEntityMapList"() {
         when:
-        TestSeedData.buildOrgs(5)
-        def elist = entityMapService.createEntityMapList(Org.list(), ['id', 'name', 'kind', 'type.id', 'type.name'])
+        TestSeedData.buildCustomers(5)
+        def elist = entityMapService.createEntityMapList(Cust.list(), ['id', 'name', 'kind', 'type.id', 'type.name'])
 
         then:
         elist.size() == 5

@@ -24,6 +24,7 @@ import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
@@ -51,9 +52,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
 
     def "test massupdate - with notes "() {
         setup:
-        OrgTypeSetup type = TestData.build(OrgTypeSetup, [newRefnumGeneratorId: null])
-        type.persist()
-        Org org = Org.create("test", "test", type.id).persist()
+        Org org = Org.create("test", "test", OrgType.Customer).persist()
         Customer customerOne = Customer.create(id: 1, name: "test-1", num: "test-1", org: org).persist()
         Customer customerTwo = Customer.create(id: 2, name: "test-2", num: "test-2", org: org).persist()
 
@@ -78,9 +77,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
 
     def "test massupdate - with new attachments "() {
         setup:
-        OrgTypeSetup type = TestData.build(OrgTypeSetup, [newRefnumGeneratorId: null])
-        type.persist()
-        Org org = Org.create("test", "test", type.id).persist()
+        Org org = Org.create("test", "test", OrgType.Customer).persist()
         Payment paymentOne = Payment.create(id: 1, amount: 100, org: org).persist()
         Payment paymentTwo = Payment.create(id: 2, amount: 200, org: org).persist()
 
@@ -137,10 +134,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
 
     def testMassUpdate_with_task() {
         setup:
-        OrgTypeSetup type = TestData.build(OrgTypeSetup, [newRefnumGeneratorId: null])
-        type.persist()
-
-        Org org = Org.create("test", "test", type.id).persist()
+        Org org = Org.create("test", "test", OrgType.Customer).persist()
         Customer customerOne = Customer.create(id: 1, name: "test-1", num: "test-1", org: org).persist()
         Customer customerTwo = Customer.create(id: 2, name: "test-2", num: "test-2", org: org).persist()
 

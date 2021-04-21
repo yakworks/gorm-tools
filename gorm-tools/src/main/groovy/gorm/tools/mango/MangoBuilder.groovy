@@ -15,6 +15,7 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
+import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.IdEnum
 import grails.gorm.DetachedCriteria
@@ -314,18 +315,16 @@ class MangoBuilder {
         }
 
         Object v = value
-        // FIXME the type conversion here should be refactord to a common  area as the same logic
-        // is used in EntityMapBinder as well
+
         if (v instanceof String) {
-            if (String.isAssignableFrom(typeToConvertTo)) {
-                v = value
-            } else if (Number.isAssignableFrom(typeToConvertTo)) {
-                v = (value as String).asType(typeToConvertTo as Class<Number>)
-            } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                v = IsoDateUtil.parse(value as String)
-            } else if (typeToConvertTo.isEnum()) {
+            Object parsedVal = EntityMapBinder.parseBasicType(v, typeToConvertTo)
+            if (parsedVal != Boolean.FALSE) {
+                v = parsedVal
+            }
+            else if (typeToConvertTo.isEnum()) {
                 v = getEnum(typeToConvertTo, v)
             }
+
         }
         else if (typeToConvertTo?.isEnum() && (v instanceof Number || v instanceof Map)){
             def idVal = v //assume its a number

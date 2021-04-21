@@ -20,12 +20,9 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import gorm.tools.utils.GormUtils
-import grails.gorm.transactions.Transactional
 import yakworks.commons.io.FileUtil
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.orgs.model.ContactPhone
 
 /**
  * Attachments are not as simple as they might be in this application.  Please read this documentation before messing

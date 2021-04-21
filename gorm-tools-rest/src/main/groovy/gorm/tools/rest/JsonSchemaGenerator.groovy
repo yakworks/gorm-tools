@@ -16,6 +16,7 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 import org.grails.validation.discovery.ConstrainedDiscovery
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.AnnotationUtils
 
 import gorm.tools.utils.GormMetaUtils
@@ -38,10 +39,10 @@ import static grails.util.GrailsClassUtils.getStaticPropertyValue
 @CompileStatic
 class JsonSchemaGenerator {
 
-    @Resource
+    @Autowired
     HibernateMappingContext persistentEntityMappingContext
 
-    @Resource
+    @Autowired
     DefaultGrailsApplication grailsApplication
 
     //good overview here
@@ -72,9 +73,9 @@ class JsonSchemaGenerator {
 
         if (mapping?.comment) map.description = mapping.comment
 
-        if (AnnotationUtils.findAnnotation(domainClass.class, RestApi)) {
-            map.description = AnnotationUtils.getAnnotationAttributes(AnnotationUtils.findAnnotation(domainClass.class, RestApi)).description
-        }
+        // if (AnnotationUtils.findAnnotation(domainClass.class, RestApi)) {
+        //     map.description = AnnotationUtils.getAnnotationAttributes(AnnotationUtils.findAnnotation(domainClass.class, RestApi)).description
+        // }
 
         map.type = 'Object'
         map.required = []
@@ -110,25 +111,30 @@ class JsonSchemaGenerator {
 
         for (PersistentProperty prop : props) {
             ConstrainedProperty constraints = (ConstrainedProperty) getConstrainedProperties(domClass).get(prop.name)
+
             //Map mappedBy = domClass.mappedBy
             if (!constraints.display) continue //skip if display is false
             if (prop instanceof Association) {
                 PersistentEntity referencedDomainClass = GormMetaUtils.getPersistentEntity(prop.type)
                 Map schemaDefs = (Map) schema.definitions
                 if (/*(prop.isManyToOne() || prop.isOneToOne()) && */ !schemaDefs?.containsKey(referencedDomainClass.name)) {
-                    if (referencedDomainClass.javaClass.isAnnotationPresent(RestApi)) {
-                        //treat as a seperate file
-                        Map refMap = ['$ref': "${referencedDomainClass.name}.json"]
-                        map[prop.name] = refMap
-                    } else {
-                        //treat as definition in same schema
-                        String refName = referencedDomainClass.getDecapitalizedName().capitalize()
-                        schemaDefs[refName] = [:]
-                        schemaDefs[refName] = generate(referencedDomainClass, schema)
-                        schema.definitions = schemaDefs
-                        Map refMap = ['$ref': "#/definitions/$referencedDomainClass.name"]
-                        map[prop.name] = refMap
-                    }
+                    //treat as a seperate file
+                    Map refMap = ['$ref': "${referencedDomainClass.javaClass.simpleName}.yaml"]
+                    map[prop.name] = refMap
+
+                    // if (referencedDomainClass.javaClass.isAnnotationPresent(RestApi)) {
+                    //     //treat as a seperate file
+                    //     Map refMap = ['$ref': "${referencedDomainClass.name}.json"]
+                    //     map[prop.name] = refMap
+                    // } else {
+                    //     //treat as definition in same schema
+                    //     String refName = referencedDomainClass.getDecapitalizedName().capitalize()
+                    //     schemaDefs[refName] = [:]
+                    //     //schemaDefs[refName] = generate(referencedDomainClass, schema)
+                    //     schema.definitions = schemaDefs
+                    //     Map refMap = ['$ref': "#/definitions/$referencedDomainClass.name"]
+                    //     map[prop.name] = refMap
+                    // }
 
                     if (!constraints.isNullable() && constraints.editable) {
                         required.add(prop.name)
@@ -172,7 +178,7 @@ class JsonSchemaGenerator {
                         jprop.readOnly = true
                     }
                     //if its nullable:false but has a default then its not required as it will get filled in.
-                    else if (jprop.default == null) {
+                    else if (jprop.default == null) { //(jprop.default == null) {
                         jprop.required = true
                         required.add(prop.name)
                     }

@@ -9,10 +9,9 @@ restApi:
     entityClass: restify.Book
 
   org:
-    entityClass: yakworks.taskify.domain.Org
-    qSearch: ['num', 'name']
+    entityClass: yakworks.rally.orgs.model.Org
     includes:
-      get: ['*', 'type.*', 'status.*']
+      get: ['*', 'info.*']
       picklist: ['id', 'name']
     form:
       - key: reasonCode
@@ -25,7 +24,7 @@ restApi:
               - name: 'name2'
 
   task:
-    entityClass: yakworks.taskify.domain.Task
+    entityClass: yakworks.testify.model.Taskify
     qSearch: ['name', 'note']
     includes:
       get: ['*', 'project.*']

@@ -9,12 +9,10 @@ include 'commons'
 //findProject(':security').name = 'gorm-tools-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks
-include "examples/test-domain"
-include "examples/rally-domain-test"
+include "examples/testify"
 include 'examples/restify'
 include 'examples/benchmarks'
 
-findProject(':examples/test-domain').name = 'test-domain'
-findProject(':examples/rally-domain-test').name = 'rally-domain-test'
+findProject(':examples/testify').name = 'testify'
 findProject(':examples/restify').name = 'restify'
 findProject(':examples/benchmarks').name = 'benchmarks'

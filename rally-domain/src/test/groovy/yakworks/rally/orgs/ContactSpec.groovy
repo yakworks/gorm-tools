@@ -5,6 +5,7 @@ import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
+import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactPhone
@@ -13,7 +14,6 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockHelper
-import spock.lang.Specification
 
 class ContactSpec extends Specification implements DomainRepoTest<Contact>, SecurityTest {
 

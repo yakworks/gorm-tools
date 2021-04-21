@@ -2,9 +2,7 @@ package gorm.tools.support
 
 import org.grails.testing.GrailsUnitTest
 
-import gorm.tools.repository.RepoMessage
 import spock.lang.*
-import testing.OrgType
 
 class MessageSourceKeySpec extends Specification implements GrailsUnitTest {
 

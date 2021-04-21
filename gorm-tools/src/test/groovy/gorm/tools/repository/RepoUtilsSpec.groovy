@@ -12,13 +12,13 @@ import grails.persistence.Entity
 import grails.testing.gorm.DataTest
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
-import testing.Org
+import testing.Cust
 
 class RepoUtilsSpec extends Specification implements DataTest {
 
     void 'instanceControllersDomainBindingApi'() {
         expect:
-        ReflectionUtils.findField(Org, 'instanceControllersDomainBindingApi')
+        ReflectionUtils.findField(Cust, 'instanceControllersDomainBindingApi')
         //Org.hasProperty('instanceControllersDomainBindingApi')
     }
 

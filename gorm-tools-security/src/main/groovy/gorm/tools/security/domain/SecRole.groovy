@@ -22,22 +22,23 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 class SecRole implements RepoEntity<SecRole>, Serializable {
 
     static final String ADMINISTRATOR = "Administrator" //full access, system user
+    static transients = ['springSecRole']
 
     Boolean inactive = false
 
     String description
     String name
 
+    static constraints = {
+        name description: "The name of the role",
+            blank: false, nullable: false, maxSize: 20
+        description description: "A longer description",
+            nullable: true, maxSize: 255
+    }
+
     static mapping = orm {
         cache "read-write"
     }
-
-    static constraints = {
-        name nullable: false, blank: false
-        description nullable: true
-    }
-
-    static transients = ['springSecRole']
 
     /**
      * Spring security plugin needs all authorities to be prefixed with ROLE_ and hence all roles must

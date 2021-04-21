@@ -8,20 +8,20 @@ import gorm.tools.beans.BeanPathTools
 import gorm.tools.testing.unit.DataRepoTest
 import grails.buildtestdata.BuildDataTest
 import spock.lang.Specification
-import testing.Location
-import testing.Org
-import testing.OrgExt
+import testing.Address
+import testing.Cust
+import testing.CustExt
 
 class TestDataJsonBuildAllSpec extends Specification implements BuildDataTest, DataRepoTest{
 
     def setupSpec(){
-        mockDomains(Org, OrgExt, Location)
+        mockDomains(Cust, CustExt, Address)
     }
 
     void "test getJsonIncludes"(){
         when:
-        def incs = TestDataJson.getFieldsToBuild(Org, '*')
-        def bpathIncs = BeanPathTools.getIncludes(Org.name, incs)
+        def incs = TestDataJson.getFieldsToBuild(Cust, '*')
+        def bpathIncs = BeanPathTools.getIncludes(Cust.name, incs)
 
         then:
         incs.containsAll(['location', 'ext', 'ext.*', 'location.id'])
@@ -30,7 +30,7 @@ class TestDataJsonBuildAllSpec extends Specification implements BuildDataTest, D
 
     void "test includes *"(){
         when:
-        def map = TestDataJson.buildMap(Org, includes:'*', deep:true)//, location: build(Location), ext: build(OrgExt), deep:true)
+        def map = TestDataJson.buildMap(Cust, includes:'*', deep:true)//, location: build(Location), ext: build(OrgExt), deep:true)
         then:
         map.ext.id
         map.ext.text1

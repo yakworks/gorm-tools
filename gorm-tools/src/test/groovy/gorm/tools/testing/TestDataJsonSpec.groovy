@@ -7,18 +7,17 @@ package gorm.tools.testing
 import gorm.tools.testing.unit.DataRepoTest
 import grails.buildtestdata.BuildDataTest
 import spock.lang.Specification
-import testing.Org
-import testing.OrgExt
+import testing.Cust
 
 class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoTest{
 
     def setupSpec(){
-        mockDomains(Org)
+        mockDomains(Cust)
     }
 
     void "sanity check TestData.build"(){
         when:
-        def build = build(Org, name: 'foo')//, includes: '*')
+        def build = build(Cust, name: 'foo')//, includes: '*')
 
         then:
 //        [secret:secret, name2:name2, amount:0, ext:testing.OrgExt : 1, inactive:false,
@@ -28,7 +27,7 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
 
     void "test getJsonIncludes"(){
         when:
-        List incs = TestDataJson.getFieldsToBuild(Org)
+        List incs = TestDataJson.getFieldsToBuild(Cust)
 
         then:
         incs == ['name', 'type', 'type.id']
@@ -37,14 +36,14 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
 
     void "test buildMap"(){
         expect:
-        def map = TestDataJson.buildMap(Org)
+        def map = TestDataJson.buildMap(Cust)
 
         map == [name: 'name', type:[id:1]]
     }
 
     void "test buildJson"(){
         expect:
-        def buildJson = TestDataJson.buildJson(Org, name: 'foo', name2: 'bar')
+        def buildJson = TestDataJson.buildJson(Cust, name: 'foo', name2: 'bar')
 
         buildJson.jsonText == '{"name":"foo","type":{"id":1},"name2":"bar"}'
     }

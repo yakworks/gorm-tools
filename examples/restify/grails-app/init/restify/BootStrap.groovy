@@ -4,7 +4,8 @@
 */
 package restify
 
-import yakworks.taskify.domain.*
+import yakworks.testify.model.Project
+import yakworks.testify.model.Taskify
 
 // import restify.domain.OrgType
 // import taskify.Project
@@ -24,13 +25,11 @@ class BootStrap {
                     startDate: "2020-01-01"
                 ], bindId: true)
                 assert prod.id == it
-                def task = new Task(name: "task1-$it",
+                def task = new Taskify(name: "task1-$it",
                     project: prod)
                     .persist()
-                def task2 = new Task(name: "task2-$it",
+                def task2 = new Taskify(name: "task2-$it",
                     project: prod)
-                    .persist()
-                new OrgType(name: "OrgType-$it")
                     .persist()
             }
 

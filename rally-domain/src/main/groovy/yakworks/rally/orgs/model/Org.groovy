@@ -5,6 +5,7 @@
 package yakworks.rally.orgs.model
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -18,7 +19,7 @@ import yakworks.rally.tag.model.Taggable
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Serializable {
+class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, CreateCriteriaSupport, Serializable {
 
     String  comments
     Long    companyId
@@ -34,6 +35,31 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Se
     Location location
     OrgSource source //originator source record
 
+    static constraints = {
+        NameNumConstraints(delegate,[
+            num: [description: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
+            name: [description: 'The full name for this organization', example: 'SpaceX Corp.']
+        ])
+        type description: 'The type of org', example: 'Customer',
+            nullable: false, bindable: false
+        comments description: 'A user visible comment', example: 'Lorem ipsum',
+            nullable: true, maxSize: 255
+        companyId description: 'Company id this org belongs to', example: '2',
+            nullable: true
+        inactive description: 'indicator for an Org that is no longer active',
+            nullable: false, required: false
+        //associations
+        flex description: 'User flex fields', nullable: true
+        info description: 'Info such as phone and website for an organization',
+            nullable: true
+        contact description: 'The default or key Contact for this organization',
+            nullable: true, bindable: false
+        source description: 'Originator source info, used when this is sourced externally',
+            nullable: true, bindable: false
+        location description: 'The primary organization address info',
+            nullable: true, bindable: false
+    }
+
     static mapping = {
         id generator: 'assigned'
         orgTypeId column: 'orgTypeId', insertable: false, updateable: false
@@ -43,19 +69,6 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Se
         contact column: 'contactId'
         location column: 'locationId'
         source column: 'orgSourceId'
-    }
-
-    static constraints = {
-        NameNumConstraints(delegate)
-        type nullable: false, bindable: false
-        comments nullable: true
-        flex nullable: true
-        info nullable: true
-        inactive nullable: false
-        contact nullable: true, bindable: false
-        source nullable: true, bindable: false
-        companyId nullable: false
-        location nullable: true, bindable: false
     }
 
     //gorm event

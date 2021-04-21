@@ -2,11 +2,10 @@ package yakworks.rally.orgs
 
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.OrgTypeSetup
-import spock.lang.Specification
 
 class OrgSourceRepoSpec extends Specification implements DomainRepoTest<OrgSource>, SecurityTest {
 
@@ -14,11 +13,7 @@ class OrgSourceRepoSpec extends Specification implements DomainRepoTest<OrgSourc
         // defineBeans{
         //     orgDimensionService(OrgDimensionService)
         // }
-        mockDomains(Org, OrgTypeSetup)
-    }
-    void setup(){
-        def ots = new OrgTypeSetup(name: 'Customer').persist(flush:true)
-        assert ots.id == 1
+        mockDomains(Org)
     }
 
     void "CRUD tests"() {

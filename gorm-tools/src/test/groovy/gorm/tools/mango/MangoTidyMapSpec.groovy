@@ -5,7 +5,7 @@
 package gorm.tools.mango
 
 import spock.lang.Specification
-import testing.Location
+import testing.Address
 
 import static gorm.tools.mango.MangoTidyMap.tidy
 
@@ -82,7 +82,7 @@ class MangoTidyMapSpec extends Specification {
     void "test eq"() {
 
         when: "object is assigned"
-        def loc = new Location()
+        def loc = new Address()
         def mmap = tidy('location': loc)
 
         then:

@@ -7,11 +7,11 @@ package gorm.tools
 import gorm.tools.utils.GormMetaUtils
 import grails.test.hibernate.HibernateSpec
 import grails.testing.gorm.DomainUnitTest
-import testing.Org
+import testing.Cust
 
-class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
+class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Cust> {
 
-    List<Class> getDomainClasses() { [Org] }
+    List<Class> getDomainClasses() { [Cust] }
 
     static doWithSpring = {
 
@@ -19,30 +19,30 @@ class GormMetaUtilsSpec extends HibernateSpec implements DomainUnitTest<Org> {
 
     def "GetPersistentEntity name string"() {
         expect:
-        GormMetaUtils.getPersistentEntity("testing.Org")
+        GormMetaUtils.getPersistentEntity("testing.Cust")
     }
 
     def "GetPersistentEntity instance"() {
         expect:
-        GormMetaUtils.getPersistentEntity(new Org())
+        GormMetaUtils.getPersistentEntity(new Cust())
     }
 
     def "GetPersistentEntity"() {
         expect:
-        GormMetaUtils.getPersistentEntity(Org)
+        GormMetaUtils.getPersistentEntity(Cust)
     }
 
     def "FindPersistentEntity"() {
         expect:
-        GormMetaUtils.findPersistentEntity("Org")
-        GormMetaUtils.findPersistentEntity("org")
-        GormMetaUtils.findPersistentEntity("testing.Org")
+        GormMetaUtils.findPersistentEntity("Cust")
+        GormMetaUtils.findPersistentEntity("cust")
+        GormMetaUtils.findPersistentEntity("testing.Cust")
     }
 
     def "getPersistentProperties"(){
         expect:
-        GormMetaUtils.getPersistentProperties("testing.Org").size()
-        GormMetaUtils.getPersistentProperties("testing.Org").find{it.name == "id"} != null
+        GormMetaUtils.getPersistentProperties("testing.Cust").size()
+        GormMetaUtils.getPersistentProperties("testing.Cust").find{it.name == "id"} != null
     }
 
 }

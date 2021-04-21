@@ -19,6 +19,7 @@ import yakworks.rally.orgs.repo.LocationRepo
 @IdEqualsHashCode
 @GrailsCompileStatic
 class Location implements RepoEntity<Location>, GetRepo<LocationRepo>, Serializable {
+    static transients = ['addressHtml']
     //static belongsTo = [org: Org]
     Kind kind = Kind.work
     String name //description name
@@ -32,6 +33,7 @@ class Location implements RepoEntity<Location>, GetRepo<LocationRepo>, Serializa
     String county
 
     // org is required and when for contact this will just be contact's org
+    //belongsTo org but since it is both a 1toMany and and association on the org we dont use the belongsTo
     Org org
     Contact contact
 
@@ -40,7 +42,40 @@ class Location implements RepoEntity<Location>, GetRepo<LocationRepo>, Serializa
     String address3
     String address4
 
-    static transients = ['addressHtml']
+    @CompileDynamic //angry monkey, GrailsCompileStatic bug needs this.
+    static enum Kind {
+        work, home, other, mailing, remittance, physical
+
+        static List<String> stringValues() {
+            return values().toList()*.name() as List<String>
+        }
+    }
+
+    static constraints = {
+        org description: 'The organization this belongs to', nullable: false
+        kind description: 'The address type', nullable: true
+
+        contact description: 'The contact this belongs to', nullable: true
+        name description: 'A descriptive name, can be used for reports an letters', nullable: true
+
+        // address fields
+        street1 nullable: true, maxSize: 100
+        street2 nullable: true, maxSize: 100
+        city nullable: true, maxSize: 100
+        state nullable: true, maxSize: 25
+        zipCode nullable: true, maxSize: 50
+        country nullable: true, maxSize: 3
+        county nullable: true, maxSize: 50
+        address3 nullable: true, maxSize: 100
+        address4 nullable: true, maxSize: 100
+    }
+
+    static mapping = {
+        //columns
+        id generator: 'assigned'
+        org column: 'orgId'
+        contact column: 'contactId'
+    }
 
     String getAddressHtml() {
         String markup = ""
@@ -60,40 +95,6 @@ class Location implements RepoEntity<Location>, GetRepo<LocationRepo>, Serializa
             markup = "$markup ${zipCode.trim()}"
 
         return markup.trim()
-    }
-
-    @CompileDynamic //angry monkey, GrailsCompileStatic bug needs this.
-    static enum Kind {
-        work, home, other, mailing, remittance, physical
-
-        static List<String> stringValues() {
-            return values().toList()*.name() as List<String>
-        }
-    }
-
-    static mapping = {
-        //columns
-        org column: 'orgId'
-        contact column: 'contactId'
-    }
-
-    static constraints = {
-        org nullable: false
-        kind nullable: true
-
-        contact nullable: true
-        name nullable: true
-
-        // address fields
-        street1 nullable: true, maxSize: 100
-        street2 nullable: true, maxSize: 100
-        city nullable: true, maxSize: 100
-        state nullable: true, maxSize: 25
-        zipCode nullable: true, maxSize: 50
-        country nullable: true, maxSize: 3
-        county nullable: true, maxSize: 50
-        address3 nullable: true, maxSize: 100
-        address4 nullable: true, maxSize: 100
     }
 
     static List<Location> listByContact(Contact con){

@@ -39,7 +39,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void beforeValidate(Org org) {
         if(org.isNew()) {
             Validate.notNull(org.type, "org.type")
-            Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
+            //Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
             generateId(org)
         }
         wireAssociations(org)
@@ -52,6 +52,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
             org.type = getOrgTypeFromData(data)
+            if(data.id) org.id = data.id as Long
             generateId(org)
         }
     }

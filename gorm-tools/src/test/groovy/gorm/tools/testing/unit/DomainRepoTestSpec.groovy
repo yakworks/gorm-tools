@@ -5,10 +5,9 @@
 package gorm.tools.testing.unit
 
 import spock.lang.Specification
-import testing.Org
-import testing.OrgType
+import testing.Cust
 
-class DomainRepoTestSpec extends Specification implements DomainRepoTest<Org> {
+class DomainRepoTestSpec extends Specification implements DomainRepoTest<Cust> {
 
     void "verify repo is added"(){
         when:

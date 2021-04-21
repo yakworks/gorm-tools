@@ -188,6 +188,34 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     }
 
     /**
+     * Quick way to convert a string to basic type such as Date, LocalDate, LocalDateTime and number
+     * if its a string it trims it and returns a null.
+     *
+     * @param sval the string value to parse to typeToConvertTo
+     * @param typeToConvertTo the Class to try and convert
+     * @return the converted object, or a Boolean.False if not converted
+     */
+    static Object parseBasicType(String sval, Class typeToConvertTo){
+        Object valueToAssign = Boolean.FALSE
+        //do we have tests for this?
+        if (String.isAssignableFrom(typeToConvertTo)) {
+            sval = sval.trim()
+            sval = ("" == sval) ? null : sval
+            valueToAssign = sval
+        } else if (Date.isAssignableFrom(typeToConvertTo)) {
+            valueToAssign = IsoDateUtil.parse(sval)
+        } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
+            valueToAssign = IsoDateUtil.parseLocalDate(sval)
+            //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
+        } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
+            valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
+        } else if (Number.isAssignableFrom(typeToConvertTo)) {
+            valueToAssign = sval.asType(typeToConvertTo as Class<Number>)
+        }
+        return valueToAssign
+    }
+
+    /**
      * Sets a value to a specified target's property.
      *
      * @param target a target entity
@@ -209,21 +237,12 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
         if (propValue instanceof String) {
             String sval = propValue as String
+            Object parsedVal = parseBasicType(sval, typeToConvertTo)
             //do we have tests for this?
-            if (String.isAssignableFrom(typeToConvertTo)) {
-                sval = sval.trim()
-                sval = ("" == sval) ? null : sval
-                valueToAssign = sval
-            } else if (Date.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parse(sval)
-            } else if (LocalDate.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parseLocalDate(sval)
-                //LocalDate.parse(val, DateTimeFormatter.ISO_DATE_TIME)
-            } else if (LocalDateTime.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
-            } else if (Number.isAssignableFrom(typeToConvertTo)) {
-                valueToAssign = sval.asType(typeToConvertTo as Class<Number>)
-            } else if (conversionHelpers.containsKey(typeToConvertTo)) {
+            if (parsedVal != Boolean.FALSE) {
+                valueToAssign = parsedVal
+            } //if no parsedVal then try converters
+            else if (conversionHelpers.containsKey(typeToConvertTo)) {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
                 ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
                 if (converter) {

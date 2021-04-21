@@ -8,18 +8,18 @@ import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import testing.Location
+import testing.Address
 import testing.Nested
-import testing.Org
+import testing.Cust
 import testing.TestSeedData
 
 class PagerSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org, Location, Nested] }
+    List<Class> getDomainClasses() { [Cust, Address, Nested] }
 
     void setupSpec() {
-        Org.withTransaction {
-            TestSeedData.buildOrgs(50)
+        Cust.withTransaction {
+            TestSeedData.buildCustomers(50)
         }
     }
 
@@ -52,7 +52,7 @@ class PagerSpec extends GormToolsHibernateSpec {
         setup:
         Pager pager = new Pager()
         def entityMapService = new EntityMapService()
-        def dlist = Org.list(max: pager.max, offset: pager.offset)
+        def dlist = Cust.list(max: pager.max, offset: pager.offset)
         EntityMapList entityMapList = entityMapService.createEntityMapList(dlist, ["*"])
 
         when:

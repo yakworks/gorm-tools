@@ -24,6 +24,7 @@ class OrgTypeSetup implements NameDescription, RepoEntity<OrgTypeSetup>, Seriali
     static mapping = {
         table 'OrgType'
         cache true
+        id generator: 'assigned'
     }
 
     static constraints = {

@@ -3,7 +3,9 @@ package yakworks.rally.orgs
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -18,8 +20,6 @@ import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockHelper
-import spock.lang.Specification
-import yakworks.rally.attachment.model.AttachmentLink
 
 class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
     //Automatically runs the basic crud tests
@@ -35,11 +35,9 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
             ContactEmail, ContactSource, ContactFlex, Activity, AttachmentLink
         )
     }
-
-    def setup(){
-        def ots = new OrgTypeSetup(name: 'Customer').persist(flush:true)
-        assert ots.id == 1
-    }
+    // def setup(){
+    //     RallySeedData.createOrgTypeSetups()
+    // }
 
     void "CRUD tests"() {
         expect:

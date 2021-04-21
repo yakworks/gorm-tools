@@ -22,11 +22,12 @@ dependencies {
   compileOnly "org.grails.plugins:build-test-data:$vBuildTestData"
 }
 
-// FIXME for now exlude the Orgs and force and implementation of them in app until we figure out how to use shadowJar
+//XXX for now we exlude the Orgs and force and implementation of them in app until we figure out how to use shadowJar
 // and not have it mess with intellij
-jar {
-  exclude('yakworks/rally/orgs/model/Org.class')
-  exclude('yakworks/rally/orgs/repo/OrgRepo.class')
-  exclude('yakworks/rally/orgs/repo/OrgRepo$*.class')
-  exclude('yakworks/rally/orgs/model/Org$*.class') //also the closure ones
-}
+
+// jar {
+//   exclude('yakworks/rally/orgs/model/Org.class')
+//   exclude('yakworks/rally/orgs/repo/OrgRepo.class')
+//   exclude('yakworks/rally/orgs/repo/OrgRepo$*.class')
+//   exclude('yakworks/rally/orgs/model/Org$*.class') //also the closure ones
+// }

@@ -19,7 +19,7 @@ import yakworks.rally.orgs.model.OrgTypeSetup
 class MockHelper {
 
     static Org org(Map args = [:]) {
-        return TestData.build(Org, [type: orgType()])
+        return TestData.build(Org)
     }
 
     static OrgType orgType(OrgType type = OrgType.Customer) {

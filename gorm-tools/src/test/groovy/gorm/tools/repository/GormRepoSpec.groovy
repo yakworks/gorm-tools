@@ -22,24 +22,24 @@ import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Org,OrgExt, TestTrxRollback] }
+    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback] }
 
     def "assert proper repos are setup"() {
         expect:
-        Org.repo instanceof OrgRepo
-        Org.repo.entityClass == Org
-        Location.repo instanceof DefaultGormRepo
-        Location.repo.entityClass == Location
+        Cust.repo instanceof CustRepo
+        Cust.repo.entityClass == Cust
+        Address.repo instanceof DefaultGormRepo
+        Address.repo.entityClass == Address
         Nested.repo instanceof DefaultGormRepo
         Nested.repo.entityClass == Nested
     }
 
     def "test get"() {
         setup:
-        Org org = build(Org)
+        Cust org = build(Cust)
 
         when:
-        Org newOrg = Org.repo.get(org.id, null)
+        Cust newOrg = Cust.repo.get(org.id, null)
 
         then:
         null != newOrg
@@ -47,7 +47,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.name == newOrg.name
 
         when:
-        newOrg = Org.repo.get(org.id)
+        newOrg = Cust.repo.get(org.id)
 
         then:
         null != newOrg
@@ -57,7 +57,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test get with version"() {
         when:
-        Org org = build(Org)//new Org(name: "get_test_version").save()
+        Cust org = build(Cust)//new Org(name: "get_test_version").save()
 
         then: "version should be 0"
         org.version == 0
@@ -70,13 +70,13 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         org.version == 1
 
         when: "test get() with old version"
-        Org.repo.get(org.id, 0)
+        Cust.repo.get(org.id, 0)
 
         then:
         thrown(OptimisticLockingFailureException)
 
         when: "test get() with valid version"
-        Org newOrg = Org.repo.get(org.id, 1)
+        Cust newOrg = Cust.repo.get(org.id, 1)
 
         then:
         noExceptionThrown()
@@ -87,8 +87,8 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test dirty checking works for traits"() {
         when:
-        Org org = build(Org)//new Org(name: "get_test_version").save()
-        org.ext  = build(OrgExt, save:false)
+        Cust org = build(Cust)//new Org(name: "get_test_version").save()
+        org.ext  = build(CustExt, save:false)
         org.ext.org = org
         org.ext.save(failOnError: true, flush:true)
         //org.save(failOnError: true, flush:true)
@@ -114,7 +114,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when: "changes happen to org"
         RepoUtil.flushAndClear()
-        org = Org.get(3)
+        org = Cust.get(3)
         assert org.name == 'name'
         org['name'] = "make dirty1"
         org.name2 = "make dirty2"
@@ -131,10 +131,10 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test get with non-existent id"() {
         setup:
-        Org org = build(Org)
+        Cust org = build(Cust)
 
         when:
-        Org.repo.get(Org.last().id + 1, null)
+        Cust.repo.get(Cust.last().id + 1, null)
 
         then:
         thrown EntityNotFoundException
@@ -142,11 +142,11 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test create with domain property"() {
         setup:
-        def type = TestData.build(OrgType)
+        def type = TestData.build(CustType)
         Map params = [name: 'foo', type: type]
 
         when:
-        Org org = Org.repo.create(params)
+        Cust org = Cust.repo.create(params)
 
         then:
         org.name == "foo"
@@ -158,18 +158,18 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Map params = [isActive: true, amount: 10.0]
 
         when:
-        Org org = Org.repo.create(params)
+        Cust org = Cust.repo.create(params)
 
         then:
         def e = thrown(EntityValidationException)
-        e.message.contains("Field error in object 'testing.Org' on field 'name': rejected value [null]")
+        e.message.contains("Field error in object 'testing.Cust' on field 'name': rejected value [null]")
     }
 
     def "test persist"() {
         when:
-        Org org = build(Org, save: false)
-        Org.repo.persist(org)
-        org = Org.get(org.id)
+        Cust org = build(Cust, save: false)
+        Cust.repo.persist(org)
+        org = Cust.get(org.id)
 
         then:
         org.name == "name"
@@ -178,16 +178,16 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test persist with validation"() {
         when:
-        Org.repo.persist(new Org(amount: 500))
+        Cust.repo.persist(new Cust(amount: 500))
 
         then:
         def e = thrown(EntityValidationException)
-        e.message.contains("Field error in object 'testing.Org' on field 'name': rejected value [null]")
+        e.message.contains("Field error in object 'testing.Cust' on field 'name': rejected value [null]")
     }
 
     def "test update"() {
         when:
-        Org org = build(Org)
+        Cust org = build(Cust)
         org.name = "test2"
 
         then:
@@ -196,16 +196,16 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when:
         Map p = [id: org.id, name: 'foo']
-        org = Org.repo.update(p, [flush: true])
+        org = Cust.repo.update(p, [flush: true])
 
         then:
         org.name == "foo"
-        Org.findByName("foo") != null
+        Cust.findByName("foo") != null
     }
 
     def "test update with non-existent id"() {
         when:
-        Org.repo.update([name: 'foo', id: 99999999])
+        Cust.repo.update([name: 'foo', id: 99999999])
 
         then:
         thrown EntityNotFoundException
@@ -213,29 +213,29 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test remove"() {
         setup:
-        Org org = build(Org)
+        Cust org = build(Cust)
 
         when:
-        Org.repo.remove(org)
+        Cust.repo.remove(org)
 
         then:
-        Org.get(org.id) == null
+        Cust.get(org.id) == null
     }
 
     def "test remove by Id"() {
         setup:
-        Org org = build(Org)
+        Cust org = build(Cust)
 
         when:
-        Org.repo.removeById(org.id)
+        Cust.repo.removeById(org.id)
 
         then:
-        Org.get(org.id) == null
+        Cust.get(org.id) == null
     }
 
     def "test remove by Id with non-existent id"() {
         when:
-        Org.repo.removeById(99999999)
+        Cust.repo.removeById(99999999)
 
         then:
         thrown EntityNotFoundException
@@ -243,8 +243,8 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test bind"() {
         when:
-        Org org = build(Org)
-        Org.repo.bind(org, [name: "bind_test"], BindAction.Update)
+        Cust org = build(Cust)
+        Cust.repo.bind(org, [name: "bind_test"], BindAction.Update)
 
         then:
         org.name == "bind_test"
@@ -252,37 +252,37 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test flush"() {
         setup:
-        Org org = build(Org, name: 'test_flush')
+        Cust org = build(Cust, name: 'test_flush')
 
         expect:
         org.isAttached()
-        Org.findByName('test_flush') != null
+        Cust.findByName('test_flush') != null
 
         when:
         org.name = 'test_flush_updated'
 
         then:
-        Org.findByName('test_flush') != null
-        Org.findByName('test_flush_updated') == null
+        Cust.findByName('test_flush') != null
+        Cust.findByName('test_flush_updated') == null
 
         when:
-        Org.repo.flush()
+        Cust.repo.flush()
         assert org.isAttached()
 
         then:
-        Org.findByName('test_flush_updated') != null
-        Org.findByName('test_flush') == null
+        Cust.findByName('test_flush_updated') != null
+        Cust.findByName('test_flush') == null
     }
 
     def "test clear"() {
         setup:
-        Org org = build(Org)
+        Cust org = build(Cust)
 
         expect:
         org.isAttached()
 
         when:
-        Org.repo.clear()
+        Cust.repo.clear()
 
         then:
         !org.isAttached()
@@ -290,7 +290,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     def "test clear when update"() {
         setup:
-        Org org = build(Org, name: 'test_clear')
+        Cust org = build(Cust, name: 'test_clear')
 
         when:
         org.name = "test_clear_updated"
@@ -300,22 +300,22 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when:
         org.save()
-        Org.repo.clear()
+        Cust.repo.clear()
 
         then:
         !org.isDirty()
         !org.isAttached()
-        Org.findByName("test_clear_updated") == null
-        Org.findByName("test_clear") != null
+        Cust.findByName("test_clear_updated") == null
+        Cust.findByName("test_clear") != null
     }
 
     def "test transaction rollback using withTrx"() {
         setup:
-        Org org = build(Org, name: 'test')
+        Cust org = build(Cust, name: 'test')
 
         when:
-        Org.repo.withTrx {
-            Org newOrg = Org.get(org.id)
+        Cust.repo.withTrx {
+            Cust newOrg = Cust.get(org.id)
             newOrg.name = "test_changed"
             newOrg.save()
             throw new RuntimeException()
@@ -323,17 +323,17 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         then:
         thrown RuntimeException
-        Org.findByName("test_changed") == null
+        Cust.findByName("test_changed") == null
 
         when:
-        Org.repo.withTrx {
-            Org.repo.remove(org)
+        Cust.repo.withTrx {
+            Cust.repo.remove(org)
             throw new RuntimeException()
         }
 
         then:
         thrown RuntimeException
-        Org.findByName("test") != null
+        Cust.findByName("test") != null
     }
 
     def "test persist with transaction rollback"() {

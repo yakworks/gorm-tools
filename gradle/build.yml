@@ -25,9 +25,9 @@ maven:
   snapshotUrl: http://repo.9ci.com/oss-snapshots
 
 codenarc:
-  toolVersion: 1.6
   main:
     excludes: ['**/BootStrap.*', '**/UrlMappings.*']
+
 spotless:
   groovy:
     excludes:

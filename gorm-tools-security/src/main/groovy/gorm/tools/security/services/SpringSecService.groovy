@@ -34,6 +34,7 @@ class SpringSecService<D> implements SecService<D>{
 
     @Autowired(required = false) //required = false so this bean works in case security. active is false
     SpringSecurityService springSecurityService
+
     @Autowired(required = false)
     AuthenticationTrustResolver authenticationTrustResolver
 

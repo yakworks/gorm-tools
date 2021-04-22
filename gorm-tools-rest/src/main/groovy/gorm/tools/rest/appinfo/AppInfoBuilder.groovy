@@ -13,6 +13,8 @@ import javax.annotation.Resource
 
 import groovy.transform.CompileDynamic
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import grails.core.DefaultGrailsApplication
 import grails.web.mapping.UrlMappingsHolder
 
@@ -21,11 +23,10 @@ import grails.web.mapping.UrlMappingsHolder
  */
 @CompileDynamic
 class AppInfoBuilder {
-    //HibernateMappingContext grailsDomainClassMappingContext
-    @Resource
-    DefaultGrailsApplication grailsApplication
-    @Resource
-    UrlMappingsHolder grailsUrlMappingsHolder
+
+    @Autowired DefaultGrailsApplication grailsApplication
+
+    @Autowired UrlMappingsHolder grailsUrlMappingsHolder
 
     List urlMappings() {
 

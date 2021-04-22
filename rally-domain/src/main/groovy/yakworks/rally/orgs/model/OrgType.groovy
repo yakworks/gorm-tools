@@ -57,7 +57,7 @@ enum OrgType implements IdEnum<OrgType, Long> {
     /**
      * case insensitive find
      */
-    static OrgType findByName (String key ){
+    static OrgType findByName(String key ){
         if(!key) return null
         return values().find { it.name().toLowerCase() == key.toLowerCase()}
     }

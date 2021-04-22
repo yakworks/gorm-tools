@@ -48,7 +48,7 @@ class AttachmentSupport {
     Path createFileFromTempFile(Long id, String originalFileName, String tempFileName, String locationKey = ATTACHMENTS_LOCATION_KEY) {
         Path attachmentFile = getAttachmentsPath(id, originalFileName, locationKey)
         Path tempFile = getTempPath().resolve(tempFileName)
-        if(!Files.exists(tempFile)) throw new FileNotFoundException("Could not find temp file: ${tempFile.toString()}")
+        if(!Files.exists(tempFile)) throw new FileNotFoundException("Could not find temp file: ${tempFile}")
         return Files.move(tempFile, attachmentFile)
     }
 

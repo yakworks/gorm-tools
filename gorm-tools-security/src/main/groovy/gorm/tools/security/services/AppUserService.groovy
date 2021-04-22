@@ -44,6 +44,7 @@ class AppUserService {
 
     @Autowired
     SecService<AppUser> secService
+
     @Autowired(required = false) //required = false so in case spring sec is not working
     PasswordValidator passwordValidator
 

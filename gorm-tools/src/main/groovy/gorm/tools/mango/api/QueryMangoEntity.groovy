@@ -36,7 +36,6 @@ trait QueryMangoEntity<D> {
     /**
      * Builds detached criteria for domain, call get or list on it.
      *
-     * @param closure
      * @return a DetachedCriteria instance
      */
     static MangoDetachedCriteria<D> query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {

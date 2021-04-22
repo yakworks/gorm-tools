@@ -11,28 +11,9 @@ import groovy.transform.CompileStatic
 import yakworks.commons.lang.IsoDateUtil
 
 /**
- * MapFlattener taken from here https://github.com/dmillett/jConfigMap
- *
- *
- * @author dmillett
- *
- * Copyright 2011 David Millett
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
-/**
  * The primary use of this is to convert a net json tree to a flat map that
  * can be used with the old grails parser
+ * MapFlattener taken from here https://github.com/dmillett/jConfigMap
  */
 @CompileStatic
 class MapFlattener {
@@ -42,9 +23,6 @@ class MapFlattener {
 
     /**
      * Groovy transforms JSON to either a Map or List based on the root node.
-     *
-     * @param groovyJsonObject
-     * @return A Map of String,String
      */
     Map<String, String> flatten(Object groovyJsonObject) {
 
@@ -66,10 +44,6 @@ class MapFlattener {
     /**
      * Iterates through each Map entry and transforms any sub-maps or sub-arrays
      * therein. Otherwise, it is just a string "key" and "value".
-     *
-     * @param jsonMap
-     * @param currentName
-     * @return
      */
     @SuppressWarnings(['EmptyCatchBlock'])
     Map<String, String> transformGroovyJsonMap(Map jsonMap, String currentName) {
@@ -125,10 +99,6 @@ class MapFlattener {
 
     /**
      * Flatten Groovy-JSON Array objects
-     *
-     * @param jsonArray
-     * @param currentName
-     * @return A map of String,String
      */
     Map<String, String> transformJsonArray(List jsonArray, String currentName) {
 

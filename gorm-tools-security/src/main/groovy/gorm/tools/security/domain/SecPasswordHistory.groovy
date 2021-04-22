@@ -33,10 +33,6 @@ class SecPasswordHistory {
 
     /**
      * Creates new password history for given user. Will remove the oldest entry if the number of history records goes more thn MAX_HISTORY
-     *
-     * @param user
-     * @param passwordHash
-     * @return
      */
     static SecPasswordHistory create(AppUser user, String passwordHash) {
         Integer historyLength = 10//AppParam.value('passwordHistoryLength').toInteger()

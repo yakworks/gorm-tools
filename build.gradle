@@ -114,6 +114,5 @@ subprojects {
 
 ext.codenarcRuleset= '''
   // getRule('Println').enabled = false
-  getRule('AbcMetric').enabled = false
-  getRule('CatchRuntimeException').enabled = false
+  // getRule('AbcMetric').enabled = false
 '''

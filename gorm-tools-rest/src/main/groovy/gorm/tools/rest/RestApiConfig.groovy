@@ -26,7 +26,6 @@ class RestApiConfig implements ConfigAware {
      * @param controllerIncludes the includes that might be set in controller
      * @param controllerKey the name of the controller key in the restApi config
      * @param entityClass the entity class to look for statics on
-     * @return
      */
     @Cacheable('restApiConfig.includes')
     Map getIncludes(String controllerKey, Class entityClass, Map mergeIncludes){
@@ -57,7 +56,6 @@ class RestApiConfig implements ConfigAware {
      * @param controllerKey the name of the controller key in the restApi config
      * @param entityClass the entity class to look for statics on
      * @param mergeIncludes the includes that might be set in controller
-     * @return
      */
     @Cacheable('restApiConfig.qSearchIncludes')
     List getQSearchIncludes(String controllerKey, Class entityClass, List mergeIncludes){

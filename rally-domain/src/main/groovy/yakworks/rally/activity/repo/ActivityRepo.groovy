@@ -328,7 +328,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * Creates new activity
      *
      * @param text Text for note body/title/summary (Title and summary will be trimmed to 255 characters)
-     * @param org
+     * @param org the org for the activity
      * @param task Data for the new task
      * @param attachments list of attachments to attach to this activity
      * @param entityName linked entity name for which the activity is created (Eg. ArTran, Customer etc)
@@ -378,7 +378,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     /**
      * quick easy way to create a Todo activity
-     * @return
      */
     @Transactional
     Activity createTodo(Org org, Long userId, String title, String linkedEntity = null,
@@ -533,7 +532,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
                 copiedActivities.add(new Results(ok:true, code:"finished.ok"))
 
             } catch (EntityValidationException e) {
-                copiedActivities.add( Results.error(activity.id, "failed", ["Copy attachment"], e) )
+                copiedActivities.add( Results.error("failed", ["Copy attachment"], e).id(activity.id) )
             }
         }
         return new Results("finished.ok", copiedActivities)

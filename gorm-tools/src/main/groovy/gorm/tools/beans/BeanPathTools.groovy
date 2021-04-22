@@ -77,7 +77,7 @@ class BeanPathTools {
      *
      * @param source a source object
      * @param propList a query of properties to include to a map
-     * @param useDelegatingBean
+     * @param useDelegatingBean if it has a delegating bean
      * @return a map which is based on object properties
      */
     @Deprecated //Use EntityMap instead now
@@ -112,13 +112,12 @@ class BeanPathTools {
      *   propsToMap(object, 'id', map)               // [id: 1]
      *   propsToMap(object, 'nested.foo', map)       // [nested: [foo: 1]]
      *
-     *
      * @param source a source object
      * @param propertyPath a property name, e.g. 'someField', 'someField.nestedField', '*' (for all properties)
      * @param currentMap a destination map
      * @return a map which contains an object's property (properties)
      */
-    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock', 'CatchException'])
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock'])
     //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
         if (source == null) return null

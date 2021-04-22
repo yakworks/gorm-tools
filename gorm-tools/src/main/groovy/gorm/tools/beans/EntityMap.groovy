@@ -206,7 +206,7 @@ class EntityMap extends AbstractMap<String, Object> {
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * throws UnsupportedOperationException
      */
     @Override
     Object remove(Object o) {
@@ -214,7 +214,7 @@ class EntityMap extends AbstractMap<String, Object> {
     }
 
     /**
-     * @throws UnsupportedOperationException
+     * throws UnsupportedOperationException
      */
     @Override
     void clear() {

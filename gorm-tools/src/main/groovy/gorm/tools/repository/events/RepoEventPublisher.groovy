@@ -30,6 +30,7 @@ import grails.events.bus.EventBus
  */
 @CompileStatic
 class RepoEventPublisher {
+
     @Autowired
     private GrailsApplication grailsApplication
 

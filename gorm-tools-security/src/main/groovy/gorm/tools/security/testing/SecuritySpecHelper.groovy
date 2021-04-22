@@ -19,8 +19,8 @@ import grails.testing.spock.OnceBefore
 
 @CompileDynamic
 trait SecuritySpecHelper {
-    @Autowired
-    @Qualifier("secService")
+
+    @Autowired @Qualifier("secService")
     SecService secService
 
     //need to name it like this, otherwise subclasses cant use setupSpec method

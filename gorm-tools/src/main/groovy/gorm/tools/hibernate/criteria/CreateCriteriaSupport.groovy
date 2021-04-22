@@ -47,7 +47,6 @@ trait CreateCriteriaSupport {
      *      }
      *  }
      * simliar with eq, like and in
-     *
      */
     @Deprecated
     static BuildableCriteria createCriteria() {

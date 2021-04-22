@@ -17,7 +17,7 @@ import gorm.tools.repository.model.RepositoryApi
 
 /**
  * Base event class for Repository event firing
- * @param D
+ * @param D the domain class
  */
 @CompileStatic
 class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvider {//extends ApplicationEvent {//

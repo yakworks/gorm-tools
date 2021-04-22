@@ -27,6 +27,7 @@ maven:
 codenarc:
   main:
     excludes: ['**/BootStrap.*', '**/UrlMappings.*']
+
 spotless:
   groovy:
     excludes:

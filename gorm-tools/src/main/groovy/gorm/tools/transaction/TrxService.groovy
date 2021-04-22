@@ -16,6 +16,9 @@ import grails.gorm.transactions.GrailsTransactionTemplate
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 
+/**
+ * A generic way to wrap transaction with closures. Used in the WithTrx trait.
+ */
 @Transactional // this adds the getTransactionManager()
 @CompileStatic
 class TrxService {

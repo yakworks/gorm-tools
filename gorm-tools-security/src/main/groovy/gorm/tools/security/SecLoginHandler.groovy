@@ -25,8 +25,8 @@ import grails.plugin.springsecurity.userdetails.GrailsUser
  */
 @CompileStatic
 class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent> {
-    @Autowired
-    AppUserService userService
+
+    @Autowired AppUserService userService
 
     @Value('${gorm.tools.security.password.expireEnabled:false}')
     boolean passwordExpiryEnabled

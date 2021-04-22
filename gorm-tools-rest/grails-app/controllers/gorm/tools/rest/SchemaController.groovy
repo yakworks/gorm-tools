@@ -9,7 +9,6 @@ import groovy.util.logging.Slf4j
 
 import grails.converters.JSON
 
-@SuppressWarnings(['NoDef'])
 @CompileDynamic
 @Slf4j
 class SchemaController {

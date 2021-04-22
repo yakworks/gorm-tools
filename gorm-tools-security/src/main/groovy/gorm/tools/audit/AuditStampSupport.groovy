@@ -16,11 +16,13 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.AnnotationUtils
 
-import gorm.tools.audit.ast.AuditStampConfigLoader
 import gorm.tools.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
 import grails.util.GrailsClassUtils
 
+/**
+ * support service for making sure entites are stamped with appropriate fields
+ */
 @CompileStatic
 class AuditStampSupport {
     private static final String DISABLE_AUDITSTAMP_FIELD = 'disableAuditStamp'
@@ -57,8 +59,6 @@ class AuditStampSupport {
 
     /**
      * initialize stamp fields if need be
-     *
-     * @param entity
      */
     void stampIfNew(Object entity, Class<?> dateTimeClass = LocalDateTime) {
         //if its not new then just exit as we will assume an updated entity is initialized correctly
@@ -121,9 +121,6 @@ class AuditStampSupport {
      *
      * it first checks for the createdDate property, if property exists and is not null, returns false, true if null
      * else If createdDate property is not defined, it checks if the domain is attached to session and exists in persistence context.
-     *
-     * @param entity
-     * @return boolean
      */
     boolean hasCreatedDate(Object entity) {
         String createdDateFieldName = fieldProps[FieldProps.CREATED_DATE_KEY].name

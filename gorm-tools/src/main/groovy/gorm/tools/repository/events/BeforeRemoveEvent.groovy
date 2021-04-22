@@ -8,6 +8,9 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.repository.model.RepositoryApi
 
+/**
+ * Fired right before the repo calls remove
+ */
 @CompileStatic
 class BeforeRemoveEvent<D> extends RepositoryEvent<D> {
 

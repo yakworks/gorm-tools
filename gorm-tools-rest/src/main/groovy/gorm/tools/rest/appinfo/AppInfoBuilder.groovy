@@ -9,9 +9,10 @@ import java.lang.management.MemoryPoolMXBean
 import java.lang.management.MemoryType
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
-import javax.annotation.Resource
 
 import groovy.transform.CompileDynamic
+
+import org.springframework.beans.factory.annotation.Autowired
 
 import grails.core.DefaultGrailsApplication
 import grails.web.mapping.UrlMappingsHolder
@@ -21,11 +22,10 @@ import grails.web.mapping.UrlMappingsHolder
  */
 @CompileDynamic
 class AppInfoBuilder {
-    //HibernateMappingContext grailsDomainClassMappingContext
-    @Resource
-    DefaultGrailsApplication grailsApplication
-    @Resource
-    UrlMappingsHolder grailsUrlMappingsHolder
+
+    @Autowired DefaultGrailsApplication grailsApplication
+
+    @Autowired UrlMappingsHolder grailsUrlMappingsHolder
 
     List urlMappings() {
 
@@ -108,9 +108,9 @@ class AppInfoBuilder {
         }
     }
 
-    float formatMB(long value) {
+    BigDecimal formatMB(long value) {
         String formatted = new DecimalFormat('.000', new DecimalFormatSymbols(Locale.ENGLISH)).format(value / 1024.0 / 1024.0)
-        formatted.toFloat()
+        formatted.toBigDecimal()
     }
 
 }

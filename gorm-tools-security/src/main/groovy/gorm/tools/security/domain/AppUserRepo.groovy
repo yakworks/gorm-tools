@@ -73,8 +73,7 @@ class AppUserRepo implements GormRepo<AppUser> {
      * Sets up password and roles fields for a given User entity. Updates the dependent Contact entity.
      *
      * @param user a User entity to be updated
-     * @param p
-     * @param bindAction
+     * @param p the params with newPassword and repassword
      */
     @RepoListener
     void afterBind(AppUser user, Map p, AfterBindEvent ae) {

@@ -44,6 +44,7 @@ class AppUserService {
 
     @Autowired
     SecService<AppUser> secService
+
     @Autowired(required = false) //required = false so in case spring sec is not working
     PasswordValidator passwordValidator
 
@@ -84,7 +85,6 @@ class AppUserService {
      * checks if password is expired. first checks the passwordExpired field and then if expireEnabled
      * it adds the expireDays to see if we are under that date
      * @param user is optional, will look in the security context if not passed in
-     * @return
      */
     //FIXME make sure we have good integration tests for this
     boolean isPasswordExpired(AppUser user = null) {
@@ -109,8 +109,6 @@ class AppUserService {
 
     /**
      * Update user's password and creates a password history record
-     * @param user
-     * @param newPwd
      */
     void updatePassword(AppUser user, String newPwd) {
         user.password = newPwd //must be hased password
@@ -125,9 +123,6 @@ class AppUserService {
 
     /**
      * Check if the password exists in user's password history
-     * @param user
-     * @param password
-     * @return
      */
     boolean passwordExistInHistory(AppUser user, String password) {
         return passwordValidator.passwordExistInHistory(user, password)

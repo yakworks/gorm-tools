@@ -43,9 +43,12 @@ class Results implements MsgSourceResolvable{
 
     Results(){}
 
-    Results(boolean ok, String code){
-        this.ok = ok
+    Results(String code){
         setMessage(code, null)
+    }
+
+    Results(String code, List args){
+        setMessage(code, args)
     }
 
     Results(boolean ok, String code, List args){
@@ -53,50 +56,24 @@ class Results implements MsgSourceResolvable{
         setMessage(code, args)
     }
 
-    Results(boolean ok, String code, List args, String defaultMessage){
-        this.ok = ok
+    Results(String code, List args, String defaultMessage){
         setMessage(code, args, defaultMessage)
     }
 
-    Results(boolean ok, String code, List args, Exception ex){
-        this.ok = ok
-        this.ex = ex
-        setMessage(code, args)
-    }
-
-    Results(boolean ok, Serializable id, String code, List args = null, Exception ex = null){
-        this.ok = ok
-        this.id = id
-        this.ex = ex
-        setMessage(code, args)
-    }
-
     Results(List<Results> childList){
-        this(null, childList)
-    }
-    Results(String code, List<Results> childList){
-        setupForLists(code, childList)
-    }
-
-    Results status(boolean ok, Map msgMap){
-        this.ok = ok
-        setMessage(msgMap)
+        fromChildList(null, childList)
     }
 
     static Results of(List<Results> childList){
-        new Results(null, childList)
-    }
-
-    static Results error(Serializable id, String code, List args = null, Exception ex = null){
-        new Results(false, id, code, args, ex)
+        new Results().fromChildList(null, childList)
     }
 
     static Results error(String code, List args = null, Exception ex = null){
-        new Results(false, code, args, ex)
+        new Results(false, code, args).exception(ex)
     }
 
     static Results error(String code, List args, String defMessage){
-        new Results(false, code, args, defMessage)
+        new Results(false, code, args).message(defMessage)
     }
 
     static Results error(Exception ex){
@@ -111,7 +88,7 @@ class Results implements MsgSourceResolvable{
     }
 
     static Results getError(){
-        new Results(ok: false)
+        return error()
     }
 
     static Results OK(){
@@ -119,14 +96,14 @@ class Results implements MsgSourceResolvable{
     }
 
     static Results getOK(){
-        new Results()
+        return OK()
     }
 
     /**
      * OK results with a
      */
     static Results OK(String code, List args = null, String defaultMessage = null){
-        new Results(true, code, args, defaultMessage)
+        new Results(code, args).message(defaultMessage)
     }
 
     /**
@@ -135,6 +112,14 @@ class Results implements MsgSourceResolvable{
      */
     Results message(String defaultMessage){
         this.defaultMessage = defaultMessage
+        return this
+    }
+
+    /**
+     * builder syntax for ok
+     */
+    Results ok(boolean ok){
+        this.ok = ok
         return this
     }
 
@@ -154,6 +139,20 @@ class Results implements MsgSourceResolvable{
         return this
     }
 
+    /**
+     * builder syntax for adding exception
+     */
+    Results exception(Exception ex){
+        this.ex = ex
+        return this
+    }
+
+    Results makeError(Results res){
+        this.ok = false
+        this.failed.add(res)
+        return this
+    }
+
     Results addError(Results res){
         this.ok = false
         this.failed.add(res)
@@ -164,7 +163,7 @@ class Results implements MsgSourceResolvable{
         addError(Results.error(ex))
     }
 
-    void setupForLists(String code, List<Results> childList){
+    Results fromChildList(String code, List<Results> childList){
         this.failed = childList.findAll { !it.ok }
         this.success = childList.findAll { it.ok }
         this.ok = failed ? false : true
@@ -179,6 +178,7 @@ class Results implements MsgSourceResolvable{
             //if no code and has failed then default to filling in message from first failed
             setMessage(failed[0])
         }
+        return this
     }
 
     String getMessage(){

@@ -19,7 +19,6 @@ import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.IdEnum
 import grails.gorm.DetachedCriteria
-import yakworks.commons.lang.IsoDateUtil
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp
@@ -74,7 +73,6 @@ class MangoBuilder {
 
     /**
      * applies the map just like running a closure.call on this.
-     * @param mangoMap
      */
     void applyMap(DetachedCriteria criteria, Map mangoMap) {
         log.debug "applyMap $mangoMap"
@@ -286,7 +284,6 @@ class MangoBuilder {
     /**
      * junctions are basically used like a stack that we pop. when they finish they get added to the criteria list.
      * The add method checks to see if there is an active junction we are in.
-     * @param mangoMap
      */
     void handleJunction(DetachedCriteria criteria, List list) {
         try {

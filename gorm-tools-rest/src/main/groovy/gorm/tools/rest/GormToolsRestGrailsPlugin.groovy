@@ -81,7 +81,6 @@ class GormToolsRestGrailsPlugin extends Plugin {
     /**
      * Makes sure the controllers created from a domain with the @RestApi annotation
      * are registered as controller artifacts
-     * @param app
      */
     @CompileStatic
     void restApiControllersFromConfig(GrailsApplication app) {

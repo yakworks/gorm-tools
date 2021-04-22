@@ -48,7 +48,7 @@ class AttachmentSupport {
     Path createFileFromTempFile(Long id, String originalFileName, String tempFileName, String locationKey = ATTACHMENTS_LOCATION_KEY) {
         Path attachmentFile = getAttachmentsPath(id, originalFileName, locationKey)
         Path tempFile = getTempPath().resolve(tempFileName)
-        if(!Files.exists(tempFile)) throw new FileNotFoundException("Could not find temp file: ${tempFile.toString()}")
+        if(!Files.exists(tempFile)) throw new FileNotFoundException("Could not find temp file: ${tempFile}")
         return Files.move(tempFile, attachmentFile)
     }
 
@@ -141,8 +141,7 @@ class AttachmentSupport {
     /**
      * Deletes a file if it exists.
      *
-     * @param   path
-     *          the path to the file to delete
+     * @param location the path to the file to delete
      *
      * @return  {@code true} if the file was deleted by this method; {@code
      *          false} if the file could not be deleted because it did not

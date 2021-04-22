@@ -14,7 +14,7 @@ import org.springframework.context.event.EventListener
 import gorm.tools.audit.AuditStampSupport
 import gorm.tools.repository.events.BeforeValidateEvent
 
-/* NOT USED but shows how much cleaner it is to use @EventListener annotation
+/** NOT USED but shows how much cleaner it is to use @EventListener annotation
  * the problem I ran into is that you can't pass the listener into the SimpleMapDatastore that is used in unit tests
  * like its done in the SecurityTest trait, so it doesnt get picked up in those cases. Also, for some reason
  * beforeValidate was getting called 2 or 3 times in unit tests.

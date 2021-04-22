@@ -14,11 +14,9 @@ import org.codehaus.groovy.transform.GroovyASTTransformationClass
 import gorm.tools.rest.controller.RestApiRepoController
 
 /**
- *
  * Meta Annotation to applied to a domain class if it is a REST resource
  * Creates a RestApiDomainController for it if it does not exist.
  * Doesn't allow a uri like @Resource so UrlMappings has to be used.
- *
  *
  * @author Joshua Burnett
  *

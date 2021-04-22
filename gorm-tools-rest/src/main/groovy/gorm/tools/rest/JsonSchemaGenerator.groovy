@@ -4,8 +4,6 @@
 */
 package gorm.tools.rest
 
-import javax.annotation.Resource
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -17,7 +15,6 @@ import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 import org.grails.validation.discovery.ConstrainedDiscovery
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.annotation.AnnotationUtils
 
 import gorm.tools.utils.GormMetaUtils
 import grails.core.DefaultGrailsApplication
@@ -35,7 +32,7 @@ import static grails.util.GrailsClassUtils.getStaticPropertyValue
  * Created by JBurnett on 6/19/17.
  */
 //@CompileStatic
-@SuppressWarnings(['UnnecessaryGetter', 'NoDef', 'AbcMetric'])
+@SuppressWarnings(['UnnecessaryGetter', 'AbcMetric'])
 @CompileStatic
 class JsonSchemaGenerator {
 

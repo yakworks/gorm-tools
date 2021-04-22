@@ -59,8 +59,8 @@ class EntityMapService {
      * wrapper around buildIncludesMap that uses a cache
      *
      * @param entityClassName the entity to wrap in a map
-     * @param includes
-     * @return
+     * @param includes the includes list in dot notation
+     * @return the created EntityMapIncludes
      */
     @Cacheable('entityMapIncludes')
     EntityMapIncludes getEntityMapIncludes(String entityClassName, List<String> includes = []) {
@@ -71,7 +71,7 @@ class EntityMapService {
      * builds a EntityMapIncludes object from a sql select like list. Used in EntityMap and EntityMapList
      *
      * @param className the class name of the PersistentEntity
-     * @param includes
+     * @param includes the includes list in our custom dot notation
      * @return the EntityMapIncludes object that can be passed to EntityMap
      */
     EntityMapIncludes buildIncludesMap(String entityClassName, List<String> includes = []) {

@@ -15,6 +15,7 @@ import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 
 /**
+ * adds methods for a Linked Entity
  *
  * @param <D> the Link entity
  * @param <I> the linked item entity

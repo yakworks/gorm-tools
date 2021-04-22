@@ -22,7 +22,6 @@ import yakworks.commons.lang.Validate
  *
  * @author Joshua Burnett (@basejump)
  * @since 1.0
- *
  */
 @CompileStatic
 @Slf4j
@@ -49,8 +48,6 @@ class PooledIdGenerator implements IdGenerator {
 
     /**
      * override the default batchSize for the specified key
-     * @param keyName
-     * @param batchSize
      */
     void setBatchSize(String keyName, Long batchSize) {
         batchSizeByKey[keyName] = batchSize

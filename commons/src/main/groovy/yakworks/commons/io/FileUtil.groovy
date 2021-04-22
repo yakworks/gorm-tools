@@ -123,7 +123,6 @@ class FileUtil {
     /**
      * Generates txt file, swallows any Exception and returns null if error
      */
-    @SuppressWarnings(['CatchException'])
     static File generateTxtFile(String content, String fileName, String fileLocation) {
         generateTxtFile(content, fileName, new File(fileLocation))
     }
@@ -131,7 +130,6 @@ class FileUtil {
     /**
      * Generates txt file, swallows any Exception and returns null if error
      */
-    @SuppressWarnings(['CatchException'])
     static File generateTxtFile(String content, String fileName, File fileDirectory) {
         if (!fileDirectory.exists()) {
             fileDirectory.mkdir()

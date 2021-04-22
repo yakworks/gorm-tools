@@ -6,6 +6,9 @@ package gorm.tools.audit.ast
 
 import groovy.transform.CompileStatic
 
+/**
+ * field property setup for audit fields
+ */
 @SuppressWarnings(['ClassForName', 'ThrowRuntimeException'])
 @CompileStatic
 class FieldProps {

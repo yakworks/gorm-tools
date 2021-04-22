@@ -16,7 +16,7 @@ import grails.core.GrailsApplication
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-@SuppressWarnings(['FactoryMethodName', 'NoDef'])
+@SuppressWarnings(['FactoryMethodName'])
 @CompileDynamic
 class SpringInfoHelper {
 

@@ -52,7 +52,6 @@ class PasswordEncryptionUtil {
      * Decrypts a byte array and returns the result. In case of an error,
      * it returns null
      */
-    @SuppressWarnings(['CatchException'])
     static byte[] decrypt(byte[] data, String password) {
         byte[] result = this.process(data, password, false)
         return result

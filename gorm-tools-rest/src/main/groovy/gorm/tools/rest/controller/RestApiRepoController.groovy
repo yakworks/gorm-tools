@@ -18,7 +18,6 @@ import grails.core.GrailsApplication
  */
 //see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
 // we can get some good ideas from how that plugin does things
-// @SuppressWarnings(['CatchException', 'NoDef', 'ClosureAsLastMethodParameter', 'FactoryMethodName'])
 @Artefact("Controller")
 @CompileStatic
 class RestApiRepoController<D extends PersistableRepoEntity> implements RestRepositoryApi<D> {

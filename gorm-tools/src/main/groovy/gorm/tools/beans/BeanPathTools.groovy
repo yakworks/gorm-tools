@@ -117,7 +117,7 @@ class BeanPathTools {
      * @param currentMap a destination map
      * @return a map which contains an object's property (properties)
      */
-    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock', 'CatchException'])
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection', 'CyclomaticComplexity', 'EmptyCatchBlock'])
     //FIXME refactor so CyclomaticComplexity doesn't fire in codenarc
     static Map propsToMap(Object source, String propertyPath, Map currentMap) {
         if (source == null) return null

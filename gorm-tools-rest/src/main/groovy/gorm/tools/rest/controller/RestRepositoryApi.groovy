@@ -212,7 +212,6 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTr
         return emap
     }
 
-    //@SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
     List getIncludes(String includesKey){
         //we are in trait, always use getters in case they are overrriden in implementing class
         def includesMap = getRestApiConfig().getIncludes(getControllerName(), getEntityClass(), getIncludes())

@@ -24,7 +24,7 @@ import static org.springframework.http.HttpStatus.OK
  *
  * based on Grails' RestFullController
  */
-@SuppressWarnings(['FactoryMethodName', 'NoDef'])
+@SuppressWarnings(['FactoryMethodName'])
 @Artefact("Controller")
 @Deprecated
 //@Transactional(readOnly = true)

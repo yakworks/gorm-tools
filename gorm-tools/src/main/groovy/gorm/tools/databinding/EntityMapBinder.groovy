@@ -49,7 +49,6 @@ import yakworks.commons.lang.IsoDateUtil
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-@SuppressWarnings(['CatchException'])
 @CompileStatic
 class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
@@ -463,7 +462,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         domainClassType
     }
 
-    @SuppressWarnings(['NestedBlockDepth'])
+    @SuppressWarnings(['NestedBlockDepth']) //FIXME lets fix, not suppress
     protected populateErrors(Object obj, BindingResult bindingResult) {
         PersistentEntity domain = getPersistentEntity(obj.getClass())
 

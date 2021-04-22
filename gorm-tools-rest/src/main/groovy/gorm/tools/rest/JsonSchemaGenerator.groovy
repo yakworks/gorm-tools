@@ -32,7 +32,7 @@ import static grails.util.GrailsClassUtils.getStaticPropertyValue
  * Created by JBurnett on 6/19/17.
  */
 //@CompileStatic
-@SuppressWarnings(['UnnecessaryGetter', 'NoDef', 'AbcMetric'])
+@SuppressWarnings(['UnnecessaryGetter', 'AbcMetric'])
 @CompileStatic
 class JsonSchemaGenerator {
 

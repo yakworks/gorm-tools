@@ -9,7 +9,6 @@ import java.lang.management.MemoryPoolMXBean
 import java.lang.management.MemoryType
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
-import javax.annotation.Resource
 
 import groovy.transform.CompileDynamic
 

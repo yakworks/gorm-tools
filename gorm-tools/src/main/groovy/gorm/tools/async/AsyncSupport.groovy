@@ -25,7 +25,6 @@ import grails.persistence.support.PersistenceContextInterceptor
  * @since 6.1
  */
 @CompileStatic
-@SuppressWarnings('CatchException')
 trait AsyncSupport implements WithTrx {
     final static Logger LOG = LoggerFactory.getLogger(AsyncSupport)
 

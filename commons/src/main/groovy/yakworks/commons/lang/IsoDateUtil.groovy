@@ -21,7 +21,6 @@ import groovy.transform.CompileStatic
  * https://en.wikipedia.org/wiki/ISO_8601
  *
  */
-@SuppressWarnings(['EmptyCatchBlock'])
 @CompileStatic
 class IsoDateUtil {
     //yyyy-MM-dd "2017-12-27"
@@ -129,6 +128,7 @@ class IsoDateUtil {
      * @param format a date format, by default "MM/dd/yyyy hh:mm:ss"
      * @return a string representation of a Date object or empty string
      */
+    @SuppressWarnings(['EmptyCatchBlock'])
     static String dateToString(Date date, String format = 'MM/dd/yyyy hh:mm:ss') {
         DateFormat df = new SimpleDateFormat(format, Locale.US)
         String dtStr = ''

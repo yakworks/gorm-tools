@@ -23,8 +23,8 @@ class RallyDomainGrailsPlugin extends grails.plugins.Plugin {
             userOrgService(UserOrgService)
         }
 
-        orgCopier(OrgCopier, lazy())
-        orgDimensionService(OrgDimensionService, lazy())
-        orgMemberService(OrgMemberService, lazy())
+        // orgCopier(OrgCopier, lazy())
+        // orgDimensionService(OrgDimensionService, lazy())
+        // orgMemberService(OrgMemberService, lazy())
     }}
 }

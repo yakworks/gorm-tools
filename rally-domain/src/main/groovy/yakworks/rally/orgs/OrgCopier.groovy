@@ -4,9 +4,13 @@
 */
 package yakworks.rally.orgs
 
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 
 import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
@@ -23,13 +27,15 @@ import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.orgs.repo.OrgTagRepo
 
+@Service @Lazy
+@Slf4j
 @CompileStatic
 class OrgCopier {
 
-    @Inject ContactRepo contactRepo
-    @Inject OrgTagRepo orgTagRepo
-    @Inject AttachmentLinkRepo attachmentLinkRepo
-    @Inject ActivityRepo activityRepo
+    @Autowired ContactRepo contactRepo
+    @Autowired OrgTagRepo orgTagRepo
+    @Autowired AttachmentLinkRepo attachmentLinkRepo
+    @Autowired ActivityRepo activityRepo
     // @Inject AttachmentRepo attachmentRepo
     // @Inject OrgSourceRepo orgSourceRepo
 

@@ -5,9 +5,12 @@
 package yakworks.rally.orgs
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.apache.commons.lang3.Validate
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
@@ -16,6 +19,8 @@ import yakworks.rally.orgs.model.OrgType
 /**
  * event listener for afterbind to setup org member
  */
+@Service @Lazy
+@Slf4j
 @CompileStatic
 class OrgMemberService {
 

@@ -7,9 +7,12 @@ package yakworks.rally.orgs
 import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.apache.commons.lang3.EnumUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
+import org.springframework.stereotype.Service
 
 import grails.gorm.transactions.Transactional
 import grails.plugin.cache.Cacheable
@@ -23,6 +26,8 @@ import yakworks.rally.orgs.model.OrgType
  * OrgDimensionService provides methods to parse the orgdimension level hierarchie and get children, parents and
  * immediate parent orgtypes for any orgtype.
  */
+@Service @Lazy
+@Slf4j
 @CompileStatic
 class OrgDimensionService {
 

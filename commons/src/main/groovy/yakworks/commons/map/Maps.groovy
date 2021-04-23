@@ -42,6 +42,36 @@ class Maps {
     }
 
     /**
+     * Does a deep merge on the maps with groovy
+     *
+     * given:
+     * def leftMap = [a: 1, b: 3, z: [a: 10, b: 20], y: [1,2,3,4]]
+     * def rightMap = [a: 2, c: 4, z: [c: 30], y: [5,6,7]]
+     *
+     * def c = Maps.deepMerge(leftMap, rightMap)
+     * assert c == [a: 2, b: 3, c: 4, z: [a: 10, b: 20, c: 30], y: [1,2,3,4,5,6,7]]
+     *
+     * @param source initial map
+     * @param other the other map
+     * @return the new merged map
+     */
+    static Map deepMerge(Map source, Map other) {
+        def cloneMap = source // source.clone() as Map //FIXME how to clone if compilestatic
+        other.inject(cloneMap) { map, e ->
+            def k = e.key
+            def val = e.value
+            if (map[k] instanceof Map && val instanceof Map) {
+                map[k] = deepMerge(map[k] as Map, val as Map)
+            } else if (map[k] instanceof Collection && val instanceof Collection) {
+                map[k] = (map[k] as Collection) + (val as Collection)
+            } else {
+                map[k] = val
+            }
+            return map
+        }
+    }
+
+    /**
      * Deeply remove/prune all nulls and falsey` empty maps, lists and strings as well
      *
      * @param map the map to prune

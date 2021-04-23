@@ -3,7 +3,9 @@ package yakworks.rally.orgs
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -11,44 +13,30 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
-import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
-import spock.lang.Specification
-import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.testing.MockHelper
 
-class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
+class Org1Spec extends Specification implements DomainRepoTest<Org>, SecurityTest {
     //Automatically runs the basic crud tests
 
     def setupSpec(){
-        defineBeans{
-            //scriptExecutorService(ScriptExecutorService)
-            orgDimensionService(OrgDimensionService)
-        }
+        // defineBeans{
+        //     //scriptExecutorService(ScriptExecutorService)
+        //     orgDimensionService(OrgDimensionService)
+        // }
         mockDomains(
-            Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag,
+            Contact, OrgFlex, OrgSource, OrgTag,
             OrgInfo, OrgTypeSetup, Location, ContactPhone,
             ContactEmail, ContactSource, ContactFlex, Activity, AttachmentLink
         )
     }
-
-
-    // void setupNewRefnumGenerator(){
-    //     // throw away
-    //     def ot1 = new OrgType(name: "1")
-    //     // new OrgType(name: "1").persist(flush:true)
-    //     def nrg = new NewRefnumGenerator(keyName: 'Customer', nextId: 5000, rangeMax: 10000, rangeMin: 5000).persist(flush:true)
-    //     assert nrg.id == 1
-    //
-    //     def ot = new OrgType(name: "2")
-    //     ot.newRefnumGeneratorId = nrg.id
-    //     ot.persist(flush: true)
-    //     assert ot.id == 2
+    // def setup(){
+    //     RallySeedData.createOrgTypeSetups()
     // }
 
     void "CRUD tests"() {
@@ -61,7 +49,10 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
 
     def testOrgSourceChange() {
         when:
-        Org org = Org.create("foo", "bar", OrgType.Customer)
+        // setupNewRefnumGenerator()
+        OrgTypeSetup type = MockHelper.buildOrgType(OrgType.Customer)
+        assert type.id == 1
+        Org org = Org.create("foo", "bar", type.id, 2)
         org.validate()
         org.createSource()
         org.persist()
@@ -91,10 +82,12 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         Long orgId = 1000
 
         Map flex = TestDataJson.buildMap(OrgFlex, includes:"*")
-        Map calc = TestDataJson.buildMap(OrgCalc, includes:"*")
         Map info = TestDataJson.buildMap(OrgInfo, includes:"*")
 
-        Map params = buildMap() << [id: orgId, flex: flex, info: info, type: 'Customer']
+        OrgTypeSetup type = MockHelper.buildOrgType(OrgType.Customer)
+        type.bind(name: 'TestOrgType')
+
+        Map params = buildMap() << [id: orgId, flex: flex, info: info, orgTypeId: type.id]
 
         when: "create"
         def org = Org.create(params, bindId: true)
@@ -104,7 +97,6 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         org.id == orgId
         org.flex.id
         org.info.id
-        //entity.calc.id
 
         org.flex.text1
         org.info.phone

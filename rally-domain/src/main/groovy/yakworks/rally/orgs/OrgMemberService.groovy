@@ -7,11 +7,11 @@ package yakworks.rally.orgs
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.lang3.Validate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
+import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
@@ -38,12 +38,12 @@ class OrgMemberService {
      */
     void setupMember(Org org, Map params) {
         if(!orgDimensionService.orgMemberEnabled) return
-        Validate.notNull(org.type, "org.type is required to set org member parents")
+
         List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]
-            Validate.notNull(orgParam, "setupMember called but params does not contain ${type.propertyName}")
+            Validate.notEmpty(orgParam, "setupMember called but params does not contain ${type.propertyName}")
 
             Org parent = Org.get(orgParam['id'] as Long)
             Validate.notNull(parent, "setupMember failed trying to get Org from param ${orgParam} with ${orgParam['id']}")

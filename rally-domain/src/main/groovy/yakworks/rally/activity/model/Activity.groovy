@@ -111,7 +111,7 @@ class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<Activit
     }
 
     AttachmentLink addAttachment(Attachment att) {
-        Validate.notNull(this.id, "Activity.id")
+        Validate.notNull(this.id, "[Activity.id]")
         return getRepo().linkAttachment(this, att)
     }
 

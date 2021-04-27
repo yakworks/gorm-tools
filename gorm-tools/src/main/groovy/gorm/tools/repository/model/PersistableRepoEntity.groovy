@@ -55,7 +55,7 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>> implements Persistable {
     // this will fire and event and call beforeValidate on the repo.
     // when cascading to child associations while validated in grail's gorm it doesn't fire a ValidationEvent
     // so we fire our own here. FIXME see line 231 in PersistentEntityValidator where it should fire event and issue PR
-    void beforeValidate() {
-        getRepo().publishBeforeValidate(this)
-    }
+    // void beforeValidate() {
+    //     getRepo().publishBeforeValidate(this)
+    // }
 }

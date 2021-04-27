@@ -14,6 +14,7 @@ import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.util.ReflectionUtils
+import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
@@ -91,13 +92,19 @@ class RepoEventPublisher {
         //if (!eventMethodMap) return //eventMethodMap = cacheEventsMethods(repo.class)
         Method method = eventMethodMap?.get(eventKey)
         if (!method) return
-
-        ReflectionUtils.invokeMethod(method, repo, methodArgs)
+        //tuncate the args to the number of params for the method
+        Object[] truncMethArgs = methodArgs[0..method.parameterCount-1]
+        ReflectionUtils.invokeMethod(method, repo, truncMethArgs)
     }
 
     void doBeforeValidate(RepositoryApi repo, Object entity, Map args) {
         BeforeValidateEvent event = new BeforeValidateEvent(repo, entity, args)
         publishEvents(repo, event, [entity] as Object[])
+    }
+
+    void doBeforeValidate(RepositoryApi repo, Object entity, Errors errors, Map args) {
+        BeforeValidateEvent event = new BeforeValidateEvent(repo, entity, args)
+        publishEvents(repo, event, [entity, errors] as Object[])
     }
 
     void doBeforePersist(RepositoryApi repo, GormEntity entity, Map args) {

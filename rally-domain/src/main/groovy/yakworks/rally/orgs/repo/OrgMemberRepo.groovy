@@ -38,7 +38,7 @@ class OrgMemberRepo implements GormRepo<OrgMember> {
             if(excludeTypes.contains(propName)) continue
 
             if(orgMember[propName] == null){
-                rejectValue(orgMember, propName, null, ConstrainedProperty.NULLABLE_CONSTRAINT, ConstrainedProperty.DEFAULT_NULL_MESSAGE_CODE)
+                rejectNullValue(orgMember, propName)
             }
         }
     }

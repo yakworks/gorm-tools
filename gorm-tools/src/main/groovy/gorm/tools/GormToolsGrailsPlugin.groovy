@@ -4,6 +4,7 @@
 */
 package gorm.tools
 
+import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
@@ -49,6 +50,13 @@ class GormToolsGrailsPlugin extends grails.plugins.Plugin {
         //     grailsApplication.getMappingContext().getPersistentEntities() as List
         // )
     }
+
+    //This is kind of equivalent to init in bootstrap
+    @CompileStatic
+    void doWithApplicationContext() {
+        beanConfig.doWithApplicationContext()
+    }
+
 
     /**
      * Invoked in a phase where plugins can add dynamic methods. Subclasses should override

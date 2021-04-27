@@ -38,7 +38,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     @RepoListener
     void beforeValidate(Org org) {
         if(org.isNew()) {
-            Validate.notNull(org.type, "org.type")
+            Validate.notNull(org.type, "[org.type]")
             //Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
             generateId(org)
         }

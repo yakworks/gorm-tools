@@ -6,16 +6,17 @@ package gorm.tools.testing.support
 
 import groovy.transform.CompileDynamic
 
-import org.grails.datastore.mapping.core.AbstractDatastore
+import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.testing.GrailsUnitTest
+import org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor
 import org.junit.BeforeClass
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.util.ClassUtils
+import org.springframework.validation.Validator
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
@@ -26,6 +27,7 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.transaction.TrxService
 
 /**
@@ -73,15 +75,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         //     // it.setRepo(repo)
         // }
 
-    }
-
-    /**
-     * FIX for https://github.com/grails/grails-testing-support/issues/22
-     * changes dataStore to lowercase datastore for consistency
-     */
-    @CompileDynamic
-    AbstractDatastore getDatastore() {
-        getDataStore()
     }
 
     /** conveinince shortcut for applicationContext */
@@ -152,6 +145,31 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             repoClasses << Class.forName(bd.beanClassName, false, grailsApplication.classLoader)
         }
         return repoClasses
+    }
+
+    @CompileDynamic
+    void setupValidatorRegistry(){
+        // def settings = datastore.getConnectionSources().getDefaultConnectionSource().getSettings()
+        // def mappingContext = datastore.mappingContext
+        // def validatorRegistry = new RepoValidatorRegistry(mappingContext, settings, getCtx())
+        // mappingContext.setValidatorRegistry(validatorRegistry)
+
+        Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
+        for (PersistentEntity entity in entities) {
+            Validator validator = registerDomainClassValidator(entity)
+
+            datastore.mappingContext.addEntityValidator(entity, validator)
+        }
+    }
+
+    @CompileDynamic
+    private Validator registerDomainClassValidator(PersistentEntity domain) {
+        String validationBeanName = "${domain.javaClass.name}Validator"
+        defineBeans {
+            "$validationBeanName"(RepoEntityValidator, domain, ref("messageSource"), ref(DataTestSetupSpecInterceptor.BEAN_NAME))
+        }
+
+        applicationContext.getBean(validationBeanName, Validator)
     }
 
     void flush() {

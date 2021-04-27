@@ -26,12 +26,13 @@ class RallySeedData {
 
     @SuppressWarnings('BuilderMethodWithSideEffects')
     static void buildOrgs(int count){
-        createOrgTypeSetups()
+        //createOrgTypeSetups()
         (1..2).each{
             def company = createOrg(it , OrgType.Company)
             company.location.kind = Location.Kind.remittance
             company.location.persist()
         }
+        if(count < 3) return
         (3..count).each { id ->
             def org = createOrg(id, OrgType.Customer)
         }

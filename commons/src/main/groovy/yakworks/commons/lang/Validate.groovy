@@ -6,6 +6,10 @@ package yakworks.commons.lang
 
 import groovy.transform.CompileStatic
 
+/**
+ * similiar to org.apache.commons.lang3.Validate but throws IllegalArgumentException instead of
+ * a NullPointer
+ */
 @CompileStatic
 class Validate {
 
@@ -16,13 +20,15 @@ class Validate {
      * Validate that the specified argument is no {@code null}
      *
      * @param obj the object to validate
-     * @param objDescriptor  the descriptor to use for default message
+     * @param message  the message to use to populate default message, if the string is wrapped in [ ] then its
+     *   build the message with the descriptor
      * @return the validated obj (never {@code null} method for chaining)
      * @throws IllegalArgumentException
      */
-    public static <T> T notNull(T obj, String objDescriptor = "validated object") {
+    public static <T> T notNull(T obj, String message = "The validated object must not be null") {
         if (obj == null) {
-            throw new IllegalArgumentException("The $objDescriptor must not be null")
+            if(message.startsWith('[')) message = "$message must not be null"
+            throw new IllegalArgumentException(message)
         }
         return obj
     }
@@ -38,7 +44,6 @@ class Validate {
      * @throws IllegalArgumentException
      */
     public static <T> T notEmpty(T obj, String objDescriptor = "validated object") {
-        notNull(obj, objDescriptor)
         if (!obj) {
             throw new IllegalArgumentException("The $objDescriptor must not be blank or empty")
         }

@@ -6,6 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.validation.Errors
+
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
@@ -21,11 +23,11 @@ class OrgMemberRepo implements GormRepo<OrgMember> {
     OrgDimensionService orgDimensionService
 
     @RepoListener
-    void beforeValidate(OrgMember orgMember) {
-        validateMembers(orgMember)
+    void beforeValidate(OrgMember orgMember, Errors errors) {
+        validateMembers(orgMember, errors)
     }
 
-    void validateMembers(OrgMember orgMember){
+    void validateMembers(OrgMember orgMember, Errors errors){
         // For OrgMember, All parents levels for the given orgtype is required
         OrgType memOrgType = orgMember.org.type
         List<OrgType> parents = orgDimensionService.getParentLevels(memOrgType)
@@ -38,7 +40,7 @@ class OrgMemberRepo implements GormRepo<OrgMember> {
             if(excludeTypes.contains(propName)) continue
 
             if(orgMember[propName] == null){
-                rejectNullValue(orgMember, propName)
+                rejectNullValue(orgMember, propName, errors)
             }
         }
     }

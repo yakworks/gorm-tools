@@ -53,7 +53,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
             generateId(attachment)
             if (!p.name) p.name = p.originalFileName
             if (!p.name) {
-                rejectValue(attachment, 'name', null, 'default.null.message')
+                rejectNullValue(attachment, 'name')
                 return
             }
             if (!p.originalFileName) p.originalFileName = p.name

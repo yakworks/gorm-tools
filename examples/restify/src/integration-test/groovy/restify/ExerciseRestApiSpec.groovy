@@ -45,7 +45,6 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         entity      | qCount
         'book'      | 5
         'org'       | 100
-        'location'  | 100
         'project'   | 50
         'task'      | 100
 
@@ -70,9 +69,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         entity      | data
         'book'      | [name:'Galt123']
         'org'       | [num:'foo1', name: "foo", type: [id: 1]]
-        'location'  | [city: "Chicago"]
         'project'   | [name: "project", num: "x123"]
         'task'      | [name: "task", project: [id: 1]]
+        //'location'  | [city: "Chicago"]
          //'user'      | [name: 'taggy', entityName: 'Customer']
     }
 
@@ -93,9 +92,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         entity     | id | prop   | val
         'book'     | 1  | 'name' | 'Galt234'
         'org'      | 1  | 'num'  | 'foo123'
-        'location' | 1  | 'city' | 'Denver'
         'project'  | 1  | 'name' | 'project123'
         'task'     | 1000  | 'name' | 'task123'
+        //        'location' | 1  | 'city' | 'Denver'
 
     }
 
@@ -116,9 +115,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         entity     | qCount | qSearch
         'book'     | 3      | 'galt'
         'org'      | 1      | 'foo123'
-        'location' | 1      | 'Denver'
         'project'  | 1      | 'project123'
         'task'     | 1      | 'task123'
+        //'location' | 1      | 'Denver'
 
     }
 }

@@ -35,6 +35,11 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
     Location location
     OrgSource source //originator source record
 
+    OrgCalc calc
+    OrgMember member
+    //this makes finders like OrgMember.findByBranch(branch) work, without it gets confused and fails
+    static mappedBy = [member: "org"]
+
     static constraints = {
         NameNumConstraints(delegate, [
             num: [description: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
@@ -58,6 +63,10 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
             nullable: true, bindable: false
         location description: 'The primary organization address info',
             nullable: true, bindable: false
+        calc description: 'Calculated fields',
+            nullable: true, bindable: false
+        member description: 'Dimension hierarchy fields',
+            nullable: true, bindable: false
     }
 
     static mapping = {
@@ -69,6 +78,8 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
         contact column: 'contactId'
         location column: 'locationId'
         source column: 'orgSourceId'
+        calc column: 'calcId'
+        member column: 'memberId'
     }
 
     //gorm event

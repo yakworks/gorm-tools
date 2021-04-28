@@ -6,6 +6,7 @@ package gorm.tools.json
 
 import gorm.tools.beans.BeanPathTools
 import gorm.tools.beans.EntityMapService
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.TestTools
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
@@ -214,7 +215,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 }
 
 @Entity @GrailsCompileStatic
-class JsonifyDom {
+class JsonifyDom implements RepoEntity<JsonifyDom> {
     String name
     String name2
     Boolean isActive = false

@@ -147,8 +147,8 @@ class GormUtils {
      * @return value of the specified property or null if any of the intermediate objects are null
      */
     static Object getPropertyValue(Object source, String property) {
-        Validate.notNull(source, 'source')
-        Validate.notEmpty(property, 'property')
+        Validate.notNull(source, '[source]')
+        Validate.notEmpty(property, '[property]')
 
         Object result = property.tokenize('.').inject(source) { Object obj, String prop ->
             Object value = null

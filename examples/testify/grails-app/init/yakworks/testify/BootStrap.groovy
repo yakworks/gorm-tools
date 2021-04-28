@@ -13,6 +13,7 @@ class BootStrap {
 
     def init = { servletContext ->
         buildOrgs()
+        buildKitchen()
         buildAppUser()
     }
 
@@ -23,9 +24,12 @@ class BootStrap {
         Org.withTransaction {
             RallySeedData.buildOrgs(100)
         }
+    }
+
+    void buildKitchen(){
         KitchenSink.withTransaction {
             println "BootStrap inserting 100 customers"
-            TestSeedData.buildKitchen(100)
+            TestSeedData.buildKitchen(10)
         }
     }
 

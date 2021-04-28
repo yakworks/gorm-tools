@@ -12,6 +12,8 @@ grails {
     }
 }
 
+//gorm.tools.audit.enabled = false
+
 grails.config.locations =  ["classpath:yakworks/test-config.groovy"]
 
 String projectRoot = System.getProperty('gradle.rootProjectDir')

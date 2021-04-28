@@ -359,8 +359,8 @@ class DateUtil {
      */
     @CompileDynamic
     static int getDaysBetween(Date start, Date end) {
-        Validate.notNull(start, "Start date")
-        Validate.notNull(end, "End date")
+        Validate.notNull(start, "[Start date]")
+        Validate.notNull(end, "[End date]")
 
         int days
 

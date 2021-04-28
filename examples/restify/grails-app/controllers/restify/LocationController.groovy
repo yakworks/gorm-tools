@@ -7,21 +7,22 @@ package restify
 import groovy.transform.CompileStatic
 
 import gorm.tools.rest.controller.RestApiRepoController
+import yakworks.rally.orgs.model.Location
 import yakworks.testify.model.Address
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class LocationController extends RestApiRepoController<Address> {
+class LocationController extends RestApiRepoController<Location> {
 
     LocationController() {
-        super(Address, false)
+        super(Location, false)
     }
 
     def post() {
         Map q = new LinkedHashMap(parseJson(request))
         q.street = q.street == null ? null : "foo street"
-        Address instance = getRepo().create(q)
+        Location instance = getRepo().create(q)
         respond instance, [status: CREATED] //201
     }
 

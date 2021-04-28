@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository
 
-import java.beans.Introspector
 
 import groovy.transform.CompileStatic
 
@@ -12,33 +11,27 @@ import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
-import org.grails.datastore.gorm.GormValidateable
 import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
-import org.springframework.validation.BeanPropertyBindingResult
-import org.springframework.validation.FieldError
+import org.springframework.validation.Errors
 
-import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.MapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.RepositoryApi
-import grails.gorm.transactions.Transactional
-import grails.gorm.validation.ConstrainedProperty
 import grails.validation.ValidationException
 
 /**
@@ -48,7 +41,7 @@ import grails.validation.ValidationException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
+trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, RepositoryApi<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder
@@ -358,52 +351,8 @@ trait GormRepo<D> implements QueryMangoEntityApi<D>, RepositoryApi<D> {
         data
     }
 
-    void publishBeforeValidate(Object entity) {
-        getRepoEventPublisher().doBeforeValidate(this, entity, [:])
-    }
-
-    //copied in from AbstractConstraint to keep it consistent
-    void rejectValue(GormValidateable target, String propName, Object val, String code, String defaultMessageCode = null, Object argsOverride = null) {
-        rejectValueWithMessage(target, propName, val, code, getDefaultMessage(defaultMessageCode), argsOverride)
-    }
-
-    //copied in from AbstractConstraint to keep it consistent
-    void rejectValueWithMessage(GormValidateable target, String propName, Object val, String code, String defaultMessage = null, Object argsOverride = null){
-        if(argsOverride == null) argsOverride = [propName, getEntityClass(), val]
-        def newCodes = [] as Set<String>
-        def errors = target.errors as BeanPropertyBindingResult
-        String classShortName = Introspector.decapitalize(getEntityClass().getSimpleName())
-        newCodes.add("${getEntityClass().getName()}.${propName}.${code}".toString())
-        newCodes.add("${classShortName}.${propName}.${code}".toString())
-        newCodes.add("${code}.${propName}".toString())
-        newCodes.add(code)
-
-        FieldError error = new FieldError(
-            errors.objectName,
-            errors.nestedPath + propName,
-            val, //reject value
-            false, //bind failure
-            newCodes as String[],
-            argsOverride as Object[],
-            defaultMessage
-        )
-        errors.addError(error)
-    }
-
-    String getDefaultMessage(String code) {
-        try {
-            if (getMessageSource() != null) {
-                return getMessageSource().getMessage(code, null, LocaleContextHolder.getLocale())
-            }
-            return ConstrainedProperty.DEFAULT_MESSAGES.get(code)
-        }
-        catch (e) {
-            return ConstrainedProperty.DEFAULT_MESSAGES.get(code)
-        }
-    }
-
-    MessageSource getMessageSource(){
-        AppCtx.getCtx()
+    void publishBeforeValidate(Object entity, Errors errors) {
+        getRepoEventPublisher().doBeforeValidate(this, entity, errors, [:])
     }
 
     @Override

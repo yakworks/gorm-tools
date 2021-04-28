@@ -2,6 +2,8 @@ package yakworks.testify.model
 
 import groovy.transform.CompileStatic
 
+import org.springframework.validation.Errors
+
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
@@ -11,10 +13,10 @@ import gorm.tools.repository.events.RepoListener
 class AddressRepo implements GormRepo<Address> {
 
     @RepoListener
-    void beforeValidate(Address loc) {
+    void beforeValidate(Address loc, Errors errors) {
         //test rejectValue
-        if(loc.city == 'LocationRepoVille'){
-            rejectValue(loc, 'city', loc.city, 'from.LocationRepo')
+        if(loc.city == 'AddyVille'){
+            rejectValue(loc, errors, 'city', loc.city, 'no.AddyVilles')
         }
     }
 

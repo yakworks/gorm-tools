@@ -1,5 +1,6 @@
 package yakworks.rally.orgs
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
@@ -18,6 +19,10 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         when:
         Long id = KitchenSink.create([num:'123', name:"Wyatt Oil"]).id
         flushAndClear()
+        String[] beans = AppCtx.ctx.getBeanDefinitionNames()
+        for (String bean : beans) {
+            println(bean)
+        }
 
         then:
         def c = KitchenSink.get(id)
@@ -60,22 +65,24 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
     void "rejectValue only in LocationRepo beforeValidate"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.location = new Address(city: "LocationRepoVille")
-        sink.persist(flush: true)
+        sink.location = new Address(city: "AddyVille", country: 'USA')
+        assert !sink.validate()
         //flushAndClear()
 
         then:
-        def ex = thrown(EntityValidationException)
-        ex.errors.errorCount == 1
-        sink.location.errors['city'].code == 'from.LocationRepo'
-        //TODO need somethign to make this work
-        // org.errors.errorCount == 1
+        //def ex = thrown(EntityValidationException)
+        sink.errors.errorCount == 2
+        //from repo
+        sink.errors['location.city'].code == 'no.AddyVilles'
+        //normal
+        sink.errors['location.country'].code == 'maxSize.exceeded'
+        //sink.location.errors['city'].code == 'no.AddyVilles'
     }
 
     void "org and orgext rejectValue in beforeValidate"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.location = new Address(city: "LocationRepoVille", country: 'USA', street: 'OrgRepoStreet')
+        sink.location = new Address(city: "AddyVille", country: 'USA', street: 'OrgRepoStreet')
         sink.ext = new KitchenSinkExt(kitchenSink: sink, textMax: 'foo') //foo is 3 chars and should fail validation
         sink.persist()
         //flushAndClear()
@@ -87,11 +94,11 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         sink.errors['location.country'].code == 'maxSize.exceeded'
         //since its in orgRepo beforeValidate it shows up as nested
         sink.errors['location.street'].code == 'from.OrgRepo'
-        //error is on the association for rejects in beforeValidation
-        sink.location.errors['city'].code == 'from.LocationRepo'
+        //comes from addy repo's beforeValidate
+        sink.errors['location.city'].code == 'no.AddyVilles'
     }
 
-    def "test Org create validation fail"(){
+    def "test create validation fail"(){
         when:
         Map invalidData2 = [num:'foo1', name: "foo", link: ["name": "", num:'foo2']]
         KitchenSink.create(invalidData2)

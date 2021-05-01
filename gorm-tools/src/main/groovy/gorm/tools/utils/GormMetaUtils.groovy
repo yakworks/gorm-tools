@@ -96,6 +96,17 @@ class GormMetaUtils {
     }
 
     /**
+     * If the name has `_$$_` then it removes it then returns it. otherwise just returns the same name passed in
+     */
+    static String unwrapIfProxy(String name) {
+        final int proxyIndicator = name.indexOf('_$$_')
+        if (proxyIndicator > -1) {
+            name = name.substring(0, proxyIndicator)
+        }
+        return name
+    }
+
+    /**
      * Returns the mapping for the entity to DB.
      *
      * @param pe the PersistentEntity can found using the loolup statics above

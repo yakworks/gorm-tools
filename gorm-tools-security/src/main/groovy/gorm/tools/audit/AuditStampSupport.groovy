@@ -18,6 +18,7 @@ import org.springframework.core.annotation.AnnotationUtils
 
 import gorm.tools.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
+import gorm.tools.utils.GormMetaUtils
 import grails.util.GrailsClassUtils
 
 /**
@@ -53,8 +54,8 @@ class AuditStampSupport {
         GrailsClassUtils.getStaticPropertyValue(clazz, DISABLE_AUDITSTAMP_FIELD) == true
     }
 
-    boolean isAuditStamped(String entityName){
-        auditStampedEntities.contains(entityName)
+    boolean isAuditStamped(String name){
+        return auditStampedEntities.contains(GormMetaUtils.unwrapIfProxy(name))
     }
 
     /**

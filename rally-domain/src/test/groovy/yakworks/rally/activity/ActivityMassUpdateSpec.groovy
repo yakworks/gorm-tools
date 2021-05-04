@@ -92,7 +92,6 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
             attachments: [
                 [
                     name            : "test.txt",
-                    originalFileName: "test.txt",
                     tempFileName    : tempFileName
                 ]
             ]

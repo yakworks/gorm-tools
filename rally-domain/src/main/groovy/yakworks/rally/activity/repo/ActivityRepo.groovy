@@ -271,7 +271,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      *        ]
      *        attachments:[
      *          name: "test.txt",
-     *          originalFileName: "test.txt",
      *          tempFileName: tempFileName
      *        ]
      *        ]

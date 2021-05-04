@@ -56,9 +56,8 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
                 rejectNullValue(attachment, 'name')
                 return
             }
-            if (!p.originalFileName) p.originalFileName = p.name
-            if (!p.mimeType) p.mimeType = FileUtil.extractMimeType(p.originalFileName as String)
-            if (!p.extension) p.extension = FileUtil.getExtension(p.originalFileName as String)
+            if (!p.mimeType) p.mimeType = FileUtil.extractMimeType(p.name as String)
+            if (!p.extension) p.extension = FileUtil.getExtension(p.name as String)
             //XXX hard coded design needs to be refactored out and simplified
             if (p.isCreditFile) p.locationKey = "attachments.creditFiles.location"
         }
@@ -99,22 +98,22 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * @return the path object for the file to link in location
      */
     Path createFile(Attachment attachment, Map p){
-        String originalFileName = p.originalFileName as String
+        String fileName = p.name as String
 
         if (p.tempFileName) { //this would be primary way to upload files via UI and api
-            return attachmentSupport.createFileFromTempFile(attachment.id, originalFileName, p.tempFileName as String, attachment.locationKey)
+            return attachmentSupport.createFileFromTempFile(attachment.id, fileName, p.tempFileName as String, attachment.locationKey)
         }
         else if (p.sourcePath) { //used for copying attachments and testing
-            return attachmentSupport.createFileFromSource(attachment.id, originalFileName, p.sourcePath as Path, attachment.locationKey)
+            return attachmentSupport.createFileFromSource(attachment.id, fileName, p.sourcePath as Path, attachment.locationKey)
         }
         else if (p.multipartFile) { //multipartFile from a ui
             MultipartFile multipartFile = p.multipartFile as MultipartFile
-            Path tempFile = attachmentSupport.createTempFile(originalFileName, null)
+            Path tempFile = attachmentSupport.createTempFile(fileName, null)
             multipartFile.transferTo(tempFile) //do this instead of bytes as it is more memory efficient for big files
-            return attachmentSupport.createFileFromTempFile(attachment.id, originalFileName, tempFile.fileName.toString(), attachment.locationKey)
+            return attachmentSupport.createFileFromTempFile(attachment.id, fileName, tempFile.fileName.toString(), attachment.locationKey)
         }
-        else if (p.bytes && p.bytes instanceof byte[]) { //used mostly for testing but also for string templates
-            return attachmentSupport.createFileFromBytes(attachment.id, originalFileName, p.bytes as byte[], attachment.locationKey)
+        else if (p.bytes && p.bytes instanceof byte[]) { //used for testing and string based templates
+            return attachmentSupport.createFileFromBytes(attachment.id, fileName, p.bytes as byte[], attachment.locationKey)
         }
     }
 
@@ -148,7 +147,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * Inserts the list of files into Attachments, and returns the attachments as a list
      * @param fileDetailsList a list of maps, Each list entry (which is a map) represents a file.
      * The map has keys as follows: <br>
-     *  - originalFileName: The name of the file the user sent. <br>
+     *  - name: The name of the file the user sent. <br>
      *  - tempFileName: The name of the temp file the app server created to store it when uploaded. <br>
      * @return the list of attachments
      */
@@ -170,7 +169,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * @param params any extra params for the Activity
      */
     Attachment create(MultipartFile multipartFile, Map params) {
-        params['originalFileName'] = multipartFile.originalFilename
+        params['name'] = multipartFile.originalFilename
         //params['mimeType'] = multipartFile.contentType
         params['multipartFile'] = multipartFile
 

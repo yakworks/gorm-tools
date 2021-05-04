@@ -33,14 +33,14 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, Serializabl
     OrgType orgType
 
     static constraints = {
-        orgId description: 'The id of the org this is for', example: '954',
+        orgId description: 'The id of the org this is for', example: 954,
             nullable: false
         orgType description: 'denormalized orgType so we can have unique index within org type (sourceType, sourceId and orgType)',
-            nullable: false, example: 'Customer'
-        source description: 'A descriptiion of where this came from',
+            nullable: false, example: 'Customer', editable: false
+        source description: 'A description of where this came from',
             nullable: true, example: 'Oracle'
         sourceType description: 'Enum, defaults to SourceType.App',
-            nullable: false, example: 'App'
+            nullable: false, example: 'App', required: false
         sourceId description: 'the unique key for this within sourceType and orgType',
             nullable: false, example: 'AR-123-A64'
         sourceVersion description: 'the version of the last edit in source system',

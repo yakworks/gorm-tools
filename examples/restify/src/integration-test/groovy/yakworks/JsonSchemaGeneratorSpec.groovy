@@ -1,12 +1,16 @@
 package yakworks
 
+import java.nio.file.Files
+
 import gorm.tools.rest.JsonSchemaGenerator
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
+import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 import yakworks.testify.model.Taskify
 
@@ -17,7 +21,7 @@ class JsonSchemaGeneratorSpec extends Specification {
     @Autowired
     JsonSchemaGenerator jsonSchemaGenerator
 
-    @Ignore //FIXME this is now giving a stack overflow error
+    //@Ignore
     def "test fail"() {
         given:
         Map schema = jsonSchemaGenerator.generate(Org)
@@ -33,7 +37,7 @@ class JsonSchemaGeneratorSpec extends Specification {
         //verify properties
         def props = schema.props
         props != null
-        props.size() == 18 //12 props, + 6 id/version/createBy/date/editedBy/date
+        props.size() == 20 //14 props, + 6 id/version/createBy/date/editedBy/date
 
         props.id != null
         props.id.type == 'integer'
@@ -68,7 +72,7 @@ class JsonSchemaGeneratorSpec extends Specification {
 
         //associations
         props.info != null
-        props.info['$ref'] == "OrgInfo.yaml"
+        props.info['$ref'] == 'OrgInfo.yaml'
 
         props.flex != null
         props.flex['$ref'] == "OrgFlex.yaml"
@@ -80,4 +84,23 @@ class JsonSchemaGeneratorSpec extends Specification {
         //schema.definitions.TaskFlex.type == "Object"
 
     }
+
+    @IgnoreRest
+    def "test generate attachments"() {
+        given:
+        def path = jsonSchemaGenerator.generateYmlFile(Attachment)
+
+        expect:
+        Files.exists(path)
+    }
+
+    def "test generateYmlModels"() {
+        given:
+        def path = jsonSchemaGenerator.generateYmlFile(Org)
+        jsonSchemaGenerator.generateYmlModels()
+
+        expect:
+        Files.exists(path)
+    }
+
 }

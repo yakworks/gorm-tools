@@ -80,11 +80,11 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         when:
         def fileName = 'hello.txt'
         byte[] data = 'blah blah blah'.getBytes()
-        Map params = [name:'foo.bar', originalFileName:'hello.txt', bytes: data]
+        Map params = [name:'hello.txt', bytes: data]
         Attachment attachment = attachmentRepo.create(params)
 
         then:
-        attachment.name == 'foo.bar'
+        attachment.name == 'hello.txt'
         "text/plain" == attachment.mimeType
         14 == attachment.contentLength
         'txt' == attachment.extension
@@ -154,8 +154,8 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         Path tempFile2 = createTempFile(fileName)
 
         List list = []
-        list.add([tempFileName:tempFile.fileName, originalFileName:'grails_logo.jpg'])
-        list.add([tempFileName:tempFile2.fileName, originalFileName:'grails_logo2.jpg'])
+        list.add([tempFileName:tempFile.fileName, name:'grails_logo.jpg'])
+        list.add([tempFileName:tempFile2.fileName, name:'grails_logo2.jpg'])
 
         when:
         List attachments = attachmentRepo.bulkCreate(list)

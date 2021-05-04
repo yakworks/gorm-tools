@@ -40,6 +40,10 @@ class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attach
         query(attachment: attach).count()
     }
 
+    boolean hasAttachments(Persistable entity) {
+        queryFor(entity).count()
+    }
+
     /**
      * Copies Attachments from the source to target
      *
@@ -47,7 +51,7 @@ class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attach
      * @param toEntity entity to copy attachments to
      * @return the Results which will be ok or have errors if problem occured with IO
      */
-    //XXX needs good test from 9ci rally
+    //XXX needs good test
     Results copy(Persistable fromEntity, Persistable toEntity) {
         Results results = Results.OK
         List attachLinks = list(fromEntity)

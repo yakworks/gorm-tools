@@ -11,7 +11,6 @@ import org.springframework.validation.Errors
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
-import grails.gorm.validation.ConstrainedProperty
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType

@@ -49,7 +49,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
             nullable: false, bindable: false
         comments description: 'A user visible comment', example: 'Lorem ipsum',
             nullable: true, maxSize: 255
-        companyId description: 'Company id this org belongs to', example: '2',
+        companyId description: 'Company id this org belongs to', example: 2,
             nullable: true
         inactive description: 'indicator for an Org that is no longer active',
             nullable: false, required: false
@@ -64,7 +64,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
         location description: 'The primary organization address info',
             nullable: true, bindable: false
         calc description: 'Calculated fields',
-            nullable: true, bindable: false
+            nullable: true, bindable: false, editable: false
         member description: 'Dimension hierarchy fields',
             nullable: true, bindable: false
     }

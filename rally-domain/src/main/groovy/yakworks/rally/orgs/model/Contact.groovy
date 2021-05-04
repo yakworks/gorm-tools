@@ -70,7 +70,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Serializable {
 
     static constraints = {
         num nullable: true, maxSize: 50
-        name blank: false, nullable: false, maxSize: 50
+        name nullable: false, blank: false, maxSize: 50
 
         entityName nullable: true
         inactive nullable: false

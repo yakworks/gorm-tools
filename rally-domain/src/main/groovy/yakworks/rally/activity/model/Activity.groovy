@@ -7,16 +7,14 @@ package yakworks.rally.activity.model
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStampTrait
-import gorm.tools.model.Persistable
 import gorm.tools.repository.model.GetRepo
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.commons.lang.Validate
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.activity.repo.ActivityRepo
+import yakworks.rally.attachment.model.Attachable
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Taggable
@@ -24,7 +22,7 @@ import yakworks.rally.tag.model.Taggable
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<ActivityRepo>, Taggable<ActivityTag>, Serializable {
+class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<ActivityRepo>, Attachable, Taggable<ActivityTag>, Serializable {
 
     // FIXME https://github.com/9ci/domain9/issues/117 hasMany is still considered evil, change these
     static hasMany = [contacts: Contact]
@@ -60,9 +58,6 @@ class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<Activit
 
         Kind(boolean isTaskKind = false) { this.isTaskKind = isTaskKind }
 
-        static List stringValues() {
-            return values().toList()*.name()
-        }
         static EnumSet<Kind> getTaskKinds() {
             def taskKinds = values().findAll{ it.isTaskKind }
             return EnumSet.copyOf(taskKinds)
@@ -100,19 +95,6 @@ class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<Activit
         visibleId nullable: true
         org nullable: false
 
-    }
-
-    List<Attachment> getAttachments() {
-        getRepo().attachmentLinkRepo.listItems(this as Persistable)
-    }
-
-    boolean hasAttachments() {
-        getRepo().hasAttachments(this)
-    }
-
-    AttachmentLink addAttachment(Attachment att) {
-        Validate.notNull(this.id, "[Activity.id]")
-        return getRepo().linkAttachment(this, att)
     }
 
     List<ActivityLink> getLinks() {

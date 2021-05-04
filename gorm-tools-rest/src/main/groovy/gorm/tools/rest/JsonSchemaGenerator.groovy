@@ -4,6 +4,12 @@
 */
 package gorm.tools.rest
 
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -15,10 +21,13 @@ import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 import org.grails.validation.discovery.ConstrainedDiscovery
 import org.springframework.beans.factory.annotation.Autowired
+import org.yaml.snakeyaml.DumperOptions
+import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.utils.GormMetaUtils
 import grails.core.DefaultGrailsApplication
 import grails.gorm.validation.ConstrainedProperty
+import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.GrailsNameUtils
 
 import static grails.util.GrailsClassUtils.getStaticPropertyValue
@@ -50,11 +59,41 @@ class JsonSchemaGenerator {
         return generate(clazz.name)
     }
 
+    void generateYmlModels() {
+        def mapctx = GormMetaUtils.getMappingContext()
+        for( PersistentEntity entity : mapctx.persistentEntities){
+            generateYmlFile(entity.javaClass)
+        }
+    }
+
+    Path generateYmlFile(Class clazz) {
+        def map = generate(clazz.name)
+        String projectDir = System.getProperty("gradle.projectDir", '')
+        Files.createDirectories(Paths.get(projectDir, "build/schema"))
+        def path = Paths.get(projectDir, "build/schema/${clazz.simpleName}.yaml")
+        saveYaml(path, map)
+        return path
+    }
+
+    def saveYaml(Path path, yml){
+        DumperOptions dops = new DumperOptions()
+        dops.indent = 2
+        dops.prettyFlow = true
+        dops.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
+        //dops.width = 120
+        Yaml yaml = new Yaml(dops)
+        yaml.dump(yml, new FileWriter(path.toString()))
+        // path.toFile().withWriter {Writer writer ->
+        //     yaml.dump(yml, writer)
+        // }
+
+    }
+
     Map generate(String domainName) {
         PersistentEntity domClass = GormMetaUtils.getPersistentEntity(domainName)
         Map schema = [:]
-        schema['$schema'] = "http://json-schema.org/schema#"
-        schema['$id'] = "http://localhost:8080/schema/${domClass.getDecapitalizedName().capitalize()}.json"
+        schema['$schema'] = 'http://json-schema.org/schema#'
+        schema['$id'] = "http://localhost:8080/schema/${domClass.getDecapitalizedName().capitalize()}.json".toString()
         schema["definitions"] = [:]
         schema.putAll generate(domClass, schema)
         return schema
@@ -88,36 +127,56 @@ class JsonSchemaGenerator {
     @SuppressWarnings(['MethodSize'])
     // @CompileDynamic
     private Map getDomainProperties(PersistentEntity domClass, Map schema) {
+        println "----- ${domClass.name} getDomainProperties ----"
         String domainName = GrailsNameUtils.getPropertyNameRepresentation(domClass.name)
-        Map<String, ?> map = [:]
+        Map<String, ?> propsMap = [:]
         List required = []
 
-        PersistentProperty idProp = domClass.getIdentity()
+        Map idVerMap = [:]
 
         //id
-        String idJsonType = getJsonType(idProp.type)['type']
-        Map idTypeMap = [type: idJsonType, readOnly: true]
-        map[idProp.name] = idTypeMap
+        PersistentProperty idProp = domClass.getIdentity()
+        if(idProp){
+            Map idJsonType = getJsonType(idProp.type)
+            idJsonType.putAll([
+                description: 'unique id',
+                example: 954,
+                readOnly: true
+            ])
+            idVerMap[idProp.name] = idJsonType
+        }
 
         //version
-        Map verTypeMap = [type: 'integer', readOnly: true]
-        if (domClass.version) map[domClass.version.name] = verTypeMap
+        if (domClass.version) {
+            idVerMap[domClass.version.name] = [
+                type: 'integer',
+                description: 'version of the edit, incremented on each change',
+                example: 0,
+                readOnly: true
+            ] as Map
+        }
 
         Mapping mapping = getMapping(domainName)
         List<PersistentProperty> props = resolvePersistentProperties(domClass)
 
+        Map<String, ConstrainedProperty> constrainedProps = GormMetaUtils.findConstrainedProperties(domClass)
+
         for (PersistentProperty prop : props) {
-            ConstrainedProperty constraints = (ConstrainedProperty) getConstrainedProperties(domClass).get(prop.name)
+            def constraints = (DefaultConstrainedProperty) constrainedProps[prop.name]
 
             //Map mappedBy = domClass.mappedBy
             if (!constraints.display) continue //skip if display is false
+
+            Map jprop = [:]
+
             if (prop instanceof Association) {
                 PersistentEntity referencedDomainClass = GormMetaUtils.getPersistentEntity(prop.type)
                 Map schemaDefs = (Map) schema.definitions
-                if (/*(prop.isManyToOne() || prop.isOneToOne()) && */ !schemaDefs?.containsKey(referencedDomainClass.name)) {
+                /*(prop.isManyToOne() || prop.isOneToOne()) && */
+                if (referencedDomainClass && !schemaDefs?.containsKey(referencedDomainClass.name)) {
                     //treat as a seperate file
-                    Map refMap = ['$ref': "${referencedDomainClass.javaClass.simpleName}.yaml"]
-                    map[prop.name] = refMap
+                    jprop['$ref'] = "${referencedDomainClass.javaClass.simpleName}.yaml".toString()
+                    //propsMap[prop.name] = refMap
 
                     // if (referencedDomainClass.javaClass.isAnnotationPresent(RestApi)) {
                     //     //treat as a seperate file
@@ -132,29 +191,12 @@ class JsonSchemaGenerator {
                     //     Map refMap = ['$ref': "#/definitions/$referencedDomainClass.name"]
                     //     map[prop.name] = refMap
                     // }
-
-                    if (!constraints.isNullable() && constraints.editable) {
-                        required.add(prop.name)
-                    }
                 }
-            } else {
-                Map jprop = [:]
-                //jprop.title = prop.naturalName
-                jprop.title = getMetaConstraintValue(constraints, "title") ?: prop.name
-                //title override
-                //def metaConstraints = constraints.getMetaConstraintValue()metaConstraints
-                //if(constraints.attributes?.title) jprop.title = constraints.attributes.title
-                //if(constraints.getMetaConstraintValue("title"))
-                String description = getMetaConstraintValue(constraints, "description")
-                if (description) jprop.description = description
-
-                //Example
-                String example = getMetaConstraintValue(constraints, "example")
-                if (example) jprop.example = example
-
+            } else { //setup type
                 //type
                 Map typeFormat = getJsonType(constraints.propertyType)
                 jprop.type = typeFormat.type
+
                 //format
                 if (typeFormat.format) jprop.format = typeFormat.format
                 if (typeFormat.enum) jprop.enum = typeFormat.enum
@@ -163,44 +205,67 @@ class JsonSchemaGenerator {
                 if (constraints.format) jprop.format = constraints.format
                 //if (constraints.property?.appliedConstraints?.email) jprop.format = 'email'
                 //pattern TODO
-
-                //defaults
-                String defVal = getDefaultValue(mapping, prop.name)
-                if (defVal != null) jprop.default = defVal //TODO convert to string?
-
-                //required
-                if (!constraints.isNullable() && constraints.editable) {
-                    //TODO update this so it can use config too
-                    if (prop.name in ['dateCreated', 'lastUpdated']) {
-                        jprop.readOnly = true
-                    }
-                    //if its nullable:false but has a default then its not required as it will get filled in.
-                    else if (jprop.default == null) { //(jprop.default == null) {
-                        jprop.required = true
-                        required.add(prop.name)
-                    }
-                }
-                //readOnly
-                if (!constraints.editable) jprop.readOnly = true
-                //default TODO
-                //minLength
-                if (constraints.getMaxSize()) jprop.maxLength = constraints.getMaxSize()
-                //maxLength
-                if (constraints.getMinSize()) jprop.minLength = constraints.getMinSize()
-
-                if (constraints.getMin() != null) jprop.minimum = constraints.getMin()
-                if (constraints.getMax() != null) jprop.maximum = constraints.getMax()
-                if (constraints.getScale() != null) jprop.multipleOf = 1 / Math.pow(10, constraints.getScale())
-
-                map[prop.name] = jprop
             }
+
+            //title
+            def title = constraints.getMetaConstraintValue("title")
+            if(title) jprop.title = title
+
+            //description
+            String description = constraints.getMetaConstraintValue("description")
+            if (description) jprop.description = description
+
+            //example
+            def example = constraints.getMetaConstraintValue("example")
+            if (example) jprop.example = example
+
+            //defaults
+            String defVal = getDefaultValue(mapping, prop.name)
+            if (defVal != null) jprop.default = defVal //TODO convert to string?
+
+            //required
+            Boolean req = constraints.getMetaConstraintValue("required")
+            println "  ${prop.name} : required: $req"
+            if (!constraints.isNullable() && constraints.editable && req != false) {
+                //if it doesn't have a default value and its not a boolean
+                if (jprop.default == null && !Boolean.isAssignableFrom(constraints.propertyType)) {
+                    //jprop.required = true
+                    required.add(prop.name)
+                }
+            }
+            //readOnly
+            if (!constraints.editable) jprop.readOnly = true
+            //default TODO
+            //minLength
+            if (constraints.getMaxSize()) jprop.maxLength = constraints.getMaxSize()
+            //maxLength
+            if (constraints.getMinSize()) jprop.minLength = constraints.getMinSize()
+
+            if (constraints.getMin() != null) jprop.minimum = constraints.getMin()
+            if (constraints.getMax() != null) jprop.maximum = constraints.getMax()
+            if (constraints.getScale() != null) jprop.multipleOf = 1 / Math.pow(10, constraints.getScale())
+
+            propsMap[prop.name] = jprop
+
 
             //def typeFormat = getJsonType(constraints)
             //map.properties[prop.pathFromRoot] = typeFormat
 
         }
+        def auditStamp = [:]
+        //Audit Stamp put in its own so we can append to end of list
+        ['createdBy', 'editedBy', 'createdDate', 'editedDate'].each {
+            auditStamp[it] = propsMap.remove(it)
+        }
+        //def sortedProps = propsMap.sort()
+        def p = [:]
+        p.putAll(propsMap.sort())
+        p.putAll(idVerMap)
+        p.putAll(auditStamp)
+        //sortedProps.putAll(idVerMap)
+        //sortedProps.putAll(auditStamp)
 
-        return [props: map, required: required]
+        return [props: p, required: required.unique()]
     }
 
     @CompileDynamic
@@ -210,35 +275,29 @@ class JsonSchemaGenerator {
     }
 
     @CompileDynamic
-    String getMetaConstraintValue(ConstrainedProperty constraints, String name) {
-        constraints?.property?.metaConstraints?."$name"
-    }
-
-    //@CompileDynamic
-    PersistentEntity getDomainClass(String domainName) {
-        GormMetaUtils.findPersistentEntity(domainName)
-        //grailsApplication.domainClasses.find { it.naturalName == domainName } as PersistentEntity
-    }
-
-    @CompileDynamic
     Mapping getMapping(String domainName) {
-        PersistentEntity pe = getDomainClass(domainName)
-        return persistentEntityMappingContext.mappingFactory?.entityToMapping?.get(pe)
+        PersistentEntity pe = GormMetaUtils.findPersistentEntity(domainName)
+        return GormMetaUtils.getMappingContext().mappingFactory?.entityToMapping?.get(pe)
     }
+
     /* see http://epoberezkin.github.io/ajv/#formats */
     /* We are adding 'money' and 'date' as formats too
      * big decimal defaults to money
      */
 
     @CompileDynamic
-    protected Map getJsonType(Class propertyType) {
-        Map typeFormat = [type: 'string']
+    protected Map<String,Object> getJsonType(Class propertyType) {
+        Map typeFormat = [type: 'string'] as Map<String,Object>
         switch (propertyType) {
             case [Boolean, Byte]:
                 typeFormat.type = 'boolean'
                 break
-            case [Integer, Long, Short]:
+            case [Integer, Short]:
                 typeFormat.type = 'integer'
+                break
+            case [Long]:
+                typeFormat.type = 'integer'
+                typeFormat.format = 'int64'
                 break
             case [Double, Float, BigDecimal]:
                 typeFormat.type = 'number'
@@ -247,12 +306,12 @@ class JsonSchemaGenerator {
                 typeFormat.type = 'number'
                 typeFormat.format = 'money'
                 break
-            case [java.time.LocalDate]:
+            case [LocalDate]:
                 typeFormat.type = 'string'
                 //date. verified to be a date of the format YYYY-MM-DD
                 typeFormat.format = 'date'
                 break
-            case [Date]:
+            case [Date, LocalDateTime]:
                 //date-time. verified to be a valid date and time in the format YYYY-MM-DDThh:mm:ssZ
                 typeFormat.type = 'string'
                 typeFormat.format = 'date-time'
@@ -277,15 +336,17 @@ class JsonSchemaGenerator {
             def orderBy = attrs.order?.tokenize(',')*.trim() ?: []
             properties = orderBy.collect { propertyName -> domainClass.getPersistentProperty(propertyName) }
         } else {
-            properties = domainClass.persistentProperties as List
+            properties = domainClass.persistentProperties
             def blacklist = attrs.except?.tokenize(',')*.trim() ?: []
             //blacklist << 'dateCreated' << 'lastUpdated'
             Map scaffoldProp = getStaticPropertyValue(domainClass.class, 'scaffold')
             if (scaffoldProp) {
                 blacklist.addAll(scaffoldProp.exclude)
             }
+            def constProps = getConstrainedProperties(domainClass)
+
             properties.removeAll { it.name in blacklist }
-            properties.removeAll { !getConstrainedProperties(it.owner)[it.name]?.display }
+            properties.removeAll { !constProps[it.name]?.display }
             properties.removeAll { it.propertyMapping.mappedForm.derived }
 
             //Collections.sort(properties, new org.grails.validation.DomainClassPropertyComparator(domainClass))
@@ -294,10 +355,8 @@ class JsonSchemaGenerator {
         return properties
     }
 
-    Map getConstrainedProperties(PersistentEntity persistentEntity) {
-        Map constrainedProperties = [:]
-        ConstrainedDiscovery constrainedDiscovery = GrailsFactoriesLoader.loadFactory(ConstrainedDiscovery)
-        constrainedProperties = constrainedDiscovery.findConstrainedProperties(persistentEntity)
-        return constrainedProperties
+    Map<String, ConstrainedProperty> getConstrainedProperties(PersistentEntity persistentEntity) {
+        return GormMetaUtils.findConstrainedProperties(persistentEntity)
     }
+
 }

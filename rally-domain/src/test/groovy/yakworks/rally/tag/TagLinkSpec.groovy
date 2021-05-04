@@ -18,7 +18,7 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
         when:
         def tag1 = Tag.create(name: 'tag1')
         def tag2 = Tag.create(name: 'tag2', entityName: 'Foo, Attachment')
-        def att = new Attachment(name: 'foo', location: 'foo').persist()
+        def att = Attachment.create(name: 'foo.txt')
         def attId = att.id
 
         def tl = TagLink.create(att, tag1)

@@ -11,7 +11,7 @@ import org.springframework.mock.web.MockHttpServletRequest
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-class JsonParserTraitSpec extends Specification implements JsonParserTrait{
+class JsonParserTraitSpec extends Specification implements JsonParserTrait {
 
     String sampleJson = '''
     {

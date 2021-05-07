@@ -17,6 +17,8 @@ import org.hibernate.tool.schema.spi.SchemaFilterProvider
  * but for testing we don't want any.
  *
  * This is set in application.yml with
+ * hibernate:
+ *   schema_management_tool: 'yakworks.rally.ddl.CustomSchemaManagementTool'
  *
  */
 @CompileStatic

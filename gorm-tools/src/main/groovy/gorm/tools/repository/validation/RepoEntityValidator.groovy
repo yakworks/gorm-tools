@@ -4,20 +4,32 @@
 */
 package gorm.tools.repository.validation
 
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.codehaus.groovy.reflection.CachedClass
+import org.codehaus.groovy.reflection.ClassInfo
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.codehaus.groovy.transform.trait.Traits
+import org.grails.datastore.gorm.validation.constraints.builder.ConstrainedPropertyBuilder
 import org.grails.datastore.gorm.validation.constraints.eval.ConstraintsEvaluator
 import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.config.GormProperties
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 import org.grails.datastore.mapping.reflect.EntityReflector
 import org.springframework.context.MessageSource
+import org.springframework.core.io.ClassPathResource
+import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
+import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
+import grails.gorm.validation.ConstrainedProperty
+import grails.gorm.validation.DefaultConstrainedProperty
 import grails.gorm.validation.PersistentEntityValidator
 
 /**
@@ -26,16 +38,27 @@ import grails.gorm.validation.PersistentEntityValidator
  * @author Graeme Rocher
  * @since 6.0
  */
+@SuppressWarnings(['Println', 'FieldName'])
 @CompileStatic
 class RepoEntityValidator extends PersistentEntityValidator {
 
+    public static final String API_CONSTRAINTS = 'constraints'
     //private static final List<String> EMBEDDED_EXCLUDES = Arrays.asList(GormProperties.IDENTITY,GormProperties.VERSION)
 
     GormRepo gormRepo
+    ConstraintsEvaluator constraintsEvaluator
+    // Map<String, ConstrainedProperty> constrainedProperties = [:]
 
     RepoEntityValidator(PersistentEntity entity, MessageSource messageSource, ConstraintsEvaluator constraintsEvaluator) {
         super(entity, messageSource, constraintsEvaluator)
-        //gormRepo = (GormRepo) InvokerHelper.invokeStaticMethod(entity.javaClass, 'getRepo', null)
+        this.constraintsEvaluator = constraintsEvaluator
+        //turn it back into modifiable map so we can mess with it
+        Map<String, ConstrainedProperty> constrainedProps = [:]
+        constrainedProps.putAll(getConstrainedProperties())
+        setConstrainedProperties(PersistentEntityValidator, super, constrainedProps)
+
+        //do the tweaks for external constraints
+        addConstraintsFromMap()
     }
 
     @Override
@@ -49,6 +72,19 @@ class RepoEntityValidator extends PersistentEntityValidator {
             gormRepo.publishBeforeValidate(obj, errors)
         }
         super.validate(obj, errors, cascade)
+    }
+
+    //for future use, trickery to set the final field
+    void setConstrainedProperties(Class clazz, Object obj, Map<String, ConstrainedProperty> map){
+        //make the constrainedProperties accessible, remove private
+        Field field = clazz.getDeclaredField("constrainedProperties")
+        field.setAccessible(true)
+        //remove final modifier
+        Field modifiersField = Field.getDeclaredField("modifiers")
+        modifiersField.setAccessible(true)
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
+        //set the value now
+        field.set(obj, map)
     }
 
     /**
@@ -68,16 +104,20 @@ class RepoEntityValidator extends PersistentEntityValidator {
             || !association.getAssociatedEntity() || !association.doesCascadeValidate(associatedObject)) {
             return
         }
+
+        //setup the path as super does
         String origNestedPath = errors.getNestedPath()
         errors.setNestedPath(buildNestedPath(origNestedPath, propertyName, indexOrKey))
 
+        //fire event
         if(associatedObject instanceof PersistableRepoEntity){
             def repo = (GormRepo) InvokerHelper.invokeStaticMethod(associatedObject.class, 'getRepo', null)
             repo.publishBeforeValidate(associatedObject, errors)
         }
 
-        // reset the nested path back to original as cascadeValidationToOne does it
+        // reset the nested path back to original as cascadeValidationToOne does it too.
         errors.setNestedPath(origNestedPath)
+
         super.cascadeValidationToOne(parentObject, propertyName, association, errors, reflector, associatedObject, indexOrKey, validatedObjects)
 
     }
@@ -97,6 +137,137 @@ class RepoEntityValidator extends PersistentEntityValidator {
         // Component is part of a Map. Nested path should have a key surrounded
         // with apostrophes at the end.
         return nestedPath + componentName + "['" + indexOrKey + "']"
+    }
+
+    void addConstraintsFromMap(){
+
+        List<Map> classMaps = ClassPropertyFetcher.getStaticPropertyValuesFromInheritanceHierarchy(targetClass, API_CONSTRAINTS, Map)
+        List<Map> traitMaps = getApiConstraintsFromTraits(targetClass, API_CONSTRAINTS)
+        List<Map> mergedList = classMaps + traitMaps
+
+        Map yamlMap = findYamlApiConfig(targetClass)
+        if(yamlMap) mergedList.add(yamlMap)
+
+        def builder = newConstrainedPropertyBuilder()
+        setConstrainedProperties(ConstrainedPropertyBuilder, builder, getConstrainedProperties())
+
+        //used for validate false
+        def noValidateBuilder = newConstrainedPropertyBuilder()
+
+        println "mergedList $mergedList"
+        for(Map cfield : mergedList){
+            for (entry in cfield) {
+                def attrs = (Map) entry.value
+                String prop = (String) entry.key
+
+                //if validate is false then add it to the nonContrainedProps so it doesn't use it during validation
+                if(attrs && attrs['validate'] == false){
+                    addConstraint(noValidateBuilder, prop, attrs)
+                } else {
+                    addConstraint(builder, prop, attrs)
+                }
+            }
+        }
+    }
+
+    ConstrainedPropertyBuilder newConstrainedPropertyBuilder(){
+        ConstrainedPropertyBuilder builder = constraintsEvaluator.newConstrainedPropertyBuilder(targetClass)
+        builder.allowDynamic = true
+        builder.defaultNullable = true
+        return builder
+    }
+
+    @CompileDynamic //so it can access protected
+    void addConstraint(ConstrainedPropertyBuilder builder, String prop, Map attr){
+        def cp = (DefaultConstrainedProperty)builder.constrainedProperties[prop]
+        if(cp){
+            //default string maxSize
+            if(String.isAssignableFrom(cp.propertyType) && !cp.maxSize){
+                attr.maxSize = 255
+            }
+        } else {
+            if(!attr.containsKey('nullable')){
+                //make sure we have a default of nullable:true
+                attr.nullable = true
+            }
+        }
+
+        builder.createNode(prop, attr)
+    }
+
+    static List<Map> getApiConstraintsFromTraits(Class mainClass, String name) {
+        CachedClass cachedClass = ClassInfo.getClassInfo(mainClass).getCachedClass() //classInfo.getCachedClass()
+        Collection<ClassInfo> hierarchy = cachedClass.getHierarchy()
+        Class javaClass = cachedClass.getTheClass()
+        List<Map> values = []
+        for (ClassInfo current : hierarchy) {
+            def traitClass = current.getTheClass()
+            def isTrait = Traits.isTrait(traitClass)
+            if(!isTrait) continue
+            def traitFieldName = getTraitFieldName(traitClass, name)
+            //def traitFieldGetter = "$traitFieldName\$get"
+            //println "$traitClass $traitFieldName"
+            //MetaMethod getterMeta = cachedClass.getMetaClass().getStaticMetaMethod(traitFieldGetter, null)
+            // T traitFieldVal
+            // try{
+            //     traitFieldVal = (T) InvokerHelper.invokeStaticMethod(mainClass, traitFieldGetter, null)
+            // } catch(MissingMethodException){
+            //}
+            Map theval = (Map)getStaticFieldValue(mainClass, traitFieldName)
+            if(theval){
+                println "$traitFieldName found with $theval"
+                values.add(theval)
+            }
+
+            // if(getterMeta){
+            //     T traitFieldVal = (T) InvokerHelper.invokeStaticMethod(mainClass, traitFieldGetter, null)
+            //     println "  $traitFieldName found with $traitFieldVal"
+            // }
+
+            // MetaProperty metaProperty = current.getMetaClass().getStaticMetaMethod()  .getMetaProperty(traitFieldName)
+            //
+            // if(metaProperty != null && Modifier.isStatic(metaProperty.getModifiers())) {
+            //     println "  $traitFieldName found"
+            // }
+        }
+        Collections.reverse(values)
+        return values
+    }
+
+    static String getTraitFieldName(Class traitClass, String fieldName) {
+        return traitClass.getName().replace('.', '_') + "__" + fieldName;
+    }
+
+    /**
+     * <p>Get a static field value.</p>
+     *
+     * @param clazz The class to check for static property
+     * @param name The field name
+     * @return The value if there is one, or null if unset OR there is no such field
+     */
+    static Object getStaticFieldValue(Class<?> clazz, String name) {
+        Field field = ReflectionUtils.findField(clazz, name);
+        if (field != null) {
+            ReflectionUtils.makeAccessible(field);
+            try {
+                return field.get(clazz);
+            } catch (IllegalAccessException ignored) {}
+        }
+        return null;
+    }
+
+    static Map findYamlApiConfig(Class mainClass) {
+        def cname = mainClass.simpleName
+        def cpr = new ClassPathResource("${cname}Api.yaml", mainClass)
+        if(cpr.exists()){
+            Yaml yaml = new Yaml()
+            Map apiMap = yaml.load(cpr.inputStream)
+            def entitySchema = (Map)apiMap[cname]
+            def entityProps = entitySchema['properties']
+            assert entityProps
+            return (Map) entityProps
+        }
+        return [:]
     }
 
 }

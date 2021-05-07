@@ -7,8 +7,7 @@ package yakworks.rally.activity.model
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStampTrait
-import gorm.tools.repository.model.GetRepo
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -22,7 +21,7 @@ import yakworks.rally.tag.model.Taggable
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<ActivityRepo>, Attachable, Taggable<ActivityTag>, Serializable {
+class Activity implements AuditStampTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable<ActivityTag>, Serializable {
 
     // FIXME https://github.com/9ci/domain9/issues/117 hasMany is still considered evil, change these
     static hasMany = [contacts: Contact]
@@ -78,23 +77,46 @@ class Activity implements AuditStampTrait, RepoEntity<Activity>, GetRepo<Activit
 
     static constraints = {
         AuditStampTraitConstraints(delegate)
-        //required
-        summary nullable: false, blank: false, maxSize: 255
-        kind nullable: false
-        visibleTo nullable: false
+        //TaggableConstraints(delegate)
+        ActivityConstraints(delegate)
+    }
 
-        //not required
-        note nullable: true, bindable: true
-        parentId nullable: true
-        template nullable: true
-        task nullable: true
-        title nullable: true, maxSize: 255
-        source nullable: true, maxSize: 255
-        sourceEntity nullable: true, maxSize: 255
-        sourceId nullable: true, maxSize: 255
-        visibleId nullable: true
-        org nullable: false
+    @CompileDynamic
+    static ActivityConstraints(Object delegate) {
+        def c = {
+            // summary d: 'A 255 char string summary of the activity.
+            // Will be the title if its a task and if note it will ends with ... if there is more to the note.',
+            //     nullable: false, blank: false, maxSize: 255
 
+            kind d: 'The type of the activity, certain kinds oare only valid for a Task',
+                nullable: false, api:[required: false]
+
+            note d: 'A note for this activity. Summary will be built from this',
+                nullable: true, bindable: true
+
+            parentId d: 'The parent note that this is a comment for',
+                nullable: true
+
+            template d: 'The template that was or will be used to generate this note or the tasks email/fax/letter/report,etc..',
+                nullable: true
+
+            task d: 'The task info if this is task kind',
+                nullable: true
+
+            title d: 'The title for this, optional as summary will work',
+                nullable: true, maxSize: 255
+
+            source nullable: true, maxSize: 255
+            sourceEntity nullable: true, maxSize: 255
+            sourceId nullable: true, maxSize: 255
+            visibleTo description: 'Defaults to Everyone',
+                nullable: false, required: false
+            visibleId nullable: true
+            org nullable: false
+            links nullable: true
+        }
+        c.delegate = delegate
+        c()
     }
 
     List<ActivityLink> getLinks() {

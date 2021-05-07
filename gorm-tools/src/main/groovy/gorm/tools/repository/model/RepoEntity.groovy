@@ -10,7 +10,7 @@ import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.repository.GormRepo
 
 /**
- * Default trait for a domain that has a default Long id and the mango query methods.
+ * Default trait for a domain that has a generated repo and mango query methods.
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1

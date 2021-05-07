@@ -11,15 +11,14 @@ import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.audit.AuditStampTrait
-import gorm.tools.repository.model.GetRepo
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class AppUser implements AuditStampTrait, RepoEntity<AppUser>, GetRepo<AppUserRepo>, Serializable {
+class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
 
     static constraints = {
         AuditStampTraitConstraints(delegate)
@@ -30,7 +29,7 @@ class AppUser implements AuditStampTrait, RepoEntity<AppUser>, GetRepo<AppUserRe
             ''',
             blank: false, nullable: false, unique: true, maxSize: 50
         name description: "The full name or display name, may come from contact or defaults to username if not populated",
-             blank: false, nullable: false, maxSize: 50
+             blank: false, nullable: false, required: false,  maxSize: 50
         email description: "The email",
               nullable: false, blank: false, email: true, unique: true
         passwordHash description: "The pwd hash, internal use only, never show this",

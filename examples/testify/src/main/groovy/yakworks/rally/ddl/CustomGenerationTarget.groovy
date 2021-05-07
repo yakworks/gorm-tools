@@ -22,7 +22,7 @@ class CustomGenerationTarget extends GenerationTargetToDatabase {
         //if (command =~ /references legacy\.xyz/)
         //don't generate all foreign keys
         if (command =~ /foreign key/){
-            println "FILTERING OUT: $command"
+            //println "FILTERING OUT: $command"
             return false
         }
         return true

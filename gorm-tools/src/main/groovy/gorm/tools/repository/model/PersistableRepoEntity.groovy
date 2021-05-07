@@ -17,23 +17,22 @@ import gorm.tools.repository.RepoUtil
  * @since 6.1
  */
 @CompileStatic
-trait PersistableRepoEntity<D, R extends GormRepo<D>> implements Persistable {
+trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, Persistable {
 
-    /**
-     * static prop that returns the repo for this entity, calls RepoUtil.findRepo(this) by default
-     */
-    static R getRepo() { RepoUtil.findRepo(this) as R }
+    static R getRepo() { return (R) RepoUtil.findRepo(this) }
+
+    R findRepo() { return (R) RepoUtil.findRepo(getClass()) }
 
     D persist(Map args = [:]) {
-        return getRepo().persist((D) this, args)
+        return findRepo().persist((D) this, args)
     }
 
     void remove(Map args = [:]) {
-        getRepo().remove((D) this, args)
+        findRepo().remove((D) this, args)
     }
 
     void bind(Map args = [:], Map data) {
-        getRepo().getMapBinder().bind(args, (D) this, data)
+        findRepo().getMapBinder().bind(args, (D) this, data)
     }
 
     /**

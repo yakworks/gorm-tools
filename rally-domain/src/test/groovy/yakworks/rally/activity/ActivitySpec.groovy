@@ -17,6 +17,7 @@ import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockHelper
 
@@ -36,8 +37,7 @@ class ActivitySpec extends Specification implements DomainRepoTest<Activity>, Se
         }
     }
     void setupSpec(){
-        // mockDomains(Org, User, Task, Attachment, Activity,
-        mockDomains(Activity, ActivityLink, AttachmentLink, Attachment, ActivityNote, ActivityTag, OrgTypeSetup)
+        mockDomains(Org, OrgTag, AttachmentLink, Attachment, ActivityNote, ActivityTag, ActivityLink)
     }
 
     Map buildUpdateMap(Map args) {
@@ -232,7 +232,7 @@ class ActivitySpec extends Specification implements DomainRepoTest<Activity>, Se
         activity.attachments[0] == AttachmentLink.get(activity, attachment).attachment
 
         when:
-        Activity.repo.removeAttachment(activity, attachment)
+        Attachment.repo.removeAttachment(activity, attachment)
         flushAndClear()
 
         then:

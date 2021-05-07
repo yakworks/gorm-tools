@@ -4,7 +4,7 @@
 */
 package yakworks.rally.attachment.model
 
-import gorm.tools.repository.model.GetRepo
+
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
@@ -14,7 +14,7 @@ import yakworks.rally.attachment.repo.AttachmentLinkRepo
  */
 @Entity
 @GrailsCompileStatic
-class AttachmentLink implements AttachmentLinkTrait<AttachmentLink>, GetRepo<AttachmentLinkRepo>, Serializable {
+class AttachmentLink implements AttachmentLinkTrait<AttachmentLink, AttachmentLinkRepo>, Serializable {
     static belongsTo = [attachment: Attachment]
     String linkedEntity
     Long linkedId

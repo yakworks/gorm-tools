@@ -4,7 +4,7 @@
 */
 package yakworks.rally.tag.model
 
-import gorm.tools.repository.model.GetRepo
+
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.tag.repo.TagLinkRepo
@@ -14,7 +14,7 @@ import yakworks.rally.tag.repo.TagLinkRepo
  */
 @Entity
 @GrailsCompileStatic
-class TagLink implements TagLinkTrait<TagLink>, GetRepo<TagLinkRepo>, Serializable {
+class TagLink implements TagLinkTrait<TagLink, TagLinkRepo>, Serializable {
     static belongsTo = [tag: Tag]
     String linkedEntity
     Long linkedId

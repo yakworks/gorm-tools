@@ -4,6 +4,7 @@
 */
 package yakworks.rally.tag.model
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
@@ -34,4 +35,17 @@ trait Taggable<D> {
         if (!_entityTagRepo) this._entityTagRepo = ClassPropertyFetcher.getStaticPropertyValue(getTagLinkClass(), 'repo', LinkedEntityRepoTrait)
         return _entityTagRepo
     }
+
+    // @CompileDynamic
+    // static TaggableConstraints(Object delegate) {
+    //     def c = {
+    //         tags description: "the tags for this item", nullable: true
+    //     }
+    //     c.delegate = delegate
+    //     c()
+    // }
+    //
+    static Map constraints = [
+        tags: [ description: 'the tags for this item', validate: false] //validate false so it does not retrieve the value
+    ]
 }

@@ -7,8 +7,7 @@ package yakworks.rally.orgs.model
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStamp
-import gorm.tools.repository.model.GetRepo
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -18,7 +17,7 @@ import yakworks.rally.orgs.repo.LocationRepo
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Location implements RepoEntity<Location>, GetRepo<LocationRepo>, Serializable {
+class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
     static transients = ['addressHtml']
     //static belongsTo = [org: Org]
     Kind kind = Kind.work

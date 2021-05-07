@@ -84,7 +84,7 @@ trait BenchConfig {
 
 
     void setRepo(Class domainClass){
-        repository = (GormRepo) RepoUtil.getRepoStaticProperty(domainClass) //domainClass.repo
+        repository = (GormRepo) RepoUtil.findRepo(domainClass) //domainClass.repo
     }
 
     void setup() {

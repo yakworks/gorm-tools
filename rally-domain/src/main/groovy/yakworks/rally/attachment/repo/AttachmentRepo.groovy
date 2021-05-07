@@ -13,6 +13,7 @@ import groovy.util.logging.Slf4j
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
+import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.AfterBindEvent
@@ -21,6 +22,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.io.FileUtil
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 
@@ -89,6 +91,29 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     }
 
     /**
+     * removes the list of attachment ids. removes the links and the attachment itself
+     *
+     * @param entity the entity the attachment is for
+     * @param deleteAttachments the list of attachment ids to remove
+     */
+    void handleAttachmentRemoval(Persistable entity, List deleteAttachments){
+        deleteAttachments.each { attachmentId ->
+            Attachment attachment = Attachment.load(attachmentId as Long)
+            if (attachment) {
+                removeAttachment(entity, attachment)
+            }
+        }
+    }
+
+    /**
+     * removes the link for the entity and removes the attachment
+     */
+    void removeAttachment(Persistable entity, Attachment attachment){
+        attachmentLinkRepo.remove(entity, attachment)
+        attachment.remove()
+    }
+
+    /**
      * 4 ways a file can be set via params
      *   1. with tempFileName key, where its a name of a file that has been uploaded
      *      to the tempDir location key for appResourceLoader
@@ -142,25 +167,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
             attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
         }
     }
-
-    /**
-     * Inserts the list of files into Attachments, and returns the attachments as a list
-     * @param fileDetailsList a list of maps, Each list entry (which is a map) represents a file.
-     * The map has keys as follows: <br>
-     *  - name: The name of the file the user sent. <br>
-     *  - tempFileName: The name of the temp file the app server created to store it when uploaded. <br>
-     * @return the list of attachments
-     */
-    // @Transactional
-    // List<Attachment> insertList(List<Map> fileDetailsList) {
-    //     log.debug("*******-->File details list: ${fileDetailsList}")
-    //     List<Attachment> resultList = []
-    //     fileDetailsList.each { Map fileDetails ->
-    //         Attachment attachment = create(fileDetails)
-    //         resultList.add(attachment)
-    //     }
-    //     resultList
-    // }
 
     /**
      * creates from a multipart file as an attachment. Used in LogoService for example.

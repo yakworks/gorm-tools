@@ -59,13 +59,13 @@ class RepoUtil {
         RepositoryArtefactHandler.getRepoBeanName(domainClass)
     }
 
-    static <T> GormRepo<T> getRepoStaticProperty(Class<T> domainClass) {
-        return ClassPropertyFetcher.getStaticPropertyValue(domainClass, 'repo', GormRepo)
-    }
+    // static <T> GormRepo<T> getRepoStaticProperty(Class<T> domainClass) {
+    //     return ClassPropertyFetcher.getStaticPropertyValue(domainClass, 'repo', GormRepo)
+    // }
 
-    static List<Class<RepositoryApi>> getRepositoryClasses() {
-        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz as List<Class<RepositoryApi>>
-    }
+    // static List<Class<RepositoryApi>> getRepositoryClasses() {
+    //     AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz as List<Class<RepositoryApi>>
+    // }
 
     /**
      * checks the passed in version with the version on the entity (entity.version)

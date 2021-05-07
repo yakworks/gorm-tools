@@ -35,4 +35,9 @@ trait Attachable {
         if (!_attachmentLinkRepo) this._attachmentLinkRepo = (AttachmentLinkRepo) RepoUtil.findRepo(AttachmentLink)
         return _attachmentLinkRepo
     }
+
+    static constraints = [
+        attachments: [ d: 'the tags for this item', nullable: true]
+        //hasAttachments: [ d: 'true if this has attachments', nullable: true]
+    ]
 }

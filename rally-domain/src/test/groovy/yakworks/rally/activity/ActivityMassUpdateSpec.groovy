@@ -16,6 +16,7 @@ import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
+import yakworks.rally.activity.model.ActivityTag
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
@@ -24,6 +25,7 @@ import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 
@@ -46,8 +48,8 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
     }
 
     def setupSpec() {
-        mockDomains(Customer, Activity, ActivityNote, ActivityLink)
-        mockDomains(Org, OrgTypeSetup, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus)
+        mockDomains(Customer, Activity, ActivityNote, ActivityLink, ActivityTag)
+        mockDomains(Org, OrgTag, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus)
     }
 
     def "test massupdate - with notes "() {

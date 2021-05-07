@@ -36,7 +36,7 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, Serializabl
         orgId description: 'The id of the org this is for', example: 954,
             nullable: false
         orgType description: 'denormalized orgType so we can have unique index within org type (sourceType, sourceId and orgType)',
-            nullable: false, example: 'Customer', editable: false
+            nullable: false, example: 'Customer', editable: false, required: false
         source description: 'A description of where this came from',
             nullable: true, example: 'Oracle'
         sourceType description: 'Enum, defaults to SourceType.App',

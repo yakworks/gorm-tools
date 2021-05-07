@@ -6,6 +6,7 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileDynamic
 
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 
 /**
@@ -15,8 +16,9 @@ import gorm.tools.repository.RepoUtil
  * @since 7.0.3
  */
 @CompileDynamic
-trait GetRepo<T> {
+trait HasRepo<D, R extends GormRepo<D>> {
 
-    static T getRepo() { return RepoUtil.findRepo(this) as T }
+    static R getRepo() { return (R) RepoUtil.findRepo(this) }
 
+    R findRepo() { return (R) RepoUtil.findRepo(getClass()) }
 }

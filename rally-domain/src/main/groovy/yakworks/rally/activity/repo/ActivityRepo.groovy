@@ -80,7 +80,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     @RepoListener
     void afterBind(Activity activity, Map data, AfterBindEvent e) {
         if (e.isBindUpdate() && data.deleteAttachments) {
-            handleAttachmentRemoval(activity, data.deleteAttachments as List)
+            attachmentRepo.handleAttachmentRemoval(activity, data.deleteAttachments as List)
         }
     }
 
@@ -130,24 +130,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         if (data?.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
         }
-    }
-
-    void handleAttachmentRemoval(Activity activity, List deleteAttachments){
-        deleteAttachments.each { attachmentId ->
-            Attachment attachment = Attachment.load(attachmentId as Long)
-            if (attachment) {
-                removeAttachment(activity, attachment)
-            }
-        }
-    }
-
-    void removeAttachment(Activity activity, Attachment attachment){
-        attachmentLinkRepo.remove(activity, attachment)
-        attachment.remove()
-    }
-
-    boolean hasAttachments(Activity activity) {
-        attachmentLinkRepo.queryFor(activity).count()
     }
 
     void updateSummary(Activity activity) {

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Specification
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
 import yakworks.testify.model.Taskify
@@ -37,7 +38,8 @@ class JsonSchemaGeneratorSpec extends Specification {
         //verify properties
         def props = schema.props
         props != null
-        props.size() == 20 //14 props, + 6 id/version/createBy/date/editedBy/date
+        //props.size() == 20 //14 props, + 6 id/version/createBy/date/editedBy/date
+        props.size() == 16 //14 props, + 2 id/version  when audit is turned off
 
         props.id != null
         props.id.type == 'integer'
@@ -85,10 +87,20 @@ class JsonSchemaGeneratorSpec extends Specification {
 
     }
 
-    @IgnoreRest
     def "test generate attachments"() {
         given:
         def path = jsonSchemaGenerator.generateYmlFile(Attachment)
+
+        expect:
+        Files.exists(path)
+    }
+
+    @IgnoreRest
+    def "test generate Activity"() {
+        given:
+        //def taggableVal = Activity.yakworks_rally_tag_model_Taggable__validation$get()
+        //assert taggableVal instanceof Map
+        def path = jsonSchemaGenerator.generateYmlFile(Activity)
 
         expect:
         Files.exists(path)

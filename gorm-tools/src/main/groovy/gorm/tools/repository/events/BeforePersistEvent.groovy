@@ -6,7 +6,7 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.model.RepositoryApi
+import gorm.tools.repository.GormRepo
 
 /**
  * Fired right before enitity save inside repository.persist
@@ -14,7 +14,7 @@ import gorm.tools.repository.model.RepositoryApi
 @CompileStatic
 class BeforePersistEvent<D> extends RepositoryEvent<D> {
 
-    BeforePersistEvent(RepositoryApi source, D entity, Map args) {
+    BeforePersistEvent(GormRepo<D> source, D entity, Map args) {
         super(source, entity, RepositoryEventType.BeforePersist.eventKey, args)
     }
 

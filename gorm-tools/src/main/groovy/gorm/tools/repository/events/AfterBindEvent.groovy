@@ -7,7 +7,7 @@ package gorm.tools.repository.events
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.model.RepositoryApi
+import gorm.tools.repository.GormRepo
 
 /**
  * Fired After a bind and save/persist. Often used along with params to setup other domains associations
@@ -17,7 +17,7 @@ import gorm.tools.repository.model.RepositoryApi
 @CompileStatic
 class AfterBindEvent<D> extends RepositoryEvent<D> {
 
-    AfterBindEvent(RepositoryApi repo, D entity, Map data, BindAction bindAction, Map args) {
+    AfterBindEvent(GormRepo<D> repo, D entity, Map data, BindAction bindAction, Map args) {
         super(repo, entity, RepositoryEventType.AfterBind.eventKey, data, bindAction, args)
     }
 

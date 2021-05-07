@@ -1,7 +1,7 @@
 package gpbench.benchmarks
 
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.model.RepositoryApi
 import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
@@ -11,7 +11,7 @@ import org.grails.datastore.gorm.GormEntity
 @CompileStatic
 class GparsRepoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<T> {
 
-    RepositoryApi<T> repo
+    GormRepo<T> repo
 
     GparsRepoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {
         super(clazz, bindingMethod)

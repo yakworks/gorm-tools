@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
@@ -31,7 +30,6 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.model.RepositoryApi
 import grails.validation.ValidationException
 
 /**
@@ -41,7 +39,7 @@ import grails.validation.ValidationException
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, RepositoryApi<D> {
+trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
     @Qualifier("entityMapBinder")
     @Autowired MapBinder mapBinder
@@ -78,7 +76,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      *   - tx: defaults to true. set to true to make sure this is wrapped in a transaction.
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    @Override
     D persist(D entity, Map args = [:]) {
         entityTrx {
             doPersist(entity, args)
@@ -100,7 +97,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      *
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    @Override
     D doPersist(D entity, Map args) {
         try {
             args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
@@ -118,7 +114,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
     /**
      * Transactional wrap for {@link #doCreate}
      */
-    @Override
     D create(Map data, Map args = [:]) {
         entityTrx {
             doCreate(data, args)
@@ -134,7 +129,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      * @return the created domain entity
      * @see #doPersist
      */
-    @Override
     D doCreate(Map data, Map args) {
         D entity = (D) getEntityClass().newInstance()
         bindAndCreate(entity, data, args)
@@ -148,7 +142,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
     /**
      * Transactional wrap for {@link #doUpdate}
      */
-    @Override
     D update(Map data, Map args = [:]) {
         entityTrx {
             doUpdate(data, args)
@@ -162,7 +155,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      * @return the updated domain entity
      * @see #doPersist
      */
-    @Override
     D doUpdate(Map data, Map args) {
         D entity = get(data['id'] as Serializable, data['version'] as Long)
         bindAndUpdate(entity, data, args)
@@ -188,7 +180,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      * better to override doBind in implementing classes for custom binding logic.
      * Or even better implement the beforeBind|afterBind event methods
      */
-    @Override
     void bind(D entity, Map data, BindAction bindAction, Map args = [:]) {
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)
@@ -200,7 +191,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      * override this one in implementing classes.
      * can also call this if you do NOT want the before/after Bind events to fire
      */
-    @Override
     void doBind(D entity, Map data, BindAction bindAction, Map args) {
         getMapBinder().bind(args, entity, data)
     }
@@ -213,7 +203,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      *
      * @throws EntityNotFoundException if its not found or if a DataIntegrityViolationException is thrown
      */
-    @Override
     void removeById(Serializable id, Map args = [:]) {
         gormStaticApi().withTransaction {
             D entity = get(id, null)
@@ -227,7 +216,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      * @param entity the domain entity
      * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
      */
-    @Override
     void remove(D entity, Map args = [:]) {
         gormStaticApi().withTransaction {
             doRemove(entity, args)
@@ -285,7 +273,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
      * @throws EntityNotFoundException if its not found
      * @throws gorm.tools.repository.errors.EntityValidationException if the versions mismatch
      */
-    @Override
     D get(Serializable id, Long version) {
         D entity = get(id)
         RepoUtil.checkFound(entity, id, getEntityClass().name)
@@ -355,7 +342,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D>, Reposi
         getRepoEventPublisher().doBeforeValidate(this, entity, errors, [:])
     }
 
-    @Override
     RuntimeException handleException(RuntimeException ex, D entity) {
         return getRepoExceptionSupport().translateException(ex, entity)
     }

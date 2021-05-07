@@ -11,7 +11,7 @@ import org.springframework.core.ResolvableType
 import org.springframework.core.ResolvableTypeProvider
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.model.RepositoryApi
+import gorm.tools.repository.GormRepo
 
 //import org.springframework.core.GenericTypeResolver
 
@@ -37,14 +37,14 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this will be 'beforePersist' */
     String eventKey //= "repoEvent"
 
-    RepositoryEvent(RepositoryApi repo, final D entity, String eventKey) {
+    RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey) {
         super(repo)
         this.entity = entity
         this.eventKey = eventKey
         //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
     }
 
-    RepositoryEvent(RepositoryApi repo, final D entity, String eventKey, Map args) {
+    RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey, Map args) {
         super(repo)
         this.entity = entity
         this.eventKey = eventKey
@@ -53,7 +53,7 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
         //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
     }
 
-    RepositoryEvent(RepositoryApi repo, final D entity, String eventKey, Map data, BindAction bindAction, Map args) {
+    RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey, Map data, BindAction bindAction, Map args) {
         super(repo)
         this.entity = entity
         this.eventKey = eventKey

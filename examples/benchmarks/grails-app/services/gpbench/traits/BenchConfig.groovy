@@ -1,15 +1,7 @@
 package gpbench.traits
 
+import java.text.DecimalFormat
 
-import gorm.tools.async.AsyncSupport
-import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.model.RepositoryApi
-import gpbench.fat.CityFat
-import gpbench.helpers.CsvReader
-import gpbench.helpers.JsonReader
-import grails.core.GrailsApplication
 import groovy.json.JsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -19,7 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.util.StopWatch
 
-import java.text.DecimalFormat
+import gorm.tools.async.AsyncSupport
+import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
+import gpbench.helpers.CsvReader
+import gpbench.helpers.JsonReader
+import grails.core.GrailsApplication
 
 @CompileStatic
 trait BenchConfig {

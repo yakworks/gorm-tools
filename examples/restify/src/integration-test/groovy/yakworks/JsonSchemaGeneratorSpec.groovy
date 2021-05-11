@@ -23,7 +23,7 @@ class JsonSchemaGeneratorSpec extends Specification {
     JsonSchemaGenerator jsonSchemaGenerator
 
     //@Ignore
-    def "test fail"() {
+    def "sanity check Org"() {
         given:
         Map schema = jsonSchemaGenerator.generate(Org)
 
@@ -36,10 +36,10 @@ class JsonSchemaGeneratorSpec extends Specification {
         //schema.required.containsAll(["name", "project", "note", "dueDate", "reminderEmail", "estimatedHours", "estimatedCost", "progressPct", "roleVisibility", "flex"])
 
         //verify properties
-        def props = schema.props
+        def props = schema['properties']
         props != null
         //props.size() == 20 //14 props, + 6 id/version/createBy/date/editedBy/date
-        props.size() == 16 //14 props, + 2 id/version  when audit is turned off
+        props.size() == 17 //15 props, + 2 id/version  when audit is turned off
 
         props.id != null
         props.id.type == 'integer'
@@ -95,7 +95,7 @@ class JsonSchemaGeneratorSpec extends Specification {
         Files.exists(path)
     }
 
-    @IgnoreRest
+    //@IgnoreRest
     def "test generate Activity"() {
         given:
         //def taggableVal = Activity.yakworks_rally_tag_model_Taggable__validation$get()

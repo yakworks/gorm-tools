@@ -19,6 +19,7 @@ import org.yaml.snakeyaml.Yaml
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
 import yakworks.commons.lang.ClassUtils
+import yakworks.commons.map.Maps
 
 /**
  * A helper to find constraints from yaml and a constraintsMap static that will also search the trait heirarchy.
@@ -64,8 +65,8 @@ class ApiConstraints {
     }
 
     void processConstraints(){
-        def listOfMaps = collectContraints()
-        processProps(listOfMaps)
+        Map consMap = collectContraints()
+        processProps(consMap)
     }
 
     void processProps(List<Map> listOfMaps){
@@ -78,6 +79,18 @@ class ApiConstraints {
                 } else {
                     addConstraint(prop, attrs)
                 }
+            }
+        }
+    }
+
+    void processProps(Map consMap){
+        for (entry in consMap) {
+            def attrs = (Map) entry.value
+            String prop = (String) entry.key
+            if(isMappingBuilder){
+                addMappingConstraint(prop, attrs)
+            } else {
+                addConstraint(prop, attrs)
             }
         }
     }
@@ -143,16 +156,30 @@ class ApiConstraints {
         }
     }
 
-    List<Map> collectContraints(){
+    Map collectContraints(){
 
         List<Map> classMaps = ClassPropertyFetcher.getStaticPropertyValuesFromInheritanceHierarchy(targetClass, API_CONSTRAINTS, Map)
         List<Map> traitMaps = ClassUtils.getStaticValuesFromTraits(targetClass, API_CONSTRAINTS, Map)
-        List<Map> mergedList = classMaps + traitMaps
+        List<Map> mergedList = traitMaps + classMaps
 
         Map yamlMap = findYamlApiConfig(targetClass)
         if(yamlMap) mergedList.add(yamlMap)
 
-        return mergedList
+        //with order above, classMaps override traitMaps and yamlMaps override all
+        Map<String, Map> mergedMap = Maps.merge(mergedList)
+        //now combine them. classMaps override traitMaps and yamlMaps override all
+        // Map<String, Map> mergedMap = [:] as Map<String, Map>
+        // for(Map cfield : mergedList){
+        //     //each item in the map is a map
+        //     for (entry in cfield) {
+        //         Map attrs = (Map) entry.value
+        //         String prop = (String) entry.key
+        //
+        //     }
+        //     mergedMap.putAll(item)
+        // }
+
+        return mergedMap //mergedList
     }
 
     // ConstrainedPropertyBuilder newConstrainedPropertyBuilder(){

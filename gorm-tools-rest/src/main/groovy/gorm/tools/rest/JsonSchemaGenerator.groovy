@@ -203,7 +203,7 @@ class JsonSchemaGenerator {
                     }
                 }
             } else { //setup type
-                println "  ${prop.name} association, ${prop} ${prop.type}"
+                println "  ${prop.name} basic, ${prop} ${prop.type}"
                 basicType(jprop, constraints)
             }
 

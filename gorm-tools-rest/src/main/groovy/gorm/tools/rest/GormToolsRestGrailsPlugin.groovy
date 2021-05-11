@@ -13,7 +13,7 @@ import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
-import grails.util.GrailsNameUtils
+import yakworks.commons.lang.NameUtils
 
 @SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod'])
 class GormToolsRestGrailsPlugin extends Plugin {
@@ -119,7 +119,7 @@ class GormToolsRestGrailsPlugin extends Plugin {
 
     @CompileStatic
     boolean controllerExists(GrailsApplication app, List<GrailsControllerClass> ctrlList, String controllerClassName, Class controllerClass) {
-        String shortName = GrailsNameUtils.getShortName(controllerClassName)
+        String shortName = NameUtils.getShortName(controllerClassName)
         GrailsControllerClass ctrlClass = getController(app, controllerClassName)
         if(ctrlClass && ctrlClass.namespace == 'api') return true
 

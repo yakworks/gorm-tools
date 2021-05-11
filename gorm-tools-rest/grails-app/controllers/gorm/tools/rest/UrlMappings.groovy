@@ -6,7 +6,7 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
-import grails.util.GrailsClassUtils
+import yakworks.commons.lang.ClassUtils
 
 @CompileDynamic
 class UrlMappings {
@@ -16,7 +16,7 @@ class UrlMappings {
         for (controller in getGrailsApplication().controllerClasses) {
             // println "controler $controller.fullName"
             String cName = controller.logicalPropertyName
-            String namespace = GrailsClassUtils.getStaticPropertyValue(controller.clazz, 'namespace')
+            String namespace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
             // println "controller $cName with namespace $namespace"
 
             if (namespace == 'api') {

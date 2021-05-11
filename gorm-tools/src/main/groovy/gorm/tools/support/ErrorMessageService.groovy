@@ -14,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 
 import gorm.tools.repository.RepoMessage
-import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
+import yakworks.commons.lang.NameUtils
 
 /**
  * creates a Map from errors so it can be converted to json and sent to client
@@ -68,7 +68,7 @@ class ErrorMessageService {
         if (e.hasProperty('errors')) {
             if (e.hasProperty("entity") && e.entity?.errors) {
                 errMap.errors = e.entity.errors.fieldErrors.groupBy {
-                    GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+                    NameUtils.getPropertyNameRepresentation(it.objectName)
                 }.each {
                     it.value = it.value.collectEntries {
                         [(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
@@ -76,7 +76,7 @@ class ErrorMessageService {
                 }
             } else if (!e.hasProperty("entity")) {
                 errMap.errors = e.errors.fieldErrors.groupBy {
-                    GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+                    NameUtils.getPropertyNameRepresentation(it.objectName)
                 }.each {
                     it.value = it.value.collectEntries {
                         [(it.field): messageSource.getMessage(it, Locale.ENGLISH)]

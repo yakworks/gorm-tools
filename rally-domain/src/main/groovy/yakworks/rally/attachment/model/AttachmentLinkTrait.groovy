@@ -33,7 +33,7 @@ trait AttachmentLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEn
 
     // used for the equals and hashcode
     @Transient
-    Long getAttachmentId() { (Long)this.getAssociationId("tag") }
+    Long getAttachmentId() { (Long)this.getAssociationId("attachment") }
 
     static LinkedEntityRepoTrait<D,Attachment> getAttachmentLinkRepo() {
         getRepo() as LinkedEntityRepoTrait<D,Attachment>

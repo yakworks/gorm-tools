@@ -26,8 +26,10 @@ class AttachmentLink implements AttachmentLinkTrait<AttachmentLink, AttachmentLi
     }
 
     static constraints = {
-        linkedEntity nullable: false, blank: false
-        linkedId nullable: false
+        linkedEntity description: 'The linked entity name', example: 'ArTran',
+            nullable: false, blank: false
+        linkedId description: 'The id for the linked entity', example: 954,
+            nullable: false
     }
 
     static List<AttachmentLink> listByAttachment(Attachment attach) {

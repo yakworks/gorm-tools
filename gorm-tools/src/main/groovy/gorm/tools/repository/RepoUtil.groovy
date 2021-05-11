@@ -11,8 +11,6 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
-import org.grails.datastore.mapping.reflect.NameUtils
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
@@ -20,6 +18,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.EntityNotFoundException
+import yakworks.commons.lang.NameUtils
 
 /**
  * A bunch of statics to support the repositories.
@@ -57,14 +56,6 @@ class RepoUtil {
     static String getRepoBeanName(Class domainClass) {
         RepositoryArtefactHandler.getRepoBeanName(domainClass)
     }
-
-    // static <T> GormRepo<T> getRepoStaticProperty(Class<T> domainClass) {
-    //     return ClassPropertyFetcher.getStaticPropertyValue(domainClass, 'repo', GormRepo)
-    // }
-
-    // static List<Class<RepositoryApi>> getRepositoryClasses() {
-    //     AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz as List<Class<RepositoryApi>>
-    // }
 
     /**
      * checks the passed in version with the version on the entity (entity.version)

@@ -6,7 +6,7 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
-import grails.util.GrailsNameUtils
+import yakworks.commons.lang.NameUtils
 
 @CompileStatic
 enum RepositoryEventType {
@@ -24,6 +24,6 @@ enum RepositoryEventType {
 
     RepositoryEventType(Class clazz) {
         this.eventClass = clazz
-        this.eventKey = GrailsNameUtils.getPropertyName(name())
+        this.eventKey = NameUtils.getPropertyName(name())
     }
 }

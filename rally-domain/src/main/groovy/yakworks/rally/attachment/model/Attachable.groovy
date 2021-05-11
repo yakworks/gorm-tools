@@ -36,8 +36,8 @@ trait Attachable {
         return _attachmentLinkRepo
     }
 
-    static constraints = [
-        attachments: [ d: 'the tags for this item', nullable: true]
+    static constraintsMap = [
+        attachments: [ description: 'the tags for this item', validate: false]
         //hasAttachments: [ d: 'true if this has attachments', nullable: true]
     ]
 }

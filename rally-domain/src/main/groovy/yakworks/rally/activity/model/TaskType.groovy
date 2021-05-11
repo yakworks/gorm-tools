@@ -27,7 +27,7 @@ class TaskType implements NameDescription, RepoEntity<TaskType>, Serializable {
     }
 
     static constraints = {
-        NameDescriptionConstraints(delegate)
+        apiConstraints(delegate)
         kind nullable: false, inList: Activity.Kind.taskKinds as List
     }
 

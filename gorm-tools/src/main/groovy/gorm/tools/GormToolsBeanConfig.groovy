@@ -119,6 +119,8 @@ class GormToolsBeanConfig {
     //This is kind of equivalent to init in bootstrap
     @CompileStatic
     void doWithApplicationContext() {
+        //FIXME, this make it very dependant on hibernate
+        //connect up the gorm-tools validator registry that fixes events and allows openapi schema
         HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
         MappingContext mappingContext = applicationContext.getBean("grailsDomainClassMappingContext", MappingContext)
         def origValRegistry = mappingContext.getValidatorRegistry()

@@ -72,51 +72,6 @@ class Activity implements AuditStampTrait, GormRepoEntity<Activity, ActivityRepo
         template column: 'templateId'
         task column: 'taskId'
         contacts joinTable: [name: 'ActivityContact', key: 'activityId', column: 'personId']
-        // attachments joinTable: [name: 'ActivityAttachment', key: 'ActivityId', column: 'AttachmentId']
-    }
-
-    static constraints = {
-        AuditStampTraitConstraints(delegate)
-        //TaggableConstraints(delegate)
-        ActivityConstraints(delegate)
-    }
-
-    @CompileDynamic
-    static ActivityConstraints(Object delegate) {
-        def c = {
-            // summary d: 'A 255 char string summary of the activity.
-            // Will be the title if its a task and if note it will ends with ... if there is more to the note.',
-            //     nullable: false, blank: false, maxSize: 255
-
-            kind d: 'The type of the activity, certain kinds oare only valid for a Task',
-                nullable: false, api:[required: false]
-
-            note d: 'A note for this activity. Summary will be built from this',
-                nullable: true, bindable: true
-
-            parentId d: 'The parent note that this is a comment for',
-                nullable: true
-
-            template d: 'The template that was or will be used to generate this note or the tasks email/fax/letter/report,etc..',
-                nullable: true
-
-            task d: 'The task info if this is task kind',
-                nullable: true
-
-            title d: 'The title for this, optional as summary will work',
-                nullable: true, maxSize: 255
-
-            source nullable: true, maxSize: 255
-            sourceEntity nullable: true, maxSize: 255
-            sourceId nullable: true, maxSize: 255
-            visibleTo description: 'Defaults to Everyone',
-                nullable: false, required: false
-            visibleId nullable: true
-            org nullable: false
-            links nullable: true
-        }
-        c.delegate = delegate
-        c()
     }
 
     List<ActivityLink> getLinks() {

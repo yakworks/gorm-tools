@@ -38,21 +38,9 @@ class TaskStatus implements NameDescription, RepoEntity<TaskStatus>, Serializabl
         state enumType: 'identity'
     }
 
-    static constraints = {
-        NameDescriptionConstraints(delegate)
-        state nullable: false
-
-        validForCall nullable: true
-        validForEmail nullable: true
-        validForFax nullable: true
-        validForMeeting nullable: true
-        validForParcel nullable: true
-        validForTask nullable: true
-
-        validForSales nullable: true
-        validForAr nullable: true
-
-    }
+    static constraintsMap = [
+        state:[ description: 'The task state this status assigns', nullable: false, required: false, default: 'Open'],
+    ]
 
     static TaskStatus getOPEN() { return this.get(0) }
 

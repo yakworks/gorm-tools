@@ -44,26 +44,26 @@ class OrgFlex implements RepoEntity<OrgFlex>, Serializable {
         id generator: 'assigned'
     }
 
-    static constraints = {
-        text1 nullable: true
-        text2 nullable: true
-        text3 nullable: true
-        text4 nullable: true
-        text5 nullable: true
-        text6 nullable: true
-        text7 nullable: true
-        text8 nullable: true
-        text9 nullable: true
-        text10 nullable: true
-        date1 nullable: true
-        date2 nullable: true
-        date3 nullable: true
-        date4 nullable: true
-        num1 nullable: true
-        num2 nullable: true
-        num3 nullable: true
-        num4 nullable: true
-        num5 nullable: true
-        num6 nullable: true
-    }
+    // static constraints = {
+    //     text1 nullable: true
+    //     text2 nullable: true
+    //     text3 nullable: true
+    //     text4 nullable: true
+    //     text5 nullable: true
+    //     text6 nullable: true
+    //     text7 nullable: true
+    //     text8 nullable: true
+    //     text9 nullable: true
+    //     text10 nullable: true
+    //     date1 nullable: true
+    //     date2 nullable: true
+    //     date3 nullable: true
+    //     date4 nullable: true
+    //     num1 nullable: true
+    //     num2 nullable: true
+    //     num3 nullable: true
+    //     num4 nullable: true
+    //     num5 nullable: true
+    //     num6 nullable: true
+    // }
 }

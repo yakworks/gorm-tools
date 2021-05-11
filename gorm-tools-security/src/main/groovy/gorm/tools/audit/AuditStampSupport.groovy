@@ -19,7 +19,7 @@ import org.springframework.core.annotation.AnnotationUtils
 import gorm.tools.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
 import gorm.tools.utils.GormMetaUtils
-import grails.util.GrailsClassUtils
+import yakworks.commons.lang.ClassUtils
 
 /**
  * support service for making sure entites are stamped with appropriate fields
@@ -51,7 +51,7 @@ class AuditStampSupport {
     }
 
     boolean isAuditStampDisabled(Class clazz) {
-        GrailsClassUtils.getStaticPropertyValue(clazz, DISABLE_AUDITSTAMP_FIELD) == true
+        ClassUtils.getStaticPropertyValue(clazz, DISABLE_AUDITSTAMP_FIELD, Boolean) == true
     }
 
     boolean isAuditStamped(String name){

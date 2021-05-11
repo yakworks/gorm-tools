@@ -9,7 +9,7 @@ import groovy.transform.CompileDynamic
 import gorm.tools.rest.controller.RestControllerErrorHandling
 import grails.artefact.Artefact
 import grails.gorm.transactions.Transactional
-import grails.util.GrailsNameUtils
+import yakworks.commons.lang.NameUtils
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -48,7 +48,7 @@ class SimpleRestApiDomainController<T, ID extends Serializable> implements CoreC
         this.resource = resource
         this.readOnly = readOnly
         resourceClassName = resource.simpleName
-        resourceName = GrailsNameUtils.getPropertyName(resource)
+        resourceName = NameUtils.getPropertyName(resource)
     }
 
     /**

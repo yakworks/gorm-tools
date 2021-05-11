@@ -10,26 +10,18 @@ import java.lang.reflect.Modifier
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.reflection.CachedClass
-import org.codehaus.groovy.reflection.ClassInfo
 import org.codehaus.groovy.runtime.InvokerHelper
-import org.codehaus.groovy.transform.trait.Traits
-import org.grails.datastore.gorm.validation.constraints.builder.ConstrainedPropertyBuilder
 import org.grails.datastore.gorm.validation.constraints.eval.ConstraintsEvaluator
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.Association
-import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
 import org.grails.datastore.mapping.reflect.EntityReflector
 import org.springframework.context.MessageSource
-import org.springframework.core.io.ClassPathResource
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
-import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
 import grails.gorm.validation.ConstrainedProperty
-import grails.gorm.validation.DefaultConstrainedProperty
 import grails.gorm.validation.PersistentEntityValidator
 
 /**
@@ -42,7 +34,7 @@ import grails.gorm.validation.PersistentEntityValidator
 @CompileStatic
 class RepoEntityValidator extends PersistentEntityValidator {
 
-    public static final String API_CONSTRAINTS = 'constraints'
+    public static final String API_CONSTRAINTS = 'constraintsMap'
     //private static final List<String> EMBEDDED_EXCLUDES = Arrays.asList(GormProperties.IDENTITY,GormProperties.VERSION)
 
     GormRepo gormRepo
@@ -53,12 +45,12 @@ class RepoEntityValidator extends PersistentEntityValidator {
         super(entity, messageSource, constraintsEvaluator)
         this.constraintsEvaluator = constraintsEvaluator
         //turn it back into modifiable map so we can mess with it
-        Map<String, ConstrainedProperty> constrainedProps = [:]
-        constrainedProps.putAll(getConstrainedProperties())
-        setConstrainedProperties(PersistentEntityValidator, super, constrainedProps)
+        // Map<String, ConstrainedProperty> constrainedProps = [:]
+        // constrainedProps.putAll(getConstrainedProperties())
+        // setConstrainedProperties(PersistentEntityValidator, super, constrainedProps)
 
         //do the tweaks for external constraints
-        addConstraintsFromMap()
+        //addConstraintsFromMap()
     }
 
     @Override
@@ -122,152 +114,9 @@ class RepoEntityValidator extends PersistentEntityValidator {
 
     }
 
+    @CompileDynamic //so it can access the private super
     private String buildNestedPath(String nestedPath, String componentName, Object indexOrKey) {
-        if (indexOrKey == null) {
-            // Component is neither part of a Collection nor Map.
-            return nestedPath + componentName
-        }
-
-        if (indexOrKey instanceof Integer) {
-            // Component is part of a Collection. Collection access string
-            // e.g. path.object[1] will be appended to the nested path.
-            return nestedPath + componentName + "[" + indexOrKey + "]"
-        }
-
-        // Component is part of a Map. Nested path should have a key surrounded
-        // with apostrophes at the end.
-        return nestedPath + componentName + "['" + indexOrKey + "']"
-    }
-
-    void addConstraintsFromMap(){
-
-        List<Map> classMaps = ClassPropertyFetcher.getStaticPropertyValuesFromInheritanceHierarchy(targetClass, API_CONSTRAINTS, Map)
-        List<Map> traitMaps = getApiConstraintsFromTraits(targetClass, API_CONSTRAINTS)
-        List<Map> mergedList = classMaps + traitMaps
-
-        Map yamlMap = findYamlApiConfig(targetClass)
-        if(yamlMap) mergedList.add(yamlMap)
-
-        def builder = newConstrainedPropertyBuilder()
-        setConstrainedProperties(ConstrainedPropertyBuilder, builder, getConstrainedProperties())
-
-        //used for validate false
-        def noValidateBuilder = newConstrainedPropertyBuilder()
-
-        println "mergedList $mergedList"
-        for(Map cfield : mergedList){
-            for (entry in cfield) {
-                def attrs = (Map) entry.value
-                String prop = (String) entry.key
-
-                //if validate is false then add it to the nonContrainedProps so it doesn't use it during validation
-                if(attrs && attrs['validate'] == false){
-                    addConstraint(noValidateBuilder, prop, attrs)
-                } else {
-                    addConstraint(builder, prop, attrs)
-                }
-            }
-        }
-    }
-
-    ConstrainedPropertyBuilder newConstrainedPropertyBuilder(){
-        ConstrainedPropertyBuilder builder = constraintsEvaluator.newConstrainedPropertyBuilder(targetClass)
-        builder.allowDynamic = true
-        builder.defaultNullable = true
-        return builder
-    }
-
-    @CompileDynamic //so it can access protected
-    void addConstraint(ConstrainedPropertyBuilder builder, String prop, Map attr){
-        def cp = (DefaultConstrainedProperty)builder.constrainedProperties[prop]
-        if(cp){
-            //default string maxSize
-            if(String.isAssignableFrom(cp.propertyType) && !cp.maxSize){
-                attr.maxSize = 255
-            }
-        } else {
-            if(!attr.containsKey('nullable')){
-                //make sure we have a default of nullable:true
-                attr.nullable = true
-            }
-        }
-
-        builder.createNode(prop, attr)
-    }
-
-    static List<Map> getApiConstraintsFromTraits(Class mainClass, String name) {
-        CachedClass cachedClass = ClassInfo.getClassInfo(mainClass).getCachedClass() //classInfo.getCachedClass()
-        Collection<ClassInfo> hierarchy = cachedClass.getHierarchy()
-        Class javaClass = cachedClass.getTheClass()
-        List<Map> values = []
-        for (ClassInfo current : hierarchy) {
-            def traitClass = current.getTheClass()
-            def isTrait = Traits.isTrait(traitClass)
-            if(!isTrait) continue
-            def traitFieldName = getTraitFieldName(traitClass, name)
-            //def traitFieldGetter = "$traitFieldName\$get"
-            //println "$traitClass $traitFieldName"
-            //MetaMethod getterMeta = cachedClass.getMetaClass().getStaticMetaMethod(traitFieldGetter, null)
-            // T traitFieldVal
-            // try{
-            //     traitFieldVal = (T) InvokerHelper.invokeStaticMethod(mainClass, traitFieldGetter, null)
-            // } catch(MissingMethodException){
-            //}
-            Map theval = (Map)getStaticFieldValue(mainClass, traitFieldName)
-            if(theval){
-                println "$traitFieldName found with $theval"
-                values.add(theval)
-            }
-
-            // if(getterMeta){
-            //     T traitFieldVal = (T) InvokerHelper.invokeStaticMethod(mainClass, traitFieldGetter, null)
-            //     println "  $traitFieldName found with $traitFieldVal"
-            // }
-
-            // MetaProperty metaProperty = current.getMetaClass().getStaticMetaMethod()  .getMetaProperty(traitFieldName)
-            //
-            // if(metaProperty != null && Modifier.isStatic(metaProperty.getModifiers())) {
-            //     println "  $traitFieldName found"
-            // }
-        }
-        Collections.reverse(values)
-        return values
-    }
-
-    static String getTraitFieldName(Class traitClass, String fieldName) {
-        return traitClass.getName().replace('.', '_') + "__" + fieldName;
-    }
-
-    /**
-     * <p>Get a static field value.</p>
-     *
-     * @param clazz The class to check for static property
-     * @param name The field name
-     * @return The value if there is one, or null if unset OR there is no such field
-     */
-    static Object getStaticFieldValue(Class<?> clazz, String name) {
-        Field field = ReflectionUtils.findField(clazz, name);
-        if (field != null) {
-            ReflectionUtils.makeAccessible(field);
-            try {
-                return field.get(clazz);
-            } catch (IllegalAccessException ignored) {}
-        }
-        return null;
-    }
-
-    static Map findYamlApiConfig(Class mainClass) {
-        def cname = mainClass.simpleName
-        def cpr = new ClassPathResource("${cname}Api.yaml", mainClass)
-        if(cpr.exists()){
-            Yaml yaml = new Yaml()
-            Map apiMap = yaml.load(cpr.inputStream)
-            def entitySchema = (Map)apiMap[cname]
-            def entityProps = entitySchema['properties']
-            assert entityProps
-            return (Map) entityProps
-        }
-        return [:]
+        super.buildNestedPath(nestedPath, componentName, indexOrKey)
     }
 
 }

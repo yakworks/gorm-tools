@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.support.ConfigAware
 import grails.plugin.cache.Cacheable
-import grails.util.GrailsClassUtils
+import yakworks.commons.lang.ClassUtils
 
 /**
  * config object for restApi. lookup logic refactored here so we can do caching and reloading here at a later time
@@ -39,11 +39,11 @@ class RestApiConfig implements ConfigAware {
         }
         //use includes if set in domain class as the default 'get'
         if (!includesMap['get']) {
-            List includesGet = GrailsClassUtils.getStaticPropertyValue(entityClass, 'includes') as List
+            List includesGet = ClassUtils.getStaticPropertyValue(entityClass, 'includes', List)
             if (includesGet) includesMap['get'] = includesGet
         }
         if (!includesMap['picklist']) {
-            List picklistIncludes = GrailsClassUtils.getStaticPropertyValue(entityClass, 'picklistIncludes') as List
+            List picklistIncludes = ClassUtils.getStaticPropertyValue(entityClass, 'picklistIncludes', List)
             if (picklistIncludes) includesMap['picklist'] = picklistIncludes
         }
         return includesMap
@@ -70,7 +70,7 @@ class RestApiConfig implements ConfigAware {
         }
         else {
             // look on domain
-            List qSearchFieldsStatic = GrailsClassUtils.getStaticPropertyValue(entityClass, 'qSearchIncludes') as List
+            List qSearchFieldsStatic = ClassUtils.getStaticPropertyValue(entityClass, 'qSearchIncludes', List)
             if (qSearchFieldsStatic) qIncludes.addAll(qSearchFieldsStatic)
         }
         return qIncludes

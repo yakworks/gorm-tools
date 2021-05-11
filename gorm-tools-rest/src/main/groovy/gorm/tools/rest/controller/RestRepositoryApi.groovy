@@ -24,10 +24,10 @@ import gorm.tools.rest.JsonParserTrait
 import gorm.tools.rest.RestApiConfig
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
-import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import grails.web.Action
 import grails.web.api.ServletAttributes
+import yakworks.commons.lang.NameUtils
 
 import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
@@ -239,8 +239,8 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTr
      * should give roughly what logicalName is which is used to setup the urlMappings by default
      */
     String getLogicalControllerName(){
-        String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
-        return GrailsNameUtils.getPropertyName(logicalName)
+        String logicalName = NameUtils.getLogicalName(this.class, 'Controller')
+        return NameUtils.getPropertyName(logicalName)
     }
 
     /**

@@ -25,10 +25,10 @@ class TagLink implements TagLinkTrait<TagLink, TagLinkRepo>, Serializable {
         tag column: 'tagId', fetch: 'join'
     }
 
-    static constraints = {
-        linkedEntity nullable: false, blank: false
-        linkedId nullable: false
-    }
+    static constraintsMap = [
+        linkedId:[ description: 'the id of the entity this tag is linked to', nullable: false],
+        linkedEntity:[ description: 'The name of the entity', blank: false, nullable: false]
+    ]
 
     static List<TagLink> listByTag(Tag tag) {
         getRepo().listByTag(tag)

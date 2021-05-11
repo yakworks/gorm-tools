@@ -30,7 +30,7 @@ import gorm.tools.audit.ast.FieldProps
 import gorm.tools.security.services.SecService
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
-import grails.util.GrailsClassUtils
+import yakworks.commons.lang.ClassUtils
 
 /**
  * the old way, kept for refernce for now
@@ -66,7 +66,7 @@ class GormToolsAuditStampListener extends AbstractPersistenceEventListener {
     }
 
     boolean isAuditStampDisabled(Class clazz) {
-        GrailsClassUtils.getStaticPropertyValue(clazz, DISABLE_AUDITSTAMP_FIELD) == true
+        ClassUtils.getStaticPropertyValue(clazz, DISABLE_AUDITSTAMP_FIELD, Boolean) == true
     }
 
     @Override

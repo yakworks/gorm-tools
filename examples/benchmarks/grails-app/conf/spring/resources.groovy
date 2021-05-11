@@ -1,6 +1,8 @@
-import grails.util.GrailsNameUtils
+
 import groovy.io.FileType
 import org.grails.orm.hibernate.cfg.GrailsDomainBinder
+
+import yakworks.commons.lang.NameUtils
 
 // GrailsDomainBinder.FOREIGN_KEY_SUFFIX = 'Id'
 
@@ -28,7 +30,7 @@ beans = {
     //adding just 1 listeners will slow things down, adding more really slows things down
     if (listenerCount > 0) {
         scriptsDir.eachFileMatch(FileType.FILES, ~/.*Listener\.groovy/) { File plugin ->
-            String beanName = GrailsNameUtils.getPropertyName(plugin.name.replace('.groovy', ''))
+            String beanName = NameUtils.getPropertyName(plugin.name.replace('.groovy', ''))
             lang.groovy(id: beanName, 'script-source': "file:resources/refreshable-beans/${plugin.name}", 'refresh-check-delay': 1000)
             println "refreshable bean $beanName created"
         }
@@ -48,7 +50,7 @@ beans = {
         println "Subscriber refreshableBeans enabled for $subCount, loading event beans from scripts"
         (1..subCount).each { eid ->
             scriptsDir.eachFileMatch(FileType.FILES, ~/.*Subscriber\.groovy/) { File plugin ->
-                String beanName = GrailsNameUtils.getPropertyName(plugin.name.replace('.groovy', '')) + "$eid"
+                String beanName = NameUtils.getPropertyName(plugin.name.replace('.groovy', '')) + "$eid"
                 lang.groovy(id: beanName, 'script-source': "file:resources/refreshable-beans/${plugin.name}", 'refresh-check-delay': 1000) {
                     lang.property(name: 'subnum', value: eid)
                 }

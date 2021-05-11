@@ -13,7 +13,7 @@ import org.springframework.web.servlet.support.RequestContextUtils
 
 import gorm.tools.support.MsgKey
 import gorm.tools.support.MsgSourceResolvable
-import grails.util.GrailsNameUtils
+import yakworks.commons.lang.NameUtils
 
 /**
  * A bunch of statics to support the Repository artifacts.
@@ -73,7 +73,7 @@ class RepoMessage {
     }
 
     static String propName(String prop) {
-        GrailsNameUtils.getPropertyName(prop)
+        NameUtils.getPropertyName(prop)
     }
 
     //used for messages, if the entity has a name field then use that other wise fall back on the id and return that

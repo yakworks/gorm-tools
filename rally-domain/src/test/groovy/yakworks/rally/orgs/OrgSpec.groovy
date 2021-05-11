@@ -3,6 +3,7 @@ package yakworks.rally.orgs
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
+import spock.lang.IgnoreRest
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
@@ -31,25 +32,20 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
             orgDimensionService(OrgDimensionService)
         }
         mockDomains(
-            Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag,
-            OrgInfo, OrgTypeSetup, Location, ContactPhone,
-            ContactEmail, ContactSource, ContactFlex, Activity, AttachmentLink
+            //events need these repos to be setup
+            OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo
         )
     }
 
+    //@IgnoreRest
+    void "sanity check build"() {
+        when:
+        def org = build()
 
-    // void setupNewRefnumGenerator(){
-    //     // throw away
-    //     def ot1 = new OrgType(name: "1")
-    //     // new OrgType(name: "1").persist(flush:true)
-    //     def nrg = new NewRefnumGenerator(keyName: 'Customer', nextId: 5000, rangeMax: 10000, rangeMin: 5000).persist(flush:true)
-    //     assert nrg.id == 1
-    //
-    //     def ot = new OrgType(name: "2")
-    //     ot.newRefnumGeneratorId = nrg.id
-    //     ot.persist(flush: true)
-    //     assert ot.id == 2
-    // }
+        then:
+        org.id
+
+    }
 
     void "CRUD tests"() {
         expect:

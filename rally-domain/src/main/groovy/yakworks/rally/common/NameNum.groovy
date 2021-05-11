@@ -17,6 +17,11 @@ trait NameNum {
     static List qSearchIncludes = ['num', 'name'] // quick search includes
     static List picklistIncludes = ['id', 'num', 'name'] //for picklist
 
+    static constraintsMap = [
+        name:[ description: 'The full name for this entity', nullable: false, blank: false, maxSize: 100],
+        num:[ description: 'Unique alpha-numeric identifier for this entity', nullable: false, blank: false, maxSize: 50]
+    ]
+
     @CompileDynamic //ok, for gorm constraints
     static NameNumConstraints(Object delegate, Map overrideProps = null) {
         def numDefault = [description: "Unique alpha-numeric identifier for this entity",

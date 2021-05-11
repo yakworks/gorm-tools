@@ -4,11 +4,15 @@
 */
 package gorm.tools.repository.model
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.validation.ApiConstraints
+import gorm.tools.utils.GormMetaUtils
+import grails.gorm.validation.ConstrainedProperty
 
 /**
  * core trait for repo methods that use the repo for persistance
@@ -51,10 +55,30 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, 
         getRepo().removeById(id, args)
     }
 
-    // this will fire and event and call beforeValidate on the repo.
-    // when cascading to child associations while validated in grail's gorm it doesn't fire a ValidationEvent
-    // so we fire our own here. FIXME see line 231 in PersistentEntityValidator where it should fire event and issue PR
-    // void beforeValidate() {
-    //     getRepo().publishBeforeValidate(this)
-    // }
+    /**
+     * default constraints static that calls findConstraints(delegate)
+     */
+    @CompileDynamic
+    static Closure getConstraints(){
+        return {
+            apiConstraints(getDelegate())
+        }
+    }
+
+    static void apiConstraints(Object builder){
+        ApiConstraints.processConstraints(this, builder)
+    }
+
+    static ApiConstraints getApiConstraints(Object builder){
+        ApiConstraints.apiConstraintsMap.get(this)
+    }
+
+    /**
+     * @return The constrained properties for this domain class
+     */
+    @CompileDynamic //so it can access getGormPersistentEntity, FIXME look into implementing GormEntity
+    static Map<String, ConstrainedProperty> getConstrainedProperties() {
+        GormMetaUtils.findConstrainedProperties(getGormPersistentEntity())
+    }
+
 }

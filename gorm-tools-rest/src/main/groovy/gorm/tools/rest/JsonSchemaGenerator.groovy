@@ -26,13 +26,13 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.beans.EntityMapService
+import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.utils.GormMetaUtils
 import grails.core.DefaultGrailsApplication
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
-import grails.util.GrailsNameUtils
-
-import static grails.util.GrailsClassUtils.getStaticPropertyValue
+import yakworks.commons.lang.ClassUtils
+import yakworks.commons.lang.NameUtils
 
 /**
  * Generates the domain part
@@ -130,7 +130,7 @@ class JsonSchemaGenerator {
     // @CompileDynamic
     private Map getDomainProperties(PersistentEntity perEntity, Map schema) {
         println "----- ${perEntity.name} getDomainProperties ----"
-        String domainName = GrailsNameUtils.getPropertyNameRepresentation(perEntity.name)
+        String domainName = NameUtils.getPropertyNameRepresentation(perEntity.name)
         Map<String, ?> propsMap = [:]
         List required = []
 
@@ -161,7 +161,9 @@ class JsonSchemaGenerator {
         Mapping mapping = getMapping(domainName)
         List<PersistentProperty> props = resolvePersistentProperties(perEntity)
 
-        Map<String, ConstrainedProperty> constrainedProps = GormMetaUtils.findConstrainedProperties(perEntity)
+        Map<String, ConstrainedProperty> constrainedProperties = GormMetaUtils.findConstrainedProperties(perEntity)
+        Map<String, ConstrainedProperty> nonValidatedProperties = GormMetaUtils.findNonValidatedProperties(perEntity)
+        def constrainedProps = constrainedProperties + nonValidatedProperties
 
         println "-- All constrainted props --"
         List constrainedPropsNames = []
@@ -409,7 +411,7 @@ class JsonSchemaGenerator {
             properties = domainClass.persistentProperties
             def blacklist = attrs.except?.tokenize(',')*.trim() ?: []
             //blacklist << 'dateCreated' << 'lastUpdated'
-            Map scaffoldProp = getStaticPropertyValue(domainClass.class, 'scaffold')
+            Map scaffoldProp = ClassUtils.getStaticPropertyValue(domainClass.class, 'scaffold', Map)
             if (scaffoldProp) {
                 blacklist.addAll(scaffoldProp.exclude)
             }

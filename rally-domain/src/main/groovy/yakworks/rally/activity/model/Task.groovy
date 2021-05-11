@@ -38,7 +38,6 @@ class Task implements RepoEntity<Task>, Serializable {
     //normally the same as createdBy unless I am creating an activity for someone else to complete
     Long userId
 
-
     @CompileDynamic //bug in GrailsCompileStatic
     static enum State implements IdEnum<State, Integer> {
         Open(0), Complete(1), Draft(2), Void(3)

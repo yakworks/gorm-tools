@@ -5,9 +5,10 @@ Activity:
   required: [org]
   type: object
   properties:
-#    arTranId:
-#      description: Short cut property to add a link entry for an ArTran.
-#      access: c #create only
+    arTranId:
+      description: Short cut property to add a link entry for an ArTran.
+      validate: false
+      access: c #create only
     contacts:
       description: The contacts associated with this activity.
     kind:
@@ -18,6 +19,7 @@ Activity:
       access: cr # (c)create and (r)read
     links:
       description: The entities this is linked to.
+      validate: false
     note:
       description: A note for this activity. Summary will be built from this
     org:

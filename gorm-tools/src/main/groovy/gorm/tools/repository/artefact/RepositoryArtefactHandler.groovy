@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 import groovy.transform.CompileStatic
 
 import grails.core.ArtefactHandlerAdapter
-import grails.util.GrailsNameUtils
+import yakworks.commons.lang.NameUtils
 
 import static org.grails.io.support.GrailsResourceUtils.GRAILS_APP_DIR
 import static org.grails.io.support.GrailsResourceUtils.REGEX_FILE_SEPARATOR
@@ -60,6 +60,6 @@ class RepositoryArtefactHandler extends ArtefactHandlerAdapter {
     }
 
     static String getRepoBeanName(Class domainClass) {
-        return "${GrailsNameUtils.getPropertyName(domainClass.name)}$SUFFIX"
+        return "${NameUtils.getPropertyName(domainClass.name)}$SUFFIX"
     }
 }

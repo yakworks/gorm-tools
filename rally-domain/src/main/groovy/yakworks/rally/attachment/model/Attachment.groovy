@@ -79,43 +79,38 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
         Activity, Collection, Invoice, Report
     }
 
-    static constraints = {
-        NameDescriptionConstraints(delegate, [
-            name: [
-                description: '''\
-                    This should be the file display name without dir; foo.txt, bar.pdf, etc.
-                    Populated from originalFileName when using a multiPart upload.
-                    Location has the relative path and unique name on system. Use description for any other useful info'''.stripIndent(),
-                maxSize: 100
-            ]
-        ])
-        location description: 'The relative path to the locationKey',
-            nullable: true, editable: false, display: false
+    static constraintsMap = [
+        name:[ description: '''\
+                This should be the file display name without dir; foo.txt, bar.pdf, etc.
+                Populated from originalFileName when using a multiPart upload.
+                Location has the relative path and unique name on system. Use description for any other useful info'''.stripIndent(),
+            maxSize: 100 ],
+        location:[ description: 'The relative path to the locationKey',
+                 nullable: true, editable: false, display: false ],
 
-        locationKey description: 'Defaults to attachments.location but can be changed to another key such as creditFiles.location',
-            example: 'attachments.location', nullable: false, required: false
+        locationKey:[ description: 'Defaults to attachments.location but can be changed to another key such as creditFiles.location',
+                 example: 'attachments.location', nullable: false, required: false],
 
-        contentLength description: 'The file size/contentLength in bytes. Populated on save',
-            example: 7896, nullable: true, editable: false
+        contentLength:[ description: 'The file size/contentLength in bytes. Populated on save',
+                 example: 7896, nullable: true, editable: false],
 
-        extension description: 'The extension the file should have. Pulled from the name if not set. Helps dictate the mime-type',
-            example: 'pdf', nullable: true
+        extension:[ description: 'The extension the file should have. Pulled from the name if not set. Helps dictate the mime-type',
+                 example: 'pdf', nullable: true],
 
-        mimeType description: 'The mime type of the file. Will be pulled from the names extension',
-            example: 'application/pdf', nullable: true, required: false
+        mimeType:[ description: 'The mime type of the file. Will be pulled from the names extension',
+                 example: 'application/pdf', nullable: true, required: false],
 
-        fileData display: false
+        fileData:[ display: false],
 
-        subject description: 'Optional value for a email template or collectionStep this is the generally the subject of an email or fax cover page.',
-            example: 'Customer', nullable: true
+        subject:[ description: 'Optional value for a email template or collectionStep this is the generally the subject of an email or fax cover page.',
+                 example: 'Customer', nullable: true],
 
-        kind description: 'The kind of attachment',
-            example: 'Activity', nullable: true
+        kind:[ description: 'The kind of attachment',
+                 example: 'Activity', nullable: true],
 
-        source description: 'A source description if this is synced from another system',
-            nullable: true, maxSize: 50
-
-    }
+        source:[ description: 'A source description if this is synced from another system',
+                 nullable: true, maxSize: 50],
+    ]
 
     static AttachmentRepo getRepo() { RepoUtil.findRepo(this) as AttachmentRepo }
 

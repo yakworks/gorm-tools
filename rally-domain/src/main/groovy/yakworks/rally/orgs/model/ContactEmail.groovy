@@ -13,7 +13,7 @@ import grails.persistence.Entity
 @AuditStamp
 @GrailsCompileStatic
 class ContactEmail implements RepoEntity<ContactEmail>, Serializable {
-    String kind
+    String kind //XXX is this used?
     String address
     Boolean isPrimary = false
 
@@ -24,9 +24,9 @@ class ContactEmail implements RepoEntity<ContactEmail>, Serializable {
         contact column: "contactId"
     }
 
-    static constraints = {
-        kind blank: false, nullable: true, maxSize: 50
-        address blank: false, nullable: true
-        isPrimary nullable: true
-    }
+    static constraintsMap = [
+        kind:[ description: 'future use', blank: false, maxSize: 50],
+        address:[ description: 'The email', blank: false, nullable: false, maxSize: 50],
+        isPrimary:[ description: 'If this is the contacts primary number', nullable: false, required: false],
+    ]
 }

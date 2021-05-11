@@ -25,13 +25,13 @@ class ActivityLink implements GormRepoEntity<ActivityLink, ActivityLinkRepo>, Se
         activity column: 'activityId', cache: true, fetch: 'join'
     }
 
-    static constraints = {
+    static constraintsMap = [
         // activity nullable: false
-        linkedEntity description: 'The linked entity name', example: 'ArTran',
-            nullable: false, blank: false
-        linkedId description: 'The id for the linked entity', example: 954,
-            nullable: false
-    }
+        linkedEntity:[ description: 'The linked entity name', example: 'ArTran',
+            nullable: false, blank: false],
+        linkedId:[ description: 'The id for the linked entity', example: 954,
+            nullable: false]
+    ]
 
     //static ActivityLinkRepo getRepo() { RepoUtil.findRepo(this) as ActivityLinkRepo }
 

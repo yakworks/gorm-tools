@@ -27,7 +27,8 @@ class ActivityTag implements TagLinkTrait<ActivityTag, ActivityTagRepo>, Seriali
     }
 
     static constraintsMap = [
-        linkedEntity:[ description: 'Defaults to Activity', nullable: false, default:'Activity', required: false]
+        linkedId:[ description: 'the id of the Activity this is linked to', nullable: false],
+        tag:[ description: 'The tag', nullable: false]
     ]
 
 }

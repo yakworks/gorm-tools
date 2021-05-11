@@ -23,15 +23,12 @@ class OrgInfo implements RepoEntity<OrgInfo>, Serializable {
 
     static mapping = {
         id generator: 'assigned'
-        //location column:'locationId', lazy:true
     }
 
-    static constraints = {
-        //location nullable:true
-        phone nullable: true
-        fax nullable: true
-        website nullable: true
-        //id bindable: false
-    }
+    static constraintsMap = [
+        phone:[ description: 'primary hq number, switchboard'],
+        fax:[ description: 'primary fax'],
+        website:[ description: 'website home page']
+    ]
 
 }

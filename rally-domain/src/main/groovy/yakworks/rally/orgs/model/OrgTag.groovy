@@ -31,4 +31,9 @@ class OrgTag implements TagLinkTrait<OrgTag, OrgTagRepo>, Serializable {
         tag nullable: false
     }
 
+    static constraintsMap = [
+        linkedId:[ description: 'the id of the entity this tag is linked to', nullable: false],
+        tag:[ description: 'The tag', nullable: false]
+    ]
+
 }

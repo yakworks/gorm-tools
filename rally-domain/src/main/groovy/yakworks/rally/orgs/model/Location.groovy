@@ -50,24 +50,24 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
         }
     }
 
-    static constraints = {
-        org description: 'The organization this belongs to', nullable: false
-        kind description: 'The address type', nullable: true
+    static constraintsMap = [
+        org:[ description: 'The organization this belongs to', nullable: false],
+        kind:[ description: 'The address type', nullable: true],
 
-        contact description: 'The contact this belongs to', nullable: true
-        name description: 'A descriptive name, can be used for reports an letters', nullable: true
+        contact:[ description: 'The contact this belongs to', nullable: true],
+        name:[ description: 'A descriptive name, can be used for reports an letters', nullable: true],
 
         // address fields
-        street1 nullable: true, maxSize: 100
-        street2 nullable: true, maxSize: 100
-        city nullable: true, maxSize: 100
-        state nullable: true, maxSize: 25
-        zipCode nullable: true, maxSize: 50
-        country nullable: true, maxSize: 3
-        county nullable: true, maxSize: 50
-        address3 nullable: true, maxSize: 100
-        address4 nullable: true, maxSize: 100
-    }
+        street1:[maxSize: 100],
+        street2:[maxSize: 100],
+        city:[maxSize: 100],
+        state:[maxSize: 25],
+        zipCode:[maxSize: 50],
+        country:[maxSize: 3],
+        county:[maxSize: 50],
+        address3:[maxSize: 100],
+        address4:[maxSize: 100],
+    ]
 
     static mapping = {
         //columns

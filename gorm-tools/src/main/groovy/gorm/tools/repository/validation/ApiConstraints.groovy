@@ -69,7 +69,7 @@ class ApiConstraints {
         processProps(consMap)
     }
 
-    void processProps(List<Map> listOfMaps){
+    void processPropsList(List<Map> listOfMaps){
         for(Map cfield : listOfMaps){
             for (entry in cfield) {
                 def attrs = (Map) entry.value
@@ -167,70 +167,9 @@ class ApiConstraints {
 
         //with order above, classMaps override traitMaps and yamlMaps override all
         Map<String, Map> mergedMap = Maps.merge(mergedList)
-        //now combine them. classMaps override traitMaps and yamlMaps override all
-        // Map<String, Map> mergedMap = [:] as Map<String, Map>
-        // for(Map cfield : mergedList){
-        //     //each item in the map is a map
-        //     for (entry in cfield) {
-        //         Map attrs = (Map) entry.value
-        //         String prop = (String) entry.key
-        //
-        //     }
-        //     mergedMap.putAll(item)
-        // }
 
         return mergedMap //mergedList
     }
-
-    // ConstrainedPropertyBuilder newConstrainedPropertyBuilder(){
-    //     ConstrainedPropertyBuilder builder = constraintsEvaluator.newConstrainedPropertyBuilder(targetClass)
-    //     builder.allowDynamic = true
-    //     builder.defaultNullable = true //this doesnt really do what it seems like it should
-    //     return builder
-    // }
-
-
-    // static List<Map> getApiConstraintsFromTraits(Class mainClass, String name) {
-    //     CachedClass cachedClass = ClassInfo.getClassInfo(mainClass).getCachedClass() //classInfo.getCachedClass()
-    //     Collection<ClassInfo> hierarchy = cachedClass.getHierarchy()
-    //     Class javaClass = cachedClass.getTheClass()
-    //     List<Map> values = []
-    //     for (ClassInfo current : hierarchy) {
-    //         def traitClass = current.getTheClass()
-    //         def isTrait = Traits.isTrait(traitClass)
-    //         if(!isTrait) continue
-    //         def traitFieldName = getTraitFieldName(traitClass, name)
-    //         Map theval = (Map)getStaticFieldValue(mainClass, traitFieldName)
-    //         if(theval){
-    //             //println "$traitFieldName found with $theval"
-    //             values.add(theval)
-    //         }
-    //     }
-    //     Collections.reverse(values)
-    //     return values
-    // }
-
-    // static String getTraitFieldName(Class traitClass, String fieldName) {
-    //     return traitClass.getName().replace('.', '_') + "__" + fieldName;
-    // }
-
-    /**
-     * <p>Get a static field value.</p>
-     *
-     * @param clazz The class to check for static property
-     * @param name The field name
-     * @return The value if there is one, or null if unset OR there is no such field
-     */
-    // static Object getStaticFieldValue(Class<?> clazz, String name) {
-    //     Field field = ReflectionUtils.findField(clazz, name);
-    //     if (field != null) {
-    //         ReflectionUtils.makeAccessible(field);
-    //         try {
-    //             return field.get(clazz);
-    //         } catch (IllegalAccessException ignored) {}
-    //     }
-    //     return null;
-    // }
 
     Map findYamlApiConfig(Class mainClass) {
         def cname = mainClass.simpleName

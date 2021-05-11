@@ -42,19 +42,6 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
 
     static constraints = {
         createdDate nullable:false, display:false, editable:false, bindable:false
-
-        action nullable: true
-        appName nullable: true
-        component nullable: true
-        controlAmount nullable: true
-        controlCount nullable: true
-        isPrimaryJob nullable: true
-        jobName nullable: true
-        jobParams nullable: true
-        linkedId nullable: true
-        source nullable: true
-        stackTrace nullable: true
-        userId nullable: true
     }
 
     //update the summary on save

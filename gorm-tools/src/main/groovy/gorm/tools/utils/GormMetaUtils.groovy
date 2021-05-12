@@ -127,8 +127,15 @@ class GormMetaUtils {
     }
 
     static Map<String, ConstrainedProperty> findNonValidatedProperties(PersistentEntity entity) {
-        def apiConstraints = ApiConstraints.apiConstraintsMap.get(entity.javaClass)
+        def apiConstraints = ApiConstraints.findApiConstraints(entity.javaClass)
         return apiConstraints ? apiConstraints.nonValidatedProperties : [:]
+    }
+
+    /**
+     * returns both non-validated and validated Constrained Properties
+     */
+    static Map<String, ConstrainedProperty> findAllConstrainedProperties(PersistentEntity entity) {
+        return findConstrainedProperties(entity) + findNonValidatedProperties(entity)
     }
 
     // static Map<String, Constrained> getConstrainedProperties(PersistentEntity entity) {

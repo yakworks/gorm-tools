@@ -22,7 +22,7 @@ import yakworks.rally.orgs.model.Contact
 @GrailsCompileStatic
 class Task implements RepoEntity<Task>, Serializable {
     static transients = ['completedByName', 'assignedToName']
-    static belongsTo = [activity: Activity]
+    static belongsTo = [Activity]
 
     Long completedBy //who completed this. System is 1
     LocalDateTime completedDate  //when was this completed
@@ -49,6 +49,7 @@ class Task implements RepoEntity<Task>, Serializable {
     }
 
     static mapping = {
+        id generator: 'assigned'
         state column: 'state', enumType: 'identity'
         status column: 'statusId'
         taskType column: 'taskTypeId'

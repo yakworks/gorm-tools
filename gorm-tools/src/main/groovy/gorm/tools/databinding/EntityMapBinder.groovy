@@ -405,7 +405,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(object.getClass() as Class)
             PersistentEntity entity = gormStaticApi.gormPersistentEntity
             List<PersistentProperty> properties = entity.persistentProperties
-            Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
+            Map<String, ConstrainedProperty> constraints = GormMetaUtils.findAllConstrainedProperties(entity)
             List explicitBindingList = EXPLICIT_BINDING_LIST.get(objectClass) ?: []
             for (PersistentProperty prop : properties) {
                 DefaultConstrainedProperty cp = (DefaultConstrainedProperty) constraints[prop.name]

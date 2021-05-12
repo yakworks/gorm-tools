@@ -69,8 +69,8 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, 
         ApiConstraints.processConstraints(this, builder)
     }
 
-    static ApiConstraints getApiConstraints(Object builder){
-        ApiConstraints.apiConstraintsMap.get(this)
+    static ApiConstraints getApiConstraints(){
+        ApiConstraints.findApiConstraints(this)
     }
 
     /**

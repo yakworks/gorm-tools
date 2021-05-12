@@ -18,6 +18,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.EntityNotFoundException
+import grails.util.Environment
 import yakworks.commons.lang.NameUtils
 
 /**
@@ -31,22 +32,33 @@ import yakworks.commons.lang.NameUtils
 class RepoUtil {
 
     private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
+    private static Boolean IS_RELOAD
 
-    // TODO getting a GenericWebApplicationContext@15057559 has been closed already error with this cached one
-    // could just be for tests, needs more invesitgation
+    static Boolean isReloadEnabled(){
+        if(IS_RELOAD == null) IS_RELOAD = Environment.getCurrent().isReloadEnabled()
+        return IS_RELOAD
+    }
+
     static <D> GormRepo<D> findRepoCached(Class<D> entity) {
         String className = NameUtils.getClassName(entity)
         def repo = REPO_CACHE.get(className)
         if(repo == null) {
-            repo = AppCtx.get(getRepoBeanName(entity), GormRepo)
+            repo = getRepoFromAppContext(entity)
             REPO_CACHE.put(className, repo)
         }
         return repo as GormRepo<D>
     }
 
     static <D> GormRepo<D> findRepo(Class<D> entity) {
-        AppCtx.get(getRepoBeanName(entity), GormRepo) as GormRepo<D>
-        //return repo as GormRepo<D>
+        if(isReloadEnabled()){
+            return getRepoFromAppContext(entity)
+        } else {
+            return findRepoCached(entity)
+        }
+    }
+
+    static <D> GormRepo<D> getRepoFromAppContext(Class<D> entity){
+        return AppCtx.get(getRepoBeanName(entity), GormRepo) as GormRepo<D>
     }
 
     static String getRepoClassName(Class domainClass) {

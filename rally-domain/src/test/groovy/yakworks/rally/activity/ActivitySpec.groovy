@@ -7,6 +7,7 @@ import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink

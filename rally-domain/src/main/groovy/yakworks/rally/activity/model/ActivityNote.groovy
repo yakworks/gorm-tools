@@ -15,10 +15,14 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @GrailsCompileStatic
 class ActivityNote implements RepoEntity<ActivityNote>, Serializable {
-    static belongsTo = [activity: Activity]
+    static belongsTo = [Activity]
 
     String body // the note body
     String contentType = 'plain' //plain,html or markdown
+
+    static mapping = {
+        id generator: 'assigned'
+    }
 
     static constraintsMap = [
         body:[ description: 'The note body', nullable: false, blank: false],

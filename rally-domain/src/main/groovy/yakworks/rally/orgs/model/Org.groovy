@@ -46,11 +46,10 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
         type:[ description: 'The type of org', example: 'Customer',
              nullable: false, bindable: false],
         comments:[ description: 'A user visible comment', example: 'Lorem ipsum',
-             nullable: true, maxSize: 255],
+             nullable: true],
         companyId:[ description: 'Company id this org belongs to', example: 2,
              nullable: true],
-        inactive:[ description: 'indicator for an Org that is no longer active',
-             nullable: false, required: false],
+        inactive:[ description: 'indicator for an Org that is no longer active'],
         //associations
         flex:[ description: 'User flex fields', nullable: true],
         info:[ description: 'Info such as phone and website for an organization',

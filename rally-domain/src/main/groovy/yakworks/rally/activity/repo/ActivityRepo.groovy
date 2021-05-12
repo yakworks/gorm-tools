@@ -30,6 +30,7 @@ import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
+import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -62,7 +63,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     @RepoListener
     void beforeValidate(Activity activity) {
-        generateId(activity)
+        if(activity.isNew()) {
+            generateId(activity)
+        }
+        wireAssociations(activity)
         updateSummary(activity)
     }
 
@@ -132,6 +136,11 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         }
     }
 
+    void wireAssociations(Activity activity) {
+        if (activity.note && !activity.note.id) activity.note.id = activity.id
+        if (activity.task && !activity.task.id) activity.task.id = activity.id
+    }
+
     void updateSummary(Activity activity) {
         //title to 255
         String title = activity.title
@@ -193,7 +202,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {
         if (!act.note) {
-            act.note = new ActivityNote(activity: act)
+            act.note = new ActivityNote()
         }
         act.note.body = body
         act.note.contentType = contentType
@@ -316,10 +325,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * @param source activity source -  if this is from outside.
      * @return Activity
      */
+    //FIXME this is old and should be deprected
     @Transactional
     Activity createActivity(String text, Org org, Map task, List<Attachment> attachments, String entityName, String source = null) {
 
         Activity activity = new Activity()
+        generateId(activity)
         activity.bind([
             org         : org,
             title       : text,

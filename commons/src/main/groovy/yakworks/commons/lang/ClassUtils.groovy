@@ -4,6 +4,7 @@
 */
 package yakworks.commons.lang
 
+import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
 import groovy.transform.CompileStatic
@@ -75,6 +76,26 @@ class ClassUtils {
             return metaProperty.getType();
         }
         return null;
+    }
+
+    /**
+     * trickery to set a private final field
+     *
+     * @param clazz the class
+     * @param fieldName the name of the field
+     * @param instance the instance to set it on
+     * @param value the value to set
+     */
+    static void setPrivateFinal(Class clazz, Object instance, String fieldName, Object value){
+        //make the constrainedProperties accessible, remove private
+        Field field = clazz.getDeclaredField(fieldName)
+        field.setAccessible(true)
+        //remove final modifier
+        Field modifiersField = Field.getDeclaredField("modifiers")
+        modifiersField.setAccessible(true)
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
+        //set the value now
+        field.set(instance, value)
     }
 
 }

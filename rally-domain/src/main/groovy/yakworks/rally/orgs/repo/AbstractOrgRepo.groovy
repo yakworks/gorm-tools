@@ -32,7 +32,6 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
     LocationRepo locationRepo
     ContactRepo contactRepo
-    OrgSourceRepo orgSourceRepo
     OrgTagRepo orgTagRepo
 
     @RepoListener
@@ -113,7 +112,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         // if no org num then let it fall through and fail validation
         if(!org.num) return false
 
-        org.source = orgSourceRepo.createSource(org, data)
+        org.source = OrgSource.repo.createSource(org, data)
         org.source.persist()
     }
 
@@ -186,7 +185,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
     //util method that creates the OrgSource from num and assigns to the source record (if originator)
     OrgSource createSource(Org org, SourceType sourceType = SourceType.App) {
-        orgSourceRepo.createSource(org, sourceType)
+        OrgSource.repo.createSource(org, sourceType)
     }
 
 }

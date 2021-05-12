@@ -41,10 +41,24 @@ class ApiConstraints {
     //if its a ConstrainedPropertyBuilder this will get set from its private
     ConstraintRegistry constraintRegistry
 
+    ApiConstraints(Class targetClass) {
+        this.targetClass = targetClass
+    }
+
     ApiConstraints(Class targetClass, Object delegateBuilder) {
         this.targetClass = targetClass
         this.delegateBuilder = delegateBuilder
         setBuilderInfo(delegateBuilder)
+    }
+
+    @CompileDynamic
+    static ApiConstraints findApiConstraints(Class entityClass){
+        ApiConstraints theApiCons = apiConstraintsMap.get(entityClass)
+        if(!theApiCons){
+            theApiCons = new ApiConstraints(entityClass)
+            apiConstraintsMap.put(entityClass, theApiCons)
+        }
+        return theApiCons
     }
 
     @CompileDynamic
@@ -105,13 +119,13 @@ class ApiConstraints {
         if(attrs && attrs['validate'] == false){
             createNonValidated(prop, attrs)
         } else {
-            DefaultConstrainedProperty cp //= (DefaultConstrainedProperty)builder.constrainedProperties[prop]
-            if(cp){
-                addMaxSizeIfMissing(cp, attrs)
-            } else {
-                descriptionShortcut(attrs)
-                addNullableIfMissing(attrs)
-            }
+            // DefaultConstrainedProperty cp //= (DefaultConstrainedProperty)builder.constrainedProperties[prop]
+            // if(cp){
+            //     addMaxSizeIfMissing(cp, attrs)
+            // } else {
+            descriptionShortcut(attrs)
+            addNullableIfMissing(attrs)
+            //}
             invokeOnBuilder(prop, attrs)
         }
 
@@ -195,7 +209,7 @@ class ApiConstraints {
             // assume in dynamic use types are strings
             if (!propertyType) propertyType = CharSequence
             cp = new DefaultConstrainedProperty(targetClass, propName, propertyType, constraintRegistry)
-            nonValidatedProperties.put(propName, cp)
+            addNonValidatedProperty(propName, cp)
         }
 
         for (entry in attributes) {
@@ -209,6 +223,10 @@ class ApiConstraints {
             }
         }
         return cp
+    }
+
+    void addNonValidatedProperty(String propName, ConstrainedProperty cprop){
+        nonValidatedProperties.put(propName, cprop)
     }
 
     // DefaultConstrainedProperty initConstrainedProperty(String propertyName, Class propertyType){

@@ -14,14 +14,8 @@ releaseNotes:
 team:
   developers: ['basejump: Joshua Burnett', 'snimavat: Sudhir Nimavat', 'alexeyzvegintcev: Alexey']
 
-bintray:
-  enabled: true
-  pkg:
-    repo: grails-plugins
-    userOrg: 9ci
-
 maven:
-  # repoUrl: http://repo.9ci.com/grails-plugins
+  repoUrl: http://repo.9ci.com/public-libs
   snapshotUrl: http://repo.9ci.com/oss-snapshots
 
 codenarc:

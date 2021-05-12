@@ -4,18 +4,12 @@
 */
 package yakworks.commons.lang
 
-import java.lang.reflect.Field
-import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.reflection.CachedClass
-import org.codehaus.groovy.reflection.CachedField
-import org.codehaus.groovy.reflection.CachedMethod
 import org.codehaus.groovy.reflection.ClassInfo
-import org.codehaus.groovy.runtime.MetaClassHelper
-import org.codehaus.groovy.runtime.metaclass.MultipleSetterProperty
 import org.codehaus.groovy.transform.trait.Traits
 
 @CompileStatic
@@ -61,7 +55,7 @@ class ClassUtils {
     }
 
     private static <T> T returnOnlyIfInstanceOf(Object value, Class<T> type) {
-        if (value != null && (type == Object.class || ReflectionUtils.isAssignableFrom(type, value.getClass()))) {
+        if (value != null && (type == Object || ReflectionUtils.isAssignableFrom(type, value.getClass()))) {
             return (T)value;
         }
         return null;

@@ -4,7 +4,6 @@
 */
 package yakworks.rally.common
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @SuppressWarnings(['MethodName'])

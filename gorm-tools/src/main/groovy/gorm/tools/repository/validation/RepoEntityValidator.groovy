@@ -16,7 +16,6 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.reflect.EntityReflector
 import org.springframework.context.MessageSource
-import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
 
 import gorm.tools.repository.GormRepo
@@ -114,6 +113,7 @@ class RepoEntityValidator extends PersistentEntityValidator {
 
     }
 
+    @SuppressWarnings('UnnecessaryOverridingMethod')
     @CompileDynamic //so it can access the private super
     private String buildNestedPath(String nestedPath, String componentName, Object indexOrKey) {
         super.buildNestedPath(nestedPath, componentName, indexOrKey)

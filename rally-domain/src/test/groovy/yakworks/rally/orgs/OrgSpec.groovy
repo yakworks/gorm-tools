@@ -24,7 +24,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         }
         mockDomains(
             //events need these repos to be setup
-            Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo
+            OrgTag, Location, Contact, Org, OrgSource, OrgFlex, OrgCalc, OrgInfo
         )
     }
 

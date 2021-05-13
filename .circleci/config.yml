@@ -12,23 +12,28 @@ jobs:
 
       - run:
           name: ✔︎ Dependencies and Compile
-          command: ./build.sh compile
+          command: ./gradlew gorm-tools:check
 
       - save_cache:
           paths: [ "~/.m2", "~/.gradle" ]
           key: gradle-{{ checksum "cache-checksum.tmp" }}
 
       # saves the build for for next job
+      - store_test_results:
+          path: gorm-tools/build/test-results/
+      - store_artifacts:
+          path: gorm-tools/build/reports/
+          destination: gorm-tools
       - save_cache:
           paths:
             - ".gradle"
             - "./build"
             - "./gorm-tools/build"
-            - "./gorm-tools-rest/build"
-            - "./gorm-tools-security/build"
-            - "./rally-domain/build"
-            - "./examples/testify/build"
-            - "./examples/restify/build"
+#            - "./gorm-tools-rest/build"
+#            - "./gorm-tools-security/build"
+#            - "./rally-domain/build"
+#            - "./examples/testify/build"
+#            - "./examples/restify/build"
           key: build-{{ .Branch }}-{{ .Revision }}
 
   gorm-tools:
@@ -123,10 +128,7 @@ jobs:
 
       - run:
           name: ✔︎ Testify
-          command: ./gradlew testify:check
-      - run:
-          name: ✔︎ Restify
-          command: ./gradlew restify:check
+          command: ./gradlew testify:check restify:check
 
       - store_test_results:
           path: examples/testify/build/test-results/
@@ -157,9 +159,9 @@ workflows:
     jobs:
       - build:
           context: bot-context #context with shared ENV vars
-      - gorm-tools:
-          context: bot-context
-          requires: [ build ]
+#      - gorm-tools:
+#          context: bot-context
+#          requires: [ build ]
       - gorm-tools-rest:
           context: bot-context
           requires: [ build ]

@@ -230,7 +230,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         activity.org = org
         addNote(activity, body)
         updateSummary(activity)
-        activity.note.persist()
 
         activity.title = title
         activity.source = source
@@ -302,7 +301,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
                 }
                 activity = createActivity(activityData.summary.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
                 createdActivities[org.id as Long] = activity
-                activity.persist()
             }
 
             Long linkedId = target['id'] as Long
@@ -329,28 +327,24 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     @Transactional
     Activity createActivity(String text, Org org, Map task, List<Attachment> attachments, String entityName, String source = null) {
 
-        Activity activity = new Activity()
-        generateId(activity)
-        activity.bind([
+        Activity activity = new Activity(
             org         : org,
             title       : text,
             source      : source,
-            sourceEntity: entityName ])
-
+            sourceEntity: entityName
+        )
+        generateId(activity)
         if (task) {
             activity.task = createActivityTask(task)
             activity.kind = activity.task.taskType.kind
-            activity.task.persist()
         } else {
             addNote(activity, text)
             updateSummary(activity)
-            activity.note.persist()
         }
         attachments?.each { attachment ->
             linkAttachment(activity, attachment)
         }
         activity.persist()
-        activity
     }
 
     @Transactional
@@ -375,7 +369,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     Activity createTodo(Org org, Long userId, String title, String linkedEntity = null,
                         List<Long> linkedIds = null, LocalDateTime dueDate = LocalDateTime.now()) {
 
-        Activity activity = create([org: org, title: title, kind : Activity.Kind.Todo])
+        Activity activity = create(org: org, title: title, kind : Activity.Kind.Todo)
 
         if(linkedIds){
             for(Long linkedId: linkedIds){
@@ -384,13 +378,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             }
         }
 
-        activity.task = Task.create([
-            activity: activity,
+        activity.task = new Task(
             taskType: TaskType.TODO,
             userId  : userId,
             dueDate : dueDate,
-            status  : TaskStatus.getOPEN()
-        ])
+            status  : TaskStatus.OPEN
+        )
         activity.persist()
         return activity
     }

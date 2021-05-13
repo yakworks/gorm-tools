@@ -5,6 +5,7 @@ import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.IgnoreRest
@@ -24,21 +25,19 @@ import yakworks.rally.testing.MockHelper
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-class ActivitySpec extends Specification implements DomainRepoTest<Activity>, SecurityTest { //implements SecuritySpecUnitTestHelper{
+class ActivitySpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     //Sanity checks and auto runs DomainRepoCrudSpec tests
 
-    Closure doWithSpringFirst() {
-        return {
+    void setupSpec(){
+        defineBeans({
             grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
             grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }
             attachmentSupport(AttachmentSupport)
-        }
-    }
-    void setupSpec(){
-        mockDomains(Org, OrgTag, AttachmentLink, Attachment, ActivityNote, ActivityTag, ActivityLink)
+        })
+        mockDomains(AttachmentLink, Activity, Org, OrgTag, Attachment, ActivityNote, ActivityTag, ActivityLink)
     }
 
     Map buildUpdateMap(Map args) {

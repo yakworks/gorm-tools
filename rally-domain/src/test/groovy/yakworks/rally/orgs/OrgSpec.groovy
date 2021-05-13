@@ -2,8 +2,7 @@ package yakworks.rally.orgs
 
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.unit.DomainRepoTest
-import spock.lang.IgnoreRest
+import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -15,7 +14,7 @@ import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 
-class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
+class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
     //Automatically runs the basic crud tests
 
     def setupSpec(){
@@ -25,26 +24,26 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         }
         mockDomains(
             //events need these repos to be setup
-            OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo
+            Org, OrgSource, OrgTag, Location, Contact, OrgFlex, OrgCalc, OrgInfo
         )
     }
 
     void "sanity check build"() {
         when:
-        def org = build()
+        def org = build(Org)
 
         then:
         org.id
 
     }
 
-    void "CRUD tests"() {
-        expect:
-        createEntity().id
-        persistEntity().id
-        updateEntity().version > 0
-        removeEntity()
-    }
+    // void "CRUD tests"() {
+    //     expect:
+    //     createEntity().id
+    //     persistEntity().id
+    //     updateEntity().version > 0
+    //     removeEntity()
+    // }
 
     def testOrgSourceChange() {
         when:
@@ -81,7 +80,7 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         Map calc = TestDataJson.buildMap(OrgCalc, includes:"*")
         Map info = TestDataJson.buildMap(OrgInfo, includes:"*")
 
-        Map params = buildMap() << [id: orgId, flex: flex, info: info, type: 'Customer']
+        Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
         when: "create"
         def org = Org.create(params, bindId: true)
@@ -113,7 +112,7 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         Long orgId = 10000
         //Map location = TestDataJson.buildMap(Location, includes:"*")
         List locations = [[street1: "street1"], [street1: "street loc2"]]
-        Map params = buildMap() + [locations: locations]
+        Map params = TestDataJson.buildMap(Org) + [locations: locations]
 
         when:
         def org = Org.create(params)

@@ -12,7 +12,7 @@ jobs:
 
       - run:
           name: ✔︎ Dependencies and Compile
-          command: ./gradlew gorm-tools:check
+          command: ./gradlew testify:check
 
       - save_cache:
           paths: [ "~/.m2", "~/.gradle" ]
@@ -20,19 +20,19 @@ jobs:
 
       # saves the build for for next job
       - store_test_results:
-          path: gorm-tools/build/test-results/
+          path: examples/testify/build/test-results/
       - store_artifacts:
-          path: gorm-tools/build/reports/
-          destination: gorm-tools
+          path: examples/testify/build/reports/
+          destination: testify
       - save_cache:
           paths:
             - ".gradle"
             - "./build"
             - "./gorm-tools/build"
-#            - "./gorm-tools-rest/build"
-#            - "./gorm-tools-security/build"
-#            - "./rally-domain/build"
-#            - "./examples/testify/build"
+            - "./gorm-tools-rest/build"
+            - "./gorm-tools-security/build"
+            - "./rally-domain/build"
+            - "./examples/testify/build"
 #            - "./examples/restify/build"
           key: build-{{ .Branch }}-{{ .Revision }}
 
@@ -116,7 +116,7 @@ jobs:
           path: rally-domain/build/reports/
           destination: rally-domain
 
-  examples:
+  testify:
     docker:
       - image: yakworks/alpine-jdk:builder8
     steps:
@@ -128,19 +128,33 @@ jobs:
 
       - run:
           name: ✔︎ Testify
-          command: ./gradlew testify:check restify:check
+          command: ./gradlew restify:check
 
       - store_test_results:
           path: examples/testify/build/test-results/
       - store_artifacts:
           path: examples/testify/build/reports/
           destination: testify
+
+  restify:
+    docker:
+      - image: yakworks/alpine-jdk:builder8
+    steps:
+      - checkout
+      - run: *gradle-cache-key
+      - restore_cache: *gradle-cache-restore
+      - restore_cache: &build-cache-restore
+          key: build-{{ .Branch }}-{{ .Revision }}
+
+      - run:
+          name: ✔︎ restify
+          command: ./gradlew restify:check
+
       - store_test_results:
           path: examples/restify/build/test-results/
       - store_artifacts:
           path: examples/restify/build/reports/
           destination: restify
-
   docs:
     docker:
       - image: yakworks/docmark
@@ -159,16 +173,16 @@ workflows:
     jobs:
       - build:
           context: bot-context #context with shared ENV vars
-#      - gorm-tools:
-#          context: bot-context
-#          requires: [ build ]
+      - gorm-tools:
+          context: bot-context
+          requires: [ build ]
       - gorm-tools-rest:
           context: bot-context
           requires: [ build ]
       - gorm-tools-security:
           context: bot-context
           requires: [ build ]
-      - examples:
+      - restify:
           context: bot-context
           requires: [ build ]
       - docs:

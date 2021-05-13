@@ -182,6 +182,9 @@ workflows:
       - gorm-tools-security:
           context: bot-context
           requires: [ build ]
+      - rally-domain:
+          context: bot-context
+          requires: [ build ]
       - restify:
           context: bot-context
           requires: [ build ]
@@ -190,6 +193,6 @@ workflows:
           requires: [ build ]
       - docs:
           context: bot-context
-          requires: [build]
+          requires: [build, gorm-tools, gorm-tools-rest, gorm-tools-security, rally-domain, testify]
           filters:
             branches: { only: [ master, /release\/.*/ ] }

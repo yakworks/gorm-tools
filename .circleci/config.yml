@@ -12,29 +12,29 @@ jobs:
 
       - run:
           name: ✔︎ Dependencies and Compile
-          command: ./gradlew testify:check
+          command: ./gradlew resolveConfigurations --no-daemon
 
       - save_cache:
           paths: [ "~/.m2", "~/.gradle" ]
           key: gradle-{{ checksum "cache-checksum.tmp" }}
 
       # saves the build for for next job
-      - store_test_results:
-          path: examples/testify/build/test-results/
-      - store_artifacts:
-          path: examples/testify/build/reports/
-          destination: testify
-      - save_cache:
-          paths:
-            - ".gradle"
-            - "./build"
-            - "./gorm-tools/build"
-            - "./gorm-tools-rest/build"
-            - "./gorm-tools-security/build"
-            - "./rally-domain/build"
-            - "./examples/testify/build"
-#            - "./examples/restify/build"
-          key: build-{{ .Branch }}-{{ .Revision }}
+#      - store_test_results:
+#          path: examples/testify/build/test-results/
+#      - store_artifacts:
+#          path: examples/testify/build/reports/
+#          destination: testify
+#      - save_cache:
+#          paths:
+#            - ".gradle"
+#            - "./build"
+#            - "./gorm-tools/build"
+#            - "./gorm-tools-rest/build"
+#            - "./gorm-tools-security/build"
+#            - "./rally-domain/build"
+#            - "./examples/testify/build"
+##            - "./examples/restify/build"
+#          key: build-{{ .Branch }}-{{ .Revision }}
 
   gorm-tools:
     docker:
@@ -128,7 +128,7 @@ jobs:
 
       - run:
           name: ✔︎ Testify
-          command: ./gradlew restify:check
+          command: ./gradlew testify:check
 
       - store_test_results:
           path: examples/testify/build/test-results/
@@ -183,6 +183,9 @@ workflows:
           context: bot-context
           requires: [ build ]
       - restify:
+          context: bot-context
+          requires: [ build ]
+      - testify:
           context: bot-context
           requires: [ build ]
       - docs:

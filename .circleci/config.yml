@@ -158,16 +158,16 @@ workflows:
       - build:
           context: bot-context #context with shared ENV vars
       - gorm-tools:
-          context: 9cibot-context
+          context: bot-context
           requires: [ build ]
       - gorm-tools-rest:
-          context: 9cibot-context
+          context: bot-context
           requires: [ build ]
       - gorm-tools-security:
-          context: 9cibot-context
+          context: bot-context
           requires: [ build ]
       - examples:
-          context: 9cibot-context
+          context: bot-context
           requires: [ build ]
       - docs:
           context: bot-context

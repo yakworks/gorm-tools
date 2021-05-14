@@ -10,6 +10,7 @@ import java.nio.file.Path
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
@@ -36,7 +37,10 @@ import yakworks.rally.attachment.model.Attachment
 class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
+    @Autowired(required = false)
     AttachmentSupport attachmentSupport
+
+    @Autowired(required = false)
     AttachmentLinkRepo attachmentLinkRepo
 
     /**

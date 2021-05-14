@@ -5,7 +5,8 @@
 package yakworks.rally.attachment.repo
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
+
+import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
@@ -14,11 +15,11 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.common.LinkedEntityRepoTrait
 
-@Slf4j
 @GormRepository
 @CompileStatic
 class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attachment> {
-    AttachmentRepo attachmentRepo
+
+    @Autowired AttachmentRepo attachmentRepo
 
     @Override
     String getItemPropName() {'attachment'}

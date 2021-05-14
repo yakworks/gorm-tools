@@ -9,6 +9,7 @@ import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Specification
@@ -16,8 +17,9 @@ import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
 
-class AttachmentSupportSpec extends Specification implements DomainRepoTest<Attachment>, SecurityTest {
+class AttachmentSupportSpec extends Specification implements DataRepoTest, SecurityTest {
 
     AttachmentSupport attachmentSupport
     AppResourceLoader appResourceLoader
@@ -31,7 +33,7 @@ class AttachmentSupportSpec extends Specification implements DomainRepoTest<Atta
             }
             attachmentSupport(AttachmentSupport)
         })
-        mockDomains(Activity, ActivityNote, ActivityLink)
+        mockDomains(Attachment, AttachmentLink, Activity, ActivityNote, ActivityLink)
     }
 
     def setup() {

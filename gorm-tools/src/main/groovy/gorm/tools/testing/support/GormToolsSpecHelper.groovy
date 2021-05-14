@@ -9,11 +9,7 @@ import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.testing.GrailsUnitTest
 import org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor
-import org.junit.BeforeClass
-import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.ConfigurableApplicationContext
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AssignableTypeFilter
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
@@ -40,62 +36,9 @@ import gorm.tools.transaction.TrxService
 //@SuppressWarnings(["ClosureAsLastMethodParameter"])
 trait GormToolsSpecHelper extends GrailsUnitTest {
 
-    @BeforeClass
-    void setupTransactionService() {
-        defineBeans {
-            trxService(TrxService)
-        }
-    }
-
-    /**
-     * Mocks Repositories for passed in Domain classes.
-     * If a Repository Class is explicitly defined then this looks for it in the same package
-     * The domains should be mocked before this is called
-     */
-    void mockRepositories(Class<?>... domainClassesToMock) {
-
-        Closure repoBeans = {}
-
-        domainClassesToMock.each { Class domainClass ->
-            Class repoClass = findRepoClass(domainClass)
-            repoBeans = repoBeans << registerRepository(domainClass, repoClass)
-        }
-        defineBeans(repoBeans << commonBeans())
-
-        //This part is needed because we cache repo entity in domain,
-        //so if we have 2 unit tests where we create same bean for repo, then in second
-        //test class when we call repo from domain(it could be Org.repo or Org.create()) we will call repo from
-        //the first test class, and if we injected new dependencies in can break test
-        // if (this.hasProperty("entityClass") && this.entityClass){
-        //     domainClassesToMock = [this.entityClass].toArray(Class) + domainClassesToMock
-        // }
-        // domainClassesToMock.each {
-        //     String repoBeanName = RepoUtil.getRepoBeanName(it)
-        //     GormRepo repo = AppCtx.get("${repoBeanName}", findRepoClass(it))
-        //     // it.setRepo(repo)
-        // }
-
-    }
-
     /** conveinince shortcut for applicationContext */
     ConfigurableApplicationContext getCtx() {
         getApplicationContext()
-    }
-
-    @CompileDynamic
-    Closure commonBeans() {
-        return {
-            entityMapBinder(EntityMapBinder, grailsApplication)
-            repoEventPublisher(RepoEventPublisher)
-            repoUtilBean(RepoUtil)
-            repoExceptionSupport(RepoExceptionSupport)
-            mangoQuery(DefaultMangoQuery)
-            mangoBuilder(MangoBuilder)
-            trxService(TrxService)
-
-            jdbcIdGenerator(MockJdbcIdGenerator)
-            idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
-        }
     }
 
     /**
@@ -118,42 +61,39 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     }
 
     @CompileDynamic
-    Closure registerRepository(Class domain, Class repoClass) {
-        String beanName = RepoUtil.getRepoBeanName(domain)
-        grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
-        Closure clos = { "$beanName"(repoClass) { bean -> bean.autowire = true } }
+    void defineRepoBeans(){
+        defineBeans {
+            entityMapBinder(EntityMapBinder, grailsApplication)
+            repoEventPublisher(RepoEventPublisher)
+            repoUtilBean(RepoUtil)
+            repoExceptionSupport(RepoExceptionSupport)
+            mangoQuery(DefaultMangoQuery)
+            mangoBuilder(MangoBuilder)
+            trxService(TrxService)
 
-        if (repoClass == DefaultGormRepo) {
-            clos = { "$beanName"(repoClass, domain) { bean -> bean.autowire = true } }
+            jdbcIdGenerator(MockJdbcIdGenerator)
+            idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
+
+            Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
+            for (PersistentEntity entity in entities) {
+                //do repo
+                Class domainClass = entity.javaClass
+                Class repoClass = findRepoClass(domainClass)
+                String beanName = RepoUtil.getRepoBeanName(domainClass)
+                grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
+                String repoName = RepoUtil.getRepoBeanName(domainClass)
+
+                if (repoClass == DefaultGormRepo) {
+                    "$repoName"(repoClass, domainClass)
+                } else {
+                    "$repoName"(repoClass)
+                }
+            }
         }
-
-        return clos
-    }
-
-    /**
-     * No Usages Yet..., scans all repository classes in given package.
-     * may be change to RepoScanner like ClassPathEntityScanner !?
-     */
-    @SuppressWarnings(['ClassForName'])
-    Set<Class> scanRepoClasses(String packageName) {
-        ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false)
-        provider.addIncludeFilter(new AssignableTypeFilter(GormRepo))
-        Set<BeanDefinition> beans = provider.findCandidateComponents(packageName)
-
-        Set<Class> repoClasses = []
-        for (BeanDefinition bd : beans) {
-            repoClasses << Class.forName(bd.beanClassName, false, grailsApplication.classLoader)
-        }
-        return repoClasses
     }
 
     @CompileDynamic
     void setupValidatorRegistry(){
-        // def settings = datastore.getConnectionSources().getDefaultConnectionSource().getSettings()
-        // def mappingContext = datastore.mappingContext
-        // def validatorRegistry = new RepoValidatorRegistry(mappingContext, settings, getCtx())
-        // mappingContext.setValidatorRegistry(validatorRegistry)
-
         Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
         for (PersistentEntity entity in entities) {
             Validator validator = registerDomainClassValidator(entity)

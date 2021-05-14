@@ -6,6 +6,7 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.Errors
 
 import gorm.tools.repository.GormRepo
@@ -19,6 +20,7 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgMemberRepo implements GormRepo<OrgMember> {
 
+    @Autowired(required = false)
     OrgDimensionService orgDimensionService
 
     @RepoListener

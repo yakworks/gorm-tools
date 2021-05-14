@@ -3,7 +3,7 @@ apply plugin: "yakworks.grails-plugin"
 // apply plugin: 'groovy'
 // apply plugin:"org.grails.grails-plugin"
 
-group = "org.grails.plugins"
+group = "org.yakworks"
 
 dependencies {
   console "org.grails:grails-console"

@@ -18,8 +18,8 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
     RepoEventPublisher repoEventPublisher
 
-    void setup() {
-        mockDomain(City)
+    void setupSpec() {
+        mockDomains(City)
     }
 
     void testEventsFired() {

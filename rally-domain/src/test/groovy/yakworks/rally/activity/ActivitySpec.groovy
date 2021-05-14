@@ -29,15 +29,15 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
     //Sanity checks and auto runs DomainRepoCrudSpec tests
 
     void setupSpec(){
-        defineBeans({
+        defineBeans{
             grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
             grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }
             attachmentSupport(AttachmentSupport)
-        })
-        mockDomains(AttachmentLink, Activity, Org, OrgTag, Attachment, ActivityNote, ActivityTag, ActivityLink)
+        }
+        mockDomains(AttachmentLink, ActivityLink, ActivityTag, Activity, Org, OrgTag, Attachment, ActivityNote)
     }
 
     Map buildUpdateMap(Map args) {

@@ -11,6 +11,7 @@ import org.springframework.mock.web.MockMultipartFile
 
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Ignore
@@ -18,10 +19,11 @@ import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
 
-class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>, SecurityTest {
+class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest {
 
     @Shared
     AppResourceLoader appResourceLoader
@@ -40,7 +42,7 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
     }
 
     def setupSpec() {
-        mockDomains(FileData)
+        mockDomains(Attachment, AttachmentLink, FileData)
     }
 
     void cleanupSpec() {

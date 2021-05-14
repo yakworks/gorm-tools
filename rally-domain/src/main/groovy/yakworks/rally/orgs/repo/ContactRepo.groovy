@@ -5,7 +5,6 @@
 package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -28,7 +27,6 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 
 @GormRepository
-@Slf4j
 @CompileStatic
 class ContactRepo implements GormRepo<Contact> {
 

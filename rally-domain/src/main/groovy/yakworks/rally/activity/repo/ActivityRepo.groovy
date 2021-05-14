@@ -8,9 +8,9 @@ import java.time.LocalDateTime
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
@@ -40,26 +40,28 @@ import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.attachment.repo.AttachmentLinkRepo
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.repo.ContactRepo
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
-@Slf4j
 @CompileStatic
 class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
+    @Autowired(required = false)
     ActivityLinkRepo activityLinkRepo
+
+    @Autowired(required = false)
     ActivityTagRepo activityTagRepo
+
+    @Autowired(required = false)
     AttachmentRepo attachmentRepo
-    AttachmentLinkRepo attachmentLinkRepo
+
+    @Autowired(required = false)
     SecService secService
-    ContactRepo contactRepo
 
     @RepoListener
     void beforeValidate(Activity activity) {
@@ -97,10 +99,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             note.delete()
         }
 
-        attachmentLinkRepo.removeAll(activity)
+        AttachmentLink.repo.removeAll(activity)
         //XXX missing removal for attachments if its not linked to anything else
-        activityTagRepo.removeAll(activity)
-        activityLinkRepo.removeAllByActivity(activity)
+        ActivityTag.repo.removeAll(activity)
+        ActivityLink.repo.removeAllByActivity(activity)
 
     }
 
@@ -159,7 +161,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     }
 
     AttachmentLink linkAttachment(Activity activity, Attachment attachment){
-        attachmentLinkRepo.create(activity, attachment)
+        AttachmentLink.repo.create(activity, attachment)
     }
 
     // This adds the realted and children entities from the params to the Activity
@@ -209,11 +211,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         return act.note
     }
 
-    void completeTask(Task task) {
+    void completeTask(Task task, Long completedById) {
+        Validate.notNull(completedById, "[completedById]")
         task.bind(status: TaskStatus.COMPLETE,
                 state: TaskStatus.COMPLETE.id as Integer,
                 completedDate: new Date(),
-                completedBy: secService.userId)
+                completedBy: completedById)
 
     }
 

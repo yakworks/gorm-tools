@@ -45,7 +45,7 @@ repositories {
   maven { url "http://repo.9ci.com/public-libs" }
 }
 ...
-compile "org.grails.plugins:gorm-tools:7.0.8-v.12"
+compile "org.yakworks:gorm-tools:7.0.8-v.12"
 ``` 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 

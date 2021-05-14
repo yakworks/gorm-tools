@@ -23,7 +23,6 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
             orgDimensionService(OrgDimensionService)
         }
         mockDomains(
-            //events need these repos to be setup
             OrgTag, Location, Contact, Org, OrgSource, OrgFlex, OrgCalc, OrgInfo
         )
     }

@@ -29,7 +29,8 @@ trait GormToolsTest implements GormToolsSpecHelper, DataTest, AutowiredTest {
     @Override
     void mockDomains(Class<?>... domainClassesToMock) {
         DataTest.super.mockDomains(domainClassesToMock)
-        mockRepositories(domainClassesToMock)
+        defineRepoBeans()
+        setupValidatorRegistry()
     }
 
 }

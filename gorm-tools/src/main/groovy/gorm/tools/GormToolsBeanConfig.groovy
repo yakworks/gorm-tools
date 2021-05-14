@@ -109,7 +109,7 @@ class GormToolsBeanConfig {
             def hasRepo = repoClasses.find { it.propertyName == repoName }
             if (!hasRepo) {
                 "${repoName}"(DefaultGormRepo, domainClass) { bean ->
-                    bean.autowire = true
+                    //bean.autowire = true
                     bean.lazyInit = true
                 }
             }
@@ -134,7 +134,7 @@ class GormToolsBeanConfig {
 
         Closure bClosure = {
             "${repoClass.propertyName}"(repoClass.getClazz()) { bean ->
-                bean.autowire = true
+                //bean.autowire = true
                 bean.lazyInit = lazyInit
             }
         }
@@ -154,10 +154,10 @@ class GormToolsBeanConfig {
         //registryRestApiControllers(grailsApplication)
     }
 
-    Closure autowireLazy() {{ bean ->
-        bean.lazyInit = true
-        bean.autowire = true
-    }}
+    // Closure autowireLazy() {{ bean ->
+    //     bean.lazyInit = true
+    //     bean.autowire = true
+    // }}
 
     Closure lazy() {{ bean ->
         bean.lazyInit = true

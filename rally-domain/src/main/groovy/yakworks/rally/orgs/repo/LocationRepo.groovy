@@ -5,7 +5,6 @@
 package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -14,7 +13,6 @@ import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.rally.orgs.model.Location
 
 @GormRepository
-@Slf4j
 @CompileStatic
 class LocationRepo implements GormRepo<Location>, IdGeneratorRepo {
 

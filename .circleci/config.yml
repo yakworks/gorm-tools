@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       - image: yakworks/alpine-jdk:builder8
-    # resource_class: 'medium+'
+    resource_class: 'medium+'
     steps:
       - checkout
       - run: &gradle-cache-key ./build.sh catKeyFiles
@@ -23,6 +23,36 @@ jobs:
           name: ✔︎ Dependencies and Compile
           command: ./gradlew check
 
+      - store_test_results:
+          path: gorm-tools/build/test-results/
+      - store_artifacts:
+          path: gorm-tools/build/reports/
+          destination: gorm-tools
+      - store_test_results:
+          path: gorm-tools-rest/build/test-results/
+      - store_artifacts:
+          path: gorm-tools-rest/build/reports/
+          destination: gorm-tools
+      - store_test_results:
+          path: gorm-tools-security/build/test-results/
+      - store_artifacts:
+          path: gorm-tools-security/build/reports/
+          destination: gorm-tools-security
+      - store_test_results:
+          path: rally-domain/build/test-results/
+      - store_artifacts:
+          path: rally-domain/build/reports/
+          destination: rally-domain
+      - store_test_results:
+          path: examples/testify/build/test-results/
+      - store_artifacts:
+          path: examples/testify/build/reports/
+          destination: testify
+      - store_test_results:
+          path: examples/restify/build/test-results/
+      - store_artifacts:
+          path: examples/restify/build/reports/
+          destination: restify
       # saves the build for for next job
 #      - store_test_results:
 #          path: examples/testify/build/test-results/

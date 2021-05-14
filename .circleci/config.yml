@@ -4,6 +4,7 @@ jobs:
   build:
     docker:
       - image: yakworks/alpine-jdk:builder8
+    resource_class: 'medium+'
     steps:
       - checkout
       - run: &gradle-cache-key ./build.sh catKeyFiles
@@ -17,6 +18,10 @@ jobs:
       - save_cache:
           paths: [ "~/.m2", "~/.gradle" ]
           key: gradle-{{ checksum "cache-checksum.tmp" }}
+
+      - run:
+          name: ✔︎ Dependencies and Compile
+          command: ./gradlew check
 
       # saves the build for for next job
 #      - store_test_results:
@@ -173,26 +178,27 @@ workflows:
     jobs:
       - build:
           context: bot-context #context with shared ENV vars
-      - gorm-tools:
-          context: bot-context
-          requires: [ build ]
-      - gorm-tools-rest:
-          context: bot-context
-          requires: [ build ]
-      - gorm-tools-security:
-          context: bot-context
-          requires: [ build ]
-      - rally-domain:
-          context: bot-context
-          requires: [ build ]
-      - restify:
-          context: bot-context
-          requires: [ build ]
-      - testify:
-          context: bot-context
-          requires: [ build ]
+#      - gorm-tools:
+#          context: bot-context
+#          requires: [ build ]
+#      - gorm-tools-rest:
+#          context: bot-context
+#          requires: [ build ]
+#      - gorm-tools-security:
+#          context: bot-context
+#          requires: [ build ]
+#      - rally-domain:
+#          context: bot-context
+#          requires: [ build ]
+#      - restify:
+#          context: bot-context
+#          requires: [ build ]
+#      - testify:
+#          context: bot-context
+#          requires: [ build ]
       - docs:
           context: bot-context
-          requires: [build, gorm-tools, gorm-tools-rest, gorm-tools-security, rally-domain, testify]
+          # requires: [build, gorm-tools, gorm-tools-rest, gorm-tools-security, rally-domain, testify]
+          requires: [build]
           filters:
             branches: { only: [ master, /release\/.*/ ] }

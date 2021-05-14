@@ -5,12 +5,13 @@ import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityTag
+import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 
 class ActivityContactSpec extends Specification implements DomainRepoTest<ActivityContact>, SecurityTest {
 
     void setupSpec() {
-        mockDomains(Org, ActivityTag)
+        mockDomains(Org, Contact, ActivityTag)
     }
 
     void "CRUD tests"() {

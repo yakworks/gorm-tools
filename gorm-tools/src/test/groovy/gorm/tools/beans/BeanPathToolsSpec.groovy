@@ -7,13 +7,18 @@ package gorm.tools.beans
 
 import org.springframework.mock.web.MockHttpServletRequest
 
-import gorm.tools.beans.domain.*
-import gorm.tools.testing.unit.GormToolsTest
+import gorm.tools.beans.domain.BookAuthor
+import gorm.tools.beans.domain.Bookz
+import gorm.tools.beans.domain.EnumThing
+import gorm.tools.beans.domain.PropsToMapTest
+import gorm.tools.beans.domain.TestEnum
+import gorm.tools.beans.domain.TestEnumIdent
+import gorm.tools.testing.unit.DataRepoTest
 import grails.web.servlet.mvc.GrailsParameterMap
 import spock.lang.Ignore
 import spock.lang.Specification
 
-class BeanPathToolsSpec extends Specification implements GormToolsTest {
+class BeanPathToolsSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         //mockDomain Person

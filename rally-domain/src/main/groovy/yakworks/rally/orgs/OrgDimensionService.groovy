@@ -12,6 +12,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.apache.commons.lang3.EnumUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
@@ -32,7 +33,7 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgDimensionService {
 
-    @Inject @Nullable //required = false so unit tests work
+    @Autowired(required = false) //required = false so unit tests work
     GrailsCacheAdminService grailsCacheAdminService
 
     //this is what should be inject at startup

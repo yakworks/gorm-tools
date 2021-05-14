@@ -11,11 +11,13 @@ import spock.lang.Specification
 import testing.Address
 import testing.Cust
 import testing.CustExt
+import testing.CustType
+import testing.Nested
 
 class TestDataJsonBuildAllSpec extends Specification implements BuildDataTest, DataRepoTest{
 
     def setupSpec(){
-        mockDomains(Cust, CustExt, Address)
+        mockDomains(Cust, CustType, Nested, CustExt, Address)
     }
 
     void "test getJsonIncludes"(){

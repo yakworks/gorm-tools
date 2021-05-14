@@ -61,11 +61,12 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     }
 
     @CompileDynamic
-    void defineRepoBeans(){
+    void defineRepoBeans(Class<?>... domainClassesToMock){
+        RepoUtil.USE_CACHE = false
         defineBeans {
             entityMapBinder(EntityMapBinder, grailsApplication)
             repoEventPublisher(RepoEventPublisher)
-            repoUtilBean(RepoUtil)
+            //repoUtilBean(RepoUtil)
             repoExceptionSupport(RepoExceptionSupport)
             mangoQuery(DefaultMangoQuery)
             mangoBuilder(MangoBuilder)
@@ -75,9 +76,9 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
 
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
-            for (PersistentEntity entity in entities) {
+            for (Class domainClass in domainClassesToMock) {
                 //do repo
-                Class domainClass = entity.javaClass
+                //Class domainClass = entity.javaClass
                 Class repoClass = findRepoClass(domainClass)
                 String beanName = RepoUtil.getRepoBeanName(domainClass)
                 grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)

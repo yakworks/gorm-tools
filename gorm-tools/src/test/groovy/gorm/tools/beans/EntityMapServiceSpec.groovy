@@ -5,7 +5,7 @@
 package gorm.tools.beans
 
 import gorm.tools.beans.domain.*
-import gorm.tools.testing.unit.GormToolsTest
+import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 import testing.Address
 import testing.Nested
@@ -13,7 +13,7 @@ import testing.Cust
 import testing.CustType
 import testing.TestSeedData
 
-class EntityMapServiceSpec extends Specification implements GormToolsTest {
+class EntityMapServiceSpec extends Specification implements DataRepoTest {
 
     EntityMapService entityMapService = new EntityMapService()
 

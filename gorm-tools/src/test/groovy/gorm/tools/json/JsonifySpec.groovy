@@ -20,13 +20,16 @@ import testing.CustExt
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+import testing.CustType
+import testing.Nested
+
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
-        mockDomains(CustExt, Address, JsonifyDom, JsonifyDomExt, NestedDom)
+        mockDomains(CustExt, CustType, Nested, Address, JsonifyDom, JsonifyDomExt, NestedDom)
         //defineBeans(new JsonViewGrailsPlugin())
     }
 

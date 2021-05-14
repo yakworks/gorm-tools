@@ -32,11 +32,13 @@ import yakworks.commons.lang.NameUtils
 class  RepoUtil {
 
     private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
-    private static Boolean IS_RELOAD
+    //set to false when doing unit tests so it doesnt cache old ones
+    public static Boolean USE_CACHE
 
-    static Boolean isReloadEnabled(){
-        if(IS_RELOAD == null) IS_RELOAD = Environment.getCurrent().isReloadEnabled()
-        return IS_RELOAD
+    static Boolean shouldCache(){
+        //if reload enabled then dont cache
+        if(USE_CACHE == null) USE_CACHE = !Environment.getCurrent().isReloadEnabled()
+        return USE_CACHE
     }
 
     static <D> GormRepo<D> findRepoCached(Class<D> entity) {
@@ -50,10 +52,10 @@ class  RepoUtil {
     }
 
     static <D> GormRepo<D> findRepo(Class<D> entity) {
-        if(isReloadEnabled()){
-            return getRepoFromAppContext(entity)
-        } else {
+        if(shouldCache()){
             return findRepoCached(entity)
+        } else {
+            return getRepoFromAppContext(entity)
         }
     }
 

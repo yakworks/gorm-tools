@@ -33,13 +33,13 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
-    @Inject @Nullable //required false so they dont need to be setup in unit tests
+    //@Inject @Nullable //required false so they dont need to be setup in unit tests
     LocationRepo locationRepo
 
-    @Inject @Nullable
+    //@Inject @Nullable
     ContactRepo contactRepo
 
-    @Inject @Nullable
+    //@Inject @Nullable
     OrgTagRepo orgTagRepo
 
     @RepoListener

@@ -15,7 +15,6 @@ import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
@@ -23,7 +22,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus
 import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.databinding.MapBinder
+import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
@@ -41,11 +40,9 @@ import grails.validation.ValidationException
 @CompileStatic
 trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
-    @Qualifier("entityMapBinder")
-    @Autowired MapBinder mapBinder
+    @Autowired EntityMapBinder entityMapBinder
 
     @Autowired RepoEventPublisher repoEventPublisher
-    @Autowired RepoExceptionSupport repoExceptionSupport
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
@@ -192,7 +189,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * can also call this if you do NOT want the before/after Bind events to fire
      */
     void doBind(D entity, Map data, BindAction bindAction, Map args) {
-        getMapBinder().bind(args, entity, data)
+        getEntityMapBinder().bind(args, entity, data)
     }
 
     /**
@@ -343,7 +340,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     }
 
     RuntimeException handleException(RuntimeException ex, D entity) {
-        return getRepoExceptionSupport().translateException(ex, entity)
+        return RepoExceptionSupport.translateException(ex, entity)
     }
 
     /** gets the datastore for this Gorm domain instance */

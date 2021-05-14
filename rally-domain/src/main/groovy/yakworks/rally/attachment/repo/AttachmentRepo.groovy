@@ -6,11 +6,12 @@ package yakworks.rally.attachment.repo
 
 import java.nio.file.Files
 import java.nio.file.Path
+import javax.annotation.Nullable
+import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
@@ -23,7 +24,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.io.FileUtil
-import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 
@@ -37,10 +37,10 @@ import yakworks.rally.attachment.model.Attachment
 class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
-    @Autowired(required = false)
+    @Inject @Nullable
     AttachmentSupport attachmentSupport
 
-    @Autowired(required = false)
+    @Inject @Nullable
     AttachmentLinkRepo attachmentLinkRepo
 
     /**

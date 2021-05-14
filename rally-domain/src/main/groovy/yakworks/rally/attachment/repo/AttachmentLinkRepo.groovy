@@ -4,9 +4,10 @@
 */
 package yakworks.rally.attachment.repo
 
-import groovy.transform.CompileStatic
+import javax.annotation.Nullable
+import javax.inject.Inject
 
-import org.springframework.beans.factory.annotation.Autowired
+import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
@@ -18,8 +19,6 @@ import yakworks.rally.common.LinkedEntityRepoTrait
 @GormRepository
 @CompileStatic
 class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attachment> {
-
-    @Autowired AttachmentRepo attachmentRepo
 
     @Override
     String getItemPropName() {'attachment'}
@@ -59,7 +58,7 @@ class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attach
         for(AttachmentLink attachLink : attachLinks){
             //catch exceptions and move on in case attachment has a bad link we dont want to fail the whole thing
             try {
-                Attachment attachmentCopy = attachmentRepo.copy(attachLink.attachment)
+                Attachment attachmentCopy = Attachment.repo.copy(attachLink.attachment)
                 if (attachmentCopy) create(toEntity, attachmentCopy)
             } catch (ex){
                 results.addError(ex)

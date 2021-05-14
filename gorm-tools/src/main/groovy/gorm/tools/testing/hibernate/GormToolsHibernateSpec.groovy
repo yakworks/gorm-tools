@@ -68,8 +68,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
                 grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
                 String repoName = RepoUtil.getRepoBeanName(domainClass)
                 if (repoClass == DefaultGormRepo) {
-                    "$repoName"(repoClass, domainClass) {
-                        bean -> bean.autowire = true
+                    "$repoName"(repoClass, domainClass) { bean ->
+                        bean.autowire = true
                     }
                 } else {
                     "$repoName"(repoClass) { bean ->

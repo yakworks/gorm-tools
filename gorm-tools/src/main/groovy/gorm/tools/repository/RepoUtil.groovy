@@ -29,7 +29,7 @@ import yakworks.commons.lang.NameUtils
  * @since 1.0
  */
 @CompileStatic
-class RepoUtil {
+class  RepoUtil {
 
     private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
     private static Boolean IS_RELOAD
@@ -55,6 +55,10 @@ class RepoUtil {
         } else {
             return findRepoCached(entity)
         }
+    }
+
+    static List<Class> getRepoClasses(){
+        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
     }
 
     static <D> GormRepo<D> getRepoFromAppContext(Class<D> entity){

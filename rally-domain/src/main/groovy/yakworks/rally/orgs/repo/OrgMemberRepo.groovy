@@ -4,9 +4,11 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.annotation.Nullable
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.Errors
 
 import gorm.tools.repository.GormRepo
@@ -20,7 +22,7 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgMemberRepo implements GormRepo<OrgMember> {
 
-    @Autowired(required = false)
+    @Inject @Nullable
     OrgDimensionService orgDimensionService
 
     @RepoListener

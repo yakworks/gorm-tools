@@ -36,7 +36,7 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, 
     }
 
     void bind(Map args = [:], Map data) {
-        findRepo().getMapBinder().bind(args, (D) this, data)
+        findRepo().getEntityMapBinder().bind(args, (D) this, data)
     }
 
     /**

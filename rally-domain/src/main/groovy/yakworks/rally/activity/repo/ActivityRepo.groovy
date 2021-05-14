@@ -5,6 +5,8 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
+import javax.annotation.Nullable
+import javax.inject.Inject
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
@@ -51,16 +53,16 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 @CompileStatic
 class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
-    @Autowired(required = false)
+    @Inject @Nullable
     ActivityLinkRepo activityLinkRepo
 
-    @Autowired(required = false)
+    @Inject @Nullable
     ActivityTagRepo activityTagRepo
 
-    @Autowired(required = false)
+    @Inject @Nullable
     AttachmentRepo attachmentRepo
 
-    @Autowired(required = false)
+    @Inject @Nullable
     SecService secService
 
     @RepoListener

@@ -4,11 +4,11 @@
 */
 package yakworks.rally.orgs
 
+import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
@@ -32,12 +32,10 @@ import yakworks.rally.orgs.repo.OrgTagRepo
 @CompileStatic
 class OrgCopier {
 
-    @Autowired ContactRepo contactRepo
-    @Autowired OrgTagRepo orgTagRepo
-    @Autowired AttachmentLinkRepo attachmentLinkRepo
-    @Autowired ActivityRepo activityRepo
-    // @Inject AttachmentRepo attachmentRepo
-    // @Inject OrgSourceRepo orgSourceRepo
+    @Inject ContactRepo contactRepo
+    @Inject OrgTagRepo orgTagRepo
+    @Inject AttachmentLinkRepo attachmentLinkRepo
+    @Inject ActivityRepo activityRepo
 
     /**
      * Copies fields from the one Org entity to another, it copies associations as well.

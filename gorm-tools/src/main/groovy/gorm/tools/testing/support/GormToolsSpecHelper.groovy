@@ -84,9 +84,13 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
                 String repoName = RepoUtil.getRepoBeanName(domainClass)
 
                 if (repoClass == DefaultGormRepo) {
-                    "$repoName"(repoClass, domainClass)
+                    "$repoName"(repoClass, domainClass){ bean ->
+                        bean.autowire = true
+                    }
                 } else {
-                    "$repoName"(repoClass)
+                    "$repoName"(repoClass){ bean ->
+                        bean.autowire = true
+                    }
                 }
             }
         }

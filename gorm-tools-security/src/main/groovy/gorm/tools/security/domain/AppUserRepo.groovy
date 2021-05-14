@@ -4,7 +4,9 @@
 */
 package gorm.tools.security.domain
 
-import org.springframework.beans.factory.annotation.Autowired
+import javax.annotation.Nullable
+import javax.inject.Inject
+
 import org.springframework.security.crypto.password.PasswordEncoder
 
 import gorm.tools.repository.GormRepo
@@ -22,7 +24,7 @@ import grails.gorm.transactions.Transactional
 @GrailsCompileStatic
 class AppUserRepo implements GormRepo<AppUser> {
     /** dependency injection for the password encoder */
-    @Autowired
+    @Inject @Nullable
     PasswordEncoder passwordEncoder
     // SecService secService
 

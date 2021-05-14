@@ -4,7 +4,7 @@
 */
 package gorm.tools.mango
 
-import org.springframework.beans.factory.annotation.Autowired
+import javax.inject.Inject
 
 import gorm.tools.mango.api.MangoQuery
 import gorm.tools.repository.GormRepo
@@ -58,7 +58,7 @@ class NewMangoQuery implements MangoQuery {
 @GormRepository
 class CityRepo implements GormRepo<City> {
 
-    @Autowired
+    @Inject
     NewMangoQuery newMangoQuery
 
     MangoQuery getMangoQuery(){ newMangoQuery }

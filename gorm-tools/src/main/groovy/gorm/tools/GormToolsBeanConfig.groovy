@@ -79,7 +79,7 @@ class GormToolsBeanConfig {
         entityMapBinder(EntityMapBinder, ref('grailsApplication'), lazy())
         entityMapService(EntityMapService, lazy())
 
-        repoEventPublisher(RepoEventPublisher, lazy())
+        repoEventPublisher(RepoEventPublisher)
 
         repoExceptionSupport(RepoExceptionSupport, lazy())
 
@@ -109,7 +109,7 @@ class GormToolsBeanConfig {
             def hasRepo = repoClasses.find { it.propertyName == repoName }
             if (!hasRepo) {
                 "${repoName}"(DefaultGormRepo, domainClass) { bean ->
-                    //bean.autowire = true
+                    bean.autowire = true
                     bean.lazyInit = true
                 }
             }
@@ -134,7 +134,7 @@ class GormToolsBeanConfig {
 
         Closure bClosure = {
             "${repoClass.propertyName}"(repoClass.getClazz()) { bean ->
-                //bean.autowire = true
+                bean.autowire = true
                 bean.lazyInit = lazyInit
             }
         }

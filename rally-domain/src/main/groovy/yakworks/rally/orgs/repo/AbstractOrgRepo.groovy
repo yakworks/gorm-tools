@@ -4,9 +4,10 @@
 */
 package yakworks.rally.orgs.repo
 
-import groovy.transform.CompileStatic
+import javax.annotation.Nullable
+import javax.inject.Inject
 
-import org.springframework.beans.factory.annotation.Autowired
+import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityValidationException
@@ -32,13 +33,13 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
-    @Autowired(required = false) //required false so they dont need to be setup in unit tests
+    @Inject @Nullable //required false so they dont need to be setup in unit tests
     LocationRepo locationRepo
 
-    @Autowired(required = false)
+    @Inject @Nullable
     ContactRepo contactRepo
 
-    @Autowired(required = false)
+    @Inject @Nullable
     OrgTagRepo orgTagRepo
 
     @RepoListener

@@ -716,7 +716,7 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         Version: 7.0.8-v.11
+         Version: 7.0.8-v.12
 
 </pre>
 
@@ -746,7 +746,12 @@ More breaking changes in 7.0.8-v6. is required on domain entity now or it needs 
 </tr>
 </tbody>
 </table>
-<div class="codehilite"><pre><span></span>compile &quot;org.grails.plugins:gorm-tools:6.1.12-v.2&quot;
+<div class="codehilite"><pre><span></span>repositories {
+  //jcenter shutdown, until move to mavenCentral use the following
+  maven { url &quot;http://repo.9ci.com/public-libs&quot; }
+}
+...
+compile &quot;org.yakworks:gorm-tools:7.0.8-v.12&quot;
 </pre></div>
 
 <p>Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 

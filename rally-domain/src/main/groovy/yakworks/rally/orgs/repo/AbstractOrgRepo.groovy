@@ -4,6 +4,9 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.annotation.Nullable
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
@@ -30,9 +33,13 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
+    //@Inject @Nullable //required false so they dont need to be setup in unit tests
     LocationRepo locationRepo
+
+    //@Inject @Nullable
     ContactRepo contactRepo
-    OrgSourceRepo orgSourceRepo
+
+    //@Inject @Nullable
     OrgTagRepo orgTagRepo
 
     @RepoListener
@@ -113,7 +120,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         // if no org num then let it fall through and fail validation
         if(!org.num) return false
 
-        org.source = orgSourceRepo.createSource(org, data)
+        org.source = OrgSource.repo.createSource(org, data)
         org.source.persist()
     }
 
@@ -186,7 +193,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
     //util method that creates the OrgSource from num and assigns to the source record (if originator)
     OrgSource createSource(Org org, SourceType sourceType = SourceType.App) {
-        orgSourceRepo.createSource(org, sourceType)
+        OrgSource.repo.createSource(org, sourceType)
     }
 
 }

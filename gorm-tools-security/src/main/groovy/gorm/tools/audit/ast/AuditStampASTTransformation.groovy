@@ -92,7 +92,9 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         // } else {
             //use the default trait
         AstUtils.injectTrait(classNode, AuditStampTrait)
-        addConstraints(classNode)
+
+        //addConstraints(classNode)
+
             // addImportFrom(classNode)
             // addMappingAndConstraints(classNode, fprops.get(FieldProps.EDITED_BY_KEY))
             // addMappingAndConstraints(classNode, fprops.get(FieldProps.CREATED_BY_KEY))
@@ -199,7 +201,7 @@ class AuditStampASTTransformation implements ASTTransformation, CompilationUnitA
         }
 
         String configStr = "AuditStampTraitConstraints(delegate)"
-        def builder = new AstBuilder().buildFromString(configStr)
+        //def builder = new AstBuilder().buildFromString(configStr)
 
         BlockStatement newConfig = (BlockStatement) new AstBuilder().buildFromString(configStr).get(0)
         // ReturnStatement returnStatement = (ReturnStatement) newConfig.getStatements().get(0)

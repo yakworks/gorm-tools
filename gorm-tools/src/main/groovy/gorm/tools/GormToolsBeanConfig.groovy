@@ -79,7 +79,7 @@ class GormToolsBeanConfig {
         entityMapBinder(EntityMapBinder, ref('grailsApplication'), lazy())
         entityMapService(EntityMapService, lazy())
 
-        repoEventPublisher(RepoEventPublisher, lazy())
+        repoEventPublisher(RepoEventPublisher)
 
         repoExceptionSupport(RepoExceptionSupport, lazy())
 
@@ -119,6 +119,8 @@ class GormToolsBeanConfig {
     //This is kind of equivalent to init in bootstrap
     @CompileStatic
     void doWithApplicationContext() {
+        //FIXME, this make it very dependant on hibernate
+        //connect up the gorm-tools validator registry that fixes events and allows openapi schema
         HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
         MappingContext mappingContext = applicationContext.getBean("grailsDomainClassMappingContext", MappingContext)
         def origValRegistry = mappingContext.getValidatorRegistry()
@@ -152,10 +154,10 @@ class GormToolsBeanConfig {
         //registryRestApiControllers(grailsApplication)
     }
 
-    Closure autowireLazy() {{ bean ->
-        bean.lazyInit = true
-        bean.autowire = true
-    }}
+    // Closure autowireLazy() {{ bean ->
+    //     bean.lazyInit = true
+    //     bean.autowire = true
+    // }}
 
     Closure lazy() {{ bean ->
         bean.lazyInit = true

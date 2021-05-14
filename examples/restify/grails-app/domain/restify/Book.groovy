@@ -19,8 +19,4 @@ class Book implements NameDescription, RepoEntity<Book> {
     //default includes fields for json render with EntityMap
     static List includes = ['id', 'name', 'description', 'publishDate']
 
-    static constraints = {
-        NameDescriptionConstraints(delegate)
-    }
-
 }

@@ -11,6 +11,7 @@ import org.springframework.mock.web.MockMultipartFile
 
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Ignore
@@ -18,10 +19,11 @@ import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
 
-class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>, SecurityTest {
+class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest {
 
     @Shared
     AppResourceLoader appResourceLoader
@@ -40,7 +42,7 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
     }
 
     def setupSpec() {
-        mockDomains(FileData)
+        mockDomains(Attachment, AttachmentLink, FileData)
     }
 
     void cleanupSpec() {
@@ -80,11 +82,11 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         when:
         def fileName = 'hello.txt'
         byte[] data = 'blah blah blah'.getBytes()
-        Map params = [name:'foo.bar', originalFileName:'hello.txt', bytes: data]
+        Map params = [name:'hello.txt', bytes: data]
         Attachment attachment = attachmentRepo.create(params)
 
         then:
-        attachment.name == 'foo.bar'
+        attachment.name == 'hello.txt'
         "text/plain" == attachment.mimeType
         14 == attachment.contentLength
         'txt' == attachment.extension
@@ -154,8 +156,8 @@ class AttachmentSpec extends Specification implements DomainRepoTest<Attachment>
         Path tempFile2 = createTempFile(fileName)
 
         List list = []
-        list.add([tempFileName:tempFile.fileName, originalFileName:'grails_logo.jpg'])
-        list.add([tempFileName:tempFile2.fileName, originalFileName:'grails_logo2.jpg'])
+        list.add([tempFileName:tempFile.fileName, name:'grails_logo.jpg'])
+        list.add([tempFileName:tempFile2.fileName, name:'grails_logo2.jpg'])
 
         when:
         List attachments = attachmentRepo.bulkCreate(list)

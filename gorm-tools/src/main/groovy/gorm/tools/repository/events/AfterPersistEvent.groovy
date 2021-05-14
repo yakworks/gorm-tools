@@ -6,7 +6,7 @@ package gorm.tools.repository.events
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.model.RepositoryApi
+import gorm.tools.repository.GormRepo
 
 /**
  * Fired after successful repository.persist
@@ -15,7 +15,7 @@ import gorm.tools.repository.model.RepositoryApi
 @CompileStatic
 class AfterPersistEvent<D> extends RepositoryEvent<D> {
 
-    AfterPersistEvent(RepositoryApi repo, D entity, Map args) {
+    AfterPersistEvent(GormRepo<D> repo, D entity, Map args) {
         super(repo, entity, RepositoryEventType.AfterPersist.eventKey, args)
     }
 

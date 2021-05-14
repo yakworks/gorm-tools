@@ -5,17 +5,17 @@
 package gorm.tools.support
 
 import java.sql.BatchUpdateException
+import javax.inject.Inject
 import javax.persistence.PersistenceException
 
 import groovy.transform.CompileDynamic
 
 import org.hibernate.exception.ConstraintViolationException
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 
 import gorm.tools.repository.RepoMessage
-import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
+import yakworks.commons.lang.NameUtils
 
 /**
  * creates a Map from errors so it can be converted to json and sent to client
@@ -23,7 +23,7 @@ import grails.validation.ValidationException
 @CompileDynamic
 class ErrorMessageService {
 
-    @Autowired
+    @Inject
     MessageSource messageSource
 
     /**
@@ -68,7 +68,7 @@ class ErrorMessageService {
         if (e.hasProperty('errors')) {
             if (e.hasProperty("entity") && e.entity?.errors) {
                 errMap.errors = e.entity.errors.fieldErrors.groupBy {
-                    GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+                    NameUtils.getPropertyNameRepresentation(it.objectName)
                 }.each {
                     it.value = it.value.collectEntries {
                         [(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
@@ -76,7 +76,7 @@ class ErrorMessageService {
                 }
             } else if (!e.hasProperty("entity")) {
                 errMap.errors = e.errors.fieldErrors.groupBy {
-                    GrailsNameUtils.getPropertyNameRepresentation(it.objectName)
+                    NameUtils.getPropertyNameRepresentation(it.objectName)
                 }.each {
                     it.value = it.value.collectEntries {
                         [(it.field): messageSource.getMessage(it, Locale.ENGLISH)]

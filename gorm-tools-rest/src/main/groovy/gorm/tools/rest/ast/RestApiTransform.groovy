@@ -41,7 +41,7 @@ import gorm.tools.rest.controller.RestApiRepoController
 import grails.artefact.Artefact
 import grails.compiler.ast.ClassInjector
 import grails.io.IOUtils
-import grails.util.GrailsNameUtils
+import yakworks.commons.lang.NameUtils
 
 import static java.lang.reflect.Modifier.FINAL
 import static java.lang.reflect.Modifier.PUBLIC
@@ -127,8 +127,8 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
         String ctrlPrefixName = entityClassNode.name
         // if resourceName then convert foo-bar hyphenated to FooBar
         if(resourceName) {
-            String entityPackage = GrailsNameUtils.getPackageName(entityClassNode.name)
-            ctrlPrefixName = "${entityPackage}.${GrailsNameUtils.getNameFromScript(resourceName)}"
+            String entityPackage = NameUtils.getPackageName(entityClassNode.name)
+            ctrlPrefixName = "${entityPackage}.${NameUtils.getClassNameFromKebabCase(resourceName)}"
         }
         String className = "${ctrlPrefixName}Controller"
         // println "making className $className"

@@ -4,7 +4,6 @@
 */
 package yakworks.rally.common
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @SuppressWarnings(['MethodName'])
@@ -17,16 +16,8 @@ trait NameDescription {
     static List qSearchIncludes = ['name', 'description'] // quick search includes
     static List picklistIncludes = ['id', 'name'] //for picklist
 
-    @CompileDynamic //ok, for gorm constraints
-    static NameDescriptionConstraints(Object delegate) {
-        def c = {
-            description description: "the description for this entity",
-                nullable: true, maxSize: 255
-            name description: "the name of this entity",
-                nullable: false, blank: false, maxSize: 50
-        }
-        c.delegate = delegate
-        c()
-    }
-
+    static constraintsMap = [
+        name:[ description: 'The name for this entity', nullable: false, blank: false, maxSize: 50],
+        description:[ description: 'The description for this entity', nullable: true, maxSize: 255]
+    ]
 }

@@ -7,7 +7,7 @@ class Loader {
     String dataBinder
 
     String insertRow(Class dclass, Map row) {
-        def repo = RepoUtil.getRepoStaticProperty(dclass)
+        def repo = RepoUtil.findRepo(dclass)
         repo.create(row)
 //        GormRepoEntity instance = (GormRepoEntity)dclass.newInstance()
 //        insertRow(instance, row)

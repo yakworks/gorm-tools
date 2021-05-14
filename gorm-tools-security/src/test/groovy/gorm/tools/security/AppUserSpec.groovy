@@ -67,16 +67,16 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         then:
         //sanity check the main ones
         conProps.username.nullable == false
-        conProps['passwordHash'].property.metaConstraints["bindable"] == false
+        conProps['passwordHash'].metaConstraints["bindable"] == false
         conProps.passwordHash.display == false
-        conProps['passwordHash'].property.display == false
+        conProps['passwordHash'].display == false
 
-        conProps['editedBy'].property.metaConstraints["bindable"] == false
-        conProps['editedBy'].property.metaConstraints["description"] == "edited by user id"
+        conProps['editedBy'].metaConstraints["bindable"] == false
+        conProps['editedBy'].metaConstraints["description"] == "edited by user id"
 
         ['editedBy','createdBy', 'editedDate','createdDate'].each {
             assert con.hasProperty(it)
-            def conProp = conProps[it].property
+            def conProp = conProps[it]
             conProp.metaConstraints["bindable"] == false
             assert conProp.nullable == false
             assert !conProp.editable

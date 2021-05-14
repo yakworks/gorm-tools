@@ -7,7 +7,7 @@ package gorm.tools.repository.events
 import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.model.RepositoryApi
+import gorm.tools.repository.GormRepo
 
 /**
  * Fired before a bind and save/persist. Allows modification to params used in the binding
@@ -17,7 +17,7 @@ import gorm.tools.repository.model.RepositoryApi
 @CompileStatic
 class BeforeBindEvent<D> extends RepositoryEvent<D> {
 
-    BeforeBindEvent(RepositoryApi repo, D entity, Map data, BindAction bindAction, Map args) {
+    BeforeBindEvent(GormRepo<D> repo, D entity, Map data, BindAction bindAction, Map args) {
         super(repo, entity, RepositoryEventType.BeforeBind.eventKey, data, bindAction, args)
     }
 

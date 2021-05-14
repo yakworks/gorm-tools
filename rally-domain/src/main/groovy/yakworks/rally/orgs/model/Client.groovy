@@ -28,11 +28,10 @@ class Client implements NameNum, RepoEntity<Client>, Serializable {
         org column: 'orgId'
     }
 
-    static constraints = {
-        NameNumConstraints(delegate)
-        appUrl blank: false, nullable: false
-        org nullable: false
-    }
+    static constraintsMap = [
+        appUrl:[ description: 'The unique url prefix', nullable: false, blank: false, maxSize: 100],
+        org:[ description: 'The org this client is tied to', nullable: false]
+    ]
 
     //returns the first and what should be the only client record
     static Client get() {

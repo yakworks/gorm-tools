@@ -12,14 +12,13 @@ import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.orm.hibernate.cfg.Mapping
-import org.grails.web.plugins.support.DefaultConstrainedDiscovery
 import org.springframework.validation.Validator
 
 import gorm.tools.beans.AppCtx
+import gorm.tools.repository.validation.ApiConstraints
 import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
-import grails.util.GrailsNameUtils
-import grails.validation.Constrained
+import yakworks.commons.lang.NameUtils
 
 /**
  * A bunch of helper and lookup/finder statics for dealing with domain classes and PersistentEntity.
@@ -73,7 +72,7 @@ class GormMetaUtils {
      */
     static PersistentEntity findPersistentEntity(String name) {
         if (name.indexOf('.') == -1) {
-            String propertyName = GrailsNameUtils.getPropertyName(name)
+            String propertyName = NameUtils.getPropertyName(name)
             return getMappingContext().persistentEntities.find { PersistentEntity entity ->
                 entity.decapitalizedName == propertyName
             }
@@ -127,9 +126,21 @@ class GormMetaUtils {
         return Collections.emptyMap()
     }
 
-    static Map<String, Constrained> getConstrainedProperties(PersistentEntity entity) {
-        return new DefaultConstrainedDiscovery().findConstrainedProperties(entity)
+    static Map<String, ConstrainedProperty> findNonValidatedProperties(PersistentEntity entity) {
+        def apiConstraints = ApiConstraints.findApiConstraints(entity.javaClass)
+        return apiConstraints ? apiConstraints.nonValidatedProperties : [:]
     }
+
+    /**
+     * returns both non-validated and validated Constrained Properties
+     */
+    static Map<String, ConstrainedProperty> findAllConstrainedProperties(PersistentEntity entity) {
+        return findConstrainedProperties(entity) + findNonValidatedProperties(entity)
+    }
+
+    // static Map<String, Constrained> getConstrainedProperties(PersistentEntity entity) {
+    //     return new DefaultConstrainedDiscovery().findConstrainedProperties(entity)
+    // }
 
     /**
      * Check if Persistent Entity has property by path

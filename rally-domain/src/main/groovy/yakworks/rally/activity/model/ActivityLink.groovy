@@ -7,15 +7,14 @@ package yakworks.rally.activity.model
 import org.codehaus.groovy.util.HashCodeHelper
 
 import gorm.tools.model.Persistable
-import gorm.tools.repository.model.GetRepo
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.activity.repo.ActivityLinkRepo
 
 @Entity
 @GrailsCompileStatic
-class ActivityLink implements RepoEntity<ActivityLink>, GetRepo<ActivityLinkRepo>, Serializable {
+class ActivityLink implements GormRepoEntity<ActivityLink, ActivityLinkRepo>, Serializable {
     static belongsTo = [activity: Activity]
     String linkedEntity
     Long linkedId
@@ -25,10 +24,15 @@ class ActivityLink implements RepoEntity<ActivityLink>, GetRepo<ActivityLinkRepo
         version false
         activity column: 'activityId', cache: true, fetch: 'join'
     }
-    static constraints = {
-        linkedEntity nullable: false, blank: false
-        linkedId nullable: false
-    }
+
+    static constraintsMap = [
+        // activity nullable: false
+        linkedEntity:[ description: 'The linked entity name', example: 'ArTran',
+            nullable: false, blank: false],
+        linkedId:[ description: 'The id for the linked entity', example: 954,
+            nullable: false]
+    ]
+
     //static ActivityLinkRepo getRepo() { RepoUtil.findRepo(this) as ActivityLinkRepo }
 
     static ActivityLink create(Persistable entity, Activity act, Map args = [:]) {

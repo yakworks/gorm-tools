@@ -4,6 +4,9 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.annotation.Nullable
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
@@ -11,7 +14,6 @@ import org.springframework.validation.Errors
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
-import grails.gorm.validation.ConstrainedProperty
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
@@ -20,6 +22,7 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgMemberRepo implements GormRepo<OrgMember> {
 
+    @Inject @Nullable
     OrgDimensionService orgDimensionService
 
     @RepoListener

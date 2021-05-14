@@ -12,7 +12,7 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 class ContactPhone implements RepoEntity<ContactPhone>, Serializable {
 
-    String kind
+    String kind //XXX what is this, should be enum?
     String num
     Boolean isPrimary = false
 
@@ -22,9 +22,9 @@ class ContactPhone implements RepoEntity<ContactPhone>, Serializable {
         contact column: 'contactId'
     }
 
-    static constraints = {
-        kind blank: false, nullable: true, maxSize: 50
-        num blank: false, nullable: true, maxSize: 50
-        isPrimary nullable: true
-    }
+    static constraintsMap = [
+        kind:[ description: 'future use', blank: false, maxSize: 50],
+        num:[ description: 'future use', blank: false, maxSize: 50],
+        isPrimary:[ description: 'if this is the contacts primary number', nullable: false, required: false],
+    ]
 }

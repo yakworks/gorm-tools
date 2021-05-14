@@ -68,36 +68,36 @@ class Contact implements NameNum, RepoEntity<Contact>, Serializable {
         sources cascade: "all-delete-orphan"
     }
 
-    static constraints = {
-        num nullable: true, maxSize: 50
-        name blank: false, nullable: false, maxSize: 50
+    static constraintsMap = [
+        num:[ nullable: true, maxSize: 50],
+        name:[ nullable: false, blank: false, maxSize: 50],
 
-        entityName nullable: true
-        inactive nullable: false
-        isPrimary nullable: false
+        entityName:[ nullable: true],
+        inactive:[ nullable: false],
+        isPrimary:[ nullable: false],
 
-        isLocationDifferent nullable: false
-        location nullable: true
-        phone nullable: true
-        email email: true, nullable: true
+        isLocationDifferent:[ nullable: false],
+        location:[ nullable: true],
+        phone:[ nullable: true],
+        email:[ email: true, nullable: true],
 
-        firstName blank: false, nullable: false, maxSize: 50
-        middleName nullable: true, maxSize: 50
-        lastName nullable: true, maxSize: 50
-        nickName nullable: true, maxSize: 50
-        salutation nullable: true, maxSize: 50
-        jobTitle nullable: true, maxSize: 50
-        department nullable: true, maxSize: 50
-        birthday nullable: true
-        comments nullable: true
+        firstName:[ blank: false, nullable: false, maxSize: 50],
+        middleName:[ nullable: true, maxSize: 50],
+        lastName:[ nullable: true, maxSize: 50],
+        nickName:[ nullable: true, maxSize: 50],
+        salutation:[ nullable: true, maxSize: 50],
+        jobTitle:[ nullable: true, maxSize: 50],
+        department:[ nullable: true, maxSize: 50],
+        birthday:[ nullable: true],
+        comments:[ nullable: true],
 
-        tagForReminders nullable: false
-        org nullable: false
-        visibleToOrgType nullable: true
+        tagForReminders:[ nullable: false],
+        org:[ nullable: false],
+        visibleToOrgType:[ nullable: true],
 
-        flex nullable: true
-        user nullable: true
-    }
+        flex:[ nullable: true],
+        user:[ nullable: true],
+    ]
 
     static ContactRepo getRepo() { RepoUtil.findRepo(this) as ContactRepo }
 

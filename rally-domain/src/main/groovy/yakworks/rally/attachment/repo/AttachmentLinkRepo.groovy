@@ -5,7 +5,6 @@
 package yakworks.rally.attachment.repo
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
@@ -14,11 +13,9 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.common.LinkedEntityRepoTrait
 
-@Slf4j
 @GormRepository
 @CompileStatic
 class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attachment> {
-    AttachmentRepo attachmentRepo
 
     @Override
     String getItemPropName() {'attachment'}
@@ -40,6 +37,10 @@ class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attach
         query(attachment: attach).count()
     }
 
+    boolean hasAttachments(Persistable entity) {
+        queryFor(entity).count()
+    }
+
     /**
      * Copies Attachments from the source to target
      *
@@ -47,14 +48,14 @@ class AttachmentLinkRepo implements LinkedEntityRepoTrait<AttachmentLink, Attach
      * @param toEntity entity to copy attachments to
      * @return the Results which will be ok or have errors if problem occured with IO
      */
-    //XXX needs good test from 9ci rally
+    //XXX needs good test
     Results copy(Persistable fromEntity, Persistable toEntity) {
         Results results = Results.OK
         List attachLinks = list(fromEntity)
         for(AttachmentLink attachLink : attachLinks){
             //catch exceptions and move on in case attachment has a bad link we dont want to fail the whole thing
             try {
-                Attachment attachmentCopy = attachmentRepo.copy(attachLink.attachment)
+                Attachment attachmentCopy = Attachment.repo.copy(attachLink.attachment)
                 if (attachmentCopy) create(toEntity, attachmentCopy)
             } catch (ex){
                 results.addError(ex)

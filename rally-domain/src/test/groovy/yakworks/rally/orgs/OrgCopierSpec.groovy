@@ -3,7 +3,11 @@ package yakworks.rally.orgs
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import grails.buildtestdata.TestData
+import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityLink
+import yakworks.rally.activity.model.ActivityTag
+import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.OrgCopier
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.Contact
@@ -20,8 +24,6 @@ import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
-import spock.lang.Specification
-import yakworks.rally.attachment.model.AttachmentLink
 
 class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest {
 
@@ -34,7 +36,7 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         mockDomains(
             Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag,
             OrgInfo, OrgTypeSetup, Location, ContactPhone,
-            ContactEmail, ContactSource, ContactFlex, Activity, AttachmentLink
+            ContactEmail, ContactSource, ContactFlex, Activity, ActivityTag, ActivityLink, AttachmentLink
         )
         defineBeans {
             orgCopier(OrgCopier)

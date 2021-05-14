@@ -1,20 +1,15 @@
 package gpbench.benchmarks.update
 
-import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.model.RepositoryApi
-import gpbench.Country
-import gpbench.Region
-import gpbench.benchmarks.BaseBatchInsertBenchmark
-import grails.web.databinding.WebDataBinding
+import java.util.concurrent.ThreadLocalRandom
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.model.PersistentProperty
-import org.grails.datastore.mapping.model.types.Association
 
-import javax.xml.crypto.Data
-import java.util.concurrent.ThreadLocalRandom
+import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
+import gpbench.Region
+import gpbench.benchmarks.BaseBatchInsertBenchmark
 
 /**
  * Baseline benchmark with grails out of the box
@@ -24,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom
 abstract class BaseUpdateBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
     EntityMapBinder entityMapBinder
-    RepositoryApi<T> repo
+    GormRepo<T> repo
     List<Map> citiesUpdated
 
     BaseUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {

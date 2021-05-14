@@ -9,14 +9,14 @@ import groovy.transform.TypeCheckingMode
 
 import org.grails.datastore.gorm.GormEntity
 
-import gorm.tools.repository.model.RepositoryApi
+import gorm.tools.repository.GormRepo
 
 /**
  * Delegates missing properties as method calls to the repository for the domain class.
  */
 @CompileStatic
 class RepoDelegatingBean extends DelegatingBean {
-    RepositoryApi repo
+    GormRepo repo
 
     @CompileStatic(TypeCheckingMode.SKIP)
     RepoDelegatingBean(GormEntity target) {

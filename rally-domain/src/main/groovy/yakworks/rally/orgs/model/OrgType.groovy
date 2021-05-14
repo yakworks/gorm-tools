@@ -7,7 +7,7 @@ package yakworks.rally.orgs.model
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.IdEnum
-import grails.util.GrailsNameUtils
+import yakworks.commons.lang.NameUtils
 
 @CompileStatic
 enum OrgType implements IdEnum<OrgType, Long> {
@@ -38,7 +38,7 @@ enum OrgType implements IdEnum<OrgType, Long> {
      * so CustAccount will become custAccount
      */
     String getPropertyName(){
-        GrailsNameUtils.getPropertyName(name())
+        NameUtils.getPropertyName(name())
     }
 
     /**

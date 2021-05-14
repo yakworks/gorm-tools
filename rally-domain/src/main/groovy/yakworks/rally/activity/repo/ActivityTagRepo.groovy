@@ -5,7 +5,6 @@
 package yakworks.rally.activity.repo
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
@@ -16,7 +15,6 @@ import yakworks.rally.common.LinkedEntityRepoTrait
 import yakworks.rally.tag.model.Tag
 
 @GormRepository
-@Slf4j
 @CompileStatic
 class ActivityTagRepo implements LinkedEntityRepoTrait<ActivityTag, Tag> {
 

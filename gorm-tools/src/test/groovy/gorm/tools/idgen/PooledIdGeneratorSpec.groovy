@@ -5,13 +5,13 @@
 package gorm.tools.idgen
 
 import gorm.tools.testing.support.MockJdbcIdGenerator
-import gorm.tools.testing.unit.GormToolsTest
+import gorm.tools.testing.unit.DataRepoTest
 import groovyx.gpars.GParsPool
 import spock.lang.Shared
 import spock.lang.Specification
 import testing.Cust
 
-class PooledIdGeneratorSpec extends Specification implements GormToolsTest {
+class PooledIdGeneratorSpec extends Specification implements DataRepoTest {
 
     // @Shared
     // MockJdbcIdGenerator jdbcIdGenerator

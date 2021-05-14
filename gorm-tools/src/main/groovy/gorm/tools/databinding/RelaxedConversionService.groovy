@@ -16,7 +16,7 @@ import org.springframework.util.Assert
 
 /**
  * copied in from old spring boot 1.5 code.
- * Allows for case insensitive enums right now but more canbe added.
+ * Allows for case insensitive enums right now but more can be added.
  */
 @CompileStatic
 class RelaxedConversionService implements ConversionService {

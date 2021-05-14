@@ -1,0 +1,55 @@
+Activity:
+  description: |
+    An activity which can be a note or task/todo.
+    Will be associated with an Org but can be linked to transactions with links.
+  required: [org]
+  type: object
+  properties:
+    arTranId:
+      description: Short cut property to add a link entry for an ArTran.
+      validate: false
+      access: c #create only
+    contacts:
+      description: The contacts associated with this activity.
+    kind:
+      description: The type of the activity, certain kinds are only valid for a Task.
+      nullable: false
+      required: false
+      default: Note
+      access: cr # (c)create and (r)read
+    links:
+      description: The entities this is linked to.
+      validate: false
+    note:
+      description: A note for this activity. Summary will be built from this
+    org:
+      description: The Org this activity belongs to
+      nullable: false
+    parentId:
+      description: The parent note that this is a comment for
+    source:
+      description: The source description for where this activity came from.
+    sourceEntity:
+      description: The gorm domain name of the record that generated this such as CollectionStep, Promise
+    sourceId:
+      description: The id from the outside source or of the collection step, promise or some future workflow template record that generated this
+    summary:
+      description: A 255 char string summary of the activity. Will be the title if its
+        a task and if note it will ends with ... if there is more to the note.
+    task:
+      description: The task info if this is a task kind
+    template:
+      description: The template that was or will be used to generate this note or the
+        tasks email/fax/letter/report,etc..
+    title:
+      description: The title for this, optional as summary will work
+    visibleId:
+      description: The id fo the role or group this is visible to if set to role
+      type: integer
+      format: int64
+    visibleTo:
+      description: Who can see this activity. Defaults to Everyone
+      default: Everyone
+      nullable: false
+      required: false
+

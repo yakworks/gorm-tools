@@ -29,7 +29,7 @@ class RepoExceptionSupport {
      * @return the new EntityValidationException or the OptimisticLockingFailureException with a betters message if thats was what
      *         was thrown originally
      */
-    RuntimeException translateException(RuntimeException ex, Object entity) {
+    static RuntimeException translateException(RuntimeException ex, Object entity) {
         /*
          * We need to check for EntityValidationException first and return it back without changes,
          * because in case "ex" is the EntityValidationException, it will be re-created with "notSaved" message.

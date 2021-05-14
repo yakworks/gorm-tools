@@ -24,12 +24,12 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
         //sanity check the main ones
         conProps.name.nullable == false
 
-        conProps['editedBy'].property.metaConstraints["bindable"] == false
-        conProps['editedBy'].property.metaConstraints["description"] == "edited by user id"
+        conProps['editedBy'].metaConstraints["bindable"] == false
+        conProps['editedBy'].metaConstraints["description"] == "edited by user id"
 
         ['editedBy','createdBy', 'editedDate','createdDate'].each {
             assert con.hasProperty(it)
-            def conProp = conProps[it].property
+            def conProp = conProps[it]
             conProp.metaConstraints["bindable"] == false
             assert !conProp.nullable
             assert !conProp.editable
@@ -50,7 +50,7 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
 
         ['editedBy','createdBy', 'editedDate','createdDate'].each {
             assert con.hasProperty(it)
-            def conProp = conProps[it].property
+            def conProp = conProps[it]
             conProp.metaConstraints["bindable"] == false
             assert !conProp.nullable
             assert !conProp.editable

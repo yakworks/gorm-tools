@@ -21,7 +21,7 @@ import yakworks.rally.common.LinkedEntityRepoTrait
  * for example, Org has its own OrgAttachment
  */
 @CompileStatic
-trait AttachmentLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, QueryMangoEntity<D> {
+trait AttachmentLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R>, QueryMangoEntity<D> {
 
     Long linkedId
     String linkedEntity
@@ -33,7 +33,7 @@ trait AttachmentLinkTrait<D> implements PersistableRepoEntity<D, GormRepo<D>>, Q
 
     // used for the equals and hashcode
     @Transient
-    Long getAttachmentId() { (Long)this.getAssociationId("tag") }
+    Long getAttachmentId() { (Long)this.getAssociationId("attachment") }
 
     static LinkedEntityRepoTrait<D,Attachment> getAttachmentLinkRepo() {
         getRepo() as LinkedEntityRepoTrait<D,Attachment>

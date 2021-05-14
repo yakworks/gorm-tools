@@ -4,6 +4,7 @@
 */
 package gorm.tools.security
 
+import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 
@@ -21,8 +22,8 @@ import grails.gorm.transactions.Transactional
 @CompileStatic
 class PasswordValidator {
 
-    @Autowired MessageSource messageSource
-    @Autowired PasswordEncoder passwordEncoder
+    @Inject MessageSource messageSource
+    @Inject PasswordEncoder passwordEncoder
 
     @Value('${gorm.tools.security.password.minLength:4}')
     Integer passwordMinLength

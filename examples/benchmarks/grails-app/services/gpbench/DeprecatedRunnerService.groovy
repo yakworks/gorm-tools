@@ -2,7 +2,7 @@ package gpbench
 
 
 import gorm.tools.async.AsyncSupport
-import gorm.tools.repository.model.RepositoryApi
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gpbench.basic.*
@@ -233,7 +233,7 @@ class DeprecatedRunnerService {
         assert Region.count() == 3953
     }
 
-    void insert(List<List<Map>> batchList, RepositoryApi repo) {
+    void insert(List<List<Map>> batchList, GormRepo repo) {
         asyncSupport.parallel(batchList) { List<Map> list, Map args ->
             repo.batchCreate(list)
         }

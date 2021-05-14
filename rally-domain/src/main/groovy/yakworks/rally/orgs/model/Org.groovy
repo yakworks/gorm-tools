@@ -40,34 +40,31 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
     //this makes finders like OrgMember.findByBranch(branch) work, without it gets confused and fails
     static mappedBy = [member: "org"]
 
-    static constraints = {
-        NameNumConstraints(delegate, [
-            num: [description: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
-            name: [description: 'The full name for this organization', example: 'SpaceX Corp.']
-        ])
-        type description: 'The type of org', example: 'Customer',
-            nullable: false, bindable: false
-        comments description: 'A user visible comment', example: 'Lorem ipsum',
-            nullable: true, maxSize: 255
-        companyId description: 'Company id this org belongs to', example: '2',
-            nullable: true
-        inactive description: 'indicator for an Org that is no longer active',
-            nullable: false, required: false
+    static constraintsMap = [
+        num: [description: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
+        name: [description: 'The full name for this organization', example: 'SpaceX Corp.'],
+        type:[ description: 'The type of org', example: 'Customer',
+             nullable: false, bindable: false],
+        comments:[ description: 'A user visible comment', example: 'Lorem ipsum',
+             nullable: true],
+        companyId:[ description: 'Company id this org belongs to', example: 2,
+             nullable: true],
+        inactive:[ description: 'indicator for an Org that is no longer active'],
         //associations
-        flex description: 'User flex fields', nullable: true
-        info description: 'Info such as phone and website for an organization',
-            nullable: true
-        contact description: 'The default or key Contact for this organization',
-            nullable: true, bindable: false
-        source description: 'Originator source info, used when this is sourced externally',
-            nullable: true, bindable: false
-        location description: 'The primary organization address info',
-            nullable: true, bindable: false
-        calc description: 'Calculated fields',
-            nullable: true, bindable: false
-        member description: 'Dimension hierarchy fields',
-            nullable: true, bindable: false
-    }
+        flex:[ description: 'User flex fields', nullable: true],
+        info:[ description: 'Info such as phone and website for an organization',
+             nullable: true],
+        contact:[ description: 'The default or key Contact for this organization',
+             nullable: true, bindable: false],
+        source:[ description: 'Originator source info, used when this is sourced externally',
+             nullable: true, bindable: false],
+        location:[ description: 'The primary organization address info',
+             nullable: true, bindable: false],
+        calc:[ description: 'Calculated fields',
+             nullable: true, bindable: false, editable: false],
+        member:[ description: 'Dimension hierarchy fields',
+             nullable: true, bindable: false]
+    ]
 
     static mapping = {
         id generator: 'assigned'

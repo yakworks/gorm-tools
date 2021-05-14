@@ -4,12 +4,13 @@
 */
 package yakworks.rally.eventlog
 
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovy.util.logging.Slf4j
 
 import org.grails.datastore.mapping.query.api.Criteria
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
@@ -34,7 +35,7 @@ class EventLogger {
     @Value('${nine.eventLog.searchDays:7}')
     int searchDays
 
-    @Autowired
+    @Inject
     GrailsApplication grailsApplication
 
     EventLog error(String message) {

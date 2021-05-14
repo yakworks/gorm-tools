@@ -17,8 +17,8 @@ class Company implements NameNum, RepoEntity<Company>, Serializable {
     public static final Long DEFAULT_COMPANY_ID = 2
     public static final Long BAD_DEBT_COMPANY_ID = 5
 
-    String website
-    String sourceId
+    String website //XXX whats this for? can't we get it from org.info
+    String sourceId //XXX whats this for?
     static belongsTo = [org: Org]
 
     static mapping = {
@@ -27,10 +27,9 @@ class Company implements NameNum, RepoEntity<Company>, Serializable {
         org insertable: false, updateable: false, column: 'id'
     }
 
-    static constraints = {
-        NameNumConstraints(delegate)
-        website nullable: true
-        sourceId nullable: true
-    }
+    static constraintsMap = [
+        website:[ description: 'The company website', nullable: true],
+        sourceId:[ description: 'The source identifier for this company', nullable: true]
+    ]
 
 }

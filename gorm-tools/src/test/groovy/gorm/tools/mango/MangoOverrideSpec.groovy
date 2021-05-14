@@ -4,17 +4,17 @@
 */
 package gorm.tools.mango
 
-import org.springframework.beans.factory.annotation.Autowired
+import javax.inject.Inject
 
 import gorm.tools.mango.api.MangoQuery
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.testing.unit.GormToolsTest
+import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
 import spock.lang.Specification
 
-class MangoOverrideSpec extends Specification implements GormToolsTest {
+class MangoOverrideSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         defineBeans{ newMangoQuery(NewMangoQuery) }
@@ -58,7 +58,7 @@ class NewMangoQuery implements MangoQuery {
 @GormRepository
 class CityRepo implements GormRepo<City> {
 
-    @Autowired
+    @Inject
     NewMangoQuery newMangoQuery
 
     MangoQuery getMangoQuery(){ newMangoQuery }

@@ -42,16 +42,6 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
         factory column: 'factoryId', lazy: true
     }
 
-    // static constraints = {
-    //     //validate dimension levels based on the configured paths, See OrgDimensionConstraint
-    //     branch orgDimension: "Branch"
-    //     division orgDimension: "Division"
-    //     business orgDimension: "Business"
-    //     sales orgDimension: "Sales"
-    //     region orgDimension: "Region"
-    //     factory orgDimension: "Factory"
-    // }
-
     OrgMember copy() {
         return new OrgMember(branch: this.branch, division: this.division, business: this.business,
             sales: this.sales, region: this.region, factory: this.factory)

@@ -12,6 +12,9 @@ import org.grails.plugin.hibernate.support.HibernatePersistenceContextIntercepto
 
 import gorm.tools.GormToolsBeanConfig
 import gorm.tools.idgen.PooledIdGenerator
+import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.testing.support.GormToolsSpecHelper
 import gorm.tools.testing.support.JsonViewSpecSetup
 import gorm.tools.testing.support.MockJdbcIdGenerator
@@ -44,22 +47,37 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
 
         defineBeans(new GormToolsBeanConfig(ctx).getBeanDefinitions())
 
-        Closure beans = {}
-
-        beans = beans << {
+        defineBeans{
             persistenceInterceptor(HibernatePersistenceContextInterceptor){
                 hibernateDatastore = (HibernateDatastore)hibernateDatastore
             }
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
         }
+        //
+        // datastore.mappingContext.persistentEntities*.javaClass.each { domainClass ->
+        //     beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
+        // }
+        // beans = beans << doWithSpringFirst()
+        defineBeans(doWithSpringFirst())
 
         //finds and register repositories for all the persistentEntities that got setup
-        datastore.mappingContext.persistentEntities*.javaClass.each { domainClass ->
-            beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
+        defineBeans {
+            for(Class domainClass in datastore.mappingContext.persistentEntities*.javaClass){
+                Class repoClass = findRepoClass(domainClass)
+                grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
+                String repoName = RepoUtil.getRepoBeanName(domainClass)
+                if (repoClass == DefaultGormRepo) {
+                    "$repoName"(repoClass, domainClass) { bean ->
+                        bean.autowire = true
+                    }
+                } else {
+                    "$repoName"(repoClass) { bean ->
+                        bean.autowire = true
+                    }
+                }
+            }
         }
-        beans = beans << doWithSpringFirst()
-        defineBeans(beans)
     }
 
     /** consistency with other areas of grails and other unit tests */

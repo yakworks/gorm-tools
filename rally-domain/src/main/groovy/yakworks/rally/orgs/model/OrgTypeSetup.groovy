@@ -27,10 +27,6 @@ class OrgTypeSetup implements NameDescription, RepoEntity<OrgTypeSetup>, Seriali
         id generator: 'assigned'
     }
 
-    static constraints = {
-        NameDescriptionConstraints(delegate)
-    }
-
     @Transient
     OrgType getOrgType(){
         OrgType.get(id)

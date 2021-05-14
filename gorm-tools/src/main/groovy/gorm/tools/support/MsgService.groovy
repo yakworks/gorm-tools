@@ -4,9 +4,10 @@
 */
 package gorm.tools.support
 
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.context.NoSuchMessageException
@@ -26,7 +27,7 @@ import org.springframework.context.i18n.LocaleContextHolder
 @CompileStatic
 class MsgService {
 
-    @Autowired MessageSource messageSource
+    @Inject MessageSource messageSource
 
     //used mostly for testing, not set in production so LocaleContextHolder gets used
     Locale defaultLocale

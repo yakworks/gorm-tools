@@ -29,7 +29,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     }
 
     Class[] getDomainClassesToMock() {
-        [TestDomain, AnotherDomain, BindableNested]
+        [TestDomain, Nest, AnotherDomain, BindableNested]
     }
 
     void "should bind numbers without going through converters"() {

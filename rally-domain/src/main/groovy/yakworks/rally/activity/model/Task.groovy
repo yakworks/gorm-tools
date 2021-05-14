@@ -22,7 +22,7 @@ import yakworks.rally.orgs.model.Contact
 @GrailsCompileStatic
 class Task implements RepoEntity<Task>, Serializable {
     static transients = ['completedByName', 'assignedToName']
-    static belongsTo = [activity: Activity]
+    static belongsTo = [Activity]
 
     Long completedBy //who completed this. System is 1
     LocalDateTime completedDate  //when was this completed
@@ -38,7 +38,6 @@ class Task implements RepoEntity<Task>, Serializable {
     //normally the same as createdBy unless I am creating an activity for someone else to complete
     Long userId
 
-
     @CompileDynamic //bug in GrailsCompileStatic
     static enum State implements IdEnum<State, Integer> {
         Open(0), Complete(1), Draft(2), Void(3)
@@ -50,25 +49,35 @@ class Task implements RepoEntity<Task>, Serializable {
     }
 
     static mapping = {
+        id generator: 'assigned'
         state column: 'state', enumType: 'identity'
         status column: 'statusId'
         taskType column: 'taskTypeId'
     }
 
-    static constraints = {
-        dueDate nullable: false
-        state nullable: false
-        status nullable: false
-        taskType nullable: false
+    static constraintsMap = [
+        dueDate:[ description: 'The relative path to the locationKey',
+            nullable: false],
+        state:[ description: 'Defaults to Open',
+            nullable: false, required: false],
+        status:[ description: 'Defaults to TaskStatus.OPEN',
+            nullable: false, required: false],
+        taskType:[ description: 'The type of the task',
+            nullable: false],
         //title         nullable:false
 
         /*optional */
-        completedBy nullable: true
-        completedDate nullable: true
-        docTag nullable: true, maxSize: 255
-        priority nullable: true
-        userId nullable: true
-    }
+        completedBy:[ description: 'The user who completed',
+            nullable: true],
+        completedDate:[ description: 'The date it was completed',
+            nullable: true],
+        docTag:[ description: 'descriptor',
+            nullable: true],
+        priority:[ description: '10 is Critical, 20 High, 30 Medium, 40 Low',
+            nullable: true],
+        userId:[ description: 'User id who is responsible for making sure this thing is done. null means anyone.',
+            nullable: true]
+    ]
 
     void setupDefaultStatus() {
         if (!status) status = TaskStatus.OPEN

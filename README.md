@@ -40,7 +40,12 @@
 
 
 ```
-compile "org.grails.plugins:gorm-tools:6.1.12-v.2"
+repositories {
+  //jcenter shutdown, until move to mavenCentral use the following
+  maven { url "http://repo.9ci.com/public-libs" }
+}
+...
+compile "org.yakworks:gorm-tools:7.0.8-v.12"
 ``` 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 

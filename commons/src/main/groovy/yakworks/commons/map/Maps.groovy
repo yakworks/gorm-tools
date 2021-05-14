@@ -41,6 +41,10 @@ class Maps {
         } as Map
     }
 
+    static Map merge(List<Map> sources) {
+        merge(sources as Map[])
+    }
+
     /**
      * Does a deep merge on the maps with groovy
      *

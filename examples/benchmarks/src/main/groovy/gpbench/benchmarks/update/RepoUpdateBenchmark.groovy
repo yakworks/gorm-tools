@@ -1,19 +1,18 @@
 package gpbench.benchmarks.update
 
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.model.RepositoryApi
-import gpbench.basic.CityBasic
-import grails.web.databinding.WebDataBinding
+import java.util.concurrent.atomic.AtomicInteger
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
 
-import java.util.concurrent.atomic.AtomicInteger
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
+import gpbench.basic.CityBasic
 
 @CompileStatic
 class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
 
-    RepositoryApi<T> repo
+    GormRepo<T> repo
 
     RepoUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)

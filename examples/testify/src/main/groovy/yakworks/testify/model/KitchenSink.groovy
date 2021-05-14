@@ -71,7 +71,7 @@ class KitchenSink implements NameNum, RepoEntity<KitchenSink>, CreateCriteriaSup
     }
 
     static constraints = {
-        NameNumConstraints(delegate)
+        apiConstraints(delegate)
 
         name2    nullable: true
         secret   nullable: true, display: false

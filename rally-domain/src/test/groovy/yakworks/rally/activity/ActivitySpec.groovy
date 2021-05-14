@@ -5,8 +5,10 @@ import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
@@ -17,16 +19,17 @@ import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockHelper
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-class ActivitySpec extends Specification implements DomainRepoTest<Activity>, SecurityTest { //implements SecuritySpecUnitTestHelper{
+class ActivitySpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     //Sanity checks and auto runs DomainRepoCrudSpec tests
 
-    Closure doWithSpringFirst() {
-        return {
+    void setupSpec(){
+        defineBeans{
             grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
             grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
             appResourceLoader(AppResourceLoader) {
@@ -34,10 +37,7 @@ class ActivitySpec extends Specification implements DomainRepoTest<Activity>, Se
             }
             attachmentSupport(AttachmentSupport)
         }
-    }
-    void setupSpec(){
-        // mockDomains(Org, User, Task, Attachment, Activity,
-        mockDomains(Activity, ActivityLink, AttachmentLink, Attachment, ActivityNote, ActivityTag, OrgTypeSetup)
+        mockDomains(AttachmentLink, ActivityLink, ActivityTag, Activity, Org, OrgTag, Attachment, ActivityNote)
     }
 
     Map buildUpdateMap(Map args) {
@@ -232,7 +232,7 @@ class ActivitySpec extends Specification implements DomainRepoTest<Activity>, Se
         activity.attachments[0] == AttachmentLink.get(activity, attachment).attachment
 
         when:
-        Activity.repo.removeAttachment(activity, attachment)
+        Attachment.repo.removeAttachment(activity, attachment)
         flushAndClear()
 
         then:

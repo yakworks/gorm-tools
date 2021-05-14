@@ -40,13 +40,13 @@ class AttachmentSupport {
      * source for the linked attachment file.
      *
      * @param attachmentId the ID of the Attachment record this file is going into.
-     * @param originalFileName The file name to use and concat with attachmentId, tempFileName will be munged with unique UUID
+     * @param fileName The file name to use and concat with attachmentId, tempFileName will be munged with unique UUID
      * @param tempFileName The name of the file in the tempDir.
      * @param locationKey defaults to 'attachments.location' but can be another config key to pass to appResourceLoader
      * @return the Path for the created attachment file.
      */
-    Path createFileFromTempFile(Long id, String originalFileName, String tempFileName, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        Path attachmentFile = getAttachmentsPath(id, originalFileName, locationKey)
+    Path createFileFromTempFile(Long id, String fileName, String tempFileName, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+        Path attachmentFile = getAttachmentsPath(id, fileName, locationKey)
         Path tempFile = getTempPath().resolve(tempFileName)
         if(!Files.exists(tempFile)) throw new FileNotFoundException("Could not find temp file: ${tempFile}")
         return Files.move(tempFile, attachmentFile)
@@ -56,13 +56,13 @@ class AttachmentSupport {
      * creates a file from bytes
      *
      * @param id the ID of the Attachment record this file is going into.
-     * @param originalFileName The file name to use and concat with attachmentId
+     * @param fileName The file name to use and concat with attachmentId
      * @param bytes the byte array to use
      * @param locationKey defaults to 'attachments.location' but can be another config key to pass to appResourceLoader
      * @return the Path for the created attachment file.
      */
-    Path createFileFromBytes(Long id, String originalFileName, byte[] bytes, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        Path attachmentFile = getAttachmentsPath(id, originalFileName, locationKey)
+    Path createFileFromBytes(Long id, String fileName, byte[] bytes, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+        Path attachmentFile = getAttachmentsPath(id, fileName, locationKey)
         return Files.write(attachmentFile, bytes)
     }
 
@@ -70,14 +70,14 @@ class AttachmentSupport {
      * Copies source/temp file for a Attachment linked file to the attachment dir.
      *
      * @param attachmentId the ID of the Attachment record this file is going into.
-     * @param originalFileName The file name to use and concat with attachmentId, can be null and will use name of sourceFile
+     * @param fileName The file name to use and concat with attachmentId, can be null and will use name of sourceFile
      * @param sourceFile The absolute path of the file or temp file to be copied and linked.
      * @param locationKey defaults to 'attachments.location' but can be another config key to pass to appResourceLoader
      * @return the Path for the created attachment file.
      */
-    Path createFileFromSource(Long id, String originalFileName, Path sourceFile, String locationKey = ATTACHMENTS_LOCATION_KEY) {
-        if(!originalFileName) originalFileName = sourceFile.getFileName().toString()
-        Path attachmentFile = getAttachmentsPath(id, originalFileName, locationKey)
+    Path createFileFromSource(Long id, String fileName, Path sourceFile, String locationKey = ATTACHMENTS_LOCATION_KEY) {
+        if(!fileName) fileName = sourceFile.getFileName().toString()
+        Path attachmentFile = getAttachmentsPath(id, fileName, locationKey)
         return Files.copy(sourceFile, attachmentFile)
     }
 
@@ -124,12 +124,12 @@ class AttachmentSupport {
     /**
      * use appResourceLoader to create a temp file
      *
-     * @param originalFileName the name of the file that was uploaded
+     * @param fileName the name of the file that was uploaded
      * @param data is the file contents, and can be String, byte[], or null.
      * @return a Path instance pointing to file
      */
-    Path createTempFile(String originalFileName, Object data){
-        appResourceLoader.createTempFile(originalFileName, data).toPath()
+    Path createTempFile(String fileName, Object data){
+        appResourceLoader.createTempFile(fileName, data).toPath()
     }
 
     Path getFile(String location, String locationKey = ATTACHMENTS_LOCATION_KEY) {
@@ -190,7 +190,6 @@ class AttachmentSupport {
      */
     static Map mergeMultipartFileParams(MultipartFile multipartFile, Map params) {
         params['name'] = params.name ?: multipartFile.originalFilename
-        params['originalFileName'] = multipartFile.originalFilename
         params['mimeType'] = multipartFile.contentType
         params['bytes'] = multipartFile.bytes
         params['extension'] = FilenameUtils.getExtension(multipartFile.originalFilename)

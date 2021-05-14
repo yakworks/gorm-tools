@@ -11,39 +11,36 @@ import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.audit.AuditStampTrait
-import gorm.tools.repository.model.GetRepo
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class AppUser implements AuditStampTrait, RepoEntity<AppUser>, GetRepo<AppUserRepo>, Serializable {
+class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
 
-    static constraints = {
-        AuditStampTraitConstraints(delegate)
-        username description: '''\
+    static constraintsMap = [
+        username:[ description: '''\
             The unique user name, also known as your handle –– what you put after the “@” symbol ala github or twitter
             to mention others in comments or notes. appears in your profile URL. username is used to log in to your account,
             and is visible when sending and receiving. All lowercase and no spaces or special characters.
-            ''',
-            blank: false, nullable: false, unique: true, maxSize: 50
-        name description: "The full name or display name, may come from contact or defaults to username if not populated",
-             blank: false, nullable: false, maxSize: 50
-        email description: "The email",
-              nullable: false, blank: false, email: true, unique: true
-        passwordHash description: "The pwd hash, internal use only, never show this",
-                     blank: false, nullable: false, maxSize: 60, bindable: false, display:false, password: true
-        passwordChangedDate description: "The date password was changed",
-            nullable: true, bindable: false
-        passwordExpired description: "The password expired",
-            bindable: false
-        resetPasswordToken description: "temp token for a password reset, internal use only",
-            nullable: true, bindable: false, display:false
-        resetPasswordDate description: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",
-            nullable: true, bindable: false, display:false
-    }
+            '''.stripIndent(), blank: false, nullable: false, unique: true, maxSize: 50],
+        username:[ description: "The full name or display name, may come from contact or defaults to username if not populated",
+                 blank: false, nullable: false, required: false,  maxSize: 50],
+        email:[ description: "The email",
+                 nullable: false, blank: false, email: true, unique: true],
+        passwordHash:[ description: "The pwd hash, internal use only, never show this",
+                 blank: false, nullable: false, maxSize: 60, bindable: false, display:false, password: true],
+        passwordChangedDate:[ description: "The date password was changed",
+                 nullable: true, bindable: false],
+        passwordExpired:[ description: "The password expired",
+                 bindable: false],
+        resetPasswordToken:[ description: "temp token for a password reset, internal use only",
+                 nullable: true, bindable: false, display:false],
+        resetPasswordDate:[ description: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",
+                 nullable: true, bindable: false, display:false]
+    ]
 
     String username
     String  name // the full name or display name, may come from contact or defaults to username if not populated

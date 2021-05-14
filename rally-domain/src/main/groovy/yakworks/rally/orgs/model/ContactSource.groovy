@@ -26,11 +26,11 @@ class ContactSource implements RepoEntity<ContactSource>, Serializable {
         contact column: 'contactId'
     }
 
-    static constraints = {
-        source nullable: false
-        sourceType nullable: false
-        sourceId nullable: false
-        sourceVersion nullable: true
-        contact nullable: false
-    }
+    static constraintsMap = [
+        source:[ nullable: false],
+        sourceType:[ nullable: false],
+        sourceId:[ nullable: false],
+        sourceVersion:[ nullable: true],
+        contact:[ nullable: false]
+    ]
 }

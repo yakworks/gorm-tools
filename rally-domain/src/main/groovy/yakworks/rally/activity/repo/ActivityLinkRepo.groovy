@@ -5,7 +5,6 @@
 package yakworks.rally.activity.repo
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import gorm.tools.repository.GormRepository
 import yakworks.rally.activity.model.Activity
@@ -13,7 +12,6 @@ import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.common.LinkedEntityRepoTrait
 
 @GormRepository
-@Slf4j
 @CompileStatic
 class ActivityLinkRepo implements LinkedEntityRepoTrait<ActivityLink, Activity> {
 

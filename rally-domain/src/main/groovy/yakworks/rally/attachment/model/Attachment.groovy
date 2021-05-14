@@ -52,8 +52,8 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
 
     //this should be the file display name without dir; foo.txt, bar.pdf, etc.
     // location has the relative path and unique name. Use description for any other display info
-    String name
-    // String description // in the NameDescription trait
+    String name // in the NameDescription trait here for constraints
+    String description // in the NameDescription trait
 
     //the relative path to the locationKey, this is the name of the file. ex: 2012-02/somepdf.pdf or views/reports/arReport.ftl
     String location
@@ -78,6 +78,39 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     static enum Kind {
         Activity, Collection, Invoice, Report
     }
+
+    static constraintsMap = [
+        name:[ description: '''\
+                This should be the file display name without dir; foo.txt, bar.pdf, etc.
+                Populated from originalFileName when using a multiPart upload.
+                Location has the relative path and unique name on system. Use description for any other useful info'''.stripIndent(),
+            maxSize: 100 ],
+        location:[ description: 'The relative path to the locationKey',
+                 nullable: true, editable: false, display: false ],
+
+        locationKey:[ description: 'Defaults to attachments.location but can be changed to another key such as creditFiles.location',
+                 example: 'attachments.location', nullable: false, required: false],
+
+        contentLength:[ description: 'The file size/contentLength in bytes. Populated on save',
+                 example: 7896, nullable: true, editable: false],
+
+        extension:[ description: 'The extension the file should have. Pulled from the name if not set. Helps dictate the mime-type',
+                 example: 'pdf', nullable: true],
+
+        mimeType:[ description: 'The mime type of the file. Will be pulled from the names extension',
+                 example: 'application/pdf', nullable: true, required: false],
+
+        fileData:[ display: false],
+
+        subject:[ description: 'Optional value for a email template or collectionStep this is the generally the subject of an email or fax cover page.',
+                 example: 'Customer', nullable: true],
+
+        kind:[ description: 'The kind of attachment',
+                 example: 'Activity', nullable: true],
+
+        source:[ description: 'A source description if this is synced from another system',
+                 nullable: true, maxSize: 50],
+    ]
 
     static AttachmentRepo getRepo() { RepoUtil.findRepo(this) as AttachmentRepo }
 
@@ -110,7 +143,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
     }
 
     Resource getResource() {
-        Attachment.log.debug "location is ${location}"
+        //log.debug "location is ${location}"
         if (!resource && location) {
             resource = getRepo().getResource(this)
         }
@@ -125,10 +158,5 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
         fileData column: 'fileDataId'
     }
 
-    static constraints = {
-        NameDescriptionConstraints(delegate)
-        // location nullable: false
-        subject nullable: true, maxSize: 255
-    }
 
 }

@@ -38,8 +38,8 @@ import grails.databinding.events.DataBindingListener
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
 import grails.util.Environment
-import grails.util.GrailsClassUtils
 import grails.validation.ValidationErrors
+import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.IsoDateUtil
 
 /**
@@ -405,7 +405,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             GormStaticApi gormStaticApi = GormEnhancer.findStaticApi(object.getClass() as Class)
             PersistentEntity entity = gormStaticApi.gormPersistentEntity
             List<PersistentProperty> properties = entity.persistentProperties
-            Map<String, ConstrainedProperty> constraints = GormMetaUtils.findConstrainedProperties(entity)
+            Map<String, ConstrainedProperty> constraints = GormMetaUtils.findAllConstrainedProperties(entity)
             List explicitBindingList = EXPLICIT_BINDING_LIST.get(objectClass) ?: []
             for (PersistentProperty prop : properties) {
                 DefaultConstrainedProperty cp = (DefaultConstrainedProperty) constraints[prop.name]
@@ -455,7 +455,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     protected Class getDomainClassType(Object obj, String propName) {
         def domainClassType
         def objClass = obj.getClass()
-        def propertyType = GrailsClassUtils.getPropertyType(objClass, propName)
+        def propertyType = ClassUtils.getPropertyType(objClass, propName)
         if(propertyType && isDomainClass(propertyType)) {
             domainClassType = propertyType
         }

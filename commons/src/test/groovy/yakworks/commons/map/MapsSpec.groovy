@@ -38,6 +38,31 @@ class MapsSpec extends Specification {
         assertMapsEqual(expected, instance.merge(m0, m1))
     }
 
+    void "merge with list" () {
+        when:
+        def m0 = [
+            foo: 'bar'
+        ]
+
+        def m1 = [
+            baz: 'qux'
+        ]
+
+        def expected = [
+            foo: 'bar',
+            baz: 'qux'
+        ]
+
+        def listOfMaps = [m0, m1]
+        def mergedMap = instance.merge(listOfMaps)
+
+        then:
+        m0.size() == 1
+        m1.size() == 1
+        mergedMap.size() == 2
+        assertMapsEqual(expected, mergedMap)
+    }
+
     void testMerge_Two_NoNesting_WithOverwriting () {
         when:
         def m0 = [

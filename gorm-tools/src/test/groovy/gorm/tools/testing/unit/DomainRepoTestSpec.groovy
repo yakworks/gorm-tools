@@ -6,8 +6,15 @@ package gorm.tools.testing.unit
 
 import spock.lang.Specification
 import testing.Cust
+import testing.CustType
 
 class DomainRepoTestSpec extends Specification implements DomainRepoTest<Cust> {
+
+    void setupSpec(){
+        //these won't automatically get picked up as thet are not required.
+        mockDomains(CustType)
+        //defineBeans(new JsonViewGrailsPlugin())
+    }
 
     void "verify repo is added"(){
         when:

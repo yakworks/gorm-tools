@@ -4,7 +4,6 @@
 */
 package gorm.tools.beans
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
@@ -16,7 +15,7 @@ import gorm.tools.model.IdEnum
 import gorm.tools.utils.GormMetaUtils
 
 /**
- * A map implementation that wraps and objects and
+ * A map implementation that wraps an objects and
  * reads properties from a gorm entity based on list of includes/excludes
  * Its used primarily for specifying a sql like select list and the feeding this into a json generator
  *

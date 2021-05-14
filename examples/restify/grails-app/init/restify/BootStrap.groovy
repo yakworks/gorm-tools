@@ -15,6 +15,17 @@ class BootStrap {
     static Random rand = new Random()
 
     def init = { servletContext ->
+        createProjects()
+
+//        def data = new JsonSlurper().parse(new File("../resources/Contacts.json"))
+//        data.each{
+//            Contact contact = new resttutorial.Contact(it)
+//            contact.save(failOnError:true, flush: true)
+//        }
+
+    }
+
+    def createProjects(){
         Project.withTransaction {
             (1..50).each {
                 def prod = Project.create([
@@ -42,12 +53,6 @@ class BootStrap {
             }
 
         }
-//        def data = new JsonSlurper().parse(new File("../resources/Contacts.json"))
-//        data.each{
-//            Contact contact = new resttutorial.Contact(it)
-//            contact.save(failOnError:true, flush: true)
-//        }
-
     }
     def destroy = {
     }

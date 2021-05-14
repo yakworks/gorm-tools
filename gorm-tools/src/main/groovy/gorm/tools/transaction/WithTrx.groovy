@@ -4,6 +4,8 @@
 */
 package gorm.tools.transaction
 
+import javax.inject.Inject
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
@@ -21,7 +23,7 @@ import org.springframework.transaction.TransactionStatus
 @CompileStatic
 trait WithTrx {
 
-    @Autowired
+    @Inject
     TrxService trxService
 
     /**

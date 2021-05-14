@@ -10,17 +10,15 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import gorm.tools.repository.model.RepositoryApi
 import grails.core.GrailsApplication
-import grails.events.bus.EventBus
 
 /**
  * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners
@@ -72,7 +70,7 @@ class RepoEventPublisher {
         if (method != null && ann) events[eventKey] = method
     }
 
-    void publishEvents(RepositoryApi repo, RepositoryEvent event, Object... methodArgs) {
+    public <D> void publishEvents(GormRepo<D> repo, RepositoryEvent<D> event, Object... methodArgs) {
         //invokeListenerMethod(repo, event)
         invokeEventMethod(repo, event.eventKey, methodArgs)
         if (!repo.enableEvents) return
@@ -87,7 +85,7 @@ class RepoEventPublisher {
 //        ReflectionUtils.invokeMethod(method, repo, event)
 //    }
 
-    void invokeEventMethod(Object repo, String eventKey, Object... methodArgs) {
+    void invokeEventMethod(GormRepo repo, String eventKey, Object... methodArgs) {
         Map<String, Method> eventMethodMap = repoEventMethodCache.get(repo.class.simpleName)
         //if (!eventMethodMap) return //eventMethodMap = cacheEventsMethods(repo.class)
         Method method = eventMethodMap?.get(eventKey)
@@ -97,43 +95,43 @@ class RepoEventPublisher {
         ReflectionUtils.invokeMethod(method, repo, truncMethArgs)
     }
 
-    void doBeforeValidate(RepositoryApi repo, Object entity, Map args) {
-        BeforeValidateEvent event = new BeforeValidateEvent(repo, entity, args)
+    public <D> void doBeforeValidate(GormRepo<D> repo, D entity, Map args) {
+        def event = new BeforeValidateEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity] as Object[])
     }
 
-    void doBeforeValidate(RepositoryApi repo, Object entity, Errors errors, Map args) {
-        BeforeValidateEvent event = new BeforeValidateEvent(repo, entity, args)
+    public <D> void doBeforeValidate(GormRepo<D> repo, D entity, Errors errors, Map args) {
+        def event = new BeforeValidateEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, errors] as Object[])
     }
 
-    void doBeforePersist(RepositoryApi repo, GormEntity entity, Map args) {
-        BeforePersistEvent event = new BeforePersistEvent(repo, entity, args)
+    public <D> void doBeforePersist(GormRepo<D> repo, D entity, Map args) {
+        def event = new BeforePersistEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
     }
 
-    void doAfterPersist(RepositoryApi repo, GormEntity entity, Map args) {
-        AfterPersistEvent event = new AfterPersistEvent(repo, entity, args)
+    public <D> void doAfterPersist(GormRepo<D> repo, D entity, Map args) {
+        def event = new AfterPersistEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
     }
 
-    void doBeforeBind(RepositoryApi repo, GormEntity entity, Map data, BindAction bindAction, Map args) {
-        BeforeBindEvent event = new BeforeBindEvent(repo, entity, data, bindAction, args)
+    public <D> void doBeforeBind(GormRepo<D> repo, D entity, Map data, BindAction bindAction, Map args) {
+        def event = new BeforeBindEvent<D>(repo, entity, data, bindAction, args)
         publishEvents(repo, event, [entity, data, event] as Object[])
     }
 
-    void doAfterBind(RepositoryApi repo, GormEntity entity, Map data, BindAction bindAction, Map args) {
-        AfterBindEvent event = new AfterBindEvent(repo, entity, data, bindAction, args)
+    public <D> void doAfterBind(GormRepo<D> repo, D entity, Map data, BindAction bindAction, Map args) {
+        def event = new AfterBindEvent<D>(repo, entity, data, bindAction, args)
         publishEvents(repo, event, [entity, data, event] as Object[])
     }
 
-    void doBeforeRemove(RepositoryApi repo, GormEntity entity, Map args) {
-        BeforeRemoveEvent event = new BeforeRemoveEvent(repo, entity, args)
+    public <D> void doBeforeRemove(GormRepo<D> repo, D entity, Map args) {
+        def event = new BeforeRemoveEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
     }
 
-    void doAfterRemove(RepositoryApi repo, GormEntity entity, Map args) {
-        AfterRemoveEvent event = new AfterRemoveEvent(repo, entity, args)
+    public <D> void doAfterRemove(GormRepo<D> repo, D entity, Map args) {
+        def event = new AfterRemoveEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
 
     }

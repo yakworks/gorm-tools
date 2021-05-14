@@ -8,11 +8,12 @@ import gorm.tools.testing.unit.DataRepoTest
 import grails.buildtestdata.BuildDataTest
 import spock.lang.Specification
 import testing.Cust
+import testing.CustType
 
 class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoTest{
 
     def setupSpec(){
-        mockDomains(Cust)
+        mockDomains(Cust, CustType)
     }
 
     void "sanity check TestData.build"(){

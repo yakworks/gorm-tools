@@ -4,7 +4,7 @@
 */
 package yakworks.rally.orgs.model
 
-import gorm.tools.repository.model.GetRepo
+
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.orgs.repo.OrgTagRepo
@@ -13,7 +13,7 @@ import yakworks.rally.tag.model.TagLinkTrait
 
 @Entity
 @GrailsCompileStatic
-class OrgTag implements TagLinkTrait<OrgTag>, GetRepo<OrgTagRepo>, Serializable {
+class OrgTag implements TagLinkTrait<OrgTag, OrgTagRepo>, Serializable {
     static transients = ['linkedEntity']
     static belongsTo = [tag: Tag]
     Long linkedId
@@ -30,5 +30,10 @@ class OrgTag implements TagLinkTrait<OrgTag>, GetRepo<OrgTagRepo>, Serializable 
         linkedId nullable: false
         tag nullable: false
     }
+
+    static constraintsMap = [
+        linkedId:[ description: 'the id of the entity this tag is linked to', nullable: false],
+        tag:[ description: 'The tag', nullable: false]
+    ]
 
 }

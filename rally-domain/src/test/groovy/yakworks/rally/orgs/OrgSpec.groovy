@@ -2,27 +2,19 @@ package yakworks.rally.orgs
 
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
-import gorm.tools.testing.unit.DomainRepoTest
-import yakworks.rally.activity.model.Activity
+import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactEmail
-import yakworks.rally.orgs.model.ContactFlex
-import yakworks.rally.orgs.model.ContactPhone
-import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
-import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.OrgTypeSetup
-import spock.lang.Specification
-import yakworks.rally.attachment.model.AttachmentLink
 
-class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
+class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
     //Automatically runs the basic crud tests
 
     def setupSpec(){
@@ -31,33 +23,26 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
             orgDimensionService(OrgDimensionService)
         }
         mockDomains(
-            Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag,
-            OrgInfo, OrgTypeSetup, Location, ContactPhone,
-            ContactEmail, ContactSource, ContactFlex, Activity, AttachmentLink
+            OrgTag, Location, Contact, Org, OrgSource, OrgFlex, OrgCalc, OrgInfo
         )
     }
 
+    void "sanity check build"() {
+        when:
+        def org = build(Org)
 
-    // void setupNewRefnumGenerator(){
-    //     // throw away
-    //     def ot1 = new OrgType(name: "1")
-    //     // new OrgType(name: "1").persist(flush:true)
-    //     def nrg = new NewRefnumGenerator(keyName: 'Customer', nextId: 5000, rangeMax: 10000, rangeMin: 5000).persist(flush:true)
-    //     assert nrg.id == 1
-    //
-    //     def ot = new OrgType(name: "2")
-    //     ot.newRefnumGeneratorId = nrg.id
-    //     ot.persist(flush: true)
-    //     assert ot.id == 2
-    // }
+        then:
+        org.id
 
-    void "CRUD tests"() {
-        expect:
-        createEntity().id
-        persistEntity().id
-        updateEntity().version > 0
-        removeEntity()
     }
+
+    // void "CRUD tests"() {
+    //     expect:
+    //     createEntity().id
+    //     persistEntity().id
+    //     updateEntity().version > 0
+    //     removeEntity()
+    // }
 
     def testOrgSourceChange() {
         when:
@@ -94,7 +79,7 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         Map calc = TestDataJson.buildMap(OrgCalc, includes:"*")
         Map info = TestDataJson.buildMap(OrgInfo, includes:"*")
 
-        Map params = buildMap() << [id: orgId, flex: flex, info: info, type: 'Customer']
+        Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
         when: "create"
         def org = Org.create(params, bindId: true)
@@ -126,7 +111,7 @@ class OrgSpec extends Specification implements DomainRepoTest<Org>, SecurityTest
         Long orgId = 10000
         //Map location = TestDataJson.buildMap(Location, includes:"*")
         List locations = [[street1: "street1"], [street1: "street loc2"]]
-        Map params = buildMap() + [locations: locations]
+        Map params = TestDataJson.buildMap(Org) + [locations: locations]
 
         when:
         def org = Org.create(params)

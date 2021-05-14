@@ -5,10 +5,11 @@
 package yakworks.rally.activity.repo
 
 import java.time.LocalDateTime
+import javax.annotation.Nullable
+import javax.inject.Inject
 import javax.persistence.criteria.JoinType
 
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import org.apache.commons.lang3.StringUtils
 
@@ -30,6 +31,7 @@ import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
+import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -39,30 +41,35 @@ import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.attachment.repo.AttachmentLinkRepo
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.repo.ContactRepo
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
-@Slf4j
 @CompileStatic
 class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
+    @Inject @Nullable
     ActivityLinkRepo activityLinkRepo
+
+    @Inject @Nullable
     ActivityTagRepo activityTagRepo
+
+    @Inject @Nullable
     AttachmentRepo attachmentRepo
-    AttachmentLinkRepo attachmentLinkRepo
+
+    @Inject @Nullable
     SecService secService
-    ContactRepo contactRepo
 
     @RepoListener
     void beforeValidate(Activity activity) {
-        generateId(activity)
+        if(activity.isNew()) {
+            generateId(activity)
+        }
+        wireAssociations(activity)
         updateSummary(activity)
     }
 
@@ -80,7 +87,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     @RepoListener
     void afterBind(Activity activity, Map data, AfterBindEvent e) {
         if (e.isBindUpdate() && data.deleteAttachments) {
-            handleAttachmentRemoval(activity, data.deleteAttachments as List)
+            attachmentRepo.handleAttachmentRemoval(activity, data.deleteAttachments as List)
         }
     }
 
@@ -93,10 +100,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             note.delete()
         }
 
-        attachmentLinkRepo.removeAll(activity)
+        AttachmentLink.repo.removeAll(activity)
         //XXX missing removal for attachments if its not linked to anything else
-        activityTagRepo.removeAll(activity)
-        activityLinkRepo.removeAllByActivity(activity)
+        ActivityTag.repo.removeAll(activity)
+        ActivityLink.repo.removeAllByActivity(activity)
 
     }
 
@@ -132,22 +139,9 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         }
     }
 
-    void handleAttachmentRemoval(Activity activity, List deleteAttachments){
-        deleteAttachments.each { attachmentId ->
-            Attachment attachment = Attachment.load(attachmentId as Long)
-            if (attachment) {
-                removeAttachment(activity, attachment)
-            }
-        }
-    }
-
-    void removeAttachment(Activity activity, Attachment attachment){
-        attachmentLinkRepo.remove(activity, attachment)
-        attachment.remove()
-    }
-
-    boolean hasAttachments(Activity activity) {
-        attachmentLinkRepo.queryFor(activity).count()
+    void wireAssociations(Activity activity) {
+        if (activity.note && !activity.note.id) activity.note.id = activity.id
+        if (activity.task && !activity.task.id) activity.task.id = activity.id
     }
 
     void updateSummary(Activity activity) {
@@ -168,7 +162,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     }
 
     AttachmentLink linkAttachment(Activity activity, Attachment attachment){
-        attachmentLinkRepo.create(activity, attachment)
+        AttachmentLink.repo.create(activity, attachment)
     }
 
     // This adds the realted and children entities from the params to the Activity
@@ -211,18 +205,19 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {
         if (!act.note) {
-            act.note = new ActivityNote(activity: act)
+            act.note = new ActivityNote()
         }
         act.note.body = body
         act.note.contentType = contentType
         return act.note
     }
 
-    void completeTask(Task task) {
+    void completeTask(Task task, Long completedById) {
+        Validate.notNull(completedById, "[completedById]")
         task.bind(status: TaskStatus.COMPLETE,
                 state: TaskStatus.COMPLETE.id as Integer,
                 completedDate: new Date(),
-                completedBy: secService.userId)
+                completedBy: completedById)
 
     }
 
@@ -239,7 +234,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         activity.org = org
         addNote(activity, body)
         updateSummary(activity)
-        activity.note.persist()
 
         activity.title = title
         activity.source = source
@@ -271,7 +265,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      *        ]
      *        attachments:[
      *          name: "test.txt",
-     *          originalFileName: "test.txt",
      *          tempFileName: tempFileName
      *        ]
      *        ]
@@ -312,7 +305,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
                 }
                 activity = createActivity(activityData.summary.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
                 createdActivities[org.id as Long] = activity
-                activity.persist()
             }
 
             Long linkedId = target['id'] as Long
@@ -335,30 +327,28 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * @param source activity source -  if this is from outside.
      * @return Activity
      */
+    //FIXME this is old and should be deprected
     @Transactional
     Activity createActivity(String text, Org org, Map task, List<Attachment> attachments, String entityName, String source = null) {
 
-        Activity activity = new Activity()
-        activity.bind([
+        Activity activity = new Activity(
             org         : org,
             title       : text,
             source      : source,
-            sourceEntity: entityName ])
-
+            sourceEntity: entityName
+        )
+        generateId(activity)
         if (task) {
             activity.task = createActivityTask(task)
             activity.kind = activity.task.taskType.kind
-            activity.task.persist()
         } else {
             addNote(activity, text)
             updateSummary(activity)
-            activity.note.persist()
         }
         attachments?.each { attachment ->
             linkAttachment(activity, attachment)
         }
         activity.persist()
-        activity
     }
 
     @Transactional
@@ -383,7 +373,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     Activity createTodo(Org org, Long userId, String title, String linkedEntity = null,
                         List<Long> linkedIds = null, LocalDateTime dueDate = LocalDateTime.now()) {
 
-        Activity activity = create([org: org, title: title, kind : Activity.Kind.Todo])
+        Activity activity = create(org: org, title: title, kind : Activity.Kind.Todo)
 
         if(linkedIds){
             for(Long linkedId: linkedIds){
@@ -392,13 +382,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             }
         }
 
-        activity.task = Task.create([
-            activity: activity,
+        activity.task = new Task(
             taskType: TaskType.TODO,
             userId  : userId,
             dueDate : dueDate,
-            status  : TaskStatus.getOPEN()
-        ])
+            status  : TaskStatus.OPEN
+        )
         activity.persist()
         return activity
     }

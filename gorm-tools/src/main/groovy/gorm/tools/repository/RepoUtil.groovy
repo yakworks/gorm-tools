@@ -11,8 +11,6 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.reflect.ClassPropertyFetcher
-import org.grails.datastore.mapping.reflect.NameUtils
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
@@ -20,7 +18,8 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.EntityNotFoundException
-import gorm.tools.repository.model.RepositoryApi
+import grails.util.Environment
+import yakworks.commons.lang.NameUtils
 
 /**
  * A bunch of statics to support the repositories.
@@ -30,25 +29,42 @@ import gorm.tools.repository.model.RepositoryApi
  * @since 1.0
  */
 @CompileStatic
-class RepoUtil {
+class  RepoUtil {
 
     private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
+    //set to false when doing unit tests so it doesnt cache old ones
+    public static Boolean USE_CACHE
 
-    // TODO getting a GenericWebApplicationContext@15057559 has been closed already error with this cached one
-    // could just be for tests, needs more invesitgation
+    static Boolean shouldCache(){
+        //if reload enabled then dont cache
+        if(USE_CACHE == null) USE_CACHE = !Environment.getCurrent().isReloadEnabled()
+        return USE_CACHE
+    }
+
     static <D> GormRepo<D> findRepoCached(Class<D> entity) {
         String className = NameUtils.getClassName(entity)
         def repo = REPO_CACHE.get(className)
         if(repo == null) {
-            repo = AppCtx.get(getRepoBeanName(entity), GormRepo)
+            repo = getRepoFromAppContext(entity)
             REPO_CACHE.put(className, repo)
         }
         return repo as GormRepo<D>
     }
 
     static <D> GormRepo<D> findRepo(Class<D> entity) {
-        AppCtx.get(getRepoBeanName(entity), GormRepo) as GormRepo<D>
-        //return repo as GormRepo<D>
+        if(shouldCache()){
+            return findRepoCached(entity)
+        } else {
+            return getRepoFromAppContext(entity)
+        }
+    }
+
+    static List<Class> getRepoClasses(){
+        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
+    }
+
+    static <D> GormRepo<D> getRepoFromAppContext(Class<D> entity){
+        return AppCtx.get(getRepoBeanName(entity), GormRepo) as GormRepo<D>
     }
 
     static String getRepoClassName(Class domainClass) {
@@ -57,14 +73,6 @@ class RepoUtil {
 
     static String getRepoBeanName(Class domainClass) {
         RepositoryArtefactHandler.getRepoBeanName(domainClass)
-    }
-
-    static <T> GormRepo<T> getRepoStaticProperty(Class<T> domainClass) {
-        return ClassPropertyFetcher.getStaticPropertyValue(domainClass, 'repo', GormRepo)
-    }
-
-    static List<Class<RepositoryApi>> getRepositoryClasses() {
-        AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz as List<Class<RepositoryApi>>
     }
 
     /**

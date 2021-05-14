@@ -51,4 +51,15 @@ trait AuditStampTrait {
         c()
     }
 
+    static constraintsMap = [
+        createdDate:[ description: "created date/time",
+            nullable: false, editable: false, bindable: false],
+        createdBy:[   description: "created by user id",
+            nullable: false, editable: false, bindable: false],
+        editedDate:[  description: "last edit date/time",
+            nullable: false, editable: false, bindable: false],
+        editedBy:[    description: "edited by user id",
+            nullable: false, editable: false, bindable: false]
+    ]
+
 }

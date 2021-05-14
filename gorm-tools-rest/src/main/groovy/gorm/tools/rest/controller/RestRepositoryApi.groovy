@@ -28,6 +28,7 @@ import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import grails.web.Action
 import grails.web.api.ServletAttributes
+import yakworks.commons.lang.NameUtils
 
 import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
@@ -240,7 +241,7 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTr
      */
     String getLogicalControllerName(){
         String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
-        return GrailsNameUtils.getPropertyName(logicalName)
+        return NameUtils.getPropertyName(logicalName)
     }
 
     /**

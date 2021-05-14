@@ -4,7 +4,6 @@
 */
 package yakworks.rally.common
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 @SuppressWarnings(['MethodName'])
@@ -16,16 +15,9 @@ trait VariableVal {
 
     static List qSearchIncludes = ['variable', 'value'] // quick search includes
 
-    @CompileDynamic //ok
-    static VariableValConstraints(Object delegate) {
-        def c = {
-            variable description: "paramater config prop name",
-                nullable: false, maxSize: 50
-            value description: "string val",
-                nullable: true, maxSize: 100
-        }
-        c.delegate = delegate
-        c()
-    }
+    static constraintsMap = [
+        variable:[ description: 'Parameter config prop name, unique', nullable: false, blank: false, maxSize: 50],
+        value:[ description: 'The value', maxSize: 50]
+    ]
 
 }

@@ -2,7 +2,7 @@
 // apply plugin: 'org.grails.grails-plugin'
 apply plugin: "yakworks.grails-plugin"
 
-group = "org.grails.plugins"
+group = "org.yakworks"
 
 dependencies {
   compile "commons-codec:commons-codec:$vCommonsCodec"

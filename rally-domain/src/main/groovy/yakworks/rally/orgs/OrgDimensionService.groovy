@@ -5,8 +5,6 @@
 package yakworks.rally.orgs
 
 import java.util.concurrent.ConcurrentHashMap
-import javax.annotation.Nullable
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j

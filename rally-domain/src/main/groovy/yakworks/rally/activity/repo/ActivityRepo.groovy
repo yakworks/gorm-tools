@@ -12,7 +12,6 @@ import javax.persistence.criteria.JoinType
 import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable

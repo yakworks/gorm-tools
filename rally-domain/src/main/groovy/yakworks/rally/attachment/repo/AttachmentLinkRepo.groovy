@@ -4,9 +4,6 @@
 */
 package yakworks.rally.attachment.repo
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable

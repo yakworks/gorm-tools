@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       - image: yakworks/alpine-jdk:builder8
-    resource_class: 'medium+'
+    # resource_class: 'medium+'
     steps:
       - checkout
       - run: &gradle-cache-key ./build.sh catKeyFiles

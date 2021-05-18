@@ -1,0 +1,31 @@
+get:
+  tags: [ foo ]
+  summary: Tpl list
+  description: Query and retrieve a Tpl list
+  operationId: getTplList
+  parameters:
+    - $ref: '#/components/parameters/page'
+    - $ref: '#/components/parameters/max'
+    - $ref: '#/components/parameters/q'
+    - $ref: '#/components/parameters/sort'
+    - $ref: '#/components/parameters/order'
+  responses:
+    '200': { $ref: tpl_response.yaml }
+    '403': { $ref: '#/components/responses/403' }
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {$ref: '../../components/codeSamples/curl/get.sh'} }
+
+post:
+  tags: [ foo ]
+  summary: Create a Tpl
+  description: Create a new Tpl
+  operationId: createTpl
+  requestBody:
+    $ref: 'tpl_request.yaml'
+  responses:
+    '201': { $ref: tpl_response.yaml }
+    '403': { $ref: '#/components/responses/403' }
+    '422': { $ref: '#/components/responses/422' }
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {$ref: '../../components/codeSamples/curl/post.sh'} }

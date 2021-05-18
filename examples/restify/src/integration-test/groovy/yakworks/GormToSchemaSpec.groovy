@@ -2,25 +2,22 @@ package yakworks
 
 import java.nio.file.Files
 
-import gorm.tools.rest.JsonSchemaGenerator
-import grails.gorm.transactions.Rollback
-import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
+import gorm.tools.openapi.GormToSchema
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
-import yakworks.testify.model.Taskify
 
 @Integration
 @Rollback
-class JsonSchemaGeneratorSpec extends Specification {
+class GormToSchemaSpec extends Specification {
 
     @Autowired
-    JsonSchemaGenerator jsonSchemaGenerator
+    GormToSchema gormToSchema
 
     //@Ignore
     def "sanity check Org"() {

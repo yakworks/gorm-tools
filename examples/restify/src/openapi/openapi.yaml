@@ -1,0 +1,69 @@
+openapi: 3.0.3
+servers:
+  - url: //demo.9ci.io/api
+    description: Default server
+  - url: //sanbox.9ci.io/api
+    description: Sandbox server
+info:
+  version: 1.0.0
+  title: 9ci Rest Api
+  termsOfService: 'http://9ci.com/terms/'
+  contact:
+    name: 9ci Inc
+    url: 'https://9ci.com'
+    email: connect@9ci.com
+  x-logo:
+    url: 'https://www.9ci.com/assets/img/logo.svg'
+    altText: 9ci logo
+  license:
+    name: 9ci Proprietary and Confidential
+    url: 'http://www.9ci.com/licenses/LICENSE-2.0.html'
+  description:
+    $ref: Intro.md
+externalDocs:
+  description: 9ci Documentation
+  url: 'https://9ci.com/documentation/2.0/'
+tags: []
+x-tagGroups: []
+
+paths: {}
+
+components:
+  schemas:
+    # common
+    Pager:
+      $ref: components/schemas/Pager.yaml
+
+  parameters:
+    id: { $ref: components/parameters/id.yaml }
+    q: { $ref: components/parameters/q.yaml }
+    page: { $ref: components/parameters/page.yaml }
+    max: { $ref: components/parameters/max.yaml }
+    sort: { $ref: components/parameters/sort.yaml }
+    order: { $ref: components/parameters/order.yaml }
+
+  responses:
+    '204': { $ref: ./components/responses/204_NoContent.yaml }
+    '403': { $ref: ./components/responses/403_Forbidden.yaml }
+    '404': { $ref: ./components/responses/404_NotFound.yaml }
+    '422': { $ref: ./components/responses/422_ValidationError.yaml }
+
+  securitySchemes:
+    main_auth:
+      description: |
+        Get access to data while protecting your account credentials.
+        OAuth2 is also a safer and more secure way to give you access.
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://petstore.swagger.io/api/oauth/dialog'
+          scopes:
+            'write:pets': modify pets in your account
+            'read:pets': read your pets
+    api_key:
+      description: >
+        For this sample, you can use the api key `special-key` to test the
+        authorization filters.
+      type: apiKey
+      name: api_key
+      in: header

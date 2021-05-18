@@ -1,0 +1,44 @@
+get:
+  tags: [ foo ]
+  summary: Get a Tpl
+  description: Returns a single Tpl
+  operationId: getTplById
+  parameters:
+    - $ref: '../../components/parameters/id.yaml'
+  responses:
+    '200': { $ref: tpl_response.yaml }
+    '403': { $ref: '../../components/responses/403_Forbidden.yaml' }
+    '404': { $ref: '../../components/responses/404_NotFound.yaml' }
+
+put:
+  tags: [ foo ]
+  summary: Update a Tpl
+  description: ''
+  operationId: updateTpl
+  parameters:
+    - $ref: '../../components/parameters/id.yaml'
+  requestBody:
+    $ref: tpl_request.yaml
+  responses:
+    '200': { $ref: responses/Batch.yaml }
+    '403': { $ref: '../../components/responses/403_Forbidden.yaml' }
+    '404': { $ref: '../../components/responses/404_NotFound.yaml' }
+    '422': { $ref: '../../components/responses/422_ValidationError.yaml' }
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {$ref: '../../components/codeSamples/curl/put.sh'} }
+
+delete:
+  tags: [ batch ]
+  summary: Delete a Batch
+  description: 'Deletes a Batch and any associated Payments'
+  operationId: deletePayment
+  parameters:
+    - $ref: '#/components/parameters/id'
+  responses:
+    '204': { $ref: '../../components/responses/204_NoContent.yaml' }
+    '403': { $ref: '../../components/responses/403_Forbidden.yaml' }
+    '404': { $ref: '../../components/responses/404_NotFound.yaml' }
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {$ref: '../../components/codeSamples/curl/delete.sh'} }

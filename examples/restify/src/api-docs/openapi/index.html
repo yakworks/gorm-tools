@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rest API</title>
+    <!-- needed for adaptive design -->
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,600,600i,700,700i,800,800i|Roboto+Slab:400,500,600,700|Ubuntu+Mono">
+
+    <!--
+    ReDoc doesn't change outer page styles
+    -->
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!--redoc spec-url='petstore.yaml'></redoc-->
+    <div id="redoc-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"> </script>
+    <script>
+      Redoc.init('openapi.yaml', {
+        pathInMiddlePanel: true,
+        theme: {
+          spacing: {
+            sectionHorizontal: 10,
+            sectionVertical: 10
+          },
+          typography: {
+            fontSize: '16px',
+            fontFamily: '"Lato","Helvetica Neue",Helvetica, sans-serif',
+            code: {
+              fontFamily: '"Ubuntu Mono","Courier New",Courier,monospace',
+              fontSize: '14px'
+            }
+          },
+          logo: {
+            maxHeight: '150px'
+          }
+        }
+      }, document.getElementById('redoc-container'))
+    </script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+type: object
+properties:
+  page:
+    description: the page number of the data
+    type: integer
+    example: 1
+  total:
+    description: the total number of pages
+    type: integer
+    example: 20
+  records:
+    description: the total count of items for the query result
+    type: integer
+    example: 100
+  data: # should be overriden with the object type for the array
+    type: array

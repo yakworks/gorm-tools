@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.rest
+package gorm.tools.openapi
 
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
@@ -26,7 +26,6 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.beans.EntityMapService
-import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.utils.GormMetaUtils
 import grails.core.DefaultGrailsApplication
 import grails.gorm.validation.ConstrainedProperty
@@ -45,7 +44,7 @@ import yakworks.commons.lang.NameUtils
 //@CompileStatic
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
-class JsonSchemaGenerator {
+class GormToSchema {
 
     @Autowired
     HibernateMappingContext persistentEntityMappingContext
@@ -73,22 +72,8 @@ class JsonSchemaGenerator {
         String projectDir = System.getProperty("gradle.projectDir", '')
         Files.createDirectories(Paths.get(projectDir, "build/schema"))
         def path = Paths.get(projectDir, "build/schema/${clazz.simpleName}.yaml")
-        saveYaml(path, map)
+        YamlUtils.saveYaml(path, map)
         return path
-    }
-
-    def saveYaml(Path path, Object yml){
-        DumperOptions dops = new DumperOptions()
-        dops.indent = 2
-        dops.prettyFlow = true
-        dops.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
-        //dops.width = 120
-        Yaml yaml = new Yaml(dops)
-        yaml.dump(yml, new FileWriter(path.toString()))
-        // path.toFile().withWriter {Writer writer ->
-        //     yaml.dump(yml, writer)
-        // }
-
     }
 
     Map generate(String domainName) {

@@ -93,7 +93,7 @@ class OpenApiGenerator implements ConfigAware {
         Map<String, List> xTagGroups = [:]
 
         for(entry in restApi){
-            String endpoint = entry.key.toString()
+            String endpoint = entry.key
             Map pathMap = (Map)entry.value
             String namespace = pathMap.namespace ?: ''
             // String pathKey = "/${namespace}/${endpoint}".toString()
@@ -123,12 +123,12 @@ class OpenApiGenerator implements ConfigAware {
     Map createPaths(Map api, String endpoint, Map pathMap){
         Map paths = (Map)api.paths
         String namespace = pathMap.namespace ?: ''
-        String pathKey = "/${namespace}/${endpoint}".toString()
-        String pathKeyId = "${pathKey}/{id}".toString()
+        String pathKey = "/${namespace}/${endpoint}"//.toString()
+        String pathKeyId = "${pathKey}/{id}"//.toString()
         String pathKeyPrefix = pathMap.namespace ? "${pathMap.namespace}/" : ''
         pathKeyPrefix = "./paths/${pathKeyPrefix}"
-        String pathKeyRef = "${pathKeyPrefix}${endpoint}.yaml".toString()
-        String pathKeyIdRef = "${pathKeyPrefix}${endpoint}@{id}.yaml".toString()
+        String pathKeyRef = "${pathKeyPrefix}${endpoint}.yaml"//.toString()
+        String pathKeyIdRef = "${pathKeyPrefix}${endpoint}@{id}.yaml"//.toString()
         //make sure dirs exist
         Files.createDirectories(getApiBuildPath('openapi').resolve(pathKeyPrefix))
 
@@ -142,7 +142,7 @@ class OpenApiGenerator implements ConfigAware {
         createPathFiles(pathKeyRef, model)
         createPathIdFiles(pathKeyIdRef, model)
 
-        String tplRef = "${pathKeyPrefix}${endpoint}_pager.yaml".toString()
+        String tplRef = "${pathKeyPrefix}${endpoint}_pager.yaml"//.toString()
         processTplFile('paths/tpl_pager.yaml', tplRef, model)
         tplRef = "${pathKeyPrefix}${endpoint}_request.yaml".toString()
         processTplFile('paths/tpl_request.yaml', tplRef, model)

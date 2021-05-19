@@ -22,13 +22,13 @@ class GormToSchemaSpec extends Specification {
     //@Ignore
     def "sanity check Org"() {
         given:
-        Map schema = jsonSchemaGenerator.generate(Org)
+        Map schema = gormToSchema.generate(Org)
 
         expect:
         schema != null
         //schema['$schema'] == "http://json-schema.org/schema#"
         //schema.description == "This is a task"
-        schema.type == "Object"
+        schema.type == "object"
         //schema.required.size() == 4
         //schema.required.containsAll(["name", "project", "note", "dueDate", "reminderEmail", "estimatedHours", "estimatedCost", "progressPct", "roleVisibility", "flex"])
 
@@ -84,32 +84,32 @@ class GormToSchemaSpec extends Specification {
 
     }
 
-    def "test generate attachments"() {
-        given:
-        def path = jsonSchemaGenerator.generateYmlFile(Attachment)
-
-        expect:
-        Files.exists(path)
-    }
+    // def "test generate attachments"() {
+    //     given:
+    //     def path = gormToSchema.generateYmlFile(Attachment)
+    //
+    //     expect:
+    //     Files.exists(path)
+    // }
 
     //@IgnoreRest
-    def "test generate Activity"() {
-        given:
-        //def taggableVal = Activity.yakworks_rally_tag_model_Taggable__validation$get()
-        //assert taggableVal instanceof Map
-        def path = jsonSchemaGenerator.generateYmlFile(Activity)
-
-        expect:
-        Files.exists(path)
-    }
-
-    def "test generateYmlModels"() {
-        given:
-        def path = jsonSchemaGenerator.generateYmlFile(Org)
-        jsonSchemaGenerator.generateYmlModels()
-
-        expect:
-        Files.exists(path)
-    }
+    // def "test generate Activity"() {
+    //     given:
+    //     //def taggableVal = Activity.yakworks_rally_tag_model_Taggable__validation$get()
+    //     //assert taggableVal instanceof Map
+    //     def path = gormToSchema.generateYmlFile(Activity)
+    //
+    //     expect:
+    //     Files.exists(path)
+    // }
+    //
+    // def "test generateYmlModels"() {
+    //     given:
+    //     def path = gormToSchema.generateYmlFile(Org)
+    //     gormToSchema.generateYmlModels()
+    //
+    //     expect:
+    //     Files.exists(path)
+    // }
 
 }

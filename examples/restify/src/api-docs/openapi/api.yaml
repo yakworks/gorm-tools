@@ -31,22 +31,22 @@ paths: {}
 components:
   schemas:
     # common
-    Pager:
-      $ref: components/schemas/Pager.yaml
+#    Pager:
+#      $ref: components/schemas/Pager.yaml
 
-  parameters:
-    id: { $ref: components/parameters/id.yaml }
-    q: { $ref: components/parameters/q.yaml }
-    page: { $ref: components/parameters/page.yaml }
-    max: { $ref: components/parameters/max.yaml }
-    sort: { $ref: components/parameters/sort.yaml }
-    order: { $ref: components/parameters/order.yaml }
+#  parameters:
+#    id: { $ref: components/parameters/id.yaml }
+#    q: { $ref: components/parameters/q.yaml }
+#    page: { $ref: components/parameters/page.yaml }
+#    max: { $ref: components/parameters/max.yaml }
+#    sort: { $ref: components/parameters/sort.yaml }
+#    order: { $ref: components/parameters/order.yaml }
 
-  responses:
-    '204': { $ref: ./components/responses/204_NoContent.yaml }
-    '403': { $ref: ./components/responses/403_Forbidden.yaml }
-    '404': { $ref: ./components/responses/404_NotFound.yaml }
-    '422': { $ref: ./components/responses/422_ValidationError.yaml }
+#  responses:
+#    '204': { $ref: ./components/responses/204_NoContent.yaml }
+#    '403': { $ref: ./components/responses/403_Forbidden.yaml }
+#    '404': { $ref: ./components/responses/404_NotFound.yaml }
+#    '422': { $ref: ./components/responses/422_ValidationError.yaml }
 
   securitySchemes:
     main_auth:

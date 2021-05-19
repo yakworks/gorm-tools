@@ -20,7 +20,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "get index list"() {
         when:
-        Response resp = get(getPath('task'))
+        Response resp = get(getPath('org'))
         assert resp.code() == HttpStatus.OK.value()
         Map pageMap = bodyToMap(resp)
 
@@ -43,10 +43,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity      | qCount
-        'book'      | 5
         'org'       | 100
         'project'   | 50
-        'task'      | 100
+        'user'      | 2
 
     }
 
@@ -67,10 +66,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity      | data
-        'book'      | [name:'Galt123']
         'org'       | [num:'foo1', name: "foo", type: [id: 1]]
         'project'   | [name: "project", num: "x123"]
-        'task'      | [name: "task", project: [id: 1]]
+        //'user'      | [username:'galt', email: "jim@joe.com", password:'secretStuff', repassword:'secretStuff']
         //'location'  | [city: "Chicago"]
          //'user'      | [name: 'taggy', entityName: 'Customer']
     }
@@ -90,10 +88,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity     | id | prop   | val
-        'book'     | 1  | 'name' | 'Galt234'
         'org'      | 1  | 'num'  | 'foo123'
         'project'  | 1  | 'name' | 'project123'
-        'task'     | 1000  | 'name' | 'task123'
+        'user'     | 1  | 'username' | 'jimmy'
         //        'location' | 1  | 'city' | 'Denver'
 
     }
@@ -113,10 +110,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity     | qCount | qSearch
-        'book'     | 3      | 'galt'
         'org'      | 1      | 'foo123'
         'project'  | 1      | 'project123'
-        'task'     | 1      | 'task123'
+        'user'     | 1      | 'admin'
         //'location' | 1      | 'Denver'
 
     }

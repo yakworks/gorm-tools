@@ -17,10 +17,6 @@ class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then: "should have exluded the flattened spring array keys"
         body.includes.get == ['*', 'info.*']
-        body.includes.picklist == ['id', 'name']
-        !body.includes.containsKey("get[0]")
-        body.form[0].selectOptions.dataApiParams.or != null
-        body.form[0].selectOptions.dataApiParams."or[0]" == null
     }
 
 

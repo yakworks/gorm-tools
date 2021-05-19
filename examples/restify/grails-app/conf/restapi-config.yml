@@ -12,10 +12,11 @@ restApi:
   roleUser:
     description: The users assigned to the roles
     namespace: security
+    allowedMethods: [GET, DELETE, POST]
     entityClass: gorm.tools.security.domain.SecRoleUser
 
   # Rally
-  acts:
+  activity:
     description: {$ref: descriptions/activity.md}
     namespace: rally
     entityClass: yakworks.rally.activity.model.Activity
@@ -31,6 +32,8 @@ restApi:
   org:
     namespace: rally
     entityClass: yakworks.rally.orgs.model.Org
+    includes:
+      get: [ '*', 'info.*' ]
   orgTypeSetup:
     namespace: rally
     entityClass: yakworks.rally.orgs.model.OrgTypeSetup

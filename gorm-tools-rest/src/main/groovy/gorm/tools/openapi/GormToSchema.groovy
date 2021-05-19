@@ -22,8 +22,6 @@ import org.grails.datastore.mapping.model.types.OneToMany
 import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 import org.springframework.beans.factory.annotation.Autowired
-import org.yaml.snakeyaml.DumperOptions
-import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.beans.EntityMapService
 import gorm.tools.utils.GormMetaUtils
@@ -92,7 +90,7 @@ class GormToSchema {
         Mapping mapping = getMapping(domainClass.name)
 
         //Map cols = mapping.columns
-        schema.title = domainClass.name //TODO Should come from application.yml !?
+        schema.title = domainClass.javaClass.simpleName
 
         if (mapping?.comment) schema.description = mapping.comment
 
@@ -100,7 +98,7 @@ class GormToSchema {
         //     map.description = AnnotationUtils.getAnnotationAttributes(AnnotationUtils.findAnnotation(domainClass.class, RestApi)).description
         // }
 
-        schema.type = 'Object'
+        schema.type = 'object'
         schema.required = []
 
         Map propMap = getDomainProperties(domainClass, schema)
@@ -258,7 +256,7 @@ class GormToSchema {
         //description
         String description = constrainedProp.getMetaConstraintValue("description")
         description = description ?: constrainedProp.getMetaConstraintValue("d")
-        if (description) propMap.description = description
+        if (description) propMap.description = description.stripIndent()
     }
 
     void defaults(Map propMap, Mapping mapping, String propName){
@@ -269,7 +267,7 @@ class GormToSchema {
     void readOnly(Map propMap, DefaultConstrainedProperty constrainedProp){
         //description
         Boolean readOnly = constrainedProp.getMetaConstraintValue("readOnly")
-        if (readOnly || constrainedProp.editable == false) propMap.readOnly = readOnly
+        if (readOnly || constrainedProp.editable == false) propMap.readOnly = true
     }
 
     boolean isRequired(Map propMap, DefaultConstrainedProperty constrainedProp){

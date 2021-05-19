@@ -38,8 +38,6 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
 
     Closure doWithSpringFirst() {
         return {
-            grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
-            grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }
@@ -48,8 +46,9 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
     }
 
     def setupSpec() {
-        mockDomains(Customer, Activity, ActivityNote, ActivityLink, ActivityTag)
-        mockDomains(Org, OrgTag, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus)
+        mockDomains(Customer, Activity, ActivityNote, ActivityLink, ActivityTag,
+            Org, OrgTag, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus
+        )
     }
 
     def "test massupdate - with notes "() {

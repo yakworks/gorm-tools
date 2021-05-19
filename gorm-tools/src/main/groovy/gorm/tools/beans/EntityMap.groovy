@@ -41,8 +41,9 @@ class EntityMap extends AbstractMap<String, Object> {
 
     private Set<String> _includes = []
     private EntityMapIncludes _includeMap
-    //WIP used to store puts as grails views puts a key with object.
+
     private Map<String, Object> shadowMap = [:]
+
     /**
      * Constructs a new {@code EntityMap} that operates on the specified bean. The given entity
      * cant be null

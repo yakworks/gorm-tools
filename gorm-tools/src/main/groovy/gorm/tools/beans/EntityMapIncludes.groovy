@@ -7,7 +7,6 @@ package gorm.tools.beans
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-
 /**
  * Includes tree for root entity and nested association properties
  */
@@ -16,10 +15,13 @@ import groovy.util.logging.Slf4j
 class EntityMapIncludes {
     String className
     Set<String> fields
+    Set<String> blacklist
+    //nestedIncludes has the associations and its included fields
     Map<String, EntityMapIncludes> nestedIncludes
 
-    EntityMapIncludes(String className, Set<String> fields){
+    EntityMapIncludes(String className, Set<String> fields, Set<String> blacklist){
         this.className = className
-        this.fields = fields
+        this.fields = fields - blacklist
+        this.blacklist = blacklist
     }
 }

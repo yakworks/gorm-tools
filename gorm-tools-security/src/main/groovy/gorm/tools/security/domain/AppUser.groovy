@@ -20,22 +20,27 @@ import grails.persistence.Entity
 @EqualsAndHashCode(includes='username', useCanEqual=false)
 class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
 
+    static List qSearchIncludes = ['username', 'name', 'email'] // quick search includes
+    static List picklistIncludes = ['id', 'username', 'name'] //for picklist
+
     static constraintsMap = [
         username:[ description: '''\
             The unique user name, also known as your handle –– what you put after the “@” symbol ala github or twitter
             to mention others in comments or notes. appears in your profile URL. username is used to log in to your account,
             and is visible when sending and receiving. All lowercase and no spaces or special characters.
-            '''.stripIndent(), blank: false, nullable: false, unique: true, maxSize: 50],
-        username:[ description: "The full name or display name, may come from contact or defaults to username if not populated",
+            ''', blank: false, nullable: false, unique: true, maxSize: 50],
+        name:[ description: "The full name, may come from contact, will defaults to username if not populated",
                  blank: false, nullable: false, required: false,  maxSize: 50],
         email:[ description: "The email",
                  nullable: false, blank: false, email: true, unique: true],
+        inactive:[ description: 'True if user is inactive which means they cannot login but are still here for history',
+                   editable: false],
         passwordHash:[ description: "The pwd hash, internal use only, never show this",
                  blank: false, nullable: false, maxSize: 60, bindable: false, display:false, password: true],
         passwordChangedDate:[ description: "The date password was changed",
-                 nullable: true, bindable: false],
+                 nullable: true, bindable: false, editable: false],
         passwordExpired:[ description: "The password expired",
-                 bindable: false],
+                 bindable: false, editable: false],
         resetPasswordToken:[ description: "temp token for a password reset, internal use only",
                  nullable: true, bindable: false, display:false],
         resetPasswordDate:[ description: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",

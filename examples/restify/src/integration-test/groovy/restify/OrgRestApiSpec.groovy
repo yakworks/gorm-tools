@@ -9,24 +9,11 @@ import okhttp3.Response
 import spock.lang.Specification
 
 @Integration
-class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
+class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
-    String path = "/api/book"
-    Map postData = [name: "fountain"]
-    Map putData = [name: "updated fountain"]
-
-    void "get index list"() {
-        when:
-        Response resp = get(path)
-        Map body = bodyToMap(resp)
-
-        then:
-        resp.code() == HttpStatus.OK.value()
-        body.data.size() == 5
-        Map book = body.data[0] as Map
-        Book.includes.containsAll(book.keySet())
-        book.keySet().containsAll(Book.includes)
-    }
+    String path = "/api/org"
+    Map postData = [num:'foo1', name: "foo", type: 'Customer']
+    Map putData = [name: "updated foo1"]
 
     void "get picklist"() {
         when:
@@ -35,21 +22,21 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data.size() == 5
+        body.data.size() == 20
         Map book = body.data[0] as Map
-        book.keySet().size() == 2 //should be the id and name
+        book.keySet().size() == 3 //should be the id and name and num
         book['id'] == 1
         book['name']
     }
 
     void "test qSearch"() {
         when:
-        Response resp = get("$path?q=galt")
+        Response resp = get("$path?q=org2")
         Map body = bodyToMap(resp)
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data.size() == 3
+        body.data.size() == 11
 
         when:
         resp = get("$path?q=flubber")
@@ -58,26 +45,26 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
         then:
         body.data.size() == 0
 
-        when: 'description search'
-        resp = get("$path?q=shrugged1")
+        when: 'num search'
+        resp = get("$path?q=11")
         body = bodyToMap(resp)
 
         then:
         body.data.size() == 1
-        body.data[0].description == 'Shrugged1'
+        body.data[0].num == '11'
 
         when: 'picklist search'
-        resp = get("$path/picklist?q=galt")
+        resp = get("$path/picklist?q=org12")
         body = bodyToMap(resp)
 
         then:
-        body.data.size() == 3
+        body.data.size() == 1
 
     }
 
     void "test q"() {
         when:
-        String q = '{description: "Shrugged1"}'
+        String q = '{name: "Org20"}'
         HttpUrl.Builder urlBuilder = HttpUrl.parse(getUrl(path)).newBuilder()
         urlBuilder.addQueryParameter("q", q)
         def resp = get(urlBuilder.build().toString())
@@ -86,7 +73,7 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.OK.value()
         body.data.size() == 1
-        body.data[0].description == "Shrugged1"
+        body.data[0].name == "Org20"
     }
 
     void "test sorting"() {
@@ -117,12 +104,12 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.OK.value()
         body.id
-        body.name.toString().startsWith('Galt')
+        body.name == 'Org1'
     }
 
     void "testing post"() {
         when:
-        Response resp = post(path, [name: "foobie"])
+        Response resp = post(path, [num: "foobie123", name: "foobie", type: "Customer"])
 
         Map body = bodyToMap(resp)
 
@@ -135,15 +122,15 @@ class BookOkRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "testing post bad data"() {
         when:
-        Response resp = post(path, [desc: "foobie"])
+        Response resp = post(path, [name: "foobie", type: "Customer"])
 
         Map body = bodyToMap(resp)
 
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.total == 1
-        body.message == 'Book validation errors'
-        body.errors.find{ it.field == 'name' }.message == 'Property [name] of class [class restify.Book] cannot be null'
+        body.message == 'Org validation errors'
+        body.errors[0].message == 'Property [num] of class [class yakworks.rally.orgs.model.Org] cannot be null'
     }
 
     void "testing put"() {

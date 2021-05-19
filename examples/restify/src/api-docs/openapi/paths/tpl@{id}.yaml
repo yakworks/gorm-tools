@@ -34,7 +34,7 @@ delete:
   description: 'Deletes a Batch and any associated Payments'
   operationId: deletePayment
   parameters:
-    - $ref: '#/components/parameters/id'
+    - $ref: '../../components/parameters/id.yaml'
   responses:
     '204': { $ref: '../../components/responses/204_NoContent.yaml' }
     '403': { $ref: '../../components/responses/403_Forbidden.yaml' }

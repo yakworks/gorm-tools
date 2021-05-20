@@ -1,5 +1,0 @@
-description: Access forbidden. Permission denied.
-content:
-  application/json:
-    schema:
-      $ref: ../schemas/errors/Error.yaml

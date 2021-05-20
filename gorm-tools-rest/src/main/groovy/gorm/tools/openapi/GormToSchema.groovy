@@ -131,6 +131,18 @@ class GormToSchema {
             idVerMap[idProp.name] = idJsonType
         }
 
+        //composite ids id
+        // PersistentProperty[] compositeId = perEntity.getCompositeIdentity()
+        // for(compProp in compositeId){
+        //     Map idJsonType = getJsonType(compProp.type)
+        //     idJsonType.putAll([
+        //         description: 'unique id',
+        //         example: 954,
+        //         readOnly: true
+        //     ])
+        //     idVerMap[idProp.name] = idJsonType
+        // }
+
         //version
         if (perEntity.version) {
             idVerMap[perEntity.version.name] = [
@@ -143,6 +155,9 @@ class GormToSchema {
 
         Mapping mapping = getMapping(domainName)
         List<PersistentProperty> props = resolvePersistentProperties(perEntity)
+        //composite ids id
+        PersistentProperty[] compositeIds = perEntity.getCompositeIdentity()
+        if(compositeIds) props.addAll(compositeIds)
 
         Map<String, ConstrainedProperty> constrainedProperties = GormMetaUtils.findConstrainedProperties(perEntity)
         Map<String, ConstrainedProperty> nonValidatedProperties = GormMetaUtils.findNonValidatedProperties(perEntity)
@@ -167,7 +182,7 @@ class GormToSchema {
             //if its version should have been taken care of or is set to version false
             if(prop.name == 'version') continue
             //skip if display is false
-            if (!constraints.display) continue
+            if (!constraints || !constraints.display) continue
 
             Map jprop = [:]
 

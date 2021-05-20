@@ -5,6 +5,7 @@ import java.nio.file.Files
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.openapi.GormToSchema
+import gorm.tools.security.domain.SecRoleUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
@@ -19,6 +20,16 @@ class GormToSchemaSpec extends Specification {
     @Autowired
     GormToSchema gormToSchema
 
+    def "check composite keys"() {
+        given:
+        Map schema = gormToSchema.generate(SecRoleUser)
+
+        expect:
+        schema != null
+        //schema['$schema'] == "http://json-schema.org/schema#"
+        //schema.description == "This is a task"
+        schema.type == "object"
+    }
     //@Ignore
     def "sanity check Org"() {
         given:

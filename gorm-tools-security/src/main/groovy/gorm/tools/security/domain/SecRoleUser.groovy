@@ -29,9 +29,13 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
         role column:'secRoleId'
     }
 
-    static constraints = {
+    static constraintsMap= [
+        user: [d: 'The user for the role'],
+        role: [d: 'The role for the user'],
+        userId: [d: 'The user id to assign the role'],
+        roleId: [d: 'The role id']
+    ]
 
-    }
 
     String getRoleName() {
         this.role.name
@@ -85,7 +89,7 @@ class SecRoleUser implements RepoEntity<SecRoleUser>, Serializable {
     }
 
     @CompileDynamic
-    static getRoleMap(AppUser userInstance) {
+    static Map<SecRole, Boolean> getRoleMap(AppUser userInstance) {
         List roles = SecRole.list()
         Set userRoleNames = []
         if (userInstance.id) {

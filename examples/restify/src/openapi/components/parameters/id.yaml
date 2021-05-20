@@ -1,7 +1,0 @@
-name: id
-in: path
-description: id for entity
-required: true
-schema:
-  type: integer
-  format: int64

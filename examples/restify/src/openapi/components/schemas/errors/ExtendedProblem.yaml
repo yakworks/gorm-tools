@@ -1,5 +1,0 @@
-type: object
-allOf:
-  - $ref: ./DocumentedProblem.yaml
-  - $ref: ./DetailedProblem.yaml
-  - $ref: ./TrackedProblem.yaml

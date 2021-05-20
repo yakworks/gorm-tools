@@ -2,36 +2,44 @@ package yakworks
 
 import java.nio.file.Files
 
-import gorm.tools.rest.JsonSchemaGenerator
-import grails.gorm.transactions.Rollback
-import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
+import gorm.tools.openapi.GormToSchema
+import gorm.tools.security.domain.SecRoleUser
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Org
-import yakworks.testify.model.Taskify
 
 @Integration
 @Rollback
-class JsonSchemaGeneratorSpec extends Specification {
+class GormToSchemaSpec extends Specification {
 
     @Autowired
-    JsonSchemaGenerator jsonSchemaGenerator
+    GormToSchema gormToSchema
 
-    //@Ignore
-    def "sanity check Org"() {
+    def "check composite keys"() {
         given:
-        Map schema = jsonSchemaGenerator.generate(Org)
+        Map schema = gormToSchema.generate(SecRoleUser)
 
         expect:
         schema != null
         //schema['$schema'] == "http://json-schema.org/schema#"
         //schema.description == "This is a task"
-        schema.type == "Object"
+        schema.type == "object"
+    }
+    //@Ignore
+    def "sanity check Org"() {
+        given:
+        Map schema = gormToSchema.generate(Org)
+
+        expect:
+        schema != null
+        //schema['$schema'] == "http://json-schema.org/schema#"
+        //schema.description == "This is a task"
+        schema.type == "object"
         //schema.required.size() == 4
         //schema.required.containsAll(["name", "project", "note", "dueDate", "reminderEmail", "estimatedHours", "estimatedCost", "progressPct", "roleVisibility", "flex"])
 
@@ -87,32 +95,32 @@ class JsonSchemaGeneratorSpec extends Specification {
 
     }
 
-    def "test generate attachments"() {
-        given:
-        def path = jsonSchemaGenerator.generateYmlFile(Attachment)
-
-        expect:
-        Files.exists(path)
-    }
+    // def "test generate attachments"() {
+    //     given:
+    //     def path = gormToSchema.generateYmlFile(Attachment)
+    //
+    //     expect:
+    //     Files.exists(path)
+    // }
 
     //@IgnoreRest
-    def "test generate Activity"() {
-        given:
-        //def taggableVal = Activity.yakworks_rally_tag_model_Taggable__validation$get()
-        //assert taggableVal instanceof Map
-        def path = jsonSchemaGenerator.generateYmlFile(Activity)
-
-        expect:
-        Files.exists(path)
-    }
-
-    def "test generateYmlModels"() {
-        given:
-        def path = jsonSchemaGenerator.generateYmlFile(Org)
-        jsonSchemaGenerator.generateYmlModels()
-
-        expect:
-        Files.exists(path)
-    }
+    // def "test generate Activity"() {
+    //     given:
+    //     //def taggableVal = Activity.yakworks_rally_tag_model_Taggable__validation$get()
+    //     //assert taggableVal instanceof Map
+    //     def path = gormToSchema.generateYmlFile(Activity)
+    //
+    //     expect:
+    //     Files.exists(path)
+    // }
+    //
+    // def "test generateYmlModels"() {
+    //     given:
+    //     def path = gormToSchema.generateYmlFile(Org)
+    //     gormToSchema.generateYmlModels()
+    //
+    //     expect:
+    //     Files.exists(path)
+    // }
 
 }

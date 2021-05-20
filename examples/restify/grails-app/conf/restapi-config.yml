@@ -1,36 +1,43 @@
 ---
 restApi:
-  project: # project already exists as a project controller so this just configures it
-    includes:
-      list: ['id', 'num', 'name', 'billable']
-      picklist: ['id', 'num', 'name']
+  # Security
+  user:
+    description: The Users of the system. Certain limitiations will apply if user has been active
+    namespace: security
+    entityClass: gorm.tools.security.domain.AppUser
+  role:
+    description: The system roles that a user can belong to
+    namespace: security
+    entityClass: gorm.tools.security.domain.SecRole
+  roleUser:
+    description: The users assigned to the roles
+    namespace: security
+    allowedMethods: [GET, DELETE, POST]
+    entityClass: gorm.tools.security.domain.SecRoleUser
 
-  book: # basic example where all the defaults come either from domain or their stock
-    entityClass: restify.Book
-
+  # Rally
+  activity:
+    description: {$ref: descriptions/activity.md}
+    namespace: rally
+    entityClass: yakworks.rally.activity.model.Activity
+  attachment:
+    namespace: rally
+    entityClass: yakworks.rally.attachment.model.Attachment
+  company:
+    namespace: rally
+    entityClass: yakworks.rally.orgs.model.Company
+  contact:
+    namespace: rally
+    entityClass: yakworks.rally.orgs.model.Contact
   org:
+    namespace: rally
     entityClass: yakworks.rally.orgs.model.Org
     includes:
-      get: ['*', 'info.*']
-      picklist: ['id', 'name']
-    form:
-      - key: reasonCode
-        type: select
-        selectOptions:
-          dataApiKey: orgType
-          dataApiParams:
-            or:
-              - name: 'name'
-              - name: 'name2'
+      get: [ '*', 'info.*' ]
+  orgTypeSetup:
+    namespace: rally
+    entityClass: yakworks.rally.orgs.model.OrgTypeSetup
+  tag:
+    namespace: rally
+    entityClass: yakworks.rally.tag.model.Tag
 
-  task:
-    entityClass: yakworks.testify.model.Taskify
-    qSearch: ['name', 'note']
-    includes:
-      get: ['*', 'project.*']
-
-  user:
-    entityClass: gorm.tools.security.domain.AppUser
-    qSearch: [ 'username', 'name' ]
-    includes:
-      get: [ '*', 'roles.id', 'roles.name' ]

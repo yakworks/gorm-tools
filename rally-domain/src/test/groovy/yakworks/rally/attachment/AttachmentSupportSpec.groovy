@@ -26,8 +26,8 @@ class AttachmentSupportSpec extends Specification implements DataRepoTest, Secur
 
     def setupSpec() {
         defineBeans({
-            grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
-            grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
+            // grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
+            // grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }

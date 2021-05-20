@@ -165,6 +165,19 @@ public class NameUtils {
     }
 
     /**
+     * Converts fooBar into FooBar. Empty and null strings are returned as-is.
+     *
+     * @param name The lower case hyphen separated name
+     * @return The class name equivalent.
+     */
+    public static String capitalize(String name) {
+        // Handle null and empty strings.
+        if (isBlank(name)) return name;
+
+        return name.substring(0,1).toUpperCase() + name.substring(1);
+    }
+
+    /**
      * Converts foo-bar into FooBar. Empty and null strings are returned as-is.
      *
      * @param name The lower case hyphen separated name

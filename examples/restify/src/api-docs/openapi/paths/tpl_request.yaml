@@ -1,0 +1,7 @@
+description: ${capitalName} resource
+required: true
+content:
+  application/json:
+    schema:
+      allOf:
+        - \$ref: '../../models/${modelName}.yaml'

@@ -7,6 +7,7 @@ package gorm.tools.rest
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
 
+import gorm.tools.openapi.GormToSchema
 import grails.converters.JSON
 
 @CompileDynamic
@@ -15,12 +16,12 @@ class SchemaController {
 
     static namespace = 'api'
 
-    JsonSchemaGenerator jsonSchemaGenerator
+    GormToSchema gormToSchema
 
     def index() {
         log.debug "SchemaController $params"
         //TODO is id is null then what?
-        render jsonSchemaGenerator.generate(params.id) as JSON
+        render gormToSchema.generate(params.id) as JSON
     }
 
 }

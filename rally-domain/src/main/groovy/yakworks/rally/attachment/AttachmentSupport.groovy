@@ -32,8 +32,11 @@ import yakworks.rally.attachment.model.Attachment
 class AttachmentSupport {
     public static final String ATTACHMENTS_LOCATION_KEY = "attachments.location"
 
-    @Autowired AppResourceLoader appResourceLoader
-    @Autowired LinkGenerator grailsLinkGenerator
+    @Autowired(required=false)
+    AppResourceLoader appResourceLoader
+
+    // @Autowired(required=false)
+    // LinkGenerator grailsLinkGenerator
 
     /**
      * Move a temp file. takes a temp file name that will be in the tempDir locationKey as the
@@ -160,7 +163,10 @@ class AttachmentSupport {
     }
 
     String getDownloadUrl(Attachment attachment) {
-        grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
+        //grailsLinkGenerator.link(uri: "/attachment/download/${attachment.id}")
+        //XXX this needs to be dealt with so it returns a full url that ends with file name such as
+        //https://foo.9ci.io/attachment/123/theFileName.pdf
+        "/attachment/download/${attachment.id}"
     }
 
     /****** STATICS ********/

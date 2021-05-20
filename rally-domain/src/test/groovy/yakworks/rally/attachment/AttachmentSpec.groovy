@@ -29,11 +29,9 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
     AppResourceLoader appResourceLoader
     AttachmentRepo attachmentRepo
 
-    // doWithSpringFirst makes sure they are setup so they canbe injected in the repo
+    // doWithSpringFirst makes sure they are setup so they can be used in the test here
     Closure doWithSpringFirst() {
         return {
-            grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
-            grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }
@@ -304,7 +302,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
 
         expect:
-        attachment.downloadUrl.contains('/attachment/download/1')
+        attachment.downloadUrl.endsWith("/attachment/download/${attachment.id}")
     }
 
 }

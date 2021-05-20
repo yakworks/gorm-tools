@@ -14,6 +14,7 @@ import grails.persistence.Entity
 class Bookz implements RepoEntity<Bookz> {
     String name
     BigDecimal cost
+    String hiddenProp
 
     Bookz(){
         id = 1
@@ -43,6 +44,10 @@ class Bookz implements RepoEntity<Bookz> {
     static mapping = {
         id generator:'assigned'
     }
+    static constraints = {
+        hiddenProp display: false
+    }
+
 }
 
 @Entity

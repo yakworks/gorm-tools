@@ -5,6 +5,7 @@
 package gorm.tools.beans
 
 import java.lang.reflect.ParameterizedType
+import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -15,6 +16,7 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 
 import gorm.tools.utils.GormMetaUtils
+import grails.gorm.validation.ConstrainedProperty
 import grails.plugin.cache.Cacheable
 
 /**
@@ -24,6 +26,11 @@ import grails.plugin.cache.Cacheable
 @Slf4j
 @CompileStatic
 class EntityMapService {
+
+    /**
+     * Holds the list of fields that have display:false for a class, meaning they should not be exported
+     */
+    static final Map<String, Set<String>> BLACKLIST = new ConcurrentHashMap<String, Set<String>>()
 
     /**
      * Wrap entity/object in EntityMap
@@ -77,9 +84,9 @@ class EntityMapService {
     EntityMapIncludes buildIncludesMap(String entityClassName, List<String> includes = []) {
         includes = includes ?: ['*'] as List<String> //default to * if nothing
         // if(!entityClass && entity) entityClass = entity.class
-        PersistentEntity domain = GormMetaUtils.findPersistentEntity(entityClassName)
+        PersistentEntity persistentEntity = GormMetaUtils.findPersistentEntity(entityClassName)
         //assert domain, "$entityClassName did not return a PersistentEntity"
-        List<PersistentProperty> properties = domain ? GormMetaUtils.getPersistentProperties(domain) : []
+        List<PersistentProperty> properties = persistentEntity ? GormMetaUtils.getPersistentProperties(persistentEntity) : []
 
         Set<String> rootProps = [] as Set<String>
         Map<String, Object> nestedProps = [:]
@@ -118,7 +125,10 @@ class EntityMapService {
                 (initMap['props'] as Set).add(nestedPropPath)
             }
         }
-        def entIncludes = new EntityMapIncludes(entityClassName, rootProps)
+        //create the includes class for what we have now along with the the blacklist
+        Set blacklist = getBlacklist(persistentEntity)
+        def entIncludes = new EntityMapIncludes(entityClassName, rootProps, blacklist)
+
         //Map<String, Object> propMap = [className: className, props: rootProps]
         // now cycle through the nested props and recursively call this
         Map<String, EntityMapIncludes> nestedMap = [:]
@@ -164,6 +174,20 @@ class EntityMapService {
         def genericReturnType = gen.cachedMethod.genericReturnType as ParameterizedType
         def actualTypeArguments = genericReturnType.actualTypeArguments
         actualTypeArguments ? actualTypeArguments[0].typeName : null
+    }
+
+    static Set<String> getBlacklist(PersistentEntity entity){
+        if(!entity) return [] as Set<String>
+        String clazz = entity.name
+        Set<String> blacklist = BLACKLIST.get(clazz)
+        if(!blacklist){
+            Map<String, ConstrainedProperty> constraints = GormMetaUtils.findAllConstrainedProperties(entity)
+            blacklist = constraints.findAll{
+                !it.value.isDisplay()
+            }.collect {it.key} as Set<String>
+            BLACKLIST.put(clazz, blacklist)
+        }
+        return blacklist
     }
 
     static Class loadClass(String clazz){

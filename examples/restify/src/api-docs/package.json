@@ -1,0 +1,15 @@
+{
+  "name": "rebilly-openapi-spec",
+  "version": "0.0.2",
+  "dependencies": {
+    "@redocly/openapi-cli": "1.0.0-beta.46"
+  },
+  "private": true,
+  "scripts": {
+    "start": "openapi preview-docs",
+    "build": "openapi bundle -o dist",
+    "test": "openapi lint",
+    "serve-dist": "openapi preview-docs dist/api.yaml",
+    "serve-api": "npm run start api"
+  }
+}

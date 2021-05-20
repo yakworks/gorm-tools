@@ -30,8 +30,6 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
     void setupSpec(){
         defineBeans{
-            grailsLinkGenerator(DefaultLinkGenerator, "http://localhost:8080")
-            grailsUrlMappingsHolder(UrlMappingsHolderFactoryBean)
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }

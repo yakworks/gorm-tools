@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 
+import gorm.tools.openapi.GormToSchema
+import gorm.tools.openapi.OpenApiGenerator
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
@@ -45,9 +47,11 @@ class GormToolsRestGrailsPlugin extends Plugin {
                 }
             }
 
-            jsonSchemaGenerator(JsonSchemaGenerator) { bean ->
-                // Autowiring behaviour. The other option is 'byType'. <<autowire>>
-                // bean.autowire = 'byName'
+            gormToSchema(GormToSchema) { bean ->
+                bean.lazyInit = true
+            }
+
+            openApiGenerator(OpenApiGenerator) { bean ->
                 bean.lazyInit = true
             }
 

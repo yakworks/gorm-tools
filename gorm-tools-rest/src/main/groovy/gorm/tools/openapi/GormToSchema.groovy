@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.rest
+package gorm.tools.openapi
 
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
@@ -22,11 +22,8 @@ import org.grails.datastore.mapping.model.types.OneToMany
 import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 import org.springframework.beans.factory.annotation.Autowired
-import org.yaml.snakeyaml.DumperOptions
-import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.beans.EntityMapService
-import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.utils.GormMetaUtils
 import grails.core.DefaultGrailsApplication
 import grails.gorm.validation.ConstrainedProperty
@@ -45,7 +42,7 @@ import yakworks.commons.lang.NameUtils
 //@CompileStatic
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
-class JsonSchemaGenerator {
+class GormToSchema {
 
     @Autowired
     HibernateMappingContext persistentEntityMappingContext
@@ -73,22 +70,8 @@ class JsonSchemaGenerator {
         String projectDir = System.getProperty("gradle.projectDir", '')
         Files.createDirectories(Paths.get(projectDir, "build/schema"))
         def path = Paths.get(projectDir, "build/schema/${clazz.simpleName}.yaml")
-        saveYaml(path, map)
+        YamlUtils.saveYaml(path, map)
         return path
-    }
-
-    def saveYaml(Path path, Object yml){
-        DumperOptions dops = new DumperOptions()
-        dops.indent = 2
-        dops.prettyFlow = true
-        dops.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
-        //dops.width = 120
-        Yaml yaml = new Yaml(dops)
-        yaml.dump(yml, new FileWriter(path.toString()))
-        // path.toFile().withWriter {Writer writer ->
-        //     yaml.dump(yml, writer)
-        // }
-
     }
 
     Map generate(String domainName) {
@@ -107,7 +90,7 @@ class JsonSchemaGenerator {
         Mapping mapping = getMapping(domainClass.name)
 
         //Map cols = mapping.columns
-        schema.title = domainClass.name //TODO Should come from application.yml !?
+        schema.title = domainClass.javaClass.simpleName
 
         if (mapping?.comment) schema.description = mapping.comment
 
@@ -115,7 +98,7 @@ class JsonSchemaGenerator {
         //     map.description = AnnotationUtils.getAnnotationAttributes(AnnotationUtils.findAnnotation(domainClass.class, RestApi)).description
         // }
 
-        schema.type = 'Object'
+        schema.type = 'object'
         schema.required = []
 
         Map propMap = getDomainProperties(domainClass, schema)
@@ -148,6 +131,18 @@ class JsonSchemaGenerator {
             idVerMap[idProp.name] = idJsonType
         }
 
+        //composite ids id
+        // PersistentProperty[] compositeId = perEntity.getCompositeIdentity()
+        // for(compProp in compositeId){
+        //     Map idJsonType = getJsonType(compProp.type)
+        //     idJsonType.putAll([
+        //         description: 'unique id',
+        //         example: 954,
+        //         readOnly: true
+        //     ])
+        //     idVerMap[idProp.name] = idJsonType
+        // }
+
         //version
         if (perEntity.version) {
             idVerMap[perEntity.version.name] = [
@@ -160,6 +155,9 @@ class JsonSchemaGenerator {
 
         Mapping mapping = getMapping(domainName)
         List<PersistentProperty> props = resolvePersistentProperties(perEntity)
+        //composite ids id
+        PersistentProperty[] compositeIds = perEntity.getCompositeIdentity()
+        if(compositeIds) props.addAll(compositeIds)
 
         Map<String, ConstrainedProperty> constrainedProperties = GormMetaUtils.findConstrainedProperties(perEntity)
         Map<String, ConstrainedProperty> nonValidatedProperties = GormMetaUtils.findNonValidatedProperties(perEntity)
@@ -184,7 +182,7 @@ class JsonSchemaGenerator {
             //if its version should have been taken care of or is set to version false
             if(prop.name == 'version') continue
             //skip if display is false
-            if (!constraints.display) continue
+            if (!constraints || !constraints.display) continue
 
             Map jprop = [:]
 
@@ -273,7 +271,7 @@ class JsonSchemaGenerator {
         //description
         String description = constrainedProp.getMetaConstraintValue("description")
         description = description ?: constrainedProp.getMetaConstraintValue("d")
-        if (description) propMap.description = description
+        if (description) propMap.description = description.stripIndent()
     }
 
     void defaults(Map propMap, Mapping mapping, String propName){
@@ -284,7 +282,7 @@ class JsonSchemaGenerator {
     void readOnly(Map propMap, DefaultConstrainedProperty constrainedProp){
         //description
         Boolean readOnly = constrainedProp.getMetaConstraintValue("readOnly")
-        if (readOnly || constrainedProp.editable == false) propMap.readOnly = readOnly
+        if (readOnly || constrainedProp.editable == false) propMap.readOnly = true
     }
 
     boolean isRequired(Map propMap, DefaultConstrainedProperty constrainedProp){

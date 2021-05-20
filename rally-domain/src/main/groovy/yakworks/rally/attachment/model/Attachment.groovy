@@ -83,7 +83,7 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
         name:[ description: '''\
                 This should be the file display name without dir; foo.txt, bar.pdf, etc.
                 Populated from originalFileName when using a multiPart upload.
-                Location has the relative path and unique name on system. Use description for any other useful info'''.stripIndent(),
+                Location has the relative path and unique name on system. Use description for any other useful info''',
             maxSize: 100 ],
         location:[ description: 'The relative path to the locationKey',
                  nullable: true, editable: false, display: false ],

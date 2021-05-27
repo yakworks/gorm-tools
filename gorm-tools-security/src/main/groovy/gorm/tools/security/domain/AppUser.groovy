@@ -24,26 +24,29 @@ class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, 
     static List picklistIncludes = ['id', 'username', 'name'] //for picklist
 
     static constraintsMap = [
-        username:[ description: '''\
+        username:[ d: '''\
             The unique user name, also known as your handle –– what you put after the “@” symbol ala github or twitter
             to mention others in comments or notes. appears in your profile URL. username is used to log in to your account,
             and is visible when sending and receiving. All lowercase and no spaces or special characters.
-            ''', blank: false, nullable: false, unique: true, maxSize: 50],
-        name:[ description: "The full name, may come from contact, will defaults to username if not populated",
+            ''',
+            blank: false, nullable: false, unique: true, maxSize: 50],
+        name:[ d: "The full name, may come from contact, will default to username if not populated",
                  blank: false, nullable: false, required: false,  maxSize: 50],
-        email:[ description: "The email",
+        email:[ d: "The email",
                  nullable: false, blank: false, email: true, unique: true],
-        inactive:[ description: 'True if user is inactive which means they cannot login but are still here for history',
+        inactive:[ d: 'True if user is inactive which means they cannot login but are still here for history',
                    editable: false],
-        passwordHash:[ description: "The pwd hash, internal use only, never show this",
+        password:[ d: "The pwd", oapi:'CU', password: true],
+        roles:[ d: 'The roles assigned to this user', oapi: [read: true, edit: ['id']]],
+        passwordHash:[ d: "The pwd hash, internal use only, never show this",
                  blank: false, nullable: false, maxSize: 60, bindable: false, display:false, password: true],
-        passwordChangedDate:[ description: "The date password was changed",
-                 nullable: true, bindable: false, editable: false],
-        passwordExpired:[ description: "The password expired",
+        passwordChangedDate:[ d: "The date password was changed",
+                 nullable: true, bindable: false, oapi:'R'],
+        passwordExpired:[ d: "The password expired",
                  bindable: false, editable: false],
-        resetPasswordToken:[ description: "temp token for a password reset, internal use only",
+        resetPasswordToken:[ d: "temp token for a password reset, internal use only",
                  nullable: true, bindable: false, display:false],
-        resetPasswordDate:[ description: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",
+        resetPasswordDate:[ d: "date when user requested to reset password, adds resetPasswordExpireDays to see if its still valid",
                  nullable: true, bindable: false, display:false]
     ]
 

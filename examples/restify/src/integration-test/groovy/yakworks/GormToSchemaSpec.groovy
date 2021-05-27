@@ -4,10 +4,12 @@ import java.nio.file.Files
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.openapi.ApiSchemaEntity
 import gorm.tools.openapi.GormToSchema
 import gorm.tools.security.domain.SecRoleUser
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.model.Attachment
@@ -31,7 +33,7 @@ class GormToSchemaSpec extends Specification {
         schema.type == "object"
     }
     //@Ignore
-    def "sanity check Org"() {
+    def "sanity check Org read"() {
         given:
         Map schema = gormToSchema.generate(Org)
 
@@ -80,6 +82,10 @@ class GormToSchemaSpec extends Specification {
         //props.type.required == null
         //props.type.default == "Todo"
 
+        //associations only id
+        props.info != null
+        props.info['$ref'] == 'OrgInfo.yaml'
+
         //associations
         props.info != null
         props.info['$ref'] == 'OrgInfo.yaml'
@@ -92,6 +98,27 @@ class GormToSchemaSpec extends Specification {
         // schema.definitions.size() == 2
         // schema.definitions.TaskFlex != null
         //schema.definitions.TaskFlex.type == "Object"
+
+    }
+
+    @IgnoreRest
+    def "sanity check Org Create"() {
+        given:
+        Map schema = gormToSchema.generate(Org, ApiSchemaEntity.CruType.Create)
+
+        expect:
+        schema != null
+        //schema['$schema'] == "http://json-schema.org/schema#"
+        //schema.description == "This is a task"
+        schema.type == "object"
+        //schema.required.size() == 4
+        //schema.required.containsAll(["name", "project", "note", "dueDate", "reminderEmail", "estimatedHours", "estimatedCost", "progressPct", "roleVisibility", "flex"])
+
+        //verify properties
+        def props = schema['properties']
+        props != null
+        //props.size() == 20 //14 props, + 6 id/version/createBy/date/editedBy/date
+        props.size() == 16 //15 props, + 2 id/version  when audit is turned off
 
     }
 

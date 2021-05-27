@@ -42,6 +42,27 @@ class OrgMember implements GormRepoEntity<OrgMember, OrgMemberRepo>, Serializabl
         factory column: 'factoryId', lazy: true
     }
 
+    static constraintsMap = [
+        branch:[ description: 'The branch for the Org',
+                 oapi:[read: true, create: ['id', 'num']]
+        ],
+        division:[ description: 'The division for the Org',
+                 oapi:[read: true, create: ['id', 'num']]
+        ],
+        business:[ description: 'The business for the Org',
+                   oapi:[read: true, create: ['id', 'num']]
+        ],
+        sales:[ description: 'The sales for the Org',
+                   oapi:[read: true, create: ['id', 'num']]
+        ],
+        region:[ description: 'The region for the Org',
+                   oapi:[read: true, create: ['id', 'num']]
+        ],
+        factory:[ description: 'The factory for the Org',
+                 oapi:[read: true, create: ['id', 'num']]
+        ],
+    ]
+
     OrgMember copy() {
         return new OrgMember(branch: this.branch, division: this.division, business: this.business,
             sales: this.sales, region: this.region, factory: this.factory)

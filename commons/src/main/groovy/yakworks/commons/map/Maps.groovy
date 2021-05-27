@@ -4,6 +4,7 @@
 */
 package yakworks.commons.map
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
@@ -60,7 +61,7 @@ class Maps {
      * @return the new merged map
      */
     static Map deepMerge(Map source, Map other) {
-        def cloneMap = source // source.clone() as Map //FIXME how to clone if compilestatic
+        def cloneMap = clone(source)
         other.inject(cloneMap) { map, e ->
             def k = e.key
             def val = e.value
@@ -73,6 +74,18 @@ class Maps {
             }
             return map
         }
+    }
+
+    /**
+     * dynamic compile so we can clone the passed in map, doesn't work for all maps, only the ones that have clone implemented
+     */
+    @CompileDynamic
+    static Map clone(Map source) {
+        source.clone()
+    }
+
+    static Map deepCopy(Map source) {
+        deepMerge(source, [:])
     }
 
     /**

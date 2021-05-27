@@ -37,7 +37,7 @@ trait Attachable {
     }
 
     static constraintsMap = [
-        attachments: [ description: 'the tags for this item', validate: false]
+        attachments: [ description: 'the attachments for this item', validate: false]
         //hasAttachments: [ d: 'true if this has attachments', nullable: true]
     ]
 }

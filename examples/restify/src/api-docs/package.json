@@ -7,7 +7,8 @@
   "private": true,
   "scripts": {
     "start": "openapi preview-docs",
-    "build": "openapi bundle -o dist",
+    "build": "npm run cpindex; openapi bundle -o dist/api",
+    "cpindex": "mkdir -p dist; cp openapi/index.html dist/",
     "test": "openapi lint",
     "serve-dist": "openapi preview-docs dist/api.yaml",
     "serve-api": "npm run start api"

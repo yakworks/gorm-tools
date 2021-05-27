@@ -356,7 +356,9 @@ class ApiSchemaEntity {
 
     Object defaultFromConstraint(Map propMap, DefaultConstrainedProperty constrainedProp ){
         def defVal = constrainedProp.getMetaConstraintValue("default")?.toString()
-        if (defVal != null) propMap.default = defVal
+        if (defVal == null) return null
+        if(!(defVal instanceof Number)) defVal = defVal.toString()
+        propMap.default = defVal
     }
 
     void defaults(Map propMap, Mapping mapping, String propName){
@@ -378,13 +380,13 @@ class ApiSchemaEntity {
 
     void title(Map propMap, DefaultConstrainedProperty constrainedProp){
         //description
-        String title = constrainedProp.getMetaConstraintValue("title")?.toString()
+        String title = constrainedProp.getMetaConstraintValue("title")
         if (title) propMap.title = title
     }
 
     void example(Map propMap, DefaultConstrainedProperty constrainedProp){
         //description
-        String example = constrainedProp.getMetaConstraintValue("example")?.toString()
+        String example = constrainedProp.getMetaConstraintValue("example")
         if (example) propMap.example = example
     }
 

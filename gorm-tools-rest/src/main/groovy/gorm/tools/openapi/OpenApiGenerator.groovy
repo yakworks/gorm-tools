@@ -119,7 +119,7 @@ class OpenApiGenerator implements ConfigAware {
         api.tags = tags
         //api.paths = paths
         def xTagGroupsList = []
-        xTagGroups.each{k,v ->
+        xTagGroups.each{k, v ->
             xTagGroupsList << [name: k, tags: v as List]
         }
         api['x-tagGroups'] = xTagGroupsList

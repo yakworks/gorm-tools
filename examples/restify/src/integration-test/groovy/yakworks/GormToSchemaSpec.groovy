@@ -118,55 +118,7 @@ class GormToSchemaSpec extends Specification {
         def props = schema['properties']
         props != null
         //props.size() == 20 //14 props, + 6 id/version/createBy/date/editedBy/date
-        props.size() == 17 //15 props, + 2 id/version  when audit is turned off
-
-        props.id != null
-        props.id.type == 'integer'
-        //props.id.format == "int64"
-        props.id.readOnly == true
-
-        props.version != null
-        props.version.type == "integer"
-        props.version.readOnly == true
-
-        props.num != null
-        props.num.type == "string"
-        props.num.description == "Unique alpha-numeric identifier for this organization"
-        props.num.example == "SPX-321"
-        props.num.maxLength == 50
-
-        props.name != null
-        props.name.type == "string"
-        props.name.description == "The full name for this organization"
-        props.name.example == "SpaceX Corp."
-        props.name.maxLength == 100
-
-        //verify enum property
-        props.type != null
-        props.type.type == "string"
-        (props.type.enum as List).containsAll([
-            'Customer', 'CustAccount', 'Branch', 'Division', 'Business', 'Company', 'Prospect', 'Sales', 'Client', 'Factory', 'Region'
-        ])
-        props.type.enum.size() == 11
-        //props.type.required == null
-        //props.type.default == "Todo"
-
-        //associations only id
-        props.info != null
-        props.info['$ref'] == 'OrgInfo.yaml'
-
-        //associations
-        props.info != null
-        props.info['$ref'] == 'OrgInfo.yaml'
-
-        props.flex != null
-        props.flex['$ref'] == "OrgFlex.yaml"
-
-        //verify definitions
-        // schema.definitions != null
-        // schema.definitions.size() == 2
-        // schema.definitions.TaskFlex != null
-        //schema.definitions.TaskFlex.type == "Object"
+        props.size() == 16 //15 props, + 2 id/version  when audit is turned off
 
     }
 

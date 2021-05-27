@@ -21,7 +21,7 @@ post:
   description: Create a new Tpl
   operationId: createTpl
   requestBody:
-    $ref: 'tpl_request.yaml'
+    $ref: 'tpl_request_create.yaml'
   responses:
     '201': { $ref: tpl_response.yaml }
     '403': { $ref: '../../components/responses/403_Forbidden.yaml' }

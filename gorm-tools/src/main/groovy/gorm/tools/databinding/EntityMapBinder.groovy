@@ -372,6 +372,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     private boolean shouldBindAssociation(Object target, Association association) {
         return (association.isOwningSide() || isExplicitBind(target, association.name))
     }
+
     /**
      * Checks if a given association is explicitly marked as bindable and should be binded in any case.
      *

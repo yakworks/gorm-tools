@@ -117,7 +117,7 @@ class AppUserRepo implements GormRepo<AppUser> {
         // Transform both arrays to ListArray<Long> to have ability to compare them
         List<Long> incomeRoles = rolesId.collect {
             // if the list is a map then assume its object map with and id key
-            // other wise convert value to long and assume it s list of ids
+            // otherwise convert value to long and assume it s list of ids
             (it instanceof Map) ? it['id'] as Long : it as Long
         }
         List<Long> existingRoles = SecRoleUser.getByUser(userId)*.role.id

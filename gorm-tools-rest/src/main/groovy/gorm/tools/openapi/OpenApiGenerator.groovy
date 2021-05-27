@@ -20,6 +20,8 @@ import yakworks.commons.io.FileSystemUtils
 import yakworks.commons.io.FileUtil
 import yakworks.commons.lang.NameUtils
 
+import static gorm.tools.openapi.ApiSchemaEntity.CruType
+
 /**
  * Generates the domain part
  * should be merged with either Swaggydocs or Springfox as outlined
@@ -144,8 +146,10 @@ class OpenApiGenerator implements ConfigAware {
 
         String tplRef = "${pathKeyPrefix}${endpoint}_pager.yaml"//.toString()
         processTplFile('paths/tpl_pager.yaml', tplRef, model)
-        tplRef = "${pathKeyPrefix}${endpoint}_request.yaml".toString()
-        processTplFile('paths/tpl_request.yaml', tplRef, model)
+        tplRef = "${pathKeyPrefix}${endpoint}_request_create.yaml".toString()
+        processTplFile('paths/tpl_request_create.yaml', tplRef, model)
+        tplRef = "${pathKeyPrefix}${endpoint}_request_update.yaml".toString()
+        processTplFile('paths/tpl_request_update.yaml', tplRef, model)
         tplRef = "${pathKeyPrefix}${endpoint}_response.yaml".toString()
         processTplFile('paths/tpl_response.yaml', tplRef, model)
     }
@@ -165,7 +169,7 @@ class OpenApiGenerator implements ConfigAware {
         tplPost.summary = "Create a ${model.capitalName}".toString()
         tplPost.description = "Create a new ${model.capitalName}".toString()
         tplPost.operationId = "create${model.capitalName}".toString()
-        tplPost.requestBody['$ref'] = "${model.name}_request.yaml".toString()
+        tplPost.requestBody['$ref'] = "${model.name}_request_create.yaml".toString()
         tplPost['responses']['201']['$ref'] = "${model.name}_response.yaml".toString()
 
         def pathYaml = getApiBuildPath('openapi').resolve(pathRef)
@@ -188,7 +192,7 @@ class OpenApiGenerator implements ConfigAware {
         tplPut.tags = [model.name]
         tplPut.summary = "Update a ${model.capitalName}".toString()
         tplPut.operationId =  "update${model.capitalName}".toString()
-        tplPut.requestBody['$ref'] = "${model.name}_request.yaml".toString()
+        tplPut.requestBody['$ref'] = "${model.name}_request_update.yaml".toString()
         tplPut['responses']['200']['$ref'] = "${model.name}_response.yaml".toString()
 
         Map tplDelete = (Map)tplYaml['delete']
@@ -212,15 +216,21 @@ class OpenApiGenerator implements ConfigAware {
     void generateModels() {
         def mapctx = GormMetaUtils.getMappingContext()
         for( PersistentEntity entity : mapctx.persistentEntities){
-            generateYmlModel(entity.javaClass)
+            def map = gormToSchema.generate(entity, CruType.Read)
+            def mapCreate = gormToSchema.generate(entity, CruType.Create)
+            def mapUpdate = gormToSchema.generate(entity, CruType.Update)
+            writeYmlModel(entity.javaClass, map, CruType.Read)
+            writeYmlModel(entity.javaClass, mapCreate, CruType.Create)
+            writeYmlModel(entity.javaClass, mapUpdate, CruType.Update)
         }
     }
 
-    Path generateYmlModel(Class clazz) {
-        def map = gormToSchema.generate(clazz.name)
+    Path writeYmlModel(Class clazz, Map schemaMap, CruType type) {
+        //if type is read then dont do suffix
+        String suffix = type == CruType.Read ? '' : "_$type"
         Files.createDirectories(getApiBuildPath('openapi/models'))
-        def path = getApiBuildPath("openapi/models/${clazz.simpleName}.yaml")
-        YamlUtils.saveYaml(path, map)
+        def path = getApiBuildPath("openapi/models/${clazz.simpleName}${suffix}.yaml")
+        YamlUtils.saveYaml(path, schemaMap)
         return path
     }
 

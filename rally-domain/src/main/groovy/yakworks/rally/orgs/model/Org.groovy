@@ -45,25 +45,26 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
         name: [description: 'The full name for this organization', example: 'SpaceX Corp.'],
         type:[ description: 'The type of org', example: 'Customer',
              nullable: false, bindable: false],
-        comments:[ description: 'A user visible comment', example: 'Lorem ipsum',
-             nullable: true],
-        companyId:[ description: 'Company id this org belongs to', example: 2,
-             nullable: true],
+        comments:[ description: 'A user visible comment', example: 'Lorem ipsum'],
+        companyId:[ description: 'Company id this org belongs to', example: 2],
         inactive:[ description: 'indicator for an Org that is no longer active'],
         //associations
         flex:[ description: 'User flex fields', nullable: true],
-        info:[ description: 'Info such as phone and website for an organization',
-             nullable: true],
+        info:[ description: 'Info such as phone and website for an organization'],
         contact:[ description: 'The default or key Contact for this organization',
-             nullable: true, bindable: false],
+             bindable: false, oapi:[read: true, create: ['$ref'], update: ['id']]
+        ],
         source:[ description: 'Originator source info, used when this is sourced externally',
-             nullable: true, bindable: false],
+             bindable: false, oapi:[read: true, create: ['source', 'sourceType', 'sourceId']]
+        ],
         location:[ description: 'The primary organization address info',
-             nullable: true, bindable: false],
+             bindable: false, oapi:[read: true, edit: ['$ref']]
+        ],
         calc:[ description: 'Calculated fields',
-             nullable: true, bindable: false, editable: false],
+             bindable: false, editable: false],
         member:[ description: 'Dimension hierarchy fields',
-             nullable: true, bindable: false]
+             bindable: false, oapi:[read: true, edit: ['$ref']]
+        ]
     ]
 
     static mapping = {

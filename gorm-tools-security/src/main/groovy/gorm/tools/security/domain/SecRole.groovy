@@ -29,12 +29,13 @@ class SecRole implements RepoEntity<SecRole>, Serializable {
     String description
     String name
 
-    static constraints = {
-        name description: "The name of the role",
-            blank: false, nullable: false, maxSize: 20
-        description description: "A longer description",
-            nullable: true, maxSize: 255
-    }
+    static constraintsMap = [
+        name: [d: "The name of the role",
+            blank: false, nullable: false, maxSize: 20],
+        description: [d: "A longer description",
+            nullable: true, maxSize: 255],
+        inactive: [d: "Whether role should be active", oapi:'U']
+    ]
 
     static mapping = orm {
         cache "read-write"

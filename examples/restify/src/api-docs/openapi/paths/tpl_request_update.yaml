@@ -4,4 +4,4 @@ content:
   application/json:
     schema:
       allOf:
-        - \$ref: '../../models/${modelName}.yaml'
+        - \$ref: '../../models/${modelName}_Update.yaml'

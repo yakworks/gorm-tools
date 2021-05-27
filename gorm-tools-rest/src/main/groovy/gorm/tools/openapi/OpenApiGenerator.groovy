@@ -108,7 +108,13 @@ class OpenApiGenerator implements ConfigAware {
             if(!xTagGroups[namespace]) xTagGroups[namespace] = []
             xTagGroups[namespace].add(endpoint)
 
-            createPaths(api, endpoint, pathMap)
+            try{
+                createPaths(api, endpoint, pathMap)
+            } catch(e){
+                String msg = "Error on $endpoint"
+                throw new IllegalArgumentException(msg, e)
+            }
+
         }
         api.tags = tags
         //api.paths = paths

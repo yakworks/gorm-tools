@@ -92,7 +92,7 @@ class DefaultMangoQuery implements MangoQuery {
                     sum(sumField)
                 }
             }
-        println projections
+
         List totalsData = sums.size() > 1 ? (List) projections[0] : [projections[0]]
         Map result = [:]
         sums.eachWithIndex { String name, Integer i ->

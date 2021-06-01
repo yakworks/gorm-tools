@@ -1,8 +1,6 @@
 ---
-restApiConfig:
-  # this is base package where the controllers will be generated. Will be prefixed by the namespace is there is one
-  defaultPackage: restify.api
 restApi:
+  defaultPackage: restify.api
   paths:
     # Security
     'security/user':

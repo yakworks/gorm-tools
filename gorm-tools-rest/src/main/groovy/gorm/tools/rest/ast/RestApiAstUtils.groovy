@@ -51,59 +51,62 @@ class RestApiAstUtils {
         controllerClassNode.addConstructor(Modifier.PUBLIC, ZERO_PARAMETERS, ClassNode.EMPTY_ARRAY, constructorBody)
     }
 
-    static makeController(CompilationUnit unit, SourceUnit source, String resourceName, ClassNode controllerTraitClassNode, ClassNode entityClassNode,
-                        String namespace, boolean readOnly = false){
+    static makeController(CompilationUnit unit, SourceUnit source, String defaultPackage, String resourceName,
+                          ClassNode controllerTraitClassNode, ClassNode entityClassNode, String namespace, boolean readOnly = false){
         final ast = source.getAST()
-        String ctrlPrefixName = entityClassNode.name
+        //String ctrlPrefixName = entityClassNode.name
+        if(!defaultPackage) defaultPackage = NameUtils.getPackageName(entityClassNode.name)
+        if(namespace) defaultPackage = "${defaultPackage}.${namespace}"
+        String ctrlPrefixName = "${defaultPackage}.${NameUtils.getClassNameFromKebabCase(resourceName)}"
         // if resourceName then convert foo-bar hyphenated to FooBar
-        if(resourceName) {
-            String entityPackage = NameUtils.getPackageName(entityClassNode.name)
-            ctrlPrefixName = "${entityPackage}.${NameUtils.getClassNameFromKebabCase(resourceName)}"
-        }
+        // if(resourceName) {
+        //     String entityPackage = NameUtils.getPackageName(entityClassNode.name)
+        //     ctrlPrefixName = "${entityPackage}.${NameUtils.getClassNameFromKebabCase(resourceName)}"
+        // }
         String className = "${ctrlPrefixName}Controller"
+
         // println "making className $className"
         final File resource = IOUtils.findSourceFile(className)
+        //if the resource exists in source then dont generate
+        if(resource) return
+
         LinkableTransform.addLinkingMethods(entityClassNode)
 
-        if (resource == null) {
+        final newControllerClassNode = new ClassNode(className, PUBLIC, ClassHelper.OBJECT_TYPE)
+        //add the trait
+        addTrait(newControllerClassNode, entityClassNode, controllerTraitClassNode)
 
-            //def superClassNodeGeneric = GrailsASTUtils.replaceGenericsPlaceholders(superClassNode, [D: entityClassNode])
-            //final ClassNode newControllerClassNode = ClassHelper.makeWithoutCaching(className)
-            final newControllerClassNode = new ClassNode(className, PUBLIC, ClassHelper.OBJECT_TYPE)
-            //add the trait
-            addTrait(newControllerClassNode, entityClassNode, controllerTraitClassNode)
+        // Add the compileStatic
+        newControllerClassNode.addAnnotation(new AnnotationNode(ClassHelper.make(CompileStatic)))
 
-            // Add the compileStatic
-            newControllerClassNode.addAnnotation(new AnnotationNode(ClassHelper.make(CompileStatic)))
+        addResponseFormats(newControllerClassNode)
+        addNamespace(newControllerClassNode, namespace)
+        //addConstructor(newControllerClassNode, entityClassNode, readOnly)
 
-            addResponseFormats(newControllerClassNode)
-            addNamespace(newControllerClassNode, namespace)
-            //addConstructor(newControllerClassNode, entityClassNode, readOnly)
+        List<ClassInjector> injectors = ArtefactTypeAstTransformation.findInjectors(ControllerArtefactHandler
+            .TYPE, GrailsAwareInjectionOperation.getClassInjectors())
 
-            List<ClassInjector> injectors = ArtefactTypeAstTransformation.findInjectors(ControllerArtefactHandler
-                .TYPE, GrailsAwareInjectionOperation.getClassInjectors())
+        ArtefactTypeAstTransformation.performInjection(source, newControllerClassNode, injectors.findAll {
+            !(it instanceof ControllerActionTransformer)
+        })
 
-            ArtefactTypeAstTransformation.performInjection(source, newControllerClassNode, injectors.findAll {
-                !(it instanceof ControllerActionTransformer)
-            })
-
-            if (unit) {
-                TraitInjectionUtils.processTraitsForNode(source, newControllerClassNode, 'Controller', unit)
-            }
-
-            ArtefactTypeAstTransformation.performInjection(source, newControllerClassNode, injectors.findAll {
-                it instanceof ControllerActionTransformer
-            })
-            // new TransactionalTransform().visit(source, transactionalAnn, newControllerClassNode)
-            newControllerClassNode.setModule(ast)
-
-            // add @Artifact(Controller) annotation that marks it as a controller
-            final artefactAnnotation = new AnnotationNode(new ClassNode(Artefact))
-            artefactAnnotation.addMember("value", new ConstantExpression(ControllerArtefactHandler.TYPE))
-            newControllerClassNode.addAnnotation(artefactAnnotation)
-
-            ast.classes.add(newControllerClassNode)
+        if (unit) {
+            TraitInjectionUtils.processTraitsForNode(source, newControllerClassNode, 'Controller', unit)
         }
+
+        ArtefactTypeAstTransformation.performInjection(source, newControllerClassNode, injectors.findAll {
+            it instanceof ControllerActionTransformer
+        })
+        // new TransactionalTransform().visit(source, transactionalAnn, newControllerClassNode)
+        newControllerClassNode.setModule(ast)
+
+        // add @Artifact(Controller) annotation that marks it as a controller
+        final artefactAnnotation = new AnnotationNode(new ClassNode(Artefact))
+        artefactAnnotation.addMember("value", new ConstantExpression(ControllerArtefactHandler.TYPE))
+        newControllerClassNode.addAnnotation(artefactAnnotation)
+
+        ast.classes.add(newControllerClassNode)
+
     }
 
     static void addNamespace(ClassNode controllerNode, String namespace) {

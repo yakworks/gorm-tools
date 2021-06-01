@@ -51,16 +51,17 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         config.loadYml(new File("${projectDir}grails-app/conf/restapi-config.yml"))
 
         Map restApi = config.getProperty('restApi', Map) as Map<String, Map>
+        String defaultPackage = restApi.defaultPackage as String
         Map paths = restApi.paths as Map<String, Map>
         paths.each { String key, Map val ->
             // Map entry = val as Map
             if (val?.entityClass) {
-                generateController(source, key, val)
+                generateController(source, defaultPackage, key, val)
             }
         }
     }
 
-    void generateController(SourceUnit source, String resourceName, Map ctrlConfig) {
+    void generateController(SourceUnit source, String defaultPackage, String resourceName, Map ctrlConfig) {
         String entityClassName = (String)ctrlConfig['entityClass']
         ClassNode entityClassNode
         try {
@@ -88,7 +89,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         String endpoint = pathParts.name
         String namespace = pathParts.namespace
         //println "endpoint: $endpoint namespace: $namespace"
-        RestApiAstUtils.makeController(compilationUnit, source, endpoint, traitNode, entityClassNode, namespace, false)
+        RestApiAstUtils.makeController(compilationUnit, source, defaultPackage, endpoint, traitNode, entityClassNode, namespace, false)
 
     }
 

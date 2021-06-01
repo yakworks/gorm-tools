@@ -271,7 +271,7 @@ class ApiSchemaEntity {
         Map allowedProp = (Map)apiProp.allowed
         def allowedInfo =  allowedProp[type.getPropertyName()]
         //it need to either be true or its a list of fields to make obj
-        if(!allowedInfo) return
+        if(!allowedInfo) return [:]
         List fields = []
         if(allowedInfo instanceof List){
             fields = (List) allowedInfo

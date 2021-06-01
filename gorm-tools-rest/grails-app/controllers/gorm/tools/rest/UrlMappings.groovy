@@ -6,6 +6,8 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
+import gorm.tools.rest.controller.RestApiController
+import gorm.tools.rest.controller.RestRepositoryApi
 import yakworks.commons.lang.ClassUtils
 
 @CompileDynamic
@@ -16,32 +18,34 @@ class UrlMappings {
         for (controller in getGrailsApplication().controllerClasses) {
             // println "controler $controller.fullName"
             String cName = controller.logicalPropertyName
+            boolean isApi = RestRepositoryApi.isAssignableFrom(controller.clazz)
             String namespace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
-            // println "controller $cName with namespace $namespace"
+           // println "controller $cName with namespace $namespace"
 
-            if (namespace == 'api') {
-                group("/api") {
-                    // println "controller $cName with namespace $namespace"
+            if (isApi) {
+                String apiPath = namespace ? "/api/$namespace" : "/api"
+                group(apiPath) {
+                    println "apiPath: $apiPath controller: $cName with namespace: $namespace"
 
                     "/${cName}/schema"(controller: "schema", action: "index") {
                         id = cName
                     }
                     //when a post is called allows an action
-                    post "/${cName}/$action(.$format)?"(controller: cName, namespace: 'api')
+                    post "/${cName}/$action(.$format)?"(controller: cName)
                     //or
-                    post "/${cName}/actions/$action(.$format)?"(controller: cName, namespace: 'api')
+                    post "/${cName}/actions/$action(.$format)?"(controller: cName)
 
-                    delete "/${cName}/$id(.$format)?"(controller: cName, action: "delete", namespace: 'api')
-                    get "/${cName}(.$format)?"(controller: cName, action: "list", namespace: 'api')
-                    get "/${cName}/$id(.$format)?"(controller: cName, action: "get", namespace: 'api')
+                    delete "/${cName}/$id(.$format)?"(controller: cName, action: "delete")
+                    get "/${cName}(.$format)?"(controller: cName, action: "list")
+                    get "/${cName}/$id(.$format)?"(controller: cName, action: "get")
 
-                    get "/${cName}/list(.$format)?"(controller: cName, action: "list", namespace: 'api')
-                    get "/${cName}/picklist(.$format)?"(controller: cName, action: "picklist", namespace: 'api')
-                    post "/${cName}/list(.$format)?"(controller: cName, action: "listPost", namespace: 'api')
+                    //get "/${cName}/list(.$format)?"(controller: cName, action: "list")
+                    get "/${cName}/picklist(.$format)?"(controller: cName, action: "picklist")
+                    //post "/${cName}/list(.$format)?"(controller: cName, action: "listPost")
 
-                    post "/${cName}(.$format)?"(controller: cName, action: "post", namespace: 'api')
-                    put "/${cName}/$id(.$format)?"(controller: cName, action: "put", namespace: 'api')
-                    patch "/${cName}/$id(.$format)?"(controller: cName, action: "put", namespace: 'api')
+                    post "/${cName}(.$format)?"(controller: cName, action: "post")
+                    put "/${cName}/$id(.$format)?"(controller: cName, action: "put")
+                    patch "/${cName}/$id(.$format)?"(controller: cName, action: "put")
                 }
             }
         }

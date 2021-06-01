@@ -1,44 +1,58 @@
 get:
-  tags: [ foo ]
-  summary: Get a Tpl
-  description: Returns a single Tpl
-  operationId: getTplById
+  tags: [ ${endpoint} ]
+  summary: Get a ${capitalName}
+  description: Retrieve a ${capitalName}
+  operationId: get${capitalName}ById
   parameters:
-    - $ref: '../../components/parameters/id.yaml'
+    - \$ref: '../../components/parameters/id.yaml'
   responses:
-    '200': { $ref: tpl_response.yaml }
-    '403': { $ref: '../../components/responses/403_Forbidden.yaml' }
-    '404': { $ref: '../../components/responses/404_NotFound.yaml' }
+    '200':
+      description: ${capitalName} Resource
+      content:
+        application/json:
+          \$ref: '../../models/${modelName}.yaml'
+    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '../../components/responses/404_NotFound.yaml' }
 
 put:
-  tags: [ foo ]
-  summary: Update a Tpl
+  tags: [ ${endpoint} ]
+  summary: Update a ${capitalName}
   description: ''
-  operationId: updateTpl
+  operationId: update${capitalName}
   parameters:
-    - $ref: '../../components/parameters/id.yaml'
+    - \$ref: '../../components/parameters/id.yaml'
   requestBody:
-    $ref: tpl_request_update.yaml
+    description: ${capitalName} resource
+    required: true
+    content:
+      application/json:
+        schema:
+          \$ref: '../../models/${modelName}_Update.yaml'
   responses:
-    '200': { $ref: tpl_response.yaml }
-    '403': { $ref: '../../components/responses/403_Forbidden.yaml' }
-    '404': { $ref: '../../components/responses/404_NotFound.yaml' }
-    '422': { $ref: '../../components/responses/422_ValidationError.yaml' }
+    '200':
+      description: ${capitalName} Resource
+      content:
+        application/json:
+          schema:
+            \$ref: '../../models/${modelName}.yaml'
+    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '../../components/responses/404_NotFound.yaml' }
+    '422': { \$ref: '../../components/responses/422_ValidationError.yaml' }
 
   x-codeSamples:
-    - { label: 'Curl', lang: 'bash', source: {$ref: '../../components/codeSamples/curl/put.sh'} }
+    - { label: 'Curl', lang: 'bash', source: {\$ref: '../../components/codeSamples/curl/put.sh'} }
 
 delete:
-  tags: [ batch ]
-  summary: Delete a Batch
+  tags: [ ${endpoint} ]
+  summary: Delete a ${capitalName}
   description: 'Deletes a Batch and any associated Payments'
-  operationId: deletePayment
+  operationId: delete${capitalName}
   parameters:
-    - $ref: '../../components/parameters/id.yaml'
+    - \$ref: '../../components/parameters/id.yaml'
   responses:
-    '204': { $ref: '../../components/responses/204_NoContent.yaml' }
-    '403': { $ref: '../../components/responses/403_Forbidden.yaml' }
-    '404': { $ref: '../../components/responses/404_NotFound.yaml' }
+    '204': { \$ref: '../../components/responses/204_NoContent.yaml' }
+    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '../../components/responses/404_NotFound.yaml' }
 
   x-codeSamples:
-    - { label: 'Curl', lang: 'bash', source: {$ref: '../../components/codeSamples/curl/delete.sh'} }
+    - { label: 'Curl', lang: 'bash', source: {\$ref: '../../components/codeSamples/curl/delete.sh'} }

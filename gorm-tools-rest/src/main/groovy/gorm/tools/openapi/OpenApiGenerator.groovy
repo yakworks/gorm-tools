@@ -14,6 +14,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.io.FileSystemUtils
@@ -89,17 +90,19 @@ class OpenApiGenerator implements ConfigAware {
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api){
-        Map restApi = config.getProperty('restApi', Map)
+        Map restCfg = config.getProperty('restApi', Map)
+        Map restApi = restCfg.paths as Map<String, Map>
+
         //Map paths = (Map)api.paths
         List tags = (List)api.tags
         Map<String, List> xTagGroups = [:]
 
         for(entry in restApi){
-            String endpoint = entry.key
+            String pathName = entry.key
             Map pathMap = (Map)entry.value
-            String namespace = pathMap.namespace ?: ''
-            // String pathKey = "/${namespace}/${endpoint}".toString()
-            // String pathKeyId = "${pathKey}/{id}".toString()
+            Map pathParts = RestApiAstUtils.splitPath(pathName, pathMap)
+            String endpoint = pathParts.name
+            String namespace = pathParts.namespace
 
             Map tagEntry = [name: endpoint]
             if(pathMap.description) tagEntry.description = pathMap.description
@@ -145,19 +148,26 @@ class OpenApiGenerator implements ConfigAware {
 
         String capitalName = NameUtils.getClassNameFromKebabCase(endpoint)
         String modelName = NameUtils.getShortName((String)pathMap.entityClass)
-        Map model = [name: endpoint, capitalName: capitalName, modelName: modelName, namespace: namespace]
+        Map model = [endpoint: endpoint, name: endpoint, capitalName: capitalName, modelName: modelName, namespace: namespace]
 
-        createPathFiles(pathKeyRef, model)
-        createPathIdFiles(pathKeyIdRef, model)
+        //createPathFiles(pathKeyRef, model)
+        //createPathIdFiles(pathKeyIdRef, model)
+        //path file
+        String tplRef = "${pathKeyPrefix}${endpoint}.yaml"//.toString()
+        processTplFile('paths/tpl.yaml', tplRef, model)
 
-        String tplRef = "${pathKeyPrefix}${endpoint}_pager.yaml"//.toString()
-        processTplFile('paths/tpl_pager.yaml', tplRef, model)
-        tplRef = "${pathKeyPrefix}${endpoint}_request_create.yaml".toString()
-        processTplFile('paths/tpl_request_create.yaml', tplRef, model)
-        tplRef = "${pathKeyPrefix}${endpoint}_request_update.yaml".toString()
-        processTplFile('paths/tpl_request_update.yaml', tplRef, model)
-        tplRef = "${pathKeyPrefix}${endpoint}_response.yaml".toString()
-        processTplFile('paths/tpl_response.yaml', tplRef, model)
+        //path Id file
+        tplRef = "${pathKeyPrefix}${endpoint}@{id}.yaml"//.toString()
+        processTplFile('paths/tpl@{id}.yaml', tplRef, model)
+
+        // tplRef = "${pathKeyPrefix}${endpoint}_pager.yaml"//.toString()
+        // processTplFile('paths/tpl_pager.yaml', tplRef, model)
+        // tplRef = "${pathKeyPrefix}${endpoint}_request_create.yaml".toString()
+        // processTplFile('paths/tpl_request_create.yaml', tplRef, model)
+        // tplRef = "${pathKeyPrefix}${endpoint}_request_update.yaml".toString()
+        // processTplFile('paths/tpl_request_update.yaml', tplRef, model)
+        // tplRef = "${pathKeyPrefix}${endpoint}_response.yaml".toString()
+        // processTplFile('paths/tpl_response.yaml', tplRef, model)
     }
 
     //create the files for the path

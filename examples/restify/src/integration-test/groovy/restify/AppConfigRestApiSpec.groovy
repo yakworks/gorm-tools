@@ -1,5 +1,7 @@
 package restify
 
+import groovy.json.JsonSlurper
+
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
@@ -12,13 +14,13 @@ class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test config values"() {
         when:
-        Response resp = get('/api/appConfig/org')
-        Map body = bodyToMap(resp)
+        Response resp = get('/api/appConfig/rally_org')
+        String bodyString = resp.body().string()
+        println "bodyString: ${bodyString}"
+        Map body = new JsonSlurper().parseText(bodyString) as Map
 
-        then: "should have exluded the flattened spring array keys"
+        then: "should have excluded the flattened spring array keys"
         body.includes.get == ['*', 'info.*']
     }
-
-
 
 }

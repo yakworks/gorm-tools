@@ -4,7 +4,6 @@
 */
 package gorm.tools.rest.ast
 
-
 import groovy.transform.CompilationUnitAware
 import groovy.transform.CompileStatic
 
@@ -18,9 +17,8 @@ import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.config.CodeGenConfig
-import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.rest.controller.RestApiRepoController
+import gorm.tools.rest.controller.RestRepositoryApi
 
 //import grails.rest.Resource
 //import grails.rest.RestfulController
@@ -34,10 +32,7 @@ import gorm.tools.rest.controller.RestApiRepoController
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
 class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware {
     // private static final ClassNode MY_TYPE = new ClassNode(RestApi)
-    public static final String ATTR_READY_ONLY = "readOnly"
-    public static final String ATTR_SUPER_CLASS = "superClass"
-    public static final String ATTR_NAMESPACE = "namespace"
-    public static final ClassNode AUTOWIRED_CLASS_NODE = new ClassNode(Autowired).getPlainNodeReference()
+    public static final String ATTR_SUPER_CLASS = "controllerTrait"
 
     private CompilationUnit compilationUnit
 
@@ -56,7 +51,8 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         config.loadYml(new File("${projectDir}grails-app/conf/restapi-config.yml"))
 
         Map restApi = config.getProperty('restApi', Map) as Map<String, Map>
-        restApi.each { String key, Map val ->
+        Map paths = restApi.paths as Map<String, Map>
+        paths.each { String key, Map val ->
             // Map entry = val as Map
             if (val?.entityClass) {
                 generateController(source, key, val)
@@ -79,15 +75,20 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         ///ClassNode entityClassNode = compilationUnit.getClassNode(entityClassName)
         assert entityClassNode, "entityClass not found with name: ${entityClassName}"
 
-        ClassNode superClassNode
-        String superClassName = (String)ctrlConfig['controllerClass']
+        ClassNode traitNode
+        String superClassName = (String)ctrlConfig['controllerTrait']
         if (superClassName) {
-            superClassNode = ClassHelper.make(getClass().classLoader.loadClass(superClassName))
+            traitNode = ClassHelper.make(getClass().classLoader.loadClass(superClassName))
         } else {
-            superClassNode = ClassHelper.make(RestApiRepoController)
+            traitNode = ClassHelper.make(RestRepositoryApi)
+            //traitNode = ClassHelper.make(RepoController)
         }
-        String namespace = (String)ctrlConfig['controllerClass']
-        RestApiTransform.makeController(compilationUnit, source, resourceName, superClassNode, entityClassNode, namespace, false)
+
+        Map pathParts = RestApiAstUtils.splitPath(resourceName, ctrlConfig)
+        String endpoint = pathParts.name
+        String namespace = pathParts.namespace
+        //println "endpoint: $endpoint namespace: $namespace"
+        RestApiAstUtils.makeController(compilationUnit, source, endpoint, traitNode, entityClassNode, namespace, false)
 
     }
 

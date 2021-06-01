@@ -1,43 +1,37 @@
 ---
+restApiConfig:
+  # this is base package where the controllers will be generated. Will be prefixed by the namespace is there is one
+  defaultPackage: restify.api
 restApi:
-  # Security
-  user:
-    description: The Users of the system. Certain limitiations will apply if user has been active
-    namespace: security
-    entityClass: gorm.tools.security.domain.AppUser
-  role:
-    description: The system roles that a user can belong to
-    namespace: security
-    entityClass: gorm.tools.security.domain.SecRole
-  roleUser:
-    description: The users assigned to the roles
-    namespace: security
-    allowedMethods: [GET, DELETE, POST]
-    entityClass: gorm.tools.security.domain.SecRoleUser
+  paths:
+    # Security
+    'security/user':
+      description: The Users of the system. Certain limitiations will apply if user has been active
+      entityClass: gorm.tools.security.domain.AppUser
+    'security/role':
+      description: The system roles that a user can belong to
+      entityClass: gorm.tools.security.domain.SecRole
+    'security/roleUser':
+      description: The users assigned to the roles
+      actions: [create, delete]
+      entityClass: gorm.tools.security.domain.SecRoleUser
 
-  # Rally
-  activity:
-    description: {$ref: descriptions/activity.md}
-    namespace: rally
-    entityClass: yakworks.rally.activity.model.Activity
-  attachment:
-    namespace: rally
-    entityClass: yakworks.rally.attachment.model.Attachment
-  company:
-    namespace: rally
-    entityClass: yakworks.rally.orgs.model.Company
-  contact:
-    namespace: rally
-    entityClass: yakworks.rally.orgs.model.Contact
-  org:
-    namespace: rally
-    entityClass: yakworks.rally.orgs.model.Org
-    includes:
-      get: [ '*', 'info.*' ]
-  orgTypeSetup:
-    namespace: rally
-    entityClass: yakworks.rally.orgs.model.OrgTypeSetup
-  tag:
-    namespace: rally
-    entityClass: yakworks.rally.tag.model.Tag
+    # Rally
+    'rally/activity':
+      description: {$ref: descriptions/activity.md}
+      entityClass: yakworks.rally.activity.model.Activity
+    'rally/attachment':
+      entityClass: yakworks.rally.attachment.model.Attachment
+    'rally/company':
+      entityClass: yakworks.rally.orgs.model.Company
+    'rally/contact':
+      entityClass: yakworks.rally.orgs.model.Contact
+    'rally/org':
+      entityClass: yakworks.rally.orgs.model.Org
+      includes:
+        get: [ '*', 'info.*' ]
+    'rally/orgTypeSetup':
+      entityClass: yakworks.rally.orgs.model.OrgTypeSetup
+    'rally/tag':
+      entityClass: yakworks.rally.tag.model.Tag
 

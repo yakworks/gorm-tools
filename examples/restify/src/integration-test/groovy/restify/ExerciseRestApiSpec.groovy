@@ -20,7 +20,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "get index list"() {
         when:
-        Response resp = get(getPath('org'))
+        Response resp = get(getPath('rally/org'))
         assert resp.code() == HttpStatus.OK.value()
         Map pageMap = bodyToMap(resp)
 
@@ -43,9 +43,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity      | qCount
-        'org'       | 100
+        'rally/org'       | 100
         'project'   | 50
-        'user'      | 2
+        'security/user'      | 2
 
     }
 
@@ -66,7 +66,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity      | data
-        'org'       | [num:'foo1', name: "foo", type: [id: 1]]
+        'rally/org'       | [num:'foo1', name: "foo", type: [id: 1]]
         'project'   | [name: "project", num: "x123"]
         //'user'      | [username:'galt', email: "jim@joe.com", password:'secretStuff', repassword:'secretStuff']
         //'location'  | [city: "Chicago"]
@@ -88,9 +88,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity     | id | prop   | val
-        'org'      | 1  | 'num'  | 'foo123'
+        'rally/org'      | 1  | 'num'  | 'foo123'
         'project'  | 1  | 'name' | 'project123'
-        'user'     | 1  | 'username' | 'jimmy'
+        'security/user'     | 1  | 'username' | 'jimmy'
         //        'location' | 1  | 'city' | 'Denver'
 
     }
@@ -110,9 +110,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity     | qCount | qSearch
-        'org'      | 1      | 'foo123'
+        'rally/org'      | 1      | 'foo123'
         'project'  | 1      | 'project123'
-        'user'     | 1      | 'admin'
+        'security/user'     | 1      | 'admin'
         //'location' | 1      | 'Denver'
 
     }

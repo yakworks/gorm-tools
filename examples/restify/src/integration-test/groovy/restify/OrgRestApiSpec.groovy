@@ -11,7 +11,7 @@ import spock.lang.Specification
 @Integration
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
-    String path = "/api/org"
+    String path = "/api/rally/org"
     Map postData = [num:'foo1', name: "foo", type: 'Customer']
     Map putData = [name: "updated foo1"]
 

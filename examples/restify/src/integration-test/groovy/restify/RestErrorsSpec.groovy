@@ -14,7 +14,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
         when:
         Map invalidData2 = [num:'foo1', name: "foo"]
-        Response resp = post('/api/org', invalidData2)
+        Response resp = post('/api/rally/org', invalidData2)
         Map body = bodyToMap(resp)
 
         then:

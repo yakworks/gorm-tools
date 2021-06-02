@@ -68,7 +68,12 @@ class UrlMappings {
         }
 
         "/"(view: "/index")
-        "500"(view: '/error')
-        "404"(view: '/notFound')
+
+        // the default view names are error and notFound. but grails sitemesh picks them up first if they exist
+        // in another plugin (such as the ones in spring sec and cache) and renders those gsps
+        // instead of gson so for rest api its important to use unique names
+        "500"(view: '/error500')
+        "404"(view: '/notFound404')
+        "400"(view: '/badRequest400')
     }
 }

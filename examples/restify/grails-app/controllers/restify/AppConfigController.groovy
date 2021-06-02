@@ -7,10 +7,10 @@ import yakworks.commons.map.Maps
 
 class AppConfigController implements RestApiController {
 
-    GrailsApplication grailsApplication
+    RestApiConfig restApiConfig
 
     def get() {
-        def resourceConfig = RestApiConfig.getPathConfig(params.id)
+        def resourceConfig = restApiConfig.getPathConfig(params.id as String)
         def fixedMap = Maps.removePropertyListKeys(resourceConfig)
         respond fixedMap
     }

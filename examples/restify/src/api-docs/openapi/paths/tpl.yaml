@@ -4,11 +4,11 @@ get:
   description: Query and retrieve a ${capitalName} list
   operationId: get${capitalName}List
   parameters:
-    - \$ref: '../../components/parameters/page.yaml'
-    - \$ref: '../../components/parameters/max.yaml'
-    - \$ref: '../../components/parameters/q.yaml'
-    - \$ref: '../../components/parameters/sort.yaml'
-    - \$ref: '../../components/parameters/order.yaml'
+    - \$ref: '${baseDir}components/parameters/page.yaml'
+    - \$ref: '${baseDir}components/parameters/max.yaml'
+    - \$ref: '${baseDir}components/parameters/q.yaml'
+    - \$ref: '${baseDir}components/parameters/sort.yaml'
+    - \$ref: '${baseDir}components/parameters/order.yaml'
   responses:
     '200':
       description: ${capitalName} Pager Resource
@@ -16,15 +16,15 @@ get:
         application/json:
           schema:
             allOf:
-              - \$ref: '../../components/schemas/Pager.yaml'
+              - \$ref: '${baseDir}components/schemas/Pager.yaml'
               - properties:
                   data:
                     description: ${capitalName} list
                     type: array
-                    items: { \$ref: '../../models/${modelName}.yaml' }
-    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
+                    items: { \$ref: '${baseDir}models/${modelName}.yaml' }
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
   x-codeSamples:
-    - { label: 'Curl', lang: 'bash', source: {\$ref: '../../components/codeSamples/curl/get.sh'} }
+    - { label: 'Curl', lang: 'bash', source: {\$ref: '${baseDir}components/codeSamples/curl/get.sh'} }
 
 post:
   tags: [ ${endpoint} ]
@@ -38,16 +38,16 @@ post:
       application/json:
         schema:
           allOf:
-            - \$ref: '../../models/${modelName}_Create.yaml'
+            - \$ref: '${baseDir}models/${modelName}_Create.yaml'
   responses:
     '201':
       description: ${capitalName} Resource
       content:
         application/json:
           schema:
-            \$ref: '../../models/${modelName}.yaml'
-    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
-    '422': { \$ref: '../../components/responses/422_ValidationError.yaml' }
+            \$ref: '${baseDir}models/${modelName}.yaml'
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
+    '422': { \$ref: '${baseDir}components/responses/422_ValidationError.yaml' }
 
   x-codeSamples:
-    - { label: 'Curl', lang: 'bash', source: {\$ref: '../../components/codeSamples/curl/post.sh'} }
+    - { label: 'Curl', lang: 'bash', source: {\$ref: '${baseDir}components/codeSamples/curl/post.sh'} }

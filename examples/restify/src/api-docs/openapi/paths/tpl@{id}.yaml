@@ -4,15 +4,15 @@ get:
   description: Retrieve a ${capitalName}
   operationId: get${capitalName}ById
   parameters:
-    - \$ref: '../../components/parameters/id.yaml'
+    - \$ref: '${baseDir}components/parameters/id.yaml'
   responses:
     '200':
       description: ${capitalName} Resource
       content:
         application/json:
-          \$ref: '../../models/${modelName}.yaml'
-    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
-    '404': { \$ref: '../../components/responses/404_NotFound.yaml' }
+          \$ref: '${baseDir}models/${modelName}.yaml'
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '${baseDir}components/responses/404_NotFound.yaml' }
 
 put:
   tags: [ ${endpoint} ]
@@ -20,27 +20,27 @@ put:
   description: ''
   operationId: update${capitalName}
   parameters:
-    - \$ref: '../../components/parameters/id.yaml'
+    - \$ref: '${baseDir}components/parameters/id.yaml'
   requestBody:
     description: ${capitalName} resource
     required: true
     content:
       application/json:
         schema:
-          \$ref: '../../models/${modelName}_Update.yaml'
+          \$ref: '${baseDir}models/${modelName}_Update.yaml'
   responses:
     '200':
       description: ${capitalName} Resource
       content:
         application/json:
           schema:
-            \$ref: '../../models/${modelName}.yaml'
-    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
-    '404': { \$ref: '../../components/responses/404_NotFound.yaml' }
-    '422': { \$ref: '../../components/responses/422_ValidationError.yaml' }
+            \$ref: '${baseDir}models/${modelName}.yaml'
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '${baseDir}components/responses/404_NotFound.yaml' }
+    '422': { \$ref: '${baseDir}components/responses/422_ValidationError.yaml' }
 
   x-codeSamples:
-    - { label: 'Curl', lang: 'bash', source: {\$ref: '../../components/codeSamples/curl/put.sh'} }
+    - { label: 'Curl', lang: 'bash', source: {\$ref: '${baseDir}components/codeSamples/curl/put.sh'} }
 
 delete:
   tags: [ ${endpoint} ]
@@ -48,11 +48,11 @@ delete:
   description: 'Deletes a Batch and any associated Payments'
   operationId: delete${capitalName}
   parameters:
-    - \$ref: '../../components/parameters/id.yaml'
+    - \$ref: '${baseDir}components/parameters/id.yaml'
   responses:
-    '204': { \$ref: '../../components/responses/204_NoContent.yaml' }
-    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
-    '404': { \$ref: '../../components/responses/404_NotFound.yaml' }
+    '204': { \$ref: '${baseDir}components/responses/204_NoContent.yaml' }
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '${baseDir}components/responses/404_NotFound.yaml' }
 
   x-codeSamples:
-    - { label: 'Curl', lang: 'bash', source: {\$ref: '../../components/codeSamples/curl/delete.sh'} }
+    - { label: 'Curl', lang: 'bash', source: {\$ref: '${baseDir}components/codeSamples/curl/delete.sh'} }

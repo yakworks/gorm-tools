@@ -23,6 +23,14 @@ jobs:
           name: ✔︎ Dependencies and Compile
           command: ./gradlew check
 
+      - run:
+          name: ✔︎ -- Checks Full Run Tests [gradle check]
+          command: ./build.sh check
+
+      - run:
+          name: ✔︎ -- Publish plugin if on releasable branch
+          command: ./build.sh ciPublishLib
+
       - store_test_results:
           path: gorm-tools/build/test-results/
       - store_artifacts:
@@ -48,143 +56,6 @@ jobs:
       - store_artifacts:
           path: examples/testify/build/reports/
           destination: testify
-      - store_test_results:
-          path: examples/restify/build/test-results/
-      - store_artifacts:
-          path: examples/restify/build/reports/
-          destination: restify
-      # saves the build for for next job
-#      - store_test_results:
-#          path: examples/testify/build/test-results/
-#      - store_artifacts:
-#          path: examples/testify/build/reports/
-#          destination: testify
-#      - save_cache:
-#          paths:
-#            - ".gradle"
-#            - "./build"
-#            - "./gorm-tools/build"
-#            - "./gorm-tools-rest/build"
-#            - "./gorm-tools-security/build"
-#            - "./rally-domain/build"
-#            - "./examples/testify/build"
-##            - "./examples/restify/build"
-#          key: build-{{ .Branch }}-{{ .Revision }}
-
-  gorm-tools:
-    docker:
-      - image: yakworks/alpine-jdk:builder8
-    steps:
-      - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradle-cache-restore
-      - restore_cache: &build-cache-restore
-          key: build-{{ .Branch }}-{{ .Revision }}
-
-      - run:
-          name: ✔︎ gorm-tools tests
-          command: ./gradlew gorm-tools:check
-
-      - store_test_results:
-          path: gorm-tools/build/test-results/
-      - store_artifacts:
-          path: gorm-tools/build/reports/
-          destination: gorm-tools
-
-  gorm-tools-rest:
-    docker:
-      - image: yakworks/alpine-jdk:builder8
-    steps:
-      - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradle-cache-restore
-      - restore_cache: &build-cache-restore
-          key: build-{{ .Branch }}-{{ .Revision }}
-
-      - run:
-          name: ✔︎ Check
-          command: ./gradlew gorm-tools-rest:check
-
-      - store_test_results:
-          path: gorm-tools-rest/build/test-results/
-      - store_artifacts:
-          path: gorm-tools-rest/build/reports/
-          destination: gorm-tools-rest
-
-  gorm-tools-security:
-    docker:
-      - image: yakworks/alpine-jdk:builder8
-    steps:
-      - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradle-cache-restore
-      - restore_cache: &build-cache-restore
-          key: build-{{ .Branch }}-{{ .Revision }}
-
-      - run:
-          name: ✔︎ Check
-          command: ./gradlew gorm-tools-security:check
-
-      - store_test_results:
-          path: gorm-tools-security/build/test-results/
-      - store_artifacts:
-          path: gorm-tools-security/build/reports/
-          destination: gorm-tools-security
-
-  rally-domain:
-    docker:
-      - image: yakworks/alpine-jdk:builder8
-    steps:
-      - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradle-cache-restore
-      - restore_cache: &build-cache-restore
-          key: build-{{ .Branch }}-{{ .Revision }}
-
-      - run:
-          name: ✔︎ Check
-          command: ./gradlew rally-domain:check
-
-      - store_test_results:
-          path: rally-domain/build/test-results/
-      - store_artifacts:
-          path: rally-domain/build/reports/
-          destination: rally-domain
-
-  testify:
-    docker:
-      - image: yakworks/alpine-jdk:builder8
-    steps:
-      - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradle-cache-restore
-      - restore_cache: &build-cache-restore
-          key: build-{{ .Branch }}-{{ .Revision }}
-
-      - run:
-          name: ✔︎ Testify
-          command: ./gradlew testify:check
-
-      - store_test_results:
-          path: examples/testify/build/test-results/
-      - store_artifacts:
-          path: examples/testify/build/reports/
-          destination: testify
-
-  restify:
-    docker:
-      - image: yakworks/alpine-jdk:builder8
-    steps:
-      - checkout
-      - run: *gradle-cache-key
-      - restore_cache: *gradle-cache-restore
-      - restore_cache: &build-cache-restore
-          key: build-{{ .Branch }}-{{ .Revision }}
-
-      - run:
-          name: ✔︎ restify
-          command: ./gradlew restify:check
-
       - store_test_results:
           path: examples/restify/build/test-results/
       - store_artifacts:
@@ -208,24 +79,6 @@ workflows:
     jobs:
       - build:
           context: bot-context #context with shared ENV vars
-#      - gorm-tools:
-#          context: bot-context
-#          requires: [ build ]
-#      - gorm-tools-rest:
-#          context: bot-context
-#          requires: [ build ]
-#      - gorm-tools-security:
-#          context: bot-context
-#          requires: [ build ]
-#      - rally-domain:
-#          context: bot-context
-#          requires: [ build ]
-#      - restify:
-#          context: bot-context
-#          requires: [ build ]
-#      - testify:
-#          context: bot-context
-#          requires: [ build ]
       - docs:
           context: bot-context
           # requires: [build, gorm-tools, gorm-tools-rest, gorm-tools-security, rally-domain, testify]

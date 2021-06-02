@@ -28,11 +28,13 @@ class RestApiConfig implements ConfigAware {
      * @param entityClass the entity class to look for statics on
      */
     @Cacheable('restApiConfig.includes')
-    Map getIncludes(String controllerKey, Class entityClass, Map mergeIncludes){
+    Map getIncludes(String controllerKey, String namespace, Class entityClass, Map mergeIncludes){
         def includesMap = [:] as Map<String, Object>
         if(mergeIncludes) includesMap.putAll(mergeIncludes)
 
-        Map cfgIncs = config.getProperty("restApi.${controllerKey}.includes", Map)
+        Map pathConfig = getPathConfig("${namespace}/${controllerKey}")
+        Map cfgIncs = pathConfig.includes as Map
+
         //if anything on config then overrite them
         if (cfgIncs) {
             includesMap.putAll(cfgIncs)
@@ -58,10 +60,11 @@ class RestApiConfig implements ConfigAware {
      * @param mergeIncludes the includes that might be set in controller
      */
     @Cacheable('restApiConfig.qSearchIncludes')
-    List getQSearchIncludes(String controllerKey, Class entityClass, List mergeIncludes){
+    List getQSearchIncludes(String controllerKey, String namespace, Class entityClass, List mergeIncludes){
         def qIncludes = [] as List<String>
         //see if there is a config for it
-        def cfgQSearch = config.getProperty("restApi.${controllerKey}.qSearch", List)
+        Map pathConfig = getPathConfig("${namespace}/${controllerKey}")
+        def cfgQSearch = pathConfig.qSearch as List
         if (cfgQSearch) {
             qIncludes.addAll(cfgQSearch)
         }
@@ -74,6 +77,13 @@ class RestApiConfig implements ConfigAware {
             if (qSearchFieldsStatic) qIncludes.addAll(qSearchFieldsStatic)
         }
         return qIncludes
+    }
+
+    Map getPathConfig(String pathKey){
+        def restApiConfig = config.getProperty("restApi.paths", Map)
+        pathKey = pathKey.replace('_','/')
+        println "getting restApi key ${pathKey}"
+        return restApiConfig[pathKey] as Map
     }
 
 }

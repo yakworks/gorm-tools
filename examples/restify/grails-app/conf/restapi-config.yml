@@ -33,3 +33,6 @@ restApi:
     'rally/tag':
       entityClass: yakworks.rally.tag.model.Tag
 
+    # no namespace
+    kitchen:
+      entityClass: yakworks.testify.model.KitchenSink

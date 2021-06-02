@@ -36,7 +36,7 @@ class TestSeedData {
         loc.id = id
         loc.persist()
 
-        String value = "Org" + id
+        String value = "Kitchen" + id
         def org = new KitchenSink(
             num: "$id",
             name: value,

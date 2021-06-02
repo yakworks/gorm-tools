@@ -82,7 +82,7 @@ class RestApiConfig implements ConfigAware {
     Map getPathConfig(String controllerKey, String namespace){
         def restApiConfig = config.getProperty("restApi.paths", Map)
         String pathkey = namespace ? "${namespace}/${controllerKey}" : controllerKey
-        println "getting restApi key ${pathkey}"
+        //println "getting restApi key ${pathkey}"
         return restApiConfig[pathkey] as Map
     }
 

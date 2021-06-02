@@ -4,7 +4,6 @@
 */
 package gorm.tools.openapi
 
-
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -13,7 +12,6 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
 
 import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware

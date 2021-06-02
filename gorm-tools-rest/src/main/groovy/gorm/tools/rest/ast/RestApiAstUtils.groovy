@@ -7,7 +7,6 @@ package gorm.tools.rest.ast
 import java.lang.reflect.Modifier
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
@@ -34,8 +33,6 @@ import org.grails.plugins.web.rest.transform.LinkableTransform
 
 import grails.artefact.Artefact
 import grails.compiler.ast.ClassInjector
-import grails.io.IOUtils
-import grails.util.BuildSettings
 import yakworks.commons.lang.NameUtils
 
 import static java.lang.reflect.Modifier.FINAL
@@ -43,6 +40,7 @@ import static java.lang.reflect.Modifier.PUBLIC
 import static java.lang.reflect.Modifier.STATIC
 import static org.grails.compiler.injection.GrailsASTUtils.ZERO_PARAMETERS
 
+@SuppressWarnings(['Println', 'ParameterCount'])
 @CompileStatic
 class RestApiAstUtils {
 

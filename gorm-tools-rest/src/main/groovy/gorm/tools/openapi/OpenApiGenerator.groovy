@@ -13,7 +13,9 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
+import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.io.FileSystemUtils
@@ -46,7 +48,9 @@ class OpenApiGenerator implements ConfigAware {
         FileSystemUtils.copyRecursively(srcPath, buildDest)
 
         generateModels()
-        genOpenapiYaml()
+        //do all but autocash
+        genOpenapiYaml(['rally', 'security', 'ar'])
+        //genOpenapiYaml(['autocash'])
     }
 
     /**
@@ -80,26 +84,27 @@ class OpenApiGenerator implements ConfigAware {
     }
 
     //generates the openapi.yaml with paths. starts by reading the src/openapi/openapi.yaml
-    void genOpenapiYaml(){
+    void genOpenapiYaml(List namespaceList){
         def openapiYaml = getApiSrcPath('openapi/api.yaml')
-        Map api = (Map)YamlUtils.loadYaml(openapiYaml)
+        Map api = (Map) YamlUtils.loadYaml(openapiYaml)
         assert api['openapi'] == '3.0.3'
-        spinThroughRestApi(api)
+        spinThroughRestApi(api, namespaceList)
     }
 
     //iterate over the restapi keys and add setup the yaml
-    void spinThroughRestApi(Map api){
-        Map restApi = config.getProperty('restApi', Map)
-        //Map paths = (Map)api.paths
+    void spinThroughRestApi(Map api, List namespaceList){
+        Map restCfg = config.getProperty('restApi', Map)
+        Map restApi = restCfg.paths as Map<String, Map>
+
         List tags = (List)api.tags
         Map<String, List> xTagGroups = [:]
 
         for(entry in restApi){
-            String endpoint = entry.key
+            String pathName = entry.key
             Map pathMap = (Map)entry.value
-            String namespace = pathMap.namespace ?: ''
-            // String pathKey = "/${namespace}/${endpoint}".toString()
-            // String pathKeyId = "${pathKey}/{id}".toString()
+            Map pathParts = RestApiAstUtils.splitPath(pathName, pathMap)
+            String endpoint = pathParts.name
+            String namespace = pathParts.namespace
 
             Map tagEntry = [name: endpoint]
             if(pathMap.description) tagEntry.description = pathMap.description
@@ -109,7 +114,7 @@ class OpenApiGenerator implements ConfigAware {
             xTagGroups[namespace].add(endpoint)
 
             try{
-                createPaths(api, endpoint, pathMap)
+                createPaths(api, endpoint, namespace, pathMap)
             } catch(e){
                 String msg = "Error on $endpoint"
                 throw new IllegalArgumentException(msg, e)
@@ -128,87 +133,42 @@ class OpenApiGenerator implements ConfigAware {
     }
 
     //create the files for the path
-    Map createPaths(Map api, String endpoint, Map pathMap){
+    Map createPaths(Map api, String endpoint, String namespace, Map restConfig){
         Map paths = (Map)api.paths
-        String namespace = pathMap.namespace ?: ''
-        String pathKey = "/${namespace}/${endpoint}"//.toString()
+        String namespacePrefix = namespace ? "$namespace/" : ''
+        String pathKey = "/${namespacePrefix}${endpoint}"//.toString()
         String pathKeyId = "${pathKey}/{id}"//.toString()
-        String pathKeyPrefix = pathMap.namespace ? "${pathMap.namespace}/" : ''
-        pathKeyPrefix = "./paths/${pathKeyPrefix}"
-        String pathKeyRef = "${pathKeyPrefix}${endpoint}.yaml"//.toString()
-        String pathKeyIdRef = "${pathKeyPrefix}${endpoint}@{id}.yaml"//.toString()
+        String pathKeyPrefix = "./paths/${namespacePrefix}"
+        String pathFileBase = "${pathKeyPrefix}${endpoint}"
         //make sure dirs exist
         Files.createDirectories(getApiBuildPath('openapi').resolve(pathKeyPrefix))
 
-        paths[pathKey] = ['$ref': pathKeyRef]
-        paths[pathKeyId] = ['$ref': pathKeyIdRef]
-
         String capitalName = NameUtils.getClassNameFromKebabCase(endpoint)
-        String modelName = NameUtils.getShortName((String)pathMap.entityClass)
-        Map model = [name: endpoint, capitalName: capitalName, modelName: modelName, namespace: namespace]
+        String modelName = NameUtils.getShortName((String)restConfig.entityClass)
+        String baseDir = namespace ? '../../' : '../'
+        Map model = [
+            endpoint: endpoint, name: endpoint, capitalName: capitalName,
+            modelName: modelName, namespace: namespace, baseDir: baseDir
+        ]
 
-        createPathFiles(pathKeyRef, model)
-        createPathIdFiles(pathKeyIdRef, model)
+        //do no param path file
+        String filePathRef = "${pathFileBase}.yaml"//.toString()
+        processTplFile('paths/tpl.yaml', filePathRef, model)
+        //update the API key
+        paths[pathKey] = ['$ref': filePathRef]
 
-        String tplRef = "${pathKeyPrefix}${endpoint}_pager.yaml"//.toString()
-        processTplFile('paths/tpl_pager.yaml', tplRef, model)
-        tplRef = "${pathKeyPrefix}${endpoint}_request_create.yaml".toString()
-        processTplFile('paths/tpl_request_create.yaml', tplRef, model)
-        tplRef = "${pathKeyPrefix}${endpoint}_request_update.yaml".toString()
-        processTplFile('paths/tpl_request_update.yaml', tplRef, model)
-        tplRef = "${pathKeyPrefix}${endpoint}_response.yaml".toString()
-        processTplFile('paths/tpl_response.yaml', tplRef, model)
-    }
+        //path Id file
+        filePathRef = "${pathFileBase}@{id}.yaml"//.toString()
+        processTplFile('paths/tpl@{id}.yaml', filePathRef, model)
+        paths[pathKeyId] = ['$ref': filePathRef]
 
-    //create the files for the path
-    void createPathFiles(String pathRef, Map model){
-        Map tplYaml = (Map)YamlUtils.loadYaml(getApiSrcPath('openapi/paths/tpl.yaml'))
-        Map tplGet = (Map)tplYaml['get']
-        tplGet.tags = [model.name]
-        tplGet.summary = "${model.capitalName} List".toString()
-        tplGet.description = "Query and retrieve a ${model.capitalName} list".toString()
-        tplGet.operationId = "get${model.capitalName}List".toString()
-        tplGet['responses']['200']['$ref'] = "${model.name}_pager.yaml".toString()
+        //if bulk operations are enabled
+        if(restConfig.bulkOps){
+            paths["${pathKey}/bulk"] = ['$ref': "${pathFileBase}@bulk.yaml".toString()]
+            filePathRef = "${pathFileBase}@bulk.yaml"//.toString()
+            processTplFile('paths/tpl@bulk.yaml', filePathRef, model)
+        }
 
-        Map tplPost = (Map)tplYaml['post']
-        tplPost.tags = [model.name]
-        tplPost.summary = "Create a ${model.capitalName}".toString()
-        tplPost.description = "Create a new ${model.capitalName}".toString()
-        tplPost.operationId = "create${model.capitalName}".toString()
-        tplPost.requestBody['$ref'] = "${model.name}_request_create.yaml".toString()
-        tplPost['responses']['201']['$ref'] = "${model.name}_response.yaml".toString()
-
-        def pathYaml = getApiBuildPath('openapi').resolve(pathRef)
-        YamlUtils.saveYaml(pathYaml, tplYaml)
-    }
-
-    //create the files for the path
-    void createPathIdFiles(String pathRef, Map model){
-        Path tplFile = getApiSrcPath().resolve('openapi/paths/tpl@{id}.yaml')
-        Map tplYaml = (Map)YamlUtils.loadYaml(tplFile)
-
-        Map tplGet = (Map)tplYaml['get']
-        tplGet.tags = [model.name]
-        tplGet.summary = "Get a ${model.capitalName}".toString()
-        tplGet.description = "Retrieve a ${model.capitalName}".toString()
-        tplGet.operationId = "get${model.capitalName}ById".toString()
-        tplGet['responses']['200']['$ref'] = "${model.name}_response.yaml".toString()
-
-        Map tplPut = (Map)tplYaml['put']
-        tplPut.tags = [model.name]
-        tplPut.summary = "Update a ${model.capitalName}".toString()
-        tplPut.operationId =  "update${model.capitalName}".toString()
-        tplPut.requestBody['$ref'] = "${model.name}_request_update.yaml".toString()
-        tplPut['responses']['200']['$ref'] = "${model.name}_response.yaml".toString()
-
-        Map tplDelete = (Map)tplYaml['delete']
-        tplDelete.tags = [model.name]
-        tplDelete.summary = "Delete a ${model.capitalName}".toString()
-        tplDelete.description = "Delete a ${model.capitalName} and any child associations".toString()
-        tplDelete.operationId = "delete${model.capitalName}".toString()
-
-        def pathYaml = getApiBuildPath('openapi').resolve(pathRef)
-        YamlUtils.saveYaml(pathYaml, tplYaml)
     }
 
     void processTplFile(String srcPath, String outputPath, Map model){
@@ -217,6 +177,44 @@ class OpenApiGenerator implements ConfigAware {
         ymlTpl = FileUtil.parseStringAsGString(ymlTpl, model)
         Path outPath = getApiBuildPath('openapi').resolve(outputPath)
         Files.write(outPath, ymlTpl.getBytes())
+    }
+
+    void modifyForAllowedOps(String filePathRef, Map restConfig){
+        //if it doesn't have the allowedOps then return
+        List allowedOps = restConfig['restConfig']
+        if(!allowedOps) return
+
+        Path yamlPath = getApiBuildPath('openapi').resolve(filePathRef)
+
+        Map tplYaml = (Map)YamlUtils.loadYaml(yamlPath)
+
+        if(!allowedOps.contains('create')){
+            tplYaml.remove('post')
+        }
+        if(!allowedOps.contains('update')){
+            tplYaml.remove('put')
+        }
+        if(!allowedOps.contains('delete')){
+            tplYaml.remove('delete')
+        }
+
+        // Map tplGet = (Map)tplYaml['get']
+        // tplGet.tags = [model.name]
+        // tplGet.summary = "${model.capitalName} List".toString()
+        // tplGet.description = "Query and retrieve a ${model.capitalName} list".toString()
+        // tplGet.operationId = "get${model.capitalName}List".toString()
+        // tplGet['responses']['200']['$ref'] = "${model.name}_pager.yaml".toString()
+        //
+        // Map tplPost = (Map)tplYaml['post']
+        // tplPost.tags = [model.name]
+        // tplPost.summary = "Create a ${model.capitalName}".toString()
+        // tplPost.description = "Create a new ${model.capitalName}".toString()
+        // tplPost.operationId = "create${model.capitalName}".toString()
+        // tplPost.requestBody['$ref'] = "${model.name}_request_create.yaml".toString()
+        // tplPost['responses']['201']['$ref'] = "${model.name}_response.yaml".toString()
+        //
+        // def pathYaml = getApiBuildPath('openapi').resolve(pathRef)
+        // YamlUtils.saveYaml(pathYaml, tplYaml)
     }
 
     void generateModels() {

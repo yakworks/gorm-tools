@@ -7,17 +7,13 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestApiRepoController
+import gorm.tools.rest.controller.RestRepositoryApi
 import yakworks.testify.model.Project
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class ProjectController extends RestApiRepoController<Project> {
-
-    ProjectController() {
-        super(Project, false)
-    }
+class ProjectController implements RestRepositoryApi<Project> {
 
     @Override
     def post() {

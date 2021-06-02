@@ -6,6 +6,8 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
+import gorm.tools.rest.controller.RestApiController
+import gorm.tools.rest.controller.RestRepositoryApi
 import yakworks.commons.lang.ClassUtils
 
 @CompileDynamic
@@ -16,44 +18,34 @@ class UrlMappings {
         for (controller in getGrailsApplication().controllerClasses) {
             // println "controler $controller.fullName"
             String cName = controller.logicalPropertyName
+            boolean isApi = RestRepositoryApi.isAssignableFrom(controller.clazz)
             String namespace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
-            // println "controller $cName with namespace $namespace"
+           // println "controller $cName with namespace $namespace"
 
-            if (namespace == 'api') {
-                group("/api") {
-                    // println "controller $cName with namespace $namespace"
+            if (isApi) {
+                String apiPath = namespace ? "/api/$namespace" : "/api"
+                println "apiPath: $apiPath controller: $cName"
+                group("${apiPath}/${cName}") {
+                    get "(.$format)?"(controller: cName, action: "list")
+                    get "/$id(.$format)?"(controller: cName, action: "get")
+                    get "/picklist(.$format)?"(controller: cName, action: "picklist")
 
-                    "/${cName}/schema"(controller: "schema", action: "index") {
+                    post "(.$format)?"(controller: cName, action: "post")
+                    put "/$id(.$format)?"(controller: cName, action: "put")
+                    patch "/$id(.$format)?"(controller: cName, action: "put")
+
+                    delete "/$id(.$format)?"(controller: cName, action: "delete")
+
+                    //when a post is called allows an action
+                    post "/$action(.$format)?"(controller: cName)
+
+                    "/schema"(controller: "schema", action: "index") {
                         id = cName
                     }
-                    //when a post is called allows an action
-                    post "/${cName}/$action(.$format)?"(controller: cName, namespace: 'api')
-                    //or
-                    post "/${cName}/actions/$action(.$format)?"(controller: cName, namespace: 'api')
 
-                    delete "/${cName}/$id(.$format)?"(controller: cName, action: "delete", namespace: 'api')
-                    get "/${cName}(.$format)?"(controller: cName, action: "list", namespace: 'api')
-                    get "/${cName}/$id(.$format)?"(controller: cName, action: "get", namespace: 'api')
-
-                    get "/${cName}/list(.$format)?"(controller: cName, action: "list", namespace: 'api')
-                    get "/${cName}/picklist(.$format)?"(controller: cName, action: "picklist", namespace: 'api')
-                    post "/${cName}/list(.$format)?"(controller: cName, action: "listPost", namespace: 'api')
-
-                    post "/${cName}(.$format)?"(controller: cName, action: "post", namespace: 'api')
-                    put "/${cName}/$id(.$format)?"(controller: cName, action: "put", namespace: 'api')
-                    patch "/${cName}/$id(.$format)?"(controller: cName, action: "put", namespace: 'api')
                 }
             }
         }
-
-        // group("/api") {
-        //     delete "/$controller/$id(.$format)?"(action: "delete")
-        //     get "/$controller(.$format)?"(action: "index")
-        //     get "/$controller/$id(.$format)?"(action: "show")
-        //     post "/$controller(.$format)?"(action: "save")
-        //     put "/$controller/$id(.$format)?"(action: "update")
-        //     patch "/$controller/$id(.$format)?"(action: "patch")
-        // }
 
         "/schema/$id?(.$format)?"(controller: "schema", action: "index")
 
@@ -64,7 +56,12 @@ class UrlMappings {
         }
 
         "/"(view: "/index")
-        "500"(view: '/error')
-        "404"(view: '/notFound')
+
+        // the default view names are error and notFound. but grails sitemesh picks up gsps first if they exist
+        // in another plugin (such as the ones that exists in spring sec and cache) and renders those gsps
+        // instead of gson so for rest api its important to use unique names
+        "500"(view: '/error500')
+        "404"(view: '/notFound404')
+        "400"(view: '/badRequest400')
     }
 }

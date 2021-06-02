@@ -11,7 +11,7 @@ import java.lang.annotation.Target
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass
 
-import gorm.tools.rest.controller.RestApiRepoController
+import gorm.tools.rest.controller.RestRepositoryApi
 
 /**
  * Meta Annotation to applied to a domain class if it is a REST resource
@@ -32,5 +32,5 @@ import gorm.tools.rest.controller.RestApiRepoController
     /**
      * @return The Controller class to generate. Can be set to null to skip the generation
      */
-    Class<?> controllerClass() default RestApiRepoController
+    Class<?> controllerTrait() default RestRepositoryApi
 }

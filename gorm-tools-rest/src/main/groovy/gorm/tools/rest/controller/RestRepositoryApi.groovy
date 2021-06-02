@@ -19,16 +19,9 @@ import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.repository.model.PersistableRepoEntity
-import gorm.tools.rest.JsonParserTrait
 import gorm.tools.rest.RestApiConfig
-import grails.artefact.controller.RestResponder
-import grails.artefact.controller.support.ResponseRenderer
-import grails.util.GrailsNameUtils
 import grails.validation.ValidationException
 import grails.web.Action
-import grails.web.api.ServletAttributes
-import yakworks.commons.lang.NameUtils
 
 import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
@@ -38,7 +31,7 @@ import static org.springframework.http.HttpStatus.OK
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
-trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTrait, RestResponder, ServletAttributes {
+trait RestRepositoryApi<D> implements RestApiController {
 
     @Autowired
     RestApiConfig restApiConfig
@@ -234,45 +227,6 @@ trait RestRepositoryApi<D extends PersistableRepoEntity> implements JsonParserTr
      * implementing class can provide the qSearchIncludes property. using the restApi config is recomended
      */
     List getqSearchIncludes() { [] }
-
-    /**
-     * getControllerName() works inisde a request and should be used, but during init or outside a request use this
-     * should give roughly what logicalName is which is used to setup the urlMappings by default
-     */
-    String getLogicalControllerName(){
-        String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
-        return NameUtils.getPropertyName(logicalName)
-    }
-
-    /**
-     * Deprecated, just calls parseJson(getRequest())
-     * TODO maybe keep this one and have it be the one that merges the json body with params
-     */
-    Map getDataMap() {
-        return parseJson(getRequest())
-    }
-
-    /**
-     * Cast this to ResponseRenderer and call render
-     * this allows us to call the render, keeping compile static without implementing the Trait
-     * as the trait get implemented with AST magic by grails.
-     * This is how the RestResponder does it but its private there
-     */
-    void callRender(Map args) {
-        ((ResponseRenderer) this).render args
-    }
-
-    void callRender(Map argMap, CharSequence body){
-        ((ResponseRenderer) this).render(argMap, body)
-    }
-
-    /**
-     * Cast this to RestResponder and call respond
-     * FIXME I dont think this is needed? whats the purpose here?
-     */
-    def callRespond(Object value, Map args = [:]) {
-        ((RestResponder) this).respond value, args
-    }
 
     void handleException(RuntimeException e) {
         //log.error e.message

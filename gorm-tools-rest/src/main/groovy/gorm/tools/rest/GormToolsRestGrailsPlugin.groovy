@@ -125,10 +125,10 @@ class GormToolsRestGrailsPlugin extends Plugin {
     boolean controllerExists(GrailsApplication app, List<GrailsControllerClass> ctrlList, String controllerClassName, Class controllerClass) {
         String shortName = NameUtils.getShortName(controllerClassName)
         GrailsControllerClass ctrlClass = getController(app, controllerClassName)
-        if(ctrlClass && ctrlClass.namespace == 'api') return true
+        if(ctrlClass && ctrlClass.namespace?.startsWith('api')) return true
 
         return ctrlList.any {
-            it.shortName == shortName && it.namespace == 'api'
+            it.shortName == shortName && it.namespace.startsWith('api')
         }
     }
 

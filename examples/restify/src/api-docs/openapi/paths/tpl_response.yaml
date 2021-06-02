@@ -1,5 +1,0 @@
-description: ${capitalName} Resource
-content:
-  application/json:
-    schema:
-      \$ref: '../../models/${modelName}.yaml'

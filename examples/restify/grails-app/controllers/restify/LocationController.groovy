@@ -6,18 +6,13 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestApiRepoController
+import gorm.tools.rest.controller.RestRepositoryApi
 import yakworks.rally.orgs.model.Location
-import yakworks.testify.model.Address
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class LocationController extends RestApiRepoController<Location> {
-
-    LocationController() {
-        super(Location, false)
-    }
+class LocationController implements RestRepositoryApi<Location> {
 
     def post() {
         Map q = new LinkedHashMap(parseJson(request))

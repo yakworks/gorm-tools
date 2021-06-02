@@ -7,6 +7,7 @@ package gorm.tools.rest.ast
 import java.lang.reflect.Modifier
 
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
@@ -34,6 +35,7 @@ import org.grails.plugins.web.rest.transform.LinkableTransform
 import grails.artefact.Artefact
 import grails.compiler.ast.ClassInjector
 import grails.io.IOUtils
+import grails.util.BuildSettings
 import yakworks.commons.lang.NameUtils
 
 import static java.lang.reflect.Modifier.FINAL
@@ -64,11 +66,14 @@ class RestApiAstUtils {
         //     ctrlPrefixName = "${entityPackage}.${NameUtils.getClassNameFromKebabCase(resourceName)}"
         // }
         String className = "${ctrlPrefixName}Controller"
-
+        //String controllerName = "${NameUtils.getClassNameFromKebabCase(resourceName)}Controller"
         // println "making className $className"
-        final File resource = IOUtils.findSourceFile(className)
+        final File resource = findSourceFile(className)
         //if the resource exists in source then dont generate
-        if(resource) return
+        if(resource) {
+            println "Controller source $className already exists and will not be generated"
+            return
+        }
 
         LinkableTransform.addLinkingMethods(entityClassNode)
 
@@ -165,5 +170,42 @@ class RestApiAstUtils {
             if(ctrlConfig['namespace']) pathParts['namespace'] = ctrlConfig['namespace'] as String
         }
         return pathParts
+    }
+
+    /**
+     * Finds a source file for the given class name
+     *
+     * @param className The class name
+     * @return The source file
+     */
+    static File findSourceFile(String className) {
+        //File applicationDir = BuildSettings.BASE_DIR
+        String projectDir = System.getProperty("gradle.projectDir", '')
+        File applicationDir = new File(projectDir)
+        //println "applicationDir $applicationDir"
+        File file = null
+        if(applicationDir != null) {
+            String fileName = className.replace('.' as char, File.separatorChar) + '.groovy'
+            List<File> allFiles = [ new File(applicationDir, "src/main/groovy") ]
+            File[] files = new File(applicationDir, "grails-app").listFiles(new FileFilter() {
+                @Override
+                boolean accept(File f) {
+                    return f.isDirectory() && !f.isHidden() && !f.name.startsWith('.')
+                }
+            })
+            if(files != null) {
+                allFiles.addAll( Arrays.asList(files) )
+            }
+            for(File dir in allFiles) {
+                File possibleFile = new File(dir, fileName)
+                //println "looking for $fileName in $dir"
+                if(possibleFile.exists()) {
+                    file = possibleFile
+                    break
+                }
+            }
+
+        }
+        return file
     }
 }

@@ -24,40 +24,28 @@ class UrlMappings {
 
             if (isApi) {
                 String apiPath = namespace ? "/api/$namespace" : "/api"
-                group(apiPath) {
-                    println "apiPath: $apiPath controller: $cName with namespace: $namespace"
+                println "apiPath: $apiPath controller: $cName"
+                group("${apiPath}/${cName}") {
+                    get "(.$format)?"(controller: cName, action: "list")
+                    get "/$id(.$format)?"(controller: cName, action: "get")
+                    get "/picklist(.$format)?"(controller: cName, action: "picklist")
 
-                    "/${cName}/schema"(controller: "schema", action: "index") {
+                    post "(.$format)?"(controller: cName, action: "post")
+                    put "/$id(.$format)?"(controller: cName, action: "put")
+                    patch "/$id(.$format)?"(controller: cName, action: "put")
+
+                    delete "/$id(.$format)?"(controller: cName, action: "delete")
+
+                    //when a post is called allows an action
+                    post "/$action(.$format)?"(controller: cName)
+
+                    "/schema"(controller: "schema", action: "index") {
                         id = cName
                     }
-                    //when a post is called allows an action
-                    post "/${cName}/$action(.$format)?"(controller: cName)
-                    //or
-                    post "/${cName}/actions/$action(.$format)?"(controller: cName)
 
-                    delete "/${cName}/$id(.$format)?"(controller: cName, action: "delete")
-                    get "/${cName}(.$format)?"(controller: cName, action: "list")
-                    get "/${cName}/$id(.$format)?"(controller: cName, action: "get")
-
-                    //get "/${cName}/list(.$format)?"(controller: cName, action: "list")
-                    get "/${cName}/picklist(.$format)?"(controller: cName, action: "picklist")
-                    //post "/${cName}/list(.$format)?"(controller: cName, action: "listPost")
-
-                    post "/${cName}(.$format)?"(controller: cName, action: "post")
-                    put "/${cName}/$id(.$format)?"(controller: cName, action: "put")
-                    patch "/${cName}/$id(.$format)?"(controller: cName, action: "put")
                 }
             }
         }
-
-        // group("/api") {
-        //     delete "/$controller/$id(.$format)?"(action: "delete")
-        //     get "/$controller(.$format)?"(action: "index")
-        //     get "/$controller/$id(.$format)?"(action: "show")
-        //     post "/$controller(.$format)?"(action: "save")
-        //     put "/$controller/$id(.$format)?"(action: "update")
-        //     patch "/$controller/$id(.$format)?"(action: "patch")
-        // }
 
         "/schema/$id?(.$format)?"(controller: "schema", action: "index")
 

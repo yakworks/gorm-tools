@@ -11,6 +11,7 @@ import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
+import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
 
 /**
@@ -54,6 +55,11 @@ trait RestApiController implements JsonParserTrait, RestResponder, ServletAttrib
 
     void callRender(Map argMap, CharSequence body){
         ((ResponseRenderer) this).render(argMap, body)
+    }
+
+    //public instance getter for static namespace
+    String getNamespaceProperty(){
+        ClassUtils.getStaticPropertyValue(this.class.metaClass, 'namespace') as String
     }
 
 }

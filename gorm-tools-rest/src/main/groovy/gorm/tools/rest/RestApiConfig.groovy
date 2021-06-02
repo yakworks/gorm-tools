@@ -28,14 +28,15 @@ class RestApiConfig implements ConfigAware {
      * @param entityClass the entity class to look for statics on
      */
     @Cacheable('restApiConfig.includes')
-    Map getIncludes(String controllerKey, Class entityClass, Map mergeIncludes){
+    Map getIncludes(String controllerKey, String namespace, Class entityClass, Map mergeIncludes){
         def includesMap = [:] as Map<String, Object>
         if(mergeIncludes) includesMap.putAll(mergeIncludes)
 
-        Map cfgIncs = config.getProperty("restApi.${controllerKey}.includes", Map)
+        Map pathConfig = getPathConfig(controllerKey, namespace)
+
         //if anything on config then overrite them
-        if (cfgIncs) {
-            includesMap.putAll(cfgIncs)
+        if (pathConfig?.includes) {
+            includesMap.putAll(pathConfig.includes as Map)
         }
         //use includes if set in domain class as the default 'get'
         if (!includesMap['get']) {
@@ -58,12 +59,12 @@ class RestApiConfig implements ConfigAware {
      * @param mergeIncludes the includes that might be set in controller
      */
     @Cacheable('restApiConfig.qSearchIncludes')
-    List getQSearchIncludes(String controllerKey, Class entityClass, List mergeIncludes){
+    List getQSearchIncludes(String controllerKey, String namespace, Class entityClass, List mergeIncludes){
         def qIncludes = [] as List<String>
         //see if there is a config for it
-        def cfgQSearch = config.getProperty("restApi.${controllerKey}.qSearch", List)
-        if (cfgQSearch) {
-            qIncludes.addAll(cfgQSearch)
+        Map pathConfig = getPathConfig(controllerKey, namespace)
+        if (pathConfig?.qSearch) {
+            qIncludes.addAll(pathConfig.qSearch as List)
         }
         else if(mergeIncludes){
             qIncludes.addAll(mergeIncludes)
@@ -76,4 +77,22 @@ class RestApiConfig implements ConfigAware {
         return qIncludes
     }
 
+    Map getPathConfig(String controllerKey, String namespace){
+        def restApiConfig = config.getProperty("restApi.paths", Map)
+        String pathkey = namespace ? "${namespace}/${controllerKey}" : controllerKey
+        //println "getting restApi key ${pathkey}"
+        return restApiConfig[pathkey] as Map
+    }
+
+    Map getPathConfig(String pathkey){
+        def restApiConfig = config.getProperty("restApi.paths", Map)
+        pathkey = pathkey.replace('_','/')//.replace('-','/')
+        return restApiConfig[pathkey] as Map
+    }
+
+    Object getConfig(String pathkey, String configKey){
+        def restApiConfig = config.getProperty("restApi.paths", Map)
+        pathkey = pathkey.replace('_','/')//.replace('-','/')
+        return restApiConfig[pathkey][configKey]
+    }
 }

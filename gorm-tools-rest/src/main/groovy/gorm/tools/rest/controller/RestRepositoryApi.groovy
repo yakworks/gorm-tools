@@ -4,6 +4,7 @@
 */
 package gorm.tools.rest.controller
 
+
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -208,14 +209,14 @@ trait RestRepositoryApi<D> implements RestApiController {
 
     List getIncludes(String includesKey){
         //we are in trait, always use getters in case they are overrriden in implementing class
-        def includesMap = getRestApiConfig().getIncludes(getControllerName(), getEntityClass(), getIncludes())
+        def includesMap = getRestApiConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
         List incs = (includesMap[includesKey] ?: includesMap['get'] ) as List
         return incs
     }
 
     List getSearchFields(){
         //we are in trait, always use getters in case they are overrriden in implementing class
-        def qincs = getRestApiConfig().getQSearchIncludes(getControllerName(), getEntityClass(), getqSearchIncludes())
+        def qincs = getRestApiConfig().getQSearchIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getqSearchIncludes())
         return qincs
     }
 

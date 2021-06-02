@@ -210,18 +210,19 @@ trait RestRepositoryApi<D> implements RestApiController {
 
     List getIncludes(String includesKey){
         //we are in trait, always use getters in case they are overrriden in implementing class
-        def includesMap = getRestApiConfig().getIncludes(getControllerName(), getNamespace(), getEntityClass(), getIncludes())
+        def includesMap = getRestApiConfig().getIncludes(getControllerName(), getNamespaceStatic(), getEntityClass(), getIncludes())
         List incs = (includesMap[includesKey] ?: includesMap['get'] ) as List
         return incs
     }
 
-    String getNamespace(){
+    //public instance getter for static namespace
+    String getNamespaceStatic(){
         ClassUtils.getStaticPropertyValue(this.class.metaClass, 'namespace') as String
     }
 
     List getSearchFields(){
         //we are in trait, always use getters in case they are overrriden in implementing class
-        def qincs = getRestApiConfig().getQSearchIncludes(getControllerName(), getNamespace(), getEntityClass(), getqSearchIncludes())
+        def qincs = getRestApiConfig().getQSearchIncludes(getControllerName(), getNamespaceStatic(), getEntityClass(), getqSearchIncludes())
         return qincs
     }
 

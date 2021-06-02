@@ -32,7 +32,7 @@ class RestApiConfig implements ConfigAware {
         def includesMap = [:] as Map<String, Object>
         if(mergeIncludes) includesMap.putAll(mergeIncludes)
 
-        Map pathConfig = getPathConfig("${namespace}/${controllerKey}")
+        Map pathConfig = getPathConfig(controllerKey, namespace)
         Map cfgIncs = pathConfig.includes as Map
 
         //if anything on config then overrite them
@@ -63,7 +63,7 @@ class RestApiConfig implements ConfigAware {
     List getQSearchIncludes(String controllerKey, String namespace, Class entityClass, List mergeIncludes){
         def qIncludes = [] as List<String>
         //see if there is a config for it
-        Map pathConfig = getPathConfig("${namespace}/${controllerKey}")
+        Map pathConfig = getPathConfig(controllerKey, namespace)
         def cfgQSearch = pathConfig.qSearch as List
         if (cfgQSearch) {
             qIncludes.addAll(cfgQSearch)
@@ -79,11 +79,11 @@ class RestApiConfig implements ConfigAware {
         return qIncludes
     }
 
-    Map getPathConfig(String pathKey){
+    Map getPathConfig(String controllerKey, String namespace){
         def restApiConfig = config.getProperty("restApi.paths", Map)
-        pathKey = pathKey.replace('_','/')
-        println "getting restApi key ${pathKey}"
-        return restApiConfig[pathKey] as Map
+        String pathkey = namespace ? "${namespace}/${controllerKey}" : controllerKey
+        println "getting restApi key ${pathkey}"
+        return restApiConfig[pathkey] as Map
     }
 
 }

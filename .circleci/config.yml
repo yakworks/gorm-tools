@@ -7,6 +7,7 @@ jobs:
     resource_class: 'medium+'
     steps:
       - checkout
+      - compare-url/reconstruct
       - run: &gradle-cache-key ./build.sh catKeyFiles
       - restore_cache: &gradle-cache-restore
           key: gradle-{{ checksum "cache-checksum.tmp" }}

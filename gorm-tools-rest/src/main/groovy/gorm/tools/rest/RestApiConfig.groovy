@@ -33,11 +33,10 @@ class RestApiConfig implements ConfigAware {
         if(mergeIncludes) includesMap.putAll(mergeIncludes)
 
         Map pathConfig = getPathConfig(controllerKey, namespace)
-        Map cfgIncs = pathConfig.includes as Map
 
         //if anything on config then overrite them
-        if (cfgIncs) {
-            includesMap.putAll(cfgIncs)
+        if (pathConfig?.includes) {
+            includesMap.putAll(pathConfig.includes as Map)
         }
         //use includes if set in domain class as the default 'get'
         if (!includesMap['get']) {
@@ -59,14 +58,13 @@ class RestApiConfig implements ConfigAware {
      * @param entityClass the entity class to look for statics on
      * @param mergeIncludes the includes that might be set in controller
      */
-    @Cacheable('restApiConfig.qSearchIncludes')
+    //@Cacheable('restApiConfig.qSearchIncludes')
     List getQSearchIncludes(String controllerKey, String namespace, Class entityClass, List mergeIncludes){
         def qIncludes = [] as List<String>
         //see if there is a config for it
         Map pathConfig = getPathConfig(controllerKey, namespace)
-        def cfgQSearch = pathConfig.qSearch as List
-        if (cfgQSearch) {
-            qIncludes.addAll(cfgQSearch)
+        if (pathConfig?.qSearch) {
+            qIncludes.addAll(pathConfig.qSearch as List)
         }
         else if(mergeIncludes){
             qIncludes.addAll(mergeIncludes)
@@ -86,4 +84,15 @@ class RestApiConfig implements ConfigAware {
         return restApiConfig[pathkey] as Map
     }
 
+    Map getPathConfig(String pathkey){
+        def restApiConfig = config.getProperty("restApi.paths", Map)
+        pathkey = pathkey.replace('_','/')//.replace('-','/')
+        return restApiConfig[pathkey] as Map
+    }
+
+    Object getConfig(String pathkey, String configKey){
+        def restApiConfig = config.getProperty("restApi.paths", Map)
+        pathkey = pathkey.replace('_','/')//.replace('-','/')
+        return restApiConfig[pathkey][configKey]
+    }
 }

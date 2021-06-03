@@ -34,6 +34,7 @@ import org.grails.plugins.web.rest.transform.LinkableTransform
 import grails.artefact.Artefact
 import grails.compiler.ast.ClassInjector
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.util.BuildSupport
 
 import static java.lang.reflect.Modifier.FINAL
 import static java.lang.reflect.Modifier.PUBLIC
@@ -178,7 +179,7 @@ class RestApiAstUtils {
      */
     static File findSourceFile(String className) {
         //File applicationDir = BuildSettings.BASE_DIR
-        String projectDir = System.getProperty("gradle.projectDir", '')
+        String projectDir = BuildSupport.gradleProjectDir
         File applicationDir = new File(projectDir)
         //println "applicationDir $applicationDir"
         File file = null

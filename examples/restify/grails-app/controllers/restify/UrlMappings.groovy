@@ -7,6 +7,7 @@ package restify
 class UrlMappings {
 
     static mappings = {
+        println "parsing restify UrlMappings"
 //        delete "/$controller/$id(.$format)?"(action: "delete")
 //        get "/$controller(.$format)?"(action: "index")
 //        get "/$controller/$id(.$format)?"(action: "show")

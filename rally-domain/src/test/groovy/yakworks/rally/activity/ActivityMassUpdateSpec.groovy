@@ -13,6 +13,7 @@ import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import spock.lang.Specification
+import yakworks.commons.util.BuildSupport
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -83,7 +84,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         Payment paymentTwo = Payment.create(id: 2, amount: 200, org: org).persist()
 
 
-        File origFile = new File(System.getProperty("gradle.rootProjectDir"), "examples/resources/test.txt")
+        File origFile = new File(BuildSupport.gradleRootProjectDir, "examples/resources/test.txt")
         byte[] bytes = FileUtils.readFileToByteArray(origFile)
         File tmpFile = appResourceLoader.createTempFile('test.txt', bytes)
         String tempFileName = appResourceLoader.getRelativeTempPath(tmpFile)

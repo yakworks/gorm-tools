@@ -17,6 +17,7 @@ import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
+import yakworks.commons.util.BuildSupport
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
@@ -49,7 +50,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
 
     // gets a file from example/resources
     Path getFile(String name){
-        Paths.get(System.getProperty("gradle.rootProjectDir"), "examples/resources/$name")
+        Paths.get(BuildSupport.gradleRootProjectDir, "examples/resources/$name")
     }
 
     Path createTempFile(String sourceFile){

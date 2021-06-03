@@ -111,7 +111,7 @@ class ApiSchemaEntity {
 
         List<String> constrainedPropsNames = getConstraintedNames(constrainedProperties)
 
-        println "-- PersistentProperties --"
+        //println "-- PersistentProperties --"
         for (PersistentProperty prop : persistentProperties) {
             String propName = prop.name
             def constrainedProperty = (DefaultConstrainedProperty) constrainedProperties[propName]
@@ -130,7 +130,7 @@ class ApiSchemaEntity {
             if (prop instanceof Association) {
                 associationProp(type, apiProp, prop, constrainedProperty)
             } else { //setup type
-                println "  ${prop.name} basic, ${prop} ${prop.type}"
+                //println "  ${prop.name} basic, ${prop} ${prop.type}"
                 basicType(apiProp, constrainedProperty)
             }
             apiProp.remove('allowed')
@@ -138,7 +138,7 @@ class ApiSchemaEntity {
         }
 
         //now do the remaining constraints
-        println "-- Contrained Non-PersistentProperties --"
+        //println "-- Contrained Non-PersistentProperties --"
         for(String propName : constrainedPropsNames){
             def constrainedProp = (DefaultConstrainedProperty) constrainedProperties[propName]
 
@@ -148,12 +148,12 @@ class ApiSchemaEntity {
             Class returnType = constrainedProp.propertyType
             if(Collection.isAssignableFrom(returnType)){
                 Class genClass = findGenericClassForCollection(entityClass, propName)
-                println "  ${propName} collection of type ${genClass.simpleName}"
+                //println "  ${propName} collection of type ${genClass.simpleName}"
                 Map propsToAdd = setupAssociationObject(type, apiProp, genClass.simpleName, constrainedProp, null)
                 apiProp['type'] = 'array'
                 apiProp['items'] = propsToAdd
             } else {
-                println "  ${propName} basic ${constrainedProp.propertyType}"
+                //println "  ${propName} basic ${constrainedProp.propertyType}"
                 basicType(apiProp, constrainedProp)
             }
             apiProp.remove('allowed') //remove allowed so it doesn't get added to the json output

@@ -13,6 +13,7 @@ import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Specification
+import yakworks.commons.util.BuildSupport
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -45,7 +46,7 @@ class AttachmentSupportSpec extends Specification implements DataRepoTest, Secur
 
     // gets a file from example/resources
     Path getFile(String name){
-        Paths.get(System.getProperty("gradle.rootProjectDir"), "examples/resources/$name")
+        Paths.get(BuildSupport.gradleRootProjectDir, "examples/resources/$name")
     }
 
     void "test concatFileNameId"() {

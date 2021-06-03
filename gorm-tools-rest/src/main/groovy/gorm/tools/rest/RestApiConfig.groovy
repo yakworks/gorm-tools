@@ -78,21 +78,29 @@ class RestApiConfig implements ConfigAware {
     }
 
     Map getPathConfig(String controllerKey, String namespace){
-        def restApiConfig = config.getProperty("restApi.paths", Map)
-        String pathkey = namespace ? "${namespace}/${controllerKey}" : controllerKey
-        //println "getting restApi key ${pathkey}"
-        return restApiConfig[pathkey] as Map
+        String configPath = namespace ? "restApi.paths.${namespace}.${controllerKey}" : "restApi.paths.${controllerKey}"
+        // String pathkey = namespace ? "${namespace}/${controllerKey}" : controllerKey
+        // //println "getting restApi key ${pathkey}"
+        // return restApiConfig[pathkey] as Map
+        Map pathConfig = config.getProperty(configPath, Map)
+        if(pathConfig == null && namespace){
+            //try the other way
+            Map apiConfigs = config.getProperty('restApi.paths', Map)
+            String pathkey = "${namespace}/${controllerKey}"
+            pathConfig = apiConfigs.containsKey(pathkey) ? apiConfigs[pathkey] as Map : null
+        }
+        return pathConfig
     }
 
     Map getPathConfig(String pathkey){
-        def restApiConfig = config.getProperty("restApi.paths", Map)
-        pathkey = pathkey.replace('_','/')//.replace('-','/')
-        return restApiConfig[pathkey] as Map
+        Map pathConfig
+        if(pathkey.contains('_')){
+            String[] parts = pathkey.split('[_]')
+            pathConfig = getPathConfig(parts[1], parts[0])
+        } else {
+            pathConfig = getPathConfig(pathkey, null)
+        }
+        return pathConfig
     }
 
-    Object getConfig(String pathkey, String configKey){
-        def restApiConfig = config.getProperty("restApi.paths", Map)
-        pathkey = pathkey.replace('_','/')//.replace('-','/')
-        return restApiConfig[pathkey][configKey]
-    }
 }

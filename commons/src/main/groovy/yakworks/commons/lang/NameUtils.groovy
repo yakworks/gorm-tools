@@ -1,27 +1,10 @@
 /*
- * Copyright 2008 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package yakworks.commons.lang;
+* Copyright 2008 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.commons.lang
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import groovy.transform.CompileStatic
 
 /**
  * Copied in from grails.util.GrailsNameUtils and converted to groovy
@@ -29,43 +12,48 @@ import java.util.Set;
  * for example from class names -> property names and vice-versa. The
  * key aspect of this class is that it has no dependencies outside stock groovy!
  */
-public class NameUtils {
+@CompileStatic
+class NameUtils {
 
-    private static final String PROPERTY_SET_PREFIX = "set";
-    private static final String PROPERTY_GET_PREFIX = "get";
-    public static final String DOLLAR_SEPARATOR = "$";
+    private static final String PROPERTY_SET_PREFIX = "set"
+    private static final String PROPERTY_GET_PREFIX = "get"
+    public static final String DOLLAR_SEPARATOR = '$'
 
-    private NameUtils() {
+    /**
+     * converts SOME_PROP to someProp
+     */
+    static String toCamelCase( String text ) {
+        text = text.toLowerCase().replaceAll( "(_)([A-Za-z0-9])"){ List<String> it -> it[2].toUpperCase() }
+        //println text
+        return text
     }
-
     /**
      * Retrieves the name of a setter for the specified property name
      * @param propertyName The property name
      * @return The setter equivalent
      */
-    public static String getSetterName(String propertyName) {
+    static String getSetterName(String propertyName) {
         final String suffix = getSuffixForGetterOrSetter(propertyName);
         return PROPERTY_SET_PREFIX+suffix;
     }
 
     /**
      * Calculate the name for a getter method to retrieve the specified property
-     * @param propertyName
      * @return The name for the getter method for this property, if it were to exist, i.e. getConstraints
      */
-    public static String getGetterName(String propertyName) {
+    static String getGetterName(String propertyName) {
         final String suffix = getSuffixForGetterOrSetter(propertyName);
         return PROPERTY_GET_PREFIX + suffix;
     }
 
-    private static String getSuffixForGetterOrSetter(String propertyName) {
+    static String getSuffixForGetterOrSetter(String propertyName) {
         final String suffix;
         if (propertyName.length() > 1 &&
             Character.isLowerCase(propertyName.charAt(0)) &&
             Character.isUpperCase(propertyName.charAt(1))) {
             suffix = propertyName;
         } else {
-            suffix = Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
+            suffix = "${Character.toUpperCase(propertyName.charAt(0))}${propertyName.substring(1)}"
         }
         return suffix;
     }
@@ -77,12 +65,12 @@ public class NameUtils {
      * @param trailingName The trailing name
      * @return The class name
      */
-    public static String getClassName(String logicalName, String trailingName) {
+    static String getClassName(String logicalName, String trailingName) {
         if (isBlank(logicalName)) {
             throw new IllegalArgumentException("Argument [logicalName] cannot be null or blank");
         }
 
-        String className = logicalName.substring(0,1).toUpperCase(Locale.ENGLISH) + logicalName.substring(1);
+        String className = logicalName.substring(0, 1).toUpperCase(Locale.ENGLISH) + logicalName.substring(1);
         if (trailingName != null) {
             className = className + trailingName;
         }
@@ -94,7 +82,7 @@ public class NameUtils {
      *
      * @param cls The class name
      */
-    public static String getFullClassName(Class cls) {
+    static String getFullClassName(Class cls) {
         String className = cls.getName();
 
         return getFullClassName(className);
@@ -105,7 +93,7 @@ public class NameUtils {
      *
      * @param className The class name
      */
-    public static String getFullClassName(String className) {
+    static String getFullClassName(String className) {
         final int i = className.indexOf('$');
         if(i > -1) {
             className = className.substring(0, i);
@@ -119,7 +107,7 @@ public class NameUtils {
      * @param logicalName The logical name
      * @return The class name
      */
-    public static String getClassName(String logicalName) {
+    static String getClassName(String logicalName) {
         return getClassName(logicalName, "");
     }
 
@@ -129,7 +117,7 @@ public class NameUtils {
      * @param clazz The class
      * @return The class name
      */
-    public static String getClassName(Class clazz) {
+    static String getClassName(Class clazz) {
         final String sn = clazz.getSimpleName();
         if(sn.contains(DOLLAR_SEPARATOR)) {
             return clazz.getSuperclass().getName();
@@ -143,7 +131,7 @@ public class NameUtils {
      * @param name The name to convert
      * @return The property name representation
      */
-    public static String getClassNameRepresentation(String name) {
+    static String getClassNameRepresentation(String name) {
         if (name == null || name.length() == 0) {
             return "";
         }
@@ -170,7 +158,7 @@ public class NameUtils {
      * @param name The lower case hyphen separated name
      * @return The class name equivalent.
      */
-    public static String capitalize(String name) {
+    static String capitalize(String name) {
         // Handle null and empty strings.
         if (isBlank(name)) return name;
 
@@ -183,12 +171,12 @@ public class NameUtils {
      * @param name The lower case hyphen separated name
      * @return The class name equivalent.
      */
-    public static String getClassNameFromKebabCase(String name) {
+    static String getClassNameFromKebabCase(String name) {
         // Handle null and empty strings.
         if (isBlank(name)) return name;
 
         if (name.indexOf('-') == -1) {
-            return name.substring(0,1).toUpperCase() + name.substring(1);
+            return name.substring(0, 1).toUpperCase() + name.substring(1);
         }
 
         StringBuilder buf = new StringBuilder();
@@ -206,7 +194,7 @@ public class NameUtils {
      * @param name The name to convert
      * @return The property name version
      */
-    public static String getPropertyName(String name) {
+    static String getPropertyName(String name) {
         return getPropertyNameRepresentation(name);
     }
 
@@ -215,7 +203,7 @@ public class NameUtils {
      * @param clazz The clazz to convert
      * @return The property name version
      */
-    public static String getPropertyName(Class<?> clazz) {
+    static String getPropertyName(Class<?> clazz) {
         return getPropertyNameRepresentation(clazz);
     }
 
@@ -225,7 +213,7 @@ public class NameUtils {
      * @param targetClass The class to get the property name for
      * @return A property name reperesentation of the class name (eg. MyClass becomes myClass)
      */
-    public static String getPropertyNameRepresentation(Class<?> targetClass) {
+    static String getPropertyNameRepresentation(Class<?> targetClass) {
         return getPropertyNameRepresentation(getShortName(targetClass));
     }
 
@@ -235,7 +223,7 @@ public class NameUtils {
      * @param name The name to convert
      * @return The property name representation
      */
-    public static String getPropertyNameRepresentation(String name) {
+    static String getPropertyNameRepresentation(String name) {
         // Strip any package from the name.
         int pos = name.lastIndexOf('.');
         if (pos != -1) {
@@ -252,7 +240,7 @@ public class NameUtils {
             return name;
         }
 
-        String propertyName = name.substring(0,1).toLowerCase(Locale.ENGLISH) + name.substring(1);
+        String propertyName = name.substring(0, 1).toLowerCase(Locale.ENGLISH) + name.substring(1);
         if (propertyName.indexOf(' ') > -1) {
             propertyName = propertyName.replaceAll("\\s", "");
         }
@@ -265,7 +253,7 @@ public class NameUtils {
      * @param name The lower case hyphen separated name
      * @return The property name equivalent
      */
-    public static String getPropertyNameFromKebabCase(String name) {
+    static String getPropertyNameFromKebabCase(String name) {
         return getPropertyName(getClassNameFromKebabCase(name));
     }
 
@@ -275,7 +263,7 @@ public class NameUtils {
      * @param targetClass The class to get a short name for
      * @return The short name of the class
      */
-    public static String getShortName(Class<?> targetClass) {
+    static String getShortName(Class<?> targetClass) {
         return getShortName(targetClass.getName());
     }
 
@@ -285,7 +273,7 @@ public class NameUtils {
      * @param className The class name to get a short name for
      * @return The short name of the class
      */
-    public static String getShortName(String className) {
+    static String getShortName(String className) {
         int i = className.lastIndexOf(".");
         if (i > -1) {
             className = className.substring(i + 1, className.length());
@@ -299,7 +287,7 @@ public class NameUtils {
      * @param className The class name to get a short name for
      * @return The short name of the class
      */
-    public static String getPackageName(String className) {
+    static String getPackageName(String className) {
         int i = className.lastIndexOf(".");
         String packageName = "";
         if (i > -1) {
@@ -315,7 +303,7 @@ public class NameUtils {
      * @param clazz The class to convert
      * @return The script name representation
      */
-    public static String getKebabCase(Class<?> clazz) {
+    static String getKebabCase(Class<?> clazz) {
         return clazz == null ? null : getKebabCase(clazz.getName());
     }
 
@@ -326,7 +314,7 @@ public class NameUtils {
      * @param name The class name to convert.
      * @return The script name representation.
      */
-    public static String getKebabCase(String name) {
+    static String getKebabCase(String name) {
         if (name == null) {
             return null;
         }
@@ -342,9 +330,9 @@ public class NameUtils {
      * @param name The property name to convert
      * @return The converted property name
      */
-    public static String getNaturalName(String name) {
+    static String getNaturalName(String name) {
         name = getShortName(name);
-        List<String> words = new ArrayList<String>();
+        List<String> words = []
         int i = 0;
         char[] chars = name.toCharArray();
         for (int j = 0; j < chars.length; j++) {
@@ -364,7 +352,7 @@ public class NameUtils {
                 }
                 else if (w.length() > 1 && Character.isUpperCase(w.charAt(w.length() - 1))) {
                     w = "";
-                    words.add(++i,w);
+                    words.add(++i, w);
                 }
 
                 words.set(i, w + c);
@@ -402,7 +390,7 @@ public class NameUtils {
      * @return <code>true</code> if the string is <code>null</code>, or
      * blank.
      */
-    public static boolean isBlank(String str) {
+    static boolean isBlank(String str) {
         return str == null || str.trim().length() == 0;
     }
 
@@ -411,7 +399,7 @@ public class NameUtils {
      * @param object The object
      * @return The property name convention
      */
-    public static String getPropertyNameConvention(Object object) {
+    static String getPropertyNameConvention(Object object) {
         String suffix = "";
 
         return getPropertyNameConvention(object, suffix);
@@ -424,7 +412,7 @@ public class NameUtils {
      * @param packageName The name of the package
      * @return True if it is valid
      */
-    public static boolean isValidJavaPackage(String packageName) {
+    static boolean isValidJavaPackage(String packageName) {
         if(isBlank(packageName)) return false;
         final String[] parts = packageName.split("\\.");
         for (String part : parts) {
@@ -440,7 +428,7 @@ public class NameUtils {
      * @param name The name
      * @return True if it is
      */
-    public static boolean isValidJavaIdentifier(String name) {
+    static boolean isValidJavaIdentifier(String name) {
         if(isBlank(name)) return false;
 
         final char[] chars = name.toCharArray();
@@ -462,7 +450,7 @@ public class NameUtils {
      * @param suffix The suffix to append to the name.
      * @return The property name convention
      */
-    public static String getPropertyNameConvention(Object object, String suffix) {
+    static String getPropertyNameConvention(Object object, String suffix) {
         if(object != null) {
             Class<?> type = object.getClass();
             if (type.isArray()) {
@@ -511,7 +499,7 @@ public class NameUtils {
      * @param getterName The getter name
      * @return The property name equivalent
      */
-    public static String getPropertyForGetter(String getterName) {
+    static String getPropertyForGetter(String getterName) {
         return getPropertyForGetter(getterName, boolean.class);
     }
 
@@ -523,7 +511,7 @@ public class NameUtils {
      * @param returnType The type the method returns
      * @return The property name equivalent
      */
-    public static String getPropertyForGetter(String getterName, Class returnType) {
+    static String getPropertyForGetter(String getterName, Class returnType) {
         if (getterName == null || getterName.length() == 0) return null;
 
         if (getterName.startsWith("get")) {
@@ -559,7 +547,7 @@ public class NameUtils {
             return suffix;
         }
         if (Character.isUpperCase(suffix.charAt(0))) {
-            return Character.toLowerCase(suffix.charAt(0)) + suffix.substring(1);
+            return "${Character.toLowerCase(suffix.charAt(0))}${suffix.substring(1)}"
         }
         if('_' == suffix.charAt(0)) {
             return suffix;
@@ -577,7 +565,7 @@ public class NameUtils {
      * @return true if it is a javabean property getter
      * @deprecated use {@link #isGetter(String, Class, Class[])} instead because this method has a defect for "is.." method with Boolean return types.
      */
-    public static boolean isGetter(String name, Class<?>[] args) {
+    static boolean isGetter(String name, Class<?>[] args) {
         return isGetter(name, boolean.class, args);
     }
 
@@ -590,7 +578,7 @@ public class NameUtils {
      * @param args The arguments
      * @return true if it is a javabean property getter
      */
-    public static boolean isGetter(String name, Class returnType, Class<?>[] args) {
+    static boolean isGetter(String name, Class returnType, Class<?>[] args) {
         if (name == null || name.length() == 0 || args == null)return false;
         if (args.length != 0)return false;
 
@@ -659,7 +647,7 @@ public class NameUtils {
      * @param setterName The setter name, must be null or empty or a valid identifier name
      * @return The property name equivalent
      */
-    public static String getPropertyForSetter(String setterName) {
+    static String getPropertyForSetter(String setterName) {
         if (setterName == null || setterName.length() == 0) return null;
 
         if (setterName.startsWith("set")) {
@@ -668,7 +656,4 @@ public class NameUtils {
         }
         return null;
     }
-
-
-
 }

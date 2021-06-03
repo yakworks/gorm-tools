@@ -19,7 +19,7 @@ import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.config.CodeGenConfig
 
 import gorm.tools.rest.controller.RestRepositoryApi
-import yakworks.commons.build.BuildUtils
+import yakworks.commons.util.BuildSupport
 
 //import grails.rest.Resource
 //import grails.rest.RestfulController
@@ -44,7 +44,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         }
 
         // this should be set for multi project builds
-        String projectDir = BuildUtils.gradleProjectDir
+        String projectDir = BuildSupport.gradleProjectDir
         // add slash
         if (projectDir) projectDir = "${projectDir}/"
         // println "projectDir ${projectDir}"

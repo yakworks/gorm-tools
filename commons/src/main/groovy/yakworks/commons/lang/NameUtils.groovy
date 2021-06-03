@@ -31,13 +31,18 @@ import java.util.Set;
  */
 public class NameUtils {
 
-    private static final String PROPERTY_SET_PREFIX = "set";
-    private static final String PROPERTY_GET_PREFIX = "get";
-    public static final String DOLLAR_SEPARATOR = "$";
+    private static final String PROPERTY_SET_PREFIX = "set"
+    private static final String PROPERTY_GET_PREFIX = "get"
+    public static final String DOLLAR_SEPARATOR = '$'
 
-    private NameUtils() {
+    /**
+     * converts SOME_PROP to someProp
+     */
+    static String toCamelCase( String text ) {
+        text = text.toLowerCase().replaceAll( "(_)([A-Za-z0-9])"){ List<String> it -> it[2].toUpperCase() }
+        //println text
+        return text
     }
-
     /**
      * Retrieves the name of a setter for the specified property name
      * @param propertyName The property name

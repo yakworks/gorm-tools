@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
-import yakworks.commons.build.BuildUtils
+import yakworks.commons.util.BuildSupport
 import yakworks.commons.io.FileSystemUtils
 import yakworks.commons.io.FileUtil
 import yakworks.commons.lang.NameUtils
@@ -56,7 +56,7 @@ class OpenApiGenerator implements ConfigAware {
      * gets a path using the gradle.projectDir as the root
      */
     Path getApiSrcPath(String sub = null){
-        def path =  Paths.get(BuildUtils.gradleProjectDir, API_SRC)
+        def path =  Paths.get(BuildSupport.gradleProjectDir, API_SRC)
         return sub ? path.resolve(sub) : path
     }
 
@@ -64,7 +64,7 @@ class OpenApiGenerator implements ConfigAware {
      * gets a path using the gradle.projectDir as the root
      */
     Path getApiBuildPath(String sub = null){
-        def path =  Paths.get(BuildUtils.gradleProjectDir, API_BUILD)
+        def path =  Paths.get(BuildSupport.gradleProjectDir, API_BUILD)
         return sub ? path.resolve(sub) : path
     }
 

@@ -19,6 +19,7 @@ import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.config.CodeGenConfig
 
 import gorm.tools.rest.controller.RestRepositoryApi
+import yakworks.commons.build.BuildUtils
 
 //import grails.rest.Resource
 //import grails.rest.RestfulController
@@ -43,7 +44,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         }
 
         // this should be set for multi project builds
-        String projectDir = System.getProperty("gradle.projectDir", '')
+        String projectDir = BuildUtils.gradleProjectDir
         // add slash
         if (projectDir) projectDir = "${projectDir}/"
         // println "projectDir ${projectDir}"
@@ -52,10 +53,18 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
 
         Map restApi = config.getProperty('restApi', Map) as Map<String, Map>
         String defaultPackage = restApi.defaultPackage as String
+        Map namespaces = (Map)restApi.namespaces
+
         Map paths = restApi.paths as Map<String, Map>
         paths.each { String key, Map val ->
-            // Map entry = val as Map
-            if (val?.entityClass) {
+            //if its a namespace iterate on it
+            if(namespaces.containsKey(key)){
+                String namespace = key
+                for(entry in val){
+                    String resourceName = "${namespace}/${entry.key}"
+                    generateController(source, defaultPackage, resourceName, (Map)entry.value)
+                }
+            } else { //normal not namespaced
                 generateController(source, defaultPackage, key, val)
             }
         }
@@ -63,6 +72,9 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
 
     void generateController(SourceUnit source, String defaultPackage, String resourceName, Map ctrlConfig) {
         String entityClassName = (String)ctrlConfig['entityClass']
+        //exit fast if not entityClassName
+        if(!entityClassName) return
+
         ClassNode entityClassNode
         try {
             //first checks for already compiled classes from libs

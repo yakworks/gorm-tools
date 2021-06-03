@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
+import yakworks.commons.build.BuildUtils
 import yakworks.commons.io.FileSystemUtils
 import yakworks.commons.io.FileUtil
 import yakworks.commons.lang.NameUtils
@@ -54,15 +55,8 @@ class OpenApiGenerator implements ConfigAware {
     /**
      * gets a path using the gradle.projectDir as the root
      */
-    String getProjectDir(){
-        return System.getProperty("gradle.projectDir", '')
-    }
-
-    /**
-     * gets a path using the gradle.projectDir as the root
-     */
     Path getApiSrcPath(String sub = null){
-        def path =  Paths.get(getProjectDir(), API_SRC)
+        def path =  Paths.get(BuildUtils.gradleProjectDir, API_SRC)
         return sub ? path.resolve(sub) : path
     }
 
@@ -70,7 +64,7 @@ class OpenApiGenerator implements ConfigAware {
      * gets a path using the gradle.projectDir as the root
      */
     Path getApiBuildPath(String sub = null){
-        def path =  Paths.get(getProjectDir(), API_BUILD)
+        def path =  Paths.get(BuildUtils.gradleProjectDir, API_BUILD)
         return sub ? path.resolve(sub) : path
     }
 
@@ -91,31 +85,28 @@ class OpenApiGenerator implements ConfigAware {
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api, List namespaceList){
-        Map restCfg = config.getProperty('restApi', Map)
-        Map restApi = restCfg.paths as Map<String, Map>
+        Map restApiPaths = config.getProperty('restApi.paths', Map)
 
         List tags = (List)api.tags
         Map<String, List> xTagGroups = [:]
 
-        for(entry in restApi){
-            String pathName = entry.key
-            Map pathMap = (Map)entry.value
-            Map pathParts = RestApiAstUtils.splitPath(pathName, pathMap)
-            String endpoint = pathParts.name
-            String namespace = pathParts.namespace
+        Map namespaces = config.getProperty('restApi.namespaces', Map, [:])
 
-            Map tagEntry = [name: endpoint]
-            if(pathMap.description) tagEntry.description = pathMap.description
-            tags << tagEntry
-
-            if(!xTagGroups[namespace]) xTagGroups[namespace] = []
-            xTagGroups[namespace].add(endpoint)
-
-            try{
-                createPaths(api, endpoint, namespace, pathMap)
-            } catch(e){
-                String msg = "Error on $endpoint"
-                throw new IllegalArgumentException(msg, e)
+        for(entry in restApiPaths){
+            if(namespaces.containsKey(entry.key)){
+                String namespace = entry.key
+                for(epoint in (Map)entry.value){
+                    String endpoint = (String)epoint.key
+                    processEndpoint(api, endpoint, namespace, (Map)epoint.value, xTagGroups, tags)
+                }
+            }
+            else { //normal not namespaced or may have slash like 'foo/bar' as key
+                String pathName = entry.key
+                Map pathCfg = (Map)entry.value
+                Map pathParts = RestApiAstUtils.splitPath(pathName, pathCfg)
+                String endpoint = pathParts.name
+                String namespace = pathParts.namespace
+                processEndpoint(api, endpoint, namespace, pathCfg, xTagGroups, tags)
             }
 
         }
@@ -123,11 +114,27 @@ class OpenApiGenerator implements ConfigAware {
         //api.paths = paths
         def xTagGroupsList = []
         xTagGroups.each{k, v ->
-            xTagGroupsList << [name: k, tags: v as List]
+            xTagGroupsList << [name: namespaces[k], tags: v as List]
         }
         api['x-tagGroups'] = xTagGroupsList
         def buildOpenapiYaml = getApiBuildPath().resolve('openapi/api.yaml')
         YamlUtils.saveYaml(buildOpenapiYaml, api)
+    }
+
+    void processEndpoint(Map api, String endpoint, String namespace, Map pathMap, Map xTagGroups, List tags){
+        Map tagEntry = [name: endpoint]
+        if(pathMap.description) tagEntry.description = pathMap.description
+        tags << tagEntry
+
+        if(!xTagGroups[namespace]) xTagGroups[namespace] = []
+        ((List)xTagGroups[namespace]).add(endpoint)
+
+        try{
+            createPaths(api, endpoint, namespace, pathMap)
+        } catch(e){
+            String msg = "Error on $endpoint"
+            throw new IllegalArgumentException(msg, e)
+        }
     }
 
     //create the files for the path

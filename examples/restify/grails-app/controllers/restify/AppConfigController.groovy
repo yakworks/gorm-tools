@@ -11,6 +11,7 @@ class AppConfigController implements RestApiController {
 
     def get() {
         def resourceConfig = restApiConfig.getPathConfig(params.id as String)
+        assert resourceConfig
         def fixedMap = Maps.removePropertyListKeys(resourceConfig)
         respond fixedMap
     }

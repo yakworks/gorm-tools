@@ -1,3 +1,4 @@
+import yakworks.commons.util.BuildSupport
 import yakworks.rally.ddl.CustomSchemaManagementTool
 
 grails {
@@ -16,7 +17,7 @@ grails {
 
 grails.config.locations =  ["classpath:yakworks/test-config.groovy"]
 
-String projectRoot = System.getProperty('gradle.rootProjectDir')
+String projectRoot = BuildSupport.gradleRootProjectDir
 app {
     resources {
         currentTenant = {

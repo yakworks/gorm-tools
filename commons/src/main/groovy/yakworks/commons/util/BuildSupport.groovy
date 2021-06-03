@@ -18,9 +18,21 @@ class BuildSupport {
      *   }
      * }
      *
-     * @return
      */
     static String getGradleProjectDir(){
         return System.getProperty("gradle.projectDir")
+    }
+
+    /**
+     * on multiproject builds this returns the gradle.rootProjectDir property
+     * example:
+     * tasks.withType(Test) {
+     *   systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
+     *   systemProperty "gradle.projectDir", project.projectDir.absolutePath
+     * }
+     *
+     */
+    static String getGradleRootProjectDir(){
+        return System.getProperty("gradle.rootProjectDir")
     }
 }

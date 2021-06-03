@@ -2,6 +2,7 @@ package yakworks.commons.io
 
 import yakworks.commons.lang.DateUtil
 import spock.lang.Specification
+import yakworks.commons.util.BuildSupport
 
 class FileUtilTests extends Specification {
 
@@ -86,7 +87,7 @@ class FileUtilTests extends Specification {
 
     void testUnzip() {
         setup:
-        File zip = new File(System.getProperty("gradle.rootProjectDir"), "examples/resources/attachments/zip-test.zip")
+        File zip = new File(BuildSupport.gradleRootProjectDir, "examples/resources/attachments/zip-test.zip")
         File tempDir = new File(System.getProperty("java.io.tmpdir"))
 
         when:
@@ -103,7 +104,7 @@ class FileUtilTests extends Specification {
     void testZip() {
         when:
         File tempDir = new File(System.getProperty("java.io.tmpdir"))
-        File test = new File(System.getProperty("gradle.rootProjectDir"),"examples/resources/attachments/test.txt")
+        File test = new File(BuildSupport.gradleRootProjectDir,"examples/resources/attachments/test.txt")
         File zip = FileUtil.zip(test)
 
         then:

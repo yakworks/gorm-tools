@@ -21,6 +21,6 @@ class BuildSupport {
      * @return
      */
     static String getGradleProjectDir(){
-        return System.getProperty("gradle.projectDir", '')
+        return System.getProperty("gradle.projectDir")
     }
 }

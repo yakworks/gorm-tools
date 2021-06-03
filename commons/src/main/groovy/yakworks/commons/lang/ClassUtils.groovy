@@ -21,7 +21,7 @@ class ClassUtils {
      * @param mainClass the class to look for traits on.
      * @param name the name of the property
      * @param requiredTyped the type of the property
-     * @return
+     * @return the list of values
      */
     public static <T> List<T> getStaticValuesFromTraits(Class mainClass, String name, Class<T> requiredTyped) {
         CachedClass cachedClass = ClassInfo.getClassInfo(mainClass).getCachedClass() //classInfo.getCachedClass()

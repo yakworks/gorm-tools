@@ -11,6 +11,8 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
 
+import groovy.transform.CompileStatic
+
 import yakworks.commons.lang.Validate
 
 import static java.nio.file.FileVisitOption.FOLLOW_LINKS
@@ -18,6 +20,7 @@ import static java.nio.file.FileVisitOption.FOLLOW_LINKS
 /**
  * Utility methods for copying or deleting from the file system.
  */
+@CompileStatic
 abstract class FileSystemUtils {
 
     /**

@@ -6,6 +6,8 @@ package gorm.tools.audit.ast
 
 import groovy.transform.CompileStatic
 
+import yakworks.commons.util.BuildSupport
+
 /**
  * Just a helper to load config during AST
  */
@@ -49,7 +51,7 @@ class AuditStampConfigLoader {
      * See README for module.path
      */
     private File loadFileFromConfigDir(String name) {
-        String modulePath = System.getProperty("gradle.projectDir")
+        String modulePath = BuildSupport.gradleProjectDir
         //assert modulePath
         String configPath
         if (modulePath != null){

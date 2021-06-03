@@ -16,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
-import yakworks.commons.util.BuildSupport
 import yakworks.commons.io.FileSystemUtils
 import yakworks.commons.io.FileUtil
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.util.BuildSupport
 
 import static gorm.tools.openapi.ApiSchemaEntity.CruType
 

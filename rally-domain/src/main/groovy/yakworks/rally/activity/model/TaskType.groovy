@@ -9,13 +9,13 @@ import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
-import yakworks.rally.common.NameDescription
+import yakworks.rally.common.NameCodeDescription
 
 @Entity
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class TaskType implements NameDescription, RepoEntity<TaskType>, Serializable {
+class TaskType implements NameCodeDescription, RepoEntity<TaskType>, Serializable {
 
     Activity.Kind kind = Activity.Kind.Todo
 

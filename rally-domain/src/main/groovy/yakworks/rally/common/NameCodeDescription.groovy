@@ -17,6 +17,6 @@ trait NameCodeDescription extends NameDescription {
 
     static constraintsMap = [
         code:[ description: 'Short code, alphanumeric with no special characters except dash (for space) and underscore', nullable: false,
-               blank: false, maxSize: 10]
+               blank: false, maxSize: 10, matches: "[a-zA-Z0-9-_]+"]
     ]
 }

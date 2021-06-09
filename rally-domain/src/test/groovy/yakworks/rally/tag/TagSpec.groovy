@@ -23,4 +23,30 @@ class TagSpec extends Specification implements DomainRepoTest<Tag>, SecurityTest
 
     }
 
+    void "test code regex"() {
+        when:
+        def tag = Tag.create('code': 'aA12-_', name: 'tag', entityName: 'Attachment')
+
+        then:
+        tag.validate()
+
+        when:
+        tag.code = 'aA 12-_'
+
+        then:
+        !tag.validate()
+
+        when:
+        tag.code = 'aA12-_*()'
+
+        then:
+        !tag.validate()
+
+        when:
+        tag.code = '1234567890A'
+
+        then:
+        !tag.validate()
+    }
+
 }

@@ -16,8 +16,8 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
 
     void "create link"() {
         when:
-        def tag1 = Tag.create(name: 'tag1')
-        def tag2 = Tag.create(name: 'tag2', entityName: 'Foo, Attachment')
+        def tag1 = Tag.create(name: 'tag1', code: 'tag1')
+        def tag2 = Tag.create(name: 'tag2', code: 'tag2', entityName: 'Foo, Attachment')
         def att = Attachment.create(name: 'foo.txt')
         def attId = att.id
 
@@ -52,7 +52,7 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
 
     void "create link with invalid tag"() {
         when: 'tag not valid for entity'
-        def tag1 = Tag.create(name: 'tag1', entityName: 'Something')
+        def tag1 = Tag.create(name: 'tag1', code:'tag1', entityName: 'Something')
         def att = new Attachment(name: 'foo', location: 'foo').persist()
 
         def tl = TagLink.create(att, tag1)
@@ -65,7 +65,7 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
     @Ignore //not working in unit tests
     void "create link duplicate"() {
         when: 'tag not valid for entity'
-        def tag1 = Tag.create(name: 'tag1')
+        def tag1 = Tag.create(name: 'tag1', code: 'tag1')
         def att = new Attachment(name: 'foo', location: 'foo').persist()
 
         TagLink.create(att, tag1, [flush:true])

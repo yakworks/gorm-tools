@@ -34,4 +34,3 @@ class NameCodeDescriptionSpec extends Specification {
     }
 
 }
-

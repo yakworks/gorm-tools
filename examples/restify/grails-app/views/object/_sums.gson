@@ -13,5 +13,5 @@ Map results = [:]
 totalsData.eachWithIndex { Object name, Integer i ->
   results[fields[i]] = totalsData[i]
 }
-// System.out.println "Model in _list $binding.variables"
+
 json  g.render(results)

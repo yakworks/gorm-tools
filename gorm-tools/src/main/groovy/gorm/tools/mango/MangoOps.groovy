@@ -24,6 +24,7 @@ class MangoOps {
     public static final String SORT = '$sort'
     public static final String Q = '$q'
     public static final String QSEARCH = '$qSearch'
+    public static final String SUMS = '$sums'
 
     @CompileStatic
     static enum CompareOp {

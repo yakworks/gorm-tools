@@ -28,6 +28,7 @@ import static gorm.tools.mango.MangoOps.PropertyOp
 import static gorm.tools.mango.MangoOps.Q
 import static gorm.tools.mango.MangoOps.QSEARCH
 import static gorm.tools.mango.MangoOps.SORT
+import static gorm.tools.mango.MangoOps.SUMS
 
 /**
  * the main builder to turn Mango QL maps and json into DetachedCriteria for Gorm
@@ -35,7 +36,8 @@ import static gorm.tools.mango.MangoOps.SORT
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-@SuppressWarnings(['FieldName', 'ConfusingMethodName']) //codenarc doesn't like the names we use to make this builder clean
+@SuppressWarnings(['FieldName', 'ConfusingMethodName'])
+//codenarc doesn't like the names we use to make this builder clean
 @CompileStatic
 @Slf4j
 class MangoBuilder {
@@ -46,7 +48,7 @@ class MangoBuilder {
     }
 
     public <D> MangoDetachedCriteria<D> build(MangoDetachedCriteria<D> criteria, Map map,
-                                         @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+                                              @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
         MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
         def tidyMap = MangoTidyMap.tidy(map)
         applyMapOrList(newCriteria, tidyMap)
@@ -54,9 +56,10 @@ class MangoBuilder {
         return newCriteria
     }
 
-    @CompileDynamic //dynamic so it can access the protected criteria.clone
+    @CompileDynamic
+    //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
-        (MangoDetachedCriteria)criteria.clone()
+        (MangoDetachedCriteria) criteria.clone()
     }
 
     void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {
@@ -89,6 +92,11 @@ class MangoBuilder {
                 continue
             }
 
+            if (key == SUMS) {
+                sums(criteria, val)
+                continue
+            }
+
             JunctionOp jop = EnumUtils.getEnum(JunctionOp, key)
             if (jop) {
                 //tidyMap should have ensured all ops have a List for a value
@@ -106,7 +114,6 @@ class MangoBuilder {
     }
 
     void applyField(DetachedCriteria criteria, String field, Object fieldVal) {
-
         PersistentProperty prop = criteria.persistentEntity.getPropertyByName(field)
 
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
@@ -204,6 +211,24 @@ class MangoBuilder {
         (sort as Map).each { k, v ->
             result = criteria.order(k.toString(), v.toString())
         }
+        return result
+    }
+
+    DetachedCriteria sums(DetachedCriteria criteria, Object sums) {
+        List<String> sumsFields
+        if (sums instanceof List ){
+            sumsFields = sums
+        }
+        if (sums instanceof String){
+            sumsFields = sums.tokenize(',[]')
+        }
+
+        DetachedCriteria result = criteria.projections {
+            for (String sumField : sumsFields) {
+                sum(sumField)
+            }
+        }
+
         return result
     }
 

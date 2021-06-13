@@ -159,4 +159,28 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     }
 
+    void "test countTotals"() {
+        when:
+        String q = '{"$sums": ["id"]}'
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(getUrl(path)).newBuilder()
+        urlBuilder.addQueryParameter("q", q)
+        def resp = get(urlBuilder.build().toString())
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body == [id:5050]
+
+        when:
+        String q2 = '{"$sums": ["id", "orgTypeId"]}'
+        urlBuilder = HttpUrl.parse(getUrl(path)).newBuilder()
+        urlBuilder.addQueryParameter("q", q2)
+        resp = get(urlBuilder.build().toString())
+        body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.OK.value()
+        body == [id:5050, orgTypeId:110]
+    }
+
 }

@@ -26,7 +26,7 @@ class UrlMappings {
                 String apiPath = namespace ? "/api/$namespace" : "/api"
                 println "apiPath: $apiPath controller: $cName"
                 group("${apiPath}/${cName}") {
-                    get "(.$format)?"(controller: cName, action: "list")
+                    get "(.$format)?"(controller: cName, action: "index")
                     get "/$id(.$format)?"(controller: cName, action: "get")
                     get "/picklist(.$format)?"(controller: cName, action: "picklist")
 

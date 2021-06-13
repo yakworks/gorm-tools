@@ -4,7 +4,6 @@
 */
 package gorm.tools.rest.controller
 
-
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -133,7 +132,12 @@ trait RestRepositoryApi<D> implements RestApiController {
 
     @Action
     def index() {
-        list()
+        // if we need to calculate sums we shouldnt use pager so if $sums is specified respond with sum for fields
+        if (params.q.toString().contains('$sums')) {
+            sums()
+        } else {
+            list()
+        }
     }
 
     /**
@@ -163,6 +167,10 @@ trait RestRepositoryApi<D> implements RestApiController {
         respond([data: data])
     }
 
+    def sums() {
+        respond(view: '/object/_sums', [projections: sumQuery(), qParams: params.q])
+    }
+
     //@CompileDynamic
     Pager pagedQuery(Map params, String includesKey) {
         Pager pager = new Pager(params)
@@ -173,18 +181,33 @@ trait RestRepositoryApi<D> implements RestApiController {
         return pager.setEntityMapList(entityMapList)
     }
 
-    List<D> query(Pager pager, Map p = [:]) {
+    List sumQuery() {
+        Map qryParams = queryParams(params)
+        ((QueryMangoEntityApi) getRepo()).queryList(qryParams)
+    }
+
+    Map queryParams(Map p) {
         //copy the params into new map
-        def qryParams = p.findAll {
-            //not if its in the the pager or the controller params
-            !(it.key in ['max', 'offset', 'page', 'controller', 'action'])
-        }
-        qryParams.pager = pager
+        Map qryParams = findQueryParams(p)
         //setup quick search
         List qsFields = getSearchFields()
         if(qsFields) qryParams.qSearchFields = qsFields
+        qryParams
+    }
 
+    List<D> query(Pager pager, Map p = [:]) {
+       Map qryParams = queryParams(p)
+
+        qryParams.pager = pager
         ((QueryMangoEntityApi)getRepo()).queryList(qryParams)
+    }
+
+    Map findQueryParams(Map params= [:]) {
+        def qryParams = params.findAll {
+            //not if its in the the pager or the controller params
+            !(it.key in ['max', 'offset', 'page', 'controller', 'action'])
+        }
+        return qryParams
     }
 
     void respondWithEntityMap(EntityMap entityMap, Map args = [:]){

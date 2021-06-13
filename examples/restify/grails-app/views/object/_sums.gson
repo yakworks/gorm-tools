@@ -1,0 +1,17 @@
+import groovy.json.JsonSlurper
+
+
+model {
+  // List data
+  List projections
+  String qParams
+}
+
+List fields = new JsonSlurper().parseText(qParams)['$sums'] as List<String>
+List totalsData = fields.size() > 1 ? projections[0] as List : projections
+Map results = [:]
+totalsData.eachWithIndex { Object name, Integer i ->
+  results[fields[i]] = totalsData[i]
+}
+// System.out.println "Model in _list $binding.variables"
+json  g.render(results)

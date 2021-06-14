@@ -1,4 +1,4 @@
-package yakworks.testify.domain
+package yakworks.rally.tag
 
 
 import gorm.tools.security.testing.SecuritySpecHelper

@@ -14,7 +14,7 @@ class TagSpec extends Specification implements DomainRepoTest<Tag>, SecurityTest
 
     void "test isValidFor"() {
         when:
-        def tag2 = Tag.create(name: 'tag2', entityName: 'Foo, Attachment')
+        def tag2 = Tag.create(name: 'tag2', code: 'tag2', entityName: 'Foo, Attachment')
 
         then:
         tag2.isValidFor('Foo')

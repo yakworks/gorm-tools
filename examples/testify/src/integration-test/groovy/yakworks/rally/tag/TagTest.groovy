@@ -1,4 +1,4 @@
-package yakworks.taskify.domain
+package yakworks.rally.tag
 
 
 import gorm.tools.security.testing.SecuritySpecHelper
@@ -14,7 +14,7 @@ class TagTest extends Specification implements DataIntegrationTest, SecuritySpec
 
     def "Tag create"(){
         when:
-        Long id = Tag.create([name: 'Foo']).id
+        Long id = Tag.create([name: 'Foo', code: 'Foo']).id
         flushAndClear()
 
         then:

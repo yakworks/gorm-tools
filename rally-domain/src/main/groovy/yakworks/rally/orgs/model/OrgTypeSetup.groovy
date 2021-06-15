@@ -11,13 +11,13 @@ import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
-import yakworks.rally.common.NameDescription
+import yakworks.rally.common.NameCodeDescription
 
 @Entity
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class OrgTypeSetup implements NameDescription, RepoEntity<OrgTypeSetup>, Serializable {
+class OrgTypeSetup implements NameCodeDescription, RepoEntity<OrgTypeSetup>, Serializable {
 
     Boolean inactive = false
 

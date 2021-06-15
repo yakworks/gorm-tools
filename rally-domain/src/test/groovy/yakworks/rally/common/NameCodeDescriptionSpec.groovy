@@ -17,6 +17,14 @@ class NameCodeDescriptionSpec extends Specification  implements DomainRepoTest<T
         'a-b' == tag.code
     }
 
+    void "test no code or name"() {
+        when: 'no code so cannot be created'
+        def tag = new Tag(entityName: 'Attachment')
+
+        then: 'should fail'
+        !tag.validate()
+    }
+
     void "code regex validation should succeed"() {
         when:
         def tag = Tag.create('code': 'aA12-_', name: 'tag', entityName: 'Attachment')

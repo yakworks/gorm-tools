@@ -4,9 +4,9 @@
 */
 package yakworks.rally.common
 
-import groovy.transform.CompileStatic
-
 import java.time.LocalDateTime
+
+import groovy.transform.CompileStatic
 
 @SuppressWarnings(['MethodName'])
 @CompileStatic

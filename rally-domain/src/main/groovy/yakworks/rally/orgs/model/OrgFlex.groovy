@@ -4,6 +4,8 @@
 */
 package yakworks.rally.orgs.model
 
+import yakworks.rally.common.FlexTrait
+
 import java.time.LocalDateTime
 
 import gorm.tools.audit.AuditStamp
@@ -16,29 +18,8 @@ import yakworks.commons.transform.IdEqualsHashCode
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class OrgFlex implements RepoEntity<OrgFlex>, Serializable {
+class OrgFlex implements FlexTrait, RepoEntity<OrgFlex>, Serializable {
     static belongsTo = [Org]
-
-    String text1
-    String text2
-    String text3
-    String text4
-    String text5
-    String text6
-    String text7
-    String text8
-    String text9
-    String text10
-    LocalDateTime date1
-    LocalDateTime date2
-    LocalDateTime date3
-    LocalDateTime date4
-    BigDecimal num1
-    BigDecimal num2
-    BigDecimal num3
-    BigDecimal num4
-    BigDecimal num5
-    BigDecimal num6
 
     static mapping = {
         id generator: 'assigned'

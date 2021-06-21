@@ -11,13 +11,13 @@ import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.rally.common.NameDescription
+import yakworks.rally.common.NameCodeDescription
 
 @AuditStamp
 @Entity
 @EqualsAndHashCode(includes=["name", "entityName"])
 @GrailsCompileStatic
-class Tag implements NameDescription, RepoEntity<Tag>, Serializable {
+class Tag implements NameCodeDescription, RepoEntity<Tag>, Serializable {
     // static transients = ['entityNameList']
     String name
     String description

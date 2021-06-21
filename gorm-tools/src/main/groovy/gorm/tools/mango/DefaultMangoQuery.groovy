@@ -81,26 +81,27 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return map where keys are names of fields and value - sum for restricted entities
      */
+    @Override
     @Transactional(readOnly = true)
-    Map countTotals(Class domainClass, Map params = [:], List<String> sums, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-
-        DetachedCriteria mangoCriteria = query(domainClass, params, closure)
-
-        List totalList
-        totalList = mangoCriteria.list {
+    public <D> Map sum(Class<D> domainClass, Map params, Closure closure = null) {
+        Map<String, Object> p = parseParams(params)
+        List sumBy = p[CRITERIA]['$sum'] as List<String>
+        Map results = [:]
+        List totalList = query(domainClass, params, closure).list {
             projections {
-                for (String sumField : sums) {
-                    sum(sumField)
+                for (String sumField : sumBy) {
+                    delegate.sum(sumField)
                 }
             }
         }
-
-        List totalsData = (List) totalList[0]
-        Map result = [:]
-        sums.eachWithIndex { String name, Integer i ->
-            result[name] = totalsData[i]
+        List totalsData = sumBy.size() > 1 ? totalList[0] as List : totalList
+        totalsData.eachWithIndex { Object name, Integer i ->
+            results[sumBy[i]] = totalsData[i]
         }
-        return result
+        sumBy.eachWithIndex { String name, Integer i ->
+            results[name] = totalsData[i]
+        }
+        return results
     }
 
     /**

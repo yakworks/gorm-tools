@@ -47,4 +47,17 @@ trait QueryMangoEntityApi<D> {
     List<D> queryList(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         getMangoQuery().queryList(getEntityClass(), params, closure)
     }
+
+    /**
+     * Map totals calculated for specified fields
+     *
+     * @param params mango language criteria map
+     * @param sumBy list of field names to calculate totals for
+     * @param closure additional restriction for criteria
+     * @return query of entities restricted by mango params
+     */
+    Map sum(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        getMangoQuery().sum(getEntityClass(), params, closure)
+
+    }
 }

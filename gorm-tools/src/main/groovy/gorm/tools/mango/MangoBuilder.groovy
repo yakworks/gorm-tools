@@ -28,7 +28,6 @@ import static gorm.tools.mango.MangoOps.PropertyOp
 import static gorm.tools.mango.MangoOps.Q
 import static gorm.tools.mango.MangoOps.QSEARCH
 import static gorm.tools.mango.MangoOps.SORT
-import static gorm.tools.mango.MangoOps.SUMS
 
 /**
  * the main builder to turn Mango QL maps and json into DetachedCriteria for Gorm
@@ -89,11 +88,6 @@ class MangoBuilder {
 
             if(key == QSEARCH || key == Q) {
                 qSearch(criteria, val)
-                continue
-            }
-
-            if (key == SUMS) {
-                sums(criteria, val)
                 continue
             }
 
@@ -211,24 +205,6 @@ class MangoBuilder {
         (sort as Map).each { k, v ->
             result = criteria.order(k.toString(), v.toString())
         }
-        return result
-    }
-
-    DetachedCriteria sums(DetachedCriteria criteria, Object sums) {
-        List<String> sumsFields
-        if (sums instanceof List ){
-            sumsFields = sums
-        }
-        if (sums instanceof String){
-            sumsFields = sums.tokenize(',[]')
-        }
-
-        DetachedCriteria result = criteria.projections {
-            for (String sumField : sumsFields) {
-                sum(sumField)
-            }
-        }
-
         return result
     }
 

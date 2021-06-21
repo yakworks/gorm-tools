@@ -182,20 +182,20 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
 
     def "sums check"() {
         when:
-        def list = mangoQuery.query(Cust, ['$sums': 'amount']).list()
+        def sums = mangoQuery.sum(Cust, [q:['$sum':['amount']]])
         then:
         noExceptionThrown()
-        list == [6633.00]
+        sums == [amount: 6633.00]
         when:
-        list = mangoQuery.query(Cust, ['$sums': 'amount,amount2']).list()
+        sums =  mangoQuery.sum(Cust, [q:['$sum':['amount', 'amount2']]])
         then:
         noExceptionThrown()
-        list == [[6633.00, 98505.00]]
+        sums == [amount: 6633.00, amount2: 98505.00]
         when:
-        list = mangoQuery.query(Cust, ['$sums': 'amount,amount2,id']).list()
+        sums = mangoQuery.sum(Cust, [q:['$sum':['amount', 'amount2', 'id']]])
         then:
         noExceptionThrown()
-        list == [[6633.00, 98505.00, 5050]]
+        sums == [amount: 6633.00, amount2: 98505.00, id: 5050]
     }
 
 }

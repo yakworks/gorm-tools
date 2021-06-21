@@ -161,7 +161,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test countTotals"() {
         when:
-        String q = '{"$sums": ["id"]}'
+        String q = '{"$sum": ["id"]}'
         HttpUrl.Builder urlBuilder = HttpUrl.parse(getUrl(path)).newBuilder()
         urlBuilder.addQueryParameter("q", q)
         def resp = get(urlBuilder.build().toString())
@@ -172,7 +172,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body == [id:5050]
 
         when:
-        String q2 = '{"$sums": ["id", "orgTypeId"]}'
+        String q2 = '{"$sum": ["id", "orgTypeId"]}'
         urlBuilder = HttpUrl.parse(getUrl(path)).newBuilder()
         urlBuilder.addQueryParameter("q", q2)
         resp = get(urlBuilder.build().toString())

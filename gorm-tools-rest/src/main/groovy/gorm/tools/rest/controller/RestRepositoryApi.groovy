@@ -4,6 +4,8 @@
 */
 package gorm.tools.rest.controller
 
+import groovy.json.JsonSlurper
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -15,6 +17,7 @@ import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
+import gorm.tools.mango.MangoOps
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityNotFoundException
@@ -133,7 +136,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     @Action
     def index() {
         // if we need to calculate sums we shouldnt use pager so if $sums is specified respond with sum for fields
-        if (params.q.toString().contains('$sums')) {
+        if (params.q.toString().contains(MangoOps.SUM)) {
             sums()
         } else {
             list()
@@ -168,7 +171,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     }
 
     def sums() {
-        respond(view: '/object/_sums', [projections: sumQuery(), qParams: params.q])
+        respond(sumQuery())
     }
 
     //@CompileDynamic
@@ -181,9 +184,10 @@ trait RestRepositoryApi<D> implements RestApiController {
         return pager.setEntityMapList(entityMapList)
     }
 
-    List sumQuery() {
+    Map sumQuery() {
         Map qryParams = queryParams(params)
-        ((QueryMangoEntityApi) getRepo()).queryList(qryParams)
+        println qryParams.q
+        ((QueryMangoEntityApi) getRepo()).sum(qryParams)
     }
 
     Map queryParams(Map p) {

@@ -31,4 +31,14 @@ interface MangoQuery {
      * @return query of entities restricted by mango params
      */
     public <D> List<D> queryList(Class<D> domainClass, Map params, Closure closure)
+
+    /**
+     *  Calculates sums for specified properties in enities query restricted by mango criteria
+     *
+     * @param params mango language criteria map
+     * @param sums query of properties names that sums should be calculated for
+     * @param closure additional restriction for criteria
+     * @return map where keys are names of fields and value - sum for restricted entities
+     */
+    public <D> Map sum(Class<D> domainClass, Map params, Closure closure)
 }

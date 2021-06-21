@@ -53,6 +53,10 @@ class NewMangoQuery implements MangoQuery {
     List queryList(Class domainClass, Map params, Closure closure = null) {
         query(domainClass, [:], null).list()
     }
+        @Override
+    Map sum(Class domainClass, Map params, Closure closure = null) {
+        [:]
+    }
 }
 
 @GormRepository

@@ -824,14 +824,14 @@ for example, sending a JSON search param that looks like this</p>
 <p><div class="codehilite"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Bill%&quot;</span><span class="p">,</span>
   <span class="s2">&quot;type&quot;</span><span class="o">:</span> <span class="s2">&quot;New&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;age&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mi">65</span><span class="p">}</span>
+  <span class="s2">&quot;age&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mf">65</span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 would get converted to the equivalent criteria</p>
 <div class="codehilite"><pre><span></span><span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span> <span class="p">{</span>
     <span class="nx">ilike</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill%&quot;</span>
     <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
-    <span class="nx">gt</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="mi">65</span>
+    <span class="nx">gt</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="mf">65</span>
 <span class="p">}</span>
 </pre></div>
 

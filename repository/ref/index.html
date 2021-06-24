@@ -882,13 +882,13 @@ your domain.</p>
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">OrgRepo</span> <span class="kd">implements</span> <span class="n">GormRepo</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="o">{</span>
 
    <span class="nd">@RepoListener</span>
-   <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">Org</span> <span class="n">org</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">,</span> <span class="n">BeforeBindEvent</span> <span class="n">be</span><span class="o">)</span> <span class="o">{</span>
+   <span class="kt">void</span> <span class="n">beforeBind</span><span class="o">(</span><span class="n">Org</span> <span class="n">org</span><span class="o">,</span> <span class="n">Map</span> <span class="n">params</span><span class="o">,</span> <span class="n">BeforeBindEvent</span> <span class="n">be</span><span class="o">)</span> <span class="o">{</span>
        <span class="c1">//do some thing before bind</span>
 
    <span class="o">}</span>
 
    <span class="nd">@Transactional</span>
-   <span class="kt">boolean</span> <span class="nf">makeInactive</span><span class="o">(</span><span class="n">Long</span> <span class="n">id</span><span class="o">){</span>
+   <span class="kt">boolean</span> <span class="n">makeInactive</span><span class="o">(</span><span class="n">Long</span> <span class="n">id</span><span class="o">){</span>
        <span class="kt">def</span> <span class="n">org</span> <span class="o">=</span> <span class="n">Org</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">id</span><span class="o">)</span>
        <span class="o">...</span> <span class="k">do</span> <span class="n">transactional</span> <span class="n">stuff</span>
        <span class="n">org</span><span class="o">.</span><span class="na">persist</span><span class="o">()</span>
@@ -962,7 +962,7 @@ on a domain entity called <code>Org</code>, the repository invokes several event
 by default. For example, methods like <code>someEvent()</code> or <code>onSomeEvent()</code> listen to the event with id <code>someEvent</code>.</p>
 <p>Due to the fact that ids of repository events contain <code>.</code> symbol, we should pass event id to the Subscriber annotation like so:</p>
 <div class="codehilite"><pre><span></span>    <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;SomeDomain.someEvent&quot;</span><span class="o">)</span>
-    <span class="kt">void</span> <span class="nf">someMethod</span><span class="o">()</span> <span class="o">{}</span>
+    <span class="kt">void</span> <span class="n">someMethod</span><span class="o">()</span> <span class="o">{}</span>
 </pre></div>
 
 <p>According to Grails docs, a class which contains a listener method (with <a class="new-tab" href="http://async.grails.org/latest/api/grails/events/annotation/Subscriber.html">@Subscriber</a> annotation) should be a <strong>spring bean</strong>.</p>
@@ -975,12 +975,12 @@ by default. For example, methods like <code>someEvent()</code> or <code>onSomeEv
 <span class="kd">class</span> <span class="nc">OrgSubscriber</span> <span class="o">{</span>
 
     <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.beforePersist&quot;</span><span class="o">)</span>
-    <span class="kt">void</span> <span class="nf">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="n">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
        <span class="c1">// ...</span>
     <span class="o">}</span>
 
     <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.afterPersist&quot;</span><span class="o">)</span>
-    <span class="kt">void</span> <span class="nf">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="n">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
        <span class="c1">// ...</span>
     <span class="o">}</span>
 <span class="o">}</span>
@@ -998,7 +998,7 @@ The Repository also publishes a number of
 <span class="kd">class</span> <span class="nc">OrgListener</span> <span class="o">{</span>
 
     <span class="nd">@EventListener</span>
-    <span class="kt">void</span> <span class="nf">beforeBind</span><span class="o">(</span><span class="n">BeforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="n">beforeBind</span><span class="o">(</span><span class="n">BeforeBindEvent</span><span class="o">&lt;</span><span class="n">Org</span><span class="o">&gt;</span> <span class="n">event</span><span class="o">)</span> <span class="o">{</span>
        <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="na">entity</span>
        <span class="c1">//Do some thing here.</span>
     <span class="o">}</span>
@@ -1023,13 +1023,13 @@ The interval can be configured using <code>refresh-check-delay</code>. This feat
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">OrgEventListener</span> <span class="o">{</span>
 
       <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.beforePersist&quot;</span><span class="o">)</span>
-      <span class="kt">void</span> <span class="nf">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">e</span><span class="o">){</span>
+      <span class="kt">void</span> <span class="n">beforePersist</span><span class="o">(</span><span class="n">BeforePersistEvent</span> <span class="n">e</span><span class="o">){</span>
           <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="o">(</span><span class="n">Org</span><span class="o">)</span> <span class="n">e</span><span class="o">.</span><span class="na">entity</span>
           <span class="c1">//do some thing with org</span>
       <span class="o">}</span>
 
       <span class="nd">@Subscriber</span><span class="o">(</span><span class="s2">&quot;Org.afterPersist&quot;</span><span class="o">)</span>
-      <span class="kt">void</span> <span class="nf">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">e</span><span class="o">){</span>
+      <span class="kt">void</span> <span class="n">afterPersist</span><span class="o">(</span><span class="n">AfterPersistEvent</span> <span class="n">e</span><span class="o">){</span>
           <span class="n">Org</span> <span class="n">org</span> <span class="o">=</span> <span class="o">(</span><span class="n">Org</span><span class="o">)</span> <span class="n">e</span><span class="o">.</span><span class="na">entity</span>
           <span class="c1">//do some thing with org</span>
       <span class="o">}</span>
@@ -1131,7 +1131,7 @@ DefaultGormRepo as the repository for the given domain.</p>
      <span class="n">mockDomain</span><span class="o">(</span><span class="n">City</span><span class="o">)</span>
    <span class="o">}</span>
 
-   <span class="kt">void</span> <span class="s2">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
+   <span class="kt">void</span> <span class="nf">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
      <span class="nl">given:</span>
      <span class="n">Map</span> <span class="n">params</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Chicago&quot;</span><span class="o">]</span>
 
@@ -1151,7 +1151,7 @@ Can be used to unit test with full hibernate support with inmemory database.</p>
 
   <span class="n">List</span><span class="o">&lt;</span><span class="n">Class</span><span class="o">&gt;</span> <span class="n">getDomainClasses</span><span class="o">()</span> <span class="o">{</span> <span class="o">[</span><span class="n">City</span><span class="o">]</span> <span class="o">}</span>
 
-   <span class="kt">void</span> <span class="s2">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
+   <span class="kt">void</span> <span class="nf">&quot;test create&quot;</span><span class="o">()</span> <span class="o">{</span>
      <span class="nl">given:</span>
      <span class="n">Map</span> <span class="n">params</span> <span class="o">=</span> <span class="o">[</span><span class="nl">name:</span><span class="s2">&quot;Chicago&quot;</span><span class="o">]</span>
 

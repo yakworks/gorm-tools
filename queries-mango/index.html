@@ -959,10 +959,10 @@ these arise more from a similarity of purpose and do not necessarily extend to c
 
 <p>The same result can be reached with criteria:</p>
 <div class="codehilite"><pre><span></span><span class="nx">Criteria</span> <span class="nx">criteria</span> <span class="o">=</span> <span class="nx">Org</span><span class="p">.</span><span class="nx">createCriteria</span><span class="p">()</span>
-<span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="nx">max</span><span class="o">:</span> <span class="mi">20</span><span class="p">)</span> <span class="p">{</span>
+<span class="nx">criteria</span><span class="p">.</span><span class="nx">list</span><span class="p">(</span><span class="nx">max</span><span class="o">:</span> <span class="mf">20</span><span class="p">)</span> <span class="p">{</span>
     <span class="nx">ilike</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;Bill%&quot;</span>
     <span class="nx">eq</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;New&quot;</span>
-    <span class="nx">gt</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="mi">5</span>
+    <span class="nx">gt</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="mf">5</span>
     <span class="nx">order</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;asc&quot;</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
@@ -1167,10 +1167,10 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
 <h4 id="associations">Associations<a class="headerlink" href="#associations" title="Permanent link">&para;</a></h4>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
-    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span>
-    <span class="s2">&quot;customerId&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span> <span class="cm">/* check if domain has customerId property, if not then uses customer.id 101 above */</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="mf">101</span><span class="p">,</span>
+    <span class="s2">&quot;customerId&quot;</span><span class="o">:</span> <span class="mf">101</span><span class="p">,</span> <span class="cm">/* check if domain has customerId property, if not then uses customer.id 101 above */</span>
     <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="cm">/* nested object way */</span>
-      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="mi">101</span><span class="p">,</span>
+      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="mf">101</span><span class="p">,</span>
       <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Wal%&quot;</span>
     <span class="p">}</span>
   <span class="p">}</span>
@@ -1184,25 +1184,25 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
 <h4 id="in-clause">IN Clause<a class="headerlink" href="#in-clause" title="Permanent link">&para;</a></h4>
 <div class="codehilite"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;criteria&quot;</span><span class="o">:</span> <span class="p">{</span>
-    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
-    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">101</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">102</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mi">103</span><span class="p">}],</span> <span class="c1">//can be in summarized object form as well</span>
-    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">101</span><span class="p">,</span><span class="mf">102</span><span class="p">,</span><span class="mf">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
+    <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">[{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mf">101</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mf">102</span><span class="p">},{</span><span class="s2">&quot;id&quot;</span><span class="o">:</span><span class="mf">103</span><span class="p">}],</span> <span class="c1">//can be in summarized object form as well</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">101</span><span class="p">,</span><span class="mf">102</span><span class="p">,</span><span class="mf">103</span><span class="p">],</span> <span class="cm">/* an array means it will use in/inList */</span>
     <span class="c1">//the 3 above are different ways to do this</span>
-    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">101</span><span class="p">,</span><span class="mf">102</span><span class="p">,</span><span class="mf">103</span><span class="p">]},</span>
     <span class="s2">&quot;customer&quot;</span><span class="o">:</span> <span class="p">{</span>
-      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]}</span>
+      <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">101</span><span class="p">,</span><span class="mf">102</span><span class="p">,</span><span class="mf">103</span><span class="p">]}</span>
     <span class="p">},</span>
 
-    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">102</span><span class="p">,</span><span class="mi">103</span><span class="p">]},</span> <span class="cm">/* an array means it will use `not { in/inList }`*/</span>
+    <span class="s2">&quot;customer.id&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$nin&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">101</span><span class="p">,</span><span class="mf">102</span><span class="p">,</span><span class="mf">103</span><span class="p">]},</span> <span class="cm">/* an array means it will use `not { in/inList }`*/</span>
   <span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 
 <h4 id="fields-comparison-examples">Fields Comparison Examples<a class="headerlink" href="#fields-comparison-examples" title="Permanent link">&para;</a></h4>
-<div class="codehilite"><pre><span></span>  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ne&quot;</span><span class="o">:</span> <span class="mi">50</span><span class="p">},</span> <span class="cm">/*not equal*/</span>
-  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mi">100</span><span class="p">},</span> <span class="cm">/* greater than value */</span>
-  <span class="s2">&quot;amount.$gt&quot;</span><span class="o">:</span> <span class="mi">100</span> <span class="cm">/* another form of the above one, can be useful when json is build, for example from angular model, where  you can&#39;t right in object form*/</span>
-  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ge&quot;</span><span class="o">:</span> <span class="mi">100</span><span class="p">},</span> <span class="cm">/* greater or equal than value */</span>
+<div class="codehilite"><pre><span></span>  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ne&quot;</span><span class="o">:</span> <span class="mf">50</span><span class="p">},</span> <span class="cm">/*not equal*/</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$gt&quot;</span><span class="o">:</span> <span class="mf">100</span><span class="p">},</span> <span class="cm">/* greater than value */</span>
+  <span class="s2">&quot;amount.$gt&quot;</span><span class="o">:</span> <span class="mf">100</span> <span class="cm">/* another form of the above one, can be useful when json is build, for example from angular model, where  you can&#39;t right in object form*/</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$ge&quot;</span><span class="o">:</span> <span class="mf">100</span><span class="p">},</span> <span class="cm">/* greater or equal than value */</span>
 
   <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="s2">&quot;$origAmount&quot;</span><span class="p">},</span> <span class="cm">/* less than value of another field*/</span>
   <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$le&quot;</span><span class="o">:</span> <span class="s2">&quot;$origAmount&quot;</span><span class="p">},</span> <span class="cm">/* less or equal than value */</span>
@@ -1213,7 +1213,7 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
     <span class="s2">&quot;$ne&quot;</span><span class="o">:</span> <span class="mf">9.99</span>
   <span class="p">},</span>
 
-  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$between&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">]},</span> <span class="cm">/* between value */</span>
+  <span class="s2">&quot;amount&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$between&quot;</span><span class="o">:</span> <span class="p">[</span><span class="mf">0</span><span class="p">,</span><span class="mf">100</span><span class="p">]},</span> <span class="cm">/* between value */</span>
 
   <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="s2">&quot;$isNull&quot;</span> <span class="cm">/* translates to isNull*/</span>
   <span class="s2">&quot;status&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$isNull&quot;</span><span class="o">:</span> <span class="kc">true</span><span class="p">},</span> <span class="cm">/* translates to isNull*/</span>
@@ -1246,14 +1246,14 @@ Assume we are running these on star trek characters <a href="http://stapi.co/api
       <span class="p">{</span> <span class="c1">// the and is default and optional and this accomplishes the same thing as example sbelow</span>
         <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Mark&quot;</span><span class="p">,</span>
         <span class="s2">&quot;$or&quot;</span><span class="o">:</span> <span class="p">{</span>
-          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mi">10</span><span class="p">},</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mf">10</span><span class="p">},</span>
           <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="s2">&quot;$isNull&quot;</span>
         <span class="p">}</span>
       <span class="p">},</span>
       <span class="p">{</span>
         <span class="s2">&quot;$and&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="c1">//the and can be explicitly specified too if you wish</span>
           <span class="s2">&quot;customer.name&quot;</span><span class="o">:</span> <span class="s2">&quot;Jim&quot;</span><span class="p">,</span>
-          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mi">15</span><span class="p">}</span>
+          <span class="s2">&quot;customer.sales&quot;</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;$lt&quot;</span><span class="o">:</span> <span class="mf">15</span><span class="p">}</span>
         <span class="p">}</span>
       <span class="p">},</span>
     <span class="p">],</span> <span class="cm">/* this would end up generating</span>
@@ -1321,7 +1321,7 @@ which contains implementation for two query methods:</p>
     <span class="o">}</span>
 </pre></div>
 see docs for <a href="http://gorm.grails.org/latest/hibernate/manual/index.html#detachedCriteria">DetachedCriteria</a></p>
-<p><div class="codehilite"><pre><span></span> <span class="n">List</span> <span class="nf">queryList</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">){</span>
+<p><div class="codehilite"><pre><span></span> <span class="n">List</span> <span class="n">queryList</span><span class="o">(</span><span class="n">Map</span> <span class="n">params</span><span class="o">=[:],</span> <span class="n">Closure</span> <span class="n">closure</span><span class="o">=</span><span class="kc">null</span><span class="o">){</span>
          <span class="n">mangoQuery</span><span class="o">.</span><span class="na">queryList</span><span class="o">(</span><span class="n">getDomainClass</span><span class="o">(),</span> <span class="n">params</span><span class="o">,</span> <span class="n">closure</span><span class="o">)</span>
      <span class="o">}</span>
 </pre></div>

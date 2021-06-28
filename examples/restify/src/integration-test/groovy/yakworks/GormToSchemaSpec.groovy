@@ -118,7 +118,7 @@ class GormToSchemaSpec extends Specification {
         def props = schema['properties']
         props != null
         //props.size() == 20 //14 props, + 6 id/version/createBy/date/editedBy/date
-        props.size() == 16 //15 props, + 2 id/version  when audit is turned off
+        props.size() == 14 //no id/ver and audit is turned off
 
     }
 

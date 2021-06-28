@@ -2,19 +2,19 @@
 # --------------------------------------------
 # main bash build script for CI, dev and releasing. make calls this too.
 # --------------------------------------------
-
 set -e
 # if build/bin does not exists then clone the bin scripts
-[ ! -e build/bin ] && git clone https://github.com/yakworks/bin.git build/bin --single-branch --depth 1;
+[ ! -e build/bin ] && git clone https://github.com/yakworks/bin.git build/bin  -b 2.0.x # --single-branch --depth 1
 # user.env overrides for local dev, not to be checked in
 [[ -f user.env ]] && source user.env
-# import build_functions.sh which has the the other source imports for functions
+# all.sh consolidates most of the helpful scripts from bin
 source build/bin/all.sh
 
 # default init from yml file
 init_from_build_yml "gradle/build.yml"
 # echo "PROJECT_NAME $PROJECT_NAME"
 
+GRADLE_PROJECTS="gorm-tools gorm-tools-rest gorm-tools-security rally-domain examples/restify examples/testify"
 # cats key files into a cache-checksum.tmp file for circle to use as key
 # change this based on how project is structured
 function catKeyFiles {
@@ -34,6 +34,16 @@ function compile {
 function check {
   #./gradlew check --max-workers=2
   ./gradlew check
+  copyTestResults
+}
+
+function copyTestResults {
+  for proj in $GRADLE_PROJECTS; do
+    mkdir -p build/test-results/$proj
+    mkdir -p build/test-reports/$proj
+    cp -r $proj/build/test-results/ build/test-results/$proj
+    cp -r $proj/build/reports/ build/test-reports/$proj
+  done
 }
 
 # helper/debug function ex: `build.sh logVars test sqlserver`

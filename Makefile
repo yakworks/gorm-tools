@@ -2,7 +2,10 @@ SHELL := /bin/bash
 MAKEFLAGS += -rR
 # -- bin and sh scripts --
 build.sh := ./build.sh
-DB_VENDOR := h2
+bin_dir := ./build/bin
+kube.sh := ${bin_dir}/kubernetes
+gw := ./gradlew
+
 # call it first to git clone the build/bn
 shResults := $(shell $(build.sh))
 # include boilerplate to set BUILD_ENV and DB from targets
@@ -12,8 +15,9 @@ shResults := $(shell $(build.sh) makeEnvFile $(BUILD_ENV) $(DB_VENDOR) $(USE_BUI
 # import/sinclude the variables file to make it availiable to make as well
 sinclude ./build/make/$(BUILD_ENV)_$(DB_VENDOR).env
 # include common makefile templates
-include ./build/bin/Makefile-docker.make
+include ./build/bin/Makefile-docker-db.make
 include ./build/bin/Makefile-gradle.make
+include ./build/bin/Makefile-kube.make
 include ./build/bin/Makefile-help.make
 
 # $(info shResults $(shResults)) # logs out the bash echo from shResults

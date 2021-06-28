@@ -33,35 +33,35 @@ jobs:
           command: ./build.sh ciPublishLib
 
       - store_test_results:
-          path: gorm-tools/build/test-results/
+          path: build/test-results/
       - store_artifacts:
-          path: gorm-tools/build/reports/
-          destination: gorm-tools
-      - store_test_results:
-          path: gorm-tools-rest/build/test-results/
-      - store_artifacts:
-          path: gorm-tools-rest/build/reports/
-          destination: gorm-tools
-      - store_test_results:
-          path: gorm-tools-security/build/test-results/
-      - store_artifacts:
-          path: gorm-tools-security/build/reports/
-          destination: gorm-tools-security
-      - store_test_results:
-          path: rally-domain/build/test-results/
-      - store_artifacts:
-          path: rally-domain/build/reports/
-          destination: rally-domain
-      - store_test_results:
-          path: examples/testify/build/test-results/
-      - store_artifacts:
-          path: examples/testify/build/reports/
-          destination: testify
-      - store_test_results:
-          path: examples/restify/build/test-results/
-      - store_artifacts:
-          path: examples/restify/build/reports/
-          destination: restify
+          path: build/test-reports/
+          destination: /
+#      - store_test_results:
+#          path: gorm-tools-rest/build/test-results/
+#      - store_artifacts:
+#          path: gorm-tools-rest/build/reports/
+#          destination: gorm-tools
+#      - store_test_results:
+#          path: gorm-tools-security/build/test-results/
+#      - store_artifacts:
+#          path: gorm-tools-security/build/reports/
+#          destination: gorm-tools-security
+#      - store_test_results:
+#          path: rally-domain/build/test-results/
+#      - store_artifacts:
+#          path: rally-domain/build/reports/
+#          destination: rally-domain
+#      - store_test_results:
+#          path: examples/testify/build/test-results/
+#      - store_artifacts:
+#          path: examples/testify/build/reports/
+#          destination: testify
+#      - store_test_results:
+#          path: examples/restify/build/test-results/
+#      - store_artifacts:
+#          path: examples/restify/build/reports/
+#          destination: restify
   docs:
     docker:
       - image: yakworks/docmark

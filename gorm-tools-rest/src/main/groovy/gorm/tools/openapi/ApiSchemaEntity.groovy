@@ -73,6 +73,7 @@ class ApiSchemaEntity {
 
         //Map cols = mapping.columns
         schema.title = simpleEntityName
+        schema['x-entity'] = simpleEntityName
 
         if (mapping?.comment) schema.description = mapping.comment
         schema.type = OBJECT

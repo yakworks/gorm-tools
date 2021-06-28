@@ -92,12 +92,17 @@ class ApiSchemaEntity {
         //def sortedProps = propsMap.sort()
         def p = [:]
         p.putAll(propsMap.sort())
-        p.putAll(idVerMap)
+        //FIXME be smarter about this
+        if(kind == CruType.Read){
+            p.putAll(idVerMap)
+        }
+
         // dont put audit stamp in for now as it just creates more noise
         // p.putAll(auditStamp)
 
+        if(p.required) schema.required = p.remove('required') as List
+
         schema['properties'] = p
-        if(propsMap.required) schema.required = propsMap.required
 
         return schema
     }
@@ -162,6 +167,7 @@ class ApiSchemaEntity {
             if(apiProp.remove('required')) required.add(propName)
             propsMap[propName] = apiProp
         }
+        if(required) propsMap.required = required
         return propsMap
     }
 

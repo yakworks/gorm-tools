@@ -97,7 +97,7 @@ class ApiSchemaEntity {
         // p.putAll(auditStamp)
 
         schema['properties'] = p
-        //schema.required = propMap.required
+        if(propsMap.required) schema.required = propsMap.required
 
         return schema
     }
@@ -108,6 +108,7 @@ class ApiSchemaEntity {
         //println "----- ${perEntity.name} getDomainProperties ----"
         //String domainName = NameUtils.getPropertyNameRepresentation(perEntity.name)
         Map<String, ?> propsMap = [:]
+        def required  = []
 
         List<String> constrainedPropsNames = getConstraintedNames(constrainedProperties)
 
@@ -134,6 +135,7 @@ class ApiSchemaEntity {
                 basicType(apiProp, constrainedProperty)
             }
             apiProp.remove('allowed')
+            if(apiProp.remove('required')) required.add(prop.name)
             propsMap[prop.name] = apiProp
         }
 
@@ -157,6 +159,7 @@ class ApiSchemaEntity {
                 basicType(apiProp, constrainedProp)
             }
             apiProp.remove('allowed') //remove allowed so it doesn't get added to the json output
+            if(apiProp.remove('required')) required.add(propName)
             propsMap[propName] = apiProp
         }
         return propsMap
@@ -232,7 +235,7 @@ class ApiSchemaEntity {
 
         defaultFromConstraint(jprop, constrainedProp)
 
-        //if(isRequired(jprop, constrainedProp)) jprop.required = true //required.add(prop.name)
+        if(isRequired(jprop, constrainedProp)) jprop.required = true //required.add(prop.name)
         //alowed methods default to all true
         Map allowed = [read: true, create: true, update: true]
         if (constrainedProp.editable == false){

@@ -34,7 +34,6 @@ function compile {
 function check {
   #./gradlew check --max-workers=2
   ./gradlew check
-  copyTestResults
 }
 
 function copyTestResults {

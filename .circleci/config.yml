@@ -29,6 +29,11 @@ jobs:
           command: ./build.sh check
 
       - run:
+          name: merge test results
+          when: always
+          command: ./build.sh copyTestResults
+
+      - run:
           name: ✔︎ -- Publish plugin if on releasable branch
           command: ./build.sh ciPublishLib
 

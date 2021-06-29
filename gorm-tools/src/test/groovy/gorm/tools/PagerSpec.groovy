@@ -28,7 +28,7 @@ class PagerSpec extends GormToolsHibernateSpec {
         Pager pager = new Pager()
 
         then: 'defaults should be as follows'
-        pager.max == 21
+        pager.max == 20
         pager.page == 1
         pager.recordCount == 0
         pager.data == null

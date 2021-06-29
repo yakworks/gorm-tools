@@ -4,7 +4,7 @@
 # --------------------------------------------
 set -e
 # if build/bin does not exists then clone the bin scripts
-[ ! -e build/bin ] && git clone https://github.com/yakworks/bin.git build/bin  -b 2.0.x # --single-branch --depth 1
+[ ! -e build/bin ] && git clone https://github.com/yakworks/bin.git build/bin  -b 2.1 # --single-branch --depth 1
 # user.env overrides for local dev, not to be checked in
 [[ -f user.env ]] && source user.env
 # all.sh consolidates most of the helpful scripts from bin
@@ -15,48 +15,7 @@ init_from_build_yml "gradle/build.yml"
 # echo "PROJECT_NAME $PROJECT_NAME"
 
 # list of projects used to spin through, build the checksum and consolidate the test reports for circle
-GRADLE_PROJECTS="gorm-tools gorm-tools-rest gorm-tools-security rally-domain examples/restify examples/testify"
-
-# cats key files into a cache-checksum.tmp file for circle to use as key
-# change this based on how project is structured
-function catKeyFiles {
-  cat gradle.properties build.gradle > cache-checksum.tmp
-  for proj in $GRADLE_PROJECTS; do
-    cat $proj/build.gradle >> cache-checksum.tmp
-  done
-}
-
-# compile used for circle
-function compile {
-  # Downloads Dependencies
-  ./gradlew resolveConfigurations --no-daemon
-  ./gradlew classes --no-daemon
-#  ./gradlew testClasses
-#  ./gradlew integrationTestClasses
-}
-
-# check used for circle
-function check {
-  #./gradlew check --max-workers=2
-  ./gradlew check
-}
-
-function copyTestResults {
-  for proj in $GRADLE_PROJECTS; do
-    mkdir -p build/test-results/$proj
-    mkdir -p build/test-reports/$proj
-    cp -r $proj/build/test-results/ build/test-results/$proj || true
-    cp -r $proj/build/reports/. build/test-reports/$proj || true
-  done
-}
-
-# helper/debug function ex: `build.sh logVars test sqlserver`
-function logVars {
-  # initEnv ${1:-dev} ${2:-mysql}
-  for varName in $BUILD_VARS; do
-    echo "$varName = ${!varName}"
-  done
-}
+setVar GRADLE_PROJECTS "gorm-tools gorm-tools-rest gorm-tools-security rally-domain examples/restify examples/testify"
 
 # --- boiler plate function runner, stay at end of file ------
 if declare -f "$1" > /dev/null; then

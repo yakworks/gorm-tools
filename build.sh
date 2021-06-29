@@ -14,11 +14,16 @@ source build/bin/all.sh
 init_from_build_yml "gradle/build.yml"
 # echo "PROJECT_NAME $PROJECT_NAME"
 
+# list of projects used to spin through, build the checksum and consolidate the test reports for circle
 GRADLE_PROJECTS="gorm-tools gorm-tools-rest gorm-tools-security rally-domain examples/restify examples/testify"
+
 # cats key files into a cache-checksum.tmp file for circle to use as key
 # change this based on how project is structured
 function catKeyFiles {
-  cat gradle.properties build.gradle gorm-tools/build.gradle gorm-tools-rest/build.gradle gorm-tools-security/build.gradle rally-domain/build.gradle examples/restify/build.gradle examples/testify/build.gradle > cache-checksum.tmp
+  cat gradle.properties build.gradle > cache-checksum.tmp
+  for proj in $GRADLE_PROJECTS; do
+    cat $proj/build.gradle >> cache-checksum.tmp
+  done
 }
 
 # compile used for circle
@@ -40,8 +45,8 @@ function copyTestResults {
   for proj in $GRADLE_PROJECTS; do
     mkdir -p build/test-results/$proj
     mkdir -p build/test-reports/$proj
-    cp -r $proj/build/test-results/ build/test-results/$proj
-    cp -r $proj/build/reports/ build/test-reports/$proj
+    cp -r $proj/build/test-results/ build/test-results/$proj || true
+    cp -r $proj/build/reports/. build/test-reports/$proj || true
   done
 }
 

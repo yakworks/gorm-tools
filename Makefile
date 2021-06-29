@@ -7,11 +7,11 @@ circle := $(BINDIR)/circle
 gw := ./gradlew
 
 # call it first to git clone the build/bn
-shResults := $(shell $(build.sh))
+shResults := $(shell ./build.sh)
 # include boilerplate to set BUILD_ENV and DB from targets
 include $(BINDIR)/Makefile-env-db.make
 # calls the build.sh makeEnvFile to build the vairables file for make, recreates each make run
-shResults := $(shell $(build.sh) makeEnvFile $(BUILD_ENV) $(DB_VENDOR) $(USE_BUILDER))
+shResults := $(shell ./build.sh makeEnvFile $(BUILD_ENV) $(DB_VENDOR) $(USE_BUILDER))
 # import/sinclude the variables file to make it availiable to make as well
 sinclude ./build/make/$(BUILD_ENV)_$(DB_VENDOR).env
 # include common makefile templates
@@ -23,9 +23,6 @@ include $(BINDIR)/Makefile-help.make
 # $(info shResults $(shResults)) # logs out the bash echo from shResults
 # $(info DBMS=$(DBMS) BUILD_ENV=$(BUILD_ENV) DOCK_BUILDER_NAME=$(DOCK_BUILDER_NAME) DOCK_DB_BUILD_NAME=$(DOCK_DB_BUILD_NAME) DockerExec=$(DockerExec) DockerDbExec=$(DockerDbExec))
 # SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-# $(info SELF_DIR=$(SELF_DIR))
-
-$(info SELF_DIR=$(SELF_DIR))
 # $(info SELF_DIR=$(SELF_DIR))
 
 # --- Targets/Goals -----

@@ -5,63 +5,40 @@ jobs:
     docker:
       - image: yakworks/alpine-jdk:builder8
     resource_class: 'medium+'
+
     steps:
       - checkout
       - compare-url/reconstruct
-      - run: &gradle-cache-key ./build.sh catKeyFiles
-      - restore_cache: &gradle-cache-restore
-          key: gradle-{{ checksum "cache-checksum.tmp" }}
+      - run: make cache-key-file
+      - restore_cache:
+          key: gradle-{{ checksum "cache-key.tmp" }}
 
-      - run:
-          name: ✔︎ Dependencies and Compile
-          command: ./gradlew resolveConfigurations --no-daemon
+      - run: make resolve-dependencies
 
       - save_cache:
           paths: [ "~/.m2", "~/.gradle" ]
-          key: gradle-{{ checksum "cache-checksum.tmp" }}
+          key: gradle-{{ checksum "cache-key.tmp" }}
 
       - run:
-          name: ✔︎ Dependencies and Compile
-          command: ./gradlew check
+          name: ✔︎ -- Test
+          command: make check
 
+      # merge test results to store in circle
       - run:
-          name: ✔︎ -- Checks Full Run Tests [gradle check]
-          command: ./build.sh check
+          name: ✔︎ -- Merge Test Results
+          when: always
+          command: make merge-test-results
 
       - run:
           name: ✔︎ -- Publish plugin if on releasable branch
-          command: ./build.sh ciPublishLib
+          command: make ci-publish-lib
 
       - store_test_results:
-          path: gorm-tools/build/test-results/
+          path: build/test-results/
       - store_artifacts:
-          path: gorm-tools/build/reports/
-          destination: gorm-tools
-      - store_test_results:
-          path: gorm-tools-rest/build/test-results/
-      - store_artifacts:
-          path: gorm-tools-rest/build/reports/
-          destination: gorm-tools
-      - store_test_results:
-          path: gorm-tools-security/build/test-results/
-      - store_artifacts:
-          path: gorm-tools-security/build/reports/
-          destination: gorm-tools-security
-      - store_test_results:
-          path: rally-domain/build/test-results/
-      - store_artifacts:
-          path: rally-domain/build/reports/
-          destination: rally-domain
-      - store_test_results:
-          path: examples/testify/build/test-results/
-      - store_artifacts:
-          path: examples/testify/build/reports/
-          destination: testify
-      - store_test_results:
-          path: examples/restify/build/test-results/
-      - store_artifacts:
-          path: examples/restify/build/reports/
-          destination: restify
+          path: build/test-reports/
+          destination: /
+
   docs:
     docker:
       - image: yakworks/docmark
@@ -70,7 +47,7 @@ jobs:
       - restore_cache: # prior Build job run
           key: build-{{ .Branch }}-{{ .Revision }}
       - compare-url/reconstruct
-      - run: ./build.sh ciPublishDocs
+      - run: make ci-publish-docs
 
 orbs:
   compare-url: iynere/compare-url@1.2.0

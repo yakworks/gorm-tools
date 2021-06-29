@@ -1,7 +1,6 @@
 SHELL := /bin/bash
 MAKEFLAGS += -rR
 # -- bin and sh scripts variables --
-build.sh := ./build.sh
 BINDIR := ./build/bin
 kube.sh := $(BINDIR)/kubernetes
 circle := $(BINDIR)/circle
@@ -52,7 +51,11 @@ merge-test-results:
 ci-publish-lib:
 	./build.sh ci-publish-lib
 
-# --- Misc -----
+# publish the lib and release files
+ci-publish-docs:
+	./build.sh ci-publish-docs
+
+# --- helpers -----
 dockmark-serve: ## run the docs server locally
 	./build.sh dockmark-serve
 

@@ -37,8 +37,9 @@ ifdef RELEASABLE_BRANCH
  publish-docs:
 	@if [ ! "$(IS_SNAPSHOT)" ]; then \
 		echo "not a snapshot, publishing docs"; \
-		$(MAKE) docmark-publish-prep; \
-		$(MAKE) git-push-pages; \
+		$(MAKE) docmark-publish; \
+	else \
+		echo "IS_SNAPSHOT ... NOT publishing docs "; \
 	fi;
 
 endif # end RELEASABLE_BRANCH

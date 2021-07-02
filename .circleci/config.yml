@@ -49,7 +49,7 @@ jobs:
       - restore_cache: # prior Build job run
           key: build-{{ .Branch }}-{{ .Revision }}
       - compare-url/reconstruct
-      - run: make publish-docmark
+      - run: make publish-docs
 
 orbs:
   compare-url: iynere/compare-url@1.2.0

@@ -31,7 +31,6 @@ jobs:
 
       # call orb that creates the CIRCLE_COMPARE_URL.txt
       - compare-url/reconstruct
-
       - run:
           name: ✔︎ -- Publish plugin if on releasable branch
           command: make publish-release

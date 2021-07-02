@@ -11,11 +11,13 @@ include $(BUILD_BIN)/make/docmark.make
 
 .PHONY: publish-release publish-lib
 
-## runs the full release publish
+# empty targets so make doesn't blow up when not a RELEASABLE_BRANCH
+# runs the full release publish
 publish-release:
-
-## publish the library jar, gradle publish if a gradle project
+# publish the library jar, gradle publish if a gradle project
 publish-lib:
+# publishes docs
+publish-docs:
 
 # NOT_SNAPSHOT := $(if $(IS_SNAPSHOT),,true)
 # ifneq (,$(and $(RELEASABLE_BRANCH),$(NOT_SNAPSHOT)))
@@ -38,20 +40,6 @@ ifdef RELEASABLE_BRANCH
 		$(MAKE) docmark-publish-prep; \
 		$(MAKE) git-push-pages; \
 	fi;
-
-	@if [ "$(IS_SNAPSHOT)" ]; then echo "pushing SNAPSHOT docs"; else echo "pushing release docs"; fi
-	@ # $(MAKE) docmark-publish-prep
-
-endif # end RELEASABLE_BRANCH
-
-NOT_SNAPSHOT := $(if $(IS_SNAPSHOT),,true)
-# $(info NOT_SNAPSHOT $(NOT_SNAPSHOT))
-# for now, only publish is its NOT as snapshot and its is releasable
-ifneq (,$(and $(RELEASABLE_BRANCH),$(NOT_SNAPSHOT)))
-
-docmark-git-push:
-	@if [ "$(IS_SNAPSHOT)" ]; then echo "pushing SNAPSHOT docs"; else echo "pushing release docs"; fi
-	@ # $(MAKE) git-push-pages
 
 endif # end RELEASABLE_BRANCH
 

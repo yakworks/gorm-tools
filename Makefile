@@ -1,61 +1,64 @@
 SHELL := /bin/bash
 MAKEFLAGS += -rR
-# -- bin and sh scripts variables --
-BINDIR := ./build/bin
-kube.sh := $(BINDIR)/kubernetes
-circle := $(BINDIR)/circle
-gw := ./gradlew
+build.sh := ./build.sh
+# DB = true
+shResults := $(shell $(build.sh)) # call build.sh first without args which will git clone scripts to build/bin
+include ./build/bin/Makefile-core.make # core includes
+# include the helper makefiles for project
+include $(BUILD_BIN)/make/gradle.make
+include $(BUILD_BIN)/make/docker.make
+include $(BUILD_BIN)/make/docmark.make
 
-# call it first to git clone the build/bn
-shResults := $(shell ./build.sh)
-# include boilerplate to set BUILD_ENV and DB from targets
-include $(BINDIR)/Makefile-env-db.make
-# calls the build.sh makeEnvFile to build the vairables file for make, recreates each make run
-shResults := $(shell ./build.sh makeEnvFile $(BUILD_ENV) $(DB_VENDOR) $(USE_BUILDER))
-# import/sinclude the variables file to make it availiable to make as well
-sinclude ./build/make/$(BUILD_ENV)_$(DB_VENDOR).env
-# include common makefile templates
-include $(BINDIR)/Makefile-docker.make
-# include $(BINDIR)/Makefile-gradle.make
-# include $(BINDIR)/Makefile-kube.make
-include $(BINDIR)/Makefile-help.make
+.PHONY: publish-release publish-lib
+
+## runs the full release publish
+publish-release:
+
+## publish the library jar, gradle publish if a gradle project
+publish-lib:
+
+# NOT_SNAPSHOT := $(if $(IS_SNAPSHOT),,true)
+# ifneq (,$(and $(RELEASABLE_BRANCH),$(NOT_SNAPSHOT)))
+
+ifdef RELEASABLE_BRANCH
+
+ publish-lib:
+	@if [ "$(IS_SNAPSHOT)" ]; then echo "publishing SNAPSHOT"; else echo "publishing release"; fi
+	./gradlew publish
+
+ publish-release: publish-lib
+	@if [ ! "$(IS_SNAPSHOT)" ]; then \
+		echo "not a snapshot ... doing a full release and version bump"; \
+		$(build.sh) releaseFiles $(RELEASABLE_BRANCH); \
+	fi;
+
+ publish-docs:
+	@if [ ! "$(IS_SNAPSHOT)" ]; then \
+		echo "not a snapshot, publishing docs"; \
+		$(MAKE) docmark-publish-prep; \
+		$(MAKE) git-push-pages; \
+	fi;
+
+	@if [ "$(IS_SNAPSHOT)" ]; then echo "pushing SNAPSHOT docs"; else echo "pushing release docs"; fi
+	@ # $(MAKE) docmark-publish-prep
+
+endif # end RELEASABLE_BRANCH
+
+NOT_SNAPSHOT := $(if $(IS_SNAPSHOT),,true)
+# $(info NOT_SNAPSHOT $(NOT_SNAPSHOT))
+# for now, only publish is its NOT as snapshot and its is releasable
+ifneq (,$(and $(RELEASABLE_BRANCH),$(NOT_SNAPSHOT)))
+
+docmark-git-push:
+	@if [ "$(IS_SNAPSHOT)" ]; then echo "pushing SNAPSHOT docs"; else echo "pushing release docs"; fi
+	@ # $(MAKE) git-push-pages
+
+endif # end RELEASABLE_BRANCH
 
 # $(info shResults $(shResults)) # logs out the bash echo from shResults
-# $(info DBMS=$(DBMS) BUILD_ENV=$(BUILD_ENV) DOCK_BUILDER_NAME=$(DOCK_BUILDER_NAME) DOCK_DB_BUILD_NAME=$(DOCK_DB_BUILD_NAME) DockerExec=$(DockerExec) DockerDbExec=$(DockerDbExec))
-# SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-# $(info SELF_DIR=$(SELF_DIR))
 
-# --- Targets/Goals -----
-# if not arguments ar provided then show help
-.DEFAULT_GOAL := help
-
-# --- Circle builds-----
-cache-key-file: ## generates the cache-key.tmp for circle to checksum
-	$(circle) cache-key-file "$(GRADLE_PROJECTS)"
-
-## calls ./gradlew resolveConfigurations to download gradle deps
-resolve-dependencies:
-	./gradlew resolveConfigurations --no-daemon
-
-check: ## call ./gradlew check to do a full lint and test
-	./gradlew check
-
-# merges test results in one spot to store in ci build
-merge-test-results:
-	$(circle) merge-test-results "$(GRADLE_PROJECTS)"
-
-# publish the lib and release files
-ci-publish-lib:
-	./build.sh ci-publish-lib
-
-# publish the lib and release files
-ci-publish-docs:
-	./build.sh ci-publish-docs
-
-# --- helpers -----
-dockmark-serve: ## run the docs server locally
-	./build.sh dockmark-serve
-
-show-compile-dependencies: ## shows gorm-tools:dependencies --configuration compile
+## shows gorm-tools:dependencies --configuration compile
+show-compile-dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
 	./gradlew gorm-tools:dependencies --configuration compile
+

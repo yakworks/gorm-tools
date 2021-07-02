@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - checkout
-      - compare-url/reconstruct
+
       - run: make cache-key-file
       - restore_cache:
           key: gradle-{{ checksum "cache-key.tmp" }}
@@ -29,9 +29,11 @@ jobs:
           when: always
           command: make merge-test-results
 
+      # call orb that creates the CIRCLE_COMPARE_URL.txt
+      - compare-url/reconstruct
       - run:
           name: ✔︎ -- Publish plugin if on releasable branch
-          command: make ci-publish-lib
+          command: make publish-release
 
       - store_test_results:
           path: build/test-results/
@@ -47,7 +49,7 @@ jobs:
       - restore_cache: # prior Build job run
           key: build-{{ .Branch }}-{{ .Revision }}
       - compare-url/reconstruct
-      - run: make ci-publish-docs
+      - run: make publish-docmark
 
 orbs:
   compare-url: iynere/compare-url@1.2.0

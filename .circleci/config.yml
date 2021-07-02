@@ -34,7 +34,7 @@ jobs:
 
       - run:
           name: ✔︎ -- Publish plugin if on releasable branch
-          command: make ci-publish-lib
+          command: make publish-release
 
       - store_test_results:
           path: build/test-results/
@@ -50,7 +50,7 @@ jobs:
       - restore_cache: # prior Build job run
           key: build-{{ .Branch }}-{{ .Revision }}
       - compare-url/reconstruct
-      - run: make ci-publish-docs
+      - run: make publish-docmark
 
 orbs:
   compare-url: iynere/compare-url@1.2.0

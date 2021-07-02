@@ -31,7 +31,7 @@ ifdef RELEASABLE_BRANCH
  publish-release: publish-lib
 	@if [ ! "$(IS_SNAPSHOT)" ]; then \
 		echo "not a snapshot ... doing a full release and version bump"; \
-		$(build.sh) releaseFiles $(RELEASABLE_BRANCH); \
+		$(MAKE) release-it; \
 	fi;
 
  publish-docs:

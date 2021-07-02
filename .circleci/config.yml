@@ -32,13 +32,13 @@ jobs:
       # call orb that creates the CIRCLE_COMPARE_URL.txt
       - compare-url/reconstruct
       - run:
-          name: ✔︎ -- Publish plugin if on releasable branch
+          name: ✔︎ -- Publish lib if on releasable branch
           command: make publish-release
 
       - store_test_results:
           path: build/test-results/
       - store_artifacts:
-          path: build/test-reports/
+          path: build/reports/
           destination: /
 
   docs:

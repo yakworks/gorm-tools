@@ -21,12 +21,12 @@ setVar GRADLE_PROJECTS "gorm-tools gorm-tools-rest gorm-tools-security rally-dom
 
 # function is called after initEnv is run
 # put variables here that depend on the initEnv
-postInitEnv(){
+post_init_env(){
   setVar FOO BAR
 }
 
 # initialize environment for dev by default, keep at end before function runs
-initEnv dev
+init_env dev
 
 # --- boiler plate function runner, keep at end of file ------
 if declare -f "$1" > /dev/null; then

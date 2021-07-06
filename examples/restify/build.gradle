@@ -16,7 +16,7 @@ buildscript {
 // apply plugin:"war"
 // apply plugin:'yakworks.grails-web'
 apply plugin:"groovy"
-apply plugin:"war"
+//apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
 
@@ -80,3 +80,6 @@ bootRun {
   String springProfilesActive = 'spring.profiles.active'
   systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
+
+bootJar.enabled = true
+//bootJar.archiveFileName = 'restify-api.jar'

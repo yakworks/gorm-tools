@@ -32,17 +32,17 @@ dependencies {
 //   exclude('yakworks/rally/orgs/model/Org$*.class') //also the closure ones
 //
 
-sourceSets.main.resources.srcDirs += "src/main/groovy"
+// sourceSets.main.resources.srcDirs += "src/main/groovy"
 
-task printSourceSetInformation(){
-  doLast{
-    println "["+sourceSets.main.name+"]"
-    println "${sourceSets.main.resources.srcDirs}"
-    // sourceSets.each { srcSet ->
-    //   println "["+srcSet.name+"]"
-    //   print "-->Source directories: "+srcSet.allResources.srcDirs+"\n"
-    //   print "-->Output directories: "+srcSet.output.classesDirs.files+"\n"
-    //   println ""
-    // }
-  }
-}
+// task printSourceSetInformation(){
+//   doLast{
+//     println "["+sourceSets.main.name+"]"
+//     println "${sourceSets.main.resources.srcDirs}"
+//     // sourceSets.each { srcSet ->
+//     //   println "["+srcSet.name+"]"
+//     //   print "-->Source directories: "+srcSet.allResources.srcDirs+"\n"
+//     //   print "-->Output directories: "+srcSet.output.classesDirs.files+"\n"
+//     //   println ""
+//     // }
+//   }
+// }

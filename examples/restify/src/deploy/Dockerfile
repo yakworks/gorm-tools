@@ -36,6 +36,7 @@ EXPOSE 8080
 # COPY build/libs/*.jar app.jar
 # ENTRYPOINT ["java","-Dloader.path=/extData/conf/", "-jar","/app.jar"]
 
+
 # ARG LIB_DIR=build/libs
 ARG LIB_DIR=.
 ARG APP_JAR_DIR=/app/jar

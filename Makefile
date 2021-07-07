@@ -5,68 +5,38 @@ build.sh := ./build.sh
 shResults := $(shell $(build.sh)) # call build.sh first without args which will git clone scripts to build/bin
 include ./build/bin/Makefile-core.make # core includes
 # include the helper makefiles for project
-include $(BUILD_BIN)/make/circle.make
-include $(BUILD_BIN)/make/gradle.make
-include $(BUILD_BIN)/make/docker.make
-include $(BUILD_BIN)/make/spring-docker.make
-include $(BUILD_BIN)/make/docmark.make
+include $(BUILD_BIN)/makefiles/docker.make
+include $(BUILD_BIN)/makefiles/jbuilder-docker.make
+include $(BUILD_BIN)/makefiles/spring-docker.make
+include $(BUILD_BIN)/makefiles/circle.make
+include $(BUILD_BIN)/makefiles/docmark.make
 
-.PHONY: publish-release publish-lib
-
-# empty targets so make doesn't blow up when not a RELEASABLE_BRANCH
-# runs the full release publish
+.PHONY: publish-release
+# runs the full release publish, empty targets so make doesn't blow up when not a RELEASABLE_BRANCH
 publish-release:
-# publish the library jar, gradle publish if a gradle project
-publish-lib:
-# publishes docs
-publish-docs:
-
-# NOT_SNAPSHOT := $(if $(IS_SNAPSHOT),,true)
-# ifneq (,$(and $(RELEASABLE_BRANCH),$(NOT_SNAPSHOT)))
 
 ifdef RELEASABLE_BRANCH
 
- publish-lib:
-	@if [ "$(IS_SNAPSHOT)" ]; then echo "publishing SNAPSHOT"; else echo "publishing release"; fi
-	./gradlew publish
-
- publish-release: publish-lib
+ publish-release: publish-lib | _verify_RELEASABLE_BRANCH
 	@if [ ! "$(IS_SNAPSHOT)" ]; then \
-		echo "not a snapshot ... doing a full release and version bump"; \
-		$(MAKE) release-it; \
-	fi;
-
- publish-docs:
-	@if [ ! "$(IS_SNAPSHOT)" ]; then \
-		echo "not a snapshot, publishing docs"; \
-		$(MAKE) docmark-publish; \
-	else \
-		echo "IS_SNAPSHOT ... NOT publishing docs "; \
+		echo "not a snapshot ... doing version bump, changelog and tag push"; \
+		$(MAKE) release-tag; \
 	fi;
 
 endif # end RELEASABLE_BRANCH
 
-## gradle restify:bootRun
-start:
-	$(gw) restify:bootRun
+# gradle restify:bootRun
+# start:
+# 	$(gw) restify:bootRun
 
 ## run the restify jar
 start-jar:
 	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m \
     	-jar $(APP_JAR)
 
-## starts the docker with the app jar, same docker that is deployed
-start-docker-app: build/docker/built
-	docker run --name=$(APP_NAME) -d \
-    	--memory="3g" --memory-swap="3g" --memory-reservation="2g" \
-    	--network builder-net \
-    	-p 8081:8080 \
-    	-e APP_PROPS="$(APP_PROPS)" \
-    	$(APP_DOCKER_URL)
-
-## stops the docker jar app
-stop-docker-app:
-	$(build.sh) docker_stop $(APP_NAME)
+## sanity checks api, curl -i -G http://localhost:8081/api/rally/org
+curl-sanity-check:
+	curl -i -G http://localhost:8081/api/rally/org
 
 # -- helpers --
 ## shows gorm-tools:dependencies --configuration compile
@@ -74,3 +44,9 @@ show-compile-dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
 	./gradlew gorm-tools:dependencies --configuration compile
 
+run-benchmarks:
+	@ $(gw) benchmarks:assemble
+	@ cd examples/benchmarks; \
+	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m -jar \
+	  -DmultiplyData=3 -Dgpars.poolsize=4 build/libs/benchmarks.war
+	@ # -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap

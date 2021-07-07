@@ -10,7 +10,7 @@ jobs:
       - checkout
 
       - run: make cache-key-file
-      - restore_cache:
+      - restore_cache: &gradle-cache-restore
           key: gradle-{{ checksum "cache-key.tmp" }}
 
       - run: make resolve-dependencies
@@ -40,16 +40,43 @@ jobs:
       - store_artifacts:
           path: build/reports/
           destination: /
-
+      - save_cache:
+          paths: [ ".gradle", "./build", "./commons/build", "./gorm-tools/build", "./gorm-tools-rest/build", "./gorm-tools-security/build", "./rally-domain/build"]
+          key: build-{{ .Branch }}-{{ .Revision }}
   docs:
     docker:
       - image: yakworks/docmark
     steps:
       - checkout
-      - restore_cache: # prior Build job run
+      - restore_cache: &build-cache-restore
           key: build-{{ .Branch }}-{{ .Revision }}
-      - compare-url/reconstruct
       - run: make publish-docs
+
+  publish-restify:
+    docker:
+      - image: yakworks/alpine-jdk:builder8
+    resource_class: 'medium+'
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run: make cache-key-file
+      - restore_cache: *gradle-cache-restore
+      - restore_cache: *build-cache-restore
+
+      # install the docker
+      - run: apk add docker
+
+      # build the jars
+      - run: make build
+
+      - run: docker-app-build
+
+      - run:
+          name: publish docker image
+          command: |
+            make dockerhub-login
+            make docker-app-push
 
 orbs:
   compare-url: iynere/compare-url@1.2.0
@@ -61,7 +88,11 @@ workflows:
           context: bot-context #context with shared ENV vars
       - docs:
           context: bot-context
-          # requires: [build, gorm-tools, gorm-tools-rest, gorm-tools-security, rally-domain, testify]
           requires: [build]
           filters:
             branches: { only: [ master, /release\/.*/ ] }
+      - publish-restify:
+          context: bot-context
+          requires: [build]
+          # filters:
+          #   branches: { only: [ master, /release\/.*/ ] }

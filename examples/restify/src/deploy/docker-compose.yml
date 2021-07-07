@@ -1,0 +1,13 @@
+version: "3.5"
+services:
+  spring_app:
+    container_name: ${APP_NAME}
+    image: ${APP_DOCKER_URL}
+    networks:
+      - docker_network
+    ports:
+      - 8081:8080
+
+networks:
+  docker_network:
+    name: ${APP_NAME}_network

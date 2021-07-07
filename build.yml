@@ -16,7 +16,7 @@ app:
   name: restify
   key: ${APP_NAME}-${VERX_NO_DOTS}
   dir: examples/restify
-  jar: ${APP_DIR}/build/libs/${APP_NAME}-${VERSION}.jar
+  jar: ${APP_DIR}/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
   docker_url: yakworks/gorm-tools:${APP_KEY}
   kub:
     nfs: 10.42.2.176

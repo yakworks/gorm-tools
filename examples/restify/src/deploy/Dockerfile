@@ -1,27 +1,6 @@
-FROM alpine:3.11
-
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+FROM yakworks/alpine-jre:8
 
 USER root
-
-RUN wget --quiet https://cdn.azul.com/public_keys/alpine-signing@azul.com-5d5dc44c.rsa.pub -P /etc/apk/keys/ && \
-    echo "https://repos.azul.com/zulu/alpine" >> /etc/apk/repositories && \
-    apk --no-cache add zulu8-jdk
-
-ENV JAVA_HOME=/usr/lib/jvm/zulu8-ca
-
-# Some stuff from CIRCLECI examples and other
-# 'shadow' allows the group and user adds below to work
-RUN apk add --no-cache git sudo openssh-client parallel \
-    curl bash make \
-    mysql-client && \
-    rm -rf /var/cache/apk/*
-
-# adds in some things needed for java ui and reporting, like fonts
-RUN apk add --no-cache dumb-init xvfb fontconfig ttf-dejavu && \
-    rm -rf /var/cache/apk/*
 
 # keeps the volumes from run to run
 # VOLUME /tmp
@@ -36,14 +15,37 @@ EXPOSE 8080
 # COPY build/libs/*.jar app.jar
 # ENTRYPOINT ["java","-Dloader.path=/extData/conf/", "-jar","/app.jar"]
 
-
 # ARG LIB_DIR=build/libs
 ARG LIB_DIR=.
 ARG APP_JAR_DIR=/app/jar
 
-COPY ${LIB_DIR}/app.jar ${APP_JAR_DIR}/
-
 COPY docker-entrypoint.sh /app/bin/
 COPY utils.sh /app/bin/
+COPY logback.groovy /app/
 
-ENTRYPOINT ["/app/bin/docker-entrypoint.sh"]
+# single jar do this
+# COPY ${LIB_DIR}/app.jar ${APP_JAR_DIR}/
+
+# COPY ${LIB_DIR}/BOOT-INF/lib ${APP_JAR_DIR}/lib
+# COPY ${LIB_DIR}/META-INF ${APP_JAR_DIR}/META-INF
+# COPY ${LIB_DIR}/BOOT-INF/classes ${APP_JAR_DIR}
+
+COPY ${LIB_DIR}/BOOT-INF/lib ${APP_JAR_DIR}/lib
+COPY ${LIB_DIR}/META-INF ${APP_JAR_DIR}/META-INF
+COPY ${LIB_DIR}/BOOT-INF/classes ${APP_JAR_DIR}
+
+# exploded
+# COPY ${LIB_DIR}/BOOT-INF/lib ${APP_JAR_DIR}/BOOT-INF/lib
+# COPY ${LIB_DIR}/org ${APP_JAR_DIR}/org
+# /META-INF has version in it so it wont get changes unless version bumps
+# COPY ${LIB_DIR}/META-INF ${APP_JAR_DIR}/META-INF
+# the default resources for demo
+# COPY ${LIB_DIR}/resources /app/resources
+# the app classes where the bulk of the changes will be, so do this last so the above can be layer cached
+# COPY ${LIB_DIR}/BOOT-INF/classes ${APP_JAR_DIR}/BOOT-INF/classes
+
+# see https://github.com/Yelp/dumb-init for dumb-init
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD ["bash", "-c", "/app/bin/docker-entrypoint.sh"]
+

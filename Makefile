@@ -29,20 +29,16 @@ endif # end RELEASABLE_BRANCH
 # start:
 # 	$(gw) restify:bootRun
 
-## run the restify jar
-start-jar:
-	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m \
-    	-jar $(APP_JAR)
-
-## sanity checks api, curl -i -G http://localhost:8081/api/rally/org
+PORT ?= 8080
+## sanity checks api with curl -i -G http://localhost:8081/api/rally/org, pass PORT=8081 for other than default 8080
 curl-sanity-check:
-	curl -i -G http://localhost:8081/api/rally/org
+	curl -i -G http://localhost:$(PORT)/api/rally/org/1
 
 # -- helpers --
 ## shows gorm-tools:dependencies --configuration compile
-show-compile-dependencies:
+show-dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
-	./gradlew gorm-tools:dependencies --configuration compile
+	./gradlew restify:dependencies --configuration runtime
 
 run-benchmarks:
 	@ $(gw) benchmarks:assemble

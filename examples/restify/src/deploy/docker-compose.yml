@@ -7,6 +7,8 @@ services:
       - docker_network
     ports:
       - 8081:8080
+    # uncomment this to debug into shell without starting the server
+    # command: tail -f /dev/null
 
 networks:
   docker_network:

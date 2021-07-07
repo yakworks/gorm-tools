@@ -1,0 +1,12 @@
+# In .dockerignore
+# Exclude everything:
+#
+*
+
+# Now un-exclude the stuff we want
+!docker-entrypoint.sh
+!logback.groovy
+!org
+!META-INF
+!BOOT-INF
+!utils.sh

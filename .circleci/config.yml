@@ -70,7 +70,7 @@ jobs:
       # build the jars
       - run: make build
 
-      - run: docker-app-build
+      - run: make docker-app-build
 
       - run:
           name: publish docker image

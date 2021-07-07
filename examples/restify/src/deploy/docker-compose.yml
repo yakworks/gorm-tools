@@ -3,10 +3,19 @@ services:
   spring_app:
     container_name: ${APP_NAME}
     image: ${APP_DOCKER_URL}
+    environment:
+      - JAVA_OPTS=-Xmx1024m
+      - | # Multiline APP_PROPS that get merged into spring props
+        APP_PROPS=
+        logging.config=/app/logback.groovy
+        grails.serverURL=https://localhost:8081
+      # to pass through from env variables from local shell just name them
+      # - GIT_KEY
     networks:
       - docker_network
     ports:
       - 8081:8080
+
     # uncomment this to debug into shell without starting the server
     # command: tail -f /dev/null
 

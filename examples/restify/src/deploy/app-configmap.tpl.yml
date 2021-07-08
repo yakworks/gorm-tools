@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ${APP_NAME}-logback
-  namespace: ${KUB_NAMESPACE}
+  name: ${APP_KEY}-cfgmap-logback
+  namespace: ${APP_KUB_NAMESPACE}
   labels:
-    app: ${APP_NAME} # tag with the app:demo10, labels are kind of like tags
+    app: ${APP_KEY} # tag with the app:demo10, labels are kind of like tags
 data:
   logback.groovy: |+
     scan("5 seconds")
-    println "#### using kubernetes ${APP_NAME}-config for logback config"
+    println "#### using kubernetes ${APP_KEY}-cfgmap-logback for logback config"
     appender('STDOUT', ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
             charset = java.nio.charset.Charset.forName('UTF-8')

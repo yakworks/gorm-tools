@@ -16,7 +16,8 @@ services:
     ports:
       - 8081:8080
 
-    # uncomment this to debug into shell without starting the server
+    # hack to keep it open to we can shell into it
+    # uncomment this to debug into shell
     # command: tail -f /dev/null
 
 networks:

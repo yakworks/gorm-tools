@@ -1,34 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${APP_NAME} # a name for the deployment
-  namespace: ${KUB_NAMESPACE}
+  name: ${APP_KEY} # a name for the deployment
+  namespace: ${APP_KUB_NAMESPACE}
   labels:
-    app: ${APP_NAME} # tag with the app:grello, labels are kind of like tags
+    app: ${APP_KEY} # tag with the app:grello, labels are kind of like tags
 spec:
   replicas: 1 # tells deployment to run 1 pods matching the template
   selector:
     matchLabels:
-      app: ${APP_NAME} # points to label key in pod template below
+      app: ${APP_KEY} # points to label key in pod template below
   template: # pod template
     metadata:
-      name: ${APP_NAME}-pod
+      name: ${APP_KEY}-pod
       labels:
-        app: ${APP_NAME} # the pod key label, labels are like tags
+        app: ${APP_KEY} # the pod key label, labels are like tags
     spec: # containers in the pod
       imagePullSecrets:
       - name: 9cibot-dockerhub
       containers:
-      - image: ${DOCKER_APP_URL}
+      - image: ${APP_DOCKER_URL}
         imagePullPolicy: Always
-        name: ${APP_NAME}-grails-app #just normal docker name
+        name: ${APP_KEY}-docker-app #just normal docker name
         # uncomment the LOGGING_CONFIG to enable
         env:
-          - name: LOGGING_CONFIG
-            value: '/app/logging/logback.groovy'
           - name: APP_PROPS
             value: |+
-              grails.serverURL=https://${KUB_INGRESS_URL}
+              logging.config=/app/logging/logback.groovy
+              grails.serverURL=https://${APP_KUB_INGRESS_URL}
 
         ports:
           - containerPort: 8080
@@ -37,10 +36,8 @@ spec:
             name: jmx
         volumeMounts:
           - mountPath: "/app/logging"
-            name: ${APP_NAME}-logback
-          - mountPath: "/ninebox"
-            name: nfs-ninebox
+            name: ${APP_KEY}-cfgmap-logging
       volumes:
-        - name: ${APP_NAME}-logging
+        - name: ${APP_KEY}-cfgmap-logging
           configMap:
-            name: ${APP_NAME}-logback
+            name: ${APP_KEY}-cfgmap-logback

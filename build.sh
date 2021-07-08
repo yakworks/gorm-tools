@@ -3,15 +3,12 @@
 # main bash build script for CI, dev and releasing. Used in Makefile
 # --------------------------------------------
 set -e  # Abort script at first error, when a command exits with non-zero status (except in until or while loops, if-tests, list constructs)
-# set -u  # Attempt to use undefined variable outputs error message, and forces an exit
-# set -x  # Similar to verbose mode (-v), but expands commands
-# set -o pipefail  # Causes a pipeline to return the exit status of the last command in the pipe that returned a non-zero return value.
 
 # if build/bin scripts do not exists then clone it
 [ ! -e build/bin ] && git clone https://github.com/yakworks/bin.git build/bin -b 2.1 # --single-branch --depth 1}
 # .env overrides for local dev, not to be checked in
 [ -f .env ] && set -o allexport && source .env && set +o allexport
-source build/bin/all.sh # consolidates most of the helpful scripts from bin
+source build/bin/init_env # main init script
 
 # NOTE: keep build.sh light & simples. create a script with helper functions in a script dir and source it in
 # source scripts/build_support.sh

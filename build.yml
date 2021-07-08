@@ -20,7 +20,7 @@ app:
   docker_url: yakworks/gorm-tools:${APP_KEY}
   kub:
     nfs: 10.42.2.176
-    namespace: gorm-tools
+    namespace: yakworks
     ingress_url: ${APP_KEY}.9ci.io
 
 release:

@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${APP_NAME} # a name for the service
-  namespace: ${KUB_NAMESPACE}
+  name: ${APP_KEY} # a name for the service
+  namespace: ${APP_KUB_NAMESPACE}
   labels:
-    app: ${APP_NAME} # tag the app:grello label onto the service as well
+    app: ${APP_KEY} # tag the app:grello label onto the service as well
 spec:
   #type: NodePort
   type: ClusterIP
@@ -13,28 +13,28 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    app: ${APP_NAME} # points to the label key for deployment
+    app: ${APP_KEY} # points to the label key for deployment
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: ${APP_NAME}
-  namespace: ${KUB_NAMESPACE}
+  name: ${APP_KEY}
+  namespace: ${APP_KUB_NAMESPACE}
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
   labels:
-    app: ${APP_NAME} # add the app=grello label onto the service as well
+    app: ${APP_KEY} # add the app=grello label onto the service as well
 spec:
   rules:
-  - host: ${KUB_INGRESS_URL}
+  - host: ${APP_KUB_INGRESS_URL}
     http:
       paths:
       - backend:
-          serviceName: ${APP_NAME}
+          serviceName: ${APP_KEY}
           servicePort: 8080
   tls:
   - secretName: 9ci-io-wild
     hosts:
-      - ${KUB_INGRESS_URL}
+      - ${APP_KUB_INGRESS_URL}
 

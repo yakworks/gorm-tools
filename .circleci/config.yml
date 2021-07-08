@@ -29,8 +29,6 @@ jobs:
           when: always
           command: make merge-test-results
 
-      # call orb that creates the CIRCLE_COMPARE_URL.txt
-      - compare-url/reconstruct
       - run:
           name: ✔︎ -- Publish lib if on releasable branch
           command: make publish-release
@@ -78,8 +76,12 @@ jobs:
             make dockerhub-login
             make docker-app-push
 
-orbs:
-  compare-url: iynere/compare-url@1.2.0
+      - run:
+          name: kubernetes config and deploy
+          command: |
+            make kube-config
+            make kube-clean
+            make kube-deploy
 
 workflows:
   build-flow:

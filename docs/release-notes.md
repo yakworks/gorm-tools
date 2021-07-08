@@ -1,3 +1,7 @@
+#### v7.0.8-v.15
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.14...v7.0.8-v.15)
+
 #### v7.0.8-v.14
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.13...v7.0.8-v.14)

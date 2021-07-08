@@ -13,6 +13,7 @@ source build/bin/init_env # main init script
 # NOTE: keep build.sh light & simples. create a script with helper functions in a script dir and source it in
 # source scripts/build_support.sh
 
+
 # --- boiler plate function runner, keep at end of file ------
 # check if first param is a functions
 if declare -f "$1" > /dev/null; then

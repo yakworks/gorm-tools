@@ -16,13 +16,22 @@ include $(BUILD_BIN)/makefiles/docmark.make
 # runs the full release publish, empty targets so make doesn't blow up when not a RELEASABLE_BRANCH
 publish-release:
 
+.PHONY: publish-release
+## kubectl apply tpl.yml files to deploy to rancher/kubernetes
+kube-deploy:
+
 ifdef RELEASABLE_BRANCH
 
- publish-release: publish-lib | _verify_RELEASABLE_BRANCH
+  publish-release: publish-lib | _verify_RELEASABLE_BRANCH
 	@if [ ! "$(IS_SNAPSHOT)" ]; then \
 		echo "not a snapshot ... doing version bump, changelog and tag push"; \
 		$(MAKE) release-tag; \
 	fi;
+
+  kube-deploy: kube-create-ns | _verify_RELEASABLE_BRANCH
+	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
+	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
+	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-service.tpl.yml
 
 endif # end RELEASABLE_BRANCH
 
@@ -51,9 +60,3 @@ run-benchmarks:
 	  -DmultiplyData=3 -Dgpars.poolsize=4 build/libs/benchmarks.war
 	@ # -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
-kube_tools := $(BUILD_BIN)/kube_tools
-## kubectl apply files to deploy to rancher/kubernetes
-kube-deploy: kube-create-ns
-	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
-	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
-	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-service.tpl.yml

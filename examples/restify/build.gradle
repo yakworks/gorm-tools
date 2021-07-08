@@ -16,7 +16,7 @@ buildscript {
 // apply plugin:"war"
 // apply plugin:'yakworks.grails-web'
 apply plugin:"groovy"
-apply plugin:"war"
+//apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.plugins.views-json"
 
@@ -61,7 +61,7 @@ dependencies {
   // runtime "com.h2database:h2"
   // runtime "com.zaxxer:HikariCP:3.4.5"
 
-  runtime "org.glassfish.web:el-impl:2.1.2-b03"
+  // runtime "org.glassfish.web:el-impl:2.1.2-b03"
   runtime "com.h2database:h2"
   runtime "javax.xml.bind:jaxb-api:2.3.1"
   runtime "com.zaxxer:HikariCP:$vHikari"
@@ -80,3 +80,6 @@ bootRun {
   String springProfilesActive = 'spring.profiles.active'
   systemProperty springProfilesActive, System.getProperty(springProfilesActive)
 }
+
+bootJar.enabled = true
+//bootJar.archiveFileName = 'restify-api.jar'

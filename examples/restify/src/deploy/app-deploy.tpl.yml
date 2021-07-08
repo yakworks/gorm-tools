@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${APP_KEY} # a name for the deployment
+  namespace: ${APP_KUB_NAMESPACE}
+  labels:
+    app: ${APP_KEY} # tag with the app:grello, labels are kind of like tags
+spec:
+  replicas: 1 # tells deployment to run 1 pods matching the template
+  selector:
+    matchLabels:
+      app: ${APP_KEY} # points to label key in pod template below
+  template: # pod template
+    metadata:
+      name: ${APP_KEY}-pod
+      labels:
+        app: ${APP_KEY} # the pod key label, labels are like tags
+    spec: # containers in the pod
+      imagePullSecrets:
+      - name: 9cibot-dockerhub
+      containers:
+      - image: ${APP_DOCKER_URL}
+        imagePullPolicy: Always
+        name: ${APP_KEY}-docker-app #just normal docker name
+        # uncomment the LOGGING_CONFIG to enable
+        env:
+          - name: APP_PROPS
+            value: |+
+              logging.config=/app/logging/logback.groovy
+              grails.serverURL=https://${APP_KUB_INGRESS_URL}
+
+        ports:
+          - containerPort: 8080
+            name: server
+          - containerPort: 8081
+            name: jmx
+        volumeMounts:
+          - mountPath: "/app/logging"
+            name: ${APP_KEY}-cfgmap-logging
+      volumes:
+        - name: ${APP_KEY}-cfgmap-logging
+          configMap:
+            name: ${APP_KEY}-cfgmap-logback

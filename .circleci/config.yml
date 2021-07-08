@@ -60,7 +60,8 @@ jobs:
 
       - run: make cache-key-file
       - restore_cache: *gradle-cache-restore
-      - restore_cache: *build-cache-restore
+      - restore_cache:
+          key: build-{{ .Branch }}-{{ .Revision }}
 
       # install the docker
       - run: apk add docker

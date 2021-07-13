@@ -29,10 +29,6 @@ jobs:
           when: always
           command: make merge-test-results
 
-      - run:
-          name: ✔︎ -- Publish lib if on releasable branch
-          command: make publish-release
-
       - store_test_results:
           path: build/test-results/
       - store_artifacts:
@@ -84,6 +80,12 @@ jobs:
             make kube-clean
             make kube-deploy
 
+      # this should happen last as it will increment the version number which is used in scripts above
+      # TODO it seems a bit backwards though and the scripts above should be modified
+      #  to use the publishedVersion perhaps or this should go in
+      - run:
+          name: ✔︎ -- Publish lib if on releasable branch
+          command: make publish-release
 workflows:
   build-flow:
     jobs:

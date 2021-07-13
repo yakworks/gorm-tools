@@ -3,7 +3,9 @@ MAKEFLAGS += -rR
 build.sh := ./build.sh
 # DB = true
 shResults := $(shell $(build.sh)) # call build.sh first without args which will git clone scripts to build/bin
+# core include, creates the makefile.env for the BUILD_VARS that evrything else depends on
 include ./build/bin/Makefile-core.make # core includes
+
 # include the helper makefiles for project
 include $(BUILD_BIN)/makefiles/docker.make
 include $(BUILD_BIN)/makefiles/kube.make

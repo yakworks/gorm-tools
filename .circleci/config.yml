@@ -86,7 +86,9 @@ jobs:
       #  to use the publishedVersion perhaps or this should go in
       - run:
           name: ✔︎ -- Publish lib if on releasable branch
-          command: make publish-release
+          command: |
+            make config-bot-git-user
+            make publish-release
 workflows:
   build-flow:
     jobs:

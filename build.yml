@@ -22,6 +22,12 @@ app:
     namespace: yakworks
     ingress_url: ${APP_KEY}.9ci.io
 
+bot:
+  email: 9cibot@9ci.com
+  user: 9cibot
+vault:
+  url: https://github.com/9ci/vault.git
+
 release:
   changelog: docs/release-notes.md
   branch_regex: master|release/.+

@@ -4,7 +4,8 @@ metadata:
   name: ${APP_KEY} # a name for the deployment
   namespace: ${APP_KUBE_NAMESPACE}
   labels:
-    app: ${APP_KEY} # tag with the app:grello, labels are kind of like tags
+    app: ${APP_KEY} # labels are kind of like tags
+    version: ${BUILD_VERSION}
 spec:
   replicas: 1 # tells deployment to run 1 pods matching the template
   selector:
@@ -50,6 +51,7 @@ metadata:
   namespace: ${APP_KUBE_NAMESPACE}
   labels:
     app: ${APP_KEY} # tag the app:grello label onto the service as well
+    version: ${BUILD_VERSION}
 spec:
   #type: NodePort
   type: ClusterIP
@@ -69,6 +71,7 @@ metadata:
   namespace: ${APP_KUBE_NAMESPACE}
   labels:
     app: ${APP_KEY} # add the app=grello label onto the service as well
+    version: ${BUILD_VERSION}
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /

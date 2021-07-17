@@ -3,9 +3,6 @@ build.sh := ./build.sh
 shResults := $(shell $(build.sh)) # call build.sh first without args which will git clone scripts to build/bin
 # core include, creates the makefile.env for the BUILD_VARS that evrything else depends on
 include ./build/bin/Makefile-core.make # core includes
-# --- variables ---
-BOT_USER ?= 9cibot@9ci.com
-VAULT_PROJECT ?= https://github.com/9ci/vault.git
 
 # --- helper makefiles ---
 include $(BUILD_BIN)/makefiles/spring-common.make
@@ -23,7 +20,8 @@ ifdef RELEASABLE_BRANCH
   publish-release: publish-lib
 	@if [ ! "$(IS_SNAPSHOT)" ]; then \
 		echo "not a snapshot ... doing version bump, changelog and tag push"; \
-		$(MAKE) release-tag; \
+		make create-github-release; \
+		make push-version-bumps; \
 	fi;
 
   kube-deploy: kube-create-ns

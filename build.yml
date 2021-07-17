@@ -5,8 +5,6 @@ description: Plugin tools Grails/Gorm - repository data services, json query lan
 author: Yak.Works
 
 project:
-  # this is the owner/repo github name
-  fullName: yakworks/gorm-tools
   # list of subproject dirs used to spin through, build the checksum and consolidate the test reports for circle
   subprojects: gorm-tools gorm-tools-rest gorm-tools-security rally-domain examples/restify examples/testify
 
@@ -14,11 +12,12 @@ project:
 # bash converts to upper and dots to underscore. for example app.name will be APP_NAME
 app:
   name: restify
-  key: ${APP_NAME}-${VERX_NO_DOTS}
+  # key: ${APP_NAME}-${VERX_NO_DOTS}
+  key: restify${VERSION_POSTFIX}
   dir: examples/restify
   jar: ${APP_DIR}/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
   docker_url: yakworks/gorm-tools:${APP_KEY}
-  kub:
+  kube:
     nfs: 10.42.2.176
     namespace: yakworks
     ingress_url: ${APP_KEY}.9ci.io

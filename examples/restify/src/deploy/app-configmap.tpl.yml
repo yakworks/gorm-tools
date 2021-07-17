@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ${APP_KEY}-cfgmap-logback
-  namespace: ${APP_KUB_NAMESPACE}
+  namespace: ${APP_KUBE_NAMESPACE}
   labels:
     app: ${APP_KEY} # tag with the app:demo10, labels are kind of like tags
 data:

@@ -3,19 +3,10 @@
 # suggested that you use the "grails integrate-with --git" command
 # to generate your .gitignore file.
 
-# Grails 2 using Grails 3 project stucture
-**/test/unit/
-**/test/integration/
-**/test/functional/
-!src/test
-
 #Grails 3
 .gradle
 .asscache
 build
-
-# web application files
-/web-app/WEB-INF/classes
 
 # default HSQL database files for production mode
 /prodDb.*
@@ -138,32 +129,11 @@ local.properties
 # External tool builders
 .externalToolBuilders/
 
-# Locally stored "Eclipse launch configurations"
-*.launch
-
- # JDT-specific (Eclipse Java Development Tools)
+# JDT-specific (Eclipse Java Development Tools)
 .classpath
 
- # Java annotation processor (APT)
- .factorypath
-
- # Ignore Gradle GUI config
- gradle-app.setting
-
- # Avoid ignoring Gradle wrapper jar file (.jar files are usually  ignored)
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually  ignored)
 !gradle-wrapper.jar
-### SublimeText template
-# cache files for sublime text
-*.tmlanguage.cache
-*.tmPreferences.cache
-*.stTheme.cache
-
-# workspace files are user-specific
-*.sublime-workspace
-
-# project files should be checked into the repository, unless a  significant
-# proportion of contributors will probably not be using SublimeText
-# *.sublime-project
 
 # sftp configuration file
 sftp-config.json
@@ -182,7 +152,6 @@ sftp-config.json
 Session.vim
 .netrwhist
 
-
 /web-app/
 /site/*
-
+.env

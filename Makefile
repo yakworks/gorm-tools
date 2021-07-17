@@ -1,18 +1,14 @@
-SHELL := /bin/bash
-MAKEFLAGS += -rR
 build.sh := ./build.sh
-# DB = true
+# DB = true # set this to true to turn on the DB environment options
 shResults := $(shell $(build.sh)) # call build.sh first without args which will git clone scripts to build/bin
 # core include, creates the makefile.env for the BUILD_VARS that evrything else depends on
 include ./build/bin/Makefile-core.make # core includes
+# --- variables ---
+BOT_USER ?= 9cibot@9ci.com
+VAULT_PROJECT ?= https://github.com/9ci/vault.git
 
-# include the helper makefiles for project
-include $(BUILD_BIN)/makefiles/docker.make
-include $(BUILD_BIN)/makefiles/kube.make
-include $(BUILD_BIN)/makefiles/jbuilder-docker.make
-include $(BUILD_BIN)/makefiles/spring-docker.make
-include $(BUILD_BIN)/makefiles/circle.make
-include $(BUILD_BIN)/makefiles/docmark.make
+# --- helper makefiles ---
+include $(BUILD_BIN)/makefiles/spring-common.make
 
 .PHONY: publish-release
 # runs the full release publish, empty targets so make doesn't blow up when not a RELEASABLE_BRANCH
@@ -24,18 +20,30 @@ kube-deploy:
 
 ifdef RELEASABLE_BRANCH
 
-  publish-release: publish-lib | _verify_RELEASABLE_BRANCH
+  publish-release: publish-lib
 	@if [ ! "$(IS_SNAPSHOT)" ]; then \
 		echo "not a snapshot ... doing version bump, changelog and tag push"; \
 		$(MAKE) release-tag; \
 	fi;
 
-  kube-deploy: kube-create-ns | _verify_RELEASABLE_BRANCH
-	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
-	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
-	@${kube_tools} kubeApplyTpl $(APP_DIR)/src/deploy/app-service.tpl.yml
+  kube-deploy: kube-create-ns
+	@$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
+	@$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
 
 endif # end RELEASABLE_BRANCH
+
+# used to test that yaml tpl is generated properly
+kube-check-yaml:
+	@$(kube_tools) process_tpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
+	@$(kube_tools) process_tpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
+
+
+# the "dockmark-build" target depends on this. depend on the docmark-copy-readme to move readme to index
+docmark-build-prep: docmark-copy-readme
+
+## alias for `docker-dockmark up` to server the docs
+docmark-start:
+	make docker-dockmark up
 
 # gradle restify:bootRun
 # start:
@@ -47,7 +55,7 @@ curl-sanity-check:
 	curl -i -G http://localhost:$(PORT)/api/rally/org/1
 
 curl-sanity-check-deployed:
-	curl -i -G https://$(APP_KUB_INGRESS_URL)/api/rally/org/1
+	curl -i -G https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
 
 # -- helpers --
 ## shows gorm-tools:dependencies --configuration compile

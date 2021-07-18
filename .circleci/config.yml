@@ -46,7 +46,7 @@ jobs:
           key: build-{{ .Branch }}-{{ .Revision }}
       - run: make publish-docs
 
-  publish-restify:
+  publish-release:
     docker:
       - image: yakworks/builder:jdk8
     resource_class: 'medium+'
@@ -60,17 +60,15 @@ jobs:
       - setup_remote_docker
       # clone 9ci/vault and decrypt bot.env
       - run: make vault-decrypt
-      # install the docker
-      - run: apk add docker
-
-      # build the jars
+      # make sure the jars are built
       - run: make build
-
-      - run: make docker-app-build
 
       - run:
           name: publish docker image
           command: |
+            # install docker app
+            apk add docker
+            make docker-app-build
             make dockerhub-login
             make docker-app-push
 
@@ -98,7 +96,7 @@ workflows:
           context: bot-context
           requires: [ build ]
           filters: { branches: { only: [ master, /release\/.*/ ] } }
-      - publish-restify:
+      - publish-release:
           context: bot-context
           requires: [build]
           filters: { branches: { only: [ master, /release\/.*/ ] } }

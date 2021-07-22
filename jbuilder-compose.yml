@@ -3,18 +3,18 @@ version: "3.5"
 services:
   jbuilder:
     container_name: ${JBUILDER_NAME}
-    image: yakworks/alpine-jdk:builder8
+    image: yakworks/builder:jdk8
     stdin_open: true # docker run -i
     tty: true        # docker run -t
     working_dir: /project
-    networks:
-      - builder_network
+    # networks:
+    #   - builder_network
     ports:
       - 8080:8080
     volumes:
       - .:/project
     # command: tail -f /dev/null
 
-networks:
-  builder_network:
-    name: ${JBUILDER_NAME}_network
+# networks:
+#   builder_network:
+#     name: ${JBUILDER_NAME}_network

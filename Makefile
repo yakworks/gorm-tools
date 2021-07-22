@@ -61,8 +61,21 @@ PORT ?= 8080
 api-sanity-check:
 	curl -i -G http://localhost:$(PORT)/api/rally/org/1
 
-api-sanity-check-deployed:
-	curl -i -G https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
+api-check-login:
+	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST \
+	  -d '{"username":"admin","password":"123Foo"}' http://localhost:$(PORT)/api/login
+
+# call this with TOKEN after api-check-login like `make api-check-with-token TOKEN=asdfasdfasdf`
+api-check-with-token:
+	curl -i -G -H "Authorization: Bearer $(TOKEN)" http://localhost:$(PORT)/api/rally/org/1
+
+api-check-deployed-login:
+	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST \
+	  -d '{"username":"admin","password":"123Foo"}' https://$(APP_KUBE_INGRESS_URL)/api/login
+
+# call this with TOKEN after api-check-deployed-login like `make api-check-deployed-with-token TOKEN=asdfasdfasdf`
+api-check-deployed-with-token:
+	curl -i -G -H "Authorization: Bearer $(TOKEN)" https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
 
 # -- helpers --
 ## shows gorm-tools:dependencies --configuration compile

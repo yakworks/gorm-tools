@@ -36,7 +36,7 @@ class BootStrap {
     void buildAppUser(){
         AppUser.withTransaction {
             println "BootStrap inserting AppUser"
-            AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"admin")
+            AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo")
             user.persist()
             //AppUser user = AppUser.create([id: 1, username: "admin", email: "admin@9ci.com", password:"admin"], bindId: true)
             assert user.id == 1
@@ -48,7 +48,7 @@ class BootStrap {
             SecRoleUser.create(user, admin, true)
             SecRoleUser.create(user, power, true)
 
-            AppUser noRoleUser = AppUser.create([id: 2, username: "noroles", email: "noroles@9ci.com", password:"admin"], bindId: true)
+            AppUser noRoleUser = AppUser.create([id: 2, username: "noroles", email: "noroles@9ci.com", password:"123Foo"], bindId: true)
             assert noRoleUser.id == 2
             return
         }

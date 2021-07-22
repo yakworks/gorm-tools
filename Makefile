@@ -1,43 +1,51 @@
+# check for build/shipkit and clone if not there, this should come first
+SHIPKIT_DIR = build/shipkit
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.8 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+# build.sh should be set so it create the env through it.
 build.sh := ./build.sh
+# Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
+include $(SHIPKIT_DIR)/Shipkit.make
+include $(SHIPKIT_DIR)/makefiles/spring-common.make
+include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
-shResults := $(shell $(build.sh)) # call build.sh first without args which will git clone scripts to build/bin
-# core include, creates the makefile.env for the BUILD_VARS that evrything else depends on
-include ./build/bin/Makefile-core.make # core includes
 
-# --- helper makefiles ---
-include $(BUILD_BIN)/makefiles/spring-common.make
+## ci deploy, main target to call from circle
+ship-it::
+	echo "$@ configuring credentials"
+	make vault-decrypt # download and decrypt bot.env for secrets
+	make config-bot-git-user # configs the bot user for git
+	make kubectl-config # configures k8s login
+	make dockerhub-login
 
-.PHONY: publish-release
-# runs the full release publish, empty targets so make doesn't blow up when not a RELEASABLE_BRANCH
-publish-release:
+	make ship-release
 
-.PHONY: publish-release
-## kubectl apply tpl.yml files to deploy to rancher/kubernetes
-kube-deploy:
+.PHONY: ship-release
 
 ifdef RELEASABLE_BRANCH
 
-  publish-release: publish-lib
-	@if [ ! "$(IS_SNAPSHOT)" ]; then \
-		echo "not a snapshot ... doing version bump, changelog and tag push"; \
-		make create-github-release; \
-		make push-version-bumps; \
-	fi;
+ship-release: build ship-libs ship-docker kube-deploy
+	# this should happen last as it will increment the version number which is used in scripts above
+    # TODO it seems a bit backwards though and the scripts above should be modified
+	make ship-version
+	echo $@ success
 
-  kube-deploy: kube-create-ns
+kube-deploy: kube-create-ns kube-clean
 	@$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
 	@$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
+	echo $@ success
+
+else
+
+ship-release:
+	echo "$@ not on a RELEASABLE_BRANCH, nothing to do"
 
 endif # end RELEASABLE_BRANCH
 
-# used to test that yaml tpl is generated properly
-kube-check-yaml:
-	@$(kube_tools) process_tpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
-	@$(kube_tools) process_tpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
-
-
 # the "dockmark-build" target depends on this. depend on the docmark-copy-readme to move readme to index
 docmark-build-prep: docmark-copy-readme
+
+
+# -- here below is for testing and debugging ---
 
 ## alias for `docker-dockmark up` to server the docs
 docmark-start:
@@ -49,10 +57,10 @@ docmark-start:
 
 PORT ?= 8080
 ## sanity checks api with curl -i -G http://localhost:8081/api/rally/org, pass PORT=8081 for other than default 8080
-curl-sanity-check:
+api-sanity-check:
 	curl -i -G http://localhost:$(PORT)/api/rally/org/1
 
-curl-sanity-check-deployed:
+api-sanity-check-deployed:
 	curl -i -G https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
 
 # -- helpers --

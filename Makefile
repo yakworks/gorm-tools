@@ -61,6 +61,14 @@ PORT ?= 8080
 api-sanity-check:
 	curl -i -G http://localhost:$(PORT)/api/rally/org/1
 
+api-sanity-check-login:
+	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST \
+	  -d '{"username":"admin","password":"123Foo"}' http://localhost:$(PORT)/api/login
+
+api-sanity-check-token:
+	#  curl -i -H "Authorization: Bearer gt6esir7rl1qhq8fon4ls2l96qbu14ie" http://localhost:8080/api/validate
+	curl -i -G -H "Authorization: Bearer $(TOKEN)" http://localhost:$(PORT)/api/rally/org/1
+
 api-sanity-check-deployed:
 	curl -i -G https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
 

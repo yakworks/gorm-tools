@@ -58,6 +58,9 @@ dependencies {
   compile project(":rally-domain")
   compile project(":testify")
 
+  compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
+  // compile "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"
+  compile "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
   // runtime "com.h2database:h2"
   // runtime "com.zaxxer:HikariCP:3.4.5"
 
@@ -74,7 +77,7 @@ dependencies {
 }
 
 bootRun {
-  ignoreExitValue true
+  //  ignoreExitValue true
   jvmArgs('-Dspring.output.ansi.enabled=always', '-noverify', '-XX:TieredStopAtLevel=1', '-Xmx1024m')
   sourceResources sourceSets.main
   String springProfilesActive = 'spring.profiles.active'

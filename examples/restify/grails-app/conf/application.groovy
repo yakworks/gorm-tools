@@ -45,9 +45,8 @@ grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName = 'gor
 environments {
     test {
         println "Setting test env to turn of security"
-        // grails.plugin.springsecurity.active = false
-        // grails.plugin.springsecurity.rest.active = false
-        // grails.plugin.springsecurity.filterChain.chainMap = []
+        grails.plugin.springsecurity.rest.active = false
+        grails.plugin.springsecurity.filterChain.chainMap = []
         grails.plugin.springsecurity.interceptUrlMap = [
             // all accesible anoymously by default
             [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]

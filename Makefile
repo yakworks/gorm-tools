@@ -10,10 +10,13 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 
 ## ci deploy, main target to call from circle
-ship-it:: ci-credentials ship-release
+ship-it::
+	make vault-decrypt
+	make ci-credentials
+	make ship-release
 	echo $@ success
 
-ci-credentials: vault-decrypt config-bot-git-user kubectl-config dockerhub-login
+ci-credentials: config-bot-git-user kubectl-config dockerhub-login
 	echo $@ success
 
 .PHONY: ship-release

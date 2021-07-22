@@ -10,32 +10,26 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 
 ## ci deploy, main target to call from circle
-ship-it::
-	echo "$@ configuring credentials"
-	make vault-decrypt # download and decrypt bot.env for secrets
-	make config-bot-git-user # configs the bot user for git
-	make kubectl-config # configures k8s login
-	make dockerhub-login
+ship-it:: ci-credentials ship-release
+	echo $@ success
 
-	make ship-release
+ci-credentials: vault-decrypt config-bot-git-user kubectl-config dockerhub-login
+	echo $@ success
 
 .PHONY: ship-release
 
 ifdef RELEASABLE_BRANCH
 
-ship-release: build
-	make ship-libs
-	make ship-docker
-	make kube-deploy
+ship-release: build ship-libs ship-docker kube-deploy
 
-	# this should happen last as it will increment the version number which is used in scripts above
+	# this should happen last and in its own make as it will increment the version number which is used in scripts above
     # TODO it seems a bit backwards though and the scripts above should be modified
 	make ship-version
 	echo $@ success
 
 kube-deploy: kube-create-ns kube-clean
-	@$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
-	@$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
+	$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
+	$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
 	echo $@ success
 
 else
@@ -74,9 +68,9 @@ show-dependencies:
 	./gradlew restify:dependencies --configuration runtime
 
 run-benchmarks:
-	@ $(gw) benchmarks:assemble
-	@ cd examples/benchmarks; \
+	$(gw) benchmarks:assemble
+	cd examples/benchmarks
 	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m -jar \
 	  -DmultiplyData=3 -Dgpars.poolsize=4 build/libs/benchmarks.war
-	@ # -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+	# -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 

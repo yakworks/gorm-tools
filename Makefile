@@ -1,6 +1,6 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.9 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.10 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # build.sh should be set so it create the env through it.
 build.sh := ./build.sh
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
@@ -23,7 +23,12 @@ ship-it::
 
 ifdef RELEASABLE_BRANCH
 
-ship-release: build ship-libs ship-docker kube-deploy
+ship-release: build
+	make ship-libs
+	make log-vars
+	make ship-docker
+	make kube-deploy
+
 	# this should happen last as it will increment the version number which is used in scripts above
     # TODO it seems a bit backwards though and the scripts above should be modified
 	make ship-version

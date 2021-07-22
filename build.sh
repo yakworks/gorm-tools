@@ -9,6 +9,9 @@ source build/shipkit/bin/init_env
 # NOTE: keep build.sh light & simples. create a script with helper functions in a script dir and source it in
 # source scripts/build_support.sh
 
+# -- Build Var Environemnts that can't be in build.yml
+# setVar VAULT_URL https://github.com/9ci/vault.git
+
 # --- boiler plate function runner, keep at end of file ------
 # check if first param is a functions
 arg1="${1:-}"

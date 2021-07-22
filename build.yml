@@ -25,8 +25,8 @@ app:
 bot:
   email: 9cibot@9ci.com
   user: 9cibot
-vault:
-  url: https://github.com/9ci/vault.git
+
+vault_url: https://github.com/9ci/vault.git
 
 release:
   changelog: docs/release-notes.md

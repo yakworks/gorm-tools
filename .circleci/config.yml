@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: yakworks/alpine-jdk:builder8
+      - image: yakworks/builder:jdk8
     resource_class: 'medium+'
 
     steps:
@@ -37,67 +37,45 @@ jobs:
       - save_cache:
           paths: [ ".gradle", "./build", "./commons/build", "./gorm-tools/build", "./gorm-tools-rest/build", "./gorm-tools-security/build", "./rally-domain/build"]
           key: build-{{ .Branch }}-{{ .Revision }}
-  docs:
+
+  ship-gh-pages:
     docker:
       - image: yakworks/docmark
     steps:
       - checkout
       - restore_cache: &build-cache-restore
           key: build-{{ .Branch }}-{{ .Revision }}
-      - run: make publish-docs
+      - run: make config-bot-git-user # configs the bot user for git
+      - run: make ship-gh-pages
 
-  publish-restify:
+  ship-it:
     docker:
-      - image: yakworks/alpine-jdk:builder8
+      - image: yakworks/builder:jdk8
     resource_class: 'medium+'
     steps:
       - checkout
-      - setup_remote_docker
-
       - run: make cache-key-file
       - restore_cache: *gradle-cache-restore
       - restore_cache:
           key: build-{{ .Branch }}-{{ .Revision }}
 
-      # install the docker
+      # setup the docker
+      - setup_remote_docker
       - run: apk add docker
 
-      # build the jars
-      - run: make build
+      # ship it
+      - run: make ship-it
 
-      - run: make docker-app-build
-
-      - run:
-          name: publish docker image
-          command: |
-            make dockerhub-login
-            make docker-app-push
-
-      - run:
-          name: kubernetes config and deploy
-          command: |
-            make kube-config
-            make kube-clean
-            make kube-deploy
-
-      # this should happen last as it will increment the version number which is used in scripts above
-      # TODO it seems a bit backwards though and the scripts above should be modified
-      #  to use the publishedVersion perhaps or this should go in
-      - run:
-          name: ✔︎ -- Publish lib if on releasable branch
-          command: make publish-release
 workflows:
   build-flow:
     jobs:
       - build:
           context: bot-context #context with shared ENV vars
-      - docs:
+      - ship-gh-pages:
+          context: bot-context
+          requires: [ build ]
+          filters: { branches: { only: [ master, /release\/.*/ ] } }
+      - ship-it:
           context: bot-context
           requires: [build]
-          filters:
-            branches: { only: [ master, /release\/.*/ ] }
-      - publish-restify:
-          context: bot-context
-          requires: [build]
-          filters:
-            branches: { only: [ master, /release\/.*/ ] }
+          filters: { branches: { only: [ master, /release\/.*/ ] } }

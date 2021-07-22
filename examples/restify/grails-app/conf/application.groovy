@@ -9,31 +9,17 @@ grails {
         '*'(nullable:true)
     }
 }
-// CAREFUL NOT TO PUSH THIS TO PRODUCTION
-grails.dbconsole.enabled = true
 
 //grails.plugin.fields.disableLookupCache = true
 //grails.converters.domain.include.version = true
 
 // Added by the Spring Security Core plugin:
-grails.plugin.springsecurity.userLookup.userDomainClassName = 'com.mysecurerest.User'
-grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'com.mysecurerest.UserAuthority'
-grails.plugin.springsecurity.authority.className = 'com.mysecurerest.Authority'
-grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
+// grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
 grails.plugin.springsecurity.interceptUrlMap = [
     [pattern: '/',               access: ['permitAll']],
-    [pattern: '/error',          access: ['permitAll']],
-    [pattern: '/index',          access: ['permitAll']],
-    [pattern: '/index.gsp',      access: ['permitAll']],
-    [pattern: '/shutdown',       access: ['permitAll']],
-    [pattern: '/assets/**',      access: ['permitAll']],
-    [pattern: '/**/js/**',       access: ['permitAll']],
-    [pattern: '/**/css/**',      access: ['permitAll']],
-    [pattern: '/**/images/**',   access: ['permitAll']],
-    [pattern: '/**/favicon.ico', access: ['permitAll']],
+    [pattern: '/h2-console', 		 access: ['permitAll']],
     [pattern: '/api/login', 		 access: ['permitAll']],
     [pattern: '/api/register', 	 access: ['permitAll']],
-    [pattern: '/dbconsole', 		 access: ['permitAll']],
     [pattern: '/api/logout', 	   access: ['isFullyAuthenticated()']],
     [pattern: '/**',             access: ['isFullyAuthenticated()']]
 ]
@@ -55,7 +41,19 @@ grails.plugin.springsecurity.rest.token.storage.gorm.tokenDomainClassName = 'gor
 // grails.plugin.springsecurity.rest.token.validation.headerName = 'X-Auth-Token'
 // grails.plugin.springsecurity.rest.token.storage.jwt.secret = ''
 
-// grails.plugin.springsecurity.rest.token.storage.memcached.hosts = 'localhost:11211'
-// grails.plugin.springsecurity.rest.token.storage.memcached.username = ''
-// grails.plugin.springsecurity.rest.token.storage.memcached.password = ''
-// grails.plugin.springsecurity.rest.token.storage.memcached.expiration = 86400
+
+environments {
+    test {
+        println "Setting test env to turn of security"
+        // grails.plugin.springsecurity.active = false
+        // grails.plugin.springsecurity.rest.active = false
+        // grails.plugin.springsecurity.filterChain.chainMap = []
+        grails.plugin.springsecurity.interceptUrlMap = [
+            // all accesible anoymously by default
+            [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
+        ]
+    }
+    development {
+        // grails.dbconsole.enabled = true
+    }
+}

@@ -5,7 +5,7 @@ grails {
             ldap {
                 active = true
                 context.managerDn = 'svclgk@nine.local'
-                context.managerPassword = 'BotFly!'
+                context.managerPassword = 'XXX'
                 context.server = 'ldap://dc1vm2k8:389'
                 authorities.retrieveGroupRoles = false //don't get roles from LDAP
                 authorities.retrieveDatabaseRoles = true //get roles from the database

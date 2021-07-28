@@ -5,6 +5,7 @@
 package gorm.tools.security.domain
 
 import groovy.transform.EqualsAndHashCode
+import gorm.tools.audit.AuditStampTrait
 
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
@@ -12,7 +13,7 @@ import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class AppUserToken implements RepoEntity<AppUserToken>, Serializable {
+class AppUserToken  implements AuditStampTrait, RepoEntity<AppUserToken>, Serializable {
 
     String tokenValue
     String username

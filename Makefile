@@ -57,23 +57,27 @@ docmark-start:
 # 	$(gw) restify:bootRun
 
 PORT ?= 8080
-## sanity checks api with curl -i -G http://localhost:8081/api/rally/org, pass PORT=8081 for other than default 8080
+# sanity checks api with curl -i -G http://localhost:8081/api/rally/org,
+# pass PORT=8081 for other than default 8080, only works when security is turned off
 api-sanity-check:
 	curl -i -G http://localhost:$(PORT)/api/rally/org/1
 
+## login to local running app, pass PORT=XXXX for other than default 8080.
+## This will return json with a token that can then be used with `api-check-with-token`
 api-check-login:
 	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST \
 	  -d '{"username":"admin","password":"123Foo"}' http://localhost:$(PORT)/api/login
 
-# call this with TOKEN after api-check-login like `make api-check-with-token TOKEN=asdfasdfasdf`
+## call this with TOKEN after `api-check-login` ex: `make api-check-with-token TOKEN=asdfasdfasdf`
 api-check-with-token:
 	curl -i -G -H "Authorization: Bearer $(TOKEN)" http://localhost:$(PORT)/api/rally/org/1
 
+## login to the deployed restify app, see notes for `api-check-login`
 api-check-deployed-login:
 	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST \
 	  -d '{"username":"admin","password":"123Foo"}' https://$(APP_KUBE_INGRESS_URL)/api/login
 
-# call this with TOKEN after api-check-deployed-login like `make api-check-deployed-with-token TOKEN=asdfasdfasdf`
+## use TOKEN after api-check-deployed-login ex: `make api-check-deployed-with-token TOKEN=asdfasdfasdf`
 api-check-deployed-with-token:
 	curl -i -G -H "Authorization: Bearer $(TOKEN)" https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
 

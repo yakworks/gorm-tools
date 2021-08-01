@@ -1,6 +1,5 @@
 
 grails.plugin.springsecurity.active = true
-grails.plugin.springsecurity.userLookup.
 grails.plugin.springsecurity.userLookup.authoritiesPropertyName = 'roles'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'gorm.tools.security.domain.SecRoleUser'
 grails.plugin.springsecurity.userLookup.enabledPropertyName = 'enabled'

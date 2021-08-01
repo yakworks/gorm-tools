@@ -49,11 +49,11 @@ class UrlMappings {
 
         "/schema/$id?(.$format)?"(controller: "schema", action: "index")
 
-        "/$controller/$action?/$id?(.$format)?" {
-            constraints {
-                // apply constraints here
-            }
-        }
+        // "/$controller/$action?/$id?(.$format)?" {
+        //     constraints {
+        //         // apply constraints here
+        //     }
+        // }
 
         "/"(view: "/index")
 

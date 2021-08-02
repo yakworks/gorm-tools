@@ -1,6 +1,6 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.20 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.21 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
@@ -83,7 +83,7 @@ gradle.dependencies:
 	./gradlew restify:dependencies --configuration runtime
 
 run-benchmarks:
-	$(gw) benchmarks:assemble
+	$(gradlew) benchmarks:assemble
 	cd examples/benchmarks
 	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m -jar \
 	  -DmultiplyData=3 -Dgpars.poolsize=4 build/libs/benchmarks.war

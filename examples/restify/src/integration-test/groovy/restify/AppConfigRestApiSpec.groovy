@@ -16,7 +16,7 @@ class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
     void "test config values"() {
         when:
-        Response resp = get('/api/appConfig/rally_org')
+        Response resp = get('/api/appConfig/rally/org')
         String bodyString = resp.body().string()
         println "bodyString: ${bodyString}"
         Map body = new JsonSlurper().parseText(bodyString) as Map

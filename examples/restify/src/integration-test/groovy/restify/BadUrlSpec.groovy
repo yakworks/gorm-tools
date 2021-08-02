@@ -19,7 +19,7 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
     //@IgnoreRest
     void "good url"() {
         when:
-        Response resp = get('/api/appConfig/rally_org')
+        Response resp = get('/api/appConfig/rally/org')
         String bodyString = resp.body().string()
         println "bodyString: ${bodyString}"
 

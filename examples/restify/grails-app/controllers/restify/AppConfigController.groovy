@@ -10,7 +10,9 @@ class AppConfigController implements RestApiController {
     RestApiConfig restApiConfig
 
     def get() {
-        def resourceConfig = restApiConfig.getPathConfig(params.id as String)
+        String namespace = params.nspace
+        String controllerKey = params.id
+        def resourceConfig = restApiConfig.getPathConfig(controllerKey, namespace)
         assert resourceConfig
         def fixedMap = Maps.removePropertyListKeys(resourceConfig)
         respond fixedMap

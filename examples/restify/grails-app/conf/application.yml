@@ -1,32 +1,12 @@
 ---
 grails:
-#  views:
-#    json:
-#      compileStatic: false
   profile: rest-api
   codegen:
     defaultPackage: restify
-  spring:
-    transactionManagement:
-      proxies: false
-  gorm:
-    # Whether to autowire entities.
-    # Disabled by default for performance reasons.
-    autowire: false
   config:
     locations:
       - classpath:restapi-config.yml
-#      - classpath:myconfig.yml
-#      - classpath:myconfig.properties
-#      - file:///etc/app/myconfig.groovy
-#      - file:///etc/app/myconfig.yml
-#      - file:///etc/app/myconfig.properties
-#      - ~/.grails/myconfig.groovy
-#      - ~/.grails/myconfig.yml
-#      - ~/.grails/myconfig.properties
-#      - file:${catalina.base}/myconfig.groovy
-#      - file:${catalina.base}/myconfig.yml
-#      - file:${catalina.base}/myconfig.properties
+
 info:
   app:
     name: '@info.app.name@'

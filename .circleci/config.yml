@@ -13,7 +13,7 @@ jobs:
       - restore_cache: &gradle-cache-restore
           key: gradle-{{ checksum "cache-key.tmp" }}
 
-      - run: make resolve-dependencies
+      - run: make gradle.resolve-dependencies
 
       - save_cache:
           paths: [ "~/.m2", "~/.gradle" ]
@@ -45,8 +45,8 @@ jobs:
       - checkout
       - restore_cache: &build-cache-restore
           key: build-{{ .Branch }}-{{ .Revision }}
-      - run: make config-bot-git-user # configs the bot user for git
-      - run: make ship-gh-pages
+      - run: make git.config-bot-user # configs the bot user for git
+      - run: make ship.gh-pages
 
   ship-it:
     docker:

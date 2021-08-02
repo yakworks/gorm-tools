@@ -71,22 +71,25 @@ subprojects {
       // testCompile "org.seleniumhq.selenium:selenium-remote-driver:$vSelenium"
     }
 
+    // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
     testlogger {
-      // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
       // theme 'standard'
       showExceptions true
-      // slowThreshold 2000
+      showStandardStreams = true //shows the printlns in console
+      showPassed false
+      showSkipped true
+      showFailed true
+      // slowThreshold 2000 //if tests take longer than this will show time it took
       // showSummary true
       // showSimpleNames false
       // showPassed true
       // showSkipped true
       // showFailed true
-      // showStandardStreams false //Show PRINTLNS
       // showPassedStandardStreams true
       // showSkippedStandardStreams true
       // showFailedStandardStreams true
     }
-  }}
+  }} //end of plugins.withId iteration
 
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice

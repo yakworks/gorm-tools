@@ -18,6 +18,6 @@ class UrlMappings {
 //        "/"(controller: 'application', action: 'index')
 //        "500"(view: '/error')
 //        "404"(view: '/notFound')
-        "/api/appConfig/$id"(controller: 'appConfig', action: 'get')
+        "/api/appConfig/$nspace/$id"(controller: 'appConfig', action: 'get')
     }
 }

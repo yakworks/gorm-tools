@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 
 import gorm.tools.beans.EntityMap
@@ -29,6 +30,7 @@ import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
@@ -246,7 +248,11 @@ trait RestRepositoryApi<D> implements RestApiController {
         }
         else if( e instanceof OptimisticLockingFailureException ){
             callRender(status: CONFLICT, e.message)
-        } else {
+        }
+        else if( e instanceof DataAccessException ){
+            callRender(status: UNPROCESSABLE_ENTITY, e.message)
+        }
+        else {
             throw e
         }
 

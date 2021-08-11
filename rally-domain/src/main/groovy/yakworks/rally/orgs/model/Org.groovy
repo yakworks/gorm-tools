@@ -13,7 +13,6 @@ import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.common.NameNum
 import yakworks.rally.common.SourceType
-import yakworks.rally.job.Job
 import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.tag.model.Taggable
 
@@ -21,7 +20,7 @@ import yakworks.rally.tag.model.Taggable
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Bulkable<Org, Job>,  Taggable<OrgTag>, CreateCriteriaSupport, Serializable {
+class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, CreateCriteriaSupport, Serializable {
 
     String  comments
     Long    companyId

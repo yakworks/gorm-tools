@@ -4,17 +4,19 @@
 */
 package yakworks.rally.orgs.repo
 
+import gorm.tools.repository.Bulkable
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
+import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
 @CompileStatic
-class OrgRepo extends AbstractOrgRepo {
+class OrgRepo extends AbstractOrgRepo implements Bulkable<Org, Job> {
 
     // add @Override
     @RepoListener

@@ -17,7 +17,7 @@ import groovy.transform.CompileStatic
 @GrailsCompileStatic
 class Job implements Serializable {
 
-    JobStatus status
+    JobState state
     String message
     String json
     String fileWithJson  // option if json is too big
@@ -26,7 +26,7 @@ class Job implements Serializable {
     int persistenceDuration  //job can be purged after that time (number of days???)
 
     static constraintsMap = [
-        status:[ description: 'Status of the job', nullable: false],
+        state:[ description: 'State of the job', nullable: false],
         message:[ description: 'Main message from results'],
         json:[ description: 'Json that is passed in' ]
 
@@ -34,17 +34,5 @@ class Job implements Serializable {
 
     static mapping = {
         id generator: 'assigned'
-    }
-
-
-}
-
-@CompileStatic
-enum JobStatus implements IdEnum<JobStatus, Integer> {
-    Failed(0), Success(1), InProcess(2), Void(3)
-    Integer id
-
-    JobStatus(Integer id) {
-        this.id = id
     }
 }

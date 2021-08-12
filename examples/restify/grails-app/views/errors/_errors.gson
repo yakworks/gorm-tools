@@ -1,27 +1,17 @@
-import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
-import org.springframework.validation.ObjectError
+import  gorm.tools.rest.error.ApiError
 
 /**
  * Renders validation errors according to vnd.error: https://github.com/blongden/vnd.error
  */
 model {
-  String message
-  Errors errors
+  ApiError apiError
 }
 
 response.contentType "application/vnd.error"
 response.status UNPROCESSABLE_ENTITY
 
 json {
-  Errors errorsObject = (Errors) this.errors
-  def allErrors = errorsObject.allErrors
-  int errorCount = allErrors.size()
-  total errorCount
-  message this.message
-  // only in validation error 422
-  // errors(allErrors) { FieldError error ->
-  //   message messageSource.getMessage(error, locale)
-  //   field error.field
-  }
+  status: apiError.status.value()
+  title: apiError.title
+  detail apiError.detail
 }

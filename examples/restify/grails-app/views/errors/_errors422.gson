@@ -1,26 +1,19 @@
-import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
-import org.springframework.validation.ObjectError
+import gorm.tools.rest.error.ApiValidationError
+
 
 /**
  * Renders validation errors according to vnd.error: https://github.com/blongden/vnd.error
  */
 model {
-  String message
-  Errors errors
+  ApiValidationError apiValidationError
 }
 
 response.contentType "application/vnd.error"
-response.status UNPROCESSABLE_ENTITY
+response.status apiValidationError.status
 
 json {
-  Errors errorsObject = (Errors) this.errors
-  def allErrors = errorsObject.allErrors
-  int errorCount = allErrors.size()
-  total errorCount
-  message this.message
-  errors(allErrors) { FieldError error ->
-    message messageSource.getMessage(error, locale)  //FIXME use object from ApiValidationError.errors (list of maps (message and field))
-    field error.field
-  }
+  status: apiValidationError.status.value()
+  title: apiValidationError.title
+  detail apiValidationError.detail
+  errors: apiValidationError.errors
 }

@@ -4,7 +4,6 @@
 */
 package gorm.tools.rest.controller
 
-
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -22,11 +21,14 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
+import gorm.tools.rest.error.ApiError
+import gorm.tools.rest.error.ApiValidationError
 import grails.validation.ValidationException
 import grails.web.Action
 
 import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
@@ -237,31 +239,24 @@ trait RestRepositoryApi<D> implements RestApiController {
             //callRender(status: NOT_FOUND, e.message)
             respond([view: '/errors/_errors'], new ApiError(status:NOT_FOUND, title: "Not Found", detail:e.message))
             //or do like that:
-            respondWithEntityMap(createEntityMap(apiError), [status: UNPROCESSABLE_ENTITY])
+            //respondWithEntityMap(createEntityMap(apiError), [status: UNPROCESSABLE_ENTITY])
         }
         else if( e instanceof EntityValidationException ){
-            String defaultMessage = e.messageMap.defaultMessage as String
-
+            //String defaultMessage = e.messageMap.defaultMessage as String
             // create ApiError object and pass that in [errors: e.errors, message: defaultMessage, renderArgs: [:]]
-            respond([view: '/errors/_errors422'], new ApiValidationError(status:UNPROCESSABLE_ENTITY, title: defaultMessage, detail:e.message))
+            respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.message, e.errors))
             //callRender(status: UNPROCESSABLE_ENTITY, m)
         }
         else if( e instanceof ValidationException ){
-            String defaultMessage = e.message
-            respond([view: '/errors/_errors422'], new ApiValidationError(status:UNPROCESSABLE_ENTITY, title: defaultMessage, detail:e.message))
+            //String defaultMessage = e.message
+            respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.message, e.errors))
         }
-        else if( e instanceof OptimisticLockingFailureException ){
-            respond([view: '/errors/_errors'], new ApiError(status, title))
+        else if(e instanceof DataAccessException ){
+            respond([view: '/errors/_errors'], new ApiError(status:UNPROCESSABLE_ENTITY, title: "Data Access Exception", detail:e.message))
            // callRender(status: CONFLICT, e.message)
         }
-        else if( e instanceof DataAccessException ){
-            respond([view: '/errors/_errors422'], new ApiValidationError())
-            //callRender(status: UNPROCESSABLE_ENTITY, e.message)
-        }
         else {
-            throw e
-            // add log.error
-            // catch all respond view error and ApiError with detail  e.message
+            respond([view: '/errors/_errors'], new ApiError(status:INTERNAL_SERVER_ERROR, title:"Internal Error", detail:e.message))
         }
 
     }

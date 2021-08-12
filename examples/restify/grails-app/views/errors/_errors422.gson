@@ -19,9 +19,8 @@ json {
   int errorCount = allErrors.size()
   total errorCount
   message this.message
-  // only in validation error 422
-  // errors(allErrors) { FieldError error ->
-  //   message messageSource.getMessage(error, locale)
-  //   field error.field
+  errors(allErrors) { FieldError error ->
+    message messageSource.getMessage(error, locale)  //FIXME use object from ApiValidationError.errors (list of maps (message and field))
+    field error.field
   }
 }

@@ -234,26 +234,34 @@ trait RestRepositoryApi<D> implements RestApiController {
     void handleException(RuntimeException e) {
         //log.error e.message
         if( e instanceof EntityNotFoundException){
-            callRender(status: NOT_FOUND, e.message)
+            //callRender(status: NOT_FOUND, e.message)
+            respond([view: '/errors/_errors'], new ApiError(status:NOT_FOUND, title: "Not Found", detail:e.message))
+            //or do like that:
+            respondWithEntityMap(createEntityMap(apiError), [status: UNPROCESSABLE_ENTITY])
         }
         else if( e instanceof EntityValidationException ){
             String defaultMessage = e.messageMap.defaultMessage as String
-            // log.info m
-            respond([view: '/errors/_errors'], [errors: e.errors, message: defaultMessage, renderArgs: [:]])
+
+            // create ApiError object and pass that in [errors: e.errors, message: defaultMessage, renderArgs: [:]]
+            respond([view: '/errors/_errors422'], new ApiValidationError(status:UNPROCESSABLE_ENTITY, title: defaultMessage, detail:e.message))
             //callRender(status: UNPROCESSABLE_ENTITY, m)
         }
         else if( e instanceof ValidationException ){
             String defaultMessage = e.message
-            respond([view: '/errors/_errors'], [errors: e.errors, message: defaultMessage, renderArgs: [:]])
+            respond([view: '/errors/_errors422'], new ApiValidationError(status:UNPROCESSABLE_ENTITY, title: defaultMessage, detail:e.message))
         }
         else if( e instanceof OptimisticLockingFailureException ){
-            callRender(status: CONFLICT, e.message)
+            respond([view: '/errors/_errors'], new ApiError(status, title))
+           // callRender(status: CONFLICT, e.message)
         }
         else if( e instanceof DataAccessException ){
-            callRender(status: UNPROCESSABLE_ENTITY, e.message)
+            respond([view: '/errors/_errors422'], new ApiValidationError())
+            //callRender(status: UNPROCESSABLE_ENTITY, e.message)
         }
         else {
             throw e
+            // add log.error
+            // catch all respond view error and ApiError with detail  e.message
         }
 
     }

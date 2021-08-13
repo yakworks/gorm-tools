@@ -18,6 +18,7 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
@@ -127,6 +128,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     def get() {
         try {
             D instance = (D) getRepo().read(params.id as Serializable)
+            RepoUtil.checkFound(instance, params.id as  Serializable, entityClass.simpleName)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap)
             // respond(jsonObject)
@@ -244,7 +246,7 @@ trait RestRepositoryApi<D> implements RestApiController {
         else if( e instanceof EntityValidationException ){
             //String defaultMessage = e.messageMap.defaultMessage as String
             // create ApiError object and pass that in [errors: e.errors, message: defaultMessage, renderArgs: [:]]
-            respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.message, e.errors))
+            respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.defaultMessage, e.errors))
             //callRender(status: UNPROCESSABLE_ENTITY, m)
         }
         else if( e instanceof ValidationException ){

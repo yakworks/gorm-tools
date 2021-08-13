@@ -8,10 +8,10 @@ model {
 }
 
 response.contentType "application/vnd.error"
-response.status UNPROCESSABLE_ENTITY
+response.status apiError.status.value()
 
 json {
-  status: apiError.status.value()
-  title: apiError.title
+  status apiError.status.value()
+  title apiError.title
   detail apiError.detail
 }

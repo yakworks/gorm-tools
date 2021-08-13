@@ -10,6 +10,19 @@ import spock.lang.Specification
 @Integration
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
+    void "entity not found"() {
+
+        when:
+        Map invalidData2 = [num:'foo1', name: "foo"]
+        Response resp = get('/api/rally/org/10001')
+        Map body = bodyToMap(resp)
+
+        then:
+        resp.code() == HttpStatus.NOT_FOUND.value()
+        body.title == "Not Found"
+        body.detail == 'Org not found for 10001'
+    }
+
     void "test org errors, no type"() {
 
         when:
@@ -19,8 +32,8 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.total == 1
-        body.message == 'OrgSource validation errors'
+        body.title == "Validation Error"
+        body.detail == 'OrgSource validation errors'
         // body.errors.find{ it.field == 'link.kind' }.message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
         // body.errors.find{ it.field == 'link.name' }
     }
@@ -36,8 +49,8 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.total == 2
-        body.message == 'Project validation errors'
+        body.title == "Validation Error"
+        body.detail == 'Project validation errors'
         body.errors[0].message == "Property [name] of class [class yakworks.testify.model.Project] cannot be null"
         body.errors[0].field == "name"
         body.errors[1].message == "Property [num] of class [class yakworks.testify.model.Project] cannot be null"

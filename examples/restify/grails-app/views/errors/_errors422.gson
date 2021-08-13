@@ -12,8 +12,8 @@ response.contentType "application/vnd.error"
 response.status apiValidationError.status
 
 json {
-  status: apiValidationError.status.value()
-  title: apiValidationError.title
+  status apiValidationError.status.value()
+  title apiValidationError.title
   detail apiValidationError.detail
-  errors: apiValidationError.errors
+  errors apiValidationError.errors
 }

@@ -236,42 +236,24 @@ trait RestRepositoryApi<D> implements RestApiController {
     List getqSearchIncludes() { [] }
 
     void handleException(RuntimeException e) {
-        //log.error e.message
         if( e instanceof EntityNotFoundException){
-            //callRender(status: NOT_FOUND, e.message)
             respond([view: '/errors/_errors'], new ApiError(status:NOT_FOUND, title: "Not Found", detail:e.message))
-            //or do like that:
-            //respondWithEntityMap(createEntityMap(apiError), [status: UNPROCESSABLE_ENTITY])
         }
         else if( e instanceof EntityValidationException ){
-            //String defaultMessage = e.messageMap.defaultMessage as String
-            // create ApiError object and pass that in [errors: e.errors, message: defaultMessage, renderArgs: [:]]
             respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.defaultMessage, e.errors))
-            //callRender(status: UNPROCESSABLE_ENTITY, m)
         }
         else if( e instanceof ValidationException ){
-            //String defaultMessage = e.message
             respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.message, e.errors))
         }
         else if(e instanceof DataAccessException ){
             respond([view: '/errors/_errors'], new ApiError(status:UNPROCESSABLE_ENTITY, title: "Data Access Exception", detail:e.message))
-           // callRender(status: CONFLICT, e.message)
         }
         else {
-            log.error e.message
+            //log.error e.message  //XXX cannot do log.error?
             respond([view: '/errors/_errors'], new ApiError(status:INTERNAL_SERVER_ERROR, title:"Internal Error", detail:e.message))
         }
 
     }
 
-    // String buildMsg(Map msgMap, Errors errors) {
-    //     Map resultErrors = [errors: [:], message: '']
-    //     (errors.allErrors as List<FieldError>).each { FieldError error ->
-    //         String message = messageSource.getMessage(error, Locale.default)
-    //         (resultErrors.errors as Map).put(error.field, message)
-    //     }
-    //     resultErrors.put('message', msgMap['defaultMessage'] as String)
-    //     return (resultErrors as JSON).toString()
-    // }
 
 }

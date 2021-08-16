@@ -258,6 +258,7 @@ trait RestRepositoryApi<D> implements RestApiController {
            // callRender(status: CONFLICT, e.message)
         }
         else {
+            log.error "Cannot catch instance of the error - ${e.message}"
             respond([view: '/errors/_errors'], new ApiError(status:INTERNAL_SERVER_ERROR, title:"Internal Error", detail:e.message))
         }
 

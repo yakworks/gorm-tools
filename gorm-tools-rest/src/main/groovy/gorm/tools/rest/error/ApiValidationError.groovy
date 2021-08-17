@@ -15,6 +15,8 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.repository.RepoMessage
 import grails.validation.ValidationException
 
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
+
 
 @CompileStatic
 class ApiValidationError extends ApiError {
@@ -25,6 +27,10 @@ class ApiValidationError extends ApiError {
         this.title = title
         this.detail = detail
         populateErrors(errs)
+    }
+
+    ApiValidationError(String detail, Errors errs) {
+        this(UNPROCESSABLE_ENTITY, "Validation Error", detail, errs)
     }
 
     private void populateErrors(Errors errs) {

@@ -240,10 +240,12 @@ trait RestRepositoryApi<D> implements RestApiController {
             respond([view: '/errors/_errors'], new ApiError(status:NOT_FOUND, title: "Not Found", detail:e.message))
         }
         else if( e instanceof EntityValidationException ){
-            respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.defaultMessage, e.errors))
+            //e.message is full error message with msg for each field, so use e.defaultMessage
+            respond([view: '/errors/_errors422'], new ApiValidationError(e.defaultMessage, e.errors))
         }
         else if( e instanceof ValidationException ){
-            respond([view: '/errors/_errors422'], new ApiValidationError(UNPROCESSABLE_ENTITY, "Validation Error", e.message, e.errors))
+            //e.message will be full error message, so build same error message as EntityValidationException.defaultMessage
+            respond([view: '/errors/_errors422'], new ApiValidationError("${entityClass.simpleName} validation errors", e.errors))
         }
         else if(e instanceof DataAccessException ){
             respond([view: '/errors/_errors'], new ApiError(status:UNPROCESSABLE_ENTITY, title: "Data Access Exception", detail:e.message))

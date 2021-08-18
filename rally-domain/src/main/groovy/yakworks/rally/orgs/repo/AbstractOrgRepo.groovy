@@ -74,6 +74,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         // do contact, support keyContact for legacy and Customers
         def contactData = data.contact ?: data.keyContact
         if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+        List contacts = data.remove("contacts")
+        if(contacts) createOrUpdateContacts(org, contacts)
     }
 
     /**
@@ -123,6 +125,19 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         org.source = OrgSource.repo.createSource(org, data)
         org.source.persist()
     }
+
+
+    void createOrUpdateContacts(Org org, List<Map> contacts) {
+        for (Map row : contacts) {
+            createOrUpdateContact(org, row)
+        }
+    }
+
+    private Contact createOrUpdateContact(Org org, Map row) {
+        row.org = org
+        return contactRepo.createOrUpdate(row)
+    }
+
 
     Contact createOrUpdatePrimaryContact(Org org, Map data){
         if(!data) return //exit fast if no data

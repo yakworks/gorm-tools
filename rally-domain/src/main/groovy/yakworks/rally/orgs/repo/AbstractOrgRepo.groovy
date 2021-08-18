@@ -127,7 +127,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     }
 
 
-    void createOrUpdateContacts(Org org, List<Map> contacts) {
+    private void createOrUpdateContacts(Org org, List<Map> contacts) {
         for (Map row : contacts) {
             createOrUpdateContact(org, row)
         }

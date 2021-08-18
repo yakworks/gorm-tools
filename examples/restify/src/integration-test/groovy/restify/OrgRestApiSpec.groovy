@@ -121,7 +121,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.name == 'foobie'
         delete(path, body.id)
     }
-    
+
     void "testing post with contacts"() {
         when:
         List<Map> contacts = [

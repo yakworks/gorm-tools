@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
+import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 
 @Integration
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {
+    JdbcTemplate jdbcTemplate
 
     void "entity not found"() {
 
@@ -58,5 +60,30 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
     }
 
+    void "test data access exception on db constraint violation"() {
+        setup:
+        jdbcTemplate.execute("CREATE UNIQUE INDEX project_num_unique ON Project(num)")
+
+        when:
+        Response resp = post('/api/project', [ name:"Project-1", num:"P1", inactive: true, billable: true])
+        Map body = bodyToMap(resp)
+        def orgId = body.id
+
+        then: "1st record inserted successfully"
+        resp.code() == HttpStatus.CREATED.value()
+
+        when: "2nd record with duplicate num"
+        resp = post('/api/project', [ name:"Project-2", num:"P1", inactive: true, billable: true])
+        body = bodyToMap(resp)
+
+        then: "Would cause DataAccessException"
+        resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
+        body.title == "Data Access Exception"
+        ((String)body.detail).contains("ConstraintViolationException")
+        ((String)body.detail).contains("PROJECT_NUM_UNIQUE")
+
+        delete("/api/project", orgId)
+        jdbcTemplate.execute("DROP index project_num_unique")
+    }
 
 }

@@ -7,10 +7,11 @@ package gorm.tools.rest.controller
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
-import org.springframework.dao.OptimisticLockingFailureException
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
@@ -27,7 +28,6 @@ import gorm.tools.rest.error.ApiValidationError
 import grails.validation.ValidationException
 import grails.web.Action
 
-import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -38,6 +38,9 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepositoryApi<D> implements RestApiController {
+
+    //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
+    final private static Logger log = LoggerFactory.getLogger(RestRepositoryApi.class)
 
     @Autowired
     RestApiConfig restApiConfig
@@ -251,7 +254,7 @@ trait RestRepositoryApi<D> implements RestApiController {
             respond([view: '/errors/_errors'], new ApiError(status:UNPROCESSABLE_ENTITY, title: "Data Access Exception", detail:e.message))
         }
         else {
-            //log.error e.message  //XXX cannot do log.error?
+            log.error(e.message, e)
             respond([view: '/errors/_errors'], new ApiError(status:INTERNAL_SERVER_ERROR, title:"Internal Error", detail:e.message))
         }
 

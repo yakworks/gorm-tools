@@ -21,6 +21,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.NOT_FOUND.value()
+        body.status == HttpStatus.NOT_FOUND.value()
         body.title == "Not Found"
         body.detail == 'Org not found for 10001'
     }
@@ -34,6 +35,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
+        body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Validation Error"
         body.detail == 'OrgSource validation errors'
         // body.errors.find{ it.field == 'link.kind' }.message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
@@ -51,6 +53,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
+        body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Validation Error"
         body.detail == 'Project validation errors'
         body.errors[0].message == "Property [name] of class [class yakworks.testify.model.Project] cannot be null"
@@ -78,6 +81,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
         then: "Would cause DataAccessException"
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
+        body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Data Access Exception"
         ((String)body.detail).contains("ConstraintViolationException")
         ((String)body.detail).contains("PROJECT_NUM_UNIQUE")

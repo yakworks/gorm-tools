@@ -12,6 +12,8 @@ import spock.lang.Specification
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/rally/org"
+    String contactApiPath = "/api/rally/contact"
+
     Map postData = [num:'foo1', name: "foo", type: 'Customer']
     Map putData = [name: "updated foo1"]
 
@@ -119,6 +121,40 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.name == 'foobie'
         delete(path, body.id)
     }
+
+    void "testing post with contacts"() {
+        when:
+        List<Map> contacts = [
+            [name: "C1", firstName: "C1"],
+            [name: "C2", firstName: "C2"],
+        ]
+        Response resp = post(path, [num: "111", name: "Org-with-contact", type: "Customer", contacts:contacts])
+
+        Map body = bodyToMap(resp)
+        def orgId = body.id
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+        body.id
+        body.name == 'Org-with-contact'
+
+        when: "Verify contacts are created"
+        Response contactResp = get("$contactApiPath?orgId=$orgId")
+        Map contactBody = bodyToMap(contactResp)
+
+        then: "Verify contacts are created"
+        contactResp.code() == HttpStatus.OK.value()
+        contactBody.data.size() == 2
+        contactBody.data[0].name == "C1"
+        contactBody.data[0].firstName == "C1"
+        contactBody.data[1].name == "C2"
+        contactBody.data[1].firstName == "C2"
+
+        delete(path, orgId)
+        delete(contactApiPath, contactBody.data[0].id)
+        delete(contactApiPath, contactBody.data[1].id)
+    }
+
 
     void "testing post bad data"() {
         when:

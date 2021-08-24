@@ -5,34 +5,38 @@
 package yakworks.rally.job
 
 import gorm.tools.audit.AuditStamp
-import gorm.tools.model.IdEnum
-import gorm.tools.support.Results
+import gorm.tools.job.JobState
+import gorm.tools.job.JobTrait
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
-import groovy.transform.CompileStatic
-
 
 @Entity
 @AuditStamp
 @GrailsCompileStatic
-class Job implements Serializable {
+/** A job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour. */
+class Job implements JobTrait, Serializable {
 
-    JobState state
-    String message
-    String json
-    String fileWithJson  // option if json is too big
-    Results results
+    String message  // not sure if needed
+    byte[] data  // data we are getting
+    // String fileWithJson  // option if json is too big
+    byte[] results
 
-    int persistenceDuration  //job can be purged after that time (number of days???)
+    // int persistenceDuration  //job can be purged after that time (number of days???)
+
+    private static final int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 
     static constraintsMap = [
-        state:[ description: 'State of the job', nullable: false],
-        message:[ description: 'Main message from results'],
-        json:[ description: 'Json that is passed in' ]
+        state:[ d: 'State of the job', nullable: false],
+        message:[ d: 'Main message from results'],
+        data:[ d: 'Json data that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
+        results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
 
     ]
 
     static mapping = {
         id generator: 'assigned'
+
     }
+
+
 }

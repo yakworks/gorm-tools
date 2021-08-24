@@ -4,14 +4,28 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.utils.GormUtils
+import gorm.tools.job.JobTrait
 import groovy.transform.CompileStatic
+import org.springframework.core.GenericTypeResolver
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
  */
 @CompileStatic
-trait Bulkable<D,J> implements GormRepo<D> {
+trait Bulkable<J extends JobTrait>  {
+
+
+    Class<J> jobClass // the domain class this is for
+    /**
+     * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
+     */
+    @Override
+    Class<J> getJobClass() {
+        if (!jobClass) this.jobClass = (Class<J>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
+        return jobClass
+    }
+
+    abstract List bulkCreate()
 
     /**
      * allows to pass in bulk of records at once, for example /api/book/bulk
@@ -24,9 +38,9 @@ trait Bulkable<D,J> implements GormRepo<D> {
      *      gpars.poolsize
      * @return Job
      */
-    J bulk(List<Map> dataList, Map args = [:]) {
+    J bulkInsert(List<Map> dataList, Map args = [:]) {
         //create Job
-        J job = (J) getEntityClass().newInstance()
+        J job = (J) getJobClass().newInstance()
 
         //chunk data into chunks of jdbc.batch_size, have transaction per chunk. Use poolsize for multi thread
 
@@ -42,6 +56,9 @@ trait Bulkable<D,J> implements GormRepo<D> {
 
         return job
     }
+
+
+
 
     // ???? would we have a separate one for updates? Nothing urgent now, we can refactor later
     J bulkUpdate(List<Map> dataList, Map args = [:]) {

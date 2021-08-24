@@ -32,7 +32,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Serializable {
 
     Boolean tagForReminders = false
     Boolean inactive = false
-    Boolean isPrimary = false
+    Boolean isPrimary = false  //XXX do we need it ?
     //ContactType type  // billing, shipping, etc
 
     String email //default

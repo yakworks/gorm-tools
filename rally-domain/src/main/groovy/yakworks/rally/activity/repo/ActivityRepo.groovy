@@ -4,8 +4,6 @@
 */
 package yakworks.rally.activity.repo
 
-import gorm.tools.source.SourceType
-
 import java.time.LocalDateTime
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -28,6 +26,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.services.SecService
+import gorm.tools.source.SourceType
 import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria

@@ -11,8 +11,8 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import grails.gorm.transactions.Transactional
 import gorm.tools.source.SourceType
+import grails.gorm.transactions.Transactional
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 

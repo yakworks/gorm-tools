@@ -4,9 +4,9 @@
 */
 package yakworks.rally.orgs.repo
 
-import gorm.tools.repository.Bulkable
 import groovy.transform.CompileStatic
 
+import gorm.tools.repository.Bulkable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import yakworks.rally.job.Job

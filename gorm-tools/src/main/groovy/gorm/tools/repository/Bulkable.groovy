@@ -4,9 +4,11 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.job.JobTrait
 import groovy.transform.CompileStatic
+
 import org.springframework.core.GenericTypeResolver
+
+import gorm.tools.job.JobTrait
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -73,4 +75,3 @@ trait Bulkable<J extends JobTrait>  {
     }
 
 }
-

@@ -4,8 +4,9 @@
 */
 package gorm.tools.job
 
-import gorm.tools.source.SourceTrait
 import groovy.transform.CompileStatic
+
+import gorm.tools.source.SourceTrait
 
 @CompileStatic
 trait JobTrait implements SourceTrait {

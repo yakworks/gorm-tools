@@ -4,8 +4,9 @@
 */
 package gorm.tools.job
 
-import gorm.tools.model.IdEnum
 import groovy.transform.CompileStatic
+
+import gorm.tools.model.IdEnum
 
 @CompileStatic
 enum JobState implements IdEnum<JobState, Integer> {

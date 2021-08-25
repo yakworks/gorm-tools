@@ -4,10 +4,11 @@
 */
 package gorm.tools.job
 
+import gorm.tools.source.SourceTrait
 import groovy.transform.CompileStatic
 
 @CompileStatic
-trait JobTrait {
+trait JobTrait implements SourceTrait {
 
     Boolean ok = false // change to TRUE if State.Finished without any issues
     JobState state

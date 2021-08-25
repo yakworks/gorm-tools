@@ -4,6 +4,8 @@
 */
 package yakworks.rally.activity.repo
 
+import gorm.tools.source.SourceType
+
 import java.time.LocalDateTime
 import javax.annotation.Nullable
 import javax.inject.Inject
@@ -236,8 +238,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         updateSummary(activity)
 
         activity.title = title
-        activity.source = source
-        activity.sourceEntity = entityName
+        activity.source = entityName
+        activity.sourceType = SourceType.App
         activity.persist()
 
         targets.each { target ->
@@ -334,8 +336,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         Activity activity = new Activity(
             org         : org,
             title       : text,
-            source      : source,
-            sourceEntity: entityName
+            source      : entityName,
+            sourceType: SourceType.App
         )
         generateId(activity)
         if (task) {

@@ -4,8 +4,6 @@
 */
 package yakworks.rally.orgs.repo
 
-import javax.annotation.Nullable
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 
@@ -20,7 +18,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.support.MsgKey
 import yakworks.commons.lang.Validate
-import yakworks.rally.common.SourceType
+import gorm.tools.source.SourceType
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org

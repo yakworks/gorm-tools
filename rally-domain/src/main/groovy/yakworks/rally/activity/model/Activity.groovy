@@ -4,6 +4,7 @@
 */
 package yakworks.rally.activity.model
 
+import gorm.tools.source.SourceTrait
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStampTrait
@@ -21,7 +22,7 @@ import yakworks.rally.tag.model.Taggable
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Activity implements AuditStampTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable<ActivityTag>, Serializable {
+class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable<ActivityTag>, Serializable {
 
     // FIXME https://github.com/9ci/domain9/issues/117 hasMany is still considered evil, change these
     static hasMany = [contacts: Contact]
@@ -42,11 +43,6 @@ class Activity implements AuditStampTrait, GormRepoEntity<Activity, ActivityRepo
 
     VisibleTo visibleTo = VisibleTo.Everyone
     Long visibleId //the id of the role that can see this note if visibleTo is Role
-
-    String source //the source if this is from an outside source
-    String sourceEntity  //The gorm domain name of the record that generated this. Ex: CollectionStep, Promise
-    String sourceId
-    //The id from the outside source or of the collection step, promise or some future workflow template record that generated this
 
     @CompileDynamic
     static enum Kind {
@@ -71,6 +67,7 @@ class Activity implements AuditStampTrait, GormRepoEntity<Activity, ActivityRepo
         org column: 'orgId'
         template column: 'templateId'
         task column: 'taskId'
+        source column: 'sourceEntity'
         contacts joinTable: [name: 'ActivityContact', key: 'activityId', column: 'personId']
     }
 

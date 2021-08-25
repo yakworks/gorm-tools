@@ -4,9 +4,6 @@
 */
 package yakworks.rally.orgs.repo
 
-import javax.annotation.Nullable
-import javax.inject.Inject
-
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
@@ -70,16 +67,11 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
             verifyNumAndOrgSource(org, data)
         }
 
-        //do location
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
         // do contact, support keyContact for legacy and Customers
         def contactData = data.contact ?: data.keyContact
         if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
-        // keep Contact and Location consistent . Either here or afterPersist, depends if you need org persisted
-        List contacts = data.remove("contacts")
-        // FIXME centralize it - move it to afterPersist -- see doAssociations
-        if(contacts) createOrUpdateContacts(org, contacts)
     }
 
     /**
@@ -89,9 +81,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void afterPersist(Org org, AfterPersistEvent e) {
         if (e.bindAction && e.data){
             Map data = e.data
-            // do locations collection if it exists
-            // pass in key so it works for both location and contact -- use doAssociations
-            if(data.locations) doLocations(org, data.locations as List<Map>)
+            doAssociations(org, data)
         }
         if(org.location?.isDirty()) org.location.persist()
         if(org.contact?.isDirty()) org.contact.persist()
@@ -131,19 +121,6 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         org.source.persist()
     }
 
-
-    private void createOrUpdateContacts(Org org, List<Map> contacts) {
-        for (Map row : contacts) {
-            createOrUpdateContact(org, row)
-        }
-    }
-
-    private Contact createOrUpdateContact(Org org, Map row) {
-        row.org = org
-        return contactRepo.createOrUpdate(row)
-    }
-
-
     Contact createOrUpdatePrimaryContact(Org org, Map data){
         if(!data) return //exit fast if no data
 
@@ -175,26 +152,10 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         return org.location
     }
 
-    void doLocations(Org org, List<Map> locations) {
-        for(Map location: locations){
-            location.org = org
-            locationRepo.createOrUpdate(location)
-        }
-    }
-
     void doAssociations(Org org, Map data) {
-        // call doAssociation for each entity/list
+        if(data.locations) doAssociation(Location, org, data.locations as List<Map>)
+        if(data.contacts) doAssociation(Contact, org, data.contacts as List<Map>)
     }
-
-    // move it to GormRepo where Org is a D
-    void doAssociation(String name, Org org, List<Map> assocList) {
-        // 1. getRepo - // use findPersistentEntity from the name and pass inn to findRepo (?). Find best way to do it so it's fast
-        // 2. cast Repo (?) to BulkGormRepo (?)
-        // 3. pass list to bulkCreateOrUpdate (for now in bulkCreateOrUpdate just have simple for loop just like you do in doLocations)
-        // 4. in bulkCreateOrUpdate have for loop to spin the list
-        // 5. bulkCreateOrUpdate in this case should not return jobId (it returns only from the main domain)
-    }
-
 
     /**
      * gets the OrgType from data so we can do it early and outside of the binder.

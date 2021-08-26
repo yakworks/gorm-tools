@@ -4,13 +4,14 @@
 */
 package gorm.tools.rest.controller
 
-
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
-import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.dao.DataAccessException
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
@@ -18,21 +19,28 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
+import gorm.tools.rest.error.ApiError
+import gorm.tools.rest.error.ApiValidationError
 import grails.validation.ValidationException
 import grails.web.Action
 
-import static org.springframework.http.HttpStatus.CONFLICT
 import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepositoryApi<D> implements RestApiController {
+
+    //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
+    final private static Logger log = LoggerFactory.getLogger(RestRepositoryApi.class)
 
     @Autowired
     RestApiConfig restApiConfig
@@ -123,6 +131,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     def get() {
         try {
             D instance = (D) getRepo().read(params.id as Serializable)
+            RepoUtil.checkFound(instance, params.id as  Serializable, entityClass.simpleName)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap)
             // respond(jsonObject)
@@ -230,36 +239,26 @@ trait RestRepositoryApi<D> implements RestApiController {
     List getqSearchIncludes() { [] }
 
     void handleException(RuntimeException e) {
-        //log.error e.message
         if( e instanceof EntityNotFoundException){
-            callRender(status: NOT_FOUND, e.message)
+            respond([view: '/errors/_errors'], new ApiError(status:NOT_FOUND, title: "Not Found", detail:e.message))
         }
         else if( e instanceof EntityValidationException ){
-            String defaultMessage = e.messageMap.defaultMessage as String
-            // log.info m
-            respond([view: '/errors/_errors'], [errors: e.errors, message: defaultMessage, renderArgs: [:]])
-            //callRender(status: UNPROCESSABLE_ENTITY, m)
+            //e.message is full error message with msg for each field, so use e.defaultMessage
+            respond([view: '/errors/_errors422'], new ApiValidationError(e.defaultMessage, e.errors))
         }
         else if( e instanceof ValidationException ){
-            String defaultMessage = e.message
-            respond([view: '/errors/_errors'], [errors: e.errors, message: defaultMessage, renderArgs: [:]])
+            //e.message will be full error message, so build same error message as EntityValidationException.defaultMessage
+            respond([view: '/errors/_errors422'], new ApiValidationError("${entityClass.simpleName} validation errors", e.errors))
         }
-        else if( e instanceof OptimisticLockingFailureException ){
-            callRender(status: CONFLICT, e.message)
-        } else {
-            throw e
+        else if(e instanceof DataAccessException ){
+            respond([view: '/errors/_errors'], new ApiError(status:UNPROCESSABLE_ENTITY, title: "Data Access Exception", detail:e.message))
+        }
+        else {
+            log.error(e.message, e)
+            respond([view: '/errors/_errors'], new ApiError(status:INTERNAL_SERVER_ERROR, title:"Internal Error", detail:e.message))
         }
 
     }
 
-    // String buildMsg(Map msgMap, Errors errors) {
-    //     Map resultErrors = [errors: [:], message: '']
-    //     (errors.allErrors as List<FieldError>).each { FieldError error ->
-    //         String message = messageSource.getMessage(error, Locale.default)
-    //         (resultErrors.errors as Map).put(error.field, message)
-    //     }
-    //     resultErrors.put('message', msgMap['defaultMessage'] as String)
-    //     return (resultErrors as JSON).toString()
-    // }
 
 }

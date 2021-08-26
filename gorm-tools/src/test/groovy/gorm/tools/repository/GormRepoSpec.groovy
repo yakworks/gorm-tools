@@ -318,7 +318,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when:
         List<Map> childs = [[name:"C1"], [name:"C2"]]
-        List<ProjectChild> result = Project.repo.doAssociation(ProjectChild, p, childs)
+        List<ProjectChild> result = Project.repo.doAssociation(p, ProjectChild, childs)
 
         then:
         result.size() == 2

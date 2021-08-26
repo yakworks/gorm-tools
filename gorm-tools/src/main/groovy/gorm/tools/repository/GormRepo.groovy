@@ -462,27 +462,34 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     /**
      * crate/update associations for given entity
      *
-     * @param associatedEntityClasss class of associated entity
      * @Param entity The entity for which associations are being created/updated
+     * @param associatedEntityClasss class of associated entity
      * @param assocList the list of data maps to create/update
      * @return the list of created entities
      */
-    List doAssociation(Class associatedEntityClass, D entity, List<Map> assocList) {
+    List doAssociation(D entity, Class associatedEntityClass, List<Map> assocList) {
         PersistentEntity associatedEntity = GormMetaUtils.getPersistentEntity(associatedEntityClass)
-        GormRepo entityRepo = RepoUtil.findRepoCached(associatedEntity.javaClass)
+        GormRepo assocRepo = RepoUtil.findRepoCached(associatedEntity.javaClass)
 
         //if the associated entity has a reference to entity, set it on data map.
         //eg. set contact.org = org
         PersistentProperty p = associatedEntity.getPropertyByName(NameUtils.getPropertyName(entity.class))
-        if(p) assocList.each { it[p.name] = entity}
-
-        entityRepo.bulkCreateOrUpdate(assocList)
-        // 2. cast Repo (?) to BulkGormRepo (?)
-        // 3. pass list to bulkCreateOrUpdate (for now in bulkCreateOrUpdate just have simple for loop just like you do in doLocations)
-        // 4. in bulkCreateOrUpdate have for loop to spin the list
-        // 5. bulkCreateOrUpdate in this case should not return jobId (it returns only from the main domain)
+        doAssociation(entity, assocRepo, assocList, p?.name)
     }
 
+    /**
+     * crate/update associations for given entity
+     *
+     * @Param entity The entity for which associations are being created/updated
+     * @param GormRepo associated entity repo
+     * @param assocList the list of data maps to create/update
+     * @param belongsToProp the name of parent property to set, if any
+     * @return the list of created entities
+     */
+    List doAssociation(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
+        if(belongsToProp) assocList.each { it[belongsToProp] = entity}
+        assocRepo.bulkCreateOrUpdate(assocList)
+    }
 
     GormInstanceApi<D> gormInstanceApi() {
         (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())

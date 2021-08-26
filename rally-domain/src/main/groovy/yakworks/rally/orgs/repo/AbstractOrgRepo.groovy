@@ -153,8 +153,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     }
 
     void doAssociations(Org org, Map data) {
-        if(data.locations) doAssociation(Location, org, data.locations as List<Map>)
-        if(data.contacts) doAssociation(Contact, org, data.contacts as List<Map>)
+        if(data.locations) doAssociation(org, Location.repo, data.locations as List<Map>, "org")
+        if(data.contacts) doAssociation(org, Contact.repo, data.contacts as List<Map>, "org")
     }
 
     /**

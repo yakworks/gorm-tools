@@ -23,7 +23,7 @@ class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then: "should have excluded the flattened spring array keys"
         resp.code() == HttpStatus.OK.value()
-        body.includes.get == ['*', 'info.*']
+        body.includes.get == ['*', 'info.*', "location.id"]
     }
 
 }

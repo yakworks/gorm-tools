@@ -22,7 +22,7 @@ import testing.*
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback] }
+    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback, Project, ProjectChild] }
 
     def "assert proper repos are setup"() {
         expect:
@@ -309,6 +309,26 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.findByName("test_clear") != null
     }
 
+    void "test doAssociation"() {
+        when:
+        Project p = Project.repo.create(name:"P1", testDate:"2017-01-01", isActive:"false", nested:[name: "Nested", value:"10.0"])
+
+        then:
+        p != null
+
+        when:
+        List<Map> childs = [[name:"C1"], [name:"C2"]]
+        List<ProjectChild> result = Project.repo.doAssociation(p, ProjectChild, childs)
+
+        then:
+        result.size() == 2
+        result[0].project == p
+        result[0].name == "C1"
+        result[1].project == p
+        result[1].name == "C2"
+
+    }
+
     def "test transaction rollback using withTrx"() {
         setup:
         Cust org = build(Cust, name: 'test')
@@ -430,4 +450,10 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
         //throws the exception here to test transaction rollback
         throw new RuntimeException()
     }
+}
+
+@Entity @GrailsCompileStatic
+class ProjectChild {
+    String name
+    Project project
 }

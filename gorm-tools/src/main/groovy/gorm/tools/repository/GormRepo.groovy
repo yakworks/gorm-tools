@@ -12,6 +12,8 @@ import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,7 +31,9 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.utils.GormMetaUtils
 import grails.validation.ValidationException
+import yakworks.commons.lang.NameUtils
 
 /**
  * A trait that turns a class into a Repository
@@ -335,6 +339,23 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         data
     }
 
+    /**
+     * batch creates or updates a list of items in a trx
+     *
+     * @param dataList the list of data maps to create/update
+     * @return the list of created entities
+     */
+    List<D> bulkCreateOrUpdate(List<Map> dataList){
+        List resultList = [] as List<D>
+        gormStaticApi().withTransaction { TransactionStatus status ->
+            for (Map item : dataList) {
+                D entity = createOrUpdate(item)
+                resultList.add(entity)
+            }
+        }
+        return resultList
+    }
+
     void publishBeforeValidate(Object entity, Errors errors) {
         getRepoEventPublisher().doBeforeValidate(this, entity, errors, [:])
     }
@@ -436,6 +457,38 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         batchTrx(list) { Serializable item ->
             removeById(item, args)
         }
+    }
+
+    /**
+     * crate/update associations for given entity
+     *
+     * @Param entity The entity for which associations are being created/updated
+     * @param associatedEntityClasss class of associated entity
+     * @param assocList the list of data maps to create/update
+     * @return the list of created entities
+     */
+    List doAssociation(D entity, Class associatedEntityClass, List<Map> assocList) {
+        PersistentEntity associatedEntity = GormMetaUtils.getPersistentEntity(associatedEntityClass)
+        GormRepo assocRepo = RepoUtil.findRepoCached(associatedEntity.javaClass)
+
+        //if the associated entity has a reference to entity, set it on data map.
+        //eg. set contact.org = org
+        PersistentProperty p = associatedEntity.getPropertyByName(NameUtils.getPropertyName(entity.class))
+        doAssociation(entity, assocRepo, assocList, p?.name)
+    }
+
+    /**
+     * crate/update associations for given entity
+     *
+     * @Param entity The entity for which associations are being created/updated
+     * @param GormRepo associated entity repo
+     * @param assocList the list of data maps to create/update
+     * @param belongsToProp the name of parent property to set, if any
+     * @return the list of created entities
+     */
+    List doAssociation(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
+        if(belongsToProp) assocList.each { it[belongsToProp] = entity}
+        assocRepo.bulkCreateOrUpdate(assocList)
     }
 
     GormInstanceApi<D> gormInstanceApi() {

@@ -14,7 +14,7 @@ class JobRepoSpec extends GormToolsHibernateSpec {
 
     void "sanity check validation"() {
         when:
-        JobImpl job = JobImpl.create([id: 1, sourceType: SourceType.ERP, sourceId: 'ar/org', data:"blah blah".toByte()])
+        JobImpl job = JobImpl.create([id: 1, sourceType: SourceType.ERP, sourceId: 'ar/org', data:"blah blah".getBytes()])
         def isValid = job.validate()
 
         then:

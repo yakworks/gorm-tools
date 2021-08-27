@@ -31,7 +31,6 @@ class JobImpl implements JobTrait, RepoEntity<JobImpl> {
     ]
 
     static mapping = {
-        id generator: 'assigned'
-
+        //id generator: 'assigned'
     }
 }

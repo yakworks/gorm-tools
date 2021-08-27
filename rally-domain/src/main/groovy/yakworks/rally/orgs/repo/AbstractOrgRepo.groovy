@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs.repo
 
-
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
@@ -67,7 +66,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         if (be.isBindCreate()) {
             verifyNumAndOrgSource(org, data)
         }
-        //do location
+
+        // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
         // do contact, support keyContact for legacy and Customers
         def contactData = data.contact ?: data.keyContact
@@ -81,8 +81,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void afterPersist(Org org, AfterPersistEvent e) {
         if (e.bindAction && e.data){
             Map data = e.data
-            // do locations collection if it exists
-            if(data.locations) doLocations(org, data.locations as List<Map>)
+            doAssociations(org, data)
         }
         if(org.location?.isDirty()) org.location.persist()
         if(org.contact?.isDirty()) org.contact.persist()
@@ -153,11 +152,9 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         return org.location
     }
 
-    void doLocations(Org org, List<Map> locations) {
-        for(Map location: locations){
-            location.org = org
-            locationRepo.createOrUpdate(location)
-        }
+    void doAssociations(Org org, Map data) {
+        if(data.locations) doAssociation(org, Location.repo, data.locations as List<Map>, "org")
+        if(data.contacts) doAssociation(org, Contact.repo, data.contacts as List<Map>, "org")
     }
 
     /**

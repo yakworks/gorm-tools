@@ -64,7 +64,8 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
              bindable: false, editable: false],
         member:[ description: 'Dimension hierarchy fields',
              bindable: false, oapi:[read: true, edit: ['$ref']]
-        ]
+        ],
+        locations: [d: "List of locations"]  //XXX add tests
     ]
 
     static mapping = {

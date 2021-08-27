@@ -6,12 +6,16 @@ import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
 import okhttp3.Response
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 @Integration
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/rally/org"
+    String contactApiPath = "/api/rally/contact"
+    String locationApiPath = "/api/rally/location"
+
     Map postData = [num:'foo1', name: "foo", type: 'Customer']
     Map putData = [name: "updated foo1"]
 
@@ -120,6 +124,79 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         delete(path, body.id)
     }
 
+    void "testing post with contacts"() {
+        when:
+        List<Map> contacts = [
+            [name: "C1", firstName: "C1"],
+            [name: "C2", firstName: "C2"],
+        ]
+        Response resp = post(path, [num: "111", name: "Org-with-contact", type: "Customer", contacts:contacts])
+
+        Map body = bodyToMap(resp)
+        def orgId = body.id
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+        body.id
+        body.name == 'Org-with-contact'
+
+        when: "Verify contacts are created"
+        Response contactResp = get("$contactApiPath?orgId=$orgId")
+        Map contactBody = bodyToMap(contactResp)
+
+        then: "Verify locations are created"
+        contactResp.code() == HttpStatus.OK.value()
+        contactBody.data.size() == 2
+        contactBody.data[0].name == "C1"
+        contactBody.data[0].firstName == "C1"
+        contactBody.data[1].name == "C2"
+        contactBody.data[1].firstName == "C2"
+
+        delete(path, orgId)
+        delete(contactApiPath, contactBody.data[0].id)
+        delete(contactApiPath, contactBody.data[1].id)
+    }
+
+    void "test post with locations"() {
+        when:
+        Map primaryLocation =  [name: "P1", street1: "P1", city:"P1", state: "P1"]
+        List<Map> locations = [
+            [name: "L1", street1: "L1", city:"L1", state: "L1"],
+            [name: "L2", street1: "L2", city:"L2", state: "L2"],
+        ]
+
+        Response resp = post(path, [num: "111", name: "Org-with-location", type: "Customer", locations:locations, location:primaryLocation])
+
+        Map body = bodyToMap(resp)
+        def orgId = body.id
+
+        then:
+        resp.code() == HttpStatus.CREATED.value()
+        body.id
+        body.name == 'Org-with-location'
+        body.location.id != null
+
+        when: "Verify locations are created"
+        Response locationResp = get("$locationApiPath?orgId=$orgId")
+        Map locationBody = bodyToMap(locationResp)
+
+        then: "Verify contacts are created"
+        locationResp.code() == HttpStatus.OK.value()
+        locationBody.data.size() == 3
+        locationBody.data[0].id == body.location.id
+        locationBody.data[0].name == "P1"
+        locationBody.data[0].street1 == "P1"
+        locationBody.data[1].name == "L1"
+        locationBody.data[1].street1 == "L1"
+        locationBody.data[2].name == "L2"
+        locationBody.data[2].street1 == "L2"
+
+        delete(path, orgId)
+        delete(locationApiPath, locationBody.data[0].id)
+        delete(locationApiPath, locationBody.data[1].id)
+        delete(locationApiPath, locationBody.data[2].id)
+    }
+
     void "testing post bad data"() {
         when:
         Response resp = post(path, [name: "foobie", type: "Customer"])
@@ -128,8 +205,9 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.total == 1
-        body.message == 'Org validation errors'
+        body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
+        body.title == 'Validation Error'
+        body.detail == "Org validation errors"
         body.errors[0].message == 'Property [num] of class [class yakworks.rally.orgs.model.Org] cannot be null'
     }
 

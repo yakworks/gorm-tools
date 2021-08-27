@@ -25,10 +25,12 @@ restApi:
         entityClass: yakworks.rally.orgs.model.Company
       contact:
         entityClass: yakworks.rally.orgs.model.Contact
+      location:
+        entityClass: yakworks.rally.orgs.model.Location
       org:
         entityClass: yakworks.rally.orgs.model.Org
         includes:
-          get: [ '*', 'info.*' ]
+          get: [ '*', 'info.*', 'location.id' ]
       orgTypeSetup:
         entityClass: yakworks.rally.orgs.model.OrgTypeSetup
       tag:

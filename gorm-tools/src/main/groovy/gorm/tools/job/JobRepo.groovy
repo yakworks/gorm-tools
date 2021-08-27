@@ -22,10 +22,10 @@ trait JobRepo implements GormRepo<JobTrait> {
     void beforePersist(JobTrait j, BeforePersistEvent e) {
         // convert String to byte array
         if(j.source instanceof String) {
-            j.source = j.source.getBytes()
+            j.source = j.source.bytes
         }
         if(j.source instanceof JSON) {
-            j.source = j.source.toString().getBytes()
+            j.source = j.source.toString().bytes
         }
     }
 }

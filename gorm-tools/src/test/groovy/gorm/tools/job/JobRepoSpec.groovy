@@ -15,7 +15,16 @@ class JobRepoSpec extends GormToolsHibernateSpec {
 
     List<Class> getDomainClasses() { [JobImpl] }
 
-    void "sanity check validation"() {
+    void "sanity check validation with String as data"() {
+        when:
+        JobImpl job = JobImpl.create([id: 1, sourceType: SourceType.ERP, sourceId: 'ar/org', data:"blah blah".bytes])
+        def isValid = job.validate()
+
+        then:
+        isValid
+    }
+
+    void "convert json to byte array"() {
         setup:
         JSONElement testJson = new JSONArray(["One", "Two", "Three"])
 
@@ -37,15 +46,8 @@ class JobRepoSpec extends GormToolsHibernateSpec {
 
     }
 
-    void "sanity check validation with String as data"() {
-        when:
-        JobImpl job = JobImpl.create([id: 1, sourceType: SourceType.ERP, sourceId: 'ar/org', data:"blah blah".bytes])
-        def isValid = job.validate()
 
-        then:
-        isValid
-    }
 
-    
+
 
 }

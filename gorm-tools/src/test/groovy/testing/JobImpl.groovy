@@ -13,7 +13,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class JobImpl implements JobTrait, RepoEntity<JobImpl>{
+class JobImpl implements JobTrait, RepoEntity<JobImpl> {
     String message  // not sure if needed
     byte[] data  // data we are getting
     // String fileWithJson  // option if json is too big

@@ -17,15 +17,15 @@ import gorm.tools.job.JobTrait
 trait Bulkable<J extends JobTrait>  {
 
 
-    Class<J> jobClass // the domain class this is for
-    /**
-     * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
-     */
-    @Override
-    Class<J> getJobClass() {
-        if (!jobClass) this.jobClass = (Class<J>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
-        return jobClass
-    }
+    // Class<J> jobClass // the domain class this is for
+    // /**
+    //  * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
+    //  */
+    // @Override
+    // Class<J> getJobClass() {
+    //     if (!jobClass) this.jobClass = (Class<J>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
+    //     return jobClass
+    // }
 
     abstract List bulkCreate()
 
@@ -40,38 +40,38 @@ trait Bulkable<J extends JobTrait>  {
      *      gpars.poolsize
      * @return Job
      */
-    J bulkInsert(List<Map> dataList, Map args = [:]) {
-        //create Job
-        J job = (J) getJobClass().newInstance()
-
-        //chunk data into chunks of jdbc.batch_size, have transaction per chunk. Use poolsize for multi thread
-
-        // for error handling -- based on `onError` from args commit success and report the failure or fail them all
-        //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
-
-        //call bulkCreate(modified so we can do transaction per chunk and error handling) and store results in resultList
-        job.resultList = bulkCreate(dataList, args)
-        job.persist()
-
-        //assign jobId on each record created. Special handling for arTran - we will have ArTranJob (jobId, arTranId). For all others we would
-        //have JobLink (jobId,entityId, entityName)
-
-        return job
-    }
+    // J bulkInsert(List<Map> dataList, Map args = [:]) {
+    //     //create Job
+    //     J job = (J) getJobClass().newInstance()
+    //
+    //     //chunk data into chunks of jdbc.batch_size, have transaction per chunk. Use poolsize for multi thread
+    //
+    //     // for error handling -- based on `onError` from args commit success and report the failure or fail them all
+    //     //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
+    //
+    //     //call bulkCreate(modified so we can do transaction per chunk and error handling) and store results in resultList
+    //     // job.resultList = bulkCreate(dataList, args)
+    //     // job.persist()
+    //
+    //     //assign jobId on each record created. Special handling for arTran - we will have ArTranJob (jobId, arTranId). For all others we would
+    //     //have JobLink (jobId,entityId, entityName)
+    //
+    //     return job
+    // }
 
 
 
 
     // ???? would we have a separate one for updates? Nothing urgent now, we can refactor later
-    J bulkUpdate(List<Map> dataList, Map args = [:]) {
-        //create Job
-        J job = (J) getEntityClass().newInstance()
-
-        //call bulkCreate and store results in resultList
-        job.resultList = bulkUpdate(dataList, args)
-        job.persist()
-
-        return job
-    }
+    // J bulkUpdate(List<Map> dataList, Map args = [:]) {
+    //     //create Job
+    //     J job = (J) getEntityClass().newInstance()
+    //
+    //     //call bulkCreate and store results in resultList
+    //     job.resultList = bulkUpdate(dataList, args)
+    //     job.persist()
+    //
+    //     return job
+    // }
 
 }

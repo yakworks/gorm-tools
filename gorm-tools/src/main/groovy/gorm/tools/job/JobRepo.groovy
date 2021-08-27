@@ -7,15 +7,24 @@ package gorm.tools.job
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
+import grails.converters.JSON
 import groovy.transform.CompileStatic
+import org.apache.commons.io.IOUtils
 
 
 @CompileStatic
 trait JobRepo implements GormRepo<JobTrait> {
 
-    void createJob(String uriPath, Map body) {
-        job = Job.repo.create(params)
-    //
+
+    @RepoListener
+    void beforePersist(JobTrait j, BeforePersistEvent e) {
+        // convert String to byte array
+        if(j.source instanceof String) {
+            j.source = j.source.getBytes()
+        }
+        if(j.source instanceof JSON) {
+            j.source = j.source.toString().getBytes()
+        }
     }
 }
 

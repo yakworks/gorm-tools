@@ -4,12 +4,14 @@
 */
 package gorm.tools.job
 
+import groovy.transform.CompileStatic
+
+import org.apache.commons.io.IOUtils
+
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
 import grails.converters.JSON
-import groovy.transform.CompileStatic
-import org.apache.commons.io.IOUtils
 
 
 @CompileStatic
@@ -27,5 +29,3 @@ trait JobRepo implements GormRepo<JobTrait> {
         }
     }
 }
-
-

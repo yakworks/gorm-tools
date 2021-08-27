@@ -46,6 +46,21 @@ class JobRepoSpec extends GormToolsHibernateSpec {
         isValid
     }
 
+
+    void "sanity check validation with Json as data"() {
+        when:
+        def data = {
+            "amount": 100,
+            "comments": "string"
+        }
+        String dataString = data.toString()
+        String dataByteArray = dataString.getBytes()
+        JobImpl job = JobImpl.create([id: 1, sourceType: SourceType.ERP, sourceId: 'ar/org', data:"blah blah"])
+        def isValid = job.validate()
+
+        then:
+        isValid
+    }
+
+
 }
-
-

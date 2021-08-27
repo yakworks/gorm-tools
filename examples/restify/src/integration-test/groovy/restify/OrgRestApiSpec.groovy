@@ -1,13 +1,14 @@
 package restify
 
+import grails.gorm.transactions.Rollback
 import org.springframework.http.HttpStatus
 
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.HttpUrl
 import okhttp3.Response
-import spock.lang.IgnoreRest
 import spock.lang.Specification
+import yakworks.rally.orgs.model.Contact
 
 @Integration
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
@@ -124,10 +125,16 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         delete(path, body.id)
     }
 
+    @Rollback
     void "testing post with contacts"() {
         when:
+
+        List<Map> phones = [[kind: "kind", num: "123"]]
+        List<Map> emails = [[kind: "kind", address: "test@9ci.com"]]
+        List<Map> sources = [[source: "source", sourceType: "sourceType", sourceId: "1"]]
+
         List<Map> contacts = [
-            [name: "C1", firstName: "C1"],
+            [name: "C1", firstName: "C1", phones: phones, emails:emails, sources: sources],
             [name: "C2", firstName: "C2"],
         ]
         Response resp = post(path, [num: "111", name: "Org-with-contact", type: "Customer", contacts:contacts])
@@ -152,6 +159,15 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         contactBody.data[1].name == "C2"
         contactBody.data[1].firstName == "C2"
 
+        when: "Verify contact associations"
+        Contact c = Contact.get(contactBody.data[0].id)
+
+        then:
+        c != null
+        c.phones.size() == 1
+        c.phones[0].num == "123"
+
+        cleanup:
         delete(path, orgId)
         delete(contactApiPath, contactBody.data[0].id)
         delete(contactApiPath, contactBody.data[1].id)

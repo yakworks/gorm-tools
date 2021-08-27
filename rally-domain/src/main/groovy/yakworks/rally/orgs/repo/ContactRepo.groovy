@@ -78,12 +78,18 @@ class ContactRepo implements GormRepo<Contact> {
 
     @RepoListener
     void afterPersist(Contact contact, AfterPersistEvent e) {
-        // if it was a bind and has locations data
-        List locationsData = e.data?.locations as List<Map>
-        if (e.bindAction && locationsData) {
-            doLocations(contact, locationsData)
+        if (e.bindAction && e.data){
+            Map data = e.data
+            doAssociations(contact, data)
         }
         if (contact.location?.isDirty()) contact.location.persist()
+    }
+
+    void doAssociations(Contact contact, Map data) {
+        if(data.locations) doAssociation(contact, Location.repo, data.locations as List<Map>, "contact")
+        if(data.phones) doAssociation(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+        if(data.emails) doAssociation(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+        if(data.sources) doAssociation(contact, ContactSource.repo, data.sources as List<Map>, "contact")
     }
 
     void doLocations(Contact contact, List<Map> locations) {

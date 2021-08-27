@@ -11,7 +11,7 @@ enum SourceType {
     App,
     Scheduler, //for Job only, more specific App
     ERP,
-    RESTApi, // more specific ERP
+    RestApi, // more specific ERP
     PayGateway
 
     public String getName() {

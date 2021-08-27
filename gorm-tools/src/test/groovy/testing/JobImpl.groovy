@@ -5,6 +5,7 @@
 package testing
 
 import gorm.tools.job.JobTrait
+import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -13,7 +14,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class JobImpl implements JobTrait, RepoEntity<JobImpl> {
+class JobImpl implements JobTrait, GormRepoEntity<JobImpl, JobImplRepo> {
     String message  // not sure if needed
     byte[] data  // data we are getting
     // String fileWithJson  // option if json is too big
@@ -27,10 +28,8 @@ class JobImpl implements JobTrait, RepoEntity<JobImpl> {
         state:[ d: 'State of the job', nullable: false],
         message:[ d: 'Main message from results'],
         data:[ d: 'Json data that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
-        results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
+        results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES],
+        sourceId: [d: 'end point or scheduled job name', nullable: false, example: 'api/ar/tran/bulkCreate?source=Oracle']
     ]
 
-    static mapping = {
-        //id generator: 'assigned'
-    }
 }

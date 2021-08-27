@@ -31,11 +31,7 @@ class Job implements JobTrait, Serializable {
         data:[ d: 'Json data that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
         results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
     ]
-
-    static mapping = {
-        id generator: 'assigned'
-
-    }
+    
 
 
 }

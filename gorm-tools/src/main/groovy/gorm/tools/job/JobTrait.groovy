@@ -6,13 +6,15 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.repository.GormRepo
+import gorm.tools.repository.model.PersistableRepoEntity
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.source.SourceTrait
 
 @CompileStatic
-trait JobTrait implements SourceTrait {
+trait JobTrait<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
 
     Boolean ok = false // change to TRUE if State.Finished without any issues
     JobState state = JobState.InProcess
-
 
 }

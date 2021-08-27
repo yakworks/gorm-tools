@@ -16,7 +16,7 @@ import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
 @CompileStatic
-class OrgRepo extends AbstractOrgRepo implements Bulkable<Org, Job> {
+class OrgRepo extends AbstractOrgRepo {
 
     // add @Override
     @RepoListener

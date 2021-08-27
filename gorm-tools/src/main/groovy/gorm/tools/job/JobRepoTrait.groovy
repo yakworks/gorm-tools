@@ -6,26 +6,17 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.io.IOUtils
-
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
-import grails.converters.JSON
 
 
 @CompileStatic
-trait JobRepo implements GormRepo<JobTrait> {
+trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
 
 
     @RepoListener
-    void beforePersist(JobTrait j, BeforePersistEvent e) {
-        // convert String to byte array
-        if(j.source instanceof String) {
-            j.source = j.source.bytes
-        }
-        if(j.source instanceof JSON) {
-            j.source = j.source.toString().bytes
-        }
+    void beforePersist(D entity, BeforePersistEvent e) {
+        entity.source = "foo"
     }
 }

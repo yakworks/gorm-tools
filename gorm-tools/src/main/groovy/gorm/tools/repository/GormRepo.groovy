@@ -25,6 +25,7 @@ import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.job.JobRepoTrait
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
@@ -47,6 +48,9 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     @Autowired EntityMapBinder entityMapBinder
 
     @Autowired RepoEventPublisher repoEventPublisher
+
+    @Autowired(required = false)
+    JobRepoTrait jobRepo
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true

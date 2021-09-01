@@ -92,20 +92,6 @@ class ContactRepo implements GormRepo<Contact> {
         if(data.sources) doAssociation(contact, ContactSource.repo, data.sources as List<Map>, "contact")
     }
 
-    void doLocations(Contact contact, List<Map> locations) {
-        for(Map location: locations){
-            String op = location.op as String  //add, update, remove
-            Long id = location.id as Long
-            location['contact'] = contact
-            //if its null then assume its an add or update depending on id
-            if(id){
-                Location.update(location)
-            } else {
-                Location.create(location)
-            }
-        }
-    }
-
     void assignOrgFromOrgId(Contact contact, Map data) {
         if (data['orgId'] && !data['org']) {
             Long orgId = data['orgId'] as Long

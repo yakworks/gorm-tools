@@ -166,6 +166,10 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         c != null
         c.phones.size() == 1
         c.phones[0].num == "123"
+        c.emails.size() == 1
+        c.emails[0].address == "test@9ci.com"
+        c.sources.size() == 1
+        c.sources[0].source == "source"
 
         cleanup:
         delete(path, orgId)

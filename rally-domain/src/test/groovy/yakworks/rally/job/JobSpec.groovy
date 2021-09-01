@@ -5,11 +5,12 @@
 package yakworks.rally.job
 
 import gorm.tools.json.Jsonify
+import gorm.tools.security.testing.SecurityTest
 import gorm.tools.source.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
-class JobSpec extends Specification  implements DomainRepoTest<Job> {
+class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTest {
 
     void "sanity check validation with String as data"() {
         expect:
@@ -30,20 +31,34 @@ class JobSpec extends Specification  implements DomainRepoTest<Job> {
 
     }
 
-    // void "kick off simulation of Job"() {
-    //     when:
-    //     //List<Map> dataList, Map args = [:]
-    //     def dataList = ["One", "Two", "Three"]
-    //     def endPoint = "api/ar/org"
-    //     def sourceName = "Oracle"
-    //     def sourceType = SourceType.RestApi
-    //     Job job = JobRepo.create(dataPayload:dataList, source:sourceName, sourceId:endPoint, sourceType: sourceType )
-    //
-    //     // in before create method:
-    //     // check if dataPayload
-    //     def res = Jsonify.render(dataPayload)
-    //     job.data = res.jsonText.bytes
-    // }
+    void "kick off simulation of Job"() {
+        when:
+        // calls with Map data, Map args = [:]
+        def dataList = '{"id":1,"inactive":false,"name":"name"}'
+        def sourceId = "api/ar/org"
+        def source = "Oracle"
+        def sourceType = SourceType.RestApi
+        def job = Job.repo.create(dataPayload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
+
+        then:
+        job
+        job.data.size()>0
+    }
+
+    void "kick off simulation of Job with data and args"() {
+        when:
+        // calls with Map data, Map args = [:]
+        def data = '{"id":1,"inactive":false,"name":"name"}'
+        def sourceId = "api/ar/org" // how to get endpoint ?
+        // def sourceType = SourceType.RestApi  // I ahve sourceType default to RestAPi if called with dataPayload
+
+        Map args = [source:"Oracle"]
+        def job = Job.repo.create(dataPayload:data, args)
+
+        then:
+        job
+        job.data.size()>0
+    }
 
 
     void "convert json to byte array"() {

@@ -7,10 +7,6 @@ package gorm.tools.job
 import gorm.tools.json.Jsonify
 import gorm.tools.source.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
-import grails.buildtestdata.TestData
-import org.grails.web.json.JSONArray
-import org.grails.web.json.JSONElement
-import spock.lang.Ignore
 import spock.lang.Specification
 import testing.*
 

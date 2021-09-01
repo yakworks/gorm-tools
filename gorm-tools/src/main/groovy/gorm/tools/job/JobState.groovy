@@ -5,12 +5,19 @@
 package gorm.tools.job
 
 import groovy.transform.CompileStatic
+import gorm.tools.model.IdEnum
+
 
 import gorm.tools.model.IdEnum
 
 @CompileStatic
 enum JobState implements IdEnum<JobState, Integer> {
-    Failed(0), Success(1), InProcess(2), Void(3)
+    Queued(0),
+    Running(1),
+    Finished(2), // completed succesfully or with errors
+    Cancelled(3), // killed, stopped
+    WTF(4)  // WORK THAT FAILED -- was running or queued and we had to change state to something becasue it's not running
+
     Integer id
 
     JobState(Integer id) {

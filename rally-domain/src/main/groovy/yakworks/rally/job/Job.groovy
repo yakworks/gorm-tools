@@ -5,15 +5,15 @@
 package yakworks.rally.job
 
 import gorm.tools.audit.AuditStamp
-import gorm.tools.job.JobState
 import gorm.tools.job.JobTrait
+import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 
+/** A job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour. */
 @Entity
 @AuditStamp
 @GrailsCompileStatic
-/** A job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour. */
 class Job implements JobTrait, Serializable {
 
     String message  // not sure if needed
@@ -31,7 +31,7 @@ class Job implements JobTrait, Serializable {
         data:[ d: 'Json data that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
         results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
     ]
-    
+
 
 
 }

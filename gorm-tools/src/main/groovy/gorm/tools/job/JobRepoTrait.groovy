@@ -18,5 +18,8 @@ trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
     @RepoListener
     void beforePersist(D entity, BeforePersistEvent e) {
         entity.source = "foo"
+
+        //Can we take source from args?
+        //    e.args['source'] = e.source
     }
 }

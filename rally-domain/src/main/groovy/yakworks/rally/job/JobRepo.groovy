@@ -17,7 +17,7 @@ class JobRepo implements  JobRepoTrait<Job> {
     @RepoListener
     void beforeBind(Job job, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
-            // must be Job called fro RestApi
+            // must be Job called from RestApi that is passing in dataPayload
             if (data.dataPayload) {
                 // def res = Jsonify.render(data.dataPayload) //XXX java.lang.NoClassDefFoundError: grails.plugin.json.view.template.JsonViewTemplate
                 // job.data = res.jsonText.bytes

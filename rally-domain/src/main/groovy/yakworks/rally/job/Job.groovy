@@ -10,15 +10,23 @@ import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 
-/** A job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour. */
+/** An instance created right away when "any job" in 9ci is called. Either called through restApi from outside, scheduled job in quartz or
+ * manually started job (Look at SourceTrait)
+ * Job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour. */
 @Entity
 @AuditStamp
 @GrailsCompileStatic
 class Job implements JobTrait, Serializable {
 
     String message  // not sure if needed
-    byte[] data  // data we are getting
+
+    // data we are getting. For RestApi calls it's data body
+    byte[] data
+
     // String fileWithJson  // option if json is too big
+
+    //The "results" is a response of resources that were successfully and unsuccessfully updated or created after processing.
+    // The results differ depending on the sourceType of the job
     byte[] results
 
     // int persistenceDuration  //job can be purged after that time (number of days???)
@@ -28,7 +36,7 @@ class Job implements JobTrait, Serializable {
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],
         message:[ d: 'Main message from results'],
-        data:[ d: 'Json data that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
+        data:[ d: 'Json data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
         results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
     ]
 

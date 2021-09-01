@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
-import gorm.tools.repository.model.RepoEntity
 import gorm.tools.source.SourceTrait
 
 @CompileStatic

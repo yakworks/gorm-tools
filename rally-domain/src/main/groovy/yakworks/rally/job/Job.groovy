@@ -6,7 +6,6 @@ package yakworks.rally.job
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.job.JobTrait
-import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 

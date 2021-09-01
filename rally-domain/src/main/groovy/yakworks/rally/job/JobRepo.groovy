@@ -6,10 +6,7 @@ package yakworks.rally.job
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.databinding.BindAction
 import gorm.tools.job.JobRepoTrait
-import gorm.tools.json.Jsonify
-import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener

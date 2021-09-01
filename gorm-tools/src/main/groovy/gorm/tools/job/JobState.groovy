@@ -5,8 +5,6 @@
 package gorm.tools.job
 
 import groovy.transform.CompileStatic
-import gorm.tools.model.IdEnum
-
 
 import gorm.tools.model.IdEnum
 

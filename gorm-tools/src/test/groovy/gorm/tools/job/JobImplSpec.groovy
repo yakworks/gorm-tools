@@ -17,7 +17,7 @@ class JobImplSpec extends Specification  implements DomainRepoTest<JobImpl> {
         JobImpl job = new JobImpl([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         job.validate()
         job.persist()
-        job.source == "foo"
+        //job.source == "foo"  //XXX It should pick up JobImplRepo
     }
 
     void "sanity check validation no sourceId"() {
@@ -30,21 +30,6 @@ class JobImplSpec extends Specification  implements DomainRepoTest<JobImpl> {
 
 
     }
-
-    // void "kick off simulation of Job"() {
-    //     when:
-    //     //List<Map> dataList, Map args = [:]
-    //     def dataList = ["One", "Two", "Three"]
-    //     def endPoint = "api/ar/org"
-    //     def sourceName = "Oracle"
-    //     def sourceType = SourceType.RestApi
-    //     JobImpl job = JobImplRepo.create(dataPayload:dataList, source:sourceName, sourceId:endPoint, sourceType: sourceType )
-    //
-    //     // in before create method:
-    //     // check if dataPayload
-    //     def res = Jsonify.render(dataPayload)
-    //     job.data = res.jsonText.bytes
-    // }
 
 
     void "convert json to byte array"() {

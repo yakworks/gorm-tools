@@ -35,6 +35,10 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
+/**
+ * This is the CRUD controller for entities
+ * @param <D>
+ */
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepositoryApi<D> implements RestApiController {
@@ -170,6 +174,20 @@ trait RestRepositoryApi<D> implements RestApiController {
         Map dataMap = parseJson(request)
         List<Map> data = getRepo().bulkUpdate(dataMap.ids as List, dataMap.data as Map)
         respond([data: data])
+    }
+
+    /** Used for bulk create calls when Job object is returned */
+    // XXX https://github.com/9ci/domain9/issues/331 Fix it so it works with Job that is created
+    @Action
+    def bulkCreate() {
+        Map dataMap = parseJson(request)
+        def job = getRepo().bulkCreate(dataMap.ids as List, dataMap.data as Map)
+        // XXX we don't have incs. We just need to do entityMap and respond it
+        //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
+        //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return
+        //  list of all sourceIds/ids that we created
+        //  so in includes we can specify what we return
+        respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
     }
 
     //@CompileDynamic

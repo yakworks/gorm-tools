@@ -15,12 +15,9 @@ import grails.gorm.annotation.Entity
 @Entity
 @AuditStamp
 @GrailsCompileStatic
-class Job implements JobTrait, Serializable {
+class Job implements JobTrait<Job>, Serializable {
 
     String message  // not sure if needed
-
-    // data we are getting. For RestApi calls it's data body
-    byte[] data
 
     // String fileWithJson  // option if json is too big
 

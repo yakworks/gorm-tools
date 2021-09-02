@@ -4,22 +4,35 @@
 */
 package gorm.tools.job
 
+import gorm.tools.json.Jsonify
+import gorm.tools.source.SourceType
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.events.BeforePersistEvent
-import gorm.tools.repository.events.RepoListener
 
 
 @CompileStatic
 trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
 
+    /**
+     * Assigns data bytes array with json if passed in as 'dataPayload'
+     * @param data
+     * @return Job
+     */
+    D createJob(Map data ) {
+        def dataPayload = data.remove('dataPayload')
+        D job = (D) getEntityClass().newInstance(data)
 
-    @RepoListener
-    void beforePersist(D entity, BeforePersistEvent e) {
-        entity.source = "foo"
-
-        //Can we take source from args?
-        //    e.args['source'] = e.source
+        // must be Job called from RestApi that is passing in dataPayload
+        if (dataPayload) {
+            if(dataPayload instanceof Map) {
+                def res = Jsonify.render(dataPayload)
+                job.data = res.jsonText.bytes
+            } else {
+                def bytes = dataPayload.toString().bytes
+                job.data = bytes
+            }
+        }
+        return job
     }
 }

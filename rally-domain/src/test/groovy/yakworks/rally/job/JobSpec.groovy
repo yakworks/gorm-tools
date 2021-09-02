@@ -34,26 +34,11 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
     void "kick off simulation of Job"() {
         when:
         // calls with Map data, Map args = [:]
-        def dataList = '{"id":1,"inactive":false,"name":"name"}'
+        def dataList = ["id":1,"inactive":false,"name":"name"]
         def sourceId = "api/ar/org"
         def source = "Oracle"
         def sourceType = SourceType.RestApi
         def job = Job.repo.create(dataPayload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
-
-        then:
-        job
-        job.data.size()>0
-    }
-
-    void "kick off simulation of Job with data and args"() {
-        when:
-        // calls with Map data, Map args = [:]
-        def data = '{"id":1,"inactive":false,"name":"name"}'
-        def sourceId = "api/ar/org" // how to get endpoint ?
-        // def sourceType = SourceType.RestApi  // I ahve sourceType default to RestAPi if called with dataPayload
-
-        Map args = [source:"Oracle"]
-        def job = Job.repo.create(dataPayload:data, args)
 
         then:
         job

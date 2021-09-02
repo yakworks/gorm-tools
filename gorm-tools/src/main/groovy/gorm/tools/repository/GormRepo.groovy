@@ -25,7 +25,6 @@ import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.job.JobRepoTrait
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException

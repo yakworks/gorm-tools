@@ -13,7 +13,6 @@ import org.springframework.validation.FieldError
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.RepoMessage
-import grails.validation.ValidationException
 
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 

@@ -37,7 +37,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 /**
  * This is the CRUD controller for entities
- * @param <D>
+ * @param <D> Object
  */
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])

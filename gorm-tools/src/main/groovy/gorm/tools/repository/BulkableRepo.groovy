@@ -9,9 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.GenericTypeResolver
-import org.springframework.transaction.TransactionStatus
 
 import gorm.tools.async.AsyncSupport
 import gorm.tools.job.JobRepoTrait

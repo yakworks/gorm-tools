@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.json.Jsonify
 import gorm.tools.repository.GormRepo
-import gorm.tools.source.SourceType
 
 
 @CompileStatic
@@ -16,8 +15,8 @@ trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
 
     /**
      * Assigns data bytes array with json if passed in as 'dataPayload'
-     * @param data
-     * @return Job
+     * @param data data map
+     * @return Job created job
      */
     D createJob(Map data ) {
         def dataPayload = data.remove('dataPayload')

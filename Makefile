@@ -1,6 +1,6 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.21 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.24 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
@@ -26,8 +26,8 @@ ifdef RELEASABLE_BRANCH
 	$(log.done)
 
  kube.deploy: kube.create-ns kube.clean
-	$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
-	$(kube_tools) kubeApplyTpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
+	$(kube_tools) apply_tpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
+	$(kube_tools) apply_tpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
 	$(log.done)
 
 else

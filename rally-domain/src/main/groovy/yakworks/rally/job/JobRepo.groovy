@@ -4,10 +4,10 @@
 */
 package yakworks.rally.job
 
-import gorm.tools.json.Jsonify
 import groovy.transform.CompileStatic
 
 import gorm.tools.job.JobRepoTrait
+import gorm.tools.json.Jsonify
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener

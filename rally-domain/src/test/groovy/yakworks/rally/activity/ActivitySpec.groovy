@@ -11,6 +11,7 @@ import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.ActivityTag
@@ -18,9 +19,11 @@ import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.rally.tag.model.Tag
 import yakworks.rally.testing.MockHelper
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
@@ -35,7 +38,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
             }
             attachmentSupport(AttachmentSupport)
         }
-        mockDomains(AttachmentLink, ActivityLink, ActivityTag, Activity, Org, OrgTag, Attachment, ActivityNote)
+        mockDomains(AttachmentLink, ActivityLink, ActivityTag, Activity, Org, OrgTag, Tag, Attachment, ActivityNote, Contact, ActivityContact)
     }
 
     Map buildUpdateMap(Map args) {
@@ -141,6 +144,41 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         then:
         Activity.get(act.id) == null
         ActivityNote.get(activity.noteId) == null
+    }
+
+    void "test save with associations"() {
+        setup:
+        Org org = MockHelper.org()
+        Tag t1 = build(Tag, [name: "T1", entityName: "Activity"])
+        Tag t2 = build(Tag, [name: "T2", entityName: "Activity"])
+
+        List<Map> contacts = [
+            [name: "C1", firstName: "C1"],
+            [name: "C2", firstName: "C2"],
+        ]
+
+        expect:
+        org.id != null
+        t1.id != null
+        t2.id != null
+
+        when:
+        def params = [
+            org    : [id: org.id],
+            note   : [body: 'test note'],
+            summary: 'The summary',
+            tags: [[id:t1.id], [id:t2.id]],
+            contacts:contacts
+        ]
+
+        Activity act = Activity.create(params)
+        act.persist(flush:true)
+
+        then:
+        act != null
+        act.tags.size() == 2
+        act.tags[0].name == "T1"
+        ActivityContact.findAllByActivity(act).size() == 2
     }
 
     void testAddActivityContact() {

@@ -315,6 +315,9 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
                          Object errors = null) {
         String aprop = association.name
 
+        //return early if its a collection type - eg hasMany
+        if(Collection.isAssignableFrom(association.getType())) return
+
         //if value is null or they are the same instance type then just set and exit fast
         if (value == null || association.getType().isAssignableFrom(value.getClass())) {
             target[aprop] = value

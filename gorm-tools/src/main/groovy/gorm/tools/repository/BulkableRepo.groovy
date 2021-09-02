@@ -4,17 +4,18 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.async.AsyncSupport
-import gorm.tools.job.JobRepoTrait
+import java.util.concurrent.atomic.AtomicInteger
+
 import groovy.transform.CompileStatic
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.GenericTypeResolver
-
-import gorm.tools.job.JobTrait
 import org.springframework.transaction.TransactionStatus
 
-import java.util.concurrent.atomic.AtomicInteger
+import gorm.tools.async.AsyncSupport
+import gorm.tools.job.JobRepoTrait
+import gorm.tools.job.JobTrait
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>

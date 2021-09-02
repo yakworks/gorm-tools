@@ -24,7 +24,7 @@ trait SourceTrait  {
                  nullable: true, example: 'Oracle, BankOfAmericaLockbox'],
         sourceType:[ description: 'Enum, defaults to SourceType.App',
                      nullable: false, example: 'App', required: false],
-        sourceId:[ description: 'the unique id from the outside source or name of the scheduled job',
-                   nullable: false, example: 'AR-123-A64']
+        sourceId:[ description: 'the unique id from the outside source or name of the scheduled job', //nullable: false,  XXX put it back in when data is fixed
+                   example: 'AR-123-A64']
     ]
 }

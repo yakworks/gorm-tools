@@ -4,11 +4,11 @@
 */
 package gorm.tools.job
 
-import gorm.tools.json.Jsonify
-import gorm.tools.source.SourceType
 import groovy.transform.CompileStatic
 
+import gorm.tools.json.Jsonify
 import gorm.tools.repository.GormRepo
+import gorm.tools.source.SourceType
 
 
 @CompileStatic

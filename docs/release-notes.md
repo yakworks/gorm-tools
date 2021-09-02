@@ -1,3 +1,18 @@
+### v7.0.8-v.16
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.15...v7.0.8-v.16)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/02aa72976b2d418c832d2c11c94e5c785c1e8504)
+- Associations (#329) [link](https://github.com/yakworks/gorm-tools/commit/8d6f7aa41ca9385f59b6b2238a99ca460180585e)
+- upgrade shipkit, fix bad function call for apply_tpl [link](https://github.com/yakworks/gorm-tools/commit/dd1928f97aeff7cbc79d977c3d76b8c17d8df5a3)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/8e61dc069374ffa700bf9ec6b1d89e89158a63cd)
+- Rest API : Handle DataAccess exception and return error message (#322) [link](https://github.com/yakworks/gorm-tools/commit/5b3f97794b79faa13a5d1671d3184916dbda208e)
+- GormRepo for common doAssociations (#326) [link](https://github.com/yakworks/gorm-tools/commit/4fb0dfdfa5cc625aae2bc7809227258655c6e3d8)
+- 323 collection handling (#324) [link](https://github.com/yakworks/gorm-tools/commit/4f92e80dbd075e3ebf446162abfdcee611c1d907)
+- Sec tweaks (#321) [link](https://github.com/yakworks/gorm-tools/commit/cc6fdfd4df46e86ead07c5a1d79f1d6c413b4a38)
+- feat: added new domain AppUserToken for rest api auth, restify demo i… (#320) [link](https://github.com/yakworks/gorm-tools/commit/7cac0bd72014f6400f797d2a3f64f87c391d4d1c)
+- new shipkit v1.0.11 (#319) [link](https://github.com/yakworks/gorm-tools/commit/fc5480b369c349fc1adabcb8de5ac1124ecc3dee)
+- modify how k8s is published (#318) [link](https://github.com/yakworks/gorm-tools/commit/46a11af3d33725b926db7aa95e24871a37e85350)
+
 #### v7.0.8-v.15
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.14...v7.0.8-v.15)

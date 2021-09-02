@@ -34,6 +34,7 @@ import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.ActivityTag
@@ -44,6 +45,7 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
+import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
@@ -129,16 +131,28 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         // not very efficient as removes batch inserting for lots of acts so need to rethink this strategy
         flush()
 
-        Map data = e.data
-        if(data?.tags) {
-            //do after persisted so tables FK has activity
-            activityTagRepo.bind(activity, data.tags)
-        }
-        // now do the links
-        if (data?.arTranId) {
-            activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
+        if (e.bindAction && e.data){
+            Map data = e.data
+            doAssociations(activity, data)
         }
     }
+
+    void doAssociations(Activity activity, Map data) {
+        if(data.tags) {
+            activityTagRepo.bind(activity, data.tags)
+        }
+        if(data.contacts) {
+            data.contacts.each { it["org"] = activity.org }
+            List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
+            contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
+        }
+        // now do the links
+        if (data.arTranId) {
+            activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
+        }
+
+    }
+
 
     void wireAssociations(Activity activity) {
         if (activity.note && !activity.note.id) activity.note.id = activity.id

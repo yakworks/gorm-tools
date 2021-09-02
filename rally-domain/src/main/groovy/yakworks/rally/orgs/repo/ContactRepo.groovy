@@ -78,26 +78,18 @@ class ContactRepo implements GormRepo<Contact> {
 
     @RepoListener
     void afterPersist(Contact contact, AfterPersistEvent e) {
-        // if it was a bind and has locations data
-        List locationsData = e.data?.locations as List<Map>
-        if (e.bindAction && locationsData) {
-            doLocations(contact, locationsData)
+        if (e.bindAction && e.data){
+            Map data = e.data
+            doAssociations(contact, data)
         }
         if (contact.location?.isDirty()) contact.location.persist()
     }
 
-    void doLocations(Contact contact, List<Map> locations) {
-        for(Map location: locations){
-            String op = location.op as String  //add, update, remove
-            Long id = location.id as Long
-            location['contact'] = contact
-            //if its null then assume its an add or update depending on id
-            if(id){
-                Location.update(location)
-            } else {
-                Location.create(location)
-            }
-        }
+    void doAssociations(Contact contact, Map data) {
+        if(data.locations) doAssociation(contact, Location.repo, data.locations as List<Map>, "contact")
+        if(data.phones) doAssociation(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+        if(data.emails) doAssociation(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+        if(data.sources) doAssociation(contact, ContactSource.repo, data.sources as List<Map>, "contact")
     }
 
     void assignOrgFromOrgId(Contact contact, Map data) {

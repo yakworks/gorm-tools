@@ -17,7 +17,9 @@ import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
+import gorm.tools.job.JobTrait
 import gorm.tools.mango.api.QueryMangoEntityApi
+import gorm.tools.repository.BulkableRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityNotFoundException
@@ -25,6 +27,7 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
 import gorm.tools.rest.error.ApiError
 import gorm.tools.rest.error.ApiValidationError
+import grails.converters.JSON
 import grails.validation.ValidationException
 import grails.web.Action
 
@@ -180,14 +183,18 @@ trait RestRepositoryApi<D> implements RestApiController {
     // XXX https://github.com/9ci/domain9/issues/331 Fix it so it works with Job that is created
     @Action
     def bulkCreate() {
-        Map dataMap = parseJson(request)
-        def job = getRepo().bulkCreate(dataMap.ids as List, dataMap.data as Map)
+        List dataList = parseJson(request).list as List
+        def job = ((BulkableRepo)getRepo()).bulkCreate(dataList)
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
         //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return
         //  list of all sourceIds/ids that we created
         //  so in includes we can specify what we return
-        respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
+        //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
+        byte[] jsonB = job["results"] as byte[]
+        String str = new String(jsonB, "UTF-8")
+        Map resp = [id: job.id, results: JSON.parse(str)]
+        respond resp, status: CREATED.value()
     }
 
     //@CompileDynamic

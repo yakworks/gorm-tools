@@ -184,7 +184,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     // called in afterBind
     void addRelatedDomainsToActivity(Activity activity, Map data) {
         if (data.attachments) {
-            List attachments = attachmentRepo.bulkCreate(data.attachments as List)
+            List attachments = attachmentRepo.bulkCreateOrUpdate(data.attachments as List)
             attachments.each { Attachment attachment ->
                 linkAttachment(activity, attachment)
             }
@@ -295,7 +295,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         List attachments = []
         List attachmentData = activityData?.attachments as List
         if (attachmentData) {
-            attachments = attachmentRepo.bulkCreate(attachmentData)
+            attachments = attachmentRepo.bulkCreateOrUpdate(attachmentData)
             if (targets[0].class.simpleName == "Payment") {
                 attachments.each { Attachment att ->
                     String summary = activityData?.summary

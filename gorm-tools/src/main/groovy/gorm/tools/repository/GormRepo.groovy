@@ -315,10 +315,12 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @param args args to pass to doCreate
      * @return the list of created entities
      */
+
+    /*
     List<D> bulkCreate(List<Map> dataList, Map args = [:]){
         // chunk data in
         return doBulkCreate(dataList, args)
-    }
+    }*/
 
 
     List<D> doBulkCreate(List<Map> dataList, Map args = [:]){

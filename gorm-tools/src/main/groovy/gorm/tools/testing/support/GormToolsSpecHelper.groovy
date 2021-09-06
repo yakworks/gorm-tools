@@ -13,6 +13,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
+import gorm.tools.async.GparsAsyncSupport
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
@@ -25,6 +26,8 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.transaction.TrxService
+import grails.persistence.support.NullPersistentContextInterceptor
+import grails.persistence.support.PersistenceContextInterceptor
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
@@ -74,6 +77,8 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
+            persistenceContextInterceptor(NullPersistentContextInterceptor) //required for asyncSupport
+            asyncSupport(GparsAsyncSupport)
 
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
             for (Class domainClass in domainClassesToMock) {

@@ -9,10 +9,15 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.GenericTypeResolver
 
 import gorm.tools.async.AsyncSupport
 import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobTrait
+import gorm.tools.json.Jsonify
+import gorm.tools.support.Results
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -24,12 +29,13 @@ trait BulkableRepo<D, J extends JobTrait>  {
     JobRepoTrait jobRepo
 
     @Autowired
+    @Qualifier("asyncSupport")
     AsyncSupport asyncSupport
 
-    // @Value('${hibernate.jdbc.batch_size:50}')
+    @Value('${hibernate.jdbc.batch_size:50}')
     int batchSize  //XXX https://github.com/9ci/domain9/issues/331  test if @Value works on trait
 
-    // @Value('${nine.autocash.parallelProcessing.enabled:false}')
+    @Value('${nine.autocash.parallelProcessing.enabled:false}')
     boolean parallelProcessingEnabled //XXX https://github.com/9ci/domain9/issues/331  we might have to move it, here we can have default
 
     // GormRepo implements it
@@ -39,7 +45,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
     abstract gormStaticApi()
 
     //// XXX https://github.com/9ci/domain9/issues/331 Not sure if needed any more
-    abstract List bulkCreate()
+    //abstract List bulkCreate()
 
 //////// MOVED FROM GORM REPO
 
@@ -56,36 +62,36 @@ trait BulkableRepo<D, J extends JobTrait>  {
      */
     J bulkCreate(List<Map> dataList, Map args = [:]){
 
-        // XXX https://github.com/9ci/domain9/issues/331 call to create Job
         // create job
-        J job
+        Class<J> jobClass = (Class<J>)GenericTypeResolver.resolveTypeArguments(getClass(), BulkableRepo)[1]
+        J job = jobClass.newInstance() as J
 
         // XXX We can do something similar for error count
         AtomicInteger count = new AtomicInteger(0)
 
         // for error handling -- based on `onError` from args commit success and report the failure or fail them all
         //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
-
-        // @Sudhir - I took below code from domain9 FinanceChargeService in case you need reference
+        //@jdabal - for parallel async, we can not rollback batches which are already commited
+        //as each batch would be in its own transaction.
+        List bulkResult = []
         if(parallelProcessingEnabled) {
             //run the batch parallel in batched transactions
-            asyncSupport.parallelCollate([batchSize:batchSize], dataList) { Map row ->
+            asyncSupport.parallel([batchSize:batchSize], dataList.collate(batchSize)) { List<Map> batch ->
                 // returns entity that was created, but into Job object we only want id and sourceid.
-                // id:123, source.sourceId
-                // we need a method that takes List resultList that was returned and does only subset and returns List<Map> and puts in job
-
+                // id:123, source.sourceId, -  @jdabal assume that every domain which is bulk imported haas sourceId field ?
                 // store results in resultList,but id and sourceId only for succesfully created records
-                def results = doBulkCreate(dataList, args)
-                count.getAndIncrement()
+                List results = doBulkCreate(batch, args)
+                if(results) bulkResult.addAll transformResults(results)
             }
         } else {
-            for(Map row : dataList) {
-                doBulkCreate(dataList, args)
-                count.getAndIncrement()
-            }
+            List results = doBulkCreate(dataList, args)
+            if(results) bulkResult.addAll transformResults(results)
         }
 
-        //XXX https://github.com/9ci/domain9/issues/331 when completed assign results on Job.results
+        count.getAndAdd(bulkResult.size())
+
+        job['results'] = Jsonify.render(bulkResult).jsonText.bytes
+        job.persist()
 
         //XXX  https://github.com/9ci/domain9/issues/331 assign jobId on each record created.
         // Special handling for arTran - we will have ArTranJob (jobId, arTranId). For all others we would
@@ -93,18 +99,33 @@ trait BulkableRepo<D, J extends JobTrait>  {
         return job
     }
 
-    List<D> doBulkCreate(List<Map> dataList, Map args = [:]){
-        List resultList = [] as List<D>
+    List<Results> doBulkCreate(List<Map> dataList, Map args = [:]){
+        List<Results> resultList = [] as List<Results>
         for (Map item : dataList) {
-            // wrap in try/catch
-            // put error in results object, just like in cash app (for example CorrectService.correctPaymentList) and we can move on if one failed
-            D entity = doCreate(item, args)
-            resultList.add(entity)
+            D entity
+            try {
+                entity = doCreate(item, args)
+                resultList.add Results.OK().id(entity["id"] as Long)
+            } catch(Exception e) {
+                resultList.add Results.error(e)
+            }
         }
         return resultList
     }
 
-//////////////////
+    private List<Map> transformResults(List<Results> results) {
+        List<Map> ret = []
+        for (Results r : results) {
+            if (r.ok) {
+                ret << [id: r.id, success: "true"]
+            } else {
+                ret << [success: "false", message: r.message]
+            }
+        }
+        return ret
+    }
+
+
 
     // Class<J> jobClass // the domain class this is for
     // /**

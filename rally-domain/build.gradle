@@ -11,7 +11,9 @@ dependencies {
   //plugins
   compileOnly "org.grails.plugins:view-tools:$vViewTools"
   //used for json parsing but require it to be added to project that uses this
-  compileOnly "org.grails.plugins:views-json:$vViews"
+  compileOnly("org.grails.plugins:views-json:$vViews") {
+    exclude group:"org.grails", module: "grails-plugin-controllers"
+  }
   compileOnly "org.grails.plugins:views-json-templates:$vViews"
 
   //libs

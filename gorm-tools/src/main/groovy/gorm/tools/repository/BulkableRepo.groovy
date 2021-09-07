@@ -39,7 +39,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
     boolean parallelProcessingEnabled //XXX https://github.com/9ci/domain9/issues/331  we might have to move it, here we can have default
 
     // GormRepo implements it
-    abstract void bindAndCreate(entity, Map data, Map args)
+    abstract void bindAndCreate(D entity, Map data, Map args)
 
     // need cleaner way to do transaction, change it
     abstract gormStaticApi()

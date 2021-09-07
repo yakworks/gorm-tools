@@ -29,6 +29,10 @@ class Job implements JobTrait<Job>, Serializable {
 
     private static final int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 
+    static mapping = {
+        state column: 'state', lazy: false, enumType: 'identity'
+    }
+
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],
         message:[ d: 'Main message from results'],

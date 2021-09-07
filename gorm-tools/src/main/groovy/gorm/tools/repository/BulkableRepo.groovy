@@ -39,10 +39,11 @@ trait BulkableRepo<D, J extends JobTrait>  {
     boolean parallelProcessingEnabled //XXX https://github.com/9ci/domain9/issues/331  we might have to move it, here we can have default
 
     // GormRepo implements it
-    abstract D doCreate(Map data, Map args)
+    abstract void bindAndCreate(entity, Map data, Map args)
 
     // need cleaner way to do transaction, change it
     abstract gormStaticApi()
+    abstract  Class<D> getEntityClass()
 
     //// XXX https://github.com/9ci/domain9/issues/331 Not sure if needed any more
     //abstract List bulkCreate()
@@ -102,25 +103,45 @@ trait BulkableRepo<D, J extends JobTrait>  {
     List<Results> doBulkCreate(List<Map> dataList, Map args = [:]){
         List<Results> resultList = [] as List<Results>
         for (Map item : dataList) {
-            D entity
+            D entity = (D)getEntityClass().newInstance()
+            Results r
             try {
-                entity = doCreate(item, args)
-                resultList.add Results.OK().id(entity["id"] as Long)
+                //need to do bindAndCreate - so that even if create fails, we can get source.sourceId if it is created
+                bindAndCreate(entity, item, args)
+                r = Results.OK().id(entity["id"] as Long)
             } catch(Exception e) {
-                resultList.add Results.error(e)
+                r = Results.error(e)
             }
+            String sourceId = getSourceId(entity, item)
+            if(sourceId) {
+                r.meta['sourceId'] = sourceId
+            }
+            resultList.add r
         }
         return resultList
+    }
+
+    private String getSourceId(D entity, Map item) {
+        String sourceId = null
+        //if the domain has source.sourceId return it
+        if(entity && entity.hasProperty("source") && entity['source']) {
+            sourceId = entity["source"]["sourceId"]
+        }
+        return sourceId
     }
 
     private List<Map> transformResults(List<Results> results) {
         List<Map> ret = []
         for (Results r : results) {
+            Map m = [:]
             if (r.ok) {
-                ret << [id: r.id, success: "true"]
+                m =  [id: r.id, success: "true"]
             } else {
-                ret << [success: "false", message: r.message]
+                m = [success: "false", message: r.message]
             }
+            if(r.meta["sourceId"]) m['sourceId'] = r.meta["sourceId"] as String
+            ret << m
+
         }
         return ret
     }

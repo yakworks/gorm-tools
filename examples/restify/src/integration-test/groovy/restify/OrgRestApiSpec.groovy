@@ -131,7 +131,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         List<Map> phones = [[kind: "kind", num: "123"]]
         List<Map> emails = [[kind: "kind", address: "test@9ci.com"]]
-        List<Map> sources = [[source: "source", sourceType: "sourceType", sourceId: "1"]]
+        List<Map> sources = [[source: "source", sourceType: "RestApi", sourceId: "1"]]
 
         List<Map> contacts = [
             [name: "C1", firstName: "C1", phones: phones, emails:emails, sources: sources],

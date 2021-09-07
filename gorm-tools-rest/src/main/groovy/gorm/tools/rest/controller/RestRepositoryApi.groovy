@@ -182,8 +182,8 @@ trait RestRepositoryApi<D> implements RestApiController {
     /** Used for bulk create calls when Job object is returned */
     // XXX https://github.com/9ci/domain9/issues/331 Fix it so it works with Job that is created
     @Action
-    def bulkCreate() {
-        List dataList = parseJson(request).list as List
+    def bulk() {
+        List dataList = parseJsonList(request)
         def job = ((BulkableRepo)getRepo()).bulkCreate(dataList)
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.

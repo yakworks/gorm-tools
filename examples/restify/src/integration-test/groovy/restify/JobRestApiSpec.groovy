@@ -14,10 +14,8 @@ import yakworks.rally.orgs.model.Contact
 @Integration
 class JobRestApiSpec extends Specification implements OkHttpRestTrait {
 
-    String path = "/api/rally/org/bulkCreate?source=Oracle"
-    Map postData = [num:'foo1', name: "foo", type: 'Customer']
-
-    // XXX https://github.com/9ci/domain9/issues/331 Not sure if we need it and if it's in a good place
+    String path = "/api/rally/org/bulk?source=Oracle"
+    
     void "testing post Org with Job"() {
         given:
         List<Map> jsonList = [
@@ -26,7 +24,7 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
             [num: "foox3", name: "Foox3", type: "Customer"],
         ]
         when:
-        Response resp = post(path, [list:jsonList])
+        Response resp = post(path, jsonList)
 
         Map body = bodyToMap(resp)
 

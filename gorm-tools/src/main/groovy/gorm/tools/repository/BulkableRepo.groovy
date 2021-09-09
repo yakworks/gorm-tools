@@ -115,7 +115,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
             } catch(Exception e) {
                 r = Results.error(e)
                 r.ex = e
-                r.meta["item"] = itmCopy   //set original data map on error
+                r.meta["data"] = itmCopy   //set original data map on error
             }
             resultList.add r
         }
@@ -133,7 +133,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
             } else {
                 //failed result would have original incoming map, return it as it is
                 m = [ok: false] as Map<String, Object>
-                m["item"] = r.meta["item"] //set original incoming data map
+                m["data"] = r.meta["item"] //set original incoming data map
 
                 Exception ex = r.ex
                 if(ex instanceof EntityValidationException || ex instanceof ValidationException) {

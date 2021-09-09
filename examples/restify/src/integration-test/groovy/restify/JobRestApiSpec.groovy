@@ -65,9 +65,9 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
         body.results[0].ok == true
         body.results[1].ok == true
         body.results[2].ok == false
-        body.results[2].item.num == "fooy2" //the original map would be returned back with error
-        body.results[2].item.name == "fooy2"
-        body.results[2].item.type == "Customer"
+        body.results[2].data.num == "fooy2" //the original map would be returned back with error
+        body.results[2].data.name == "fooy2"
+        body.results[2].data.type == "Customer"
         body.results[2].error != null
 
 

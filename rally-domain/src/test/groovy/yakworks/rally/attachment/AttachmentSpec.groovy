@@ -159,7 +159,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         list.add([tempFileName:tempFile2.fileName, name:'grails_logo2.jpg'])
 
         when:
-        List attachments = attachmentRepo.bulkCreate(list)
+        List attachments = attachmentRepo.bulkCreateOrUpdate(list)
 
         then:
         2 == attachments.size()

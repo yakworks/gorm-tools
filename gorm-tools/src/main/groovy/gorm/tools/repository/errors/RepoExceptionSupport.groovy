@@ -6,9 +6,13 @@ package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
 
+import org.springframework.context.MessageSource
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
+import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.RepoMessage
 
 /**
@@ -59,5 +63,21 @@ class RepoExceptionSupport {
         }
         return ex
     }
+
+    /**
+     * Returns list of errors in the format [{field:name, message:error}]
+     * @param Errors
+     */
+    static List<Map<String, String>> toErrorList(Errors errs) {
+        List<Map<String, String>> errors = []
+        MessageSource messageSource =  AppCtx.getCtx()
+        errs.allErrors.each {def err
+            Map m = [message:messageSource.getMessage(it, RepoMessage.defaultLocale())]
+            if(it instanceof FieldError) m['field'] = it.field
+            errors << m
+        }
+        return errors
+    }
+
 
 }

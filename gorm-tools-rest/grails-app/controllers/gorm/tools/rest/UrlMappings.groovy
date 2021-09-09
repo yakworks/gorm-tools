@@ -30,6 +30,9 @@ class UrlMappings {
                     get "/$id(.$format)?"(controller: cName, action: "get")
                     get "/picklist(.$format)?"(controller: cName, action: "picklist")
 
+                    post "/bulk(.$format)?"(controller: cName, action: "bulkCreate")
+                    put "/bulk(.$format)?"(controller: cName, action: "bulkUpdate")
+
                     post "(.$format)?"(controller: cName, action: "post")
                     put "/$id(.$format)?"(controller: cName, action: "put")
                     patch "/$id(.$format)?"(controller: cName, action: "put")

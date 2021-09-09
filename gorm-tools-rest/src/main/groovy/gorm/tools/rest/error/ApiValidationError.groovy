@@ -6,17 +6,12 @@ package gorm.tools.rest.error
 
 import groovy.transform.CompileStatic
 
-import org.springframework.context.MessageSource
 import org.springframework.http.HttpStatus
 import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.repository.RepoMessage
-import grails.validation.ValidationException
+import gorm.tools.repository.errors.RepoExceptionSupport
 
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
-
 
 @CompileStatic
 class ApiValidationError extends ApiError {
@@ -34,11 +29,6 @@ class ApiValidationError extends ApiError {
     }
 
     private void populateErrors(Errors errs) {
-        MessageSource messageSource =  AppCtx.getCtx()
-        errs.allErrors.each {def err
-            Map m = [message:messageSource.getMessage(it, RepoMessage.defaultLocale())]
-            if(it instanceof FieldError) m['field'] = it.field
-            this.errors << m
-        }
+        this.errors = RepoExceptionSupport.toErrorList(errs) as List<Map>
     }
 }

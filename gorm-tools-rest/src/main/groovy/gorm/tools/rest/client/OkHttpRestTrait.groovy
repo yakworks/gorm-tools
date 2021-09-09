@@ -53,6 +53,18 @@ trait OkHttpRestTrait {
         return getHttpClient().newCall(request).execute()
     }
 
+    Response post(String uriPath, List body) {
+        String jsonBody = toJson(body)
+        RequestBody requestBody = RequestBody.create(jsonBody, getJsonMediaType())
+
+        Request request = new Request.Builder().url(getUrl(uriPath))
+            .addHeader("Content-Type", jsonHeader)
+            .post(requestBody)
+            .build()
+
+        return getHttpClient().newCall(request).execute()
+    }
+
     Response put(String uriPath, Map body, Object id) {
         put("$uriPath/$id", body)
     }

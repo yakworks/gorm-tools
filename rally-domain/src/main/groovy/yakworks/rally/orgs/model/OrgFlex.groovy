@@ -4,8 +4,6 @@
 */
 package yakworks.rally.orgs.model
 
-import java.time.LocalDateTime
-
 import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic

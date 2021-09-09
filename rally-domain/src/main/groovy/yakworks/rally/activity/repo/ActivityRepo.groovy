@@ -26,6 +26,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.services.SecService
+import gorm.tools.source.SourceType
 import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
@@ -183,7 +184,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     // called in afterBind
     void addRelatedDomainsToActivity(Activity activity, Map data) {
         if (data.attachments) {
-            List attachments = attachmentRepo.bulkCreate(data.attachments as List)
+            List attachments = attachmentRepo.bulkCreateOrUpdate(data.attachments as List)
             attachments.each { Attachment attachment ->
                 linkAttachment(activity, attachment)
             }
@@ -250,8 +251,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         updateSummary(activity)
 
         activity.title = title
-        activity.source = source
-        activity.sourceEntity = entityName
+        activity.source = entityName
+        activity.sourceType = SourceType.App
         activity.persist()
 
         targets.each { target ->
@@ -294,7 +295,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         List attachments = []
         List attachmentData = activityData?.attachments as List
         if (attachmentData) {
-            attachments = attachmentRepo.bulkCreate(attachmentData)
+            attachments = attachmentRepo.bulkCreateOrUpdate(attachmentData)
             if (targets[0].class.simpleName == "Payment") {
                 attachments.each { Attachment att ->
                     String summary = activityData?.summary
@@ -348,8 +349,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         Activity activity = new Activity(
             org         : org,
             title       : text,
-            source      : source,
-            sourceEntity: entityName
+            source      : entityName,
+            sourceType: SourceType.App
         )
         generateId(activity)
         if (task) {

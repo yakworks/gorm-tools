@@ -7,11 +7,11 @@ package yakworks.rally.orgs.model
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.repository.model.GormRepoEntity
+import gorm.tools.source.SourceType
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.common.NameNum
-import yakworks.rally.common.SourceType
 import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.tag.model.Taggable
 

@@ -15,9 +15,9 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.source.SourceType
 import gorm.tools.support.MsgKey
 import yakworks.commons.lang.Validate
-import yakworks.rally.common.SourceType
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org

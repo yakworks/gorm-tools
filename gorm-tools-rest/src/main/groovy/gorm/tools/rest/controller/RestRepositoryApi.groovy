@@ -11,30 +11,27 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
-import org.springframework.dao.DataAccessException
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.QueryMangoEntityApi
+import gorm.tools.repository.BulkableRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.errors.EntityNotFoundException
-import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.rest.RestApiConfig
 import gorm.tools.rest.error.ApiError
+import gorm.tools.rest.error.ApiErrorHandler
 import gorm.tools.rest.error.ApiValidationError
-import grails.validation.ValidationException
 import grails.web.Action
 
-import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import static org.springframework.http.HttpStatus.NOT_FOUND
-import static org.springframework.http.HttpStatus.NO_CONTENT
-import static org.springframework.http.HttpStatus.OK
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
+import static org.springframework.http.HttpStatus.*
 
+/**
+ * This is the CRUD controller for entities
+ * @param <D> Object
+ */
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepositoryApi<D> implements RestApiController {
@@ -172,6 +169,24 @@ trait RestRepositoryApi<D> implements RestApiController {
         respond([data: data])
     }
 
+    /** Used for bulk create calls when Job object is returned */
+    @Action
+    def bulkCreate() {
+        List dataList = parseJsonList(request)
+        def job = ((BulkableRepo)getRepo()).bulkCreate(dataList, [includes: getIncludes("bulk"), source:params.source])
+        // XXX we don't have incs. We just need to do entityMap and respond it
+        //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
+        //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return
+        //  list of all sourceIds/ids that we created
+        //  so in includes we can specify what we return
+        //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
+        byte[] jsonB = job["results"] as byte[]
+        String str = new String(jsonB, "UTF-8")
+        Map resp = [id: job.id, ok:job.ok, results: parseJson(new StringReader(str))]
+        if(job.source) resp.source = job.source
+        respond resp, status: CREATED.value()
+    }
+
     //@CompileDynamic
     Pager pagedQuery(Map params, String includesKey) {
         Pager pager = new Pager(params)
@@ -239,26 +254,15 @@ trait RestRepositoryApi<D> implements RestApiController {
     List getqSearchIncludes() { [] }
 
     void handleException(RuntimeException e) {
-        if( e instanceof EntityNotFoundException){
-            respond([view: '/errors/_errors'], new ApiError(status:NOT_FOUND, title: "Not Found", detail:e.message))
-        }
-        else if( e instanceof EntityValidationException ){
-            //e.message is full error message with msg for each field, so use e.defaultMessage
-            respond([view: '/errors/_errors422'], new ApiValidationError(e.defaultMessage, e.errors))
-        }
-        else if( e instanceof ValidationException ){
-            //e.message will be full error message, so build same error message as EntityValidationException.defaultMessage
-            respond([view: '/errors/_errors422'], new ApiValidationError("${entityClass.simpleName} validation errors", e.errors))
-        }
-        else if(e instanceof DataAccessException ){
-            respond([view: '/errors/_errors'], new ApiError(status:UNPROCESSABLE_ENTITY, title: "Data Access Exception", detail:e.message))
-        }
-        else {
-            log.error(e.message, e)
-            respond([view: '/errors/_errors'], new ApiError(status:INTERNAL_SERVER_ERROR, title:"Internal Error", detail:e.message))
+        ApiError apiError = ApiErrorHandler.handleException(entityClass, e)
+
+        log.error(e.message, e)
+        if( apiError instanceof ApiValidationError){
+            respond([view: '/errors/_errors422'], apiError)
+        } else {
+            respond([view: '/errors/_errors'], apiError)
         }
 
     }
-
 
 }

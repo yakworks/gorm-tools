@@ -31,6 +31,7 @@ restApi:
         entityClass: yakworks.rally.orgs.model.Org
         includes:
           get: [ '*', 'info.*', 'location.id' ]
+          bulk: ['id', 'num', 'name', 'source.sourceId']
       orgTypeSetup:
         entityClass: yakworks.rally.orgs.model.OrgTypeSetup
       tag:

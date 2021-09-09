@@ -14,6 +14,7 @@ import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
 import gorm.tools.async.GparsAsyncSupport
+import gorm.tools.beans.EntityMapService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
@@ -79,6 +80,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
             persistenceContextInterceptor(NullPersistentContextInterceptor) //required for asyncSupport
             asyncSupport(GparsAsyncSupport)
+            entityMapService(EntityMapService)
 
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
             for (Class domainClass in domainClassesToMock) {

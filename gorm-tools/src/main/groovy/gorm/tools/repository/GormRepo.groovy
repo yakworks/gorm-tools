@@ -307,36 +307,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         }
     }
 
-    //XXX https://github.com/9ci/domain9/issues/331  TAKE bulkCreate and doBulkCreate out. We moved them to BulkableRepo
-    /**
-     * batch creates a list of items in a trx
-     *
-     * @param dataList the list of data maps to create
-     * @param args args to pass to doCreate
-     * @return the list of created entities
-     */
-
-    /*
-    List<D> bulkCreate(List<Map> dataList, Map args = [:]){
-        // chunk data in
-        return doBulkCreate(dataList, args)
-    }*/
-
-
-    List<D> doBulkCreate(List<Map> dataList, Map args = [:]){
-        List resultList = [] as List<D>
-        gormStaticApi().withTransaction { TransactionStatus status ->
-            for (Map item : dataList) {
-                // wrap in try/catch
-                // put error in results object, just like in cash app
-                D entity = doCreate(item, args)
-                resultList.add(entity)
-            }
-        }
-        return resultList
-    }
-
-
 
     /**
      * Mass update a list of ids

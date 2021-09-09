@@ -184,7 +184,7 @@ class EntityMapService {
             Map<String, ConstrainedProperty> constraints = GormMetaUtils.findAllConstrainedProperties(entity)
             blacklist = constraints.findAll{
                 !it.value.isDisplay()
-            }.collect {it.key} as Set<String>
+            }*.key as Set<String>
             BLACKLIST.put(clazz, blacklist)
         }
         return blacklist

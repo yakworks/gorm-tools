@@ -36,7 +36,11 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
         body.results != null
         body.results.size() == 3
         body.results[0].id != null
-        body.results[0].sourceId == "foox1"
+
+        //verify the bulk includes from restapi-config.xml
+        body.results[0].source.sourceId == "foox1"
+        body.results[0].num == "foox1"
+        body.results[0].name == "Foox1"
     }
 
     void "testing post with duplicates"() {
@@ -59,11 +63,14 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
         body.results != null
         body.results.size() == 3
         body.results[0].id != null
-        body.results[0].sourceId != null
+        body.results[0].source.sourceId != null
         body.results[0].success == "true"
         body.results[1].success == "true"
         body.results[2].success == "false"
-        body.results[2].sourceId  == "fooy2"
+        body.results[2].num == "fooy2" //the original map would be returned back with error
+        body.results[2].name == "fooy2"
+        body.results[2].error != null
+
 
         cleanup:
         jdbcTemplate.execute("DROP index org_source_unique")

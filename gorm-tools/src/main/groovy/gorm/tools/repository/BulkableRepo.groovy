@@ -12,12 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.GenericTypeResolver
+import org.springframework.validation.Errors
 
 import gorm.tools.async.AsyncSupport
+import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobTrait
 import gorm.tools.json.Jsonify
+import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.support.Results
+import grails.validation.ValidationException
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -32,23 +37,19 @@ trait BulkableRepo<D, J extends JobTrait>  {
     @Qualifier("asyncSupport")
     AsyncSupport asyncSupport
 
+    @Autowired
+    EntityMapService entityMapService
+
     @Value('${hibernate.jdbc.batch_size:50}')
-    int batchSize  //XXX https://github.com/9ci/domain9/issues/331  test if @Value works on trait
+    int batchSize
 
     @Value('${nine.autocash.parallelProcessing.enabled:false}')
-    boolean parallelProcessingEnabled //XXX https://github.com/9ci/domain9/issues/331  we might have to move it, here we can have default
+    boolean parallelProcessingEnabled
 
-    // GormRepo implements it
-    abstract void bindAndCreate(D entity, Map data, Map args)
-
-    // need cleaner way to do transaction, change it
-    abstract gormStaticApi()
+    //Here for @CompileStatic - GormRepo implements it
+    abstract D doCreate(Map data, Map args)
     abstract  Class<D> getEntityClass()
 
-    //// XXX https://github.com/9ci/domain9/issues/331 Not sure if needed any more
-    //abstract List bulkCreate()
-
-//////// MOVED FROM GORM REPO
 
     /**
      * allows to pass in bulk of records at once, for example /api/book/bulk
@@ -62,12 +63,11 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @return Job
      */
     J bulkCreate(List<Map> dataList, Map args = [:]){
-
         // create job
         Class<J> jobClass = (Class<J>)GenericTypeResolver.resolveTypeArguments(getClass(), BulkableRepo)[1]
         J job = jobClass.newInstance() as J
 
-        // XXX We can do something similar for error count
+        // XXX error count / rollback support
         AtomicInteger count = new AtomicInteger(0)
 
         // for error handling -- based on `onError` from args commit success and report the failure or fail them all
@@ -75,24 +75,22 @@ trait BulkableRepo<D, J extends JobTrait>  {
         //@jdabal - for parallel async, we can not rollback batches which are already commited
         //as each batch would be in its own transaction.
         List bulkResult = []
-        if(parallelProcessingEnabled) {
-            //run the batch parallel in batched transactions
-            asyncSupport.parallel([batchSize:batchSize], dataList.collate(batchSize)) { List<Map> batch ->
-                // returns entity that was created, but into Job object we only want id and sourceid.
-                // id:123, source.sourceId, -  @jdabal assume that every domain which is bulk imported haas sourceId field ?
-                // store results in resultList,but id and sourceId only for succesfully created records
-                List results = doBulkCreate(batch, args)
-                if(results) bulkResult.addAll transformResults(results)
+        try {
+            if (getParallelProcessingEnabled()) {
+                asyncSupport.parallel([batchSize: getBatchSize()], dataList.collate(getBatchSize())) { List<Map> batch ->
+                    List results = doBulkCreate(batch, args)
+                    if (results) bulkResult.addAll transformResults(results, args.includes as List)
+                }
+            } else {
+                List results = doBulkCreate(dataList, args)
+                if (results) bulkResult.addAll transformResults(results, args.includes as List)
             }
-        } else {
-            List results = doBulkCreate(dataList, args)
-            if(results) bulkResult.addAll transformResults(results)
+        } finally {
+            count.getAndAdd(bulkResult.size())
+            job['results'] = Jsonify.render(bulkResult).jsonText.bytes
+            job.persist()
         }
 
-        count.getAndAdd(bulkResult.size())
-
-        job['results'] = Jsonify.render(bulkResult).jsonText.bytes
-        job.persist()
 
         //XXX  https://github.com/9ci/domain9/issues/331 assign jobId on each record created.
         // Special handling for arTran - we will have ArTranJob (jobId, arTranId). For all others we would
@@ -103,60 +101,45 @@ trait BulkableRepo<D, J extends JobTrait>  {
     List<Results> doBulkCreate(List<Map> dataList, Map args = [:]){
         List<Results> resultList = [] as List<Results>
         for (Map item : dataList) {
-            D entity = (D)getEntityClass().newInstance()
+            D entityInstance
             Results r
             try {
-                //need to do bindAndCreate - so that even if create fails, we can get source.sourceId if it is created
-                bindAndCreate(entity, item, args)
-                r = Results.OK().id(entity["id"] as Long)
+                entityInstance = doCreate(item, args)
+                r = Results.OK().id(entityInstance["id"] as Long)
+                r.entity = entityInstance
             } catch(Exception e) {
                 r = Results.error(e)
-            }
-            String sourceId = getSourceId(entity, item)
-            if(sourceId) {
-                r.meta['sourceId'] = sourceId
+                //set original data map
+                r.meta["item"] = item
             }
             resultList.add r
         }
         return resultList
     }
 
-    private String getSourceId(D entity, Map item) {
-        String sourceId = null
-        //if the domain has source.sourceId return it
-        if(entity && entity.hasProperty("source") && entity['source']) {
-            sourceId = entity["source"]["sourceId"]
-        }
-        return sourceId
-    }
-
-    private List<Map> transformResults(List<Results> results) {
+    private List<Map> transformResults(List<Results> results, List includes = []) {
         List<Map> ret = []
         for (Results r : results) {
-            Map m = [:]
+            Map<String, Object> m
             if (r.ok) {
-                m =  [id: r.id, success: "true"]
+                //successful result would have entity, use the includes list to prepare result object
+                m =  [id: r.id, success: "true"] as Map<String, Object>
+                if(includes) m << entityMapService.createEntityMap(r.entity, includes) as Map<String, Object>
             } else {
-                m = [success: "false", message: r.message]
-            }
-            if(r.meta["sourceId"]) m['sourceId'] = r.meta["sourceId"] as String
-            ret << m
+                //failed result would have original incoming map, return it as it is
+                m = [success: "false"] as Map<String, Object>
+                m << (r.meta["item"] as Map<String, Object>) //set original incoming data map
 
+                Exception ex = r.ex
+                if(ex instanceof EntityValidationException || r.ex instanceof ValidationException) {
+                    m["errors"] = RepoExceptionSupport.toErrorList(ex["errors"] as Errors)
+                } else {
+                    m["error"] = r.message
+                }
+
+            }
+            ret << m
         }
         return ret
     }
-
-
-
-    // Class<J> jobClass // the domain class this is for
-    // /**
-    //  * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
-    //  */
-    // @Override
-    // Class<J> getJobClass() {
-    //     if (!jobClass) this.jobClass = (Class<J>) GenericTypeResolver.resolveTypeArgument(getClass(), GormRepo)
-    //     return jobClass
-    // }
-
-
 }

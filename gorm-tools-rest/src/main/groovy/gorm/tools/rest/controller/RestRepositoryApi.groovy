@@ -173,7 +173,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     @Action
     def bulkCreate() {
         List dataList = parseJsonList(request)
-        def job = ((BulkableRepo)getRepo()).bulkCreate(dataList, [includes: getIncludes("bulk")])
+        def job = ((BulkableRepo)getRepo()).bulkCreate(dataList, [includes: getIncludes("bulk"), source:params.source])
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
         //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return
@@ -183,6 +183,7 @@ trait RestRepositoryApi<D> implements RestApiController {
         byte[] jsonB = job["results"] as byte[]
         String str = new String(jsonB, "UTF-8")
         Map resp = [id: job.id, ok:job.ok, results: parseJson(new StringReader(str))]
+        if(job.source) resp.source = job.source
         respond resp, status: CREATED.value()
     }
 

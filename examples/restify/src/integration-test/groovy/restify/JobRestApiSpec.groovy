@@ -29,6 +29,7 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.CREATED.value()
         body.ok == true
+        body.source == "Oracle"
         body.results != null
         body.results.size() == 3
         body.results[0].id != null
@@ -37,6 +38,7 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
         body.results[0].source.sourceId == "foox1"
         body.results[0].num == "foox1"
         body.results[0].name == "Foox1"
+
     }
 
     void "testing post with duplicates"() {

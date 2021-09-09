@@ -90,6 +90,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
             List<Map> jsonResults = transformResults(bulkResult, args.includes as List)
             job['results'] = Jsonify.render(jsonResults).jsonText.bytes
             job.ok = !(bulkResult.any({ it.ok == false}))
+            job.source = args.source
             job.persist()
         }
 

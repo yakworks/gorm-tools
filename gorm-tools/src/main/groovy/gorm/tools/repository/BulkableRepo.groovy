@@ -109,6 +109,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 r.entity = entityInstance
             } catch(Exception e) {
                 r = Results.error(e)
+                r.ex = e
                 //set original data map
                 r.meta["item"] = item
             }
@@ -131,7 +132,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 m << (r.meta["item"] as Map<String, Object>) //set original incoming data map
 
                 Exception ex = r.ex
-                if(ex instanceof EntityValidationException || r.ex instanceof ValidationException) {
+                if(ex instanceof EntityValidationException || ex instanceof ValidationException) {
                     m["errors"] = RepoExceptionSupport.toErrorList(ex["errors"] as Errors)
                 } else {
                     m["error"] = r.message

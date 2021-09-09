@@ -182,7 +182,7 @@ trait RestRepositoryApi<D> implements RestApiController {
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
         byte[] jsonB = job["results"] as byte[]
         String str = new String(jsonB, "UTF-8")
-        Map resp = [id: job.id, results: parseJson(new StringReader(str))]
+        Map resp = [id: job.id, ok:job.ok, results: parseJson(new StringReader(str))]
         respond resp, status: CREATED.value()
     }
 

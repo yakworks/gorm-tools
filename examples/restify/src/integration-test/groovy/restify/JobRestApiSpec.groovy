@@ -2,16 +2,11 @@ package restify
 
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
-import okhttp3.HttpUrl
 import okhttp3.Response
-import org.bouncycastle.crypto.engines.EthereumIESEngine
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
-import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Specification
-import yakworks.rally.job.Job
-import yakworks.rally.orgs.model.Contact
 
 @Integration
 class JobRestApiSpec extends Specification implements OkHttpRestTrait {
@@ -33,6 +28,7 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.CREATED.value()
+        body.ok == true
         body.results != null
         body.results.size() == 3
         body.results[0].id != null
@@ -64,11 +60,12 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
         body.results.size() == 3
         body.results[0].id != null
         body.results[0].source.sourceId != null
-        body.results[0].success == "true"
-        body.results[1].success == "true"
-        body.results[2].success == "false"
-        body.results[2].num == "fooy2" //the original map would be returned back with error
-        body.results[2].name == "fooy2"
+        body.results[0].ok == true
+        body.results[1].ok == true
+        body.results[2].ok == false
+        body.results[2].item.num == "fooy2" //the original map would be returned back with error
+        body.results[2].item.name == "fooy2"
+        body.results[2].item.type == "Customer"
         body.results[2].error != null
 
 

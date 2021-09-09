@@ -74,20 +74,22 @@ trait BulkableRepo<D, J extends JobTrait>  {
         //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
         //@jdabal - for parallel async, we can not rollback batches which are already commited
         //as each batch would be in its own transaction.
-        List bulkResult = []
+        List<Results> bulkResult = []
         try {
             if (getParallelProcessingEnabled()) {
                 asyncSupport.parallel([batchSize: getBatchSize()], dataList.collate(getBatchSize())) { List<Map> batch ->
-                    List results = doBulkCreate(batch, args)
-                    if (results) bulkResult.addAll transformResults(results, args.includes as List)
+                    List<Results> results = doBulkCreate(batch, args)
+                    if (results) bulkResult.addAll results
                 }
             } else {
                 List results = doBulkCreate(dataList, args)
-                if (results) bulkResult.addAll transformResults(results, args.includes as List)
+                if (results) bulkResult.addAll results
             }
         } finally {
             count.getAndAdd(bulkResult.size())
-            job['results'] = Jsonify.render(bulkResult).jsonText.bytes
+            List<Map> jsonResults = transformResults(bulkResult, args.includes as List)
+            job['results'] = Jsonify.render(jsonResults).jsonText.bytes
+            job.ok = !(bulkResult.any({ it.ok == false}))
             job.persist()
         }
 
@@ -101,6 +103,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
     List<Results> doBulkCreate(List<Map> dataList, Map args = [:]){
         List<Results> resultList = [] as List<Results>
         for (Map item : dataList) {
+            //need to copy the incoming map, as during create(), repos may remove entries from the data map
+            Map itmCopy = [:] << item  //Maps.deepCopy(item) doesnt work, as clone returns false
             D entityInstance
             Results r
             try {
@@ -110,8 +114,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
             } catch(Exception e) {
                 r = Results.error(e)
                 r.ex = e
-                //set original data map
-                r.meta["item"] = item
+                r.meta["item"] = itmCopy   //set original data map on error
             }
             resultList.add r
         }
@@ -124,12 +127,12 @@ trait BulkableRepo<D, J extends JobTrait>  {
             Map<String, Object> m
             if (r.ok) {
                 //successful result would have entity, use the includes list to prepare result object
-                m =  [id: r.id, success: "true"] as Map<String, Object>
+                m =  [id: r.id, ok: true] as Map<String, Object>
                 if(includes) m << entityMapService.createEntityMap(r.entity, includes) as Map<String, Object>
             } else {
                 //failed result would have original incoming map, return it as it is
-                m = [success: "false"] as Map<String, Object>
-                m << (r.meta["item"] as Map<String, Object>) //set original incoming data map
+                m = [ok: false] as Map<String, Object>
+                m["item"] = r.meta["item"] //set original incoming data map
 
                 Exception ex = r.ex
                 if(ex instanceof EntityValidationException || ex instanceof ValidationException) {

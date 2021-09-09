@@ -115,7 +115,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
             } catch(Exception e) {
                 r = Results.error(e)
                 r.ex = e
-                r.meta["data"] = itmCopy   //set original data map on error
+                r.meta["item"] = itmCopy   //set original data map on error
             }
             resultList.add r
         }

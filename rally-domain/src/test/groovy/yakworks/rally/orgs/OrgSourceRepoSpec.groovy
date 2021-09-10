@@ -42,4 +42,21 @@ class OrgSourceRepoSpec extends Specification implements DomainRepoTest<OrgSourc
 
     }
 
+    void "test findBySourceIdAndOrgType"(){
+        when:
+        Org org = build(Org)
+        org.id = 202
+        org.persist()
+        Map params = [sourceId: '123', source: 'QB', sourceType: 'ERP', orgId: 202, orgType: OrgType.Customer]
+        OrgSource.create(params)
+        flushAndClear()
+
+        OrgSource os = OrgSource.findBySourceIdAndOrgType('123', OrgType.Customer)
+
+        then:
+        os != null
+
+
+    }
+
 }

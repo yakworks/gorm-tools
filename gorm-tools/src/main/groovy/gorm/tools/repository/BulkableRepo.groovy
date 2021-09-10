@@ -17,6 +17,7 @@ import org.springframework.validation.Errors
 import gorm.tools.async.AsyncSupport
 import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
+import gorm.tools.job.JobState
 import gorm.tools.job.JobTrait
 import gorm.tools.json.Jsonify
 import gorm.tools.repository.errors.EntityValidationException
@@ -63,13 +64,10 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @return Job
      */
     J bulkCreate(List<Map> dataList, Map args = [:]){
-        // create job
-        Class<J> jobClass = (Class<J>)GenericTypeResolver.resolveTypeArguments(getClass(), BulkableRepo)[1]
-        J job = jobClass.newInstance() as J
 
         // XXX error count / rollback support
         AtomicInteger count = new AtomicInteger(0)
-
+        J job
         // for error handling -- based on `onError` from args commit success and report the failure or fail them all
         //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
         //@jdabal - for parallel async, we can not rollback batches which are already commited
@@ -88,12 +86,10 @@ trait BulkableRepo<D, J extends JobTrait>  {
         } finally {
             count.getAndAdd(bulkResult.size())
             List<Map> jsonResults = transformResults(bulkResult, args.includes as List)
-            job['results'] = Jsonify.render(jsonResults).jsonText.bytes
-            job.ok = !(bulkResult.any({ it.ok == false}))
-            job.source = args.source
-            job.persist()
+            byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
+            boolean  ok = !(bulkResult.any({ it.ok == false}))
+            job = (J)jobRepo.create([ok:ok, results: resultBytes, source:args.source, state: JobState.Finished, dataPayload:dataList])
         }
-
 
         //XXX  https://github.com/9ci/domain9/issues/331 assign jobId on each record created.
         // Special handling for arTran - we will have ArTranJob (jobId, arTranId). For all others we would

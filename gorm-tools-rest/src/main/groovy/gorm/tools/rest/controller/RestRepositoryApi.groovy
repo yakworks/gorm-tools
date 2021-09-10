@@ -16,6 +16,7 @@ import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
+import gorm.tools.job.JobTrait
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.BulkableRepo
 import gorm.tools.repository.GormRepo
@@ -173,7 +174,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     @Action
     def bulkCreate() {
         List dataList = parseJsonList(request)
-        def job = ((BulkableRepo)getRepo()).bulkCreate(dataList, [includes: getIncludes("bulk"), source:params.source])
+        JobTrait job = ((BulkableRepo)getRepo()).bulkCreate(dataList, [includes: getIncludes("bulk"), source:params.source])
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
         //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return

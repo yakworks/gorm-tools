@@ -45,7 +45,6 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind

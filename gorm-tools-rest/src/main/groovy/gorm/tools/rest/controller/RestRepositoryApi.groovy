@@ -38,7 +38,7 @@ import static org.springframework.http.HttpStatus.*
 trait RestRepositoryApi<D> implements RestApiController {
 
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
-    final private static Logger log = LoggerFactory.getLogger(RestRepositoryApi.class)
+    final private static Logger log = LoggerFactory.getLogger(RestRepositoryApi)
 
     @Autowired
     RestApiConfig restApiConfig

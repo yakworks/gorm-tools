@@ -13,7 +13,7 @@ trait NameCodeDescription extends NameDescription {
     String code
 
     static List qSearchIncludes = ['name', 'code', 'description'] // quick search includes
-    static List picklistIncludes = ['id', 'code'] //for picklist
+    static List picklistIncludes = ['id', 'code', 'name'] //for picklist
 
     static constraintsMap = [
         code:[ description: 'Short code, alphanumeric with no special characters except dash (for space) and underscore', nullable: false,

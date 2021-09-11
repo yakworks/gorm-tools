@@ -28,7 +28,6 @@ import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.NullPersistentContextInterceptor
-import grails.persistence.support.PersistenceContextInterceptor
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.

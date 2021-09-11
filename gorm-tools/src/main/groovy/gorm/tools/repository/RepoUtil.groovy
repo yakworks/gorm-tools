@@ -29,6 +29,7 @@ import yakworks.commons.lang.NameUtils
  * @since 1.0
  */
 @CompileStatic
+@SuppressWarnings(["FieldName"])
 class  RepoUtil {
 
     private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()

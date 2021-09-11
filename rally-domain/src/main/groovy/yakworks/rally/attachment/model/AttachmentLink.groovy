@@ -4,7 +4,7 @@
 */
 package yakworks.rally.attachment.model
 
-
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
@@ -14,10 +14,8 @@ import yakworks.rally.attachment.repo.AttachmentLinkRepo
  */
 @Entity
 @GrailsCompileStatic
-class AttachmentLink implements AttachmentLinkTrait<AttachmentLink, AttachmentLinkRepo>, Serializable {
+class AttachmentLink implements AttachmentLinkTrait<AttachmentLink>, GormRepoEntity<AttachmentLink, AttachmentLinkRepo>, Serializable {
     static belongsTo = [attachment: Attachment]
-    String linkedEntity
-    Long linkedId
 
     static mapping = {
         id composite: ['attachment', 'linkedId', 'linkedEntity']
@@ -25,22 +23,4 @@ class AttachmentLink implements AttachmentLinkTrait<AttachmentLink, AttachmentLi
         attachment column: 'attachmentId', fetch: 'join'
     }
 
-    static constraints = {
-        linkedEntity description: 'The linked entity name', example: 'ArTran',
-            nullable: false, blank: false
-        linkedId description: 'The id for the linked entity', example: 954,
-            nullable: false
-    }
-
-    static List<AttachmentLink> listByAttachment(Attachment attach) {
-        getRepo().listByAttachment(attach)
-    }
-
-    static void removeAllByAttachment(Attachment attach) {
-        getRepo().removeAllByAttachment(attach)
-    }
-
-    static boolean exists(Attachment attach) {
-        getRepo().exists(attach)
-    }
 }

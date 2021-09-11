@@ -45,7 +45,6 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
@@ -105,6 +104,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
         AttachmentLink.repo.removeAll(activity)
         //XXX missing removal for attachments if its not linked to anything else
+        //  meaning attachment should also be deleted if it only exists for this activity
+
         ActivityTag.repo.removeAll(activity)
         ActivityLink.repo.removeAllByActivity(activity)
 
@@ -141,11 +142,13 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         if(data.tags) {
             activityTagRepo.bind(activity, data.tags)
         }
-        if(data.contacts) {
-            data.contacts.each { it["org"] = activity.org }
-            List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
-            contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
-        }
+        // XXX fix this
+        // if(data.contacts) {
+        //     data.contacts.each { it["org"] = activity.org }
+        //     //XXX this is wrong, passing in Contact.repo? wont this create contacts, we dont want that here
+        //     List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
+        //     contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
+        // }
         // now do the links
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
@@ -508,7 +511,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             toAct.addToContacts(c)
         }
 
-        List activityLinks = ActivityLink.list(fromAct)
+        List activityLinks = activityLinkRepo.queryFor(fromAct).list()
         activityLinks?.each { ActivityLink link ->
             activityLinkRepo.create(link.linkedId, link.linkedEntity, toAct)
         }

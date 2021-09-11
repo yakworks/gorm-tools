@@ -19,7 +19,7 @@ trait Attachable {
     }
 
     boolean hasAttachments() {
-        return getAttachmentLinkRepo().hasAttachments((Persistable)this)
+        return getAttachmentLinkRepo().exists((Persistable)this)
     }
 
     AttachmentLink addAttachment(Attachment attach) {
@@ -28,12 +28,8 @@ trait Attachable {
         return getAttachmentLinkRepo().create(entity, attach)
     }
 
-    @SuppressWarnings(['FieldName'])
-    private static AttachmentLinkRepo _attachmentLinkRepo
-
     AttachmentLinkRepo getAttachmentLinkRepo() {
-        if (!_attachmentLinkRepo) this._attachmentLinkRepo = (AttachmentLinkRepo) RepoUtil.findRepo(AttachmentLink)
-        return _attachmentLinkRepo
+        (AttachmentLinkRepo) RepoUtil.findRepo(AttachmentLink)
     }
 
     static constraintsMap = [

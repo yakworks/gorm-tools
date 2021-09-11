@@ -10,21 +10,19 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.util.HashCodeHelper
 
-import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.Persistable
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.model.PersistableRepoEntity
-import yakworks.rally.common.LinkedEntityRepoTrait
+import gorm.tools.repository.RepoUtil
+import yakworks.rally.common.LinkXRefRepo
+import yakworks.rally.common.LinkXRefTrait
 
 /**
  * common trait that a concrete composite entity can implement if the stock AttachmentLink will not suffice
  * for example, Org has its own OrgAttachment
+ *
+ * @param <X> the LinkXRef entity
  */
 @CompileStatic
-trait AttachmentLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R>, QueryMangoEntity<D> {
-
-    Long linkedId
-    String linkedEntity
+trait AttachmentLinkTrait<X> implements LinkXRefTrait {
 
     abstract Attachment getAttachment()
     abstract void setAttachment(Attachment t)
@@ -35,21 +33,21 @@ trait AttachmentLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEn
     @Transient
     Long getAttachmentId() { (Long)this.getAssociationId("attachment") }
 
-    static LinkedEntityRepoTrait<D,Attachment> getAttachmentLinkRepo() {
-        getRepo() as LinkedEntityRepoTrait<D,Attachment>
+    static LinkXRefRepo<X,Attachment> getAttachmentLinkRepo() {
+        (LinkXRefRepo<X,Attachment>) RepoUtil.findRepo(this)
     }
 
-    static D create(Persistable entity, Attachment attach, Map args = [:]) {
+    static X create(Persistable entity, Attachment attach, Map args = [:]) {
         getAttachmentLinkRepo().create(entity, attach, args)
     }
 
 
-    static D get(Persistable entity, Attachment attach) {
+    static X get(Persistable entity, Attachment attach) {
         getAttachmentLinkRepo().get(entity, attach)
     }
 
-    static List<D> list(Persistable entity) {
-        getAttachmentLinkRepo().list(entity)
+    static List<X> list(Persistable entity) {
+        getAttachmentLinkRepo().queryFor(entity).list()
     }
 
     static List<Attachment> listAttachments(Persistable entity) {
@@ -64,7 +62,7 @@ trait AttachmentLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEn
     boolean equals(Object other) {
         if (other == null) return false
         if (this.is(other)) return true
-        if (other instanceof AttachmentLinkTrait<D>) {
+        if (other instanceof AttachmentLinkTrait<X>) {
             return other.getLinkedId() == getLinkedId() && other.getLinkedEntity() == getLinkedEntity() && other.getAttachmentId() == getAttachmentId()
         }
         return false

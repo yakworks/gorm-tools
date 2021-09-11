@@ -15,12 +15,13 @@ import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.common.NameNum
 import yakworks.rally.orgs.repo.ContactRepo
+import yakworks.rally.tag.model.Taggable
 
 @Entity
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Contact implements NameNum, RepoEntity<Contact>, Serializable {
+class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     String num
     String name
     String entityName // used for jobs contacts at ced
@@ -113,11 +114,6 @@ class Contact implements NameNum, RepoEntity<Contact>, Serializable {
         String fullName = ((firstName ?: "") + ' ' + (lastName ?: "")).trim()
         name = fullName.size() > 50 ? fullName[0..49] : fullName
     }
-
-//  static void contactName(Contact contact) {
-//  def fullName =(contact.firstName ?: "") + ' ' + (contact.lastName ?: "")
-//  contact.name = fullName.size() > 50 ? fullName[0..49] : fullName
-//  }
 
     /**
      * If contact has a locationId and isLocationDifferent=false, otherwise use the main location from the org.

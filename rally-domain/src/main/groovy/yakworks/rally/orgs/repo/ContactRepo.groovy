@@ -4,6 +4,9 @@
 */
 package yakworks.rally.orgs.repo
 
+import javax.annotation.Nullable
+import javax.inject.Inject
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
@@ -11,6 +14,7 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
+import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
@@ -18,6 +22,7 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.support.MsgKey
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
+import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -25,10 +30,15 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.repo.TagLinkRepo
+import yakworks.rally.tag.repo.TaggableRepo
 
 @GormRepository
 @CompileStatic
-class ContactRepo implements GormRepo<Contact> {
+class ContactRepo implements GormRepo<Contact>, TaggableRepo {
+
+    @Inject @Nullable
+    TagLinkRepo tagLinkRepo
 
     @RepoListener
     void beforeValidate(Contact contact) {
@@ -47,15 +57,20 @@ class ContactRepo implements GormRepo<Contact> {
             def msgKey = new MsgKey("contact.not.deleted.iskey", [contact.name], "contact delete error")
             throw new EntityValidationException(msgKey, contact)
         }
-        //XXX why are we keeping the locations around? should we not be deleting?
-        Location.executeUpdate("update Location set contact = null where contact = :contact", [contact: contact]) //set contact to null
 
-        //XXX add back in when ActivityContact is added.
-        // if (ActivityContact.existsByContact(contact)) {
-        //     def msgKey = new MsgKey("delete.error.reference",  ['Contact', contact.name, 'Activity'], "contact delete error")
-        //     throw new EntityValidationException(msgKey, contact)
-        // }
+        if (ActivityContact.existsByContact(contact)) {
+            def msgKey = new MsgKey("delete.error.reference",  ['Contact', contact.name, 'Activity'], "contact delete error")
+            throw new EntityValidationException(msgKey, contact)
+        }
 
+        //remove
+        removeTagsLinks(contact)
+    }
+
+    @RepoListener
+    void afterRemove(Contact contact, AfterRemoveEvent e) {
+        Location.query(contact: contact).deleteAll()
+        ContactSource.query(contact: contact).deleteAll()
     }
 
     @RepoListener
@@ -90,6 +105,7 @@ class ContactRepo implements GormRepo<Contact> {
         if(data.phones) doAssociation(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
         if(data.emails) doAssociation(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
         if(data.sources) doAssociation(contact, ContactSource.repo, data.sources as List<Map>, "contact")
+        if(data.tags) bindTagsLinks(contact, data.tags)
     }
 
     void assignOrgFromOrgId(Contact contact, Map data) {

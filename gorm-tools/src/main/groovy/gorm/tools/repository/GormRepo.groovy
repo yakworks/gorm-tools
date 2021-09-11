@@ -326,6 +326,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
     /**
      * batch creates or updates a list of items in a trx
+     * Will rollback on any error
      *
      * @param dataList the list of data maps to create/update
      * @return the list of created entities

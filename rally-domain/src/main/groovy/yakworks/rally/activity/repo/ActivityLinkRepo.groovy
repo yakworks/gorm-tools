@@ -9,11 +9,11 @@ import groovy.transform.CompileStatic
 import gorm.tools.repository.GormRepository
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.common.LinkedEntityRepoTrait
+import yakworks.rally.common.LinkXRefRepo
 
 @GormRepository
 @CompileStatic
-class ActivityLinkRepo implements LinkedEntityRepoTrait<ActivityLink, Activity> {
+class ActivityLinkRepo implements LinkXRefRepo<ActivityLink, Activity> {
 
     @Override
     String getItemPropName() {'activity'}

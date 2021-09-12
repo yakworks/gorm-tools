@@ -114,7 +114,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             if (!activity.task.status) activity.task.status = TaskStatus.OPEN
             if (!activity.task.taskType) activity.task.taskType = TaskType.TODO
         }
-
     }
 
     @RepoListener
@@ -125,10 +124,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         }
         //FIXME this is a hack so the events for links get fired after data is inserted
         // not very efficient as removes batch inserting for lots of acts so need to rethink this strategy
-        flush()
+        // flush()
     }
 
     void doAssociations(Activity activity, Map data) {
+        if(data.attachments) doAttachments(activity, data.attachments)
+
         if(data.tags) {
             activityTagRepo.addOrRemove(activity, data.tags)
         }
@@ -139,12 +140,11 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         //     List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
         //     contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
         // }
-        // now do the links
+
+        // now do the links last do events will have the other data
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
         }
-
-        if(data.attachments) doAttachments(activity, data.attachments)
     }
 
 

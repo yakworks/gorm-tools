@@ -128,7 +128,7 @@ trait LinkXRefRepo<X, I> extends GormRepo<X> {
             if(op == DataOp.replace) {
                 xlist = replaceList(linkedEntity, dataList)
             } else {
-                xlist = addOrRemoveList(linkedEntity, dataList)
+                throw new UnsupportedOperationException("op=replace is the only supported operation when passing a map for associations")
             }
         } else { //its a list
             xlist = addOrRemoveList(linkedEntity, itemParams as List)

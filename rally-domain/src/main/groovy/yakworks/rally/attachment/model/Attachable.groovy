@@ -4,32 +4,31 @@
 */
 package yakworks.rally.attachment.model
 
+import javax.persistence.Transient
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable
-import gorm.tools.repository.RepoUtil
-import yakworks.commons.lang.Validate
-import yakworks.rally.attachment.repo.AttachmentLinkRepo
 
 @CompileStatic
 trait Attachable {
 
+    @Transient
+    int _hasAttachments = 0
+
     List<Attachment> getAttachments() {
-        getAttachmentLinkRepo().listItems((Persistable)this)
+        AttachmentLink.listAttachments((Persistable)this)
     }
 
-    boolean hasAttachments() {
-        return getAttachmentLinkRepo().exists((Persistable)this)
+    int hasAttachments() {
+        if(!_hasAttachments) _hasAttachments = (Integer)AttachmentLink.repo.queryFor((Persistable)this).count()
+        return _hasAttachments
     }
 
     AttachmentLink addAttachment(Attachment attach) {
-        def entity = (Persistable)this
-        Validate.notNull(entity.id, "[entity.id]")
-        return getAttachmentLinkRepo().create(entity, attach)
-    }
-
-    AttachmentLinkRepo getAttachmentLinkRepo() {
-        (AttachmentLinkRepo) RepoUtil.findRepo(AttachmentLink)
+        def al = AttachmentLink.create((Persistable)this, attach)
+        _hasAttachments = _hasAttachments + 1
+        return al
     }
 
     static constraintsMap = [

@@ -31,6 +31,7 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.DataOp
 import gorm.tools.utils.GormMetaUtils
 import grails.validation.ValidationException
 import yakworks.commons.lang.NameUtils
@@ -138,6 +139,10 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         return entity
     }
 
+    /**
+     * just calls bindAndSave with the right BindAction
+     * This is the best method to overrride if needed
+     */
     void bindAndCreate(D entity, Map data, Map args) {
         bindAndSave(entity, data, BindAction.Create, args)
     }
@@ -244,8 +249,8 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
     /**
      * creates, removes or updates the location based on params
-     * if params has an id then its considered an update
-     * if params has an id and params.op == remove then it will delete it
+     * if data has an id then its considered an update
+     * if data has an id and data.op == remove then it will delete it, see DataOp enum
      * otherwise create it
      * XXX needs tests
      */
@@ -253,9 +258,9 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         if(!data) return
 
         D entity
-        String op = data.op as String  //add, update, delete really only needed for delete
+        DataOp op = DataOp.get(data.op) //add, update, delete really only needed for delete
         if(data.id){
-            if(op == 'remove') {
+            if(op == DataOp.remove) {
                 removeById(data.id as Long)
             } else {
                 entity = update(data)
@@ -487,5 +492,11 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
     GormValidationApi gormValidationApi() {
         GormEnhancer.findValidationApi(getEntityClass())
+    }
+
+    //just a little helper to collect the id keys
+    List<Long> collectIds(List dataList){
+        if(!dataList) return []
+        return dataList.collect { it['id'] as Long }
     }
 }

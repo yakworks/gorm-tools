@@ -22,7 +22,7 @@ class ActivityLinkRepo implements LinkXRefRepo<ActivityLink, Activity> {
     Activity loadItem(Long id) { Activity.load(id)}
 
     List<ActivityLink> listByActivity(Activity act) {
-        query(activity: act).list()
+        queryByItem(act).list()
     }
 
     void removeAllByActivity(Activity act) {

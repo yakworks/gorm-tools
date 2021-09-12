@@ -13,19 +13,26 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.core.io.Resource
+import org.springframework.transaction.TransactionStatus
 import org.springframework.web.multipart.MultipartFile
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.AfterBindEvent
+import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.io.FileUtil
+import yakworks.commons.lang.Validate
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.model.AttachmentLink
+import yakworks.rally.tag.repo.TaggableRepoSupport
 
 /**
  * Attachments are not as simple as they might be in this application.  Please read this documentation before messing
@@ -34,7 +41,7 @@ import yakworks.rally.attachment.model.Attachment
 @Slf4j
 @GormRepository
 @CompileStatic
-class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
+class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo, TaggableRepoSupport {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
     @Inject @Nullable
@@ -42,6 +49,28 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
 
     @Inject @Nullable
     AttachmentLinkRepo attachmentLinkRepo
+
+    /**
+     * wraps super.bindAndCreate in try catch so that on any exception
+     * it will delete the file reference in the data params
+     */
+    @Override
+    void bindAndCreate(Attachment attachment, Map data, Map args) {
+        try {
+            //normal call to bindAndSave that occurs in super trait
+            bindAndSave(attachment, data, BindAction.Create, args)
+        } catch (e) {
+            // the file may have been created in afterBind so delete it if exception fires
+            Path attachedFile = data['attachedFile'] as Path
+            if(attachedFile) Files.deleteIfExists(attachedFile)
+            throw e
+        }
+    }
+
+    @RepoListener
+    void afterPersist(Attachment attachment, AfterPersistEvent e) {
+        addOrRemoveTags(attachment, e)
+    }
 
     /**
      * The event listener, which is called before binding data to an Attachment entity
@@ -94,19 +123,17 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         }
     }
 
-    /**
-     * removes the list of attachment ids. removes the links and the attachment itself
-     *
-     * @param entity the entity the attachment is for
-     * @param deleteAttachments the list of attachment ids to remove
-     */
-    void handleAttachmentRemoval(Persistable entity, List deleteAttachments){
-        deleteAttachments.each { attachmentId ->
-            Attachment attachment = Attachment.load(attachmentId as Long)
-            if (attachment) {
-                removeAttachment(entity, attachment)
-            }
+    // XXX needs test
+    @RepoListener
+    void beforeRemove(Attachment attachment, BeforeRemoveEvent e) {
+        if (attachment.location) {
+            //delete the file
+            attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
         }
+        //remove the links
+        attachmentLinkRepo.removeAllByItem(attachment)
+        //tags
+        removeTagLinks(attachment)
     }
 
     /**
@@ -146,31 +173,6 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         }
     }
 
-    /**
-     * wraps super.bindAndCreate in try catch so that on any exception it will delete the file reference in the data params
-     */
-    @Override
-    Attachment doCreate(Map data, Map args) {
-        Attachment attachment
-        try {
-            attachment = new Attachment()
-            bindAndCreate(attachment, data, args)
-        } catch (e) {
-            // the file may have been created in afterBind so delete it if exception fires
-            Path attachedFile = data['attachedFile'] as Path
-            if(attachedFile) Files.deleteIfExists(attachedFile)
-            throw e
-        }
-
-        attachment
-    }
-
-    @RepoListener
-    void beforeRemove(Attachment attachment, BeforeRemoveEvent e) {
-        if(attachment.location) {
-            attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
-        }
-    }
 
     /**
      * creates from a multipart file as an attachment. Used in LogoService for example.

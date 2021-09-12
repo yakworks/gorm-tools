@@ -36,24 +36,28 @@ trait TagLinkTrait<X> implements LinkXRefTrait {
         tag:[ description: 'The tag', nullable: false]
     ]
 
+    static LinkXRefRepo<X,Tag> getTagLinkRepo() {
+        (LinkXRefRepo<X,Tag>) RepoUtil.findRepo(this)
+    }
+
     static List<Tag> listTags(Persistable entity) {
         getTagLinkRepo().listItems(entity)
     }
 
     static List<X> list(Tag tag) {
-        getTagLinkRepo().queryFor(tag).list()
+        getTagLinkRepo().list(tag)
     }
 
     static List<X> list(Persistable linkedEntity) {
-        getTagLinkRepo().queryFor(linkedEntity).list()
+        getTagLinkRepo().list(linkedEntity)
+    }
+
+    static boolean hasTags(Persistable entity) {
+        getTagLinkRepo().exists(entity)
     }
 
     static boolean exists(Tag tag) {
         getTagLinkRepo().exists(tag)
-    }
-
-    static LinkXRefRepo<X,Tag> getTagLinkRepo() {
-        (LinkXRefRepo<X,Tag>) RepoUtil.findRepo(this)
     }
 
     static X create(Persistable entity, Tag theTag, Map args = [:]) {

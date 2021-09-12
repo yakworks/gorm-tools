@@ -39,7 +39,7 @@ class ActivityLink implements LinkXRefTrait, GormRepoEntity<ActivityLink, Activi
     }
 
     static List<ActivityLink> list(Activity act) {
-        getRepo().queryFor(act).list()
+        getRepo().listByActivity(act)
     }
 
     static List<Activity> listActs(Persistable entity) {

@@ -17,13 +17,13 @@ import yakworks.rally.attachment.model.Attachable
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.HasTags
 import yakworks.rally.tag.model.Tag
-import yakworks.rally.tag.model.Taggable
 
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
+class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, HasTags, Serializable {
 
     // FIXME https://github.com/9ci/domain9/issues/117 hasMany is still considered evil, change these
     static hasMany = [contacts: Contact]
@@ -80,5 +80,14 @@ class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity,
     List<Tag> getTags() {
         ActivityTag.listTags(this)
     }
+
+    // SEE activityApi
+    // static constraintsMap = [
+    //     links:[ description: 'links for this', validate: false]
+    // ]
+
+    // List<ActivityContact> geContacts() {
+    //     ActivityContact.findAllWhere(activity: this, [ cache: true ])
+    // }
 
 }

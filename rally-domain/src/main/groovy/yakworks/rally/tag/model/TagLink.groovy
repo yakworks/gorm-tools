@@ -4,6 +4,8 @@
 */
 package yakworks.rally.tag.model
 
+import gorm.tools.model.Persistable
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -26,5 +28,13 @@ class TagLink implements TagLinkTrait<TagLink>, GormRepoEntity<TagLink, TagLinkR
     static constraintsMap = [
         tag:[ description: 'the tag for the linked entity', validate: false ],
     ]
+
+    static TagLinkRepo getTagLinkRepo() {
+        (TagLinkRepo) RepoUtil.findRepo(this)
+    }
+
+    static List<TagLink> addTags(Persistable linkedEntity, List<Tag> tags) {
+        getTagLinkRepo().addTags(linkedEntity, tags)
+    }
 
 }

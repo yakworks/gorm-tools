@@ -24,7 +24,7 @@ class OrgTagRepo implements LinkXRefRepo<OrgTag, Tag> {
     @Override
     Tag loadItem(Long id) { Tag.load(id)}
 
-    List<Tag> listTags(Org org) {
+    List<Tag> listTags(Persistable org) {
         queryFor(org).list()*.tag
     }
 
@@ -39,7 +39,7 @@ class OrgTagRepo implements LinkXRefRepo<OrgTag, Tag> {
     @Override
     void validateCreate(Persistable entity, Tag tag) {
         Org org = (Org) entity
-        if (tag.entityName != org.type.name())
+        if (!tag.isValidFor(org.type.name()))
             throw new IllegalArgumentException("Tags entityName: ${tag.entityName} not valid for org type ${org.type.name()}")
     }
 

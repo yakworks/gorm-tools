@@ -8,8 +8,8 @@ package yakworks.rally.common
 import groovy.transform.CompileStatic
 
 /**
- * common trait that a concrete composite entity can implement if the stock TagLink will not suffice
- * for example, Org has its own OrgTag lining table
+ * common trait that a concrete composite entity can implement.
+ * for example in some cases the stock TagLink will not suffice Org has its own OrgTag Xref table
  */
 @CompileStatic
 trait LinkXRefTrait {

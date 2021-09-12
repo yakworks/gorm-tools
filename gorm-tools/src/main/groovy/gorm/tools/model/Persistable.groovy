@@ -18,7 +18,7 @@ import org.springframework.lang.Nullable
  * @since 7.0.x
  */
 @CompileStatic
-trait Persistable implements IPersistable<Long>, Ident<Long> {
+trait Persistable { //implements IPersistable<Long>, Ident<Long> {
     abstract boolean isAttached()
     abstract Serializable getVersion()
 

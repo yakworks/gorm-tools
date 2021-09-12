@@ -14,7 +14,6 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
-import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
@@ -31,11 +30,11 @@ import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.repo.TagLinkRepo
-import yakworks.rally.tag.repo.TaggableRepo
+import yakworks.rally.tag.repo.TaggableRepoSupport
 
 @GormRepository
 @CompileStatic
-class ContactRepo implements GormRepo<Contact>, TaggableRepo {
+class ContactRepo implements GormRepo<Contact>, TaggableRepoSupport {
 
     @Inject @Nullable
     TagLinkRepo tagLinkRepo
@@ -64,14 +63,18 @@ class ContactRepo implements GormRepo<Contact>, TaggableRepo {
         }
 
         //remove
-        removeTagsLinks(contact)
+        removeTagLinks(contact)
+
+        //XXX why are we keeping the locations around?
+        // if its a location for a contact it should be deleted along with the contact right?
+        Location.executeUpdate("update Location set contact = null where contact = :contact", [contact: contact]) //set contact to null
+
+        //XXX we are not deleting Location or CSource? Why
+        // something like this should be run no?
+        // Location.query(contact: contact).deleteAll()
+        // ContactSource.query(contact: contact).deleteAll()
     }
 
-    @RepoListener
-    void afterRemove(Contact contact, AfterRemoveEvent e) {
-        Location.query(contact: contact).deleteAll()
-        ContactSource.query(contact: contact).deleteAll()
-    }
 
     @RepoListener
     void afterBind(Contact contact, Map data, AfterBindEvent e) {
@@ -105,7 +108,7 @@ class ContactRepo implements GormRepo<Contact>, TaggableRepo {
         if(data.phones) doAssociation(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
         if(data.emails) doAssociation(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
         if(data.sources) doAssociation(contact, ContactSource.repo, data.sources as List<Map>, "contact")
-        if(data.tags) bindTagsLinks(contact, data.tags)
+        if(data.tags) addOrRemoveTags(contact, data.tags)
     }
 
     void assignOrgFromOrgId(Contact contact, Map data) {

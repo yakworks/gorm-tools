@@ -12,13 +12,18 @@ import gorm.tools.model.Persistable
  * Marks a domain as taggable with a getTags() getter and constraintsMap
  */
 @CompileStatic
-trait Taggable {
+trait Taggable implements HasTags {
 
     List<Tag> getTags(){
-        TagLink.repo.listTags(this as Persistable)
+        TagLink.listTags(this as Persistable)
     }
 
-    static Map constraintsMap = [
-        tags: [ d: 'the tags for this item', validate: false] //validate false so it does not initialize
-    ]
+    boolean hasTags() {
+        return TagLink.hasTags((Persistable)this)
+    }
+
+    List<TagLink> addTags(List<Tag> tags) {
+        TagLink.addTags((Persistable)this, tags)
+    }
+
 }

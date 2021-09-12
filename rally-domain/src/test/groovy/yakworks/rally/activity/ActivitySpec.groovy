@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.grails.web.mapping.DefaultLinkGenerator
 import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
+import gorm.tools.model.Persistable
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
@@ -24,6 +25,7 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
+import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockHelper
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
@@ -38,7 +40,8 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
             }
             attachmentSupport(AttachmentSupport)
         }
-        mockDomains(AttachmentLink, ActivityLink, ActivityTag, Activity, Org, OrgTag, Tag, Attachment, ActivityNote, Contact, ActivityContact)
+        mockDomains(AttachmentLink, ActivityLink, ActivityTag, Activity, Org, OrgTag,
+            Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact)
     }
 
     Map buildUpdateMap(Map args) {
@@ -254,8 +257,8 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         Attachment attachment = build(Attachment) //new Attachment(TestDataJson.buildMap([:], Attachment))
         attachment.location = "foo/bar"
         attachment.persist()
-        Activity activity = build(Activity)
-        activity.addAttachment attachment
+        def activity = build(Activity) as Persistable
+        AttachmentLink.create(activity, attachment)
 
         Long attId = attachment.id
 

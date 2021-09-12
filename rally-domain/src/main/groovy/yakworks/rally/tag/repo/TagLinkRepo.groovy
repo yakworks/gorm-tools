@@ -21,7 +21,12 @@ import yakworks.rally.tag.model.TagLink
 class TagLinkRepo implements LinkXRefRepo<TagLink, Tag>, GormRepo<TagLink> {
 
     List<Tag> listTags(Persistable linkedEntity) {
-        queryFor(linkedEntity).list()*.tag
+        list(linkedEntity)*.tag
+    }
+
+    List<TagLink> addTags(Persistable linkedEntity, List<Tag> tags) {
+        List<Long> ids = collectIds(tags)
+        add(linkedEntity, ids)
     }
 
     @Override

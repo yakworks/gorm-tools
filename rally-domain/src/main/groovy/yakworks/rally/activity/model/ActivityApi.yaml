@@ -11,6 +11,7 @@ Activity:
       access: c #create only
     contacts:
       description: The contacts associated with this activity.
+      validate: false
     kind:
       description: The type of the activity, certain kinds are only valid for a Task.
       nullable: false

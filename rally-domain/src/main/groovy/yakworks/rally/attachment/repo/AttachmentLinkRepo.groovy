@@ -4,11 +4,13 @@
 */
 package yakworks.rally.attachment.repo
 
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.support.Results
+import yakworks.commons.lang.Validate
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.common.LinkXRefRepo
@@ -23,23 +25,10 @@ class AttachmentLinkRepo implements LinkXRefRepo<AttachmentLink, Attachment> {
     @Override
     Attachment loadItem(Long id) { Attachment.load(id)}
 
-    // List<AttachmentLink> listByAttachment(Attachment attach) {
-    //     query(attachment: attach).list()
-    // }
-
-    // void removeAllByAttachment(Attachment attach) {
-    //     listByAttachment(attach).each {
-    //         it.remove()
-    //     }
-    // }
-
-    // boolean exists(Attachment attach) {
-    //     query(attachment: attach).count()
-    // }
-    //
-    // boolean hasAttachments(Persistable entity) {
-    //     queryFor(entity).count()
-    // }
+    @Override
+    void validateCreate(Persistable linkEntity, Attachment attachment){
+        Validate.notNull(linkEntity.id, "[linkEntity.id]")
+    }
 
     /**
      * Copies Attachments from the source to target
@@ -62,5 +51,19 @@ class AttachmentLinkRepo implements LinkXRefRepo<AttachmentLink, Attachment> {
             }
         }
         return results
+    }
+
+    @Override
+    List<AttachmentLink> replaceList(Persistable linkedEntity, List dataList){
+        def itemList = dataList as List<Map>
+        List<Long> itemParamIds = collectIds(itemList)
+        List<Long> currentItemIds = listItemIds(linkedEntity)
+
+        List<Long> itemsToAdd = itemParamIds - currentItemIds
+        List xlist = add(linkedEntity, itemsToAdd)
+
+        List<Long> itemsToRemove = currentItemIds - itemParamIds
+        remove(linkedEntity, itemsToRemove)
+        return xlist
     }
 }

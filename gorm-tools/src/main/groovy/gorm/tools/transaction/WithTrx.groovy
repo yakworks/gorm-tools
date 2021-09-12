@@ -11,7 +11,6 @@ import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SimpleType
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.TransactionStatus
 
 /**

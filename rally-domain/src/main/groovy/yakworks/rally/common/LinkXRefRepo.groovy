@@ -112,7 +112,7 @@ trait LinkXRefRepo<X, I> extends GormRepo<X> {
      * @param itemParams the data map or list with id key for what should be synced and possible op key for instructions
      */
     List<X> addOrRemove(Persistable linkedEntity, Object itemParams){
-        if(!itemParams) return
+        if(!itemParams) return []
         Long linkedId = linkedEntity.id
 
         Validate.isTrue(itemParams instanceof List || itemParams instanceof Map, "bind data must be map or list: %s", itemParams.class)

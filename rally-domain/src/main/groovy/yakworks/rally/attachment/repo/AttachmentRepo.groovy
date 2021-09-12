@@ -13,7 +13,6 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.core.io.Resource
-import org.springframework.transaction.TransactionStatus
 import org.springframework.web.multipart.MultipartFile
 
 import gorm.tools.databinding.BindAction
@@ -25,13 +24,10 @@ import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.repository.model.DataOp
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.io.FileUtil
-import yakworks.commons.lang.Validate
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.tag.repo.TaggableRepoSupport
 
 /**

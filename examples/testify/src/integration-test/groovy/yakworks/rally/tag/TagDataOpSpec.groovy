@@ -106,7 +106,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
 
     }
 
-    void "test op:remove on all"() {
+    void "test op:replace with empty array to remove all"() {
         when:
         def att = setupAnAttachmentWithTags()
         flushAndClear()
@@ -115,7 +115,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         def dta = [
             id: att.id,
             tags: [
-                op:'remove'
+                op:'replace', data: []
             ]
         ]
         def updatedAtt = Attachment.update(dta)

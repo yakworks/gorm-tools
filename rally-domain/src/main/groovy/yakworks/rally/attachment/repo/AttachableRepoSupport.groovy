@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.model.Persistable
 import gorm.tools.repository.events.RepositoryEvent
 import yakworks.rally.attachment.model.Attachable
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.tag.repo.TagLinkRepo
 
 /**
  * Basic helpers to keep

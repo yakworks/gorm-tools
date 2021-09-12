@@ -11,12 +11,20 @@ import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityTag
-import yakworks.rally.common.LinkedEntityRepoTrait
+import yakworks.rally.common.LinkXRefRepo
 import yakworks.rally.tag.model.Tag
 
 @GormRepository
 @CompileStatic
-class ActivityTagRepo implements LinkedEntityRepoTrait<ActivityTag, Tag> {
+class ActivityTagRepo implements LinkXRefRepo<ActivityTag, Tag> {
+
+    /**
+     * Makes the composite key only be linkedId and item, ignores linkedEntityName
+     */
+    @Override
+    Map getKeyMap(long linkedId, String linkedEntityName, Tag tag){
+        [linkedId: linkedId, 'tag': tag]
+    }
 
     @Override
     String getItemPropName() {'tag'}
@@ -24,6 +32,9 @@ class ActivityTagRepo implements LinkedEntityRepoTrait<ActivityTag, Tag> {
     @Override
     Tag loadItem(Long id) { Tag.load(id)}
 
+    List<Tag> listTags(Activity activity) {
+        queryFor(activity).list()*.tag
+    }
     /**
      * override in implementation to throw IllegalArgumentException if the tag.entityName does not match
      */

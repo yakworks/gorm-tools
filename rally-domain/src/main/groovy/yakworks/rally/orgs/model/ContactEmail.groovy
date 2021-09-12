@@ -13,6 +13,7 @@ import grails.persistence.Entity
 @AuditStamp
 @GrailsCompileStatic
 class ContactEmail implements RepoEntity<ContactEmail>, Serializable {
+
     String kind //XXX is this used?
     String address
     Boolean isPrimary = false

@@ -9,6 +9,7 @@ import javax.inject.Inject
 
 import org.springframework.security.crypto.password.PasswordEncoder
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
@@ -29,17 +30,16 @@ class AppUserRepo implements GormRepo<AppUser> {
     // SecService secService
 
     /**
-     * overrides the create method as its more clear whats going on than trying to do role logic with events
+     * overrides the bindAndCreate method vs events
+     * as its more clear whats going on than trying to do role logic with events
      * this will already be transactional as its called from create
      */
     @Override
-    AppUser doCreate(Map data, Map args) {
-        AppUser user = new AppUser()
+    void bindAndCreate(AppUser user, Map data, Map args) {
         String pwd = data['password']// data.remove('password')
         if(pwd) user.password = pwd
-        bindAndCreate(user, data, args)
+        bindAndSave(user, data, BindAction.Create, args)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
-        return user
     }
 
     /**

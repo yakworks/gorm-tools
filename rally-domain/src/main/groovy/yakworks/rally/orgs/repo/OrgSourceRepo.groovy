@@ -15,6 +15,7 @@ import gorm.tools.source.SourceType
 import grails.gorm.transactions.Transactional
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
 @CompileStatic
@@ -90,5 +91,10 @@ class OrgSourceRepo implements GormRepo<OrgSource>, IdGeneratorRepo {
             return SourceType.valueOf(sourceTypeObject as String) //must match exactly case sensitive
         }
 
+    }
+
+    OrgSource findBySourceIdAndOrgType(String sourceId, OrgType orgType) {
+        return OrgSource.find("from OrgSource where sourceId = :sourceId and orgType = :orgType ",
+            [sourceId: sourceId, orgType: orgType])
     }
 }

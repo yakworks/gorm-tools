@@ -11,27 +11,18 @@ import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.activity.repo.ActivityLinkRepo
+import yakworks.rally.common.LinkXRefTrait
 
 @Entity
 @GrailsCompileStatic
-class ActivityLink implements GormRepoEntity<ActivityLink, ActivityLinkRepo>, Serializable {
+class ActivityLink implements LinkXRefTrait, GormRepoEntity<ActivityLink, ActivityLinkRepo>, Serializable {
     static belongsTo = [activity: Activity]
-    String linkedEntity
-    Long linkedId
 
     static mapping = {
         id composite: ['activity', 'linkedId', 'linkedEntity']
         version false
         activity column: 'activityId', cache: true, fetch: 'join'
     }
-
-    static constraintsMap = [
-        // activity nullable: false
-        linkedEntity:[ description: 'The linked entity name', example: 'ArTran',
-            nullable: false, blank: false],
-        linkedId:[ description: 'The id for the linked entity', example: 954,
-            nullable: false]
-    ]
 
     //static ActivityLinkRepo getRepo() { RepoUtil.findRepo(this) as ActivityLinkRepo }
 
@@ -47,11 +38,7 @@ class ActivityLink implements GormRepoEntity<ActivityLink, ActivityLinkRepo>, Se
         getRepo().get(entity, act)
     }
 
-    static List<ActivityLink> list(Persistable entity) {
-        getRepo().list(entity)
-    }
-
-    static List<ActivityLink> listByActivity(Activity act) {
+    static List<ActivityLink> list(Activity act) {
         getRepo().listByActivity(act)
     }
 

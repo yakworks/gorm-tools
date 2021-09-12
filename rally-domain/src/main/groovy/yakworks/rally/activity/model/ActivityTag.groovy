@@ -4,7 +4,7 @@
 */
 package yakworks.rally.activity.model
 
-
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.activity.repo.ActivityTagRepo
@@ -13,7 +13,7 @@ import yakworks.rally.tag.model.TagLinkTrait
 
 @Entity
 @GrailsCompileStatic
-class ActivityTag implements TagLinkTrait<ActivityTag, ActivityTagRepo>, Serializable {
+class ActivityTag implements TagLinkTrait<ActivityTag>, GormRepoEntity<ActivityTag, ActivityTagRepo>, Serializable {
     static transients = ['linkedEntity']
     static belongsTo = [tag: Tag]
     Long linkedId
@@ -27,8 +27,7 @@ class ActivityTag implements TagLinkTrait<ActivityTag, ActivityTagRepo>, Seriali
     }
 
     static constraintsMap = [
-        linkedId:[ description: 'the id of the Activity this is linked to', nullable: false],
-        tag:[ description: 'The tag', nullable: false]
+        linkedEntity:[ description: 'placeholder, will always be Activity']
     ]
 
 }

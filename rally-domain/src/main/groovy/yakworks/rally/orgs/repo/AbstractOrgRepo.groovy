@@ -93,6 +93,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
             def msgKey = new MsgKey("delete.error.source.external", ["Org ${org.name}", SourceType.ERP], "Org delete error")
             throw new EntityValidationException(msgKey, org)
         }
+        //remove tags
         orgTagRepo.removeAll(org)
     }
 

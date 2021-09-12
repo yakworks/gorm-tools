@@ -66,7 +66,7 @@ class RepoExceptionSupport {
 
     /**
      * Returns list of errors in the format [{field:name, message:error}]
-     * @param Errors the errors object
+     * @param errs the erros object to convert
      */
     static List<Map<String, String>> toErrorList(Errors errs) {
         List<Map<String, String>> errors = []

@@ -8,16 +8,26 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.model.Persistable
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.support.Results
-import yakworks.rally.common.LinkedEntityRepoTrait
+import yakworks.rally.common.LinkXRefRepo
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
 
 @Slf4j
 @GormRepository
 @CompileStatic
-class TagLinkRepo implements LinkedEntityRepoTrait<TagLink, Tag> {
+class TagLinkRepo implements LinkXRefRepo<TagLink, Tag>, GormRepo<TagLink> {
+
+    List<Tag> listTags(Persistable linkedEntity) {
+        list(linkedEntity)*.tag
+    }
+
+    List<TagLink> addTags(Persistable linkedEntity, List<Tag> tags) {
+        List<Long> ids = collectIds(tags)
+        add(linkedEntity, ids)
+    }
 
     @Override
     String getItemPropName() {'tag'}
@@ -35,23 +45,9 @@ class TagLinkRepo implements LinkedEntityRepoTrait<TagLink, Tag> {
     @Override
     Tag loadItem(Long id) { Tag.load(id)}
 
-    List<TagLink> listByTag(Tag tag) {
-        query(tag: tag).list()
-    }
-
-    void removeAllByTag(Tag tag) {
-        listByTag(tag).each {
-            it.remove()
-        }
-    }
-
-    boolean exists(Tag tag) {
-        query(tag: tag).count()
-    }
-
     void copy(Persistable fromEntity, Persistable toEntity) {
         Results results = Results.OK
-        List links = list(fromEntity)
+        List links = queryFor(fromEntity).list()
         for(TagLink tagLink : links){
             create(toEntity, tagLink.tag)
         }

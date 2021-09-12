@@ -13,6 +13,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class Validate {
 
+    private static final String DEFAULT_IS_TRUE_EX_MESSAGE = "The validated expression is false"
     //private static final String DEFAULT_NOT_EMPTY =  "The validated object must not be null, blank or empty";
     //private static final String DEFAULT_NOT_NULL = "The validated object must not be null";
 
@@ -48,5 +49,54 @@ class Validate {
             throw new IllegalArgumentException("The $objDescriptor must not be blank or empty")
         }
         return obj
+    }
+
+    /**
+     * <p>Validate that the argument condition is {@code true}; otherwise
+     * throwing an exception with the specified message. This method is useful when
+     * validating according to an arbitrary boolean expression, such as validating a
+     * primitive number or using your own custom validation expression.</p>
+     *
+     * <pre>
+     * Validate.isTrue(i &gt;= min &amp;&amp; i &lt;= max, "The value must be between &#37;d and &#37;d", min, max);
+     * Validate.isTrue(myObject.isOk(), "The object is not okay");</pre>
+     *
+     * For performance reasons, the Object... values is passed as a separate parameter and
+     * appended to the exception message only in the case of an error.
+     *
+     * @param expression  the boolean expression to check
+     * @param message  the {@link String#format(String, Object...)} exception message if invalid, not null
+     * @param values  the optional values for the formatted exception message, null array not recommended
+     * @throws IllegalArgumentException if expression is {@code false}
+     */
+    public static void isTrue(final boolean expression, final String message, final Object... values) {
+        if (!expression) {
+            throw new IllegalArgumentException(String.format(message, values))
+        }
+    }
+
+    /**
+     * <p>Validate that the argument condition is {@code true}; otherwise
+     * throwing an exception. This method is useful when validating according
+     * to an arbitrary boolean expression, such as validating a
+     * primitive number or using your own custom validation expression.</p>
+     *
+     * <pre>
+     * Validate.isTrue(i &gt; 0);
+     * Validate.isTrue(myObject.isOk());</pre>
+     *
+     * <p>The message of the exception is &quot;The validated expression is
+     * false&quot;.</p>
+     *
+     * @param expression  the boolean expression to check
+     * @throws IllegalArgumentException if expression is {@code false}
+     * @see #isTrue(boolean, String, long)
+     * @see #isTrue(boolean, String, double)
+     * @see #isTrue(boolean, String, Object...)
+     */
+    public static void isTrue(final boolean expression) {
+        if (!expression) {
+            throw new IllegalArgumentException(DEFAULT_IS_TRUE_EX_MESSAGE)
+        }
     }
 }

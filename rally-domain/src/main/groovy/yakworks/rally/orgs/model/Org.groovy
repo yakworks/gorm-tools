@@ -13,13 +13,14 @@ import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.common.NameNum
 import yakworks.rally.orgs.repo.OrgRepo
-import yakworks.rally.tag.model.Taggable
+import yakworks.rally.tag.model.HasTags
+import yakworks.rally.tag.model.Tag
 
 @Entity
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, CreateCriteriaSupport, Serializable {
+class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCriteriaSupport, Serializable {
 
     String  comments
     Long    companyId
@@ -100,6 +101,11 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, Taggable<OrgTag>, Cr
 
     List<Location> getLocations(){
         Location.listByOrgOnly(this)
+    }
+
+    @Override //hasTags trait
+    List<Tag> getTags() {
+        OrgTag.repo.listTags(this)
     }
 
     /**

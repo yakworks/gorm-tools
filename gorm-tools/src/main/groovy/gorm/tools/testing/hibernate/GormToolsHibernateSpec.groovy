@@ -78,6 +78,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
                 }
             }
         }
+
+        doWithSpringAfter()
     }
 
     /** consistency with other areas of grails and other unit tests */
@@ -91,6 +93,14 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
      */
     Closure doWithSpringFirst() {
         return {}
+    }
+
+    /**
+     * Call back to provide beans before repositories are mocked, this gives chance to define beans which may need to
+     * be injected into repositories
+     */
+    void doWithSpringAfter() {
+
     }
 
 }

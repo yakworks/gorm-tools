@@ -28,6 +28,7 @@ import yakworks.commons.lang.NameUtils
  * @author Joshua Burnett (@basejump)
  * @since 1.0
  */
+@SuppressWarnings(['FieldName'])
 @CompileStatic
 @SuppressWarnings(["FieldName"])
 class  RepoUtil {

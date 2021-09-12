@@ -1,3 +1,16 @@
+### v7.0.8-v.20
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.19...v7.0.8-v.20)
+- 325 tags (#335) [link](https://github.com/yakworks/gorm-tools/commit/48c1451fdba45c6fbd0545591ce66351fca5bd9e)
+- Merge branch 'master' of https://github.com/yakworks/gorm-tools [link](https://github.com/yakworks/gorm-tools/commit/dd3bb9d3e6a4b45e4b79b0fc19fb2a67741f3781)
+- back to snapshot [link](https://github.com/yakworks/gorm-tools/commit/9ac97e89be245e76e7370fcf4c2a080f5eed7f49)
+
+### v7.0.8-v.19
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.18...v7.0.8-v.19)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/7b72027e5659bbe035e05926487d42302829cade)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/8b1290faed20efa119ec86d3ddcf1c16caac6277)
+
 ### v7.0.8-v.17
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.16...v7.0.8-v.17)

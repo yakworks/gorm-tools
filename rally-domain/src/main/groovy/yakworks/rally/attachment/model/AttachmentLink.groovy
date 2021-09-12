@@ -4,20 +4,23 @@
 */
 package yakworks.rally.attachment.model
 
+import org.codehaus.groovy.util.HashCodeHelper
 
+import gorm.tools.model.Persistable
+import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
+import yakworks.rally.common.LinkXRefTrait
 
 /**
  * generalized composite table to link a Attachment to any entity
  */
 @Entity
 @GrailsCompileStatic
-class AttachmentLink implements AttachmentLinkTrait<AttachmentLink, AttachmentLinkRepo>, Serializable {
+class AttachmentLink implements LinkXRefTrait, GormRepoEntity<AttachmentLink, AttachmentLinkRepo>, Serializable {
     static belongsTo = [attachment: Attachment]
-    String linkedEntity
-    Long linkedId
 
     static mapping = {
         id composite: ['attachment', 'linkedId', 'linkedEntity']
@@ -25,22 +28,55 @@ class AttachmentLink implements AttachmentLinkTrait<AttachmentLink, AttachmentLi
         attachment column: 'attachmentId', fetch: 'join'
     }
 
-    static constraints = {
-        linkedEntity description: 'The linked entity name', example: 'ArTran',
-            nullable: false, blank: false
-        linkedId description: 'The id for the linked entity', example: 954,
-            nullable: false
+    static AttachmentLinkRepo getAttachmentLinkRepo() {
+        RepoUtil.findRepo(this) as AttachmentLinkRepo
     }
 
-    static List<AttachmentLink> listByAttachment(Attachment attach) {
-        getRepo().listByAttachment(attach)
+    static AttachmentLink create(Persistable linkedEntity, Attachment attach, Map args = [:]) {
+        getAttachmentLinkRepo().create(linkedEntity, attach, args)
     }
 
-    static void removeAllByAttachment(Attachment attach) {
-        getRepo().removeAllByAttachment(attach)
+    static AttachmentLink get(Persistable linkedEntity, Attachment attach) {
+        getAttachmentLinkRepo().get(linkedEntity, attach)
     }
 
-    static boolean exists(Attachment attach) {
-        getRepo().exists(attach)
+    static List<AttachmentLink> list(Persistable linkedEntity) {
+        getAttachmentLinkRepo().list(linkedEntity)
     }
+
+    static List<AttachmentLink> list(Attachment attach) {
+        getAttachmentLinkRepo().list(attach)
+    }
+
+    static List<Attachment> listAttachments(Persistable entity) {
+        getAttachmentLinkRepo().listItems(entity)
+    }
+
+    static boolean exists(Persistable entity, Attachment attach) {
+        getAttachmentLinkRepo().exists(entity, attach)
+    }
+
+    static boolean hasAttachments(Persistable entity) {
+        getAttachmentLinkRepo().exists(entity)
+    }
+
+    @Override
+    boolean equals(Object other) {
+        if (other == null) return false
+        if (this.is(other)) return true
+        if (other instanceof AttachmentLink) {
+            return other.getLinkedId() == getLinkedId() && other.getLinkedEntity() == getLinkedEntity() && other.getAttachmentId() == getAttachmentId()
+        }
+        return false
+    }
+
+    @Override
+    int hashCode() {
+        int hashCode = HashCodeHelper.initHash()
+        if (getLinkedId()) { hashCode = HashCodeHelper.updateHash(hashCode, getLinkedId()) }
+        if (getLinkedEntity()) { hashCode = HashCodeHelper.updateHash(hashCode, getLinkedEntity()) }
+        if (getAttachmentId()) { hashCode = HashCodeHelper.updateHash(hashCode, getAttachmentId()) }
+        hashCode
+    }
+
 }

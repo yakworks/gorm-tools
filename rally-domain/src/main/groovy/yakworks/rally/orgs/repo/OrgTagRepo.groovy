@@ -9,14 +9,14 @@ import groovy.transform.CompileStatic
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
-import yakworks.rally.common.LinkedEntityRepoTrait
+import yakworks.rally.common.LinkXRefRepo
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.Tag
 
 @GormRepository
 @CompileStatic
-class OrgTagRepo implements LinkedEntityRepoTrait<OrgTag, Tag> {
+class OrgTagRepo implements LinkXRefRepo<OrgTag, Tag> {
 
     @Override
     String getItemPropName() {'tag'}
@@ -24,19 +24,22 @@ class OrgTagRepo implements LinkedEntityRepoTrait<OrgTag, Tag> {
     @Override
     Tag loadItem(Long id) { Tag.load(id)}
 
-    // @RepoListener
-    // void beforeValidate(OrgTag orgTag) {
-    //
-    // }
+    List<Tag> listTags(Persistable org) {
+        queryFor(org).list()*.tag
+    }
 
-    List<Tag> listTags(Persistable entity) {
-        list(entity)*.tag
+    /**
+     * Makes the composite key only be linkedId and item, ignores linkedEntityName
+     */
+    @Override
+    Map getKeyMap(long linkedId, String linkedEntityName, Tag tag){
+        [linkedId: linkedId, 'tag': tag]
     }
 
     @Override
     void validateCreate(Persistable entity, Tag tag) {
         Org org = (Org) entity
-        if (tag.entityName != org.type.name())
+        if (!tag.isValidFor(org.type.name()))
             throw new IllegalArgumentException("Tags entityName: ${tag.entityName} not valid for org type ${org.type.name()}")
     }
 
@@ -48,6 +51,7 @@ class OrgTagRepo implements LinkedEntityRepoTrait<OrgTag, Tag> {
         if (tags) add(toOrg, tags)
     }
 
+    // this doesn't have linkedEntity Field so we need to override
     @Override
     MangoDetachedCriteria<OrgTag> queryFor(Persistable entity){
         query(linkedId: entity.id)

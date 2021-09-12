@@ -18,7 +18,6 @@ import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
@@ -34,7 +33,6 @@ import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
-import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.ActivityTag
@@ -45,7 +43,6 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Org
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
@@ -88,13 +85,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     }
 
     @RepoListener
-    void afterBind(Activity activity, Map data, AfterBindEvent e) {
-        if (e.isBindUpdate() && data.deleteAttachments) {
-            attachmentRepo.handleAttachmentRemoval(activity, data.deleteAttachments as List)
-        }
-    }
-
-    @RepoListener
     void beforeRemove(Activity activity, BeforeRemoveEvent e) {
         if (activity.note) {
             ActivityNote note = activity.note
@@ -105,6 +95,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
         AttachmentLink.repo.removeAll(activity)
         //XXX missing removal for attachments if its not linked to anything else
+        //  meaning attachment should also be deleted if it only exists for this activity
+
         ActivityTag.repo.removeAll(activity)
         ActivityLink.repo.removeAllByActivity(activity)
 
@@ -122,35 +114,37 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             if (!activity.task.status) activity.task.status = TaskStatus.OPEN
             if (!activity.task.taskType) activity.task.taskType = TaskType.TODO
         }
-
     }
 
     @RepoListener
     void afterPersist(Activity activity, AfterPersistEvent e) {
-        //FIXME this is a hack so the events for links get fired after data is inserted
-        // not very efficient as removes batch inserting for lots of acts so need to rethink this strategy
-        flush()
-
         if (e.bindAction && e.data){
             Map data = e.data
             doAssociations(activity, data)
         }
+        //FIXME this is a hack so the events for links get fired after data is inserted
+        // not very efficient as removes batch inserting for lots of acts so need to rethink this strategy
+        // flush()
     }
 
     void doAssociations(Activity activity, Map data) {
+        if(data.attachments) doAttachments(activity, data.attachments)
+
         if(data.tags) {
-            activityTagRepo.bind(activity, data.tags)
+            activityTagRepo.addOrRemove(activity, data.tags)
         }
-        if(data.contacts) {
-            data.contacts.each { it["org"] = activity.org }
-            List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
-            contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
-        }
-        // now do the links
+        // XXX fix this
+        // if(data.contacts) {
+        //     data.contacts.each { it["org"] = activity.org }
+        //     //XXX this is wrong, passing in Contact.repo? wont this create contacts, we dont want that here
+        //     List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
+        //     contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
+        // }
+
+        // now do the links last do events will have the other data
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
         }
-
     }
 
 
@@ -176,25 +170,9 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     }
 
-    AttachmentLink linkAttachment(Activity activity, Attachment attachment){
-        AttachmentLink.repo.create(activity, attachment)
-    }
-
     // This adds the realted and children entities from the params to the Activity
     // called in afterBind
     void addRelatedDomainsToActivity(Activity activity, Map data) {
-        if (data.attachments) {
-            List attachments = attachmentRepo.bulkCreateOrUpdate(data.attachments as List)
-            attachments.each { Attachment attachment ->
-                linkAttachment(activity, attachment)
-            }
-        }
-        else if (data.attachment) {
-            Attachment attachment = attachmentRepo.create((Map) data.attachment)
-            if (attachment) {
-                linkAttachment(activity, attachment)
-            }
-        }
 
         Map task = data.task as Map
 
@@ -216,6 +194,16 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             //activity.note.persist() Dont save it here, it will be cascaded
         }
 
+    }
+
+    // This adds the realted and children entities from the params to the Activity
+    // called in afterBind
+    void doAttachments(Activity activity, Object attData) {
+        List attachments = attachmentRepo.bulkCreateOrUpdate(attData as List)
+        attachments.each { Attachment attachment ->
+            AttachmentLink.create(activity, attachment)
+        }
+        activity._hasAttachments = attachments.size()
     }
 
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {
@@ -361,7 +349,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             updateSummary(activity)
         }
         attachments?.each { attachment ->
-            linkAttachment(activity, attachment)
+            AttachmentLink.create(activity, attachment)
         }
         activity.persist()
     }
@@ -500,7 +488,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         fromAct.attachments?.each { Attachment attachment ->
             Attachment attachCopy = attachmentRepo.copy(attachment)
             if(attachCopy) {
-                linkAttachment(toAct, attachCopy)
+                AttachmentLink.create(toAct, attachCopy)
             }
         }
 
@@ -508,7 +496,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             toAct.addToContacts(c)
         }
 
-        List activityLinks = ActivityLink.list(fromAct)
+        List activityLinks = activityLinkRepo.queryFor(fromAct).list()
         activityLinks?.each { ActivityLink link ->
             activityLinkRepo.create(link.linkedId, link.linkedEntity, toAct)
         }

@@ -18,6 +18,7 @@ import yakworks.commons.io.FileUtil
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.common.NameDescription
+import yakworks.rally.tag.model.Taggable
 
 /**
  * Attachments refer to an externally created file, which could be a letter template, an image, text document or anything else.
@@ -40,7 +41,7 @@ import yakworks.rally.common.NameDescription
 @AuditStamp
 @Entity
 @GrailsCompileStatic
-class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachment>, Serializable {
+class Attachment implements NameDescription, Taggable, AuditStampTrait, RepoEntity<Attachment>, Serializable {
     static final String DEFAULT_LOCATION_KEY = "attachments.location"
 
     //non persistable
@@ -57,7 +58,8 @@ class Attachment implements NameDescription, AuditStampTrait, RepoEntity<Attachm
 
     //the relative path to the locationKey, this is the name of the file. ex: 2012-02/somepdf.pdf or views/reports/arReport.ftl
     String location
-    //the appResource config key to get the base directory that location is relative to
+    // the appResource config key to get the base directory that location is relative to
+    // can also be used for future keys that designate storaage like S3 or linodes block
     String locationKey = DEFAULT_LOCATION_KEY
     //the file size/contentLength in bytes
     Long contentLength

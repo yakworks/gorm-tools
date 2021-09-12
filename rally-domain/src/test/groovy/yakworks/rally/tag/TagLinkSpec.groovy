@@ -14,6 +14,35 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
         mockDomains Tag, Attachment
     }
 
+    List createSomeTags(){
+        def tag1 = Tag.create(name: 'tag1', code: 'tag1')
+        def tag2 = Tag.create(name: 'tag2', code: 'tag2', entityName: 'Foo, Attachment')
+        def tag3 = Tag.create(name: 'tag3', code: 'tag3', entityName: 'Attachment')
+        def tag4 = Tag.create(name: 'tag4 wont work', code: 'tag4', entityName: 'SomethingElse')
+        return [tag1, tag2, tag3, tag4]
+    }
+
+    Attachment setupAnAttachmentWithTags(){
+        def tags = createSomeTags()
+        def tagId1 = tags[0].id
+        def tagId2 = tags[0].id
+
+        def attachData = [
+            name: 'foo.txt',
+            tags: [[id: 1], [id: 2], [id: 3]]
+        ]
+        return Attachment.create(attachData)
+    }
+
+    void "sanity check"() {
+        when:
+        def att = setupAnAttachmentWithTags()
+
+        then:
+        att.hasTags()
+        att.getTags().size() == 3
+    }
+
     void "create link"() {
         when:
         def tag1 = Tag.create(name: 'tag1', code: 'tag1')
@@ -50,6 +79,18 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
 
     }
 
+    void "create an attachment with tags"() {
+        when:
+        def tag1 = Tag.create(name: 'tag1', code:'tag1', entityName: 'Something')
+        def att = new Attachment(name: 'foo', location: 'foo').persist()
+
+        def tl = TagLink.create(att, tag1)
+
+        then:
+        thrown IllegalArgumentException
+
+    }
+
     void "create link with invalid tag"() {
         when: 'tag not valid for entity'
         def tag1 = Tag.create(name: 'tag1', code:'tag1', entityName: 'Something')
@@ -74,6 +115,5 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
 
         then:
         thrown IllegalArgumentException
-
     }
 }

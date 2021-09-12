@@ -10,21 +10,19 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.util.HashCodeHelper
 
-import gorm.tools.mango.api.QueryMangoEntity
 import gorm.tools.model.Persistable
-import gorm.tools.repository.GormRepo
-import gorm.tools.repository.model.PersistableRepoEntity
-import yakworks.rally.common.LinkedEntityRepoTrait
+import gorm.tools.repository.RepoUtil
+import yakworks.rally.common.LinkXRefRepo
+import yakworks.rally.common.LinkXRefTrait
 
 /**
  * common trait that a concrete composite entity can implement if the stock TagLink will not suffice
  * for example, Org has its own OrgTag lining table
+ *
+ * @param <X> the LinkXRef entity
  */
 @CompileStatic
-trait TagLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEntity<D, R>, QueryMangoEntity<D> {
-
-    Long linkedId
-    String linkedEntity
+trait TagLinkTrait<X> implements LinkXRefTrait {
 
     abstract Tag getTag()
     abstract void setTag(Tag t)
@@ -34,25 +32,40 @@ trait TagLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEntity<D,
     @Transient
     Long getTagId() { (Long)this.getAssociationId("tag") }
 
-    static LinkedEntityRepoTrait<D,Tag> getTagLinkRepo() {
-        getRepo() as LinkedEntityRepoTrait<D,Tag>
-    }
+    static constraintsMap = [
+        tag:[ description: 'The tag', nullable: false]
+    ]
 
-    static D create(Persistable entity, Tag theTag, Map args = [:]) {
-        getTagLinkRepo().create(entity, theTag, args)
-    }
-
-
-    static D get(Persistable entity, Tag theTag) {
-        getTagLinkRepo().get(entity, theTag)
-    }
-
-    static List<D> list(Persistable entity) {
-        getTagLinkRepo().list(entity)
+    static LinkXRefRepo<X,Tag> getTagLinkRepo() {
+        (LinkXRefRepo<X,Tag>) RepoUtil.findRepo(this)
     }
 
     static List<Tag> listTags(Persistable entity) {
         getTagLinkRepo().listItems(entity)
+    }
+
+    static List<X> list(Tag tag) {
+        getTagLinkRepo().list(tag)
+    }
+
+    static List<X> list(Persistable linkedEntity) {
+        getTagLinkRepo().list(linkedEntity)
+    }
+
+    static boolean hasTags(Persistable entity) {
+        getTagLinkRepo().exists(entity)
+    }
+
+    static boolean exists(Tag tag) {
+        getTagLinkRepo().exists(tag)
+    }
+
+    static X create(Persistable entity, Tag theTag, Map args = [:]) {
+        getTagLinkRepo().create(entity, theTag, args)
+    }
+
+    static X get(Persistable entity, Tag theTag) {
+        getTagLinkRepo().get(entity, theTag)
     }
 
     static boolean exists(Persistable entity, Tag theTag) {
@@ -63,7 +76,7 @@ trait TagLinkTrait<D, R extends GormRepo<D>> implements PersistableRepoEntity<D,
     boolean equals(Object other) {
         if (other == null) return false
         if (this.is(other)) return true
-        if (other instanceof TagLinkTrait<D>) {
+        if (other instanceof TagLinkTrait<X>) {
             return other.getLinkedId() == getLinkedId() && other.getLinkedEntity() == getLinkedEntity() && other.getTagId() == getTagId()
         }
         return false

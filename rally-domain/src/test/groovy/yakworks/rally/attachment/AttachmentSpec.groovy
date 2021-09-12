@@ -23,6 +23,8 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 import yakworks.rally.attachment.repo.AttachmentRepo
+import yakworks.rally.tag.model.Tag
+import yakworks.rally.tag.model.TagLink
 
 class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest {
 
@@ -41,7 +43,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
     }
 
     def setupSpec() {
-        mockDomains(Attachment, AttachmentLink, FileData)
+        mockDomains(Attachment, AttachmentLink, FileData, Tag, TagLink)
     }
 
     void cleanupSpec() {

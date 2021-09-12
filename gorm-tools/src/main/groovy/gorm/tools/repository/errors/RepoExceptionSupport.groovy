@@ -66,12 +66,12 @@ class RepoExceptionSupport {
 
     /**
      * Returns list of errors in the format [{field:name, message:error}]
-     * @param Errors
+     * @param errs the erros object to convert
      */
     static List<Map<String, String>> toErrorList(Errors errs) {
         List<Map<String, String>> errors = []
         MessageSource messageSource =  AppCtx.getCtx()
-        errs.allErrors.each {def err
+        errs.allErrors.each {
             Map m = [message:messageSource.getMessage(it, RepoMessage.defaultLocale())]
             if(it instanceof FieldError) m['field'] = it.field
             errors << m

@@ -21,11 +21,8 @@ import static gorm.tools.utils.GormUtils.entityListToIdMap
 class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
 
     TagLinkRepo(){
-        super(Tag)
+        super(Tag, 'tag')
     }
-
-    @Override
-    List<String> getPropNames() { ['linkedId', 'tag']}
 
     /**
      * override in implementation to throw IllegalArgumentException if the tag.entityName does not match
@@ -36,12 +33,6 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
         def entName = getLinkedEntityName(entity)
         if (!tag.isValidFor(entName))
             throw new IllegalArgumentException("Tag [${tag.name}] not valid for $entName, restricted with entityName:${tag.entityName}")
-    }
-
-    @Override
-    Persistable lookup(String type, Object data){
-        //FIXME make a generic way to lookup id and code, for now only loads by id
-        Tag.load(data['id'] as Long)
     }
 
     boolean hasTags(Persistable entity) {

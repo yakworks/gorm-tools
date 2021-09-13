@@ -13,6 +13,7 @@ import org.codehaus.groovy.util.HashCodeHelper
 import gorm.tools.model.LinkedEntity
 import gorm.tools.model.Persistable
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.events.RepositoryEvent
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 
 /**
@@ -38,6 +39,22 @@ trait TagLinkTrait<X> implements LinkedEntity {
 
     static AbstractLinkedEntityRepo<X, Tag> getTagLinkRepo() {
         (AbstractLinkedEntityRepo<X, Tag>) RepoUtil.findRepo(this)
+    }
+
+    static Integer remove(Persistable entity) {
+        getTagLinkRepo().remove(entity)
+    }
+
+    // helper to call in afterPersist
+    static List<X> addOrRemoveTags(Persistable linkedEntity, Object itemParams) {
+        getTagLinkRepo().addOrRemove(linkedEntity, itemParams)
+    }
+
+    // helpe to call in afterPersist
+    static List<X> addOrRemoveTags(Persistable linkedEntity, RepositoryEvent e) {
+        if (e.bindAction && e.data?.tags){
+            getTagLinkRepo().addOrRemove(linkedEntity, e.data.tags)
+        }
     }
 
     static List<X> list(Persistable entity) {

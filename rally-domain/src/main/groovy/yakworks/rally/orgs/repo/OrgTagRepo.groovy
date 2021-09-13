@@ -22,11 +22,8 @@ import static gorm.tools.utils.GormUtils.collectLongIds
 class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
 
     OrgTagRepo(){
-        super(Tag)
+        super(Tag, 'tag')
     }
-
-    @Override
-    List<String> getPropNames() { ['linkedId', 'tag']}
 
     @Override
     void validateCreate(Persistable entity, Tag tag) {
@@ -34,12 +31,6 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
         Org org = (Org) entity
         if (!tag.isValidFor(org.type.name()))
             throw new IllegalArgumentException("Tags entityName: ${tag.entityName} not valid for org type ${org.type.name()}")
-    }
-
-    @Override
-    Persistable lookup(String type, Object data){
-        //FIXME make a generic way to lookup id and code, for now only loads by id
-        Tag.load(data['id'] as Long)
     }
 
     /**

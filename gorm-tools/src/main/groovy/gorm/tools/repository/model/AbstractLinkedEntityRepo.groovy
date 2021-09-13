@@ -24,8 +24,8 @@ import static gorm.tools.utils.GormUtils.collectLongIds
 @CompileStatic
 abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends AbstractCrossRefRepo<X, Persistable, R> {
 
-    protected AbstractLinkedEntityRepo(Class<R> relatedClazz){
-        super(Persistable, relatedClazz)
+    protected AbstractLinkedEntityRepo(Class<R> relatedClazz, String propName){
+        super(Persistable, relatedClazz, ['dummy', propName])
     }
 
     @Override
@@ -66,14 +66,6 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
         query(linkedId: entity.id, linkedEntity: getLinkedEntityName(entity))
     }
 
-    /**
-     * Copies all related from given entity to target main entity
-     */
-    void copyRelated(Persistable fromEntity, Persistable toEntity) {
-        List<Long> relatedIds = collectLongIds(list(fromEntity), "${relatedPropName}Id")
-        //FIXME we should bypass events for this so its faster
-        if (relatedIds) add(toEntity, relatedIds)
-    }
 
     void copyLinked(R fromRelated, R toRelated){
         for (X link  : list(fromRelated)) {

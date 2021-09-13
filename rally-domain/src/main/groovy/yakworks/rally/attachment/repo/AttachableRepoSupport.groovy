@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.events.RepositoryEvent
-import yakworks.rally.attachment.model.Attachable
-import yakworks.rally.attachment.model.AttachmentLink
 
 /**
  * helpers trait to add to a Attachable entity's repo

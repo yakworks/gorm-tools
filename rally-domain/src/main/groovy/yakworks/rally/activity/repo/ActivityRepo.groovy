@@ -33,6 +33,7 @@ import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.model.Task
@@ -44,14 +45,13 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
-import yakworks.rally.tag.repo.TaggableRepoSupport
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
 @CompileStatic
-class ActivityRepo implements GormRepo<Activity>, TaggableRepoSupport, IdGeneratorRepo {
+class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     @Inject @Nullable
     ActivityLinkRepo activityLinkRepo
@@ -91,12 +91,13 @@ class ActivityRepo implements GormRepo<Activity>, TaggableRepoSupport, IdGenerat
             note.delete()
         }
 
-        removeTagLinks(activity)
+        TagLink.remove(activity)
 
         AttachmentLink.repo.remove(activity)
         //XXX missing removal for attachments if its not linked to anything else
         //  meaning attachment should also be deleted if it only exists for this activity
         ActivityLink.repo.remove(activity)
+        ActivityContact.repo.remove(activity)
 
     }
 
@@ -127,8 +128,8 @@ class ActivityRepo implements GormRepo<Activity>, TaggableRepoSupport, IdGenerat
 
     void doAssociations(Activity activity, Map data) {
         if(data.attachments) doAttachments(activity, data.attachments)
-
-        if(data.tags) addOrRemoveTags(activity, data.tags)
+        if(data.contacts) ActivityContact.repo.addOrRemove(activity, data.contacts)
+        if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
         // XXX fix this
         // if(data.contacts) {
@@ -201,7 +202,7 @@ class ActivityRepo implements GormRepo<Activity>, TaggableRepoSupport, IdGenerat
         attachments.each { Attachment attachment ->
             AttachmentLink.create(activity, attachment)
         }
-        activity.hasAttachments = true
+        activity.setHasAttachments(true)
     }
 
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {
@@ -490,9 +491,7 @@ class ActivityRepo implements GormRepo<Activity>, TaggableRepoSupport, IdGenerat
             }
         }
 
-        fromAct.contacts?.each { Contact c ->
-            toAct.addToContacts(c)
-        }
+        ActivityContact.repo.copyRelated(fromAct, toAct)
 
         activityLinkRepo.copyLinked(fromAct, toAct)
 

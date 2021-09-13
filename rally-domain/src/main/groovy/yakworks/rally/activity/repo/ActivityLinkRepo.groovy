@@ -17,16 +17,7 @@ import yakworks.rally.activity.model.ActivityLink
 class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> {
 
     ActivityLinkRepo(){
-        super(Activity)
-    }
-
-    @Override
-    List<String> getPropNames() { ['linkedId', 'activity']}
-
-    @Override
-    Persistable lookup(String type, Object data){
-        //FIXME make a generic way to lookup id and code, for now only loads by id
-        Activity.load(data['id'] as Long)
+        super(Activity, 'activity')
     }
 
     /**

@@ -19,16 +19,7 @@ import yakworks.rally.attachment.model.AttachmentLink
 class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attachment> {
 
     AttachmentLinkRepo(){
-        super(Attachment)
-    }
-
-    @Override
-    List<String> getPropNames() { ['linkedId', 'attachment']}
-
-    @Override
-    Persistable lookup(String type, Object data){
-        //FIXME make a generic way to lookup id and code, for now only loads by id
-        Attachment.load(data['id'] as Long)
+        super(Attachment, 'attachment')
     }
 
     @Override
@@ -45,7 +36,7 @@ class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attach
         // update the has attachments
         if(Attachable.isAssignableFrom(entity.class)){
             def attachableEntity = (Attachable)entity
-            attachableEntity.hasAttachments = linkList?.size()
+            attachableEntity.setHasAttachments(linkList?.size() as Boolean)
         }
     }
 

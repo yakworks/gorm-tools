@@ -7,10 +7,13 @@ package gorm.tools.repository.model
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.codehaus.groovy.runtime.InvokerHelper
+
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoUtil
 import yakworks.commons.lang.Validate
 
 import static gorm.tools.utils.GormUtils.collectLongIds
@@ -30,24 +33,25 @@ import static gorm.tools.utils.GormUtils.listToIdMap
 @Slf4j
 @CompileStatic
 abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persistable> implements GormRepo<X> {
-    Class<P> mainClass;
-    Class<R> relatedClass;
+    Class<P> mainClass
+    Class<R> relatedClass
+    List<String> propNames
 
-    protected AbstractCrossRefRepo(Class<P> mainClazz, Class<R> relatedClazz){
+    protected AbstractCrossRefRepo(Class<P> mainClazz, Class<R> relatedClazz, List<String> propKeys){
         mainClass = mainClazz
         relatedClass= relatedClazz
+        propNames = propKeys
     }
 
     /**
      * in implementation will search for fields and call L.load if it has an id
      * but can do look ups such as for code or sourceId if no id is provided
      */
-    abstract Persistable lookup(String type, Object data)
-
-    /**
-     * must be override, first item is main prop name and second is the related prop name
-     */
-    abstract List<String> getPropNames()
+    Persistable lookup(Class clazz, Object data){
+        //FIXME make a generic way to lookup id and code, for now only loads by id
+        Long aid = data['id'] as Long
+        return InvokerHelper.invokeStaticMethod(clazz, 'load', aid) as Persistable
+    }
 
     String getMainPropName(){
         propNames[0]
@@ -121,7 +125,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      */
     void remove(P main, List<Long> relatedIdList) {
         for (Long relatedId : relatedIdList) {
-            remove(main, (R)lookup(relatedPropName, [id: relatedId]))
+            remove(main, (R)lookup(relatedClass, [id: relatedId]))
         }
     }
 
@@ -239,7 +243,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         Validate.notNull(data.id, "createOrRemove requires data map to have an id key")
         X xrefEntity
         DataOp op = DataOp.get(data.op) //add, update, delete really only needed for delete
-        R related = (R)lookup(relatedPropName, data)
+        R related = (R)lookup(relatedClass, data)
         if(op == DataOp.remove){
             remove(main, related)
         } else {
@@ -251,6 +255,15 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     List<X> add(P main, List<Long> ids){
         List<Map> itemsToAddMap = listToIdMap(ids)
         return addOrRemoveList(main, itemsToAddMap)
+    }
+
+    /**
+     * Copies all related from given entity to target main entity
+     */
+    void copyRelated(P fromEntity, P toEntity) {
+        List<Long> relatedIds = collectLongIds(list(fromEntity), "${relatedPropName}Id")
+        //FIXME we should bypass events for this so its faster
+        if (relatedIds) add(toEntity, relatedIds)
     }
 
     // ***** Unsupported some gormRepo methods should not be called with an XRef tables so blow errors for these

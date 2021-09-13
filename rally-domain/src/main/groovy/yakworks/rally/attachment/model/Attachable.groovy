@@ -4,7 +4,6 @@
 */
 package yakworks.rally.attachment.model
 
-import javax.persistence.Transient
 
 import groovy.transform.CompileStatic
 
@@ -16,13 +15,11 @@ trait Attachable {
     // cached version so we can avoid hitting db in events
     private Boolean _hasAttachments
 
-    @Transient
-    boolean getHasAttachments() {
+    boolean hasAttachments() {
         if(_hasAttachments == null) _hasAttachments = AttachmentLink.repo.queryFor((Persistable)this).count() as Boolean
         return _hasAttachments
     }
 
-    @Transient
     void setHasAttachments(boolean val) {
         this._hasAttachments = val
     }

@@ -312,6 +312,16 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         }
     }
 
+    /**
+     * a read wrapped in a read-only transaction.
+     *
+     * @param id required, the id to get
+     * @return the retrieved entity
+     */
+    D load(Serializable id) {
+        (D) gormStaticApi().load(id)
+    }
+
 
     /**
      * Mass update a list of ids

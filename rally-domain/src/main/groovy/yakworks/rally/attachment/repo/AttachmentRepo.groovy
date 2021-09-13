@@ -127,7 +127,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo, TaggableR
             attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
         }
         //remove the links
-        attachmentLinkRepo.removeAllByItem(attachment)
+        attachmentLinkRepo.remove(attachment)
         //tags
         removeTagLinks(attachment)
     }

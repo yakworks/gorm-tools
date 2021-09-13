@@ -6,20 +6,19 @@ package yakworks.rally.attachment.model
 
 import org.codehaus.groovy.util.HashCodeHelper
 
+import gorm.tools.model.LinkedEntity
 import gorm.tools.model.Persistable
-import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
-import yakworks.rally.common.LinkXRefTrait
 
 /**
  * generalized composite table to link a Attachment to any entity
  */
 @Entity
 @GrailsCompileStatic
-class AttachmentLink implements LinkXRefTrait, GormRepoEntity<AttachmentLink, AttachmentLinkRepo>, Serializable {
+class AttachmentLink implements LinkedEntity, GormRepoEntity<AttachmentLink, AttachmentLinkRepo>, Serializable {
     static belongsTo = [attachment: Attachment]
 
     static mapping = {
@@ -28,36 +27,24 @@ class AttachmentLink implements LinkXRefTrait, GormRepoEntity<AttachmentLink, At
         attachment column: 'attachmentId', fetch: 'join'
     }
 
-    static AttachmentLinkRepo getAttachmentLinkRepo() {
-        RepoUtil.findRepo(this) as AttachmentLinkRepo
-    }
-
     static AttachmentLink create(Persistable linkedEntity, Attachment attach, Map args = [:]) {
-        getAttachmentLinkRepo().create(linkedEntity, attach, args)
+        getRepo().create(linkedEntity, attach, args)
     }
 
     static AttachmentLink get(Persistable linkedEntity, Attachment attach) {
-        getAttachmentLinkRepo().get(linkedEntity, attach)
+        getRepo().get(linkedEntity, attach)
     }
 
-    static List<AttachmentLink> list(Persistable linkedEntity) {
-        getAttachmentLinkRepo().list(linkedEntity)
-    }
-
-    static List<AttachmentLink> list(Attachment attach) {
-        getAttachmentLinkRepo().list(attach)
+    static List<AttachmentLink> list(Persistable entity) {
+        getRepo().list(entity)
     }
 
     static List<Attachment> listAttachments(Persistable entity) {
-        getAttachmentLinkRepo().listItems(entity)
+        getRepo().listAttachments(entity)
     }
 
     static boolean exists(Persistable entity, Attachment attach) {
-        getAttachmentLinkRepo().exists(entity, attach)
-    }
-
-    static boolean hasAttachments(Persistable entity) {
-        getAttachmentLinkRepo().exists(entity)
+        getRepo().exists(entity, attach)
     }
 
     @Override

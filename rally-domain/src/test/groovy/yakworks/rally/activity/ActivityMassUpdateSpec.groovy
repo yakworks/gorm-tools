@@ -17,7 +17,6 @@ import yakworks.commons.util.BuildSupport
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.ActivityTag
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
@@ -47,7 +46,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
     }
 
     def setupSpec() {
-        mockDomains(Customer, Activity, ActivityNote, ActivityLink, ActivityTag,
+        mockDomains(Customer, Activity, ActivityNote, ActivityLink,
             Org, OrgTag, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus
         )
     }

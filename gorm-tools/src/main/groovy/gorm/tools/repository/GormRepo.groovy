@@ -494,9 +494,4 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         GormEnhancer.findValidationApi(getEntityClass())
     }
 
-    //just a little helper to collect the id keys
-    List<Long> collectIds(List dataList){
-        if(!dataList) return []
-        return dataList.collect { it['id'] as Long }
-    }
 }

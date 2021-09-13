@@ -6,28 +6,27 @@ package yakworks.rally.activity.repo
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.common.LinkXRefRepo
 
 @GormRepository
 @CompileStatic
-class ActivityLinkRepo implements LinkXRefRepo<ActivityLink, Activity> {
+class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> {
 
-    @Override
-    String getItemPropName() {'activity'}
-
-    @Override
-    Activity loadItem(Long id) { Activity.load(id)}
-
-    List<ActivityLink> listByActivity(Activity act) {
-        queryByItem(act).list()
+    ActivityLinkRepo(){
+        super(Activity)
     }
 
-    void removeAllByActivity(Activity act) {
-        listByActivity(act).each {
-            it.remove()
-        }
+    @Override
+    List<String> getPropNames() { ['linkedId', 'activity']}
+
+    @Override
+    Persistable lookup(String type, Object data){
+        //FIXME make a generic way to lookup id and code, for now only loads by id
+        Activity.load(data['id'] as Long)
     }
+
 }

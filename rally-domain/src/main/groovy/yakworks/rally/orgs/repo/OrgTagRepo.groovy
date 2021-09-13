@@ -9,51 +9,63 @@ import groovy.transform.CompileStatic
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
-import yakworks.rally.common.LinkXRefRepo
+import gorm.tools.repository.model.AbstractLinkedEntityRepo
+import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.tag.model.Tag
 
+import static gorm.tools.utils.GormUtils.collectLongIds
+
 @GormRepository
 @CompileStatic
-class OrgTagRepo implements LinkXRefRepo<OrgTag, Tag> {
+class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
+
+    OrgTagRepo(){
+        super(Tag)
+    }
 
     @Override
-    String getItemPropName() {'tag'}
+    List<String> getPropNames() { ['linkedId', 'tag']}
 
     @Override
-    Tag loadItem(Long id) { Tag.load(id)}
+    void validateCreate(Persistable entity, Tag tag) {
+        Validate.notNull(entity.id, "[linkEntity.id]")
+        Org org = (Org) entity
+        if (!tag.isValidFor(org.type.name()))
+            throw new IllegalArgumentException("Tags entityName: ${tag.entityName} not valid for org type ${org.type.name()}")
+    }
 
-    List<Tag> listTags(Persistable org) {
-        queryFor(org).list()*.tag
+    @Override
+    Persistable lookup(String type, Object data){
+        //FIXME make a generic way to lookup id and code, for now only loads by id
+        Tag.load(data['id'] as Long)
     }
 
     /**
-     * Makes the composite key only be linkedId and item, ignores linkedEntityName
+     * Makes the composite key only be linkedId and item, since there is no linkedEntity field
      */
     @Override
     Map getKeyMap(long linkedId, String linkedEntityName, Tag tag){
         [linkedId: linkedId, 'tag': tag]
     }
 
+    //override since there is no linkedEntity field
     @Override
-    void validateCreate(Persistable entity, Tag tag) {
-        Org org = (Org) entity
-        if (!tag.isValidFor(org.type.name()))
-            throw new IllegalArgumentException("Tags entityName: ${tag.entityName} not valid for org type ${org.type.name()}")
+    MangoDetachedCriteria<OrgTag> queryByMain(Persistable entity){
+        query(linkedId: entity.id)
+    }
+
+    List<Tag> listTags(Persistable org) {
+        queryFor(org).list()*.tag
     }
 
     /**
      * Copies all tags from given org to target org
      */
     void copyToOrg(Org fromOrg, Org toOrg) {
-        List<Long> tags = listItemIds(fromOrg)
-        if (tags) add(toOrg, tags)
+        List<Long> tagsIds = collectLongIds(list(fromOrg), "tagId")
+        if (tagsIds) add(toOrg, tagsIds)
     }
 
-    // this doesn't have linkedEntity Field so we need to override
-    @Override
-    MangoDetachedCriteria<OrgTag> queryFor(Persistable entity){
-        query(linkedId: entity.id)
-    }
 }

@@ -23,7 +23,7 @@ trait TaggableRepoSupport {
 
     // call in beforeRemove
     void removeTagLinks(Persistable linkedEntity) {
-        tagLinkRepo.removeAll(linkedEntity)
+        tagLinkRepo.remove(linkedEntity)
     }
 
     // call in afterPersist

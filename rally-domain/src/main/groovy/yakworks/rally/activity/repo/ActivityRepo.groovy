@@ -35,7 +35,6 @@ import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.ActivityTag
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
@@ -44,19 +43,18 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.TagLink
+import yakworks.rally.tag.repo.TaggableRepoSupport
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
 @CompileStatic
-class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
+class ActivityRepo implements GormRepo<Activity>, TaggableRepoSupport, IdGeneratorRepo {
 
     @Inject @Nullable
     ActivityLinkRepo activityLinkRepo
-
-    @Inject @Nullable
-    ActivityTagRepo activityTagRepo
 
     @Inject @Nullable
     AttachmentRepo attachmentRepo
@@ -93,12 +91,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             note.delete()
         }
 
-        AttachmentLink.repo.removeAll(activity)
+        removeTagLinks(activity)
+
+        AttachmentLink.repo.remove(activity)
         //XXX missing removal for attachments if its not linked to anything else
         //  meaning attachment should also be deleted if it only exists for this activity
-
-        ActivityTag.repo.removeAll(activity)
-        ActivityLink.repo.removeAllByActivity(activity)
+        ActivityLink.repo.remove(activity)
 
     }
 
@@ -130,9 +128,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     void doAssociations(Activity activity, Map data) {
         if(data.attachments) doAttachments(activity, data.attachments)
 
-        if(data.tags) {
-            activityTagRepo.addOrRemove(activity, data.tags)
-        }
+        if(data.tags) addOrRemoveTags(activity, data.tags)
+
         // XXX fix this
         // if(data.contacts) {
         //     data.contacts.each { it["org"] = activity.org }
@@ -496,13 +493,11 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             toAct.addToContacts(c)
         }
 
-        List activityLinks = activityLinkRepo.queryFor(fromAct).list()
-        activityLinks?.each { ActivityLink link ->
-            activityLinkRepo.create(link.linkedId, link.linkedEntity, toAct)
-        }
+        activityLinkRepo.copyLinked(fromAct, toAct)
 
         toAct.persist()
-        ActivityTag.repo.copyToActivity(fromAct, toAct)
+
+        TagLink.repo.copyTags(fromAct, toAct)
         return toAct
 
     }

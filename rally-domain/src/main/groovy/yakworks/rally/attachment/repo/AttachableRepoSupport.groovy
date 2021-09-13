@@ -27,7 +27,7 @@ trait AttachableRepoSupport {
 
     // call in beforeRemove
     void removeAttachmentLinks(Persistable linkedEntity) {
-        attachmentLinkRepo.removeAll(linkedEntity)
+        attachmentLinkRepo.remove(linkedEntity)
     }
 
     // call in afterPersist

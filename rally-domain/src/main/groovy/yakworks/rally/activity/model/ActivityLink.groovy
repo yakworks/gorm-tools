@@ -6,6 +6,7 @@ package yakworks.rally.activity.model
 
 import org.codehaus.groovy.util.HashCodeHelper
 
+import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.LinkedEntity
 import gorm.tools.model.Persistable
 import gorm.tools.repository.model.GormRepoEntity
@@ -24,24 +25,28 @@ class ActivityLink implements LinkedEntity, GormRepoEntity<ActivityLink, Activit
         activity column: 'activityId', cache: true, fetch: 'join'
     }
 
-    static ActivityLink create(long linkedId, String linkedEntity, Activity act) {
-        getRepo().create(linkedId, linkedEntity, act)
+    static ActivityLink create(Persistable linkedEntity, Activity act) {
+        getRepo().create(linkedEntity, act)
     }
 
     static ActivityLink get(Persistable entity, Activity act) {
         getRepo().get(entity, act)
     }
 
-    static List<ActivityLink> list(Activity act) {
-        getRepo().list(act)
+    static List<ActivityLink> list(Persistable entity) {
+        getRepo().list(entity)
     }
 
-    static List<Activity> listActs(Persistable entity) {
+    static List<Activity> listActivities(Persistable entity) {
         getRepo().listRelated(entity)
     }
 
     static boolean exists(Persistable entity, Activity act) {
         getRepo().exists(entity, act)
+    }
+
+    static MangoDetachedCriteria<ActivityLink> queryFor(Persistable entity) {
+        getRepo().queryFor(entity)
     }
 
     @Override

@@ -80,6 +80,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     X create(P main, R related,  Map args = [:]) {
         def params = getKeyMap(main, related)
         validateCreate(main, related)
+        //keep main entity in args so events can get to it
+        args['mainEntity'] = main
         return create(params, args)
     }
 
@@ -193,6 +195,19 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         return xlist
     }
 
+    /**
+     * iterates over list and calls the createOrRemove
+     * This should NOT normally be called directly, use addOrRemove
+     */
+    List<X> addOrRemoveList(P main, List<Map> dataList){
+        List xlist = [] as List<X>
+        for (Map relatedItem : dataList) {
+            X xref = createOrRemove(main, relatedItem)
+            if(xref) xlist.add(xref)
+        }
+        return xlist
+    }
+
     List<X> replaceList(P main, List<Map> dataList){
         def itemList = dataList as List<Map>
         // if its empty, then remove all
@@ -215,19 +230,6 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
             return xlist
         }
 
-    }
-
-    /**
-     * iterates over list and calls the createOrRemove
-     * This should NOT normally be called directly, use addOrRemove
-     */
-    List<X> addOrRemoveList(P main, List<Map> dataList){
-        List xlist = [] as List<X>
-        for (Map relatedItem : dataList) {
-            X xref = createOrRemove(main, relatedItem)
-            if(xref) xlist.add(xref)
-        }
-        return xlist
     }
 
     /**

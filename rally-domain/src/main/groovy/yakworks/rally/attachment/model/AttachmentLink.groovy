@@ -31,6 +31,10 @@ class AttachmentLink implements LinkedEntity, GormRepoEntity<AttachmentLink, Att
         getRepo().create(linkedEntity, attach, args)
     }
 
+    static List<AttachmentLink> addOrRemove(Persistable linkedEntity, Object itemParams){
+        getRepo().addOrRemove(linkedEntity, itemParams)
+    }
+
     static AttachmentLink get(Persistable linkedEntity, Attachment attach) {
         getRepo().get(linkedEntity, attach)
     }

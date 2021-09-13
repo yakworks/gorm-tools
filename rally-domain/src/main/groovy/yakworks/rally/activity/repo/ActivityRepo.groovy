@@ -197,10 +197,11 @@ class ActivityRepo implements GormRepo<Activity>, TaggableRepoSupport, IdGenerat
     // called in afterBind
     void doAttachments(Activity activity, Object attData) {
         List attachments = attachmentRepo.bulkCreateOrUpdate(attData as List)
+        //FIXME this is not right
         attachments.each { Attachment attachment ->
             AttachmentLink.create(activity, attachment)
         }
-        activity._hasAttachments = attachments.size()
+        activity.hasAttachments = true
     }
 
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {

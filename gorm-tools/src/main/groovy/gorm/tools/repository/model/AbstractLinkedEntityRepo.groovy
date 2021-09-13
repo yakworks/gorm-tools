@@ -48,6 +48,10 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
         [linkedId: linkedId, linkedEntity: linkedEntityName, (relatedPropName): related]
     }
 
+    /**
+     * used in testing and for copying. bypasses the validation so use with caution.
+     * Also event will not have the mainEntity which is the linkedEntity
+     */
     X create(long linkedId, String linkedEntityName, R related) {
         def params = getKeyMap(linkedId, linkedEntityName, related)
         return create(params, [:])
@@ -67,6 +71,7 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
      */
     void copyRelated(Persistable fromEntity, Persistable toEntity) {
         List<Long> relatedIds = collectLongIds(list(fromEntity), "${relatedPropName}Id")
+        //FIXME we should bypass events for this so its faster
         if (relatedIds) add(toEntity, relatedIds)
     }
 

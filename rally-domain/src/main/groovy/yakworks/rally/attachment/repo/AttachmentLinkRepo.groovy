@@ -10,6 +10,7 @@ import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import gorm.tools.support.Results
+import yakworks.rally.attachment.model.Attachable
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 
@@ -28,6 +29,24 @@ class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attach
     Persistable lookup(String type, Object data){
         //FIXME make a generic way to lookup id and code, for now only loads by id
         Attachment.load(data['id'] as Long)
+    }
+
+    @Override
+    List<AttachmentLink> addOrRemove(Persistable entity, Object itemParams){
+        def list = super.addOrRemove(entity, itemParams)
+        updateAttachableHasAttachments(entity, list)
+        return list
+    }
+
+    /**
+     * updates the cached hasAttachments on the attachable entity
+     */
+    void updateAttachableHasAttachments(Persistable entity, List linkList){
+        // update the has attachments
+        if(Attachable.isAssignableFrom(entity.class)){
+            def attachableEntity = (Attachable)entity
+            attachableEntity.hasAttachments = linkList?.size()
+        }
     }
 
     boolean hasAttachments(Persistable entity) {

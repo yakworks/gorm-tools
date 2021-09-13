@@ -29,4 +29,13 @@ class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> 
         Activity.load(data['id'] as Long)
     }
 
+    /**
+     * iterates through and removes all by Activity vs doing deleteAll so that delete event is fired
+     */
+    void remove(Activity act, Map args = [:]) {
+        for( ActivityLink link : list(act)){
+            doRemove(link, args)
+        }
+    }
+
 }

@@ -54,7 +54,7 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
 
     List<TagLink> addTags(Persistable linkedEntity, List<Tag> tags) {
         List<Map> ids = entityListToIdMap(tags)
-        addOrRemoveList(linkedEntity, ids)
+        addOrRemove(linkedEntity, ids)
     }
 
     void copyTags(Persistable fromEntity, Persistable toEntity) {

@@ -23,7 +23,7 @@ import yakworks.rally.tag.model.Taggable
 @IdEqualsHashCode
 @GrailsCompileStatic
 class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
-    static transients = ['_hasAttachments']
+    static transients = ['hasAttachments']
 
     // FIXME https://github.com/9ci/domain9/issues/117 hasMany is still considered evil, change these
     static hasMany = [contacts: Contact]

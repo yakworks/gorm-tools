@@ -174,6 +174,21 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
 
     /*** binding to add and remove ****/
 
+    /**
+     * This assumes that the entities already exist and we are just doing the linking.
+     * id keys should exist in the data.
+     *
+     * If itemParams is a list then its assumed to be a replace.
+     *  - will compare items , remove whats not on the itemParams and add whats not there
+     *
+     * If itemParams is an object and has op=update then it will spin through and look for the op field in each object
+     *  - if no op field in data then its assumed to be an add and will add if not exists
+     *  - if op=delete then removes
+     *
+     * @param main the primary entity, or linkedEntity if its a linkedEntityRepo
+     * @param itemParams the List or Map data
+     * @return
+     */
     List<X> addOrRemove(P main, Object itemParams){
         if(!itemParams) return []
         Long mainId = main['id'] as Long
@@ -188,13 +203,14 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
             List dataList = (List)itemParams.data
 
             Validate.isTrue(itemParams.data instanceof List)
-            if(op == DataOp.replace) {
-                xlist = replaceList(main, dataList)
-            } else {
-                throw new UnsupportedOperationException("op=replace is the only supported operation when passing a map for associations")
+            if(op == DataOp.update) {
+                xlist =  addOrRemoveList(main, dataList as List)
+            }
+            else {
+                throw new UnsupportedOperationException("op=update is currently the only supported operation when passing a map for associations")
             }
         } else { //its a list
-            xlist = addOrRemoveList(main, itemParams as List)
+            xlist = replaceList(main, itemParams as List)
         }
         return xlist
     }
@@ -204,6 +220,12 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      * This should NOT normally be called directly, use addOrRemove
      */
     List<X> addOrRemoveList(P main, List<Map> dataList){
+        //if its passing in an empty list on update then clear it out
+        if(dataList.isEmpty()) {
+            remove(main)
+            return []
+        }
+
         List xlist = [] as List<X>
         for (Map relatedItem : dataList) {
             X xref = createOrRemove(main, relatedItem)
@@ -216,7 +238,6 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         def itemList = dataList as List<Map>
         // if its empty, then remove all
         if(dataList.isEmpty()) {
-            remove(main)
             return []
         } else {
             //list of existing related items
@@ -247,7 +268,9 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
         if(op == DataOp.remove){
             remove(main, related)
         } else {
-            xrefEntity = create(main, related)
+            if(!exists(main, related)) { //if it already exists then move on
+                xrefEntity = create(main, related)
+            }
         }
         return xrefEntity
     }

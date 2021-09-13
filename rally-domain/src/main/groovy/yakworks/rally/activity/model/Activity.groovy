@@ -25,9 +25,6 @@ import yakworks.rally.tag.model.Taggable
 class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
     // static transients = ['hasAttachments']
 
-    // FIXME https://github.com/9ci/domain9/issues/117 hasMany is still considered evil, change these
-    static hasMany = [contacts: Contact]
-
     Kind kind = Kind.Note
     ActivityNote note
 
@@ -69,14 +66,13 @@ class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity,
         template column: 'templateId'
         task column: 'taskId'
         source column: 'sourceEntity'
-        contacts joinTable: [name: 'ActivityContact', key: 'activityId', column: 'personId']
     }
 
     List<ActivityLink> getLinks() {
         ActivityLink.list(this)
     }
 
-    List<Contact> getContact() {
+    List<Contact> getContacts() {
         ActivityContact.repo.listRelated(this)
     }
 

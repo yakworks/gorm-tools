@@ -178,10 +178,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             activity.kind = ActKind.Todo
         }
 
-        if (data.contact) {
-            activity.addToContacts((Map) data.contact)
-        }
-
         String summary = (data.summary as String)?.trim()
         if (!activity.note && summary?.length() > 255 ) {
             addNote(activity, summary)

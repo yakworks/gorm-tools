@@ -43,18 +43,23 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
             Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact)
     }
 
-    Map buildUpdateMap(Map args) {
-        Org org = MockHelper.org()
-        Map m = buildMap(args)
-        m.org = [id:org.id]
-        return m
-    }
-
     ActivityRepo activityRepo
 
     static Map getNoteParams(){
-        return [org:[id:205], title: 'Todays test note', note:[body: 'Todays test note'], summary:'2+3=5']
+        return [
+            org:[id:205],
+            title: 'Todays test note',
+            note:[body: 'Todays test note'],
+            summary:'2+3=5'
+        ]
     }
+
+    List createSomeContacts(){
+        Contact contact1 = MockHelper.contact([firstName: "bill"])
+        Contact contact2 = MockHelper.contact([firstName: "bob"])
+        [contact1, contact2]
+    }
+
 
     void "creates note if summary is longer than 255"() {
         when:
@@ -70,7 +75,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         activity.note.body == summary
     }
 
-    void testUpdateUpdatesNoteIfExist() {
+    void "update note if exists"() {
         when:
         Org org = build(Org)
         Activity activity = build(Activity, [org:org])
@@ -153,12 +158,10 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         Org org = MockHelper.org()
         Tag t1 = build(Tag, [name: "T1", entityName: "Activity"])
         Tag t2 = build(Tag, [name: "T2", entityName: "Activity"])
+        List contacts = createSomeContacts()
 
-        // XXX fix this test when we fix how contacts are done
-        // List<Map> contacts = [
-        //     [name: "C1", firstName: "C1"],
-        //     [name: "C2", firstName: "C2"],
-        // ]
+        List<Map> cmap = [[id:contacts[0].id], [id:contacts[1].id]]
+
 
         expect:
         org.id != null
@@ -171,7 +174,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
             note   : [body: 'test note'],
             summary: 'The summary',
             tags: [[id:t1.id], [id:t2.id]],
-            // contacts:contacts
+            contacts: cmap
         ]
 
         Activity act = Activity.create(params)
@@ -181,7 +184,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         act != null
         act.tags.size() == 2
         act.tags[0].name == "T1"
-
+        act.contacts.size() == 2
     }
 
     void testAddActivityContact() {

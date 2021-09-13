@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.job.Job
+import yakworks.rally.orgs.model.Org
 
 @Integration
 class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParserTrait {
@@ -23,7 +24,7 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParse
     void "testing post Org with Job"() {
         given:
         List<Map> jsonList = [
-            [num: "foox1", name: "Foox1", type: "Customer"],
+            [num: "foox1", name: "Foox1", type: "Customer", location: [ "street1": "string",  "street2": "string", "city": "string"]],
             [num: "foox2", name: "Foox2", type: "Customer"],
             [num: "foox3", name: "Foox3", type: "Customer"],
         ]
@@ -45,6 +46,15 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParse
         body.results[0].source.sourceId == "foox1"
         body.results[0].num == "foox1"
         body.results[0].name == "Foox1"
+
+        when: "Verify org"
+        Org org = Org.get( body.results[0].id as Long)
+
+        then:
+        org != null
+        org.num == "foox1"
+        org.location != null
+        org.location.street1 == "string"
 
         when: "Verify job.data"
         Job job = Job.get(body.id as Long)

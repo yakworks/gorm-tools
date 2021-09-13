@@ -5,7 +5,6 @@
 package yakworks.commons.map
 
 import spock.lang.Specification
-import spock.lang.Ignore
 
 class MapsSpec extends Specification {
     def instance = new Maps()
@@ -330,7 +329,6 @@ class MapsSpec extends Specification {
         assertMapsEqual(expected, m1)
     }
 
-    @Ignore
     void "test deep copy"() {
         given:
         Map source = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3]]
@@ -346,7 +344,6 @@ class MapsSpec extends Specification {
         assertMapsEqual(source, copy)
     }
 
-    @Ignore
     void "test deep merge"() {
         given:
         Map m1 = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3]]

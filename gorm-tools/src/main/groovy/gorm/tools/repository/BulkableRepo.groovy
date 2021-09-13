@@ -67,7 +67,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
         // XXX error count / rollback support
         AtomicInteger count = new AtomicInteger(0)
-        J job
+        J job = (J)jobRepo.create([source:args.source, state: JobState.Running, dataPayload:dataList])
         // for error handling -- based on `onError` from args commit success and report the failure or fail them all
         //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
         //@jdabal - for parallel async, we can not rollback batches which are already commited
@@ -88,7 +88,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
             List<Map> jsonResults = transformResults(bulkResult, args.includes as List)
             byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
             boolean  ok = !(bulkResult.any({ it.ok == false}))
-            job = (J)jobRepo.create([ok:ok, results: resultBytes, source:args.source, state: JobState.Finished, dataPayload:dataList])
+            job = (J)jobRepo.update([id:job.id, ok:ok, results: resultBytes, state: JobState.Finished])
         }
 
         //XXX  https://github.com/9ci/domain9/issues/331 assign jobId on each record created.
@@ -101,8 +101,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
         List<Results> resultList = [] as List<Results>
         for (Map item : dataList) {
             //need to copy the incoming map, as during create(), repos may remove entries from the data map
-            Map itmCopy = [:] << item  //Maps.deepCopy(item) doesnt work, as clone returns false
-            itmCopy = Maps.deepCopy(itmCopy)
+            Map itmCopy = Maps.deepCopy(item)
             D entityInstance
             Results r
             try {

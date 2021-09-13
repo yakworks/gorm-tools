@@ -61,14 +61,16 @@ class Maps {
      * @return the new merged map
      */
     static Map deepMerge(Map source, Map other) {
-        def cloneMap = clone(source)
-        other.inject(cloneMap) { map, e ->
+        def cloneMap = clone(other) ?: [:]
+        source.inject(cloneMap) { map, e ->
             def k = e.key
             def val = e.value
-            if (map[k] instanceof Map && val instanceof Map) {
-                map[k] = deepMerge(map[k] as Map, val as Map)
-            } else if (map[k] instanceof Collection && val instanceof Collection) {
-                map[k] = (map[k] as Collection) + (val as Collection)
+            if (( map[k] == null || map[k] instanceof Map ) && val instanceof Map) {
+                if(map[k] == null) map[k] = [:]
+                map[k] = deepMerge(val as Map, map[k] as Map)
+            } else if ((map[k] == null || map[k] instanceof Collection) && val instanceof Collection) {
+                if(map[k] == null) map[k] = []
+                map[k] = (val as Collection) + (map[k] as Collection)
             } else {
                 map[k] = val
             }

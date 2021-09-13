@@ -23,6 +23,7 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.support.Results
 import grails.validation.ValidationException
+import yakworks.commons.map.Maps
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -101,6 +102,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
         for (Map item : dataList) {
             //need to copy the incoming map, as during create(), repos may remove entries from the data map
             Map itmCopy = [:] << item  //Maps.deepCopy(item) doesnt work, as clone returns false
+            itmCopy = Maps.deepCopy(itmCopy)
             D entityInstance
             Results r
             try {

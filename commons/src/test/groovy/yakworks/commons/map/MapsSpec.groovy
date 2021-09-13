@@ -329,6 +329,21 @@ class MapsSpec extends Specification {
         assertMapsEqual(expected, m1)
     }
 
+    void "test deep merge"() {
+        given:
+        Map source = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3]]
+
+        when:
+        Map copy = Maps.deepCopy(source)
+
+        then:
+        !copy.is(source)
+        !copy.nested.is(source.nested)
+        !copy.list.is(source.list)
+
+        assertMapsEqual(source, copy)
+    }
+
     // A couple rather crude map equality testers.
     private void assertMapsEqual(expected, actual) {
         compareMapsWithAssertions(expected, actual)

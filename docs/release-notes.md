@@ -1,3 +1,9 @@
+### v7.0.8-v.23
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.22...v7.0.8-v.23)
+- moark for release [link](https://github.com/yakworks/gorm-tools/commit/42204e33151b2939bf318338dde74c1e5679800e)
+- clean up (#338) [link](https://github.com/yakworks/gorm-tools/commit/0a1440392a826262cb1cc82567cfa7cceaadb01a)
+
 ### v7.0.8-v.22
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.21...v7.0.8-v.22)

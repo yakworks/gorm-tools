@@ -33,9 +33,9 @@ import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
+import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.ActivityTag
 import yakworks.rally.activity.model.Task
 import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
@@ -44,6 +44,7 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.TagLink
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKind
 import static yakworks.rally.activity.model.Activity.VisibleTo
@@ -54,9 +55,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     @Inject @Nullable
     ActivityLinkRepo activityLinkRepo
-
-    @Inject @Nullable
-    ActivityTagRepo activityTagRepo
 
     @Inject @Nullable
     AttachmentRepo attachmentRepo
@@ -93,12 +91,13 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             note.delete()
         }
 
-        AttachmentLink.repo.removeAll(activity)
+        TagLink.remove(activity)
+
+        AttachmentLink.repo.remove(activity)
         //XXX missing removal for attachments if its not linked to anything else
         //  meaning attachment should also be deleted if it only exists for this activity
-
-        ActivityTag.repo.removeAll(activity)
-        ActivityLink.repo.removeAllByActivity(activity)
+        ActivityLink.repo.remove(activity)
+        ActivityContact.repo.remove(activity)
 
     }
 
@@ -129,10 +128,9 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     void doAssociations(Activity activity, Map data) {
         if(data.attachments) doAttachments(activity, data.attachments)
+        if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
+        if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
-        if(data.tags) {
-            activityTagRepo.addOrRemove(activity, data.tags)
-        }
         // XXX fix this
         // if(data.contacts) {
         //     data.contacts.each { it["org"] = activity.org }
@@ -180,10 +178,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             activity.kind = ActKind.Todo
         }
 
-        if (data.contact) {
-            activity.addToContacts((Map) data.contact)
-        }
-
         String summary = (data.summary as String)?.trim()
         if (!activity.note && summary?.length() > 255 ) {
             addNote(activity, summary)
@@ -200,10 +194,11 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     // called in afterBind
     void doAttachments(Activity activity, Object attData) {
         List attachments = attachmentRepo.bulkCreateOrUpdate(attData as List)
+        //FIXME this is not right
         attachments.each { Attachment attachment ->
             AttachmentLink.create(activity, attachment)
         }
-        activity._hasAttachments = attachments.size()
+        activity.setHasAttachments(true)
     }
 
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {
@@ -492,17 +487,13 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             }
         }
 
-        fromAct.contacts?.each { Contact c ->
-            toAct.addToContacts(c)
-        }
+        ActivityContact.repo.copyRelated(fromAct, toAct)
 
-        List activityLinks = activityLinkRepo.queryFor(fromAct).list()
-        activityLinks?.each { ActivityLink link ->
-            activityLinkRepo.create(link.linkedId, link.linkedEntity, toAct)
-        }
+        activityLinkRepo.copyLinked(fromAct, toAct)
 
         toAct.persist()
-        ActivityTag.repo.copyToActivity(fromAct, toAct)
+
+        TagLink.repo.copyTags(fromAct, toAct)
         return toAct
 
     }

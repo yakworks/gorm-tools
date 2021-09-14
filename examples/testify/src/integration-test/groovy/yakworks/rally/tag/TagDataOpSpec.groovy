@@ -64,7 +64,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         TagLink.list(att).size() == 3
     }
 
-    void "add is the default if nothing specified"() {
+    void "replace is the default if nothing specified"() {
         when:
         def tags = createSomeTags()
         def att = setupAnAttachmentWithTags(tags)
@@ -80,11 +80,10 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         def updatedAtt = Attachment.update(dta)
         flush()
         then:
-        updatedAtt.tags.size() == 5
+        updatedAtt.tags.size() == 2
 
     }
 
-    @Ignore
     void "if a tag already exists then will simple keep it and not add it"() {
         when:
         def tags = createSomeTags()
@@ -102,11 +101,11 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         def updatedAtt = Attachment.update(dta)
         flush()
         then:
-        updatedAtt.tags.size() == 5
+        updatedAtt.tags.size() == 3
 
     }
 
-    void "test op:replace with empty array to remove all"() {
+    void "test op:update with empty array to remove all"() {
         when:
         def att = setupAnAttachmentWithTags()
         flushAndClear()
@@ -115,7 +114,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         def dta = [
             id: att.id,
             tags: [
-                op:'replace', data: []
+                op:'update', data: []
             ]
         ]
         def updatedAtt = Attachment.update(dta)
@@ -136,7 +135,9 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         def dta = [
             id: att.id,
             tags: [
-                [ op:'remove', id: tag1Id ]
+                op:'update', data: [
+                    [ op:'remove', id: tag1Id ]
+                ]
             ]
         ]
         def updatedAtt = Attachment.update(dta)
@@ -146,7 +147,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
 
     }
 
-    void "test op:replace"() {
+    void "test op:update replace"() {
         when:
         def tags = createSomeTags()
         def att = setupAnAttachmentWithTags(tags)
@@ -155,24 +156,25 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         def dta = [
             id: att.id,
             tags: [
-                op:'replace',
+                op:'update',
                 data: [
                     [id: tags[0].id], //this was already here and should remain
-                    [id: tags[1].id],
+                    [id: tags[1].id], //this was already here and should remain
                     [id: tags[3].id],
                     [id: tags[4].id],
-
                 ]
+                //so the above data only adds 2, there is 1 that exists not mentioned and it will remain
             ]
         ]
         def updatedAtt = Attachment.update(dta)
         flush()
-        then:
-        updatedAtt.tags.size() == 4
+        then: "it kept the 2 existing and added 2 to the 3 that existed"
+        updatedAtt.tags.size() == 5
         updatedAtt.tags[0].name == 'tag0'
         updatedAtt.tags[1].name == 'tag1'
-        updatedAtt.tags[2].name == 'tag3'
-        updatedAtt.tags[3].name == 'tag4'
+        updatedAtt.tags[2].name == 'tag2' //still here even though not refed above
+        updatedAtt.tags[3].name == 'tag3'
+        updatedAtt.tags[4].name == 'tag4'
     }
 
 }

@@ -8,28 +8,46 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.events.AfterPersistEvent
-import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import gorm.tools.support.Results
-import yakworks.commons.lang.Validate
+import yakworks.rally.attachment.model.Attachable
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.common.LinkXRefRepo
 
 @GormRepository
 @CompileStatic
-class AttachmentLinkRepo implements LinkXRefRepo<AttachmentLink, Attachment> {
+class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attachment> {
 
-    @Override
-    String getItemPropName() {'attachment'}
-
-    @Override
-    Attachment loadItem(Long id) { Attachment.load(id)}
-
-    @Override
-    void validateCreate(Persistable linkEntity, Attachment attachment){
-        Validate.notNull(linkEntity.id, "[linkEntity.id]")
+    AttachmentLinkRepo(){
+        super(Attachment, 'attachment')
     }
+
+    @Override
+    List<AttachmentLink> addOrRemove(Persistable entity, Object itemParams){
+        def list = super.addOrRemove(entity, itemParams)
+        updateAttachableHasAttachments(entity, list)
+        return list
+    }
+
+    /**
+     * updates the cached hasAttachments on the attachable entity
+     */
+    void updateAttachableHasAttachments(Persistable entity, List linkList){
+        // update the has attachments
+        if(Attachable.isAssignableFrom(entity.class)){
+            def attachableEntity = (Attachable)entity
+            attachableEntity.setHasAttachments(linkList?.size() as Boolean)
+        }
+    }
+
+    boolean hasAttachments(Persistable entity) {
+        count(entity)
+    }
+
+    List<Attachment> listAttachments(Persistable entity) {
+        listRelated(entity)
+    }
+
     //
     // @RepoListener
     // void afterPersist(AttachmentLink activity, AfterPersistEvent e) {
@@ -61,17 +79,4 @@ class AttachmentLinkRepo implements LinkXRefRepo<AttachmentLink, Attachment> {
         return results
     }
 
-    // @Override
-    // List<AttachmentLink> replaceList(Persistable linkedEntity, List dataList){
-    //     def itemList = dataList as List<Map>
-    //     List<Long> itemParamIds = collectIds(itemList)
-    //     List<Long> currentItemIds = listItemIds(linkedEntity)
-    //
-    //     List<Long> itemsToAdd = itemParamIds - currentItemIds
-    //     List xlist = add(linkedEntity, itemsToAdd)
-    //
-    //     List<Long> itemsToRemove = currentItemIds - itemParamIds
-    //     remove(linkedEntity, itemsToRemove)
-    //     return xlist
-    // }
 }

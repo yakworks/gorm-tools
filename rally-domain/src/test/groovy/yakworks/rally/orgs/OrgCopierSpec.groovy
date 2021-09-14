@@ -6,7 +6,6 @@ import grails.buildtestdata.TestData
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.activity.model.ActivityTag
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.OrgCopier
 import yakworks.rally.orgs.OrgDimensionService
@@ -36,7 +35,7 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         mockDomains(
             Org, Contact, OrgFlex, OrgMember, OrgCalc, OrgSource, OrgTag,
             OrgInfo, OrgTypeSetup, Location, ContactPhone,
-            ContactEmail, ContactSource, ContactFlex, Activity, ActivityTag, ActivityLink, AttachmentLink
+            ContactEmail, ContactSource, ContactFlex, Activity, ActivityLink, AttachmentLink
         )
         defineBeans {
             orgCopier(OrgCopier)

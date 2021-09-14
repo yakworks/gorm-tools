@@ -13,6 +13,7 @@ import org.grails.datastore.mapping.model.types.Identity
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.model.Persistable
 import yakworks.commons.lang.Validate
 
 /**
@@ -157,6 +158,32 @@ class GormUtils {
         }
 
         return result
+    }
+
+    /**
+     * simple util that collects the ids as Long list, can pass in idPropName for another field
+     */
+    static List<Long> collectLongIds(List dataList, String idPropName = 'id'){
+        if(!dataList) return []
+        return dataList.collect { it[idPropName] as Long }
+    }
+
+    /**
+     * converts a list of long ids to a list of maps with id key
+     * so [1,2,3] would be converted to [[id:1], [id:2], [id:3]]
+     * can also pass in a different key with idPropName
+     */
+    static List<Map> listToIdMap(List<Long> idList, String idPropName = 'id'){
+        idList.collect { [(idPropName): it] } as List<Map>
+    }
+
+    /**
+     * converts a list of objects with id to a list of maps with id key
+     * so [1,2,3] would be converted to [[id:1], [id:2], [id:3]]
+     * can also pass in a different key with idPropName
+     */
+    static List<Map> entityListToIdMap(List entityList){
+        entityList.collect { [id: it['id']] } as List<Map>
     }
 
 }

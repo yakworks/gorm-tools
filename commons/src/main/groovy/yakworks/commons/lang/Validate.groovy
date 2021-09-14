@@ -35,6 +35,24 @@ class Validate {
     }
 
     /**
+     * Validate that the specified argument is no {@code null}
+     *
+     * For performance reasons, the Object... values is passed as a separate parameter and
+     * appended to the exception message only in the case of an error.
+     *
+     * @param expression  the boolean expression to check
+     * @param message  the {@link String#format(String, Object...)} exception message if invalid, not null
+     * @param msgArgs  the optional message args for the formatted exception message, null array not recommended
+     * @throws IllegalArgumentException if expression is {@code false}
+     */
+    public static <T> T notNull(final T obj, final String message, final Object... msgArgs) {
+        if (obj == null) {
+            throw new IllegalArgumentException(String.format(message, msgArgs))
+        }
+        return obj
+    }
+
+    /**
      * Validate that the specified argument is
      * neither {@code null} nor a length of zero (no characters) nor an empty collection
      * otherwise throwing an IllegalArgumentException with the specified message.

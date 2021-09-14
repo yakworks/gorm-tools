@@ -10,11 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.events.RepositoryEvent
-import yakworks.rally.attachment.model.Attachable
-import yakworks.rally.attachment.model.AttachmentLink
 
 /**
- * Basic helpers to keep
+ * helpers trait to add to a Attachable entity's repo
  */
 @CompileStatic
 trait AttachableRepoSupport {
@@ -27,20 +25,12 @@ trait AttachableRepoSupport {
 
     // call in beforeRemove
     void removeAttachmentLinks(Persistable linkedEntity) {
-        attachmentLinkRepo.removeAll(linkedEntity)
+        attachmentLinkRepo.remove(linkedEntity)
     }
 
     // call in afterPersist
     void addOrRemoveAttachments(Persistable attachable, Object itemParams) {
-        // List attachments = attachmentRepo.bulkCreateOrUpdate(itemParams as List)
-
-        List<AttachmentLink> attLinks = attachmentLinkRepo.addOrRemove(attachable, itemParams)
-
-        // update the has attachments
-        if(attLinks && attachable instanceof Attachable){
-            def attachableEntity = (Attachable)attachable
-            attachableEntity._hasAttachments = attLinks.size()
-        }
+        attachmentLinkRepo.addOrRemove(attachable, itemParams)
     }
 
     // call in afterPersist

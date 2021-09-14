@@ -11,10 +11,18 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.reflection.CachedClass
 import org.codehaus.groovy.reflection.ClassInfo
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.codehaus.groovy.transform.trait.Traits
 
 @CompileStatic
 class ClassUtils {
+
+    /**
+     * Wrapper around InvokerHelper.invokeStaticMethod, here just so we can remember it
+     */
+    static Object callStaticMethod(Class type, String method, Object arguments) {
+        return InvokerHelper.invokeStaticMethod(type, method, arguments)
+    }
 
     /**
      * gets the static properties from implemented traits on a class

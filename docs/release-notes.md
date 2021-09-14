@@ -1,3 +1,8 @@
+### v7.0.8-v.21
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.20...v7.0.8-v.21)
+- Crossref repos (#336) [link](https://github.com/yakworks/gorm-tools/commit/d30d3716ef4649b9328da6de225e4ecb10e33bd2)
+
 ### v7.0.8-v.20
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.19...v7.0.8-v.20)

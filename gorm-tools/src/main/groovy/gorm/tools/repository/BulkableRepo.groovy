@@ -19,6 +19,7 @@ import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobState
 import gorm.tools.job.JobTrait
 import gorm.tools.json.Jsonify
+import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.support.Results
@@ -133,7 +134,13 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
                 Exception ex = r.ex
                 if(ex instanceof EntityValidationException || ex instanceof ValidationException) {
-                    m["errors"] = RepoExceptionSupport.toErrorList(ex["errors"] as Errors)
+                    Errors err = ex["errors"] as Errors
+                    if(err && !(err instanceof EmptyErrors)) {
+                        m["errors"] = RepoExceptionSupport.toErrorList(ex["errors"] as Errors)
+                    } else {
+                        //this is some other exception wrapped in validation exception
+                        m["error"] = ex.cause?.message
+                    }
                 } else {
                     m["error"] = r.message
                 }

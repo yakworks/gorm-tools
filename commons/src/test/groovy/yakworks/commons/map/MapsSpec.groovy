@@ -331,7 +331,7 @@ class MapsSpec extends Specification {
 
     void "test deep copy"() {
         given:
-        Map source = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3]]
+        Map source = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3], listOfMap:[[one:1]]]
 
         when:
         Map copy = Maps.deepCopy(source)
@@ -340,7 +340,8 @@ class MapsSpec extends Specification {
         !copy.is(source)
         !copy.nested.is(source.nested)
         !copy.list.is(source.list)
-
+        !copy.listOfMap[0].is(source.listOfMap[0]) //maps inside list should not have been copied by reference
+        copy.listOfMap[0].one == 1
         assertMapsEqual(source, copy)
     }
 

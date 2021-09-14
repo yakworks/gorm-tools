@@ -1,23 +1,30 @@
 package restify
 
+import gorm.tools.job.JobState
+import gorm.tools.rest.JsonParserTrait
 import gorm.tools.rest.client.OkHttpRestTrait
+import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import groovy.json.JsonSlurper
 import okhttp3.Response
 import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.IgnoreRest
 import spock.lang.Specification
+import yakworks.rally.job.Job
+import yakworks.rally.orgs.model.Org
 
 @Integration
-class JobRestApiSpec extends Specification implements OkHttpRestTrait {
+class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParserTrait {
     JdbcTemplate jdbcTemplate
 
     String path = "/api/rally/org/bulk?source=Oracle"
 
+    @Rollback
     void "testing post Org with Job"() {
         given:
         List<Map> jsonList = [
-            [num: "foox1", name: "Foox1", type: "Customer"],
+            [num: "foox1", name: "Foox1", type: "Customer", location: [ "street1": "string",  "street2": "string", "city": "string"]],
             [num: "foox2", name: "Foox2", type: "Customer"],
             [num: "foox3", name: "Foox3", type: "Customer"],
         ]
@@ -28,6 +35,7 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.CREATED.value()
+        body.id != null
         body.ok == true
         body.source == "Oracle"
         body.results != null
@@ -38,6 +46,35 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait {
         body.results[0].source.sourceId == "foox1"
         body.results[0].num == "foox1"
         body.results[0].name == "Foox1"
+
+        when: "Verify org"
+        Org org = Org.get( body.results[0].id as Long)
+
+        then:
+        org != null
+        org.num == "foox1"
+        org.location != null
+        org.location.street1 == "string"
+
+        when: "Verify job.data"
+        Job job = Job.get(body.id as Long)
+
+        then:
+        job != null
+        job.data != null
+        job.state == JobState.Finished
+
+        when: "Verify job.data json"
+        StringReader str = new StringReader(new String(job.data, "UTF-8"))
+        List dataList = parseJson(str)
+
+        then:
+        dataList.size() == 3
+        dataList[0].num == "foox1"
+
+        delete("/api/rally/org", body.results[0].id)
+        delete("/api/rally/org", body.results[1].id)
+        delete("/api/rally/org", body.results[2].id)
 
     }
 

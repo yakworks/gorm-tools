@@ -1,3 +1,8 @@
+### v7.0.8-v.22
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.21...v7.0.8-v.22)
+- 9ci/domain9#331 bulkable - fixes (#332) [link](https://github.com/yakworks/gorm-tools/commit/920b464212545c3bbae989aa0c1cf5d5a76cd860)
+
 ### v7.0.8-v.21
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.20...v7.0.8-v.21)

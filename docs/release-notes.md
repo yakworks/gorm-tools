@@ -1,3 +1,8 @@
+### v7.0.8-v.24
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.23...v7.0.8-v.24)
+- 9ci/domain9#370 Fix stackoverflow when there's list of maps in incoming bulk  json (#337) [link](https://github.com/yakworks/gorm-tools/commit/c418425fb7af4eb5752b0e6110575f805e05ab3a)
+
 ### v7.0.8-v.23
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.22...v7.0.8-v.23)

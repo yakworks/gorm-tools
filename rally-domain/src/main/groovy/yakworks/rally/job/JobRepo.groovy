@@ -21,16 +21,12 @@ class JobRepo implements  JobRepoTrait<Job> {
     void beforeBind(Job job, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
             // must be Job called from RestApi that is passing in dataPayload
-            if (data.dataPayload  && data.dataPayload instanceof Map) {
-                def res = Jsonify.render(data.dataPayload)
+            def payload = data.dataPayload
+            if (payload  && (payload instanceof Map || payload instanceof List)) {
+                def res = Jsonify.render(payload)
                 job.data = res.jsonText.bytes
-                // def bytes = data.dataPayload.toString().bytes // just for now till we figure out Jsonify issue
-                // job.data = bytes
-
                 job.sourceType = SourceType.RestApi  // we should default to RestApi if dataPayload is passed
             }
-
         }
     }
-
 }

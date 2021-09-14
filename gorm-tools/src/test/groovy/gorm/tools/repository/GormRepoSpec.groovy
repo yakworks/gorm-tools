@@ -318,7 +318,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when:
         List<Map> childs = [[name:"C1"], [name:"C2"]]
-        List<ProjectChild> result = Project.repo.doAssociation(p, ProjectChild, childs)
+        List<ProjectChild> result = Project.repo.persistAssociationData(p, ProjectChild.repo, childs, 'project')
 
         then:
         result.size() == 2
@@ -453,7 +453,7 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
 }
 
 @Entity @GrailsCompileStatic
-class ProjectChild {
+class ProjectChild implements RepoEntity<ProjectChild>{
     String name
     Project project
 }

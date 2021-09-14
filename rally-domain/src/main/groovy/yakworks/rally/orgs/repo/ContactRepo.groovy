@@ -98,10 +98,10 @@ class ContactRepo implements GormRepo<Contact> {
     }
 
     void doAssociations(Contact contact, Map data) {
-        if(data.locations) doAssociation(contact, Location.repo, data.locations as List<Map>, "contact")
-        if(data.phones) doAssociation(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
-        if(data.emails) doAssociation(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
-        if(data.sources) doAssociation(contact, ContactSource.repo, data.sources as List<Map>, "contact")
+        if(data.locations) persistAssociationData(contact, Location.repo, data.locations as List<Map>, "contact")
+        if(data.phones) persistAssociationData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+        if(data.emails) persistAssociationData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+        if(data.sources) persistAssociationData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 

@@ -48,7 +48,7 @@ class ActivityContact implements GormRepoEntity<ActivityContact, ActivityContact
         if (other == null) return false
         if (this.is(other)) return true
         if (other instanceof ActivityContact) {
-            return other.getContactId() == getContactId() && other.getActivityId() == getActivityId()
+            return other.contactId == contactId && other.activityId == activityId
         }
         return false
     }
@@ -56,8 +56,8 @@ class ActivityContact implements GormRepoEntity<ActivityContact, ActivityContact
     @Override
     int hashCode() {
         int hashCode = HashCodeHelper.initHash()
-        if (getContactId()) { hashCode = HashCodeHelper.updateHash(hashCode, getContactId()) }
-        if (getActivityId()) { hashCode = HashCodeHelper.updateHash(hashCode, getActivityId()) }
+        if (contactId) { hashCode = HashCodeHelper.updateHash(hashCode, contactId) }
+        if (activityId) { hashCode = HashCodeHelper.updateHash(hashCode, activityId) }
         hashCode
     }
 }

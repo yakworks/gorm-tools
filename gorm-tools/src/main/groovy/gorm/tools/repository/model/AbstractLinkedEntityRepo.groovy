@@ -11,8 +11,6 @@ import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import yakworks.commons.lang.Validate
 
-import static gorm.tools.utils.GormUtils.collectLongIds
-
 /**
  * CrossRefRepo for a linked entity table that is a composite key, many to many.
  * The main class is the LinkedEntity Persitable and the Linked item (such as Tag) is the related

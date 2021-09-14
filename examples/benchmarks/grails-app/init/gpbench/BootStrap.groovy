@@ -1,11 +1,12 @@
 package gpbench
 
-import grails.core.GrailsApplication
-import grails.plugin.springsecurity.userdetails.GrailsUser
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
+
+import grails.core.GrailsApplication
+import grails.plugin.springsecurity.userdetails.GrailsUser
 
 class BootStrap {
 
@@ -15,7 +16,6 @@ class BootStrap {
     @Value('${runBenchmarks:true}')
     boolean runBenchmarks
 
-    DeprecatedRunnerService deprecatedRunnerService
     CityFatInsertBenchmarks cityFatInsertBenchmarks
     DataSetup dataSetup
     GrailsApplication grailsApplication

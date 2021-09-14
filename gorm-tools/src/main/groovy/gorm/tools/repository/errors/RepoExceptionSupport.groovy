@@ -68,6 +68,7 @@ class RepoExceptionSupport {
      * Returns list of errors in the format [{field:name, message:error}]
      * @param errs the erros object to convert
      */
+    //FIXME #339 this should return a concrete List of Objects, call it ApiFieldError
     static List<Map<String, String>> toErrorList(Errors errs) {
         List<Map<String, String>> errors = []
         MessageSource messageSource =  AppCtx.getCtx()

@@ -13,6 +13,9 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
+/**
+ * a validation error based on https://datatracker.ietf.org/doc/html/rfc7807
+ */
 @CompileStatic
 class ApiValidationError extends ApiError {
     List<Map> errors = []

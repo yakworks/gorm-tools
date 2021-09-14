@@ -355,11 +355,16 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @param dataList the list of data maps to create/update
      * @return the list of created entities
      */
+    //FIXME #339 we have to many bulks and batch. centralize and/or fix names
     List<D> bulkCreateOrUpdate(List<Map> dataList){
         List resultList = [] as List<D>
         gormStaticApi().withTransaction { TransactionStatus status ->
             for (Map item : dataList) {
                 D entity = createOrUpdate(item)
+                //FIXME #339 we dont do anything here where we flushAndClear at batch point.
+                // at min even if we are not batch chunking them its highly inefficient has we have show many many times to do larg chunks \
+                // like this
+
                 resultList.add(entity)
             }
         }
@@ -428,6 +433,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     /**
      * Transactional, Iterates over list and runs closure for each item
      */
+    //FIXME #339 move these out with bulkCreateOrUpdate? these are only used in benchmarks they needed?
     void batchTrx(List list, Closure closure) {
         gormStaticApi().withTransaction { TransactionStatus status ->
             for (Object item : list) {

@@ -27,6 +27,8 @@ class ApiErrorHandler {
             return new ApiError(status: NOT_FOUND, title: "Not Found", detail: e.message)
         } else if (e instanceof EntityValidationException) {
             //e.message is full error message with msg for each field, so use e.defaultMessage
+            //FIXME #339 EntityValidationException is a msgSource, pass it through messageSource.getMessage
+            //defaultMessage wont always be there, sometimes we just pass in the key and no default desc
             return new ApiValidationError(e.defaultMessage, e.errors)
         } else if (e instanceof ValidationException) {
             //e.message will be full error message, so build same error message as EntityValidationException.defaultMessage

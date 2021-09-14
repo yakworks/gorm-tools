@@ -64,6 +64,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
      *      gpars.poolsize
      * @return Job
      */
+    //FIXME #339 parameter description above is off, clean up
     J bulkCreate(List<Map> dataList, Map args = [:]){
 
         // XXX error count / rollback support
@@ -86,6 +87,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
             }
         } finally {
             count.getAndAdd(bulkResult.size())
+            //FIXME #339 whats the includes for?
+            //FIXME #339 we wait way to long to transformResults, do it as we go, the results is going to be HUGE
             List<Map> jsonResults = transformResults(bulkResult, args.includes as List)
             byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
             boolean  ok = !(bulkResult.any({ it.ok == false}))
@@ -102,6 +105,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
         List<Results> resultList = [] as List<Results>
         for (Map item : dataList) {
             //need to copy the incoming map, as during create(), repos may remove entries from the data map
+            //FIXME #339 if deepCopy blows up for any reason we loose exception catching
             Map itmCopy = Maps.deepCopy(item)
             D entityInstance
             Results r
@@ -119,6 +123,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
         return resultList
     }
 
+    //FIXME #339 this should return a concrete List of Objects, javadoc this method, for example whats includes and where does it come from
     private List<Map> transformResults(List<Results> results, List includes = []) {
         List<Map> ret = []
         for (Results r : results) {
@@ -128,6 +133,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 m =  [id: r.id, ok: true] as Map<String, Object>
                 if(includes) m << entityMapService.createEntityMap(r.entity, includes) as Map<String, Object>
             } else {
+                //FIXME #339 can we not share/reuse the ApiError objects here so its consitent.
+                // why do we need a special way ndt keep it consitent with what a get blows?
                 //failed result would have original incoming map, return it as it is
                 m = [ok: false] as Map<String, Object>
                 m["data"] = r.meta["item"] //set original incoming data map
@@ -138,6 +145,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
                     if(err && !(err instanceof EmptyErrors)) {
                         m["errors"] = RepoExceptionSupport.toErrorList(ex["errors"] as Errors)
                     } else {
+                        //FIXME #339 concrete object should support this, this is hacky
                         //this is some other exception wrapped in validation exception
                         m["error"] = ex.cause?.message
                     }

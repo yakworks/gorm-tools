@@ -8,6 +8,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.http.HttpStatus
 
+/**
+ * problems loosely based on https://datatracker.ietf.org/doc/html/rfc7807
+ */
 @CompileStatic
 class ApiError {
     HttpStatus status

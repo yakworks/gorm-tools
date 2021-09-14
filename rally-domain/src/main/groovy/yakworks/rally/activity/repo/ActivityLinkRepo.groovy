@@ -6,28 +6,27 @@ package yakworks.rally.activity.repo
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.common.LinkXRefRepo
 
 @GormRepository
 @CompileStatic
-class ActivityLinkRepo implements LinkXRefRepo<ActivityLink, Activity> {
+class ActivityLinkRepo extends AbstractLinkedEntityRepo<ActivityLink, Activity> {
 
-    @Override
-    String getItemPropName() {'activity'}
-
-    @Override
-    Activity loadItem(Long id) { Activity.load(id)}
-
-    List<ActivityLink> listByActivity(Activity act) {
-        queryByItem(act).list()
+    ActivityLinkRepo(){
+        super(Activity, 'activity')
     }
 
-    void removeAllByActivity(Activity act) {
-        listByActivity(act).each {
-            it.remove()
+    /**
+     * iterates through and removes all by Activity vs doing deleteAll so that delete event is fired
+     */
+    void remove(Activity act, Map args = [:]) {
+        for( ActivityLink link : list(act)){
+            doRemove(link, args)
         }
     }
+
 }

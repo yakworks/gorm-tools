@@ -28,7 +28,7 @@ import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.io.FileUtil
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.tag.repo.TaggableRepoSupport
+import yakworks.rally.tag.model.TagLink
 
 /**
  * Attachments are not as simple as they might be in this application.  Please read this documentation before messing
@@ -37,7 +37,7 @@ import yakworks.rally.tag.repo.TaggableRepoSupport
 @Slf4j
 @GormRepository
 @CompileStatic
-class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo, TaggableRepoSupport {
+class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
     @Inject @Nullable
@@ -65,7 +65,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo, TaggableR
 
     @RepoListener
     void afterPersist(Attachment attachment, AfterPersistEvent e) {
-        addOrRemoveTags(attachment, e)
+        TagLink.addOrRemoveTags(attachment, e)
     }
 
     /**
@@ -127,9 +127,9 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo, TaggableR
             attachmentSupport.deleteFile(attachment.location, attachment.locationKey)
         }
         //remove the links
-        attachmentLinkRepo.removeAllByItem(attachment)
+        attachmentLinkRepo.remove(attachment)
         //tags
-        removeTagLinks(attachment)
+        TagLink.remove(attachment)
     }
 
     /**

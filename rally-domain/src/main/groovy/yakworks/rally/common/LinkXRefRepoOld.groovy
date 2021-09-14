@@ -15,8 +15,8 @@ import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.lang.Validate
-import yakworks.rally.tag.model.Tag
-import yakworks.rally.tag.model.TagLink
+
+import static gorm.tools.utils.GormUtils.collectLongIds
 
 /**
  * Repo for a linked entity table that is a composite key, many to many.
@@ -33,7 +33,7 @@ import yakworks.rally.tag.model.TagLink
  */
 @Slf4j
 @CompileStatic
-trait LinkXRefRepo<X, I> extends GormRepo<X> {
+trait LinkXRefRepoOld<X, I> extends GormRepo<X> {
 
     /**
      * the linked item, example: Tag
@@ -143,7 +143,7 @@ trait LinkXRefRepo<X, I> extends GormRepo<X> {
             removeAll(linkedEntity)
             return []
         } else {
-            List<Long> itemParamIds = collectIds(itemList)
+            List<Long> itemParamIds = collectLongIds(itemList)
             List<Long> currentItemIds = listItemIds(linkedEntity)
 
             List<Long> itemsToAdd = itemParamIds - currentItemIds

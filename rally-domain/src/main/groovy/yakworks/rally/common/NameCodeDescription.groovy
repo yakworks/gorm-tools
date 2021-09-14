@@ -23,4 +23,5 @@ trait NameCodeDescription extends NameDescription {
     void beforeValidate() {
         if(!this.name && this.code) this.name = code.replaceAll('-', ' ')
     }
+
 }

@@ -4,8 +4,6 @@
 */
 package yakworks.rally.orgs.repo
 
-import javax.annotation.Nullable
-import javax.inject.Inject
 
 import groovy.transform.CompileStatic
 
@@ -29,15 +27,11 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.tag.repo.TagLinkRepo
-import yakworks.rally.tag.repo.TaggableRepoSupport
+import yakworks.rally.tag.model.TagLink
 
 @GormRepository
 @CompileStatic
-class ContactRepo implements GormRepo<Contact>, TaggableRepoSupport {
-
-    @Inject @Nullable
-    TagLinkRepo tagLinkRepo
+class ContactRepo implements GormRepo<Contact> {
 
     @RepoListener
     void beforeValidate(Contact contact) {
@@ -57,13 +51,13 @@ class ContactRepo implements GormRepo<Contact>, TaggableRepoSupport {
             throw new EntityValidationException(msgKey, contact)
         }
 
-        if (ActivityContact.existsByContact(contact)) {
+        if (ActivityContact.repo.count(contact)) {
             def msgKey = new MsgKey("delete.error.reference",  ['Contact', contact.name, 'Activity'], "contact delete error")
             throw new EntityValidationException(msgKey, contact)
         }
 
         //remove
-        removeTagLinks(contact)
+        TagLink.remove(contact)
 
         //XXX why are we keeping the locations around?
         // if its a location for a contact it should be deleted along with the contact right?
@@ -108,7 +102,7 @@ class ContactRepo implements GormRepo<Contact>, TaggableRepoSupport {
         if(data.phones) doAssociation(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
         if(data.emails) doAssociation(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
         if(data.sources) doAssociation(contact, ContactSource.repo, data.sources as List<Map>, "contact")
-        if(data.tags) addOrRemoveTags(contact, data.tags)
+        if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
     void assignOrgFromOrgId(Contact contact, Map data) {

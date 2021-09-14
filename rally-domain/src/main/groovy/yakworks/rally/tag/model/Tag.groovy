@@ -20,7 +20,6 @@ import yakworks.rally.common.NameCodeDescription
 class Tag implements NameCodeDescription, RepoEntity<Tag>, Serializable {
     // static transients = ['entityNameList']
     String name
-    String description
 
     //the domain entity this tag is valid for, null if is good for any taggable entity, can be comma seperated list
     String entityName

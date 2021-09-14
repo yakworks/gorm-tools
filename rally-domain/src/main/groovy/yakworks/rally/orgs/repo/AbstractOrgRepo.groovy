@@ -94,7 +94,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
             throw new EntityValidationException(msgKey, org)
         }
         //remove tags
-        orgTagRepo.removeAll(org)
+        orgTagRepo.remove(org)
     }
 
     /**

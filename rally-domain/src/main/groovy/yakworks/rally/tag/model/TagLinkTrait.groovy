@@ -10,10 +10,11 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.util.HashCodeHelper
 
+import gorm.tools.model.LinkedEntity
 import gorm.tools.model.Persistable
 import gorm.tools.repository.RepoUtil
-import yakworks.rally.common.LinkXRefRepo
-import yakworks.rally.common.LinkXRefTrait
+import gorm.tools.repository.events.RepositoryEvent
+import gorm.tools.repository.model.AbstractLinkedEntityRepo
 
 /**
  * common trait that a concrete composite entity can implement if the stock TagLink will not suffice
@@ -22,7 +23,7 @@ import yakworks.rally.common.LinkXRefTrait
  * @param <X> the LinkXRef entity
  */
 @CompileStatic
-trait TagLinkTrait<X> implements LinkXRefTrait {
+trait TagLinkTrait<X> implements LinkedEntity {
 
     abstract Tag getTag()
     abstract void setTag(Tag t)
@@ -36,28 +37,40 @@ trait TagLinkTrait<X> implements LinkXRefTrait {
         tag:[ description: 'The tag', nullable: false]
     ]
 
-    static LinkXRefRepo<X,Tag> getTagLinkRepo() {
-        (LinkXRefRepo<X,Tag>) RepoUtil.findRepo(this)
+    static AbstractLinkedEntityRepo<X, Tag> getTagLinkRepo() {
+        (AbstractLinkedEntityRepo<X, Tag>) RepoUtil.findRepo(this)
+    }
+
+    static Integer remove(Persistable entity) {
+        getTagLinkRepo().remove(entity)
+    }
+
+    // helper to call in afterPersist
+    static List<X> addOrRemoveTags(Persistable linkedEntity, Object itemParams) {
+        getTagLinkRepo().addOrRemove(linkedEntity, itemParams)
+    }
+
+    // helpe to call in afterPersist
+    static List<X> addOrRemoveTags(Persistable linkedEntity, RepositoryEvent e) {
+        if (e.bindAction && e.data?.tags){
+            getTagLinkRepo().addOrRemove(linkedEntity, e.data.tags)
+        }
+    }
+
+    static List<X> list(Persistable entity) {
+        getTagLinkRepo().list(entity)
     }
 
     static List<Tag> listTags(Persistable entity) {
-        getTagLinkRepo().listItems(entity)
-    }
-
-    static List<X> list(Tag tag) {
-        getTagLinkRepo().list(tag)
-    }
-
-    static List<X> list(Persistable linkedEntity) {
-        getTagLinkRepo().list(linkedEntity)
+        getTagLinkRepo().listRelated(entity)
     }
 
     static boolean hasTags(Persistable entity) {
-        getTagLinkRepo().exists(entity)
+        getTagLinkRepo().count(entity)
     }
 
     static boolean exists(Tag tag) {
-        getTagLinkRepo().exists(tag)
+        getTagLinkRepo().count(tag)
     }
 
     static X create(Persistable entity, Tag theTag, Map args = [:]) {

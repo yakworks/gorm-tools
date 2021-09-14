@@ -9,6 +9,7 @@ import groovy.transform.CompileDynamic
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.testing.GrailsUnitTest
 import org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
@@ -130,5 +131,22 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     void flushAndClear(){
         getDatastore().currentSession.flush()
         getDatastore().currentSession.clear()
+    }
+
+    /**
+     * removes bean with name and replace with passed in object, defaults to autowired
+     */
+    void replaceSpringBean(String name, Object obj, boolean autowire = true){
+        def beanInstance = autowire ? autowire(repo) : obj
+        ctx.beanFactory.removeBeanDefinition(name)
+        ctx.beanFactory.registerSingleton(name, beanInstance)
+    }
+
+    /**
+     * Autowires bean properties for object
+     */
+    def autowire(Object obj) {
+        ctx.autowireCapableBeanFactory.autowireBeanProperties(obj, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
+        obj
     }
 }

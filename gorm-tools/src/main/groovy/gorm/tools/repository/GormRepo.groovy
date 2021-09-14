@@ -12,8 +12,6 @@ import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,7 +19,6 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
-import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
@@ -32,9 +29,7 @@ import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.DataOp
-import gorm.tools.utils.GormMetaUtils
 import grails.validation.ValidationException
-import yakworks.commons.lang.NameUtils
 
 /**
  * A trait that turns a class into a Repository
@@ -48,8 +43,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     @Autowired EntityMapBinder entityMapBinder
 
     @Autowired RepoEventPublisher repoEventPublisher
-
-
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
@@ -111,7 +104,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
-            throw handleException(ex, entity)
+            throw RepoExceptionSupport.translateException(ex, entity)
         }
     }
 
@@ -243,7 +236,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
             getRepoEventPublisher().doAfterRemove(this, (GormEntity)entity, args)
         }
         catch (DataAccessException ex) {
-            throw handleException(ex, entity)
+            throw RepoExceptionSupport.translateException(ex, entity)
         }
     }
 
@@ -322,6 +315,19 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         (D) gormStaticApi().load(id)
     }
 
+    /**
+     * bulkCreateOrUpdate associations for given entity
+     *
+     * @Param mainEntity The entity that has the associations that are being created/updated
+     * @param assocRepo association entity repo
+     * @param assocList the list of data maps to create/update
+     * @param belongsToProp the name of parent property to set, if any
+     * @return the list of created entities
+     */
+    List persistAssociationData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
+        if(belongsToProp) assocList.each { it[belongsToProp] = entity}
+        assocRepo.bulkCreateOrUpdate(assocList)
+    }
 
     /**
      * Mass update a list of ids
@@ -335,7 +341,10 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
             values.id = it
             values
         } as List<Map>
-        batchUpdate(data)
+
+        batchTrx(data) { Map item ->
+            doUpdate(item, [:])
+        }
         data
     }
 
@@ -355,14 +364,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
             }
         }
         return resultList
-    }
-
-    void publishBeforeValidate(Object entity, Errors errors) {
-        getRepoEventPublisher().doBeforeValidate(this, entity, errors, [:])
-    }
-
-    RuntimeException handleException(RuntimeException ex, D entity) {
-        return RepoExceptionSupport.translateException(ex, entity)
     }
 
     /** gets the datastore for this Gorm domain instance */
@@ -436,61 +437,13 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         }
     }
 
-    void batchPersist(Map args = [:], List<D> list) {
-        batchTrx(list) { D item ->
-            doPersist(item, args)
-        }
-    }
-
     void batchCreate(Map args = [:], List<Map> list) {
         batchTrx(list) { Map item ->
             doCreate(item, args)
         }
     }
 
-    void batchUpdate(Map args = [:], List<Map> list) {
-        batchTrx(list) { Map item ->
-            doUpdate(item, args)
-        }
-    }
 
-    void batchRemove(Map args = [:], List list) {
-        batchTrx(list) { Serializable item ->
-            removeById(item, args)
-        }
-    }
-
-    /**
-     * crate/update associations for given entity
-     *
-     * @Param entity The entity for which associations are being created/updated
-     * @param associatedEntityClasss class of associated entity
-     * @param assocList the list of data maps to create/update
-     * @return the list of created entities
-     */
-    List doAssociation(D entity, Class associatedEntityClass, List<Map> assocList) {
-        PersistentEntity associatedEntity = GormMetaUtils.getPersistentEntity(associatedEntityClass)
-        GormRepo assocRepo = RepoUtil.findRepoCached(associatedEntity.javaClass)
-
-        //if the associated entity has a reference to entity, set it on data map.
-        //eg. set contact.org = org
-        PersistentProperty p = associatedEntity.getPropertyByName(NameUtils.getPropertyName(entity.class))
-        doAssociation(entity, assocRepo, assocList, p?.name)
-    }
-
-    /**
-     * crate/update associations for given entity
-     *
-     * @Param entity The entity for which associations are being created/updated
-     * @param GormRepo associated entity repo
-     * @param assocList the list of data maps to create/update
-     * @param belongsToProp the name of parent property to set, if any
-     * @return the list of created entities
-     */
-    List doAssociation(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
-        if(belongsToProp) assocList.each { it[belongsToProp] = entity}
-        assocRepo.bulkCreateOrUpdate(assocList)
-    }
 
     GormInstanceApi<D> gormInstanceApi() {
         (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())

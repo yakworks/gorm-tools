@@ -13,7 +13,6 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
 import yakworks.commons.lang.Validate
 
 import static gorm.tools.utils.GormUtils.collectLongIds
@@ -37,10 +36,13 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     Class<R> relatedClass
     List<String> propNames
 
+    CriteriaRemover criteriaRemover
+
     protected AbstractCrossRefRepo(Class<P> mainClazz, Class<R> relatedClazz, List<String> propKeys){
         mainClass = mainClazz
         relatedClass= relatedClazz
         propNames = propKeys
+        criteriaRemover = new CriteriaRemover()
     }
 
     /**
@@ -109,15 +111,15 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     /**
      * removes a specific entry
      */
-    boolean remove(P main, R related) {
-        queryFor(main, related).deleteAll()
+    void remove(P main, R related) {
+        criteriaRemover.deleteAll( queryFor(main, related) )
     }
 
     /**
      * removes all xref entries for an entity
      */
-    Integer remove(Persistable entity) {
-        queryFor(entity).deleteAll() as Integer
+    void remove(Persistable entity) {
+        criteriaRemover.deleteAll( queryFor(entity) )
     }
 
     /**
@@ -190,7 +192,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      *
      * @param main the primary entity, or linkedEntity if its a linkedEntityRepo
      * @param itemParams the List or Map data
-     * @return
+     * @return the list or created or updated
      */
     List<X> addOrRemove(P main, Object itemParams){
         if(!itemParams) return []

@@ -128,7 +128,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     void doAssociations(Activity activity, Map data) {
         if(data.attachments) doAttachments(activity, data.attachments)
-        if(data.contacts) ActivityContact.repo.addOrRemove(activity, data.contacts)
+        if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
         if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
         // XXX fix this

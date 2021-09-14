@@ -64,8 +64,11 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     /**
      * override in implementation to throw IllegalArgumentException if the tag.entityName does not match
      */
-    @SuppressWarnings(['EmptyMethod'])
-    void validateCreate(P main, R related){ }
+    void validateCreate(P main, R related){
+        //by default check that ids are set when creating, no proxys as they just caue problems in this context
+        Validate.notNull(main.id, "main entity.id can't be null: %s", mainClass )
+        Validate.notNull(related.id, "related entity.id can't be null: %s", relatedClass)
+    }
 
     /**
      * this is the map that makes the composite key across the 3 fields.

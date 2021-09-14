@@ -6,6 +6,7 @@ package yakworks.rally.activity.model
 
 import org.codehaus.groovy.util.HashCodeHelper
 
+import gorm.tools.model.Persistable
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -24,6 +25,22 @@ class ActivityContact implements GormRepoEntity<ActivityContact, ActivityContact
         table 'ActivityContact'
         activity column: 'activityId'
         contact column: 'personId'
+    }
+
+    static ActivityContact create( Activity act, Contact con, Map args = [:]) {
+        getRepo().create(act, con, args)
+    }
+
+    static List<ActivityContact> list(Persistable entity) {
+        getRepo().list(entity)
+    }
+
+    static List<Contact> listContacts( Activity act ) {
+        getRepo().listRelated(act)
+    }
+
+    static List<ActivityContact> addOrRemove(Activity act, Object itemParams){
+        getRepo().addOrRemove(act, itemParams)
     }
 
     @Override

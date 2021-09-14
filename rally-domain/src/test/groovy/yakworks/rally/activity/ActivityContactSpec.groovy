@@ -18,7 +18,7 @@ class ActivityContactSpec extends Specification implements DomainRepoTest<Activi
         when:
         def act = build(Activity)
         def c = build(Contact)
-        def sc = ActivityContact.repo.create(act, c)
+        def sc = ActivityContact.create(act, c)
 
         then:
         sc

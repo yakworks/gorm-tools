@@ -73,7 +73,7 @@ class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity,
     }
 
     List<Contact> getContacts() {
-        ActivityContact.repo.listRelated(this)
+        ActivityContact.listContacts(this)
     }
 
     // SEE activityApi

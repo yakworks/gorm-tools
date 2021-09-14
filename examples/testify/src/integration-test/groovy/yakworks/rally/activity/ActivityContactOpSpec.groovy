@@ -54,7 +54,7 @@ class ActivityContactOpSpec extends Specification implements DataIntegrationTest
         flush() //needed for the checks as it queries
 
         then:
-        ActivityContact.repo.list(att).size() == 3
+        ActivityContact.list(att).size() == 3
     }
 
     void "replace is the default if nothing specified"() {
@@ -114,7 +114,7 @@ class ActivityContactOpSpec extends Specification implements DataIntegrationTest
 
         then:
         !updatedAtt.hasTags()
-        ActivityContact.repo.list(updatedAtt).size() == 0
+        ActivityContact.list(updatedAtt).size() == 0
     }
 
     void "test op:remove on one"() {

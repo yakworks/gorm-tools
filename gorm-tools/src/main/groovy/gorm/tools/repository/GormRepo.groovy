@@ -241,7 +241,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * creates, removes or updates the location based on params
+     * creates, removes or updates the entity based on DataOp
      * if data has an id then its considered an update
      * if data has an id and data.op == remove then it will delete it, see DataOp enum
      * otherwise create it
@@ -250,7 +250,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     //FIXME #339 if dont like this method and think it should be baked.
     // this does nothing special for create so it really just for the update and deletes
     // if we want to support multiple ways to do look ups, for code for example, then this wont work
-    // we can put the special look up logic in the main update
+    // we can put the special look up logic in the main update maybe.
     D createOrUpdate(Map data){
         if(!data) return
 

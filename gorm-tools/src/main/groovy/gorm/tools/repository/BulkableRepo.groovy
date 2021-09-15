@@ -45,6 +45,10 @@ trait BulkableRepo<D, J extends JobTrait>  {
     @Value('${hibernate.jdbc.batch_size:50}')
     int batchSize
 
+    //FIXME #339 change this key. we have 3 namespace options,
+    // we can put it under gorm.tools as we have gorm.tools.security and gorm.tools.audit
+    // or we can put it under app where we have resources.
+    // or we can put everything under yakworks namespace
     @Value('${nine.autocash.parallelProcessing.enabled:false}')
     boolean parallelProcessingEnabled
 

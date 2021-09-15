@@ -49,6 +49,8 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
      * in implementation will search for fields and call L.load if it has an id
      * but can do look ups such as for code or sourceId if no id is provided
      */
+    //FIXME #339 the lookup concept should be part of the gormRepo and gormRepo entity chain
+    // we will need it for updates and bulkable too.
     Persistable lookup(Class clazz, Object data){
         //FIXME make a generic way to lookup id and code, for now only loads by id
         Long aid = data['id'] as Long

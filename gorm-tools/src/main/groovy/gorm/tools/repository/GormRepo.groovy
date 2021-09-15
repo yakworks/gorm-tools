@@ -23,6 +23,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
+import gorm.tools.model.Lookupable
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
@@ -30,6 +31,7 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.DataOp
 import grails.validation.ValidationException
+import yakworks.commons.lang.ClassUtils
 
 /**
  * A trait that turns a class into a Repository
@@ -163,20 +165,39 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         return entity
     }
 
-    /*
-    D lookup(Map data) {
+    /**
+     * Uses the items in the data to find the entity.
+     * If data has an id key the use that.
+     * otherwise it will see if entity has lookupable or if the concrete repo has a lookup method
+     * @param data
+     * @return
+     */
+    D findWithData(Map data) {
         D foundEntity
         def ident = data['id'] as Serializable
         //check by id first
         if(ident){
-            foundEntity = get(ident, data['version'] as Long)
-        } else if(HasLookup.isAssinableFrom(getEntityClass())){
-            // call the lookup somehow
+            //return it fast if its good to go, will have blown and error if not found
+            return get(ident, data['version'] as Long)
+        } else if(Lookupable.isAssignableFrom(getEntityClass())){
+            // call the lookup if domain implements the Lookupable
+            //FIXME is there a cleaner way to do this?
+            foundEntity = (D) ClassUtils.callStaticMethod(getEntityClass(), 'lookup', data)
+        } else {
+            foundEntity = lookup(data)
         }
-        if(!foundEntity) blow notfound exception
+        RepoUtil.checkFound(foundEntity, 'data map', getEntityClass().name)
         return foundEntity
     }
+
+    /**
+     * does nothing, can be implemented by the conrete repo for special lookup logic such as for souceId
      */
+    D lookup(Map data) {
+        return null
+    }
+
+
 
     void bindAndUpdate(D entity, Map data, Map args) {
         bindAndSave(entity, data, BindAction.Update, args)

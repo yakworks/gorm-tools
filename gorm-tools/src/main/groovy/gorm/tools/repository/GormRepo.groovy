@@ -247,6 +247,10 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * otherwise create it
      * XXX needs tests
      */
+    //FIXME #339 if dont like this method and think it should be baked.
+    // this does nothing special for create so it really just for the update and deletes
+    // if we want to support multiple ways to do look ups, for code for example, then this wont work
+    // we can put the special look up logic in the main update
     D createOrUpdate(Map data){
         if(!data) return
 
@@ -336,6 +340,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @param values data to apply to selected rows
      * @return the converted list of maps that was used to update
      */
+    //FIXME #339 we have to many bulks and batch. centralize and/or fix names
     List<Map> bulkUpdate(List ids, Map values){
         List<Map> data = ids.collect {
             values.id = it
@@ -355,6 +360,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @param dataList the list of data maps to create/update
      * @return the list of created entities
      */
+    //FIXME #339 lets move to Bulkable?
     List<D> batchCreateOrUpdate(List<Map> dataList){
         List resultList = [] as List<D>
 

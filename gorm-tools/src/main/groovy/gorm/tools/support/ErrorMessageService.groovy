@@ -20,7 +20,8 @@ import yakworks.commons.lang.NameUtils
 /**
  * creates a Map from errors so it can be converted to json and sent to client
  */
-@CompileDynamic
+//FIXME #339 is any of the functionality needed here? do we capture the BatchUpdateException still
+// if we replaced the functionality of this then lets remove it
 class ErrorMessageService {
 
     @Inject

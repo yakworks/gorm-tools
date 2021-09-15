@@ -25,6 +25,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 /**
  * Prepares ApiError / ApiValidationError for given exception
  */
+//FIXME #339 move to gorm.tools.api so it can be shared if we need it
 @CompileStatic
 class ApiErrorHandler {
 
@@ -32,6 +33,7 @@ class ApiErrorHandler {
         if (e instanceof EntityNotFoundException) {
             return new ApiError(status: NOT_FOUND, title: "Not Found", detail: e.message)
         } else if (e instanceof EntityValidationException) {
+            //FIXME #339 these dont need to be static, make this a bean and use support.MsgService
             return new ApiValidationError(AppCtx.getCtx().getMessage(e,  RepoMessage.defaultLocale()), toFieldErrorList(e.errors))
         } else if (e instanceof ValidationException) {
             //e.message will be full error message, so build same error message as EntityValidationException.defaultMessage
@@ -52,6 +54,7 @@ class ApiErrorHandler {
         MessageSource messageSource =  AppCtx.getCtx()
         errs.allErrors.each {def err ->
             ApiFieldError fieldError = new ApiFieldError()
+            // make this a bean and use MsgService
             fieldError.message = messageSource.getMessage(err, RepoMessage.defaultLocale())
             if(err instanceof FieldError) fieldError.field = err.field
             errors << fieldError

@@ -59,7 +59,12 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @param dataList the list of data maps to create
      * @param args args to pass to doCreate. It can have:
      *      source - which would be set as job.source
-     *      includes - list of fields to include in json results
+     *      //FIXME #339 source is params I think, no really an arg right?
+     *      includes - list of enity fields to include in success json results
+     *      onError // 'rollback' or 'continue' (catches error) or 'skip'
+     *      errorThreshold // number of errors to stop and rollback
+     *      async: whether it should return job imediately or do it sync
+     *      //FIXME #339 fix above, dont delete
      * @return Job
      */
     J bulkCreate(List<Map> dataList, Map args = [:]){
@@ -71,6 +76,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
         //@jdabal - for parallel async, we can not rollback batches which are already commited
         //as each batch would be in its own transaction.
 
+        //FIXME #339 we wait way to long to transformResults, do it as we go?
+        // if we do it as we go then what the performance impact? maybe do it as we go in chunks?
         List<Map> jsonResults
         try {
             if (getParallelProcessingEnabled()) {
@@ -78,8 +85,10 @@ trait BulkableRepo<D, J extends JobTrait>  {
                     List<Results> results = doBulkCreate(batch, args)
                     if (results) jsonResults.addAll transformResults(results, args.includes as List)
                 }
+                //FIXME #339 if we do it as we go then what you have above runs risk of erroring now and rolling back trx
             } else {
                 List results = doBulkCreate(dataList, args)
+                //FIXME #339 not DRY, dont code dupe
                 if (results) jsonResults.addAll transformResults(results, args.includes as List)
             }
         } finally {
@@ -122,7 +131,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @param results List<Results?
      * @param includes - List of fields to include in json response for successful records.
      *        this is `bulk` fields configured in restapi-config.yml and passed down by RestRepositoryApi
-     * @return
+     * @return //FIXME #339 codenarxc will fail on empty return docs
      */
     private List<Map> transformResults(List<Results> results, List includes = []) {
         List<Map> ret = []

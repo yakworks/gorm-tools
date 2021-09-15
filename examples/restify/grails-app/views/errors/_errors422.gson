@@ -15,5 +15,5 @@ json {
   status apiValidationError.status.value()
   title apiValidationError.title
   detail apiValidationError.detail
-  errors apiValidationError.errors
+  errors apiValidationError.errors.collect({ [field: it.field, message: it.message]})
 }

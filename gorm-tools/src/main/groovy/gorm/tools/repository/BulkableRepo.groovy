@@ -54,44 +54,37 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
 
     /**
-     * allows to pass in bulk of records at once, for example /api/book/bulk
+     * Allows to pass in bulk of records at once, for example /api/book/bulk
      * Each call creates a job that stores info for the call and is returned with results
      * @param dataList the list of data maps to create
      * @param args args to pass to doCreate. It can have:
-     *      onError // 'rollback' or 'continue' (catches error) or 'skip'
-     *      errorThreshold // number of errors to stop and rollback
-     *      jdbc.batch_size // all, default or specify number
-     *      gpars.poolsize
+     *      source - which would be set as job.source
+     *      includes - list of fields to include in json results
      * @return Job
      */
-    //FIXME #339 parameter description above is off, clean up
     J bulkCreate(List<Map> dataList, Map args = [:]){
 
         // XXX error count / rollback support
-        AtomicInteger count = new AtomicInteger(0)
         J job = (J)jobRepo.create([source:args.source, state: JobState.Running, dataPayload:dataList])
         // for error handling -- based on `onError` from args commit success and report the failure or fail them all
         //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
         //@jdabal - for parallel async, we can not rollback batches which are already commited
         //as each batch would be in its own transaction.
-        List<Results> bulkResult = []
+
+        List<Map> jsonResults
         try {
             if (getParallelProcessingEnabled()) {
                 asyncSupport.parallel([batchSize: getBatchSize()], dataList.collate(getBatchSize())) { List<Map> batch ->
                     List<Results> results = doBulkCreate(batch, args)
-                    if (results) bulkResult.addAll results
+                    if (results) jsonResults.addAll transformResults(results, args.includes as List)
                 }
             } else {
                 List results = doBulkCreate(dataList, args)
-                if (results) bulkResult.addAll results
+                if (results) jsonResults.addAll transformResults(results, args.includes as List)
             }
         } finally {
-            count.getAndAdd(bulkResult.size())
-            //FIXME #339 whats the includes for?
-            //FIXME #339 we wait way to long to transformResults, do it as we go, the results is going to be HUGE
-            List<Map> jsonResults = transformResults(bulkResult, args.includes as List)
             byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
-            boolean  ok = !(bulkResult.any({ it.ok == false}))
+            boolean  ok = !(jsonResults.any({ it.ok == false}))
             job = (J)jobRepo.update([id:job.id, ok:ok, results: resultBytes, state: JobState.Finished])
         }
 
@@ -105,11 +98,11 @@ trait BulkableRepo<D, J extends JobTrait>  {
         List<Results> resultList = [] as List<Results>
         for (Map item : dataList) {
             //need to copy the incoming map, as during create(), repos may remove entries from the data map
-            //FIXME #339 if deepCopy blows up for any reason we loose exception catching
-            Map itmCopy = Maps.deepCopy(item)
+            Map itmCopy
             D entityInstance
             Results r
             try {
+                itmCopy = Maps.deepCopy(item)
                 entityInstance = doCreate(item, args)
                 r = Results.OK().id(entityInstance["id"] as Long)
                 r.entity = entityInstance
@@ -123,7 +116,14 @@ trait BulkableRepo<D, J extends JobTrait>  {
         return resultList
     }
 
-    //FIXME #339 this should return a concrete List of Objects, javadoc this method, for example whats includes and where does it come from
+    /**
+     * Processes Results of bulkcreate and processes list of maps which can be converted to json and set on job.results
+     *
+     * @param results List<Results?
+     * @param includes - List of fields to include in json response for successful records.
+     *        this is `bulk` fields configured in restapi-config.yml and passed down by RestRepositoryApi
+     * @return
+     */
     private List<Map> transformResults(List<Results> results, List includes = []) {
         List<Map> ret = []
         for (Results r : results) {

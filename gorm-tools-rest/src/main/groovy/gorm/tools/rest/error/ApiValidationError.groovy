@@ -18,20 +18,16 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
  */
 @CompileStatic
 class ApiValidationError extends ApiError {
-    List<Map> errors = []
+    List<ApiFieldError> errors = []
 
-    ApiValidationError(HttpStatus status, String title, String detail, Errors errs) {
+    ApiValidationError(HttpStatus status, String title, String detail, List<ApiFieldError> errs) {
         this.status = status
         this.title = title
         this.detail = detail
-        populateErrors(errs)
+        this.errors = errs
     }
 
-    ApiValidationError(String detail, Errors errs) {
+    ApiValidationError(String detail, List<ApiFieldError> errs) {
         this(UNPROCESSABLE_ENTITY, "Validation Error", detail, errs)
-    }
-
-    private void populateErrors(Errors errs) {
-        this.errors = RepoExceptionSupport.toErrorList(errs) as List<Map>
     }
 }

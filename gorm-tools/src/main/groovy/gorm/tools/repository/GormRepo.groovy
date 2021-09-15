@@ -316,7 +316,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * bulkCreateOrUpdate associations for given entity
+     * batchCreateOrUpdate associations for given entity
      *
      * @Param mainEntity The entity that has the associations that are being created/updated
      * @param assocRepo association entity repo
@@ -326,7 +326,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      */
     List persistAssociationData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
         if(belongsToProp) assocList.each { it[belongsToProp] = entity}
-        assocRepo.bulkCreateOrUpdate(assocList)
+        assocRepo.batchCreateOrUpdate(assocList)
     }
 
     /**
@@ -355,19 +355,13 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @param dataList the list of data maps to create/update
      * @return the list of created entities
      */
-    //FIXME #339 we have to many bulks and batch. centralize and/or fix names
-    List<D> bulkCreateOrUpdate(List<Map> dataList){
+    List<D> batchCreateOrUpdate(List<Map> dataList){
         List resultList = [] as List<D>
-        gormStaticApi().withTransaction { TransactionStatus status ->
-            for (Map item : dataList) {
-                D entity = createOrUpdate(item)
-                //FIXME #339 we dont do anything here where we flushAndClear at batch point.
-                // at min even if we are not batch chunking them its highly inefficient has we have show many many times to do larg chunks \
-                // like this
 
-                resultList.add(entity)
-            }
+        batchTrx(dataList) { Map item ->
+            resultList << createOrUpdate(item)
         }
+
         return resultList
     }
 
@@ -448,8 +442,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
             doCreate(item, args)
         }
     }
-
-
 
     GormInstanceApi<D> gormInstanceApi() {
         (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())

@@ -157,10 +157,26 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @see #doPersist
      */
     D doUpdate(Map data, Map args) {
+        //FIXME #339 I think we do the lookup logic here, framed sample out sample below
         D entity = get(data['id'] as Serializable, data['version'] as Long)
         bindAndUpdate(entity, data, args)
         return entity
     }
+
+    /*
+    D lookup(Map data) {
+        D foundEntity
+        def ident = data['id'] as Serializable
+        //check by id first
+        if(ident){
+            foundEntity = get(ident, data['version'] as Long)
+        } else if(HasLookup.isAssinableFrom(getEntityClass())){
+            // call the lookup somehow
+        }
+        if(!foundEntity) blow notfound exception
+        return foundEntity
+    }
+     */
 
     void bindAndUpdate(D entity, Map data, Map args) {
         bindAndSave(entity, data, BindAction.Update, args)

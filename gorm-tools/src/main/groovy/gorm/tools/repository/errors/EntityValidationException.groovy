@@ -20,7 +20,7 @@ import gorm.tools.support.MsgSourceResolvable
  */
 @CompileStatic
 class EntityValidationException extends ValidationException implements MsgSourceResolvable {
-    private static String defMsg = "Save or Validation Error(s) occurred"
+    public static String defMsg = "Save or Validation Error(s) occurred"
     Object entity //the entity that the error occured on
     Map meta //any meta that can be set and passed up the chain for an error
     // Map messageMap //map with message info code,args and defaultMessage

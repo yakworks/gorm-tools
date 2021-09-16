@@ -18,13 +18,12 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.job.JobTrait
 import gorm.tools.mango.api.QueryMangoEntityApi
-import gorm.tools.repository.BulkableRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.bulk.BulkableRepo
+import gorm.tools.repository.errors.api.ApiError
+import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.rest.RestApiConfig
-import gorm.tools.rest.error.ApiError
-import gorm.tools.rest.error.ApiErrorHandler
-import gorm.tools.rest.error.ApiValidationError
 import grails.web.Action
 
 import static org.springframework.http.HttpStatus.*
@@ -263,11 +262,16 @@ trait RestRepositoryApi<D> implements RestApiController {
         ApiError apiError = ApiErrorHandler.handleException(entityClass, e)
 
         log.error(e.message, e)
-        if( apiError instanceof ApiValidationError){
-            respond([view: '/errors/_errors422'], apiError)
-        } else {
-            respond([view: '/errors/_errors'], apiError)
-        }
+
+        //FIXME #339 rethink how we do this. do we really need 2 different views?
+        // can't the one view be smart enough to render the error?
+        // see if this works
+        // if( apiError.status == HttpStatus.UNPROCESSABLE_ENTITY){
+        //     respond([view: '/errors/_errors422'], apiError)
+        // } else {
+        //     respond([view: '/errors/_errors'], apiError)
+        // }
+        respond([view: '/errors/_apiError'], apiError)
 
     }
 

@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.repository.bulk.BulkableRepo
 import grails.converters.JSON
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

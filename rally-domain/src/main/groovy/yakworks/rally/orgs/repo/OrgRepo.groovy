@@ -6,8 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.BulkableRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.events.RepoListener
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Company

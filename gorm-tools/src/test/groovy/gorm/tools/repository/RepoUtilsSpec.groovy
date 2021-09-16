@@ -68,13 +68,6 @@ class RepoUtilsSpec extends Specification implements DataTest {
         r.defaultMessage == "MockDomain not found for id:2"
     }
 
-    void "test defaultLocale"() {
-        when:
-        Locale locale = RepoMessage.defaultLocale()
-
-        then:
-        locale == Locale.ENGLISH
-    }
 
 }
 

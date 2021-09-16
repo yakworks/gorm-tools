@@ -34,13 +34,13 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParse
         Map body = bodyToMap(resp)
 
         then:
-        resp.code() == HttpStatus.CREATED.value()
         body.id != null
         body.ok == true
         body.source == "Oracle"
         body.results != null
         body.results.size() == 3
         body.results[0].id != null
+        resp.code() == HttpStatus.CREATED.value()
 
         //verify the bulk includes from restapi-config.xml
         body.results[0].source.sourceId == "foox1"

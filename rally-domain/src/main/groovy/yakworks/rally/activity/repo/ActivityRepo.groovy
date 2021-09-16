@@ -193,7 +193,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     // This adds the realted and children entities from the params to the Activity
     // called in afterBind
     void doAttachments(Activity activity, Object attData) {
-        List attachments = attachmentRepo.bulkCreateOrUpdate(attData as List)
+        List attachments = attachmentRepo.batchCreateOrUpdate(attData as List)
         //FIXME this is not right
         attachments.each { Attachment attachment ->
             AttachmentLink.create(activity, attachment)
@@ -278,7 +278,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         List attachments = []
         List attachmentData = activityData?.attachments as List
         if (attachmentData) {
-            attachments = attachmentRepo.bulkCreateOrUpdate(attachmentData)
+            attachments = attachmentRepo.batchCreateOrUpdate(attachmentData)
             if (targets[0].class.simpleName == "Payment") {
                 attachments.each { Attachment att ->
                     String summary = activityData?.summary

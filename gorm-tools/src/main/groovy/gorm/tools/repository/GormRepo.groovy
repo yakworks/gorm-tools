@@ -160,7 +160,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      */
     D doUpdate(Map data, Map args) {
         //FIXME #339 I think we do the lookup logic here, framed sample out sample below
-        D entity = get(data['id'] as Serializable, data['version'] as Long)
+        D entity = findWithData(data)
         bindAndUpdate(entity, data, args)
         return entity
     }
@@ -169,8 +169,9 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * Uses the items in the data to find the entity.
      * If data has an id key the use that.
      * otherwise it will see if entity has lookupable or if the concrete repo has a lookup method
-     * @param data
-     * @return
+     *
+     * @param data - the map with the keys for lookup
+     * @return the found entity
      */
     D findWithData(Map data) {
         D foundEntity

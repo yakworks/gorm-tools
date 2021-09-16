@@ -7,6 +7,7 @@ package gorm.tools.repository.errors
 import groovy.transform.CompileStatic
 
 import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.validation.Errors
@@ -62,6 +63,17 @@ class RepoExceptionSupport {
             return new EntityValidationException(RepoMessage.notSaved(entity), entity, null, ex)
         }
         return ex
+    }
+
+    static List<Map<String, String>> toErrorList(Errors errs) {
+        List<Map<String, String>> errors = []
+        MessageSource messageSource =  AppCtx.getCtx()
+        errs.allErrors.each {def err ->
+            Map m = [message:messageSource.getMessage(err, LocaleContextHolder.getLocale())]
+            if(err instanceof FieldError) m['field'] = err.field
+            errors << m
+        }
+        return errors
     }
 
 }

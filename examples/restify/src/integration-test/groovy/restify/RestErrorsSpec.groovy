@@ -22,8 +22,8 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.NOT_FOUND.value()
         body.status == HttpStatus.NOT_FOUND.value()
-        body.title == "Not Found"
-        body.detail == 'Org not found for 10001'
+        body.title == "Org not found with id 10001"
+        // body.detail == 'Org not found for 10001'
     }
 
     void "test org errors, no type"() {
@@ -36,8 +36,8 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.title == "Validation Error"
-        body.detail == 'OrgSource validation errors'
+        body.title == "OrgSource Validation Error(s)"
+
         // body.errors.find{ it.field == 'link.kind' }.message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
         // body.errors.find{ it.field == 'link.name' }
     }
@@ -54,8 +54,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.title == "Validation Error"
-        body.detail == 'Project validation errors'
+        body.title == "Project Validation Error(s)"
         body.errors[0].message == "Property [name] of class [class yakworks.testify.model.Project] cannot be null"
         body.errors[0].field == "name"
         body.errors[1].message == "Property [num] of class [class yakworks.testify.model.Project] cannot be null"

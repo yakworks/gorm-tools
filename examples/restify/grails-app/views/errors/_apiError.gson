@@ -1,4 +1,5 @@
-import  gorm.tools.repository.errors.api.ApiError
+import gorm.tools.repository.errors.api.ApiError
+
 
 /**
  * Renders validation errors according to vnd.error: https://github.com/blongden/vnd.error
@@ -14,4 +15,7 @@ json {
   status apiError.status.value()
   title apiError.title
   detail apiError.detail
+  if(apiError.errors){
+    errors apiError.errors
+  }
 }

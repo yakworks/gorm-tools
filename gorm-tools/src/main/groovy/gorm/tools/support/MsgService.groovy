@@ -13,6 +13,8 @@ import org.springframework.context.MessageSourceResolvable
 import org.springframework.context.NoSuchMessageException
 import org.springframework.context.i18n.LocaleContextHolder
 
+import gorm.tools.beans.AppCtx
+
 /**
  * Helper class for easy access to messages from a MessageSource,
  * providing various overloaded getMessage methods.
@@ -97,4 +99,12 @@ class MsgService {
         return this.messageSource.getMessage(resolvable, getDefaultLocale());
     }
 
+    /**
+     * static cheater if in context where can't inject service
+     * @param msr
+     * @return
+     */
+    static String get(MessageSourceResolvable msr) {
+        AppCtx.ctx.getMessage(msr, LocaleContextHolder.getLocale())
+    }
 }

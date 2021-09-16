@@ -23,6 +23,7 @@ import org.springframework.transaction.support.DefaultTransactionStatus
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
+import gorm.tools.model.Lookupable
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
@@ -30,6 +31,7 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.DataOp
 import grails.validation.ValidationException
+import yakworks.commons.lang.ClassUtils
 
 /**
  * A trait that turns a class into a Repository
@@ -157,10 +159,46 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @see #doPersist
      */
     D doUpdate(Map data, Map args) {
-        D entity = get(data['id'] as Serializable, data['version'] as Long)
+        //FIXME #339 I think we do the lookup logic here, framed sample out sample below
+        D entity = findWithData(data)
         bindAndUpdate(entity, data, args)
         return entity
     }
+
+    /**
+     * Uses the items in the data to find the entity.
+     * If data has an id key the use that.
+     * otherwise it will see if entity has lookupable or if the concrete repo has a lookup method
+     *
+     * @param data - the map with the keys for lookup
+     * @return the found entity
+     */
+    D findWithData(Map data) {
+        D foundEntity
+        def ident = data['id'] as Serializable
+        //check by id first
+        if(ident){
+            //return it fast if its good to go, will have blown and error if not found
+            return get(ident, data['version'] as Long)
+        } else if(Lookupable.isAssignableFrom(getEntityClass())){
+            // call the lookup if domain implements the Lookupable
+            //FIXME is there a cleaner way to do this?
+            foundEntity = (D) ClassUtils.callStaticMethod(getEntityClass(), 'lookup', data)
+        } else {
+            foundEntity = lookup(data)
+        }
+        RepoUtil.checkFound(foundEntity, 'data map', getEntityClass().name)
+        return foundEntity
+    }
+
+    /**
+     * does nothing, can be implemented by the conrete repo for special lookup logic such as for souceId
+     */
+    D lookup(Map data) {
+        return null
+    }
+
+
 
     void bindAndUpdate(D entity, Map data, Map args) {
         bindAndSave(entity, data, BindAction.Update, args)
@@ -241,12 +279,16 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * creates, removes or updates the location based on params
+     * creates, removes or updates the entity based on DataOp
      * if data has an id then its considered an update
      * if data has an id and data.op == remove then it will delete it, see DataOp enum
      * otherwise create it
      * XXX needs tests
      */
+    //FIXME #339 if dont like this method and think it should be baked.
+    // this does nothing special for create so it really just for the update and deletes
+    // if we want to support multiple ways to do look ups, for code for example, then this wont work
+    // we can put the special look up logic in the main update maybe.
     D createOrUpdate(Map data){
         if(!data) return
 
@@ -316,7 +358,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * bulkCreateOrUpdate associations for given entity
+     * batchCreateOrUpdate associations for given entity
      *
      * @Param mainEntity The entity that has the associations that are being created/updated
      * @param assocRepo association entity repo
@@ -326,7 +368,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      */
     List persistAssociationData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
         if(belongsToProp) assocList.each { it[belongsToProp] = entity}
-        assocRepo.bulkCreateOrUpdate(assocList)
+        assocRepo.batchCreateOrUpdate(assocList)
     }
 
     /**
@@ -336,6 +378,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @param values data to apply to selected rows
      * @return the converted list of maps that was used to update
      */
+    //FIXME #339 we have to many bulks and batch. centralize and/or fix names
     List<Map> bulkUpdate(List ids, Map values){
         List<Map> data = ids.collect {
             values.id = it
@@ -355,14 +398,14 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @param dataList the list of data maps to create/update
      * @return the list of created entities
      */
-    List<D> bulkCreateOrUpdate(List<Map> dataList){
+    //FIXME #339 lets move to Bulkable?
+    List<D> batchCreateOrUpdate(List<Map> dataList){
         List resultList = [] as List<D>
-        gormStaticApi().withTransaction { TransactionStatus status ->
-            for (Map item : dataList) {
-                D entity = createOrUpdate(item)
-                resultList.add(entity)
-            }
+
+        batchTrx(dataList) { Map item ->
+            resultList << createOrUpdate(item)
         }
+
         return resultList
     }
 
@@ -428,6 +471,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     /**
      * Transactional, Iterates over list and runs closure for each item
      */
+    //FIXME #339 move these out with bulkCreateOrUpdate? these are only used in benchmarks they needed?
     void batchTrx(List list, Closure closure) {
         gormStaticApi().withTransaction { TransactionStatus status ->
             for (Object item : list) {
@@ -442,8 +486,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
             doCreate(item, args)
         }
     }
-
-
 
     GormInstanceApi<D> gormInstanceApi() {
         (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())

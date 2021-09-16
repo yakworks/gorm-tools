@@ -57,7 +57,8 @@ trait RestControllerErrorHandling {
     String buildMsg(Map msgMap, Errors errors) {
         StringBuilder result = new StringBuilder(msgMap.defaultMessage)
         errors.getAllErrors().each { FieldError error ->
-            result.append("\n" + message(error: error, args: error.arguments, local: RepoMessage.defaultLocale()))
+            //FIXME #339 centralize this FieldError logic, is this really needed?
+            result.append("\n" + message(error: error, args: error.arguments, local: LocaleContextHolder.getLocale()))
         }
         return result
     }

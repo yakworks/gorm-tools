@@ -6,9 +6,12 @@ package yakworks.rally.common
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.model.Lookupable
+import gorm.tools.repository.RepoUtil
+
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameCodeDescription extends NameDescription {
+trait NameCodeDescription<D> extends NameDescription implements Lookupable<D> {
 
     String code
 
@@ -23,5 +26,13 @@ trait NameCodeDescription extends NameDescription {
     void beforeValidate() {
         if(!this.name && this.code) this.name = code.replaceAll('-', ' ')
     }
+
+    //FIXME #339 framed out example
+    static D lookup(Map data){
+        if(data['code']) {
+            (D) RepoUtil.findRepo(this).query(code: data['code']).get()
+        }
+    }
+
 
 }

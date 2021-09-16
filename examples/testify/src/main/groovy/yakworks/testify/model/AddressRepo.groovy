@@ -4,9 +4,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
 
-import gorm.tools.repository.BulkableRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.events.RepoListener
 import yakworks.rally.job.Job
 

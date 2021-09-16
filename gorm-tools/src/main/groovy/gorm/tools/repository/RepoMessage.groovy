@@ -8,6 +8,7 @@ package gorm.tools.repository
 import groovy.transform.CompileStatic
 
 import org.grails.web.servlet.mvc.GrailsWebRequest
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.servlet.support.RequestContextUtils
 
@@ -60,17 +61,18 @@ class RepoMessage {
     // static String resolveDomainLabel(Object entity) {
     //     return resolveMessage("${propName(entity.class.name)}.label", "${GrailsNameUtils.getShortName(entity.class.name)}")
     // }
-
-    static Locale defaultLocale() {
-        try {
-            GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes() as GrailsWebRequest
-            Locale currentLocale = RequestContextUtils.getLocale(webRequest.getCurrentRequest())
-            return currentLocale
-        }
-        catch (java.lang.IllegalStateException e) {
-            return Locale.ENGLISH
-        }
-    }
+    // @Deprecated
+    // static Locale defaultLocale() {
+    //     // try {
+    //     //     GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes() as GrailsWebRequest
+    //     //     Locale currentLocale = RequestContextUtils.getLocale(webRequest.getCurrentRequest())
+    //     //     return currentLocale
+    //     // }
+    //     // catch (java.lang.IllegalStateException e) {
+    //     //     return Locale.ENGLISH
+    //     // }
+    //     return LocaleContextHolder.getLocale()
+    // }
 
     static String propName(String prop) {
         NameUtils.getPropertyName(prop)

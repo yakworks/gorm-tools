@@ -20,6 +20,8 @@ import yakworks.commons.lang.NameUtils
 /**
  * creates a Map from errors so it can be converted to json and sent to client
  */
+//FIXME #339 is any of the functionality needed here? do we capture the BatchUpdateException still
+// if we replaced the functionality of this then lets remove it
 @CompileDynamic
 class ErrorMessageService {
 
@@ -99,6 +101,6 @@ class ErrorMessageService {
     String buildMsg(Map msgMap) {
         Object[] args = (msgMap.args instanceof List) ? msgMap.args as Object[] : [] as Object[]
 
-        return messageSource.getMessage(msgMap.code, args, msgMap.defaultMessage, RepoMessage.defaultLocale())
+        return messageSource.getMessage(msgMap.code, args, msgMap.defaultMessage, LocaleContextHolder.getLocale())
     }
 }

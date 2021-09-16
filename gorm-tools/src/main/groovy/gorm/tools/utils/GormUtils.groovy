@@ -13,7 +13,6 @@ import org.grails.datastore.mapping.model.types.Identity
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.model.Persistable
 import yakworks.commons.lang.Validate
 
 /**

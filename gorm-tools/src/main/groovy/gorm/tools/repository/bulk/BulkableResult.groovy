@@ -5,6 +5,10 @@
 package gorm.tools.repository.bulk
 
 import groovy.transform.CompileStatic
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
+
+import org.springframework.http.HttpStatus
 
 import gorm.tools.repository.errors.api.ApiError
 
@@ -20,7 +24,7 @@ import gorm.tools.repository.errors.api.ApiError
            entity: {
              "id": 356312,
              "num": "78987",
-             "org": {
+             "sourceId": {
                "source": {
                  "sourceId": "JOANNA75764-US123"
                }
@@ -60,26 +64,45 @@ import gorm.tools.repository.errors.api.ApiError
  }
  }
  */
+@Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class BulkableResult {
 
     boolean ok = true
 
+    HttpStatus status
+
+    /**
+     * the entity that was created
+     */
+    Object entity
+
     /**
      * the entity fields for what was created or updated
      * if it errored then this will be null
      */
-    Map entity
+    Map entityData
 
     /**
-     * the data the was processed. will be one of the items in the list that was sent.
+     * the data the was submitted to process. will be one of the items in the list that was sent.
      */
-    Map data
+    Map requestData
 
     /**
      * On error this is the processed error based on exception type
      */
     ApiError error
 
+    static BulkableResult of(ApiError error, Map requestData){
+        new BulkableResult(ok: false, error: error, requestData: requestData, status: error.status)
+    }
 
+    static BulkableResult of(Object entity){
+        new BulkableResult(entity: entity)
+    }
+
+    BulkableResult status(int statusId){
+        this.status = HttpStatus.valueOf(statusId)
+        return this
+    }
 }

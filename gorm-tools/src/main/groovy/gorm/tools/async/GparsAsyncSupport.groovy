@@ -7,11 +7,14 @@ package gorm.tools.async
 import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
-import groovyx.gpars.GParsPool
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.SecondParam
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.util.PoolUtils
 
 import org.springframework.beans.factory.annotation.Value
+
+import static groovyx.gpars.GParsPool.withPool
 
 /**
  * a Gpars implementation of the AsyncSupport trait
@@ -36,44 +39,47 @@ class GparsAsyncSupport implements AsyncSupport {
         if (batchSize == 0) batchSize = 100
     }
 
-    /**
-     * Iterates over the batchList with GParsPoolUtil.eachParallel and calls the closure passing in the list and the args
-     * Generally you will want to use the {@link AsyncSupport#parallel} method
-     * that added by the Trait as it calls the withTransaction
-     *
-     * @param args _optional_ arg map to be passed to the async engine such as gpars.
-     *     can also add any other value and they will be passed down through the closure as well <br>
-     *     - poolSize : gets passed down into the GParsPool.withPool for example
-     * @param batches a collated list of lists. each batch list in the batches will be asynchronously passed to the provided closure
-     * @param batchClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
-     */
     @Override
-    void parallel(Map args, List<List> batches, Closure batchClosure) {
-        int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
-        GParsPool.withPool(psize) {
-            GParsPoolUtil.eachParallel(batches as Collection<List>) { List batch ->
-                batchClosure.call(batch, args.clone())
-            }
+    void parallel(Map args, Collection collection, Closure closure) {
+
+        boolean gparsEnabled = args.asyncEnabled as Boolean ? args.asyncEnabled as Boolean : getAsyncEnabled()
+
+        if (gparsEnabled) {
+            eachParallel(collection, closure)
+        } else {
+            collection.each(wrapSession(args, closure))
         }
+
     }
 
-    /**
-     * Iterates over the batchList with GParsPoolUtil.eachParallel and calls the closure passing in the list and the args
-     * Uses withSession to make sure there is a session bound to the thread
-     *
-     * @param args _optional_ arg map to be passed to the async engine such as gpars.
-     *     can also add any other value and they will be passed down through the closure as well <br>
-     *     - poolSize : gets passed down into the GParsPool.eachParallel for example
-     * @param collection a collated list of lists. each batch list in the batches will be asynchronously passed to the provided closure
-     * @param itemClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
-     */
+    // @Override
+    // void parallel(Map args, List<List> collection, Closure closure){
+    //
+    //     parallel(args, collection, closure)
+    //
+    // }
+
     @Override
-    public <T> Collection<T> eachParallel(Map args, Collection<T> collection, Closure itemClosure){
+    public <T> Collection<T> parallelChunks(Map args, Collection<T> collection,
+                                            @ClosureParams(SecondParam) Closure closure) {
+        int batchSize = args.batchSize ? args.batchSize as Integer : getBatchSize()
+
+        def batchedList = collate(collection, batchSize)
+
+        parallel(args, batchedList, closure)
+
+        return collection
+    }
+
+    @Override
+    public <T> Collection<T> eachParallel(Map args, Collection<T> collection,
+                                          @ClosureParams(SecondParam.FirstGenericType) Closure closure){
         int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
-        GParsPool.withPool(psize) {
-            GParsPoolUtil.eachParallel(collection, withSession(itemClosure))
+        withPool(psize) {
+            GParsPoolUtil.eachParallel(collection, wrapSession(args, closure))
         }
         return collection
     }
+
 
 }

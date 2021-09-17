@@ -24,8 +24,11 @@ class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
         List all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString()) as List<Long>
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
-        asyncSupport.parallelBatch(batches){Long id, Map args ->
-            updateRow(id, citiesUpdated[at.incrementAndGet()])
+
+        asyncSupport.parallel(batches) { List batch ->
+            asyncSupport.batchTrx(batch) {Long id ->
+                updateRow(id, citiesUpdated[at.incrementAndGet()])
+            }
         }
     }
 

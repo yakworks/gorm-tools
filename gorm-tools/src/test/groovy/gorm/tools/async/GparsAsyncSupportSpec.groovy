@@ -19,9 +19,13 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
     List<Class> getDomainClasses() { [CustType] }
 
     void setup() {
-
         //asyncSupport = ctx.getBean("asyncSupport")
+        asyncSupport.asyncEnabled = true
     }
+
+    // void cleanup() {
+    //     asyncSupport.asyncEnabled = false
+    // }
 
     void "test collate"() {
         given:
@@ -48,9 +52,13 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        asyncSupport.parallel(asyncSupport.collate(list, 10)) { List batch, Map args ->
+        def slicedList = asyncSupport.collate(list, 10)
+        assert slicedList.size() == 10
+
+        asyncSupport.parallel(slicedList) { List batch ->
             count.addAndGet(batch.size())
         }
+
         then:
         count.get() == 100
     }
@@ -81,7 +89,7 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        asyncSupport.parallelCollate([batchSize:10], list) { Map record, Map args ->
+        asyncSupport.parallelCollate(batchSize: 10, list) { Map record ->
             count.addAndGet(1)
         }
         then:
@@ -96,9 +104,8 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         int count = 0
-        asyncSupport.batchTrx([test:1], list) { Map item, Map args ->
+        asyncSupport.batchTrx(list) { Map item->
             count = count + 1
-            assert args.test == 1
         }
 
         then:

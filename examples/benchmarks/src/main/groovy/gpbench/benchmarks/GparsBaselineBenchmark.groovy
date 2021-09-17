@@ -20,11 +20,13 @@ class GparsBaselineBenchmark<T> extends BaseBatchInsertBenchmark<T> {
         super(clazz, bindingMethod, validate)
     }
 
+
     @Override
     def execute() {
-        asyncSupport.parallelBatch(cities) { Map row, Map zargs ->
-            //println "insertingRow $row"
-            insertRow(row)
+        asyncSupport.parallel(cities) { List batch ->
+            asyncSupport.batchTrx(batch) { Map row ->
+                insertRow(row)
+            }
         }
     }
 

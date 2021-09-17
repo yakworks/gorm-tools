@@ -65,14 +65,16 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
         cleanup(domainClass, dataMap.size())
     }
 
-    void saveAsync(Class domainClass, List dataMap){
+    void saveAsync(Class domainClass, List<Map> dataMap){
         //collates list into list of lists
-        List<List> collatedList = asyncSupport.collate(dataMap)
+        def collatedList = asyncSupport.collate(dataMap)
         if(binderType == 'gorm-tools-repo'){
             asyncSupport.parallel(collatedList, getRepoBatchClosure())
         } else {
-            asyncSupport.parallelBatch(collatedList) { Map row, Map zargs ->
-                getBindAndSaveClosure().call(domainClass, row)
+            asyncSupport.parallel(collatedList) { List batch ->
+                asyncSupport.batchTrx(batch) { Map row ->
+                    getBindAndSaveClosure().call(domainClass, row)
+                }
             }
         }
     }

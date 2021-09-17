@@ -4,12 +4,10 @@
 */
 package gorm.tools.repository.bulk
 
-
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.validation.Errors
 
 import gorm.tools.async.AsyncSupport
@@ -22,8 +20,12 @@ import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.support.Results
+import gorm.tools.transaction.TrxService
+import grails.async.Promise
 import grails.validation.ValidationException
 import yakworks.commons.map.Maps
+
+import static grails.async.Promises.task
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -41,27 +43,18 @@ trait BulkableRepo<D, J extends JobTrait>  {
     @Autowired
     EntityMapService entityMapService
 
-    @Value('${hibernate.jdbc.batch_size:50}')
-    int batchSize
-
-    //FIXME #339 change this key. we have 3 namespace options,
-    // we can put it under gorm.tools as we have gorm.tools.security and gorm.tools.audit
-    // or we can put it under app where we have resources.
-    // or we can put everything under yakworks namespace
-    @Value('${nine.autocash.parallelProcessing.enabled:false}')
-    boolean parallelProcessingEnabled
+    @Autowired
+    TrxService trxService
 
     //Here for @CompileStatic - GormRepo implements it
     abstract D doCreate(Map data, Map args)
     abstract  Class<D> getEntityClass()
 
-    //FIXME #339 rename arg for source to jobSource. We should add a field in job to store the args that were passed in
 
     /**
      * Allows to pass in bulk of records at once, for example /api/book/bulk
      * Each call creates a job that stores info for the call and is returned with results
      * @param dataList the list of data maps to create
-     * @param jobParams - extra meta data, such as 'source' to bind to the job that was created
      * @param args args to pass to doCreate. It can have:
      *      jobSource -  what to set the job.source to
      *      includes - for result, list of fields to include for the created or updated entity
@@ -71,50 +64,109 @@ trait BulkableRepo<D, J extends JobTrait>  {
      *      async - (default: true) whether it should return thr job imediately or do it sync
      * @return Job
      */
-    J bulkCreate(List<Map> dataList, Map args = [:]){
+    J bulkCreate(List<Map> dataList, Map args = [:]) {
 
         //FIXME #339
-        J job = (J)jobRepo.create([source:args.source, state: JobState.Running, dataPayload:dataList])
-        // for error handling -- based on `onError` from args commit success and report the failure or fail them all
-        //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
-        //@jdabal - for parallel async, we can not rollback batches which are already commited
-        //as each batch would be in its own transaction.
-        //@suhdir, we should count the errors and stop once it hits errorThreshold, no rollback needed
+        J job = (J) jobRepo.create([source: args.source, state: JobState.Running, dataPayload: dataList], [flush:true])
 
-        //FIXME #339 we wait way to long to transformResults, do it as we go?
-        // if we do it as we go then what the performance impact? maybe do it as we go in chunks?
-        List<Results> bulkResult = []
-        List<Map> jsonResults
-        try {
-            if (getParallelProcessingEnabled()) {
-                asyncSupport.parallel([batchSize: getBatchSize()], dataList.collate(getBatchSize())) { List<Map> batch ->
-                    List<Results> results = doBulkCreate(batch, args)
-                    // if (results) jsonResults.addAll transformResults(results, args.includes as List)
-                }
-                //FIXME #339 if we do it as we go then what you have above runs risk of erroring now and rolling back trx
-            } else {
-                List results = doBulkCreate(dataList, args)
-                //FIXME #339 not DRY, dont code dupe
-                // if (results) jsonResults.addAll transformResults(results, args.includes as List)
-                if (results) bulkResult.addAll results
-            }
-        } finally {
-            // byte[] resultBytes = jsonResults ? Jsonify.render(jsonResults).jsonText.bytes : null
-            // boolean  ok = !(jsonResults.any({ it.ok == false}))
-            // job = (J)jobRepo.update([id:job.id, ok:ok, results: resultBytes, state: JobState.Finished])
+        //keep the jobId around
+        Long jobId = job.id
 
-            jsonResults = transformResults(bulkResult, args.includes as List)
-            byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
-            boolean  ok = !(bulkResult.any({ it.ok == false}))
-            job = (J)jobRepo.update([id:job.id, ok:ok, results: resultBytes, state: JobState.Finished])
+        List<Results> bulkResults = Collections.synchronizedList([]) as List<Results>
+
+        Closure bulkCreateClosure = { List<Map> dataChunk ->
+            bulkResults.addAll( doBulkCreateTrx(dataChunk, args))
         }
 
-        //XXX  https://github.com/9ci/domain9/issues/331 assign jobId on each record created.
-        // Special handling for arTran - we will have ArTranJob (jobId, arTranId). For all others we would
-        //have JobLink (jobId,entityId, entityName)
-        return job
+        asyncSupport.parallelChunks(dataList, bulkCreateClosure)
+
+        updateJobResults(jobId, bulkResults, args.includes as List)
+
+        // return job
+
+        return (J) jobRepo.get(jobId)
+
     }
 
+    //FIXME implement
+    // J bulkCreatePromise(List<Map> dataList, Map args = [:]) {
+    //
+    //     Promise promise = task {
+    //
+    //         //doBulkCreate(bulkResults, dataList, args)
+    //
+    //     }.onComplete { result ->
+    //         updateJobResults(jobId, bulkResults, args.includes as List)
+    //     }.onError { Throwable err ->
+    //         //!! should nver get here? log to Job?
+    //     }
+    //
+    // }
+
+
+    /**
+     * Allows to pass in bulk of records at once, for example /api/book/bulk
+     * Each call creates a job that stores info for the call and is returned with results
+     * @param dataList the list of data maps to create
+     * @param args args to pass to doCreate. It can have:
+     *      jobSource -  what to set the job.source to
+     *      includes - for result, list of fields to include for the created or updated entity
+     *      errorThreshold - (default: false) number of errors before it stops the job. this setting ignored if transactional=true
+     *      transactional - (default: false) if true then the whole set should be in a transaction. disables parallelProcessing.
+     *          will disable parallelProcessing
+     *      async - (default: true) whether it should return thr job imediately or do it sync
+     * @return Job
+     */
+    // J bulkCreateOld(List<Map> dataList, Map args = [:]){
+    //
+    //     //FIXME #339
+    //     J job = (J)jobRepo.create([source:args.source, state: JobState.Running, dataPayload:dataList])
+    //     // for error handling -- based on `onError` from args commit success and report the failure or fail them all
+    //     //  also use errorThreshold, for example if it failed on more than 10 records we stop and rollback everything
+    //     //@jdabal - for parallel async, we can not rollback batches which are already commited
+    //     //as each batch would be in its own transaction.
+    //     //@suhdir, we should count the errors and stop once it hits errorThreshold, no rollback needed
+    //
+    //     //FIXME #339 we wait way to long to transformResults, do it as we go?
+    //     // if we do it as we go then what the performance impact? maybe do it as we go in chunks?
+    //     List<Results> bulkResult = []
+    //     List<Map> jsonResults
+    //     try {
+    //         if (getParallelProcessingEnabled()) {
+    //             asyncSupport.parallel([batchSize: getBatchSize()], dataList.collate(getBatchSize())) { List<Map> batch ->
+    //                 //FIXME #339 no transaction?
+    //                 List<Results> results = doBulkCreate(batch, args)
+    //                 // if (results) jsonResults.addAll transformResults(results, args.includes as List)
+    //             }
+    //             //FIXME #339 if we do it as we go then what you have above runs risk of erroring now and rolling back trx
+    //         } else {
+    //             List results = doBulkCreate(dataList, args)
+    //             //FIXME #339 not DRY, dont code dupe
+    //             // if (results) jsonResults.addAll transformResults(results, args.includes as List)
+    //             if (results) bulkResult.addAll results
+    //         }
+    //     } finally {
+    //         // byte[] resultBytes = jsonResults ? Jsonify.render(jsonResults).jsonText.bytes : null
+    //         // boolean  ok = !(jsonResults.any({ it.ok == false}))
+    //         // job = (J)jobRepo.update([id:job.id, ok:ok, results: resultBytes, state: JobState.Finished])
+    //
+    //         jsonResults = transformResults(bulkResult, args.includes as List)
+    //         byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
+    //         boolean  ok = !(bulkResult.any({ it.ok == false}))
+    //         job = (J)jobRepo.update([id:job.id, ok:ok, results: resultBytes, state: JobState.Finished])
+    //     }
+    //
+    //     //XXX  https://github.com/9ci/domain9/issues/331 assign jobId on each record created.
+    //     // Special handling for arTran - we will have ArTranJob (jobId, arTranId). For all others we would
+    //     //have JobLink (jobId,entityId, entityName)
+    //     return job
+    // }
+
+    List<Results> doBulkCreateTrx(List<Map> dataList, Map args = [:]){
+        trxService.withTrx {
+            doBulkCreate(dataList, args)
+        }
+    }
 
     List<Results> doBulkCreate(List<Map> dataList, Map args = [:]){
         List<Results> resultList = [] as List<Results>
@@ -138,6 +190,13 @@ trait BulkableRepo<D, J extends JobTrait>  {
         return resultList
     }
 
+    void updateJobResults(Long jobId, List<Results> bulkResults, List includes){
+        List<Map> jsonResults = transformResults(bulkResults, includes as List)
+        byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
+        // FIXME dont do any, it spins back through the list to find the ok=false. spin through 1 time only.
+        boolean ok = !(bulkResults.any({ it.ok == false}))
+        jobRepo.update([id:jobId, ok: ok, results: resultBytes, state: JobState.Finished], [flush: true])
+    }
     /**
      * Processes Results of bulkcreate and processes list of maps which can be converted to json and set on job.results
      *

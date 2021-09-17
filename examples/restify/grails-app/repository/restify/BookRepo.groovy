@@ -10,8 +10,11 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import grails.gorm.transactions.Transactional
 
-@Transactional
 @CompileStatic
 class BookRepo implements GormRepo<Book> {
 
+    @Transactional(rollbackForClassName = "TestTransactionException")
+    def foo(){
+        assert 1==1
+    }
 }

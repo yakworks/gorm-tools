@@ -18,7 +18,7 @@ trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
      * @param data data map
      * @return Job created job
      */
-    D createJob(Map data ) {
+    D createJob(Map data) {
         def dataPayload = data.remove('dataPayload')
         D job = (D) getEntityClass().newInstance(data)
 

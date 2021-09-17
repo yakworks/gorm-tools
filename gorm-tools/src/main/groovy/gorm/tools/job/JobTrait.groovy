@@ -17,6 +17,8 @@ trait JobTrait<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> 
     JobState state = JobState.Running
     // data we are getting. For RestApi calls it's data body
     byte[] data
+    // // The List of bulkable results in json form
+    // byte[] results
 
     //Keep constraints in Job class.
 }

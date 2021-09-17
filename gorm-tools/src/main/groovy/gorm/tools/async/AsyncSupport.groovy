@@ -5,6 +5,8 @@
 package gorm.tools.async
 
 import groovy.transform.CompileStatic
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.SecondParam
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -32,40 +34,41 @@ trait AsyncSupport implements WithTrx {
     @Value('${hibernate.jdbc.batch_size:0}')
     int batchSize
 
+    /** The list size to send to the collate that slices.*/
+    @Value('${gorm.tools.async.enabled:false}')
+    boolean asyncEnabled
+
     @Autowired
     PersistenceContextInterceptor persistenceInterceptor
 
     /**
-     * calls {@link #parallel} with the args, batches list calling {@link #doBatch} for each batch in batches
-     * passes itemClosure down through to the {@link #doBatch}
-     *
-     * @param args _optional_ arg map to be passed to the async engine such as gpars.
-     *     can also add any other value and they will be passed down through the closure as well <br>
-     *     - poolSize : gets passed down into the GParsPool.withPool for example
-     * @param batches a collated list(batches) of sub-lists(a batch or items). each item in the batch(sub-list)
-     *   will be asynchronously passed to the provided itemClosure. You should first collate the list with {@link #collate}
-     * @param itemClosure the closure to call for each item lowest list.
-     */
-    void parallelBatch(Map args = [:], List<List> batches, Closure itemClosure) {
-        parallel(args, batches) { List batch, Map cargs ->
-            batchTrx(cargs, batch, itemClosure)
-        }
-    }
-
-    /**
-     * Iterates over the batchList of lists and calls the closure passing in the list and the args asynchronously.
-     * parallelClosure it self is not asynchronous and will return once all the items in the batchList are processed.
-     * If you want this method itself to be run asynchronous then it can be done in a Promise as outlined in the Grails async docs
+     * main difference here from {@link #eachParallel} eachParallel is that this will check if asyncEnabled is true
+     * if its false then it just gracefully passes the closure on to the colection.each
      *
      * Must be overriden by the concrete implementation as this is where the meat is.
      *
      * @param args _optional_ arg map to be passed to the async engine such as gpars.
-     *     can also add any other value and they will be passed down through the closure as well <br>
      *     - poolSize : gets passed down into the GParsPool.withPool for example
-     * @param batches a collated list of lists. each batch list in the batches will be asynchronously passed to the provided closure
-     * @param batchClosure the closure to call for each batch(sub-list of items) in the batches(list of batch sub-lists)
+     *     - asyncEnabled : forces async to true of false regardless of what the class val is, useful for testing
+     * @param collection the collection to iterate process
+     * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    abstract void parallel(Map args = [:], List<List> batches, Closure batchClosure)
+    abstract void parallel(Map args = [:], Collection collection, Closure closure)
+
+
+    // abstract void parallel(Map args, List<List> collection, Closure closure)
+
+    /**
+     * collates the data into slices/chunks and calls the chunkClosure for each slice of items in the item list.
+     * Will check to see if asyncEnabled is true and if not then will just call a normal each and pass to chunkClosure
+     *
+     * @param args _optional_ arg map to be passed to the async engine such as gpars.
+     *     - batchSize : the size of the lists when collated or sliced into chunks
+     * @param collection the items list to slice into chunks
+     * @param chunkClosure the closure to call for each collated slice of data. will get passed the List for processing
+     */
+    abstract <T> Collection<T> parallelChunks(Map args = [:], Collection<T> collection,
+                                              @ClosureParams(SecondParam) Closure closure)
 
     /**
      * Iterates over the lists and calls the closure passing in the list item and the args asynchronously.
@@ -75,21 +78,29 @@ trait AsyncSupport implements WithTrx {
      * @param args _optional_ arg map to be passed to the async engine such as gpars.
      *     can also add any other value and they will be passed down through the closure as well <br>
      *     - poolSize : gets passed down into the GParsPool.withPool for example
-     * @param batches a collated list of lists. each batch list in the batches will be asynchronously passed to the provided closure
-     * @param itemClosure the closure to call for each item in list
+     * @param collection the collection to iterate process
+     * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    abstract <T> Collection<T> eachParallel(Map args = [:], Collection<T> collection, Closure itemClosure)
+    abstract <T> Collection<T> eachParallel(Map args = [:], Collection<T> collection,
+                                            @ClosureParams(SecondParam.FirstGenericType) Closure closure)
 
     /**
-     * Uses collate to break or slice the list into batches and then calls parallelBatch
+     * Uses collate to break or slice the list into batches and then process the each(itemClosure) inside a trx
+     * here more for example, not normally something we would run in production
      *
      * @param args optional arg map to be passed on through to eachParallel and the async engine such as gpars. <br>
      *     - batchSize : parameter to be passed into collate
      * @param list the list to process that will get sliced into batches via collate
-     * @param itemClosure the closure to pass to eachParallel which is then passed to withTransaction
+     * @param itemClosure the closure to pass to eachParallel that gets passed the entry in the collection
      */
-    void parallelCollate(Map args = [:], List list, Closure itemClosure) {
-        parallelBatch(args, collate(list, args.batchSize as Integer), itemClosure)
+    public <T> Collection<T> parallelCollate(Map args = [:], Collection<T> collection,
+                                             @ClosureParams(SecondParam.FirstGenericType) Closure closure) {
+
+        // List<List<T>> collated = collate(collection, args.batchSize as Integer)
+        parallelChunks(args as Map, collection as Collection<Object>) { batch ->
+            batchTrx(batch, closure)
+        } as Collection<T>
+
     }
 
     /**
@@ -98,55 +109,63 @@ trait AsyncSupport implements WithTrx {
      * @param batchSize _optional_ the length of each batch sub-list in the returned list. override the {@link #batchSize}
      * @return the batches (list of lists) containing the chunked list of items
      */
-    List<List> collate(List items, Integer batchSize = null) {
-        items.collate(batchSize ?: getBatchSize()) as List<List>
+    public <T> List<List<T>> collate(Collection<T> items, Integer batchSize = null) {
+        items.collate(batchSize ?: getBatchSize())
     }
 
     /**
-     * runs {@link #doBatch ) in a Transaction and flush and clear is called after doBatch but before commit.
+     * runs in a Transaction and flush and clear is called after doBatch but before commit.
      */
-    void batchTrx(Map args, List items, Closure itemClosure) {
+    void batchTrx(Collection items, Closure itemClosure) {
         withTrx { TransactionStatus status ->
-            doBatch(args, items, itemClosure)
-            //status.flush()
-            //clear(status)
+            items.each(itemClosure)
             flushAndClear(status)
         }
-
     }
 
-    /**
-     * calls closure for each item in list.
-     *
-     * @param args <i>optional args to pass to the closure. coming from parallelClosure
-     * @param items the list or items to iterate over and run the closure
-     * @param itemClosure the closure to execute for each item. will get passed the item and args as it itereates over the list
-     */
-    void doBatch(Map args, List items, Closure itemClosure) {
-        for (Object item : items) {
-            itemClosure.call(item, args)
-        }
-    }
-
-    public <T> Closure<T> withSession(Closure<T> wrapped) {
-        return { T item ->
-            persistenceInterceptor.init()
-            try {
-                wrapped.call(item)
-            } finally {
-                try {
-                    persistenceInterceptor.flush()
-                    persistenceInterceptor.clear()
-                } catch (Exception e) {
-                    LOG.error("unexpected fail to flush and clear session after withSession", e);
-                } finally {
-                    try {
-                        persistenceInterceptor.destroy()
-                    } catch (Exception e) {
-                        LOG.error("unexpected fail to flush and clear session after withSession", e);
-                    }
-                }
+    public Closure withEachTrx(Closure wrapped) {
+        return { items ->
+            withTrx { TransactionStatus status ->
+                items.each(wrapped)
+                flushAndClear(status)
             }
         }
     }
+
+    /**
+     * if args has a withSession: true then wrap in a session
+     */
+    public <T> Closure<T> wrapSession(Map args = [:], Closure<T> c) {
+        return { T item ->
+            if(args.withSession) {
+                withSession { session ->
+                    c.call(item)
+                }
+            } else {
+                c.call(item)
+            }
+        }
+    }
+    //
+    // public <T> Closure<T> withSession(Closure<T> wrapped) {
+    //     return { T item ->
+    //         persistenceInterceptor.init()
+    //         try {
+    //             wrapped.call(item)
+    //         } finally {
+    //             try {
+    //                 persistenceInterceptor.flush()
+    //                 persistenceInterceptor.clear()
+    //             } catch (Exception e) {
+    //                 LOG.error("unexpected fail to flush and clear session after withSession", e);
+    //             } finally {
+    //                 try {
+    //                     persistenceInterceptor.destroy()
+    //                 } catch (Exception e) {
+    //                     LOG.error("unexpected fail to flush and clear session after withSession", e);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 }

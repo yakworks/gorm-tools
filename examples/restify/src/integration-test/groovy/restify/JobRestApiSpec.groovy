@@ -23,6 +23,8 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParse
 
     String path = "/api/rally/org/bulk?source=Oracle"
 
+    //FIXME #339 good to sanity check if we are testing rendering etc...
+    // but much of this is repo logic testing, not rest testing, move/copy it please, much of this could be done in a unit
     void "testing post Org with Job"() {
         given:
         List<Map> jsonList = [
@@ -45,9 +47,9 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParse
         resp.code() == HttpStatus.CREATED.value()
 
         //verify the bulk includes from restapi-config.xml
-        body.results[0].source.sourceId == "foox1"
-        body.results[0].num == "foox1"
-        body.results[0].name == "Foox1"
+        body.results[0].data.source.sourceId == "foox1"
+        body.results[0].data.num == "foox1"
+        body.results[0].data.name == "Foox1"
 
         when: "Verify org"
         Org org = Org.get( body.results[0].id as Long)
@@ -66,7 +68,7 @@ class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParse
         job.data != null
         job.state == JobState.Finished
 
-        when: "Verify job.data json"
+        when: "Verify job.data json, this is what come in from the request"
         StringReader str = new StringReader(new String(job.data, "UTF-8"))
         List dataList = parseJson(str)
 

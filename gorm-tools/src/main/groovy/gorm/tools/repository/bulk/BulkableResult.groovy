@@ -4,35 +4,54 @@
 */
 package gorm.tools.repository.bulk
 
+
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.SimpleType
 
 import org.springframework.http.HttpStatus
 
 import gorm.tools.repository.errors.api.ApiError
 
+/*
+
+{
+  "id": 123,
+  "state": "success",
+  "results": [
+    {
+      "ok": true,
+      "status": 201, //created
+      "data": {
+        "id": 356312,
+        "num": "78987",
+        "sourceId": "JOANNA75764-US123"
+      }
+    },
+    {
+      "ok": false,
+      "status": 422, //validation
+      "title": "Org Validation Error"
+      "errors": [ { "field": "num", "message": "num can't be null" } ]
+      "data": {
+        "sourceId": "JOANNA75764-US123"
+      },
+
+    },
+  ]
+}
+ */
 /**
  * Bulkable result for a single entity
  * Think of this as the result of a post or put on and entity
- * {
- *     id: 123
- *     state: success
- *     results: {[
- *       {
- *         ok: true,
-           entity: {
-             "id": 356312,
-             "num": "78987",
-             "sourceId": {
-               "source": {
-                 "sourceId": "JOANNA75764-US123"
-               }
-           }
-         },
+ *
+
+
  {
     ok: false,
-    data: {... the data that was sent }
+    requestData: {... the data that was sent }
     error: {
         status: 422,
         title: Org Validation Error
@@ -75,7 +94,7 @@ class BulkableResult {
     /**
      * the entity that was created
      */
-    Object entity
+    Object entityObject
 
     /**
      * the entity fields for what was created or updated
@@ -98,11 +117,60 @@ class BulkableResult {
     }
 
     static BulkableResult of(Object entity){
-        new BulkableResult(entity: entity)
+        new BulkableResult(entityObject: entity)
+    }
+
+    static BulkableResult of(Object entity, int statusId){
+        of(entity).status(statusId)
     }
 
     BulkableResult status(int statusId){
         this.status = HttpStatus.valueOf(statusId)
         return this
     }
+
+    BulkableResult addTo(Results results){
+        results.add(this)
+        this
+    }
+
+    static class Results {
+        boolean ok = true
+        @Delegate List<BulkableResult> resultsList
+
+        Results(){ resultsList = Collections.synchronizedList([]) as List<BulkableResult> }
+
+        boolean add(BulkableResult bulkableResult){
+            if(!bulkableResult.ok) ok = false
+            resultsList << bulkableResult
+        }
+
+        void merge(Results results){
+            if(!results.ok) ok = false
+            resultsList.addAll(results.resultsList)
+        }
+
+        List<Map> transform(@ClosureParams(value = SimpleType, options = "gorm.tools.repository.bulk.BulkableResult") Closure<Map> customizer) {
+            List<Map> ret = []
+            boolean ok = true
+            for (BulkableResult r : resultsList) {
+                def map = [ok: r.ok, status: r.status.value()] as Map<String, Object>
+                //do the failed
+                if (!r.ok) {
+                    //failed result would have original incoming map, return it as it is
+                    map.putAll([
+                        data: r.requestData,
+                        title: r.error.title,
+                        detail: r.error.detail,
+                        errors: r.error.errors
+                    ])
+                }
+                //run the customizer closure
+                map.putAll customizer(r)
+                ret << map
+            }
+            return ret
+        }
+    }
+
 }

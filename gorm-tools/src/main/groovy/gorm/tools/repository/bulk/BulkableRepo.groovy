@@ -48,7 +48,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * Each call creates a job that stores info for the call and is returned with results
      * @param dataList the list of data maps to create
      * @param args args to pass to doCreate. It can have:
-     *      jobSource -  what to set the job.source to
+     *      source -  what to set the job.source to
      *      includes - for result, list of fields to include for the created or updated entity
      *      errorThreshold - (default: false) number of errors before it stops the job. this setting ignored if transactional=true
      *      transactional - (default: false) if true then the whole set should be in a transaction. disables parallelProcessing.
@@ -58,21 +58,22 @@ trait BulkableRepo<D, J extends JobTrait>  {
      */
     J bulkCreate(List<Map> dataList, Map args = [:]) {
 
-        //FIXME #339
+        //FIXME #339 make a conrete create method that we can pass this stuff too
+        // rename
         J job = (J) jobRepo.create([source: args.source, state: JobState.Running, dataPayload: dataList], [flush:true])
 
         //keep the jobId around
         Long jobId = job.id
 
-        List<BulkableResult> bulkResults = Collections.synchronizedList([]) as List<BulkableResult>
+        def results = new BulkableResult.Results()
 
         Closure bulkCreateClosure = { List<Map> dataChunk ->
-            bulkResults.addAll( doBulkCreateTrx(dataChunk, args))
+            results.merge doBulkCreateTrx(dataChunk, args)
         }
 
         asyncSupport.parallelChunks(dataList, bulkCreateClosure)
 
-        updateJobResults(jobId, bulkResults, args.includes as List)
+        updateJobResults(jobId, results, args.includes as List)
 
         // return job
 
@@ -80,7 +81,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
     }
 
-    //FIXME implement
+    //FIXME #339 implement
     // J bulkCreatePromise(List<Map> dataList, Map args = [:]) {
     //
     //     Promise promise = task {
@@ -96,14 +97,14 @@ trait BulkableRepo<D, J extends JobTrait>  {
     // }
 
 
-    List<BulkableResult> doBulkCreateTrx(List<Map> dataList, Map args = [:]){
+    BulkableResult.Results doBulkCreateTrx(List<Map> dataList, Map args = [:]){
         trxService.withTrx {
             doBulkCreate(dataList, args)
         }
     }
 
-    List<BulkableResult> doBulkCreate(List<Map> dataList, Map args = [:]){
-        List<BulkableResult> resultList = [] as List<BulkableResult>
+    BulkableResult.Results doBulkCreate(List<Map> dataList, Map args = [:]){
+        def results = new BulkableResult.Results()
         for (Map item : dataList) {
             Map itmCopy
             D entityInstance
@@ -112,48 +113,24 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 itmCopy = Maps.deepCopy(item)
                 entityInstance = doCreate(item, args)
-                r = BulkableResult.of(entityInstance)
+                BulkableResult.of(entityInstance, 201).addTo(results)
             } catch(Exception e) {
                 def apiError = ApiErrorHandler.handleException(getEntityClass(), e)
-                r = BulkableResult.of(apiError, itmCopy)
+                BulkableResult.of(apiError, itmCopy).addTo(results)
             }
-            resultList.add r
         }
-        return resultList
+        return results
     }
 
-    void updateJobResults(Long jobId, List<BulkableResult> bulkResults, List includes){
-        List<Map> jsonResults = transformResults(bulkResults, includes as List)
+    void updateJobResults(Long jobId, BulkableResult.Results results, List includes){
+        List<Map> jsonResults = results.transform {
+            //successful result would have entity, use the includes list to prepare result object
+            def data = entityMapService.createEntityMap(it.entityObject, includes?:['id']) as Map<String, Object>
+            return [id: data['id'], data: data]
+        }
         byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
-        // FIXME dont do any, it spins back through the list to find the ok=false. spin through 1 time only.
-        boolean ok = !(bulkResults.any({ it.ok == false}))
-        jobRepo.update([id:jobId, ok: ok, results: resultBytes, state: JobState.Finished], [flush: true])
+
+        jobRepo.update([id:jobId, ok: results.ok, results: resultBytes, state: JobState.Finished], [flush: true])
     }
 
-    /**
-     * Processes Results of bulkcreate and processes list of maps which can be converted to json and set on job.results
-     *
-     * @param results List<Results?
-     * @param includes - List of fields to include in json response for successful records.
-     *        this is `bulk` fields configured in restapi-config.yml and passed down by RestRepositoryApi
-     * @return //FIXME #339 codenarxc will fail on empty return docs
-     */
-    private List<Map> transformResults(List<BulkableResult> results, List includes = []) {
-        List<Map> ret = []
-        for (BulkableResult r : results) {
-            Map<String, Object> m
-            if (r.ok) {
-                //successful result would have entity, use the includes list to prepare result object
-                m =  [id: r.entity['id'], ok: true] as Map<String, Object>
-                if(includes) m << entityMapService.createEntityMap(r.entity, includes) as Map<String, Object>
-            } else {
-                //failed result would have original incoming map, return it as it is
-                m = [ok: false] as Map<String, Object>
-                m["data"] = r.requestData //set original incoming data map
-                m["error"] = r.error
-            }
-            ret << m
-        }
-        return ret
-    }
 }

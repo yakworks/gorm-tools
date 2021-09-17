@@ -17,7 +17,7 @@ class Nested implements RepoEntity<Nested> {
     static belongsTo = [Project]
 
     static constraints = {
-        name blank: true, nullable: true, examole: "test"
+        name blank: false, nullable: false, examole: "test"
         value nullable: true, example: new BigDecimal(123)
     }
 }

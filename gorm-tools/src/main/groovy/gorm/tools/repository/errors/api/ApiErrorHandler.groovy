@@ -17,7 +17,6 @@ import gorm.tools.repository.RepoMessage
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.support.MsgService
 import grails.validation.ValidationException
 

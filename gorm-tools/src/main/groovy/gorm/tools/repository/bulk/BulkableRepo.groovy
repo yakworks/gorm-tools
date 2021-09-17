@@ -58,9 +58,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
      */
     J bulkCreate(List<Map> dataList, Map args = [:]) {
 
-        //FIXME #339 make a conrete create method that we can pass this stuff too
-        // rename
-        J job = (J) jobRepo.create([source: args.source, state: JobState.Running, dataPayload: dataList], [flush:true])
+        J job = (J) jobRepo.create(args.source as String, args.sourceId as String, dataList, [flush:true])
 
         //keep the jobId around
         Long jobId = job.id
@@ -76,7 +74,6 @@ trait BulkableRepo<D, J extends JobTrait>  {
         updateJobResults(jobId, results, args.includes as List)
 
         // return job
-
         return (J) jobRepo.get(jobId)
 
     }
@@ -125,8 +122,13 @@ trait BulkableRepo<D, J extends JobTrait>  {
     void updateJobResults(Long jobId, BulkableResult.Results results, List includes){
         List<Map> jsonResults = results.transform {
             //successful result would have entity, use the includes list to prepare result object
-            def data = entityMapService.createEntityMap(it.entityObject, includes?:['id']) as Map<String, Object>
-            return [id: data['id'], data: data]
+            if(it.ok) {
+                def data = entityMapService.createEntityMap(it.entityObject, includes ?: ['id']) as Map<String, Object>
+                return [id: data['id'], data: data]
+            } else {
+                //its a failures, there would be no entityObject
+                return [:]
+            }
         }
         byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
 

@@ -8,30 +8,15 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.json.Jsonify
 import gorm.tools.repository.GormRepo
+import yakworks.commons.lang.Validate
 
 
 @CompileStatic
 trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
 
-    /**
-     * Assigns data bytes array with json if passed in as 'dataPayload'
-     * @param data data map
-     * @return Job created job
-     */
-    D createJob(Map data) {
-        def dataPayload = data.remove('dataPayload')
-        D job = (D) getEntityClass().newInstance(data)
-
-        // must be Job called from RestApi that is passing in dataPayload
-        if (dataPayload) {
-            if(dataPayload instanceof Map) {
-                def res = Jsonify.render(dataPayload)
-                job.data = res.jsonText.bytes
-            } else {
-                def bytes = dataPayload.toString().bytes
-                job.data = bytes
-            }
-        }
-        return job
+    D create(String source, String sourceId, def payload, Map args = [:]) {
+        Validate.notNull(payload)
+        byte[] data = Jsonify.render(payload).jsonText.bytes
+        return create([source: source, sourceId: sourceId, state: JobState.Running, data: data], args)
     }
 }

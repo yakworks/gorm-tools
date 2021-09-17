@@ -11,7 +11,7 @@ import yakworks.testify.model.Address
 
 @Integration
 @Rollback
-class BulkableRepoSpec extends Specification {
+class BulkableRepoIntegrationSpec extends Specification {
 
     void "test bulk create"() {
         given:

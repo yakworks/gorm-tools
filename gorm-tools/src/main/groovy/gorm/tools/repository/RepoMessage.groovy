@@ -30,6 +30,10 @@ class RepoMessage {
         return new MsgKey("validation.error", [entityName], "$entityName validation errors")
     }
 
+    static MsgSourceResolvable validationError(String entityName) {
+        return new MsgKey("validation.error", [entityName], "$entityName validation errors")
+    }
+
     static MsgSourceResolvable notSaved(Object entity) {
         String entityName = entity.class.simpleName
         return new MsgKey("persist.error", [entityName], "$entityName save failed")

@@ -20,9 +20,9 @@ class GparsRepoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<
 
     @Override
     def execute() {
-        asyncSupport.parallel(cities) { List<Map> list, Map args ->
+        asyncSupport.parallel(cities) { List<Map> list->
             repo.batchTrx(list) { Map item ->
-                repo.doCreate(item, args)
+                repo.doCreate(item, [:])
             }
             //entityClass.repository.create( row, [validate:validate, dataBinder:dataBinder ])
             //repository.create(row)

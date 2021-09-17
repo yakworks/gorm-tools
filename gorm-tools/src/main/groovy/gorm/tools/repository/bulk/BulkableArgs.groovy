@@ -4,6 +4,9 @@
 */
 package gorm.tools.repository.bulk
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class BulkableArgs {
     /**
      * what to set the job.source to

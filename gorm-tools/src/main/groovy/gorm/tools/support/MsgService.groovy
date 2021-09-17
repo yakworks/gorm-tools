@@ -101,10 +101,8 @@ class MsgService {
 
     /**
      * static cheater if in context where can't inject service
-     * @param msr
-     * @return
      */
     static String get(MessageSourceResolvable msr) {
-        AppCtx.ctx.getMessage(msr, LocaleContextHolder.getLocale())
+        AppCtx.get('msgService', this).getMessage(msr)
     }
 }

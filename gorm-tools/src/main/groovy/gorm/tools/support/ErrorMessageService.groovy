@@ -13,7 +13,6 @@ import groovy.transform.CompileDynamic
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.MessageSource
 
-import gorm.tools.repository.RepoMessage
 import grails.validation.ValidationException
 import yakworks.commons.lang.NameUtils
 

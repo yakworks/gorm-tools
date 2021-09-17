@@ -1,5 +1,7 @@
 package gpbench.benchmarks
 
+import groovy.transform.CompileDynamic
+
 import gorm.tools.async.AsyncSupport
 import gorm.tools.repository.RepoUtil
 import gpbench.basic.CityBasic
@@ -7,7 +9,6 @@ import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
-import groovy.transform.CompileDynamic
 
 //@CompileStatic
 abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {

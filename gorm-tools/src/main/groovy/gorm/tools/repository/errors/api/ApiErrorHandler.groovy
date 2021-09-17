@@ -14,8 +14,10 @@ import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.RepoMessage
+import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.support.MsgService
 import grails.validation.ValidationException
 
@@ -30,8 +32,16 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 @CompileStatic
 class ApiErrorHandler {
 
-    //FIXME #339 javadoc thisgw clean
+    static ApiError handleException(Exception e) {
+        handleException("Entity", e)
+    }
+
     static ApiError handleException(Class entityClass, Exception e) {
+        handleException(entityClass.simpleName, e)
+    }
+
+    //FIXME #339 javadoc thisgw clean
+    static ApiError handleException(String entityName, Exception e) {
         // default error status code is 422
         HttpStatus status = UNPROCESSABLE_ENTITY
 
@@ -39,11 +49,17 @@ class ApiErrorHandler {
             return new ApiError(NOT_FOUND, getMsg(e))
         }
         else if (e instanceof EntityValidationException) {
-            return new ApiError(status, getMsg(e)).errors(toFieldErrorList(e.errors))
+            String detail
+            if(e.errors instanceof EmptyErrors){
+                //this is some other exception wrapped in validation exception
+                detail = e.cause?.message
+            }
+            return new ApiError(status, getMsg(e), detail).errors(toFieldErrorList(e.errors))
+
         }
         else if (e instanceof ValidationException) {
             // grails has a ValidationException, so does gorm
-            def msg = getMsg(RepoMessage.validationError(entityClass))
+            def msg = getMsg(RepoMessage.validationError(entityName))
             return new ApiError(status, msg).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof MessageSourceResolvable) {

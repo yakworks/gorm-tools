@@ -36,7 +36,7 @@ class DataSetup implements BenchConfig {
     }
 
     void insert(List<List<Map>> batchList, GormRepo repo) {
-        asyncSupport.parallel(batchList) { List<Map> list, Map args ->
+        asyncSupport.parallel(batchList) { List<Map> list ->
             repo.batchCreate(list)
         }
     }

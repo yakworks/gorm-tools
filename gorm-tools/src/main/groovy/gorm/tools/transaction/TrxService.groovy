@@ -4,30 +4,53 @@
 */
 package gorm.tools.transaction
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SimpleType
 
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.internal.RuntimeSupport
+import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
+import org.grails.datastore.mapping.transactions.TransactionCapableDatastore
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
-import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.TransactionDefinition
 
 import grails.gorm.transactions.GrailsTransactionTemplate
-import grails.gorm.transactions.NotTransactional
-import grails.gorm.transactions.Transactional
 
 /**
  * A generic way to wrap transaction with closures. Used in the WithTrx trait.
+ * Work on same principal as @Transactional annotation.
+ * Doesn't require a domain to use the closure
+ * and uses CustomizableRollbackTransactionAttribute which rollsback on any error
+ * where the domain.withTransaction uses DefaultTransactionDefinition
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 7.x
  */
-@Transactional // this adds the getTransactionManager()
 @CompileStatic
 class TrxService {
 
-    //dynamic wrapper so that static compile warnings dont show
-    @CompileDynamic
-    @NotTransactional
-    PlatformTransactionManager getTrxManager() {
-        return this.getTransactionManager() // <- this is added by the @Transactional
+    PlatformTransactionManager transactionManager
+    Datastore targetDatastore
+
+    PlatformTransactionManager getTransactionManager() {
+        return this.transactionManager != null ? this.transactionManager : GormEnhancer.findSingleTransactionManager()
+    }
+
+    @Autowired(required = false)
+    void setTargetDatastore(Datastore... datastores) {
+        Datastore defds = RuntimeSupport.findDefaultDatastore(datastores)
+        this.targetDatastore = defds
+        if (defds != null) {
+            this.transactionManager = ((TransactionCapableDatastore) defds).transactionManager
+        }
+    }
+
+    protected Datastore getTargetDatastore() {
+        return this.targetDatastore != null ? this.targetDatastore : GormEnhancer.findSingleDatastore()
     }
 
     /**
@@ -36,12 +59,72 @@ class TrxService {
      * @param callable The callable The callable
      * @return The result of the callable
      */
-    @NotTransactional //marked as NotTransactional because it does it it self
-    def <T> T withTrx(@ClosureParams(value = SimpleType,
-                    options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
-        GrailsTransactionTemplate transTemplate = new GrailsTransactionTemplate(this.getTrxManager())
-        transTemplate.execute { TransactionStatus transactionStatus ->
-            return callable.call(transactionStatus)
+    public <T> T withTrx(@ClosureParams(value = SimpleType, options = "org.springframework.transaction.support.DefaultTransactionStatus") Closure<T> callable) {
+
+        def tranDef = new CustomizableRollbackTransactionAttribute()
+        withTrx(tranDef, callable)
+
+    }
+
+    /**
+     * Executes the closure within the context of a transaction for the given {@link org.springframework.transaction.TransactionDefinition}
+     *
+     * @param callable The closure to call
+     * @return The result of the closure execution
+     */
+    public <T> T withTrx(Map transactionProperties,
+                         @ClosureParams(value = SimpleType, options = "org.springframework.transaction.support.DefaultTransactionStatus") Closure<T> callable) {
+
+        def tranDef = new CustomizableRollbackTransactionAttribute()
+        transactionProperties.each { k, v ->
+            try {
+                tranDef[k as String] = v
+            } catch (MissingPropertyException mpe) {
+                throw new IllegalArgumentException("[${k}] is not a valid transaction property.")
+            }
         }
+
+        withTrx(tranDef, callable)
+    }
+
+    /**
+     * Executes the closure within the context of a transaction for the given {@link org.springframework.transaction.TransactionDefinition}
+     *
+     * @param callable The closure to call
+     * @return The result of the closure execution
+     */
+    public <T> T withTrx(TransactionDefinition definition,
+                         @ClosureParams(value = SimpleType, options = "org.springframework.transaction.support.DefaultTransactionStatus") Closure<T> callable) {
+
+        if (!callable) {
+            return
+        }
+
+        new GrailsTransactionTemplate(getTransactionManager(), definition).execute(callable)
+    }
+
+    /**
+     * Conditionally Executes the closure within the context of a transaction
+     * Make its easier to reason about in flow when the transactional wrapper is optional
+     *
+     * @param isTransactional whether its transactional or not
+     * @param callable The closure to call
+     * @return The result of the closure execution
+     */
+    public <T> T withOptionalTrx(boolean isTransactional,
+                         @ClosureParams(value = SimpleType, options = "org.springframework.transaction.support.DefaultTransactionStatus") Closure<T> callable) {
+
+        if (!callable) {
+            return
+        }
+        if(isTransactional){
+            withTrx(callable)
+        } else{
+            return callable.call(null)
+        }
+    }
+
+    public <T> T withSession(Closure<T> callable){
+        getTargetDatastore().withSession callable
     }
 }

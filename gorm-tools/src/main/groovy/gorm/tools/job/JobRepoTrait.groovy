@@ -8,15 +8,21 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.json.Jsonify
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.bulk.BulkableResults
 import yakworks.commons.lang.Validate
 
 
 @CompileStatic
 trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
 
-    D create(String source, String sourceId, def payload, Map args = [:]) {
+    D create(String source, String sourceId, def payload) {
         Validate.notNull(payload)
         byte[] data = Jsonify.render(payload).jsonText.bytes
-        return create([source: source, sourceId: sourceId, state: JobState.Running, data: data], args)
+        return create([source: source, sourceId: sourceId, state: JobState.Running, data: data], [flush:true])
+    }
+
+    D update(Long id, JobState state, BulkableResults results, List<Map> renderResults) {
+        byte[] resultBytes = Jsonify.render(renderResults).jsonText.bytes
+        return update([id:id, ok: results.ok, results: resultBytes, state: state], [flush: true])
     }
 }

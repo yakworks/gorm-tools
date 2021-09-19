@@ -50,6 +50,8 @@ trait AsyncSupport implements WithTrx {
      * @param args _optional_ arg map to be passed to the async engine such as gpars.
      *     - poolSize : gets passed down into the GParsPool.withPool for example
      *     - asyncEnabled : forces async to true of false regardless of what the class val is, useful for testing
+     *     - transactional : if true then it wraps the closure in a transaction
+     *     - session : if true then wraps closure in a session
      * @param collection the collection to iterate process
      * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
@@ -64,6 +66,8 @@ trait AsyncSupport implements WithTrx {
      *
      * @param args _optional_ arg map to be passed to the async engine such as gpars.
      *     - batchSize : the size of the lists when collated or sliced into chunks
+     *     - transactional : if true then it wraps the closure in a transaction
+     *     - session : if true then wraps closure in a session
      * @param collection the items list to slice into chunks
      * @param chunkClosure the closure to call for each collated slice of data. will get passed the List for processing
      */
@@ -78,6 +82,8 @@ trait AsyncSupport implements WithTrx {
      * @param args _optional_ arg map to be passed to the async engine such as gpars.
      *     can also add any other value and they will be passed down through the closure as well <br>
      *     - poolSize : gets passed down into the GParsPool.withPool for example
+     *     - transactional : if true then it wraps the closure in a transaction
+     *     - session : if true then wraps closure in a session
      * @param collection the collection to iterate process
      * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */

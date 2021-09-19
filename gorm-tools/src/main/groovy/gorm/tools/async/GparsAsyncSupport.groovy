@@ -41,7 +41,7 @@ class GparsAsyncSupport implements AsyncSupport {
 
     @Override
     void parallel(Map args, Collection collection, Closure closure) {
-
+        boolean transactional = args.transactional as Boolean
         boolean gparsEnabled = args.asyncEnabled as Boolean ? args.asyncEnabled as Boolean : getAsyncEnabled()
 
         if (gparsEnabled) {

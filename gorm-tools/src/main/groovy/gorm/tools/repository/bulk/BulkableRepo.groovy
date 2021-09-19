@@ -14,10 +14,11 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobState
 import gorm.tools.job.JobTrait
-import gorm.tools.json.Jsonify
 import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.transaction.TrxService
 import yakworks.commons.map.Maps
+
+import static gorm.tools.repository.bulk.BulkableResults.Result
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -49,7 +50,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @param dataList the list of data maps to create
      * @param args args to pass to doCreate. It can have:
      *      source -  what to set the job.source to
-     *      includes - for result, list of fields to include for the created or updated entity
+     *      includes - for successful result, list of fields to include for the created or updated entity
      *      errorThreshold - (default: false) number of errors before it stops the job. this setting ignored if transactional=true
      *      transactional - (default: false) if true then the whole set should be in a transaction. disables parallelProcessing.
      *          will disable parallelProcessing
@@ -58,12 +59,12 @@ trait BulkableRepo<D, J extends JobTrait>  {
      */
     J bulkCreate(List<Map> dataList, Map args = [:]) {
 
-        J job = (J) jobRepo.create(args.source as String, args.sourceId as String, dataList, [flush:true])
+        J job = (J) jobRepo.create(args.source as String, args.sourceId as String, dataList)
 
         //keep the jobId around
         Long jobId = job.id
 
-        def results = new BulkableResult.Results()
+        def results = new BulkableResults()
 
         Closure bulkCreateClosure = { List<Map> dataChunk ->
             results.merge doBulkCreateTrx(dataChunk, args)
@@ -71,7 +72,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
         asyncSupport.parallelChunks(dataList, bulkCreateClosure)
 
-        updateJobResults(jobId, results, args.includes as List)
+        finishJob(jobId, results, args.includes as List)
 
         // return job
         return (J) jobRepo.get(jobId)
@@ -94,45 +95,54 @@ trait BulkableRepo<D, J extends JobTrait>  {
     // }
 
 
-    BulkableResult.Results doBulkCreateTrx(List<Map> dataList, Map args = [:]){
+    BulkableResults doBulkCreateTrx(List<Map> dataList, Map args = [:]){
         trxService.withTrx {
             doBulkCreate(dataList, args)
         }
     }
 
-    BulkableResult.Results doBulkCreate(List<Map> dataList, Map args = [:]){
-        def results = new BulkableResult.Results()
+    BulkableResults doBulkCreate(List<Map> dataList, Map args = [:]){
+        def results = new BulkableResults(false)
         for (Map item : dataList) {
             Map itmCopy
             D entityInstance
-            BulkableResult r
+            BulkableResults r
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 itmCopy = Maps.deepCopy(item)
                 entityInstance = doCreate(item, args)
-                BulkableResult.of(entityInstance, 201).addTo(results)
+                Result.of(entityInstance, 201).addTo(results)
             } catch(Exception e) {
                 def apiError = ApiErrorHandler.handleException(getEntityClass(), e)
-                BulkableResult.of(apiError, itmCopy).addTo(results)
+                Result.of(apiError, itmCopy).addTo(results)
             }
         }
         return results
     }
 
-    void updateJobResults(Long jobId, BulkableResult.Results results, List includes){
-        List<Map> jsonResults = results.transform {
-            //successful result would have entity, use the includes list to prepare result object
-            if(it.ok) {
-                def data = entityMapService.createEntityMap(it.entityObject, includes ?: ['id']) as Map<String, Object>
-                return [id: data['id'], data: data]
-            } else {
-                //its a failures, there would be no entityObject
-                return [:]
-            }
-        }
-        byte[] resultBytes = Jsonify.render(jsonResults).jsonText.bytes
+    J finishJob(Long jobId, BulkableResults results, List includes){
+        List<Map> jsonResults = transformResults(results, includes?:['id'])
+        jobRepo.update(jobId, JobState.Finished, results, jsonResults)
+    }
 
-        jobRepo.update([id:jobId, ok: results.ok, results: resultBytes, state: JobState.Finished], [flush: true])
+    /**
+     * transforms the BulkableResults to a list of maps that can be serialzied or rendered
+     *
+     * @param results the BulkableResults
+     * @param includes if results are successfull then this is the entity inlcludes on what fields to serialize
+     * @return the transformed list of data maps
+     */
+    List<Map> transformResults(BulkableResults results, List includes){
+        // the transform closure will run for each enty in results list
+        List<Map> jsonResults = results.transform(includes){  result ->
+            result = result as BulkableResults.Result //compiler is getting confused on type
+            //successful result would have entity, use the includes list to prepare result object
+            if(result.ok) {
+                def data = entityMapService.createEntityMap(result.entityObject, includes) as Map<String, Object>
+                return [id: data['id'], data: data]
+            }
+            return [:]
+        }
     }
 
 }

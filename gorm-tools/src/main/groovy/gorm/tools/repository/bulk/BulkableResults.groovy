@@ -14,13 +14,15 @@ import groovy.transform.stc.SimpleType
 import org.springframework.http.HttpStatus
 
 import gorm.tools.repository.errors.api.ApiError
-
-/*
+/**
+ * Bulkable result for a single entity
+ * Think of this as the result of a post or put on and entity
+ *
 
 {
   "id": 123,
-  "state": "success",
-  "results": [
+  "state": "finished", //from job
+  "data": [
     {
       "ok": true,
       "status": 201, //created
@@ -43,46 +45,7 @@ import gorm.tools.repository.errors.api.ApiError
   ]
 }
  */
-/**
- * Bulkable result for a single entity
- * Think of this as the result of a post or put on and entity
- *
 
-
- {
-    ok: false,
-    requestData: {... the data that was sent }
-    error: {
-        status: 422,
-        title: Org Validation Error
-        errors: [ array of ApiFieldError ]
-    }
- }
- *     ]}
- * }
- *
- *     results: {[
- *       {
- *         ok: true,
- entity: {
- "id": 356312,
- "num": "78987",
- "org": {
- "source": {
- "sourceId": "JOANNA75764-US123"
- }
- }
- },
- {
- ok: false,
- data: {... the data that was sent }
- error: {
- status: 422,
- title: Org Validation Error
- errors: [ array of ApiFieldError ]
- }
- }
- */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class BulkableResult {
@@ -166,7 +129,8 @@ class BulkableResult {
                     ])
                 }
                 //run the customizer closure
-                map.putAll customizer(r)
+                Map customizerResults = customizer(r)
+                if(customizerResults) map.putAll customizerResults
                 ret << map
             }
             return ret

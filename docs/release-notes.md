@@ -1,3 +1,17 @@
+### v7.0.8-v.25
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25)
+- #339 Bulkable tests (#343) [link](https://github.com/yakworks/gorm-tools/commit/0434020ca2449e809a106bb83c1ee0c1e63d7a34)
+- Trx service (#342) [link](https://github.com/yakworks/gorm-tools/commit/17fce5de03864d734b4bebe798b1a1d87cd90876)
+- FIXME comments for #339 (#340) [link](https://github.com/yakworks/gorm-tools/commit/5e75637b86b07c7d932511165edbac1905dba44c)
+
+### v7.0.8-v.25
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25)
+- #339 Bulkable tests (#343) [link](https://github.com/yakworks/gorm-tools/commit/0434020ca2449e809a106bb83c1ee0c1e63d7a34)
+- Trx service (#342) [link](https://github.com/yakworks/gorm-tools/commit/17fce5de03864d734b4bebe798b1a1d87cd90876)
+- FIXME comments for #339 (#340) [link](https://github.com/yakworks/gorm-tools/commit/5e75637b86b07c7d932511165edbac1905dba44c)
+
 ### v7.0.8-v.24
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.23...v7.0.8-v.24)

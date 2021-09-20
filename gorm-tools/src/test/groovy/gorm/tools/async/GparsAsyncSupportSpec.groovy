@@ -55,7 +55,7 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
         def slicedList = asyncSupport.slice(list, 10)
         assert slicedList.size() == 10
 
-        asyncSupport.parallel(slicedList) { List batch ->
+        asyncSupport.eachParallel(slicedList) { List batch ->
             count.addAndGet(batch.size())
         }
 

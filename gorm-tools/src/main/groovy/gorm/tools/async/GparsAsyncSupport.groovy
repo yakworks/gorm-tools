@@ -42,13 +42,15 @@ class GparsAsyncSupport implements AsyncSupport, ConfigAware {
                                           @ClosureParams(SecondParam.FirstGenericType) Closure closure){
         boolean gparsEnabled = args.asyncEnabled != null ? args.asyncEnabled : getAsyncEnabled()
 
+        Closure wrappedClosure = wrapSessionOrTransaction(args, closure)
+
         if (gparsEnabled) {
             int psize = args.poolSize ?: getPoolSize()
             withPool(psize) {
-                GParsPoolUtil.eachParallel(collection, closure)
+                GParsPoolUtil.eachParallel(collection, wrappedClosure)
             }
         } else {
-            collection.each(closure)
+            collection.each(wrappedClosure)
         }
 
         return collection

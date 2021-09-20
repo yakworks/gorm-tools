@@ -30,7 +30,7 @@ class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
             updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
 
-        asyncSupport.parallel(AsyncArgs.transactional(), batches, sliceClosure)
+        asyncSupport.eachParallel(AsyncArgs.transactional(), batches, sliceClosure)
     }
 
     @CompileDynamic

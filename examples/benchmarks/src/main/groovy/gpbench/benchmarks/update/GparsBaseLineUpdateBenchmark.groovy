@@ -27,7 +27,7 @@ class GparsBaseLineUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
         def sliceClosure = asyncSupport.sliceClosure { Long id ->
             updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
-        asyncSupport.parallel(AsyncArgs.transactional(), cities, sliceClosure)
+        asyncSupport.eachParallel(AsyncArgs.transactional(), cities, sliceClosure)
     }
 
 

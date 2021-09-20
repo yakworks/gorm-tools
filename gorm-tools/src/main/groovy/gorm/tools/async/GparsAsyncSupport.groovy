@@ -38,8 +38,7 @@ class GparsAsyncSupport implements AsyncSupport, ConfigAware {
 
 
     @Override
-    public <T> Collection<T> eachParallel(AsyncArgs args, Collection<T> collection,
-                                          @ClosureParams(SecondParam.FirstGenericType) Closure closure){
+    public <T> Collection<T> eachParallel(AsyncArgs args, Collection<T> collection, Closure closure){
         boolean gparsEnabled = args.asyncEnabled != null ? args.asyncEnabled : getAsyncEnabled()
 
         Closure wrappedClosure = wrapSessionOrTransaction(args, closure)

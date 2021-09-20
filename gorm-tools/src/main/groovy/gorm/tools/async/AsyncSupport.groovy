@@ -64,12 +64,10 @@ trait AsyncSupport implements WithTrx {
      * @param asyncArgs the collection to iterate process
      * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    abstract <T> Collection<T> eachParallel(AsyncArgs asyncArgs, Collection<T> collection,
-                                            @ClosureParams(SecondParam.FirstGenericType) Closure closure)
+    abstract <T> Collection<T> eachParallel(AsyncArgs asyncArgs, Collection<T> collection, Closure closure)
 
 
-    public <T> Collection<T> eachParallel(Collection<T> collection,
-                                          @ClosureParams(SecondParam.FirstGenericType) Closure closure){
+    public <T> Collection<T> eachParallel(Collection<T> collection, Closure closure){
         eachParallel(new AsyncArgs(), collection, closure)
     }
 

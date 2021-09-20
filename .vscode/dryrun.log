@@ -1,0 +1,12 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/Users/basejump/github/yak/gorm-tools'
+ 
+_=/usr/local/bin/awk
+awk -f /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/help.awk build/shipkit/Shipkit.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-flags.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/env-goals.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make build/make/makefile0.env /Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/spring-common.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kubectl-config.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kube.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make /Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/ship-gh-pages.make Makefile
+printf "\n\e[4mCommon Variables:\n\e[0m"
+printf "\e[1;36m VERBOSE=true                 \e[0m| show logit.debug in build/make/shikit.log and shows target output on console \n"
+printf "\e[1;36m dry_run=true                 \e[0m| setting this to true will stop certain deployment commands from pushing, such as kubectl and docker \n"
+printf "\e[1;36m env=<file.env> or <file.sh>  \e[0m| loads custom variables in from .env file or source 'imports' a custom bash .sh script \n"
+printf "\n"
+make: Leaving directory '/Users/basejump/github/yak/gorm-tools'
+ 

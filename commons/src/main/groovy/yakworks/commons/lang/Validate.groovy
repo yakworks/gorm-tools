@@ -21,8 +21,8 @@ class Validate {
      * Validate that the specified argument is no {@code null}
      *
      * @param obj the object to validate
-     * @param message  the message to use to populate default message, if the string is wrapped in [ ] then its
-     *   build the message with the descriptor
+     * @param message  the message to use to populate default message, if the string is wrapped in [ ] then it
+     *   builds the default message with the descriptor
      * @return the validated obj (never {@code null} method for chaining)
      * @throws IllegalArgumentException
      */

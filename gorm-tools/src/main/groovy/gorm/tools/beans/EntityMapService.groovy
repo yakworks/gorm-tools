@@ -27,6 +27,11 @@ import grails.plugin.cache.Cacheable
 @CompileStatic
 class EntityMapService {
 
+    //static cheater to get the bean, use sparingly if at all
+    static EntityMapService getBean(){
+        AppCtx.get('entityMapService', this)
+    }
+
     /**
      * Holds the list of fields that have display:false for a class, meaning they should not be exported
      */

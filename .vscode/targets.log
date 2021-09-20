@@ -1,0 +1,1649 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+ 
+# GNU Make 4.3
+# Built for x86_64-apple-darwin18.7.0
+# Copyright (C) 1988-2020 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+
+# Make data base, printed on Sun Sep 19 18:42:58 2021
+
+# Variables
+
+# environment
+JAVA_HOME = /Users/basejump/.sdkman/candidates/java/current
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 39)
+SHIPKIT_INSTALLS = $(abspath $(BUILD_DIR)/installs)
+# environment
+LC_ALL = C
+# environment
+SDKMAN_PLATFORM = DarwinX64
+# makefile (from 'build/make/makefile0.env', line 30)
+PROJECT_NAME = gorm-tools
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 138)
+_finished = printf '$(cgreen)✔︎ $@ finished $(creset)\n'
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 127)
+cmagenta = \e[35m
+# environment
+TMPDIR = /var/folders/v2/v1xbmr0j5ml2q_4vdrv_wzs40000gn/T/
+# environment
+XPC_SERVICE_NAME = com.apple.xpc.launchd.oneshot.0x10000003.Electron
+# environment
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/v2/v1xbmr0j5ml2q_4vdrv_wzs40000gn/T/vscode-ipc-72631f2f-c4ba-41d5-8a13-ea82aa7f1ecd.sock
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 7)
+gradle_tools := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/gradle_tools
+# makefile (from 'build/shipkit/Shipkit.make', line 3)
+SHIPKIT_BIN := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin
+# environment
+VSCODE_CWD = /
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 119)
+creset = \e[0m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 132)
+cblueB = \e[1;34m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-flags.make', line 12)
+VERBOSE = false
+# environment
+ARTIFACTORY_USER = 9cibot
+# makefile (from 'build/make/makefile0.env', line 17)
+APP_DOCKER_SRC = ./deploy/docker
+# makefile (from 'build/make/makefile0.env', line 25)
+VAULT_URL = https://github.com/9ci/vault.git
+# default
+MAKE_COMMAND := make
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 143)
+logr.done = printf '$(cgreen)✔︎ [$@] finished %s $(creset)\n'
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 124)
+cgreen = \e[32m
+# environment
+GOPATH = /Users/basejump/go
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# makefile (from 'build/make/makefile0.env', line 18)
+APP_DOCKER_URL = yakworks/gorm-tools:restify 
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 41)
+HELP_AWK := /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/help.awk
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+.VARIABLES := 
+# environment
+COMMAND_MODE = unix2003
+# environment
+PWD = /Users/basejump/github/yak/gorm-tools
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# makefile (from 'build/make/makefile0.env', line 27)
+RELEASE_BRANCH_REGEX = master|release/.+
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 58)
+APP_COMPOSE_CLEAN_FLAGS = --volumes --remove-orphans
+# makefile (from 'build/make/makefile0.env', line 7)
+BUILD_VERSION = 7.0.8-v.25
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 177)
+DOWNLOAD_FLAGS := 
+# environment
+VSCODE_LOG_STACK = false
+# automatic
+%F = $(notdir $%)
+# environment
+VSCODE_CODE_CACHE_PATH = /Users/basejump/Library/Application Support/Code/CachedData/e7d7e9a9348e6a8cc8c03f877d39cb72e5dfb1ff
+# environment
+LANG = C
+# default
+.LOADED := 
+# makefile (from 'build/make/makefile0.env', line 26)
+RELEASE_CHANGELOG = docs/release-notes.md
+# default
+.INCLUDE_DIRS = /usr/local/Cellar/make/4.3/include /usr/local/include
+# environment
+__CF_USER_TEXT_ENCODING = 0x1F5:0x0:0x0
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 220)
+OS_NAME := Darwin
+# makefile
+MAKEFLAGS = pqrR --no-print-directory
+# environment
+KUBECONFIG = :/Users/basejump/.kube/config:/Users/basejump/.kube/configs/rancher-lke-kubeconfig.yml:/Users/basejump/.kube/configs/dev-barn-kubeconfig.yml
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make', line 5)
+GITHUB_BASE_URL = github.com/$(PROJECT_FULLNAME).git
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 6)
+semver := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/semver
+# makefile (from 'build/make/makefile0.env', line 15)
+APP_KEY = restify 
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 12)
+SHELL_VARS = VERBOSE_LOG BUILD_DIR MAKE_ENV_FILE DBMS env dry_run
+# makefile
+CURDIR := /Users/basejump/github/yak/gorm-tools
+# environment
+VSCODE_PIPE_LOGGING = true
+# makefile (from 'build/make/makefile0.env', line 8)
+FOO = bar
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 9)
+build_gradle = build.gradle
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 7)
+gw := ./gradlew
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+GROOVY_HOME = /Users/basejump/.sdkman/candidates/groovy/current
+# makefile (from 'build/make/makefile0.env', line 3)
+VERSION = 7.0.8-v.25
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 222)
+OS_CPU := amd64
+# makefile (from 'Makefile', line 48)
+PORT = 8080
+# environment
+MFLAGS = -pqrR --no-print-directory
+# environment
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.q5iBfjObKs/Listeners
+# default
+.SHELLFLAGS := -c
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 8)
+GROOVYDOC_BUILD_DIR = $(BUILD_DIR)/docs/groovydoc
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# makefile (from 'build/shipkit/Shipkit.make', line 4)
+SHIPKIT_MAKEFILES := /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 180)
+download = 	$(DOWNLOADER) $(DOWNLOAD_FLAGS) "$(1)" | $(2)
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 5)
+github.sh := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/github
+# environment
+ASANA_TOKEN = 0/afdc4bd849b88ffaaefb821c755cc41d
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/ship-gh-pages.make', line 1)
+MAKEFILE_LIST := Makefile build/shipkit/Shipkit.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-flags.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/env-goals.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make build/make/makefile0.env /Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/spring-common.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kubectl-config.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kube.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make /U 
+sers/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make /Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make /Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/ship-gh-pages.make
+# automatic
+@F = $(notdir $@)
+# environment
+VSCODE_VERBOSE_LOGGING = true
+# environment
+VSCODE_PID = 295
+# environment
+SDKMAN_DIR = /Users/basejump/.sdkman
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 10)
+MAKE_ENV_FILE = $(BUILD_DIR)/make/makefile$(MAKELEVEL).env
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# makefile (from 'build/make/makefile0.env', line 6)
+VERSIONX_DOTLESS = v7-0-8-v-x
+# makefile (from 'build/make/makefile0.env', line 34)
+BUILD_VARS = BUILD_ENV VERSION PUBLISHED_VERSION VERSIONX VERSIONX_DOTLESS BUILD_VERSION FOO GPG_PASS  TITLE DESCRIPTION AUTHOR PROJECT_SUBPROJECTS APP_NAME APP_KEY APP_JAR APP_DOCKER_SRC APP_DOCKER_URL APP_KUBE_SRC APP_KUBE_NFS APP_KUBE_NAMESPACE APP_KUBE_INGRESS_URL BOT_EMAIL BOT_USER VAULT_URL RELEASE_CHANGELOG RELEASE_BRANCH_REGEX TEAM_DEVELOPERS PROJECT_FULLNAME PROJECT_NAME APP_DEPLOY_SRC PAGES_BUILD_DIR PAGES_BRANCH 
+# environment
+BASH_COMPLETION_COMPAT_DIR = /usr/local/etc/bash_completion.d
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 14)
+SHELL_EXPORTS :=  VERBOSE_LOG=''  BUILD_DIR='build'  MAKE_ENV_FILE='build/make/makefile0.env'  DBMS=''  env=''  dry_run=''
+# makefile (from 'build/make/makefile0.env', line 10)
+TITLE = Gorm Tools Grails Plugin
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 221)
+OS_ARCH := x86_64
+# automatic
+*F = $(notdir $*)
+# makefile (from 'build/make/makefile0.env', line 4)
+PUBLISHED_VERSION = 7.0.8-v.24
+# environment
+SDKMAN_VERSION = 5.11.0+644
+# makefile (from 'build/make/makefile0.env', line 9)
+GPG_PASS = bar
+# makefile (from 'build/make/makefile0.env', line 28)
+TEAM_DEVELOPERS = ['basejump: Joshua Burnett', 'snimavat: Sudhir Nimavat', 'alexeyzvegintcev: Alexey']
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 147)
+logr = printf '$(ccyan)$(LOG_PREFIX) %s $(creset)\n'
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 187)
+define download_tar
+	$(logr) "download and untar to $(2)"
+	install_dir=$(SHIPKIT_INSTALLS)/$(2)
+	mkdir -p $$install_dir
+	$(DOWNLOADER) $(DOWNLOAD_FLAGS) "$(1)" | tar zxf - -C $$install_dir --strip-components 1
+endef
+# makefile (from 'build/make/makefile0.env', line 11)
+DESCRIPTION = Plugin tools Grails/Gorm - repository data services, json query language, fast data binder
+# environment
+CIRCLE_TOKEN = accc4fcc4011c637070560ad5280c9469136f6dc
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# makefile (from 'build/make/makefile0.env', line 5)
+VERSIONX = 7.0.8-v.x
+# environment
+VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 10)
+VERSION_SET_SNAPSHOT = false
+# environment
+CLICOLOR = 1
+# default
+MAKE_HOST := x86_64-apple-darwin18.7.0
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 134)
+cmagentaB = \e[1;35m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-flags.make', line 3)
+SHELL := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/make_shell
+# environment
+GRGIT_USER = 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
+# default
+MAKECMDGOALS := all
+# makefile (from 'build/make/makefile0.env', line 19)
+APP_KUBE_SRC = ./deploy/kube
+# environment
+GITHUB_TOKEN = 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
+# environment
+SHLVL = 1
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 121)
+cbold = \e[1m
+# environment
+Apple_PubSub_Socket_Render = /private/tmp/com.apple.launchd.grkLkMNdtN/Render
+# environment
+MAKELEVEL := 0
+# default
+MAKE = $(MAKE_COMMAND)
+# makefile (from 'build/make/makefile0.env', line 29)
+PROJECT_FULLNAME = yakworks/gorm-tools
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/env-goals.make', line 12)
+dummy_targets = dev prod testenv
+# environment
+PATH = /Users/basejump/.sdkman/candidates/java/current/bin:/Users/basejump/.sdkman/candidates/groovy/current/bin:/Users/basejump/.sdkman/candidates/grails/current/bin:/Users/basejump/.sdkman/candidates/gradle/current/bin:/usr/local/opt/make/libexec/gnubin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/usr/local/MacGPG2/bin:/Users/basejump/go/bin:/usr/local/opt/go/libexec/bin
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 178)
+DOWNLOAD_TO_FLAGS := --write-out "%{http_code}" -o
+# default
+MAKEFILES := 
+# automatic
+^F = $(notdir $^)
+# makefile (from 'build/make/makefile0.env', line 20)
+APP_KUBE_NFS = 10.42.2.176
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 6)
+VAULT_DIR = $(BUILD_DIR)/vault
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 7)
+DOCKMARK_SITE_DIR = $(BUILD_DIR)/site
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 129)
+cyellow = \e[33m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 20)
+SH_RESULTS := 
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 8)
+JBUILDER_COMPOSE_CMD := JBUILDER_NAME=gorm-tools_jbuilder docker compose -p gorm-tools_jbuilder_servers -f ./jbuilder-compose.yml
+# environment
+KUBE_EDITOR = code --wait
+# environment
+SDKMAN_CANDIDATES_DIR = /Users/basejump/.sdkman/candidates
+# environment
+GOROOT = /usr/local/opt/go/libexec
+# environment
+GRADLE_HOME = /Users/basejump/.sdkman/candidates/gradle/current
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 155)
+logr.warn = printf '$(cyellow)$(LOG_PREFIX) %s $(creset)\n'
+# makefile (from 'build/make/makefile0.env', line 23)
+BOT_EMAIL = 9cibot@9ci.com
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 17)
+DOCKER_DEPLOY_SOURCES := ./deploy/docker/Dockerfile ./deploy/docker/docker-compose.yml ./deploy/docker/docker-entrypoint.sh ./deploy/docker/logback.groovy ./deploy/docker/utils.sh
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 104)
+uc = $(call _awk_case,toupper,$(1))
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 126)
+ccyan = \e[36m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 5)
+docmark.sh := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/docmark
+# environment
+VSCODE_LOG_NATIVE = false
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 6)
+JBUILDER_NAME := gorm-tools_jbuilder
+# makefile (from 'build/make/makefile0.env', line 16)
+APP_JAR = examples/restify/build/libs/restify-7.0.8-v.25.jar
+# makefile (from 'build/make/makefile0.env', line 32)
+PAGES_BUILD_DIR = build/gh-pages
+# environment
+ARTIFACTORY_PASSWORD = 999Pl4z4dr1ve
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 3)
+GIT_SECRET_SH = $(SHIPKIT_INSTALLS)/git-secret/git-secret
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 18)
+docker_verb_targets = up down shell pull
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kube.make', line 4)
+kube_tools := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/kube_tools
+# automatic
+?F = $(notdir $?)
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 117)
+LOG_PREFIX = -->
+# environment
+SECURITYSESSIONID = 186a8
+ 
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 203)
+download_to = 	$(DOWNLOADER) $(DOWNLOAD_TO_FLAGS) $(2) "$(1)"
+# automatic
++F = $(notdir $+)
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 5)
+GIT_SECRET_URL := https://github.com/sobolevn/git-secret/archive/refs/tags/v0.4.0.tar.gz
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 151)
+logr.info = printf '$(ccyan)$(LOG_PREFIX) %s $(creset)\n'
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 7)
+JBUILDER_COMPOSE_FILE = ./jbuilder-compose.yml
+# 'override' directive
+GNUMAKEFLAGS := 
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 133)
+ccyanB = \e[1;36m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 30)
+testArg := $(subst ,, )
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make', line 9)
+GITHUB_URL = https://dummy:$(GITHUB_TOKEN)@$(GITHUB_BASE_URL)
+# makefile (from 'build/shipkit/Shipkit.make', line 2)
+SHIPKIT_DIR := /Users/basejump/github/yak/gorm-tools/build/shipkit/
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 214)
+OS = 
+# environment
+LOGNAME = basejump
+# environment
+CPPFLAGS = -I/usr/local/opt/mysql-client/include
+# environment
+MAVEN_REPO_USER = 9cibot
+# environment
+XPC_FLAGS = 0x0
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-flags.make', line 6)
+.DEFAULT_GOAL := help
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 4)
+GIT_SECRET_VERSION := 0.4.0
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 4)
+BASHKIT_CORE = $(SHIPKIT_BIN)/core
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 8)
+build_docker_dir := build/docker
+# environment
+EDITOR = code --wait
+# environment
+USER = basejump
+# makefile (from 'build/make/makefile0.env', line 24)
+BOT_USER = 9cibot2
+# default
+MAKE_VERSION := 4.3
+# 'override' directive
+.SHELLSTATUS := 0
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 7)
+changelog := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/changelog
+# makefile (from 'build/make/makefile0.env', line 31)
+APP_DEPLOY_SRC = ./deploy
+# environment
+MAVEN_REPO_KEY = 999Pl4z4dr1ve
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 18)
+build.sh = $(SHIPKIT_BIN)/init_env
+# environment
+LDFLAGS = -L/usr/local/opt/mysql-client/lib
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 6)
+gradlew = ./gradlew
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 175)
+CURL_OPTS = --location --silent
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 197)
+define download_git
+	$(logr) "git clone to $(SHIPKIT_INSTALLS)/$(2)"
+	install_dir=$(SHIPKIT_INSTALLS)/$(2)
+	git clone $(1) $(SHIPKIT_INSTALLS)/$(2)
+endef
+# makefile (from 'build/make/makefile0.env', line 2)
+BUILD_ENV = dev
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 176)
+DOWNLOADER = curl $(CURL_OPTS)
+# environment
+_ = /usr/local/opt/make/libexec/gnubin/make
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 135)
+credB = \e[1;31m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 9)
+VERSION_FILENAME = version.properties
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 102)
+_awk_case = $(shell echo | awk '{ print $(1)("$(2)") }')
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 8)
+gradle_properties = gradle.properties
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/services/extensions/node/extensionHostProcess
+# makefile (from 'build/make/makefile0.env', line 22)
+APP_KUBE_INGRESS_URL = restify 
+# makefile (from 'build/make/makefile0.env', line 33)
+PAGES_BRANCH = gh-pages
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 7)
+BUILD_DIR = build
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 2)
+docker_tools := /Users/basejump/github/yak/gorm-tools/build/shipkit/bin/docker_tools
+# environment
+SDKMAN_CANDIDATES_API = https://api.sdkman.io/2
+# environment
+HOME = /Users/basejump
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 125)
+cblue = \e[34m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 123)
+culine = \e[4m
+# makefile (from 'build/make/makefile0.env', line 13)
+PROJECT_SUBPROJECTS = gorm-tools gorm-tools-rest gorm-tools-security rally-domain examples/restify examples/testify
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 159)
+logr.error = printf '$(credB)$(LOG_PREFIX) %s $(creset)\n'
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+VSCODE_IPC_HOOK = /Users/basejump/Library/Application Support/Code/1.60.0-main.sock
+# default
+.RECIPEPREFIX := 
+# automatic
+<F = $(notdir $<)
+# default
+SUFFIXES := 
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 56)
+APP_COMPOSE_FILE = $(build_docker_dir)/docker-compose.yml
+# makefile (from 'build/make/makefile0.env', line 21)
+APP_KUBE_NAMESPACE = yakworks
+# environment
+GRAILS_HOME = /Users/basejump/.sdkman/candidates/grails/current
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink load
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 128)
+cred = \e[31m
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 103)
+lc = $(call _awk_case,tolower,$(1))
+# makefile (from 'build/make/makefile0.env', line 12)
+AUTHOR = Yak.Works
+# makefile (from 'build/make/makefile0.env', line 14)
+APP_NAME = restify
+ 
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 57)
+APP_COMPOSE_CMD := APP_DOCKER_URL=yakworks/gorm-tools:restify  APP_NAME=restify docker compose -p restify_servers -f build/docker/docker-compose.yml
+# variable set hash-table stats:
+# Load=208/1024=20%, Rehash=0, Collisions=74/487=15%
+
+# Pattern-specific Variable Values
+
+_verify_% :
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 97)
+# MAKE_TARGET := $$@
+
+_program_% :
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 87)
+# MAKE_TARGET := $$@
+
+# 2 pattern-specific variable values
+# Directories
+
+# . (device 16777220, inode 4298083902): 36 files, no impossibilities.
+# ./deploy/docker (device 16777220, inode 4412240384): 8 files, no impossibilities.
+
+# 44 files, no impossibilities in 2 directories.
+
+# Implicit Rules
+
+_program_%: FORCE
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 89):
+	_=$(or $(shell which $* 2> /dev/null),$(error `$*` command not found. Please install `$*` and try again))
+
+_verify_%: FORCE
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 99):
+	_=$(if $($*),,$(error `$*` is not defined or is empty))
+
+kubectl.use-context.%:
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kubectl-config.make', line 20):
+	kubectl config use-context $*
+
+# 3 implicit rules, 0 (0.0%) terminal.
+# Files
+
+secrets.add: /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 51):
+	if [ "$(file)" ]; then
+		$(GIT_SECRET_SH) add $(file)
+	elif [ "$(email)" ]; then
+		$(GIT_SECRET_SH) tell $(email)
+	else
+		$(logr.error) "must set either the 'file' var or 'email' var"
+	fi
+
+# Not a target:
+_verify_K8_USER:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+start.jar: examples/restify/build/libs/restify-7.0.8-v.25.jar
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 57):
+	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m -jar $(APP_JAR)
+
+# Not a target:
+_verify_PAGES_BUILD_DIR:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+cache-key-file: gradle.cache-key-file
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+.ONESHELL:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+FORCE:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+check::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 18):
+	$(gradlew) check
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/ship-gh-pages.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.102702035
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+_verify_GPG_PASS:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+compile::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 24):
+	$(gradlew) classes
+
+secrets.help:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 27):
+	printf "\n$(cmagenta)Git-secrets make tasks. see https://git-secret.io/ for more info on using installed version$(creset)\n\n"
+	printf "$(culine)Targets:\n\n$(creset)"
+	printf "$(ccyanB)secrets.init                     $(creset)| initializes new project \n"
+	printf "$(ccyanB)secrets.add email=jim@gmail.com  $(creset)| adds an authorized user key, should only be by email that matched their public key \n"
+	printf "$(ccyanB)secrets.add file=secret.env      $(creset)| adds a file to the secrets \n"
+	printf "$(ccyanB)secrets.hide                     $(creset)| encrypts and hides all the files in the secret list \n"
+	printf "$(ccyanB)secrets.reveal                   $(creset)| decrytps all the files in the secret list \n"
+	printf "$(ccyanB)secrets.remove file=abc.env      $(creset)| removes a file to the secrets \n"
+	printf "$(ccyanB)secrets.remove email=...         $(creset)| removes an authroized user key \n"
+	printf "$(ccyanB)secrets.list                     $(creset)| list files and authorized users \n"
+	printf "$(ccyanB)secrets.clean                    $(creset)| removes all the hidden files \n"
+	printf "\n"
+	printf "$(cbold)If using a git repo as a vault linked the VAULT_URL variable then\n"
+	printf "$(ccyanB)secrets.decrypt-vault   $(creset)| clone in VAULT_DIR and decrypt/reveal. bot.env here is used in other shipkit scripts\n\n"
+ 
+
+log-vars: FORCE
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 70):
+	printf "$(culine)Variable:\n\n$(creset)"
+	for v in $(sort $(BUILD_VARS)); do
+		printf "$(ccyan)$$v $(creset)=$(cbold) $${!v:-} $(creset)\n"
+	done;
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.103289888
+#  File has been updated.
+#  Successfully updated.
+
+pull:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 21):
+	@:
+
+kubectl.config: | _verify_K8_SERVER _verify_K8_USER _verify_K8_TOKEN
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kubectl-config.make', line 8):
+	kubectl config set-cluster ranch-dev --server="$(K8_SERVER)"
+	kubectl config set-credentials "$(K8_USER)" --token="$(K8_TOKEN)"
+	kubectl config set-context "ranch-dev" --user="$(K8_USER)" --cluster="ranch-dev"
+	kubectl config use-context "ranch-dev"
+	$(_finished)
+
+docker.jbuilder: | _verify-DOCKER_CMD
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 12):
+	$(MAKE) jbuilder-$(DOCKER_CMD)
+
+# Not a target:
+_verify_APP_JAR:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+gradle.merge-test-results: | _verify_PROJECT_SUBPROJECTS
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 67):
+	$(gradle_tools) merge_test_results "$(PROJECT_SUBPROJECTS)"
+	$(logr.done)
+
+lint::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 14):
+	$(gradlew) spotlessCheck codenarcMain
+
+# Not a target:
+_verify_APP_DOCKER_URL:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+secrets.reveal: /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 78):
+	$(GIT_SECRET_SH) reveal -p "$(GPG_PASS)"
+
+test-logging-os: FORCE
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 226):
+	$(logr) "OS_NAME $(OS_NAME)"
+	$(logr) "OS_ARCH $(OS_ARCH)"
+	$(logr.warn) "OS_CPU $(OS_CPU)"
+	$(logr.error) "error $(OS_CPU)"
+	$(_finished)
+
+api-check-deployed-with-token:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 78):
+	curl -i -G -H "Authorization: Bearer $(TOKEN)" https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
+
+build/docker_push_restify: build/docker_built_restify | _verify_APP_DOCKER_URL
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 45):
+	if [ "$(dry_run)" ]; then
+		echo "🌮 dry_run ->  docker push $(APP_DOCKER_URL)"
+	else
+		docker push $(APP_DOCKER_URL)
+		touch $(BUILD_DIR)/docker_push_$(APP_KEY)
+	fi
+
+ship.docker::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 83):
+	$(logr.done) " - not on a RELEASABLE_BRANCH, nothing to do"
+
+prod:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/env-goals.make', line 15):
+	@:
+
+# Not a target:
+_verify_BOT_EMAIL:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.101520615
+#  File has been updated.
+#  Successfully updated.
+
+kubectl.get-contexts:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kubectl-config.make', line 17):
+	kubectl config get-contexts
+
+secrets.list: /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 81):
+	printf "$(cgreen) -- Secret Files --\n"
+	$(GIT_SECRET_SH) list
+	echo
+	printf "$(cblue) -- Secret Users --\n"
+	$(GIT_SECRET_SH) whoknows
+
+# Not a target:
+_verify_APP_KUBE_NAMESPACE:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+gradle.cache-key-file: | _verify_PROJECT_SUBPROJECTS
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 74):
+	cat $(gradle_properties) $(build_gradle) > cache-key.tmp
+	for project in $(PROJECT_SUBPROJECTS); do
+		[ -f $$project/build.gradle ] && cat $$project/build.gradle >> cache-key.tmp
+		[ -f $$project/gradle.properties ] && cat $$project/gradle.properties >> cache-key.tmp
+	done
+	$(logr.done)
+
+# Not a target:
+deploy/docker/logback.groovy:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 17:43:49.072651584
+#  File has been updated.
+#  Successfully updated.
+
+build/docker/app.jar: examples/restify/build/libs/restify-7.0.8-v.25.jar build/docker/Dockerfile | _verify_APP_JAR
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 29):
+	$(logr) "copy app.jar"
+	cp $(APP_JAR) $(build_docker_dir)/app.jar
+	cd $(build_docker_dir)
+	"$$JAVA_HOME"/bin/jar -xf app.jar
+
+docker.dockmark: | _verify-DOCKER_CMD
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 20):
+	make docker.dockmark-$(DOCKER_CMD)
+
+ci-credentials: git.config-bot-user kubectl.config dockerhub.login
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 18):
+	$(logr.done)
+
+# Not a target:
+deploy/docker/Dockerfile:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+build/docker_built_restify: build/docker/app.jar | _verify_APP_DOCKER_URL
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 36):
+	docker build -t $(APP_DOCKER_URL) $(build_docker_dir)/.
+	touch $(BUILD_DIR)/docker_built_$(APP_KEY)
+
+up:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 21):
+	@:
+
+help-all:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 59):
+	@LC_ALL=C $(MAKE) -pRrq -f $(firstword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort -u | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
+
+docmark.build: docmark.build-prep
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 49):
+	docmark build --site-dir $(DOCKMARK_SITE_DIR)
+
+kube.clean: | _verify_APP_KUBE_NAMESPACE
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kube.make', line 10):
+	$(kube_tools) ctl delete deployment,svc,configmap,ingress --selector="app=$(APP_KEY)" --namespace="$(APP_KUBE_NAMESPACE)"
+
+# Not a target:
+deploy/docker/docker-compose.yml:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+build/docker:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 15):
+	mkdir -p $@
+
+publish.libs:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 90):
+	if [ "$(IS_SNAPSHOT)" ]; then $(logr) "publishing SNAPSHOT"; else $(logr) "publishing release"; fi
+	if [ "$(dry_run)" ]; then
+		echo "🌮 dry_run ->  $(gradlew) publish"
+	else
+		$(gradlew) publish
+	fi
+
+api-check-login:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 55):
+	curl -H "Content-Type: application/json" -X POST -d '{"username":"admin","password":"Br1ck#ouse"}' \
+		http://localhost:8080/api/login
+
+testenv:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/env-goals.make', line 15):
+	@:
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kubectl-config.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.102381888
+#  File has been updated.
+#  Successfully updated.
+
+ship.libs::
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 107):
+	$(logr.done) " - not a RELEASABLE_BRANCH, nothing to be done"
+
+.SILENT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+git.config-bot-user: | _verify_BOT_EMAIL
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+# variable set hash-table stats:
+# Load=0/32=0%, Rehash=0, Collisions=0/2=0%
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make', line 28):
+	hasGitUser=`git config --global user.email || true`
+	if [ ! "$$hasGitUser" ] || [ "$(CI)" ]; then
+		git config credential.helper 'cache --timeout=120'
+		git config --global user.name "$(BOT_USER)"
+		git config --global user.email "$(BOT_EMAIL)"
+		$(logr) "git.config-bot-user for $(BOT_USER)<$(BOT_EMAIL)>"
+	fi
+
+# Not a target:
+_verify_PUBLISHED_VERSION:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+kube.port-forward:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kube.make', line 19):
+	kubectl port-forward --namespace=$(APP_KUBE_NAMESPACE) --address 0.0.0.0 service/$(KUBE_DB_SERVICE_NAME) 1$(DB_PORT):$(DB_PORT)
+
+# Not a target:
+_verify_RELEASE_CHANGELOG:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+docmark.build-prep: docmark.copy-readme
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+clean::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 21):
+	$(gradlew) clean
+
+merge-test-results: gradle.merge-test-results
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+docmark.shell: docker.dockmark-shell
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+_verify-snapshot: FORCE
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 45):
+	_=$(if $(IS_SNAPSHOT),,$(error set snapshot=true in version properties))
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.103019145
+#  File has been updated.
+#  Successfully updated.
+
+dockerhub.login: FORCE
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 30):
+	echo "$(DOCKERHUB_PASSWORD)" | docker login -u "$(DOCKERHUB_USER)" --password-stdin
+
+# Not a target:
+build/shipkit/Shipkit.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.0939299
+#  File has been updated.
+#  Successfully updated.
+
+test.unit::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 37):
+	$(gradlew) test $(testArg)
+
+# Not a target:
+ 
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/env-goals.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.101363899
+#  File has been updated.
+#  Successfully updated.
+
+docker.app-shell: docker.app-up
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 73):
+	docker exec -it $(APP_NAME) bash -l
+
+docker.dockmark-down:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 28):
+	$(docmark.sh) docker.remove docmark-serve
+
+secrets.import-gpg-key: | _verify_BOT_EMAIL
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 19):
+	@if [ "$(GPG_PRIVATE_KEY)"  ]; then
+		$(logr) "importing GPG KEY"
+		echo "$(GPG_PRIVATE_KEY)" | base64 --decode | gpg -v --batch --import
+	fi
+
+# Not a target:
+_verify_PROJECT_FULLNAME:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+ship.gh-pages:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/ship-gh-pages.make', line 34):
+	$(logr.done) " - IS_RELEASABLE=false as this is either a snapshot or its not on a releasable branch"
+
+jbuilder-pull:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 28):
+	$(JBUILDER_COMPOSE_CMD) pull
+
+# Not a target:
+build/make/makefile0.env:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 18:42:58.418966261
+#  File has been updated.
+#  Successfully updated.
+
+examples/restify/build/libs/restify-7.0.8-v.25.jar:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 53):
+	$(gradlew) assemble
+
+jbuilder-down:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 20):
+	$(JBUILDER_COMPOSE_CMD) down --volumes --remove-orphans
+
+_verify-DOCKER_CMD: FORCE
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 25):
+	_=$(if $(DOCKER_CMD),,$(error docker target must be followed by the verb such as up, down, shell or pull))
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+dev:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/env-goals.make', line 15):
+	@:
+
+docker.app-build: build/docker_built_restify
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+secrets.decrypt-vault: secrets.import-gpg-key /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret | _verify_VAULT_URL _verify_GPG_PASS
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 14):
+	[ ! -e $(VAULT_DIR) ] && git clone $(VAULT_URL) $(VAULT_DIR) || :;
+	cd build/vault && $(GIT_SECRET_SH) reveal -p "$(GPG_PASS)"
+	$(_finished)
+
+push-version-bumps:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 26):
+	$(logr) "snapshot:false ... bumping versions"
+	if [ "$(dry_run)" ]; then
+		echo "🌮 dry_run ->  push-version-bumps"
+	else
+		git add README.md version.properties "$(RELEASE_CHANGELOG)"
+		git commit -m "v$(VERSION) changelog, version bump [ci skip]"
+		git push -q $(GITHUB_URL) $(RELEASABLE_BRANCH)
+		$(logr.done)
+	fi
+
+# Not a target:
+all:
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+
+ship.release:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 37):
+	$(logr.done) "not on a RELEASABLE_BRANCH, nothing to do""
+
+# Not a target:
+deploy/docker/utils.sh:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+_verify_K8_SERVER:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# makefile (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 45)
+help: _HELP_F := Makefile
+help: | _program_awk
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+# variable set hash-table stats:
+# Load=1/32=3%, Rehash=0, Collisions=0/3=0%
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 49):
+	@awk -f $(HELP_AWK) $(wordlist 2,$(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)) $(_HELP_F)
+	printf "\n$(culine)Common Variables:\n$(creset)"
+	printf "$(ccyanB) VERBOSE=true                 $(creset)| show logit.debug in build/make/shikit.log and shows target output on console \n"
+	printf "$(ccyanB) dry_run=true                 $(creset)| setting this to true will stop certain deployment commands from pushing, such as kubectl and docker \n"
+	printf "$(ccyanB) env=<file.env> or <file.sh>  $(creset)| loads custom variables in from .env file or source 'imports' a custom bash .sh script \n"
+	printf "\n"
+
+docker.dockmark-shell:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 32):
+	$(docmark.sh) docmark.shell
+
+docker.dockmark-pull:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 36):
+	docker pull "$(DOCMARK_DOCKER_IMAGE)"
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.101066141
+#  File has been updated.
+#  Successfully updated.
+
+build::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 108):
+	mkdir -p $@
+
+build::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 28):
+	$(gradlew) assemble
+
+update-changelog: | _verify_VERSION _verify_PUBLISHED_VERSION _verify_RELEASE_CHANGELOG _verify_PROJECT_FULLNAME
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+ 
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 13):
+	$(changelog) update_changelog "$(VERSION)" "$(PUBLISHED_VERSION)" "$(RELEASE_CHANGELOG)" "$(PROJECT_FULLNAME)"
+	$(logr.done)
+ 
+
+secrets.decrypt: secrets.reveal
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+test.e2e::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 41):
+	$(gradlew) integrationTest $(testArg)
+
+jbuilder-shell: jbuilder-up
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 24):
+	docker exec -it $(JBUILDER_NAME) bash -l
+
+# Not a target:
+_verify_VAULT_URL:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+update-readme-version: | _verify_VERSION
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 17):
+	$(semver) replace_version "$(VERSION)" README.md
+	$(logr.done)
+
+kube.create-ns: | _verify_APP_KUBE_NAMESPACE
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kube.make', line 15):
+	$(kube_tools) create_namespace $(APP_KUBE_NAMESPACE)
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.1016707
+#  File has been updated.
+#  Successfully updated.
+
+docker.clean-build:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 12):
+	rm -rf $(build_docker_dir)/*
+
+# Not a target:
+deploy/docker/docker-entrypoint.sh:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/kube.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.102248889
+#  File has been updated.
+#  Successfully updated.
+
+test::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 33):
+	$(gradlew) test integrationTest
+
+git.clone-pages: | _verify_PAGES_BRANCH _verify_PAGES_BUILD_DIR
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make', line 16):
+	mkdir -p $(BUILD_DIR) && rm -rf "$(PAGES_BUILD_DIR)"
+	git clone $(GITHUB_URL) $(PAGES_BUILD_DIR) -b $(PAGES_BRANCH) --single-branch --depth 1
+
+api-sanity-check:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 52):
+	curl -i -G http://localhost:$(PORT)/api/rally/org/1
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-flags.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.09997595
+#  File has been updated.
+#  Successfully updated.
+
+docmark.copy-readme:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 42):
+	$(docmark.sh) docmark.copy_readme $(VERSION)
+ 
+
+run-benchmarks:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 87):
+	$(gradlew) benchmarks:assemble
+	cd examples/benchmarks
+	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m -jar \
+	  -DmultiplyData=3 -Dgorm.tools.async.poolSize=4 build/libs/benchmarks.war
+	# -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+
+pages.deploy-github: docmark.publish-prep
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/ship-gh-pages.make', line 13):
+	if [ "$(dry_run)" ]; then
+		echo "🌮 dry_run ->  $(MAKE) git.push-pages"
+	else
+		$(MAKE) git.push-pages
+	fi
+	$(logr.done)
+
+git.push-pages: | _verify_PAGES_BRANCH _verify_PROJECT_FULLNAME
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/git-tools.make', line 21):
+	git -C $(PAGES_BUILD_DIR) add -A .
+	git -C $(PAGES_BUILD_DIR) commit -a -m "CI Docs published [skip ci]" || true # or true so doesnt blow error if no changes
+	git -C $(PAGES_BUILD_DIR) push -q $(GITHUB_URL) $(PAGES_BRANCH) || true
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.101220292
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+_verify_VERSION:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+docker.dockmark-up:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docmark.make', line 24):
+	$(docmark.sh) docmark.run
+
+api-check-with-token:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 60):
+	curl_call="curl --silent -H 'Content-Type: application/json' -X POST \
+		-d '{\"username\":\"admin\",\"password\":\"Br1ck#ouse\"}' \
+		http://localhost:$(PORT)/api/login"
+	resp=`eval "$$curl_call"`
+	echo -e "login response: $$resp \n"
+	token=`echo $$resp | awk -F'"' '/access_token/{ print $$(NF-1) }'`
+	curl_call="curl -G -H 'Authorization: Bearer $$token' http://localhost:$(PORT)/api/rally/org/1"
+	echo -e "$$curl_call \n"
+	eval $$curl_call
+	echo -e "\n$@ success"
+
+docker.app-down:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 70):
+	$(APP_COMPOSE_CMD) down $(APP_COMPOSE_CLEAN_FLAGS)
+
+# Not a target:
+_verify_K8_TOKEN:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+/Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 10):
+	$(call download_tar,$(GIT_SECRET_URL),git-secret)
+	cd $(SHIPKIT_INSTALLS)/git-secret && make build
+
+publish.snapshot: | _verify-snapshot
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 49):
+	$(gradlew) snapshot
+
+gradle.dependencies:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 83):
+	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
+	./gradlew restify:dependencies --configuration runtime
+
+shell:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 21):
+	@:
+
+resolve-dependencies: gradle.resolve-dependencies
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+ship-it::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+ship-it::
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 12):
+	make secrets.decrypt-vault
+	make ci-credentials
+	make ship.release
+	$(logr.done)
+
+gradle.resolve-dependencies:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/gradle-tools.make', line 63):
+	$(gradlew) resolveConfigurations --no-daemon
+
+docker.app-push: build/docker_push_restify
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+
+secrets.hide: /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 72):
+	$(GIT_SECRET_SH) hide -d
+
+docker.app-up: build/docker_built_restify
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 66):
+	$(APP_COMPOSE_CMD) up -d
+
+docmark.start: docker.dockmark-up
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+bump-version-file: | _verify_VERSION
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 21):
+	$(semver) bump_version_file "$(VERSION)" "$(VERSION_FILENAME)" "$(VERSION_SET_SNAPSHOT)"
+	$(logr.done) " with $(VERSION_FILENAME) for v:$(VERSION)"
+
+ship.version:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/ship-version.make', line 54):
+	$(logr.done) " - IS_RELEASABLE=false as this is either a snapshot or its not on a releasable branch"
+
+build/docker/Dockerfile: build/docker deploy/docker/Dockerfile deploy/docker/docker-compose.yml deploy/docker/docker-entrypoint.sh deploy/docker/logback.groovy deploy/docker/utils.sh | _verify_APP_JAR
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 23):
+	$(logr) "copy Dockerfile"
+	rm -rf $(build_docker_dir)/*
+	cp -r $(APP_DOCKER_SRC)/. $(build_docker_dir);
+
+docmark.publish-prep: docmark.build git.clone-pages
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/ship-gh-pages.make', line 6):
+	cp -r $(DOCKMARK_SITE_DIR)/. $(PAGES_BUILD_DIR)
+	if [ -d "$(GROOVYDOC_BUILD_DIR)" ]; then
+		cp -r $(GROOVYDOC_BUILD_DIR) $(PAGES_BUILD_DIR)/groovydocs
+	fi
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.102546741
+#  File has been updated.
+#  Successfully updated.
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit//makefiles/spring-common.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.103146116
+#  File has been updated.
+#  Successfully updated.
+
+log-make-vars: FORCE
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 76):
+	$(foreach v, $(sort $(BUILD_VARS)), $(info $(v) = $($(v))) )
+
+print-make-vars: FORCE
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make', line 80):
+	$(foreach v, $(.VARIABLES), $(info $(v) = $($(v))))
+
+.PHONY: dev prod testenv help help-all FORCE up down shell pull kubectl.config kube.clean kube.create-ns kube.port-forward resolve-dependencies merge-test-results ship.libs publish.libs docker.app-build docker.app-push ship.gh-pages
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+secrets.remove: /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 60):
+	if [ "$(file)" ]; then
+		$(GIT_SECRET_SH) remove $(file)
+	elif [ "$(email)" ]; then
+		$(GIT_SECRET_SH) killperson $(email)
+	else
+		$(logr.error) "must set either the 'file' var or 'email' var"
+	fi
+
+api-check-deployed-login:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 73):
+	curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST \
+	  -d '{"username":"admin","password":"123Foo"}' https://$(APP_KUBE_INGRESS_URL)/api/login
+
+# Not a target:
+_verify_PROJECT_SUBPROJECTS:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+down:
+#  Phony target (prerequisite of .PHONY).
+#  Implicit rule search has not been done.
+#  File does not exist.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/docker.make', line 21):
+	@:
+
+secrets.init: /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 48):
+	$(GIT_SECRET_SH) init
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/Shipkit-main.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.100284784
+#  File has been updated.
+#  Successfully updated.
+
+secrets.encrypt: secrets.hide
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+docker.app: | _verify-DOCKER_CMD
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/spring-docker.make', line 62):
+	$(MAKE) docker.app-$(DOCKER_CMD)
+
+# Not a target:
+_program_awk:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+jbuilder-up:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make', line 16):
+	$(JBUILDER_COMPOSE_CMD) up -d
+
+secrets.show-version: /Users/basejump/github/yak/gorm-tools/build/installs/git-secret/git-secret
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from '/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/secrets.make', line 44):
+	$(GIT_SECRET_SH) --version
+
+# Not a target:
+_verify_PAGES_BRANCH:
+#  Implicit rule search has not been done.
+ 
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+/Users/basejump/github/yak/gorm-tools/build/shipkit/makefiles/jbuilder-docker.make:
+#  Implicit rule search has been done.
+#  Last modified 2021-09-19 00:40:37.101945584
+#  File has been updated.
+#  Successfully updated.
+
+# files hash-table stats:
+# Load=149/1024=15%, Rehash=0, Collisions=33/326=10%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 195 / storage = 4013 B / avg = 20 B
+# current buf: size = 8162 B / used = 4013 B / count = 195 / avg = 20 B
+
+# strcache performance: lookups = 436 / hit rate = 55%
+# hash-table stats:
+# Load=195/8192=2%, Rehash=0, Collisions=5/436=1%
+# Finished Make data base on Sun Sep 19 18:42:58 2021
+
+ 

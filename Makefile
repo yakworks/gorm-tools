@@ -1,6 +1,6 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.24 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.27 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
@@ -12,28 +12,29 @@ ship-it::
 	make secrets.decrypt-vault
 	make ci-credentials
 	make ship.release
-	$(log.done)
+	$(logr.done)
 
 ci-credentials: git.config-bot-user kubectl.config dockerhub.login
-	$(log.done)
+	$(logr.done)
 
-ifdef RELEASABLE_BRANCH
+ifdef RELEASABLE_BRANCH_OR_DRY_RUN
+# ifneq ($(and $(RELEASABLE_BRANCH),$(DRY_RUN)),)
 
  ship.release: build ship.libs ship.docker kube.deploy
 	# this should happen last and in its own make as it will increment the version number which is used in scripts above
     # TODO it seems a bit backwards though and the scripts above should be modified
 	make ship.version
-	$(log.done)
+	$(logr.done)
 
  kube.deploy: kube.create-ns kube.clean
-	$(kube_tools) apply_tpl $(APP_DIR)/src/deploy/app-configmap.tpl.yml
-	$(kube_tools) apply_tpl $(APP_DIR)/src/deploy/app-deploy.tpl.yml
-	$(log.done)
+	$(kube_tools) apply_tpl $(APP_KUBE_SRC)/app-configmap.tpl.yml
+	$(kube_tools) apply_tpl $(APP_KUBE_SRC)/app-deploy.tpl.yml
+	$(logr.done)
 
 else
 
  ship.release:
-	$(log.done) "not on a RELEASABLE_BRANCH, nothing to do""
+	$(logr.done) "not on a RELEASABLE_BRANCH, nothing to do""
 
 endif # end RELEASABLE_BRANCH
 
@@ -86,5 +87,5 @@ run-benchmarks:
 	$(gradlew) benchmarks:assemble
 	cd examples/benchmarks
 	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m -jar \
-	  -DmultiplyData=3 -Dgpars.poolsize=4 build/libs/benchmarks.war
+	  -DmultiplyData=3 -Dgorm.tools.async.poolSize=4 build/libs/benchmarks.war
 	# -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap

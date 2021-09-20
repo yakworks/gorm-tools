@@ -5,13 +5,20 @@
 package gorm.tools.repository.bulk
 
 import groovy.transform.CompileStatic
+import groovy.transform.ToString
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 
+@Builder(builderStrategy= SimpleStrategy, prefix="")
+@ToString
 @CompileStatic
 class BulkableArgs {
     /**
      * what to set the job.source to
      */
     String jobSource
+
+    String jobSourceId
 
     /**
      * for result, list of fields to include for the created or updated entity
@@ -31,5 +38,10 @@ class BulkableArgs {
 
     // whether it should return thr job imediately or do it sync
     boolean async = true
+
+    /**
+     * the args, such as flush:true etc.., to pass down to the repo methods
+     */
+    Map persistArgs = [:]
 
 }

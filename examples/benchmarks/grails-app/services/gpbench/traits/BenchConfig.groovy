@@ -34,7 +34,7 @@ trait BenchConfig {
     @Autowired
     CsvReader csvReader
 
-    @Value('${gpars.poolsize}')
+    @Value('${gorm.tools.async.poolSize}')
     int poolSize
 
     @Value('${hibernate.jdbc.batch_size}')
@@ -126,7 +126,7 @@ trait BenchConfig {
         //println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
         //println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
         println "Available processors: " + Runtime.getRuntime().availableProcessors()
-        println "Gpars pool size (gpars.poolsize): " + poolSize
+        println "Gpars pool size (gorm.tools.async.poolSize): " + poolSize
         println "binderType: " + binderType
         println "hibernate.jdbc.batch_size (jdbcBatchSize): " + batchSize
         println "batchSliceSize: " + batchSliceSize

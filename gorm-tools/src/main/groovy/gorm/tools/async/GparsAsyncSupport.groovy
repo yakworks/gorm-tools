@@ -12,7 +12,7 @@ import groovy.transform.stc.SecondParam
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.util.PoolUtils
 
-import org.springframework.beans.factory.annotation.Value
+import gorm.tools.support.ConfigAware
 
 import static groovyx.gpars.GParsPool.withPool
 
@@ -25,59 +25,32 @@ import static groovyx.gpars.GParsPool.withPool
  * @since 6.1
  */
 @CompileStatic
-class GparsAsyncSupport implements AsyncSupport {
-
-    /** the pool size passed to GParsPool.withPool. if gpars.poolsize is not set then it uses PoolUtils.retrieveDefaultPoolSize()*/
-    @Value('${gpars.poolsize:0}')
-    int poolSize
+class GparsAsyncSupport implements AsyncSupport, ConfigAware {
 
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct
     void init() {
         if (poolSize == 0) poolSize = PoolUtils.retrieveDefaultPoolSize()
         //if batchSize is 0 then hibernate may not bbe installed and hibernate.jdbc.batch_size is not set. force it to 100
-        if (batchSize == 0) batchSize = 100
+        Integer batchSize = config.getProperty('hibernate.jdbc.batch_size', Integer)
+        sliceSize = batchSize ?: sliceSize
     }
 
-    @Override
-    void parallel(Map args, Collection collection, Closure closure) {
 
-        boolean gparsEnabled = args.asyncEnabled as Boolean ? args.asyncEnabled as Boolean : getAsyncEnabled()
+    @Override
+    public <T> Collection<T> eachParallel(AsyncArgs args, Collection<T> collection,
+                                          @ClosureParams(SecondParam.FirstGenericType) Closure closure){
+        boolean gparsEnabled = args.asyncEnabled != null ? args.asyncEnabled : getAsyncEnabled()
 
         if (gparsEnabled) {
-            eachParallel(collection, closure)
+            int psize = args.poolSize ?: getPoolSize()
+            withPool(psize) {
+                GParsPoolUtil.eachParallel(collection, closure)
+            }
         } else {
-            collection.each(wrapSession(args, closure))
+            collection.each(closure)
         }
 
-    }
-
-    // @Override
-    // void parallel(Map args, List<List> collection, Closure closure){
-    //
-    //     parallel(args, collection, closure)
-    //
-    // }
-
-    @Override
-    public <T> Collection<T> parallelChunks(Map args, Collection<T> collection,
-                                            @ClosureParams(SecondParam) Closure closure) {
-        int batchSize = args.batchSize ? args.batchSize as Integer : getBatchSize()
-
-        def batchedList = collate(collection, batchSize)
-
-        parallel(args, batchedList, closure)
-
-        return collection
-    }
-
-    @Override
-    public <T> Collection<T> eachParallel(Map args, Collection<T> collection,
-                                          @ClosureParams(SecondParam.FirstGenericType) Closure closure){
-        int psize = args.poolSize ? args.poolSize as Integer : getPoolSize()
-        withPool(psize) {
-            GParsPoolUtil.eachParallel(collection, wrapSession(args, closure))
-        }
         return collection
     }
 

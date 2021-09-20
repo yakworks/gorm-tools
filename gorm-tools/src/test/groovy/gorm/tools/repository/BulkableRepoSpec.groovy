@@ -1,6 +1,7 @@
 package gorm.tools.repository
 
 import gorm.tools.job.JobState
+import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.testing.unit.DataRepoTest
 import groovy.json.JsonSlurper
@@ -20,6 +21,10 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         mockDomains(Project, Nested, JobImpl)
     }
 
+    BulkableArgs setupBulkableArgs(){
+        return new BulkableArgs(jobSource:"test", jobSourceId: "test", includes: ["id", "name", "nested.name"])
+    }
+
     void "test bulkable repo"() {
         expect:
         Project.repo instanceof BulkableRepo
@@ -30,7 +35,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         List list = generateDataList(20)
 
         when: "bulk insert 20 records"
-        JobImpl job = Project.repo.bulkCreate(list, [source:"test", sourceId: "test", includes: ["id", "name", "nested.name"]])
+        JobImpl job = Project.repo.bulkCreate(list, setupBulkableArgs())
 
         then: "verify job"
         job != null
@@ -83,7 +88,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         list[19].nested.name = ""
 
         when: "bulk insert"
-        JobImpl job = Project.repo.bulkCreate(list, [source:"test", sourceId: "test", includes: ["id", "name", "nested.name"]])
+        JobImpl job = Project.repo.bulkCreate(list, setupBulkableArgs())
 
         then: "verify job"
         job.ok == false

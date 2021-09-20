@@ -62,12 +62,12 @@ The goal is to have good benchmarks to measure and answer the following question
 ### Running the benchmarks
 
 - There is a script ```run-benchmarks.sh``` which will run the benchmarks
-- Run ```./run-benchmarks.sh``` or `gradle assemble; java -server -jar -DmultiplyData=3 -Dgpars.poolsize=1 build/libs/benchmarks.war`
+- Run ```./run-benchmarks.sh``` or `gradle assemble; java -server -jar -DmultiplyData=3 -Dgorm.tools.async.poolSize=1 build/libs/benchmarks.war`
 - **multiplyData** multiplies the base 36k City record set. so setting it to 3 will process 3 x 36k=118k rows.
 
 By default benchmarks uses default gpars pool size which is (availableProcessors + 1) which can be modified by passing system property
 
-- **gpars.poolsize** 1 for single thread, set to 5 if you have a 4 core processor (even if its 8 cores with hyperhreading), 9 for 8 cores, etc..
+- **gorm.tools.async.poolSize** 1 for single thread, set to 5 if you have a 4 core processor (even if its 8 cores with hyperhreading), 9 for 8 cores, etc..
 
 ## Batch or Bulk Data Inserts with large datasets
 
@@ -167,10 +167,10 @@ Grails 3.3.2
 Gorm 6.1.9
 
  ```
- gradle assemble; java -server -jar -DmultiplyData=3 -Dgpars.poolsize=5 build/libs/benchmarks.war
+ gradle assemble; java -server -jar -DmultiplyData=3 -Dgorm.tools.async.poolSize=5 build/libs/benchmarks.war
 --- Environment info ---
 Available processors: 8
-Gpars pool size (gpars.poolsize): 4
+Gpars pool size (gorm.tools.async.poolSize): 4
 binderType: gorm-tools
 hibernate.jdbc.batch_size (jdbcBatchSize): 255
 batchSliceSize: 255
@@ -263,7 +263,7 @@ https://stackoverflow.com/questions/6687422/hibernate-batch-size-confusion
 ### Overview
 By default Second level cache is disabled for benchmarks. To enable it we should use the 'secondLevelCache' system property.
 
-For example: `java -server -jar -DmultiplyData=3 -Dgpars.poolsize=1 -DsecondLevelCache=true build/libs/benchmarks.war`
+For example: `java -server -jar -DmultiplyData=3 -Dgorm.tools.async.poolSize=1 -DsecondLevelCache=true build/libs/benchmarks.war`
 
 `./run-benchmarks.sh` script by default starts benchmarks without Second Level Cache.
 It contains the "Running benchmarks with Second Level cache" section with commented out configuration,
@@ -271,7 +271,7 @@ which can be used to run benchmarks with Second Level Cache.
 Uncomment the next line in the script to run benchmarks with Second Level cache:
 
 ```
-java -server -jar -DmultiplyData=3 -Dgpars.poolsize=5 -DsecondLevelCache=true build/libs/benchmarks.war
+java -server -jar -DmultiplyData=3 -Dgorm.tools.async.poolSize=5 -DsecondLevelCache=true build/libs/benchmarks.war
 ```
 
   **Note**: Changing caching strategy can affect benchmark results
@@ -287,7 +287,7 @@ See Grails [Caching strategy]{.new-tab} and [Hiberante Second Level cache]{.new-
 Using 'cacheStrategy' system property we can specify the caching strategy for all domains.
 The default caching strategy is 'read-write'.
 For example:
-`java -server -jar -DmultiplyData=3 -Dgpars.poolsize=1 -DsecondLevelCache=true -DcacheStrategy='read-write' build/libs/benchmarks.war `
+`java -server -jar -DmultiplyData=3 -Dgorm.tools.async.poolSize=1 -DsecondLevelCache=true -DcacheStrategy='read-write' build/libs/benchmarks.war `
 
 #### EhCache configuration
 

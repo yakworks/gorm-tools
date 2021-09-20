@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import gorm.tools.async.AsyncArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gpbench.basic.CityBasic
@@ -25,11 +26,11 @@ class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
 
-        asyncSupport.parallel(batches) { List batch ->
-            asyncSupport.batchTrx(batch) {Long id ->
-                updateRow(id, citiesUpdated[at.incrementAndGet()])
-            }
+        def sliceClosure = asyncSupport.sliceClosure { Long id ->
+            updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
+
+        asyncSupport.parallel(AsyncArgs.transactional(), batches, sliceClosure)
     }
 
     @CompileDynamic

@@ -21,7 +21,7 @@ import yakworks.rally.orgs.model.Org
 class JobRestApiSpec extends Specification implements OkHttpRestTrait, JsonParserTrait {
     JdbcTemplate jdbcTemplate
 
-    String path = "/api/rally/org/bulk?source=Oracle"
+    String path = "/api/rally/org/bulk?jobSource=Oracle"
 
     //FIXME #339 good to sanity check if we are testing rendering etc...
     // but much of this is repo logic testing, not rest testing, move/copy it please, much of this could be done in a unit

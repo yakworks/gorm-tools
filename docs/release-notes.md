@@ -1,6 +1,19 @@
 ### v7.0.8-v.25
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25)
+- fix bad build.yml [link](https://github.com/yakworks/gorm-tools/commit/71737ba4dbf530e825ea6deb1dce7af07ae28bf5)
+- fix async errors [link](https://github.com/yakworks/gorm-tools/commit/9d904de3f8cb7f07fffad03208fc014188fac411)
+- Merge branch 'async' [link](https://github.com/yakworks/gorm-tools/commit/7104b2f4387775b9133cdc4dc9cc1cbaf2170c38)
+- change asyn so only each parralel [link](https://github.com/yakworks/gorm-tools/commit/829ea01e84a4dc07ba982459f5094bcc3f8d2421)
+- Async (#344) [link](https://github.com/yakworks/gorm-tools/commit/ced63ee9ca06e4c7b0c26db55fb24d234cb5363a)
+- asyn refactor and clean up old unused stuff from benchmarks [link](https://github.com/yakworks/gorm-tools/commit/5374c82ebc40cdcab1bb3253a6e1018d400e6524)
+- #339 Bulkable tests (#343) [link](https://github.com/yakworks/gorm-tools/commit/0434020ca2449e809a106bb83c1ee0c1e63d7a34)
+- Trx service (#342) [link](https://github.com/yakworks/gorm-tools/commit/17fce5de03864d734b4bebe798b1a1d87cd90876)
+- FIXME comments for #339 (#340) [link](https://github.com/yakworks/gorm-tools/commit/5e75637b86b07c7d932511165edbac1905dba44c)
+
+### v7.0.8-v.25
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25)
 - #339 Bulkable tests (#343) [link](https://github.com/yakworks/gorm-tools/commit/0434020ca2449e809a106bb83c1ee0c1e63d7a34)
 - Trx service (#342) [link](https://github.com/yakworks/gorm-tools/commit/17fce5de03864d734b4bebe798b1a1d87cd90876)
 - FIXME comments for #339 (#340) [link](https://github.com/yakworks/gorm-tools/commit/5e75637b86b07c7d932511165edbac1905dba44c)

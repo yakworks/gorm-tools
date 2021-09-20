@@ -74,32 +74,6 @@ trait AsyncSupport implements WithTrx {
     }
 
     /**
-     * main difference here from {@link #eachParallel} is that it checks args and wraps closure in
-     * transaction of session if set.
-     *
-     * @param asyncArgs the async args
-     * @param collection the collection to iterate process
-     * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
-     */
-    void parallel(AsyncArgs args, Collection collection, Closure closure){
-
-        Closure wrappedClosure = closure
-        if(args.transactional){
-            verifyDatastore(args)
-            wrappedClosure = wrapTrx(args.datastore, closure)
-        } else if(args.session){
-            verifyDatastore(args)
-            wrappedClosure = wrapSession(args.datastore, closure)
-        }
-
-        eachParallel(args, collection, wrappedClosure)
-    }
-
-    void parallel(Collection collection, Closure closure){
-        parallel(new AsyncArgs(), collection,  closure)
-    }
-
-    /**
      * collates or slices the data collection into slices/chunks and calls the sliceClosure for each slice of items in the item list.
      * Will check to see if asyncEnabled is true and if not then will just call a normal each and pass to chunkClosure
      *
@@ -113,7 +87,7 @@ trait AsyncSupport implements WithTrx {
 
         def slicedList = slice(data, sliceSize)
 
-        parallel(asyncArgs, slicedList, sliceClosure)
+        eachParallel(asyncArgs, slicedList, sliceClosure)
 
         return data
     }
@@ -180,7 +154,7 @@ trait AsyncSupport implements WithTrx {
      * checks args for session or trx and wraps the closure if needed
      * @return
      */
-    Closure wrapClosureIfSession(AsyncArgs asyncArgs, Closure closure){
+    Closure wrapSessionOrTransaction(AsyncArgs asyncArgs, Closure closure){
         Closure wrappedClosure = closure
         if(asyncArgs.transactional){
             verifyDatastore(asyncArgs)
@@ -189,6 +163,7 @@ trait AsyncSupport implements WithTrx {
             verifyDatastore(asyncArgs)
             wrappedClosure = wrapSession(asyncArgs.datastore, closure)
         }
+        return wrappedClosure
     }
 
     /**

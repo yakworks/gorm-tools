@@ -8,14 +8,17 @@ import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SecondParam
 
+import org.grails.datastore.mapping.core.Datastore
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.transaction.WithTrx
 import grails.persistence.support.PersistenceContextInterceptor
+import yakworks.commons.lang.Validate
 
 /**
  * a trait to be used for colating/slicing a list into "batches" to then asynchronously with Transactions
@@ -30,148 +33,208 @@ import grails.persistence.support.PersistenceContextInterceptor
 trait AsyncSupport implements WithTrx {
     final static Logger LOG = LoggerFactory.getLogger(AsyncSupport)
 
-    /** The list size to send to the collate that slices.*/
-    @Value('${hibernate.jdbc.batch_size:0}')
-    int batchSize
+    /**
+     * The default slice or chunk size for collating. for example if this is 100 and you pass list of of 100
+     * then it will slice it or collate it into a list with 10 of lists with 100 items each.
+     * should default to the hibernate.jdbc.batch_size in the implementation. Usually best to set this around 100
+     */
+    @Value('${gorm.tools.async.sliceSize:100}')
+    int sliceSize
 
     /** The list size to send to the collate that slices.*/
     @Value('${gorm.tools.async.enabled:false}')
     boolean asyncEnabled
 
+    /** the pool size passed to GParsPool.withPool. if gorm.tools.async.poolSize is not set then it uses PoolUtils.retrieveDefaultPoolSize()*/
+    @Value('${gorm.tools.async.poolSize:0}')
+    int poolSize
+
+
     @Autowired
     PersistenceContextInterceptor persistenceInterceptor
 
     /**
-     * main difference here from {@link #eachParallel} eachParallel is that this will check if asyncEnabled is true
-     * if its false then it just gracefully passes the closure on to the colection.each
-     *
-     * Must be overriden by the concrete implementation as this is where the meat is.
-     *
-     * @param args _optional_ arg map to be passed to the async engine such as gpars.
-     *     - poolSize : gets passed down into the GParsPool.withPool for example
-     *     - asyncEnabled : forces async to true of false regardless of what the class val is, useful for testing
-     *     - transactional : if true then it wraps the closure in a transaction
-     *     - session : if true then wraps closure in a session
-     * @param collection the collection to iterate process
-     * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
-     */
-    abstract void parallel(Map args = [:], Collection collection, Closure closure)
-
-
-    // abstract void parallel(Map args, List<List> collection, Closure closure)
-
-    /**
-     * collates the data into slices/chunks and calls the chunkClosure for each slice of items in the item list.
-     * Will check to see if asyncEnabled is true and if not then will just call a normal each and pass to chunkClosure
-     *
-     * @param args _optional_ arg map to be passed to the async engine such as gpars.
-     *     - batchSize : the size of the lists when collated or sliced into chunks
-     *     - transactional : if true then it wraps the closure in a transaction
-     *     - session : if true then wraps closure in a session
-     * @param collection the items list to slice into chunks
-     * @param chunkClosure the closure to call for each collated slice of data. will get passed the List for processing
-     */
-    abstract <T> Collection<T> parallelChunks(Map args = [:], Collection<T> collection,
-                                              @ClosureParams(SecondParam) Closure closure)
-
-    /**
      * Iterates over the lists and calls the closure passing in the list item and the args asynchronously.
-     * see GParsPoolUtil.eachParallel
+     * see GParsPoolUtil.eachParallel. This will check if asyncEnabled is true by default or in args
+     * and if its false then it just gracefully passes the closure on to the collection.each
+     *
      * Must be overriden by the concrete implementation as this is where the meat is.
      *
-     * @param args _optional_ arg map to be passed to the async engine such as gpars.
-     *     can also add any other value and they will be passed down through the closure as well <br>
-     *     - poolSize : gets passed down into the GParsPool.withPool for example
-     *     - transactional : if true then it wraps the closure in a transaction
-     *     - session : if true then wraps closure in a session
-     * @param collection the collection to iterate process
+     * @param asyncArgs looks at poolSize and asyncEnabled
+     * @param asyncArgs the collection to iterate process
      * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    abstract <T> Collection<T> eachParallel(Map args = [:], Collection<T> collection,
+    abstract <T> Collection<T> eachParallel(AsyncArgs asyncArgs, Collection<T> collection,
                                             @ClosureParams(SecondParam.FirstGenericType) Closure closure)
 
+
+    public <T> Collection<T> eachParallel(Collection<T> collection,
+                                          @ClosureParams(SecondParam.FirstGenericType) Closure closure){
+        eachParallel(new AsyncArgs(), collection, closure)
+    }
+
     /**
-     * Uses collate to break or slice the list into batches and then process the each(itemClosure) inside a trx
-     * here more for example, not normally something we would run in production
+     * main difference here from {@link #eachParallel} is that it checks args and wraps closure in
+     * transaction of session if set.
      *
-     * @param args optional arg map to be passed on through to eachParallel and the async engine such as gpars. <br>
-     *     - batchSize : parameter to be passed into collate
-     * @param list the list to process that will get sliced into batches via collate
-     * @param itemClosure the closure to pass to eachParallel that gets passed the entry in the collection
+     * @param asyncArgs the async args
+     * @param collection the collection to iterate process
+     * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    public <T> Collection<T> parallelCollate(Map args = [:], Collection<T> collection,
-                                             @ClosureParams(SecondParam.FirstGenericType) Closure closure) {
+    void parallel(AsyncArgs args, Collection collection, Closure closure){
 
-        // List<List<T>> collated = collate(collection, args.batchSize as Integer)
-        parallelChunks(args as Map, collection as Collection<Object>) { batch ->
-            batchTrx(batch, closure)
-        } as Collection<T>
-
-    }
-
-    /**
-     * Uses collate to break or slice the list into sub-lists of batches. Uses the {@link #batchSize} unless batchSize is sent in
-     * @param items the list to slice up into batches
-     * @param batchSize _optional_ the length of each batch sub-list in the returned list. override the {@link #batchSize}
-     * @return the batches (list of lists) containing the chunked list of items
-     */
-    public <T> List<List<T>> collate(Collection<T> items, Integer batchSize = null) {
-        items.collate(batchSize ?: getBatchSize())
-    }
-
-    /**
-     * runs in a Transaction and flush and clear is called after doBatch but before commit.
-     */
-    void batchTrx(Collection items, Closure itemClosure) {
-        withTrx { TransactionStatus status ->
-            items.each(itemClosure)
-            flushAndClear(status)
+        Closure wrappedClosure = closure
+        if(args.transactional){
+            verifyDatastore(args)
+            wrappedClosure = wrapTrx(args.datastore, closure)
+        } else if(args.session){
+            verifyDatastore(args)
+            wrappedClosure = wrapSession(args.datastore, closure)
         }
+
+        eachParallel(args, collection, wrappedClosure)
     }
 
-    public Closure withEachTrx(Closure wrapped) {
-        return { items ->
-            withTrx { TransactionStatus status ->
-                items.each(wrapped)
-                flushAndClear(status)
+    void parallel(Collection collection, Closure closure){
+        parallel(new AsyncArgs(), collection,  closure)
+    }
+
+    /**
+     * collates or slices the data collection into slices/chunks and calls the sliceClosure for each slice of items in the item list.
+     * Will check to see if asyncEnabled is true and if not then will just call a normal each and pass to chunkClosure
+     *
+     * @param asyncArgs the async args
+     * @param data the items list to slice into chunks
+     * @param sliceClosure the closure to call for each collated slice of data. will get passed the List for processing
+     */
+    public <T> Collection<T> eachSlice(AsyncArgs asyncArgs, Collection<T> data,
+                                         @ClosureParams(SecondParam) Closure sliceClosure) {
+        Integer sliceSize = asyncArgs.sliceSize ?: getSliceSize()
+
+        def slicedList = slice(data, sliceSize)
+
+        parallel(asyncArgs, slicedList, sliceClosure)
+
+        return data
+    }
+
+    public <T> Collection<T> eachSlice(Collection<T> data,
+                                       @ClosureParams(SecondParam) Closure sliceClosure){
+        eachSlice(new AsyncArgs(), data,  sliceClosure)
+    }
+
+    /**
+     * Will slice the data based on args or defaults and then process by slices.
+     * this differs from the eachSlice in that the itemClosure gets called for each item in the collection
+     * like a normal groovy .each where the closure passed to eachSlice gets called for each slice or chunk or data.
+     *
+     * pass transactional = true to have each slice be in its own transaction as you normally would for eachSlice
+     *
+     * @param asyncArgs the arguments for how the asyn should be setup
+     * @param list the list to process that will get sliced into batches via collate
+     * @param itemClosure the closure to pass to eachParallel that gets passed each entry in the collection
+     */
+    public <T> Collection<T> slicedEach(AsyncArgs asyncArgs, Collection<T> collection,
+                                        @ClosureParams(SecondParam.FirstGenericType) Closure itemClosure) {
+
+        verifyDatastore(asyncArgs)
+        Closure sliceClos = sliceClosure(asyncArgs.datastore, itemClosure)
+
+        eachSlice(asyncArgs, collection as Collection<Object>,sliceClos) as Collection<T>
+
+    }
+
+
+    /**
+     * Uses collate to slice the list into sub-lists. Uses the {@link #sliceSize} unless batchSize is sent in
+     * @param items the list to slice up into batches
+     * @param sliceSize _optional_ the length of each batch sub-list in the returned list. override the {@link #sliceSize}
+     * @return the (list of lists) containing the chunked list of items
+     */
+    public <T> List<List<T>> slice(Collection<T> items, Integer sliceSize = null) {
+        items.collate(sliceSize ?: getSliceSize())
+    }
+
+    /**
+     * returns closure that can be passed to an '.each' for a slice of data
+     * the itemClosure is called  for each row in the slice and pass the item
+     * if its in a transaction then will flush and clear when done
+     */
+    Closure sliceClosure(Datastore ds, Closure itemClosure) {
+        Validate.notNull(ds, '[datastore]')
+        return { Collection sliceOfitems ->
+            sliceOfitems.each(itemClosure)
+            if (TransactionSynchronizationManager.isSynchronizationActive()){
+                ds.currentSession.flush()
+                ds.currentSession.clear()
             }
         }
     }
 
+    Closure sliceClosure(Closure itemClosure) {
+        Datastore dstore = getTrxService().getTargetDatastore()
+        sliceClosure(dstore, itemClosure)
+    }
+
     /**
-     * if args has a withSession: true then wrap in a session
+     * checks args for session or trx and wraps the closure if needed
+     * @return
      */
-    public <T> Closure<T> wrapSession(Map args = [:], Closure<T> c) {
+    Closure wrapClosureIfSession(AsyncArgs asyncArgs, Closure closure){
+        Closure wrappedClosure = closure
+        if(asyncArgs.transactional){
+            verifyDatastore(asyncArgs)
+            wrappedClosure = wrapTrx(asyncArgs.datastore, closure)
+        } else if(asyncArgs.session){
+            verifyDatastore(asyncArgs)
+            wrappedClosure = wrapSession(asyncArgs.datastore, closure)
+        }
+    }
+
+    /**
+     * if args doesn't have a datastore then it grabs the default one from the trxService
+     */
+    void verifyDatastore(AsyncArgs asyncArgs){
+        if(!asyncArgs.datastore){
+            asyncArgs.datastore = getTrxService().getTargetDatastore()
+        }
+    }
+
+    /**
+     * Wrap closure in a transaction
+     */
+    public <T> Closure<T> wrapTrx(Datastore ds, Closure<T> c) {
         return { T item ->
-            if(args.withSession) {
-                withSession { session ->
-                    c.call(item)
-                }
-            } else {
+            getTrxService().withTrx(ds) { TransactionStatus status ->
                 c.call(item)
             }
         }
     }
-    //
-    // public <T> Closure<T> withSession(Closure<T> wrapped) {
+
+    /**
+     * wrap closure in a session
+     */
+    // public <T> Closure<T> wrapSession(Datastore ds, Closure<T> c) {
     //     return { T item ->
-    //         persistenceInterceptor.init()
-    //         try {
-    //             wrapped.call(item)
-    //         } finally {
-    //             try {
-    //                 persistenceInterceptor.flush()
-    //                 persistenceInterceptor.clear()
-    //             } catch (Exception e) {
-    //                 LOG.error("unexpected fail to flush and clear session after withSession", e);
-    //             } finally {
-    //                 try {
-    //                     persistenceInterceptor.destroy()
-    //                 } catch (Exception e) {
-    //                     LOG.error("unexpected fail to flush and clear session after withSession", e);
-    //                 }
-    //             }
+    //         ds.withSession {
+    //             c.call(item)
     //         }
     //     }
     // }
+    //
+    public <T> Closure<T> wrapSession(Datastore ds, Closure<T> wrapped) {
+        return { T item ->
+            persistenceInterceptor.init()
+            try {
+                wrapped.call(item)
+            } finally {
+                try {
+                    //only destroys if new one was created, otherwise does nothing
+                    persistenceInterceptor.destroy()
+                } catch (Exception e) {
+                    //ignore errors
+                }
+            }
+        }
+    }
 }

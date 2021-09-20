@@ -18,12 +18,11 @@ project:
 # only when we have an old version will it have that appened.
 # app_key standard to <app name>-<env>-<short version>
 # so when app_name=restify, app_env=dev short_ver=10 then its restify-dev,
-# if VERSION_POSTFIX get set then it would be rcm-api-dev-10-snapshot
-# when app_env=test then we have rcm-api-test-10
-# to release for a client,
+# if VERSION_POSTFIX get set then it would be restify-snapshot
+
 app:
   name: restify
-  key: ${APP_NAME}${VERSION_POSTFIX} ##${DASH_SHORT_VERSION}
+  key: ${APP_NAME}${VERSION_POSTFIX} # ${DASH_SHORT_VERSION}
   jar: examples/restify/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
   docker:
     src: ./deploy/docker

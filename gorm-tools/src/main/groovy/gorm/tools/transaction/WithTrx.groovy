@@ -6,7 +6,6 @@ package gorm.tools.transaction
 
 import javax.inject.Inject
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SimpleType
@@ -46,22 +45,21 @@ trait WithTrx {
      */
     public <T> T withTrx(@ClosureParams(value = SimpleType,
                       options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
-        trxService.withTrx(callable)
+        getTrxService().withTrx(callable)
     }
 
     public <T> T withSession(Closure<T> callable){
-        trxService.withSession callable
+        getTrxService().withSession callable
     }
 
     void flushAndClear(TransactionStatus status) {
-        status.flush()
-        clear(status)
+        getTrxService().flushAndClear(status)
     }
 
-    @CompileDynamic
-    void clear(TransactionStatus status) {
-        //TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
-        status.transaction.sessionHolder.getSession().clear()
-    }
+
+    // @CompileDynamic
+    // void clear(TransactionStatus status) {
+    //     trxService.clear(status)
+    // }
 
 }

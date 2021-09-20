@@ -4,21 +4,15 @@
 */
 package gorm.tools.repository.bulk
 
-
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
-import groovy.transform.stc.ClosureParams
-import groovy.transform.stc.SimpleType
 
 import org.springframework.http.HttpStatus
 
-import gorm.tools.beans.EntityMapService
 import gorm.tools.repository.errors.api.ApiError
-/**
- * Bulkable result for a single entity
- * Think of this as the result of a post or put on and entity
- *
+
+/*
 transform example when in a job
 {
   "id": 123, // jobId
@@ -49,6 +43,11 @@ transform example when in a job
 }
  */
 
+/**
+ * Bulkable result for a single entity
+ * Think of this as the result of a post or put on and entity
+ *
+ */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class BulkableResults {
@@ -119,7 +118,7 @@ class BulkableResults {
     }
 
     /**
-     *
+     * merges reults list int this
      * @param mergee what to merge into this one
      */
     void merge(BulkableResults mergee){
@@ -138,10 +137,10 @@ class BulkableResults {
             def map = [ok: r.ok, status: r.status.value()] as Map<String, Object>
             //do the failed
             if (r.ok) {
-                //successful result would have entity, use the includes list to prepare result object
+                // successful result would have entity, use the includes list to prepare result object
                 // def data = EntityMapService.bean.createEntityMap(r.entityObject, includes) as Map<String, Object>
                 // map = [id: data['id'], data: data]
-
+                assert r.ok
             } else {
                 //failed result transforms error and saves requestData
                 map.putAll([

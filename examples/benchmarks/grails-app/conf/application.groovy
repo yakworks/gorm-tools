@@ -3,7 +3,7 @@ gorm.tools.audit.enabled = Boolean.valueOf(System.getProperty("auditTrailEnabled
 
 grails.gorm.autowire = Boolean.valueOf(System.getProperty("autowire.enabled", "false"))
 hibernate.jdbc.batch_size = System.getProperty("jdbcBatchSize", "255").toInteger()
-gpars.poolsize = 4
+gorm.tools.async.poolSize = 4
 
 /** Custome config for benchmarks **/
 

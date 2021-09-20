@@ -36,7 +36,7 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
         list.size() == 100
 
         when:
-        list = asyncSupport.collate(list, 10)
+        list = asyncSupport.slice(list, 10)
 
         then:
         list.size() == 10
@@ -52,7 +52,7 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        def slicedList = asyncSupport.collate(list, 10)
+        def slicedList = asyncSupport.slice(list, 10)
         assert slicedList.size() == 10
 
         asyncSupport.parallel(slicedList) { List batch ->
@@ -89,24 +89,28 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        asyncSupport.parallelCollate(batchSize: 10, list) { Map record ->
+        def args = AsyncArgs.of(CustType.repo.datastore).sliceSize(10).asyncEnabled(false)
+
+        asyncSupport.slicedEach(args, list) { Map record ->
             count.addAndGet(1)
         }
         then:
         count.get() == 100
     }
 
-
-    void "test withTrx"() {
+    void "test sliceBatchClosure"() {
         given:
         List list = createList(10)
         ApplicationContext mockContext = Mock()
 
         when:
         int count = 0
-        asyncSupport.batchTrx(list) { Map item->
+        def sliceClosure = asyncSupport.sliceClosure{ Map item ->
             count = count + 1
         }
+
+        sliceClosure.call( list )
+
 
         then:
         count == 10

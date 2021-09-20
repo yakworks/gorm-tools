@@ -6,9 +6,11 @@ package gorm.tools.repository.bulk
 
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+import gorm.tools.async.AsyncArgs
 import gorm.tools.async.AsyncSupport
 import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
@@ -39,17 +41,18 @@ trait BulkableRepo<D, J extends JobTrait>  {
     @Autowired
     TrxService trxService
 
-    //Here for @CompileStatic - GormRepo implements it
+    //Here for @CompileStatic - GormRepo implements these
     abstract D doCreate(Map data, Map args)
     abstract  Class<D> getEntityClass()
-
+    abstract void flushAndClear()
+    abstract Datastore getDatastore()
 
     /**
      * Allows to pass in bulk of records at once, for example /api/book/bulk
      * Each call creates a job that stores info for the call and is returned with results
      * @param dataList the list of data maps to create
      * @param args args to pass to doCreate. It can have:
-     *      source -  what to set the job.source to
+     *      jobSource -  what to set the job.source to
      *      includes - for successful result, list of fields to include for the created or updated entity
      *      errorThreshold - (default: false) number of errors before it stops the job. this setting ignored if transactional=true
      *      transactional - (default: false) if true then the whole set should be in a transaction. disables parallelProcessing.
@@ -57,9 +60,9 @@ trait BulkableRepo<D, J extends JobTrait>  {
      *      async - (default: true) whether it should return thr job imediately or do it sync
      * @return Job
      */
-    J bulkCreate(List<Map> dataList, Map args = [:]) {
+    J bulkCreate(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
 
-        J job = (J) jobRepo.create(args.source as String, args.sourceId as String, dataList)
+        J job = (J) jobRepo.create(bulkablArgs.jobSource, bulkablArgs.jobSourceId, dataList)
 
         //keep the jobId around
         Long jobId = job.id
@@ -67,12 +70,14 @@ trait BulkableRepo<D, J extends JobTrait>  {
         def results = new BulkableResults()
 
         Closure bulkCreateClosure = { List<Map> dataChunk ->
-            results.merge doBulkCreateTrx(dataChunk, args)
+            results.merge doBulkCreate(dataList, bulkablArgs.persistArgs)
         }
 
-        asyncSupport.parallelChunks(dataList, bulkCreateClosure)
+        def asynArgs = new AsyncArgs(transactional:true, datastore: getDatastore())
+        // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
+        asyncSupport.eachSlice(asynArgs, dataList, bulkCreateClosure)
 
-        finishJob(jobId, results, args.includes as List)
+        finishJob(jobId, results, bulkablArgs.includes)
 
         // return job
         return (J) jobRepo.get(jobId)
@@ -95,12 +100,14 @@ trait BulkableRepo<D, J extends JobTrait>  {
     // }
 
 
-    BulkableResults doBulkCreateTrx(List<Map> dataList, Map args = [:]){
-        trxService.withTrx {
-            doBulkCreate(dataList, args)
-        }
-    }
-
+    /**
+     * Does the bulk create, normally will be passing in a slice of data and this will be wrapped in a transaction
+     * Flushes and clears at the end so errors show up in the right place
+     *
+     * @param dataList the data chunk
+     * @param args the persist args to pass to repo methods
+     * @return the BulkableResults object with what succeeded and what failed
+     */
     BulkableResults doBulkCreate(List<Map> dataList, Map args = [:]){
         def results = new BulkableResults(false)
         for (Map item : dataList) {
@@ -117,6 +124,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 Result.of(apiError, itmCopy).addTo(results)
             }
         }
+        //end of transaction, flush here so easier to debug problems and clear for memory to help garbage collection
+        flushAndClear()
         return results
     }
 

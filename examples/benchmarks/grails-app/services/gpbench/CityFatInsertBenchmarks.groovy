@@ -1,5 +1,6 @@
 package gpbench
 
+import gorm.tools.async.AsyncArgs
 import yakworks.commons.lang.IsoDateUtil
 import gpbench.fat.*
 import gpbench.traits.BenchProcessData
@@ -152,7 +153,8 @@ class CityFatInsertBenchmarks extends BenchProcessData {
                     scriptinsert.insertRow(domainClass, row)
                 }
             } else if(createAction == 'save async') {
-                asyncSupport.parallelCollate(data) { row, zargs ->
+                def asyncArgs = AsyncArgs.of(domainClass).transactional(true)
+                asyncSupport.slicedEach(asyncArgs, data) { row ->
                     scriptinsert.insertRow(domainClass, row)
                 }
             }

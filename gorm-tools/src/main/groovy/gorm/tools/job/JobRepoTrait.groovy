@@ -15,7 +15,7 @@ import yakworks.commons.lang.Validate
 @CompileStatic
 trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
 
-    D create(String source, String sourceId, def payload) {
+    D create(String source, String sourceId, Object payload) {
         Validate.notNull(payload)
         byte[] data = Jsonify.render(payload).jsonText.bytes
         return create([source: source, sourceId: sourceId, state: JobState.Running, data: data], [flush:true])

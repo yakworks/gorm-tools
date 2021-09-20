@@ -1,11 +1,11 @@
 package gpbench.benchmarks.update
 
+import gorm.tools.async.AsyncArgs
 import gpbench.basic.CityBasic
 import gorm.tools.databinding.EntityMapBinder
-import grails.web.databinding.WebDataBinding
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
 
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -23,11 +23,11 @@ class GparsBaseLineUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
         List all = CityBasic.executeQuery("select id from ${domainClass.getSimpleName()}".toString()) as List<Long>
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
-        asyncSupport.parallel(cities) { List batch ->
-            asyncSupport.batchTrx(batch) {Long id ->
-                updateRow(id, citiesUpdated[at.incrementAndGet()])
-            }
+
+        def sliceClosure = asyncSupport.sliceClosure { Long id ->
+            updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
+        asyncSupport.parallel(AsyncArgs.transactional(), cities, sliceClosure)
     }
 
 

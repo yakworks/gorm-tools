@@ -22,11 +22,11 @@ project:
 
 app:
   name: restify
-  key: ${APP_NAME}${VERSION_POSTFIX} # ${DASH_SHORT_VERSION}
+  key: ${APP_NAME}${VERSION_POSTFIX}
   jar: examples/restify/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
   docker:
     src: ./deploy/docker
-    url: yakworks/gorm-tools:${APP_KEY} # ${VERSIONX}${DASH-SNAPSHOT}
+    url: yakworks/gorm-tools:${APP_KEY}
   kube:
     src: ./deploy/kube
     nfs: 10.42.2.176

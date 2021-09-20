@@ -1098,7 +1098,7 @@ Repository also publishes events using spring event mechanism which can be used 
 <p>Plugin makes it easy to process list of batches asynchronously with transaction using <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/AsyncSupport.html">AsyncSupport</a>. 
 <a href="https://yakworks.github.io/gorm-tools/api/gorm/tools/async/GparsAsyncSupport.html">GparsAsyncSupport</a> is default implementation provided by the plugin.</p>
 <p><strong>batchSize</strong> - Is the batchsize used for slicing the list. The default value is obtained from <code>hibernate.jdbc.batch_size</code> configuration setting. However it can be explicitely passed in args as shown in below example.<br />
-<strong>poolSize</strong> - Is the size of Gpars thread pool used by <code>GparsAsyncSupport</code>. The default value can configured using <code>gpars.poolsize</code>. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1</p>
+<strong>poolSize</strong> - Is the size of Gpars thread pool used by <code>GparsAsyncSupport</code>. The default value can configured using <code>gorm.tools.async.poolSize</code>. If not configured, it will use the default poolsize used by Gpars. which is available processors + 1</p>
 <p><strong>Example</strong>:
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">TestService</span> <span class="o">{</span>
     <span class="n">AsyncSupport</span> <span class="n">asyncSupport</span>

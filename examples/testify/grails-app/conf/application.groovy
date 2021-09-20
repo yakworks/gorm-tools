@@ -13,6 +13,8 @@ grails {
     }
 }
 
+// gorm.tools.async.enabled = true
+
 //gorm.tools.audit.enabled = false
 
 grails.config.locations =  ["classpath:yakworks/test-config.groovy"]

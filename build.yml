@@ -1,5 +1,8 @@
 # used in the build.sh as well as gradle
 # see defaults options https://github.com/yakworks/gradle-plugins/tree/master/src/main/resources/configs/defaults.yml
+
+# shipkit converts these keys to uppercase and dots to underscore. for example app.name will be APP_NAME
+
 title: Gorm Tools Grails Plugin
 description: Plugin tools Grails/Gorm - repository data services, json query language, fast data binder
 author: Yak.Works
@@ -8,23 +11,31 @@ project:
   # list of subproject dirs used to spin through, build the checksum and consolidate the test reports for circle
   subprojects: gorm-tools gorm-tools-rest gorm-tools-security rally-domain examples/restify examples/testify
 
-# app info, assumes that there is one main deployable app per project which is the best practice. You can always make more
-# bash converts to upper and dots to underscore. for example app.name will be APP_NAME
+# app info, assumes that there is one main deployable app per project which is the best practice.
+# But you can always make more and create a .env or .sh and call 'make foo env=deploy/custom.env
+# versions snapshot, dev, stable
+# restify:current stable, restify-dev: latest dev release, restify-snapshot: most recent snapshot
+# only when we have an old version will it have that appened.
+# app_key standard to <app name>-<env>-<short version>
+# so when app_name=restify, app_env=dev short_ver=10 then its restify-dev,
+# if VERSION_POSTFIX get set then it would be restify-snapshot
+
 app:
   name: restify
-  # key: ${APP_NAME}-${VERX_NO_DOTS}
-  key: restify${VERSION_POSTFIX}
-  dir: examples/restify
-  jar: ${APP_DIR}/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
-  docker_url: yakworks/gorm-tools:${APP_KEY}
+  key: ${APP_NAME}${VERSION_POSTFIX} # ${DASH_SHORT_VERSION}
+  jar: examples/restify/build/libs/${APP_NAME}-${BUILD_VERSION}.jar
+  docker:
+    src: ./deploy/docker
+    url: yakworks/gorm-tools:${APP_KEY} # ${VERSIONX}${DASH-SNAPSHOT}
   kube:
+    src: ./deploy/kube
     nfs: 10.42.2.176
     namespace: yakworks
     ingress_url: ${APP_KEY}.9ci.io
 
 bot:
   email: 9cibot@9ci.com
-  user: 9cibot
+  user: 9cibot2
 
 vault_url: https://github.com/9ci/vault.git
 

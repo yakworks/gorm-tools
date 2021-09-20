@@ -7,8 +7,8 @@ import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.testify.model.Project
 
-@Integration
 @Rollback
+@Integration
 class GparsAsyncSpec extends Specification {
 
     GparsAsyncSupport asyncSupport
@@ -18,19 +18,27 @@ class GparsAsyncSpec extends Specification {
         List<Map> list = createList(50)
 
         expect:
+        // Project.withSession {
+        //     Project.count() == 50
+        // }
         //starting org count
         Project.count() == 0
 
         list.size() == 50
 
         when:
-        AtomicInteger count = new AtomicInteger(0)
-        asyncSupport.eachParallel(list) { Map item ->
+        // FIXME #339 how is this working, transaction thats set on the test should not be rolling into asyncSupport?
+        def args = new AsyncArgs(asyncEnabled: true)
+        asyncSupport.eachParallel(args, list) { Map item ->
             new Project(num: item.name, name: "name $item.name").persist()
         }
+        // Project.repo.flush()
 
         then:
-        Project.count() == 50
+        Project.withSession {
+            Project.count() == 50
+        }
+
     }
 
     List<Map> createList(int num) {

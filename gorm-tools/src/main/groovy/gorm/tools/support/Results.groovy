@@ -6,11 +6,8 @@ package gorm.tools.support
 
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
-import groovy.transform.builder.Builder
-import groovy.transform.builder.SimpleStrategy
 
 import org.springframework.context.MessageSourceResolvable
-import org.springframework.core.NestedRuntimeException
 
 /**
  * In many cases for parallel processing and batch processing we are spinning through chunks of data.
@@ -22,7 +19,7 @@ import org.springframework.core.NestedRuntimeException
  */
 @SuppressWarnings(['ConfusingMethodName', 'MethodName'])
 @ToString(includes = ['ok', 'id', 'code', 'args', 'meta'], includeNames = true)
-@Builder(builderStrategy= SimpleStrategy, prefix="")
+// @Builder(builderStrategy= SimpleStrategy, includes=['id', 'code'], prefix="")
 //@MapConstructor(noArg=true)
 @CompileStatic
 class Results implements MsgSourceResolvable{
@@ -44,20 +41,13 @@ class Results implements MsgSourceResolvable{
 
     // the error message key, may be the same as this result but sometimes we have a header
     // or title message as its called in ApiErrors and this would be for the detail
-    MsgKey error
+    MsgKeyError error
 
     // in some cases we may keep a reference to the ex so we can build errors from it later
     // perhaps for the errors
     private Exception ex
 
-    // root cause message from the exception
-    String rootCause
-
     Results(){}
-
-    Results(String code, List args){
-        setMessage(code, args)
-    }
 
     Results(String code, List args, String defaultMessage){
         setMessage(code, args, defaultMessage)
@@ -68,15 +58,11 @@ class Results implements MsgSourceResolvable{
     }
 
     static Results of(Exception ex){
-        Results.error(ex)
+        Results.error().exception(ex)
     }
 
     static Results error(String code, List args = null, Exception ex = null){
         Results.error().message(code, args).exception(ex)
-    }
-
-    static Results error(Exception ex){
-        Results.error().exception(ex)
     }
 
     /**
@@ -98,7 +84,7 @@ class Results implements MsgSourceResolvable{
      * Ok result with message code
      */
     static Results OK(String code, List args = null, String defaultMessage = null){
-        new Results(code, args).defaultMessage(defaultMessage)
+        new Results(code, args, defaultMessage)
     }
 
     /**
@@ -118,25 +104,21 @@ class Results implements MsgSourceResolvable{
         this.defaultMessage = message
         return this
     }
+
+    Results id(Serializable id){
+        this.id = id
+        if(!args) args = [id]
+        return this
+    }
+
+    Results code(String code){
+        this.code = code
+        return this
+    }
+
     //shortcut for default message
     Results msg(String message){
         defaultMessage(message)
-    }
-
-    /**
-     * builder syntax for ok
-     */
-    Results ok(boolean ok){
-        this.ok = ok
-        return this
-    }
-
-    /**
-     * builder syntax for setting id
-     */
-    Results id(Serializable id){
-        this.id = id
-        return this
     }
 
     /**
@@ -148,48 +130,16 @@ class Results implements MsgSourceResolvable{
     }
 
     /**
-     * builder syntax for setting code
-     */
-    Results code(String code){
-        setCode(code)
-        return this
-    }
-
-    /**
      * builder syntax for adding exception
      */
     Results exception(Exception ex){
         if(!ex) return this
+        error = MsgKeyError.of(ex)
         // only fill message if not already set
-        if(ex instanceof MessageSourceResolvable){
-            //if we are not setup then use exception as message
-            if(!this.code){
-                this.setMessage(ex as MessageSourceResolvable)
-            } else {
-                error = MsgKey.of((MessageSourceResolvable)ex)
-            }
-        } else {
-            if(!this.code){
-                this.defaultMessage(ex.message)
-            } else {
-                error = new MsgKey(null, ex.message)
-            }
+        if(!code){
+            this.setMessage(error)
         }
         return this
-    }
-
-    Results errorMessage(Exception ex){
-        if(ex instanceof NestedRuntimeException){
-            rootCause = ex.rootCause ? ex.rootCause.message : ex.message
-        } else {
-            rootCause = ex.message
-        }
-        return this
-    }
-
-    //legacy
-    Results addError(Results res){
-        addFailed(res)
     }
 
     Results addFailed(Results res){
@@ -199,7 +149,7 @@ class Results implements MsgSourceResolvable{
     }
 
     Results addFailed(Exception ex){
-        addFailed(Results.error(ex))
+        addFailed(Results.of(ex))
     }
 
     Results fromChildList(String code, List<Results> childList){
@@ -220,21 +170,11 @@ class Results implements MsgSourceResolvable{
         return this
     }
 
+    //Discouraged
     String getMessage(){
         //use a var so in future we can get a bit fancier on how we contruct the message
         MessageSourceResolvable msr = this
-        if(id != null && !args) args = [id.toString()]
-        if(ex){
-            if(ex instanceof MessageSourceResolvable){
-                msr = (MessageSourceResolvable)ex
-                //setMessage(ex as MessageSourceResolvable)
-            }
-            else if(ex.hasProperty('messageMap')){
-                msr = new MsgKey(ex['messageMap'] as Map)
-            }
-        }
-        // return AppCtx.get("messageSource", MessageSource).getMessage(msr, LocaleContextHolder.getLocale())
-
+        //
         return MsgService.get(msr)
     }
 

@@ -121,7 +121,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     /**
      * allows to pass in a list of bean closures, calling defineBeans sometimes causes problems so this allows
      * you to pass in the collection and do the defintion at one time
-     * @param closures
      */
     void defineBeansMany(List<Closure> closures) {
         def binding = new Binding()

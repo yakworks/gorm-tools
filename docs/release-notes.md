@@ -1,3 +1,8 @@
+### v7.0.8-v.26
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.25...v7.0.8-v.26)
+- Parallel each (#346) [link](https://github.com/yakworks/gorm-tools/commit/1571e3b1960f8114d151ddc9c4cd13be0574c49d)
+
 ### v7.0.8-v.25
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25)

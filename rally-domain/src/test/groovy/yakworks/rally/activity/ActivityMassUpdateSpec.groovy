@@ -36,16 +36,13 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
     ActivityRepo activityRepo
     AppResourceLoader appResourceLoader
 
-    Closure doWithSpringFirst() {
-        return {
+    def setupSpec() {
+        defineBeans {
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }
             attachmentSupport(AttachmentSupport)
         }
-    }
-
-    def setupSpec() {
         mockDomains(Customer, Activity, ActivityNote, ActivityLink,
             Org, OrgTag, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus
         )

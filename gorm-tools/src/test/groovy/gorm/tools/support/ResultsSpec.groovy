@@ -8,7 +8,7 @@ import spock.lang.Specification
 class ResultsSpec extends Specification implements GormToolsSpecHelper {
 
     void setupSpec() {
-       defineCommonBeans()
+        defineCommonBeans()
     }
 
     def setup() {

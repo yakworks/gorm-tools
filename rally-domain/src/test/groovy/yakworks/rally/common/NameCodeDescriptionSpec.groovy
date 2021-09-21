@@ -5,6 +5,9 @@ import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.tag.model.Tag
 
+/**
+ * uses Tag to test the trait
+ */
 class NameCodeDescriptionSpec extends Specification  implements DomainRepoTest<Tag>, SecurityTest  {
 
     void "test populate name from code"() {

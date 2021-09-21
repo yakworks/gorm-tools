@@ -10,6 +10,7 @@ import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.testing.GrailsUnitTest
 import org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
+import org.springframework.beans.factory.support.BeanDefinitionRegistry
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
@@ -30,6 +31,7 @@ import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.NullPersistentContextInterceptor
+import grails.spring.BeanBuilder
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
@@ -38,7 +40,7 @@ import grails.persistence.support.NullPersistentContextInterceptor
  * @since 6.1
  */
 @CompileDynamic
-//@SuppressWarnings(["ClosureAsLastMethodParameter"])
+@SuppressWarnings(["Indentation"])
 trait GormToolsSpecHelper extends GrailsUnitTest {
 
     /** conveinince shortcut for applicationContext */
@@ -65,31 +67,33 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         return DefaultGormRepo
     }
 
-    @CompileDynamic
+    Closure commonBeans(){ { ->
+        entityMapBinder(EntityMapBinder, grailsApplication)
+        repoEventPublisher(RepoEventPublisher)
+        //repoUtilBean(RepoUtil)
+        repoExceptionSupport(RepoExceptionSupport)
+        mangoQuery(DefaultMangoQuery)
+        mangoBuilder(MangoBuilder)
+        trxService(TrxService)
+
+        jdbcIdGenerator(MockJdbcIdGenerator)
+        idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
+        persistenceContextInterceptor(NullPersistentContextInterceptor) //required for parallelTools
+        parallelTools(GparsParallelTools)
+        entityMapService(EntityMapService)
+        msgService(MsgService)
+    }}
+
+    /**
+     * see commonBeans, sets up beans for common services for binders, mango, idegen, parralelTools and msgService
+     */
     void defineCommonBeans(){
-        defineBeans {
-            entityMapBinder(EntityMapBinder, grailsApplication)
-            repoEventPublisher(RepoEventPublisher)
-            //repoUtilBean(RepoUtil)
-            repoExceptionSupport(RepoExceptionSupport)
-            mangoQuery(DefaultMangoQuery)
-            mangoBuilder(MangoBuilder)
-            trxService(TrxService)
-
-            jdbcIdGenerator(MockJdbcIdGenerator)
-            idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
-            persistenceContextInterceptor(NullPersistentContextInterceptor) //required for parallelTools
-            parallelTools(GparsParallelTools)
-            entityMapService(EntityMapService)
-            msgService(MsgService)
-        }
+        defineBeans(commonBeans())
     }
-
-    @CompileDynamic
     void defineRepoBeans(Class<?>... domainClassesToMock){
         RepoUtil.USE_CACHE = false
-        defineCommonBeans()
-        defineBeans {
+
+        Closure beanClos = {
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
             for (Class domainClass in domainClassesToMock) {
                 //do repo
@@ -110,6 +114,25 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
                 }
             }
         }
+
+        defineBeansMany([commonBeans(), beanClos])
+    }
+
+    /**
+     * allows to pass in a list of bean closures, calling defineBeans sometimes causes problems so this allows
+     * you to pass in the collection and do the defintion at one time
+     * @param closures
+     */
+    void defineBeansMany(List<Closure> closures) {
+        def binding = new Binding()
+        def bb = new BeanBuilder(null, null, grailsApplication.getClassLoader())
+        binding.setVariable "application", grailsApplication
+        bb.setBinding binding
+        for(Closure closure : closures){
+            bb.beans(closure)
+        }
+        bb.registerBeans((BeanDefinitionRegistry)applicationContext)
+        applicationContext.beanFactory.preInstantiateSingletons()
     }
 
     @CompileDynamic

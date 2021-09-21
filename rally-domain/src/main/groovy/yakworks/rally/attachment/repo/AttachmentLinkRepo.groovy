@@ -73,7 +73,7 @@ class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attach
                 Attachment attachmentCopy = Attachment.repo.copy(attachLink.attachment)
                 if (attachmentCopy) create(toEntity, attachmentCopy)
             } catch (ex){
-                results.addError(ex)
+                results.addFailed(ex)
             }
         }
         return results

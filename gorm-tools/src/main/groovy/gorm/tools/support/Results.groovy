@@ -7,11 +7,7 @@ package gorm.tools.support
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
-import org.springframework.context.MessageSource
 import org.springframework.context.MessageSourceResolvable
-import org.springframework.context.i18n.LocaleContextHolder
-
-import gorm.tools.beans.AppCtx
 
 /**
  * In many cases for parallel processing and batch processing we are spinning through chunks of data.
@@ -26,6 +22,10 @@ import gorm.tools.beans.AppCtx
 //@MapConstructor(noArg=true)
 @CompileStatic
 class Results implements MsgSourceResolvable{
+    public static final SUCCESS_CODE="results.ok"
+    public static final ERROR_CODE="results.error"
+    public static final FINISHED_CODE="results.finished"
+
     boolean ok = true
     //some or none of these may be filled in
     //the optional identifier of the entity this is for
@@ -40,19 +40,12 @@ class Results implements MsgSourceResolvable{
     List<Results> success = []
 
     Exception ex
+    // message from the exception
+    String errorMessage
 
     Results(){}
 
-    Results(String code){
-        setMessage(code, null)
-    }
-
     Results(String code, List args){
-        setMessage(code, args)
-    }
-
-    Results(boolean ok, String code, List args){
-        this.ok = ok
         setMessage(code, args)
     }
 
@@ -60,24 +53,26 @@ class Results implements MsgSourceResolvable{
         setMessage(code, args, defaultMessage)
     }
 
-    Results(List<Results> childList){
-        fromChildList(null, childList)
-    }
-
     static Results of(List<Results> childList){
         new Results().fromChildList(null, childList)
     }
 
-    static Results error(String code, List args = null, Exception ex = null){
-        new Results(false, code, args).exception(ex)
+    static Results of(Exception ex){
+        Results.error(ex)
     }
 
-    static Results error(String code, List args, String defMessage){
-        new Results(false, code, args).defaultMessage(defMessage)
+    static Results error(String code, List args = null, Exception ex = null){
+        Results.error().message(code, args).exception(ex)
     }
 
     static Results error(Exception ex){
-        Results.error().defaultMessage(ex.message)
+        def res = Results.error()
+        if(ex instanceof MessageSourceResolvable){
+            res.setMessage(ex as MessageSourceResolvable)
+        } else {
+            res.defaultMessage(ex.message)
+        }
+        return res
     }
 
     /**
@@ -97,10 +92,6 @@ class Results implements MsgSourceResolvable{
 
     /**
      * Ok result with message code
-     * @param code
-     * @param args
-     * @param defaultMessage
-     * @return the created result
      */
     static Results OK(String code, List args = null, String defaultMessage = null){
         new Results(code, args).defaultMessage(defaultMessage)
@@ -110,8 +101,8 @@ class Results implements MsgSourceResolvable{
      * sets the default message if not setting a message code
      * allows builder syntax like Results.OK().message('some foo')
      */
-    Results message(String defaultMessage){
-        this.defaultMessage = defaultMessage
+    Results message(String code, List args = null, String defaultMessage = null){
+        setMessage(code, args, defaultMessage)
         return this
     }
 
@@ -156,24 +147,29 @@ class Results implements MsgSourceResolvable{
      * builder syntax for adding exception
      */
     Results exception(Exception ex){
+        if(ex instanceof MessageSourceResolvable){
+            this.setMessage(ex as MessageSourceResolvable)
+        } else {
+            this.defaultMessage(ex.message)
+        }
+        //FIXME dont store exception, will be huge memory killer
         this.ex = ex
         return this
     }
 
-    Results makeError(Results res){
-        this.ok = false
-        this.failed.add(res)
-        return this
-    }
-
+    //legacy
     Results addError(Results res){
+        addFailed(res)
+    }
+
+    Results addFailed(Results res){
         this.ok = false
         this.failed.add(res)
         return this
     }
 
-    Results addError(Exception ex){
-        addError(Results.error(ex))
+    Results addFailed(Exception ex){
+        addFailed(Results.error(ex))
     }
 
     Results fromChildList(String code, List<Results> childList){

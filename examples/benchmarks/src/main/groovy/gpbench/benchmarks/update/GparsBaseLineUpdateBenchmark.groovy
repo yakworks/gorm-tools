@@ -1,6 +1,6 @@
 package gpbench.benchmarks.update
 
-import gorm.tools.async.AsyncArgs
+import gorm.tools.async.ParallelConfig
 import gpbench.basic.CityBasic
 import gorm.tools.databinding.EntityMapBinder
 
@@ -24,10 +24,10 @@ class GparsBaseLineUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
         List<List<Long>> batches = all.collate(batchSize)
         AtomicInteger at = new AtomicInteger(-1)
 
-        def sliceClosure = asyncSupport.sliceClosure { Long id ->
+        def sliceClosure = parallelTools.sliceClosure { Long id ->
             updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
-        asyncSupport.eachParallel(AsyncArgs.transactional(), cities, sliceClosure)
+        parallelTools.each(ParallelConfig.transactional(), cities, sliceClosure)
     }
 
 

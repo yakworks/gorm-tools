@@ -73,11 +73,11 @@ class Results implements MsgSourceResolvable{
     }
 
     static Results error(String code, List args, String defMessage){
-        new Results(false, code, args).message(defMessage)
+        new Results(false, code, args).defaultMessage(defMessage)
     }
 
     static Results error(Exception ex){
-        Results.error().message(ex.message)
+        Results.error().defaultMessage(ex.message)
     }
 
     /**
@@ -85,10 +85,6 @@ class Results implements MsgSourceResolvable{
      */
     static Results error(){
         new Results(ok: false)
-    }
-
-    static Results getError(){
-        return error()
     }
 
     static Results OK(){
@@ -100,10 +96,14 @@ class Results implements MsgSourceResolvable{
     }
 
     /**
-     * OK results with a
+     * Ok result with message code
+     * @param code
+     * @param args
+     * @param defaultMessage
+     * @return the created result
      */
     static Results OK(String code, List args = null, String defaultMessage = null){
-        new Results(code, args).message(defaultMessage)
+        new Results(code, args).defaultMessage(defaultMessage)
     }
 
     /**
@@ -113,6 +113,19 @@ class Results implements MsgSourceResolvable{
     Results message(String defaultMessage){
         this.defaultMessage = defaultMessage
         return this
+    }
+
+    /**
+     * sets the default message if not setting a message code
+     * allows builder syntax like Results.OK().defaultMessage('some foo')
+     */
+    Results defaultMessage(String message){
+        this.defaultMessage = message
+        return this
+    }
+    //shortcut for default message
+    Results msg(String message){
+        defaultMessage(message)
     }
 
     /**
@@ -194,7 +207,9 @@ class Results implements MsgSourceResolvable{
                 msr = new MsgKey(ex['messageMap'] as Map)
             }
         }
-        return AppCtx.get("messageSource", MessageSource).getMessage(msr, LocaleContextHolder.getLocale())
+        // return AppCtx.get("messageSource", MessageSource).getMessage(msr, LocaleContextHolder.getLocale())
+
+        return MsgService.get(msr)
     }
 
 }

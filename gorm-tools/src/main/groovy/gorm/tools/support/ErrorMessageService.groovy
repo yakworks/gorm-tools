@@ -12,6 +12,7 @@ import groovy.transform.CompileDynamic
 
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 
 import grails.validation.ValidationException
 import yakworks.commons.lang.NameUtils
@@ -21,6 +22,7 @@ import yakworks.commons.lang.NameUtils
  */
 //FIXME #339 is any of the functionality needed here? do we capture the BatchUpdateException still
 // if we replaced the functionality of this then lets remove it
+// its still used in one area of domain9, ArTranMassUpdateService, needs to be unwound
 @CompileDynamic
 class ErrorMessageService {
 
@@ -72,7 +74,7 @@ class ErrorMessageService {
                     NameUtils.getPropertyNameRepresentation(it.objectName)
                 }.each {
                     it.value = it.value.collectEntries {
-                        [(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+                        [(it.field): messageSource.getMessage(it, LocaleContextHolder.getLocale())]
                     }
                 }
             } else if (!e.hasProperty("entity")) {
@@ -80,7 +82,7 @@ class ErrorMessageService {
                     NameUtils.getPropertyNameRepresentation(it.objectName)
                 }.each {
                     it.value = it.value.collectEntries {
-                        [(it.field): messageSource.getMessage(it, Locale.ENGLISH)]
+                        [(it.field): messageSource.getMessage(it, LocaleContextHolder.getLocale())]
                     }
                 }
             }

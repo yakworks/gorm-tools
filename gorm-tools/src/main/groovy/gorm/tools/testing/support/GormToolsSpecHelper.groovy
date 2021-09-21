@@ -14,7 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
-import gorm.tools.async.GparsAsyncSupport
+import gorm.tools.async.GparsParallelTools
 import gorm.tools.beans.EntityMapService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
@@ -27,6 +27,7 @@ import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
+import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.NullPersistentContextInterceptor
 
@@ -65,8 +66,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     }
 
     @CompileDynamic
-    void defineRepoBeans(Class<?>... domainClassesToMock){
-        RepoUtil.USE_CACHE = false
+    void defineCommonBeans(){
         defineBeans {
             entityMapBinder(EntityMapBinder, grailsApplication)
             repoEventPublisher(RepoEventPublisher)
@@ -78,10 +78,18 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
-            persistenceContextInterceptor(NullPersistentContextInterceptor) //required for asyncSupport
-            asyncSupport(GparsAsyncSupport)
+            persistenceContextInterceptor(NullPersistentContextInterceptor) //required for parallelTools
+            parallelTools(GparsParallelTools)
             entityMapService(EntityMapService)
+            msgService(MsgService)
+        }
+    }
 
+    @CompileDynamic
+    void defineRepoBeans(Class<?>... domainClassesToMock){
+        RepoUtil.USE_CACHE = false
+        defineCommonBeans()
+        defineBeans {
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
             for (Class domainClass in domainClassesToMock) {
                 //do repo

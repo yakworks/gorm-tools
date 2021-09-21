@@ -114,7 +114,7 @@ and UrlMappings for a rest api. It uses a transactional Repository data service 
 | description     | information to appear to a dev and in the Open api docs                                                | ""                   |
 | endpoint        | if this annotation only for api docs and you don't want a controller generated then set this to false. | true                 |
 | readOnly        | Whether this is a read-only endpoint (one that doesn't allow DELETE, POST, PUT or PATCH requests)      | false                |
-| controllerClass | The Controller class to generate. Can be set to null to skip the generation                            | RestApiRepoController |
+| controllerClass | The Controller class to generate. Can be set to null to skip the generation                            | RestRepositoryApi |
 
 **Example**
 ```groovy
@@ -124,7 +124,7 @@ import gorm.restapi.RestApi
 class AppUser {
 ```
 
-see the section on the [RestApiRepoController](insert link here) for more details about the controller setup
+see the section on the [RestRepositoryApi](insert link here) for more details about the controller setup
 
 ### OpenAPI and json-schema
 

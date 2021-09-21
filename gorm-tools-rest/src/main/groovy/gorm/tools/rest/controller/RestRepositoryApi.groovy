@@ -48,6 +48,9 @@ trait RestRepositoryApi<D> implements RestApiController {
     @Autowired
     EntityMapService entityMapService
 
+    @Autowired
+    ApiErrorHandler apiErrorHandler
+
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
      * done in {@link gorm.tools.repository.GormRepo#getEntityClass}
@@ -261,7 +264,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     List getqSearchIncludes() { [] }
 
     void handleException(RuntimeException e) {
-        ApiError apiError = ApiErrorHandler.handleException(entityClass, e)
+        ApiError apiError = apiErrorHandler.handleException(entityClass, e)
 
         log.error(e.message, e)
 

@@ -41,6 +41,9 @@ trait BulkableRepo<D, J extends JobTrait>  {
     @Autowired
     TrxService trxService
 
+    @Autowired
+    ApiErrorHandler apiErrorHandler
+
     //Here for @CompileStatic - GormRepo implements these
     abstract D doCreate(Map data, Map args)
     abstract  Class<D> getEntityClass()
@@ -120,7 +123,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 entityInstance = doCreate(item, args)
                 Result.of(entityInstance, 201).addTo(results)
             } catch(Exception e) {
-                def apiError = ApiErrorHandler.handleException(getEntityClass(), e)
+                def apiError = apiErrorHandler.handleException(getEntityClass(), e)
                 Result.of(apiError, itmCopy).addTo(results)
             }
         }

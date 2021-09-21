@@ -25,8 +25,10 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
+import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
+import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.NullPersistentContextInterceptor
 
@@ -81,6 +83,8 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             persistenceContextInterceptor(NullPersistentContextInterceptor) //required for asyncSupport
             asyncSupport(GparsAsyncSupport)
             entityMapService(EntityMapService)
+            msgService(MsgService)
+            apiErrorHandler(ApiErrorHandler)
 
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
             for (Class domainClass in domainClassesToMock) {

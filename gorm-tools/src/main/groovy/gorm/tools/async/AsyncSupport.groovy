@@ -112,7 +112,7 @@ trait AsyncSupport implements WithTrx {
         verifyDatastore(asyncArgs)
         Closure sliceClos = sliceClosure(asyncArgs.datastore, itemClosure)
 
-        eachSlice(asyncArgs, collection as Collection<Object>,sliceClos) as Collection<T>
+        eachSlice(asyncArgs, collection as Collection<Object>, sliceClos) as Collection<T>
 
     }
 
@@ -150,7 +150,6 @@ trait AsyncSupport implements WithTrx {
 
     /**
      * checks args for session or trx and wraps the closure if needed
-     * @return
      */
     Closure wrapSessionOrTransaction(AsyncArgs asyncArgs, Closure closure){
         Closure wrappedClosure = closure
@@ -195,6 +194,7 @@ trait AsyncSupport implements WithTrx {
     //     }
     // }
     //
+    @SuppressWarnings(["EmptyCatchBlock"])
     public <T> Closure<T> wrapSession(Datastore ds, Closure<T> wrapped) {
         return { T item ->
             persistenceInterceptor.init()

@@ -7,8 +7,6 @@ package gorm.tools.async
 import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
-import groovy.transform.stc.ClosureParams
-import groovy.transform.stc.SecondParam
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.util.PoolUtils
 

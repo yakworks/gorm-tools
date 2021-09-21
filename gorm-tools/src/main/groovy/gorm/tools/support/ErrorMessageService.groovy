@@ -21,6 +21,7 @@ import yakworks.commons.lang.NameUtils
  */
 //FIXME #339 is any of the functionality needed here? do we capture the BatchUpdateException still
 // if we replaced the functionality of this then lets remove it
+// Still used by ArTran mass update, refactor to use new ApiError and ApiErrorHandler and remove this class.
 @CompileDynamic
 class ErrorMessageService {
 

@@ -171,9 +171,11 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * otherwise it will see if entity has lookupable or if the concrete repo has a lookup method
      *
      * @param data - the map with the keys for lookup
+     * @param boolean mustExist - if the record must exist, default true
      * @return the found entity
+     * @throws EntityNotFoundException if mustExist is true, and entity not found
      */
-    D findWithData(Map data) {
+    D findWithData(Map data, boolean mustExist = true) {
         D foundEntity
         def ident = data['id'] as Serializable
         //check by id first
@@ -187,7 +189,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         } else {
             foundEntity = lookup(data)
         }
-        RepoUtil.checkFound(foundEntity, 'data map', getEntityClass().name)
+        if(mustExist) RepoUtil.checkFound(foundEntity, 'data map', getEntityClass().name)
         return foundEntity
     }
 
@@ -197,8 +199,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     D lookup(Map data) {
         return null
     }
-
-
 
     void bindAndUpdate(D entity, Map data, Map args) {
         bindAndSave(entity, data, BindAction.Update, args)
@@ -289,21 +289,15 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     // this does nothing special for create so it really just for the update and deletes
     // if we want to support multiple ways to do look ups, for code for example, then this wont work
     // we can put the special look up logic in the main update maybe.
-    D createOrUpdate(Map data){
-        if(!data) return
-
-        D entity
-        DataOp op = DataOp.get(data.op) //add, update, delete really only needed for delete
-        if(data.id){
-            if(op == DataOp.remove) {
-                removeById(data.id as Long)
-            } else {
-                entity = update(data)
-            }
+    D createOrUpdate(Map data, Map args = [:]) {
+        if (!data) return
+        D instance = findWithData(data, false)
+        if (instance) {
+            instance = update(data, args)
         } else {
-            entity = create(data)
+            instance = create(data, args)
         }
-        return entity
+        return instance
     }
 
     /**
@@ -399,6 +393,9 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @return the list of created entities
      */
     //FIXME #339 lets move to Bulkable?
+    //@KJosh, in use cases such as doAssociations, when doing one-to-many collection handling,
+    // we just want to insert list of contacts for an org etc, batchCreateOrUpdate makes it easier, without needing its repo to be Bulkable.
+    //We use it for persistAssociationData when doing associations
     List<D> batchCreateOrUpdate(List<Map> dataList){
         List resultList = [] as List<D>
 
@@ -472,6 +469,9 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * Transactional, Iterates over list and runs closure for each item
      */
     //FIXME #339 move these out with bulkCreateOrUpdate? these are only used in benchmarks they needed?
+    //@josh we use this for association handling etc, when we want to store list of contacts for an org after persist
+    //one to many associations needs simple loop to create/update associations in a batch, when doing bindAssociation,
+    // and doesnt need Job or any other bulk functionality, so may be we can keep it here?
     void batchTrx(List list, Closure closure) {
         gormStaticApi().withTransaction { TransactionStatus status ->
             for (Object item : list) {

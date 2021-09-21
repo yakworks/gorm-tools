@@ -504,7 +504,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     @Transactional
     Results copyToOrg(Org fromOrg, Org toOrg) {
         List<Activity> activities = Activity.findAllWhere(org: fromOrg)
-        List<Results> copiedActivities = [] as List<Results>
+        List<Results> errorResults = [] as List<Results>
         activities.each { Activity activity ->
             try {
                 Activity copy = copy(activity, new Activity(org: toOrg))
@@ -512,13 +512,11 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
                     Map queryParams = [edDate: activity['editedDate'], crDate: activity['createdDate'], newid: copy.id]
                     Activity.executeUpdate("update Activity act set act.editedDate=:edDate, act.createdDate=:crDate where act.id=:newid ", queryParams)
                 }
-                copiedActivities.add(new Results(ok:true, code:"finished.ok"))
-
             } catch (EntityValidationException e) {
-                copiedActivities.add( Results.error("failed", ["Copy attachment"], e).id(activity.id) )
+                errorResults << Results.error("failed", ["Copy attachment"], e).id(activity.id)
             }
         }
-        return new Results("finished.ok", copiedActivities)
+        return errorResults ? Results.of(errorResults) : Results.OK()
 
     }
 

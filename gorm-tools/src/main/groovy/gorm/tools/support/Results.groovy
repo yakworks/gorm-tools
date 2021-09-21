@@ -7,11 +7,7 @@ package gorm.tools.support
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
 
-import org.springframework.context.MessageSource
 import org.springframework.context.MessageSourceResolvable
-import org.springframework.context.i18n.LocaleContextHolder
-
-import gorm.tools.beans.AppCtx
 
 /**
  * In many cases for parallel processing and batch processing we are spinning through chunks of data.
@@ -23,15 +19,19 @@ import gorm.tools.beans.AppCtx
  */
 @SuppressWarnings(['ConfusingMethodName', 'MethodName'])
 @ToString(includes = ['ok', 'id', 'code', 'args', 'meta'], includeNames = true)
+// @Builder(builderStrategy= SimpleStrategy, includes=['id', 'code'], prefix="")
 //@MapConstructor(noArg=true)
 @CompileStatic
 class Results implements MsgSourceResolvable{
+    public static final SUCCESS_CODE="results.ok"
+    public static final ERROR_CODE="results.error"
+    public static final FINISHED_CODE="results.finished"
+
     boolean ok = true
-    //some or none of these may be filled in
+
     //the optional identifier of the entity this is for
     Serializable id
-    //the entity that this result if for
-    Object entity
+
     //any extra meta information that can be set and passed up the chain for an error
     Map<String, Object> meta = [:] as Map<String, Object>
 
@@ -39,45 +39,30 @@ class Results implements MsgSourceResolvable{
     List<Results> failed = []
     List<Results> success = []
 
-    Exception ex
+    // the error message key, may be the same as this result but sometimes we have a header
+    // or title message as its called in ApiErrors and this would be for the detail
+    MsgKeyError error
+
+    // in some cases we may keep a reference to the ex so we can build errors from it later
+    // perhaps for the errors
+    private Exception ex
 
     Results(){}
 
-    Results(String code){
-        setMessage(code, null)
-    }
-
-    Results(String code, List args){
-        setMessage(code, args)
-    }
-
-    Results(boolean ok, String code, List args){
-        this.ok = ok
-        setMessage(code, args)
-    }
-
     Results(String code, List args, String defaultMessage){
         setMessage(code, args, defaultMessage)
-    }
-
-    Results(List<Results> childList){
-        fromChildList(null, childList)
     }
 
     static Results of(List<Results> childList){
         new Results().fromChildList(null, childList)
     }
 
+    static Results of(Exception ex){
+        Results.error().exception(ex)
+    }
+
     static Results error(String code, List args = null, Exception ex = null){
-        new Results(false, code, args).exception(ex)
-    }
-
-    static Results error(String code, List args, String defMessage){
-        new Results(false, code, args).message(defMessage)
-    }
-
-    static Results error(Exception ex){
-        Results.error().message(ex.message)
+        Results.error().message(code, args).exception(ex)
     }
 
     /**
@@ -85,10 +70,6 @@ class Results implements MsgSourceResolvable{
      */
     static Results error(){
         new Results(ok: false)
-    }
-
-    static Results getError(){
-        return error()
     }
 
     static Results OK(){
@@ -100,42 +81,51 @@ class Results implements MsgSourceResolvable{
     }
 
     /**
-     * OK results with a
+     * Ok result with message code
      */
     static Results OK(String code, List args = null, String defaultMessage = null){
-        new Results(code, args).message(defaultMessage)
+        new Results(code, args, defaultMessage)
     }
 
     /**
      * sets the default message if not setting a message code
      * allows builder syntax like Results.OK().message('some foo')
      */
-    Results message(String defaultMessage){
-        this.defaultMessage = defaultMessage
+    Results message(String code, List args = null, String defaultMessage = null){
+        setMessage(code, args, defaultMessage)
         return this
     }
 
     /**
-     * builder syntax for ok
+     * sets the default message if not setting a message code
+     * allows builder syntax like Results.OK().defaultMessage('some foo')
      */
-    Results ok(boolean ok){
-        this.ok = ok
+    Results defaultMessage(String message){
+        this.defaultMessage = message
         return this
+    }
+
+    Results id(Serializable id){
+        this.id = id
+        if(!args) args = [id.toString()]
+        return this
+    }
+
+    Results code(String code){
+        this.code = code
+        return this
+    }
+
+    //shortcut for default message
+    Results msg(String message){
+        defaultMessage(message)
     }
 
     /**
      * builder syntax for setting id
      */
-    Results id(Serializable id){
-        this.id = id
-        return this
-    }
-
-    /**
-     * builder syntax for setting code
-     */
-    Results code(String code){
-        setCode(code)
+    Results meta(Map map){
+        this.meta.putAll(map)
         return this
     }
 
@@ -143,24 +133,23 @@ class Results implements MsgSourceResolvable{
      * builder syntax for adding exception
      */
     Results exception(Exception ex){
-        this.ex = ex
+        if(!ex) return this
+        error = MsgKeyError.of(ex)
+        // only fill message if not already set
+        if(!code){
+            this.setMessage(error)
+        }
         return this
     }
 
-    Results makeError(Results res){
+    Results addFailed(Results res){
         this.ok = false
         this.failed.add(res)
         return this
     }
 
-    Results addError(Results res){
-        this.ok = false
-        this.failed.add(res)
-        return this
-    }
-
-    Results addError(Exception ex){
-        addError(Results.error(ex))
+    Results addFailed(Exception ex){
+        addFailed(Results.of(ex))
     }
 
     Results fromChildList(String code, List<Results> childList){
@@ -181,20 +170,12 @@ class Results implements MsgSourceResolvable{
         return this
     }
 
+    //Discouraged
     String getMessage(){
         //use a var so in future we can get a bit fancier on how we contruct the message
         MessageSourceResolvable msr = this
-        if(id != null && !args) args = [id.toString()]
-        if(ex){
-            if(ex instanceof MessageSourceResolvable){
-                msr = (MessageSourceResolvable)ex
-                //setMessage(ex as MessageSourceResolvable)
-            }
-            else if(ex.hasProperty('messageMap')){
-                msr = new MsgKey(ex['messageMap'] as Map)
-            }
-        }
-        return AppCtx.get("messageSource", MessageSource).getMessage(msr, LocaleContextHolder.getLocale())
+        //
+        return MsgService.get(msr)
     }
 
 }

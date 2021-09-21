@@ -30,16 +30,9 @@ trait DataRepoTest implements JsonViewSpecSetup, GormToolsSpecHelper, BuildDataT
     }
 
     //called from BuildDataTest as it setups and mocks the domains
-    void onMockDomains(Class<?>... entityClasses) {
-        defineBeans(doWithSpringFirst())
-        //mockRepositories(entityClasses)
-    }
+    // void onMockDomains(Class<?>... entityClasses) {
+    //     defineBeans(doWithSpringFirst())
+    //     //mockRepositories(entityClasses)
+    // }
 
-    /**
-     * Call back to provide beans before repositories are mocked, this gives chance to define beans which may need to
-     * be injected into repositories
-     */
-    Closure doWithSpringFirst() {
-        return {}
-    }
 }

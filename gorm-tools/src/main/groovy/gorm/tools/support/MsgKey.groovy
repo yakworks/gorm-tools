@@ -7,6 +7,7 @@ package gorm.tools.support
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import groovy.transform.TupleConstructor
 
 import org.springframework.context.MessageSourceResolvable
 
@@ -19,7 +20,8 @@ import org.springframework.context.MessageSourceResolvable
 @SuppressWarnings("serial")
 @CompileStatic
 @EqualsAndHashCode
-@ToString(includes = ['msgCodes', 'args', 'defaultMessage'], includeNames = true)
+@TupleConstructor
+@ToString(includes = ['code', 'args', 'defaultMessage'], includeNames = true)
 class MsgKey implements MsgSourceResolvable, Serializable {
 
     /**
@@ -27,45 +29,9 @@ class MsgKey implements MsgSourceResolvable, Serializable {
      */
     MsgKey() {}
 
-    /**
-     * Create a new MessageSourceKey.
-     * @param code the code to be used to resolve this message
-     */
-    MsgKey(String code) {
-        this([code], null, null)
-    }
-
-    /**
-     * Create a new MessageSourceKey.
-     * @param codes the codes to be used to resolve this message
-     */
-    MsgKey(List<String> codes) {
-        this(codes, null, null)
-    }
-
-    MsgKey(String code, String defaultMessage) {
-        this([code], null, defaultMessage)
-    }
-
-    MsgKey(String code, List arguments) {
-        this([code], arguments, null)
-    }
-
-    MsgKey(String code, List arguments, String defaultMessage) {
+    MsgKey(String code, List arguments = null, String defaultMessage = null) {
         this([code], arguments, defaultMessage)
     }
-
-    MsgKey(Map msgMap) {
-        this([msgMap.code as String], msgMap.args as List, msgMap.defaultMessage as String)
-    }
-    /**
-     * Copy constructor: Create a new instance from another resolvable.
-     * @param resolvable the resolvable to copy from
-     */
-    MsgKey(MessageSourceResolvable resolvable) {
-        this(resolvable.codes.toList(), resolvable.arguments.toList(), resolvable.defaultMessage)
-    }
-
     /**
      * Create a new MessageSourceKey.
      * @param codes the codes to be used to resolve this message
@@ -77,5 +43,22 @@ class MsgKey implements MsgSourceResolvable, Serializable {
         this.args = arguments
         this.defaultMessage = defaultMessage
     }
+
+    static MsgKey of(MessageSourceResolvable resolvable) {
+        new MsgKey(resolvable.codes?.toList(), resolvable.arguments?.toList(), resolvable.defaultMessage)
+    }
+
+    static MsgKey of(String code, List arguments = null, String defaultMessage = null) {
+        new MsgKey(code, arguments, defaultMessage)
+    }
+
+    static MsgKey of(String code, String defaultMessage) {
+        of(code, null, defaultMessage)
+    }
+
+    static MsgKey ofDefault(String defaultMessage) {
+        of(null, null, defaultMessage)
+    }
+
 
 }

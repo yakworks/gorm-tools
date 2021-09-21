@@ -2,7 +2,7 @@ package gpbench.benchmarks
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.async.AsyncSupport
+import gorm.tools.async.ParallelTools
 import gorm.tools.repository.RepoUtil
 import gpbench.basic.CityBasic
 import gpbench.helpers.JsonReader
@@ -15,7 +15,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
     int poolSize
     int batchSize
 
-    AsyncSupport asyncSupport
+    ParallelTools parallelTools
 
     JsonReader jsonReader
 

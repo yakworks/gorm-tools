@@ -32,17 +32,13 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
     AppResourceLoader appResourceLoader
     AttachmentRepo attachmentRepo
 
-    // doWithSpringFirst makes sure they are setup so they can be used in the test here
-    Closure doWithSpringFirst() {
-        return {
+    def setupSpec() {
+        defineBeans {
             appResourceLoader(AppResourceLoader) {
                 grailsApplication = grailsApplication
             }
             attachmentSupport(AttachmentSupport)
         }
-    }
-
-    def setupSpec() {
         mockDomains(Attachment, AttachmentLink, FileData, Tag, TagLink)
     }
 
@@ -210,7 +206,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
 
         then: "will fail on name"
         EntityValidationException g = thrown()
-        'validation.error' == g.messageMap.code
+        'validation.error' == g.code
         // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
         // File monthDir = appResourceLoader.getMonthDirectory("attachments.location")
         // File testFile = new File(monthDir.path, destFileName)

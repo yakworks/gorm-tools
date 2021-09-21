@@ -37,7 +37,7 @@ abstract class BaseUpdateBenchmark<T> extends BaseBatchInsertBenchmark<T> {
         regionIds = Region.executeQuery("select id from Region")
         regionCount = Region.count()
 
-        asyncSupport.parallel(cities) { List<Map> list ->
+        parallelTools.parallel(cities) { List<Map> list ->
             repo.batchTrx(list) { Map item ->
                 repo.doCreate(item, [:])
             }

@@ -1,6 +1,5 @@
 package gorm.tools.async
 
-import java.util.concurrent.atomic.AtomicInteger
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -9,9 +8,9 @@ import yakworks.testify.model.Project
 
 @Rollback
 @Integration
-class GparsAsyncSpec extends Specification {
+class ParallelToolsSpecSpec extends Specification {
 
-    GparsAsyncSupport asyncSupport
+    ParallelTools parallelTools
 
     void "test eachParallel"() {
         given:
@@ -27,9 +26,9 @@ class GparsAsyncSpec extends Specification {
         list.size() == 50
 
         when:
-        // FIXME #339 how is this working, transaction thats set on the test should not be rolling into asyncSupport?
-        def args = new AsyncArgs(asyncEnabled: true)
-        asyncSupport.eachParallel(args, list) { Map item ->
+        // FIXME #339 how is this working, transaction thats set on the test should not be rolling into parallelTools?
+        def args = new ParallelConfig(enabled: true)
+        parallelTools.each(args, list) { Map item ->
             new Project(num: item.name, name: "name $item.name").persist()
         }
         // Project.repo.flush()

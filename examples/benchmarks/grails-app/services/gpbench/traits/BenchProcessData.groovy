@@ -3,7 +3,7 @@ package gpbench.traits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.async.AsyncArgs
+import gorm.tools.async.ParallelConfig
 import gorm.tools.beans.Pager
 import gorm.tools.transaction.WithTrx
 import gorm.tools.databinding.BindAction
@@ -68,14 +68,14 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
 
     void saveAsync(Class domainClass, List<Map> dataMap){
         //collates list into list of lists
-        def collatedList = asyncSupport.slice(dataMap)
+        def collatedList = parallelTools.slice(dataMap)
         if(binderType == 'gorm-tools-repo'){
-            asyncSupport.eachParallel(collatedList, getRepoBatchClosure())
+            parallelTools.each(collatedList, getRepoBatchClosure())
         } else {
-            def sliceClosure = asyncSupport.sliceClosure { Map item ->
+            def sliceClosure = parallelTools.sliceClosure { Map item ->
                 getBindAndSaveClosure().call(domainClass, item)
             }
-            asyncSupport.eachParallel(AsyncArgs.transactional(), collatedList, sliceClosure)
+            parallelTools.each(ParallelConfig.transactional(), collatedList, sliceClosure)
         }
     }
 

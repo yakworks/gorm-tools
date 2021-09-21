@@ -7,8 +7,6 @@ package gorm.tools.async
 import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
-import groovy.transform.stc.ClosureParams
-import groovy.transform.stc.SecondParam
 import groovyx.gpars.GParsPoolUtil
 import groovyx.gpars.util.PoolUtils
 
@@ -17,7 +15,7 @@ import gorm.tools.support.ConfigAware
 import static groovyx.gpars.GParsPool.withPool
 
 /**
- * a Gpars implementation of the AsyncSupport trait
+ * a Gpars implementation of the ParallelTools trait
  * to be used for colating/slicing a list into "batches" to then asynchronously process with Transactions
  * insert or update for maximum performance.
  *
@@ -25,7 +23,7 @@ import static groovyx.gpars.GParsPool.withPool
  * @since 6.1
  */
 @CompileStatic
-class GparsAsyncSupport implements AsyncSupport, ConfigAware {
+class GparsParallelTools implements ParallelTools, ConfigAware {
 
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct
@@ -38,8 +36,8 @@ class GparsAsyncSupport implements AsyncSupport, ConfigAware {
 
 
     @Override
-    public <T> Collection<T> eachParallel(AsyncArgs args, Collection<T> collection, Closure closure){
-        boolean gparsEnabled = args.asyncEnabled != null ? args.asyncEnabled : getAsyncEnabled()
+    public <T> Collection<T> each(ParallelConfig args, Collection<T> collection, Closure closure){
+        boolean gparsEnabled = args.enabled != null ? args.enabled : getAsyncEnabled()
 
         Closure wrappedClosure = wrapSessionOrTransaction(args, closure)
 

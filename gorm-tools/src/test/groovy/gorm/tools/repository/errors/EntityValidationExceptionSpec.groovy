@@ -23,7 +23,7 @@ class EntityValidationExceptionSpec extends Specification {
     void testNoErrors() {
         setup:
         Map entity = [someEntity: "go cubs"]
-        def msgKey = new MsgKey('vtest', 'defmsg')
+        def msgKey = MsgKey.of('vtest', 'defmsg')
 
         when:
         def e = new EntityValidationException(msgKey, entity)

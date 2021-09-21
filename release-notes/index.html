@@ -512,10 +512,21 @@
                 
                 <h3 id="v708-v25">v7.0.8-v.25<a class="headerlink" href="#v708-v25" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25">Full Changelog</a>
+- fix bad build.yml <a href="https://github.com/yakworks/gorm-tools/commit/71737ba4dbf530e825ea6deb1dce7af07ae28bf5">link</a>
+- fix async errors <a href="https://github.com/yakworks/gorm-tools/commit/9d904de3f8cb7f07fffad03208fc014188fac411">link</a>
+- Merge branch 'async' <a href="https://github.com/yakworks/gorm-tools/commit/7104b2f4387775b9133cdc4dc9cc1cbaf2170c38">link</a>
+- change asyn so only each parralel <a href="https://github.com/yakworks/gorm-tools/commit/829ea01e84a4dc07ba982459f5094bcc3f8d2421">link</a>
+- Async (#344) <a href="https://github.com/yakworks/gorm-tools/commit/ced63ee9ca06e4c7b0c26db55fb24d234cb5363a">link</a>
+- asyn refactor and clean up old unused stuff from benchmarks <a href="https://github.com/yakworks/gorm-tools/commit/5374c82ebc40cdcab1bb3253a6e1018d400e6524">link</a>
 - #339 Bulkable tests (#343) <a href="https://github.com/yakworks/gorm-tools/commit/0434020ca2449e809a106bb83c1ee0c1e63d7a34">link</a>
 - Trx service (#342) <a href="https://github.com/yakworks/gorm-tools/commit/17fce5de03864d734b4bebe798b1a1d87cd90876">link</a>
 - FIXME comments for #339 (#340) <a href="https://github.com/yakworks/gorm-tools/commit/5e75637b86b07c7d932511165edbac1905dba44c">link</a></p>
 <h3 id="v708-v25_1">v7.0.8-v.25<a class="headerlink" href="#v708-v25_1" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25">Full Changelog</a>
+- #339 Bulkable tests (#343) <a href="https://github.com/yakworks/gorm-tools/commit/0434020ca2449e809a106bb83c1ee0c1e63d7a34">link</a>
+- Trx service (#342) <a href="https://github.com/yakworks/gorm-tools/commit/17fce5de03864d734b4bebe798b1a1d87cd90876">link</a>
+- FIXME comments for #339 (#340) <a href="https://github.com/yakworks/gorm-tools/commit/5e75637b86b07c7d932511165edbac1905dba44c">link</a></p>
+<h3 id="v708-v25_2">v7.0.8-v.25<a class="headerlink" href="#v708-v25_2" title="Permanent link">&para;</a></h3>
 <p><a href="https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.24...v7.0.8-v.25">Full Changelog</a>
 - #339 Bulkable tests (#343) <a href="https://github.com/yakworks/gorm-tools/commit/0434020ca2449e809a106bb83c1ee0c1e63d7a34">link</a>
 - Trx service (#342) <a href="https://github.com/yakworks/gorm-tools/commit/17fce5de03864d734b4bebe798b1a1d87cd90876">link</a>
@@ -787,7 +798,7 @@
 <li>2019-05-20 - <a href="https://github.com/yakworks/gorm-tools/compare/v6.2.1...v6.2.2">4 commits</a> by <a href="https://github.com/basejump">Joshua B</a> - published to <a href="https://bintray.com/null/null/org.grails.plugins/6.2.2"><img alt="Bintray" src="https://img.shields.io/badge/Bintray-6.2.2-green.svg" /></a></li>
 <li>
 <ul>
-<li>rename asyncSupport <a href="https://github.com/yakworks/gorm-tools/pull/195">(#195)</a></li>
+<li>rename parallelTools <a href="https://github.com/yakworks/gorm-tools/pull/195">(#195)</a></li>
 </ul>
 </li>
 </ul>
@@ -914,11 +925,11 @@
 <li>quickSearchFields for Mango should have defaults and be able to be set in config <a href="https://github.com/yakworks/gorm-tools/issues/89">(#89)</a></li>
 <li>@GormRepository annotation for AST <a href="https://github.com/yakworks/gorm-tools/issues/88">(#88)</a></li>
 <li>Groovydocs updates <a href="https://github.com/yakworks/gorm-tools/pull/87">(#87)</a></li>
-<li>AsyncSupport and GparsAsyncSupport need tests and docs <a href="https://github.com/yakworks/gorm-tools/issues/86">(#86)</a></li>
+<li>ParallelTools and GparsParallelTools need tests and docs <a href="https://github.com/yakworks/gorm-tools/issues/86">(#86)</a></li>
 <li>81 map binder <a href="https://github.com/yakworks/gorm-tools/pull/83">(#83)</a></li>
 <li>GormMapBinder enhancments <a href="https://github.com/yakworks/gorm-tools/issues/82">(#82)</a></li>
 <li>FastBinder refactor to a trait MapBinder <a href="https://github.com/yakworks/gorm-tools/issues/81">(#81)</a></li>
-<li>Refactor to AsyncSupport so the gpars lib is behind the scenes a… <a href="https://github.com/yakworks/gorm-tools/pull/80">(#80)</a></li>
+<li>Refactor to ParallelTools so the gpars lib is behind the scenes a… <a href="https://github.com/yakworks/gorm-tools/pull/80">(#80)</a></li>
 <li>Mango override for dao <a href="https://github.com/yakworks/gorm-tools/pull/79">(#79)</a></li>
 <li>Code reformat <a href="https://github.com/yakworks/gorm-tools/pull/78">(#78)</a></li>
 <li>DbDialectService working with H2 and tests <a href="https://github.com/yakworks/gorm-tools/issues/77">(#77)</a></li>

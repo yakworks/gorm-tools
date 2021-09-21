@@ -66,6 +66,14 @@ class MsgKey implements MsgSourceResolvable, Serializable {
         this(resolvable.codes.toList(), resolvable.arguments.toList(), resolvable.defaultMessage)
     }
 
+    static MsgKey of(MessageSourceResolvable resolvable) {
+        new MsgKey(resolvable)
+    }
+
+    static MsgKey of(String code, List arguments = null, String defaultMessage = null) {
+        new MsgKey(code, arguments, defaultMessage)
+    }
+
     /**
      * Create a new MessageSourceKey.
      * @param codes the codes to be used to resolve this message

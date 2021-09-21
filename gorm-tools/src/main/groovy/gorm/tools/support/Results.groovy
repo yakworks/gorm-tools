@@ -6,8 +6,11 @@ package gorm.tools.support
 
 import groovy.transform.CompileStatic
 import groovy.transform.ToString
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 
 import org.springframework.context.MessageSourceResolvable
+import org.springframework.core.NestedRuntimeException
 
 /**
  * In many cases for parallel processing and batch processing we are spinning through chunks of data.
@@ -19,6 +22,7 @@ import org.springframework.context.MessageSourceResolvable
  */
 @SuppressWarnings(['ConfusingMethodName', 'MethodName'])
 @ToString(includes = ['ok', 'id', 'code', 'args', 'meta'], includeNames = true)
+@Builder(builderStrategy= SimpleStrategy, prefix="")
 //@MapConstructor(noArg=true)
 @CompileStatic
 class Results implements MsgSourceResolvable{
@@ -27,11 +31,10 @@ class Results implements MsgSourceResolvable{
     public static final FINISHED_CODE="results.finished"
 
     boolean ok = true
-    //some or none of these may be filled in
+
     //the optional identifier of the entity this is for
     Serializable id
-    //the entity that this result if for
-    Object entity
+
     //any extra meta information that can be set and passed up the chain for an error
     Map<String, Object> meta = [:] as Map<String, Object>
 
@@ -39,9 +42,16 @@ class Results implements MsgSourceResolvable{
     List<Results> failed = []
     List<Results> success = []
 
-    Exception ex
-    // message from the exception
-    String errorMessage
+    // the error message key, may be the same as this result but sometimes we have a header
+    // or title message as its called in ApiErrors and this would be for the detail
+    MsgKey error
+
+    // in some cases we may keep a reference to the ex so we can build errors from it later
+    // perhaps for the errors
+    private Exception ex
+
+    // root cause message from the exception
+    String rootCause
 
     Results(){}
 
@@ -66,13 +76,7 @@ class Results implements MsgSourceResolvable{
     }
 
     static Results error(Exception ex){
-        def res = Results.error()
-        if(ex instanceof MessageSourceResolvable){
-            res.setMessage(ex as MessageSourceResolvable)
-        } else {
-            res.defaultMessage(ex.message)
-        }
-        return res
+        Results.error().exception(ex)
     }
 
     /**
@@ -136,6 +140,14 @@ class Results implements MsgSourceResolvable{
     }
 
     /**
+     * builder syntax for setting id
+     */
+    Results meta(Map map){
+        this.meta.putAll(map)
+        return this
+    }
+
+    /**
      * builder syntax for setting code
      */
     Results code(String code){
@@ -147,13 +159,31 @@ class Results implements MsgSourceResolvable{
      * builder syntax for adding exception
      */
     Results exception(Exception ex){
+        if(!ex) return this
+        // only fill message if not already set
         if(ex instanceof MessageSourceResolvable){
-            this.setMessage(ex as MessageSourceResolvable)
+            //if we are not setup then use exception as message
+            if(!this.code){
+                this.setMessage(ex as MessageSourceResolvable)
+            } else {
+                error = MsgKey.of((MessageSourceResolvable)ex)
+            }
         } else {
-            this.defaultMessage(ex.message)
+            if(!this.code){
+                this.defaultMessage(ex.message)
+            } else {
+                error = new MsgKey(null, ex.message)
+            }
         }
-        //FIXME dont store exception, will be huge memory killer
-        this.ex = ex
+        return this
+    }
+
+    Results errorMessage(Exception ex){
+        if(ex instanceof NestedRuntimeException){
+            rootCause = ex.rootCause ? ex.rootCause.message : ex.message
+        } else {
+            rootCause = ex.message
+        }
         return this
     }
 

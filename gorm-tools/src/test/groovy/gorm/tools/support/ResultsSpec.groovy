@@ -68,7 +68,7 @@ class ResultsSpec extends Specification implements GormToolsSpecHelper {
 
     def "test error with args and def message"() {
         when:
-        def er = Results.error('sky.dive.with.args', ['go', 'fast'], 'im default')
+        def er = Results.error('sky.dive.with.args', ['go', 'fast']).defaultMessage('im default')
 
         then:
         er.code == 'sky.dive.with.args'

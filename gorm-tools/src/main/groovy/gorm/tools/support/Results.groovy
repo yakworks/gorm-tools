@@ -107,7 +107,7 @@ class Results implements MsgSourceResolvable{
 
     Results id(Serializable id){
         this.id = id
-        if(!args) args = [id]
+        if(!args) args = [id.toString()]
         return this
     }
 

@@ -62,7 +62,7 @@ class MsgKeyError extends MsgKey {
         if(ex instanceof NestedRuntimeException){
             rootCause = ex.rootCause ? ex.rootCause.message : ex.message
         } else {
-            rootCause = NestedExceptionUtils.getRootCause(ex).message
+            rootCause = NestedExceptionUtils.getRootCause(ex)?.message
         }
         return this
     }

@@ -24,7 +24,7 @@ class JobRepo implements  JobRepoTrait<Job> {
             def payload = data.dataPayload
             if (payload  && (payload instanceof Map || payload instanceof List)) {
                 def res = Jsonify.render(payload)
-                job.data = res.jsonText.bytes
+                job.requestData = res.jsonText.bytes
                 job.sourceType = SourceType.RestApi  // we should default to RestApi if dataPayload is passed
             }
         }

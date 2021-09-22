@@ -16,7 +16,7 @@ trait JobTrait<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> 
     Boolean ok = false // change to TRUE if State.Finished without any issues
     JobState state = JobState.Running
     // data we are getting. For RestApi calls it's data body
-    byte[] data
+    byte[] requestData
     // // The List of bulkable results in json form
     // byte[] results
 

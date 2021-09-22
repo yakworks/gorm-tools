@@ -27,17 +27,14 @@ class JobImplSpec extends Specification  implements DomainRepoTest<JobImpl> {
         then:
         job
         !job.validate()
-
-
     }
-
 
     void "convert json to byte array"() {
         setup:
         def res = Jsonify.render(["One", "Two", "Three"])
 
         when:
-        JobImpl job = new JobImpl(sourceType: SourceType.ERP, sourceId: 'ar/org', data:res.jsonText.bytes)
+        JobImpl job = new JobImpl(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.jsonText.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
@@ -48,13 +45,9 @@ class JobImplSpec extends Specification  implements DomainRepoTest<JobImpl> {
 
         then:
         j
-        res.jsonText.bytes == j.data
-        res.jsonText == new String(j.data, 'UTF-8')
+        res.jsonText.bytes == j.requestData
+        res.jsonText == new String(j.requestData, 'UTF-8')
 
     }
-
-
-
-
 
 }

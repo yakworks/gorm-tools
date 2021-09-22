@@ -23,7 +23,7 @@ class Job implements JobTrait<Job>, Serializable {
 
     //The "results" is a response of resources that were successfully and unsuccessfully updated or created after processing.
     // The results differ depending on the sourceType of the job
-    byte[] results
+    byte[] data
 
     // int persistenceDuration  //job can be purged after that time (number of days???)
 
@@ -36,8 +36,8 @@ class Job implements JobTrait<Job>, Serializable {
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],
         message:[ d: 'Main message from results'],
-        data:[ d: 'Json data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
-        results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
+        requestData:[ d: 'Json data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
+        data: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
     ]
 
 

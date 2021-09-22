@@ -18,7 +18,7 @@ class JobImpl implements JobTrait<JobImpl>, GormRepoEntity<JobImpl, JobImplRepo>
     String message  // not sure if needed
 
     // String fileWithJson  // option if json is too big
-    byte[] results
+    byte[] data
 
     // int persistenceDuration  //job can be purged after that time (number of days???)
 
@@ -28,7 +28,7 @@ class JobImpl implements JobTrait<JobImpl>, GormRepoEntity<JobImpl, JobImplRepo>
         state:[ d: 'State of the job', nullable: false],
         message:[ d: 'Main message from results'],
         data:[ d: 'Json data that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
-        results: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES],
+        data: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES],
         sourceId: [d: 'end point or scheduled job name', nullable: false, example: 'api/ar/tran/bulkCreate?source=Oracle']
     ]
 

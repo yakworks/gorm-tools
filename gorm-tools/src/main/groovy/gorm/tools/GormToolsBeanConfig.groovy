@@ -28,6 +28,7 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.GrailsRepositoryClass
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
+import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoValidatorRegistry
 import gorm.tools.support.ErrorMessageService
@@ -60,7 +61,6 @@ class GormToolsBeanConfig {
     Closure getBeanDefinitions() {{->
         msgService(MsgService)
         errorMessageService(ErrorMessageService, lazy())
-
         jdbcTemplate(JdbcTemplate, ref("dataSource"), lazy())
 
         jdbcIdGenerator(JdbcIdGenerator) { bean ->
@@ -93,6 +93,7 @@ class GormToolsBeanConfig {
         }
 
         trxService(TrxService, lazy())
+        apiErrorHandler(ApiErrorHandler, lazy())
 
         def repoClasses = application.repositoryClasses
         for(GrailsRepositoryClass repoClass : repoClasses){

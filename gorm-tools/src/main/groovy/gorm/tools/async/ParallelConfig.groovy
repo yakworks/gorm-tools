@@ -15,9 +15,8 @@ import yakworks.commons.lang.Validate
 
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
-class AsyncArgs {
+class ParallelConfig {
 
-    //FIXME document these
     /**
      * the size of the lists when collated or sliced into chunks,
      * overrides defaults that get set from jdbc.batch_size
@@ -34,7 +33,7 @@ class AsyncArgs {
      * override the default pool size that gets set from gorm.tools.async.enabled
      * useful for testing
      */
-    Boolean asyncEnabled
+    Boolean enabled
 
     /**
      * wrap the closure for slice or entry in a transaction, so its transaction for each parrallel run
@@ -59,18 +58,18 @@ class AsyncArgs {
         }
     }
 
-    static AsyncArgs transactional(){
-        new AsyncArgs(transactional: true)
+    static ParallelConfig transactional(){
+        new ParallelConfig(transactional: true)
     }
 
-    static AsyncArgs of(Datastore ds, boolean session = true){
+    static ParallelConfig of(Datastore ds, boolean session = true){
         // if passing in a datastore then assume you want a session too. so set to false if not desired
         // if transactional is set later then it overrides session
-        new AsyncArgs(datastore: ds, session: true)
+        new ParallelConfig(datastore: ds, session: true)
     }
 
-    static AsyncArgs of(Class entity){
+    static ParallelConfig of(Class entity){
         def repo = RepoUtil.findRepo(entity)
-        AsyncArgs.of(repo.datastore)
+        ParallelConfig.of(repo.datastore)
     }
 }

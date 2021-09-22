@@ -107,7 +107,7 @@ class AppUserRepo implements GormRepo<AppUser> {
     /** throws EntityValidationException if not. NOTE: keep the real pas**ord name out so scanners dont pick this up */
     void isSamePass(String pass, String rePass, AppUser user) {
         if (pass.trim() != rePass.trim()) {
-            def msg = new MsgKey('password.mismatch', "The passwords you entered do not match")
+            def msg = MsgKey.of('password.mismatch', "The passwords you entered do not match")
             throw new EntityValidationException(msg, user)
         }
     }

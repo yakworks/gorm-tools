@@ -24,14 +24,14 @@ import yakworks.commons.lang.Validate
  * a trait to be used for colating/slicing a list into "batches" to then asynchronously with Transactions
  * insert or update for maximum performance.
  *
- * @see GparsAsyncSupport  GparsAsyncSupport - for a concrete implementation
+ * @see GparsParallelTools  GparsParallelTools - for a concrete implementation
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileStatic
-trait AsyncSupport implements WithTrx {
-    final static Logger LOG = LoggerFactory.getLogger(AsyncSupport)
+trait ParallelTools implements WithTrx {
+    final static Logger LOG = LoggerFactory.getLogger(ParallelTools)
 
     /**
      * The default slice or chunk size for collating. for example if this is 100 and you pass list of of 100
@@ -64,11 +64,11 @@ trait AsyncSupport implements WithTrx {
      * @param asyncArgs the collection to iterate process
      * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    abstract <T> Collection<T> eachParallel(AsyncArgs asyncArgs, Collection<T> collection, Closure closure)
+    abstract <T> Collection<T> each(ParallelConfig asyncArgs, Collection<T> collection, Closure closure)
 
 
-    public <T> Collection<T> eachParallel(Collection<T> collection, Closure closure){
-        eachParallel(new AsyncArgs(), collection, closure)
+    public <T> Collection<T> each(Collection<T> collection, Closure closure){
+        each(new ParallelConfig(), collection, closure)
     }
 
     /**
@@ -79,20 +79,20 @@ trait AsyncSupport implements WithTrx {
      * @param data the items list to slice into chunks
      * @param sliceClosure the closure to call for each collated slice of data. will get passed the List for processing
      */
-    public <T> Collection<T> eachSlice(AsyncArgs asyncArgs, Collection<T> data,
-                                         @ClosureParams(SecondParam) Closure sliceClosure) {
+    public <T> Collection<T> eachSlice(ParallelConfig asyncArgs, Collection<T> data,
+                                       @ClosureParams(SecondParam) Closure sliceClosure) {
         Integer sliceSize = asyncArgs.sliceSize ?: getSliceSize()
 
         def slicedList = slice(data, sliceSize)
 
-        eachParallel(asyncArgs, slicedList, sliceClosure)
+        each(asyncArgs, slicedList, sliceClosure)
 
         return data
     }
 
     public <T> Collection<T> eachSlice(Collection<T> data,
                                        @ClosureParams(SecondParam) Closure sliceClosure){
-        eachSlice(new AsyncArgs(), data,  sliceClosure)
+        eachSlice(new ParallelConfig(), data,  sliceClosure)
     }
 
     /**
@@ -106,7 +106,7 @@ trait AsyncSupport implements WithTrx {
      * @param list the list to process that will get sliced into batches via collate
      * @param itemClosure the closure to pass to eachParallel that gets passed each entry in the collection
      */
-    public <T> Collection<T> slicedEach(AsyncArgs asyncArgs, Collection<T> collection,
+    public <T> Collection<T> slicedEach(ParallelConfig asyncArgs, Collection<T> collection,
                                         @ClosureParams(SecondParam.FirstGenericType) Closure itemClosure) {
 
         verifyDatastore(asyncArgs)
@@ -151,7 +151,7 @@ trait AsyncSupport implements WithTrx {
     /**
      * checks args for session or trx and wraps the closure if needed
      */
-    Closure wrapSessionOrTransaction(AsyncArgs asyncArgs, Closure closure){
+    Closure wrapSessionOrTransaction(ParallelConfig asyncArgs, Closure closure){
         Closure wrappedClosure = closure
         if(asyncArgs.transactional){
             verifyDatastore(asyncArgs)
@@ -166,7 +166,7 @@ trait AsyncSupport implements WithTrx {
     /**
      * if args doesn't have a datastore then it grabs the default one from the trxService
      */
-    void verifyDatastore(AsyncArgs asyncArgs){
+    void verifyDatastore(ParallelConfig asyncArgs){
         if(!asyncArgs.datastore){
             asyncArgs.datastore = getTrxService().getTargetDatastore()
         }

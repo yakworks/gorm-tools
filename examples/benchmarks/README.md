@@ -147,7 +147,7 @@ Goals:
 - **save batch** - see the examples. uses the the jdb_batch size(default of 100)
 	and "chunks" or batches the saves. calls flush() after each batch of 100
 	is inserted and calls clear() to empty the hibernate/gorm cache
-- **save async** - Uses the gorm-tools helper bean [AsyncSupport]
+- **save async** - Uses the gorm-tools helper bean [ParallelTools]
 	which uses gpars by default. This also chunks or batches the inserts
   asynchronously using a pool size of 5 threads by default.
 	essentially collates the List of items from json into a list of lists(or batches)
@@ -157,7 +157,7 @@ Goals:
 [CityFat]: todo
 [CityFatDynamic]: todo
 [CityFatNoTraits]: todo
-[AsyncSupport]: todo
+[ParallelTools]: todo
 
 #### Bench Mark Results
 

@@ -2,9 +2,14 @@ package gorm.tools.support
 
 import org.grails.testing.GrailsUnitTest
 
+import gorm.tools.testing.support.GormToolsSpecHelper
 import spock.lang.Specification
 
-class ResultsSpec extends Specification implements GrailsUnitTest {
+class ResultsSpec extends Specification implements GormToolsSpecHelper {
+
+    void setupSpec() {
+        defineCommonBeans()
+    }
 
     def setup() {
         messageSource.addMessage("sky.dive", Locale.default, "freefall")
@@ -19,7 +24,7 @@ class ResultsSpec extends Specification implements GrailsUnitTest {
         Results.OK.ok == true
         Results.OK.code('foo').code == 'foo'
         Results.OK.id(123).id == 123
-        Results.OK.message("foo").message == 'foo'
+        Results.OK.defaultMessage("foo").message == 'foo'
     }
 
     def "test bulder examples"() {
@@ -30,13 +35,13 @@ class ResultsSpec extends Specification implements GrailsUnitTest {
         'go fast pull' == res.message
 
         when:
-        res = Results.OK.message('flubber')
+        res = Results.OK.msg('flubber')
         then:
         res.ok
         res.message == 'flubber'
 
         when:
-        res = Results.error.message('flubber')
+        res = Results.error().msg('flubber')
         then:
         !res.ok
         res.message == 'flubber'
@@ -63,7 +68,7 @@ class ResultsSpec extends Specification implements GrailsUnitTest {
 
     def "test error with args and def message"() {
         when:
-        def er = Results.error('sky.dive.with.args', ['go', 'fast'], 'im default')
+        def er = Results.error('sky.dive.with.args', ['go', 'fast']).defaultMessage('im default')
 
         then:
         er.code == 'sky.dive.with.args'

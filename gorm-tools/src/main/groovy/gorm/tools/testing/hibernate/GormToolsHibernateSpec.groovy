@@ -54,12 +54,8 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
         }
-        //
-        // datastore.mappingContext.persistentEntities*.javaClass.each { domainClass ->
-        //     beans = beans << registerRepository(domainClass, findRepoClass(domainClass))
-        // }
-        // beans = beans << doWithSpringFirst()
-        defineBeans(doWithSpringFirst())
+
+        // defineBeans(doWithSpringFirst())
 
         //finds and register repositories for all the persistentEntities that got setup
         defineBeans {
@@ -79,7 +75,7 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             }
         }
 
-        doWithSpringAfter()
+        // doWithSpringAfter()
     }
 
     /** consistency with other areas of grails and other unit tests */
@@ -87,21 +83,5 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
         hibernateDatastore
     }
 
-    /**
-     * Call back to provide beans before repositories are mocked, this gives chance to define beans which may need to
-     * be injected into repositories
-     */
-    Closure doWithSpringFirst() {
-        return {}
-    }
-
-    /**
-     * Call back to provide beans before repositories are mocked, this gives chance to define beans which may need to
-     * be injected into repositories
-     */
-    @SuppressWarnings('EmptyMethodInAbstractClass')
-    void doWithSpringAfter() {
-
-    }
 
 }

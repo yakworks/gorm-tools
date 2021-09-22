@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.util.StopWatch
 
-import gorm.tools.async.AsyncSupport
+import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
@@ -30,7 +30,7 @@ trait BenchConfig {
     @Autowired
     EntityMapBinder entityMapBinder
     @Autowired
-    AsyncSupport asyncSupport
+    ParallelTools parallelTools
     @Autowired
     CsvReader csvReader
 

@@ -10,8 +10,8 @@ import org.grails.datastore.mapping.core.Datastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.async.AsyncArgs
-import gorm.tools.async.AsyncSupport
+import gorm.tools.async.ParallelConfig
+import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobState
@@ -32,8 +32,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
     JobRepoTrait jobRepo
 
     @Autowired
-    @Qualifier("asyncSupport")
-    AsyncSupport asyncSupport
+    @Qualifier("parallelTools")
+    ParallelTools parallelTools
 
     @Autowired
     EntityMapService entityMapService
@@ -72,13 +72,12 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
         def results = new BulkableResults()
 
-        Closure bulkCreateClosure = { List<Map> dataChunk ->
+
+        def asynArgs = new ParallelConfig(transactional:true, datastore: getDatastore())
+        // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
+        parallelTools.eachSlice(asynArgs, dataList) { dataChunk ->
             results.merge doBulkCreate(dataList, bulkablArgs.persistArgs)
         }
-
-        def asynArgs = new AsyncArgs(transactional:true, datastore: getDatastore())
-        // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
-        asyncSupport.eachSlice(asynArgs, dataList, bulkCreateClosure)
 
         finishJob(jobId, results, bulkablArgs.includes)
 

@@ -12,31 +12,31 @@ import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
 import testing.CustType
 
-class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredTest {
+class GparsParallelToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
 
-    GparsAsyncSupport asyncSupport
+    GparsParallelTools parallelTools
 
     List<Class> getDomainClasses() { [CustType] }
 
     void setup() {
-        //asyncSupport = ctx.getBean("asyncSupport")
-        asyncSupport.asyncEnabled = true
+        //parallelTools = ctx.getBean("parallelTools")
+        parallelTools.asyncEnabled = true
     }
 
     // void cleanup() {
-    //     asyncSupport.asyncEnabled = false
+    //     parallelTools.asyncEnabled = false
     // }
 
     void "test collate"() {
         given:
         List list = createList(100)
-        //asyncSupport.transactionService = getDatastore().getService(TransactionService)
+        //parallelTools.transactionService = getDatastore().getService(TransactionService)
 
         expect:
         list.size() == 100
 
         when:
-        list = asyncSupport.slice(list, 10)
+        list = parallelTools.slice(list, 10)
 
         then:
         list.size() == 10
@@ -52,10 +52,10 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        def slicedList = asyncSupport.slice(list, 10)
+        def slicedList = parallelTools.slice(list, 10)
         assert slicedList.size() == 10
 
-        asyncSupport.eachParallel(slicedList) { List batch ->
+        parallelTools.each(slicedList) { List batch ->
             count.addAndGet(batch.size())
         }
 
@@ -72,7 +72,7 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        asyncSupport.eachParallel(list) { Map item ->
+        parallelTools.each(list) { Map item ->
             new CustType(name: "name $item.name").persist()
         }
         then:
@@ -89,9 +89,9 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        def args = AsyncArgs.of(CustType.repo.datastore).sliceSize(10).asyncEnabled(false)
+        def args = ParallelConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
 
-        asyncSupport.slicedEach(args, list) { Map record ->
+        parallelTools.slicedEach(args, list) { Map record ->
             count.addAndGet(1)
         }
         then:
@@ -105,7 +105,7 @@ class GparsAsyncSupportSpec extends GormToolsHibernateSpec implements AutowiredT
 
         when:
         int count = 0
-        def sliceClosure = asyncSupport.sliceClosure{ Map item ->
+        def sliceClosure = parallelTools.sliceClosure{ Map item ->
             count = count + 1
         }
 

@@ -5,11 +5,9 @@
 package restify
 
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.rest.RestApi
 import grails.compiler.GrailsCompileStatic
 
 @GrailsCompileStatic
-@RestApi(description = "The user for the restify application")
 class ExampleUser implements RepoEntity<ExampleUser> {
 
     String userName

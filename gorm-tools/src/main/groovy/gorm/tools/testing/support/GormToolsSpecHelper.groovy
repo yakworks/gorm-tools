@@ -83,6 +83,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         parallelTools(GparsParallelTools)
         entityMapService(EntityMapService)
         msgService(MsgService)
+        apiErrorHandler(ApiErrorHandler)
     }}
 
     /**

@@ -58,8 +58,8 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
     def execute() {
         assert CityBasic.count() == 0
 
-        RowMapper<Map> mapper = new GrailsParameterMapRowMapper()
-        ScrollableQuery query = new ScrollableQuery(mapper, dataSource, batchSize)
+        RowMapper<Map> rm = new GrailsParameterMapRowMapper() as RowMapper<Map>
+        ScrollableQuery query = new ScrollableQuery(rm, dataSource, batchSize)
         insert(query)
         assert CityBasic.count() == 115000
     }

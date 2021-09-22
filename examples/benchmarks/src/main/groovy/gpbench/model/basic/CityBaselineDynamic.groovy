@@ -30,10 +30,10 @@ class CityBaselineDynamic {
 
     static belongsTo = [region: Region, country: Country]
 
-    static mapping = {
-        //id generator:'native'
-//        cache true
-    }
+//     static mapping = {
+//         //id generator:'native'
+// //        cache true
+//     }
 
     static constraints = {
         importFrom(CityBaseline)

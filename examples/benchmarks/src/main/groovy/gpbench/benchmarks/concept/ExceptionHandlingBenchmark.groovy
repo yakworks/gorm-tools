@@ -43,7 +43,7 @@ class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
     void insertBatch(List<Map> batch, CityBasicRepo repo) {
         for (Map record : batch) {
             try {
-                throw exceptionToThrow.newInstance("test")
+                throw exceptionToThrow.newInstance("test") as Throwable
             } catch (exceptionToCatch) {
                 repo.create(record)
             }

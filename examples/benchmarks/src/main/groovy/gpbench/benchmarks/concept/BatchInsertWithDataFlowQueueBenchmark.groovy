@@ -1,5 +1,7 @@
 package gpbench.benchmarks.concept
 
+import groovy.transform.CompileDynamic
+
 import gorm.tools.transaction.WithTrx
 import gpbench.model.basic.CityBasic
 import gpbench.repo.CityBasicRepo
@@ -58,6 +60,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark imp
     }
 
     @Transactional
+    @CompileDynamic
     void insertBatch(List<Map> batch, CityBasicRepo repo) {
         for (Map record : batch) {
             try {

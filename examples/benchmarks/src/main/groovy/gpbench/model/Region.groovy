@@ -7,7 +7,6 @@ import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
-@IdEqualsHashCode
 @GrailsCompileStatic
 class Region implements GormRepoEntity<Region, RegionRepo> {
 

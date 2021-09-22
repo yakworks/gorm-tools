@@ -14,7 +14,6 @@ import yakworks.commons.transform.IdEqualsHashCode
  * repo Baseline. This has a repo and has been touched by the gorm-tools AST
  */
 @Entity
-@IdEqualsHashCode
 @GrailsCompileStatic
 class CityBasic implements CityTrait, DateUserStamp, GormRepoEntity<CityBasic, CityBasicRepo> {
 

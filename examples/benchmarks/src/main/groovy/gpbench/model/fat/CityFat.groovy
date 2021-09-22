@@ -7,10 +7,8 @@ import gpbench.model.traits.CityTraitFat
 import gpbench.model.traits.DateUserStamp
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
-@IdEqualsHashCode
 @GrailsCompileStatic
 class CityFat implements CityTraitFat, DateUserStamp, RepoEntity<CityFat> {
 

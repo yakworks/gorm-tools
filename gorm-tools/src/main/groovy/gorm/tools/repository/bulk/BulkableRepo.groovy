@@ -72,7 +72,6 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
         def results = new BulkableResults()
 
-
         def asynArgs = new ParallelConfig(transactional:true, datastore: getDatastore())
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(asynArgs, dataList) { dataChunk ->
@@ -150,7 +149,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
             //successful result would have entity, use the includes list to prepare result object
             if(result.ok) {
                 def data = entityMapService.createEntityMap(result.entityObject, includes) as Map<String, Object>
-                return [id: data['id'], data: data]
+                return [data: data]
             }
             return [:]
         }

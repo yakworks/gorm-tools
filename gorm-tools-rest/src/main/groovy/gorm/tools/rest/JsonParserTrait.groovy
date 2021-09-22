@@ -81,6 +81,10 @@ trait JsonParserTrait {
         return getJsonSlurper().parse(reader)
     }
 
+    Object parseJson(byte[] bytes){
+        return getJsonSlurper().parse(bytes)
+    }
+
     /**
      * The Map object that can be bound to create or update domain entity.  Defaults whats in the request based on mime-type.
      * Subclasses may override this

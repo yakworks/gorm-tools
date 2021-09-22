@@ -11,6 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
@@ -192,7 +193,7 @@ trait RestRepositoryApi<D> implements RestApiController {
         // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
         // and then repond is going to take that object and turn it back into json bytes
         // seems we should be able to skip some steps here somehow.
-        Map resp = [id: job.id, ok:job.ok, results: parseJson(new StringReader(str))]
+        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: parseJson(new StringReader(str))]
         if(job.source) resp.source = job.source
         respond resp, status: CREATED.value()
     }

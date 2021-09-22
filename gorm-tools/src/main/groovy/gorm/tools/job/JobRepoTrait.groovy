@@ -18,11 +18,11 @@ trait JobRepoTrait<D extends JobTrait<D>> implements GormRepo<D> {
     D create(String source, String sourceId, Object payload) {
         Validate.notNull(payload)
         byte[] data = Jsonify.render(payload).jsonText.bytes
-        return create([source: source, sourceId: sourceId, state: JobState.Running, data: data], [flush:true])
+        return create([source: source, sourceId: sourceId, state: JobState.Running, requestData: data], [flush:true])
     }
 
     D update(Long id, JobState state, BulkableResults results, List<Map> renderResults) {
         byte[] resultBytes = Jsonify.render(renderResults).jsonText.bytes
-        return update([id:id, ok: results.ok, results: resultBytes, state: state], [flush: true])
+        return update([id:id, ok: results.ok, data: resultBytes, state: state], [flush: true])
     }
 }

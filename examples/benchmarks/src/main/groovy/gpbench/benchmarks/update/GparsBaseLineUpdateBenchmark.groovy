@@ -1,7 +1,7 @@
 package gpbench.benchmarks.update
 
 import gorm.tools.async.ParallelConfig
-import gpbench.basic.CityBasic
+import gpbench.model.basic.CityBasic
 import gorm.tools.databinding.EntityMapBinder
 
 import groovy.transform.CompileDynamic

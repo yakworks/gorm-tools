@@ -2,7 +2,7 @@ package gpbench.benchmarks.concept
 
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityValidationException
-import gpbench.basic.CityBasicRepo
+import gpbench.repo.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic

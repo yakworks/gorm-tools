@@ -1,6 +1,6 @@
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepositoryEvent
-import gpbench.fat.CitySpringEventsRefreshable
+import gpbench.model.fat.CitySpringEventsRefreshable
 import gpbench.SecUtil
 import groovy.transform.CompileStatic
 import org.springframework.context.ApplicationListener

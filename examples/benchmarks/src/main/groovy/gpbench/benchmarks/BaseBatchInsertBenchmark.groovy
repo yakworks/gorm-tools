@@ -4,7 +4,7 @@ import groovy.transform.CompileDynamic
 
 import gorm.tools.async.ParallelTools
 import gorm.tools.repository.RepoUtil
-import gpbench.basic.CityBasic
+import gpbench.model.basic.CityBasic
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
 import grails.gorm.transactions.Transactional

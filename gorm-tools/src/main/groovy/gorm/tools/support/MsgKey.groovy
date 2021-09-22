@@ -20,7 +20,6 @@ import org.springframework.context.MessageSourceResolvable
 @SuppressWarnings("serial")
 @CompileStatic
 @EqualsAndHashCode
-@TupleConstructor
 @ToString(includes = ['code', 'args', 'defaultMessage'], includeNames = true)
 class MsgKey implements MsgSourceResolvable, Serializable {
 

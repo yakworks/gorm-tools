@@ -5,6 +5,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.security.core.context.SecurityContextHolder
 
+import gpbench.services.CityFatInsertBenchmarks
+import gpbench.services.DataSetup
 import grails.core.GrailsApplication
 import grails.plugin.springsecurity.userdetails.GrailsUser
 

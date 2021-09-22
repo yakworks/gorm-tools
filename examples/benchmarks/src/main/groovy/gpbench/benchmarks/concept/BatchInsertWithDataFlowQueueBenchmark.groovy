@@ -1,8 +1,8 @@
 package gpbench.benchmarks.concept
 
 import gorm.tools.transaction.WithTrx
-import gpbench.basic.CityBasic
-import gpbench.basic.CityBasicRepo
+import gpbench.model.basic.CityBasic
+import gpbench.repo.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional

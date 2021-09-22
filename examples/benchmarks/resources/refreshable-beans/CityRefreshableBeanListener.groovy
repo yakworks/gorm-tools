@@ -1,4 +1,4 @@
-import gpbench.CityRefreshableBeanEvents
+import gpbench.model.CityRefreshableBeanEvents
 import gpbench.SecUtil
 import grails.events.annotation.gorm.Listener
 import groovy.transform.CompileStatic

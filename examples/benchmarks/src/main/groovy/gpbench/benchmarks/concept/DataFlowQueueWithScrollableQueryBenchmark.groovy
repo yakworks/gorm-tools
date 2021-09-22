@@ -3,10 +3,10 @@ package gpbench.benchmarks.concept
 import gorm.tools.repository.RepoUtil
 import gorm.tools.jdbc.GrailsParameterMapRowMapper
 import gorm.tools.jdbc.ScrollableQuery
-import gpbench.basic.CityBasicRepo
-import gpbench.basic.CityBasic
+import gpbench.repo.CityBasicRepo
+import gpbench.model.basic.CityBasic
 import gpbench.benchmarks.AbstractBenchmark
-import gpbench.DataSetup
+import gpbench.services.DataSetup
 import gpbench.helpers.CsvReader
 import grails.gorm.transactions.Transactional
 import groovy.sql.Sql

@@ -1,7 +1,7 @@
 package gpbench.listeners
 
 import gorm.tools.repository.events.BeforeBindEvent
-import gpbench.fat.CitySpringEvents
+import gpbench.model.fat.CitySpringEvents
 import gpbench.SecUtil
 import groovy.transform.CompileStatic
 import org.springframework.context.event.EventListener

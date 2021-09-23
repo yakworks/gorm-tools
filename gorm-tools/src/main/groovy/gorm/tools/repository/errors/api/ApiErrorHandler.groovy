@@ -6,6 +6,7 @@ package gorm.tools.repository.errors.api
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus
@@ -27,20 +28,30 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 /**
  * Prepares ApiError / ApiValidationError for given exception
  */
-//FIXME #339 these dont need to be static do they, make this a bean and then we can use support.MsgService
 @CompileStatic
 class ApiErrorHandler {
 
-    static ApiError handleException(Exception e) {
+    @Autowired MsgService msgService
+
+    ApiError handleException(Exception e) {
         handleException("Entity", e)
     }
 
-    static ApiError handleException(Class entityClass, Exception e) {
+    ApiError handleException(Class entityClass, Exception e) {
         handleException(entityClass.simpleName, e)
     }
 
-    //FIXME #339 javadoc thisgw clean
-    static ApiError handleException(String entityName, Exception e) {
+    /**
+     * Prepares ApiError for given entity and exception
+     * - ApiError(status:422) for EntityValidationException, ValidationException and DataAccessException
+     * - ApiError(status:404) for EntityNotFoundException
+     * - ApiError(status:500) for other exceptions
+     *
+     * @param entityName domain class
+     * @param Exception e
+     * @return ApiError
+     */
+    ApiError handleException(String entityName, Exception e) {
         // default error status code is 422
         HttpStatus status = UNPROCESSABLE_ENTITY
 
@@ -54,7 +65,6 @@ class ApiErrorHandler {
                 detail = e.cause?.message
             }
             return new ApiError(status, getMsg(e), detail).errors(toFieldErrorList(e.errors))
-
         }
         else if (e instanceof ValidationException) {
             // grails has a ValidationException, so does gorm
@@ -72,8 +82,8 @@ class ApiErrorHandler {
         }
     }
 
-    static String getMsg(MessageSourceResolvable msr){
-        MsgService.get(msr)
+    String getMsg(MessageSourceResolvable msr){
+        msgService.getMessage(msr)
     }
 
     /**
@@ -81,7 +91,7 @@ class ApiErrorHandler {
      * @param errs the erros object to convert
      */
     //FIXME #339 see errormessageService, do we need some of that logic?
-    static List<ApiFieldError> toFieldErrorList(Errors errs) {
+    List<ApiFieldError> toFieldErrorList(Errors errs) {
         List<ApiFieldError> errors = []
         for(ObjectError err : errs.allErrors) {
             ApiFieldError fieldError = new ApiFieldError(getMsg(err))

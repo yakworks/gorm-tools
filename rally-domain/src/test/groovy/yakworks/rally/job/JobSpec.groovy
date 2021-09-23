@@ -43,7 +43,7 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
 
         then:
         job
-        job.data.size()>0
+        job.requestData.size()>0
     }
 
 
@@ -52,7 +52,7 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
         def res = Jsonify.render(["One", "Two", "Three"])
 
         when:
-        Job job = new Job(sourceType: SourceType.ERP, sourceId: 'ar/org', data:res.jsonText.bytes)
+        Job job = new Job(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.jsonText.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
@@ -63,8 +63,8 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
 
         then:
         j
-        res.jsonText.bytes == j.data
-        res.jsonText == new String(j.data, 'UTF-8')
+        res.jsonText.bytes == j.requestData
+        res.jsonText == new String(j.requestData, 'UTF-8')
 
     }
 

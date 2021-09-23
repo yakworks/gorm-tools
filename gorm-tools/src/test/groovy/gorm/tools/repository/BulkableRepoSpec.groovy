@@ -41,12 +41,12 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         job != null
         job.source == "test"
         job.sourceId == "test"
+        job.requestData != null
         job.data != null
-        job.results != null
         job.state == JobState.Finished
 
-        when: "Verify job.data"
-        def payload = toJson(job.data)
+        when: "Verify job.requestData"
+        def payload = toJson(job.requestData)
 
         then:
         payload != null
@@ -56,8 +56,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         payload[0].nested.name == "nested-1"
         payload[19].name == "project-20"
 
-        when: "verify job.results"
-        def results = toJson(job.results)
+        when: "verify job.data"
+        def results = toJson(job.data)
         then:
         results != null
         results instanceof List
@@ -93,8 +93,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         then: "verify job"
         job.ok == false
 
-        when: "verify job.results"
-        def results = toJson(job.results)
+        when: "verify job.data"
+        def results = toJson(job.data)
 
         then:
         results != null
@@ -104,7 +104,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         results.findAll({ it.ok == true}).size() == 18
         results[0].ok == true
 
-        and: "Failed records"
+        and: "Verify failed records"
         results[9].ok == false
         results[9].data != null
         results[9].data.name == null
@@ -133,6 +133,5 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
     def toJson(byte[] data) {
         return slurper.parse(data)
     }
-
 
 }

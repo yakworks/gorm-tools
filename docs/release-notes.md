@@ -1,3 +1,15 @@
+### v7.0.8-v.28
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.27...v7.0.8-v.28)
+- Merge pull request #347 from yakworks/jobtrait_fixrestrepositoryapi [link](https://github.com/yakworks/gorm-tools/commit/12120bc3e0e8baaa10046ec6d4eda562239780da)
+- add tests and xxx [link](https://github.com/yakworks/gorm-tools/commit/3562f5b2ce918a0aab98f6597e10485c46fda680)
+- move everything to jobTrait and fix restRepositoryApi [link](https://github.com/yakworks/gorm-tools/commit/d71ecfdb8b224ccff66b8c9ee082890c1ca2f30e)
+
+### v7.0.8-v.27
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.26...v7.0.8-v.27)
+- cleanup and fixmes (#345) [link](https://github.com/yakworks/gorm-tools/commit/868736856ff64103aef2c70a18a913bb37b5d6af)
+
 ### v7.0.8-v.26
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.25...v7.0.8-v.26)
@@ -427,7 +439,7 @@
  - 81 map binder [(#83)](https://github.com/yakworks/gorm-tools/pull/83)
  - GormMapBinder enhancments [(#82)](https://github.com/yakworks/gorm-tools/issues/82)
  - FastBinder refactor to a trait MapBinder [(#81)](https://github.com/yakworks/gorm-tools/issues/81)
- - Refactor to ParallelTools so the gpars lib is behind the scenes a… [(#80)](https://github.com/yakworks/gorm-tools/pull/80)
+ - Refactor to ParallelTools so the gpars lib is behind the scenes a‗� [(#80)](https://github.com/yakworks/gorm-tools/pull/80)
  - Mango override for dao [(#79)](https://github.com/yakworks/gorm-tools/pull/79)
  - Code reformat [(#78)](https://github.com/yakworks/gorm-tools/pull/78)
  - DbDialectService working with H2 and tests [(#77)](https://github.com/yakworks/gorm-tools/issues/77)

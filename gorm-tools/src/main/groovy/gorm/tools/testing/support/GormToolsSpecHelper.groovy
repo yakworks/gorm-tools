@@ -26,6 +26,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
+import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.support.MsgService
@@ -82,6 +83,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         parallelTools(GparsParallelTools)
         entityMapService(EntityMapService)
         msgService(MsgService)
+        apiErrorHandler(ApiErrorHandler)
     }}
 
     /**

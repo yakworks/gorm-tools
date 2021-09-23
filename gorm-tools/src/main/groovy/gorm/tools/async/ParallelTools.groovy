@@ -194,7 +194,7 @@ trait ParallelTools implements WithTrx {
     //     }
     // }
     //
-    @SuppressWarnings('EmptyCatchBlock')
+    @SuppressWarnings(["EmptyCatchBlock"])
     public <T> Closure<T> wrapSession(Datastore ds, Closure<T> wrapped) {
         return { T item ->
             persistenceInterceptor.init()

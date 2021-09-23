@@ -26,10 +26,10 @@ class BulkableRepoIntegrationSpec extends Specification {
 
         then:
         noExceptionThrown()
-        job.results != null
+        job.data != null
 
         when: "verify json"
-        JSONArray json = JSON.parse(new String(job.results, "UTF-8"))
+        JSONArray json = JSON.parse(new String(job.data, "UTF-8"))
 
         then:
         json != null

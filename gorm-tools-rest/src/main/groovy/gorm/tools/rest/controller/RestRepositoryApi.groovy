@@ -11,6 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
@@ -47,6 +48,9 @@ trait RestRepositoryApi<D> implements RestApiController {
 
     @Autowired
     EntityMapService entityMapService
+
+    @Autowired
+    ApiErrorHandler apiErrorHandler
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -174,7 +178,9 @@ trait RestRepositoryApi<D> implements RestApiController {
     @Action
     def bulkCreate() {
         List dataList = parseJsonList(request)
-        def bulkableArgs = new BulkableArgs(jobSource: params.jobSource as String, jobSourceId: params.jobSourceId as String, includes: getIncludes("bulk"))
+        //XXX add test for sourceId. there is actually no test that is testing Job values from here https://github.com/yakworks/gorm-tools/issues/348
+        String endpoint = "${params.controller}/${params.action}"
+        def bulkableArgs = new BulkableArgs(jobSourceId: endpoint, jobSource: params.jobSource as String, includes: getIncludes("bulk"))
         JobTrait job = ((BulkableRepo)getRepo()).bulkCreate(dataList, bulkableArgs)
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
@@ -182,14 +188,14 @@ trait RestRepositoryApi<D> implements RestApiController {
         //  list of all sourceIds/ids that we created
         //  so in includes we can specify what we return
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
-        byte[] jsonB = job["results"] as byte[]
+        byte[] jsonB = job["data"] as byte[]
         String str = new String(jsonB, "UTF-8")
         //FIXME #339 we need to see if we can rethink this.
         // in bulkCreate we convert the object to json bytes ( need to save to db so have to do this)
         // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
         // and then repond is going to take that object and turn it back into json bytes
         // seems we should be able to skip some steps here somehow.
-        Map resp = [id: job.id, ok:job.ok, results: parseJson(new StringReader(str))]
+        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: parseJson(new StringReader(str))]
         if(job.source) resp.source = job.source
         respond resp, status: CREATED.value()
     }
@@ -261,7 +267,7 @@ trait RestRepositoryApi<D> implements RestApiController {
     List getqSearchIncludes() { [] }
 
     void handleException(RuntimeException e) {
-        ApiError apiError = ApiErrorHandler.handleException(entityClass, e)
+        ApiError apiError = apiErrorHandler.handleException(entityClass, e)
 
         log.error(e.message, e)
 

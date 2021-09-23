@@ -1,12 +1,14 @@
 package gpbench.benchmarks.concept
 
+import groovy.transform.CompileStatic
+
+import org.springframework.dao.DataAccessException
+
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityValidationException
-import gpbench.basic.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark
+import gpbench.repo.CityBasicRepo
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
-import org.springframework.dao.DataAccessException
 
 /**
  * Runs batch inserts with exception.
@@ -43,7 +45,7 @@ class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
     void insertBatch(List<Map> batch, CityBasicRepo repo) {
         for (Map record : batch) {
             try {
-                throw exceptionToThrow.newInstance("test")
+                throw exceptionToThrow.newInstance("test") as Throwable
             } catch (exceptionToCatch) {
                 repo.create(record)
             }

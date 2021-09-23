@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
+import groovy.transform.Synchronized
 
 import org.grails.datastore.gorm.validation.constraints.builder.ConstrainedPropertyBuilder
 import org.grails.datastore.gorm.validation.constraints.registry.ConstraintRegistry
@@ -22,7 +23,8 @@ import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
 
 /**
- * A helper to find constraints from yaml and a constraintsMap static that will also search the trait heirarchy.
+ * A helper to find constraints that can find from yaml and a constraintsMap static block
+ * that will also search the trait heirarchy.
  */
 @SuppressWarnings(['Println', 'FieldName'])
 @CompileStatic
@@ -61,6 +63,7 @@ class ApiConstraints {
         return theApiCons
     }
 
+    @Synchronized //only one needs to be here as its done once
     @CompileDynamic
     static void processConstraints(Class entityClass, Object builder){
         def ac = new ApiConstraints(entityClass, builder)

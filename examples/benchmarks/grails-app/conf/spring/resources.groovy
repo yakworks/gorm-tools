@@ -8,7 +8,7 @@ import yakworks.commons.lang.NameUtils
 
 // Place your Spring DSL code here
 beans = {
-    jdbcTemplate(org.springframework.jdbc.core.JdbcTemplate, ref("dataSource"))
+    // jdbcTemplate(org.springframework.jdbc.core.JdbcTemplate, ref("dataSource"))
 
     //see see https://docs.spring.io/spring/docs/5.0.2.RELEASE/spring-framework-reference/languages.html#dynamic-language-refreshable-beans
     xmlns lang: "http://www.springframework.org/schema/lang"

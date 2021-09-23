@@ -8,8 +8,8 @@ import groovy.transform.CompileStatic
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gpbench.Region
 import gpbench.benchmarks.BaseBatchInsertBenchmark
+import gpbench.model.Region
 
 /**
  * Baseline benchmark with grails out of the box

@@ -56,7 +56,7 @@ dependencies {
   compile project(":gorm-tools-security")
   compile project(":gorm-tools-rest")
   compile project(":rally-domain")
-  compile project(":testify")
+  // compile project(":testify")
 
   compile 'org.grails.plugins:csv:1.0'
 
@@ -87,4 +87,4 @@ bootRun {
 }
 
 bootJar.enabled = true
-//bootJar.archiveFileName = 'restify-api.jar'
+bootJar.archiveFileName = 'benchmarks.jar'

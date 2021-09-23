@@ -11,9 +11,9 @@ import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class CityRefreshableBeanEvents implements CityTrait, RepoEntity<CityRefreshableBeanEvents> {
+class CityRefreshableBeanEvents implements CityTrait, RepoEntity<CityRefreshableBeanEvents>, Serializable {
 
-    static belongsTo = [region: Region, country: Country]
+    // static belongsTo = [region: Region, country: Country]
 
     Date dateCreated
     Date lastUpdated
@@ -24,13 +24,13 @@ class CityRefreshableBeanEvents implements CityTrait, RepoEntity<CityRefreshable
         //cache true
     }
 
-    static constraints = {
-        CityTraitConstraints(delegate)
-        dateCreated nullable: false, display: false, editable: false, bindable: false
-        lastUpdated nullable: false, display: false, editable: false, bindable: false
-        dateCreatedUser nullable: false, display: false, editable: false, bindable: false
-        lastUpdatedUser nullable: false, display: false, editable: false, bindable: false
-    }
+    static constraintsMap = [
+        dateCreated:[ nullable: false, display: false, editable: false, bindable: false],
+        lastUpdated:[ nullable: false, display: false, editable: false, bindable: false],
+        dateCreatedUser:[ nullable: false, display: false, editable: false, bindable: false],
+        lastUpdatedUser:[ nullable: false, display: false, editable: false, bindable: false]
+    ]
+
 
     String toString() { name }
 }

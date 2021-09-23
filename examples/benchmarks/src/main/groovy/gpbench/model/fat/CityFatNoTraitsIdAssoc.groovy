@@ -98,10 +98,6 @@ class CityFatNoTraitsIdAssoc implements GormRepoEntity<CityFatNoTraitsIdAssoc, C
         country2Id nullable: false
     }
 
-    static mapping = {
-        //id generator: "native"
-    }
-
     String toString() { name }
 
     void setProps(Map row) {

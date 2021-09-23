@@ -17,6 +17,17 @@ import java.time.LocalDateTime
 @Entity
 @GrailsCompileStatic
 class CityFatNoTraits implements RepoEntity<CityFatNoTraits> {
+    // static belongsTo = [ region: Region, country: Country,
+    //                      region2: Region, country2: Country,
+    //                      region3: Region, country3: Country ]
+
+    Region region
+    Country country
+    Region region2
+    Country country2
+    Region region3
+    Country country3
+
     String name
     String shortCode
     BigDecimal latitude
@@ -52,10 +63,6 @@ class CityFatNoTraits implements RepoEntity<CityFatNoTraits> {
     LocalDateTime date3
     LocalDate date4
 
-    static belongsTo = [ region: Region, country: Country,
-                         region2: Region, country2: Country,
-                         region3: Region, country3: Country ]
-
     static constraints = {
         name blank: false, nullable: false
         shortCode blank: false, nullable: false
@@ -70,8 +77,8 @@ class CityFatNoTraits implements RepoEntity<CityFatNoTraits> {
         shortCode2 blank: false, nullable: false
         latitude2 nullable: false, scale: 4, max: 90.00
         longitude2 nullable: false, scale: 4, max: 380.00
-        region2 nullable: false
-        country2 nullable: false
+        // region2 nullable: false
+        // country2 nullable: false
         state2 nullable: true
         countryName2 nullable: true
 
@@ -79,8 +86,8 @@ class CityFatNoTraits implements RepoEntity<CityFatNoTraits> {
         shortCode3 blank: false, nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
-        region3 nullable: false
-        country3 nullable: false
+        // region3 nullable: false
+        // country3 nullable: false
         state3 nullable: true
         countryName3 nullable: true
 

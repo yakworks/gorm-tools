@@ -128,7 +128,9 @@ trait BenchConfig {
         //println "Total Memory: " + (Runtime.getRuntime().totalMemory() / 1024 )+ " KB"
         //println "Free memory: " + (Runtime.getRuntime().freeMemory() / 1024 ) + " KB"
         println "Available processors: " + Runtime.getRuntime().availableProcessors()
+        println "Gpars enabled (gorm.tools.async.enabled): " + poolSize
         println "Gpars pool size (gorm.tools.async.poolSize): " + poolSize
+        println "parallelTools.poolSize ${parallelTools.poolSize}"
         println "binderType: " + binderType
         println "hibernate.jdbc.batch_size (jdbcBatchSize): " + batchSize
         println "batchSliceSize: " + batchSliceSize

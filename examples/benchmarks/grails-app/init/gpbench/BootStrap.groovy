@@ -24,7 +24,7 @@ class BootStrap {
 
     def init = { servletContext ->
         dataSetup.printEnvironment()
-        //load base country and city data which is used by all benchmarks
+        //load base country and region data which is used by all benchmarks
         dataSetup.initBaseData()
 
         mockAuthentication()

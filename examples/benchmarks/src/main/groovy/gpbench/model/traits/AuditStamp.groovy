@@ -12,25 +12,12 @@ trait AuditStamp {
     Long createdBy
     Long editedBy
 
-    @CompileDynamic
-    static AuditStampConstraints(Object delegate) {
-        def c = {
-            createdDate nullable: false, display: false, editable: false, bindable: false
-            editedDate nullable: false, display: false, editable: false, bindable: false
-            createdBy nullable: false, display: false, editable: false, bindable: false
-            editedBy nullable: false, display: false, editable: false, bindable: false
-        }
-        c.delegate = delegate
-        c()
-    }
+    static constraintsMap = [
+        createdDate:[ nullable: false, display: false, editable: false, bindable: false],
+        editedDate:[ nullable: false, display: false, editable: false, bindable: false],
+        createdBy:[ nullable: false, display: false, editable: false, bindable: false],
+        editedBy:[ nullable: false, display: false, editable: false, bindable: false]
+    ]
+
 }
 
-class AuditStampConstraints implements AuditStamp {
-
-    static constraints = {
-        createdDate nullable: false, display: false, editable: false, bindable: false
-        editedDate nullable: false, display: false, editable: false, bindable: false
-        createdBy nullable: false, display: false, editable: false, bindable: false
-        editedBy nullable: false, display: false, editable: false, bindable: false
-    }
-}

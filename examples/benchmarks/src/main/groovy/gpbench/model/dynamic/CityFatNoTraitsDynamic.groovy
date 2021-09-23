@@ -1,4 +1,4 @@
-package gpbench.model.fat
+package gpbench.model.dynamic
 
 import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
@@ -10,7 +10,8 @@ import java.time.LocalDateTime
 import grails.persistence.Entity
 
 /**
- * Single version of without traits
+ * Single Dynamic version without traits so it gets not benefit
+ * Shows the significant reduction in performance
  */
 @Entity
 class CityFatNoTraitsDynamic implements RepoEntity<CityFatNoTraitsDynamic> {

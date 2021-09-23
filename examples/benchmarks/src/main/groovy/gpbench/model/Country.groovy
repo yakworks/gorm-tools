@@ -19,11 +19,6 @@ class Country implements GormRepoEntity<Country, CountryRepo>{
 //        cache true
     }
 
-    static constraints = {
-        name unique: true
-        capital nullable: true
-    }
-
     String toString() { name }
 
 }

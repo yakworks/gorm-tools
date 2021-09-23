@@ -52,8 +52,8 @@ class DataSetup implements gpbench.services.traits.BenchConfig {
     }
 
     void truncateTables() {
-        jdbcTemplate.update("DELETE FROM Origin")
-        //jdbcTemplate.update("DELETE FROM city")
+        // jdbcTemplate.update("DELETE FROM Origin")
+        // jdbcTemplate.update("DELETE FROM city")
         jdbcTemplate.update("DELETE FROM Region")
         jdbcTemplate.update("DELETE FROM Country")
     }

@@ -1,10 +1,9 @@
 package gpbench.model.traits
 
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-
 import java.time.LocalDate
 import java.time.LocalDateTime
+
+import groovy.transform.CompileStatic
 
 @CompileStatic
 trait DatesTrait {
@@ -14,15 +13,10 @@ trait DatesTrait {
     LocalDateTime date3
     LocalDate date4
 
-    @CompileDynamic
-    static DatesTraitConstraints(Object delegate) {
-        def c = {
-            date1 nullable: true
-            date2 nullable: true
-            date3 nullable: true
-            date4 nullable: true
-        }
-        c.delegate = delegate
-        c()
-    }
+    static constraintsMap = [
+        date1:[ d: 'date1'],
+        date2:[ d: 'date2'],
+        date3:[ d: 'date3'],
+        date4:[ d: 'date4']
+    ]
 }

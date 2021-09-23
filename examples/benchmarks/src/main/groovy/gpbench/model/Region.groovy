@@ -8,13 +8,14 @@ import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
 @GrailsCompileStatic
-class Region implements GormRepoEntity<Region, RegionRepo> {
+class Region implements GormRepoEntity<Region, RegionRepo>, Serializable {
+    static belongsTo = [country: Country]
 
     String name
     String code
     String admCode
 
-    static belongsTo = [country: Country]
+
 
     static mapping = {
 //        cache true
@@ -25,7 +26,6 @@ class Region implements GormRepoEntity<Region, RegionRepo> {
     static constraints = {
         name nullable: false
         code nullable: false
-        admCode nullable: true
     }
 
     String toString() { code }

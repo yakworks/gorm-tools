@@ -30,7 +30,7 @@ class CityBaseline {
     String state
     String countryName
 
-    static belongsTo = [region: Region, country: Country]
+    // static belongsTo = [region: Region, country: Country]
 
     static constraints = {
         name blank: false, nullable: false

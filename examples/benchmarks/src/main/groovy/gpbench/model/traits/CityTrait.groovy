@@ -1,7 +1,6 @@
 package gpbench.model.traits
 
 
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gpbench.model.Country
@@ -17,22 +16,16 @@ trait CityTrait {
     BigDecimal latitude
     BigDecimal longitude
 
-    Region region
-    Country country
+    // Region region
+    // Country country
 
-    @CompileDynamic
-    static CityTraitConstraints(Object delegate) {
-        def c = {
-            name blank: false, nullable: false
-            shortCode blank: false, nullable: false
-            latitude nullable: false, scale: 4, max: 90.00
-            longitude nullable: false, scale: 4, max: 380.00
-            region nullable: false
-            country nullable: false
-            state nullable: true
-            countryName nullable: true
-        }
-        c.delegate = delegate
-        c()
-    }
+    static constraintsMap = [
+        name:[ d: 'The full name for this entity', blank: false, nullable: false],
+        shortCode:[ d: 'The full name for this entity', blank: false, nullable: false],
+        latitude:[ d: 'The full name for this entity', nullable: false, scale: 4, max: 90.00],
+        longitude:[ d: 'The full name for this entity', nullable: false, scale: 4, max: 380.00],
+        state:[ d: 'The full name for this entity'],
+        countryName:[ d: 'The full name for this entity']
+    ]
+
 }

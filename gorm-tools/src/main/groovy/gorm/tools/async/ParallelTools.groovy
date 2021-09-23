@@ -42,7 +42,7 @@ trait ParallelTools implements WithTrx {
     int sliceSize
 
     /** The list size to send to the collate that slices.*/
-    @Value('${gorm.tools.async.enabled:false}')
+    @Value('${gorm.tools.async.enabled:true}')
     boolean asyncEnabled
 
     /** the pool size passed to GParsPool.withPool. if gorm.tools.async.poolSize is not set then it uses PoolUtils.retrieveDefaultPoolSize()*/

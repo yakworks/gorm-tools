@@ -33,7 +33,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
         bindAndSave((GormEntity)domainClass.newInstance(), row)
     }
 
-    Closure repoBatchClosure = { List batchList, Map args ->
+    Closure repoBatchClosure = { List batchList ->
         getRepository().batchCreate(batchList)
     }
 
@@ -82,7 +82,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
     void saveBatch(Class<?> domainClass, List<Map> dataMap, Closure rowClosure = getBindAndSaveClosure()){
         List<List<Map>> collatedList = dataMap.collate(batchSize)
         for (List<Map> batchList : collatedList) {
-            binderType == 'gorm-tools-repo' ? getRepoBatchClosure().call(batchList, [:]) :
+            binderType == 'gorm-tools-repo' ? getRepoBatchClosure().call(batchList) :
                 saveBatchChunkTx(domainClass, batchList, rowClosure)
         }
     }

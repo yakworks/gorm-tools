@@ -16,9 +16,10 @@ import gorm.tools.repository.errors.api.ApiError
 transform example when in a job
 {
   "id": 123, // jobId
+  "status": 200, //201 created?, do we send back a 400 if its ok:false? also a 207 Multi-Status options maybe?
   "ok": false
   "state": "finished", //from job
-  "errors":
+  "errors": ???
   "data": [
     {
       "ok": true,

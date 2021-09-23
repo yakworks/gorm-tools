@@ -17,22 +17,15 @@ trait CityTrait2 {
     BigDecimal latitude2
     BigDecimal longitude2
 
-    Region region2
-    Country country2
+    // Region region2
+    // Country country2
 
-    @CompileDynamic
-    static CityTrait2Constraints(Object delegate) {
-        def c = {
-            name2 blank: false, nullable: false
-            shortCode2 blank: false, nullable: false
-            latitude2 nullable: false, scale: 4, max: 90.00
-            longitude2 nullable: false, scale: 4, max: 380.00
-            region2 nullable: false
-            country2 nullable: false
-            state2 nullable: true
-            countryName2 nullable: true
-        }
-        c.delegate = delegate
-        c()
-    }
+    static constraintsMap = [
+        name2:[ d: 'fff', blank: false, nullable: false],
+        shortCode2:[ d: 'fff', blank: false, nullable: false],
+        latitude2:[ d: 'fff', nullable: false, scale: 4, max: 90.00],
+        longitude2:[ d: 'fff', nullable: false, scale: 4, max: 380.00],
+        state2:[ d: 'fff'],
+        countryName2:[ d: 'fff']
+    ]
 }

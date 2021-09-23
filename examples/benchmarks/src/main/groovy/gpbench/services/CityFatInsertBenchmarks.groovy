@@ -9,13 +9,13 @@ import gorm.tools.async.ParallelConfig
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.fat.CityFat
+import gpbench.model.fat.CityFatAssocIds
 import gpbench.model.fat.CityFatAuditTrail
-import gpbench.model.fat.CityFatDynamic
+import gpbench.model.dynamic.CityFatDynamic
 import gpbench.model.fat.CityFatNativeIdGen
+import gpbench.model.fat.CityFatNoAssoc
 import gpbench.model.fat.CityFatNoTraits
-import gpbench.model.fat.CityFatNoTraitsDynamic
-import gpbench.model.fat.CityFatNoTraitsIdAssoc
-import gpbench.model.fat.CityFatNoTraitsNoAssoc
+import gpbench.model.dynamic.CityFatNoTraitsDynamic
 import gpbench.model.fat.CityMethodEvents
 import gpbench.model.fat.CitySpringEvents
 import gpbench.model.fat.CitySpringEventsRefreshable
@@ -60,10 +60,10 @@ class CityFatInsertBenchmarks extends gpbench.services.traits.BenchProcessData {
             createAction = action
             println "-- createAction: $createAction --"
             //the fastest one is one without associations and everything is compile static
-            doSettersStatic(CityFatNoTraitsNoAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNoAssoc')
-            doSettersStatic(CityFatNoTraitsIdAssoc, 'CompileStatic explicit setters, CityFatNoTraitsIdAssoc')
+            doSettersStatic(CityFatAssocIds, 'CompileStatic explicit setters, CityFatAssocIds')
             // doSettersStatic(CityFatNoTraitsNullAssoc, 'CompileStatic explicit setters, CityFatNoTraitsNullAssoc')
             doSettersStatic(CityFatNoTraits, 'CompileStatic explicit setters, CityFatNoTraits')
+            doSettersStatic(CityFatNoAssoc, 'CompileStatic explicit setters, CityFatNoAssoc')
             doSettersStatic(CityFat, 'CompileStatic explicit setters, CityFat')
             doSettersStatic(CityFatNativeIdGen, 'CompileStatic explicit setters, CityFatNativeIdGen')
             doSettersStatic(CityFatAuditTrail, 'CompileStatic explicit setters, CityFatAuditTrail')
@@ -78,11 +78,16 @@ class CityFatInsertBenchmarks extends gpbench.services.traits.BenchProcessData {
         ["save async", "create", "validate", "save batch", "save async"].each{ action ->
             createAction = action
             println "-- createAction: $createAction --"
-            doGormToolsRepo(CityFatNoTraitsNoAssoc, 'gorm-tools: repo and binder, CityFatNoTraitsNoAssoc')
-            doGormToolsRepo(CityFatNoTraitsIdAssoc, 'gorm-tools: repo and binder, CityFatNoTraitsIdAssoc')
+            String descrip = "gorm-tools: repo and binder"
             // doGormToolsRepo(CityFatNoTraitsNullAssoc, 'gorm-tools: repo and binder, CityFatNoTraitsNullAssoc')
-            doGormToolsRepo(CityFatNoTraits, 'gorm-tools: repo and binder, CityFatNoTraits')
-            doGormToolsRepo(CityFat, 'gorm-tools: repo and binder, CityFat')
+
+            // doGormToolsRepo(CityFatAssocIds, "$descrip, CityFatAssocIds")
+            doGormToolsRepo(CityFatNoTraits, "$descrip, CityFatNoTraits")
+            doGormToolsRepo(CityFatNoAssoc, "$descrip, CityFatNoAssoc")
+            doGormToolsRepo(CityFat, "$descrip, CityFat")
+            doGormToolsRepo(CityFatNativeIdGen, "$descrip, CityFatNativeIdGen")
+            doGormToolsRepo(CityFatAuditTrail, "$descrip, CityFatAuditTrail")
+
             //grailsDataBinderNoTraits(CityFatNoTraits)
             warmup = false
             println "\n" + statsToMarkdownTable()
@@ -97,9 +102,9 @@ class CityFatInsertBenchmarks extends gpbench.services.traits.BenchProcessData {
             createAction = it
             println "-- createAction: $createAction --"
             //doSettersDynamic(CityFat, 'CompileDynamic on explicit setters, CityFat')
+            doGormToolsRepo(CityFatNoTraitsDynamic, 'gorm-tools: repo batch methods, CityFatNoTraitsDynamic')
             doSettersStatic(CityFatDynamic, 'CompileStatic on explicit setters, CityFatDynamic')
             doSettersDynamic(CityFatDynamic, 'CompileDynamic on explicit setters, CityFatDynamic')
-            doSettersDynamic(CityFatNoTraitsDynamic, 'CompileDynamic on explicit setters, CityFatNoTraitsDynamic')
             doGormToolsRepo(CityFatDynamic, 'gorm-tools: repo batch methods, CityFatDynamic')
             warmup = false
             println "\n" + statsToMarkdownTable()

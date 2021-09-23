@@ -29,7 +29,7 @@ class CityDynamic implements GormRepoEntity<CityDynamic, CityDynamicRepo> {
     Long dateCreatedUser
     Long lastUpdatedUser
 
-    static belongsTo = [Region, Country]
+    // static belongsTo = [Region, Country]
 
     static mapping = {
 //        cache true

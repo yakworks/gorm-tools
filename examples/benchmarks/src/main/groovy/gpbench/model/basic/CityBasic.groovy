@@ -17,16 +17,15 @@ import yakworks.commons.transform.IdEqualsHashCode
 @GrailsCompileStatic
 class CityBasic implements CityTrait, DateUserStamp, GormRepoEntity<CityBasic, CityBasicRepo> {
 
-    static belongsTo = [region: Region, country: Country]
+    // static belongsTo = [region: Region, country: Country]
 
 //    static mapping = {
 //        cache true
 //    }
 
-    static constraints = {
-        CityTraitConstraints(delegate)
-        DateUserStampConstraints(delegate)
-    }
+
+    Region region
+    Country country
 
     String toString() { name }
 

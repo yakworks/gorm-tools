@@ -1,6 +1,6 @@
 package gpbench.model.traits
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 
 @CompileStatic
@@ -14,15 +14,10 @@ trait DateUserStamp {
     Long dateCreatedUser
     Long lastUpdatedUser
 
-    @CompileDynamic
-    static DateUserStampConstraints(Object delegate) {
-        def c = {
-            dateCreated nullable: true, display: false, editable: false, bindable: false
-            lastUpdated nullable: true, display: false, editable: false, bindable: false
-            dateCreatedUser nullable: true, display: false, editable: false, bindable: false
-            lastUpdatedUser nullable: true, display: false, editable: false, bindable: false
-        }
-        c.delegate = delegate
-        c()
-    }
+    static constraintsMap = [
+        dateCreated:[ display: false, editable: false, bindable: false ],
+        lastUpdated:[ display: false, editable: false, bindable: false ],
+        dateCreatedUser:[ display: false, editable: false, bindable: false ],
+        lastUpdatedUser:[ display: false, editable: false, bindable: false ]
+    ]
 }

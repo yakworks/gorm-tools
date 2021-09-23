@@ -28,7 +28,7 @@ class CityBaselineDynamic {
     Long dateCreatedUser
     Long lastUpdatedUser
 
-    static belongsTo = [region: Region, country: Country]
+    // static belongsTo = [region: Region, country: Country]
 
 //     static mapping = {
 //         //id generator:'native'

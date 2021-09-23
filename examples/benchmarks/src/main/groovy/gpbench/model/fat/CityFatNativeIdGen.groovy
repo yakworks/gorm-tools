@@ -3,7 +3,7 @@ package gpbench.model.fat
 import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
 import gpbench.model.Region
-import gpbench.model.traits.CityTraitFat
+import gpbench.model.traits.CityTraitFatWithAssoc
 import gpbench.model.traits.DateUserStamp
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -13,7 +13,7 @@ import grails.persistence.Entity
  */
 @Entity
 @GrailsCompileStatic
-class CityFatNativeIdGen implements CityTraitFat, DateUserStamp, RepoEntity<CityFatNativeIdGen> {
+class CityFatNativeIdGen implements CityTraitFatWithAssoc, DateUserStamp, RepoEntity<CityFatNativeIdGen> {
 
     // static belongsTo = [region : Region, country: Country,
     //                     region2: Region, country2: Country,
@@ -28,19 +28,6 @@ class CityFatNativeIdGen implements CityTraitFat, DateUserStamp, RepoEntity<City
 
     static mapping = {
         id generator: "native"
-    }
-
-    //@CompileStatic(TypeCheckingMode.SKIP)
-    static constraints = {
-        CityTraitFatConstraints(delegate)
-        DateUserStampConstraints(delegate)
-
-        region nullable: false
-        country nullable: false
-        region2 nullable: false
-        country2 nullable: false
-        region3 nullable: false
-        country3 nullable: false
     }
 
 }

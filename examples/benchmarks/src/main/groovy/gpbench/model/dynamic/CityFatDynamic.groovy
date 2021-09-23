@@ -1,28 +1,27 @@
-package gpbench.model.fat
+package gpbench.model.dynamic
 
 import gorm.tools.repository.model.RepoEntity
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.traits.CityTraitFatWithAssoc
 import gpbench.model.traits.DateUserStamp
-import gpbench.model.traits.StaticSetter
-import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
+/**
+ * Without @GrailsCompileStatic, dynamic but it seems to benefit from the compilestaic on the traits
+ */
 @Entity
-@GrailsCompileStatic
-class CityFat implements CityTraitFatWithAssoc, DateUserStamp, RepoEntity<CityFat> {
+class CityFatDynamic implements CityTraitFatWithAssoc, DateUserStamp, RepoEntity<CityFatDynamic> {
 
     // static belongsTo = [region : Region, country: Country,
     //                     region2: Region, country2: Country,
     //                     region3: Region, country3: Country]
 
-   Region region
-   Country country
-   Region region2
-   Country country2
-   Region region3
-   Country country3
-
+    Region region
+    Country country
+    Region region2
+    Country country2
+    Region region3
+    Country country3
 
 }

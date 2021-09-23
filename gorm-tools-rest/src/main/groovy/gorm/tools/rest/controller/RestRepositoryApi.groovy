@@ -178,7 +178,9 @@ trait RestRepositoryApi<D> implements RestApiController {
     @Action
     def bulkCreate() {
         List dataList = parseJsonList(request)
-        def bulkableArgs = new BulkableArgs(jobSource: params.jobSource as String, jobSourceId: params.jobSourceId as String, includes: getIncludes("bulk"))
+        //XXX add test for sourceId. there is actually no test that is testing Job values from here https://github.com/yakworks/gorm-tools/issues/348
+        String endpoint = "${params.controller}/${params.action}"
+        def bulkableArgs = new BulkableArgs(jobSourceId: endpoint, jobSource: params.jobSource as String, includes: getIncludes("bulk"))
         JobTrait job = ((BulkableRepo)getRepo()).bulkCreate(dataList, bulkableArgs)
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
@@ -186,7 +188,7 @@ trait RestRepositoryApi<D> implements RestApiController {
         //  list of all sourceIds/ids that we created
         //  so in includes we can specify what we return
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
-        byte[] jsonB = job["results"] as byte[]
+        byte[] jsonB = job["data"] as byte[]
         String str = new String(jsonB, "UTF-8")
         //FIXME #339 we need to see if we can rethink this.
         // in bulkCreate we convert the object to json bytes ( need to save to db so have to do this)

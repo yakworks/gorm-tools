@@ -12,10 +12,11 @@ import yakworks.rally.orgs.model.Org
 
 @Rollback
 @Integration
-@Ignore //FIXME - Since the job.data and job.results fields renamed, Gorm throws strange errors - StaticAPI not found, Gorm not initialized
+
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonParserTrait {
     String path = "/api/rally/org/bulk?jobSource=Oracle"
 
+    //XXX https://github.com/yakworks/gorm-tools/issues/348 can we test Job here?
     void "verify bulk create and sanity check response"() {
         given:
         List<Map> jsonList = [
@@ -35,7 +36,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonPars
         body.source == "Oracle" //should have been picked from query string
         body.data != null
         body.data.size() == 3
-        body.data[0].id != null
+        body.data[0].data.id != null
         resp.code() == HttpStatus.CREATED.value()
 
         and: "verify the 'bulk' includes from restapi-config.xml"
@@ -44,7 +45,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonPars
         body.data[0].data.name == "Foox1"
 
         when: "Verify created org"
-        Org org = Org.get( body.data[0].id as Long)
+        Org org = Org.get( body.data[0].data.id as Long)
 
         then:
         org != null

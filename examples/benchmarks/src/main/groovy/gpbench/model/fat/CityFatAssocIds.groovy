@@ -1,16 +1,17 @@
 package gpbench.model.fat
 
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import gpbench.model.traits.CityTraitFat
 import gpbench.model.traits.DateUserStamp
 import gpbench.model.traits.StaticSetter
+import gpbench.repo.CityFatAssocIdsRepo
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 // add just the id fields instead of associations, super fast on setters
 @Entity
 @GrailsCompileStatic
-class CityFatAssocIds implements CityTraitFat, DateUserStamp, RepoEntity<CityFatAssocIds> {
+class CityFatAssocIds implements CityTraitFat, DateUserStamp, GormRepoEntity<CityFatAssocIds, CityFatAssocIdsRepo> {
 
     Long regionId
     Long region2Id

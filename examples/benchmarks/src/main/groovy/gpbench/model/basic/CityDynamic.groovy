@@ -1,9 +1,9 @@
 package gpbench.model.basic
 
 import gorm.tools.repository.model.GormRepoEntity
+import gpbench.SecUtil
 import gpbench.model.Country
 import gpbench.model.Region
-import gpbench.SecUtil
 import gpbench.repo.CityDynamicRepo
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode

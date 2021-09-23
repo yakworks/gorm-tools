@@ -1,13 +1,13 @@
 package gpbench.repo
 
+import groovy.transform.CompileStatic
+
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gpbench.model.Country
-
-import groovy.transform.CompileStatic
 
 @GormRepository
 @CompileStatic

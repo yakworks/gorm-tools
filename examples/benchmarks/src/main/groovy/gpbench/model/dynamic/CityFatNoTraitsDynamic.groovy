@@ -1,12 +1,11 @@
 package gpbench.model.dynamic
 
-import gorm.tools.repository.model.RepoEntity
-import gpbench.model.Country
-import gpbench.model.Region
-
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+import gorm.tools.repository.model.RepoEntity
+import gpbench.model.Country
+import gpbench.model.Region
 import grails.persistence.Entity
 
 /**

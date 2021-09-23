@@ -8,14 +8,14 @@ import org.springframework.stereotype.Component
 import gorm.tools.async.ParallelConfig
 import gpbench.model.Country
 import gpbench.model.Region
+import gpbench.model.dynamic.CityFatDynamic
+import gpbench.model.dynamic.CityFatNoTraitsDynamic
 import gpbench.model.fat.CityFat
 import gpbench.model.fat.CityFatAssocIds
 import gpbench.model.fat.CityFatAuditTrail
-import gpbench.model.dynamic.CityFatDynamic
 import gpbench.model.fat.CityFatNativeIdGen
 import gpbench.model.fat.CityFatNoAssoc
 import gpbench.model.fat.CityFatNoTraits
-import gpbench.model.dynamic.CityFatNoTraitsDynamic
 import gpbench.model.fat.CityMethodEvents
 import gpbench.model.fat.CitySpringEvents
 import gpbench.model.fat.CitySpringEventsRefreshable

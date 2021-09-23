@@ -1,23 +1,25 @@
 package gpbench.benchmarks.concept
 
-import gorm.tools.repository.RepoUtil
-import gorm.tools.jdbc.GrailsParameterMapRowMapper
-import gorm.tools.jdbc.ScrollableQuery
-import gpbench.repo.CityBasicRepo
-import gpbench.model.basic.CityBasic
-import gpbench.benchmarks.AbstractBenchmark
-import gpbench.services.DataSetup
-import gpbench.helpers.CsvReader
-import grails.gorm.transactions.Transactional
+import javax.sql.DataSource
+
 import groovy.sql.Sql
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.operator.PoisonPill
+
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 
-import javax.sql.DataSource
+import gorm.tools.jdbc.GrailsParameterMapRowMapper
+import gorm.tools.jdbc.ScrollableQuery
+import gorm.tools.repository.RepoUtil
+import gpbench.benchmarks.AbstractBenchmark
+import gpbench.helpers.CsvReader
+import gpbench.model.basic.CityBasic
+import gpbench.repo.CityBasicRepo
+import gpbench.services.DataSetup
+import grails.gorm.transactions.Transactional
 
 import static groovyx.gpars.dataflow.Dataflow.operator
 

@@ -1,9 +1,9 @@
 package gpbench.repo
 
+import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.utils.GormUtils
-import gorm.tools.repository.DefaultGormRepo
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.basic.CityDynamic

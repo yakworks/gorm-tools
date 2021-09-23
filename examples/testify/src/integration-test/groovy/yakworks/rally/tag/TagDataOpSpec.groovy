@@ -30,7 +30,7 @@ class TagDataOpSpec extends Specification implements DataIntegrationTest, Securi
         // valid for 2
         tags <<  Tag.create(name: 'cross', code: 'cross', entityName: 'Contact, Attachment')
         // valid only for Contact
-        tags <<  Tag.creeate(name: 'manager', code: 'manager', entityName: 'Contact')
+        tags <<  Tag.create(name: 'manager', code: 'manager', entityName: 'Contact')
         flushAndClear()
         return tags
     }

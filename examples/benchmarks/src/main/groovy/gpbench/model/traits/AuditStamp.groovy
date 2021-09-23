@@ -20,4 +20,3 @@ trait AuditStamp {
     ]
 
 }
-

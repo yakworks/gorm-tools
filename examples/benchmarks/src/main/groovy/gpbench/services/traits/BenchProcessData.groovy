@@ -1,25 +1,26 @@
 package gpbench.services.traits
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.mapping.core.Session
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.async.ParallelConfig
 import gorm.tools.beans.Pager
-import gorm.tools.transaction.WithTrx
 import gorm.tools.databinding.BindAction
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoTidyMap
 import gorm.tools.repository.model.PersistableRepoEntity
+import gorm.tools.transaction.WithTrx
 import gpbench.model.Region
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import grails.web.databinding.WebDataBinding
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.core.Session
 
 @CompileStatic
 abstract class BenchProcessData implements BenchConfig, WithTrx  {

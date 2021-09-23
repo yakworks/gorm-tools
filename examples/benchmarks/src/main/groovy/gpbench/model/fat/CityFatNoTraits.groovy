@@ -1,15 +1,16 @@
 package gpbench.model.fat
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+
+import org.grails.datastore.gorm.GormEnhancer
+
 import gorm.tools.repository.model.RepoEntity
-import grails.persistence.Entity
-import yakworks.commons.lang.IsoDateUtil
 import gpbench.model.Country
 import gpbench.model.Region
 import grails.compiler.GrailsCompileStatic
-import org.grails.datastore.gorm.GormEnhancer
-
-import java.time.LocalDate
-import java.time.LocalDateTime
+import grails.persistence.Entity
+import yakworks.commons.lang.IsoDateUtil
 
 /**
  * Without traits and nullable: false on associations

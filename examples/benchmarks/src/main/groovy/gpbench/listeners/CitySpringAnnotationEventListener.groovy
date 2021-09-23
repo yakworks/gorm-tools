@@ -1,11 +1,13 @@
 package gpbench.listeners
 
-import gorm.tools.repository.events.BeforeBindEvent
-import gpbench.model.fat.CitySpringEvents
-import gpbench.SecUtil
 import groovy.transform.CompileStatic
+
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
+
+import gorm.tools.repository.events.BeforeBindEvent
+import gpbench.SecUtil
+import gpbench.model.fat.CitySpringEvents
 
 /**
  * for Spring Event Listener Bean for CitySpringEvents repo events

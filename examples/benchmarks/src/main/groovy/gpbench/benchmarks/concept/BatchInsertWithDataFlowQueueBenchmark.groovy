@@ -1,17 +1,17 @@
 package gpbench.benchmarks.concept
 
 import groovy.transform.CompileDynamic
-
-import gorm.tools.transaction.WithTrx
-import gpbench.model.basic.CityBasic
-import gpbench.repo.CityBasicRepo
-import gpbench.benchmarks.BaseBatchInsertBenchmark
-import grails.compiler.GrailsCompileStatic
-import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.operator.PoisonPill
+
+import gorm.tools.transaction.WithTrx
+import gpbench.benchmarks.BaseBatchInsertBenchmark
+import gpbench.model.basic.CityBasic
+import gpbench.repo.CityBasicRepo
+import grails.compiler.GrailsCompileStatic
+import grails.gorm.transactions.Transactional
 
 import static groovyx.gpars.dataflow.Dataflow.operator
 

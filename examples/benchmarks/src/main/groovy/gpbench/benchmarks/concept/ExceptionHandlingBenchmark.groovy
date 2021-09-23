@@ -1,12 +1,14 @@
 package gpbench.benchmarks.concept
 
+import groovy.transform.CompileStatic
+
+import org.springframework.dao.DataAccessException
+
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.errors.EntityValidationException
-import gpbench.repo.CityBasicRepo
 import gpbench.benchmarks.BaseBatchInsertBenchmark
+import gpbench.repo.CityBasicRepo
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
-import org.springframework.dao.DataAccessException
 
 /**
  * Runs batch inserts with exception.

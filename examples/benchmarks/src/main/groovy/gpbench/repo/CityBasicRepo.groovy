@@ -1,12 +1,13 @@
 package gpbench.repo
 
+import groovy.transform.CompileStatic
+
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.basic.CityBasic
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
 
 @GormRepository
 @CompileStatic

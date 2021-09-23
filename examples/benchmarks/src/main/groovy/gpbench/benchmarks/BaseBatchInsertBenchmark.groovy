@@ -4,9 +4,9 @@ import groovy.transform.CompileDynamic
 
 import gorm.tools.async.ParallelTools
 import gorm.tools.repository.RepoUtil
-import gpbench.model.basic.CityBasic
 import gpbench.helpers.JsonReader
 import gpbench.helpers.RecordsLoader
+import gpbench.model.basic.CityBasic
 import grails.gorm.transactions.Transactional
 import grails.plugin.springsecurity.SpringSecurityService
 

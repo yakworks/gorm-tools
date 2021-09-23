@@ -1,9 +1,11 @@
 package gpbench.benchmarks
 
+import groovy.transform.CompileStatic
+
+import org.grails.datastore.gorm.GormEntity
+
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import groovy.transform.CompileStatic
-import org.grails.datastore.gorm.GormEntity
 
 /**
  * Runs batch inserts in parallel using gparse.

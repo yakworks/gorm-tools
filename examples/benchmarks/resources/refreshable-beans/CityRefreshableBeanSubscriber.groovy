@@ -1,4 +1,4 @@
-import gpbench.CityRefreshableBeanEvents
+import gpbench.model.CityRefreshableBeanEvents
 import grails.events.annotation.Subscriber
 import org.grails.datastore.mapping.engine.event.PostInsertEvent
 

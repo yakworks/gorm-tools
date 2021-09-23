@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.async.ParallelConfig
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gpbench.basic.CityBasic
+import gpbench.model.basic.CityBasic
 
 @CompileStatic
 class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{

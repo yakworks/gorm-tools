@@ -1,15 +1,16 @@
 package gpbench.helpers
 
-import grails.core.GrailsApplication
-import grails.plugins.csv.CSVMapReader
+import java.text.NumberFormat
+
 import groovy.transform.CompileStatic
 import groovy.transform.TypeCheckingMode
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 
-//import org.springframework.mock.web.MockHttpServletRequest
-import java.text.NumberFormat
+import grails.core.GrailsApplication
+import grails.plugins.csv.CSVMapReader
 
 @Component
 @CompileStatic

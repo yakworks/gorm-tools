@@ -115,7 +115,6 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @return the BulkableResults object with what succeeded and what failed
      */
     BulkableResults doBulkCreate(List<Map> dataList, Map args = [:]){
-        if(args['flush'] == null) args['flush'] = true
         def results = new BulkableResults(false)
         for (Map item : dataList) {
             Map itmCopy

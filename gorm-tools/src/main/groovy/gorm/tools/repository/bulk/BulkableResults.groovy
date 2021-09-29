@@ -19,7 +19,12 @@ transform example when in a job
   "status": 200, //201 created?, do we send back a 400 if its ok:false? also a 207 Multi-Status options maybe?
   "ok": false
   "state": "finished", //from job
-  "errors": ???
+  "errors": [
+     {
+        "title": "XXX constraint violation",
+        "detail" "Data Access Exception"
+        }
+   ],
   "data": [
     {
       "ok": true,
@@ -55,9 +60,11 @@ class BulkableResults {
 
     boolean ok = true
     @Delegate List<Result> resultList
+    List<ApiError> globalErrors //These are errors caught during batch flush etc, and can not be identified/associated with a single record
 
     BulkableResults(boolean isSynchronized = true){
         resultList = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
+        globalErrors = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<ApiError>
     }
 
     @Builder(builderStrategy= SimpleStrategy, prefix="")
@@ -125,6 +132,12 @@ class BulkableResults {
     void merge(BulkableResults mergee){
         if(!mergee.ok) ok = false
         resultList.addAll(mergee.resultList)
+        globalErrors.addAll(mergee.globalErrors)
+    }
+
+    void addGlobalError(ApiError err) {
+        globalErrors << err
+        this.ok = false
     }
 
     /**
@@ -133,6 +146,9 @@ class BulkableResults {
      */
     List<Map> transform(List includes = null, Closure<Map> customizer = null) {
         List<Map> ret = []
+        //XXX save global errors
+        //Add new field job.errors to domain ?
+        // or or make job.data a map instead of a list eg job.data = {errors:[], results:[]} ?
         boolean ok = true
         for (Result r : resultList) {
             def map = [ok: r.ok, status: r.status.value()] as Map<String, Object>

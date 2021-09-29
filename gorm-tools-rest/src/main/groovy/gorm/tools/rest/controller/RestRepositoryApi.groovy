@@ -195,8 +195,7 @@ trait RestRepositoryApi<D> implements RestApiController {
         // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
         // and then repond is going to take that object and turn it back into json bytes
         // seems we should be able to skip some steps here somehow.
-        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: parseJson(new StringReader(str))]
-        if(job.source) resp.source = job.source
+        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: parseJson(new StringReader(str)), source:job.source, sourceId:job.sourceId]
         respond resp, status: CREATED.value()
     }
 

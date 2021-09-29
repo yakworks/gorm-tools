@@ -132,7 +132,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         parallelTools.sliceSize = 10
 
         and:
-        List<Map> list = generateDataList(60) //this should trigger two batches of 10
+        List<Map> list = generateDataList(60) //this should trigger 6 batches of 10
 
         expect:
         Project.repo.parallelTools.sliceSize == 10

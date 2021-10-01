@@ -51,6 +51,8 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonPars
         job != null
         job.data != null
         job.state == JobState.Finished
+        job.sourceId == "org/bulkCreate"
+        job.source == "Oracle"
 
         when: "Verify job.data json, this is what come in from the request"
         List dataList = parseJson(job.requestData)

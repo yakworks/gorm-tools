@@ -13,6 +13,7 @@ import groovy.transform.builder.SimpleStrategy
 @ToString
 @CompileStatic
 class BulkableArgs {
+
     /**
      * what to set the job.source to
      */

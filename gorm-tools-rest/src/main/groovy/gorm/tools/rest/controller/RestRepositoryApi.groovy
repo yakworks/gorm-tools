@@ -188,15 +188,12 @@ trait RestRepositoryApi<D> implements RestApiController {
         //  list of all sourceIds/ids that we created
         //  so in includes we can specify what we return
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
-        byte[] jsonB = job["data"] as byte[]
-        String str = new String(jsonB, "UTF-8")
         //FIXME #339 we need to see if we can rethink this.
         // in bulkCreate we convert the object to json bytes ( need to save to db so have to do this)
         // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
         // and then repond is going to take that object and turn it back into json bytes
         // seems we should be able to skip some steps here somehow.
-        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: parseJson(new StringReader(str))]
-        if(job.source) resp.source = job.source
+        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: parseJson(job.data), source:job.source, sourceId:job.sourceId]
         respond resp, status: CREATED.value()
     }
 

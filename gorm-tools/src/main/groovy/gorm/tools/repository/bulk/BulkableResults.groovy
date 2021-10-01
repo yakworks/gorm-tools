@@ -19,7 +19,12 @@ transform example when in a job
   "status": 200, //201 created?, do we send back a 400 if its ok:false? also a 207 Multi-Status options maybe?
   "ok": false
   "state": "finished", //from job
-  "errors": ???
+  "errors": [
+     {
+        "title": "XXX constraint violation",
+        "detail" "Data Access Exception"
+        }
+   ],
   "data": [
     {
       "ok": true,
@@ -36,8 +41,8 @@ transform example when in a job
       "title": "Org Validation Error"
       "errors": [ { "field": "num", "message": "num can't be null" } ]
       "data": {
-        "sourceId": "JOANNA75764-US123"
-      },
+        "sourceId": "JOANNA75764-US123" ...
+     },
 
     },
   ]
@@ -55,6 +60,7 @@ class BulkableResults {
 
     boolean ok = true
     @Delegate List<Result> resultList
+    List<ApiError> globalErrors //These are errors caught during batch flush etc, and can not be identified/associated with a single record
 
     BulkableResults(boolean isSynchronized = true){
         resultList = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
@@ -78,9 +84,10 @@ class BulkableResults {
         Map entityData
 
         /**
-         * the data the was submitted to process. will be one of the items in the list that was sent.
+         * the data the was submitted to process.
+         * will either be one of the items in the list that was sent or the list slice that failed on flush/commit
          */
-        Map requestData
+        Object requestData
 
         /**
          * On error this is the processed error based on exception type
@@ -97,7 +104,12 @@ class BulkableResults {
             this
         }
 
-        static Result of(ApiError error, Map requestData){
+        static Result of(ApiError error){
+            new Result(ok: false, error: error, status: error.status)
+
+        }
+
+        static Result of(ApiError error, Object requestData){
             new Result(ok: false, error: error, requestData: requestData, status: error.status)
 
         }

@@ -48,7 +48,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         job.data != null
         job.state == JobState.Finished
 
-        when: "Verify job.requestData"
+        when: "Verify job.requestData (incoming json)"
         def payload = toJson(job.requestData)
 
         then:
@@ -59,7 +59,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         payload[0].nested.name == "nested-1"
         payload[19].name == "project-20"
 
-        when: "verify job.data"
+        when: "verify job.data (job results)"
         def results = toJson(job.data)
         then:
         results != null

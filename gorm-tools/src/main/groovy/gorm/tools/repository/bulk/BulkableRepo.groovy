@@ -79,7 +79,9 @@ trait BulkableRepo<D, J extends JobTrait>  {
             try {
                 results.merge doBulkCreate((List<Map>) dataChunk, bulkablArgs.persistArgs)
             } catch(Exception e) {
-                results.addGlobalError apiErrorHandler.handleException(getEntityClass(), e)
+                //catch any errors that may have happen during flush/commit
+                def apiError = apiErrorHandler.handleException(getEntityClass(), e)
+                Result.of(apiError, dataChunk).addTo(results)
             }
         }
 
@@ -90,7 +92,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
     }
 
-    //FIXME #339 implement
+    // FIXME #339 implement
     // J bulkCreatePromise(List<Map> dataList, Map args = [:]) {
     //
     //     Promise promise = task {

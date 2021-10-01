@@ -41,8 +41,8 @@ transform example when in a job
       "title": "Org Validation Error"
       "errors": [ { "field": "num", "message": "num can't be null" } ]
       "data": {
-        "sourceId": "JOANNA75764-US123"
-      },
+        "sourceId": "JOANNA75764-US123" ...
+     },
 
     },
   ]
@@ -64,7 +64,6 @@ class BulkableResults {
 
     BulkableResults(boolean isSynchronized = true){
         resultList = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
-        globalErrors = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<ApiError>
     }
 
     @Builder(builderStrategy= SimpleStrategy, prefix="")
@@ -85,9 +84,10 @@ class BulkableResults {
         Map entityData
 
         /**
-         * the data the was submitted to process. will be one of the items in the list that was sent.
+         * the data the was submitted to process.
+         * will either be one of the items in the list that was sent or the list slice that failed on flush/commit
          */
-        Map requestData
+        Object requestData
 
         /**
          * On error this is the processed error based on exception type
@@ -104,7 +104,12 @@ class BulkableResults {
             this
         }
 
-        static Result of(ApiError error, Map requestData){
+        static Result of(ApiError error){
+            new Result(ok: false, error: error, status: error.status)
+
+        }
+
+        static Result of(ApiError error, Object requestData){
             new Result(ok: false, error: error, requestData: requestData, status: error.status)
 
         }
@@ -132,12 +137,6 @@ class BulkableResults {
     void merge(BulkableResults mergee){
         if(!mergee.ok) ok = false
         resultList.addAll(mergee.resultList)
-        globalErrors.addAll(mergee.globalErrors)
-    }
-
-    void addGlobalError(ApiError err) {
-        globalErrors << err
-        this.ok = false
     }
 
     /**
@@ -146,9 +145,6 @@ class BulkableResults {
      */
     List<Map> transform(List includes = null, Closure<Map> customizer = null) {
         List<Map> ret = []
-        //XXX save global errors
-        //Add new field job.errors to domain ?
-        // or or make job.data a map instead of a list eg job.data = {errors:[], results:[]} ?
         boolean ok = true
         for (Result r : resultList) {
             def map = [ok: r.ok, status: r.status.value()] as Map<String, Object>

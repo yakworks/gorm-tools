@@ -243,34 +243,4 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.name == '9Galt'
 
     }
-
-    void "testing bulkUpdate"() {
-        when:
-        Response resp = post("$path/bulkUpdate", [ids: [1, 2], data: [name: "mass Updated"]])
-
-        Map body = bodyToMap(resp)
-
-        then:
-        resp.code() == HttpStatus.OK.value()
-        body.data[0].name == 'mass Updated'
-        body.data[1].name == 'mass Updated'
-
-    }
-
-    //XXX test bulk create https://github.com/yakworks/gorm-tools/issues/348
-    void "testing bulk create"() {
-        when:
-        Response resp = post("$path/bulkCreate?jobSource=Oracle", [postData])
-
-        Map body = bodyToMap(resp)
-
-        then:
-        resp.code() == HttpStatus.CREATED.value()
-        //def job = Job.get(resp.id)
-        //job.sourceId == "/api/rally/org/bulkCreate"
-        //job.source == "Oracle"
-        body.source == "Oracle"
-
-    }
-
 }

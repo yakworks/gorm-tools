@@ -1,19 +1,18 @@
 package restify
 
+import gorm.tools.job.JobState
 import gorm.tools.rest.JsonParserTrait
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import org.springframework.http.HttpStatus
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 
 @Rollback
 @Integration
-
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonParserTrait {
     String path = "/api/rally/org/bulk?jobSource=Oracle"
 
@@ -45,13 +44,23 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonPars
         body.data[0].data.num == "foox1"
         body.data[0].data.name == "Foox1"
 
-        when: "Verify created job"
-        Job job = Job.get(body.id)
+        when: "Verify job.data"
+        Job job = Job.get(body.id as Long)
 
         then:
         job != null
+        job.data != null
+        job.requestData != null
+        job.state == JobState.Finished
         job.sourceId == "org/bulkCreate"
         job.source == "Oracle"
+
+        when: "Verify job.data json, this is what come in from the request"
+        List dataList = parseJson(job.requestData)
+
+        then:
+        dataList.size() == 3
+        dataList[0].num == "foox1"
 
         when: "Verify created org"
         Org org = Org.get( body.data[0].data.id as Long)

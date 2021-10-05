@@ -55,12 +55,6 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * Each call creates a job that stores info for the call and is returned with results
      * @param dataList the list of data maps to create
      * @param args args to pass to doCreate. It can have:
-     *      jobSource -  what to set the job.source to
-     *      includes - for successful result, list of fields to include for the created or updated entity
-     *      errorThreshold - (default: false) number of errors before it stops the job. this setting ignored if transactional=true
-     *      transactional - (default: false) if true then the whole set should be in a transaction. disables parallelProcessing.
-     *          will disable parallelProcessing
-     *      async - (default: true) whether it should return thr job imediately or do it sync
      * @return Job
      */
     J bulkCreate(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {

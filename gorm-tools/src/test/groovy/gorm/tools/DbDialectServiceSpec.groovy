@@ -124,7 +124,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         when: "postgres"
         service.dialectName = null
         config.hibernate.dialect = "PostgreSQLDialect"
-        function = service.ifnull
+        function = service.ifNull
 
         then:
         function == 'is null'

@@ -176,7 +176,7 @@ class DbDialectService {
     static Map getGlobalVariables() {
         Map result = [:]
         int dialect = setupDialect()
-        if (dialect == MYSQL || dialect == H2 || dialect == ORACLE) {
+        if (dialect == MYSQL || dialect == H2 || dialect == ORACLE || dialect == POSTGRES) {
             result.concat = "FN9_CONCAT"
         } else if (dialect == MSSQL) {
             result.concat = "dbo.FN9_CONCAT"

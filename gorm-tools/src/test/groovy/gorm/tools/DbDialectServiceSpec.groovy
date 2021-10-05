@@ -94,7 +94,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         date = service.currentDate
 
         then:
-        date = "now()"
+        date == "now()"
     }
 
     void "test getIfNull"() {

@@ -45,7 +45,7 @@ class DbDialectService {
         else if (dialectName.matches(".*SQLServer20\\d\\dDialect")) result = MSSQL
         else if (dialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
         else if (dialectName.contains("Oracle")) result = ORACLE
-        else if (dialectName.contains("PostgreSQLDialect")) result = POSTGRESQL
+        else if (dialectName.contains("Postgre")) result = POSTGRESQL
 
         if (result == UNKNOWN) {
             throw new SQLException("Unknown dialect ${dialectName} in gorm.tools.jdbc.DbDialectService.\n"

@@ -35,8 +35,7 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
 
     static mapping = {
         //cache true
-        table 'EventLog'
-        //set id to autoincrement
+        // table 'EventLog'
         id generator: 'native'
     }
 

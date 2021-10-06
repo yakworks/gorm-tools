@@ -22,7 +22,6 @@ class ActivityContact implements GormRepoEntity<ActivityContact, ActivityContact
     static mapping = {
         version false
         id composite: ['activity', 'contact']
-        table 'ActivityContact'
         activity column: 'activityId'
         contact column: 'personId'
     }

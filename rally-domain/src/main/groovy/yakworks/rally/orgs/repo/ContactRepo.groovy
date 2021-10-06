@@ -4,11 +4,11 @@
 */
 package yakworks.rally.orgs.repo
 
-import gorm.tools.repository.bulk.BulkableRepo
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent

@@ -37,7 +37,7 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
         //cache true
         table 'EventLog'
         //set id to autoincrement
-        id generator: 'native'
+        id generator: 'identity'
     }
 
     static constraints = {

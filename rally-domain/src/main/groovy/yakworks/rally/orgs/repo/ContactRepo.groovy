@@ -4,7 +4,7 @@
 */
 package yakworks.rally.orgs.repo
 
-
+import gorm.tools.repository.bulk.BulkableRepo
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
@@ -20,6 +20,7 @@ import gorm.tools.support.MsgKey
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.model.ActivityContact
+import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -31,7 +32,7 @@ import yakworks.rally.tag.model.TagLink
 
 @GormRepository
 @CompileStatic
-class ContactRepo implements GormRepo<Contact> {
+class ContactRepo implements GormRepo<Contact>, BulkableRepo<Contact, Job> {
 
     @RepoListener
     void beforeValidate(Contact contact) {

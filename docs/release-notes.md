@@ -1,3 +1,14 @@
+### v7.0.8-v.29
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.28...v7.0.8-v.29)
+- release Bulkable Contacts [link](https://github.com/yakworks/gorm-tools/commit/bbd0df73566a77e6edeed265f974c3b8ad7224c6)
+- make Contact bulkable (#359) [link](https://github.com/yakworks/gorm-tools/commit/ed53f38f6d331180892046bf725d85de752f2fdd)
+- Fix BulkRestApiSpec (#349) [link](https://github.com/yakworks/gorm-tools/commit/ecbedd06476f590c5336fbbd9620d4c0f0fafc42)
+- 413 ApiError on bulkable commits (#354) [link](https://github.com/yakworks/gorm-tools/commit/ed7a0790eb65ed4a07a7b80eae8ed0da853e12aa)
+- new vault with sops, refactor steps into circle so its clearer when we have a failure and where (#351) [link](https://github.com/yakworks/gorm-tools/commit/a1f3acfdd2b2d1738a5fe81aa83582fa1dc05337)
+- Benchmarks (#350) [link](https://github.com/yakworks/gorm-tools/commit/6bead127e9d40545f01f3fb7616d71307d1838e4)
+- back to snapshot [link](https://github.com/yakworks/gorm-tools/commit/d28d30606321653412f6924d1cc8f50b0bbf6ac3)
+
 ### v7.0.8-v.28
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.27...v7.0.8-v.28)

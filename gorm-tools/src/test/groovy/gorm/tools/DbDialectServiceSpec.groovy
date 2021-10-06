@@ -53,7 +53,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         service.dialectName == "dialect_mssql"
         service.isMsSql() == true
 
-        when: "postgres"
+        when: "postgresql"
         service.dialectName = null
         config.hibernate.dialect = 'PostgreSQLDialect'
         dialect = service.getDialect()
@@ -88,7 +88,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         then:
         date == "getdate()"
 
-        when: "postgres"
+        when: "postgresql"
         service.dialectName = null
         config.hibernate.dialect = "PostgreSQLDialect"
         date = service.currentDate
@@ -121,7 +121,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         then:
         function == "isnull"
 
-        when: "postgres"
+        when: "postgresql"
         service.dialectName = null
         config.hibernate.dialect = "PostgreSQLDialect"
         function = service.ifNull
@@ -154,7 +154,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         then:
         function == "+"
 
-        when: "postgres"
+        when: "postgresql"
         service.dialectName = null
         config.hibernate.dialect = "PostgreSQLDialect"
         function = service.concat
@@ -196,7 +196,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         then:
         function == "CHR"
 
-        when: "postgres"
+        when: "postgresql"
         service.dialectName = null
         config.hibernate.dialect = "PostgreSQLDialect"
         function = service.charFn
@@ -238,7 +238,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         then:
         function == "SUBSTR"
 
-        when: "postgres"
+        when: "postgresql"
         service.dialectName = null
         config.hibernate.dialect = "PostgreSQLDialect"
         function = service.substringFn
@@ -280,7 +280,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         then:
         function == "FN9_CONCAT"
 
-        when: "postgres"
+        when: "postgresql"
         service.dialectName = null
         config.hibernate.dialect = "PostgreSQLDialect"
         function = DbDialectService.globalVariables.concat

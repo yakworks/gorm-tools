@@ -53,6 +53,15 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         service.dialectName == "dialect_mssql"
         service.isMsSql() == true
 
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = 'PostgreSQLDialect'
+        dialect = service.getDialect()
+
+        then:
+        dialect == DbDialectService.POSTGRESQL
+        service.dialectName == "dialect_postgres"
+        service.isPostgres() == true
     }
 
     void "test getCurrentDate"() {
@@ -78,6 +87,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         date == "getdate()"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        date = service.currentDate
+
+        then:
+        date == "now()"
     }
 
     void "test getIfNull"() {
@@ -103,6 +120,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "isnull"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.ifNull
+
+        then:
+        function == 'is null'
     }
 
     void "test getConcat"() {
@@ -128,6 +153,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "+"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.concat
+
+        then:
+        function == "||"
     }
 
 
@@ -162,6 +195,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "CHR"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.charFn
+
+        then:
+        function == "CHAR"
     }
 
 
@@ -196,6 +237,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "SUBSTR"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.substringFn
+
+        then:
+        function == "SUBSTRING"
     }
 
 
@@ -226,6 +275,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         when: "Oracle"
         service.dialectName = null
         config.hibernate.dialect = 'OracleDailect'
+        function = DbDialectService.globalVariables.concat
+
+        then:
+        function == "FN9_CONCAT"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
         function = DbDialectService.globalVariables.concat
 
         then:

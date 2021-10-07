@@ -110,6 +110,10 @@ class ContactRepo implements GormRepo<Contact> {
             Long orgId = data['orgId'] as Long
             contact.org = Org.get(orgId)
         }
+        // lookup Org ?
+        if (data['org.source]']) {
+            contact.org = Org.repo.lookup(data['org.source'] as Map)
+        }
     }
 
     @Transactional

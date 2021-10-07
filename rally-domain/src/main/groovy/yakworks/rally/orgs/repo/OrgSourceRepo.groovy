@@ -94,8 +94,10 @@ class OrgSourceRepo implements GormRepo<OrgSource>, IdGeneratorRepo {
     }
 
     OrgSource findBySourceIdAndOrgType(String sourceId, OrgType orgType) {
-        return OrgSource.find("from OrgSource where sourceId = :sourceId and orgType = :orgType ",
-            [sourceId: sourceId, orgType: orgType])
+        // return OrgSource.find("from OrgSource where sourceId = :sourceId and orgType = :orgType ",
+        //     [sourceId: sourceId, orgType: orgType])
+
+        return OrgSource.where { sourceId == sourceId && orgType == orgType }.get()
     }
 
 

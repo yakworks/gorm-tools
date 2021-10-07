@@ -12,13 +12,15 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockHelper
 
 class ContactSpec extends Specification implements DomainRepoTest<Contact>, SecurityTest {
 
     void setupSpec(){
-        mockDomains(AppUser, Org, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail)
+        mockDomains(AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail)
     }
 
     @Override
@@ -278,5 +280,28 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         contact.locations[1].street1 == "test street2"
 
     }
+
+    def "test create Contact with org lookup by source"() {
+        setup:
+        Org org = Org.create("foo", "bar", OrgType.Customer)
+        org.validate()
+        org.createSource()
+        org.persist()
+
+        Map params = buildCreateMap([:])
+        params.remove("org")
+        params.org = [source: [sourceId: 'foo', orgType: OrgType.Customer.name()]]
+
+
+        when:
+        def entity = Contact.create(params)
+        flushAndClear()
+        def contact = Contact.get(entity.id)
+
+        then:
+        contact.org.num == "foo"
+
+    }
+
 
 }

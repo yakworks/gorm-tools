@@ -17,8 +17,8 @@ import yakworks.rally.orgs.model.OrgType
 class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
     //Automatically runs the basic crud tests
 
-    def setupSpec(){
-        defineBeans{
+    def setupSpec() {
+        defineBeans {
             //scriptExecutorService(ScriptExecutorService)
             orgDimensionService(OrgDimensionService)
         }
@@ -67,7 +67,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         when: "flush and clear is called and OrgSource is retreived again"
         flushAndClear()
 
-        then : "should stil be the sourceId that was set"
+        then: "should stil be the sourceId that was set"
         assert OrgSource.get(osi).sourceId == "test"
     }
 
@@ -75,9 +75,9 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         setup:
         Long orgId = 1000
 
-        Map flex = TestDataJson.buildMap(OrgFlex, includes:"*")
-        Map calc = TestDataJson.buildMap(OrgCalc, includes:"*")
-        Map info = TestDataJson.buildMap(OrgInfo, includes:"*")
+        Map flex = TestDataJson.buildMap(OrgFlex, includes: "*")
+        Map calc = TestDataJson.buildMap(OrgCalc, includes: "*")
+        Map info = TestDataJson.buildMap(OrgInfo, includes: "*")
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
@@ -97,7 +97,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         org.info.website
 
         when: "update"
-        org = Org.update([ id: org.id, flex:[text1:'yyy'], info:[phone:'555-1234', fax:'555-1234', website:'www.test.com']])
+        org = Org.update([id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']])
 
         then:
         org.flex.text1 == 'yyy'
@@ -130,10 +130,27 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
         where:
 
-        orgType            | data
-        OrgType.Customer   | [orgTypeId: 1]
-        OrgType.Branch     | [orgTypeId: '3']
-        OrgType.Branch     | [type: OrgType.Branch]
-        OrgType.Branch     | [type: [id: 3]]
+        orgType          | data
+        OrgType.Customer | [orgTypeId: 1]
+        OrgType.Branch   | [orgTypeId: '3']
+        OrgType.Branch   | [type: OrgType.Branch]
+        OrgType.Branch   | [type: [id: 3]]
+    }
+
+    void "test find org by sourceid"() {
+        when:
+        Org org = Org.create("foo", "bar", OrgType.Customer)
+        org.validate()
+        org.createSource()
+        org.persist()
+
+        then: "source id is the default"
+        assert org.source.sourceId == "foo"
+
+        Org o = Org.repo.lookup([source: [sourceId: 'foo', orgType: OrgType.Customer.name()]])
+        assert o
+        o.name == "bar"
+
+
     }
 }

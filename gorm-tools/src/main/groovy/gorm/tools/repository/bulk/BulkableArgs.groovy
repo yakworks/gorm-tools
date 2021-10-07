@@ -38,7 +38,7 @@ class BulkableArgs {
     boolean transactional = false
 
     // whether it should return thr job imediately or do it sync
-    boolean async = true
+    boolean async = false
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods

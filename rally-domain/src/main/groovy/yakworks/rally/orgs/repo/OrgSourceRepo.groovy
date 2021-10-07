@@ -98,10 +98,6 @@ class OrgSourceRepo implements GormRepo<OrgSource>, IdGeneratorRepo {
             [sourceId: sourceId, orgType: orgType])
     }
 
-    /* XXX issue  (also do the same for arTran)
-    Org lookupSourceId(Map data) {
-        return OrgSource.findWhere("sourceId": data.source.sourceId, "orgType": data.orgType).id  // benchmark it
-        //XXX use orgSourceRepo.findBySourceIdAndOrgType but return orgId not entire OrgSource
-    }
-*/
+
+
 }

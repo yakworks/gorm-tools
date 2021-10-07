@@ -180,7 +180,7 @@ trait RestRepositoryApi<D> implements RestApiController {
         List dataList = parseJsonList(request)
         //XXX add test for sourceId. there is actually no test that is testing Job values from here https://github.com/yakworks/gorm-tools/issues/348
         String endpoint = "${params.controller}/${params.action}"
-        def bulkableArgs = new BulkableArgs(jobSourceId: endpoint, jobSource: params.jobSource as String, async: params.async, includes: getIncludes("bulk"))
+        def bulkableArgs = new BulkableArgs(jobSourceId: endpoint, jobSource: params.jobSource as String, includes: getIncludes("bulk"))
         JobTrait job = ((BulkableRepo)getRepo()).bulkCreate(dataList, bulkableArgs)
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.

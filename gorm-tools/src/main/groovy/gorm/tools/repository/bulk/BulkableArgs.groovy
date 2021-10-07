@@ -20,12 +20,6 @@ class BulkableArgs {
 
     String jobSourceId
 
-    /**
-     * the size of the lists when collated or sliced into chunks,
-     * overrides defaults that get set from jdbc.batch_size
-     */
-    //TODO have config that we
-    Integer sliceSize
 
     /**
      * for result, list of fields to include for the created or updated entity

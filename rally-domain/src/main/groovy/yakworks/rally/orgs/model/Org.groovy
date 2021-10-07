@@ -6,6 +6,8 @@ package yakworks.rally.orgs.model
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
+import gorm.tools.model.Lookupable
+import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.source.SourceType
 import grails.compiler.GrailsCompileStatic
@@ -20,7 +22,7 @@ import yakworks.rally.tag.model.Tag
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCriteriaSupport, Serializable {
+class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCriteriaSupport, Serializable, Lookupable<Org> {
 
     String  comments
     Long    companyId
@@ -122,6 +124,12 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         def o = new Org(num: num, name: name, companyId: companyId)
         o.type = orgType
         return o
+    }
+
+    static Org lookup(Map data){
+        if(data['source']) {
+            (Org) getRepo().lookup(data)
+        }
     }
 
 }

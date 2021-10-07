@@ -39,6 +39,9 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     //@Inject @Nullable
     OrgTagRepo orgTagRepo
 
+    //@Inject @Nullable
+    OrgSourceRepo orgSourceRepo
+
     @RepoListener
     void beforeValidate(Org org) {
         if(org.isNew()) {
@@ -190,6 +193,12 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     //util method that creates the OrgSource from num and assigns to the source record (if originator)
     OrgSource createSource(Org org, SourceType sourceType = SourceType.App) {
         OrgSource.repo.createSource(org, sourceType)
+    }
+
+    Org lookup(Map data) {
+        //return OrgSource.findWhere("sourceId": data.source.sourceId, "orgType": data.orgType).id  // benchmark it
+        OrgSource source = data.source as OrgSource
+        return doGet(orgSourceRepo.findBySourceIdAndOrgType(source.sourceId as String, OrgType.findByName(data.orgType as String)).orgId)
     }
 
 }

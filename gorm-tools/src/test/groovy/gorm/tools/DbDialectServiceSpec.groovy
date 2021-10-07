@@ -59,7 +59,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
         dialect = service.getDialect()
 
         then:
-        dialect == DbDialectService.POSTGRES
+        dialect == DbDialectService.POSTGRESQL
         service.dialectName == "dialect_postgres"
         service.isPostgres() == true
     }

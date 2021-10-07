@@ -1,3 +1,11 @@
+### v7.0.8-v.30
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.29...v7.0.8-v.30)
+- turn org.gradle.parallel=true back on [link](https://github.com/yakworks/gorm-tools/commit/7f479ee639daf069178aec558b72a67c238ebfeb)
+- release [link](https://github.com/yakworks/gorm-tools/commit/a3efdf583e1ecd8e42fdfc5f8d7b0766556a5423)
+- Updated for postgres (#358) [link](https://github.com/yakworks/gorm-tools/commit/331e5ca4fdee3ddc1ac9f4e690dd735b40633076)
+- back to snapshot [link](https://github.com/yakworks/gorm-tools/commit/a6569722f12cc8bb0e808398a0199b6127f582df)
+
 ### v7.0.8-v.29
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.28...v7.0.8-v.29)

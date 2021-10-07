@@ -36,7 +36,7 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
     static mapping = {
         //cache true
         // table 'EventLog'
-        id generator: 'native'
+        id generator: 'identity'
     }
 
     static constraints = {

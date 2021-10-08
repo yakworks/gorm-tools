@@ -106,13 +106,15 @@ class ContactRepo implements GormRepo<Contact> {
     }
 
     void assignOrg(Contact contact, Map data) {
-        if (data['org'] instanceof Org){
+        if (data['org'] instanceof Org) {
             contact.org = data['org'] as Org
-        } else if (data['orgId'] && !data['org']) {
-            Long orgId = data['orgId'] as Long
-            contact.org = Org.get(orgId)
-        } else if(data['org']) {
-            Map orgMap = data['org']
+            return
+        }
+        Map orgMap = data['org']
+        if (data['orgId'] || (orgMap && orgMap['id'])) {
+            def orgId = data['orgId']?:orgMap['id']
+            contact.org = Org.get(orgId as Long)
+        } else if(orgMap) {
             contact.org = Org.repo.lookup(orgMap)
         }
     }

@@ -105,6 +105,7 @@ class ContactRepo implements GormRepo<Contact> {
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
+    // vXXX ery messy, we can pass in data.org, data.orgId, data.org.id, data.source.sourceId
     void assignOrg(Contact contact, Map data) {
         if (data['org'] instanceof Org) {
             contact.org = data['org'] as Org

@@ -112,7 +112,7 @@ class ContactRepo implements GormRepo<Contact> {
             contact.org = Org.get(orgId)
         }
         //try by orgSource
-        if(orgMap['source']) {
+        if(orgMap && orgMap['source']) {
             contact.org = Org.repo.lookup(orgMap)
         }
     }

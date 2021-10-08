@@ -39,6 +39,10 @@ bot:
 
 vault_url: https://github.com/9ci/vault.git
 
+version:
+  # after release, will set version.properties back to snapshot=true
+  set_snapshot: true
+
 release:
   changelog: docs/release-notes.md
   branch_regex: master|release/.+

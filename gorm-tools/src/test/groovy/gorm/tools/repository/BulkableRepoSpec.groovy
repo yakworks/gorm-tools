@@ -1,11 +1,13 @@
 package gorm.tools.repository
 
+import gorm.tools.async.ParallelTools
 import gorm.tools.job.JobState
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.testing.unit.DataRepoTest
 import groovy.json.JsonSlurper
 import org.springframework.http.HttpStatus
+import spock.lang.Issue
 import spock.lang.Shared
 import spock.lang.Specification
 import testing.JobImpl
@@ -15,6 +17,7 @@ import testing.Project
 class BulkableRepoSpec extends Specification implements DataRepoTest {
 
     @Shared JsonSlurper slurper
+    ParallelTools parallelTools
 
     void setupSpec() {
         slurper = new JsonSlurper()
@@ -45,7 +48,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         job.data != null
         job.state == JobState.Finished
 
-        when: "Verify job.requestData"
+        when: "Verify job.requestData (incoming json)"
         def payload = toJson(job.requestData)
 
         then:
@@ -56,7 +59,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         payload[0].nested.name == "nested-1"
         payload[19].name == "project-20"
 
-        when: "verify job.data"
+        when: "verify job.data (job results)"
         def results = toJson(job.data)
         then:
         results != null
@@ -99,6 +102,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         then:
         results != null
         results instanceof List
+        results.size() == 20
 
         and: "verify successfull results"
         results.findAll({ it.ok == true}).size() == 18
@@ -119,6 +123,29 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         results[19].errors.size() == 1
         results[19].errors[0].field == "nested.name"
         //results[19].errors[0].field == "name"
+    }
+
+
+    @Issue("domain9#413")
+    void "test batching"() {
+        setup: "Set batchSize of 10 to trigger batching/slicing"
+        parallelTools.sliceSize = 10
+
+        and:
+        List<Map> list = generateDataList(60) //this should trigger 6 batches of 10
+
+        expect:
+        Project.repo.parallelTools.sliceSize == 10
+
+        when: "bulk insert in multi batches"
+        JobImpl job = Project.repo.bulkCreate(list, setupBulkableArgs())
+        def results = toJson(job.data)
+
+        then: "just 60 should have been inserted, not the entire list twice"
+        results.size() == 60
+
+        cleanup:
+        parallelTools.sliceSize = 50
     }
 
     private List<Map> generateDataList(int numRecords) {

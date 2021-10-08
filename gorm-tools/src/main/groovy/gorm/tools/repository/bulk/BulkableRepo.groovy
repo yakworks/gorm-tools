@@ -16,6 +16,7 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobState
 import gorm.tools.job.JobTrait
+import gorm.tools.repository.errors.api.ApiError
 import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.transaction.TrxService
 import yakworks.commons.map.Maps
@@ -69,7 +70,13 @@ trait BulkableRepo<D, J extends JobTrait>  {
         def asynArgs = new ParallelConfig(transactional:true, datastore: getDatastore())
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(asynArgs, dataList) { dataChunk ->
-            results.merge doBulkCreate(dataList, bulkablArgs.persistArgs)
+            try {
+                results.merge doBulkCreate((List<Map>) dataChunk, bulkablArgs.persistArgs)
+            } catch(Exception e) {
+                //catch any errors that may have happen during flush/commit
+                def apiError = apiErrorHandler.handleException(getEntityClass(), e)
+                Result.of(apiError, dataChunk).addTo(results)
+            }
         }
 
         finishJob(jobId, results, bulkablArgs.includes)
@@ -79,7 +86,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
     }
 
-    //FIXME #339 implement
+    // FIXME #339 implement
     // J bulkCreatePromise(List<Map> dataList, Map args = [:]) {
     //
     //     Promise promise = task {

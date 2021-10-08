@@ -21,7 +21,6 @@ class OrgCalc implements RepoEntity<OrgCalc>, Serializable {
 
 
     static mapping = {
-        table 'OrgCalc'
         id generator: 'assigned'
         version false
     }

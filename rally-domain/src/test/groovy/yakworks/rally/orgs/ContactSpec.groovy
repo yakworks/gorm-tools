@@ -281,7 +281,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     }
 
-    def "test create Contact with org lookup by source"() {
+    def "test create Contact with org lookup by orgSource"() {
         setup:
         Org org = Org.create("foo", "bar", OrgType.Customer)
         org.validate()

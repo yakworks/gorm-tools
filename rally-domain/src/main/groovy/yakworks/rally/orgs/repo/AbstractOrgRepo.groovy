@@ -195,16 +195,17 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         OrgSource.repo.createSource(org, sourceType)
     }
 
+    // lookup by sourceId
     Org lookup(Map data) {
-        //return OrgSource.findWhere("sourceId": data.source.sourceId, "orgType": data.orgType).id  // benchmark it
+        if(!data.source) return null;
+
         OrgSource source = data.source as OrgSource
+
+        if(!(source.sourceId && source.orgType)) return null
+
         OrgType orgType = OrgType.findByName(source.orgType as String)
-        if(!(source.sourceId && orgType)) return null
         return doGet(orgSourceRepo.findBySourceIdAndOrgType(source.sourceId as String, orgType).orgId)
 
-            // took from CustRepo
-        // Long orgId = OrgSource.repo.findBySourceIdAndOrgType(source.sourceId as String, OrgType.findByName(data.orgType as String))?.orgId
-        // return orgId ? gormStaticApi().load(orgId) : null
 
     }
 

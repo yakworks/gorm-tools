@@ -21,7 +21,7 @@ import yakworks.rally.tag.model.Tag
 @AuditStamp
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCriteriaSupport, Serializable, Lookupable<Org> {
+class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCriteriaSupport, Serializable {
 
     String  comments
     Long    companyId
@@ -124,11 +124,4 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         o.type = orgType
         return o
     }
-
-    static Org lookup(Map data){
-        if(data['source']) {
-            (Org) getRepo().lookup(data)
-        }
-    }
-
 }

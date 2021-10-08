@@ -72,7 +72,7 @@ class ContactRepo implements GormRepo<Contact> {
 
     @RepoListener
     void afterBind(Contact contact, Map data, AfterBindEvent e) {
-        assignOrgFromOrgId(contact, data)
+        assignOrg(contact, data)
         contact.concatName()
         assignUserNameFromContactName(contact)
     }
@@ -105,14 +105,14 @@ class ContactRepo implements GormRepo<Contact> {
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
-    void assignOrgFromOrgId(Contact contact, Map data) {
-        Map orgMap = data['org']
-        if (data['orgId'] && !orgMap) {
+    void assignOrg(Contact contact, Map data) {
+        if (data['org'] instanceof Org){
+            contact.org = data['org'] as Org
+        } else if (data['orgId'] && !data['org']) {
             Long orgId = data['orgId'] as Long
             contact.org = Org.get(orgId)
-        }
-        //try by orgSource
-        if(orgMap && orgMap['source']) {
+        } else if(data['org']) {
+            Map orgMap = data['org']
             contact.org = Org.repo.lookup(orgMap)
         }
     }

@@ -25,6 +25,7 @@ class DbDialectService {
     static final int MYSQL = 2
     static final int ORACLE = 3
     static final int H2 = 4
+    static final int POSTGRESQL = 5
 
     // injected in bean setup
     JdbcTemplate jdbcTemplate
@@ -44,6 +45,7 @@ class DbDialectService {
         else if (dialectName.matches(".*SQLServer20\\d\\dDialect")) result = MSSQL
         else if (dialectName.contains("MySQL5InnoDBDialect")) result = MYSQL
         else if (dialectName.contains("Oracle")) result = ORACLE
+        else if (dialectName.contains("Postgre")) result = POSTGRESQL
 
         if (result == UNKNOWN) {
             throw new SQLException("Unknown dialect ${dialectName} in gorm.tools.jdbc.DbDialectService.\n"
@@ -64,6 +66,7 @@ class DbDialectService {
             case MYSQL: date = "now()"; break
             case ORACLE: date = "SYSDATE"; break
             case H2: date = "CURRENT_DATE()"; break
+            case POSTGRESQL: date = "now()"; break
             default: date = "now()"
         }
         date
@@ -75,6 +78,7 @@ class DbDialectService {
             case MSSQL: ifnull = "isnull"; break
             case MYSQL: ifnull = "ifnull"; break
             case ORACLE: ifnull = "NVL"; break
+            case POSTGRESQL: ifnull = "COALESCE"; break
             default: ifnull = "ifnull"
         }
         ifnull
@@ -88,6 +92,7 @@ class DbDialectService {
             case MYSQL: concat = "+"; break
             case ORACLE: concat = "||"; break
             case H2: concat = "||"; break
+            case POSTGRESQL: concat = "||"; break
             default: concat = "+"
         }
         concat
@@ -99,6 +104,7 @@ class DbDialectService {
             case MSSQL: charFn = "CHAR"; break
             case MYSQL: charFn = "CHAR"; break
             case ORACLE: charFn = "CHR"; break
+            case POSTGRESQL: charFn = "CHAR"; break
             default: charFn = "CHAR"
         }
         charFn
@@ -111,21 +117,28 @@ class DbDialectService {
             case MSSQL: substringFn = "SUBSTRING"; break
             case MYSQL: substringFn = "SUBSTRING"; break
             case ORACLE: substringFn = "SUBSTR"; break
+            case POSTGRESQL: substringFn = "SUBSTRING"; break
             default: substringFn = "SUBSTRING"
         }
         substringFn
     }
 
-    String getDialectName() {
-        String dialectName
+    /**
+    * returns the datadiff function with what is passed is. if upperDate is less than lowerDate then result
+    * after being run in sql will be negative
+    */
+    String datediff(Object upperDate, Object lowerDate) {
+        String func
         switch (dialect) {
-            case MSSQL: dialectName = "dialect_mssql"; break
-            case MYSQL: dialectName = "dialect_mysql"; break
-            case ORACLE: dialectName = "dialect_oracle"; break
-            case H2: dialectName = "dialect_h2"; break
-            default: dialectName = "dialect_mysql"
+            case MSSQL: func = "DATEDIFF(dd, ${lowerDate}, ${upperDate})"; break
+            case MYSQL: func = "DATEDIFF(${upperDate}, ${lowerDate})"; break
+            case POSTGRESQL: func = "date_part('day', ${upperDate} - ${lowerDate} )"; break
         }
-        dialectName
+        func
+    }
+
+    String getDialectName() {
+        return getSimpleDialectName(dialect)
     }
 
     String getTop(int num) {
@@ -134,6 +147,7 @@ class DbDialectService {
             case MSSQL: top = "TOP ${num}"; break
             case MYSQL: top = "LIMIT ${num}"; break
             case ORACLE: top = "ROWNUM <=${num}"; break
+            case POSTGRESQL: top = "fetch first ${num} rows only"; break
             default: top = "LIMIT ${num}"
         }
         top
@@ -164,15 +178,25 @@ class DbDialectService {
         return myDate
     }
 
+    static String getSimpleDialectName(int dialectKey) {
+        String dialectName
+        switch (dialectKey) {
+            case MSSQL: dialectName = "mssql"; break
+            case MYSQL: dialectName = "mysql"; break
+            case ORACLE: dialectName = "oracle"; break
+            case H2: dialectName = "h2"; break
+            case POSTGRESQL: dialectName = "postgresql"; break
+            default: dialectName = "mysql"
+        }
+        dialectName
+    }
+
     static Map getGlobalVariables() {
         Map result = [:]
         int dialect = setupDialect()
-        if (dialect == MYSQL || dialect == H2 || dialect == ORACLE) {
-            result.concat = "FN9_CONCAT"
-        } else if (dialect == MSSQL) {
-            result.concat = "dbo.FN9_CONCAT"
-        }
-
+        String dialectName = getSimpleDialectName(dialect)
+        result.dialect = dialectName
+        // result['databaseId'] = dialectName
         return result
     }
 
@@ -186,6 +210,10 @@ class DbDialectService {
 
     boolean isH2() {
         return dialect == H2
+    }
+
+    boolean isPostgres() {
+        return dialect == POSTGRESQL
     }
 
 }

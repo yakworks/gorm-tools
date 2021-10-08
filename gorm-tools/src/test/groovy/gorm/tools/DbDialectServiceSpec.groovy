@@ -21,7 +21,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         dialect == DbDialectService.H2
-        service.dialectName == "dialect_h2"
+        service.dialectName == "h2"
         service.isH2() == true
 
         when: "mysql"
@@ -30,7 +30,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         dialect == DbDialectService.MYSQL
-        service.dialectName == "dialect_mysql"
+        service.dialectName == "mysql"
         service.isMySql() == true
 
         when: "mssql server 20**"
@@ -40,7 +40,7 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         dialect == DbDialectService.MSSQL
-        service.dialectName == "dialect_mssql"
+        service.dialectName == "mssql"
         service.isMsSql() == true
 
         when: "sql server"
@@ -50,9 +50,18 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         dialect == DbDialectService.MSSQL
-        service.dialectName == "dialect_mssql"
+        service.dialectName == "mssql"
         service.isMsSql() == true
 
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = 'PostgreSQLDialect'
+        dialect = service.getDialect()
+
+        then:
+        dialect == DbDialectService.POSTGRESQL
+        service.dialectName == "postgresql"
+        service.isPostgres() == true
     }
 
     void "test getCurrentDate"() {
@@ -78,6 +87,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         date == "getdate()"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        date = service.currentDate
+
+        then:
+        date == "now()"
     }
 
     void "test getIfNull"() {
@@ -103,6 +120,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "isnull"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.ifNull
+
+        then:
+        function == 'COALESCE'
     }
 
     void "test getConcat"() {
@@ -128,6 +153,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "+"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.concat
+
+        then:
+        function == "||"
     }
 
 
@@ -162,6 +195,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "CHR"
+
+        when: "postgresql"
+        service.dialectName = null
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.charFn
+
+        then:
+        function == "CHAR"
     }
 
 
@@ -196,40 +237,14 @@ class DbDialectServiceSpec extends Specification implements ServiceUnitTest<DbDi
 
         then:
         function == "SUBSTR"
-    }
 
-
-    void "test getGlobalVariables"() {
-        when: "dialect is H2"
-        config.hibernate.dialect = 'H2Dialect'
-        String function = DbDialectService.globalVariables.concat
-
-        then:
-        function == "FN9_CONCAT"
-
-        when: "mysql"
+        when: "postgresql"
         service.dialectName = null
-        config.hibernate.dialect = 'MySQL5InnoDBDialect'
-        function = DbDialectService.globalVariables.concat
+        config.hibernate.dialect = "PostgreSQLDialect"
+        function = service.substringFn
 
         then:
-        function == "FN9_CONCAT"
-
-        when: "sql server"
-        service.dialectName = null
-        config.hibernate.dialect = 'SQLServerDialect'
-        function = DbDialectService.globalVariables.concat
-
-        then:
-        function == "dbo.FN9_CONCAT"
-
-        when: "Oracle"
-        service.dialectName = null
-        config.hibernate.dialect = 'OracleDailect'
-        function = DbDialectService.globalVariables.concat
-
-        then:
-        function == "FN9_CONCAT"
+        function == "SUBSTRING"
     }
 
 }

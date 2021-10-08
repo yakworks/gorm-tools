@@ -7,7 +7,6 @@ package yakworks.rally.orgs.model
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.Lookupable
-import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.source.SourceType
 import grails.compiler.GrailsCompileStatic

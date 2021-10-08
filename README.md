@@ -19,7 +19,7 @@
     |    |(  <_> |  <_> )  |__\___ \               `!!! !!!! !!  )!!!!!!!!!!!!!
     |____| \____/ \____/|____/____  >               !!  ! ! \( \(  !!!|/!  |/!
                                   \/               /_(      /_(/_(    /_(  /_(   
-         Version: 7.0.8-v.28
+         Version: 7.0.8-v.30
          
 </pre>
 
@@ -27,7 +27,7 @@
 
 **7.0.x is for grails 4.x and gorm 7.0.x**
 
-> *DOCS ARE OUT OF DATE AND BEING UPDATED FOR BREAKING CHANGES IN 6.1.12-v.X*
+> *DOCS ARE OUT OF DATE AND BEING UPDATED FOR BREAKING CHANGES after 6.1.12-v.X*
 > *ALSO MERGING IN DOCS FOR THE REST-API AND AUDITSTAMP THAT WAS MERGED INTO HERE*
 > More breaking changes in 7.0.8-v6. is required on domain entity now or it needs to implement @GormRepoEntity
 
@@ -47,6 +47,12 @@ repositories {
 ...
 compile "org.yakworks:gorm-tools:7.0.8-v.12"
 ``` 
+
+## Sub Projects
+
+
+
+## Purpose 
 
 Gorm-tools allows your Grails/Gorm project to start with a design of best practices that they can customize along the way. 
 This brings an opinionated starting point to a Grails/Gorm project but without being locked in.
@@ -151,10 +157,22 @@ criteria.list {
 
 ## Developer Notes
 
+### Make
+
+while gradle is the build tool behind spring/grails, make is used for consitency to run gradle
+and use docker and setting up env for testing
+
+run `make` to see help
+
+run `make check` for full tests
+
+or run `./gradlew check`
+
 ### Running docs locally
 
-Docs are built with https://yakworks.github.io/docmark/
-Run  `./build.sh dockmark-serve` or `make dockmark-serve`
+run make help for latest targets
+
+`make docmark.start`
 
 ### Publishing Plugin Releases
 

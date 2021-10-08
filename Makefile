@@ -1,30 +1,25 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.29 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.40 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
+include $(SHIPKIT_DIR)/makefiles/vault.make
 include $(SHIPKIT_DIR)/makefiles/spring-common.make
 include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 # DB = true # set this to true to turn on the DB environment options
 
-## ci deploy, main target to call from circle
-ship-it::
-	make secrets.decrypt-vault
-	make ci-credentials
-	make ship.release
-	$(logr.done)
-
-ci-credentials: git.config-bot-user kubectl.config dockerhub.login
+# should run vault.decrypt before this,
+# sets up github, kubernetes and docker login
+ship.authorize: git.config-bot-user kubectl.config dockerhub.login
 	$(logr.done)
 
 ifdef RELEASABLE_BRANCH_OR_DRY_RUN
-# ifneq ($(and $(RELEASABLE_BRANCH),$(DRY_RUN)),)
 
  ship.release: build ship.libs ship.docker kube.deploy
-	# this should happen last and in its own make as it will increment the version number which is used in scripts above
-    # TODO it seems a bit backwards though and the scripts above should be modified
-	make ship.version
 	$(logr.done)
+
+ ship.docker: docker.app-build docker.app-push
+	$(logr.done) "docker built and pushed"
 
  kube.deploy: kube.create-ns kube.clean
 	$(kube_tools) apply_tpl $(APP_KUBE_SRC)/app-configmap.tpl.yml
@@ -34,7 +29,7 @@ ifdef RELEASABLE_BRANCH_OR_DRY_RUN
 else
 
  ship.release:
-	$(logr.done) "not on a RELEASABLE_BRANCH, nothing to do""
+	$(logr.done) "not on a RELEASABLE_BRANCH, nothing to do"
 
 endif # end RELEASABLE_BRANCH
 
@@ -83,9 +78,24 @@ gradle.dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
 	./gradlew restify:dependencies --configuration runtime
 
+[ ! "$JAVA_OPTS" ]&& JAVA_OPTS="-Xmx3g -XX:MaxMetaspaceSize=256m"
+# -noverify -XX:TieredStopAtLevel=1} # good for dev
+SERVER_JAVA_OPTS = "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+
+GC_JAVA_OPTS = "-XX:+UseConcMarkSweepGC -XX:+UseCMSInitiatingOccupancyOnly \
+-XX:+CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=70 \
+-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
+-XX:SurvivorRatio=8"
+## runs the benchmark tests
 run-benchmarks:
 	$(gradlew) benchmarks:assemble
 	cd examples/benchmarks
-	java -server -Xmx3048m -XX:MaxMetaspaceSize=256m -jar \
-	  -DmultiplyData=3 -Dgorm.tools.async.poolSize=4 build/libs/benchmarks.war
-	# -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+	java -server -Xmx3g -XX:MaxMetaspaceSize=256m \
+		-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
+		-XX:+UseConcMarkSweepGC -XX:+UseCMSInitiatingOccupancyOnly \
+		-XX:+CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=70 \
+		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
+		-XX:SurvivorRatio=8 \
+		-DmultiplyData=3 -Dgorm.tools.async.poolSize=4 -Djava.awt.headless=true \
+		-Dgrails.env=prod -jar build/libs/benchmarks.jar
+

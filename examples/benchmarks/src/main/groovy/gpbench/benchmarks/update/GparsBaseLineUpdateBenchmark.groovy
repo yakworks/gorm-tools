@@ -1,13 +1,13 @@
 package gpbench.benchmarks.update
 
-import gorm.tools.async.ParallelConfig
-import gpbench.basic.CityBasic
-import gorm.tools.databinding.EntityMapBinder
+import java.util.concurrent.atomic.AtomicInteger
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import java.util.concurrent.atomic.AtomicInteger
+import gorm.tools.async.ParallelConfig
+import gorm.tools.databinding.EntityMapBinder
+import gpbench.model.basic.CityBasic
 
 @CompileStatic
 class GparsBaseLineUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{

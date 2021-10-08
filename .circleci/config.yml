@@ -65,8 +65,15 @@ jobs:
       - setup_remote_docker
       - run: apk add docker
 
-      # ship it
-      - run: make ship-it
+      # download vault and decrypts
+      - run: make vault.decrypt
+      # sets up git config, kubectl and docker login
+      - run: make ship.authorize
+      # publish libs, push docker, kubernetes deploy
+      - run: make ship.release
+      # add to changelog, creates a release to github, rolls version.props and pushes changes to github
+      # only happens if IS_RELEASABLE, meaning if its a snapshot then it skips this
+      - run: make ship.version
 
 workflows:
   build-flow:

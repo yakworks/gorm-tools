@@ -18,7 +18,7 @@ class FileData implements RepoEntity<FileData>, Serializable {
     byte[] data
 
     static mapping = {
-        table 'FileData'
+        // table 'FileData'
     }
 
     static constraints = {

@@ -21,7 +21,7 @@ class ParallelToolsSpecSpec extends Specification {
         //     Project.count() == 50
         // }
         //starting org count
-        Org.count() == 0
+        Org.count() == 100
 
         list.size() == 50
 
@@ -35,7 +35,7 @@ class ParallelToolsSpecSpec extends Specification {
 
         then:
         Org.withSession {
-            Org.count() == 50
+            Org.count() == 150
         }
 
     }

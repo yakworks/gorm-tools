@@ -8,7 +8,7 @@ import yakworks.testify.model.Project
 
 @Rollback
 @Integration
-class ParallelToolsSpecSpec extends Specification {
+class ParallelToolsSpec extends Specification {
 
     ParallelTools parallelTools
 
@@ -17,26 +17,18 @@ class ParallelToolsSpecSpec extends Specification {
         List<Map> list = createList(50)
 
         expect:
-        // Project.withSession {
-        //     Project.count() == 50
-        // }
-        //starting org count
         Project.count() == 0
-
         list.size() == 50
 
         when:
-        // FIXME #339 how is this working, transaction thats set on the test should not be rolling into parallelTools?
-        def args = new ParallelConfig(enabled: true)
+        //FIXME #339 How is the transactional changes from parallelTools visible to the test.
+        def args = new ParallelConfig(enabled: true, transactional: true)
         parallelTools.each(args, list) { Map item ->
             new Project(num: item.name, name: "name $item.name").persist()
         }
-        // Project.repo.flush()
 
         then:
-        Project.withSession {
-            Project.count() == 50
-        }
+        Project.count() == 50
 
     }
 

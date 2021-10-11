@@ -1,10 +1,10 @@
 package gorm.tools.async
 
-
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.testify.model.Project
+import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgType
 
 @Rollback
 @Integration
@@ -21,7 +21,7 @@ class ParallelToolsSpecSpec extends Specification {
         //     Project.count() == 50
         // }
         //starting org count
-        Project.count() == 0
+        Org.count() == 100
 
         list.size() == 50
 
@@ -29,13 +29,13 @@ class ParallelToolsSpecSpec extends Specification {
         // FIXME #339 how is this working, transaction thats set on the test should not be rolling into parallelTools?
         def args = new ParallelConfig(enabled: true)
         parallelTools.each(args, list) { Map item ->
-            new Project(num: item.name, name: "name $item.name").persist()
+            new Org(num: item.name, name: "name $item.name", type: OrgType.Customer).persist()
         }
         // Project.repo.flush()
 
         then:
-        Project.withSession {
-            Project.count() == 50
+        Org.withSession {
+            Org.count() == 150
         }
 
     }

@@ -42,32 +42,32 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         // body.errors.find{ it.field == 'link.name' }
     }
 
-    void 'test post errors on project'() {
+    void 'test post errors on org'() {
 
         when:
         Map invalidData2 = [
-            inactive: true, billable: true, endDate: '2020-11-11', startDate: '2020-11-11'
+            type: "Customer"
         ]
-        Response resp = post('/api/project', invalidData2)
+        Response resp = post('/api/rally/org', invalidData2)
         Map body = bodyToMap(resp)
 
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.title == "Project Validation Error(s)"
-        body.errors[0].message == "Property [name] of class [class yakworks.testify.model.Project] cannot be null"
+        body.title == "Org Validation Error(s)"
+        body.errors[0].message == "Property [name] of class [class yakworks.rally.orgs.model.Org] cannot be null"
         body.errors[0].field == "name"
-        body.errors[1].message == "Property [num] of class [class yakworks.testify.model.Project] cannot be null"
+        body.errors[1].message == "Property [num] of class [class yakworks.rally.orgs.model.Org] cannot be null"
         body.errors[1].field == "num"
 
     }
 
     void "test data access exception on db constraint violation"() {
         setup:
-        jdbcTemplate.execute("CREATE UNIQUE INDEX project_num_unique ON Project(num)")
+        jdbcTemplate.execute("CREATE UNIQUE INDEX org_num_unique ON Org(num)")
 
         when:
-        Response resp = post('/api/project', [ name:"Project-1", num:"P1", inactive: true, billable: true])
+        Response resp = post('/api/rally/org', [ name:"Project-1", num:"P1", type: "Customer"])
         Map body = bodyToMap(resp)
         def orgId = body.id
 
@@ -75,7 +75,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         resp.code() == HttpStatus.CREATED.value()
 
         when: "2nd record with duplicate num"
-        resp = post('/api/project', [ name:"Project-2", num:"P1", inactive: true, billable: true])
+        resp = post('/api/rally/org', [ name:"Project-2", num:"P1",type: "Customer"])
         body = bodyToMap(resp)
 
         then: "Would cause DataAccessException"
@@ -83,10 +83,10 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Data Access Exception"
         ((String)body.detail).contains("ConstraintViolationException")
-        ((String)body.detail).contains("PROJECT_NUM_UNIQUE")
+        ((String)body.detail).contains("ORG_NUM_UNIQUE")
 
-        delete("/api/project", orgId)
-        jdbcTemplate.execute("DROP index project_num_unique")
+        delete("/api/rally/org", orgId)
+        jdbcTemplate.execute("DROP index org_num_unique")
     }
 
 }

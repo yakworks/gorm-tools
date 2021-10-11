@@ -4,6 +4,7 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Issue
 import spock.lang.Specification
+import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.testify.model.Address
 
@@ -27,7 +28,7 @@ class EntityMapBinderSpec extends Specification {
         org.location.city == "Rajkot"
 
         when: "now try to bind just address"
-        Address address = new Address()
+        Location address = new Location()
         address.bind params.location
 
         then:

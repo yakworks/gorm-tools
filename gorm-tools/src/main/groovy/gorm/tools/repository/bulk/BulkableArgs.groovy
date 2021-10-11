@@ -5,14 +5,25 @@
 package gorm.tools.repository.bulk
 
 import groovy.transform.CompileStatic
+import groovy.transform.MapConstructor
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
+import gorm.tools.repository.model.DataOp
+
 @Builder(builderStrategy= SimpleStrategy, prefix="")
+@MapConstructor
 @ToString
 @CompileStatic
 class BulkableArgs {
+
+    BulkableArgs() { this([:])}
+
+    /**
+     * the operation to perform, limited to add and update right now
+     */
+    DataOp op
 
     /**
      * what to set the job.source to
@@ -37,12 +48,25 @@ class BulkableArgs {
     // if true then the whole set should be in a transaction. disables parallelProcessing.
     boolean transactional = false
 
-    // whether it should return thr job imediately or do it sync
-    boolean async = true
+    // whether it should return the job immediately or run in a standard blocking synchronous
+    Boolean async = false
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
      */
     Map persistArgs = [:]
 
+    static BulkableArgs of(DataOp dataOp){
+        new BulkableArgs(op: dataOp)
+    }
+
+    static BulkableArgs create(Map args = [:]){
+        args.op = DataOp.add
+        new BulkableArgs(args)
+    }
+
+    static BulkableArgs update(Map args = [:]){
+        args.op = DataOp.update
+        new BulkableArgs(args)
+    }
 }

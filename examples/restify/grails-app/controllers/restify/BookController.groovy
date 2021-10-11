@@ -4,16 +4,14 @@
 */
 package restify
 
-
 import groovy.transform.CompileStatic
 
 import gorm.tools.rest.controller.RestRepositoryApi
-import yakworks.testify.model.Project
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class ProjectController implements RestRepositoryApi<Project> {
+class BookController implements RestRepositoryApi<Book> {
 
     @Override
     def post() {
@@ -21,7 +19,7 @@ class ProjectController implements RestRepositoryApi<Project> {
             Map q = parseJson(request)
             String comments = q.comments ?: ""
             q.comments = "$comments - post was here"
-            Project instance = getRepo().create(q)
+            Book instance = getRepo().create(q)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap, [status: CREATED])
             // respond instance, [status: CREATED] //201

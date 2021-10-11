@@ -4,8 +4,7 @@
 */
 package restify
 
-import yakworks.testify.model.Project
-import yakworks.testify.model.Taskify
+// import yakworks.testify.model.Taskify
 
 // import restify.domain.OrgType
 // import taskify.Project
@@ -15,7 +14,7 @@ class BootStrap {
     static Random rand = new Random()
 
     def init = { servletContext ->
-        createProjects()
+        createBooks()
 
 //        def data = new JsonSlurper().parse(new File("../resources/Contacts.json"))
 //        data.each{
@@ -25,24 +24,24 @@ class BootStrap {
 
     }
 
-    def createProjects(){
-        Project.withTransaction {
-            (1..50).each {
-                def prod = Project.create([
-                    id: it,
-                    name: "Fooinator-$it",
-                    num: "$it",
-                    activateDate: "2020-01-01",
-                    startDate: "2020-01-01"
-                ], bindId: true)
-                assert prod.id == it
-                def task = new Taskify(name: "task1-$it",
-                    project: prod)
-                    .persist()
-                def task2 = new Taskify(name: "task2-$it",
-                    project: prod)
-                    .persist()
-            }
+    def createBooks(){
+        Book.withTransaction {
+            // (1..50).each {
+            //     def prod = Project.create([
+            //         id: it,
+            //         name: "Fooinator-$it",
+            //         num: "$it",
+            //         activateDate: "2020-01-01",
+            //         startDate: "2020-01-01"
+            //     ], bindId: true)
+            //     assert prod.id == it
+            //     def task = new Taskify(name: "task1-$it",
+            //         project: prod)
+            //         .persist()
+            //     def task2 = new Taskify(name: "task2-$it",
+            //         project: prod)
+            //         .persist()
+            // }
 
             (1..5).each {id ->
                 def book = new Book(description: "Shrugged$id")

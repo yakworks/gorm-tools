@@ -4,9 +4,12 @@ import gorm.tools.async.ParallelTools
 import gorm.tools.job.JobState
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
+import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
 import groovy.json.JsonSlurper
 import org.springframework.http.HttpStatus
+
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Shared
 import spock.lang.Specification
@@ -16,16 +19,16 @@ import testing.Project
 
 class BulkableRepoSpec extends Specification implements DataRepoTest {
 
-    @Shared JsonSlurper slurper
+    // @Shared JsonSlurper slurper
     ParallelTools parallelTools
 
     void setupSpec() {
-        slurper = new JsonSlurper()
+        // slurper = new JsonSlurper()
         mockDomains(Project, Nested, JobImpl)
     }
 
-    BulkableArgs setupBulkableArgs(){
-        return new BulkableArgs(jobSource:"test", jobSourceId: "test", includes: ["id", "name", "nested.name"])
+    BulkableArgs setupBulkableArgsCreate(){
+        return new BulkableArgs(op: DataOp.add, jobSource:"test", jobSourceId: "test", includes: ["id", "name", "nested.name"])
     }
 
     void "test bulkable repo"() {
@@ -38,7 +41,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         List list = generateDataList(20)
 
         when: "bulk insert 20 records"
-        JobImpl job = Project.repo.bulkCreate(list, setupBulkableArgs())
+        JobImpl job = Project.repo.bulk(list, setupBulkableArgsCreate())
 
         then: "verify job"
         job != null
@@ -91,7 +94,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         list[19].nested.name = ""
 
         when: "bulk insert"
-        JobImpl job = Project.repo.bulkCreate(list, setupBulkableArgs())
+        JobImpl job = Project.repo.bulk(list, setupBulkableArgsCreate())
 
         then: "verify job"
         job.ok == false
@@ -138,7 +141,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         Project.repo.parallelTools.sliceSize == 10
 
         when: "bulk insert in multi batches"
-        JobImpl job = Project.repo.bulkCreate(list, setupBulkableArgs())
+        JobImpl job = Project.repo.bulk(list, setupBulkableArgsCreate())
         def results = toJson(job.data)
 
         then: "just 60 should have been inserted, not the entire list twice"
@@ -158,6 +161,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
     }
 
     def toJson(byte[] data) {
+        def slurper = new JsonSlurper()
         return slurper.parse(data)
     }
 

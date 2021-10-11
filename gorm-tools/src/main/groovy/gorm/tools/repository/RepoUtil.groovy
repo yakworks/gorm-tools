@@ -10,10 +10,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.model.PersistentProperty
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
@@ -21,7 +18,6 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.EntityNotFoundException
-import gorm.tools.utils.GormMetaUtils
 import grails.util.Environment
 import yakworks.commons.lang.NameUtils
 

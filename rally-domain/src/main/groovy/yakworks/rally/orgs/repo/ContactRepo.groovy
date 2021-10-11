@@ -106,18 +106,13 @@ class ContactRepo implements GormRepo<Contact>, BulkableRepo<Contact, Job> {
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
-    // vXXX ery messy, we can pass in data.org, data.orgId, data.org.id, data.source.sourceId
     void assignOrg(Contact contact, Map data) {
+        // used on copy contact with copy org
         if (data['org'] instanceof Org) {
             contact.org = data['org'] as Org
-            return
-        }
-        Map orgMap = data['org']
-        if (data['orgId'] || (orgMap && orgMap['id'])) {
-            def orgId = data['orgId']?:orgMap['id']
-            contact.org = Org.get(orgId as Long)
-        } else if(orgMap) {
-            contact.org = Org.repo.lookup(orgMap)
+        } else {
+            contact.org = Org.repo.findWithData(data['org'] as Map)
+
         }
     }
 

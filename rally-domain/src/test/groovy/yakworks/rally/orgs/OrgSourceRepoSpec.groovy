@@ -59,4 +59,21 @@ class OrgSourceRepoSpec extends Specification implements DomainRepoTest<OrgSourc
 
     }
 
+    void "test find org by sourceid"() {
+        when:
+        Org org = Org.create("foo", "bar", OrgType.Customer)
+        org.validate()
+        org.createSource()
+        org.persist()
+
+        then: "source id is the default"
+        assert org.source.sourceId == "foo"
+
+        Org o = OrgSource.findBySourceIdAndOrgType('foo', OrgType.Customer)
+        assert o
+        o.name == "bar"
+
+
+    }
+
 }

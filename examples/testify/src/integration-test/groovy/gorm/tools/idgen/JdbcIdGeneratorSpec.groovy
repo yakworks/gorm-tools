@@ -5,13 +5,13 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.testify.model.Project
+import yakworks.rally.orgs.model.Org
 
 //import grails.persistence.Entity
 @Integration
 @Rollback
 class JdbcIdGeneratorSpec extends Specification {
-    private static final String TABLE_KEY = "Project.id"
+    private static final String TABLE_KEY = "Org.id"
 
     JdbcIdGenerator jdbcIdGenerator
     //JdbcTemplate jdbcTemplate
@@ -19,7 +19,7 @@ class JdbcIdGeneratorSpec extends Specification {
     @Ignore
     void "test WTF"() {
         when:
-        def prj = TestData.build(Project)
+        def prj = TestData.build(Org)
 
         then:
         prj.id == 1

@@ -15,6 +15,7 @@ class Book implements NameDescription, RepoEntity<Book> {
 
     BigDecimal cost
     LocalDate publishDate
+    String comments
 
     //default includes fields for json render with EntityMap
     static List includes = ['id', 'name', 'description', 'publishDate']

@@ -33,11 +33,11 @@ class ApiErrorHandler {
 
     @Autowired MsgService msgService
 
-    ApiError handleException(Exception e) {
+    ApiError handleException(Throwable e) {
         handleException("Entity", e)
     }
 
-    ApiError handleException(Class entityClass, Exception e) {
+    ApiError handleException(Class entityClass, Throwable e) {
         handleException(entityClass.simpleName, e)
     }
 
@@ -51,7 +51,7 @@ class ApiErrorHandler {
      * @param Exception e
      * @return ApiError
      */
-    ApiError handleException(String entityName, Exception e) {
+    ApiError handleException(String entityName, Throwable e) {
         // default error status code is 422
         HttpStatus status = UNPROCESSABLE_ENTITY
 

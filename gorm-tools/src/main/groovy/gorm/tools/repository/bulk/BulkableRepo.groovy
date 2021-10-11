@@ -4,8 +4,9 @@
 */
 package gorm.tools.repository.bulk
 
+import java.util.function.Supplier
+
 import groovy.transform.CompileStatic
-import groovy.util.logging.Slf4j
 
 import org.grails.datastore.mapping.core.Datastore
 import org.slf4j.Logger
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+import gorm.tools.async.Futures
 import gorm.tools.async.ParallelConfig
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
@@ -20,12 +22,11 @@ import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobState
 import gorm.tools.job.JobTrait
 import gorm.tools.repository.errors.api.ApiErrorHandler
+import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxService
-import grails.async.Promise
 import yakworks.commons.map.Maps
 
 import static gorm.tools.repository.bulk.BulkableResults.Result
-import static grails.async.Promises.task
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -53,6 +54,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
     //Here for @CompileStatic - GormRepo implements these
     abstract D doCreate(Map data, Map args)
+    abstract D doUpdate(Map data, Map args)
     abstract  Class<D> getEntityClass()
     abstract void flushAndClear()
     abstract Datastore getDatastore()
@@ -61,78 +63,58 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * Allows to pass in bulk of records at once, for example /api/book/bulk
      * Each call creates a job that stores info for the call and is returned with results
      * @param dataList the list of data maps to create
-     * @param args args to pass to doCreate. It can have:
-     *      jobSource -  what to set the job.source to
-     *      includes - for successful result, list of fields to include for the created or updated entity
-     *      errorThreshold - (default: false) number of errors before it stops the job. this setting ignored if transactional=true
-     *      transactional - (default: false) if true then the whole set should be in a transaction. disables parallelProcessing.
-     *          will disable parallelProcessing
-     *      async - (default: true) whether it should return thr job imediately or do it sync
+     * @param bulkablArgs the args object to pass on to doBulk
      * @return Job
      */
-    J bulkCreate(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
+    J bulk(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
 
         J job = (J) jobRepo.create(bulkablArgs.jobSource, bulkablArgs.jobSourceId, dataList)
         //keep the jobId around
         Long jobId = job.id
 
-        Closure<BulkableResults> bulkClosure = {
-            def results = new BulkableResults()
+        def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<BulkableResults>
 
-            def asynArgs = new ParallelConfig(transactional:true, datastore: getDatastore())
-            // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
-            parallelTools.eachSlice(asynArgs, dataList) { dataChunk ->
-                try {
-                    results.merge doBulkCreate((List<Map>) dataChunk, bulkablArgs.persistArgs)
-                } catch(Exception e) {
-                    //catch any errors which may occur during flush/commit
-                    def apiError = apiErrorHandler.handleException(getEntityClass(), e)
-                    Result.of(apiError, dataChunk).addTo(results)
-                }
+        Futures.of(bulkablArgs.async, supplierFunc).whenComplete{ BulkableResults results, ex ->
+            if(ex){ //should never really happen
+                def apiError = apiErrorHandler.handleException(getEntityClass(), ex)
+                Result.of(apiError, null).addTo(results)
             }
-            return results
-        }
-
-        //if async, then run bulk insert asynchronously and immediately return the created job without waiting to finish
-        if(bulkablArgs.async) {
-            Promise p = task { bulkClosure() }
-            p.onComplete { BulkableResults results ->
-                finishJob(jobId, results, bulkablArgs.includes)
-            }
-            p.onError {Exception err -> log.error(err.message, err)}
-        } else {
-            //synchrnous
-            BulkableResults results = bulkClosure()
             finishJob(jobId, results, bulkablArgs.includes)
         }
+
         // return job
         return (J) jobRepo.get(jobId)
 
     }
 
-    // FIXME #339 implement
-    // J bulkCreatePromise(List<Map> dataList, Map args = [:]) {
-    //
-    //     Promise promise = task {
-    //
-    //         //doBulkCreate(bulkResults, dataList, args)
-    //
-    //     }.onComplete { result ->
-    //         updateJobResults(jobId, bulkResults, args.includes as List)
-    //     }.onError { Throwable err ->
-    //         //!! should nver get here? log to Job?
-    //     }
-    //
-    // }
+    BulkableResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
+        def results = new BulkableResults()
+
+        def asynArgs = new ParallelConfig(transactional:true, datastore: getDatastore())
+        // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
+        parallelTools.eachSlice(asynArgs, dataList) { dataSlice ->
+            try {
+                results.merge doBulkSlice((List<Map>) dataSlice, bulkablArgs)
+            } catch(Exception e) {
+                //catch any errors which may occur during flush/commit
+                def apiError = apiErrorHandler.handleException(getEntityClass(), e)
+                Result.of(apiError, dataSlice).addTo(results)
+            }
+        }
+        return results
+    }
+
+
     /**
-     * Does the bulk create, normally will be passing in a slice of data and this will be wrapped in a transaction
+     * Does the bulk create/update, normally will be passing in a slice of data.
+     * this should be wrapped in a transaction
      * Flushes and clears at the end so errors show up in the right place
      *
      * @param dataList the data chunk
      * @param args the persist args to pass to repo methods
      * @return the BulkableResults object with what succeeded and what failed
      */
-    BulkableResults doBulkCreate(List<Map> dataList, Map args = [:]){
+    BulkableResults doBulkSlice(List<Map> dataList, BulkableArgs bulkablArgs){
         def results = new BulkableResults(false)
         for (Map item : dataList) {
             Map itmCopy
@@ -141,9 +123,11 @@ trait BulkableRepo<D, J extends JobTrait>  {
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 itmCopy = Maps.deepCopy(item)
-                entityInstance = doCreate(item, args)
+                entityInstance = bulkablArgs.op == DataOp.add ? doCreate(item, bulkablArgs.persistArgs) : doUpdate(item, bulkablArgs.persistArgs)
                 Result.of(entityInstance, 201).addTo(results)
             } catch(Exception e) {
+                // XXX I think we should be throwing here so it can roll back, then per Joanna we can recycle through
+                // each item in its own transaction
                 def apiError = apiErrorHandler.handleException(getEntityClass(), e)
                 Result.of(apiError, itmCopy).addTo(results)
             }

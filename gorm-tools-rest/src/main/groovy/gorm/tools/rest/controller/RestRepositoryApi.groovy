@@ -11,7 +11,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
-import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
@@ -25,6 +24,7 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.api.ApiError
 import gorm.tools.repository.errors.api.ApiErrorHandler
+import gorm.tools.repository.model.DataOp
 import gorm.tools.rest.RestApiConfig
 import grails.web.Action
 
@@ -180,8 +180,8 @@ trait RestRepositoryApi<D> implements RestApiController {
         List dataList = parseJsonList(request)
         //XXX add test for sourceId. there is actually no test that is testing Job values from here https://github.com/yakworks/gorm-tools/issues/348
         String endpoint = "${params.controller}/${params.action}"
-        def bulkableArgs = new BulkableArgs(jobSourceId: endpoint, jobSource: params.jobSource as String, includes: getIncludes("bulk"))
-        JobTrait job = ((BulkableRepo)getRepo()).bulkCreate(dataList, bulkableArgs)
+        def bulkableArgs = new BulkableArgs(op: DataOp.add, jobSourceId: endpoint, jobSource: params.jobSource as String, includes: getIncludes("bulk"))
+        JobTrait job = ((BulkableRepo)getRepo()).bulk(dataList, bulkableArgs)
         // XXX we don't have incs. We just need to do entityMap and respond it
         //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
         //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return

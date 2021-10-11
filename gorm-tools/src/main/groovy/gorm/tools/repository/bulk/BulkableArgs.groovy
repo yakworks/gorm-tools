@@ -10,6 +10,8 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
+import org.springframework.beans.factory.annotation.Value
+
 import gorm.tools.repository.model.DataOp
 
 @Builder(builderStrategy= SimpleStrategy, prefix="")
@@ -26,11 +28,10 @@ class BulkableArgs {
     DataOp op
 
     /**
-     * what to set the job.source to
+     * extra params to pass into Job, such as source and sourceId. The endpoint the
+     * request came from will end up in sourceId
      */
-    String jobSource
-
-    String jobSourceId
+    Map params = [:]
 
     /**
      * for result, list of fields to include for the created or updated entity
@@ -45,11 +46,18 @@ class BulkableArgs {
      */
     int errorThreshold = 0
 
-    // if true then the whole set should be in a transaction. disables parallelProcessing.
+    /**
+     * if true then the bulk operation is all or nothing, meaning 1 error and it will roll back.
+     * TODO not implemented yet
+     */
     boolean transactional = false
 
-    // whether it should return the job immediately or run in a standard blocking synchronous
-    Boolean async = false
+    /**
+     * Allows override for the default async from gorm.tools.async.enabled
+     * whether it should run async with a CompletableFuture and return the job immediately
+     * or run in a standard blocking synchronous
+     */
+    Boolean asyncEnabled = false
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods

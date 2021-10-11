@@ -28,7 +28,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
     }
 
     BulkableArgs setupBulkableArgsCreate(){
-        return new BulkableArgs(op: DataOp.add, jobSource:"test", jobSourceId: "test", includes: ["id", "name", "nested.name"])
+        return new BulkableArgs(op: DataOp.add, params:[source: "test", sourceId: "test"], includes: ["id", "name", "nested.name"])
     }
 
     void "test bulkable repo"() {

@@ -8,6 +8,8 @@ import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
 import groovy.json.JsonSlurper
 import org.springframework.http.HttpStatus
+
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Shared
 import spock.lang.Specification
@@ -17,11 +19,11 @@ import testing.Project
 
 class BulkableRepoSpec extends Specification implements DataRepoTest {
 
-    @Shared JsonSlurper slurper
+    // @Shared JsonSlurper slurper
     ParallelTools parallelTools
 
     void setupSpec() {
-        slurper = new JsonSlurper()
+        // slurper = new JsonSlurper()
         mockDomains(Project, Nested, JobImpl)
     }
 
@@ -159,6 +161,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
     }
 
     def toJson(byte[] data) {
+        def slurper = new JsonSlurper()
         return slurper.parse(data)
     }
 

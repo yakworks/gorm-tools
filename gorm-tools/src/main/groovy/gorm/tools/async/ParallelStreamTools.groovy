@@ -4,6 +4,7 @@
 */
 package gorm.tools.async
 
+import java.util.concurrent.ForkJoinPool
 import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
@@ -25,10 +26,13 @@ import static groovyx.gpars.GParsPool.withPool
 @CompileStatic
 class ParallelStreamTools implements ParallelTools, ConfigAware {
 
+    ForkJoinPool forkJoinPool
+
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct
     void init() {
-        if (poolSize == 0) poolSize = PoolUtils.retrieveDefaultPoolSize()
+        if (poolSize == 0) poolSize = Runtime.getRuntime().availableProcessors()
+        forkJoinPool = new ForkJoinPool(poolSize)
         //if batchSize is 0 then hibernate may not bbe installed and hibernate.jdbc.batch_size is not set. force it to 100
         Integer batchSize = config.getProperty('hibernate.jdbc.batch_size', Integer)
         sliceSize = batchSize ?: sliceSize
@@ -43,9 +47,11 @@ class ParallelStreamTools implements ParallelTools, ConfigAware {
 
         if (gparsEnabled) {
             int psize = args.poolSize ?: getPoolSize()
-            withPool(psize) {
-                GParsPoolUtil.eachParallel(collection, wrappedClosure)
-            }
+
+            // WIP
+            // create ForkJoinPool
+            //submit parralelStream to it
+
         } else {
             collection.each(wrappedClosure)
 

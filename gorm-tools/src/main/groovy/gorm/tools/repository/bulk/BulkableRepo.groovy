@@ -21,12 +21,14 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobState
 import gorm.tools.job.JobTrait
+import gorm.tools.repository.errors.api.ApiError
 import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.repository.model.DataOp
 import gorm.tools.transaction.TrxService
 import yakworks.commons.map.Maps
 
 import static gorm.tools.repository.bulk.BulkableResults.Result
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -53,10 +55,13 @@ trait BulkableRepo<D, J extends JobTrait>  {
     ApiErrorHandler apiErrorHandler
 
     //Here for @CompileStatic - GormRepo implements these
+    abstract D create(Map data, Map args)
+    abstract D update(Map data, Map args)
     abstract D doCreate(Map data, Map args)
     abstract D doUpdate(Map data, Map args)
     abstract  Class<D> getEntityClass()
     abstract void flushAndClear()
+    abstract void clear()
     abstract Datastore getDatastore()
 
     /**
@@ -89,16 +94,30 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
     BulkableResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
         def results = new BulkableResults()
+        List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
-        def asynArgs = new ParallelConfig(transactional:true, datastore: getDatastore())
+        def pconfig = new ParallelConfig(transactional:true, datastore: getDatastore())
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
-        parallelTools.eachSlice(asynArgs, dataList) { dataSlice ->
+        parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
-                results.merge doBulkSlice((List<Map>) dataSlice, bulkablArgs)
+                results.merge doBulk((List<Map>) dataSlice, bulkablArgs)
             } catch(Exception e) {
-                //catch any errors which may occur during flush/commit
-                def apiError = apiErrorHandler.handleException(getEntityClass(), e)
-                Result.of(apiError, dataSlice).addTo(results)
+                //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
+                sliceErrors.add(dataSlice)
+            }
+        }
+        // if it has slice errors try again but this time run each item in its own transaction
+        if(sliceErrors.size()) {
+            def asynArgsNoTrx = ParallelConfig.of(getDatastore())
+            parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
+                try {
+                    results.merge doBulk((List<Map>) dataSlice, bulkablArgs, true)
+                } catch(Exception e) {
+                    // this is an unexpected errors and should not happen, we should have intercepted them all already
+                    log.error(e.message, e)
+                    def apiError = new ApiError(INTERNAL_SERVER_ERROR, "Internal Server Error", e.message)
+                    Result.of(apiError, dataSlice).addTo(results)
+                }
             }
         }
         return results
@@ -111,30 +130,56 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * Flushes and clears at the end so errors show up in the right place
      *
      * @param dataList the data chunk
-     * @param args the persist args to pass to repo methods
+     * @param bulkablArgs the persist args to pass to repo methods
+     * @param transactionalItem defaults to false which means the whole thing is a trx and
+     *        any error processing the dataList will throw error for rollback. if true then its assumed that this
+     *        method is not wrapped in a trx will be passed to createOrUpdate where each entity is in its own trx.
+     *        also, if true then it will collect the errors in the results.
      * @return the BulkableResults object with what succeeded and what failed
      */
-    BulkableResults doBulkSlice(List<Map> dataList, BulkableArgs bulkablArgs){
+    BulkableResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
         def results = new BulkableResults(false)
         for (Map item : dataList) {
-            Map itmCopy
+            Map itemCopy
             D entityInstance
             BulkableResults r
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
-                itmCopy = Maps.deepCopy(item)
-                entityInstance = bulkablArgs.op == DataOp.add ? doCreate(item, bulkablArgs.persistArgs) : doUpdate(item, bulkablArgs.persistArgs)
+                itemCopy = Maps.deepCopy(item)
+                boolean isCreate = bulkablArgs.op == DataOp.add
+                entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
                 Result.of(entityInstance, 201).addTo(results)
             } catch(Exception e) {
-                // XXX I think we should be throwing here so it can roll back, then per Joanna we can recycle through
-                // each item in its own transaction
-                def apiError = apiErrorHandler.handleException(getEntityClass(), e)
-                Result.of(apiError, itmCopy).addTo(results)
+                // if trx by item then collect the execeptions, otherwise throw so it can rollback
+                if(transactionalItem){
+                    def apiError = apiErrorHandler.handleException(getEntityClass(), e)
+                    Result.of(apiError, itemCopy).addTo(results)
+                } else {
+                    throw e
+                }
             }
         }
-        //end of transaction, flush here so easier to debug problems and clear for memory to help garbage collection
-        flushAndClear()
+        //end of transaction slice, flush here so easier to debug problems and clear for memory to help garbage collection
+        // if trx is at item then only clear
+        //XXX the test doesn't have a session setup? need to figure this one out
+        try {
+            transactionalItem ? clear() : flushAndClear()
+        } catch(e){
+            //ignore until we figure this out
+        }
+
         return results
+    }
+
+
+    D createOrUpdate(boolean isCreate, boolean transactional, Map data, Map persistArgs){
+        D entityInstance
+        if(transactional){
+            entityInstance = isCreate ? create(data, persistArgs) : update(data, persistArgs)
+        } else{
+            entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
+        }
+        return entityInstance
     }
 
     J finishJob(Long jobId, BulkableResults results, List includes){

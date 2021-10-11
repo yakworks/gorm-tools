@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import grails.converters.JSON
 import grails.gorm.transactions.Rollback
@@ -25,7 +26,7 @@ class BulkableRepoIntegrationSpec extends Specification {
         ]
 
         when:
-        Job job = ((BulkableRepo)Address.repo).bulkCreate(jsonList)
+        Job job = ((BulkableRepo)Address.repo).bulk(jsonList, BulkableArgs.create())
 
         then:
         noExceptionThrown()
@@ -52,7 +53,7 @@ class BulkableRepoIntegrationSpec extends Specification {
         ]
 
         when:
-        Job job = ((BulkableRepo)Address.repo).bulkCreate(jsonList)
+        Job job = ((BulkableRepo)Address.repo).bulk(jsonList, BulkableArgs.create())
 
         then:
         noExceptionThrown()

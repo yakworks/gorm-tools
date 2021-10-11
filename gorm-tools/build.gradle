@@ -12,6 +12,7 @@ dependencies {
 
   compile "org.hibernate:hibernate-core:$vHibernate"
   compile "org.hibernate:hibernate-ehcache:$vHibernate"
+  compile "io.activej:activej-promise:5.0-rc3"
 
   compile "org.grails.plugins:cache:$vGrailsCache"
   compile "org.codehaus.gpars:gpars:$vGpars"

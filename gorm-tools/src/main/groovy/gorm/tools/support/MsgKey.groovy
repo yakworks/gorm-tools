@@ -7,7 +7,6 @@ package gorm.tools.support
 import groovy.transform.CompileStatic
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
-import groovy.transform.TupleConstructor
 
 import org.springframework.context.MessageSourceResolvable
 

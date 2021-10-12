@@ -6,7 +6,6 @@ package yakworks.rally.activity.repo
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import yakworks.rally.activity.model.Activity

@@ -325,8 +325,12 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      */
     D get(Serializable id) {
         entityTrx {
-            (D) gormStaticApi().get(id)
+            doGet(id)
         }
+    }
+
+    D doGet(Serializable id) {
+        (D)gormStaticApi().get(id)
     }
 
     /**

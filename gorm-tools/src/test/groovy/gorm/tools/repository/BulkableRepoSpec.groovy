@@ -142,6 +142,9 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
 
         when: "bulk insert in multi batches"
         JobImpl job = Project.repo.bulk(list, setupBulkableArgsCreate())
+        job = JobImpl.findById(job.id)
+
+        println job.data
         def results = toJson(job.data)
 
         then: "just 60 should have been inserted, not the entire list twice"

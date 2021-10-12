@@ -13,6 +13,9 @@ import org.grails.datastore.mapping.core.Datastore
 import gorm.tools.repository.RepoUtil
 import yakworks.commons.lang.Validate
 
+/**
+ * common config settings for async operations, such as Futures and Parralel processing
+ */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class ParallelConfig {
@@ -30,36 +33,42 @@ class ParallelConfig {
     Integer poolSize
 
     /**
-     * override the default pool size that gets set from gorm.tools.async.enabled
+     * override the default config from gorm.tools.async.enabled
      * useful for testing
      */
     Boolean enabled
 
     /**
-     * wrap the closure for slice or entry in a transaction, so its transaction for each parrallel run
+     * wrap the closure for slice or future in a transaction, so its transaction for each parrallel run
      */
     Boolean transactional
 
     /**
      * wrap the closure for slice or entry with a session
-     * this setting is ignored if transactional=true since a session is implied in a transaction
+     * this setting is ignored if transactional=true since a session already implied in a transaction
      */
     Boolean session
 
     /**
      * the datastore to use for the session or transaction
+     * Optional and is only really needed if multiple datasources. if only on defualt datasource
+     * then it will get that default from the trxService
      */
     Datastore datastore
 
-    void validate(){
-        def msg = 'when session is true then datastore must also be set, either explicitely or via entityClass or repo'
-        if(session){
-            Validate.notNull(datastore, msg)
-        }
-    }
+    // void validate(){
+    //     def msg = 'when session is true then datastore must also be set, either explicitely or via entityClass or repo'
+    //     if(session){
+    //         Validate.notNull(datastore, msg)
+    //     }
+    // }
 
     static ParallelConfig transactional(){
         new ParallelConfig(transactional: true)
+    }
+
+    static ParallelConfig withSession(){
+        new ParallelConfig(session: true)
     }
 
     static ParallelConfig of(Datastore ds, boolean session = true){

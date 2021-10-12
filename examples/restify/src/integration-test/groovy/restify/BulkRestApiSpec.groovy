@@ -33,11 +33,11 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonPars
         body.ok == true
         body.state == "Finished"
         body.source == "Oracle" //should have been picked from query string
-        body.sourceId == "org/bulkCreate"
+        body.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle"
         body.data != null
         body.data.size() == 3
         body.data[0].data.id != null
-        resp.code() == HttpStatus.CREATED.value()
+        resp.code() == HttpStatus.MULTI_STATUS.value()
 
         and: "verify the 'bulk' includes from restapi-config.xml"
         body.data[0].data.source.sourceId == "foox1"
@@ -52,7 +52,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonPars
         job.data != null
         job.requestData != null
         job.state == JobState.Finished
-        job.sourceId == "org/bulkCreate"
+        job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle"
         job.source == "Oracle"
 
         when: "Verify job.data json, this is what come in from the request"

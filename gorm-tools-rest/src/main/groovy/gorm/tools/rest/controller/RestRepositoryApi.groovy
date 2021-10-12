@@ -4,6 +4,9 @@
 */
 package gorm.tools.rest.controller
 
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletRequestWrapper
+
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -11,6 +14,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
@@ -28,7 +32,10 @@ import gorm.tools.repository.model.DataOp
 import gorm.tools.rest.RestApiConfig
 import grails.web.Action
 
-import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpStatus.CREATED
+import static org.springframework.http.HttpStatus.MULTI_STATUS
+import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.OK
 
 /**
  * This is the CRUD controller for entities
@@ -167,34 +174,51 @@ trait RestRepositoryApi<D> implements RestApiController {
         respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
     }
 
-    @Action
-    def bulkUpdate() {
-        Map dataMap = parseJson(request)
-        List<Map> data = getRepo().bulkUpdate(dataMap.ids as List, dataMap.data as Map)
-        respond([data: data])
-    }
+    // @Action
+    // def bulkUpdate() {
+    //     Map dataMap = parseJson(request)
+    //     List<Map> data = getRepo().bulkUpdate(dataMap.ids as List, dataMap.data as Map)
+    //     respond([data: data])
+    // }
+
+    // XXX we don't have incs. We just need to do entityMap and respond it
+    //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
+    //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return
+    //  list of all sourceIds/ids that we created
+    //  so in includes we can specify what we return
+    //FIXME #339 we need to see if we can rethink this.
+    // in bulkCreate we convert the object to json bytes ( need to save to db so have to do this)
+    // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
+    // and then repond is going to take that object and turn it back into json bytes
+    // seems we should be able to skip some steps here somehow.
 
     /** Used for bulk create calls when Job object is returned */
     @Action
     def bulkCreate() {
-        List dataList = parseJsonList(request)
-        //XXX add test for sourceId. there is actually no test that is testing Job values from here https://github.com/yakworks/gorm-tools/issues/348
-        String endpoint = "${params.controller}/${params.action}"
-        def bulkableArgs = new BulkableArgs(op: DataOp.add, jobSourceId: endpoint, jobSource: params.jobSource as String, includes: getIncludes("bulk"))
+        bulkProcess(request, params, DataOp.add)
+    }
+
+    /** Used for bulk create calls when Job object is returned */
+    @Action
+    def bulkUpdate() {
+        bulkProcess(request, params, DataOp.update)
+    }
+
+
+    def bulkProcess(HttpServletRequest req, Map params, DataOp dataOp) {
+        List dataList = parseJsonList(req)
+        String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
+        // String contextPath = req.getContextPath()
+        // String requestURL = req.getRequestURL()
+        // String forwardURI = req.forwardURI
+
+        Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
+        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: getIncludes("bulk"), params: bulkParams)
+
         JobTrait job = ((BulkableRepo)getRepo()).bulk(dataList, bulkableArgs)
-        // XXX we don't have incs. We just need to do entityMap and respond it
-        //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
-        //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return
-        //  list of all sourceIds/ids that we created
-        //  so in includes we can specify what we return
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
-        //FIXME #339 we need to see if we can rethink this.
-        // in bulkCreate we convert the object to json bytes ( need to save to db so have to do this)
-        // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
-        // and then repond is going to take that object and turn it back into json bytes
-        // seems we should be able to skip some steps here somehow.
         Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: (job.data ? parseJson(job.data) : []), source:job.source, sourceId:job.sourceId]
-        respond resp, status: CREATED.value()
+        respond resp, status: MULTI_STATUS.value()
     }
 
     //@CompileDynamic

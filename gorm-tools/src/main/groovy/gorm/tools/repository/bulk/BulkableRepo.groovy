@@ -72,14 +72,14 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @return Job
      */
     J bulk(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
-
-        J job = (J) jobRepo.create(bulkablArgs.jobSource, bulkablArgs.jobSourceId, dataList)
+        Map params = bulkablArgs.params
+        J job = (J) jobRepo.create((String)params.source, (String)params.sourceId, dataList)
         //keep the jobId around
         Long jobId = job.id
 
         def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<BulkableResults>
 
-        Futures.of(bulkablArgs.async, supplierFunc).whenComplete{ BulkableResults results, ex ->
+        Futures.of(bulkablArgs.asyncEnabled, supplierFunc).whenComplete{ BulkableResults results, ex ->
             if(ex){ //should never really happen
                 def apiError = apiErrorHandler.handleException(getEntityClass(), ex)
                 Result.of(apiError, null).addTo(results)
@@ -131,10 +131,12 @@ trait BulkableRepo<D, J extends JobTrait>  {
      *
      * @param dataList the data chunk
      * @param bulkablArgs the persist args to pass to repo methods
-     * @param transactionalItem defaults to false which means the whole thing is a trx and
-     *        any error processing the dataList will throw error for rollback. if true then its assumed that this
-     *        method is not wrapped in a trx will be passed to createOrUpdate where each entity is in its own trx.
-     *        also, if true then it will collect the errors in the results.
+     * @param transactionalItem defaults to false which assumes this method is wrapped in a trx and
+     *        any error processing the dataList will throw error so it rollsback.
+     *        if true then its assumed that this method is not wrapped in a trx, and transactionalItem value
+     *        will be passed to createOrUpdate where each item update or create is in its own trx.
+     *        also, if true then this method will try not to throw an exception and
+     *        it will collect the errors in the results.
      * @return the BulkableResults object with what succeeded and what failed
      */
     BulkableResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){

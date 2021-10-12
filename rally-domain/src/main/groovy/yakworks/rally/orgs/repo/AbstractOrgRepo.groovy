@@ -6,6 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.dao.DataRetrievalFailureException
+
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
@@ -203,20 +205,30 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     @Override
     Org lookup(Map data) {
         Org org
-        if(data.num)  {
-            // List orgs = Org.findAll('from Org where num = :num', [num: data.num as String]);
-            List orgs = Org.queryList(num:data.num as String)
-            if(orgs.size() == 1)  org = orgs[0]
+        if (data.source && data.source['sourceId']) {
+            Map source = data.source as Map
+            if(source.orgType) {
+                OrgType orgType = OrgType.findByName(source.orgType as String)
+                Long oid = OrgSource.repo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
+                if(oid) org = get(oid)
+            } else {
+                // lookup by just sourceId and see if it returns just one
+                List<Long> res = OrgSource.repo.findOrgIdBySourceId(source.sourceId as String)
+                if(res) {
+                    if(res.size() > 1)
+                        throw new DataRetrievalFailureException("Multiple Orgs found for sourceId: ${source.sourceId}, lookup key must return a unique Org")
 
+                    org = get(res[0])
+                }
+            }
+        } else if(data.num)  {
+            List orgsForNum = Org.findAllWhere(num:data.num as String)
+            if(orgsForNum) {
+                if(orgsForNum.size() > 1)
+                    throw new DataRetrievalFailureException("Multiple Orgs found for num: ${data.num}, lookup key must return a unique Org")
 
-        } else if (data.source) {
-            OrgSource source = data.source as OrgSource
-
-            if(!(source.sourceId && source.orgType)) return null
-
-            OrgType orgType = OrgType.findByName(source.orgType as String)
-            org = doGet(OrgSource.repo.findBySourceIdAndOrgType(source.sourceId as String, orgType).orgId)
-
+                org = orgsForNum[0]
+            }
         }
         return org
 

@@ -6,7 +6,6 @@ package yakworks.rally.orgs.model
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
-import gorm.tools.model.Lookupable
 import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.source.SourceType
 import grails.compiler.GrailsCompileStatic
@@ -67,7 +66,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         member:[ description: 'Dimension hierarchy fields',
              bindable: false, oapi:[read: true, edit: ['$ref']]
         ],
-        locations: [d: "List of locations"]  //XXX add tests
+        locations: [d: "List of locations", validate: false ]  //XXX add tests
     ]
 
     static mapping = {

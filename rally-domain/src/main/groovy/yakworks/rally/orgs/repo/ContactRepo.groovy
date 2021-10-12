@@ -107,12 +107,12 @@ class ContactRepo implements GormRepo<Contact>, BulkableRepo<Contact, Job> {
     }
 
     void assignOrg(Contact contact, Map data) {
-        // used on copy contact with copy org
-        if (data['org'] instanceof Org) {
-            contact.org = data['org'] as Org
-        } else {
+        if (data['orgId'] && !data['org']) {
+            Long orgId = data['orgId'] as Long
+            contact.org = Org.get(orgId)
+        }
+        else if(data['org'] && data['org'] instanceof Map){
             contact.org = Org.repo.findWithData(data['org'] as Map)
-
         }
     }
 

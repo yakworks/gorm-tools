@@ -13,6 +13,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.source.SourceType
 import grails.gorm.transactions.Transactional
+import yakworks.commons.lang.Validate
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
@@ -94,12 +95,24 @@ class OrgSourceRepo implements GormRepo<OrgSource>, IdGeneratorRepo {
     }
 
     OrgSource findBySourceIdAndOrgType(String theSourceId, OrgType theOrgType) {
-        // return OrgSource.find('from OrgSource where sourceId = :sourceId and orgType = :orgType ',
-        //     [sourceId: theSourceId, orgType: theOrgType])
+        return OrgSource.find('from OrgSource where sourceId = :sourceId and orgType = :orgType ',
+            [sourceId: theSourceId, orgType: theOrgType])
 
-        return OrgSource.where { sourceId == theSourceId && orgType == theOrgType }.get() //back to find
+        // return OrgSource.where { sourceId == theSourceId && orgType == theOrgType }.get() //back to find
     }
 
+    List<Long> findOrgIdBySourceId(String theSourceId) {
+        OrgSource.executeQuery('select orgId from OrgSource where sourceId = :sourceId',
+            [sourceId: theSourceId] ) as List<Long>
+    }
 
+    Long findOrgIdBySourceIdAndOrgType(String theSourceId, OrgType theOrgType) {
+        Validate.notNull(theOrgType, '[theOrgType]')
+        Validate.notNull(theSourceId, '[theSourceId]')
+        List res = OrgSource.executeQuery('select orgId from OrgSource where sourceId = :sourceId and orgType = :orgType',
+            [sourceId: theSourceId, orgType: theOrgType] )
+        // will only return 1
+        res ? res[0] as Long : null
+    }
 
 }

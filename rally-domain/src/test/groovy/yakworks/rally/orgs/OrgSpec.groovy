@@ -138,49 +138,4 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         OrgType.Branch   | [type: [id: 3]]
     }
 
-
-    void "test find org by sourceid"() {
-        when:
-        Org org = Org.create("foo", "bar", OrgType.Customer)
-        org.validate()
-        org.createSource()
-        org.persist()
-
-        then: "source id is the default"
-        assert org.source.sourceId == "foo"
-
-        Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: OrgType.Customer.name()]])
-        assert o
-        o.name == "bar"
-
-
-    }
-
-    @Ignore //XXX getting error: yakworks.rally.orgs.model.Org not found for data map
-    void "test find org by num"() {
-        when:
-        Org org = Org.create("foo", "bar", OrgType.Customer)
-        org.persist()
-
-        Org org2 = Org.create("foo2", "bar", OrgType.Customer)
-        org2.persist()
-
-        org2 = Org.update([id: org2.id, num:"foo"])
-        org2.persist()
-
-        then: "not found because not unique"
-        org.num == org2.num
-        Org o = Org.repo.findWithData(num: "foo")
-        assert !o
-
-        when:
-        Org org3 = Org.create("foo3", "bar", OrgType.Customer)
-        org3.persist()
-
-        then: "found because unique"
-        Org o3 = Org.repo.findWithData(num: "foo3")
-        assert o3
-    }
-
-
 }

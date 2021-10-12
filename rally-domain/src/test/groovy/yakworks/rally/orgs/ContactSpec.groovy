@@ -12,13 +12,15 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.testing.MockHelper
 
 class ContactSpec extends Specification implements DomainRepoTest<Contact>, SecurityTest {
 
     void setupSpec(){
-        mockDomains(AppUser, Org, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail)
+        mockDomains(AppUser, Org, OrgSource, OrgTypeSetup, Location, ContactPhone, ContactSource, ContactEmail)
     }
 
     @Override

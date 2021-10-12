@@ -6,6 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.dao.DataRetrievalFailureException
+
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
@@ -38,6 +40,9 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
     //@Inject @Nullable
     OrgTagRepo orgTagRepo
+
+    //@Inject @Nullable
+    OrgSourceRepo orgSourceRepo
 
     @RepoListener
     void beforeValidate(Org org) {
@@ -190,6 +195,44 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     //util method that creates the OrgSource from num and assigns to the source record (if originator)
     OrgSource createSource(Org org, SourceType sourceType = SourceType.App) {
         OrgSource.repo.createSource(org, sourceType)
+    }
+
+    /**
+     * Lookup Org by num or sourceId. Search by num is usually used for other orgs like division or num (non customer or custAccount)
+     * where we have unique num. Search by sourceId is used when there is no org or org.id; for example to assign org on contact
+     * @param data (num or source with sourceId and orgType)
+     */
+    @Override
+    Org lookup(Map data) {
+        Org org
+        if (data.source && data.source['sourceId']) {
+            Map source = data.source as Map
+            if(source.orgType) {
+                OrgType orgType = OrgType.findByName(source.orgType as String)
+                Long oid = OrgSource.repo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
+                if(oid) org = get(oid)
+            } else {
+                // lookup by just sourceId and see if it returns just one
+                List<Long> res = OrgSource.repo.findOrgIdBySourceId(source.sourceId as String)
+                if(res) {
+                    if(res.size() > 1)
+                        throw new DataRetrievalFailureException("Multiple Orgs found for sourceId: ${source.sourceId}, lookup key must return a unique Org")
+
+                    org = get(res[0])
+                }
+            }
+        } else if(data.num)  {
+            List orgsForNum = Org.findAllWhere(num:data.num as String)
+            if(orgsForNum) {
+                if(orgsForNum.size() > 1)
+                    throw new DataRetrievalFailureException("Multiple Orgs found for num: ${data.num}, lookup key must return a unique Org")
+
+                org = orgsForNum[0]
+            }
+        }
+        return org
+
+
     }
 
 }

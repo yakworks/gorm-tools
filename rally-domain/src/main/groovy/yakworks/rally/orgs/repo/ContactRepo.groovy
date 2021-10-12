@@ -73,7 +73,7 @@ class ContactRepo implements GormRepo<Contact>, BulkableRepo<Contact, Job> {
 
     @RepoListener
     void afterBind(Contact contact, Map data, AfterBindEvent e) {
-        assignOrgFromOrgId(contact, data)
+        assignOrg(contact, data)
         contact.concatName()
         assignUserNameFromContactName(contact)
     }
@@ -106,10 +106,13 @@ class ContactRepo implements GormRepo<Contact>, BulkableRepo<Contact, Job> {
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
-    void assignOrgFromOrgId(Contact contact, Map data) {
+    void assignOrg(Contact contact, Map data) {
         if (data['orgId'] && !data['org']) {
             Long orgId = data['orgId'] as Long
             contact.org = Org.get(orgId)
+        }
+        else if(data['org'] && data['org'] instanceof Map){
+            contact.org = Org.repo.findWithData(data['org'] as Map)
         }
     }
 

@@ -66,7 +66,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         member:[ description: 'Dimension hierarchy fields',
              bindable: false, oapi:[read: true, edit: ['$ref']]
         ],
-        locations: [d: "List of locations"]  //XXX add tests
+        locations: [d: "List of locations", validate: false ]  //XXX add tests
     ]
 
     static mapping = {
@@ -123,5 +123,4 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         o.type = orgType
         return o
     }
-
 }

@@ -1,3 +1,14 @@
+### v7.0.8-v.31
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.30...v7.0.8-v.31)
+- trigger release [link](https://github.com/yakworks/gorm-tools/commit/cd538f33ba93e52bca6dc75b1a28c633eadd3593)
+- Bulk controller ops (#370) [link](https://github.com/yakworks/gorm-tools/commit/46fa038487f15bd7e8b06480835fd793882c36de)
+- 425 lookups (#364) [link](https://github.com/yakworks/gorm-tools/commit/a8e0c1a5270f7204323a26ddff84083663ba1a11)
+- resolves #357, intial design, needs tests (#368) [link](https://github.com/yakworks/gorm-tools/commit/c70516743ec2f67560e909072744d258a67c51a1)
+- 356 bulkable async futures (#367) [link](https://github.com/yakworks/gorm-tools/commit/3786c7918ba735c09a9b5035e2a9f46befcd9384)
+- tweaks for DBDialectService and datediff, clean up name (#366) [link](https://github.com/yakworks/gorm-tools/commit/bcf611de129fa46ee75ef0bb951b6faef13369ef)
+- fix changelog and setting to autoset snapsho backt to true on release [link](https://github.com/yakworks/gorm-tools/commit/446eb520279bfcf61e69fed8bf991c19a04af32c)
+
 ### v7.0.8-v.30
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.29...v7.0.8-v.30)

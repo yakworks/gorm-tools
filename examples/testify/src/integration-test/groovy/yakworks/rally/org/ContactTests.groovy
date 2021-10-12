@@ -18,7 +18,7 @@ class ContactTests extends Specification implements DomainIntTest {
         Org org = Org.create("foo", "bar", OrgType.Customer)
         org.validate()
         org.createSource()
-        org.persist()
+        org.persist(flush: true)
 
         Map params = [firstName:'Peter', email:'abc@walmart.com']
         params.org = [source: [sourceId: 'foo', orgType: OrgType.Customer.name()]]

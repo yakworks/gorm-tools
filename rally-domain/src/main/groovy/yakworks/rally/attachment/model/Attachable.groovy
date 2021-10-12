@@ -4,11 +4,11 @@
 */
 package yakworks.rally.attachment.model
 
-
 import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable
 
+@SuppressWarnings('FieldName')
 @CompileStatic
 trait Attachable {
 

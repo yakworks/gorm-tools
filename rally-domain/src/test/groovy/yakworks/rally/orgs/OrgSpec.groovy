@@ -3,6 +3,7 @@ package yakworks.rally.orgs
 import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -17,8 +18,8 @@ import yakworks.rally.orgs.model.OrgType
 class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
     //Automatically runs the basic crud tests
 
-    def setupSpec(){
-        defineBeans{
+    def setupSpec() {
+        defineBeans {
             //scriptExecutorService(ScriptExecutorService)
             orgDimensionService(OrgDimensionService)
         }
@@ -67,7 +68,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         when: "flush and clear is called and OrgSource is retreived again"
         flushAndClear()
 
-        then : "should stil be the sourceId that was set"
+        then: "should stil be the sourceId that was set"
         assert OrgSource.get(osi).sourceId == "test"
     }
 
@@ -75,9 +76,9 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         setup:
         Long orgId = 1000
 
-        Map flex = TestDataJson.buildMap(OrgFlex, includes:"*")
-        Map calc = TestDataJson.buildMap(OrgCalc, includes:"*")
-        Map info = TestDataJson.buildMap(OrgInfo, includes:"*")
+        Map flex = TestDataJson.buildMap(OrgFlex, includes: "*")
+        Map calc = TestDataJson.buildMap(OrgCalc, includes: "*")
+        Map info = TestDataJson.buildMap(OrgInfo, includes: "*")
 
         Map params = TestDataJson.buildMap(Org) << [id: orgId, flex: flex, info: info, type: 'Customer']
 
@@ -97,7 +98,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         org.info.website
 
         when: "update"
-        org = Org.update([ id: org.id, flex:[text1:'yyy'], info:[phone:'555-1234', fax:'555-1234', website:'www.test.com']])
+        org = Org.update([id: org.id, flex: [text1: 'yyy'], info: [phone: '555-1234', fax: '555-1234', website: 'www.test.com']])
 
         then:
         org.flex.text1 == 'yyy'
@@ -130,10 +131,11 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
         where:
 
-        orgType            | data
-        OrgType.Customer   | [orgTypeId: 1]
-        OrgType.Branch     | [orgTypeId: '3']
-        OrgType.Branch     | [type: OrgType.Branch]
-        OrgType.Branch     | [type: [id: 3]]
+        orgType          | data
+        OrgType.Customer | [orgTypeId: 1]
+        OrgType.Branch   | [orgTypeId: '3']
+        OrgType.Branch   | [type: OrgType.Branch]
+        OrgType.Branch   | [type: [id: 3]]
     }
+
 }

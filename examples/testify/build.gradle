@@ -17,6 +17,8 @@ dependencies {
   compile "org.grails:grails-plugin-domain-class"
   compile "org.grails.plugins:external-config:$vExternalConfig"
 
+  compile "org.grails.plugins:view-tools:$vViewTools"
+
   compile project(":gorm-tools")
   compile project(":gorm-tools-security")
   compile project(":rally-domain")

@@ -6,9 +6,7 @@ import org.springframework.http.HttpStatus
 
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
-import okhttp3.HttpUrl
 import okhttp3.Response
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 @Integration

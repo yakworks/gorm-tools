@@ -3,11 +3,11 @@ package gorm.tools.repository
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.JobState
+import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
-import groovy.json.JsonSlurper
 import org.springframework.http.HttpStatus
 import spock.lang.Issue
 import spock.lang.Specification
@@ -15,14 +15,12 @@ import testing.JobImpl
 import testing.Nested
 import testing.Project
 
-class BulkableRepoSpec extends Specification implements DataRepoTest {
+class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParserTrait {
 
-    // @Shared JsonSlurper slurper
     ParallelTools parallelTools
     AsyncService asyncService
 
     void setupSpec() {
-        // slurper = new JsonSlurper()
         mockDomains(Project, Nested, JobImpl)
     }
 
@@ -188,15 +186,6 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
             list << [name: "project-$index", testDate:"2021-01-01", isActive: false, nested: nested]
         }
         return list
-    }
-
-    // def toJson(byte[] data) {
-    //     def slurper = new JsonSlurper()
-    //     return slurper.parse(data)
-    // }
-    def parseJson(byte[] data) {
-        def slurper = new JsonSlurper()
-        return slurper.parseText(new String(data, "UTF-8"))
     }
 
 }

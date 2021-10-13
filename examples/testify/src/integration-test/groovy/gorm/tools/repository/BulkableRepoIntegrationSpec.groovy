@@ -1,13 +1,12 @@
 package gorm.tools.repository
 
+import org.springframework.jdbc.core.JdbcTemplate
+
+import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
-import grails.converters.JSON
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import groovy.json.JsonSlurper
-import org.grails.web.json.JSONArray
-import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
@@ -18,7 +17,7 @@ import yakworks.rally.testing.DomainIntTest
 
 @Integration
 @Rollback
-class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest {
+class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest, JsonParserTrait {
     JdbcTemplate jdbcTemplate
 
     def cleanup() {
@@ -60,7 +59,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "bulk update"
-        def results = toJson(job.data)
+        def results = parseJson(job.data)
         jsonList.eachWithIndex { it, idx ->
             it["id"] = results[idx].data.id
             it["comments"] = "flubber${it.id}"
@@ -174,13 +173,4 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         return list
     }
 
-    def toJson(byte[] data) {
-        def slurper = new JsonSlurper()
-        return slurper.parse(data)
-    }
-
-    def parseJson(byte[] data) {
-        def slurper = new JsonSlurper()
-        return slurper.parseText(new String(data, "UTF-8"))
-    }
 }

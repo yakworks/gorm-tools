@@ -1,20 +1,19 @@
 package gpbench.helpers
 
-import groovy.json.JsonSlurper
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 
-import grails.converters.JSON
+import gorm.tools.json.JsonParserTrait
 import grails.core.GrailsApplication
 
 @Component
 @CompileStatic
-class JsonReader extends RecordsLoader {
+class JsonReader extends RecordsLoader implements JsonParserTrait {
 
     @Autowired
     GrailsApplication grailsApplication
@@ -25,12 +24,10 @@ class JsonReader extends RecordsLoader {
         Resource resource = grailsApplication.mainContext.getResource("classpath:${file}.json")
         assert resource.exists(), "File $file does not exist"
 
-        def slurper = new JsonSlurper()
-
         String line
         resource.inputStream.withReader { Reader reader ->
             while (line = reader.readLine()) {
-                Map json = slurper.parseText(line) as Map
+                Map json = parseJsonText(line) as Map
                 results.add json
             }
         }

@@ -1,19 +1,19 @@
 package gpbench.helpers
 
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.web.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 
-import grails.converters.JSON
+import gorm.tools.json.JsonParserTrait
 import grails.core.GrailsApplication
 
 @Component
 @CompileStatic
-class JsonReader extends RecordsLoader {
+class JsonReader extends RecordsLoader implements JsonParserTrait {
 
     @Autowired
     GrailsApplication grailsApplication
@@ -27,7 +27,7 @@ class JsonReader extends RecordsLoader {
         String line
         resource.inputStream.withReader { Reader reader ->
             while (line = reader.readLine()) {
-                JSONObject json = (JSONObject) JSON.parse(line)
+                Map json = parseJsonText(line) as Map
                 results.add json
             }
         }

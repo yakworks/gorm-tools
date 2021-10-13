@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Component
 
-import gorm.tools.async.ParallelConfig
+import gorm.tools.async.AsyncConfig
 import gpbench.model.Country
 import gpbench.model.Region
 import gpbench.model.dynamic.CityFatDynamic
@@ -171,7 +171,7 @@ class CityFatInsertBenchmarks extends gpbench.services.traits.BenchProcessData {
                     scriptinsert.insertRow(domainClass, row)
                 }
             } else if(createAction == 'save async') {
-                def asyncArgs = ParallelConfig.of(domainClass).transactional(true)
+                def asyncArgs = AsyncConfig.of(domainClass).transactional(true)
                 parallelTools.slicedEach(asyncArgs, data) { row ->
                     scriptinsert.insertRow(domainClass, row)
                 }

@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.async.Futures
-import gorm.tools.async.ParallelConfig
+import gorm.tools.async.AsyncConfig
+import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobRepoTrait
@@ -44,6 +44,9 @@ trait BulkableRepo<D, J extends JobTrait>  {
     @Autowired
     @Qualifier("parallelTools")
     ParallelTools parallelTools
+
+    @Autowired
+    AsyncService asyncService
 
     @Autowired
     EntityMapService entityMapService
@@ -78,14 +81,16 @@ trait BulkableRepo<D, J extends JobTrait>  {
         Long jobId = job.id
 
         def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<BulkableResults>
+        def asyncArgs = new AsyncConfig(enabled: bulkablArgs.asyncEnabled)
 
-        Futures.of(bulkablArgs.asyncEnabled, supplierFunc).whenComplete{ BulkableResults results, ex ->
-            if(ex){ //should never really happen
-                def apiError = apiErrorHandler.handleException(getEntityClass(), ex)
-                Result.of(apiError, null).addTo(results)
+        asyncService.supplyAsync(asyncArgs, supplierFunc)
+            .whenComplete { BulkableResults results, ex ->
+                if(ex){ //should never really happen
+                    def apiError = apiErrorHandler.handleException(getEntityClass(), ex)
+                    Result.of(apiError, null).addTo(results)
+                }
+                finishJob(jobId, results, bulkablArgs.includes)
             }
-            finishJob(jobId, results, bulkablArgs.includes)
-        }
 
         // return job
         return (J) jobRepo.get(jobId)
@@ -96,11 +101,12 @@ trait BulkableRepo<D, J extends JobTrait>  {
         def results = new BulkableResults()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
-        def pconfig = new ParallelConfig(transactional:true, datastore: getDatastore())
+        def pconfig = new AsyncConfig(transactional:true, datastore: getDatastore())
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
-                results.merge doBulk((List<Map>) dataSlice, bulkablArgs)
+                def res = doBulk((List<Map>) dataSlice, bulkablArgs)
+                results.merge(res)
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
@@ -108,7 +114,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
         }
         // if it has slice errors try again but this time run each item in its own transaction
         if(sliceErrors.size()) {
-            def asynArgsNoTrx = ParallelConfig.of(getDatastore())
+            def asynArgsNoTrx = AsyncConfig.of(getDatastore())
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
                     results.merge doBulk((List<Map>) dataSlice, bulkablArgs, true)
@@ -151,7 +157,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                Result.of(entityInstance, 201).addTo(results)
+                Result.of(entityInstance, isCreate ? 201 : 200).addTo(results)
             } catch(Exception e) {
                 // if trx by item then collect the execeptions, otherwise throw so it can rollback
                 if(transactionalItem){
@@ -162,13 +168,10 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 }
             }
         }
-        //end of transaction slice, flush here so easier to debug problems and clear for memory to help garbage collection
-        // if trx is at item then only clear
-        //XXX the test doesn't have a session setup? need to figure this one out
-        try {
+        // flush and clear here so easier to debug problems and clear for memory to help garbage collection
+        if(getDatastore().hasCurrentSession()) {
+            // if trx is at item then only clear
             transactionalItem ? clear() : flushAndClear()
-        } catch(e){
-            //XXX ignore until we figure this out
         }
 
         return results

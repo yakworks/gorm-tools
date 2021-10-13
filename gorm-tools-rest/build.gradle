@@ -6,7 +6,7 @@ group = "org.yakworks"
 
 dependencies {
   compile "commons-codec:commons-codec:$vCommonsCodec"
-  compile "org.grails.plugins:converters:$vConverters"
+  // compile "org.grails.plugins:converters:$vConverters"
   compile "org.grails:grails-plugin-rest"
   compile "org.grails:grails-plugin-url-mappings"
   compile "org.grails:grails-plugin-interceptors"

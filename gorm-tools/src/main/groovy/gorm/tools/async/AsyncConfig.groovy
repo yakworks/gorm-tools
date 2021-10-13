@@ -11,14 +11,13 @@ import groovy.transform.builder.SimpleStrategy
 import org.grails.datastore.mapping.core.Datastore
 
 import gorm.tools.repository.RepoUtil
-import yakworks.commons.lang.Validate
 
 /**
  * common config settings for async operations, such as Futures and Parralel processing
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
-class ParallelConfig {
+class AsyncConfig {
 
     /**
      * the size of the lists when collated or sliced into chunks,
@@ -56,29 +55,22 @@ class ParallelConfig {
      */
     Datastore datastore
 
-    // void validate(){
-    //     def msg = 'when session is true then datastore must also be set, either explicitely or via entityClass or repo'
-    //     if(session){
-    //         Validate.notNull(datastore, msg)
-    //     }
-    // }
-
-    static ParallelConfig transactional(){
-        new ParallelConfig(transactional: true)
+    static AsyncConfig transactional(){
+        new AsyncConfig(transactional: true)
     }
 
-    static ParallelConfig withSession(){
-        new ParallelConfig(session: true)
+    static AsyncConfig withSession(){
+        new AsyncConfig(session: true)
     }
 
-    static ParallelConfig of(Datastore ds, boolean session = true){
+    static AsyncConfig of(Datastore ds, boolean session = true){
         // if passing in a datastore then assume you want a session too. so set to false if not desired
         // if transactional is set later then it overrides session
-        new ParallelConfig(datastore: ds, session: true)
+        new AsyncConfig(datastore: ds, session: true)
     }
 
-    static ParallelConfig of(Class entity){
+    static AsyncConfig of(Class entity){
         def repo = RepoUtil.findRepo(entity)
-        ParallelConfig.of(repo.datastore)
+        AsyncConfig.of(repo.datastore)
     }
 }

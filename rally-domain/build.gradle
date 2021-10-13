@@ -7,11 +7,12 @@ dependencies {
   //compile "org.springframework.boot:spring-boot-starter-logging"
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-tools-security")
-  compileOnly "org.grails.plugins:converters:$vConverters"
+  // compileOnly "org.grails.plugins:converters:$vConverters"
   //plugins
   compileOnly "org.grails.plugins:view-tools:$vViewTools"
   //used for json parsing but require it to be added to project that uses this
   compileOnly("org.grails.plugins:views-json:$vViews") {
+    //exclude controllers since it messes with the domain compile and map constructor
     exclude group:"org.grails", module: "grails-plugin-controllers"
   }
   compileOnly "org.grails.plugins:views-json-templates:$vViews"

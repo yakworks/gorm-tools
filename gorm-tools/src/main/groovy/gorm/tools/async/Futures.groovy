@@ -16,7 +16,7 @@ import groovy.transform.CompileStatic
 class Futures {
 
     /**
-     * run the closure asyncronously
+     * run the closure asyncronously, if session is needed use asynService.runAsync
      * the runnable does not return a value but this returns a CompletableFuture
      * so you can call .join to block
      */

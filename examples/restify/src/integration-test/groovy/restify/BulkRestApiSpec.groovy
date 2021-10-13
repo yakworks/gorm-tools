@@ -1,19 +1,19 @@
 package restify
 
+import org.springframework.http.HttpStatus
+
 import gorm.tools.job.JobState
-import gorm.tools.rest.JsonParserTrait
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
-import org.springframework.http.HttpStatus
 import spock.lang.Specification
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 
 @Rollback
 @Integration
-class BulkRestApiSpec extends Specification implements OkHttpRestTrait, JsonParserTrait {
+class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
     String path = "/api/rally/org/bulk?jobSource=Oracle"
 
     void "verify bulk create and sanity check response"() {

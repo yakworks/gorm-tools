@@ -148,8 +148,6 @@ class DefaultMangoQuery implements MangoQuery {
             if (qString.trim().startsWith('{')) {
                 // parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key
                 criteria = new HashMap(jsonSlurper.parseText(qString) as Map)
-                // JSON.use('deep')
-                // result['criteria'] = JSON.parse(params[criteriaKeyName] as String) as Map
             } else if (params.containsKey('qSearchFields')) {
                 //if it has a qsFields then set up the map
                 Map qMap = ['text': qString, 'fields': criteria.remove('qSearchFields')]

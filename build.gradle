@@ -42,10 +42,6 @@ subprojects {
 
       compile "org.grails.plugins:events"
 
-      // compile("org.grails.plugins:async"){
-      //   exclude group: 'org.grails', module: 'grails-plugin-controllers'
-      // }
-
       // compile "io.activej:activej-http:5.0-rc3"
       // compile "io.activej:activej-launchers-common:5.0-rc3"
       compile "io.activej:activej-launchers-http:5.0-rc3"

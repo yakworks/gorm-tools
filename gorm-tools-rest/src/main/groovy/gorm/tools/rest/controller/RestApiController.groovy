@@ -6,7 +6,7 @@ package gorm.tools.rest.controller
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.JsonParserTrait
+import gorm.tools.json.JsonParserTrait
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils

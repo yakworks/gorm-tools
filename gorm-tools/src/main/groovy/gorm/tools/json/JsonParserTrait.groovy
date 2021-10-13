@@ -2,11 +2,10 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.rest
+package gorm.tools.json
 
 import javax.servlet.http.HttpServletRequest
 
-import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
@@ -82,18 +81,12 @@ trait JsonParserTrait {
     }
 
     Object parseJson(byte[] bytes){
+        //parseJsonText(new String(data, "UTF-8"))
         return getJsonSlurper().parse(bytes)
     }
 
-    /**
-     * The Map object that can be bound to create or update domain entity.  Defaults whats in the request based on mime-type.
-     * Subclasses may override this
-     */
-    // @CompileDynamic //so it can access the SimpleMapDataBindingSource.map
-    // Map getDataMap() {
-    //     SimpleMapDataBindingSource bsrc =
-    //         (SimpleMapDataBindingSource) DataBindingUtils.createDataBindingSource(grailsApplication, getEntityClass(), getRequest())
-    //     return bsrc.map
-    // }
+    Object parseJsonText(String text){
+        return getJsonSlurper().parseText(text)
+    }
 
 }

@@ -25,7 +25,7 @@ dependencies {
   // testCompile project(":rally-domain")
 
   //FIXME this is needed for AST somewhere in rally-domain, figure out where
-  compile "org.grails.plugins:converters:$vConverters"
+  // compile "org.grails.plugins:converters:$vConverters"
 
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
   runtime "javax.xml.bind:jaxb-api:2.3.1"

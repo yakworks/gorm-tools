@@ -10,19 +10,17 @@ import org.springframework.context.ApplicationContext
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
-import spock.lang.Ignore
 import testing.CustType
 
-@Ignore
-class GparsParallelToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
+class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
 
-    GparsParallelTools parallelTools
+    ParallelStreamTools parallelTools
 
     List<Class> getDomainClasses() { [CustType] }
 
     void setup() {
         //parallelTools = ctx.getBean("parallelTools")
-        parallelTools.asyncEnabled = true
+        parallelTools.asyncService.asyncEnabled = true
     }
 
     // void cleanup() {

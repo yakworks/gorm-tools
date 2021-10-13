@@ -78,24 +78,18 @@ gradle.dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
 	./gradlew restify:dependencies --configuration runtime
 
-[ ! "$JAVA_OPTS" ]&& JAVA_OPTS="-Xmx3g -XX:MaxMetaspaceSize=256m"
-# -noverify -XX:TieredStopAtLevel=1} # good for dev
-SERVER_JAVA_OPTS = "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
-
-GC_JAVA_OPTS = "-XX:+UseConcMarkSweepGC -XX:+UseCMSInitiatingOccupancyOnly \
--XX:+CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=70 \
--XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
--XX:SurvivorRatio=8"
 ## runs the benchmark tests
 run-benchmarks:
 	$(gradlew) benchmarks:assemble
 	cd examples/benchmarks
 	java -server -Xmx3g -XX:MaxMetaspaceSize=256m \
-		-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
-		-XX:+UseConcMarkSweepGC -XX:+UseCMSInitiatingOccupancyOnly \
-		-XX:+CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=70 \
-		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
-		-XX:SurvivorRatio=8 \
 		-DmultiplyData=3 -Dgorm.tools.async.poolSize=4 -Djava.awt.headless=true \
-		-Dgrails.env=prod -jar build/libs/benchmarks.jar
+        -Dgrails.env=prod -jar build/libs/benchmarks.jar
+
+#		-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
+#		-XX:+UseConcMarkSweepGC -XX:+UseCMSInitiatingOccupancyOnly \
+#		-XX:+CMSParallelRemarkEnabled -XX:CMSInitiatingOccupancyFraction=70 \
+#		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
+#		-XX:SurvivorRatio=8 \
+
 

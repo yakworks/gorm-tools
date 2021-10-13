@@ -4,11 +4,11 @@
 */
 package gorm.tools.rest.client
 
-import groovy.json.JsonSlurper
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import gorm.tools.json.JsonParserTrait
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -20,7 +20,7 @@ import okhttp3.Response
  */
 @CompileStatic
 //@CompileDynamic
-trait OkHttpRestTrait {
+trait OkHttpRestTrait implements JsonParserTrait{
 
     String jsonHeader = "application/json;charset=utf-8"
 
@@ -106,11 +106,11 @@ trait OkHttpRestTrait {
     }
 
     Map bodyToMap(Response resp){
-        new JsonSlurper().parseText(resp.body().string()) as Map
+        parseJsonText(resp.body().string()) as Map
     }
 
     List bodyToList(Response resp){
-        new JsonSlurper().parseText(resp.body().string()) as List
+        parseJsonText(resp.body().string()) as List
     }
 
     String toJson(Map body){

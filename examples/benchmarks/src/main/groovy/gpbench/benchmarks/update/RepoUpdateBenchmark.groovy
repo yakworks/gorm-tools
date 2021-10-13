@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.async.ParallelConfig
+import gorm.tools.async.AsyncConfig
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gpbench.model.basic.CityBasic
@@ -30,7 +30,7 @@ class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
             updateRow(id, citiesUpdated[at.incrementAndGet()])
         }
 
-        parallelTools.each(ParallelConfig.transactional(), batches, sliceClosure)
+        parallelTools.each(AsyncConfig.transactional(), batches, sliceClosure)
     }
 
     @CompileDynamic

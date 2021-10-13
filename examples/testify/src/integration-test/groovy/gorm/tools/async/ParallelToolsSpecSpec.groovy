@@ -27,16 +27,17 @@ class ParallelToolsSpecSpec extends Specification {
 
         when:
         // FIXME #339 how is this working, transaction thats set on the test should not be rolling into parallelTools?
-        def args = new ParallelConfig(enabled: true)
+        def args = new AsyncConfig(enabled: true)
         parallelTools.each(args, list) { Map item ->
             new Org(num: item.name, name: "name $item.name", type: OrgType.Customer).persist()
         }
         // Project.repo.flush()
 
         then:
-        Org.withSession {
-            Org.count() == 150
-        }
+        Org.count() == 150
+        // Org.withSession {
+        //     Org.count() == 150
+        // }
 
     }
 

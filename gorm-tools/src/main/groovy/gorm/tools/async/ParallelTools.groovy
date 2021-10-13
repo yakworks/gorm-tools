@@ -4,6 +4,7 @@
 */
 package gorm.tools.async
 
+
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SecondParam
@@ -12,12 +13,8 @@ import org.grails.datastore.mapping.core.Datastore
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
-import gorm.tools.transaction.WithTrx
-import grails.persistence.support.PersistenceContextInterceptor
 import yakworks.commons.lang.Validate
 
 /**
@@ -30,28 +27,11 @@ import yakworks.commons.lang.Validate
  * @since 6.1
  */
 @CompileStatic
-trait ParallelTools implements WithTrx {
+trait ParallelTools {
     final static Logger LOG = LoggerFactory.getLogger(ParallelTools)
 
-    /**
-     * The default slice or chunk size for collating. for example if this is 100 and you pass list of of 100
-     * then it will slice it or collate it into a list with 10 of lists with 100 items each.
-     * should default to the hibernate.jdbc.batch_size in the implementation. Usually best to set this around 100
-     */
-    @Value('${gorm.tools.async.sliceSize:100}')
-    int sliceSize
-
-    /** The list size to send to the collate that slices.*/
-    @Value('${gorm.tools.async.enabled:true}')
-    boolean asyncEnabled
-
-    /** the pool size passed to GParsPool.withPool. if gorm.tools.async.poolSize is not set then it uses PoolUtils.retrieveDefaultPoolSize()*/
-    @Value('${gorm.tools.async.poolSize:0}')
-    int poolSize
-
-
     @Autowired
-    PersistenceContextInterceptor persistenceInterceptor
+    AsyncService asyncService
 
     /**
      * Iterates over the lists and calls the closure passing in the list item and the args asynchronously.
@@ -64,11 +44,11 @@ trait ParallelTools implements WithTrx {
      * @param asyncArgs the collection to iterate process
      * @param closure the closure to call for each item in collection, get the entry from the collection passed to it like norma groovy each
      */
-    abstract <T> Collection<T> each(ParallelConfig asyncArgs, Collection<T> collection, Closure closure)
+    abstract <T> Collection<T> each(AsyncConfig asyncArgs, Collection<T> collection, Closure closure)
 
 
     public <T> Collection<T> each(Collection<T> collection, Closure closure){
-        each(new ParallelConfig(), collection, closure)
+        each(new AsyncConfig(), collection, closure)
     }
 
     /**
@@ -79,9 +59,9 @@ trait ParallelTools implements WithTrx {
      * @param data the items list to slice into chunks
      * @param sliceClosure the closure to call for each collated slice of data. will get passed the List for processing
      */
-    public <T> Collection<T> eachSlice(ParallelConfig asyncArgs, Collection<T> data,
+    public <T> Collection<T> eachSlice(AsyncConfig asyncArgs, Collection<T> data,
                                        @ClosureParams(SecondParam) Closure sliceClosure) {
-        Integer sliceSize = asyncArgs.sliceSize ?: getSliceSize()
+        Integer sliceSize = asyncArgs.sliceSize ?: getAsyncService().getSliceSize()
 
         def slicedList = slice(data, sliceSize)
 
@@ -92,7 +72,7 @@ trait ParallelTools implements WithTrx {
 
     public <T> Collection<T> eachSlice(Collection<T> data,
                                        @ClosureParams(SecondParam) Closure sliceClosure){
-        eachSlice(new ParallelConfig(), data,  sliceClosure)
+        eachSlice(new AsyncConfig(), data,  sliceClosure)
     }
 
     /**
@@ -106,10 +86,10 @@ trait ParallelTools implements WithTrx {
      * @param list the list to process that will get sliced into batches via collate
      * @param itemClosure the closure to pass to eachParallel that gets passed each entry in the collection
      */
-    public <T> Collection<T> slicedEach(ParallelConfig asyncArgs, Collection<T> collection,
+    public <T> Collection<T> slicedEach(AsyncConfig asyncArgs, Collection<T> collection,
                                         @ClosureParams(SecondParam.FirstGenericType) Closure itemClosure) {
 
-        verifyDatastore(asyncArgs)
+        getAsyncService().verifyDatastore(asyncArgs)
         Closure sliceClos = sliceClosure(asyncArgs.datastore, itemClosure)
 
         eachSlice(asyncArgs, collection as Collection<Object>, sliceClos) as Collection<T>
@@ -118,13 +98,13 @@ trait ParallelTools implements WithTrx {
 
 
     /**
-     * Uses collate to slice the list into sub-lists. Uses the {@link #sliceSize} unless batchSize is sent in
+     * Uses collate to slice the list into sub-lists. Uses the asyncService.sliceSize unless batchSize is sent in
      * @param items the list to slice up into batches
-     * @param sliceSize _optional_ the length of each batch sub-list in the returned list. override the {@link #sliceSize}
+     * @param sliceSize _optional_ the length of each batch sub-list in the returned list. override the asyncService.sliceSize
      * @return the (list of lists) containing the chunked list of items
      */
     public <T> List<List<T>> slice(Collection<T> items, Integer sliceSize = null) {
-        items.collate(sliceSize ?: getSliceSize())
+        items.collate(sliceSize ?: getAsyncService().getSliceSize())
     }
 
     /**
@@ -143,71 +123,11 @@ trait ParallelTools implements WithTrx {
         }
     }
 
+    /**
+     * sliceClosure that uses default datastore from trxService
+     */
     Closure sliceClosure(Closure itemClosure) {
-        Datastore dstore = getTrxService().getTargetDatastore()
+        Datastore dstore = asyncService.trxService.targetDatastore
         sliceClosure(dstore, itemClosure)
-    }
-
-    /**
-     * checks args for session or trx and wraps the closure if needed
-     */
-    Closure wrapSessionOrTransaction(ParallelConfig asyncArgs, Closure closure){
-        Closure wrappedClosure = closure
-        if(asyncArgs.transactional){
-            verifyDatastore(asyncArgs)
-            wrappedClosure = wrapTrx(asyncArgs.datastore, closure)
-        } else if(asyncArgs.session){
-            verifyDatastore(asyncArgs)
-            wrappedClosure = wrapSession(asyncArgs.datastore, closure)
-        }
-        wrappedClosure
-    }
-
-    /**
-     * if args doesn't have a datastore then it grabs the default one from the trxService
-     */
-    void verifyDatastore(ParallelConfig asyncArgs){
-        if(!asyncArgs.datastore){
-            asyncArgs.datastore = getTrxService().getTargetDatastore()
-        }
-    }
-
-    /**
-     * Wrap closure in a transaction
-     */
-    public <T> Closure<T> wrapTrx(Datastore ds, Closure<T> c) {
-        return { T item ->
-            getTrxService().withTrx(ds) { TransactionStatus status ->
-                c.call(item)
-            }
-        }
-    }
-
-    /**
-     * wrap closure in a session
-     */
-    // public <T> Closure<T> wrapSession(Datastore ds, Closure<T> c) {
-    //     return { T item ->
-    //         ds.withSession {
-    //             c.call(item)
-    //         }
-    //     }
-    // }
-    //
-    @SuppressWarnings(["EmptyCatchBlock"])
-    public <T> Closure<T> wrapSession(Datastore ds, Closure<T> wrapped) {
-        return { T item ->
-            persistenceInterceptor.init()
-            try {
-                wrapped.call(item)
-            } finally {
-                try {
-                    //only destroys if new one was created, otherwise does nothing
-                    persistenceInterceptor.destroy()
-                } catch (Exception e) {
-                    //ignore errors
-                }
-            }
-        }
     }
 }

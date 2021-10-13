@@ -1,23 +1,23 @@
 package gorm.tools.repository
 
+import org.springframework.jdbc.core.JdbcTemplate
+
+import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
-import grails.converters.JSON
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import groovy.json.JsonSlurper
-import org.grails.web.json.JSONArray
-import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.testing.DomainIntTest
 
 @Integration
 @Rollback
-class BulkableRepoIntegrationSpec extends Specification {
+class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest, JsonParserTrait {
     JdbcTemplate jdbcTemplate
 
     def cleanup() {
@@ -33,18 +33,18 @@ class BulkableRepoIntegrationSpec extends Specification {
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create())
+        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
 
         then:
         noExceptionThrown()
         job.data != null
 
         when: "verify json"
-        JSONArray json = JSON.parse(new String(job.data, "UTF-8"))
+        List json = parseJson(job.data)
 
         then:
         json != null
-        json.length() == 3
+        json.size() == 3
     }
 
     void "sanity check bulk update"() {
@@ -52,30 +52,32 @@ class BulkableRepoIntegrationSpec extends Specification {
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create())
+        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
 
         then:
         noExceptionThrown()
         job.data != null
 
         when: "bulk update"
-        def results = toJson(job.data)
+        def results = parseJson(job.data)
         jsonList.eachWithIndex { it, idx ->
             it["id"] = results[idx].data.id
-            it["comments"] = "comment-${it.id}"
+            it["comments"] = "flubber${it.id}"
         }
 
-        job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.update())
+        job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
+        flushAndClear()
 
         then:
         noExceptionThrown()
         job != null
 
         when: "Verify updated records"
-        int count
-        Org.withNewTransaction {
-            count = Org.countByCommentsIlike("comment-%")
-        }
+        def listUp = Org.query(comments: "flubber%").list()
+        int count = Org.countByCommentsLike("flubber%")
+        // Org.withNewTransaction {
+        //     count = Org.countByCommentsIlike("comment-%")
+        // }
         then:
         count == 5
     }
@@ -85,8 +87,8 @@ class BulkableRepoIntegrationSpec extends Specification {
         OrgSource os1, os2, os3
 
         setup:
-        int sliceSize = ((BulkableRepo) Org.repo).parallelTools.sliceSize
-        ((BulkableRepo) Org.repo).parallelTools.sliceSize = 10 //trigger batching
+        int sliceSize = ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize
+        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = 10 //trigger batching
 
         and: "data bad contact records which would fail"
         List<Map> jsonList = generateOrgData(20)
@@ -94,18 +96,18 @@ class BulkableRepoIntegrationSpec extends Specification {
         jsonList[15].contact = [name:"xxxx"]
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create())
+        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
 
         then:
         noExceptionThrown()
         job.data != null
 
         when: "verify json"
-        JSONArray json = JSON.parse(new String(job.data, "UTF-8"))
+        List json = parseJson(job.data)
 
         then: "job is good"
         json != null
-        json.length() == 20
+        json.size() == 20
 
         and: "just 2 records should have failed, all other should be successfull"
         json.count({it.ok == false}) == 2 //
@@ -116,11 +118,11 @@ class BulkableRepoIntegrationSpec extends Specification {
         json[5].errors != null
 
         when:
-        Org.withNewTransaction {
+        // Org.withNewTransaction {
             os1 = OrgSource.findBySourceId(jsonList[5].num) //this should have rolled back when contact save fails
             os2 = OrgSource.findBySourceId(jsonList[15].num)
             os3 = OrgSource.findBySourceId("testorg-1") //this should exist
-        }
+        // }
 
         then: "Verify no dangling records have been commited"
         os1 == null
@@ -128,7 +130,7 @@ class BulkableRepoIntegrationSpec extends Specification {
         os3 != null
 
         cleanup: "Cleanup orgs as they would have been committed during bulk"
-        ((BulkableRepo) Org.repo).parallelTools.sliceSize = sliceSize //set original back
+        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = sliceSize //set original back
     }
 
     @Ignore("Fix XXX in BulkableRepo")
@@ -149,7 +151,7 @@ class BulkableRepoIntegrationSpec extends Specification {
         job.data != null
 
         when: "verify json"
-        JSONArray json = JSON.parse(new String(job.data, "UTF-8"))
+        List json = parseJson(job.data)
 
         then:
         json != null
@@ -171,8 +173,4 @@ class BulkableRepoIntegrationSpec extends Specification {
         return list
     }
 
-    def toJson(byte[] data) {
-        def slurper = new JsonSlurper()
-        return slurper.parse(data)
-    }
 }

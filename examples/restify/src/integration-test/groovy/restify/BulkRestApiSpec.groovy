@@ -56,7 +56,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         job.source == "Oracle"
 
         when: "Verify job.data json, this is what come in from the request"
-        List dataList = parseJson(job.requestData)
+        List dataList = parseJsonBytes(job.requestData)
 
         then:
         dataList.size() == 3

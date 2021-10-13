@@ -80,9 +80,10 @@ trait JsonParserTrait {
         return getJsonSlurper().parse(reader)
     }
 
-    Object parseJson(byte[] bytes){
-        //parseJsonText(new String(data, "UTF-8"))
-        return getJsonSlurper().parse(bytes)
+    Object parseJsonBytes(byte[] bytes){
+        // TODO not sure whats up here but these stops some of the null issues
+        parseJsonText(new String(bytes, "UTF-8"))
+        // return getJsonSlurper().parse(bytes)
     }
 
     Object parseJsonText(String text){

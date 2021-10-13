@@ -50,7 +50,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         job.state == JobState.Finished
 
         when: "Verify job.requestData (incoming json)"
-        def payload = parseJson(job.requestData)
+        def payload = parseJsonBytes(job.requestData)
 
         then:
         payload != null
@@ -61,7 +61,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         payload[19].name == "project-20"
 
         when: "verify job.data (job results)"
-        def results = parseJson(job.data)
+        def results = parseJsonBytes(job.data)
         then:
         results != null
         results instanceof List
@@ -131,7 +131,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         job.ok == false
 
         when: "verify job.data"
-        def results = parseJson(job.data)
+        def results = parseJsonBytes(job.data)
 
         then:
         results != null
@@ -170,7 +170,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         JobImpl job = Project.repo.bulk(list, setupBulkableArgs())
         job = JobImpl.findById(job.id)
 
-        def results = parseJson(job.data)
+        def results = parseJsonBytes(job.data)
 
         then: "just 60 should have been inserted, not the entire list twice"
         results.size() == 60

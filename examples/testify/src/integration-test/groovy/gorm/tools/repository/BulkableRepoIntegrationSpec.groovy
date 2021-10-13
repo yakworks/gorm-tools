@@ -40,7 +40,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "verify json"
-        List json = parseJson(job.data)
+        List json = parseJsonBytes(job.data)
 
         then:
         json != null
@@ -59,7 +59,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "bulk update"
-        def results = parseJson(job.data)
+        def results = parseJsonBytes(job.data)
         jsonList.eachWithIndex { it, idx ->
             it["id"] = results[idx].data.id
             it["comments"] = "flubber${it.id}"
@@ -103,7 +103,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "verify json"
-        List json = parseJson(job.data)
+        List json = parseJsonBytes(job.data)
 
         then: "job is good"
         json != null
@@ -151,7 +151,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "verify json"
-        List json = parseJson(job.data)
+        List json = parseJsonBytes(job.data)
 
         then:
         json != null

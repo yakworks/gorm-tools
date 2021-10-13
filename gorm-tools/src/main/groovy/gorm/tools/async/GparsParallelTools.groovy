@@ -4,11 +4,9 @@
 */
 package gorm.tools.async
 
-import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 import groovyx.gpars.GParsPoolUtil
-import groovyx.gpars.util.PoolUtils
 
 import gorm.tools.support.ConfigAware
 
@@ -22,28 +20,18 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
-
+@Deprecated
 @CompileStatic
 class GparsParallelTools implements ParallelTools, ConfigAware {
 
-    /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
-    @PostConstruct
-    void init() {
-        if (poolSize == 0) poolSize = PoolUtils.retrieveDefaultPoolSize()
-        //if batchSize is 0 then hibernate may not bbe installed and hibernate.jdbc.batch_size is not set. force it to 100
-        Integer batchSize = config.getProperty('hibernate.jdbc.batch_size', Integer)
-        sliceSize = batchSize ?: sliceSize
-    }
-
-
     @Override
-    public <T> Collection<T> each(ParallelConfig args, Collection<T> collection, Closure closure){
-        boolean gparsEnabled = args.enabled != null ? args.enabled : getAsyncEnabled()
+    public <T> Collection<T> each(AsyncConfig args, Collection<T> collection, Closure closure){
+        boolean gparsEnabled = args.enabled != null ? args.enabled : asyncService.getAsyncEnabled()
 
-        Closure wrappedClosure = wrapSessionOrTransaction(args, closure)
+        Closure wrappedClosure = asyncService.wrapClosure(args, closure)
 
         if (gparsEnabled) {
-            int psize = args.poolSize ?: getPoolSize()
+            int psize = args.poolSize ?: asyncService.getPoolSize()
             withPool(psize) {
                 GParsPoolUtil.eachParallel(collection, wrappedClosure)
             }

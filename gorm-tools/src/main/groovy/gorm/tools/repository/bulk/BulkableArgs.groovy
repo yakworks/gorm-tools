@@ -56,7 +56,7 @@ class BulkableArgs {
      * whether it should run async with a CompletableFuture and return the job immediately
      * or run in a standard blocking synchronous
      */
-    Boolean asyncEnabled = false
+    Boolean asyncEnabled
 
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods

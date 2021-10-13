@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
-import spock.lang.Ignore
 import testing.CustType
 
 class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
@@ -21,7 +20,7 @@ class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements Autowir
 
     void setup() {
         //parallelTools = ctx.getBean("parallelTools")
-        parallelTools.asyncEnabled = true
+        parallelTools.asyncService.asyncEnabled = true
     }
 
     // void cleanup() {
@@ -90,7 +89,7 @@ class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements Autowir
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        def args = ParallelConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
+        def args = AsyncConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
 
         parallelTools.slicedEach(args, list) { Map record ->
             count.addAndGet(1)

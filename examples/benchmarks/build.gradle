@@ -38,8 +38,8 @@ dependencies {
 
   compile "org.grails:grails-logging"
   compile "org.grails.plugins:cache"
-  compile "org.grails.plugins:async"
   compile "org.grails.plugins:events"
+  compile "org.grails.plugins:async"
   compile "org.grails.plugins:external-config:$vExternalConfig"
 
   compile "org.grails.plugins:hibernate5"
@@ -58,7 +58,8 @@ dependencies {
   compile project(":rally-domain")
   // compile project(":testify")
 
-  compile 'org.grails.plugins:csv:1.0'
+  // compile 'org.grails.plugins:csv:1.0'
+  compile 'net.sf.opencsv:opencsv:2.3'
 
   // compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
   // compile "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"

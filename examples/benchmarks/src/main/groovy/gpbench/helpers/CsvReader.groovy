@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 
+import gpbench.helpers.csv.CSVMapReader
 import grails.core.GrailsApplication
-import grails.plugins.csv.CSVMapReader
 
 @Component
 @CompileStatic

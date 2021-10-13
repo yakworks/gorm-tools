@@ -10,9 +10,6 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.core.Datastore
-import org.springframework.transaction.TransactionStatus
-
 import gorm.tools.support.ConfigAware
 
 /**
@@ -31,21 +28,18 @@ class ParallelStreamTools implements ParallelTools, ConfigAware {
     /** setup defaults for poolSize and batchSize if config isn't present. batchSize set to 100 if not config found*/
     @PostConstruct
     void init() {
-        if (poolSize == 0) poolSize = 4 // Runtime.getRuntime().availableProcessors()
-        forkJoinPool = new ForkJoinPool(poolSize)
-        //if batchSize is 0 then hibernate may not bbe installed and hibernate.jdbc.batch_size is not set. force it to 100
-        Integer batchSize = config.getProperty('hibernate.jdbc.batch_size', Integer)
-        sliceSize = batchSize ?: sliceSize
+        // if (poolSize == 0) poolSize = 4 // Runtime.getRuntime().availableProcessors()
+        forkJoinPool = new ForkJoinPool(asyncService.poolSize)
     }
 
     @Override
-    public <T> Collection<T> each(ParallelConfig args, Collection<T> collection, Closure closure){
-        boolean parEnabled = args.enabled != null ? args.enabled : getAsyncEnabled()
+    public <T> Collection<T> each(AsyncConfig args, Collection<T> collection, Closure closure){
+        boolean parEnabled = args.enabled != null ? args.enabled : asyncService.getAsyncEnabled()
 
-        Consumer<T> wrappedConsumer = consumerSessionOrTransaction(args, closure) as Consumer<T>
+        Consumer<T> wrappedConsumer = asyncService.wrapConsumer(args, closure as Consumer<T>)
 
         if (parEnabled) {
-            int psize = args.poolSize ?: getPoolSize()
+            int psize = args.poolSize ?: asyncService.getPoolSize()
             forkJoinPool.submit {
                 collection.parallelStream().forEach(wrappedConsumer)
             }.join() //join makes it wait
@@ -56,53 +50,5 @@ class ParallelStreamTools implements ParallelTools, ConfigAware {
 
         return collection
     }
-
-    public <T> Consumer<T> consumerSessionOrTransaction(ParallelConfig asyncArgs, Closure<T> closure){
-        Consumer<T> wrappedConsumer
-
-        if(asyncArgs.transactional){
-            verifyDatastore(asyncArgs)
-            wrappedConsumer = wrapConsumerTrx(asyncArgs.datastore, closure)
-        } else if(asyncArgs.session){
-            verifyDatastore(asyncArgs)
-            wrappedConsumer = wrapConsumerSession(asyncArgs.datastore, closure)
-        } else {
-            // no wrap so just do closure
-            wrappedConsumer = closure as Consumer<T>
-        }
-        wrappedConsumer
-    }
-
-    public <T> Consumer<T> wrapConsumerTrx(Datastore ds, Closure<T> c) {
-        return new Consumer<T>() {
-            @Override
-            void accept(T item) {
-                getTrxService().withTrx(ds) { TransactionStatus status ->
-                    c.call(item)
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings(["EmptyCatchBlock"])
-    public <T> Consumer<T> wrapConsumerSession(Datastore ds, Closure<T> wrapped) {
-        return new Consumer<T>() {
-            @Override
-            void accept(T item) {
-                persistenceInterceptor.init()
-                try {
-                    wrapped.call(item)
-                } finally {
-                    try {
-                        //only destroys if new one was created, otherwise does nothing
-                        persistenceInterceptor.destroy()
-                    } catch (Exception e) {
-                        //ignore errors
-                    }
-                }
-            }
-        }
-    }
-
 
 }

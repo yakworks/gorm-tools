@@ -7,9 +7,13 @@ package gorm.tools.async
 import java.util.concurrent.CompletableFuture
 import java.util.function.Supplier
 
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 
-class FuturesSpec extends Specification {
+class FuturesSpec extends GormToolsHibernateSpec implements AutowiredTest  {
+
+    AsyncService asyncService
 
     void "synchronous future example"() {
         when:
@@ -17,7 +21,7 @@ class FuturesSpec extends Specification {
 
         def supplierFunc = { return 'foo' } as Supplier<String>
 
-        Futures.of(false, supplierFunc).whenComplete{ String result, ex ->
+        asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == 'foo'
             message = result
             println "whenComplete with $result"
@@ -34,7 +38,7 @@ class FuturesSpec extends Specification {
 
         def supplierFunc = { throw new RuntimeException('some exception') } as Supplier<String>
 
-        Futures.of(false, supplierFunc).whenComplete{ String result, ex ->
+        asyncService.supplyAsync(new AsyncConfig(enabled:false), supplierFunc).whenComplete{ String result, ex ->
             assert result == null
             assert ex.message == 'some exception'
             message = ex.message
@@ -52,7 +56,7 @@ class FuturesSpec extends Specification {
 
         def supplierFunc = { 'foo' } as Supplier<String>
 
-        CompletableFuture completableFuture = Futures.of(true, supplierFunc).whenComplete{ String result, ex ->
+        CompletableFuture completableFuture = asyncService.supplyAsync(supplierFunc).whenComplete{ String result, ex ->
             message = result
             println "CompletableFuture whenComplete with $result"
         }

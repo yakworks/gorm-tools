@@ -34,18 +34,18 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create())
+        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
 
         then:
         noExceptionThrown()
         job.data != null
 
         when: "verify json"
-        JSONArray json = JSON.parse(new String(job.data, "UTF-8"))
+        List json = parseJson(job.data)
 
         then:
         json != null
-        json.length() == 3
+        json.size() == 3
     }
 
     void "sanity check bulk update"() {
@@ -53,7 +53,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create())
+        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
 
         then:
         noExceptionThrown()
@@ -66,7 +66,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             it["comments"] = "flubber${it.id}"
         }
 
-        job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.update())
+        job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
         flushAndClear()
 
         then:
@@ -88,8 +88,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         OrgSource os1, os2, os3
 
         setup:
-        int sliceSize = ((BulkableRepo) Org.repo).parallelTools.sliceSize
-        ((BulkableRepo) Org.repo).parallelTools.sliceSize = 10 //trigger batching
+        int sliceSize = ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize
+        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = 10 //trigger batching
 
         and: "data bad contact records which would fail"
         List<Map> jsonList = generateOrgData(20)
@@ -97,7 +97,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[15].contact = [name:"xxxx"]
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create())
+        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
 
         then:
         noExceptionThrown()
@@ -131,7 +131,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         os3 != null
 
         cleanup: "Cleanup orgs as they would have been committed during bulk"
-        ((BulkableRepo) Org.repo).parallelTools.sliceSize = sliceSize //set original back
+        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = sliceSize //set original back
     }
 
     @Ignore("Fix XXX in BulkableRepo")

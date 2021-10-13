@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.JobState
 import gorm.tools.repository.bulk.BulkableArgs
@@ -18,6 +19,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
 
     // @Shared JsonSlurper slurper
     ParallelTools parallelTools
+    AsyncService asyncService
 
     void setupSpec() {
         // slurper = new JsonSlurper()
@@ -25,7 +27,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
     }
 
     BulkableArgs setupBulkableArgs(DataOp op = DataOp.add){
-        return new BulkableArgs(op: op, params:[source: "test", sourceId: "test"], includes: ["id", "name", "nested.name"])
+        return new BulkableArgs(asyncEnabled: false, op: op,
+            params:[source: "test", sourceId: "test"], includes: ["id", "name", "nested.name"])
     }
 
     void "test bulkable repo"() {
@@ -162,26 +165,20 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
     @Issue("domain9#413")
     void "test batching"() {
         setup: "Set batchSize of 10 to trigger batching/slicing"
-        parallelTools.sliceSize = 10
-
-        and:
+        asyncService.sliceSize = 10
         List<Map> list = generateDataList(60) //this should trigger 6 batches of 10
-
-        expect:
-        Project.repo.parallelTools.sliceSize == 10
 
         when: "bulk insert in multi batches"
         JobImpl job = Project.repo.bulk(list, setupBulkableArgs())
         job = JobImpl.findById(job.id)
 
-        println job.data
         def results = parseJson(job.data)
 
         then: "just 60 should have been inserted, not the entire list twice"
         results.size() == 60
 
         cleanup:
-        parallelTools.sliceSize = 50
+        asyncService.sliceSize = 50
     }
 
     private List<Map> generateDataList(int numRecords) {

@@ -15,7 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
-import gorm.tools.async.GparsParallelTools
+import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.beans.EntityMapService
 import gorm.tools.databinding.EntityMapBinder
@@ -82,6 +82,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
         persistenceContextInterceptor(NullPersistentContextInterceptor) //required for parallelTools
         parallelTools(ParallelStreamTools)
+        asyncService(AsyncService)
         entityMapService(EntityMapService)
         msgService(MsgService)
         apiErrorHandler(ApiErrorHandler)

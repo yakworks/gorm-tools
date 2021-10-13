@@ -211,9 +211,10 @@ trait RestRepositoryApi<D> implements RestApiController {
         // String contextPath = req.getContextPath()
         // String requestURL = req.getRequestURL()
         // String forwardURI = req.forwardURI
-
+        // XXX for now default is false, but we should change
+        boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
-        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: getIncludes("bulk"), params: bulkParams)
+        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: getIncludes("bulk"), params: bulkParams, asyncEnabled: asyncEnabled)
 
         JobTrait job = ((BulkableRepo)getRepo()).bulk(dataList, bulkableArgs)
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])

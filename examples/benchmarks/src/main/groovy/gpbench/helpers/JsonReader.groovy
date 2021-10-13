@@ -1,5 +1,6 @@
 package gpbench.helpers
 
+import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -24,10 +25,12 @@ class JsonReader extends RecordsLoader {
         Resource resource = grailsApplication.mainContext.getResource("classpath:${file}.json")
         assert resource.exists(), "File $file does not exist"
 
+        def slurper = new JsonSlurper()
+
         String line
         resource.inputStream.withReader { Reader reader ->
             while (line = reader.readLine()) {
-                JSONObject json = (JSONObject) JSON.parse(line)
+                Map json = slurper.parseText(line) as Map
                 results.add json
             }
         }

@@ -91,7 +91,7 @@ class GparsParallelToolsSpec extends GormToolsHibernateSpec implements Autowired
 
         when:
         AtomicInteger count = new AtomicInteger(0)
-        def args = ParallelConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
+        def args = AsyncConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
 
         parallelTools.slicedEach(args, list) { Map record ->
             count.addAndGet(1)

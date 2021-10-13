@@ -100,7 +100,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
-                results.merge doBulk((List<Map>) dataSlice, bulkablArgs)
+                def res = doBulk((List<Map>) dataSlice, bulkablArgs)
+                results.merge(res)
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
@@ -151,7 +152,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                Result.of(entityInstance, 201).addTo(results)
+                Result.of(entityInstance, isCreate ? 201 : 200).addTo(results)
             } catch(Exception e) {
                 // if trx by item then collect the execeptions, otherwise throw so it can rollback
                 if(transactionalItem){

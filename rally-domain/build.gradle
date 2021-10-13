@@ -7,7 +7,7 @@ dependencies {
   //compile "org.springframework.boot:spring-boot-starter-logging"
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-tools-security")
-  compileOnly "org.grails.plugins:converters:$vConverters"
+  // compileOnly "org.grails.plugins:converters:$vConverters"
   //plugins
   compileOnly "org.grails.plugins:view-tools:$vViewTools"
   //used for json parsing but require it to be added to project that uses this

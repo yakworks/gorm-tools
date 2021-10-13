@@ -34,9 +34,10 @@ class ParallelToolsSpecSpec extends Specification {
         // Project.repo.flush()
 
         then:
-        Org.withSession {
-            Org.count() == 150
-        }
+        Org.count() == 150
+        // Org.withSession {
+        //     Org.count() == 150
+        // }
 
     }
 

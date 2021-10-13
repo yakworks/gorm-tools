@@ -13,10 +13,9 @@ import grails.testing.spring.AutowiredTest
 import spock.lang.Ignore
 import testing.CustType
 
-@Ignore
-class GparsParallelToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
+class ParallelStreamsToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
 
-    GparsParallelTools parallelTools
+    ParallelStreamTools parallelTools
 
     List<Class> getDomainClasses() { [CustType] }
 

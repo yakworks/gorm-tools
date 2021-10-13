@@ -49,7 +49,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         job.state == JobState.Finished
 
         when: "Verify job.requestData (incoming json)"
-        def payload = toJson(job.requestData)
+        def payload = parseJson(job.requestData)
 
         then:
         payload != null
@@ -60,7 +60,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         payload[19].name == "project-20"
 
         when: "verify job.data (job results)"
-        def results = toJson(job.data)
+        def results = parseJson(job.data)
         then:
         results != null
         results instanceof List
@@ -130,7 +130,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         job.ok == false
 
         when: "verify job.data"
-        def results = toJson(job.data)
+        def results = parseJson(job.data)
 
         then:
         results != null
@@ -175,7 +175,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         job = JobImpl.findById(job.id)
 
         println job.data
-        def results = toJson(job.data)
+        def results = parseJson(job.data)
 
         then: "just 60 should have been inserted, not the entire list twice"
         results.size() == 60
@@ -193,9 +193,13 @@ class BulkableRepoSpec extends Specification implements DataRepoTest {
         return list
     }
 
-    def toJson(byte[] data) {
+    // def toJson(byte[] data) {
+    //     def slurper = new JsonSlurper()
+    //     return slurper.parse(data)
+    // }
+    def parseJson(byte[] data) {
         def slurper = new JsonSlurper()
-        return slurper.parse(data)
+        return slurper.parseText(new String(data, "UTF-8"))
     }
 
 }

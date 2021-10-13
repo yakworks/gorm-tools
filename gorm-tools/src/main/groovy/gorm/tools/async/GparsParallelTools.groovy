@@ -22,6 +22,7 @@ import static groovyx.gpars.GParsPool.withPool
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+
 @CompileStatic
 class GparsParallelTools implements ParallelTools, ConfigAware {
 

@@ -14,10 +14,11 @@ import spock.lang.Specification
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.testing.DomainIntTest
 
 @Integration
 @Rollback
-class BulkableRepoIntegrationSpec extends Specification {
+class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest {
     JdbcTemplate jdbcTemplate
 
     def cleanup() {
@@ -62,20 +63,22 @@ class BulkableRepoIntegrationSpec extends Specification {
         def results = toJson(job.data)
         jsonList.eachWithIndex { it, idx ->
             it["id"] = results[idx].data.id
-            it["comments"] = "comment-${it.id}"
+            it["comments"] = "flubber${it.id}"
         }
 
         job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.update())
+        flushAndClear()
 
         then:
         noExceptionThrown()
         job != null
 
         when: "Verify updated records"
-        int count
-        Org.withNewTransaction {
-            count = Org.countByCommentsIlike("comment-%")
-        }
+        def listUp = Org.query(comments: "flubber%").list()
+        int count = Org.countByCommentsLike("flubber%")
+        // Org.withNewTransaction {
+        //     count = Org.countByCommentsIlike("comment-%")
+        // }
         then:
         count == 5
     }
@@ -101,11 +104,11 @@ class BulkableRepoIntegrationSpec extends Specification {
         job.data != null
 
         when: "verify json"
-        JSONArray json = JSON.parse(new String(job.data, "UTF-8"))
+        List json = parseJson(job.data)
 
         then: "job is good"
         json != null
-        json.length() == 20
+        json.size() == 20
 
         and: "just 2 records should have failed, all other should be successfull"
         json.count({it.ok == false}) == 2 //
@@ -116,11 +119,11 @@ class BulkableRepoIntegrationSpec extends Specification {
         json[5].errors != null
 
         when:
-        Org.withNewTransaction {
+        // Org.withNewTransaction {
             os1 = OrgSource.findBySourceId(jsonList[5].num) //this should have rolled back when contact save fails
             os2 = OrgSource.findBySourceId(jsonList[15].num)
             os3 = OrgSource.findBySourceId("testorg-1") //this should exist
-        }
+        // }
 
         then: "Verify no dangling records have been commited"
         os1 == null
@@ -149,7 +152,7 @@ class BulkableRepoIntegrationSpec extends Specification {
         job.data != null
 
         when: "verify json"
-        JSONArray json = JSON.parse(new String(job.data, "UTF-8"))
+        List json = parseJson(job.data)
 
         then:
         json != null
@@ -174,5 +177,10 @@ class BulkableRepoIntegrationSpec extends Specification {
     def toJson(byte[] data) {
         def slurper = new JsonSlurper()
         return slurper.parse(data)
+    }
+
+    def parseJson(byte[] data) {
+        def slurper = new JsonSlurper()
+        return slurper.parseText(new String(data, "UTF-8"))
     }
 }

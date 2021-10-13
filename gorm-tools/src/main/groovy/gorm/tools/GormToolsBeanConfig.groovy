@@ -16,6 +16,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.async.GparsParallelTools
+import gorm.tools.async.ParallelStreamTools
 import gorm.tools.beans.EntityMapService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
@@ -83,7 +84,7 @@ class GormToolsBeanConfig {
 
         repoExceptionSupport(RepoExceptionSupport, lazy())
 
-        parallelTools(GparsParallelTools, lazy())
+        parallelTools(ParallelStreamTools, lazy())
 
         DbDialectService.dialectName = application.config.hibernate.dialect
 

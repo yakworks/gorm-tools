@@ -10,8 +10,6 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
-import org.springframework.beans.factory.annotation.Value
-
 import gorm.tools.repository.model.DataOp
 
 @Builder(builderStrategy= SimpleStrategy, prefix="")

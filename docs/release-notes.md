@@ -1,3 +1,11 @@
+### v7.0.8-v.32
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.31...v7.0.8-v.32)
+- release 32 [link](https://github.com/yakworks/gorm-tools/commit/18d2ec6b7cfdbdf817b7f2e1478b738951a47ccc)
+- move to parseJsonBytes so tests dont get confused (#374) [link](https://github.com/yakworks/gorm-tools/commit/639c2bb136ff098f2daf90c41ae04674c096e76b)
+- Async pool (#373) [link](https://github.com/yakworks/gorm-tools/commit/336f5dce88ad324929a75bcdd926c1f18b1f38a1)
+- Merge master (#372) [link](https://github.com/yakworks/gorm-tools/commit/21be3588a6ce5791b0af0aa598dff5643899ee3c)
+
 ### v7.0.8-v.31
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.30...v7.0.8-v.31)

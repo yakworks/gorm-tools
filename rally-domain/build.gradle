@@ -16,7 +16,7 @@ dependencies {
     exclude group:"org.grails", module: "grails-plugin-controllers"
   }
   compileOnly "org.grails.plugins:views-json-templates:$vViews"
-
+  compileOnly "net.sf.opencsv:opencsv:$vOpenCsv"
   //libs
   compileOnly "commons-io:commons-io:$vCommonsIO"
   //jasper uses itext 2.1.7 which uses bouncy 138, so until we sort that out we keep it stuck there

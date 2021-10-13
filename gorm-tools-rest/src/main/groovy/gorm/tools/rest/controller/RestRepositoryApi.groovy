@@ -218,7 +218,7 @@ trait RestRepositoryApi<D> extends RestApiController {
 
         JobTrait job = ((BulkableRepo)getRepo()).bulk(dataList, bulkableArgs)
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
-        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: (job.data ? parseJson(job.data) : []), source:job.source, sourceId:job.sourceId]
+        Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: (job.data ? parseJsonBytes(job.data) : []), source:job.source, sourceId:job.sourceId]
         respond resp, status: MULTI_STATUS.value()
     }
 

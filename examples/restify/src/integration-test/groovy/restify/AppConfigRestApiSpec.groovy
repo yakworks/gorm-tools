@@ -16,8 +16,9 @@ class AppConfigRestApiSpec extends Specification implements OkHttpRestTrait, Jso
     void "test config values"() {
         when:
         Response resp = get('/api/appConfig/rally/org')
-        println "bodyString: ${resp.body().string()}"
-        Map body = bodyToMap(resp) as Map
+        String bodyString = resp.body().string()
+        println "bodyString: ${bodyString}"
+        Map body = parseJsonText(bodyString) as Map
 
         then: "should have excluded the flattened spring array keys"
         resp.code() == HttpStatus.OK.value()

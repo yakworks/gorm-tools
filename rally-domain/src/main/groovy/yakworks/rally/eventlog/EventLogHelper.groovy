@@ -35,7 +35,7 @@ class EventLogHelper {
      * @return A helper with all this plus a userid and appName and a linkedId already generated.
      */
     EventLogHelper(String component, Map jobParams, Boolean isPrimaryJob = false) {
-        this(component, component, jobParams.toString(), isPrimaryJob)
+        this(component, component, jobParams as String, isPrimaryJob)
         if (jobParams?.jobName) {
             this.jobName = (jobParams['jobName']) as String
         }
@@ -49,7 +49,7 @@ class EventLogHelper {
      * @return A helper with all this plus a userid and appName and a linkedId already generated.
      */
     EventLogHelper(String component, String jobName, Map jobParams, Boolean isPrimaryJob = false) {
-        this(component, jobName as String, jobParams.toString(), isPrimaryJob)
+        this(component, jobName as String, jobParams as String, isPrimaryJob)
         if (!jobName && (jobParams?.jobName)) {
             this.jobName = (jobParams['jobName']) as String
         }

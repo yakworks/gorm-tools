@@ -5,8 +5,8 @@ group = "org.yakworks"
 dependencies {
   //console "org.grails:grails-console"
   //compile "org.springframework.boot:spring-boot-starter-logging"
-  compileOnly project(":gorm-tools")
-  compileOnly project(":gorm-tools-security")
+  implementation project(":gorm-tools")
+  implementation project(":gorm-tools-security")
   //plugins
   compileOnly "org.grails.plugins:view-tools:$vViewTools"
   //used for json parsing but require it to be added to project that uses this

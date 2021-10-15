@@ -17,6 +17,9 @@ group = "org.yakworks"
 
 apply plugin: 'yakworks.shipyak' //our opinionated defaults for gradle groovy & grails projects
 
+// Good article on java-library and the api config vs implementation
+// https://tomgregory.com/how-to-use-gradle-api-vs-implementation-dependencies-with-the-java-library-plugin/
+
 subprojects {
   repositories {
     maven { url "https://repo.grails.org/grails/core" }
@@ -100,7 +103,7 @@ subprojects {
   }} //end of plugins.withId iteration
 
   configurations {
-    testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
+    testImplementation.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
     all {
       resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
     }

@@ -13,7 +13,7 @@ import java.text.SimpleDateFormat
 import yakworks.commons.lang.DateUtil
 import yakworks.commons.lang.IsoDateUtil
 
-@Ignore
+// @Ignore
 class DateUtilSpec extends Specification {
     @Shared SimpleDateFormat tester = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 

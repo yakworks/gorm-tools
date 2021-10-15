@@ -14,42 +14,39 @@ dependencies {
   // compile "org.grails:grails-plugin-rest"
 
   // compile "org.grails.plugins:cache"
-  compile "org.grails:grails-plugin-domain-class"
-  compile "org.grails.plugins:external-config:$vExternalConfig"
+  implementation "org.grails:grails-plugin-domain-class"
+  implementation "dk.glasius:external-config:$vExternalConfig"
 
-  compile "org.grails.plugins:view-tools:$vViewTools"
+  implementation "org.grails.plugins:view-tools:$vViewTools"
 
-  compile project(":gorm-tools")
-  compile project(":gorm-tools-security")
-  compile project(":rally-domain")
+  implementation project(":gorm-tools")
+  implementation project(":gorm-tools-security")
+  implementation project(":rally-domain")
   // testCompile project(":rally-domain")
 
-  //FIXME this is needed for AST somewhere in rally-domain, figure out where
-  // compile "org.grails.plugins:converters:$vConverters"
-
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
-  runtime "javax.xml.bind:jaxb-api:2.3.1"
-  runtime "com.zaxxer:HikariCP:$vHikari"
+  runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+  runtimeOnly "com.zaxxer:HikariCP:$vHikari"
   // testCompile "io.micronaut:micronaut-inject-groovy"
   // testCompile "org.grails:grails-gorm-testing-support"
   // testCompile "org.mockito:mockito-core"
   // testCompile "io.micronaut:micronaut-http-client"
-  testCompile "io.micronaut:micronaut-inject-groovy"
-  testCompile "org.grails:grails-gorm-testing-support"
-  testCompile "org.mockito:mockito-core"
-  testCompile "io.micronaut:micronaut-http-client"
-  testCompile "org.grails:grails-web-testing-support"
-  testCompile "org.grails:views-json-testing-support"
+  testImplementation "io.micronaut:micronaut-inject-groovy"
+  testImplementation "org.grails:grails-gorm-testing-support"
+  testImplementation "org.mockito:mockito-core"
+  testImplementation "io.micronaut:micronaut-http-client"
+  testImplementation "org.grails:grails-web-testing-support"
+  testImplementation "org.grails:views-json-testing-support"
 }
 
-bootRun {
-  ignoreExitValue true
-  jvmArgs(
-    '-Dspring.output.ansi.enabled=always',
-    '-noverify',
-    '-XX:TieredStopAtLevel=1',
-    '-Xmx1024m')
-  sourceResources sourceSets.main
-  String springProfilesActive = 'spring.profiles.active'
-  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
-}
+// bootRun {
+//   ignoreExitValue true
+//   jvmArgs(
+//     '-Dspring.output.ansi.enabled=always',
+//     '-noverify',
+//     '-XX:TieredStopAtLevel=1',
+//     '-Xmx1024m')
+//   sourceResources sourceSets.main
+//   String springProfilesActive = 'spring.profiles.active'
+//   systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+// }

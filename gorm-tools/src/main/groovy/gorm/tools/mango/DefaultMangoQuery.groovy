@@ -128,13 +128,12 @@ class DefaultMangoQuery implements MangoQuery {
 
         //pull out the sort if its there
         //clean up sort
-        def sort
+        String sort
+        Map sortMap = [:]
         if (criteria['sort']) {
-            sort = criteria.remove('sort')
+            sort = criteria.remove('sort') as String
             if(criteria['order']) {
-                Map newSort = [:]
-                newSort[sort] = criteria.remove('order')
-                sort = newSort
+                sortMap[sort] = criteria.remove('order') as String
             }
         }
 
@@ -159,8 +158,12 @@ class DefaultMangoQuery implements MangoQuery {
         else if(qCriteria && qCriteria instanceof Map){
             criteria = qCriteria as Map
         }
-        // if sort is populated
-        if(sort) criteria['$sort'] = sort
+        // if string sort is populated
+        if(sortMap) {
+            criteria['$sort'] = sortMap
+        } else if(sort){
+            criteria['$sort'] = sort
+        }
 
         return [criteria: criteria, pager: pagerObj]
     }

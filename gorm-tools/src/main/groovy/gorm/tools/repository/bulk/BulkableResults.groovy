@@ -143,7 +143,7 @@ class BulkableResults {
      * transform results to list of maps, see above.
      * @param customizer closure that ruturns a map that should be merged in, runs for each item in results
      */
-    List<Map> transform(List includes = null, Closure<Map> customizer = null) {
+    List<Map> transform(List includes = null, Closure customizer = null) {
         List<Map> ret = []
         boolean ok = true
         for (Result r : resultList) {
@@ -165,7 +165,7 @@ class BulkableResults {
             }
             //run the customizer closure
             if(customizer) {
-                Map customizerResults = customizer(r as BulkableResults.Result)
+                Map customizerResults = customizer(r as BulkableResults.Result) as Map
                 if (customizerResults) map.putAll customizerResults
             }
             ret << map

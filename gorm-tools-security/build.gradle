@@ -1,24 +1,29 @@
 // apply plugin: 'groovy'
 // apply plugin:"org.grails.grails-plugin"
+apply plugin: 'java-library'
 apply plugin: "yakworks.grails-plugin"
 
 group = "org.yakworks"
 
 repositories {
   //yakworks.grails-plugin adds the repos we need
-  maven { url "http://repo.9ci.com/oss-snapshots" }
+  maven {
+    url "http://repo.9ci.com/oss-snapshots"
+    allowInsecureProtocol = true
+  }
   mavenLocal()
 }
 
 dependencies {
   console "org.grails:grails-console"
 
-  compile 'org.grails:grails-plugin-domain-class' // add DomainClass trait with getConstrainedProperties to domains
-  compile "org.grails.plugins:spring-security-core:$vSpringSecurity"
+  implementation 'org.grails:grails-plugin-domain-class' // add DomainClass trait with getConstrainedProperties to domains
+  api "org.grails.plugins:spring-security-core:$vSpringSecurity"
 
   // compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
 
-  compile project(":gorm-tools")
+  implementation project(":commons")
+  implementation project(":gorm-tools")
 
   // used for bundled Test traits
   compileOnly "org.grails:grails-testing-support"

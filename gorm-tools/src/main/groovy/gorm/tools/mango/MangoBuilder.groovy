@@ -50,7 +50,11 @@ class MangoBuilder {
         MangoDetachedCriteria newCriteria = cloneCriteria(criteria)
         def tidyMap = MangoTidyMap.tidy(map)
         applyMapOrList(newCriteria, tidyMap)
-        if (callable) newCriteria.with callable
+        if (callable) {
+            final Closure clonedClosure = (Closure) callable.clone()
+            clonedClosure.setResolveStrategy(Closure.DELEGATE_FIRST)
+            newCriteria.with(clonedClosure)
+        }
         return newCriteria
     }
 

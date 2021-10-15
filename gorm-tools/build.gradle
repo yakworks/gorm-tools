@@ -1,3 +1,4 @@
+apply plugin: 'java-library'
 apply plugin: "yakworks.grails-plugin"
 // apply plugin:"idea"
 // apply plugin: 'groovy'
@@ -8,16 +9,17 @@ group = "org.yakworks"
 dependencies {
   console "org.grails:grails-console"
 
-  compile project(":commons")
+  api project(":commons")
+  api "com.github.spotbugs:spotbugs-annotations:4.4.2"
 
-  compile "org.hibernate:hibernate-core:$vHibernate"
-  compile "org.hibernate:hibernate-ehcache:$vHibernate"
-  compile "io.activej:activej-promise:5.0-rc3"
+  implementation "org.hibernate:hibernate-core:$vHibernate"
+  implementation "org.hibernate:hibernate-ehcache:$vHibernate"
+  implementation "io.activej:activej-promise:5.0-rc3"
 
-  compile "org.grails.plugins:cache:$vGrailsCache"
-  compile "org.codehaus.gpars:gpars:$vGpars"
+  implementation "org.grails.plugins:cache:$vGrailsCache"
+  implementation "org.codehaus.gpars:gpars:$vGpars"
 
-  compile "org.apache.commons:commons-lang3:$vCommonsLang3"
+  implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
   // compile "org.grails:grails-datastore-gorm:7.0.8.RELEASE"
   //used for json parsing but require it to be added to project that uses this
   compileOnly "org.grails.plugins:views-json:$vViews"

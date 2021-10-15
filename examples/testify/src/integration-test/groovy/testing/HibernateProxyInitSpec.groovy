@@ -16,9 +16,11 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
     void "checking id should not unwrap proxy"() {
         when:
         def proxy = Org.load(1)
+        def proxyHandler = Org.getGormPersistentEntity().mappingContext.proxyHandler
 
         then: "load returns a proxy"
-        !Hibernate.isInitialized(proxy)
+        // !Hibernate.isInitialized(proxy)
+        !proxyHandler.isInitialized(proxy)
 
         when:
         proxy.id == 1

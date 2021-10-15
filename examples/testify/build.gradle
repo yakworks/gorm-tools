@@ -4,16 +4,7 @@ apply plugin:"org.grails.grails-plugin"
 dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
-  //
-  // compile "org.grails:grails-web-boot"
-  //
-  // compile "org.grails:grails-logging"
-  // compile "org.grails:grails-plugin-databinding"
-  // compile "org.grails:grails-plugin-i18n"
-  // compile "org.grails:grails-plugin-services"
-  // compile "org.grails:grails-plugin-rest"
 
-  // compile "org.grails.plugins:cache"
   implementation "org.grails:grails-plugin-domain-class"
   implementation "dk.glasius:external-config:$vExternalConfig"
 
@@ -24,13 +15,13 @@ dependencies {
   implementation project(":rally-domain")
   // testCompile project(":rally-domain")
 
+  implementation "org.hibernate:hibernate-core:$vHibernate"
+  implementation "org.hibernate:hibernate-ehcache:$vHibernate"
+
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
-  // testCompile "io.micronaut:micronaut-inject-groovy"
-  // testCompile "org.grails:grails-gorm-testing-support"
-  // testCompile "org.mockito:mockito-core"
-  // testCompile "io.micronaut:micronaut-http-client"
+
   testImplementation "io.micronaut:micronaut-inject-groovy"
   testImplementation "org.grails:grails-gorm-testing-support"
   testImplementation "org.mockito:mockito-core"

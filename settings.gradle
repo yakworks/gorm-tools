@@ -9,11 +9,12 @@ include 'commons'
 //findProject(':security').name = 'gorm-tools-security' // the name that will be published
 
 // tests will be included in main runs but not deploy tasks and doc tasks
-include "examples/testify"
-include 'restify'
-project(':restify').projectDir = new File('examples/restify')
-// include 'examples/benchmarks'
+include "testify"
+project(':testify').projectDir = new File('examples/testify')
+// include 'restify'
+// project(':restify').projectDir = new File('examples/restify')
+// include 'benchmarks'
+// project(':benchmarks').projectDir = new File('examples/benchmarks')
 
-findProject(':examples/testify').name = 'testify'
-
+// findProject(':examples/testify').name = 'testify'
 // findProject(':examples/benchmarks').name = 'benchmarks'

@@ -12,11 +12,10 @@ dependencies {
   api project(":commons")
   api "com.github.spotbugs:spotbugs-annotations:4.4.2"
 
-  implementation "org.hibernate:hibernate-core:$vHibernate"
-  implementation "org.hibernate:hibernate-ehcache:$vHibernate"
-  implementation "io.activej:activej-promise:5.0-rc3"
+  api "org.hibernate:hibernate-core:$vHibernate"
+  api "org.hibernate:hibernate-ehcache:$vHibernate"
 
-  implementation "org.grails.plugins:cache:$vGrailsCache"
+  // implementation "org.grails.plugins:cache:$vGrailsCache"
   implementation "org.codehaus.gpars:gpars:$vGpars"
 
   implementation "org.apache.commons:commons-lang3:$vCommonsLang3"

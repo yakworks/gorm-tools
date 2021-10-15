@@ -13,7 +13,7 @@ import yakworks.rally.orgs.model.Org
 @Rollback
 class HibernateProxyInitSpec extends Specification implements DataIntegrationTest {
 
-    void "calling getId() should not unwrap proxy"() {
+    void "checking id should not unwrap proxy"() {
         when:
         def proxy = Org.load(1)
 
@@ -21,7 +21,7 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         !Hibernate.isInitialized(proxy)
 
         when:
-        proxy.id
+        proxy.id == 1
 
         then: "getId should also not unwrap the proxy"
         !Hibernate.isInitialized(proxy)
@@ -33,7 +33,35 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         //org.info.isDirty()
 
         then:
+
         org.info.id == 4
+        !Hibernate.isInitialized(org.info)
+        !GrailsHibernateUtil.isInitialized(org, "info")
+
+    }
+
+    void "calling getId() should not unwrap proxy"() {
+        when:
+        def proxy = Org.load(1)
+
+        then: "load returns a proxy"
+        !Hibernate.isInitialized(proxy)
+
+        when:
+        proxy.getId() == 1
+
+        then: "getId should also not unwrap the proxy"
+        !Hibernate.isInitialized(proxy)
+    }
+
+    void "verify association not initialized on getId() check"() {
+        when:
+        Org org = Org.get(4)
+        //org.info.isDirty()
+
+        then:
+
+        org.info.getId() == 4
         !Hibernate.isInitialized(org.info)
         !GrailsHibernateUtil.isInitialized(org, "info")
 

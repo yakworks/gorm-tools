@@ -24,6 +24,8 @@ class Job implements JobTrait<Job>, Serializable {
 
     static mapping = {
         state column: 'state', lazy: false, enumType: 'identity'
+        data column: 'data', sqlType: 'mediumText' //here for create with testing on h2, wont effect prod db as its already created
+        requestData column: 'requestData', sqlType: 'mediumText'
     }
 
     static constraintsMap = [

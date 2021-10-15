@@ -22,9 +22,10 @@ trait Persistable { //implements IPersistable<Long>, Ident<Long> {
     abstract boolean isAttached()
     abstract Serializable getVersion()
 
-    @Nullable
-    abstract Long getId()
-    abstract void setId(@Nullable Long id)
+    Long id
+    // @Nullable
+    // abstract Long getId()
+    // abstract void setId(@Nullable Long id)
 
     /**
      * Returns if the {@code Persistable} is new or was persisted already.

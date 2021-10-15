@@ -11,10 +11,10 @@ include 'commons'
 // tests will be included in main runs but not deploy tasks and doc tasks
 include "testify"
 project(':testify').projectDir = new File('examples/testify')
-// include 'restify'
-// project(':restify').projectDir = new File('examples/restify')
-// include 'benchmarks'
-// project(':benchmarks').projectDir = new File('examples/benchmarks')
+include 'restify'
+project(':restify').projectDir = new File('examples/restify')
+include 'benchmarks'
+project(':benchmarks').projectDir = new File('examples/benchmarks')
 
 // findProject(':examples/testify').name = 'testify'
 // findProject(':examples/benchmarks').name = 'benchmarks'

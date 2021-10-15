@@ -10,6 +10,7 @@ buildscript {
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
     // classpath "org.grails.plugins:views-gradle:2.0.2"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
+    classpath "org.grails.plugins:views-gradle:$vViews"
   }
 }
 
@@ -113,13 +114,18 @@ subprojects {
     }
   }
 
-  // sets the path to sys properties so we can use it find grails-app/conf during AST
-  plugins.withId('groovy') {
-    compileGroovy {
-      groovyOptions.fork = true
-      groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
+  tasks.withType(GroovyCompile) {
+    configure(groovyOptions) {
+      forkOptions.jvmArgs = ['-Xmx1024m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
     }
   }
+  // sets the path to sys properties so we can use it find grails-app/conf during AST
+  // plugins.withId('groovy') {
+  //   compileGroovy {
+  //     groovyOptions.fork = true
+  //     groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
+  //   }
+  // }
 
   tasks.withType(Test) {
     useJUnitPlatform()

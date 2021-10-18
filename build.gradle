@@ -24,8 +24,8 @@ subprojects {
 
   ['org.grails.grails-plugin', 'org.grails.grails-web'].each { plugId -> plugins.withId(plugId) {
 
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+    // sourceCompatibility = '1.8'
+    // targetCompatibility = '1.8'
 
     dependencies {
       developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -40,21 +40,22 @@ subprojects {
       compile "org.grails:grails-plugin-databinding"
       compile "org.grails:grails-plugin-services"
 
+      compile "org.grails.plugins:cache"
       compile "org.grails.plugins:events"
+
+      compile "org.grails.plugins:hibernate5"
+      compile "org.hibernate:hibernate-core:$vHibernate"
+      compile "org.hibernate:hibernate-ehcache:$vHibernate"
+
+      compile 'org.codehaus.groovy:groovy-dateutil'
+
+      compile "dk.glasius:external-config:$vExternalConfig"
 
       // compile "io.activej:activej-http:5.0-rc3"
       // compile "io.activej:activej-launchers-common:5.0-rc3"
       compile "io.activej:activej-launchers-http:5.0-rc3"
       compile "io.activej:activej-boot:5.0-rc3"
       compile "io.activej:activej-promise:5.0-rc3"
-
-      // compile "org.grails:grails-datastore-gorm:7.0.8.RELEASE"
-      compile ("org.grails.plugins:hibernate5")
-      //   {
-      //   exclude group: 'org.grails', module: 'grails-datastore-gorm'
-      // }
-
-      compile 'org.codehaus.groovy:groovy-dateutil'
 
       runtime "com.h2database:h2"
       testRuntime "com.zaxxer:HikariCP:$vHikari"

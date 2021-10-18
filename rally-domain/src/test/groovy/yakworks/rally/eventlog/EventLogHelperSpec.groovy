@@ -6,9 +6,9 @@ import spock.lang.Specification
 
 class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLog> {
 
-    final String JOB_NAME  = 'EventLogHelperTests'
-    final String COMPONENT = 'service/method'
-    final String APP_NAME  = 'rally-domain'
+    static final String JOB_NAME  = 'EventLogHelperTests'
+    static final String COMPONENT = 'service/method'
+    static final String APP_NAME  = 'rally-domain'
 
     void setupSpec() {
         defineBeans {

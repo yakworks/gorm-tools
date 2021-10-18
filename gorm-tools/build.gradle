@@ -10,11 +10,7 @@ dependencies {
 
   compile project(":commons")
 
-  compile "org.hibernate:hibernate-core:$vHibernate"
-  compile "org.hibernate:hibernate-ehcache:$vHibernate"
-  compile "io.activej:activej-promise:5.0-rc3"
-
-  compile "org.grails.plugins:cache:$vGrailsCache"
+  // compile "org.grails.plugins:cache:$vGrailsCache"
   compile "org.codehaus.gpars:gpars:$vGpars"
 
   compile "org.apache.commons:commons-lang3:$vCommonsLang3"

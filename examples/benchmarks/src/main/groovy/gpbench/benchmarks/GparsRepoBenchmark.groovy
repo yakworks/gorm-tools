@@ -23,9 +23,9 @@ class GparsRepoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<
     @Override
     def execute() {
         parallelTools.each(cities) { List<Map> list->
-            repo.batchTrx(list) { Map item ->
-                repo.doCreate(item, [:])
-            }
+           // repo.batchTrx(list) { Map item ->
+           //     repo.doCreate(item, [:])
+            //}
             //entityClass.repository.create( row, [validate:validate, dataBinder:dataBinder ])
             //repository.create(row)
             //insertRow(row)

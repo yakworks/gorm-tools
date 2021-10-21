@@ -356,7 +356,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
     }
 
     /**
-     * batchCreateOrUpdate associations for given entity
+     * creates or updates associations for given entity
      *
      * @Param mainEntity The entity that has the associations that are being created/updated
      * @param assocRepo association entity repo
@@ -366,44 +366,20 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      */
     List persistAssociationData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
         if(belongsToProp) assocList.each { it[belongsToProp] = entity}
-        assocRepo.batchCreateOrUpdate(assocList)
+        assocRepo.createOrUpdate(assocList)
     }
 
     /**
-     * Mass update a list of ids
-     *
-     * @param ids list of ids to update
-     * @param values data to apply to selected rows
-     * @return the converted list of maps that was used to update
-     */
-    //FIXME #339 we have to many bulks and batch. centralize and/or fix names
-    List<Map> bulkUpdate(List ids, Map values){
-        List<Map> data = ids.collect {
-            values.id = it
-            values
-        } as List<Map>
-
-        batchTrx(data) { Map item ->
-            doUpdate(item, [:])
-        }
-        data
-    }
-
-    /**
-     * batch creates or updates a list of items in a trx
+     * Creates or updates a list of items
      * Will rollback on any error
      *
      * @param dataList the list of data maps to create/update
      * @return the list of created entities
      */
-    //FIXME #339 lets move to Bulkable?
-    //@KJosh, in use cases such as doAssociations, when doing one-to-many collection handling,
-    // we just want to insert list of contacts for an org etc, batchCreateOrUpdate makes it easier, without needing its repo to be Bulkable.
-    //We use it for persistAssociationData when doing associations
-    List<D> batchCreateOrUpdate(List<Map> dataList){
+    List<D> createOrUpdate(List<Map> dataList){
         List resultList = [] as List<D>
 
-        batchTrx(dataList) { Map item ->
+        dataList.each { Map item ->
             resultList << createOrUpdate(item)
         }
 
@@ -467,29 +443,6 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         txObject.sessionHolder.getSession().clear()
     }
 
-    /* -- batch methods -- */
-
-    /**
-     * Transactional, Iterates over list and runs closure for each item
-     */
-    //FIXME #339 move these out with bulkCreateOrUpdate? these are only used in benchmarks they needed?
-    //@josh we use this for association handling etc, when we want to store list of contacts for an org after persist
-    //one to many associations needs simple loop to create/update associations in a batch, when doing bindAssociation,
-    // and doesnt need Job or any other bulk functionality, so may be we can keep it here?
-    void batchTrx(List list, Closure closure) {
-        gormStaticApi().withTransaction { TransactionStatus status ->
-            for (Object item : list) {
-                closure(item)
-            }
-            flushAndClear()
-        }
-    }
-
-    void batchCreate(Map args = [:], List<Map> list) {
-        batchTrx(list) { Map item ->
-            doCreate(item, args)
-        }
-    }
 
     GormInstanceApi<D> gormInstanceApi() {
         (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())

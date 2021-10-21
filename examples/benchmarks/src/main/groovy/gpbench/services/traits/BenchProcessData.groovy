@@ -35,7 +35,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
     }
 
     Closure repoBatchClosure = { List batchList ->
-        getRepository().batchCreate(batchList)
+        batchCreate(getRepository(), batchList)
     }
 
     abstract void run()

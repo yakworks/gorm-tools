@@ -109,6 +109,8 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 results.merge(res)
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
+                //XXX Johsh - here is the problem - we catch the exception and proceed, so exception isnt crossing transaction boundry
+                //if we put breakpoint in GrailsTransactionTemplate.execute, we can see that transaction gets committed instead of rollback.
                 sliceErrors.add(dataSlice)
             }
         }

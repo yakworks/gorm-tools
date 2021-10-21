@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.json.JsonParserTrait
@@ -81,6 +82,31 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         then:
         count == 5
     }
+
+    void "test failures should rollback"() {
+        List<Map> jsonList = generateOrgData(1)
+        jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
+
+        when:
+        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        flush()
+
+        then:
+        noExceptionThrown()
+        job.data != null
+
+        when:
+        List json = parseJsonBytes(job.data)
+        List requestData = parseJsonBytes(job.requestData)
+
+        then:
+        json != null
+        requestData != null
+
+        and: "no dangling records committed"
+        OrgSource.findBySourceIdLike("ORG-1%") == null
+    }
+
 
     @Issue("#357")
     void "test spin back through failures and run them one by one"() {

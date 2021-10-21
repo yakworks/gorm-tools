@@ -124,7 +124,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         if(!org.num) return false
 
         org.source = OrgSource.repo.createSource(org, data)
-        org.source.persist()
+        org.source.persist(flush:true) //XXX added temporary to reveal the issue #464
     }
 
     Contact createOrUpdatePrimaryContact(Org org, Map data){

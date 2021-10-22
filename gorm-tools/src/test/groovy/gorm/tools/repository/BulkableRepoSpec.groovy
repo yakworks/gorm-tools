@@ -14,11 +14,13 @@ import spock.lang.Specification
 import testing.JobImpl
 import testing.Nested
 import testing.Project
+import testing.ProjectRepo
 
 class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParserTrait {
 
     ParallelTools parallelTools
     AsyncService asyncService
+    ProjectRepo projectRepo
 
     void setupSpec() {
         mockDomains(Project, Nested, JobImpl)
@@ -39,7 +41,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         List list = generateDataList(20)
 
         when: "bulk insert 20 records"
-        JobImpl job = Project.repo.bulk(list, setupBulkableArgs())
+        Long jobId = projectRepo.bulk(list, setupBulkableArgs())
+        def job = JobImpl.get(jobId)
 
         then: "verify job"
         job != null
@@ -87,7 +90,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         List list = generateDataList(10)
 
         when: "insert records"
-        JobImpl job = Project.repo.bulk(list, setupBulkableArgs())
+        Long jobId = projectRepo.bulk(list, setupBulkableArgs())
+        def job = JobImpl.get(jobId)
 
         then:
         job.state == JobState.Finished
@@ -101,7 +105,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
             it.id = idx + 1
         }
 
-        job = Project.repo.bulk(list, setupBulkableArgs(DataOp.update))
+        jobId = projectRepo.bulk(list, setupBulkableArgs(DataOp.update))
+        job = JobImpl.get(jobId)
 
         then:
         noExceptionThrown()
@@ -125,7 +130,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         list[19].nested.name = ""
 
         when: "bulk insert"
-        JobImpl job = Project.repo.bulk(list, setupBulkableArgs())
+        Long jobId = projectRepo.bulk(list, setupBulkableArgs())
+        def job = JobImpl.get(jobId)
 
         then: "verify job"
         job.ok == false
@@ -167,8 +173,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         List<Map> list = generateDataList(60) //this should trigger 6 batches of 10
 
         when: "bulk insert in multi batches"
-        JobImpl job = Project.repo.bulk(list, setupBulkableArgs())
-        job = JobImpl.findById(job.id)
+        Long jobId = projectRepo.bulk(list, setupBulkableArgs())
+        def job = JobImpl.findById(jobId)
 
         def results = parseJsonBytes(job.data)
 

@@ -7,6 +7,6 @@ import groovy.transform.CompileStatic
 
 @GormRepository
 @CompileStatic
-class ProjectRepo implements GormRepo<Project>, BulkableRepo<Project, JobImpl> {
+class ProjectRepo implements GormRepo<Project>, BulkableRepo<Project> {
 
 }

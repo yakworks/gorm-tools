@@ -243,7 +243,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @throws EntityNotFoundException if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
-        gormStaticApi().withTransaction {
+        withTrx {
             D entity = get(id, null)
             doRemove(entity)
         }
@@ -256,7 +256,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
-        gormStaticApi().withTransaction {
+        withTrx {
             doRemove(entity, args)
         }
     }

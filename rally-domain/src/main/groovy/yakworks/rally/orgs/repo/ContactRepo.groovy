@@ -32,7 +32,7 @@ import yakworks.rally.tag.model.TagLink
 
 @GormRepository
 @CompileStatic
-class ContactRepo implements GormRepo<Contact>, BulkableRepo<Contact, Job> {
+class ContactRepo implements GormRepo<Contact>, BulkableRepo<Contact> {
 
     @RepoListener
     void beforeValidate(Contact contact) {

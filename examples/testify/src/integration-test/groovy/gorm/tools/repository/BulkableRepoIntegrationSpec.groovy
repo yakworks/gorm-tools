@@ -14,12 +14,15 @@ import spock.lang.Specification
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.testing.DomainIntTest
 
 @Integration
 @Rollback
 class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest, JsonParserTrait {
+
     JdbcTemplate jdbcTemplate
+    OrgRepo orgRepo
 
     def cleanup() {
         //cleanup all orgs which would have been committed during tests because of parallel/async
@@ -34,7 +37,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()
@@ -53,7 +57,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()
@@ -66,7 +71,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             it["comments"] = "flubber${it.id}"
         }
 
-        job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
+        jobId = orgRepo.bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
+        job = Job.get(jobId)
         flushAndClear()
 
         then:
@@ -88,7 +94,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
         flush()
 
         then:
@@ -113,8 +120,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         OrgSource os1, os2, os3
 
         setup:
-        int sliceSize = ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize
-        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = 10 //trigger batching
+        int sliceSize = orgRepo.parallelTools.asyncService.sliceSize
+        orgRepo.parallelTools.asyncService.sliceSize = 10 //trigger batching
 
         and: "data bad contact records which would fail"
         List<Map> jsonList = generateOrgData(20)
@@ -122,7 +129,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[15].contact = [name:"xxxx"]
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()
@@ -156,7 +164,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         os3 != null
 
         cleanup: "Cleanup orgs as they would have been committed during bulk"
-        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = sliceSize //set original back
+        orgRepo.parallelTools.asyncService.sliceSize = sliceSize //set original back
     }
 
     @Ignore("Fix XXX in BulkableRepo")
@@ -170,7 +178,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[2].num = "testorg-2"
 
         when:
-        Job job = ((BulkableRepo)Org.repo).bulk(jsonList, BulkableArgs.create())
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create())
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()

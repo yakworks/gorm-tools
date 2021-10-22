@@ -12,7 +12,7 @@ import yakworks.rally.job.Job
 
 @GormRepository
 @CompileStatic
-class AddressRepo implements GormRepo<Address>, BulkableRepo<Address, Job> {
+class AddressRepo implements GormRepo<Address>, BulkableRepo<Address> {
 
     @RepoListener
     void beforeValidate(Address loc, Errors errors) {

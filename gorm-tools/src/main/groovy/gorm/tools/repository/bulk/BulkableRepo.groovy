@@ -35,7 +35,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
  */
 @CompileStatic
-trait BulkableRepo<D> extends GormRepo<D> {
+trait BulkableRepo<D> {
 
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
 

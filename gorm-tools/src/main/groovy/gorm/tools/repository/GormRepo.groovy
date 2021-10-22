@@ -443,6 +443,11 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
         gormStaticApi().withTransaction(trxAttr, callable)
     }
 
+    public <T> T withTrx(Closure<T> callable) {
+        def trxAttr = new CustomizableRollbackTransactionAttribute()
+        gormStaticApi().withTransaction(trxAttr, callable)
+    }
+
     /**
      * Read-only specifically for wrapping something that will return the domain entity for this (such as a get or read)
      * like withTransaction this creates one if none is present or joins an existing transaction if one is already present.

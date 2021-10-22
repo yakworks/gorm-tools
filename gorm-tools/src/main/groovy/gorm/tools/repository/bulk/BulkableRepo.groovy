@@ -101,7 +101,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
         def results = new BulkableResults()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
-        def pconfig = new AsyncConfig(transactional:true, datastore: getDatastore())
+        def pconfig = new AsyncConfig(transactional: true, datastore: getDatastore())
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {

@@ -24,6 +24,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
+import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
@@ -40,7 +41,7 @@ import yakworks.commons.lang.ClassUtils
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
+trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
     @Autowired EntityMapBinder entityMapBinder
 

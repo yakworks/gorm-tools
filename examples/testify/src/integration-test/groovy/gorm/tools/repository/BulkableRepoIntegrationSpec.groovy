@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
-import gorm.tools.repository.bulk.BulkableRepo
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore

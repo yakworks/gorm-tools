@@ -31,7 +31,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
             params:[source: "test", sourceId: "test"], includes: ["id", "name", "nested.name"])
     }
 
-    void "test bulkable repo"() {
+    void "sanity check bulkable repo"() {
         expect:
         Project.repo instanceof BulkableRepo
     }

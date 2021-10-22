@@ -6,19 +6,24 @@ import groovy.json.JsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormStaticApi
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.transaction.TransactionStatus
 import org.springframework.util.StopWatch
 
 import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
+import gorm.tools.transaction.TrxService
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import grails.core.GrailsApplication
+import grails.gorm.transactions.GrailsTransactionTemplate
 
 @CompileStatic
 trait BenchConfig {
@@ -35,6 +40,9 @@ trait BenchConfig {
     ParallelTools parallelTools
     @Autowired
     CsvReader csvReader
+
+    @Autowired
+    TrxService trxService
 
     @Value('${gorm.tools.async.poolSize}')
     int poolSize
@@ -244,4 +252,20 @@ trait BenchConfig {
         muteConsole = false
         println ""
     }
+
+    //just keep here as helpers instead of GormRepo
+    void batchTrx(List list, Closure closure) {
+        trxService.withTrx { TransactionStatus status ->
+            for (Object item : list) {
+                closure(item)
+            }
+        }
+    }
+
+    void batchCreate(GormRepo repo, Map args = [:], List<Map> list) {
+        batchTrx(list) { Map item ->
+            repo.doCreate(item, args)
+        }
+    }
+
 }

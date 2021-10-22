@@ -1,5 +1,6 @@
 package yakworks.rally.org
 
+import gorm.tools.testing.TestDataJson
 import org.springframework.dao.DataRetrievalFailureException
 
 import spock.lang.Ignore
@@ -359,6 +360,33 @@ class OrgTests extends Specification implements DomainIntTest {
 
         then: "not found because not unique"
         thrown DataRetrievalFailureException
+    }
+
+    def "update org lookup by sourceid"() {
+        setup:
+        Long orgId = 1111
+
+        Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer']
+
+        when: "create"
+        def org = Org.create(params, bindId: true)
+        orgRepo.flush()
+
+        then: "make sure source is assigned properly"
+        org.id == orgId
+        org.source.sourceId == 'foo'
+        org.source.orgType == OrgType.Customer
+        // use the same query orgSource.repo is using
+        List res = OrgSource.executeQuery('select orgId from OrgSource where sourceId = :sourceId and orgType = :orgType',
+            [sourceId: 'foo', orgType: OrgType.Customer] )
+        res.size() == 1
+
+        when: "update"
+        org = Org.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
+
+        then:
+        org.name == 'new name'
+        org.source.sourceId == 'foo'
     }
 
 }

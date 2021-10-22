@@ -40,7 +40,7 @@ class DataSetup implements gpbench.services.traits.BenchConfig {
 
     void insert(List<List<Map>> batchList, GormRepo repo) {
         parallelTools.each(batchList) { List<Map> list ->
-            repo.batchCreate(list)
+            batchCreate(repo, list)
         }
     }
 

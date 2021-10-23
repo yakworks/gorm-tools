@@ -1,10 +1,10 @@
 package gorm.tools.repository
 
+import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
-import gorm.tools.repository.bulk.BulkableRepo
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
@@ -13,12 +13,15 @@ import spock.lang.Specification
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.testing.DomainIntTest
 
 @Integration
 @Rollback
 class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest, JsonParserTrait {
+
     JdbcTemplate jdbcTemplate
+    OrgRepo orgRepo
 
     def cleanup() {
         //cleanup all orgs which would have been committed during tests because of parallel/async
@@ -33,7 +36,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()
@@ -52,7 +56,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()
@@ -65,7 +70,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             it["comments"] = "flubber${it.id}"
         }
 
-        job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
+        jobId = orgRepo.bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
+        job = Job.get(jobId)
         flushAndClear()
 
         then:
@@ -82,13 +88,39 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         count == 5
     }
 
+    void "test failures should rollback"() {
+        List<Map> jsonList = generateOrgData(1)
+        jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
+
+        when:
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
+        flush()
+
+        then:
+        noExceptionThrown()
+        job.data != null
+
+        when:
+        List json = parseJsonBytes(job.data)
+        List requestData = parseJsonBytes(job.requestData)
+
+        then:
+        json != null
+        requestData != null
+
+        and: "no dangling records committed"
+        OrgSource.findBySourceIdLike("ORG-1%") == null
+    }
+
+
     @Issue("#357")
     void "test spin back through failures and run them one by one"() {
         OrgSource os1, os2, os3
 
         setup:
-        int sliceSize = ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize
-        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = 10 //trigger batching
+        int sliceSize = orgRepo.parallelTools.asyncService.sliceSize
+        orgRepo.parallelTools.asyncService.sliceSize = 10 //trigger batching
 
         and: "data bad contact records which would fail"
         List<Map> jsonList = generateOrgData(20)
@@ -96,7 +128,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[15].contact = [name:"xxxx"]
 
         when:
-        Job job = ((BulkableRepo) Org.repo).bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()
@@ -130,7 +163,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         os3 != null
 
         cleanup: "Cleanup orgs as they would have been committed during bulk"
-        ((BulkableRepo) Org.repo).parallelTools.asyncService.sliceSize = sliceSize //set original back
+        orgRepo.parallelTools.asyncService.sliceSize = sliceSize //set original back
     }
 
     @Ignore("Fix XXX in BulkableRepo")
@@ -144,7 +177,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[2].num = "testorg-2"
 
         when:
-        Job job = ((BulkableRepo)Org.repo).bulk(jsonList, BulkableArgs.create())
+        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create())
+        Job job = Job.get(jobId)
 
         then:
         noExceptionThrown()

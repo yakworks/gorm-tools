@@ -18,13 +18,11 @@ import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
-import gorm.tools.job.JobRepoTrait
 import gorm.tools.job.JobState
-import gorm.tools.job.JobTrait
+import gorm.tools.job.RepoJobService
 import gorm.tools.repository.errors.api.ApiError
 import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.repository.model.DataOp
-import gorm.tools.transaction.TrxService
 import yakworks.commons.map.Maps
 
 import static gorm.tools.repository.bulk.BulkableResults.Result
@@ -34,12 +32,12 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
  */
 @CompileStatic
-trait BulkableRepo<D, J extends JobTrait>  {
+trait BulkableRepo<D> {
 
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
 
     @Autowired(required = false)
-    JobRepoTrait jobRepo
+    RepoJobService repoJobService
 
     @Autowired
     @Qualifier("parallelTools")
@@ -50,9 +48,6 @@ trait BulkableRepo<D, J extends JobTrait>  {
 
     @Autowired
     EntityMapService entityMapService
-
-    @Autowired
-    TrxService trxService
 
     @Autowired
     ApiErrorHandler apiErrorHandler
@@ -66,6 +61,7 @@ trait BulkableRepo<D, J extends JobTrait>  {
     abstract void flushAndClear()
     abstract void clear()
     abstract Datastore getDatastore()
+    abstract <T> T withTrx(Closure<T> callable)
 
     /**
      * Allows to pass in bulk of records at once, for example /api/book/bulk
@@ -74,11 +70,9 @@ trait BulkableRepo<D, J extends JobTrait>  {
      * @param bulkablArgs the args object to pass on to doBulk
      * @return Job
      */
-    J bulk(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
+    Long bulk(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
         Map params = bulkablArgs.params
-        J job = (J) jobRepo.create((String)params.source, (String)params.sourceId, dataList)
-        //keep the jobId around
-        Long jobId = job.id
+        Long jobId = repoJobService.createJob((String)params.source, (String)params.sourceId, dataList)
 
         def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<BulkableResults>
         def asyncArgs = new AsyncConfig(enabled: bulkablArgs.asyncEnabled)
@@ -92,21 +86,21 @@ trait BulkableRepo<D, J extends JobTrait>  {
                 finishJob(jobId, results, bulkablArgs.includes)
             }
 
-        // return job
-        return (J) jobRepo.get(jobId)
-
+        return jobId
     }
 
     BulkableResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
         def results = new BulkableResults()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
-        def pconfig = new AsyncConfig(transactional:true, datastore: getDatastore())
+        def pconfig = new AsyncConfig(transactional: true, datastore: getDatastore())
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
-                def res = doBulk((List<Map>) dataSlice, bulkablArgs)
-                results.merge(res)
+                withTrx {
+                    BulkableResults res = doBulk((List<Map>) dataSlice, bulkablArgs)
+                    results.merge(res)
+                }
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
@@ -188,9 +182,9 @@ trait BulkableRepo<D, J extends JobTrait>  {
         return entityInstance
     }
 
-    J finishJob(Long jobId, BulkableResults results, List includes){
+    void finishJob(Long jobId, BulkableResults results, List includes){
         List<Map> jsonResults = transformResults(results, includes?:['id'])
-        jobRepo.update(jobId, JobState.Finished, results, jsonResults)
+        repoJobService.updateJob(jobId, JobState.Finished, results, jsonResults)
     }
 
     /**

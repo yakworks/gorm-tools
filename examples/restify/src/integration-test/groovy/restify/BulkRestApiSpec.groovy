@@ -1,5 +1,6 @@
 package restify
 
+import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 
 import gorm.tools.job.JobState
@@ -10,6 +11,7 @@ import okhttp3.Response
 import spock.lang.Specification
 import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgSource
 
 @Rollback
 @Integration
@@ -75,4 +77,35 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         delete("/api/rally/org", body.data[1].id)
         delete("/api/rally/org", body.data[2].id)
     }
+
+    void "test failures should rollback"() {
+        List<Map> jsonList =  [[num: "foox2", name: "Foox2", type: "Customer"]]
+        jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
+
+        when:
+        Response resp = post(path, jsonList)
+        Map body = bodyToMap(resp)
+
+        then:
+        noExceptionThrown()
+
+        when:
+        Job job = Job.get(body.id as Long)
+
+        then:
+        job.data != null
+
+        when:
+        List json = parseJsonBytes(job.data)
+        List requestData = parseJsonBytes(job.requestData)
+
+        then:
+        json != null
+        requestData != null
+
+        and: "no dangling records committed"
+        OrgSource.findBySourceIdLike("ORG-1%") == null
+    }
+
+
 }

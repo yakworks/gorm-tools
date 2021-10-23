@@ -9,6 +9,7 @@ import grails.plugins.metadata.PluginSource
 @ComponentScan(['yakworks.testify', 'gorm.tools.audit', 'yakworks.rally'])
 @PluginSource
 class Application extends GrailsAutoConfiguration {
+
     static void main(String[] args) {
         GrailsApp.run(Application, args)
     }

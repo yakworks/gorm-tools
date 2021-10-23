@@ -5,7 +5,6 @@
 package gorm.tools.rest.controller
 
 import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletRequestWrapper
 
 import groovy.transform.CompileStatic
 
@@ -14,18 +13,17 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
-import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
-import gorm.tools.job.JobTrait
+import gorm.tools.job.RepoJobEntity
+import gorm.tools.job.RepoJobService
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.bulk.BulkableArgs
-import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.api.ApiError
 import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.repository.model.DataOp
@@ -58,6 +56,9 @@ trait RestRepositoryApi<D> extends RestApiController {
 
     @Autowired
     ApiErrorHandler apiErrorHandler
+
+    @Autowired(required = false)
+    RepoJobService repoJobService
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -216,7 +217,9 @@ trait RestRepositoryApi<D> extends RestApiController {
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
         BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: getIncludes("bulk"), params: bulkParams, asyncEnabled: asyncEnabled)
 
-        JobTrait job = ((BulkableRepo)getRepo()).bulk(dataList, bulkableArgs)
+        Long jobId = getRepo().bulk(dataList, bulkableArgs)
+        RepoJobEntity job = repoJobService.getJob(jobId)
+
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
         Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: (job.data ? parseJsonBytes(job.data) : []), source:job.source, sourceId:job.sourceId]
         respond resp, status: MULTI_STATUS.value()

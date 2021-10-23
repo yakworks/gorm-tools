@@ -6,8 +6,8 @@ package yakworks.rally.job
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.job.JobRepoTrait
 import gorm.tools.json.Jsonify
+import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
@@ -15,7 +15,7 @@ import gorm.tools.source.SourceType
 
 @GormRepository
 @CompileStatic
-class JobRepo implements  JobRepoTrait<Job> {
+class JobRepo implements GormRepo<Job> {
 
     @RepoListener
     void beforeBind(Job job, Map data, BeforeBindEvent be) {

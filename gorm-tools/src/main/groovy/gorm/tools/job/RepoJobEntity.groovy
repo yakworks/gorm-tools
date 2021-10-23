@@ -11,7 +11,7 @@ import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.source.SourceTrait
 
 @CompileStatic
-trait JobTrait<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
+trait RepoJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
 
     Boolean ok = false // change to TRUE if State.Finished without any issues
     JobState state = JobState.Running

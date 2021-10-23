@@ -24,6 +24,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
+import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
@@ -40,7 +41,7 @@ import yakworks.commons.lang.ClassUtils
  * @since 6.x
  */
 @CompileStatic
-trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
+trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
     @Autowired EntityMapBinder entityMapBinder
 
@@ -243,7 +244,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @throws EntityNotFoundException if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
-        gormStaticApi().withTransaction {
+        withTrx {
             D entity = get(id, null)
             doRemove(entity)
         }
@@ -256,7 +257,7 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
-        gormStaticApi().withTransaction {
+        withTrx {
             doRemove(entity, args)
         }
     }
@@ -415,6 +416,11 @@ trait GormRepo<D> implements RepoEntityErrors<D>, QueryMangoEntityApi<D> {
      * @return The entity that was run in the closure
      */
     D entityTrx(Closure<D> callable) {
+        def trxAttr = new CustomizableRollbackTransactionAttribute()
+        gormStaticApi().withTransaction(trxAttr, callable)
+    }
+
+    public <T> T withTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
         gormStaticApi().withTransaction(trxAttr, callable)
     }

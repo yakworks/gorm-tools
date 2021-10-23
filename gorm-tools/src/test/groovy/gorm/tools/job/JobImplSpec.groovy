@@ -10,19 +10,19 @@ import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import testing.*
 
-class JobImplSpec extends Specification  implements DomainRepoTest<JobImpl> {
+class JobImplSpec extends Specification  implements DomainRepoTest<TestRepoJob> {
 
     void "sanity check validation with String as data"() {
         expect:
-        JobImpl job = new JobImpl([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        TestRepoJob job = new TestRepoJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         job.validate()
         job.persist()
-        //job.source == "foo"  //XXX It should pick up JobImplRepo
+        //job.source == "foo"  //XXX It should pick up TestRepoJobService
     }
 
     void "sanity check validation no sourceId"() {
         when:
-        JobImpl job = new JobImpl()
+        TestRepoJob job = new TestRepoJob()
         // job.persist()
         then:
         job
@@ -34,14 +34,14 @@ class JobImplSpec extends Specification  implements DomainRepoTest<JobImpl> {
         def res = Jsonify.render(["One", "Two", "Three"])
 
         when:
-        JobImpl job = new JobImpl(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.jsonText.bytes)
+        TestRepoJob job = new TestRepoJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.jsonText.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
         jobId
 
         when: "query the db for job we can read the data"
-        JobImpl j = JobImpl.get(jobId)
+        TestRepoJob j = TestRepoJob.get(jobId)
 
         then:
         j

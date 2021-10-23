@@ -12,7 +12,7 @@ import grails.boot.config.GrailsAutoConfiguration
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
-@ComponentScan("yakworks.taskify")
+@ComponentScan(['yakworks.testify', 'gorm.tools.security', 'yakworks.rally'])
 @RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
@@ -31,7 +31,7 @@ class Application extends GrailsAutoConfiguration {
      */
     @Override
     Collection<String> packageNames() {
-        super.packageNames() + ['yakworks.rally', 'yakworks.testify', 'gorm.tools.security.domain']
+        super.packageNames() + ['yakworks.rally', 'yakworks.testify', 'gorm.tools.security']
     }
 
 }

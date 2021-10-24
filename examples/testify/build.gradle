@@ -7,8 +7,6 @@ dependencies {
 
   implementation "org.grails:grails-plugin-domain-class"
 
-  implementation project(":gorm-tools")
-  implementation project(":gorm-tools-security")
   implementation project(":rally-domain")
 
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"

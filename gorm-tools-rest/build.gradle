@@ -10,6 +10,6 @@ dependencies {
 
   implementation project(":gorm-tools")
 
-  //for rest train
+  // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
 }

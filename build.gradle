@@ -113,20 +113,22 @@ subprojects {
     }
   }
 
-  tasks.withType(GroovyCompile) {
-    configure(groovyOptions) {
+  // FUTURE FOR GRADLE 6+
+  // tasks.withType(GroovyCompile) {
+  //   configure(groovyOptions) {
+  //     groovyOptions.fork = true
+  //     forkOptions.jvmArgs = ['-Xmx1024m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+  //   }
+  // }
+
+  // sets the path to sys properties so we can use it find grails-app/conf during AST
+  plugins.withId('groovy') {
+    compileGroovy {
       groovyOptions.fork = true
-      forkOptions.jvmArgs = ['-Xmx1024m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+      groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
     }
   }
 
-  // sets the path to sys properties so we can use it find grails-app/conf during AST
-  // plugins.withId('groovy') {
-  //   compileGroovy {
-  //     groovyOptions.fork = true
-  //     groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
-  //   }
-  // }
   tasks.withType(Test) {
     //so that we can use in config and share resources/rootlocation across projects for testing
     systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath

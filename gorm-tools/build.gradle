@@ -1,3 +1,4 @@
+apply plugin: 'java-library'
 apply plugin: "yakworks.grails-plugin"
 // apply plugin:"idea"
 // apply plugin: 'groovy'
@@ -8,16 +9,10 @@ group = "org.yakworks"
 dependencies {
   console "org.grails:grails-console"
 
-  compile project(":commons")
+  api project(":commons")
 
-  // compile "org.grails.plugins:cache:$vGrailsCache"
-  compile "org.codehaus.gpars:gpars:$vGpars"
-
-  compile "org.apache.commons:commons-lang3:$vCommonsLang3"
-  // compile "org.grails:grails-datastore-gorm:7.0.8.RELEASE"
-  //used for json parsing but require it to be added to project that uses this
-  compileOnly "org.grails.plugins:views-json:$vViews"
-  compileOnly "org.grails.plugins:views-json-templates:$vViews"
+  compileOnly "org.codehaus.gpars:gpars:$vGpars"
+  implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 
   //used for bundled Test traits
   compileOnly "org.grails:grails-gorm-testing-support"

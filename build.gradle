@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
-    // classpath "org.grails.plugins:views-gradle:2.0.2"
+    classpath "org.grails.plugins:views-gradle:$vViews"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
   }
 }
@@ -24,43 +24,52 @@ subprojects {
 
   ['org.grails.grails-plugin', 'org.grails.grails-web'].each { plugId -> plugins.withId(plugId) {
 
-    // sourceCompatibility = '1.8'
-    // targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
     dependencies {
       developmentOnly("org.springframework.boot:spring-boot-devtools")
-      compile "org.springframework.boot:spring-boot-starter-logging"
-      compile "org.springframework.boot:spring-boot-autoconfigure"
-      compile "org.grails:grails-core"
-      compile "org.springframework.boot:spring-boot-starter-tomcat"
+      compileOnly "io.micronaut:micronaut-inject-groovy"
+      implementation "org.springframework.boot:spring-boot-starter-logging"
+      implementation "org.springframework.boot:spring-boot-autoconfigure"
+      implementation "org.grails:grails-core"
+      implementation "org.springframework.boot:spring-boot-starter-tomcat"
 
-      compile "org.grails:grails-web-boot"
+      implementation "org.grails:grails-web-boot"
 
-      compile "org.grails:grails-logging"
-      compile "org.grails:grails-plugin-databinding"
-      compile "org.grails:grails-plugin-services"
+      implementation "org.grails:grails-logging"
+      implementation "org.grails:grails-plugin-databinding"
+      implementation "org.grails:grails-plugin-services"
 
-      compile "org.grails.plugins:cache"
-      compile "org.grails.plugins:events"
+      implementation "org.grails.plugins:cache"
+      implementation "org.grails.plugins:events"
 
-      compile "org.grails.plugins:hibernate5"
-      compile "org.hibernate:hibernate-core:$vHibernate"
-      compile "org.hibernate:hibernate-ehcache:$vHibernate"
+      implementation "org.grails.plugins:hibernate5"
+      implementation "org.hibernate:hibernate-core:$vHibernate"
+      implementation "org.hibernate:hibernate-ehcache:$vHibernate"
 
-      compile 'org.codehaus.groovy:groovy-dateutil'
+      implementation 'org.codehaus.groovy:groovy-dateutil'
 
-      compile "dk.glasius:external-config:$vExternalConfig"
+      implementation "dk.glasius:external-config:$vExternalConfig"
 
       // compile "io.activej:activej-http:5.0-rc3"
       // compile "io.activej:activej-launchers-common:5.0-rc3"
-      compile "io.activej:activej-launchers-http:5.0-rc3"
-      compile "io.activej:activej-boot:5.0-rc3"
-      compile "io.activej:activej-promise:5.0-rc3"
+      implementation "io.activej:activej-launchers-http:5.0-rc3"
+      implementation "io.activej:activej-boot:5.0-rc3"
+      implementation "io.activej:activej-promise:5.0-rc3"
 
-      runtime "com.h2database:h2"
-      testRuntime "com.zaxxer:HikariCP:$vHikari"
+      // *** compileOnly, dependent projects need to add these in ***
 
-      compileOnly "io.micronaut:micronaut-inject-groovy"
+      //used for json parsing but require it to be added to project that uses this
+      compileOnly("org.grails.plugins:views-json:$vViews") {
+        //exclude controllers since it messes with the domain compile and map constructor
+        exclude group:"org.grails", module: "grails-plugin-controllers"
+      }
+      compileOnly "org.grails.plugins:views-json-templates:$vViews"
+      //*** End Compile Only ****
+
+      runtimeOnly "com.h2database:h2"
+      runtimeOnly "com.zaxxer:HikariCP:$vHikari"
 
       testCompile "org.mockito:mockito-core"
       testCompile "org.grails:grails-gorm-testing-support"
@@ -68,14 +77,6 @@ subprojects {
       testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
       testCompile "org.grails:views-json-testing-support:$vViews"
 
-      //html unit for geb rest testing
-      // testCompile "org.grails:grails-datastore-rest-client"
-      // testCompile "org.grails.plugins:geb"
-      // testCompile "org.seleniumhq.selenium:htmlunit-driver:$vHtmlunit"
-      // testCompile "net.sourceforge.htmlunit:htmlunit:$vHtmlunit"
-      // testCompile "org.seleniumhq.selenium:selenium-api:$vSelenium"
-      // testCompile "org.seleniumhq.selenium:selenium-support:$vSelenium"
-      // testCompile "org.seleniumhq.selenium:selenium-remote-driver:$vSelenium"
     }
 
     // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
@@ -100,6 +101,7 @@ subprojects {
 
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
+    testCompile.extendsFrom implementation
     all {
       resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
     }
@@ -109,13 +111,19 @@ subprojects {
     }
   }
 
-  // sets the path to sys properties so we can use it find grails-app/conf during AST
-  plugins.withId('groovy') {
-    compileGroovy {
-      groovyOptions.fork = true
-      groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
+  tasks.withType(GroovyCompile) {
+    configure(groovyOptions) {
+      forkOptions.jvmArgs = ['-Xmx1024m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
     }
   }
+
+  // sets the path to sys properties so we can use it find grails-app/conf during AST
+  // plugins.withId('groovy') {
+  //   compileGroovy {
+  //     groovyOptions.fork = true
+  //     groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
+  //   }
+  // }
   tasks.withType(Test) {
     //so that we can use in config and share resources/rootlocation across projects for testing
     systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath

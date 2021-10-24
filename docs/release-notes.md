@@ -1,3 +1,14 @@
+### v7.0.8-v.33
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.32...v7.0.8-v.33)
+- fix mem to old gradle way so we dont get gradle exit value 137 [link](https://github.com/yakworks/gorm-tools/commit/e094ad1cfb7d19406832118b2cc9b3167d1e9818)
+- fix assemble, move more compile to implementation config [link](https://github.com/yakworks/gorm-tools/commit/7e916ccd654c48f75515abc2dbc8fa51b578e522)
+- Gradle cleanup compile to implementation (#381) [link](https://github.com/yakworks/gorm-tools/commit/fb7c1a0cab62676f3348db5cc3a55499b05ace55)
+- 9ci/domain9#464 Add test to reveal transaction issue (#380) [link](https://github.com/yakworks/gorm-tools/commit/2416098b2503538f19a869eb151a39596576df89)
+- add test to update by sourceId (#376) [link](https://github.com/yakworks/gorm-tools/commit/a77d1c5bf3ba5cc1fc63c23c0796c5f9e9c5c4f5)
+- 9ci/domain9#464 Cleanup FIXMEs, remove batchTrx which commited trx during bulk operation (#379) [link](https://github.com/yakworks/gorm-tools/commit/ca74892afce625973388e3d66729984b7184a312)
+- bump to grails 4.0.12 latests and java11 prep (#378) [link](https://github.com/yakworks/gorm-tools/commit/45c2ade30d4be6c95936defdb3ccbd02074a98e3)
+
 ### v7.0.8-v.32
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.31...v7.0.8-v.32)

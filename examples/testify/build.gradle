@@ -4,35 +4,17 @@ apply plugin:"org.grails.grails-plugin"
 dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
-  //
-  // compile "org.grails:grails-web-boot"
-  //
-  // compile "org.grails:grails-logging"
-  // compile "org.grails:grails-plugin-databinding"
-  // compile "org.grails:grails-plugin-i18n"
-  // compile "org.grails:grails-plugin-services"
-  // compile "org.grails:grails-plugin-rest"
 
-  // compile "org.grails.plugins:cache"
-  compile "org.grails:grails-plugin-domain-class"
+  implementation "org.grails:grails-plugin-domain-class"
 
-  compile "org.grails.plugins:view-tools:$vViewTools"
-
-  compile project(":gorm-tools")
-  compile project(":gorm-tools-security")
-  compile project(":rally-domain")
-  // testCompile project(":rally-domain")
-
-  //FIXME this is needed for AST somewhere in rally-domain, figure out where
-  // compile "org.grails.plugins:converters:$vConverters"
+  implementation project(":gorm-tools")
+  implementation project(":gorm-tools-security")
+  implementation project(":rally-domain")
 
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
-  runtime "javax.xml.bind:jaxb-api:2.3.1"
-  runtime "com.zaxxer:HikariCP:$vHikari"
-  // testCompile "io.micronaut:micronaut-inject-groovy"
-  // testCompile "org.grails:grails-gorm-testing-support"
-  // testCompile "org.mockito:mockito-core"
-  // testCompile "io.micronaut:micronaut-http-client"
+  runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+  runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+
   testCompile "io.micronaut:micronaut-inject-groovy"
   testCompile "org.grails:grails-gorm-testing-support"
   testCompile "org.mockito:mockito-core"

@@ -102,6 +102,8 @@ subprojects {
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
     testCompile.extendsFrom implementation
+    testImplementation.extendsFrom compileOnly
+    // compile.extendsFrom implementation
     all {
       resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
     }

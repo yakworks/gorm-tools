@@ -5,8 +5,8 @@ group = "org.yakworks"
 
 dependencies {
 
-  implementation project(":gorm-tools")
-  implementation project(":gorm-tools-security")
+  api project(":gorm-tools")
+  api project(":gorm-tools-security")
 
   //for AppResourceLoader in AttachmentSupport
   api "org.grails.plugins:view-tools:$vViewTools"

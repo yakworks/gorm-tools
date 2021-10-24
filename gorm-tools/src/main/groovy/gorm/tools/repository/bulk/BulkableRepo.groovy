@@ -93,7 +93,7 @@ trait BulkableRepo<D> {
         def results = new BulkableResults()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
-        def pconfig = new AsyncConfig(transactional: true, datastore: getDatastore())
+        AsyncConfig pconfig = AsyncConfig.of(getDatastore())
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
@@ -108,7 +108,7 @@ trait BulkableRepo<D> {
         }
         // if it has slice errors try again but this time run each item in its own transaction
         if(sliceErrors.size()) {
-            def asynArgsNoTrx = AsyncConfig.of(getDatastore())
+            AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
                     results.merge doBulk((List<Map>) dataSlice, bulkablArgs, true)

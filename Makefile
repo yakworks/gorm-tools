@@ -20,7 +20,7 @@ publish:
 	else
 		if [ "$(IS_SNAPSHOT)" ]; then
 			$(logr) "publishing SNAPSHOT"
-			$(gradlew) publish
+			$(gradlew) publishJavaLibraryPublicationToMavenRepository
 		else
 			$(logr) "publishing to Sonatype Maven Central"
 			$(gradlew) publishToSonatype closeAndReleaseSonatypeStagingRepository

@@ -1,3 +1,12 @@
+### v7.0.8-v.35
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.33...v7.0.8-v.35)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3804ab66a1303f48088a9788f0cab13fdcf0c8ab)
+- dont use generic publish for snapshots, use publishJavaLibraryPublicationToMavenRepository [link](https://github.com/yakworks/gorm-tools/commit/90a38c44989c713f016aa004f454798f8d17ba03)
+- snapshot to true [link](https://github.com/yakworks/gorm-tools/commit/de38bbce1dd14a74b454c90fff3d9bdeaa0932a5)
+- Shipyak266 sonatype publish (#384) [link](https://github.com/yakworks/gorm-tools/commit/cb2f732a98c058babcba4a0685f11353bfec6842)
+- Shipyak gradle upgrade (#382) [link](https://github.com/yakworks/gorm-tools/commit/6eee9ddd4a1daf58996ec6b0f20a261a86932e2b)
+
 ### v7.0.8-v.33
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.32...v7.0.8-v.33)

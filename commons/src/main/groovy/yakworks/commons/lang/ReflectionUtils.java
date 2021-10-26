@@ -14,7 +14,7 @@
  */
 package yakworks.commons.lang;
 
-import org.springframework.util.StringUtils;
+import yakworks.commons.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

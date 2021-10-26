@@ -1,7 +1,5 @@
 apply plugin: "yakworks.grails-plugin"
 
-group = "org.yakworks"
-
 dependencies {
 
   implementation "org.grails:grails-plugin-rest"

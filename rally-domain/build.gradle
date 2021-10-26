@@ -1,7 +1,6 @@
-apply plugin: 'java-library'
-apply plugin: "yakworks.grails-plugin"
+description "gorm rally domain entities"
 
-group = "org.yakworks"
+apply plugin: "yakworks.grails-plugin"
 
 dependencies {
 
@@ -16,7 +15,7 @@ dependencies {
   compileOnly "org.grails.plugins:build-test-data:$vBuildTestData"
 }
 
-//XXX for now we exlude the Orgs and force and implementation of them in app until we figure out how to use shadowJar
+// XXX for now we exlude the Orgs and force and implementation of them in app until we figure out how to use shadowJar
 // and not have it mess with intellij
 
 // jar {

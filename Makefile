@@ -13,9 +13,23 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 ship.authorize: git.config-bot-user kubectl.config dockerhub.login
 	$(logr.done)
 
+## publish the java jar lib to either repo.9ci for snapshot to Sonatype Maven Central
+publish:
+	if [ "$(dry_run)" ]; then
+		echo "🌮 dry_run ->  $(gradlew) publish"
+	else
+		if [ "$(IS_SNAPSHOT)" ]; then
+			$(logr) "publishing SNAPSHOT"
+			$(gradlew) publish
+		else
+			$(logr) "publishing to Sonatype Maven Central"
+			$(gradlew) publishToSonatype closeAndReleaseSonatypeStagingRepository
+		fi
+	fi
+
 ifdef RELEASABLE_BRANCH_OR_DRY_RUN
 
- ship.release: build ship.libs ship.docker kube.deploy
+ ship.release: build publish ship.docker kube.deploy
 	$(logr.done)
 
  ship.docker: docker.app-build docker.app-push

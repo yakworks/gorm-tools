@@ -1,7 +1,4 @@
-apply plugin: 'java-library'
 apply plugin: "yakworks.grails-plugin"
-
-group = "org.yakworks"
 
 dependencies {
   console "org.grails:grails-console"

@@ -41,11 +41,11 @@
 
 ```
 repositories {
-  //jcenter shutdown, until move to mavenCentral use the following
-  maven { url "http://repo.9ci.com/public-libs" }
+  //jcenter shutdown, use mavenCentral
+  mavenCentral()
 }
 ...
-compile "org.yakworks:gorm-tools:7.0.8-v.12"
+compile "org.yakworks:gorm-tools:7.0.8-v.33"
 ``` 
 
 ## Sub Projects

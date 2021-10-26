@@ -10,14 +10,30 @@ buildscript {
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
     classpath "org.grails.plugins:views-gradle:$vViews"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
+    classpath "io.github.gradle-nexus:publish-plugin:1.1.0"
   }
 }
 
 group = "org.yakworks"
 
-apply plugin: 'yakworks.shipyak' //our opinionated defaults for gradle groovy & grails projects
+//our opinionated defaults for gradle groovy & grails projects
+apply plugin: 'yakworks.shipyak'
+apply plugin: "io.github.gradle-nexus.publish-plugin"
 
-subprojects {
+nexusPublishing {
+  repositories {
+    sonatype()
+  }
+}
+
+subprojects { subprj ->
+
+  group = "org.yakworks"
+
+  if (subprj.name in ['gorm-tools', 'commons', 'gorm-tools-security', 'gorm-tools-rest', 'rally-domain']){
+    subprj.ext.isLib = true
+  }
+
   repositories {
     maven { url "https://repo.grails.org/grails/core" }
   }
@@ -133,6 +149,21 @@ subprojects {
     //so that we can use in config and share resources/rootlocation across projects for testing
     systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
     systemProperty "gradle.projectDir", project.projectDir.absolutePath
+  }
+
+  // if its a lib then setup gpg signing, see signing.gnupg.keyName
+  if (subprj.findProperty('isLib')){
+    apply plugin: 'java-library'
+    apply plugin: 'signing'
+    afterEvaluate {
+      if(!isSnapshot) {
+        signing {
+          required { gradle.taskGraph.hasTask("publish") }
+          useGpgCmd()
+          sign publishing.publications.javaLibrary
+        }
+      }
+    }
   }
 }
 

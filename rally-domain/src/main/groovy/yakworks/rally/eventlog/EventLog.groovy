@@ -4,6 +4,8 @@
 */
 package yakworks.rally.eventlog
 
+import java.time.LocalDateTime
+
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
@@ -20,7 +22,7 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
     String action      // Status of the job at the time of the log event
     String appName     // rcm, arApi, gbApi, ...
     String component   // The process the app was called from
-    Date createdDate  // the date row was created
+    LocalDateTime createdDate  // the date row was created
     BigDecimal controlAmount
     Long controlCount
     Boolean isPrimaryJob = false
@@ -45,11 +47,11 @@ class EventLog implements RepoEntity<EventLog>, Serializable {
 
     //update the summary on save
     def beforeInsert() {
-        if(!createdDate) createdDate = new Date()
+        if(!createdDate) createdDate = LocalDateTime.now()
     }
 
     void beforeValidate() {
-        if(!createdDate) createdDate = new Date()
+        if(!createdDate) createdDate = LocalDateTime.now()
     }
 
     static transients = ['priorityName']

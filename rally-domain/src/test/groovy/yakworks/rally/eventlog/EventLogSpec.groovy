@@ -1,5 +1,8 @@
 package yakworks.rally.eventlog
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
@@ -162,14 +165,14 @@ class EventLogSpec extends Specification implements DomainRepoTest<EventLog>{
              priority:'3',source:'test',userId:9
         ])
         eventLog.save(flush:true)
-        eventLog.createdDate= new Date()-100
+        eventLog.createdDate = LocalDateTime.now().minusDays(100)
         eventLog.save(flush:true)
 
         eventLog = new EventLog([
             action:'testAct2',component:'testComp2', jobName:'testName2',message:'testMsg2',
             priority:'3',source:'test', userId:9
         ])
-        eventLog.createdDate= new Date()
+        eventLog.createdDate= LocalDateTime.now()
         eventLog.save(flush:true)
 
         then:

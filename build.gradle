@@ -54,22 +54,16 @@ subprojects { subprj ->
       implementation "org.springframework.boot:spring-boot-starter-tomcat"
 
       implementation "org.grails:grails-web-boot"
-
       implementation "org.grails:grails-logging"
-      // implementation "org.grails:grails-plugin-databinding"
       implementation "org.grails:grails-plugin-services"
-
       implementation "org.grails.plugins:cache"
       implementation "org.grails.plugins:events"
 
-      implementation 'org.codehaus.groovy:groovy-dateutil'
+      // implementation 'org.codehaus.groovy:groovy-dateutil'
 
       compileOnly "org.grails.plugins:hibernate5:$vGormHibernate"
       compileOnly "org.hibernate:hibernate-core:$vHibernate"
       compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
-
-      // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
-      // implementation "dk.glasius:external-config:$vExternalConfig"
 
       // compile "io.activej:activej-http:5.0-rc3"
       // compile "io.activej:activej-launchers-common:5.0-rc3"
@@ -81,9 +75,8 @@ subprojects { subprj ->
 
       //*** End Compile Only ****
 
-      runtimeOnly "com.h2database:h2"
-      runtimeOnly "com.zaxxer:HikariCP:$vHikari"
-
+      testRuntime "com.h2database:h2"
+      testRuntime "com.zaxxer:HikariCP:$vHikari"
       testCompile "org.mockito:mockito-core"
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"

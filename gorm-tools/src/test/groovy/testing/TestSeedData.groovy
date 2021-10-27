@@ -18,7 +18,7 @@ class TestSeedData {
                 inactive: (index % 2 == 0),
                 amount: (index - 1) * 1.34,
                 amount2: (index - 1) * (index - 1) * 0.3,
-                date: new Date().clearTime() + index,
+                date: LocalDate.now().plusDays(index).toDate(),
                 locDate: LocalDate.now().plusDays(index),
                 locDateTime: LocalDate.now().plusDays(index).atStartOfDay(),
                 name2: index % 2 == 0 ? null : "Name2-$index",

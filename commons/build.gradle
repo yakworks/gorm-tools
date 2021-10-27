@@ -4,8 +4,11 @@ sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
 dependencies {
-  compileOnly "org.codehaus.groovy:groovy-all:$groovyVersion"
-  compileOnly "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+  api "org.codehaus.groovy:groovy:$groovyVersion"
+  api "org.codehaus.groovy:groovy-datetime:$groovyVersion"
+  api "org.codehaus.groovy:groovy-templates:$groovyVersion"
+
+  // compileOnly "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
   //libs
   implementation "commons-io:commons-io:$vCommonsIO"
   //jasper uses itext 2.1.7 which uses bouncy 138, so until we sort that out we keep it stuck at this version

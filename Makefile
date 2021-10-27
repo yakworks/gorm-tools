@@ -22,10 +22,14 @@ publish:
 			$(logr) "publishing SNAPSHOT"
 			$(gradlew) publishJavaLibraryPublicationToMavenRepository
 		else
+			$(logr) "publishing to repo.9ci"
+			$(gradlew) publishJavaLibraryPublicationToMavenRepository
 			$(logr) "publishing to Sonatype Maven Central"
 			$(gradlew) publishToSonatype closeAndReleaseSonatypeStagingRepository
 		fi
+		$(logr.done) "published"
 	fi
+
 
 ifdef RELEASABLE_BRANCH_OR_DRY_RUN
 

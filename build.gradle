@@ -32,7 +32,7 @@ subprojects { subprj ->
 
   group = "org.yakworks"
 
-  if (subprj.name in ['gorm-tools', 'commons', 'gorm-tools-security', 'gorm-tools-rest', 'rally-domain']){
+  if (subprj.name in ['gorm-tools', 'commons', 'gorm-tools-security', 'gorm-tools-rest', 'rally-domain', 'gorm-test-support' ]){
     subprj.ext.isLib = true
   }
 

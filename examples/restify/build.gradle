@@ -14,6 +14,8 @@ dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
+  implementation project(":gorm-tools")
+  implementation project(":gorm-tools-security")
   implementation project(":rally-domain")
   implementation project(":testify")
   implementation project(":gorm-tools-rest")
@@ -29,6 +31,8 @@ dependencies {
   implementation "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
 
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
+  // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
+  runtime "org.grails.plugins:external-config:$vExternalConfig"
   runtimeOnly "com.h2database:h2"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"

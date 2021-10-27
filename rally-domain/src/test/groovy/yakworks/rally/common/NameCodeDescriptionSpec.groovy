@@ -1,6 +1,6 @@
 package yakworks.rally.common
 
-import gorm.tools.security.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.tag.model.Tag

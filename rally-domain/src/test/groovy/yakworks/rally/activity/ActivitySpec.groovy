@@ -1,15 +1,11 @@
 package yakworks.rally.domain
 
 import org.apache.commons.lang3.RandomStringUtils
-import org.grails.web.mapping.DefaultLinkGenerator
-import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import gorm.tools.model.Persistable
-import gorm.tools.security.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
@@ -22,10 +18,9 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
-import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
-import yakworks.rally.testing.MockHelper
+import yakworks.rally.testing.MockData
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
@@ -55,15 +50,15 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
     }
 
     List createSomeContacts(){
-        Contact contact1 = MockHelper.contact([firstName: "bill"])
-        Contact contact2 = MockHelper.contact([firstName: "bob"])
+        Contact contact1 = MockData.contact([firstName: "bill"])
+        Contact contact2 = MockData.contact([firstName: "bob"])
         [contact1, contact2]
     }
 
 
     void "creates note if summary is longer than 255"() {
         when:
-        def params = [kind:"Note", org:MockHelper.org()]
+        def params = [kind:"Note", org:MockData.org()]
         String summary = RandomStringUtils.randomAlphabetic(300)
         params.summary = summary
         Activity activity = Activity.create(params)
@@ -111,7 +106,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
     */
     void "save and remove a simple note"(){
         setup:
-        Org org = MockHelper.org()
+        Org org = MockData.org()
 
         expect:
         org.id != null
@@ -155,7 +150,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
     void "test save with associations"() {
         setup:
-        Org org = MockHelper.org()
+        Org org = MockData.org()
         Tag t1 = build(Tag, [name: "T1", entityName: "Activity"])
         Tag t2 = build(Tag, [name: "T2", entityName: "Activity"])
         List contacts = createSomeContacts()

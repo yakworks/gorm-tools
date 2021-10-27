@@ -3,11 +3,11 @@ apply plugin: "yakworks.grails-plugin"
 dependencies {
   console "org.grails:grails-console"
 
-  // compile 'org.grails:grails-plugin-domain-class' // add DomainClass trait with getConstrainedProperties to domains
   api "org.grails.plugins:spring-security-core:$vSpringSecurity"
 
-  implementation project(":gorm-tools")
+  compileOnly project(":gorm-tools")
 
-  // used for bundled Test traits
-  compileOnly "org.grails:grails-testing-support"
+  testCompile project(":gorm-test-support")
+  testCompile "org.grails:grails-gorm-testing-support"
+  testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
 }

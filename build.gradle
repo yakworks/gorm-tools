@@ -20,9 +20,11 @@ group = "org.yakworks"
 apply plugin: 'yakworks.shipyak'
 apply plugin: "io.github.gradle-nexus.publish-plugin"
 
-nexusPublishing {
-  repositories {
-    sonatype()
+if(!isSnapshot) {
+  nexusPublishing {
+    repositories {
+      sonatype()
+    }
   }
 }
 
@@ -54,34 +56,29 @@ subprojects { subprj ->
       implementation "org.grails:grails-web-boot"
 
       implementation "org.grails:grails-logging"
-      implementation "org.grails:grails-plugin-databinding"
+      // implementation "org.grails:grails-plugin-databinding"
       implementation "org.grails:grails-plugin-services"
 
       implementation "org.grails.plugins:cache"
       implementation "org.grails.plugins:events"
 
-      implementation "org.grails.plugins:hibernate5"
-      implementation "org.hibernate:hibernate-core:$vHibernate"
-      implementation "org.hibernate:hibernate-ehcache:$vHibernate"
-
       implementation 'org.codehaus.groovy:groovy-dateutil'
 
-      implementation "dk.glasius:external-config:$vExternalConfig"
+      compileOnly "org.grails.plugins:hibernate5:$vGormHibernate"
+      compileOnly "org.hibernate:hibernate-core:$vHibernate"
+      compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
+
+      // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
+      // implementation "dk.glasius:external-config:$vExternalConfig"
 
       // compile "io.activej:activej-http:5.0-rc3"
       // compile "io.activej:activej-launchers-common:5.0-rc3"
-      implementation "io.activej:activej-launchers-http:5.0-rc3"
-      implementation "io.activej:activej-boot:5.0-rc3"
-      implementation "io.activej:activej-promise:5.0-rc3"
+      // implementation "io.activej:activej-launchers-http:5.0-rc3"
+      // implementation "io.activej:activej-boot:5.0-rc3"
+      // implementation "io.activej:activej-promise:5.0-rc3"
 
       // *** compileOnly, dependent projects need to add these in ***
 
-      //used for json parsing but require it to be added to project that uses this
-      compileOnly("org.grails.plugins:views-json:$vViews") {
-        //exclude controllers since it messes with the domain compile and map constructor
-        exclude group:"org.grails", module: "grails-plugin-controllers"
-      }
-      compileOnly "org.grails.plugins:views-json-templates:$vViews"
       //*** End Compile Only ****
 
       runtimeOnly "com.h2database:h2"

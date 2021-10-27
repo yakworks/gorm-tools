@@ -4,9 +4,10 @@
 */
 package yakworks.rally.job
 
+
 import groovy.transform.CompileStatic
 
-import gorm.tools.json.Jsonify
+import gorm.tools.json.JsonTools
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
@@ -23,8 +24,8 @@ class JobRepo implements GormRepo<Job> {
             // must be Job called from RestApi that is passing in dataPayload
             def payload = data.dataPayload
             if (payload  && (payload instanceof Map || payload instanceof List)) {
-                def res = Jsonify.render(payload)
-                job.requestData = res.jsonText.bytes
+                String res = JsonTools.toJson(payload)
+                job.requestData = res.bytes
                 job.sourceType = SourceType.RestApi  // we should default to RestApi if dataPayload is passed
             }
         }

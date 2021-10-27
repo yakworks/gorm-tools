@@ -2,15 +2,12 @@ package yakworks.rally.domain
 
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.security.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
-import grails.buildtestdata.TestData
 import grails.persistence.Entity
 import grails.plugin.viewtools.AppResourceLoader
 
 import org.apache.commons.io.FileUtils
-import org.grails.web.mapping.DefaultLinkGenerator
-import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
@@ -27,7 +24,6 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.model.OrgTypeSetup
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 

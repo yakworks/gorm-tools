@@ -9,35 +9,41 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.security.domain.AppUser
-import grails.buildtestdata.TestData
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 
 @CompileDynamic //ok for testing
-class MockHelper {
+class MockData {
 
-    static Org org(Map args = [:]) {
-        return TestData.build(Org)
+    static Org org(Map dta = [:]) {
+        Map vals = [num: 'tsla', name: 'Tesla', type: OrgType.Customer]
+        vals.putAll(dta?:[:])
+        def o = new Org(vals).persist()
+        return o
     }
 
     static OrgType orgType(OrgType type = OrgType.Customer) {
-        OrgTypeSetup ots = TestData.build([id: type, name: type.name()], OrgTypeSetup)
+        OrgTypeSetup ots = new OrgTypeSetup(id: type, name: type.name()).persist()
         assert type.typeSetup
         return type
     }
 
-    static Contact contact(Map args = [:]) {
-        args.org = org(args?.remove('org'))
-        return TestData.build(args, Contact)
+    static Contact contact(Map dta = [:]) {
+        def orgDta = dta?.remove('org') ?: [:]
+        dta.org = org(orgDta)
+        Map vals = [firstName: "Ayne"]
+        vals.putAll(dta)
+        def c = Contact.create(vals)
+        return c
     }
 
     static AppUser user(Map args = [:]) {
         Map contactArgs = args?.remove("contact") ?: [:]
         if(!contactArgs.name) contactArgs.name = args.username
         args.contact = contact(contactArgs)
-        AppUser user = TestData.build(args, AppUser)
+        AppUser user = AppUser.create(username:"karen", password:"karen", repassword:"karen", email:"karen@9ci.com")
         user.password = "test"
         user.persist()
         return user

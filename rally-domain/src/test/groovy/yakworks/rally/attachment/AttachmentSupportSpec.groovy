@@ -5,12 +5,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import org.apache.commons.io.FileUtils
-import org.grails.web.mapping.DefaultLinkGenerator
-import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
-import gorm.tools.security.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport

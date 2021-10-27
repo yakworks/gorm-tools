@@ -12,9 +12,11 @@ import org.grails.orm.hibernate.HibernateDatastore
 import org.junit.After
 import org.springframework.jdbc.core.JdbcTemplate
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.jdbc.DbDialectService
 import grails.build.support.MetaClassRegistryCleaner
 import grails.buildtestdata.TestDataBuilder
+import grails.config.Config
 
 /**
  * Contains helpers for integration tests. Can be chained with some custom helper traits with the application-specific
@@ -29,6 +31,10 @@ trait DataIntegrationTest implements TestDataBuilder {
     JdbcTemplate jdbcTemplate
     DbDialectService dbDialectService
     HibernateDatastore hibernateDatastore
+
+    Config getConfig(){
+        AppCtx.config
+    }
 
     /**
      * A metaclass registry cleaner to track and clean all changes, that were made to the metaclass during the test.

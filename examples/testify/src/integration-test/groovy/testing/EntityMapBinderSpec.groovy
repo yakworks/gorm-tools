@@ -2,6 +2,7 @@ package testing
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Location
@@ -13,6 +14,7 @@ import yakworks.testify.model.Address
 class EntityMapBinderSpec extends Specification {
 
     @Issue("https://github.com/yakworks/gorm-tools/issues/181")
+    @Ignore
     void "perform gormtools binding after grails binding"() {
         setup:
         Map params = [num: "123", name:"test-org", type: "Customer", location:[city:"Rajkot"]]

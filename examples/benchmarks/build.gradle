@@ -19,8 +19,10 @@ dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
-  implementation project(":gorm-tools-rest")
+  implementation project(":gorm-tools")
+  implementation project(":gorm-tools-security")
   implementation project(":rally-domain")
+  implementation project(":gorm-tools-rest")
 
   implementation "net.sf.opencsv:opencsv:$vOpenCsv"
 

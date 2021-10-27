@@ -1,7 +1,7 @@
 package yakworks.rally.tag
 
 
-import gorm.tools.security.testing.SecuritySpecHelper
+import yakworks.gorm.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

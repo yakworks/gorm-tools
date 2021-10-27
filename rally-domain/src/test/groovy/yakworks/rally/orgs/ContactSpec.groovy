@@ -1,7 +1,7 @@
 package yakworks.rally.orgs
 
 import gorm.tools.security.domain.AppUser
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
@@ -13,9 +13,8 @@ import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
-import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
-import yakworks.rally.testing.MockHelper
+import yakworks.rally.MockHelper
 
 class ContactSpec extends Specification implements DomainRepoTest<Contact>, SecurityTest {
 

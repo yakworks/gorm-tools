@@ -1,15 +1,11 @@
 package yakworks.rally.domain
 
 import org.apache.commons.lang3.RandomStringUtils
-import org.grails.web.mapping.DefaultLinkGenerator
-import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 
 import gorm.tools.model.Persistable
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
@@ -22,10 +18,9 @@ import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
-import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
-import yakworks.rally.testing.MockHelper
+import yakworks.rally.MockHelper
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 

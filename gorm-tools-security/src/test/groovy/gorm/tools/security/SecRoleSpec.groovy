@@ -6,7 +6,7 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest

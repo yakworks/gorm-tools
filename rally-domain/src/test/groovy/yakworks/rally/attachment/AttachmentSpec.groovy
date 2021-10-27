@@ -10,7 +10,7 @@ import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.mock.web.MockMultipartFile
 
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader

@@ -1,6 +1,6 @@
 package yakworks.rally.orgs
 
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Ignore

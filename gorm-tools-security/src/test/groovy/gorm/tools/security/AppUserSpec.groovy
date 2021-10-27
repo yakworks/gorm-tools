@@ -2,17 +2,13 @@ package gorm.tools.security
 
 import org.apache.commons.lang3.RandomStringUtils
 
-import gorm.tools.audit.AuditStampBeforeValidateListener
-import gorm.tools.audit.AuditStampPersistenceEventListener
-import gorm.tools.audit.AuditStampSupport
 import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import gorm.tools.security.domain.AppUser
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
 class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, SecurityTest {

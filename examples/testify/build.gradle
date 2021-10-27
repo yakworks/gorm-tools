@@ -7,11 +7,18 @@ dependencies {
 
   implementation "org.grails:grails-plugin-domain-class"
 
+  implementation project(":gorm-tools")
+  implementation project(":gorm-tools-security")
   implementation project(":rally-domain")
 
+  implementation "org.grails.plugins:view-tools:$vViewTools"
+
+  runtimeOnly "dk.glasius:external-config:$vExternalConfig"
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+
+  testCompile project(":gorm-tools-test-support")
 
   testCompile "io.micronaut:micronaut-inject-groovy"
   testCompile "org.grails:grails-gorm-testing-support"

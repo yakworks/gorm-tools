@@ -4,7 +4,6 @@ import org.springframework.util.ReflectionUtils
 
 import gorm.tools.audit.StampedEntity
 import gorm.tools.security.domain.AppUser
-import gorm.tools.security.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 
@@ -14,7 +13,7 @@ import spock.lang.Specification
  * we don't want it as it adds a map constructor that uses the slow Grails binder and ties domains to controllers
  * we want the default groovy map constructor or ability to use the Groovy @MapConstrutor AST transformation
  */
-class NoControllersDomainBindingSpec extends Specification implements DomainRepoTest<AppUser>, SecurityTest  {
+class NoControllersDomainBindingSpec extends Specification implements DomainRepoTest<AppUser> {
 
     void "check for instanceControllersDomainBindingApi"() {
         expect:

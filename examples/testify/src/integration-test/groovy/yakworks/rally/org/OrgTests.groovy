@@ -22,7 +22,7 @@ import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
 import yakworks.rally.testing.DomainIntTest
-import yakworks.rally.testing.MockHelper
+import gorm.tools.testing.MockHelper
 
 @Integration
 @Rollback

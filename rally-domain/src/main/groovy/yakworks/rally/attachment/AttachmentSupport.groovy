@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 import grails.plugin.viewtools.AppResourceLoader
-import grails.web.mapping.LinkGenerator
 import yakworks.rally.attachment.model.Attachment
 
 /**

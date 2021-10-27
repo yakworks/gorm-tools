@@ -2,7 +2,7 @@ package yakworks.rally.domain
 
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
 import grails.persistence.Entity

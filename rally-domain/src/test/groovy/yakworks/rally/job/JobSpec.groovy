@@ -5,7 +5,7 @@
 package yakworks.rally.job
 
 import gorm.tools.json.Jsonify
-import gorm.tools.security.testing.SecurityTest
+import gorm.tools.testing.SecurityTest
 import gorm.tools.source.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Ignore

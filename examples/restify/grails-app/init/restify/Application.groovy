@@ -12,7 +12,7 @@ import grails.boot.config.GrailsAutoConfiguration
 
 // the component scan here does not seem to be the same as the packageNames and is needed to pick up the
 // the services marked with @Component
-@ComponentScan(['yakworks.testify', 'gorm.tools.security', 'yakworks.rally'])
+@ComponentScan(['yakworks.testify', 'gorm.tools.security', 'yakworks.rally', "restify"])
 @RestApiFromConfig
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {

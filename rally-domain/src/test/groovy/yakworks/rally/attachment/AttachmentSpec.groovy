@@ -5,14 +5,11 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import org.apache.commons.io.FileUtils
-import org.grails.web.mapping.DefaultLinkGenerator
-import org.grails.web.mapping.UrlMappingsHolderFactoryBean
 import org.springframework.mock.web.MockMultipartFile
 
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.testing.unit.DomainRepoTest
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Ignore
 import spock.lang.Shared

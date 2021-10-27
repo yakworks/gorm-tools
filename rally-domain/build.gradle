@@ -14,7 +14,7 @@ dependencies {
     exclude group:"org.grails", module: "grails-gorm-testing-support"
   }
 
-  testCompile project(":gorm-tools-test-support")
+  testCompile project(":gorm-test-support")
   testCompile "org.grails:grails-gorm-testing-support"
   testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
 }

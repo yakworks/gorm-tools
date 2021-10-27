@@ -1,14 +1,12 @@
 package yakworks.rally.orgs
 
-import gorm.tools.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import grails.buildtestdata.TestData
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.attachment.model.AttachmentLink
-import yakworks.rally.orgs.OrgCopier
-import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex

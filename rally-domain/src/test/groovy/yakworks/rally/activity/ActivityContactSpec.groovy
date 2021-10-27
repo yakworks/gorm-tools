@@ -1,7 +1,7 @@
 package yakworks.rally.activity
 
 import gorm.tools.repository.model.CriteriaRemover
-import gorm.tools.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.gorm.DetachedCriteria
 import spock.lang.Shared

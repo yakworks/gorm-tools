@@ -21,7 +21,7 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
-import gorm.tools.testing.DomainIntTest
+import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.testing.MockData
 
 @Integration

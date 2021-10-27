@@ -2,7 +2,7 @@ package yakworks.rally.orgs
 
 import org.apache.commons.lang3.EnumUtils
 
-import gorm.tools.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import grails.testing.services.ServiceUnitTest
 import yakworks.rally.orgs.model.OrgType

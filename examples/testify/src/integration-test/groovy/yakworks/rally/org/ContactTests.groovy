@@ -7,7 +7,7 @@ import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
-import gorm.tools.testing.DomainIntTest
+import yakworks.gorm.testing.DomainIntTest
 
 @Integration
 @Rollback

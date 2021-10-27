@@ -90,7 +90,7 @@ api-check-deployed-with-token:
 ## shows gorm-tools:dependencies --configuration runtime
 gradle.dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath
-	./gradlew restify:dependencies --configuration runtime
+	./gradlew rally-domain:dependencies --configuration compileClasspath
 
 ## runs the benchmark tests
 run-benchmarks:

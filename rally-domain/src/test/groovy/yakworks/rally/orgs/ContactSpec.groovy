@@ -1,7 +1,7 @@
 package yakworks.rally.orgs
 
 import gorm.tools.security.domain.AppUser
-import gorm.tools.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData

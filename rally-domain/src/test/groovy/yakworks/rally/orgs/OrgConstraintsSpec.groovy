@@ -1,7 +1,6 @@
 package yakworks.rally.orgs
 
-import gorm.tools.testing.SecurityTest
-import gorm.tools.testing.TestDataJson
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
@@ -12,7 +11,6 @@ import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgInfo
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTag
-import yakworks.rally.orgs.model.OrgType
 
 class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, SecurityTest {
     //Automatically runs the basic crud tests

@@ -1,9 +1,8 @@
 package yakworks.rally.orgs
 
-import gorm.tools.testing.SecurityTest
+import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DataRepoTest
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location

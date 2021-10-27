@@ -1,12 +1,10 @@
 package yakworks.rally.tag
 
 
-import gorm.tools.testing.SecuritySpecHelper
+import yakworks.gorm.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.Tag

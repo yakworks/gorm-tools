@@ -2,7 +2,7 @@ package yakworks.rally.orgs
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.security.testing.SecuritySpecHelper
+import gorm.tools.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

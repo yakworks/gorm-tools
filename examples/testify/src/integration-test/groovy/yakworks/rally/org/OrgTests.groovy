@@ -21,8 +21,8 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
-import yakworks.rally.testing.DomainIntTest
-import gorm.tools.testing.MockHelper
+import gorm.tools.testing.DomainIntTest
+import yakworks.rally.testing.MockData
 
 @Integration
 @Rollback
@@ -50,7 +50,7 @@ class OrgTests extends Specification implements DomainIntTest {
 
     def "test create"() {
         when:
-        def params = MockHelper.createOrg
+        def params = MockData.createOrg
         def org = orgRepo.create(params)
         orgRepo.flushAndClear()
         org = Org.get(org.id)
@@ -94,7 +94,7 @@ class OrgTests extends Specification implements DomainIntTest {
     @Ignore //XXX fix so it works here
     def "test create duplicate fail"() {
         when:
-        def params = MockHelper.createOrg
+        def params = MockData.createOrg
         params.num = 'TTI'
         def org = orgRepo.create(params)
         orgRepo.flush()
@@ -148,7 +148,7 @@ class OrgTests extends Specification implements DomainIntTest {
     @Ignore //XXX fix so it works here
     def "update org"() {
         when:
-        def params = MockHelper.updateOrg
+        def params = MockData.updateOrg
         params.id = 205 //use existing 205 customer that has
         def org = orgRepo.update(params)
         orgRepo.flushAndClear()
@@ -292,7 +292,7 @@ class OrgTests extends Specification implements DomainIntTest {
 
     def "test create Org different orgType same sourceId"() {
         when:
-        def params = MockHelper.createOrg
+        def params = MockData.createOrg
         def orgCustomer = orgRepo.create(params)
         orgRepo.flushAndClear()
         orgCustomer = Org.get(orgCustomer.id)

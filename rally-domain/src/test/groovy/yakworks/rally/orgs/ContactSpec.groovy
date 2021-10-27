@@ -14,7 +14,7 @@ import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgTypeSetup
-import yakworks.rally.MockHelper
+import yakworks.rally.testing.MockData
 
 class ContactSpec extends Specification implements DomainRepoTest<Contact>, SecurityTest {
 
@@ -24,19 +24,19 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     @Override
     Map buildMap(Map args) {
-        args.org = MockHelper.org(args)
+        args.org = MockData.org()
         TestDataJson.buildMap(args, Contact)
     }
 
-    Contact build(Map args) {
-        MockHelper.contact(args)
-    }
+    // Contact build(Map args) {
+    //     MockData.contact(args)
+    // }
 
     Contact createContactWithUser(){
-        Contact contact = MockHelper.contact([firstName: "Al", lastName: 'Coholic',  email: "al@9ci.io"])
+        Contact contact = MockData.contact([firstName: "John", lastName: 'Galt',  email: "al@9ci.io"])
         // AppUser user = TestData.build(AppUser, [password:"test"])
         AppUser user = new AppUser(username: contact.email, email: contact.email, password: 'foo')
-        MockHelper.stamp(user)
+        MockData.stamp(user)
         user.id = contact.id
         user.persist()
         contact.user = user
@@ -44,26 +44,13 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
     }
 
     //show data table option 2
-    def "test emails"() {
-        when:
-        def entity = createEntity(email: email)
-
-        then:
-        entity.email == email
-
-        where:
-        email                   | _
-        "xyz@gmail.contractors" | _
-        "xyz@gmail.supply"      | _
-    }
-
-    //show data table option 2
     def "test invalid email"() {
         when:
-        createEntity(email: 'foo@bar.comx')
+        MockData.contact(email: 'foo@bar.comx')
+        // createEntity(email: 'foo@bar.comx')
 
         then:
-        thrown(grails.validation.ValidationException)
+        thrown(gorm.tools.repository.errors.EntityValidationException)
     }
 
     def testEquals() {
@@ -93,22 +80,16 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
     def testUpdateContact_noUser(){
         when:
         // Checking firstName of contact before update
-        Contact contact = createEntity([firstName: "Robert"])
+        Contact contact =  MockData.contact(firstName: "Robert")
 
         then:
         "Robert" == contact.firstName
 
         when:
         Map params = [id:contact.id, firstName:'Peter', email:'abc@walmart.com', tagForReminders:'on']
-        Contact result = Contact.repo.update(params)
+        Contact.update(params)
 
-        then:
-        result != null
-        result.errors.allErrors.size() == 0
-
-        when:
-        // Checking firstName of contact after update
-        Contact updatedContact = Contact.get(result.id)
+        Contact updatedContact = Contact.get(contact.id)
 
         then:
         params['firstName'] == updatedContact.firstName
@@ -119,7 +100,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testUpdateContact_withUser(){
         when:
-        Contact contact = MockHelper.createContactWithUser()
+        Contact contact = MockData.createContactWithUser()
 
         then:
         contact.firstName == 'John'
@@ -151,7 +132,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
     */
     def testUpdateContact_WithoutTagForReminder(){
         when:
-        Contact contact = MockHelper.createContactWithUser()
+        Contact contact = MockData.createContactWithUser()
 
         then:
         "John" == contact.firstName
@@ -175,7 +156,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testSave_With_StringTrimmerEditor() {
         when:
-        Map create = ['email': 'jbhasin@objectseek.com', firstName: 'DefContact', lastName: '  test', org: [id: '2']]
+        Map create = ['email': 'jbhasin@objectseek.com', firstName: 'DefContact', lastName: '  test']
         Contact contact = createEntity(create)
 
         then:
@@ -184,7 +165,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testStringTrimmerEditor_forBlankSpaces(){
         when:
-        def create = ['email':'jbhasin@objectseek.com', firstName:'DefContact', lastName:'     ', org:[id:'2']]
+        def create = ['email':'jbhasin@objectseek.com', firstName:'DefContact', lastName:'     ']
         Contact contact = createEntity(create)
 
         then:
@@ -205,7 +186,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
     def testAssignUserNameFromContactName_hasUser() {
         given:
-        Contact contact = MockHelper.createContactWithUser()
+        Contact contact = MockData.createContactWithUser()
 
         expect:
         contact != null

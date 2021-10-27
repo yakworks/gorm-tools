@@ -4,6 +4,7 @@
 */
 package gorm.tools.json
 
+import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
@@ -26,11 +27,12 @@ import grails.plugin.json.view.template.JsonViewTemplate
  */
 @CompileStatic
 class Jsonify {
-//
-//    @Autowired
-//    JsonViewTemplateEngine jsonViewTemplateEngine
 
     static private JsonViewTemplate cachedEmptyTemplate
+
+    static String toJson(Object object){
+        JsonOutput.toJson(object)
+    }
 
     static JsonViewTemplate getViewTemplate() {
         if (!cachedEmptyTemplate) {

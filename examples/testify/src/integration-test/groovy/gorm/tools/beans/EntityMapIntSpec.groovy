@@ -3,7 +3,7 @@ package gorm.tools.beans
 import org.codehaus.groovy.reflection.CachedField
 
 import gorm.tools.security.domain.AppUser
-import gorm.tools.security.testing.SecuritySpecHelper
+import gorm.tools.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback

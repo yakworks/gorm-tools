@@ -111,8 +111,17 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
 
     static ConstructorNode addConstructor(ClassNode controllerClassNode, ClassNode domainClassNode, boolean readOnly) {
         BlockStatement constructorBody = new BlockStatement()
-        constructorBody.addStatement(new ExpressionStatement(new ConstructorCallExpression(ClassNode.SUPER, new
-                TupleExpression(new ClassExpression(domainClassNode), new ConstantExpression(readOnly, true)))))
+        constructorBody.addStatement(
+            new ExpressionStatement(
+                new ConstructorCallExpression(
+                    ClassNode.SUPER,
+                    new TupleExpression(
+                        new ClassExpression(domainClassNode),
+                        new ConstantExpression(readOnly, true)
+                    )
+                )
+            )
+        )
         controllerClassNode.addConstructor(Modifier.PUBLIC, ZERO_PARAMETERS, ClassNode.EMPTY_ARRAY, constructorBody)
     }
 

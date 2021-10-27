@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.job.JobState
 import gorm.tools.job.RepoJobService
-import gorm.tools.json.Jsonify
+import gorm.tools.json.JsonTools
 import gorm.tools.repository.bulk.BulkableResults
 import yakworks.commons.lang.Validate
 
@@ -29,7 +29,7 @@ class DefaultRepoJobService implements RepoJobService {
     @Override
     Long createJob(String source, String sourceId, Object payload) {
         Validate.notNull(payload)
-        byte[] reqData = Jsonify.render(payload).jsonText.bytes
+        byte[] reqData = JsonTools.toJson(payload).bytes
         Map data = [source: source, sourceId: sourceId, state: JobState.Running, requestData: reqData]
         def job = jobRepo.create((Map)data, (Map)[flush:true])
         return job.id
@@ -37,7 +37,7 @@ class DefaultRepoJobService implements RepoJobService {
 
     @Override
     void updateJob(Long id, JobState state, BulkableResults results, List<Map> renderResults) {
-        byte[] resultBytes = Jsonify.render(renderResults).jsonText.bytes
+        byte[] resultBytes = JsonTools.toJson(renderResults).bytes
         Map data = [id:id, ok: results.ok, data: resultBytes, state: state]
         jobRepo.update((Map)data, (Map)[flush: true])
     }

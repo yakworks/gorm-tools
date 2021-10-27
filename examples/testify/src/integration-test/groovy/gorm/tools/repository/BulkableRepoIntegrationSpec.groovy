@@ -14,7 +14,7 @@ import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.repo.OrgRepo
-import yakworks.rally.testing.DomainIntTest
+import gorm.tools.testing.DomainIntTest
 
 @Integration
 @Rollback

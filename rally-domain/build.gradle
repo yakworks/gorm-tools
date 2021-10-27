@@ -10,6 +10,10 @@ dependencies {
   //for AppResourceLoader in AttachmentSupport
   compileOnly "org.grails.plugins:view-tools:$vViewTools"
 
+  compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
+    exclude group:"org.grails", module: "grails-gorm-testing-support"
+  }
+
   testCompile project(":gorm-tools-test-support")
   testCompile "org.grails:grails-gorm-testing-support"
   testCompile "org.grails.plugins:build-test-data:$vBuildTestData"

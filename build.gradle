@@ -10,7 +10,7 @@ buildscript {
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
     classpath "org.grails.plugins:views-gradle:$vViews"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
-    classpath "io.github.gradle-nexus:publish-plugin:1.1.0"
+    classpath "io.github.gradle-nexus:publish-plugin:$vMavenNexus"
   }
 }
 
@@ -32,57 +32,75 @@ subprojects { subprj ->
 
   group = "org.yakworks"
 
-  if (subprj.name in ['gorm-tools', 'commons', 'gorm-tools-security', 'gorm-tools-rest', 'rally-domain']){
-    subprj.ext.isLib = true
-  }
-
   repositories {
+    mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
+    mavenCentral()
   }
 
-  ['org.grails.grails-plugin', 'org.grails.grails-web'].each { plugId -> plugins.withId(plugId) {
+  ext {
+    //consider them all java libs, set to false for examples/testing
+    isPublishable = true
+    isExample = false
+    // all but commons are gorm
+    isGormLib = subprj.name != 'commons'
+    // example test projects
+    if (subprj.name in [ 'testify', 'restify', 'benchmarks' ]){
+      isPublishable = false
+      isExample = true
+    }
+  }
 
-    sourceCompatibility = '1.8'
-    targetCompatibility = '1.8'
+  plugins.withId('groovy') {
+    sourceCompatibility = "$javaCompatibility"
+    targetCompatibility = "$javaCompatibility"
+
+    // sets the path to sys properties so we can use it find grails-app/conf during AST
+    compileGroovy {
+      groovyOptions.fork = true
+      groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
+    }
+  }
+
+  // if its a lib then setup gpg signing, see signing.gnupg.keyName
+  if (isPublishable){
+    apply plugin: 'java-library'
+
+    // gpg signing required by nexus/sonatype
+    apply plugin: 'signing'
+    afterEvaluate {
+      if(!isSnapshot) {
+        signing {
+          required { gradle.taskGraph.hasTask("publish") }
+          useGpgCmd()
+          sign publishing.publications.javaLibrary
+        }
+      }
+    }
+
+  } // end isPublishable
+
+  if (isGormLib) {
+    apply plugin: 'groovy'
 
     dependencies {
-      developmentOnly("org.springframework.boot:spring-boot-devtools")
       compileOnly "io.micronaut:micronaut-inject-groovy"
-      implementation "org.springframework.boot:spring-boot-starter-logging"
       implementation "org.springframework.boot:spring-boot-autoconfigure"
       implementation "org.grails:grails-core"
-      implementation "org.springframework.boot:spring-boot-starter-tomcat"
-
       implementation "org.grails:grails-web-boot"
-
-      implementation "org.grails:grails-logging"
-      // implementation "org.grails:grails-plugin-databinding"
-      implementation "org.grails:grails-plugin-services"
+      implementation "org.grails:grails-databinding"
 
       implementation "org.grails.plugins:cache"
-      implementation "org.grails.plugins:events"
-
-      implementation 'org.codehaus.groovy:groovy-dateutil'
 
       compileOnly "org.grails.plugins:hibernate5:$vGormHibernate"
       compileOnly "org.hibernate:hibernate-core:$vHibernate"
       compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
-      // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
-      // implementation "dk.glasius:external-config:$vExternalConfig"
+      // tests deps
+      testRuntime "com.h2database:h2"
+      testRuntime "com.zaxxer:HikariCP:$vHikari"
 
-      // compile "io.activej:activej-http:5.0-rc3"
-      // compile "io.activej:activej-launchers-common:5.0-rc3"
-      // implementation "io.activej:activej-launchers-http:5.0-rc3"
-      // implementation "io.activej:activej-boot:5.0-rc3"
-      // implementation "io.activej:activej-promise:5.0-rc3"
-
-      // *** compileOnly, dependent projects need to add these in ***
-
-      //*** End Compile Only ****
-
-      runtimeOnly "com.h2database:h2"
-      runtimeOnly "com.zaxxer:HikariCP:$vHikari"
+      testCompile project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
 
       testCompile "org.mockito:mockito-core"
       testCompile "org.grails:grails-gorm-testing-support"
@@ -91,7 +109,56 @@ subprojects { subprj ->
       testCompile "org.grails:views-json-testing-support:$vViews"
 
     }
+  }
 
+  if (isExample) {
+    apply plugin: 'groovy'
+
+    dependencies {
+      compileOnly "io.micronaut:micronaut-inject-groovy"
+      implementation "org.springframework.boot:spring-boot-starter-logging"
+      implementation "org.springframework.boot:spring-boot-autoconfigure"
+      implementation "org.grails:grails-core"
+      implementation "org.springframework.boot:spring-boot-starter-tomcat"
+
+      implementation "org.grails:grails-web-boot"
+      implementation "org.grails:grails-plugin-services"
+
+      // implementation 'org.codehaus.groovy:groovy-dateutil'
+
+      // implementation "io.activej:activej-boot:5.0-rc3"
+      // implementation "io.activej:activej-promise:5.0-rc3"
+
+    }
+
+  } //end isGormLib
+
+  configurations {
+    testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
+    testCompile.extendsFrom implementation
+    testImplementation.extendsFrom compileOnly
+    // compile.extendsFrom implementation
+    all {
+      resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
+    }
+  }
+
+  tasks.withType(Test) {
+    //so that we can use in config and share resources/rootlocation across projects for testing
+    systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
+    systemProperty "gradle.projectDir", project.projectDir.absolutePath
+  }
+
+}
+
+ext.codenarcRuleset= '''
+  // getRule('Println').enabled = false
+  // getRule('AbcMetric').enabled = false
+'''
+
+//logging
+subprojects { subprj ->
+  test {
     // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
     testlogger {
       // theme 'standard'
@@ -110,61 +177,5 @@ subprojects { subprj ->
       // showSkippedStandardStreams true
       // showFailedStandardStreams true
     }
-  }} //end of plugins.withId iteration
-
-  configurations {
-    testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
-    testCompile.extendsFrom implementation
-    testImplementation.extendsFrom compileOnly
-    // compile.extendsFrom implementation
-    all {
-      resolutionStrategy.cacheChangingModulesFor 1, 'seconds' //when changing = true this sets the cache time
-    }
-    developmentOnly
-    runtimeClasspath {
-      extendsFrom developmentOnly
-    }
-  }
-
-  // FUTURE FOR GRADLE 6+
-  // tasks.withType(GroovyCompile) {
-  //   configure(groovyOptions) {
-  //     groovyOptions.fork = true
-  //     forkOptions.jvmArgs = ['-Xmx1024m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
-  //   }
-  // }
-
-  // sets the path to sys properties so we can use it find grails-app/conf during AST
-  plugins.withId('groovy') {
-    compileGroovy {
-      groovyOptions.fork = true
-      groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
-    }
-  }
-
-  tasks.withType(Test) {
-    //so that we can use in config and share resources/rootlocation across projects for testing
-    systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
-    systemProperty "gradle.projectDir", project.projectDir.absolutePath
-  }
-
-  // if its a lib then setup gpg signing, see signing.gnupg.keyName
-  if (subprj.findProperty('isLib')){
-    apply plugin: 'java-library'
-    apply plugin: 'signing'
-    afterEvaluate {
-      if(!isSnapshot) {
-        signing {
-          required { gradle.taskGraph.hasTask("publish") }
-          useGpgCmd()
-          sign publishing.publications.javaLibrary
-        }
-      }
-    }
   }
 }
-
-ext.codenarcRuleset= '''
-  // getRule('Println').enabled = false
-  // getRule('AbcMetric').enabled = false
-'''

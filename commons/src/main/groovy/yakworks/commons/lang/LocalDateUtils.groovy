@@ -22,7 +22,19 @@ class LocalDateUtils {
      * Returns the first day of the current month and sets time to midnight.
      */
     static LocalDate getFirstDateOfMonth() {
-        return LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+        return getFirstDateOfMonth(LocalDate.now())
+    }
+
+    static LocalDate getFirstDateOfMonth(LocalDate locDate) {
+        return locDate.with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+    static LocalDate getLastDateOfMonth() {
+        return getLastDateOfMonth(LocalDate.now())
+    }
+
+    static LocalDate getLastDateOfMonth(LocalDate locDate) {
+        return locDate.with(TemporalAdjusters.lastDayOfMonth());
     }
 
     /**

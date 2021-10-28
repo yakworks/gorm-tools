@@ -1,5 +1,8 @@
 package yakworks.testify.seed
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 import groovy.transform.CompileStatic
 
 import yakworks.testify.model.Address
@@ -46,7 +49,7 @@ class TestSeedData {
             inactive: (id % 2 == 0),
             revenue: (id - 1) * 1.25,
             creditLimit: (id - 1) * 1.5,
-            actDate: new Date().clearTime() + (id as Integer),
+            actDate: LocalDateTime.now().plusDays(id).toDate(),
             location: loc
         )
         org.id = id

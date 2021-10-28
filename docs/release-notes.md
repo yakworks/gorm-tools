@@ -1,3 +1,11 @@
+### v7.0.8-v.36
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.35...v7.0.8-v.36)
+- Dependency part2 (#388) [link](https://github.com/yakworks/gorm-tools/commit/8ee931d790e0521b7b37e2c439dd25415b9af317)
+- add gorm-test-support, publish to repo.9ci first then to sonotype maven central [link](https://github.com/yakworks/gorm-tools/commit/28286902a9ddeb49226ebed0ef7f42dbc44ae292)
+- release [link](https://github.com/yakworks/gorm-tools/commit/3e2113ebdc0b75aa874659ca2d4294bafe1ec4ef)
+- Dependency fix (#385) [link](https://github.com/yakworks/gorm-tools/commit/535ef58662161fd24315f805dd886accd8380be8)
+
 ### v7.0.8-v.35
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.33...v7.0.8-v.35)

@@ -5,6 +5,7 @@
 package gorm.tools.mango
 
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.Address
@@ -172,13 +173,13 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         when:
 
 
-        List res = build(([date: new Date().clearTime() + 2])).list()
+        List res = build(([date: LocalDate.now().plusDays(2).toDate() ])).list()
 
         then:
         res.size() == 1
 
         when:
-        res = build(([date: ['$gt': new Date().clearTime() + 7]])).list()
+        res = build(([date: ['$gt': LocalDate.now().plusDays(7).toDate() ]])).list()
 
         then:
         res.size() == 3

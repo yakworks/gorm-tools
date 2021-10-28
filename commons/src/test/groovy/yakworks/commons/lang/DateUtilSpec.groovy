@@ -4,6 +4,10 @@
 */
 package yakworks.commons.lang
 
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
@@ -83,18 +87,18 @@ class DateUtilSpec extends Specification {
 
     void "test IsTodayTheDate"() {
         when:
-        def dayOfMonth = new Date().getAt(Calendar.DAY_OF_MONTH)
-        def dayOfWeek = new Date().getAt(Calendar.DAY_OF_WEEK)
+        def locDate = LocalDate.now()
+        def dayOfMonth = locDate.getDayOfMonth()
+        def dayOfWeek = DayOfWeek.from(locDate).value
 
         then:
-        DateUtil.isTodayTheDate('monthly', dayOfMonth)
-        !DateUtil.isTodayTheDate('monthly', dayOfMonth - 1)
+        DateUtil.isTodayTheDate(ChronoUnit.MONTHS, dayOfMonth)
+        !DateUtil.isTodayTheDate(ChronoUnit.MONTHS, dayOfMonth - 1)
 
-        DateUtil.isTodayTheDate('weekly', dayOfWeek)
-        !DateUtil.isTodayTheDate('weekly', dayOfWeek - 1)
+        DateUtil.isTodayTheDate(ChronoUnit.WEEKS, dayOfWeek)
+        !DateUtil.isTodayTheDate(ChronoUnit.WEEKS, dayOfWeek - 1)
 
-        DateUtil.isTodayTheDate('daily', 122)
-        !DateUtil.isTodayTheDate('bzzz', dayOfWeek)
+        DateUtil.isTodayTheDate(ChronoUnit.DAYS, 122)
     }
 
     // @Ignore //FIXME this is blowing up on daylight savings today. Adding 10 thinks it 9 days apart.

@@ -4,6 +4,7 @@
 */
 package yakworks.rally.eventlog
 
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 import groovy.transform.CompileStatic
@@ -124,7 +125,7 @@ class EventLogger {
     List<EventLog> getEventList(Map params) {
         Pager pager = new Pager(params)
         Criteria criteria = EventLog.createCriteria()
-        Date searchDate = new Date() - searchDays
+        Date searchDate = LocalDateTime.now().minusDays(searchDays).clearTime()
         List<EventLog> events = criteria.list(max: pager.max, offset: pager.offset) {
             if (searchDays > 0) {
                 gt('createdDate', searchDate)
@@ -144,7 +145,7 @@ class EventLogger {
     @CompileStatic(TypeCheckingMode.SKIP)
     void purgeEvents() {
         if (purgeDays > 0) {
-            Date cutoff = new Date() - purgeDays
+            def cutoff = LocalDateTime.now().minusDays(purgeDays)
             cutoff.clearTime()
             if (cutoff) {
                 EventLog.createCriteria().list {

@@ -5,8 +5,6 @@ dependencies {
 
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-tools-security")
-  compileOnly project(":gorm-tools-rest")
-  // compileOnly project(":rally-domain")
 
   //used for bundled Test traits
   compile "org.grails:grails-gorm-testing-support"

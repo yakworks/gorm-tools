@@ -23,11 +23,6 @@ dependencies {
   testCompile project(":gorm-test-support")
 
   testCompile "io.micronaut:micronaut-inject-groovy"
-  testCompile "org.grails:grails-gorm-testing-support"
-  testCompile "org.mockito:mockito-core"
-  testCompile "io.micronaut:micronaut-http-client"
-  testCompile "org.grails:grails-web-testing-support"
-  testCompile "org.grails:views-json-testing-support"
 }
 
 bootRun {

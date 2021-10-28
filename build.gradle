@@ -96,6 +96,7 @@ subprojects { subprj ->
       compileOnly "org.hibernate:hibernate-core:$vHibernate"
       compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
 
+      // tests deps
       testRuntime "com.h2database:h2"
       testRuntime "com.zaxxer:HikariCP:$vHikari"
 
@@ -121,18 +122,12 @@ subprojects { subprj ->
       implementation "org.springframework.boot:spring-boot-starter-tomcat"
 
       implementation "org.grails:grails-web-boot"
-      implementation "org.grails:grails-logging"
       implementation "org.grails:grails-plugin-services"
-      implementation "org.grails.plugins:cache"
-      implementation "org.grails.plugins:events"
 
       // implementation 'org.codehaus.groovy:groovy-dateutil'
 
       // implementation "io.activej:activej-boot:5.0-rc3"
       // implementation "io.activej:activej-promise:5.0-rc3"
-
-      testRuntime "com.h2database:h2"
-      testRuntime "com.zaxxer:HikariCP:$vHikari"
 
     }
 

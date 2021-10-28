@@ -8,11 +8,13 @@ import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAccessor
 
 import groovy.time.TimeCategory
@@ -309,21 +311,19 @@ class DateUtil {
     /**
      * Checks if the current day number is equal to specified day number in a given period.
      *
-     * @period daily , weekly or monthly
+     * @period ChronoUnit DAYS WEEKS or MONTHS
      * @dayNumber 1-30 for monthly, 1-7 for weekly (1 is Sunday)
      * @return is today the date for a specified period and dayInPeriod
      */
-    @SuppressWarnings('ExplicitCallToGetAtMethod')
-    static boolean isTodayTheDate(String period, int dayNumber) {
-        int dayOfMonth = new Date().getAt(Calendar.DAY_OF_MONTH)
-        int dayOfWeek = new Date().getAt(Calendar.DAY_OF_WEEK)
-        switch (period.toLowerCase()) {
-            case "daily":
+    static boolean isTodayTheDate(ChronoUnit period, int dayNumber) {
+        LocalDate thedate = LocalDate.now()
+        switch (period) {
+            case ChronoUnit.DAYS:
                 return true
-            case "weekly":
-                return dayNumber == dayOfWeek
-            case "monthly":
-                return dayNumber == dayOfMonth
+            case ChronoUnit.WEEKS:
+                return DayOfWeek.from(thedate).value == dayNumber
+            case ChronoUnit.MONTHS:
+                return thedate.getDayOfMonth() == dayNumber
             default:
                 return false
         }
@@ -381,11 +381,9 @@ class DateUtil {
     */
 
     static Date getLastDayOfMonth(Date date, int addMonth = 0) {
-        Calendar c = Calendar.getInstance()
-        c.setTime(date)
-        c.add(Calendar.MONTH, addMonth)
-        c.set(Calendar.DAY_OF_MONTH, c.getActualMaximum(Calendar.DAY_OF_MONTH))
-        c.getTime().clearTime()
+        def locDate = LocalDateUtils.getLastDateOfMonth(date.toLocalDate())
+        if(addMonth) locDate = locDate.plusMonths(addMonth as Long)
+        return locDate.toDate()
     }
 
     /*
@@ -397,11 +395,9 @@ class DateUtil {
     */
 
     static Date getFirstDayOfMonth(Date date, int addMonth = 0) {
-        Calendar c = Calendar.getInstance()
-        c.setTime(date)
-        c.add(Calendar.MONTH, addMonth)
-        c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH))
-        c.getTime().clearTime()
+        def locDate = LocalDateUtils.getFirstDateOfMonth(date.toLocalDate())
+        if(addMonth) locDate = locDate.plusMonths(addMonth as Long)
+        return locDate.toDate()
     }
 
     static LocalDate toLocalDate(Date date, ZoneId zoneId = ZoneId.systemDefault()) {

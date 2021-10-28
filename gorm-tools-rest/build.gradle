@@ -1,7 +1,8 @@
 apply plugin: "yakworks.grails-plugin"
 
 dependencies {
-
+  //for the RestTomcatWebServerCustomizer
+  compileOnly "org.springframework.boot:spring-boot-starter-tomcat"
   implementation "org.grails:grails-plugin-rest"
   implementation "org.grails:grails-plugin-url-mappings"
   implementation "org.grails:grails-plugin-interceptors"

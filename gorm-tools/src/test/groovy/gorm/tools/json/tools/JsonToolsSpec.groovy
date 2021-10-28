@@ -2,24 +2,27 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.json
+package gorm.tools.json.tools
+
+import java.time.LocalDate
+import java.time.LocalDateTime
+
+import groovy.json.JsonGenerator
 
 import gorm.tools.beans.BeanPathTools
 import gorm.tools.beans.EntityMapService
+import gorm.tools.json.JsonTools
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.TestTools
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import testing.Address
 import testing.Cust
 import testing.CustExt
-
-import java.time.LocalDate
-import java.time.LocalDateTime
-
 import testing.CustType
 import testing.Nested
 
@@ -27,9 +30,11 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 
 class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 
+    EntityMapService entityMapService
+
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
-        mockDomains(CustExt, CustType, Nested, Address, gorm.tools.json.tools.JsonifyDom, gorm.tools.json.tools.JsonifyDomExt, gorm.tools.json.tools.NestedDom)
+        mockDomains(CustExt, CustType, Nested, Address, JsonifyDom, JsonifyDomExt, NestedDom)
         //defineBeans(new JsonViewGrailsPlugin())
     }
 
@@ -63,47 +68,53 @@ class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 
     }
 
+    @IgnoreRest
     void "test Org json stock"() {
         when:
         def org = build()
-        def res = Jsonify.render(org)
+        def emap = entityMapService.createEntityMap(org, ['*'])
+        def generator = new JsonGenerator.Options()
+            .excludeNulls()
+            .build()
+        // def emap = [foo: 'bar']
+        def res = generator.toJson(emap)
 
         then:
-        res.jsonText == '{"id":1,"inactive":false,"kind":"CLIENT","beforeValidateCheck":"got it","testIdent":"Num2","name":"name","type":{"id":1}}'
+        res == '{"id":1,"inactive":false,"kind":"CLIENT","beforeValidateCheck":"got it","testIdent":"Num2","name":"name","type":{"id":1}}'
 
     }
 
     void "test JsonifyDom json stock"() {
         when: "no includes"
-        def jdom = TestData.build([:], gorm.tools.json.tools.JsonifyDom)
-        def res = Jsonify.render(jdom)
+        def jdom = TestData.build([:], JsonifyDom)
+        def res = JsonTools.render(jdom)
 
         then: 'should not include the ext because its null'
-        res.jsonText == '{"id":1,"localDate":"2018-01-25","isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}'
+        res == '{"id":1,"localDate":"2018-01-25","isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}'
 
         when: "ext association is mocked up in data"
-        jdom = TestData.build(gorm.tools.json.tools.JsonifyDom, includes: ['ext'])
-        res = Jsonify.render(jdom)
+        jdom = TestData.build(JsonifyDom, includes: ['ext'])
+        res = JsonTools.render(jdom)
 
         then: 'the default will be just the ext.id'
-        res.jsonText == '{"id":2,"localDate":"2018-01-25","ext":{"id":1},"isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}'
+        res == '{"id":2,"localDate":"2018-01-25","ext":{"id":1},"isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}'
 
         when: "ext association is in includes and deep:true and not renderNulls"
         // jdom = TestData.build(JsonifyDom, includes: ['ext'])
         // def args = [includes: ['id', 'name', 'ext'], deep: true, renderNulls: true]
         //deep needs to be true
         def args = [includes: ['id', 'name', 'name2', 'ext.*'], deep: true]
-        res = Jsonify.render(jdom, args)
+        res = JsonTools.render(jdom, args)
 
         then: 'ext fields should be shown'
-        res.jsonText == '{"id":2,"ext":{"id":1,"nameExt":"nameExt"},"name":"name"}'
+        res == '{"id":2,"ext":{"id":1,"nameExt":"nameExt"},"name":"name"}'
 
 
     }
 
     void "test JsonifyDom renderNulls: true"() {
         when: "ext association is in includes and deep:true and not renderNulls"
-        def jdom = TestData.build(gorm.tools.json.tools.JsonifyDom, includes: ['ext'])
+        def jdom = TestData.build(JsonifyDom, includes: ['ext'])
         def args = [includes: ['id', 'name', 'name2', 'ext.*'], deep: true, renderNulls: true]
         def res = Jsonify.render(jdom, args)
 
@@ -114,7 +125,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 
     void "currency converter should work"() {
         when:
-        def jdom = TestData.build(gorm.tools.json.tools.JsonifyDom, currency: Currency.getInstance('USD'))
+        def jdom = TestData.build(JsonifyDom, currency: Currency.getInstance('USD'))
         def args = [includes: ['id', 'currency']]
         def res = Jsonify.render(jdom, args)
 
@@ -125,7 +136,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 
     void "transients should be rendered"() {
         when:
-        def jdom = TestData.build(gorm.tools.json.tools.JsonifyDom, includes: ['ext'])
+        def jdom = TestData.build(JsonifyDom, includes: ['ext'])
         def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
         String incTrans = 'company'
         def res = Jsonify.render(jdom, args){ obj ->
@@ -140,7 +151,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 
     void "test BeanPathTools.buildMapFromPaths should be rendered"() {
         when:
-        def jdom = TestData.build(gorm.tools.json.tools.JsonifyDom, includes: ['ext'])
+        def jdom = TestData.build(JsonifyDom, includes: ['ext'])
         List inc = ['id', 'ext.nameExt', 'company']
         //def map = BeanPathTools.buildMapFromPaths(jdom, inc)
         def entityMapService = new EntityMapService()
@@ -218,7 +229,7 @@ class JsonifySpec extends Specification implements DomainRepoTest<Cust> {
 }
 
 @Entity @GrailsCompileStatic
-class JsonifyDom implements RepoEntity<gorm.tools.json.tools.JsonifyDom> {
+class JsonifyDom implements RepoEntity<JsonifyDom> {
     String name
     String name2
     Boolean isActive = false
@@ -229,7 +240,7 @@ class JsonifyDom implements RepoEntity<gorm.tools.json.tools.JsonifyDom> {
     Currency currency
     String secret
 
-    gorm.tools.json.tools.JsonifyDomExt ext
+    JsonifyDomExt ext
 
     static transients = ['company']
 
@@ -255,9 +266,9 @@ class JsonifyDom implements RepoEntity<gorm.tools.json.tools.JsonifyDom> {
 @Entity @GrailsCompileStatic
 class JsonifyDomExt {
     String nameExt
-    gorm.tools.json.tools.NestedDom nested
+    NestedDom nested
 
-    static belongsTo = [testJsonifyDom: gorm.tools.json.tools.JsonifyDom]
+    static belongsTo = [testJsonifyDom: JsonifyDom]
 
     static mapping = {
         id generator:'foreign', params:[property:'testJsonifyDom']

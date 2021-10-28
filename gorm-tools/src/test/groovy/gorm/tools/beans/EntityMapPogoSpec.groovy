@@ -7,7 +7,7 @@ package gorm.tools.beans
 
 import spock.lang.Specification
 
-class EntityMapSpec extends Specification {
+class EntityMapPogoSpec extends Specification {
 
     // void testOverridePropertiesRecursionBug() {
     //     when:
@@ -33,32 +33,26 @@ class EntityMapSpec extends Specification {
         'bar.baz' == theRest
     }
 
+    PogoBean pogoBean(){
+        new PogoBean(
+            name:"Bart", age: 45, other:"stuff",
+            info: [ phone: "1234", email: "jo@jo.com" ],
+            nested: new NestedBean( prop1: 'foo')
+        )
+    }
+
     void 'test default get includes'() {
 
         when:
-        def tobj = new PogoBean(name:"Bart", age:11, other:"stuff")
-        def map = new EntityMap(tobj)
+        def map = new EntityMap(pogoBean())
 
         def includes = map.getIncludes()
 
         then:
-        3 == map.size()
-        3 == includes.size()
-        ['name', 'age', 'other'].containsAll(includes)
+        5 == map.size()
+        5 == includes.size()
+        ['name', 'age', 'other', 'info', 'nested'].containsAll(includes)
     }
-
-    // void testSelectSubMap() {
-    //
-    //     when:
-    //     def map = new EntityWrapperMap(new PropertyMapTest(name:"Bart", age:11, other:"stuff"))
-    //
-    //     def submap = map['name', 'age']
-    //
-    //     then:
-    //     2 == submap.size()
-    //     "Bart" == submap.name
-    //     11 == submap.age
-    // }
 
     void testIsEmpty() {
         expect:
@@ -76,23 +70,22 @@ class EntityMapSpec extends Specification {
 
     void testContainsValue() {
         when:
-        def map = new EntityMap(new PogoBean(name:"Homer", age:45))
+        def map = new EntityMap(pogoBean())
 
         then:
-        map == [name:"Homer", age:45, other: null]
-        map.containsValue("Homer")
+        map.containsValue("Bart")
         map.containsValue(45)
         !map.containsValue("fo")
     }
 
     void testGet() {
         when:
-        def map = new EntityMap(new PogoBean(name:"Homer", age:45))
+        def map = new EntityMap(pogoBean())
 
         then:
-        "Homer" == map.get("name")
-        "Homer" == map.name
-        "Homer" == map['name']
+        "Bart" == map.get("name")
+        "Bart" == map.name
+        "Bart" == map['name']
 
         45 == map.get("age")
         45 == map.age
@@ -103,70 +96,69 @@ class EntityMapSpec extends Specification {
         map.get('foo') == null
     }
 
-    void testPut() {
-        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
-
-        map.name = "Homer"
-        map.age = 45
-        assertEquals "Homer", map.get("name")
-        assertEquals "Homer", map.name
-        assertEquals "Homer", map['name']
-
+    void "put test"() {
+        when:
+        def map = new EntityMap(pogoBean())
         def old = map.put("name", "lisa")
-        assertEquals "Homer", old
 
-        assertEquals "lisa", map.name
+        then:
+        "Bart" == old
+        "lisa" == map.name
     }
 
     void testKeySet() {
         when:
-        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
+        def map = new EntityMap(pogoBean())
         def keys = map.keySet()
 
         then:
+        keys.size() == 5
         keys.contains("name")
         keys.contains("age")
     }
 
     void testValues() {
         when:
-        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
+        def map = new EntityMap(pogoBean())
         def values = map.values()
 
         then:
         values.contains("Bart")
-        values.contains(11)
+        values.contains(45)
     }
 
     void "test entrySet"() {
         when:
-        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
+        def map = new EntityMap(pogoBean())
         def entset = map.entrySet()
 
         then:
-        entset.size() == 3
+        entset.size() == 5
         for(entry in map.entrySet()) {
             map.getIncludes().contains(entry.key)
         }
 
     }
 
-    void "test nested bean"() {
+    void "test nested pogo"() {
         when:
-        def map = new EntityMap(new PogoBean(name:"Bart", age:11))
-        def entset = map.entrySet()
+        def map = new EntityMap(pogoBean())
 
         then:
-        entset.size() == 3
-        for(entry in map.entrySet()) {
-            map.getIncludes().contains(entry.key)
-        }
-
+        map.info instanceof EntityMap
+        map.nested instanceof EntityMap
     }
+
 }
 
-class PogoBean{
+class PogoBean {
     String name
     Integer age
     String other
+    Map info
+    NestedBean nested
+}
+
+class NestedBean {
+    String prop1
 }

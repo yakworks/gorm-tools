@@ -134,8 +134,7 @@ class EntityMapService {
         Set blacklist = getBlacklist(persistentEntity)
         def entIncludes = new EntityMapIncludes(entityClassName, rootProps, blacklist)
 
-        //Map<String, Object> propMap = [className: className, props: rootProps]
-        // now cycle through the nested props and recursively call this
+        // now we cycle through the nested props and recursively call this again for each associations includes
         Map<String, EntityMapIncludes> nestedMap = [:]
         for (entry in nestedProps.entrySet()) {
             def prop = entry.key as String

@@ -4,8 +4,11 @@
 */
 package gorm.tools.json
 
+import groovy.json.JsonGenerator
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
+
+import gorm.tools.beans.EntityMap
 
 /**
  * A helper class that uses the logic in grails json view plugin to generate json without needing
@@ -18,7 +21,21 @@ import groovy.transform.CompileStatic
 @CompileStatic
 class JsonTools {
 
+    static JsonGenerator generator
+
     static String toJson(Object object){
         JsonOutput.toJson(object)
+    }
+
+    static String render(Object object, Map arguments = [:]){
+        if(!generator) initGenerator()
+        generator.toJson(object)
+    }
+
+    static void initGenerator(){
+        // exclude nulls by default
+        generator = new JsonGenerator.Options()
+            .excludeNulls()
+            .build()
     }
 }

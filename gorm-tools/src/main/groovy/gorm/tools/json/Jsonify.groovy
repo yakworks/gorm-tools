@@ -30,10 +30,6 @@ class Jsonify {
 
     static private JsonViewTemplate cachedEmptyTemplate
 
-    static String toJson(Object object){
-        JsonOutput.toJson(object)
-    }
-
     static JsonViewTemplate getViewTemplate() {
         if (!cachedEmptyTemplate) {
             //create an empty and emptyTemplate and cache. we only use it to get to the DefaultGrailsJsonViewHelper which has the beans we need setup

@@ -9,10 +9,10 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.config.GormProperties
-import org.springframework.util.Assert
 
 import gorm.tools.model.IdEnum
 import gorm.tools.utils.GormMetaUtils
+import yakworks.commons.lang.Validate
 
 /**
  * A map implementation that wraps an objects and
@@ -34,6 +34,9 @@ class EntityMap extends AbstractMap<String, Object> {
 
     private MetaClass entityMetaClass;
     private Object entity
+    // if the wrapped entity is a map then this will be the cast intance
+    private Map entityAsMap
+
     //GormProperties.IDENTITY, GormProperties.VERSION,
     private static List<String> EXCLUDES = [
         'class', 'constraints', 'hasMany', 'mapping', 'properties',
@@ -50,9 +53,12 @@ class EntityMap extends AbstractMap<String, Object> {
      * @param entity The object to inspect
      */
     EntityMap(Object entity) {
-        Assert.notNull(entity, "Object cannot be null")
+        Validate.notNull(entity)
         this.entity = entity
         entityMetaClass = GroovySystem.getMetaClassRegistry().getMetaClass(entity.getClass())
+        if(Map.isAssignableFrom(entity.class)) {
+            entityAsMap = (Map)entity
+        }
     }
 
     /**
@@ -62,12 +68,11 @@ class EntityMap extends AbstractMap<String, Object> {
      * @param entity The object to inspect
      */
     EntityMap(Object entity, EntityMapIncludes includeMap) {
-        this.entity = entity
+        this(entity)
         initialise(includeMap)
     }
 
     private void initialise(EntityMapIncludes includeMap) {
-        entityMetaClass = GroovySystem.getMetaClassRegistry().getMetaClass(entity.getClass())
         if(includeMap){
             _includeMap = includeMap
             _includes = includeMap.fields as Set<String>
@@ -89,7 +94,7 @@ class EntityMap extends AbstractMap<String, Object> {
      */
     @Override
     boolean isEmpty() {
-        return false // will never be empty
+        return size() == 0
     }
 
     /**
@@ -172,7 +177,6 @@ class EntityMap extends AbstractMap<String, Object> {
             }
         }
         else if(incMap){
-            //EntityMapIncludes incMap = incNested[prop]
             //its has its own includes so its either an object or an iterable
             if(val instanceof Iterable){
                 val = new EntityMapList(val as List, incMap)
@@ -180,6 +184,9 @@ class EntityMap extends AbstractMap<String, Object> {
                 //assume its an object then
                 val = new EntityMap(val, incMap)
             }
+        }
+        else if(val instanceof Map) {
+            val = new EntityMap(val)
         }
         else if(val instanceof GormEntity) {
             // if it reached here then just generate the default id
@@ -192,17 +199,16 @@ class EntityMap extends AbstractMap<String, Object> {
     }
 
     /**
-     * put will not set keys on the object but allows to add extra props and overrides
+     * put will not set keys on the wrapped object but allows to add extra props and overrides
+     * by using a shadow map to store the values
      */
     @Override
     Object put(final String name, final Object value) {
-        // see BeanMap in http://commons.apache.org/proper/commons-beanutils/index.html
-        // and grails LazyMetaPropertyMap to implement this if need be
-        // throw new UnsupportedOperationException("Wrapper is read-only")
-
         //json-views want to set an object key thats a copy of this so allow it
         shadowMap.put(name, value)
+        //make sure its in the includes now too
         _includes.add(name)
+        return entity[name]
     }
 
     /**
@@ -291,12 +297,21 @@ class EntityMap extends AbstractMap<String, Object> {
         return EXCLUDES.contains(mp)
     }
 
+    /**
+     * gets the includes if specified or creates the meta properties
+     */
     Set<String> getIncludes(){
+        //if not includes then build default
         if(!_includes){
-            // make the default includes
-            for (MetaProperty mp : entityMetaClass.getProperties()) {
-                if (isExcluded(mp.name)) continue
-                _includes.add(mp.name)
+            if(entityAsMap != null) {
+                _includes = entityAsMap.keySet().findAll{ key -> !isExcluded(key as String) }
+            }
+            else {
+                //assume its an object
+                for (MetaProperty mp : entityMetaClass.getProperties()) {
+                    if (isExcluded(mp.name)) continue
+                    _includes.add(mp.name)
+                }
             }
         }
         return _includes

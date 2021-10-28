@@ -10,13 +10,11 @@ dependencies {
   //for AppResourceLoader in AttachmentSupport
   compileOnly "org.grails.plugins:view-tools:$vViewTools"
 
+  // for the mock and seed data
   compileOnly("org.grails.plugins:build-test-data:$vBuildTestData"){
     exclude group:"org.grails", module: "grails-gorm-testing-support"
   }
 
-  testCompile project(":gorm-test-support")
-  testCompile "org.grails:grails-gorm-testing-support"
-  testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
 }
 
 // XXX for now we exlude the Orgs and force and implementation of them in app until we figure out how to use shadowJar

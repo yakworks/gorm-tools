@@ -6,6 +6,8 @@ dependencies {
   api "org.grails.plugins:spring-security-core:$vSpringSecurity"
 
   compileOnly project(":gorm-tools")
+  // for the org.grails.web.util.WebUtils
+  // compileOnly "org.grails:grails-web-common"
 
   testCompile project(":gorm-test-support")
   testCompile "org.grails:grails-gorm-testing-support"

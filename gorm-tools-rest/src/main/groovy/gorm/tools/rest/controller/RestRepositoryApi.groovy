@@ -18,8 +18,8 @@ import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
-import gorm.tools.job.RepoJobEntity
-import gorm.tools.job.RepoJobService
+import gorm.tools.job.RepoSyncJobEntity
+import gorm.tools.job.RepoSyncJobService
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
@@ -58,7 +58,7 @@ trait RestRepositoryApi<D> extends RestApiController {
     ApiErrorHandler apiErrorHandler
 
     @Autowired(required = false)
-    RepoJobService repoJobService
+    RepoSyncJobService repoJobService
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -218,7 +218,7 @@ trait RestRepositoryApi<D> extends RestApiController {
         BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: getIncludes("bulk"), params: bulkParams, asyncEnabled: asyncEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
-        RepoJobEntity job = repoJobService.getJob(jobId)
+        RepoSyncJobEntity job = repoJobService.getJob(jobId)
 
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
         Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: (job.data ? parseJsonBytes(job.data) : []), source:job.source, sourceId:job.sourceId]

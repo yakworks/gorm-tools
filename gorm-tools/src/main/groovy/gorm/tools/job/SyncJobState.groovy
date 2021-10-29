@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.model.IdEnum
 
 @CompileStatic
-enum JobState implements IdEnum<JobState, Integer> {
+enum SyncJobState implements IdEnum<SyncJobState, Integer> {
     Queued(0),
     Running(1),
     Finished(2), // completed succesfully or with errors
@@ -18,7 +18,7 @@ enum JobState implements IdEnum<JobState, Integer> {
 
     Integer id
 
-    JobState(Integer id) {
+    SyncJobState(Integer id) {
         this.id = id
     }
 }

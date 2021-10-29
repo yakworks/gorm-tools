@@ -2,7 +2,7 @@ package gorm.tools.repository
 
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
-import gorm.tools.job.JobState
+import gorm.tools.job.SyncJobState
 import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
@@ -11,11 +11,11 @@ import gorm.tools.testing.unit.DataRepoTest
 import org.springframework.http.HttpStatus
 import spock.lang.Issue
 import spock.lang.Specification
-import testing.TestRepoJob
+import testing.TestRepoSyncJob
 import testing.Nested
 import testing.Project
 import testing.ProjectRepo
-import testing.TestRepoJobService
+import testing.TestRepoSyncJobService
 
 class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParserTrait {
 
@@ -25,9 +25,9 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
 
     void setupSpec() {
         defineBeans{
-            repoJobService(TestRepoJobService)
+            repoJobService(TestRepoSyncJobService)
         }
-        mockDomains(Project, Nested, TestRepoJob)
+        mockDomains(Project, Nested, TestRepoSyncJob)
     }
 
     BulkableArgs setupBulkableArgs(DataOp op = DataOp.add){
@@ -46,7 +46,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
 
         when: "bulk insert 20 records"
         Long jobId = projectRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.get(jobId)
+        def job = TestRepoSyncJob.get(jobId)
 
         then: "verify job"
         job != null
@@ -54,7 +54,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         job.sourceId == "test"
         job.requestData != null
         job.data != null
-        job.state == JobState.Finished
+        job.state == SyncJobState.Finished
 
         when: "Verify job.requestData (incoming json)"
         def payload = parseJsonBytes(job.requestData)
@@ -95,10 +95,10 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
 
         when: "insert records"
         Long jobId = projectRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.get(jobId)
+        def job = TestRepoSyncJob.get(jobId)
 
         then:
-        job.state == JobState.Finished
+        job.state == SyncJobState.Finished
 
         and: "Verify db records"
         Project.count() == 10
@@ -110,13 +110,13 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         }
 
         jobId = projectRepo.bulk(list, setupBulkableArgs(DataOp.update))
-        job = TestRepoJob.get(jobId)
+        job = TestRepoSyncJob.get(jobId)
 
         then:
         noExceptionThrown()
         job != null
         job.data != null
-        job.state == JobState.Finished
+        job.state == SyncJobState.Finished
 
         and: "Verify db records"
         Project.count() == 10
@@ -135,7 +135,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
 
         when: "bulk insert"
         Long jobId = projectRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.get(jobId)
+        def job = TestRepoSyncJob.get(jobId)
 
         then: "verify job"
         job.ok == false
@@ -178,7 +178,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
 
         when: "bulk insert in multi batches"
         Long jobId = projectRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.findById(jobId)
+        def job = TestRepoSyncJob.findById(jobId)
 
         def results = parseJsonBytes(job.data)
 

@@ -16,10 +16,10 @@ import gorm.tools.source.SourceType
 
 @GormRepository
 @CompileStatic
-class JobRepo implements GormRepo<Job> {
+class SyncJobRepo implements GormRepo<SyncJob> {
 
     @RepoListener
-    void beforeBind(Job job, Map data, BeforeBindEvent be) {
+    void beforeBind(SyncJob job, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
             // must be Job called from RestApi that is passing in dataPayload
             def payload = data.dataPayload

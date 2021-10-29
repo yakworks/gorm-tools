@@ -10,18 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import gorm.tools.job.JobState
-import gorm.tools.job.RepoJobService
+import gorm.tools.job.RepoSyncJobService
+import gorm.tools.job.SyncJobState
 import gorm.tools.json.JsonTools
 import gorm.tools.repository.bulk.BulkableResults
 import yakworks.commons.lang.Validate
 
 @Lazy @Service('repoJobService')
 @CompileStatic
-class DefaultRepoJobService implements RepoJobService {
+class DefaultRepoSyncJobService implements RepoSyncJobService {
 
     @Autowired
-    JobRepo jobRepo
+    SyncJobRepo jobRepo
 
     /**
      * create Job and returns the job id
@@ -30,19 +30,19 @@ class DefaultRepoJobService implements RepoJobService {
     Long createJob(String source, String sourceId, Object payload) {
         Validate.notNull(payload)
         byte[] reqData = JsonTools.toJson(payload).bytes
-        Map data = [source: source, sourceId: sourceId, state: JobState.Running, requestData: reqData]
+        Map data = [source: source, sourceId: sourceId, state: SyncJobState.Running, requestData: reqData]
         def job = jobRepo.create((Map)data, (Map)[flush:true])
         return job.id
     }
 
     @Override
-    void updateJob(Long id, JobState state, BulkableResults results, List<Map> renderResults) {
+    void updateJob(Long id, SyncJobState state, BulkableResults results, List<Map> renderResults) {
         byte[] resultBytes = JsonTools.toJson(renderResults).bytes
         Map data = [id:id, ok: results.ok, data: resultBytes, state: state]
         jobRepo.update((Map)data, (Map)[flush: true])
     }
 
-    Job getJob(Serializable id){
+    SyncJob getJob(Serializable id){
         jobRepo.get(id)
     }
 

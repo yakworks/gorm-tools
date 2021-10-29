@@ -1,16 +1,21 @@
 package testing
 
+import gorm.tools.databinding.EntityMapBinder
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.Tag
+import yakworks.rally.tag.model.TagLink
 
 @Integration
 @Rollback
 class EntityMapBinderSpec extends Specification {
+    EntityMapBinder entityMapBinder
 
     @Issue("https://github.com/yakworks/gorm-tools/issues/181")
     @Ignore
@@ -69,5 +74,19 @@ class EntityMapBinderSpec extends Specification {
 
         then:
         org2.info.phone == "1-900"
+    }
+
+    void "bind: domain with composite id"() {
+        given:
+        Tag t = new Tag(name:"test")
+
+        when:
+        TagLink link = new TagLink()
+        entityMapBinder.bind([:], link, [tag:t, linkedId:"1", linkedEntity: "Org"])
+
+        then:
+        link.tag == t
+        link.linkedId == 1
+        link.linkedEntity == "Org"
     }
 }

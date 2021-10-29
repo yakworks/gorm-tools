@@ -5,6 +5,7 @@ import yakworks.rally.orgs.model.Org
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.rally.orgs.model.OrgTag
 
 @Integration
 @Rollback
@@ -47,6 +48,11 @@ class GormMetaUtils2Spec extends Specification {
     def "GetPersistentEntity"() {
         expect:
         GormMetaUtils.getPersistentEntity(Org)
+    }
+
+    void "check domain with composite id"() {
+        expect:
+        GormMetaUtils.findAllConstrainedProperties(OrgTag.simpleName).persistentProperties.size() == 3
     }
 
 }

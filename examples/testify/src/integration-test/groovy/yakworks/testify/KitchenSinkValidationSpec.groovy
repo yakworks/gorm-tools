@@ -7,9 +7,9 @@ import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.testify.model.Address
-import yakworks.testify.model.KitchenSink
-import yakworks.testify.model.KitchenSinkExt
+import yakworks.gorm.testing.model.Address
+import yakworks.gorm.testing.model.KitchenSink
+import yakworks.gorm.testing.model.KitchenSinkExt
 
 @Integration
 @Rollback

@@ -1,19 +1,12 @@
-package yakworks.testify.seed
+package yakworks.gorm.testing.model
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
-import yakworks.testify.model.Address
-import yakworks.testify.model.KitchenSink
-import yakworks.testify.model.KitchenSinkExt
-import yakworks.testify.model.KitchenSinkStatus
-
-// import grails.buildtestdata.TestData
-
 @CompileStatic
-class TestSeedData {
+class KitchenSeedData {
 
     static void buildKitchen(int count){
         (1..2).each{

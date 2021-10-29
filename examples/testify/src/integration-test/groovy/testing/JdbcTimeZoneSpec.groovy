@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-import yakworks.testify.model.KitchenSink
+import yakworks.gorm.testing.model.KitchenSink
 
 @Integration
 @Rollback

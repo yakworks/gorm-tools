@@ -1,4 +1,4 @@
-package yakworks.testify.model
+package yakworks.gorm.testing.model
 
 import groovy.transform.CompileStatic
 

@@ -6,8 +6,8 @@ import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.testing.RallySeedData
-import yakworks.testify.model.KitchenSink
-import yakworks.testify.seed.TestSeedData
+import yakworks.gorm.testing.model.KitchenSink
+import yakworks.gorm.testing.model.KitchenSeedData
 
 class BootStrap {
 
@@ -29,7 +29,7 @@ class BootStrap {
     void buildKitchen(){
         KitchenSink.withTransaction {
             println "BootStrap inserting 100 customers"
-            TestSeedData.buildKitchen(10)
+            KitchenSeedData.buildKitchen(10)
         }
     }
 

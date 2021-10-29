@@ -7,7 +7,7 @@ import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
-import yakworks.testify.model.Address
+import yakworks.gorm.testing.model.Address
 
 @Integration
 @Rollback
@@ -19,7 +19,7 @@ class EntityMapBinderSpec extends Specification {
         setup:
         Map params = [num: "123", name:"test-org", type: "Customer", location:[city:"Rajkot"]]
 
-        when: "Address is bound as part of org association binding"
+        when: "Stuff is bound as part of org association binding"
         Org org = new Org()
         org.properties = params
 

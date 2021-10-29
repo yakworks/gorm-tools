@@ -2,7 +2,7 @@ package yakworks.testify
 
 import grails.plugins.Plugin
 
-class TestDomainGrailsPlugin extends Plugin {
+class TestifyGrailsPlugin extends Plugin {
 
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.2.11 > *"

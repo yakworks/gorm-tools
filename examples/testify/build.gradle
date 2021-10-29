@@ -10,6 +10,7 @@ dependencies {
   implementation project(":gorm-tools")
   implementation project(":gorm-tools-security")
   implementation project(":rally-domain")
+  implementation project(":gorm-test-domain")
 
   implementation "org.grails.plugins:view-tools:$vViewTools"
 

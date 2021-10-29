@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.testify.model
+package yakworks.gorm.testing.model
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,11 +11,11 @@ import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
+import gorm.tools.model.NameNum
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
-import yakworks.rally.common.NameNum
 
 /**
  * A sample domain model for ktichen sink testing

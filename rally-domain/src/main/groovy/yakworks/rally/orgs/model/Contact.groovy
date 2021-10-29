@@ -7,13 +7,13 @@ package yakworks.rally.orgs.model
 import java.time.LocalDate
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.model.NameNum
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.security.domain.AppUser
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
-import yakworks.rally.common.NameNum
 import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.tag.model.Taggable
 

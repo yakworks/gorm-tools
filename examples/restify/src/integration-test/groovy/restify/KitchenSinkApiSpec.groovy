@@ -16,10 +16,12 @@ class KitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
     void "test get"() {
         when:
         def resp = get("$path/1")
-        Map body = bodyToMap(resp)
+        String bodyText = resp.body().string()
+        Map body = parseJsonText(bodyText) as Map
 
         then:
         resp.code() == HttpStatus.OK.value()
+        // bodyText == "123"
         body.id
         body.name == 'Kitchen1'
 

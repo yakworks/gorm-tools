@@ -10,6 +10,7 @@ import org.springframework.core.io.Resource
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.audit.AuditStampTrait
+import gorm.tools.model.NameDescription
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
@@ -17,7 +18,6 @@ import grails.persistence.Entity
 import yakworks.commons.io.FileUtil
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.attachment.repo.AttachmentRepo
-import yakworks.rally.common.NameDescription
 import yakworks.rally.tag.model.Taggable
 
 /**

@@ -52,7 +52,7 @@ class GormMetaUtils2Spec extends Specification {
 
     void "check domain with composite id"() {
         expect:
-        GormMetaUtils.findAllConstrainedProperties(OrgTag.simpleName).persistentProperties.size() == 3
+        GormMetaUtils.findPersistentEntity(OrgTag.simpleName).persistentProperties.size() == 3
     }
 
 }

@@ -160,9 +160,9 @@ class NameUtils {
      */
     static String capitalize(String name) {
         // Handle null and empty strings.
-        if (isBlank(name)) return name;
+        if (isBlank(name)) return name
 
-        return name.substring(0,1).toUpperCase() + name.substring(1);
+        return name.substring(0, 1).toUpperCase() + name.substring(1)
     }
 
     /**

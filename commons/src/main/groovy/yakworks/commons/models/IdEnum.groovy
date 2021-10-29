@@ -2,14 +2,14 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.model
+package yakworks.commons.models
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 /**
  * used as an helper for enum that is identity type. collects value for the get. map can also be used
- * should be used in conjunction with enumType: 'identity' in the mapping.
+ * should be used in conjunction with enumType: 'identity' in the mapping for hibernate/gorm.
  * Also used in entityMapBinding
  *
  * @param <E> the enum

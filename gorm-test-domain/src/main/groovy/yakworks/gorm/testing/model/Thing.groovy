@@ -4,19 +4,17 @@
 */
 package yakworks.gorm.testing.model
 
-import gorm.tools.repository.model.RepoEntity
+import gorm.tools.repository.model.GormRepoEntity
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
 @Entity
 @IdEqualsHashCode
-class Address implements RepoEntity<Address>{
-    static List qSearchIncludes = ['street', 'city']
+class Thing implements GormRepoEntity<Thing, ThingRepo> {
+    static List qSearchIncludes = ['country', 'city']
     // address fields
     String street
     String city
-    String state //provence
-    String zipCode //postalCode
     String country = "US"
 
     static constraints = {

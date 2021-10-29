@@ -71,7 +71,13 @@ class Maps {
             } else if ((map[k] == null || map[k] instanceof Collection) && val instanceof Collection) {
                 if(map[k] == null) map[k] = []
                 //The list could be list of maps - handle it
-                map[k] = ((val as Collection) + (map[k] as Collection)).collect({ it -> if(it instanceof Map) { return deepCopy(it)} else return it })
+                map[k] = ((val as Collection) + (map[k] as Collection)).collect{ it ->
+                    if(it instanceof Map) {
+                        return deepCopy(it)
+                    } else{
+                        return it
+                    }
+                }
             } else {
                 map[k] = val
             }

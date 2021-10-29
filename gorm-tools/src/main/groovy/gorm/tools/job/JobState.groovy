@@ -6,7 +6,7 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.model.IdEnum
+import yakworks.commons.models.IdEnum
 
 @CompileStatic
 enum JobState implements IdEnum<JobState, Integer> {

@@ -14,13 +14,13 @@ import gorm.tools.repository.events.RepoListener
 
 @GormRepository
 @CompileStatic
-class AddressRepo implements GormRepo<Address> {
+class ThingRepo implements GormRepo<Thing> {
 
     @RepoListener
-    void beforeValidate(Address loc, Errors errors) {
+    void beforeValidate(Thing loc, Errors errors) {
         //test rejectValue
-        if(loc.city == 'AddyVille'){
-            rejectValue(loc, errors, 'city', loc.city, 'no.AddyVilles')
+        if(loc.city == 'RejectThis'){
+            rejectValue(loc, errors, 'city', loc.city, 'no.from.ThingRepo')
         }
     }
 }

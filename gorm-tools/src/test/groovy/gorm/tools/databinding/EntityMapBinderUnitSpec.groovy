@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DataRepoTest
-import gorm.tools.model.IdEnum
+import yakworks.commons.models.IdEnum
 import grails.databinding.converters.ValueConverter
 import grails.persistence.Entity
 import org.grails.databinding.converters.ConversionService

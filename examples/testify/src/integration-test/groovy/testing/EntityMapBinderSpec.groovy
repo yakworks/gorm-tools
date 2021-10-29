@@ -7,7 +7,6 @@ import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
-import yakworks.gorm.testing.model.Address
 
 @Integration
 @Rollback

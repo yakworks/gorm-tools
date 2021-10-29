@@ -10,9 +10,9 @@ import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.config.GormProperties
 
-import gorm.tools.model.IdEnum
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.Validate
+import yakworks.commons.models.IdEnum
 
 /**
  * A map implementation that wraps an objects and

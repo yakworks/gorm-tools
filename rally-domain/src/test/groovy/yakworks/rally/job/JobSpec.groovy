@@ -4,7 +4,7 @@
 */
 package yakworks.rally.job
 
-import gorm.tools.json.Jsonify
+import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.source.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
@@ -49,10 +49,10 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
 
     void "convert json to byte array"() {
         setup:
-        def res = Jsonify.render(["One", "Two", "Three"])
+        def res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        Job job = new Job(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.jsonText.bytes)
+        Job job = new Job(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"

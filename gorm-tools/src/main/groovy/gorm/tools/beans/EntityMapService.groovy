@@ -18,6 +18,7 @@ import org.grails.datastore.mapping.model.types.Association
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
 import grails.plugin.cache.Cacheable
+import yakworks.commons.json.JsonEngine
 
 /**
  * EntityMapService contains a set of helpers, which will create the EntityMap and Lists
@@ -44,9 +45,26 @@ class EntityMapService {
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
-    EntityMap createEntityMap(Object entity, List<String> includes) {
+    EntityMap createEntityMap(Object entity, List<String> includes = null) {
         EntityMapIncludes includesMap = buildIncludesMap(entity.class.name, includes)
         return new EntityMap(entity, includesMap)
+    }
+
+    /**
+     * Calls createEntityMap and then passed to JsonEngine to generate json string
+     *
+     * @param entity the entity to wrap in a map
+     * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
+     * @return the json string
+     */
+    String toJson(Object entity, List<String> includes = null){
+        EntityMap emap = createEntityMap(entity, includes)
+        return JsonEngine.toJson(emap)
+    }
+
+    String toJson(List entityList, List<String> includes = null){
+        EntityMapList elist = createEntityMapList(entityList, includes)
+        return JsonEngine.toJson(elist)
     }
 
     /**

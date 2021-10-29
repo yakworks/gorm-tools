@@ -9,6 +9,7 @@ import grails.buildtestdata.BuildDataTest
 import spock.lang.Specification
 import testing.Cust
 import testing.CustType
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 
 class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoTest{
 
@@ -31,7 +32,7 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
         List incs = TestDataJson.getFieldsToBuild(Cust)
 
         then:
-        incs == ['name', 'type', 'type.id']
+        incs == ['name', 'type.id']
 
     }
 
@@ -45,8 +46,8 @@ class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoT
     void "test buildJson"(){
         expect:
         def buildJson = TestDataJson.buildJson(Cust, name: 'foo', name2: 'bar')
-
-        buildJson.jsonText == '{"name":"foo","type":{"id":1},"name2":"bar"}'
+        assertThatJson(buildJson)
+            .isEqualTo('{"name":"foo","type":{"id":1},"name2":"bar"}')
     }
 
 }

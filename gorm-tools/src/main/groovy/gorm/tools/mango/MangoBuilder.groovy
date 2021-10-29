@@ -17,8 +17,8 @@ import org.grails.datastore.mapping.query.api.QueryableCriteria
 
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntity
-import gorm.tools.model.IdEnum
 import grails.gorm.DetachedCriteria
+import yakworks.commons.models.IdEnum
 
 import static gorm.tools.mango.MangoOps.CompareOp
 import static gorm.tools.mango.MangoOps.ExistOp

@@ -12,6 +12,7 @@ import groovy.transform.CompileDynamic
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
+import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -24,7 +25,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class KitchenSink implements NameNum, RepoEntity<KitchenSink>, CreateCriteriaSupport {
+class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRepo>, CreateCriteriaSupport {
 
     //strings
     String name2
@@ -39,10 +40,10 @@ class KitchenSink implements NameNum, RepoEntity<KitchenSink>, CreateCriteriaSup
     LocalDate locDate
     LocalDateTime locDateTime
     //special
-    //Currency currency //FIXME creates and overflow
     KitchenSink link
+
     //Associations
-    Address location //belongs to whatever
+    Thing thing //belongs to whatever
 
     // since OrgExt also has an Org property (orgParent) it gets confused and
     // needs to know that its "belongs" to is the map and that orgParent gets set sepearatly
@@ -66,7 +67,7 @@ class KitchenSink implements NameNum, RepoEntity<KitchenSink>, CreateCriteriaSup
     static mapping = {
         //id generator:'assigned'
         ext column: 'extId' //, cascade: 'none'
-        location column: 'locationId'
+        thing column: 'locationId'
         status enumType: 'identity'
     }
 

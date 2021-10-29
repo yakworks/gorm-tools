@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.model.IdEnum
+import yakworks.commons.models.IdEnum
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity

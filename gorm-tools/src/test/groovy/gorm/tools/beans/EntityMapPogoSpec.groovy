@@ -146,7 +146,8 @@ class EntityMapPogoSpec extends Specification {
 
         then:
         map.info instanceof EntityMap
-        map.nested instanceof EntityMap
+        // pogos dont get wrapped unless they are refed in includes
+        map.nested instanceof NestedBean
     }
 
 }

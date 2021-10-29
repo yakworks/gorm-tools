@@ -15,13 +15,13 @@ import groovy.util.logging.Slf4j
 class EntityMapIncludes {
     String className
     Set<String> fields
-    Set<String> blacklist
+    Set<String> excludeFields
     //nestedIncludes has the associations and its included fields
     Map<String, EntityMapIncludes> nestedIncludes
 
-    EntityMapIncludes(String className, Set<String> fields, Set<String> blacklist){
+    EntityMapIncludes(String className, Set<String> fields, Set<String> excludeFields){
         this.className = className
-        this.fields = fields - blacklist
-        this.blacklist = blacklist
+        this.fields = fields - excludeFields
+        this.excludeFields = excludeFields
     }
 }

@@ -4,7 +4,7 @@
 */
 package yakworks.gorm.testing.model
 
-import java.time.LocalDate
+
 import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
@@ -32,7 +32,7 @@ class KitchenSeedData {
     }
 
     static KitchenSink createKitchen(Long id){
-        def loc = new Address(city: "City$id")
+        def loc = new Thing(city: "City$id")
         loc.id = id
         loc.persist()
 
@@ -47,7 +47,7 @@ class KitchenSeedData {
             revenue: (id - 1) * 1.25,
             creditLimit: (id - 1) * 1.5,
             actDate: LocalDateTime.now().plusDays(id).toDate(),
-            location: loc
+            thing: loc
         )
         org.id = id
         return org

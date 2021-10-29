@@ -1,4 +1,4 @@
-package yakworks.rally.orgs
+package yakworks.testify
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.errors.EntityValidationException
@@ -7,7 +7,7 @@ import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
-import yakworks.gorm.testing.model.Address
+import yakworks.gorm.testing.model.Thing
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkExt
 
@@ -65,7 +65,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
     void "rejectValue only in LocationRepo beforeValidate"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.location = new Address(city: "AddyVille", country: 'USA')
+        sink.thing = new Thing(city: "AddyVille", country: 'USA')
         assert !sink.validate()
         //flushAndClear()
 
@@ -82,7 +82,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
     void "org and orgext rejectValue in beforeValidate"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.location = new Address(city: "AddyVille", country: 'USA', street: 'OrgRepoStreet')
+        sink.thing = new Thing(city: "AddyVille", country: 'USA', street: 'RejectThis')
         sink.ext = new KitchenSinkExt(kitchenSink: sink, textMax: 'foo') //foo is 3 chars and should fail validation
         sink.persist()
         //flushAndClear()
@@ -91,11 +91,11 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         def ex = thrown(EntityValidationException)
         //normal validation errors
         sink.errors['ext.textMax'].code == 'maxSize.exceeded'
-        sink.errors['location.country'].code == 'maxSize.exceeded'
+        sink.errors['thing.country'].code == 'maxSize.exceeded'
         //since its in orgRepo beforeValidate it shows up as nested
-        sink.errors['location.street'].code == 'from.OrgRepo'
+        sink.errors['thing.street'].code == 'no.from.KitchenSinkRepo'
         //comes from addy repo's beforeValidate
-        sink.errors['location.city'].code == 'no.AddyVilles'
+        sink.errors['thing.city'].code == 'no.from.ThingRepo'
     }
 
     def "test create validation fail"(){

@@ -62,10 +62,10 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         sink.ext.id
     }
 
-    void "rejectValue only in LocationRepo beforeValidate"(){
+    void "rejectValue only in ThingRepo beforeValidate"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.thing = new Thing(city: "AddyVille", country: 'USA')
+        sink.thing = new Thing(city: "RejectThis", country: 'USA')
         assert !sink.validate()
         //flushAndClear()
 
@@ -73,16 +73,16 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         //def ex = thrown(EntityValidationException)
         sink.errors.errorCount == 2
         //from repo
-        sink.errors['location.city'].code == 'no.AddyVilles'
+        sink.errors['thing.city'].code == 'no.from.ThingRepo'
         //normal
-        sink.errors['location.country'].code == 'maxSize.exceeded'
+        sink.errors['thing.country'].code == 'maxSize.exceeded'
         //sink.location.errors['city'].code == 'no.AddyVilles'
     }
 
     void "org and orgext rejectValue in beforeValidate"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.thing = new Thing(city: "AddyVille", country: 'USA', street: 'RejectThis')
+        sink.thing = new Thing(city: "RejectThis", country: 'USA', street: 'RejectThis')
         sink.ext = new KitchenSinkExt(kitchenSink: sink, textMax: 'foo') //foo is 3 chars and should fail validation
         sink.persist()
         //flushAndClear()

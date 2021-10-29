@@ -63,8 +63,8 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
 
         then:
         j
-        res.jsonText.bytes == j.requestData
-        res.jsonText == new String(j.requestData, 'UTF-8')
+        res.bytes == j.requestData
+        res == new String(j.requestData, 'UTF-8')
 
     }
 

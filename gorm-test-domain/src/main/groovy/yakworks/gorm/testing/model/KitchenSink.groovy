@@ -70,88 +70,11 @@ class KitchenSink implements NameNum, RepoEntity<KitchenSink>, CreateCriteriaSup
         status enumType: 'identity'
     }
 
-    static constraints = {
-        apiConstraints(delegate)
+    static constraintsMap = [
+        secret: [ display: false ],
+        inactive: [ required: false ],
+        kind: [ nullable: false ],
+        link: [ bindable: true ],
+    ]
 
-        name2    nullable: true
-        secret   nullable: true, display: false
-
-        inactive nullable: true, required: false
-        revenue  nullable: true
-
-        //dates
-        actDate     nullable: true, example: "2018-01-26T01:36:02Z"
-        locDate     nullable: true, example: "2018-01-25"
-        locDateTime nullable: true, example: "2018-01-01T01:01:01"
-        //special
-        //currency    nullable: true
-
-        //enums
-        kind nullable: false
-        status nullable: true
-
-        //Associations
-        location nullable: true
-        ext  nullable: true
-        link nullable: true, bindable: true
-    }
-
-
-    static config = """{
-        json {
-            includes = '*' //should be default
-            excludes = ['location']
-        }
-        query.quickSearch = ["name", "name2"]
-        audittrail.enabled = false
-        autotest.update = [name:'foo']
-    }"""
-
-    // @Override
-    // boolean equals(Object o) {
-    //     if (o == null) return false
-    //     if (this.is(o)) return true
-    //     if (!(o instanceof Org)) return false
-    //     Org other = (Org) o
-    //     //if (id != null && other.id !=null) return id == other.id
-    //     return id == other.id
-    //     //return false
-    // }
-
-
-
-    // @Override
-    // int hashCode() {
-    //     int _result = HashCodeHelper.initHash();
-    //     _result = HashCodeHelper.updateHash(_result, num)
-    //     return HashCodeHelper.updateHash(_result, name)
-    //     // if (this.getId() != this) {
-    //     //     int var2 = HashCodeHelper.updateHash(_result, this.getId());
-    //     //     _result = var2;
-    //     // }
-    //     //
-    //     // return _result;
-    //     // return new HashCodeBuilder()
-    //     //     .append(num)
-    //     //     .append(name)
-    //     //     .toHashCode()
-    // }
-
-    // boolean equals(Object other) {
-    //     if (other == null) {
-    //         return false;
-    //     } else if (this == other) {
-    //         return true;
-    //     } else if (!(other instanceof Org)) {
-    //         return false;
-    //     } else {
-    //         Org otherTyped = (Org)other;
-    //         return ScriptBytecodeAdapter.compareEqual(this.getId(), otherTyped.getId());
-    //     }
-    // }
-
-    // @Override
-    // int hashCode() {
-    //     return 31 //when using id for equals then this is fine unless collection is large, like 10,000 items
-    // }
 }

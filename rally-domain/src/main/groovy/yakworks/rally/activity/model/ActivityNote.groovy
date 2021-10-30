@@ -22,6 +22,7 @@ class ActivityNote implements RepoEntity<ActivityNote>, Serializable {
 
     static mapping = {
         id generator: 'assigned'
+        body sqlType:'TEXT'
     }
 
     static constraintsMap = [

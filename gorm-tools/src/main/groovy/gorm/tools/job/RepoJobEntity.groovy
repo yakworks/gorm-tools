@@ -6,9 +6,9 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.model.SourceTrait
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
-import gorm.tools.model.SourceTrait
 
 @CompileStatic
 trait RepoJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {

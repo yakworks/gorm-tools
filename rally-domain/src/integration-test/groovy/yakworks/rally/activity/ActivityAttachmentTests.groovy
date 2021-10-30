@@ -40,7 +40,6 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
     ActivityRepo activityRepo
     AppResourceLoader appResourceLoader
     JdbcTemplate jdbcTemplate
-    SecService secService
     AttachmentRepo attachmentRepo
 
     static Map getNoteParams() {
@@ -67,9 +66,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
         then:
         1 == activity.attachments.size()
-
-        attachment != null
-        attachment.id != null
+        attachment.id
 
         activity.attachments.each {
             assert 'txt' == it.extension
@@ -77,7 +74,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
             assert it.location.endsWith('.txt')
         }
 
-        200 == activity.org.id
+        9 == activity.org.id
 
     }
 
@@ -122,11 +119,10 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
         then:
         noExceptionThrown()
-        activity != null
-        attachment != null
-        attachment.id != null
+        activity.hasAttachments()
+        attachment.id
         'grails_logo.jpg' == attachment.name
-        activity.task == null
+        !activity.task
 
         cleanup:
         FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
@@ -135,7 +131,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
     void "update note with attachments"() {
         when:
         Map params = [id: 22, note: [body: 'Test updated Note body']]
-        params['attachments'] = [getTestAttachment()]
+        params['attachments'] = [getTestAttachment('foo.pdf')]
 
         Activity result = activityRepo.update(params)
         flushAndClear()
@@ -147,17 +143,14 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
         when:
         Activity updatedActivity = Activity.get(params.id)
-
-        then:
-        params.note.body == updatedActivity.note.body
-
-        when:
         def attachment = updatedActivity.attachments[0]
 
         then:
-        attachment != null
-        attachment.id != null
-        'grails_logo.jpg' == attachment.name
+        updatedActivity.hasAttachments()
+        params.note.body == updatedActivity.note.body
+
+        attachment.id
+        'foo.pdf' == attachment.name
 
         cleanup:
         FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
@@ -166,24 +159,11 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
     void testHasAttachments(){
         when:
-        def activity = Activity.get(200)//Existing Activity in test d/b without ActivityAttachment
+        def activity = Activity.get(9)//Existing Activity in test d/b without ActivityAttachment
 
         then:
-        activity != null
+        activity
         !activity.attachments
-    }
-
-    void testHasAttachments_Success(){
-        when:
-        //Adding attachment to existing Activity from test d/b to check for hasAttachments
-        def activity = Activity.get(200)
-        def att = Attachment.get(1004)
-        assert att
-        activity.addAttachment(att)
-        activity.persist()
-        flush()
-        then:
-        activity.hasAttachments()
     }
 
 }

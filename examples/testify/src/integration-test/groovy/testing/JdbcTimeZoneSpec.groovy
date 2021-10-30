@@ -32,7 +32,7 @@ class JdbcTimeZoneSpec extends Specification {
         KitchenSink kitchenSink = new KitchenSink(num:'t1', name: "test", actDate: now, locDateTime: ldt)
         kitchenSink.persist(flush: true)
 
-        RepoUtil.flushAndClear()
+        KitchenSink.repo.flushAndClear()
 
         kitchenSink = KitchenSink.get(kitchenSink.id)
 

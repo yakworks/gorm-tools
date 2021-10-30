@@ -20,6 +20,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.repository.RepoUtil
 import grails.gorm.transactions.GrailsTransactionTemplate
 
@@ -147,15 +148,7 @@ class TrxService {
         ses.clear()
     }
 
-    // @CompileDynamic
-    // void clear(TransactionStatus status) {
-    //     // FIXME The reason this is compile dynamic might just be how unit tests wire things up for transactions
-    //     // might just need to move tests over to integration and see.
-    //     //Cannot cast object 'org.springframework.orm.hibernate5.HibernateTransactionManager$HibernateTransactionObject
-    //     // def defTrxStatus = (DefaultTransactionStatus)status
-    //     // // TransactionObject txObject = (TransactionObject) defTrxStatus.getTransaction()
-    //     // final SessionHolder sessionHolder = defTrxStatus['sessionHolder'](SessionHolder)
-    //     // sessionHolder.getSession().clear()
-    //     status.transaction.sessionHolder.getSession().clear()
-    // }
+    static TrxService bean(){
+        AppCtx.get('trxService', TrxService)
+    }
 }

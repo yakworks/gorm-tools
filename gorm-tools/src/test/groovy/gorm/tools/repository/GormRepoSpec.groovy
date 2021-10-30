@@ -113,7 +113,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         // org.getDirtyPropertyNames() == ['ext']
 
         when: "changes happen to org"
-        RepoUtil.flushAndClear()
+        flushAndClear()
         org = Cust.get(3)
         assert org.name == 'name'
         org['name'] = "make dirty1"

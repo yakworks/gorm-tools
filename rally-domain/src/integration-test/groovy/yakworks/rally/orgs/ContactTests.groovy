@@ -5,6 +5,7 @@ import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -12,84 +13,33 @@ import yakworks.rally.orgs.model.ContactPhone
 import yakworks.rally.orgs.model.ContactSource
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.ContactRepo
 
 @Integration
 @Rollback
-class ContactTests extends Specification implements DataIntegrationTest {
+class ContactTests extends Specification implements DomainIntTest {
 
     ContactRepo contactRepo
 
-    def testEquals() {
+    def "listActive should only return active contacts"() {
         when:
-        def contact = Contact.get(51)
+        def result = Contact.listActive(99)
+        def primary = Org.get(99).contact
+        def secondary = Contact.findByNum("secondary99")
 
         then:
-        contact != null
+        result.contains(primary)
+        result.contains(secondary)
 
         when:
-        def contact2 = Contact.get(51)
+        secondary.inactive = true
+        secondary.persist(flush:true)
+
+        result = Contact.listActive(99)
 
         then:
-        contact2 != null
-        contact.equals(contact2)
-
-        when:
-        contact2 = Contact.get(52)
-
-        then:
-        !contact.equals(contact2)
-
-        when:
-        // diff class
-        def org = Org.get(101)
-
-        then:
-        !contact.equals(org)
-
-        when:
-        // null
-        def contactNull = Contact.get(-987)
-
-        then:
-        !contact.equals(contactNull)
-    }
-
-    def testHashCode() {
-        when:
-        def contact = Contact.get(51)
-        int contactHash = contact.hashCode()
-
-        def contact2 = Contact.get(51)
-        int contact2Hash = contact2.hashCode()
-
-        then:
-        contactHash == contact2Hash
-
-        when:
-        contact2 = Contact.get(52)
-        contact2Hash = contact2.hashCode()
-
-        then:
-        contactHash != contact2Hash
-    }
-
-    def testListActive() {
-        when:
-        def result = Contact.listActive(205)
-
-        then:
-        result.contains(Contact.get(52))
-
-        when:
-        def totest = Contact.get(52)
-        totest.email = 'bb@greenbill.com'
-        totest.inactive = true
-        totest.persist(flush:true)
-        result = Contact.listActive(205)
-
-        then:
-        !result.contains(Contact.get(52))
+        !result.contains(secondary)
     }
 
     def testDeleteFailure_ForLoggedInUserContact(){
@@ -147,26 +97,35 @@ class ContactTests extends Specification implements DataIntegrationTest {
 
     void "test delete contact fails when its primary contact for org"() {
         when:
-        def con = Contact.get(50)
+        def con = Org.get(50).contact
         con.user = null
         con.persist(flush:true)
         //contact 50 is key contact
-        Contact.get(50).remove()
+        Org.get(50).contact.remove()
 
         then:
         EntityValidationException e = thrown()
         e.code == "contact.not.deleted.iskey"
     }
 
-    void "test contact email update : updates user.email"() {
+    void "test create Contact with org lookup by orgSource"() {
+        setup:
+        Org org = Org.create("foo", "bar", OrgType.Customer)
+        org.validate()
+        org.createSource()
+        org.persist(flush: true)
+
+        Map params = [firstName:'Peter', email:'abc@walmart.com']
+        params.org = [source: [sourceId: 'foo', orgType: OrgType.Customer.name()]]
+
+
         when:
-        Contact cuser = Contact.get(2)
-        cuser.email = "updated@email.com"
-        cuser.persist()
-        flush()
+        def entity = Contact.create(params)
+        flushAndClear()
+        def contact = Contact.get(entity.id)
 
         then:
-        cuser.user.email == "updated@email.com"
+        contact.org.num == "foo"
 
     }
 

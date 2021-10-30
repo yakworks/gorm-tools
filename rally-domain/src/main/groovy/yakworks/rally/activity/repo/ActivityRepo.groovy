@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils
 
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
+import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
@@ -25,7 +26,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.services.SecService
-import gorm.tools.model.SourceType
 import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
@@ -213,7 +213,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         Validate.notNull(completedById, "[completedById]")
         task.bind(status: TaskStatus.COMPLETE,
                 state: TaskStatus.COMPLETE.id as Integer,
-                completedDate: new Date(),
+                completedDate: LocalDateTime.now(),
                 completedBy: completedById)
 
     }

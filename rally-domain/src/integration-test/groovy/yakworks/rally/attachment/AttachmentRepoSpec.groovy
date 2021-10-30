@@ -77,39 +77,6 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
 
     }
 
-
-    def testInsert_fail() {
-        when:
-        Map params = [bytes:'blah blah blah'.getBytes()]
-        Attachment result = attachmentRepo.create(params)
-
-        then:
-        EntityValidationException g = thrown()
-        'validation.error' == g.code
-
-    }
-
-    @Ignore //FIXME
-    def "test create file in creditFile"() {
-        byte[] bytes = "A test string".bytes
-        Map params = [name:"test", extension:"jpg", bytes:bytes, isCreditFile: true]
-
-        when:
-        Attachment entity = attachmentRepo.create(params)
-        File attachedFile = appResourceLoader.getFile(entity.location)
-
-        then:
-        entity != null
-        entity instanceof Attachment
-        entity.name == "test"
-        entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
-        attachedFile.absolutePath.startsWith appResourceLoader.getLocation("attachments.creditFiles.location").absolutePath
-
-
-        cleanup:
-        attachedFile.delete()
-    }
-
     def testDeleteFileIfInsert_fail() {
         when:
         File origFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")
@@ -250,52 +217,5 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         old.inputStream != null
     }
 
-//    def testMassUpdate_attachment() {
-//        setup:
-//
-//        File origFile = new File("${RESOURCES_PATH}/grails_logo.jpg")
-//        byte[] bytes = FileUtils.readFileToByteArray(origFile)
-//        File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', bytes)
-//        String tempFileName = appResourceLoader.getRelativeTempPath(tmpFile)
-//
-//        def changes = [
-//            summary: 'attachment_test',
-//            attachments: [
-//                [name: "grails_logo.jpg", originalFileName: "grails_logo.jpg", tempFileName: tempFileName]
-//            ]
-//        ]
-//
-//        CustAccount custAcc1 = CustAccount.first()
-//        //CustAccount custAcc2 = CustAccount.list()[1]
-//        //def custAccIds = [custAcc1.id, custAcc2.id]
-//        def custAccIds = [custAcc1.id]
-//
-//        when:
-//        activityRepo.insertMassActivity([custAcc1.id], changes as Map)
-//
-//        //custAccountMassUpdateService.massUpdate(custAccIds, changes)
-//        flushAndClear()
-//
-//        then:
-//        Long id = custAcc1.id
-//        //custAccIds.each { id ->
-//            def link = ActivityLink.findByLinkedEntityAndLinkedId('CustAccount', id)
-//            assert link
-//            def activity = link.activity
-//            assert activity
-//            assert activity.summary == "attachment_test"
-//
-//            assert activity.attachments[0]
-//
-//            def activityAttachment = ActivityAttachment.findByActivity(activity)
-//            assert activityAttachment
-//            assert activity.id == activityAttachment.activity?.id
-//            def attachment = activityAttachment.attachment
-//            assert attachment
-//            assert attachment.id
-//            assert '123.pdf' == attachment.name
-//        //}
-//
-//    }
 
 }

@@ -35,7 +35,7 @@ class ContactRepo implements GormRepo<Contact> {
     @RepoListener
     void beforeValidate(Contact contact) {
         if (contact.flex && !contact.flex.id) contact.flex.contact = contact
-        contact.concatName()
+        setupNameProps(contact)
     }
 
     @RepoListener
@@ -72,19 +72,11 @@ class ContactRepo implements GormRepo<Contact> {
     @RepoListener
     void afterBind(Contact contact, Map data, AfterBindEvent e) {
         assignOrg(contact, data)
-        contact.concatName()
-        assignUserNameFromContactName(contact)
     }
 
     @RepoListener
     void beforePersist(Contact contact, BeforePersistEvent e) {
-        if(contact.isDirty('email')) {
-            AppUser user = contact.user
-            if(user) {
-                user.email = contact.email
-                user.persist()
-            }
-        }
+
     }
 
     @RepoListener
@@ -94,6 +86,35 @@ class ContactRepo implements GormRepo<Contact> {
             doAssociations(contact, data)
         }
         if (contact.location?.isDirty()) contact.location.persist()
+        syncChangesToUser(contact)
+    }
+
+    /**
+     * if email or name is changed the progate them to user
+     */
+    void syncChangesToUser(Contact contact){
+        AppUser user = contact.user
+        if(user){
+            if(contact.isDirty('email')){
+                user.email = contact.email
+            }
+            if(contact.isDirty('name') && contact.user.name != contact.name){
+                user.name = contact.name
+            }
+            if(user.isDirty()) user.persist()
+        }
+    }
+
+    void setupNameProps(Contact c) {
+        if(c.isNew()) {
+            if(!c.firstName && c.name) c.firstName = c.name
+        }
+        concatName(c)
+    }
+
+    void concatName(Contact c) {
+        String fullName = ((c.firstName ?: "") + ' ' + (c.lastName ?: "")).trim()
+        c.name = fullName.size() > 50 ? fullName[0..49] : fullName
     }
 
     void doAssociations(Contact contact, Map data) {
@@ -114,7 +135,6 @@ class ContactRepo implements GormRepo<Contact> {
         }
     }
 
-    @Transactional
     Contact assignUserNameFromContactName(Contact contact) {
         if (contact.user && contact.user.name != contact.name) {
             contact.user.name = contact.name

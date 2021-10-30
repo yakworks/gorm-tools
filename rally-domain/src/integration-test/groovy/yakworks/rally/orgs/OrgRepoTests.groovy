@@ -3,9 +3,11 @@ package yakworks.rally.orgs
 import java.time.LocalDate
 
 import org.springframework.core.NestedExceptionUtils
+import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.model.SourceType
+import gorm.tools.testing.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
@@ -45,7 +47,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     def "test create"() {
         when:
         def params = MockData.createOrg
-        def org = orgRepo.create(params.asUnmodifiable())
+        def org = orgRepo.create(params)
         orgRepo.flushAndClear()
         org = Org.get(org.id)
 
@@ -265,5 +267,75 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     }
 
+
+    void "test find org by sourceid"() {
+        when:
+        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
+        // org.persist()
+        // org.createSource()
+        orgRepo.flush()
+
+        then: "source id is the default"
+        assert org.source.sourceId == "foo"
+
+        Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
+        o.name == "bar"
+
+    }
+
+    void "test find org by num"() {
+        when:
+        Org org3 = Org.create(num: "foo3", name: "bar3", type: OrgType.Customer)
+        orgRepo.flush()
+
+        Org o3 = Org.repo.findWithData(num: "foo3")
+
+        then: "found because unique"
+        assert o3
+    }
+
+    void "test find org by num not unique"() {
+        when:
+        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
+        Org org2 = Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
+        orgRepo.flush()
+        Org o3 = Org.repo.findWithData(num: "foo")
+
+        then: "not found because not unique"
+        thrown DataRetrievalFailureException
+
+        when: "num would get set to sourceId so it will fail too"
+        o3 = Org.repo.findWithData(source:[ sourceId: "foo"])
+
+        then: "not found because not unique"
+        thrown DataRetrievalFailureException
+    }
+
+    def "update org lookup by sourceid"() {
+        setup:
+        Long orgId = 1111
+
+        Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer']
+
+        when: "create"
+        def org = Org.create(params, bindId: true)
+        orgRepo.flush()
+
+        then: "make sure source is assigned properly"
+        org.id == orgId
+        org.source.sourceId == 'foo'
+        org.source.orgType == OrgType.Customer
+        // use the same query orgSource.repo is using
+        List res = OrgSource.executeQuery('select orgId from OrgSource where sourceId = :sourceId and orgType = :orgType',
+            [sourceId: 'foo', orgType: OrgType.Customer] )
+        res.size() == 1
+
+        when: "update"
+        org = Org.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
+
+        then:
+        org.name == 'new name'
+        org.source.sourceId == 'foo'
+    }
 
 }

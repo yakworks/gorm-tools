@@ -11,6 +11,9 @@ import groovy.transform.CompileStatic
 import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.beans.AppCtx
+import gorm.tools.security.domain.AppUser
+import gorm.tools.security.domain.SecRole
+import gorm.tools.security.domain.SecRoleUser
 import grails.compiler.GrailsCompileStatic
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -31,6 +34,8 @@ class RallySeedData {
     }
 
     static fullMonty(){
+        buildAppUser()
+        buildClientOrg()
         buildOrgs(100)
         buildTags()
         createIndexes()
@@ -44,27 +49,42 @@ class RallySeedData {
     static void buildOrgs(int count){
         Org.withTransaction {
             //createOrgTypeSetups()
-            (1..2).each{
+            (2..3).each{
                 def company = createOrg(it , OrgType.Company)
                 company.location.kind = Location.Kind.remittance
                 company.location.persist()
             }
             if(count < 3) return
-            (3..count).each { id ->
+            (4..count).each { id ->
                 def org = createOrg(id, OrgType.Customer)
             }
         }
 
     }
 
+    static void buildClientOrg(){
+        Org.withTransaction {
+            def data = [
+                id: 1,
+                num: "1",
+                name: "Client Org",
+                type: OrgType.Client,
+                location: [city: "City1"]
+            ]
+            def client = Org.create(data)
+
+            def user = Contact.create(
+                id: 1,
+                num: "1",
+                name: "Main User",
+                org: client,
+                user: [id: 1]
+            )
+        }
+
+    }
+
     static Org createOrg(Long id, OrgType type){
-        def con = Contact.create(
-            id: id,
-            num: "primary$id",
-            email    : "jgalt$id@taggart.com",
-            firstName: "John$id",
-            lastName : "Galt$id"
-        )
 
         String value = "Org" + id
         def data = [
@@ -82,7 +102,10 @@ class RallySeedData {
             ],
             location: [city: "City$id"],
             contact: [
-                id: con.id
+                num: "primary$id",
+                email    : "jgalt$id@taggart.com",
+                firstName: "John$id",
+                lastName : "Galt$id"
             ],
             contacts: [[
                 num: "secondary$id",
@@ -110,4 +133,24 @@ class RallySeedData {
         }
     }
 
+    static void buildAppUser(){
+        AppUser.withTransaction {
+            println "BootStrap inserting AppUser"
+            AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo")
+            user.persist()
+            //AppUser user = AppUser.create([id: 1, username: "admin", email: "admin@9ci.com", password:"admin"], bindId: true)
+            assert user.id == 1
+
+            SecRole admin = SecRole.create([id:1, name: SecRole.ADMINISTRATOR], bindId: true)
+            SecRole power = SecRole.create([id:2, name: "Power User"], bindId: true)
+            SecRole guest = SecRole.create([id:3, name: "Guest"], bindId: true)
+
+            SecRoleUser.create(user, admin, true)
+            SecRoleUser.create(user, power, true)
+
+            AppUser noRoleUser = AppUser.create([id: 2, username: "noroles", email: "noroles@9ci.com", password:"123Foo"], bindId: true)
+            assert noRoleUser.id == 2
+            return
+        }
+    }
 }

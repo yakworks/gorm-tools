@@ -110,11 +110,6 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         return (user && user.enabled)
     }
 
-    void concatName() {
-        String fullName = ((firstName ?: "") + ' ' + (lastName ?: "")).trim()
-        name = fullName.size() > 50 ? fullName[0..49] : fullName
-    }
-
     /**
      * If contact has a locationId and isLocationDifferent=false, otherwise use the main location from the org.
      */

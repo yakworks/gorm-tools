@@ -38,7 +38,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "test create orgTag"() {
         when:
         setUpData()
-        def org = Org.get(205)
+        def org = Org.get(50)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         def o = orgTagRepo.create(org, Tag.get(1))
         flushAndClear()
@@ -51,7 +51,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "sanity check methods"() {
         setup:
         setUpData()
-        def org = Org.get(205)
+        def org = Org.get(50)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.get(1))
         orgTagRepo.create(org, Tag.get(2))
@@ -75,7 +75,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "remove"() {
         when:
         setUpData()
-        def org = Org.get(205)
+        def org = Org.get(50)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.get(1))
         flushAndClear()
@@ -90,7 +90,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "remove all"() {
         when:
         setUpData()
-        def org = Org.get(205)
+        def org = Org.get(50)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.get(1))
         orgTagRepo.create(org, Tag.get(2))
@@ -106,7 +106,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "list" () {
         setup:
         setUpData()
-        def org = Org.get(205)
+        def org = Org.get(50)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.load(1))
         orgTagRepo.create(org, Tag.load(2))

@@ -1,4 +1,4 @@
-package testing
+package yakworks.rally
 
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 import org.hibernate.Hibernate

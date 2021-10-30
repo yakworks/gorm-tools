@@ -6,7 +6,7 @@ package yakworks.commons.testing.pogos
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.models.IdEnum
+import yakworks.commons.model.IdEnum
 
 @CompileStatic
 enum GadgetStatus implements IdEnum<GadgetStatus,Integer> {

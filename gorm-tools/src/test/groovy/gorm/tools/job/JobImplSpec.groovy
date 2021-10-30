@@ -4,7 +4,7 @@
 */
 package gorm.tools.job
 
-import gorm.tools.source.SourceType
+import gorm.tools.model.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import testing.*

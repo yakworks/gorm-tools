@@ -11,7 +11,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.source.SourceType
+import gorm.tools.model.SourceType
 import yakworks.commons.json.JsonEngine
 
 @GormRepository

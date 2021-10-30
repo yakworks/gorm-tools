@@ -12,7 +12,7 @@ import org.grails.datastore.mapping.model.config.GormProperties
 
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.Validate
-import yakworks.commons.models.IdEnum
+import yakworks.commons.model.IdEnum
 
 /**
  * A map implementation that wraps an objects and

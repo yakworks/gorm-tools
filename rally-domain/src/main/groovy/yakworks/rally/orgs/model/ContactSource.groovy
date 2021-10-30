@@ -6,7 +6,7 @@ package yakworks.rally.orgs.model
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.source.SourceTrait
+import gorm.tools.model.SourceTrait
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

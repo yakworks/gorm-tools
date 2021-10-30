@@ -1,32 +1,26 @@
-package yakworks.rally.org
-
-import gorm.tools.testing.TestDataJson
-import org.springframework.dao.DataRetrievalFailureException
-
-import spock.lang.Ignore
-import yakworks.rally.orgs.model.Contact
+package yakworks.rally.orgs
 
 import java.time.LocalDate
 
 import org.springframework.core.NestedExceptionUtils
 
 import gorm.tools.repository.errors.EntityValidationException
-import grails.testing.mixin.integration.Integration
-import grails.gorm.transactions.Rollback
-import yakworks.rally.orgs.OrgDimensionService
-import yakworks.rally.orgs.model.OrgMember
-import spock.lang.Specification
 import gorm.tools.model.SourceType
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
+import spock.lang.Specification
+import yakworks.gorm.testing.DomainIntTest
+import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
-import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.testing.MockData
 
 @Integration
 @Rollback
-class OrgTests extends Specification implements DomainIntTest {
+class OrgRepoTests extends Specification implements DomainIntTest {
 
     OrgRepo orgRepo
     OrgDimensionService orgDimensionService
@@ -51,7 +45,7 @@ class OrgTests extends Specification implements DomainIntTest {
     def "test create"() {
         when:
         def params = MockData.createOrg
-        def org = orgRepo.create(params)
+        def org = orgRepo.create(params.asUnmodifiable())
         orgRepo.flushAndClear()
         org = Org.get(org.id)
 
@@ -91,15 +85,11 @@ class OrgTests extends Specification implements DomainIntTest {
 
     }
 
-    @Ignore //XXX fix so it works here
     def "test create duplicate fail"() {
         when:
         def params = MockData.createOrg
-        params.num = 'TTI'
-        def org = orgRepo.create(params)
-        orgRepo.flush()
-        //do it again
-        org = orgRepo.create(params)
+        params.num = '99' //should already exist in test db
+        def org = orgRepo.create(params.asUnmodifiable())
         orgRepo.flush()
 
         then:
@@ -107,7 +97,8 @@ class OrgTests extends Specification implements DomainIntTest {
         def rootCause = NestedExceptionUtils.getRootCause(ge)
         rootCause.message.contains("Unique index or primary key violation") || //mysql and H2
             rootCause.message.contains("Duplicate entry") || //mysql
-            rootCause.message.contains("Violation of UNIQUE KEY constraint") //sql server
+            rootCause.message.contains("Violation of UNIQUE KEY constraint") || //sql server
+            rootCause.message.contains("duplicate key value violates unique constraint") //postgres
 
     }
 
@@ -117,7 +108,7 @@ class OrgTests extends Specification implements DomainIntTest {
             name: 'testComp',
             type: 'Customer'
         ]
-        orgRepo.create(params)
+        orgRepo.create(params.asUnmodifiable())
         orgRepo.flush()
 
         then:
@@ -126,33 +117,31 @@ class OrgTests extends Specification implements DomainIntTest {
         exception.errors['num'].code == "nullable"
     }
 
-    @Ignore //XXX fix so it works here
     def "change key contact"() {
         when:
-        //cust 205 has 2 contacts, 51 and 52, test db has 51 setup and we change it to 52
-        assert Org.get(205).contact.id == 51
+        assert Org.get(99).contact.num == 'primary99'
+        def c2 = Contact.findByNum('secondary99')
 
         def params = [
-            id        : 205,
+            id        : 99,
             contact: [
-                id: 52
+                id: c2.id
             ]
         ]
-        orgRepo.update(params)
+        orgRepo.update(params.asUnmodifiable())
         flushAndClear()
 
         then:
-        Org.get(205).contact.id == 52
+        Org.get(99).contact.id == c2.id
     }
 
-    @Ignore //XXX fix so it works here
     def "update org"() {
         when:
         def params = MockData.updateOrg
-        params.id = 205 //use existing 205 customer that has
-        def org = orgRepo.update(params)
+        params.id = 99 //use existing 205 customer that has
+        def org = orgRepo.update(params.asUnmodifiable())
         orgRepo.flushAndClear()
-        org = Org.get(205)
+        org = Org.get(99)
 
         then:
         org
@@ -173,7 +162,7 @@ class OrgTests extends Specification implements DomainIntTest {
         //org.locations.size() == 3 //the location + what was in the locations
     }
 
-    def testOrgSourceChange() {
+    def "change sourceId for Org"() {
         //simulates the customer and cust account setup as well.
         when:
         Org org = Org.create("foo", "bar", OrgType.CustAccount, 2)
@@ -220,52 +209,11 @@ class OrgTests extends Specification implements DomainIntTest {
         org.location.city == 'Denver'
     }
 
-    @Ignore //XXX fix so it works here
-    void "test insert with orgmembers"() {
-        given:
-        orgDimensionService.testInit('Branch.Division.Business')
-        Org division = Org.create("Division", "Division", OrgType.Division).persist()
-        division.member = OrgMember.make(division)
-        division.member.business = Org.create("Business", "Business", OrgType.Business).persist()
-        division.persist()
-        division.member.persist()
-
-        Map params = [name: "test", num: "test", orgTypeId: 3, member: [division: [id: division.id]]]
-
-        when:
-        Org result = Org.create(params)
-
-        then:
-        result != null
-        result.name == "test"
-        result.num == "test"
-        result.member != null
-        result.member.division.id == division.id
-        result.member.business.id == division.member.business.id
-
-        when:
-        Org otherBusiness = Org.create("b2", "b2", OrgType.Business).persist([flush: true])
-        params = [
-            name: "test", num: "test", orgTypeId: "3",
-            member: [
-                division: [id: division.id],
-                business: [id: otherBusiness.id]
-            ]
-        ]
-        result = orgRepo.create(params)
-
-        then: "Specified business should NOT take precedence parents set from division"
-        result.member.business == division.member.business
-
-        cleanup:
-        orgDimensionService.testInit(null)
-    }
-
-    @Ignore //XXX fix so it works here
     def "delete should fail when source is ERP"() {
         when:
-        def org = Org.get(205)
-        assert org.source.sourceType == SourceType.ERP
+        def org = Org.get(99)
+        org.source.sourceType = SourceType.ERP
+        org.source.persist(flush:true)
         orgRepo.removeById(org.id)
 
         then:
@@ -273,9 +221,7 @@ class OrgTests extends Specification implements DomainIntTest {
         e.code == 'delete.error.source.external'
     }
 
-
-
-    //https://github.com/9ci/domain9/issues/268 need better tests for success delete, make sure contacts are deleted, etc..
+    //XXX https://github.com/9ci/domain9/issues/268 need better tests for success delete, make sure contacts are deleted, etc..
     @Ignore //FIXME whats the scoop with this one?
     def "delete contact with org"() {
         when:
@@ -319,74 +265,5 @@ class OrgTests extends Specification implements DomainIntTest {
 
     }
 
-    void "test find org by sourceid"() {
-        when:
-        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
-        // org.persist()
-        // org.createSource()
-        orgRepo.flush()
-
-        then: "source id is the default"
-        assert org.source.sourceId == "foo"
-
-        Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
-        o.name == "bar"
-
-    }
-
-    void "test find org by num"() {
-        when:
-        Org org3 = Org.create(num: "foo3", name: "bar3", type: OrgType.Customer)
-        orgRepo.flush()
-
-        Org o3 = Org.repo.findWithData(num: "foo3")
-
-        then: "found because unique"
-        assert o3
-    }
-
-    void "test find org by num not unique"() {
-        when:
-        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
-        Org org2 = Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
-        orgRepo.flush()
-        Org o3 = Org.repo.findWithData(num: "foo")
-
-        then: "not found because not unique"
-        thrown DataRetrievalFailureException
-
-        when: "num would get set to sourceId so it will fail too"
-        o3 = Org.repo.findWithData(source:[ sourceId: "foo"])
-
-        then: "not found because not unique"
-        thrown DataRetrievalFailureException
-    }
-
-    def "update org lookup by sourceid"() {
-        setup:
-        Long orgId = 1111
-
-        Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer']
-
-        when: "create"
-        def org = Org.create(params, bindId: true)
-        orgRepo.flush()
-
-        then: "make sure source is assigned properly"
-        org.id == orgId
-        org.source.sourceId == 'foo'
-        org.source.orgType == OrgType.Customer
-        // use the same query orgSource.repo is using
-        List res = OrgSource.executeQuery('select orgId from OrgSource where sourceId = :sourceId and orgType = :orgType',
-            [sourceId: 'foo', orgType: OrgType.Customer] )
-        res.size() == 1
-
-        when: "update"
-        org = Org.update([source: [sourceId: 'foo', orgType: 'Customer'], name: 'new name'])
-
-        then:
-        org.name == 'new name'
-        org.source.sourceId == 'foo'
-    }
 
 }

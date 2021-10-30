@@ -8,7 +8,7 @@ import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
 import gorm.tools.repository.model.GormRepoEntity
-import gorm.tools.source.SourceType
+import gorm.tools.model.SourceType
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode

@@ -6,7 +6,7 @@ package gorm.tools.beans.domain
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.models.IdEnum
+import yakworks.commons.model.IdEnum
 import gorm.tools.repository.model.RepoEntity
 import grails.persistence.Entity
 

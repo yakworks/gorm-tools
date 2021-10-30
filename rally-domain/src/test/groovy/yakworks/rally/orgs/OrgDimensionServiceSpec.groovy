@@ -9,7 +9,7 @@ import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import spock.lang.Specification
 
-class OrgDimensionServiceTests extends Specification implements ServiceUnitTest<OrgDimensionService>, DataRepoTest, SecurityTest {
+class OrgDimensionServiceSpec extends Specification implements ServiceUnitTest<OrgDimensionService>, DataRepoTest, SecurityTest {
 
     void setupSpec() {
         mockDomain OrgTypeSetup

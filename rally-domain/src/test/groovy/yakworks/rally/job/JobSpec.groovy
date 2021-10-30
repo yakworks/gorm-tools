@@ -6,7 +6,7 @@ package yakworks.rally.job
 
 import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.source.SourceType
+import gorm.tools.model.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Ignore
 import spock.lang.Specification

@@ -7,7 +7,7 @@ package yakworks.rally.orgs.model
 import groovy.transform.CompileStatic
 
 import yakworks.commons.lang.NameUtils
-import yakworks.commons.models.IdEnum
+import yakworks.commons.model.IdEnum
 
 @CompileStatic
 enum OrgType implements IdEnum<OrgType, Long> {

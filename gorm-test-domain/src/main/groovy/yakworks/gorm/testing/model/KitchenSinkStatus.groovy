@@ -6,7 +6,7 @@ package yakworks.gorm.testing.model
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.models.IdEnum
+import yakworks.commons.model.IdEnum
 
 @CompileStatic
 enum KitchenSinkStatus implements IdEnum<KitchenSinkStatus,Integer> {

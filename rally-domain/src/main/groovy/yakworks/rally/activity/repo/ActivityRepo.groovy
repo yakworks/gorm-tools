@@ -25,7 +25,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.services.SecService
-import gorm.tools.source.SourceType
+import gorm.tools.model.SourceType
 import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
@@ -42,7 +42,6 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
-import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
 

@@ -5,6 +5,8 @@
 package yakworks.commons.json
 
 import groovy.json.JsonGenerator
+import groovy.json.JsonParserType
+import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
 import groovy.transform.builder.Builder
@@ -38,6 +40,7 @@ class JsonEngine {
     Boolean escapeUnicode = false
 
     JsonGenerator jsonGenerator
+    JsonSlurper jsonSlurper
 
     // JsonEngine(){ }
 
@@ -64,7 +67,12 @@ class JsonEngine {
         }
 
         jsonGenerator = options.build()
+        jsonSlurper = buildSlurper()
         return this
+    }
+
+    JsonSlurper buildSlurper(){
+        new JsonSlurper().setType(JsonParserType.LAX).setLazyChop(false).setChop(true)
     }
 
     List<JsonGenerator.Converter> getConverters(){
@@ -97,6 +105,11 @@ class JsonEngine {
     static JsonGenerator getGenerator(){
         if(!INSTANCE) INSTANCE = new JsonEngine().build()
         INSTANCE.jsonGenerator
+    }
+
+    static JsonSlurper getSlurper(){
+        if(!INSTANCE) INSTANCE = new JsonEngine().build()
+        INSTANCE.jsonSlurper
     }
 
 }

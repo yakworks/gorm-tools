@@ -8,7 +8,7 @@ import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStampTrait
 import gorm.tools.repository.model.GormRepoEntity
-import gorm.tools.source.SourceTrait
+import gorm.tools.model.SourceTrait
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode

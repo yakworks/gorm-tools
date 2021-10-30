@@ -92,6 +92,11 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     @Override
+    MangoDetachedCriteria<T> ne(String propertyName, Object propertyValue) {
+        nestedPathPropCall(propertyName, propertyValue, "ne")
+    }
+
+    @Override
     MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
         nestedPathPropCall(propertyName, values, "inList")
     }

@@ -15,7 +15,7 @@ import yakworks.rally.orgs.model.Contact
  */
 @Integration
 @Rollback
-class ActivityContactOpSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
+class ActivityContactOpTests extends Specification implements DataIntegrationTest, SecuritySpecHelper {
 
     List createSomeContacts(){
         List items = []

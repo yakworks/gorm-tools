@@ -14,8 +14,15 @@ import spock.lang.Specification
 @Integration
 @Rollback
 class OrgMemberServiceSpec extends Specification implements DomainIntTest {
+
     OrgDimensionService orgDimensionService
     OrgMemberService orgMemberService
+
+    void initOrgDimensions(Map dims){
+        orgDimensionService.dimensionsConfig = dims
+        orgDimensionService.clearCache()
+        orgDimensionService.init()
+    }
 
     void testSetParent() {
         setup:

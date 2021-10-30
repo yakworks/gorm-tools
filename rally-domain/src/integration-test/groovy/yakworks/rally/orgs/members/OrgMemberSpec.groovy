@@ -11,12 +11,15 @@ import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
 import spock.lang.Specification
 import spock.lang.Unroll
+import yakworks.rally.orgs.repo.OrgRepo
 
 @Integration
 @Rollback
 class OrgMemberSpec extends Specification implements DomainIntTest {
 
+    OrgRepo orgRepo
     OrgDimensionService orgDimensionService
+
 
     def "test sanity check on orgMember"() {
         setup:

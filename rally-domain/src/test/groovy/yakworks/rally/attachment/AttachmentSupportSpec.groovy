@@ -74,9 +74,9 @@ class AttachmentSupportSpec extends Specification implements DataRepoTest, Secur
         when:
         def fileName = 'grails_logo.jpg'
         byte[] data = Files.readAllBytes(getFile(fileName))
-        File tempFile = appResourceLoader.createTempFile('createFileFromTempFile.jpg', data)
+        Path tempFile = attachmentSupport.createTempFile('createFileFromTempFile.jpg', data)
 
-        Path createdFile = attachmentSupport.createFileFromTempFile(123, fileName, tempFile.name)
+        Path createdFile = attachmentSupport.createFileFromTempFile(123, fileName, tempFile.fileName.toString())
 
         then:
         Files.exists(createdFile)

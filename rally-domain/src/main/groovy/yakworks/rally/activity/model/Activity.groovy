@@ -24,24 +24,35 @@ import yakworks.rally.tag.model.Taggable
 @GrailsCompileStatic
 class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
     // static transients = ['hasAttachments']
+    // XXX Sync changes with database
+    //  - databse has a whole bunch of fields that are not needed, like forCustome, templateId, etc...
+    //  - remove title as its just a dup of summary
 
     Kind kind = Kind.Note
-    ActivityNote note
 
     // Org is here to speed up search arTran activities for customer or custAccount -Activity.findAllByOrg(fromOrg.org)
     // If activity is on org level activityLink has org id as well.
     Org org
-    Long parentId //the parent note that this is a comment for.
-    String title // the title of this is a task / the subject for an email. Blank otherwise. I question the need for this
+    //the parent note that this is a comment for.
+    Long parentId
+
     // a 255 char string summary of the activity. Will be the title if its a task and if note it will ends with ... if there is more to the note.
     String summary //don't set this, it will just get overriden during save
-    Task task //if this note has a todo task that needs to be /or was/ accomplished
-    Attachment template
+
+    //if this note has a todo task that needs to be /or was/ accomplished
+    Task task
+
     //the template that was or will be used to generate this note or the todo's email/fax/letter/report,etc..
+    Attachment template
+
+    ActivityNote note
 
     VisibleTo visibleTo = VisibleTo.Everyone
-    Long visibleId //the id of the role that can see this note if visibleTo is Role
 
+    //the id of the role that can see this note if visibleTo is Role
+    Long visibleId
+
+    //
     @CompileDynamic
     static enum Kind {
         Note, Comment, Promise,
@@ -65,7 +76,7 @@ class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity,
         org column: 'orgId'
         template column: 'templateId'
         task column: 'taskId'
-        source column: 'sourceEntity'
+        source column: 'sourceEntity' //XXX why are we mapping this like this
     }
 
     List<ActivityLink> getLinks() {

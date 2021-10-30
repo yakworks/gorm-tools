@@ -15,6 +15,7 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
 import grails.compiler.GrailsCompileStatic
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -35,14 +36,17 @@ class RallySeedData {
 
     static fullMonty(){
         buildAppUser()
+        createOrgTypeSetups()
         buildClientOrg()
         buildOrgs(100)
         buildTags()
         createIndexes()
     }
+
     static void createOrgTypeSetups(){
         OrgType.values().each {
-            new OrgTypeSetup(id: it.id, name: it.name()).persist(flush:true)
+            String code = it == OrgType.CustAccount ? 'CustAcct': it.name()
+            new OrgTypeSetup(id: it.id, code: code, name: it.name()).persist(flush:true)
         }
     }
 
@@ -73,13 +77,16 @@ class RallySeedData {
             ]
             def client = Org.create(data)
 
-            def user = Contact.create(
+            def contact = new Contact(
                 id: 1,
                 num: "1",
                 name: "Main User",
-                org: client,
-                user: [id: 1]
+                org: client
             )
+            contact.user = AppUser.get(1)
+            contact.persist(flush: true)
+
+            assert Contact.findById(1)
         }
 
     }
@@ -115,6 +122,8 @@ class RallySeedData {
             ]]
         ]
         def org = Org.create(data)
+        // add note
+        def act = Activity.create([id:id, org: org, note: [body: 'Test note']], bindId: true)
         // assert org.flex.date1.toString() == '2021-04-20'
         return org
     }

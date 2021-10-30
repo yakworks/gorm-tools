@@ -1,5 +1,7 @@
 package yakworks.rally.attachment
 
+import java.nio.file.Path
+
 import gorm.tools.repository.errors.EntityValidationException
 import grails.gorm.transactions.Rollback
 import grails.plugin.viewtools.AppResourceLoader
@@ -25,6 +27,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
 
     AppResourceLoader appResourceLoader
     AttachmentRepo attachmentRepo
+    AttachmentSupport attachmentSupport
 
     // void cleanupSpec() {
     //     FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
@@ -77,24 +80,6 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
 
     }
 
-    def testDeleteFileIfInsert_fail() {
-        when:
-        File origFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")
-        byte[] data = FileUtils.readFileToByteArray(origFile)
-        File tmpFile = appResourceLoader.createTempFile('grails_logo.jpg', data)
-        assert tmpFile.exists()
-        Map params = [tempFileName: tmpFile.name, id:12345999999L]
-        Attachment result = attachmentRepo.create(params)
-
-        then:
-        EntityValidationException g = thrown()
-        'validation.error' == g.code
-        String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
-        File monthDir = appResourceLoader.getMonthDirectory("attachments.location")
-        File testFile = new File(monthDir.path, destFileName)
-        assert !testFile.exists()
-    }
-
     def testInsert_works() {
         when:
         Map params = [name:'hello.txt', subject:'greetings']
@@ -116,26 +101,6 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         attachedFile?.delete()
     }
 
-
-    def testInsertMultipartFile_works() {
-        when:
-        File inputFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")
-        byte[] bytes = FileUtils.readFileToByteArray(inputFile)
-        MockMultipartFile file = new MockMultipartFile("file", "grails_logo.jpg", "multipart/form-data", bytes);
-        Attachment entity = attachmentRepo.create(file, [:]);
-        File attachedFile = appResourceLoader.getFile(entity.location)
-
-        then:
-        entity
-        'jpg' == entity.extension
-        "image/jpeg" == entity.mimeType
-
-        entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
-
-        cleanup:
-        attachmentRepo.remove(entity)
-    }
-
     def testRemove_works() {
         when:
         Attachment attachment = attachmentRepo.create([name: 'hello.txt', bytes: 'blah blah blah'.getBytes()])
@@ -147,35 +112,22 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
         null == Attachment.get(id)
     }
 
-    def testUpdate_fail() {
-        when:
-        Attachment attachment = Attachment.get(1005)
-
-        then:
-        attachment != null
-
-        when:
-        attachment.name = null;
-        attachment.persist(flush:true)
-
-        then:
-        EntityValidationException e = thrown()
-        e.message.contains('rejected value [null]')
-
-    }
-
     def testUpdate_works() {
         when:
+        Map params = [name:'hello.txt', subject:'greetings', bytes: 'blah blah blah'.getBytes()]
+        Attachment attachment = attachmentRepo.create(params)
+        flushAndClear()
+
         final String newName = 'Something Completely Different'
-        Attachment attachment = Attachment.get(1005)
+        Attachment att = Attachment.get(attachment.id)
 
         then:
-        attachment != null
+        att != null
 
         when:
-        attachment.name = newName
-        attachment.persist(flush:true)
-        Attachment a2 = Attachment.get(1005)
+        att.name = newName
+        att.persist(flush:true)
+        Attachment a2 = Attachment.get(attachment.id)
 
         then:
         newName == a2.name

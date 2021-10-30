@@ -130,14 +130,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
         if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
-        // XXX fix this
-        // if(data.contacts) {
-        //     data.contacts.each { it["org"] = activity.org }
-        //     //XXX this is wrong, passing in Contact.repo? wont this create contacts, we dont want that here
-        //     List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
-        //     contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
-        // }
-
         // now do the links last do events will have the other data
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
@@ -152,17 +144,14 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     void updateSummary(Activity activity) {
         //title to 255
-        String title = activity.title
-        if (title?.length() > 255) {
-            activity.title = StringUtils.abbreviate(title, 255)
+        if (activity.summary?.length() > 255) {
+            activity.summary = StringUtils.abbreviate(activity.summary, 255)
         }
 
         //update Summary
         if (activity.kind in [ActKind.Note, ActKind.Comment] && activity.note) {
             int endChar = activity.note.body.trim().length()
             activity.summary = (endChar > 255) ? activity.note.body.trim().substring(0, 251) + " ..." : activity.note.body.trim()
-        } else if (activity.kind.isTaskKind) {
-            activity.summary = activity.title
         }
 
     }
@@ -232,7 +221,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         addNote(activity, body)
         updateSummary(activity)
 
-        activity.title = title
         activity.source = entityName
         activity.sourceType = SourceType.App
         activity.persist()
@@ -330,7 +318,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
         Activity activity = new Activity(
             org         : org,
-            title       : text,
+            summary     : text,
             source      : entityName,
             sourceType: SourceType.App
         )
@@ -367,10 +355,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * quick easy way to create a Todo activity
      */
     @Transactional
-    Activity createTodo(Org org, Long userId, String title, String linkedEntity = null,
+    Activity createTodo(Org org, Long userId, String summary, String linkedEntity = null,
                         List<Long> linkedIds = null, LocalDateTime dueDate = LocalDateTime.now()) {
 
-        Activity activity = create(org: org, title: title, kind : Activity.Kind.Todo)
+        Activity activity = create(org: org, summary: summary, kind : Activity.Kind.Todo)
 
         if(linkedIds){
             for(Long linkedId: linkedIds){

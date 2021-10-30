@@ -199,11 +199,12 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         when:
         Path tempFile = createTempFile('grails_logo.jpg')
         Map params = [tempFileName: tempFile.fileName]
-        Attachment result = attachmentRepo.create(params)
+        Attachment attachment = attachmentRepo.create(params)
 
         then: "will fail on name"
         EntityValidationException g = thrown()
         'validation.error' == g.code
+        // XXX fix way to verify the file got delted
         // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
         // File monthDir = appResourceLoader.getMonthDirectory("attachments.location")
         // File testFile = new File(monthDir.path, destFileName)

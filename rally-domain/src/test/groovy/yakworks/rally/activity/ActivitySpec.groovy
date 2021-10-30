@@ -11,6 +11,8 @@ import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
+import yakworks.rally.activity.model.TaskStatus
+import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
@@ -34,7 +36,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
             }
             attachmentSupport(AttachmentSupport)
         }
-        mockDomains(AttachmentLink, ActivityLink, Activity, Org, OrgTag,
+        mockDomains(AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
             Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact)
     }
 
@@ -123,7 +125,6 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
         then:
         ActKinds.Note == act.kind
-        null == act.title
         'test note' == act.summary
         'test note' == act.note.body
 

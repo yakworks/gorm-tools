@@ -45,10 +45,10 @@ class ContactTests extends Specification implements DomainIntTest {
     def testDeleteFailure_ForLoggedInUserContact(){
 
         expect:
-        secService.userId != null
+        secService.userId == 1
 
         when:
-        Contact contact = Contact.findById(secService.userId)
+        Contact contact = Contact.get(1)
 
         then:
         contact != null

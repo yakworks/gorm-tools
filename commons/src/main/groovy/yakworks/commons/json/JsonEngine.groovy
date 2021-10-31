@@ -29,7 +29,7 @@ import yakworks.commons.json.converters.ZonedDateTimeJsonConverter
 @CompileStatic
 class JsonEngine {
 
-    private static JsonEngine INSTANCE
+    public static JsonEngine INSTANCE
 
     String dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
 
@@ -72,7 +72,8 @@ class JsonEngine {
     }
 
     JsonSlurper buildSlurper(){
-        new JsonSlurper().setType(JsonParserType.LAX).setLazyChop(false).setChop(true)
+        //TODO make this configurable
+        return new JsonSlurper() //.setType(JsonParserType.LAX).setLazyChop(false).setChop(true)
     }
 
     List<JsonGenerator.Converter> getConverters(){

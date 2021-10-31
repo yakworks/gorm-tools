@@ -124,8 +124,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         and: "data bad contact records which would fail"
         List<Map> jsonList = generateOrgData(20)
-        jsonList[5].contact = [name:"xxxx"]
-        jsonList[15].contact = [name:"xxxx"]
+        jsonList[5].contact = [name:""]
+        jsonList[15].contact = [name:""]
 
         when:
         Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))

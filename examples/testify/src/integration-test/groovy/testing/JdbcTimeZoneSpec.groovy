@@ -26,7 +26,7 @@ class JdbcTimeZoneSpec extends Specification {
         dataSource != null
 
         when:
-        //Date now = new Date()
+        Date now = new Date()
         LocalDateTime ldt = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault())
 
         KitchenSink kitchenSink = new KitchenSink(num:'t1', name: "test", actDate: now, locDateTime: ldt)

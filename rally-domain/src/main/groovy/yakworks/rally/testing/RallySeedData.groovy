@@ -25,7 +25,7 @@ import yakworks.rally.tag.model.Tag
 
 // import grails.buildtestdata.TestData
 @SuppressWarnings('BuilderMethodWithSideEffects')
-@GrailsCompileStatic
+@CompileStatic
 class RallySeedData {
 
     static JdbcTemplate jdbcTemplate
@@ -68,25 +68,12 @@ class RallySeedData {
 
     static void buildClientOrg(){
         Org.withTransaction {
-            def data = [
-                id: 1,
-                num: "1",
-                name: "Client Org",
-                type: OrgType.Client,
-                location: [city: "City1"]
-            ]
-            def client = Org.create(data)
+            def client = createOrg(1, OrgType.Client)
 
-            def contact = new Contact(
-                id: 1,
-                num: "1",
-                name: "Main User",
-                org: client
-            )
-            contact.user = AppUser.get(1)
-            contact.persist(flush: true)
+            client.contact.user = AppUser.get(1)
+            client.contact.persist(flush: true)
 
-            assert Contact.findById(1)
+            assert Contact.query(id: 1).get()
         }
 
     }
@@ -108,12 +95,6 @@ class RallySeedData {
                 date1: LocalDate.now().plusDays(id).toString()
             ],
             location: [city: "City$id"],
-            contact: [
-                num: "primary$id",
-                email    : "jgalt$id@taggart.com",
-                firstName: "John$id",
-                lastName : "Galt$id"
-            ],
             contacts: [[
                 num: "secondary$id",
                 email    : "secondary$id@taggart.com",
@@ -122,6 +103,21 @@ class RallySeedData {
             ]]
         ]
         def org = Org.create(data)
+
+        def contact = new Contact(
+            id: id,
+            num: "primary$id",
+            email    : "jgalt$id@taggart.com",
+            firstName: "John$id",
+            lastName : "Galt$id",
+            org: org
+        )
+        contact.user = AppUser.get(1)
+        contact.persist()
+
+        org.contact = contact
+        org.persist()
+
         // add note
         def act = Activity.create([id:id, org: org, note: [body: 'Test note']], bindId: true)
         // assert org.flex.date1.toString() == '2021-04-20'
@@ -130,9 +126,8 @@ class RallySeedData {
 
     static void buildTags(){
         Tag.withTransaction {
-            def t1 =new Tag(id: 1, code: "CPG", entityName: 'Customer').persist(flush: true)
-            def t2 =new Tag(id: 2, code: "MFG", entityName: 'Customer').persist(flush: true)
-            assert Tag.findById(1)
+            def t1 = new Tag(id: 1, code: "CPG", entityName: 'Customer').persist(flush: true)
+            def t2 = new Tag(id: 2, code: "MFG", entityName: 'Customer').persist(flush: true)
         }
     }
 

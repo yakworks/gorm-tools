@@ -55,10 +55,15 @@ subprojects { subprj ->
     sourceCompatibility = "$javaCompatibility"
     targetCompatibility = "$javaCompatibility"
 
-    // sets the path to sys properties so we can use it find grails-app/conf during AST
-    compileGroovy {
-      groovyOptions.fork = true
-      groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
+    // compileGroovy {
+    //   groovyOptions.fork = true
+    //   groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
+    // }
+    tasks.withType(GroovyCompile) {
+        configure(groovyOptions) {
+            // sets the path to sys properties so we can use it find grails-app/conf during AST
+            forkOptions.jvmArgs = ['-Xmx1024m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+        }
     }
   }
 

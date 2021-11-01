@@ -15,8 +15,10 @@ trait NameCode<D> extends Named implements Lookupable<D> {
 
     String code
 
-    static List qSearchIncludes = ['name', 'code'] // quick search includes
-    static List picklistIncludes = ['id', 'code', 'name'] //for picklist
+    static Map includes = [
+        qSearch: ['name', 'code'],
+        picklist: ['id', 'code', 'name']
+    ]
 
     static constraintsMap = [
         name:[ description: 'The name for this entity', nullable: false, blank: false, maxSize: 50],

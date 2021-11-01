@@ -52,7 +52,9 @@ class Cust implements GormRepoEntity<Cust, CustRepo> {
         testIdent enumType: 'identity'
     }
 
-    static List qSearchIncludes = ["name"]
+    static Map includes = [
+        qSearch: ['name']
+    ]
 
     static constraints = {
         name blank: false, nullable: false

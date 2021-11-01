@@ -18,11 +18,6 @@ import gorm.tools.mango.MangoDetachedCriteria
 @CompileDynamic
 trait QueryMangoEntity<D> {
 
-    //@Transient
-    //static List<String> qSearchIncludes = []
-
-    // static abstract GormRepo<D> getRepo()
-
     /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional optional criteria
      * call get or list on returned object to fire it

@@ -20,8 +20,10 @@ import grails.persistence.Entity
 @EqualsAndHashCode(includes='username', useCanEqual=false)
 class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
 
-    static List qSearchIncludes = ['username', 'name', 'email'] // quick search includes
-    static List picklistIncludes = ['id', 'username', 'name'] //for picklist
+    static Map includes = [
+        qSearch: ['username', 'name', 'email'], // quick search includes
+        picklist: ['id', 'username', 'name']
+    ]
 
     static constraintsMap = [
         username:[ d: '''\

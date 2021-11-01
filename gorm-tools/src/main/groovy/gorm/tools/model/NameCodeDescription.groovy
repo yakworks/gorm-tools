@@ -6,15 +6,16 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.RepoUtil
-
 @SuppressWarnings(['MethodName'])
 @CompileStatic
 trait NameCodeDescription<D> extends NameCode<D> {
 
     String description
 
-    static List qSearchIncludes = ['name', 'code', 'description'] // quick search includes
+    static Map includes = [
+        qSearch: ['name', 'code', 'description'],
+        picklist: ['id', 'code', 'name']
+    ]
 
     static constraintsMap = [
         description:[ description: 'The description for this entity', nullable: true, maxSize: 255]

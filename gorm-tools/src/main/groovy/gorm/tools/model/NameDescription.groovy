@@ -16,8 +16,10 @@ trait NameDescription extends Named {
     String name
     String description
 
-    static List qSearchIncludes = ['name', 'description'] // quick search includes
-    static List picklistIncludes = ['id', 'name'] //for picklist
+    static Map includes = [
+        qSearch: ['name', 'description'],
+        picklist: ['id', 'name']
+    ]
 
     static constraintsMap = [
         name:[ description: 'The name for this entity', nullable: false, blank: false, maxSize: 50],

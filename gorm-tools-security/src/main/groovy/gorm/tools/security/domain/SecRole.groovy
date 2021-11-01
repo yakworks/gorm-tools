@@ -6,6 +6,7 @@ package gorm.tools.security.domain
 
 import groovy.transform.EqualsAndHashCode
 
+import gorm.tools.model.NameDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -19,15 +20,13 @@ import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 @Entity
 @EqualsAndHashCode(includes='name', useCanEqual=false)
 @GrailsCompileStatic
-class SecRole implements RepoEntity<SecRole>, Serializable {
+class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
 
     static final String ADMINISTRATOR = "Administrator" //full access, system user
     static transients = ['springSecRole']
 
-    Boolean inactive = false
-
-    String description
     String name
+    Boolean inactive = false
 
     static constraintsMap = [
         name: [d: "The name of the role",

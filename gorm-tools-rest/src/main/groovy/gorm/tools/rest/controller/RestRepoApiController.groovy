@@ -41,10 +41,10 @@ import static org.springframework.http.HttpStatus.OK
  */
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
-trait RestRepositoryApi<D> extends RestApiController {
+trait RestRepoApiController<D> extends RestApiController {
 
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
-    final private static Logger log = LoggerFactory.getLogger(RestRepositoryApi)
+    final private static Logger log = LoggerFactory.getLogger(RestRepoApiController)
 
     @Autowired
     RestApiConfig restApiConfig
@@ -72,7 +72,7 @@ trait RestRepositoryApi<D> extends RestApiController {
      * The gorm domain class. uses the {@link org.springframework.core.GenericTypeResolver} is not set during contruction
      */
     Class<D> getEntityClass() {
-        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), RestRepositoryApi)
+        if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), RestRepoApiController)
         return entityClass
     }
 
@@ -96,7 +96,7 @@ trait RestRepositoryApi<D> extends RestApiController {
             D instance = (D) getRepo().create(dataMap)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap, [status: CREATED])
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             handleException(e)
         }
     }
@@ -114,7 +114,7 @@ trait RestRepositoryApi<D> extends RestApiController {
             D instance = (D) getRepo().update(data)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap, [status: OK])
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             handleException(e)
         }
 
@@ -128,7 +128,7 @@ trait RestRepositoryApi<D> extends RestApiController {
         try {
             getRepo().removeById((Serializable) params.id)
             callRender(status: NO_CONTENT) //204
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             handleException(e)
         }
 
@@ -145,7 +145,7 @@ trait RestRepositoryApi<D> extends RestApiController {
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap)
             // respond(jsonObject)
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             handleException(e)
         }
     }
@@ -291,7 +291,7 @@ trait RestRepositoryApi<D> extends RestApiController {
      */
     Map getIncludes(){ [:] }
 
-    void handleException(RuntimeException e) {
+    void handleException(Exception e) {
         ApiError apiError = apiErrorHandler.handleException(entityClass, e)
 
         log.error(e.message, e)

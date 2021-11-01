@@ -37,7 +37,7 @@ import org.grails.plugins.web.rest.transform.LinkableTransform
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.rest.RestApi
-import gorm.tools.rest.controller.RestRepositoryApi
+import gorm.tools.rest.controller.RestRepoApiController
 import grails.artefact.Artefact
 import grails.compiler.ast.ClassInjector
 import grails.io.IOUtils
@@ -94,7 +94,7 @@ class RestApiTransform implements ASTTransformation, CompilationUnitAware {
         if (superClassAttribute instanceof ClassExpression) {
             superClassNode = ((ClassExpression) superClassAttribute).getType()
         } else {
-            superClassNode = ClassHelper.make(RestRepositoryApi)
+            superClassNode = ClassHelper.make(RestRepoApiController)
         }
         // get annotation vals
         final readOnlyAttr = annotationNode.getMember(ATTR_READY_ONLY)

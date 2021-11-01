@@ -1275,12 +1275,14 @@ ability to search by one string in criteria filters against several domain field
 search can be passed in <code>$qSearch</code> or <code>$q</code> keywords. 
 There are 2 ways to specify fields that should be searched against:</p>
 <ol>
-<li>in static property <code>qSearchIncludes</code> as list of strings, see example bellow:
+<li>in static property <code>includes.qSearch</code> as list of strings, see example bellow:
 <div class="codehilite"><pre><span></span><span class="kd">class</span> <span class="nc">Org</span> <span class="o">{</span>
     <span class="n">String</span> <span class="n">name</span>
     <span class="n">Address</span> <span class="n">address</span>
 
-    <span class="kd">static</span> <span class="n">qSearchIncludes</span> <span class="o">=</span> <span class="o">[</span><span class="s2">&quot;name&quot;</span><span class="o">,</span> <span class="s2">&quot;address.city&quot;</span><span class="o">]</span>
+    <span class="kd">static</span> <span class="n">includes</span> <span class="o">=</span> <span class="o">[</span>
+      <span class="nl">qSearch:</span> <span class="o">[</span><span class="s1">&#39;name&#39;</span><span class="o">,</span> <span class="s1">&#39;address.city&#39;</span><span class="o">]</span>
+    <span class="o">]</span>
     <span class="o">...</span>
 </pre></div></li>
 <li>default fields in config
@@ -1291,7 +1293,7 @@ There are 2 ways to specify fields that should be searched against:</p>
 </pre></div></li>
 </ol>
 <p>Mango criteria will add <code>%</code> automatically, if quick search string doesn't have it and will apply <code>ilike</code> statement
-for each field in <code>qSearchIncludes</code>. If domain field is not string type, then <code>eq</code> statement will be used.</p>
+for each field in <code>includes.qSearch</code>. If domain field is not string type, then <code>eq</code> statement will be used.</p>
 <p><div class="codehilite"><pre><span></span><span class="n">Org</span><span class="o">.</span><span class="na">repo</span><span class="o">.</span><span class="na">search</span><span class="o">([</span><span class="nl">criteria:</span> <span class="o">[</span><span class="n">$q</span><span class="o">:</span> <span class="s2">&quot;abc&quot;</span><span class="o">],</span> <span class="nl">max:</span> <span class="mi">20</span><span class="o">])</span>
 </pre></div>
 So it is the same as:</p>

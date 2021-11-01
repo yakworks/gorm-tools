@@ -18,7 +18,7 @@ import org.codehaus.groovy.transform.ASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 import org.grails.config.CodeGenConfig
 
-import gorm.tools.rest.controller.RestRepositoryApi
+import gorm.tools.rest.controller.RestRepoApiController
 import yakworks.commons.util.BuildSupport
 
 //import grails.rest.Resource
@@ -93,7 +93,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         if (superClassName) {
             traitNode = ClassHelper.make(getClass().classLoader.loadClass(superClassName))
         } else {
-            traitNode = ClassHelper.make(RestRepositoryApi)
+            traitNode = ClassHelper.make(RestRepoApiController)
             //traitNode = ClassHelper.make(RepoController)
         }
 

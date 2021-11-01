@@ -120,6 +120,16 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
         ['*', 'stringList', 'bazMap'] | [name: 'foo', cost: 10.00, id: 1, version: null, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
     }
 
+    void "works with space in field and its null"() {
+        when: 'a field has spaces'
+        Bookz book = new Bookz(name: 'foo')
+        def result = entityMapService.createEntityMap(book, ['name', '  simplePogo.name'])
+
+        then: 'its should trim them and still work'
+        result == [name: 'foo', simplePogo: [ name: 'fly']]
+
+    }
+
     void "test buildMapFromPaths Enum"() {
         setup:
         EnumThing et = new EnumThing(

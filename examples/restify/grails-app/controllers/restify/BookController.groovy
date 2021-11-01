@@ -6,12 +6,12 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepositoryApi
+import gorm.tools.rest.controller.RestRepoApiController
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class BookController implements RestRepositoryApi<Book> {
+class BookController implements RestRepoApiController<Book> {
 
     @Override
     def post() {

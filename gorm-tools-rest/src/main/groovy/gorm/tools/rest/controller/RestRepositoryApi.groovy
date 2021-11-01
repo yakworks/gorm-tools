@@ -215,7 +215,8 @@ trait RestRepositoryApi<D> extends RestApiController {
         // XXX for now default is false, but we should change
         boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
-        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: getIncludes("bulk"), params: bulkParams, asyncEnabled: asyncEnabled)
+        List bulkIncludes = getIncludesMap()['bulk'] as List
+        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         RepoJobEntity job = repoJobService.getJob(jobId)
@@ -230,7 +231,7 @@ trait RestRepositoryApi<D> extends RestApiController {
         Pager pager = new Pager(params)
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
-        List incs = getIncludes(includesKey)
+        List incs = getFieldIncludes(includesKey)
         EntityMapList entityMapList = entityMapService.createEntityMapList(dlist, incs)
         return pager.setEntityMapList(entityMapList)
     }
@@ -243,7 +244,7 @@ trait RestRepositoryApi<D> extends RestApiController {
         }
         qryParams.pager = pager
         //setup quick search
-        List qsFields = getSearchFields()
+        List qsFields = getIncludesMap()['qSearch'] as List
         if(qsFields) qryParams.qSearchFields = qsFields
 
         ((QueryMangoEntityApi)getRepo()).queryList(qryParams)
@@ -263,33 +264,32 @@ trait RestRepositoryApi<D> extends RestApiController {
      * @return the object to pass on to json views
      */
     EntityMap createEntityMap(D instance, String includesKey = 'get'){
-        List incs = getIncludes(includesKey)
+        List incs = getFieldIncludes(includesKey)
         // def emap = BeanPathTools.buildMapFromPaths(instance, incs)
         EntityMap emap = entityMapService.createEntityMap(instance, incs)
         return emap
     }
 
-    List getIncludes(String includesKey){
+    Map getIncludesMap(){
         //we are in trait, always use getters in case they are overrriden in implementing class
-        def includesMap = getRestApiConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
-        List incs = (includesMap[includesKey] ?: includesMap['get'] ) as List
+        return getRestApiConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
+    }
+
+    /**
+     * get the fields includes, returns 'get' as the default if nothing found for includesKey
+     */
+    List<String> getFieldIncludes(String includesKey){
+        //we are in trait, always use getters in case they are overrriden in implementing class
+        def includesMap = getIncludesMap()
+        List incs = (includesMap[includesKey] ?: includesMap['get'] ) as List<String>
         return incs
     }
 
-    List getSearchFields(){
-        //we are in trait, always use getters in case they are overrriden in implementing class
-        def qincs = getRestApiConfig().getQSearchIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getqSearchIncludes())
-        return qincs
-    }
-
     /**
-     * implementing class can provide the includes map property. using the restApi config is recomended
+     * implementing controller class can provide the includes map property.
+     * This will override whats in the entity and the config
      */
     Map getIncludes(){ [:] }
-    /**
-     * implementing class can provide the qSearchIncludes property. using the restApi config is recomended
-     */
-    List getqSearchIncludes() { [] }
 
     void handleException(RuntimeException e) {
         ApiError apiError = apiErrorHandler.handleException(entityClass, e)

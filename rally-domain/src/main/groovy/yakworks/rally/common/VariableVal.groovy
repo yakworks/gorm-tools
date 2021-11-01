@@ -13,7 +13,9 @@ trait VariableVal {
     String variable
     String value
 
-    static List qSearchIncludes = ['variable', 'value'] // quick search includes
+    static Map includes = [
+        qSearch: ['variable', 'value']
+    ]
 
     static constraintsMap = [
         variable:[ description: 'Parameter config prop name, unique', nullable: false, blank: false, maxSize: 50],

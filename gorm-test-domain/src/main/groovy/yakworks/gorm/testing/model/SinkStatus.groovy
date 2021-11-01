@@ -9,12 +9,12 @@ import groovy.transform.CompileStatic
 import yakworks.commons.model.IdEnum
 
 @CompileStatic
-enum KitchenSinkStatus implements IdEnum<KitchenSinkStatus,Integer> {
+enum SinkStatus implements IdEnum<SinkStatus,Integer> {
     Active(1),
     Inactive(2),
     Void(3)
 
     final Integer id
 
-    KitchenSinkStatus(Integer id) { this.id = id }
+    SinkStatus(Integer id) { this.id = id }
 }

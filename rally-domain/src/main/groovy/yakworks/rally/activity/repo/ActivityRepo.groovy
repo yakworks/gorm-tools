@@ -149,7 +149,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         }
 
         //update name
-        if (activity.kind in [ActKind.Note, ActKind.Comment] && activity.note) {
+        if (activity.kind == ActKind.Note && activity.note) {
             int endChar = activity.note.body.trim().length()
             activity.name = (endChar > 255) ? activity.note.body.trim().substring(0, 251) + " ..." : activity.note.body.trim()
         }

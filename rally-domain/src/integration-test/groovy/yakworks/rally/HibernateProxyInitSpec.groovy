@@ -13,9 +13,9 @@ import yakworks.rally.orgs.model.Org
 @Rollback
 class HibernateProxyInitSpec extends Specification implements DataIntegrationTest {
 
-    void "calling getId() should not unwrap proxy"() {
+    void "calling id prop should not unwrap proxy"() {
         when:
-        def proxy = Org.load(1)
+        def proxy = Org.load(2)
 
         then: "load returns a proxy"
         !Hibernate.isInitialized(proxy)
@@ -27,7 +27,21 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         !Hibernate.isInitialized(proxy)
     }
 
-    void "verify association not initialized on id check"() {
+    void "calling getId() prop should not unwrap proxy"() {
+        when:
+        def proxy = Org.load(2)
+
+        then: "load returns a proxy"
+        !Hibernate.isInitialized(proxy)
+
+        when:
+        proxy.getId()
+
+        then: "getId should also not unwrap the proxy"
+        !Hibernate.isInitialized(proxy)
+    }
+
+    void "verify association not initialized on id prop check"() {
         when:
         Org org = Org.get(4)
         //org.info.isDirty()
@@ -36,7 +50,28 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         org.info.id == 4
         !Hibernate.isInitialized(org.info)
         !GrailsHibernateUtil.isInitialized(org, "info")
+    }
 
+    void "verify association not initialized on getId() prop check"() {
+        when:
+        Org org = Org.get(4)
+        //org.info.isDirty()
+
+        then:
+        org.info.getId() == 4
+        !Hibernate.isInitialized(org.info)
+        !GrailsHibernateUtil.isInitialized(org, "info")
+    }
+
+    void "verify association not initialized on assocId prop check"() {
+        when:
+        Org org = Org.get(2)
+
+        then:
+        !Hibernate.isInitialized(org.info)
+        org.infoId == 2
+        //GrailsHibernateUtil is just an alternative to Hibernate way to check and sanity check
+        !GrailsHibernateUtil.isInitialized(org, "info")
     }
 
     void "verify association not initialized on validate"() {
@@ -51,5 +86,16 @@ class HibernateProxyInitSpec extends Specification implements DataIntegrationTes
         org.validate()
         !Hibernate.isInitialized(org.info)
         !GrailsHibernateUtil.isInitialized(org, "info")
+    }
+
+    void "verify association not initialized on persist"() {
+        when:
+        Org org = Org.get(2)
+        org.name = "updated"
+        org.persist(flush: true)
+
+        then:
+        !GrailsHibernateUtil.isInitialized(org,"info")
+
     }
 }

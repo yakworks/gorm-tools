@@ -9,7 +9,7 @@ import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.gorm.testing.model.Thing
 import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.KitchenSinkExt
+import yakworks.gorm.testing.model.SinkExt
 
 @Integration
 @Rollback
@@ -54,7 +54,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
     void "org and orgext validation success"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.ext = new KitchenSinkExt(kitchenSink: sink, textMax: 'fo')
+        sink.ext = new SinkExt(kitchenSink: sink, name: "foo", textMax: 'fo')
         sink.persist()
 
         then:
@@ -82,8 +82,8 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
     void "org and orgext rejectValue in beforeValidate"(){
         when:
         def sink = new KitchenSink(num:'foo1', name: "foo", kind: KitchenSink.Kind.CLIENT)
-        sink.thing = new Thing(city: "RejectThis", country: 'USA', street: 'RejectThis')
-        sink.ext = new KitchenSinkExt(kitchenSink: sink, textMax: 'foo') //foo is 3 chars and should fail validation
+        sink.thing = new Thing(city: "RejectThis", country: 'USA', name: 'RejectThis')
+        sink.ext = new SinkExt(kitchenSink: sink, textMax: 'foo') //foo is 3 chars and should fail validation
         sink.persist()
         //flushAndClear()
 
@@ -93,7 +93,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         sink.errors['ext.textMax'].code == 'maxSize.exceeded'
         sink.errors['thing.country'].code == 'maxSize.exceeded'
         //since its in orgRepo beforeValidate it shows up as nested
-        sink.errors['thing.street'].code == 'no.from.KitchenSinkRepo'
+        sink.errors['thing.name'].code == 'no.from.KitchenSinkRepo'
         //comes from addy repo's beforeValidate
         sink.errors['thing.city'].code == 'no.from.ThingRepo'
     }

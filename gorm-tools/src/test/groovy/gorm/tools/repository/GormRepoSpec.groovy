@@ -19,10 +19,12 @@ import grails.persistence.Entity
 import org.springframework.dao.OptimisticLockingFailureException
 
 import testing.*
+import yakworks.gorm.testing.model.KitchenSink
+import yakworks.gorm.testing.model.SinkItem
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback, Project, ProjectChild] }
+    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback, KitchenSink, SinkItem] }
 
     def "assert proper repos are setup"() {
         expect:
@@ -311,20 +313,20 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     void "test doAssociation"() {
         when:
-        Project p = Project.repo.create(name:"P1", testDate:"2017-01-01", isActive:"false", nested:[name: "Nested", value:"10.0"])
+        def ks = TestData.build(KitchenSink)
 
         then:
-        p != null
+        ks != null
 
         when:
-        List<Map> childs = [[name:"C1"], [name:"C2"]]
-        List<ProjectChild> result = Project.repo.persistAssociationData(p, ProjectChild.repo, childs, 'project')
+        List<Map> items = [[name:"C1"], [name:"C2"]]
+        List<SinkItem> result = KitchenSink.repo.persistAssociationData(ks, SinkItem.repo, items, 'kitchenSink')
 
         then:
         result.size() == 2
-        result[0].project == p
+        result[0].kitchenSink == ks
         result[0].name == "C1"
-        result[1].project == p
+        result[1].kitchenSink == ks
         result[1].name == "C2"
 
     }
@@ -450,10 +452,4 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
         //throws the exception here to test transaction rollback
         throw new RuntimeException()
     }
-}
-
-@Entity @GrailsCompileStatic
-class ProjectChild implements RepoEntity<ProjectChild>{
-    String name
-    Project project
 }

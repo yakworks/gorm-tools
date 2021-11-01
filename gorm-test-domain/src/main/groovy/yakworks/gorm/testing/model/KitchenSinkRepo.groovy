@@ -20,8 +20,8 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
     void beforeValidate(KitchenSink o) {
         o.beforeValidateCheck = "got it"
         //test rejectValue
-        if(o.thing?.street == 'RejectThis'){
-            rejectValue(o, 'thing.street', o.thing.street, 'no.from.KitchenSinkRepo')
+        if(o.thing?.name == 'RejectThis'){
+            rejectValue(o, 'thing.name', o.thing.name, 'no.from.KitchenSinkRepo')
         }
         if(o.name == 'foos'){
             rejectValue(o, 'name', o.name, 'no.foos')

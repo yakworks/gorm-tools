@@ -9,26 +9,20 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
 
+// One to many, one kitchenSink has many SinkItems
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class KitchenSinkExt implements RepoEntity<KitchenSinkExt>{
+class SinkItem implements RepoEntity<SinkItem>{
     static belongsTo = [kitchenSink: KitchenSink]
 
-    KitchenSink kitchenParent
-    String text1
-    String text2
-    String textMax
+    String name
 
     static mapping = {
-        id column: 'id', generator: 'foreign', params: [property: 'kitchenSink']
-        kitchenSink insertable: false, updateable: false , column:'id'
-        kitchenParent column: 'custParentId'
+        kitchenSink column: 'kitchenSinkId'
     }
-    static constraints = {
-        kitchenParent nullable: true
-        text1 nullable: true
-        text2 nullable: true
-        textMax maxSize: 2
-    }
+    static constraintsMap = [
+        kitchenSink:[ nullable: false],
+        name:[ nullable: false]
+    ]
 }

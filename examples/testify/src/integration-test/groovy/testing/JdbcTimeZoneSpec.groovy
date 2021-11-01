@@ -1,6 +1,6 @@
 package testing
 
-import gorm.tools.repository.RepoUtil
+
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import org.springframework.jdbc.core.JdbcTemplate
@@ -29,7 +29,7 @@ class JdbcTimeZoneSpec extends Specification {
         Date now = new Date()
         LocalDateTime ldt = LocalDateTime.ofInstant(now.toInstant(), ZoneId.systemDefault())
 
-        KitchenSink kitchenSink = new KitchenSink(num:'t1', name: "test", actDate: now, locDateTime: ldt)
+        KitchenSink kitchenSink = new KitchenSink(num:'t1', name: "test", actDate: now, localDateTime: ldt)
         kitchenSink.persist(flush: true)
 
         KitchenSink.repo.flushAndClear()
@@ -38,15 +38,15 @@ class JdbcTimeZoneSpec extends Specification {
 
         then:
         kitchenSink.actDate == now
-        kitchenSink.locDateTime == ldt
+        kitchenSink.localDateTime == ldt
 
         when:
-        def result = jdbcTemplate.queryForList("select actDate, locDateTime from KITCHENSINK where id = ${kitchenSink.id}")
+        def result = jdbcTemplate.queryForList("select actDate, localDateTime from KITCHENSINK where id = ${kitchenSink.id}")
 
         then:
         result.size() == 1
         result[0].actDate != null
-        result[0].locDateTime != null
+        result[0].localDateTime != null
 
 
         when:

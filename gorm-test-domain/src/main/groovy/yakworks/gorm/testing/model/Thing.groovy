@@ -11,15 +11,17 @@ import yakworks.commons.transform.IdEqualsHashCode
 @Entity
 @IdEqualsHashCode
 class Thing implements GormRepoEntity<Thing, ThingRepo> {
-    static List qSearchIncludes = ['country', 'city']
+    static List qSearchIncludes = ['name', 'city']
     // address fields
-    String street
+    String name
     String city
     String country = "US"
 
-    static constraints = {
-        // city nullable: false
-        // address nullable: true
-        country maxSize:2
+    static mapping = {
+        id generator:'assigned'
     }
+
+    static constraintsMap = [
+        country:[ maxSize: 2 ]
+    ]
 }

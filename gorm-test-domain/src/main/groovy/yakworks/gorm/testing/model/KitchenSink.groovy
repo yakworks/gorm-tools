@@ -13,9 +13,9 @@ import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
 import gorm.tools.repository.model.GormRepoEntity
-import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.lang.IsoDateUtil
 import yakworks.commons.transform.IdEqualsHashCode
 
 /**
@@ -33,22 +33,25 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     //boolean
     Boolean inactive = false
     //decimal
-    BigDecimal revenue
-    BigDecimal creditLimit //used for gtef compares
+    BigDecimal amount
+
     //dates
     Date actDate
-    LocalDate locDate
-    LocalDateTime locDateTime
-    //special
+    LocalDate localDate
+    LocalDateTime localDateTime
+
+    //self reference
     KitchenSink link
 
     //Associations
     Thing thing //belongs to whatever
 
-    // since OrgExt also has an Org property (orgParent) it gets confused and
-    // needs to know that its "belongs" to is the map and that orgParent gets set sepearatly
-    KitchenSinkExt ext //<- ext belong to customer
+    SinkExt ext
+    //<- ext belong to KitchenSink
+    // since ext also has an KitchenSink property (kitchenParent) it will confused
+    // example of how to explcitly force the "belongsTo"  with the mappedBy
     static mappedBy = [ext: "kitchenSink"]
+
 
     //used for event testing
     String event
@@ -57,7 +60,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
 
     //enums
     Kind kind
-    KitchenSinkStatus status
+    SinkStatus status
 
     //bug in grailsCompileStatic requires this on internal enums
     //also, internal enums must always come before the static constraints or it doesn't get set
@@ -67,7 +70,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     static mapping = {
         //id generator:'assigned'
         ext column: 'extId' //, cascade: 'none'
-        thing column: 'locationId'
+        thing column: 'thingId'
         status enumType: 'identity'
     }
 
@@ -78,4 +81,63 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
         link: [ bindable: true ],
     ]
 
+    // static KitchenSink build(Long id){
+    //     def loc = new Thing(city: "City$id")
+    //     loc.id = id
+    //     loc.persist()
+    //
+    //     def ks = new KitchenSink(
+    //         id: id,
+    //         num: "$id",
+    //         name: "Kitchen$id",
+    //         name2: (id % 2) ? "OrgName2" + id : null ,
+    //         kind: (id % 2) ? KitchenSink.Kind.VENDOR : KitchenSink.Kind.CLIENT ,
+    //         status: (id % 2) ? SinkStatus.Inactive : SinkStatus.Active,
+    //         inactive: (id % 2 == 0),
+    //         amount: (id - 1) * 1.25,
+    //         actDate: LocalDateTime.now().plusDays(id).toDate(),
+    //         localDate: LocalDate.now().plusDays(id),
+    //         localDateTime: LocalDateTime.now().plusDays(id),
+    //         thing: loc
+    //     ).persist()
+    //     ks.ext = new SinkExt(
+    //         kitchenSink: ks,
+    //         name: "ext$id",
+    //         kitchenParent: id % 2 == 0 ? KitchenSink.load(1) : KitchenSink.load(2)
+    //     ).persist()
+    //     return ks
+    // }
+
+    static KitchenSink build(Long id){
+        def loc = new Thing(id: id, name: "Thing$id").persist()
+        def data = generateData(id)
+        data.putAll([id: id, thing: [id: id] ])
+        def ks = KitchenSink.create(data, bindId: true)
+        return ks
+    }
+
+    static Map generateData(Long id) {
+        return [
+            num: "$id",
+            name: "Sink$id",
+            name2: (id % 2) ? "SinkName2-$id" + id : null,
+            kind: ((id % 2) ? KitchenSink.Kind.VENDOR : KitchenSink.Kind.CLIENT) as String,
+            status: ( (id % 2) ? SinkStatus.Inactive : SinkStatus.Active ) as String,
+            inactive: (id % 2 == 0),
+            amount: (id - 1) * 1.25,
+            // actDate: LocalDateTime.now().plusDays(id).toDate(),
+            localDate: IsoDateUtil.format(LocalDate.now().plusDays(id)),
+            localDateTime: IsoDateUtil.format(LocalDateTime.now().plusDays(id)),
+            ext:[ name: "SinkExt$id"],
+            // thing: [id: id]
+        ]
+    }
+
+    static List<Map> generateDataList(int numRecords) {
+        List<Map> list = []
+        (1..numRecords).each { int index ->
+            list << generateData(index)
+        }
+        return list
+    }
 }

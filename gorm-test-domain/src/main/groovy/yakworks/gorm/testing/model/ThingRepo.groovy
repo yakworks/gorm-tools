@@ -11,16 +11,18 @@ import org.springframework.validation.Errors
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.IdGeneratorRepo
 
 @GormRepository
 @CompileStatic
-class ThingRepo implements GormRepo<Thing> {
+class ThingRepo implements GormRepo<Thing>, IdGeneratorRepo {
 
     @RepoListener
-    void beforeValidate(Thing loc, Errors errors) {
+    void beforeValidate(Thing thing, Errors errors) {
+        generateId(thing)
         //test rejectValue
-        if(loc.city == 'RejectThis'){
-            rejectValue(loc, errors, 'city', loc.city, 'no.from.ThingRepo')
+        if(thing.city == 'RejectThis'){
+            rejectValue(thing, errors, 'city', thing.city, 'no.from.ThingRepo')
         }
     }
 }

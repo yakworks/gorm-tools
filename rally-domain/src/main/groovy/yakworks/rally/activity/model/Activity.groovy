@@ -28,7 +28,8 @@ class Activity implements Named, AuditStampTrait, SourceTrait, GormRepoEntity<Ac
     // XXX Sync changes with database
     //  - database has a whole bunch of fields that are not needed, like forCustome, templateId, etc...
     //  - remove title as its just a dup of name
-    //  - nename summary to just name
+    //  - rename summary to just name
+    //  - remove arTranId
 
     Kind kind = Kind.Note
 
@@ -58,8 +59,8 @@ class Activity implements Named, AuditStampTrait, SourceTrait, GormRepoEntity<Ac
     //
     @CompileDynamic
     static enum Kind {
-        Note, Comment, Promise,
-        Todo(true), Call(true), Meeting(true), Email(true), Fax(true), Parcel(true)
+        Note, Promise,
+        Todo(true), Call(true), Meeting(true), Email(true), Parcel(true)
 
         boolean isTaskKind
 
@@ -84,9 +85,6 @@ class Activity implements Named, AuditStampTrait, SourceTrait, GormRepoEntity<Ac
     }
 
     static Map constraintsMap = [
-        arTranId: [
-            d: 'Short cut property to add a link entry for an ArTran.', validate: false, oapi: 'C'
-        ],
         contacts: [
             d: 'The contacts associated with this activity.', validate: false
         ],

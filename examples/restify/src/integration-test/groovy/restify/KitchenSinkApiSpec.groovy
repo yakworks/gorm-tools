@@ -23,7 +23,7 @@ class KitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
         resp.code() == HttpStatus.OK.value()
         // bodyText == "123"
         body.id
-        body.name == 'Kitchen1'
+        body.name == 'Sink1'
 
     }
 

@@ -5,23 +5,18 @@ apply plugin:"org.grails.plugins.views-json"
 
 
 dependencies {
+  console "org.grails:grails-console"
+  profile "org.grails.profiles:rest-api"
 
   implementation "org.grails:grails-plugin-url-mappings"
   implementation "org.grails:grails-plugin-rest"
   implementation "org.grails:grails-plugin-codecs"
   implementation "org.grails:grails-plugin-interceptors"
 
-  console "org.grails:grails-console"
-  profile "org.grails.profiles:rest-api"
-
-  implementation project(":gorm-tools")
-  implementation project(":gorm-tools-security")
-  implementation project(":rally-domain")
   implementation project(":testify")
   implementation project(":gorm-tools-rest")
 
   // compile vs implementation required for json views in gradle5/grails4
-  compile project(":gorm-tools")
   compile ("org.grails.plugins:views-json:$vViews")
   compile "org.grails.plugins:views-json-templates:$vViews"
 
@@ -30,7 +25,7 @@ dependencies {
   // compile "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"
   implementation "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
 
-  // runtime "org.glassfish.web:el-impl:2.1.2-b03"
+  // dk.glasius not working, load twice
   // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
   runtime "org.grails.plugins:external-config:$vExternalConfig"
   runtimeOnly "com.h2database:h2"

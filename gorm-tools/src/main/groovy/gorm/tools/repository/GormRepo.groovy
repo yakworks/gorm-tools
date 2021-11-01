@@ -160,7 +160,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @see #doPersist
      */
     D doUpdate(Map data, Map args) {
-        //FIXME #339 I think we do the lookup logic here, framed sample out sample below
         D entity = findWithData(data)
         bindAndUpdate(entity, data, args)
         return entity
@@ -392,12 +391,12 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         gormInstanceApi().datastore
     }
 
-    /** flush on the datastore's currentSession. When possible use the transactionStatus.flush(). see WithTrx trait */
+    /** flush on the datastore's currentSession.*/
     void flush(){
         getDatastore().currentSession.flush()
     }
 
-    /** cache clear on the datastore's currentSession. When possible use the transactionStatus. see WithTrx trait  */
+    /** cache clear on the datastore's currentSession.*/
     void clear(){
         getDatastore().currentSession.clear()
     }
@@ -443,7 +442,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         clear(status)
     }
 
-    //@CompileDynamic
     void clear(TransactionStatus status) {
         TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
         txObject.sessionHolder.getSession().clear()

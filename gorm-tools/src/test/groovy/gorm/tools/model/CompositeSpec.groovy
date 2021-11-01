@@ -15,6 +15,7 @@ class CompositeSpec extends GormToolsHibernateSpec {
         !ent.id
         !ent.version
         ent.isNew()
+        // ent.ident() == ent
 
         when:
         ent.persist()

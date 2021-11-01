@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
 
+import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
@@ -17,9 +18,9 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import gorm.tools.source.SourceType
 import gorm.tools.support.MsgKey
 import yakworks.commons.lang.Validate
+import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -32,17 +33,15 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
-    //@Inject @Nullable //required false so they dont need to be setup in unit tests
     LocationRepo locationRepo
 
-    //@Inject @Nullable
     ContactRepo contactRepo
 
-    //@Inject @Nullable
     OrgTagRepo orgTagRepo
 
-    //@Inject @Nullable
     OrgSourceRepo orgSourceRepo
+
+    OrgMemberService orgMemberService
 
     @RepoListener
     void beforeValidate(Org org) {
@@ -70,6 +69,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void afterBind(Org org, Map data, AfterBindEvent be) {
         if (be.isBindCreate()) {
             verifyNumAndOrgSource(org, data)
+            if(data.member) orgMemberService.setupMember(org, data.remove('member') as Map)
         }
 
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
@@ -77,6 +77,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         // do contact, support keyContact for legacy and Customers
         def contactData = data.contact ?: data.keyContact
         if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+
     }
 
     /**

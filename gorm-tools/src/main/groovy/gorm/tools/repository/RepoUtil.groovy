@@ -120,7 +120,6 @@ class  RepoUtil {
     /**
      * flushes the session and clears the session cache and the DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
      */
-    @Deprecated
     static void flushAndClear() {
         flush()
         clear()

@@ -24,7 +24,7 @@ restApi:
               - name: 'name2'
 
   task:
-    entityClass: yakworks.testify.model.Taskify
+    entityClass: yakworks.gorm.testing.model.Taskify
     qSearch: ['name', 'note']
     includes:
       get: ['*', 'project.*']

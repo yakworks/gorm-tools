@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
+import yakworks.commons.json.JsonEngine
+
 /**
  * Trait to adds parse methods for using JsonSlurper to parse HttpServletRequest body
  *
@@ -18,16 +20,8 @@ import groovy.transform.CompileStatic
 @CompileStatic
 trait JsonParserTrait {
 
-    JsonSlurper slurperInstance //lazy, use getJsonSlurper so it can be overriden
-
-    /**
-     * lazy accesor for a JsonSlurper, use getJsonSlurper() in a trait so that this can
-     * be overriden. Default is JsonParserType.LAX but may be INDEX_OVERLAY, dont use default
-     */
     JsonSlurper getJsonSlurper(){
-        if(!slurperInstance) slurperInstance = new JsonSlurper()//.setType(JsonParserType.LAX)
-            //.setLazyChop(false).setChop(true)
-        return slurperInstance
+        return JsonEngine.slurper
     }
 
     /**

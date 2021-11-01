@@ -4,16 +4,18 @@
 */
 package gorm.tools.testing
 
+import groovy.json.JsonSlurper
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.EmbeddedPersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 
-import gorm.tools.json.Jsonify
+import gorm.tools.beans.EntityMapService
 import grails.buildtestdata.TestData
 import grails.buildtestdata.builders.DataBuilderContext
 import grails.buildtestdata.builders.PersistentEntityDataBuilder
+import yakworks.commons.json.JsonEngine
 
 /**
  * static build methods to wrap {@link TestData} and Jsonify's statics for the json-views.
@@ -36,13 +38,15 @@ class TestDataJson {
      * @param args see {@link #parseArgs}
      * @return the JsonifyResult
      */
-    static Jsonify.JsonifyResult buildJson(Map args = [:], Class entityClass) {
+    static String buildJson(Map args = [:], Class entityClass) {
         //default for save should be false and find true, we don't want to save the dom as we are ust using it to build the json map
         Map<String, Map> parsedArgs = parseArgs(args)
         Object obj = TestData.build(parsedArgs.args, entityClass, parsedArgs.data)
-        parsedArgs.jsonArgs['includes'] = getFieldsToBuild(entityClass, parsedArgs.args['includes'], parsedArgs.data)
+        def incs = getFieldsToBuild(entityClass, parsedArgs.args['includes'], parsedArgs.data)
         //println res.jsonArgs['includes']
-        return Jsonify.render(obj, parsedArgs.jsonArgs)
+        EntityMapService entityMapService = new EntityMapService()
+        def emap = entityMapService.createEntityMap(obj, incs)
+        return JsonEngine.toJson(emap)
     }
 
     static List<String> getFieldsToBuild(Class entityClass, Object buildDataIncludes = null, Map data = [:]) {
@@ -56,6 +60,7 @@ class TestDataJson {
 
         builder.persistentEntity.associations.each{ Association assc ->
             if(fieldsToBuild.contains(assc.name) && !(assc.associatedEntity instanceof EmbeddedPersistentEntity)){
+                fieldsToBuild.remove(assc.name)
                 if(assc.isOwningSide()){
                     fieldsToBuild.add(assc.name + ".*")
                 } else{
@@ -63,11 +68,12 @@ class TestDataJson {
                 }
             }
         }
-//        builder.findRequiredAssociations().each {
-//            fieldsToBuild.add(it.name + ".id")
-//        }
 
         return fieldsToBuild as List<String>
+    }
+
+    static Object parseJsonText(String text){
+        return new JsonSlurper().parseText(text)
     }
 
     /**
@@ -75,7 +81,7 @@ class TestDataJson {
      * @return Map
      */
     static Map buildMap(Map args = [:], Class entityClass) {
-        buildJson(args, entityClass).json as Map
+        parseJsonText(buildJson(args, entityClass)) as Map
     }
 
     /**

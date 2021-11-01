@@ -19,6 +19,7 @@ import org.springframework.lang.Nullable
  */
 @CompileStatic
 trait Persistable { //implements IPersistable<Long>, Ident<Long> {
+    //used in gorm/hibernate to check if its in the session
     abstract boolean isAttached()
     abstract Serializable getVersion()
 

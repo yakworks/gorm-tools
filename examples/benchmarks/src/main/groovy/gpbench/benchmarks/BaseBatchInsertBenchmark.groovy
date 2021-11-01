@@ -64,7 +64,7 @@ abstract class BaseBatchInsertBenchmark<T> extends AbstractBenchmark {
     void cleanup() {
         assert domainClass.count() == cityListSize * repeatedCityTimes//345000 //37230
         domainClass.executeUpdate("delete from ${domainClass.getSimpleName()}".toString())
-        RepoUtil.flushAndClear()
+        // RepoUtil.flushAndClear()
     }
 
     @Override

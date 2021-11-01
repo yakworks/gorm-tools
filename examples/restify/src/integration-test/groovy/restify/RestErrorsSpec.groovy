@@ -63,9 +63,6 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
     }
 
     void "test data access exception on db constraint violation"() {
-        setup:
-        jdbcTemplate.execute("CREATE UNIQUE INDEX org_num_unique ON Org(num)")
-
         when:
         Response resp = post('/api/rally/org', [ name:"Project-1", num:"P1", type: "Customer"])
         Map body = bodyToMap(resp)
@@ -83,10 +80,9 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Data Access Exception"
         ((String)body.detail).contains("ConstraintViolationException")
-        ((String)body.detail).contains("ORG_NUM_UNIQUE")
+        ((String)body.detail).contains("IX_ORGSOURCE_UNIQUE")
 
         delete("/api/rally/org", orgId)
-        jdbcTemplate.execute("DROP index org_num_unique")
     }
 
 }

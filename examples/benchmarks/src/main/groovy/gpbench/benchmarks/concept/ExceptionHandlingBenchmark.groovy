@@ -37,7 +37,7 @@ class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
     void insert(List<List<Map>> batchList, CityBasicRepo repo) {
         for (List<Map> batch : batchList) {
             insertBatch(batch, repo)
-            RepoUtil.flushAndClear()
+            repo.flushAndClear()
         }
     }
 

@@ -5,11 +5,10 @@
 package gorm.tools.mango
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.Address
-import testing.Nested
+import testing.AddyNested
 import testing.Cust
 import testing.TestIdent
 import testing.TestSeedData
@@ -18,7 +17,7 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
 
     MangoBuilder mangoBuilder
 
-    List<Class> getDomainClasses() { [Cust, Address, Nested] }
+    List<Class> getDomainClasses() { [Cust, Address, AddyNested] }
 
     MangoDetachedCriteria build(map, Closure closure = null) {
         //DetachedCriteria detachedCriteria = new DetachedCriteria(Org)

@@ -10,6 +10,7 @@ import groovy.util.logging.Slf4j
 
 /**
  * Helpful methods for dealing with maps
+ * some merge ideas take from https://gist.github.com/robhruska/4612278 and https://e.printstacktrace.blog/how-to-merge-two-maps-in-groovy/
  */
 
 @Slf4j
@@ -17,7 +18,6 @@ import groovy.util.logging.Slf4j
 class Maps {
 
     /**
-     * https://gist.github.com/robhruska/4612278
      * Deeply merges the contents of each Map in sources, merging from
      * "right to left" and returning the merged Map.
      *
@@ -29,16 +29,33 @@ class Maps {
      * overwritten.
      *
      * The source maps will not be modified.
+     *
+     * If only 1 map is passed in then it just returns that without making a copy or modifying
+     *
+     * @return the new merged map
      */
     static Map merge(Map[] sources) {
         if (sources.length == 0) return [:]
         if (sources.length == 1) return sources[0]
 
-        sources.inject([:]) { result, source ->
-            source.each { k, v ->
-                result[k] = result[k] instanceof Map ? merge(result[k] as Map, v as Map) : v
+        sources.inject([:]) { merged, source ->
+            source.each { k, val ->
+                def mergedVal = merged[k]
+                if (( mergedVal == null || mergedVal instanceof Map ) && val instanceof Map) {
+                    if(mergedVal == null) merged[k] = [:]
+                    merged[k] = merge(merged[k] as Map, val as Map)
+                } else if ((mergedVal == null || mergedVal instanceof Collection) && val instanceof Collection) {
+                    if(mergedVal == null) merged[k] = []
+                    merged[k] = (Collection)merged[k] + (Collection)val
+                    //The list could be list of maps, so make sure they get copied
+                    merged[k] = merged[k].collect{ item ->
+                        return (item instanceof Map) ? merge([:], item) : item
+                    }
+                } else {
+                    merged[k] = val
+                }
             }
-            result
+            return merged
         } as Map
     }
 
@@ -46,49 +63,8 @@ class Maps {
         merge(sources as Map[])
     }
 
-    /**
-     * Does a deep merge on the maps with groovy
-     *
-     * given:
-     * def leftMap = [a: 1, b: 3, z: [a: 10, b: 20], y: [1,2,3,4]]
-     * def rightMap = [a: 2, c: 4, z: [c: 30], y: [5,6,7]]
-     *
-     * def c = Maps.deepMerge(leftMap, rightMap)
-     * assert c == [a: 2, b: 3, c: 4, z: [a: 10, b: 20, c: 30], y: [1,2,3,4,5,6,7]]
-     *
-     * @param source initial map
-     * @param other the other map
-     * @return the new merged map
-     */
-    static Map deepMerge(Map source, Map other) {
-        def cloneMap = clone(other) ?: [:]
-        source.inject(cloneMap) { map, e ->
-            def k = e.key
-            def val = e.value
-            if (( map[k] == null || map[k] instanceof Map ) && val instanceof Map) {
-                if(map[k] == null) map[k] = [:]
-                map[k] = deepMerge(val as Map, map[k] as Map)
-            } else if ((map[k] == null || map[k] instanceof Collection) && val instanceof Collection) {
-                if(map[k] == null) map[k] = []
-                //The list could be list of maps - handle it
-                map[k] = ((val as Collection) + (map[k] as Collection)).collect({ it -> if(it instanceof Map) { return deepCopy(it)} else return it })
-            } else {
-                map[k] = val
-            }
-            return map
-        }
-    }
-
-    /**
-     * dynamic compile so we can clone the passed in map, doesn't work for all maps, only the ones that have clone implemented
-     */
-    @CompileDynamic
-    static Map clone(Map source) {
-        source.clone()
-    }
-
     static Map deepCopy(Map source) {
-        deepMerge(source, [:])
+        merge([:], source)
     }
 
     /**

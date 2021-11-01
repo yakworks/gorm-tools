@@ -53,7 +53,7 @@ class JdbcTimeZoneSpec extends Specification {
         //verify that timestamp was stored in UTC. but was retrived in system timzone, so conversion to UTC should match.
         DateFormat fm = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss")
         String td1 = fm.format(result[0].actDate)
-        String td2 = fm.format(result[0].locDateTime)
+        String td2 = fm.format(result[0].localDateTime)
         fm.setTimeZone(TimeZone.getTimeZone("UTC"))
         String nowString = fm.format(now)
 

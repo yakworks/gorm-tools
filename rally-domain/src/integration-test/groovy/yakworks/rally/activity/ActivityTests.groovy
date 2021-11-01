@@ -129,7 +129,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         assert customers.size() == 5
 
         when:
-        Activity activity = activityRepo.insertMassNote(customers, "Customer", org, "test note", "test note")
+        Activity activity = activityRepo.insertMassNote(customers, "Customer", org, "test note")
         flush()
 
         activity = Activity.get(activity.id)

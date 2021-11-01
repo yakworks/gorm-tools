@@ -212,10 +212,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * @param targets A list of domains which need to have the activity assigned.
      * @param entityName is the class name. Should be the same as target.getClass().getSimpleName()
      * @param org is an Org to which this target is related.  All targets must be related to the same Org.
-     * @param title The title of the activity.
+     * @param body the note body
      */
     @Transactional
-    Activity insertMassNote(List targets, String entityName, Org org, String title, String body, String source = null) {
+    Activity insertMassNote(List targets, String entityName, Org org, String body) {
         Activity activity = new Activity()
         activity.org = org
         addNote(activity, body)

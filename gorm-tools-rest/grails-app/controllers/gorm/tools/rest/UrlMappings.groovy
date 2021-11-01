@@ -6,8 +6,7 @@ package gorm.tools.rest
 
 import groovy.transform.CompileDynamic
 
-import gorm.tools.rest.controller.RestApiController
-import gorm.tools.rest.controller.RestRepositoryApi
+import gorm.tools.rest.controller.RestRepoApiController
 import yakworks.commons.lang.ClassUtils
 
 @CompileDynamic
@@ -18,7 +17,7 @@ class UrlMappings {
         for (controller in getGrailsApplication().controllerClasses) {
             // println "controler $controller.fullName"
             String cName = controller.logicalPropertyName
-            boolean isApi = RestRepositoryApi.isAssignableFrom(controller.clazz)
+            boolean isApi = RestRepoApiController.isAssignableFrom(controller.clazz)
             String namespace = ClassUtils.getStaticPropertyValue(controller.clazz, 'namespace', String)
            // println "controller $cName with namespace $namespace"
 

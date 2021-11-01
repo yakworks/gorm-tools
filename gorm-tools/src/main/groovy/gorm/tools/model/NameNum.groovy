@@ -17,13 +17,10 @@ trait NameNum extends Named {
 
     String num
 
-    static List qSearchIncludes = ['num', 'name'] // quick search includes
-    static List picklistIncludes = ['id', 'num', 'name'] //for picklist
-
-    // static Map includes = [
-    //     qSearch: ['num', 'name'],
-    //     picklist: ['id', 'num', 'name']
-    // ]
+    static Map includes = [
+        qSearch: ['num', 'name'],
+        picklist: ['id', 'num', 'name']
+    ]
 
     static constraintsMap = [
         name:[ description: 'The full name for this entity', nullable: false, blank: false, maxSize: 100],

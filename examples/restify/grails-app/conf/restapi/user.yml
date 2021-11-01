@@ -3,7 +3,7 @@ restApi:
     includes:
       get: [ id, username , name, email, inactive, roles.id, roles.name ]
       picklist: [ id, username, name]
-    qSearch: [ username, name, email ]
+      qSearch: [ username, name, email ]
     gridOptions:
       colModel:
         - { name: id, hidden: true }

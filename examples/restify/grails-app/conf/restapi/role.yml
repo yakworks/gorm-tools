@@ -1,7 +1,7 @@
 restApi:
   role:
-    qSearch: [ name, description ]
     includes:
+      qSearch: [ name, description ]
       picklist: [ id, name ]
     gridOptions:
       colModel:

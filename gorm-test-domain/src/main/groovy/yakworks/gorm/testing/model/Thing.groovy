@@ -11,7 +11,10 @@ import yakworks.commons.transform.IdEqualsHashCode
 @Entity
 @IdEqualsHashCode
 class Thing implements GormRepoEntity<Thing, ThingRepo> {
-    static List qSearchIncludes = ['name', 'city']
+    static Map includes = [
+        qSearch: ['name', 'city'],
+        picklist: ['id', 'name']
+    ]
     // address fields
     String name
     String city

@@ -18,6 +18,7 @@ import org.grails.datastore.mapping.query.api.QueryableCriteria
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntity
 import grails.gorm.DetachedCriteria
+import yakworks.commons.lang.ClassUtils
 import yakworks.commons.model.IdEnum
 
 import static gorm.tools.mango.MangoOps.CompareOp
@@ -216,7 +217,8 @@ class MangoBuilder {
             qSearchFields = val['fields'] as List<String>
         } else if (QueryMangoEntity.isAssignableFrom(getTargetClass(criteria))){
             qText = val as String
-            qSearchFields = getQSearchFields(criteria)
+            Class entityClazz = getTargetClass(criteria)
+            qSearchFields = getQSearchFields(entityClazz)
         }
 
         if(qSearchFields) {
@@ -234,9 +236,9 @@ class MangoBuilder {
         criteria.targetClass
     }
 
-    @CompileDynamic //dynamic so we can access the protected targetClass.quickSearchFields
-    List<String>  getQSearchFields(DetachedCriteria criteria) {
-        criteria.targetClass.qSearchIncludes
+    List<String> getQSearchFields(Class entityClazz) {
+        Map incs =  ClassUtils.getStaticPropertyValue(entityClazz, 'includes', Map)
+        return ( incs ? incs['qSearch'] : [] ) as List<String>
     }
 
     //@CompileDynamic

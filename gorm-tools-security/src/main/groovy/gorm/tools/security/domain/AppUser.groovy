@@ -14,11 +14,12 @@ import gorm.tools.audit.AuditStampTrait
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.model.Named
 
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
+class AppUser implements Named, AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
 
     static Map includes = [
         qSearch: ['username', 'name', 'email'], // quick search includes

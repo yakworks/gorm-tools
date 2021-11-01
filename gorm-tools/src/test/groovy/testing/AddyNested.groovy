@@ -10,7 +10,7 @@ import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class Nested implements RepoEntity<Nested> {
+class AddyNested implements RepoEntity<AddyNested> {
     String name
     BigDecimal value
 

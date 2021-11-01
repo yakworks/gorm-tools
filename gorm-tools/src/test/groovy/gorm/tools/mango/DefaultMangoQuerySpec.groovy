@@ -7,7 +7,7 @@ package gorm.tools.mango
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.testing.spring.AutowiredTest
 import testing.Address
-import testing.Nested
+import testing.AddyNested
 import testing.Cust
 import testing.TestSeedData
 
@@ -15,7 +15,7 @@ class DefaultMangoQuerySpec extends GormToolsHibernateSpec implements AutowiredT
 
     DefaultMangoQuery mangoQuery
 
-    List<Class> getDomainClasses() { [Cust, Address, Nested] }
+    List<Class> getDomainClasses() { [Cust, Address, AddyNested] }
 
     void setupSpec() {
         Cust.withTransaction {

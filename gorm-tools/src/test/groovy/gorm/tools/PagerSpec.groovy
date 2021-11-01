@@ -9,13 +9,13 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.Address
-import testing.Nested
+import testing.AddyNested
 import testing.Cust
 import testing.TestSeedData
 
 class PagerSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Cust, Address, Nested] }
+    List<Class> getDomainClasses() { [Cust, Address, AddyNested] }
 
     void setupSpec() {
         Cust.withTransaction {

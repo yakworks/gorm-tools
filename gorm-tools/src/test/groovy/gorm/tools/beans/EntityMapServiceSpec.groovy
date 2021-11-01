@@ -8,7 +8,7 @@ import gorm.tools.beans.domain.*
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 import testing.Address
-import testing.Nested
+import testing.AddyNested
 import testing.Cust
 import testing.CustType
 import testing.TestSeedData
@@ -19,7 +19,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains Bookz, BookTag, BookAuthor, EnumThing, Cust, Address, CustType, Nested
+        mockDomains Bookz, BookTag, BookAuthor, EnumThing, Cust, Address, CustType, AddyNested
     }
 
     void "test buildIncludesMap"(){

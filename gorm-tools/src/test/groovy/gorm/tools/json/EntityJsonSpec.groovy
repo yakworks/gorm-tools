@@ -19,7 +19,7 @@ import testing.Address
 import testing.Cust
 import testing.CustExt
 import testing.CustType
-import testing.Nested
+import testing.AddyNested
 
 import static grails.gorm.hibernate.mapping.MappingBuilder.orm
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
@@ -30,7 +30,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
-        mockDomains(CustExt, CustType, Nested, Address, JsonifyDom, JsonifyDomExt, NestedDom)
+        mockDomains(CustExt, CustType, AddyNested, Address, JsonifyDom, JsonifyDomExt, NestedDom)
         //defineBeans(new JsonViewGrailsPlugin())
     }
 

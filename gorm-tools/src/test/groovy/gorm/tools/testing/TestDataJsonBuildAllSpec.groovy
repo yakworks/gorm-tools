@@ -4,7 +4,7 @@
 */
 package gorm.tools.testing
 
-import gorm.tools.beans.BeanPathTools
+
 import gorm.tools.testing.unit.DataRepoTest
 import grails.buildtestdata.BuildDataTest
 import spock.lang.Specification
@@ -12,12 +12,12 @@ import testing.Address
 import testing.Cust
 import testing.CustExt
 import testing.CustType
-import testing.Nested
+import testing.AddyNested
 
 class TestDataJsonBuildAllSpec extends Specification implements BuildDataTest, DataRepoTest{
 
     def setupSpec(){
-        mockDomains(Cust, CustType, Nested, CustExt, Address)
+        mockDomains(Cust, CustType, AddyNested, CustExt, Address)
     }
 
     void "test getJsonIncludes"(){

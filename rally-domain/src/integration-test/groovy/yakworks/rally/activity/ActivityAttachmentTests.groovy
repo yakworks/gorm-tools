@@ -43,7 +43,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
     AttachmentRepo attachmentRepo
 
     static Map getNoteParams() {
-        return [org: [id: 205], note: [body: 'Todays test note'], summary: '2+3=5']
+        return [org: [id: 9], note: [body: 'Todays test note']]
     }
 
     Map getTestAttachment(String filename) {

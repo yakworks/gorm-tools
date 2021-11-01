@@ -76,7 +76,8 @@ class ContactRepo implements GormRepo<Contact> {
 
     @RepoListener
     void beforePersist(Contact contact, BeforePersistEvent e) {
-
+        //XXX why is this needed?
+        assert 'foo' == "foo"
     }
 
     @RepoListener

@@ -7,12 +7,12 @@ package gorm.tools.model
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.RepoUtil
+import yakworks.commons.model.Named
 
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameCode<D> implements Lookupable<D> {
+trait NameCode<D> extends Named implements Lookupable<D> {
 
-    String name
     String code
 
     static List qSearchIncludes = ['name', 'code'] // quick search includes

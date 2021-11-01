@@ -14,7 +14,6 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
-import grails.compiler.GrailsCompileStatic
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -139,15 +138,13 @@ class RallySeedData {
 
     static void buildAppUser(){
         AppUser.withTransaction {
-            println "BootStrap inserting AppUser"
             AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo")
             user.persist()
-            //AppUser user = AppUser.create([id: 1, username: "admin", email: "admin@9ci.com", password:"admin"], bindId: true)
             assert user.id == 1
 
-            SecRole admin = SecRole.create([id:1, name: SecRole.ADMINISTRATOR], bindId: true)
-            SecRole power = SecRole.create([id:2, name: "Power User"], bindId: true)
-            SecRole guest = SecRole.create([id:3, name: "Guest"], bindId: true)
+            SecRole admin = new SecRole(id:1, name: SecRole.ADMINISTRATOR).persist()
+            SecRole power = new SecRole(id:2, name: "Power User").persist()
+            SecRole guest = new SecRole(id:3, name: "Guest").persist()
 
             SecRoleUser.create(user, admin, true)
             SecRoleUser.create(user, power, true)

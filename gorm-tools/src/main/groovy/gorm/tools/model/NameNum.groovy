@@ -6,12 +6,16 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
+import yakworks.commons.model.Named
+
+/**
+ * trait for a name num entity, common for Organizations(Customers etc..) and Contacts.
+ */
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameNum {
+trait NameNum extends Named {
 
     String num
-    String name
 
     static List qSearchIncludes = ['num', 'name'] // quick search includes
     static List picklistIncludes = ['id', 'num', 'name'] //for picklist

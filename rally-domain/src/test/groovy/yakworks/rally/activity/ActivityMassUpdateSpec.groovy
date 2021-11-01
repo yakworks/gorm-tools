@@ -56,7 +56,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         activityRepo != null
 
         when:
-        activityRepo.insertMassActivity([customerOne, customerTwo], [summary: 'note_test'])
+        activityRepo.insertMassActivity([customerOne, customerTwo], [name: 'note_test'])
 
         then:
         [customerOne, customerTwo].each { id ->
@@ -82,13 +82,8 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         String tempFileName = appResourceLoader.getRelativeTempPath(tmpFile)
 
         Map changes = [
-            summary    : 'attachment_test',
-            attachments: [
-                [
-                    name            : "test.txt",
-                    tempFileName    : tempFileName
-                ]
-            ]
+            name: 'attachment_test',
+            attachments: [ [name: "test.txt", tempFileName: tempFileName] ]
         ]
         expect:
         Payment.get(1) != null
@@ -104,7 +99,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
             assert link
             Activity activity = link.activity
             assert activity
-            assert activity.summary == "attachment_test"
+            assert activity.name == "attachment_test"
             Attachment attachment = activity.attachments[0]
             assert attachment
             assert attachment.id
@@ -139,8 +134,8 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         Customer.get(2) != null
 
         Map changes = [
-            summary: 'task_test',
-            task   : [
+            name: 'task_test',
+            task: [
                 dueDate : "2017-04-28",
                 priority: 10,
                 state   : 1,
@@ -160,7 +155,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
             assert link
             Activity activity = link.activity
             assert activity
-            assert activity.summary == "task_test"
+            assert activity.name == "task_test"
             assert activity.kind == ActKinds.Todo
             assert activity.task
             assert activity.task.taskType == TaskType.TODO

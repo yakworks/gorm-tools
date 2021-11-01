@@ -6,25 +6,24 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
-/** Source information, where the data came from, where was it called from */
+/**
+ * Source information, where the data came from, where was it called from
+ */
 @CompileStatic
 trait SourceTrait  {
 
-    // 9ci or Erp system name. Open field for descriptive name of the system or job
-    String source = '9ci'
+    // Open field for descriptive name of the system or job
+    String source
 
-    // Erp or App for most sources
+    // External or App for most sources, indicates what the system of record is
     SourceType sourceType = SourceType.App
 
-    //Unique id from the outside source or specific name of the scheduled job so it's easy to find
+    // Unique id from the external source or the id if its internal
     String sourceId
 
     static constraintsMap = [
-        source:[ description: 'A description of where this came from',
-                 nullable: true, example: 'Oracle, BankOfAmericaLockbox'],
-        sourceType:[ description: 'Enum, defaults to SourceType.App',
-                     nullable: false, example: 'App', required: false],
-        sourceId:[ description: 'the unique id from the outside source or name of the scheduled job', //nullable: false,  XXX put it back in when data is fixed
-                   example: 'AR-123-A64']
+        source:[ d: 'A description of where this came from', example: 'Oracle, BankOfAmerica, Lockbox'],
+        sourceType:[ d: 'Enum, defaults to SourceType.App', nullable: false, example: 'App', default: 'App'],
+        sourceId:[ d: 'the unique id from the outside source or name of the scheduled job', nullable: false, example: 'AR-123-A64']
     ]
 }

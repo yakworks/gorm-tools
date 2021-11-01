@@ -6,9 +6,12 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
+import yakworks.commons.model.Named
+
+
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameDescription {
+trait NameDescription extends Named {
 
     String name
     String description

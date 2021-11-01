@@ -15,12 +15,9 @@ import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
-import yakworks.rally.tag.model.Tag
-import yakworks.rally.tag.model.TagLink
 import yakworks.rally.testing.MockData
 
 class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
@@ -47,7 +44,7 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
     Map getActTaskData(Long orgId){
         return [
             org:[id: orgId], //org id does not exist
-            summary: 'Do Something',
+            name: 'Do Something',
             task: [
                 dueDate : "2017-04-28",
                 priority: 10,
@@ -66,7 +63,7 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
         then:
         act
         act.task
-        act.summary == 'Do Something'
+        act.name == 'Do Something'
     }
 
     def "create task with note"(){
@@ -78,7 +75,7 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
 
         then:
         act.task
-        act.summary == 'Do Something'
+        act.name == 'Do Something'
         act.kind == Activity.Kind.Todo
         act.note.body == 'test note'
     }
@@ -91,7 +88,7 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
         then:
         activity != null
         activity.org == contact.org
-        activity.summary == "Task Summary"
+        activity.name == "Task Summary"
         activity.kind == Activity.Kind.Todo
         activity.task != null
         activity.task.taskType == TaskType.TODO

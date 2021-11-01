@@ -31,13 +31,13 @@ class ActivityTests extends Specification implements DomainIntTest {
     AttachmentRepo attachmentRepo
 
     static Map getNoteParams() {
-        return [org: [id: 205], note: [body: 'Todays test note'], summary: '2+3=5']
+        return [org: [id: 205], note: [body: 'Todays test note']]
     }
 
     void "create note"() {
         setup:
         Org org = Org.first()
-        Map params = [org:[id: org.id], summary: "test-note", attachments: [], task: [state: 0]]
+        Map params = [org:[id: org.id], name: "test-note", attachments: [], task: [state: 0]]
 
         when:
         Activity result = activityRepo.create(params)
@@ -45,15 +45,15 @@ class ActivityTests extends Specification implements DomainIntTest {
 
         then:
         result != null
-        result.summary == "test-note"
+        result.name == "test-note"
         result.kind == ActKind.Note
 
         when: "update"
-        result = activityRepo.update([id: result.id, summary: "test-updated", kind: "Note", visibleTo: 'Owner'])
+        result = activityRepo.update([id: result.id, name: "test-updated", kind: "Note", visibleTo: 'Owner'])
 
         then:
         result != null
-        result.summary == "test-updated"
+        result.name == "test-updated"
         result.visibleTo == VisibleTo.Owner
     }
 
@@ -67,7 +67,7 @@ class ActivityTests extends Specification implements DomainIntTest {
 
         then:
         updatedActivity.note != null
-        updatedActivity.summary.length() == 255
+        updatedActivity.name.length() == 255
         updatedActivity.note.body.length() == 300
         params.note.body == updatedActivity.note.body
     }
@@ -152,7 +152,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         flush()
 
         when:
-        def params = [org:org, kind:"Note", summary: RandomStringUtils.randomAlphabetic(100)]
+        def params = [org:org, kind:"Note", name: RandomStringUtils.randomAlphabetic(100)]
         params.tags = [[id:tag1.id], [id:tag2.id]]
 
 
@@ -175,7 +175,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         def params = [
             org:[id: 909090],
             note:[body: 'Todays test note'],
-            summary: '!! will get overriden as it has a note !!'
+            name: '!! will get overriden as it has a note !!'
         ]
 
         Activity act = Activity.create(params)
@@ -184,7 +184,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         then:
         act
         act.note.body == params.note.body
-        act.summary == params.note.body
+        act.name == params.note.body
 
         when:
         flushAndClear()
@@ -196,7 +196,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         activity.orgId == params.org.id.toLong()
         activity.org.id == params.org.id.toLong()
         params.note.body == activity.note.body
-        params.note.body == activity.summary
+        params.note.body == activity.name
         Activity.Kind.Note == activity.kind
         activity.task == null
 

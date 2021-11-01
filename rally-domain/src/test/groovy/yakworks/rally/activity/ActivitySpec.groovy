@@ -11,7 +11,6 @@ import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.TaskStatus
 import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.AttachmentSupport
@@ -46,8 +45,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         return [
             org:[id:205],
             title: 'Todays test note',
-            note:[body: 'Todays test note'],
-            summary:'2+3=5'
+            note:[body: 'Todays test note']
         ]
     }
 
@@ -61,15 +59,14 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
     void "creates note if summary is longer than 255"() {
         when:
         def params = [kind:"Note", org:MockData.org()]
-        String summary = RandomStringUtils.randomAlphabetic(300)
-        params.summary = summary
+        params.name = RandomStringUtils.randomAlphabetic(300)
         Activity activity = Activity.create(params)
 
         then:
         activity.note != null
-        activity.summary.length() == 255
+        activity.name.length() == 255
         activity.note.body.length() == 300
-        activity.note.body == summary
+        activity.note.body == params.name
     }
 
     void "update note if exists"() {
@@ -79,15 +76,14 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         activity.persist()
         def params = [kind:"Note", id:activity.id]
         flushAndClear()
-        String summary = RandomStringUtils.randomAlphabetic(300)
-        params.summary = summary
+        params.name = RandomStringUtils.randomAlphabetic(300)
         Activity updatedActivity = Activity.update(params)
 
         then:
         updatedActivity.note != null
-        updatedActivity.summary.length() == 255
+        updatedActivity.name.length() == 255
         updatedActivity.note.body.length() == 300
-        updatedActivity.note.body == summary
+        updatedActivity.note.body == params.name
     }
 
     void "save works on gorm6.1.11 but fails on 6.1.12"(){
@@ -96,7 +92,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         def params = [
                 org:[id: 205], //org id does not exist
                 note:[body: 'Todays test note'],
-                summary: 'will get overriden'
+                name: 'will get overriden'
         ]
 
         Activity act = Activity.create(params)
@@ -117,7 +113,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         def params = [
                 org    : [id: org.id],
                 note   : [body: 'test note'],
-                summary: '!! should get overriden as it has a note !!'
+                name: '!! should get overriden as it has a note !!'
         ]
 
         Activity act = Activity.create(params)
@@ -125,7 +121,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
         then:
         ActKinds.Note == act.kind
-        'test note' == act.summary
+        'test note' == act.name
         'test note' == act.note.body
 
         when:
@@ -136,7 +132,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         activity
         activity.note
         params.note.body == activity.note.body
-        params.note.body == activity.summary
+        params.note.body == activity.name
 
         ActKinds.Note == activity.kind
         activity.task == null
@@ -168,7 +164,6 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         def params = [
             org    : [id: org.id],
             note   : [body: 'test note'],
-            summary: 'The summary',
             tags: [[id:t1.id], [id:t2.id]],
             contacts: cmap
         ]
@@ -202,20 +197,20 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
         when:
         Org org = build(Org)
-        Activity activity = build(Activity, [org:org, summary: 'test summary'])
+        Activity activity = build(Activity, [org:org, name: 'test summary'])
         activity.repo.addNote(activity, "test body")
         activity.persist()
 
         then:
         activity.id != null
         //Check summary of saved Activity
-        activity.note.body == activity.summary
+        activity.note.body == activity.name
     }
 
     void testUpdateSummary_WithLongBody(){
         when:
         Org org = build(Org)
-        Activity activity = build(Activity, [org:org, summary: 'test summary'])
+        Activity activity = build(Activity, [org:org, name: 'test summary'])
         //Adding noteBody with more than 255 chars
         String noteBody = "DENIAL 1:  Proof of shipment enclosed.  Order shipped FOB Origin.  Please repay the deduction and address carton shrotage issues with your designated carrier. tt Matt Johnson w/Albuquerque Factory, said not valid sales allowance. LVM to Robert remind. new past due invoices."
         assert noteBody.trim().length() > 255
@@ -225,14 +220,14 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         then:
         activity.id != null
         //Check summary of saved Activity
-        activity.note.body.trim().substring(0,251)+" ..." == activity.summary
-        255 == activity.summary.length()
+        activity.note.body.trim().substring(0,251)+" ..." == activity.name
+        255 == activity.name.length()
     }
 
     void testUpdateSummary_With255CharsBody(){
         setup:
         Org org = build(Org)
-        Activity activity = build(Activity, [org:org, summary: 'test summary'])
+        Activity activity = build(Activity, [org:org, name: 'test summary'])
         //Adding noteBody with exact 255 chars
         String noteBody = "DENIAL 1:  Proof of shipment enclosed.  Order shipped FOB Origin.  Please repay the deduction and address carton shrotage issues with your designated carrier. tt Matt Johnson w/Albuquerque Factory, said not valid sales allowance. LVM to Robert remind. new"
 
@@ -246,8 +241,8 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         then:
         activity.id != null
         //Check summary of saved Activity
-        activity.note.body.trim() == activity.summary
-        255 == activity.summary.length()
+        activity.note.body.trim() == activity.name
+        255 == activity.name.length()
     }
 
     def "test removeActivityAttachment"() {

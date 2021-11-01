@@ -29,7 +29,9 @@ class Job implements RepoJobEntity<Job>, Serializable {
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],
         requestData:[ d: 'Json data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
-        data: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES]
+        data: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES],
+        //XXX I dont think this should be nullable
+        sourceId:[ d: 'the unique id from the outside source for the scheduled job', nullable: true]
     ]
 
 

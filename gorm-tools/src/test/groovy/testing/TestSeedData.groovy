@@ -1,7 +1,6 @@
 package testing
 
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 import grails.buildtestdata.TestData
 
@@ -27,7 +26,7 @@ class TestSeedData {
                 location: (
                     new Address(
                         address: "City$index",
-                        nested: new Nested(
+                        nested: new AddyNested(
                             name: "Nested${2 * index}",
                             value: index
                         )

@@ -15,9 +15,6 @@ import groovy.text.SimpleTemplateEngine
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.FilenameUtils
-
 import yakworks.commons.lang.DateUtil
 
 /*
@@ -72,8 +69,11 @@ class FileUtil {
     /**
      * Gets extension from name
      */
-    static String getExtension(String name) {
-        FilenameUtils.getExtension(name)
+    static String getExtension(String fileName) {
+        if (!fileName) return ''
+        int extensionPos = fileName.lastIndexOf('.')
+        int lastSeparator = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'))
+        return lastSeparator > extensionPos ? '' : fileName.substring(extensionPos+1)
     }
 
     /**
@@ -234,6 +234,6 @@ class FileUtil {
      * @throws IOException in case of an I/O error
      */
     static String readFileToString(final File file, final Charset charsetName) throws IOException {
-        return FileUtils.readFileToString(file, charsetName)
+        file.getText(charsetName.name())
     }
 }

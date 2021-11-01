@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.security.domain.AppUser
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
@@ -28,6 +29,12 @@ class MockData {
         OrgTypeSetup ots = new OrgTypeSetup(id: type, name: type.name()).persist()
         assert type.typeSetup
         return type
+    }
+
+    static List createSomeContacts(){
+        Contact contact1 = contact([firstName: "bill"])
+        Contact contact2 = contact([firstName: "bob"])
+        [contact1, contact2]
     }
 
     static Contact contact(Map dta = [:]) {
@@ -125,6 +132,28 @@ class MockData {
             ],
             info: [
                 phone  : '555-1212',
+            ]
+        ]
+    }
+
+    Activity createActNote(Long orgId){
+        Map params = [
+            org:[id: orgId], //org id does not exist
+            note:[body: 'Todays test note']
+        ]
+        Activity act = Activity.create(params)
+        flush()
+        return act
+    }
+
+    Map getActTaskData(Long orgId){
+        return [
+            org:[id: orgId], //org id does not exist
+            task   : [
+                dueDate : "2017-04-28",
+                priority: 10,
+                state   : 1,
+                taskType: [id: 1]
             ]
         ]
     }

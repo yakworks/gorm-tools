@@ -102,7 +102,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
             }
         }
 
-        RepoUtil.flushAndClear()
+        cityRepo.flushAndClear()
     }
 
     @Override

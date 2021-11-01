@@ -8,34 +8,73 @@ import java.time.LocalDate
 
 import groovy.transform.CompileStatic
 
+import org.springframework.jdbc.core.JdbcTemplate
+
+import gorm.tools.beans.AppCtx
+import gorm.tools.security.domain.AppUser
+import gorm.tools.security.domain.SecRole
+import gorm.tools.security.domain.SecRoleUser
+import yakworks.rally.activity.model.Activity
+import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
+import yakworks.rally.tag.model.Tag
 
 // import grails.buildtestdata.TestData
-
+@SuppressWarnings('BuilderMethodWithSideEffects')
 @CompileStatic
 class RallySeedData {
 
+    static JdbcTemplate jdbcTemplate
+
+    static init(){
+        jdbcTemplate = AppCtx.get("jdbcTemplate", JdbcTemplate)
+    }
+
+    static fullMonty(){
+        buildAppUser()
+        createOrgTypeSetups()
+        buildClientOrg()
+        buildOrgs(100)
+        buildTags()
+        createIndexes()
+    }
+
     static void createOrgTypeSetups(){
         OrgType.values().each {
-            new OrgTypeSetup(id: it.id, name: it.name()).persist(flush:true)
+            String code = it == OrgType.CustAccount ? 'CustAcct': it.name()
+            new OrgTypeSetup(id: it.id, code: code, name: it.name()).persist(flush:true)
         }
     }
 
-    @SuppressWarnings('BuilderMethodWithSideEffects')
     static void buildOrgs(int count){
-        //createOrgTypeSetups()
-        (1..2).each{
-            def company = createOrg(it , OrgType.Company)
-            company.location.kind = Location.Kind.remittance
-            company.location.persist()
+        Org.withTransaction {
+            //createOrgTypeSetups()
+            (2..3).each{
+                def company = createOrg(it , OrgType.Company)
+                company.location.kind = Location.Kind.remittance
+                company.location.persist()
+            }
+            if(count < 3) return
+            (4..count).each { id ->
+                def org = createOrg(id, OrgType.Customer)
+            }
         }
-        if(count < 3) return
-        (3..count).each { id ->
-            def org = createOrg(id, OrgType.Customer)
+
+    }
+
+    static void buildClientOrg(){
+        Org.withTransaction {
+            def client = createOrg(1, OrgType.Client)
+
+            client.contact.user = AppUser.get(1)
+            client.contact.persist(flush: true)
+
+            assert Contact.query(id: 1).get()
         }
+
     }
 
     static Org createOrg(Long id, OrgType type){
@@ -54,11 +93,65 @@ class RallySeedData {
                 num2: (id - 1) * 1.5,
                 date1: LocalDate.now().plusDays(id).toString()
             ],
-            location: [city: "City$id"]
+            location: [city: "City$id"],
+            contacts: [[
+                num: "secondary$id",
+                email    : "secondary$id@taggart.com",
+                firstName: "firstName$id",
+                lastName : "lastName$id"
+            ]]
         ]
         def org = Org.create(data)
+
+        def contact = new Contact(
+            id: id,
+            num: "primary$id",
+            email    : "jgalt$id@taggart.com",
+            firstName: "John$id",
+            lastName : "Galt$id",
+            org: org
+        )
+        contact.user = AppUser.get(1)
+        contact.persist()
+
+        org.contact = contact
+        org.persist()
+
+        // add note
+        def act = Activity.create([id:id, org: org, note: [body: 'Test note']], bindId: true)
         // assert org.flex.date1.toString() == '2021-04-20'
         return org
     }
 
+    static void buildTags(){
+        Tag.withTransaction {
+            def t1 = new Tag(id: 1, code: "CPG", entityName: 'Customer').persist(flush: true)
+            def t2 = new Tag(id: 2, code: "MFG", entityName: 'Customer').persist(flush: true)
+        }
+    }
+
+    static void createIndexes(){
+        Tag.withTransaction {
+            jdbcTemplate.execute("CREATE UNIQUE INDEX ix_OrgSource_unique on OrgSource(sourceType,sourceId,orgTypeId)")
+        }
+    }
+
+    static void buildAppUser(){
+        AppUser.withTransaction {
+            AppUser user = new AppUser(id: 1, username: "admin", email: "admin@9ci.com", password:"123Foo")
+            user.persist()
+            assert user.id == 1
+
+            SecRole admin = new SecRole(id:1, name: SecRole.ADMINISTRATOR).persist()
+            SecRole power = new SecRole(id:2, name: "Power User").persist()
+            SecRole guest = new SecRole(id:3, name: "Guest").persist()
+
+            SecRoleUser.create(user, admin, true)
+            SecRoleUser.create(user, power, true)
+
+            AppUser noRoleUser = AppUser.create([id: 2, username: "noroles", email: "noroles@9ci.com", password:"123Foo"], bindId: true)
+            assert noRoleUser.id == 2
+            return
+        }
+    }
 }

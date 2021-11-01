@@ -39,4 +39,4 @@ restApi:
 
     # no namespace
     kitchen:
-      entityClass: yakworks.testify.model.KitchenSink
+      entityClass: yakworks.gorm.testing.model.KitchenSink

@@ -1,4 +1,5 @@
 apply plugin:"groovy"
+apply plugin: 'java-library'
 apply plugin:"org.grails.grails-plugin"
 
 dependencies {
@@ -7,22 +8,19 @@ dependencies {
 
   implementation "org.grails:grails-plugin-domain-class"
 
-  implementation project(":gorm-tools")
-  implementation project(":gorm-tools-security")
-  implementation project(":rally-domain")
+  api project(":gorm-tools")
+  api project(":gorm-tools-security")
+  api project(":rally-domain")
+  api project(":gorm-test-domain")
 
-  implementation "org.grails.plugins:view-tools:$vViewTools"
+  api "org.grails.plugins:view-tools:$vViewTools"
 
-  // the new dk.glasius:external-config imports some configs twice
-  // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
   runtime "org.grails.plugins:external-config:$vExternalConfig"
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
   runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
   runtimeOnly "com.zaxxer:HikariCP:$vHikari"
 
-  testCompile project(":gorm-test-support")
-
-  testCompile "io.micronaut:micronaut-inject-groovy"
+  // testCompile "io.micronaut:micronaut-inject-groovy"
 }
 
 bootRun {

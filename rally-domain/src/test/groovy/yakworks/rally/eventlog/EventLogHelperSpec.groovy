@@ -145,9 +145,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         String result = elh.debugFinish()
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
         assert list.size() == 1
         def row = list[0]
@@ -168,9 +168,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT, JOB_NAME, [a:'a', b:42], true)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         String result = elh.debugFinish('blah blah blah')
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:
@@ -192,9 +192,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT, JOB_NAME, 'a, 42')
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         elh.debugStart()
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:
@@ -215,9 +215,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         String result = elh.infoFinish()
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:
@@ -237,9 +237,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         elh.infoStart()
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:
@@ -258,9 +258,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         String result = elh.infoFinish('blah blah blah')
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:
@@ -280,10 +280,10 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         Exception e = new Exception('hell, world!')
         String result = elh.errorFinish(e, 'blah blah blah')
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:
@@ -328,9 +328,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         String result = elh.errorFinish('blah blah blah')
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:
@@ -351,9 +351,9 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flushAndClear()
+        flushAndClear()
         String result = elh.errorFinish()
-        RepoUtil.flushAndClear()
+        flushAndClear()
         def list = EventLog.list()
 
         expect:

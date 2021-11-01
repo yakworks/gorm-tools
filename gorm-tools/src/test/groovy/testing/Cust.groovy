@@ -10,14 +10,15 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.model.IdEnum
+import yakworks.commons.model.IdEnum
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 @Entity
 @GrailsCompileStatic
-class Cust implements NameTrait, GormRepoEntity<Cust, CustRepo> {
+class Cust implements GormRepoEntity<Cust, CustRepo> {
+    String name
     Integer descId // inverted order for test
     //strings
     String name2
@@ -54,7 +55,7 @@ class Cust implements NameTrait, GormRepoEntity<Cust, CustRepo> {
     static List qSearchIncludes = ["name"]
 
     static constraints = {
-        importFrom(NameTraitConstraints)
+        name blank: false, nullable: false
         descId   nullable: true
         name2    nullable: true
         secret   nullable: true, display: false

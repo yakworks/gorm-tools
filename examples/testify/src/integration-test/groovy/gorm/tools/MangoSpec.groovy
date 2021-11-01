@@ -188,11 +188,11 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` "() {
         when:
-        List list = Org.queryList([criteria: ['$or': ["name": "Org1", "flex.id": 4]]])
+        List list = Org.queryList([criteria: ['$or': ["name": "Org9", "flex.id": 10]]])
         then:
         list.size() == 2
-        list[0].name == "Org1"
-        list[1].name == "Org4"
+        list[0].name == "Org9"
+        list[1].name == "Org10"
     }
 
     def "Filter with `or` on low level"() {
@@ -200,8 +200,6 @@ class MangoSpec extends Specification {
         List list = Org.queryList([criteria: [location: ['$or': ["city": "City3", "id": 1000]]], max: 150])
         then:
         list.size() == 2
-        list[0].name == "Org1"
-        list[1].name == "Org3"
     }
 
     def "Filter with several `or` on one level"() {

@@ -58,7 +58,7 @@ class RestApiConfig implements ConfigAware {
      * @param entityClass the entity class to look for statics on
      * @param mergeIncludes the includes that might be set in controller
      */
-    @Cacheable('restApiConfig.qSearchIncludes')
+    @Cacheable('restApiConfig.includes.qSearch')
     List getQSearchIncludes(String controllerKey, String namespace, Class entityClass, List mergeIncludes){
         def qIncludes = [] as List<String>
         //see if there is a config for it

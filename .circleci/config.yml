@@ -19,6 +19,7 @@ jobs:
           paths: [ "~/.m2", "~/.gradle" ]
           key: gradle-{{ checksum "cache-key.tmp" }}
 
+      - run: make compile
       - run:
           name: ✔︎ -- Test
           command: make check

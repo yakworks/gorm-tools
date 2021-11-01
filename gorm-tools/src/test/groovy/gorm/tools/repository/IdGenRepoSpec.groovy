@@ -6,40 +6,39 @@ package gorm.tools.repository
 
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-import testing.IdGenTest
 
-//import static grails.buildtestdata.TestData.build
-
-import testing.IdGenTestRepo
+import yakworks.gorm.testing.model.Thing
+import yakworks.gorm.testing.model.ThingRepo
 
 class IdGenRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [IdGenTest] }
+    //test the thing
+    List<Class> getDomainClasses() { [Thing] }
 
     def "assert proper repos are setup"() {
         expect:
-        IdGenTest.repo instanceof IdGenTestRepo
-        IdGenTest.repo instanceof IdGeneratorRepo
+        Thing.repo instanceof ThingRepo
+        Thing.repo instanceof IdGeneratorRepo
     }
 
     def "test getIdGeneratorKey()"() {
         expect:
-        'IdGenTest.id' == IdGenTest.repo.getIdGeneratorKey()
+        'Thing.id' == Thing.repo.getIdGeneratorKey()
     }
 
     def "test generateId()"() {
         expect:
-        1 == IdGenTest.repo.generateId()
+        1 == Thing.repo.generateId()
     }
 
     def "test generateId(Ent)"() {
         when:
-        def ent = new IdGenTest()
+        def ent = new Thing()
 
         then:
-        2 == IdGenTest.repo.generateId(ent)
+        2 == Thing.repo.generateId(ent)
         //should be same if called again as it checks if id is null
-        2 == IdGenTest.repo.generateId(ent)
+        2 == Thing.repo.generateId(ent)
         ent.id == 2
     }
 }

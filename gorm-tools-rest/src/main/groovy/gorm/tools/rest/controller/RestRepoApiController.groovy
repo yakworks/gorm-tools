@@ -294,18 +294,7 @@ trait RestRepoApiController<D> extends RestApiController {
     void handleException(Exception e) {
         ApiError apiError = apiErrorHandler.handleException(entityClass, e)
 
-        log.error(e.message, e)
-
-        //FIXME #339 rethink how we do this. do we really need 2 different views?
-        // can't the one view be smart enough to render the error?
-        // see if this works
-        // if( apiError.status == HttpStatus.UNPROCESSABLE_ENTITY){
-        //     respond([view: '/errors/_errors422'], apiError)
-        // } else {
-        //     respond([view: '/errors/_errors'], apiError)
-        // }
-        respond([view: '/errors/_apiError'], apiError)
-
+        respond([view: '/errors/_apiError', status: apiError.status.value()], apiError)
     }
 
 }

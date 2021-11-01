@@ -5,6 +5,7 @@
 package gorm.tools.repository.errors.api
 
 import groovy.transform.CompileStatic
+import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
@@ -28,6 +29,7 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 /**
  * Prepares ApiError / ApiValidationError for given exception
  */
+@Slf4j
 @CompileStatic
 class ApiErrorHandler {
 
@@ -75,9 +77,11 @@ class ApiErrorHandler {
             return new ApiError(status, getMsg(e))
         }
         else if (e instanceof DataAccessException) {
+            log.error("UNEXPECTED Data Access Exception ${e.message}", e)
             return new ApiError(status, "Data Access Exception").detail(e.message)
         }
         else {
+            log.error("UNEXPECTED Internal Server Error ${e.message}", e)
             return new ApiError(INTERNAL_SERVER_ERROR, "Internal Server Error", e.message)
         }
     }

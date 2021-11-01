@@ -115,6 +115,7 @@ class EntityMapService {
         Map<String, Object> nestedProps = [:]
 
         for (String field : includes) {
+            field = field.trim()
             Integer nestedIndex = field.indexOf('.')
             //no index then its just a property or its the *
             if (nestedIndex == -1) {

@@ -1,6 +1,5 @@
 import gorm.tools.repository.errors.api.ApiError
 
-
 /**
  * Renders validation errors according to vnd.error: https://github.com/blongden/vnd.error
  */
@@ -8,7 +7,9 @@ model {
   ApiError apiError
 }
 
-response.contentType "application/vnd.error"
+// per rfc-7807 https://opensource.zalando.com/restful-api-guidelines/#176
+response.contentType "application/problem+json"
+
 response.status apiError.status.value()
 
 json {

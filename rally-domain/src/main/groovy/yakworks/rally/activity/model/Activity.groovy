@@ -7,11 +7,11 @@ package yakworks.rally.activity.model
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStampTrait
+import gorm.tools.model.NamedEntity
 import gorm.tools.model.SourceTrait
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.commons.model.Named
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.model.Attachable
@@ -23,7 +23,7 @@ import yakworks.rally.tag.model.Taggable
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Activity implements Named, AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
+class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
     // static transients = ['hasAttachments']
     // XXX Sync changes with database
     //  - database has a whole bunch of fields that are not needed, like forCustome, templateId, etc...
@@ -117,7 +117,8 @@ class Activity implements Named, AuditStampTrait, SourceTrait, GormRepoEntity<Ac
             d: 'The id from the outside source or of the collection step, promise or some future workflow template record that generated this'
         ],
         name: [
-            d: 'The short name or a 255 char string summary of the activity, if note it will ends with ... if there is more to the note.'
+            d: 'The short name or a 255 char string summary of the activity, if note it will ends with ... if there is more to the note.',
+            maxSize: 255
         ],
         task: [
             d: 'The task info if this is a task kind'

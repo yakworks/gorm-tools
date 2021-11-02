@@ -134,12 +134,21 @@ class ApiSchemaEntity {
 
             if(!isAllowed(type, apiProp)) continue
 
-            if (prop instanceof Association) {
-                associationProp(type, apiProp, prop, constrainedProperty)
-            } else { //setup type
-                //println "  ${prop.name} basic, ${prop} ${prop.type}"
-                basicType(apiProp, constrainedProperty)
+            if(propName == 'stringList'){
+                println "WTF"
             }
+            try{
+                if (prop instanceof Association && prop.associatedEntity) {
+                    associationProp(type, apiProp, prop, constrainedProperty)
+                } else { //setup type
+                    //println "  ${prop.name} basic, ${prop} ${prop.type}"
+                    basicType(apiProp, constrainedProperty)
+                }
+            } catch(e){
+                e.printStackTrace()
+                throw e
+            }
+
             apiProp.remove('allowed')
             if(apiProp.remove('required')) required.add(prop.name)
             propsMap[prop.name] = apiProp

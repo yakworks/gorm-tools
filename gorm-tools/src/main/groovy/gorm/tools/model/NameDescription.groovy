@@ -11,9 +11,8 @@ import yakworks.commons.model.Named
 
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameDescription extends Named {
+trait NameDescription extends NamedEntity {
 
-    String name
     String description
 
     static Map includes = [
@@ -22,7 +21,6 @@ trait NameDescription extends Named {
     ]
 
     static constraintsMap = [
-        name:[ description: 'The name for this entity', nullable: false, blank: false, maxSize: 50],
         description:[ description: 'The description for this entity', nullable: true, maxSize: 255]
     ]
 }

@@ -4,6 +4,7 @@
 */
 package yakworks.gorm.testing.model
 
+import gorm.tools.model.NamedEntity
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -13,12 +14,13 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class SinkExt implements RepoEntity<SinkExt>{
+class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
     static belongsTo = [kitchenSink: KitchenSink]
 
     KitchenSink kitchenParent
     String name
     String textMax
+    Thing thing
 
     static mapping = {
         id column: 'id', generator: 'foreign', params: [property: 'kitchenSink']

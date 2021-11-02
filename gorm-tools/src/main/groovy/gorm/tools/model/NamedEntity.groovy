@@ -13,18 +13,17 @@ import yakworks.commons.model.Named
  */
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameNum extends NamedEntity {
+trait NamedEntity extends Named {
 
-    String num
+    String name
 
     static Map includes = [
-        qSearch: ['num', 'name'],
-        picklist: ['id', 'num', 'name']
+        qSearch: ['name'],
+        picklist: ['id', 'name']
     ]
 
     static constraintsMap = [
-        name:[ description: 'Full name for this entity', nullable: false, blank: false, maxSize: 100],
-        num:[ description: 'Unique alpha-numeric identifier for this entity', nullable: false, blank: false, maxSize: 50]
+        name:[ description: 'The name for this entity', nullable: false, blank: false, maxSize: 50],
     ]
 
 }

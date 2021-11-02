@@ -21,8 +21,8 @@ class ThingRepo implements GormRepo<Thing>, IdGeneratorRepo {
     void beforeValidate(Thing thing, Errors errors) {
         generateId(thing)
         //test rejectValue
-        if(thing.city == 'RejectThis'){
-            rejectValue(thing, errors, 'city', thing.city, 'no.from.ThingRepo')
+        if(thing.name == 'RejectThis'){
+            rejectValue(thing, errors, 'name', thing.name, 'no.from.ThingRepo')
         }
     }
 }

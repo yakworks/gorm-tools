@@ -11,7 +11,7 @@ import yakworks.commons.model.Named
 
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameCode<D> extends Named implements Lookupable<D> {
+trait NameCode<D> extends NamedEntity implements Lookupable<D> {
 
     String code
 
@@ -21,7 +21,6 @@ trait NameCode<D> extends Named implements Lookupable<D> {
     ]
 
     static constraintsMap = [
-        name:[ description: 'The name for this entity', nullable: false, blank: false, maxSize: 50],
         code:[ description: 'Short code, alphanumeric with no special characters except dash (for space) and underscore', nullable: false,
                blank: false, maxSize: 10, matches: "[a-zA-Z0-9-_]+"]
     ]

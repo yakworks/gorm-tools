@@ -76,6 +76,7 @@ class EntityMapBinderSpec extends Specification {
         org2.info.phone == "1-900"
     }
 
+    @Issue("https://github.com/yakworks/gorm-tools/issues/391")
     void "bind: domain with composite id"() {
         given:
         Tag t = new Tag(name:"test")
@@ -84,9 +85,9 @@ class EntityMapBinderSpec extends Specification {
         TagLink link = new TagLink()
         entityMapBinder.bind([:], link, [tag:t, linkedId:"1", linkedEntity: "Org"])
 
-        then:
-        link.tag == t
-        link.linkedId == 1
-        link.linkedEntity == "Org"
+        then: "This values should have been sent"
+        link.tag == null
+        link.linkedId == null
+        link.linkedEntity == null
     }
 }

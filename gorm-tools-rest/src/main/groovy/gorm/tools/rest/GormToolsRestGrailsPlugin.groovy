@@ -11,6 +11,9 @@ import org.grails.core.artefact.DomainClassArtefactHandler
 
 import gorm.tools.openapi.GormToSchema
 import gorm.tools.openapi.OpenApiGenerator
+import gorm.tools.rest.render.JsonGeneratorRenderer
+import gorm.tools.rest.render.PagerRenderer
+import gorm.tools.rest.render.ProblemRenderer
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
@@ -32,20 +35,10 @@ class GormToolsRestGrailsPlugin extends Plugin {
 
             restApiConfig(RestApiConfig){ bean -> bean.lazyInit = true}
 
-            //controller names to be used during iterations, do it so we only itrate once
-            List<GrailsControllerClass> ctrlList = getExistingControllers(application)
-            //println ctrlNames
-
-            for (GrailsClass grailsClass in application.getArtefacts(DomainClassArtefactHandler.TYPE)) {
-                final domainClass = grailsClass.clazz
-
-                // if it has the RestApi annotation then make sure the controller that was created for it gets added
-                if (domainClass.getAnnotation(RestApi)) {
-                    String controllerName = "${domainClass.name}Controller"
-                    //Check if we already have such controller in app
-                    addControllerWhenNotExists(application, ctrlList, controllerName)
-                }
-            }
+            //renderers
+            mapJsonRenderer(JsonGeneratorRenderer, Map)
+            problemRenderer(ProblemRenderer)
+            pagerRenderer(PagerRenderer)
 
             gormToSchema(GormToSchema) { bean ->
                 bean.lazyInit = true
@@ -80,6 +73,24 @@ class GormToolsRestGrailsPlugin extends Plugin {
 
     void onShutdown(Map<String, Object> event) {
         // TODO Implement code that is executed when the application shuts down (optional)
+    }
+
+    //old
+    void controllersFromDomainAnnotation(){
+        //controller names to be used during iterations, do it so we only itrate once
+        List<GrailsControllerClass> ctrlList = getExistingControllers(application)
+        //println ctrlNames
+
+        for (GrailsClass grailsClass in application.getArtefacts(DomainClassArtefactHandler.TYPE)) {
+            final domainClass = grailsClass.clazz
+
+            // if it has the RestApi annotation then make sure the controller that was created for it gets added
+            if (domainClass.getAnnotation(RestApi)) {
+                String controllerName = "${domainClass.name}Controller"
+                //Check if we already have such controller in app
+                addControllerWhenNotExists(application, ctrlList, controllerName)
+            }
+        }
     }
 
     /**

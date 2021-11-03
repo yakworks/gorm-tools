@@ -30,7 +30,6 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.model.DataOp
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
 
@@ -206,10 +205,18 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
     void bindAndSave(D entity, Map data, BindAction bindAction, Map args){
+        //if data is empty then fire exception
+        RepoUtil.checkData(data, entityClass)
+
+        // throw error if id is passed in but bindId is false
+        if(BindAction.Create == bindAction && data.id){
+            RepoUtil.checkCreateData(data, args,  entityClass)
+            if(args.bindId) entity['id'] = data['id']
+        }
+
         args['bindAction'] = bindAction
         bind(entity, data, bindAction, args)
-        //set the id if it has one in data and bindId arg is passed in as true
-        if(args.remove('bindId') && BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
+
         args['data'] = data
         doPersist(entity, args)
     }

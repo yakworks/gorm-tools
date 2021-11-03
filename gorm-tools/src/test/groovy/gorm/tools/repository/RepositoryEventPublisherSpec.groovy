@@ -24,7 +24,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
     void testEventsFired() {
         when:
-        City city = TestDataJson.buildCreate(City)//City.create(params)
+        City city = City.create(name: 'Denver')
 
         then:
         city != null
@@ -40,8 +40,9 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
     void "test persist events from update"() {
         when:
-        TestDataJson.buildCreate(City) //make sure one is there
-        Map tdata = [id: 1, name: "test update"]
+        //make sure one is there
+        City city1 = City.create(name: 'Denver')
+        Map tdata = [id: city1.id, name: "test update"]
         City city = City.update(tdata)
 
         then:
@@ -106,7 +107,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
     void "test subscriber listener with persist events"() {
         when:
-        City city = buildCreate(City) //City.create([name: "test"])
+        City city = City.create(name: 'Denver')
 
         then:
         sleep(100)
@@ -140,7 +141,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
     void "test subscriber listener with bind events"() {
         when:
-        City city = buildCreate(City)
+        City city = City.create(name: 'Denver')
 
         then:
         sleep(100)
@@ -150,8 +151,8 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
     void "test subscriber listener when removing an entity"() {
         when:
-        City city = buildCreate(City) //City.create(params)
-        City city2 = buildCreate(City) //City.create(params)
+        City city = City.create(name: 'Denver') //City.create(params)
+        City city2 = City.create(name: 'Chicago') //City.create(params)
         city.remove()
         City.removeById(city2.id)
 
@@ -165,16 +166,15 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
     void "test subscriber listener when updating an entity"() {
         setup:
-        Map params = [id: 1, name: "test"]
-        City city = City.create(params)
+        City city = City.create(name: "test")
         city.events = [:]
 
         when:
-        City.update([id: 1, name: "test1"])
+        City.update([id: city.id, name: "test1"])
 
         then:
         sleep(100)
-        City.get(1).name == "test1"
+        City.get(city.id).name == "test1"
         city.events.beforeBind
         city.events.afterBind
         city.events.beforePersist
@@ -182,10 +182,10 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
 
         when:
         city.events = [:]
-        City.update([id: 1, name: "test2"])
+        City.update([id: city.id, name: "test2"])
 
         then:
-        City.get(1).name == "test2"
+        City.get(city.id).name == "test2"
         city.events.beforeBind
         city.events.afterBind
         city.events.beforePersist

@@ -8,6 +8,11 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
 
+/**
+ * helpers for Plain Old Groovy Objects and Beans
+ *
+ * @author Joshua Burnett (@basejump)
+ */
 @CompileStatic
 class Pogo {
 

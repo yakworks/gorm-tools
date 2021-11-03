@@ -7,7 +7,6 @@ package gorm.tools.model
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.RepoUtil
-import yakworks.commons.model.Named
 
 @SuppressWarnings(['MethodName'])
 @CompileStatic

@@ -14,6 +14,9 @@ import groovy.transform.CompileStatic
  *
  * @param <E> the enum
  * @param <T> the id type
+ *
+ * @author Joshua Burnett (@basejump)
+ *
  */
 @SuppressWarnings(['PropertyName'])
 @CompileStatic

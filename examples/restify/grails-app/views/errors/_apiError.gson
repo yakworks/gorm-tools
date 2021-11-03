@@ -1,10 +1,10 @@
-import gorm.tools.repository.errors.api.ApiError
+import gorm.tools.api.problem.Problem
 
 /**
  * Renders validation errors according to vnd.error: https://github.com/blongden/vnd.error
  */
 model {
-  ApiError apiError
+  Problem apiError
 }
 
 // per rfc-7807 https://opensource.zalando.com/restful-api-guidelines/#176

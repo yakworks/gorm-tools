@@ -11,15 +11,15 @@ import groovy.transform.CompileStatic
  * currency converter for json
  */
 @CompileStatic
-class CurrencyConverter implements JsonGenerator.Converter {
+class URIConverter implements JsonGenerator.Converter {
 
     @Override
     boolean handles(Class<?> type) {
-        Currency == type
+        URI == type
     }
 
     @Override
     Object convert(Object value, String key) {
-        ((Currency)value).currencyCode
+        ((URI)value).toString()
     }
 }

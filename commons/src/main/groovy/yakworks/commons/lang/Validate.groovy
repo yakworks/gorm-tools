@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 /**
  * similiar to org.apache.commons.lang3.Validate but throws IllegalArgumentException instead of
  * a NullPointer
+ *
+ * @author Joshua Burnett (@basejump)
  */
 @CompileStatic
 class Validate {

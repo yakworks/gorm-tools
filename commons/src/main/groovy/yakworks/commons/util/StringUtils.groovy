@@ -8,6 +8,8 @@ import groovy.transform.CompileStatic
 
 /**
  * String utilities.
+ *
+ * @author Joshua Burnett (@basejump)
  */
 @CompileStatic
 class StringUtils {

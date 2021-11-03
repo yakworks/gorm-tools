@@ -6,8 +6,6 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.model.Named
-
 /**
  * trait for a name num entity, common for Organizations(Customers etc..) and Contacts.
  */

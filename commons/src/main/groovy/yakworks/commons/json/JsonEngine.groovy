@@ -5,10 +5,8 @@
 package yakworks.commons.json
 
 import groovy.json.JsonGenerator
-import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
-import groovy.transform.MapConstructor
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
@@ -20,11 +18,16 @@ import yakworks.commons.json.converters.LocalTimeJsonConverter
 import yakworks.commons.json.converters.OffsetDateTimeJsonConverter
 import yakworks.commons.json.converters.OffsetTimeJsonConverter
 import yakworks.commons.json.converters.PeriodJsonConverter
+import yakworks.commons.json.converters.URIConverter
 import yakworks.commons.json.converters.ZonedDateTimeJsonConverter
 
 /**
  * Json Parser
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 7.0.8
  */
+@SuppressWarnings('FieldName')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class JsonEngine {
@@ -44,7 +47,8 @@ class JsonEngine {
 
     // JsonEngine(){ }
 
-    JsonEngine build() {
+    // default build options
+    JsonGenerator.Options buildOptions() {
 
         JsonGenerator.Options options = new JsonGenerator.Options()
 
@@ -66,7 +70,11 @@ class JsonEngine {
             options.addConverter(it)
         }
 
-        jsonGenerator = options.build()
+        return options
+    }
+
+    JsonEngine build() {
+        jsonGenerator = buildOptions().build()
         jsonSlurper = buildSlurper()
         return this
     }
@@ -77,7 +85,7 @@ class JsonEngine {
     }
 
     List<JsonGenerator.Converter> getConverters(){
-        ServiceLoader<JsonGenerator.Converter> loader = ServiceLoader.load(JsonGenerator.Converter.class);
+        ServiceLoader<JsonGenerator.Converter> loader = ServiceLoader.load(JsonGenerator.Converter);
         List<JsonGenerator.Converter> converters = []
         for (JsonGenerator.Converter converter : loader) {
             converters.add(converter)
@@ -91,6 +99,7 @@ class JsonEngine {
         converters.add(new PeriodJsonConverter())
         converters.add(new ZonedDateTimeJsonConverter())
         converters.add(new CurrencyConverter())
+        converters.add(new URIConverter())
         // OrderComparator.sort(converters)
         return converters
     }

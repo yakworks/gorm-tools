@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 
+import gorm.tools.api.problem.Problem
+import gorm.tools.api.problem.ProblemHandler
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
@@ -24,8 +26,6 @@ import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.bulk.BulkableArgs
-import gorm.tools.repository.errors.api.ApiError
-import gorm.tools.repository.errors.api.ApiErrorHandler
 import gorm.tools.repository.model.DataOp
 import gorm.tools.rest.RestApiConfig
 import grails.web.Action
@@ -38,6 +38,9 @@ import static org.springframework.http.HttpStatus.OK
 /**
  * This is the CRUD controller for entities
  * @param <D> Object
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 6.1
  */
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
@@ -55,7 +58,7 @@ trait RestRepoApiController<D> extends RestApiController {
     EntityMapService entityMapService
 
     @Autowired
-    ApiErrorHandler apiErrorHandler
+    ProblemHandler problemHandler
 
     @Autowired(required = false)
     RepoJobService repoJobService
@@ -92,7 +95,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def post() {
         try {
-            Map dataMap = parseJson(request)
+            Map dataMap = parseJson()
             D instance = (D) getRepo().create(dataMap)
             def entityMap = createEntityMap(instance)
             respondWithEntityMap(entityMap, [status: CREATED])
@@ -164,15 +167,14 @@ trait RestRepoApiController<D> extends RestApiController {
     def list() {
         Pager pager = pagedQuery(params, 'list')
         // passing renderArgs args would be usefull for 'renderNulls' if we want to include/exclude
-        respond([view: '/object/_pagedList'], [pager: pager, renderArgs: [:]])
+        respond([status: OK], pager)
         // respond query(params)
     }
 
     @Action
     def picklist() {
         Pager pager = pagedQuery(params, 'picklist')
-        Map renderArgs = [:]
-        respond([view: '/object/_pagedList'], [pager: pager, renderArgs: renderArgs])
+        respond([status: OK], pager)
     }
 
     // @Action
@@ -182,11 +184,6 @@ trait RestRepoApiController<D> extends RestApiController {
     //     respond([data: data])
     // }
 
-    // XXX we don't have incs. We just need to do entityMap and respond it
-    //  for returning Job we need to figure out what to do with bytes[] data and how to return Results associations.
-    //  We need special method for that. Maybe something like we return error (list of ApiError ) but also we need to return
-    //  list of all sourceIds/ids that we created
-    //  so in includes we can specify what we return
     //FIXME #339 we need to see if we can rethink this.
     // in bulkCreate we convert the object to json bytes ( need to save to db so have to do this)
     // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
@@ -206,7 +203,7 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
 
-    def bulkProcess(HttpServletRequest req, Map params, DataOp dataOp) {
+    void bulkProcess(HttpServletRequest req, Map params, DataOp dataOp) {
         List dataList = parseJsonList(req)
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
         // String contextPath = req.getContextPath()
@@ -223,7 +220,14 @@ trait RestRepoApiController<D> extends RestApiController {
 
         //respondWithEntityMap(entityMapService.createEntityMap(job, null), [status: CREATED])
         Map resp = [id: job.id, ok:job.ok, state:job.state.name(), data: (job.data ? parseJsonBytes(job.data) : []), source:job.source, sourceId:job.sourceId]
-        respond resp, status: MULTI_STATUS.value()
+        respond([status: MULTI_STATUS.value()], resp)
+    }
+
+    void respondWithEntityMap(EntityMap entityMap, Map args = [:]){
+        // def resArgs = [view: '/object/_entityMap'] // as Map<String, Object>
+        // if(args) resArgs.putAll(args)
+        // respond(resArgs as Map, [entityMap: entityMap] as Map)
+        respond(args as Map, entityMap)
     }
 
     //@CompileDynamic
@@ -248,12 +252,6 @@ trait RestRepoApiController<D> extends RestApiController {
         if(qsFields) qryParams.qSearchFields = qsFields
 
         ((QueryMangoEntityApi)getRepo()).queryList(qryParams)
-    }
-
-    void respondWithEntityMap(EntityMap entityMap, Map args = [:]){
-        def resArgs = [view: '/object/_entityMap'] // as Map<String, Object>
-        if(args) resArgs.putAll(args)
-        respond(resArgs as Map, [entityMap: entityMap] as Map)
     }
 
     /**
@@ -292,9 +290,8 @@ trait RestRepoApiController<D> extends RestApiController {
     Map getIncludes(){ [:] }
 
     void handleException(Exception e) {
-        ApiError apiError = apiErrorHandler.handleException(entityClass, e)
-
-        respond([view: '/errors/_apiError', status: apiError.status.value()], apiError)
+        Problem apiError = problemHandler.handleException(entityClass, e)
+        respond([status: apiError.status], apiError)
     }
 
 }

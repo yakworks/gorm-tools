@@ -241,7 +241,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
             org = get(oid)
         } else if(data.num)  {
             String num = data.num as String
-            List orgsForNum = orgType ? Org.findAllWhere(num:num, orgType: orgType) : Org.findAllWhere(num:num)
+            List orgsForNum = orgType ? Org.findAllWhere(num:num, type: orgType) : Org.findAllWhere(num:num)
             if(orgsForNum?.size() == 1) {
                 org = orgsForNum[0]
             } else if (orgsForNum.size() > 1){

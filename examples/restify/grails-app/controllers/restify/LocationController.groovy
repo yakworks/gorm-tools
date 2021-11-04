@@ -15,7 +15,7 @@ import static org.springframework.http.HttpStatus.CREATED
 class LocationController implements RestRepoApiController<Location> {
 
     def post() {
-        Map q = new LinkedHashMap(parseJson(request))
+        Map q = bodyAsMap()
         q.street = q.street == null ? null : "foo street"
         Location instance = getRepo().create(q)
         respond instance, [status: CREATED] //201

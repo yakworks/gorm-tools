@@ -11,8 +11,9 @@ import groovy.util.logging.Slf4j
 /**
  * Helpful methods for dealing with maps
  * some merge ideas take from https://gist.github.com/robhruska/4612278 and https://e.printstacktrace.blog/how-to-merge-two-maps-in-groovy/
+ *
+ * @author Joshua Burnett (@basejump)
  */
-
 @Slf4j
 @CompileStatic
 class Maps {
@@ -152,6 +153,13 @@ class Maps {
                 return val == full[it.key]
             }
         }
+    }
+
+    /**
+     * checks that main map contains all the subset
+     */
+    static boolean containsAll(Map main, Map subset){
+        main.entrySet().containsAll(subset.entrySet())
     }
 
 }

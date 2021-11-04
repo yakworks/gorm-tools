@@ -18,7 +18,7 @@ class BootStrap {
     void buildKitchen(){
         KitchenSink.withTransaction {
             println "BootStrap inserting 100 customers"
-            KitchenSeedData.buildKitchen(10)
+            KitchenSeedData.createKitchenSinks(10)
         }
     }
 

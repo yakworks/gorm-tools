@@ -4,23 +4,22 @@
 */
 package gorm.tools.rest.client
 
-import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import gorm.tools.json.JsonParserTrait
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
+import yakworks.commons.json.JsonEngine
 
 /**
  * Trait with helper methods to wrap OKHttps HttpClient for rest api testing
  */
 @CompileStatic
 //@CompileDynamic
-trait OkHttpRestTrait implements JsonParserTrait{
+trait OkHttpRestTrait {
 
     String jsonHeader = "application/json;charset=utf-8"
 
@@ -106,24 +105,14 @@ trait OkHttpRestTrait implements JsonParserTrait{
     }
 
     Map bodyToMap(Response resp){
-        parseJsonText(resp.body().string()) as Map
+        JsonEngine.parseJson(resp.body().string(), Map)
     }
 
     List bodyToList(Response resp){
-        parseJsonText(resp.body().string()) as List
+        JsonEngine.parseJson(resp.body().string(), List)
     }
 
-    String toJson(Map body){
-        def w = new StringWriter()
-        def sjb = new StreamingJsonBuilder(w)
-        sjb.call(body)
-        return w.toString()
-    }
-
-    String toJson(List body){
-        def w = new StringWriter()
-        def sjb = new StreamingJsonBuilder(w)
-        sjb.call(body)
-        return w.toString()
+    String toJson(Object body){
+        JsonEngine.toJson(body)
     }
 }

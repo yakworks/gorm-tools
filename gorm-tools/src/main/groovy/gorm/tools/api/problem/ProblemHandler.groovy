@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.errors.api
+package gorm.tools.api.problem
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -27,19 +27,23 @@ import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 /**
- * Prepares ApiError / ApiValidationError for given exception
+ * Service to prepare ApiError / ApiValidationError for given exception
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 7.0.8
  */
 @Slf4j
 @CompileStatic
-class ApiErrorHandler {
+class ProblemHandler {
 
-    @Autowired MsgService msgService
+    @Autowired
+    MsgService msgService
 
-    ApiError handleException(Throwable e) {
+    Problem handleException(Throwable e) {
         handleException("Entity", e)
     }
 
-    ApiError handleException(Class entityClass, Throwable e) {
+    Problem handleException(Class entityClass, Throwable e) {
         handleException(entityClass.simpleName, e)
     }
 
@@ -53,12 +57,12 @@ class ApiErrorHandler {
      * @param Exception e
      * @return ApiError
      */
-    ApiError handleException(String entityName, Throwable e) {
+    Problem handleException(String entityName, Throwable e) {
         // default error status code is 422
         HttpStatus status = UNPROCESSABLE_ENTITY
 
         if (e instanceof EntityNotFoundException) {
-            return new ApiError(NOT_FOUND, getMsg(e))
+            return DefaultProblem.of(NOT_FOUND, getMsg(e))
         }
         else if (e instanceof EntityValidationException) {
             String detail
@@ -66,23 +70,27 @@ class ApiErrorHandler {
                 //this is some other exception wrapped in validation exception
                 detail = e.cause?.message
             }
-            return new ApiError(status, getMsg(e), detail).errors(toFieldErrorList(e.errors))
+            return ValidationProblem.of(status, getMsg(e), detail).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof ValidationException) {
             // grails has a ValidationException, so does gorm
             def msg = getMsg(RepoMessage.validationError(entityName))
-            return new ApiError(status, msg).errors(toFieldErrorList(e.errors))
+            return ValidationProblem.of(status, msg).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof MessageSourceResolvable) {
-            return new ApiError(status, getMsg(e))
+            return DefaultProblem.of(status, getMsg(e))
+        }
+        else if (e instanceof IllegalArgumentException) {
+            //We use this all over to double as a validation error, Validate.notNull for example.
+            return DefaultProblem.of(status, "Illegal Argument", e.message)
         }
         else if (e instanceof DataAccessException) {
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            return new ApiError(status, "Data Access Exception").detail(e.message)
+            return DefaultProblem.of(status, "Data Access Exception", e.message)
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return new ApiError(INTERNAL_SERVER_ERROR, "Internal Server Error", e.message)
+            return DefaultProblem.of(INTERNAL_SERVER_ERROR).detail(e.message)
         }
     }
 
@@ -95,10 +103,10 @@ class ApiErrorHandler {
      * @param errs the erros object to convert
      */
     //FIXME #339 see errormessageService, do we need some of that logic?
-    List<ApiFieldError> toFieldErrorList(Errors errs) {
-        List<ApiFieldError> errors = []
+    List<ProblemFieldError> toFieldErrorList(Errors errs) {
+        List<ProblemFieldError> errors = []
         for(ObjectError err : errs.allErrors) {
-            ApiFieldError fieldError = new ApiFieldError(getMsg(err))
+            ProblemFieldError fieldError = new ProblemFieldError(getMsg(err))
             if(err instanceof FieldError) fieldError.field = err.field
             errors << fieldError
         }

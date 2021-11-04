@@ -6,14 +6,12 @@ package gorm.tools.model
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.model.Named
-
 /**
  * trait for a name num entity, common for Organizations(Customers etc..) and Contacts.
  */
 @SuppressWarnings(['MethodName'])
 @CompileStatic
-trait NameNum extends Named {
+trait NameNum extends NamedEntity {
 
     String num
 
@@ -23,7 +21,7 @@ trait NameNum extends Named {
     ]
 
     static constraintsMap = [
-        name:[ description: 'The full name for this entity', nullable: false, blank: false, maxSize: 100],
+        name:[ description: 'Full name for this entity', nullable: false, blank: false, maxSize: 100],
         num:[ description: 'Unique alpha-numeric identifier for this entity', nullable: false, blank: false, maxSize: 50]
     ]
 

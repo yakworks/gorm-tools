@@ -2,19 +2,13 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.errors.api
+package gorm.tools.api.problem
 
 import groovy.transform.CompileStatic
-import groovy.transform.EqualsAndHashCode
-import groovy.transform.ToString
-import groovy.transform.TupleConstructor
-import groovy.transform.builder.Builder
-import groovy.transform.builder.SimpleStrategy
-
-import org.springframework.http.HttpStatus
 
 /**
  * This is the base error class.
+ * See https://github.com/zalando/problem fro what this is based on.
  * The ApiError models follow https://datatracker.ietf.org/doc/html/rfc7807
  * From the spec
  * A problem details object can have the following members:
@@ -40,25 +34,23 @@ import org.springframework.http.HttpStatus
  * - "instance" (string) - A URI reference that identifies the specific
  * occurrence of the problem.  It may or may not yield further
  * information if dereferenced.
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 7.0.8
  */
-@Builder(builderStrategy= SimpleStrategy, prefix="")
-@ToString @EqualsAndHashCode @TupleConstructor
 @CompileStatic
-class ApiError implements Serializable {
-    HttpStatus status
+trait Problem {
+    int status
     String title
     String detail
-    List<ApiFieldError> errors = []
+    URI type = URI.create("about:blank")
 
-    static ApiError of(int statusId){
-        new ApiError(HttpStatus.valueOf(statusId))
-    }
+    //the message properties code
+    String code
 
-    ApiError status(int statusId){
-        this.status = HttpStatus.valueOf(statusId)
-        return this
-    }
+    // Optional, additional attributes of the problem. Implementations can choose to ignore this in favor of concrete, typed fields.
+    Map<String, Object> params
 
-
+    List<ProblemFieldError> errors
 
 }

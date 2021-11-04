@@ -101,7 +101,7 @@ class RallySeedData {
                 lastName : "lastName$id"
             ]]
         ]
-        def org = Org.create(data)
+        def org = Org.create(data, bindId: true)
 
         def contact = new Contact(
             id: id,

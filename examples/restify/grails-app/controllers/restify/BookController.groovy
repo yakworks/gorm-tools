@@ -16,12 +16,12 @@ class BookController implements RestRepoApiController<Book> {
     @Override
     def post() {
         try {
-            Map q = parseJson(request)
+            Map q = bodyAsMap()
             String comments = q.comments ?: ""
             q.comments = "$comments - post was here"
             Book instance = getRepo().create(q)
             def entityMap = createEntityMap(instance)
-            respondWithEntityMap(entityMap, [status: CREATED])
+            respond([status: CREATED], entityMap)
             // respond instance, [status: CREATED] //201
         } catch (RuntimeException e) {
             handleException(e)

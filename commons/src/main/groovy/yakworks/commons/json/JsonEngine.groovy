@@ -4,11 +4,10 @@
 */
 package yakworks.commons.json
 
+
 import groovy.json.JsonGenerator
-import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
-import groovy.transform.MapConstructor
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
@@ -20,11 +19,16 @@ import yakworks.commons.json.converters.LocalTimeJsonConverter
 import yakworks.commons.json.converters.OffsetDateTimeJsonConverter
 import yakworks.commons.json.converters.OffsetTimeJsonConverter
 import yakworks.commons.json.converters.PeriodJsonConverter
+import yakworks.commons.json.converters.URIConverter
 import yakworks.commons.json.converters.ZonedDateTimeJsonConverter
 
 /**
  * Json Parser
+ *
+ * @author Joshua Burnett (@basejump)
+ * @since 7.0.8
  */
+@SuppressWarnings('FieldName')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class JsonEngine {
@@ -44,7 +48,8 @@ class JsonEngine {
 
     // JsonEngine(){ }
 
-    JsonEngine build() {
+    // default build options
+    JsonGenerator.Options buildOptions() {
 
         JsonGenerator.Options options = new JsonGenerator.Options()
 
@@ -66,7 +71,11 @@ class JsonEngine {
             options.addConverter(it)
         }
 
-        jsonGenerator = options.build()
+        return options
+    }
+
+    JsonEngine build() {
+        jsonGenerator = buildOptions().build()
         jsonSlurper = buildSlurper()
         return this
     }
@@ -77,7 +86,7 @@ class JsonEngine {
     }
 
     List<JsonGenerator.Converter> getConverters(){
-        ServiceLoader<JsonGenerator.Converter> loader = ServiceLoader.load(JsonGenerator.Converter.class);
+        ServiceLoader<JsonGenerator.Converter> loader = ServiceLoader.load(JsonGenerator.Converter);
         List<JsonGenerator.Converter> converters = []
         for (JsonGenerator.Converter converter : loader) {
             converters.add(converter)
@@ -91,6 +100,7 @@ class JsonEngine {
         converters.add(new PeriodJsonConverter())
         converters.add(new ZonedDateTimeJsonConverter())
         converters.add(new CurrencyConverter())
+        converters.add(new URIConverter())
         // OrderComparator.sort(converters)
         return converters
     }
@@ -111,6 +121,35 @@ class JsonEngine {
     static JsonSlurper getSlurper(){
         if(!INSTANCE) INSTANCE = new JsonEngine().build()
         INSTANCE.jsonSlurper
+    }
+
+    /**
+     * Parse a JSON data structure from request body input stream.
+     * if no content then returns an empty map
+     */
+    static Object parseJson(String text) {
+        return getSlurper().parseText(text)
+    }
+
+    /**
+     * parse string and expect the class type back.
+     * usually would call this with parseJson(text, Map) or parseJson(text, List)
+     */
+    static <T> T parseJson(String text, Class<T> clazz) {
+        Object parsedObj = parseJson(text)
+
+        validateExpectedClass(clazz, parsedObj)
+
+        return (T)parsedObj
+    }
+
+    /**
+     * throw IllegalArgumentException if clazz is not a super of object
+     */
+    static void validateExpectedClass(Class clazz, Object parsedObj){
+        if(!clazz.isAssignableFrom(parsedObj.class))
+            throw new IllegalArgumentException("Json parsing expected a ${clazz.simpleName} but got a ${parsedObj.class.simpleName}")
+
     }
 
 }

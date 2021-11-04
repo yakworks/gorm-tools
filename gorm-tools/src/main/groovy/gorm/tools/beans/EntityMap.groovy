@@ -185,7 +185,7 @@ class EntityMap extends AbstractMap<String, Object> {
                 val = new EntityMap(val, incMap)
             }
         }
-        else if(val instanceof Map) {
+        else if(val instanceof Map && !(val instanceof EntityMap)) {
             val = new EntityMap(val)
         }
         else if(val instanceof GormEntity) {

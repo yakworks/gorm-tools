@@ -4,6 +4,7 @@
 */
 package yakworks.gorm.testing.model
 
+import gorm.tools.model.NamedEntity
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -13,16 +14,17 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class SinkItem implements RepoEntity<SinkItem>{
+class SinkItem implements NamedEntity, RepoEntity<SinkItem>{
     static belongsTo = [kitchenSink: KitchenSink]
-
-    String name
 
     static mapping = {
         kitchenSink column: 'kitchenSinkId'
     }
     static constraintsMap = [
-        kitchenSink:[ nullable: false],
-        name:[ nullable: false]
+        kitchenSink:[ nullable: false]
     ]
+
+    static List<SinkItem> listByKitchenSink(KitchenSink sink){
+        SinkItem.where { KitchenSink == sink }.list()
+    }
 }

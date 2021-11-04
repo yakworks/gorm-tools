@@ -8,7 +8,7 @@ import groovy.json.JsonGenerator
 import groovy.transform.CompileStatic
 
 /**
- * surprisingly, there is no currency converter for json. This is it, it get registered in a META-INF/services file
+ * currency converter for json
  */
 @CompileStatic
 class CurrencyConverter implements JsonGenerator.Converter {

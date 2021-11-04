@@ -269,17 +269,22 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
 
     void "test find org by sourceid"() {
-        when:
+        when: "findWithData has orgType on source"
         Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
-        // org.persist()
-        // org.createSource()
         orgRepo.flush()
-
-        then: "source id is the default"
         assert org.source.sourceId == "foo"
 
         Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
-        o.name == "bar"
+
+        then: "source id is the default"
+        o
+
+        when: "findWithData has type in daya"
+        flushAndClear()
+        Org o = Org.repo.findWithData([type: 'Customer', source: [sourceId: 'foo']])
+
+        then: "source id is the default"
+        o
 
     }
 
@@ -291,6 +296,12 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Org o3 = Org.repo.findWithData(num: "foo3")
 
         then: "found because unique"
+        assert o3
+
+        when:
+        o3 = Org.repo.findWithData(num: "foo3", type: OrgType.Customer)
+
+        then: "also found"
         assert o3
     }
 
@@ -309,6 +320,23 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         then: "not found because not unique"
         thrown DataRetrievalFailureException
+    }
+
+    void "test find org by num not unique with type"() {
+        when:
+        Org org = Org.create(num: "foo", name: "bar", type: OrgType.Customer)
+        Org org2 = Org.create(num: "foo", name: "bar2", type: OrgType.CustAccount)
+        orgRepo.flush()
+        Org o3 = Org.repo.findWithData(num: "foo", type: OrgType.Customer)
+
+        then: "found because data has type"
+        o3
+
+        when: "will uses type"
+        o3 = Org.repo.findWithData(source:[ sourceId: "foo"], , type: OrgType.Customer)
+
+        then: "not found because not unique"
+        o3
     }
 
     def "update org lookup by sourceid"() {

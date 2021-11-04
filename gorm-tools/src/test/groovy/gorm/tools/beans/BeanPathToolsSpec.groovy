@@ -80,7 +80,7 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         2           | 'bookAuthor.bookAuthor.age'
         4           | 'bookAuthor.book.cost'
         ["test": 1] | 'bookAuthor.book.bazMap'
-        1           | 'bookAuthor.book.bazMap.test'
+        // 1           | 'bookAuthor.book.bazMap.test'
         null        | 'bookAuthor.book.enumThings'
     }
 
@@ -89,7 +89,7 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         def obj = makeBookAuthor()
 
         expect:
-        exp == BeanPathTools.getFieldValue2(obj, path)
+        exp == BeanPathTools.getPropertyValue(obj, path)
 
         where:
         exp         | path
@@ -99,28 +99,11 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         2           | 'bookAuthor.bookAuthor.age'
         4           | 'bookAuthor.book.cost'
         ["test": 1] | 'bookAuthor.book.bazMap'
+        // 1           | 'bookAuthor.book.bazMap.test'
         null        | 'bookAuthor.book.enumThings'
     }
 
-    void "getFieldValue3"() {
-        setup:
-        def obj = makeBookAuthor()
-
-        expect:
-        exp == BeanPathTools.getFieldValue3(obj, path)
-
-        where:
-        exp         | path
-        5           | 'age'
-        'atlas'     | 'book.name'
-        ["foo"]     | 'book.stringList'
-        2           | 'bookAuthor.bookAuthor.age'
-        4           | 'bookAuthor.book.cost'
-        ["test": 1] | 'bookAuthor.book.bazMap'
-        null        | 'bookAuthor.book.enumThings'
-    }
-
-    void "Get properties by path"() {
+    void "propsToMap"() {
         setup:
         def obj = makeBookAuthor()
 

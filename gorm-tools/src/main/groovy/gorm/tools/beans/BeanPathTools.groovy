@@ -45,7 +45,16 @@ class BeanPathTools {
         GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, field)
     }
 
-    static Object getFieldValue2(Object source, String property) {
+    /**
+     * Return the value of the (possibly nested) property of the specified name, for the specified source object
+     *
+     * Example getPropertyValue(source, "x.y.z")
+     *
+     * @param source - The source object
+     * @param property - the property
+     * @return value of the specified property or null if any of the intermediate objects are null
+     */
+    static Object getPropertyValue(Object source, String property) {
         Validate.notNull(source, '[source]')
         Validate.notEmpty(property, '[property]')
 
@@ -56,13 +65,6 @@ class BeanPathTools {
         }
 
         return result
-    }
-
-    static Object getFieldValue3(Object source, String property) {
-        Validate.notNull(source, '[source]')
-        Validate.notEmpty(property, '[property]')
-
-        InvokerHelper.getProperty(source, property)
     }
 
     /**

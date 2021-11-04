@@ -70,6 +70,7 @@ class Gadget {
             stringList: ['rand', 'galt'],
             link: new Gadget(name: "linked gadget")
         )
+
     }
 
     static List<Gadget> buildGadgets(int count){

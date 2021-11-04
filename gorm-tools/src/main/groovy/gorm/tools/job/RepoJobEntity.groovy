@@ -23,4 +23,16 @@ trait RepoJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
     //The "data" is a response of resources that were successfully and unsuccessfully updated or created after processing.
     // The data differ depending on the sourceType of the job
     byte[] data
+
+    /**
+     * returns the data byte array as a raw json string.
+     * If no data then returns string repreentation of json empty array which is '[]'
+     */
+    String dataToString(){
+        return getData() ? new String(getData(), "UTF-8") : '[]'
+    }
+
+    String requestDataToString(){
+        return getRequestData() ? new String(getRequestData(), "UTF-8") : '[]'
+    }
 }

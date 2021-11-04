@@ -10,6 +10,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
@@ -18,6 +19,7 @@ import org.grails.datastore.mapping.model.types.Association
 import gorm.tools.utils.GormMetaUtils
 import grails.util.GrailsClassUtils
 import grails.web.servlet.mvc.GrailsParameterMap
+import yakworks.commons.lang.Validate
 import yakworks.commons.map.MapFlattener
 
 //import org.apache.commons.logging.*
@@ -41,6 +43,28 @@ class BeanPathTools {
 
     static Object getFieldValue(Object domain, String field) {
         GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, field)
+    }
+
+    /**
+     * Return the value of the (possibly nested) property of the specified name, for the specified source object
+     *
+     * Example getPropertyValue(source, "x.y.z")
+     *
+     * @param source - The source object
+     * @param property - the property
+     * @return value of the specified property or null if any of the intermediate objects are null
+     */
+    static Object getPropertyValue(Object source, String property) {
+        Validate.notNull(source, '[source]')
+        Validate.notEmpty(property, '[property]')
+
+        Object result = property.tokenize('.').inject(source) { Object obj, String prop ->
+            Object value = null
+            if (obj != null && obj.hasProperty(prop)) value = obj[prop]
+            return value
+        }
+
+        return result
     }
 
     /**

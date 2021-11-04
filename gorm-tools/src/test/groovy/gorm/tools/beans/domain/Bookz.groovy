@@ -26,7 +26,7 @@ class Bookz implements RepoEntity<Bookz> {
         'Tesla'
     }
 
-    static hasMany = [enumThings: EnumThing, stringList: String]
+    static hasMany = [stringList: String]
 
     //See https://sysgears.com/articles/advanced-gorm-features-inheritance-embedded-data-maps-and-lists-storing/
     List<String> stringList
@@ -57,7 +57,8 @@ class BookAuthor {
     }
     Bookz book
     BookAuthor bookAuthor
-    int age
+    Integer age
+    String name
 
     static mapping = {
         id generator:'assigned'
@@ -72,35 +73,6 @@ class SimplePogo {
 @Entity
 class BookTag {
     String name
-}
-
-@Entity
-class EnumThing {
-    TestEnum testEnum
-    TestEnumIdent enumIdent
-
-    static mapping = {
-        id generator:'assigned'
-    }
-
-    List getBooks() {
-        [ new Bookz(name: 'val 1'), new Bookz(name: 'val 2')]
-    }
-
-}
-
-enum TestEnum {FOO, BAR}
-
-@CompileStatic
-enum TestEnumIdent implements IdEnum<TestEnumIdent,Long> {
-    Num2(2), Num4(4)
-    final Long id
-
-    TestEnumIdent(Long id) { this.id = id }
-
-    String getNum(){
-        "$id-${this.name()}"
-    }
 }
 
 class PropsToMapTest {

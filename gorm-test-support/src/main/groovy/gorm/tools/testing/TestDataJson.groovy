@@ -56,6 +56,9 @@ class TestDataJson {
         ctx.includes = buildDataIncludes //as Set<String>
 
         Set<String> fieldsToBuild = builder.getFieldsToBuild(ctx)
+
+        // if(fieldsToBuild.contains('id') && !getIncludeList(builder, ctx).contains('id') ) fieldsToBuild.remove('id')
+
         fieldsToBuild.addAll(data.keySet())
 
         builder.persistentEntity.associations.each{ Association assc ->
@@ -70,6 +73,18 @@ class TestDataJson {
         }
 
         return fieldsToBuild as List<String>
+    }
+
+    // hack to get include list
+    static Set<String> getIncludeList(PersistentEntityDataBuilder builder, DataBuilderContext ctx) {
+        Set<String> includeList = [] as Set
+        if (ctx.includes && ctx.includes instanceof String && ctx.includes == '*') {
+            includeList = builder.getConstraintsPropertyNames()
+        }
+        else if (ctx.includes instanceof List) {
+            includeList = ctx.includes as Set<String>
+        }
+        return includeList
     }
 
     static Object parseJsonText(String text){

@@ -98,6 +98,12 @@ class EntityMapService {
     }
 
     /**
+     * buildIncludesMap with class
+     */
+    EntityMapIncludes buildIncludesMap(Class entityClazz, List<String> includes = []) {
+        buildIncludesMap(entityClazz.name, includes)
+    }
+    /**
      * builds a EntityMapIncludes object from a sql select like list. Used in EntityMap and EntityMapList
      *
      * @param className the class name of the PersistentEntity
@@ -108,8 +114,12 @@ class EntityMapService {
         includes = includes ?: ['*'] as List<String> //default to * if nothing
         // if(!entityClass && entity) entityClass = entity.class
         PersistentEntity persistentEntity = GormMetaUtils.findPersistentEntity(entityClassName)
-        //assert domain, "$entityClassName did not return a PersistentEntity"
-        List<PersistentProperty> properties = persistentEntity ? GormMetaUtils.getPersistentProperties(persistentEntity) : []
+        List<PersistentProperty> properties = []
+        if(persistentEntity){
+            //in case the short name was passed in make sure its full class name
+            entityClassName = persistentEntity.javaClass.name
+            properties = GormMetaUtils.getPersistentProperties(persistentEntity)
+        }
 
         Set<String> rootProps = [] as Set<String>
         Map<String, Object> nestedProps = [:]

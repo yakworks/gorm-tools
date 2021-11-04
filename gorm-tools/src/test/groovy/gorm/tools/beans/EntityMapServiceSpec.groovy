@@ -4,14 +4,20 @@
 */
 package gorm.tools.beans
 
-import gorm.tools.beans.domain.*
+
+import gorm.tools.beans.domain.BookAuthor
+import gorm.tools.beans.domain.BookTag
+import gorm.tools.beans.domain.Bookz
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
-import testing.Address
-import testing.AddyNested
-import testing.Cust
-import testing.CustType
-import testing.TestSeedData
+import yakworks.gorm.testing.model.Enummy
+import yakworks.gorm.testing.model.KitchenSink
+import yakworks.gorm.testing.model.SinkExt
+import yakworks.gorm.testing.model.SinkItem
+import yakworks.gorm.testing.model.SinkStatus
+import yakworks.gorm.testing.model.TestEnum
+import yakworks.gorm.testing.model.TestEnumIdent
+import yakworks.gorm.testing.model.Thing
 
 class EntityMapServiceSpec extends Specification implements DataRepoTest {
 
@@ -19,120 +25,107 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains Bookz, BookTag, BookAuthor, EnumThing, Cust, Address, CustType, AddyNested
+        mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
     }
 
     void "test buildIncludesMap"(){
         when:
-        def res = entityMapService.buildIncludesMap("Bookz", ['name'])
+        def res = entityMapService.buildIncludesMap("Thing", ['name'])
 
         then:
-        res.className == 'Bookz' // [className: 'Bookz', props: ['name']]
+        res.className == 'yakworks.gorm.testing.model.Thing'
         res.fields == ['name'] as Set
 
         when:
-        res = entityMapService.buildIncludesMap("Bookz")
+        res = entityMapService.buildIncludesMap(Thing)
 
         then:
-        res.className == 'Bookz' // [className: 'Bookz', props: ['name']]
-        res.fields == ['id', 'version', 'name', 'cost'] as Set
+        res.className.contains('Thing') // [className: 'Bookz', props: ['name']]
+        res.fields == ['id', 'version', 'name', 'country'] as Set
 
-        when:
-        res = entityMapService.buildIncludesMap("Bookz", ['name', 'enumThings.*'])
+        when: "check on collections"
+        res = entityMapService.buildIncludesMap(KitchenSink, ['name', 'items.*'])
 
         then:
-        res.className == 'Bookz' // [className: 'Bookz', props: ['name']]
-        res.fields == ['name', 'enumThings'] as Set
+        res.className.contains('KitchenSink') // [className: 'Bookz', props: ['name']]
+        res.fields == ['name', 'items'] as Set
         res.nestedIncludes.size() == 1
-        res.nestedIncludes['enumThings'].with{
-            className == 'gorm.tools.beans.domain.EnumThing'
-            fields == ['id', 'testEnum', 'version', 'enumIdent'] as Set
+        res.nestedIncludes['items'].with{
+            className == 'yakworks.gorm.testing.model.SinkItem'
+            fields == ['id', 'version', 'name'] as Set
         }
 
         when:
-        res = entityMapService.buildIncludesMap("BookAuthor", ['*', 'book.*', 'bookAuthor.id', 'bookAuthor.age'])
+        res = entityMapService.buildIncludesMap(KitchenSink, ['id', 'num', 'ext.*', 'sinkLink.id', 'sinkLink.num'])
 
         then:
-        res.className == 'BookAuthor' // [className: 'Bookz', props: ['name']]
-        res.fields == ['id', 'age', 'version', 'book', 'bookAuthor'] as Set
+        res.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
+        res.fields == ['id', 'num', 'ext', 'sinkLink'] as Set
         res.nestedIncludes.size() == 2
-        // res.nested == [
-        //     book: ['className': 'gorm.tools.beans.domain.Bookz', props: ['id', 'version', 'name', 'cost'] as Set],
-        //     bookAuthor: ['className': 'gorm.tools.beans.domain.BookAuthor', props: ['id', 'age'] as Set]
-        // ]
-
+        res.nestedIncludes['ext'].with{
+            className == SinkExt.name
+            fields == ['id', 'version', 'name'] as Set
+        }
+        res.nestedIncludes['sinkLink'].with{
+            className == KitchenSink.name
+            fields == ['id', 'version', 'name'] as Set
+        }
     }
 
-    BookAuthor makeBookAuthor(){
-        def ba = new BookAuthor(
-            age: 5,
-            book: new Bookz(
-                name: 'atlas',
-                stringList: ["foo", "bar"],
-                bazMap: ["testing": 99]
-            ),
-            bookAuthor: new BookAuthor(
-                bookAuthor: new BookAuthor(
-                    age: 2
-                ),
-                book: new Bookz(
-                    name: 'shrugged',
-                    cost: 4,
-                    bazMap: ["test": 1],
-                    stringList: ["buzz", "booz"]
-                )
-            )
-        )
-        return ba
-    }
-
-    void "test createEntityBeanMap"() {
+    void "entityMap getIncludes()"() {
         when: 'sanity check'
-        def emap = entityMapService.createEntityMap(makeBookAuthor(), ['*', 'book.id'])
+        def emap = entityMapService.createEntityMap(KitchenSink.build(1), ['id', 'num', 'ext.id'])
 
         then:
-        4 == emap.size()
-        ['id', 'age', 'version', 'book'].containsAll(emap.getIncludes())
+        3 == emap.size()
+        emap.getIncludes() == ['id', 'num', 'ext'] as Set
     }
 
     void "test null assoc"() {
         when:
-        def ba = new BookAuthor( age: 5)
-        def result = entityMapService.createEntityMap(ba, ['age', 'book.id'])
+        def ks = KitchenSink.build(1)
+        def result = entityMapService.createEntityMap(ks, ['id', 'sinkLink.thing.name'])
 
         then:
-        result == [ age: 5, book: null ]
+        result.size() == 2
+        result == [ id: 1, sinkLink: null ]
     }
 
-    void "test bookz"() {
+    void "createEntityMap dingus on KitchenSink"() {
         setup:
-        Bookz book = new Bookz(name: 'foo', cost: 10.00, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2])
-
+        def ks = KitchenSink.build(1)
         expect:
-        result == entityMapService.createEntityMap(book, fields) //BeanPathTools.buildMapFromPaths(book, fields)
+        result == entityMapService.createEntityMap(ks, fields) //BeanPathTools.buildMapFromPaths(book, fields)
 
         where:
         fields                        | result
-        ['*']                         | [id: 1, version: null, name: 'foo', cost: 10.00]
-        ['name', 'company']           | [name: 'foo', company: 'Tesla']
-        ['name', 'simplePogo.name']   | [name: 'foo', simplePogo: [ name: 'fly']]
-        ['name', 'bookTags.name']     | [ name: 'foo', bookTags: [[ name: 'red'], [ name: 'green']] ]
-        ['*', 'stringList', 'bazMap'] | [name: 'foo', cost: 10.00, id: 1, version: null, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
+        ['num', 'name']               | [num: '1', name: 'Sink1']
+        ['name', 'simplePogo.foo']    | [name: 'Sink1', simplePogo: [ foo: 'fly']]
+        ['name', 'items.name']        | [ name: 'Sink1', items: [[ name: 'red'], [ name: 'blue']] ]
+    }
+
+    void "createEntityMap enums on kitchenSink"() {
+        when:
+        def ks = KitchenSink.build(1)
+        def result = entityMapService.createEntityMap(ks, ['num', 'kind', 'status', 'thing.name'])
+
+        then:
+        result == [num: '1', kind: 'VENDOR', status:[id:2, name:'Inactive'], thing: [name: 'Thing1']]
     }
 
     void "works with space in field and its null"() {
         when: 'a field has spaces'
-        Bookz book = new Bookz(name: 'foo')
-        def result = entityMapService.createEntityMap(book, ['name', '  simplePogo.name'])
+        def ks = KitchenSink.build(1)
+        def result = entityMapService.createEntityMap(ks, ['num', '  simplePogo.foo'])
 
         then: 'its should trim them and still work'
-        result == [name: 'foo', simplePogo: [ name: 'fly']]
+        result == [num: '1', simplePogo: [ foo: 'fly']]
 
     }
 
     void "test buildMapFromPaths Enum"() {
         setup:
-        EnumThing et = new EnumThing(
+        Enummy et = new Enummy(
             testEnum: TestEnum.FOO,
             enumIdent: TestEnumIdent.Num2
         )
@@ -151,84 +144,46 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
 
     void "test createEntityBeanMap with EnumThing list"() {
         when:
-        Bookz book = new Bookz(name: 'foo', cost: 10.00)
+        List enummyList = []
         (1..2).each{id ->
-            def et = new EnumThing(
+            def et = new Enummy(
+                id: id,
                 testEnum: TestEnum.FOO,
                 enumIdent: TestEnumIdent.Num2
             )
-            et.id = id
-            book.addToEnumThings(et)
+            enummyList.add(et)
         }
-        def result = entityMapService.createEntityMap(book, ['*', 'enumThings.*'])
+        def resultsList = entityMapService.createEntityMapList(enummyList, ['*'])
 
         then:
-        result == [
-            id: 1,
-            version: null,
-            name: 'foo',
-            cost: 10.00,
-            enumThings: [
-                [id: 1, testEnum: 'FOO', version:null, enumIdent: [id:2, name:'Num2']],
-                [id: 2, testEnum: 'FOO', version:null, enumIdent: [id:2, name:'Num2']]
-            ]
-        ]
+        resultsList.size() == 2
+        resultsList[0] == [id: 1, testEnum: 'FOO', version:null, enumIdent: [id:2, name:'Num2']]
+        resultsList[1] == [id: 2, testEnum: 'FOO', version:null, enumIdent: [id:2, name:'Num2']]
 
         when:
-        result = entityMapService.createEntityMap(book, ['enumThings.testEnum', 'enumThings.enumIdent'])
+        resultsList = entityMapService.createEntityMapList(enummyList, ['testEnum', 'enumIdent'])
 
         then:
-        result == [
-            enumThings: [
-                [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']],
-                [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']]
-            ]
-        ]
+        resultsList[0] == [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']]
+        resultsList[1] == [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']]
+
     }
 
-    void "BookAuthor tests "() {
+    void "association tests"() {
         setup:
-        def obj = makeBookAuthor()
+        def ks = KitchenSink.build(1)
+        ks.sinkLink = ks
+        ks.stringList = ['red', 'blue', 'green']
 
         expect:
-        exp == entityMapService.createEntityMap(obj, path)
+        exp == entityMapService.createEntityMap(ks, path)
 
         where:
         path                          | exp
-        ['*']                         | [id: 2, version: null, age: 5]
-        ['age']                       | [age: 5]
-        ['book.name']                 | [book: [name: 'atlas']]
-        ['bookAuthor.bookAuthor.age'] | [bookAuthor: [bookAuthor: [age: 2]]]
-        ['bookAuthor.book.cost']      | [bookAuthor: [book: [cost: 4]]]
-        ['bookAuthor.book.*']         | [bookAuthor: [book: [cost: 4, name: 'shrugged', id: 1, version: null]]]
-        ['bookAuthor.*']              | [bookAuthor: [id: 2, age: 0, version: null]]
+        ['thing.*']                   | [thing: [id:1, version:0, name:'Thing1', country:'US']]
+        ['ext.name']                  | [ext: [name: 'SinkExt1']]
+        ['sinkLink.ext.name']         | [sinkLink: [ext: [name: 'SinkExt1']]]
+        ['bazMap', 'stringList']      | [bazMap: [foo: 'bar'], stringList:['red', 'blue', 'green']]
     }
 
-    void "BookAuthor tests complex"() {
-        when:
-        def emap = entityMapService.createEntityMap(makeBookAuthor(), ['*', 'book.stringList', 'book.bazMap'])
-
-        then:
-        emap == [
-            id: 2, version: null, age: 5,
-            book: [
-                stringList: ["foo", "bar"],
-                bazMap: ["testing": 99]
-            ]
-        ]
-
-    }
-
-    void "test createEntityMapList"() {
-        when:
-        TestSeedData.buildCustomers(5)
-        def elist = entityMapService.createEntityMapList(Cust.list(), ['id', 'name', 'kind', 'type.id', 'type.name'])
-
-        then:
-        elist.size() == 5
-        elist.totalCount == 5
-        elist[0] == [
-            id: 1, name: 'Name1', kind: 'COMPANY', type: [id:1, name: 'name']
-        ]
-    }
 }

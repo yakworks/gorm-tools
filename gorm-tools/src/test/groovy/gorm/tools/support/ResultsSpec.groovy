@@ -1,14 +1,16 @@
 package gorm.tools.support
 
-import org.grails.testing.GrailsUnitTest
-
 import gorm.tools.testing.support.GormToolsSpecHelper
+import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 
 class ResultsSpec extends Specification implements GormToolsSpecHelper {
 
     void setupSpec() {
         defineCommonBeans()
+        Results.metaClass.getMessage = {
+            return MsgService.get(delegate)
+        }
     }
 
     def setup() {
@@ -24,7 +26,7 @@ class ResultsSpec extends Specification implements GormToolsSpecHelper {
         Results.OK.ok == true
         Results.OK.code('foo').code == 'foo'
         Results.OK.id(123).id == 123
-        Results.OK.defaultMessage("foo").message == 'foo'
+        MsgService.get( Results.OK.defaultMessage("foo")) == 'foo'
     }
 
     def "test bulder examples"() {
@@ -32,7 +34,7 @@ class ResultsSpec extends Specification implements GormToolsSpecHelper {
         def res = Results.OK('sky.dive.with.args', ['go', 'fast'])
         then:
         'sky.dive.with.args' == res.code
-        'go fast pull' == res.message
+        'go fast pull' == MsgService.get( res )
 
         when:
         res = Results.OK.msg('flubber')
@@ -44,7 +46,7 @@ class ResultsSpec extends Specification implements GormToolsSpecHelper {
         res = Results.error().msg('flubber')
         then:
         !res.ok
-        res.message == 'flubber'
+        MsgService.get(res) == 'flubber'
     }
 
     def "test error"() {
@@ -62,7 +64,7 @@ class ResultsSpec extends Specification implements GormToolsSpecHelper {
 
         then:
         er.code == 'sky.dive.with.args'
-        'go fast pull' == er.message
+        'go fast pull' == MsgService.get( er )
         null == er.defaultMessage
     }
 
@@ -72,7 +74,6 @@ class ResultsSpec extends Specification implements GormToolsSpecHelper {
 
         then:
         er.code == 'sky.dive.with.args'
-        'go fast pull' == er.message
         'im default' == er.defaultMessage
     }
 }

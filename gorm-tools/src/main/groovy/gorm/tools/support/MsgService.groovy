@@ -99,9 +99,16 @@ class MsgService {
     }
 
     /**
-     * static cheater if in context where can't inject service
+     * AVOID, static cheater if in static context where we can't inject service
+     */
+    static MsgService get() {
+        AppCtx.get('msgService', this)
+    }
+
+    /**
+     * AVOID, static cheater if in context where can't inject service
      */
     static String get(MessageSourceResolvable msr) {
-        AppCtx.get('msgService', this).getMessage(msr)
+        MsgService.get().getMessage(msr)
     }
 }

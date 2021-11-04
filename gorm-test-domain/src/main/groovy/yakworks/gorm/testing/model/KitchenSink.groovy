@@ -15,7 +15,6 @@ import gorm.tools.model.NameNum
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.commons.lang.IsoDateUtil
 import yakworks.commons.transform.IdEqualsHashCode
 
 /**
@@ -41,7 +40,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     LocalDateTime localDateTime
 
     //self reference
-    KitchenSink link
+    KitchenSink sinkLink
 
     //Associations
     Thing thing //belongs to whatever
@@ -62,6 +61,15 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     Kind kind
     SinkStatus status
 
+    // objects
+    SimplePogo getSimplePogo(){
+        return new SimplePogo(foo: 'fly')
+    }
+
+    Map bazMap
+    List<String> stringList
+    static hasMany = [stringList: String]
+
     //bug in grailsCompileStatic requires this on internal enums
     //also, internal enums must always come before the static constraints or it doesn't get set
     @CompileDynamic
@@ -78,8 +86,13 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
         secret: [ display: false ],
         inactive: [ required: false ],
         kind: [ nullable: false ],
-        link: [ bindable: true ],
+        sinkLink: [ bindable: true ],
+        items: [validate: false]
     ]
+
+    List<SinkItem> getItems(){
+        SinkItem.listByKitchenSink(this)
+    }
 
     // static KitchenSink build(Long id){
     //     def loc = new Thing(city: "City$id")
@@ -109,35 +122,10 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     // }
 
     static KitchenSink build(Long id){
-        def loc = new Thing(id: id, name: "Thing$id").persist()
-        def data = generateData(id)
-        data.putAll([id: id, thing: [id: id] ])
-        def ks = KitchenSink.create(data, bindId: true)
-        return ks
-    }
-
-    static Map generateData(Long id) {
-        return [
-            num: "$id",
-            name: "Sink$id",
-            name2: (id % 2) ? "SinkName2-$id" + id : null,
-            kind: ((id % 2) ? KitchenSink.Kind.VENDOR : KitchenSink.Kind.CLIENT) as String,
-            status: ( (id % 2) ? SinkStatus.Inactive : SinkStatus.Active ) as String,
-            inactive: (id % 2 == 0),
-            amount: (id - 1) * 1.25,
-            // actDate: LocalDateTime.now().plusDays(id).toDate(),
-            localDate: IsoDateUtil.format(LocalDate.now().plusDays(id)),
-            localDateTime: IsoDateUtil.format(LocalDateTime.now().plusDays(id)),
-            ext:[ name: "SinkExt$id"],
-            // thing: [id: id]
-        ]
+        return getRepo().build(id)
     }
 
     static List<Map> generateDataList(int numRecords) {
-        List<Map> list = []
-        (1..numRecords).each { int index ->
-            list << generateData(index)
-        }
-        return list
+        return getRepo().generateDataList(numRecords)
     }
 }

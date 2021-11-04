@@ -17,6 +17,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
+import gorm.tools.repository.errors.DataException
 import gorm.tools.repository.errors.EntityNotFoundException
 import grails.util.Environment
 import yakworks.commons.lang.NameUtils
@@ -108,6 +109,23 @@ class  RepoUtil {
         if (!entity) {
             throw new EntityNotFoundException(id, domainClassName)
         }
+    }
+
+    /**
+     * check that the passed in data is not empty and throws EmptyDataException if so
+     * @throws DataException if it not found
+     */
+    static void checkData(Map data, Class entityClass) {
+        if (!data) {
+            throw new DataException('data.empty.error', entityClass)
+        }
+    }
+
+    /**
+     * in create data, if id is passed then bindId must be set to true, if not throw exception
+     */
+    static void checkCreateData(Map data, Map args, Class entityClass) {
+        if(data['id'] && !args.bindId) throw new DataException('data.create.bindId.error', entityClass)
     }
 
     /**

@@ -5,14 +5,12 @@
 package yakworks.gorm.testing.model
 
 
-import java.time.LocalDateTime
-
 import groovy.transform.CompileStatic
 
 @CompileStatic
 class KitchenSeedData {
 
-    static void buildKitchen(int count){
+    static void createKitchenSinks(int count){
         (1..2).each{id ->
             def ks = KitchenSink.build(id)
             ks.kind = KitchenSink.Kind.PARENT

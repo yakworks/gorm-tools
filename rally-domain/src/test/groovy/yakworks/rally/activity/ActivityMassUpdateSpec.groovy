@@ -47,8 +47,8 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
     def "test massupdate - with notes "() {
         setup:
         Org org = Org.create("test", "test", OrgType.Customer).persist()
-        Customer customerOne = Customer.create(id: 1, name: "test-1", num: "test-1", org: org).persist()
-        Customer customerTwo = Customer.create(id: 2, name: "test-2", num: "test-2", org: org).persist()
+        Customer customerOne = Customer.create([id: 1, name: "test-1", num: "test-1", org: org], bindId: true).persist()
+        Customer customerTwo = Customer.create([id: 2, name: "test-2", num: "test-2", org: org], bindId: true).persist()
 
         expect:
         Customer.get(1) != null
@@ -72,8 +72,8 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
     def "test massupdate - with new attachments "() {
         setup:
         Org org = Org.create("test", "test", OrgType.Customer).persist()
-        Payment paymentOne = Payment.create(id: 1, amount: 100, org: org).persist()
-        Payment paymentTwo = Payment.create(id: 2, amount: 200, org: org).persist()
+        Payment p1 = Payment.create(amount: 100, org: org).persist()
+        Payment p2 = Payment.create(amount: 200, org: org).persist()
 
 
         File origFile = new File(BuildSupport.gradleRootProjectDir, "examples/resources/test.txt")
@@ -86,15 +86,15 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
             attachments: [ [name: "test.txt", tempFileName: tempFileName] ]
         ]
         expect:
-        Payment.get(1) != null
-        Payment.get(2) != null
+        Payment.get(p1.id) != null
+        Payment.get(p2.id) != null
         activityRepo != null
 
         when:
-        activityRepo.insertMassActivity([paymentOne, paymentTwo], changes, null, true)
+        activityRepo.insertMassActivity([p1, p2], changes, null, true)
 
         then: "Activity with attachments is created for each payments"
-        [paymentOne, paymentTwo].each { id ->
+        [p1, p2].each { id ->
             ActivityLink link = ActivityLink.findByLinkedEntityAndLinkedId('Payment', id)
             assert link
             Activity activity = link.activity
@@ -107,7 +107,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         }
 
         cleanup:
-        [paymentOne, paymentTwo].each { id ->
+        [p1, p2].each { id ->
             ActivityLink link = ActivityLink.findByLinkedEntityAndLinkedId('Payment', id)
             Activity activity = link?.activity
             Attachment attachment = activity?.attachments[0]
@@ -123,11 +123,11 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
     def testMassUpdate_with_task() {
         setup:
         Org org = Org.create("test", "test", OrgType.Customer).persist()
-        Customer customerOne = Customer.create(id: 1, name: "test-1", num: "test-1", org: org).persist()
-        Customer customerTwo = Customer.create(id: 2, name: "test-2", num: "test-2", org: org).persist()
+        Customer c1 = Customer.create(name: "test-1", num: "test-1", org: org).persist()
+        Customer c2 = Customer.create(name: "test-2", num: "test-2", org: org).persist()
 
-        TaskType todo = TaskType.build([id:1, name: "TODO"]).persist()
-        TaskStatus open = TaskStatus.build([id:0, name: "Open"]).persist()
+        TaskType todo = TaskType.build([id:1, code: "TODO"]).persist()
+        TaskStatus open = TaskStatus.build([id:0, code: "Open"]).persist()
 
         expect:
         Customer.get(1) != null
@@ -144,7 +144,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
             ]
         ]
 
-        List targets = [customerOne, customerTwo]
+        List targets = [c1, c2]
 
         when:
         activityRepo.insertMassActivity(targets, changes)

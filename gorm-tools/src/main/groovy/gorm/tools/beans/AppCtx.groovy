@@ -75,4 +75,8 @@ class AppCtx {
     static <T> T get(String name, Class<T> requiredType){
         getCtx().getBean(name, requiredType)
     }
+
+    static <T> T get(Class<T> requiredType){
+        getCtx().getBean(requiredType)
+    }
 }

@@ -1,6 +1,6 @@
 package yakworks.rally.orgs.members
 
-import org.apache.commons.lang3.EnumUtils
+import yakworks.commons.lang.EnumUtils
 
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback

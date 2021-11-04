@@ -6,7 +6,7 @@ package gorm.tools.mango
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.lang3.EnumUtils
+import yakworks.commons.lang.EnumUtils
 
 /**
  * Utils to normalizes params map to transform it to mango language

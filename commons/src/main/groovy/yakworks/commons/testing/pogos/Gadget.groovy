@@ -37,7 +37,7 @@ class Gadget {
     List<Thing> thingList
     Thing thing
     //self reference
-    Gadget link
+    Gadget nested
 
     //enums
     Kind kind // internal
@@ -54,7 +54,7 @@ class Gadget {
         return new Gadget(
             id: id,
             id2: id,
-            name: "Kitchen${id}",
+            name: "Gadget${id}",
             inactive: false,
             enabled: true,
             bigDecimal: id + 99.99,
@@ -64,11 +64,10 @@ class Gadget {
             kind: (id % 2) ? Gadget.Kind.CHILD : Gadget.Kind.PARENT ,
             status: (id % 2) ? GadgetStatus.Inactive : GadgetStatus.Active,
             //objects
-            thing: new Thing(name: "thingy${id+100}"),
+            thing: new Thing(name: "thingy${id}"),
             thingList: [Thing.of(id+101, "Thingy${id+101}"), Thing.of(id+102, "Thingy${id+102}")],
-            mapData: [foo: "foo1", bar: 'bar1'],
-            stringList: ['rand', 'galt'],
-            link: new Gadget(name: "linked gadget")
+            mapData: [foo: "foo${id}", bar: "bar${id}"],
+            stringList: ['rand', 'galt']
         )
 
     }

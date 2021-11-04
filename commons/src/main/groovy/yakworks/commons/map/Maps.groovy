@@ -4,9 +4,11 @@
 */
 package yakworks.commons.map
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
+import yakworks.commons.lang.PropertyTools
 
 /**
  * Helpful methods for dealing with maps
@@ -17,6 +19,19 @@ import groovy.util.logging.Slf4j
 @Slf4j
 @CompileStatic
 class Maps {
+
+    /**
+     * Return the value of a nested path
+     *
+     * Example getPropertyValue(source, "x.y.z")
+     *
+     * @param source - The source object
+     * @param property - the property
+     * @return value of the specified property or null if any of the intermediate objects are null
+     */
+    static Object getProperty(Map source, String property) {
+        PropertyTools.getProperty(source, property)
+    }
 
     /**
      * Deeply merges the contents of each Map in sources, merging from
@@ -161,5 +176,7 @@ class Maps {
     static boolean containsAll(Map main, Map subset){
         main.entrySet().containsAll(subset.entrySet())
     }
+
+
 
 }

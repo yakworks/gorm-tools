@@ -15,7 +15,7 @@ class AttachmentController implements RestRepoApiController<Attachment> {
     static namespace = 'rally'
 
     def upload() {
-        Map q = parseJson(request)
+        Map q = bodyAsMap()
         Map obj = [name: q.name]
         respond obj
     }

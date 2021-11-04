@@ -6,10 +6,10 @@ package gorm.tools.rest.render
 
 import groovy.transform.CompileStatic
 
+import org.springframework.http.HttpStatus
+
 import gorm.tools.api.problem.Problem
 import grails.rest.render.RenderContext
-import grails.util.GrailsWebUtil
-import grails.web.mime.MimeType
 
 /**
  * Default renderer for JSON
@@ -27,6 +27,7 @@ class ProblemRenderer extends JsonGeneratorRenderer<Problem>{
     @Override
     void render(Problem problem, RenderContext context) {
         setContentType(context)
+        context.status = HttpStatus.valueOf(problem.status)
         context.writer.write(jsonGenerator.toJson(problem))
     }
 

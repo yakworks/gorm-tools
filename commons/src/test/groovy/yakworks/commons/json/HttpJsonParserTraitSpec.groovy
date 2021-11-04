@@ -2,16 +2,13 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.json
+package yakworks.commons.json
 
-import org.apache.groovy.json.internal.LazyMap
-import org.apache.groovy.json.internal.LazyValueMap
 import org.springframework.mock.web.MockHttpServletRequest
 
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 
-class JsonParserTraitSpec extends Specification implements JsonParserTrait {
+class HttpJsonParserTraitSpec extends Specification implements HttpJsonParserTrait {
 
     String sampleJson = '''
     {
@@ -25,7 +22,7 @@ class JsonParserTraitSpec extends Specification implements JsonParserTrait {
     void "test parseJson"() {
         when: 'parseJson should succeed with Object/Map data'
         def request = createMockRequest(sampleJson)
-        Map data = parseJson(request)
+        Map data = parseJson(request, Map)
 
         then:
         data.amount == 6.01
@@ -37,7 +34,7 @@ class JsonParserTraitSpec extends Specification implements JsonParserTrait {
         when:
         def request = createMockRequest(sampleJson)
         //Map data = new LinkedHashMap(parseJson(request))
-        Map data = parseJson(request)
+        Map data = parseJson(request, Map)
 
         // assert data instanceof LazyValueMap
         assert data.name
@@ -54,7 +51,7 @@ class JsonParserTraitSpec extends Specification implements JsonParserTrait {
     void "test parseJson with bad or no data"() {
         when: 'request body empty'
         def request = createMockRequest('')
-        Map data = parseJson(request)
+        Map data = parseJson(request, Map)
 
         then: 'parseJson should return empty map when request is empty'
         data == [:]
@@ -64,10 +61,11 @@ class JsonParserTraitSpec extends Specification implements JsonParserTrait {
             ["Wy Guy", "Goobie"]
         """
         def requestWithListData = createMockRequest(listJson)
-        Map listData = parseJson(requestWithListData)
+        Map listData = parseJson(requestWithListData, Map)
 
-        then: 'parseJson should return empty map when data is not a map'
-        listData == [:]
+        then: 'parseJson should throw IllegalArgument'
+        def e = thrown(IllegalArgumentException)
+        e.message.contains('Json parsing expected a Map')
     }
 
     void "test parseJsonList"() {
@@ -76,7 +74,7 @@ class JsonParserTraitSpec extends Specification implements JsonParserTrait {
             ["Wy Guy", "Goobie"]
         """
         def request = createMockRequest(json)
-        List data = parseJsonList(request)
+        List data = parseJson(request, List)
 
         then:
         data.size() == 2
@@ -88,7 +86,7 @@ class JsonParserTraitSpec extends Specification implements JsonParserTrait {
         when: 'request body empty'
 
         def request = createMockRequest('')
-        List data = parseJsonList(request)
+        List data = parseJson(request, List)
 
         then: 'parseJsonList should return empty List when request is empty'
         data == []
@@ -96,10 +94,11 @@ class JsonParserTraitSpec extends Specification implements JsonParserTrait {
         when: 'request body is a map object'
         String listJson = """ { "foo": "bar" } """
         def requestWithMapData = createMockRequest(listJson)
-        List listData = parseJsonList(requestWithMapData)
+        List listData = parseJson(requestWithMapData, List)
 
         then: 'parseJson should return empty list when data is not a map'
-        listData == []
+        def e = thrown(IllegalArgumentException)
+        e.message.contains('Json parsing expected a List')
     }
 
     MockHttpServletRequest createMockRequest(String content){

@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.JobState
-import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
@@ -14,12 +13,15 @@ import spock.lang.Issue
 import spock.lang.Specification
 import testing.TestRepoJob
 import testing.TestRepoJobService
+import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.SecurityTest
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo
 import yakworks.gorm.testing.model.SinkExt
 
-class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParserTrait, SecurityTest {
+import static yakworks.commons.json.JsonEngine.parseJson
+
+class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTest {
 
     ParallelTools parallelTools
     AsyncService asyncService
@@ -59,7 +61,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         job.state == JobState.Finished
 
         when: "Verify job.requestData (incoming json)"
-        def payload = parseJsonBytes(job.requestData)
+        def payload = parseJson(job.requestDataToString())
 
         then:
         payload != null
@@ -70,8 +72,11 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         payload[19].name == "Sink20"
 
         when: "verify job.data (job results)"
-        def results = parseJsonBytes(job.data)
+        def dataString = job.dataToString()
+        List results = parseJson(dataString, List)
+
         then:
+        dataString.startsWith('[{') //sanity check
         results != null
         results instanceof List
         results.size() == 20
@@ -143,7 +148,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         job.ok == false
 
         when: "verify job.data"
-        def results = parseJsonBytes(job.data)
+        def results = parseJson(job.dataToString())
 
         then:
         results != null
@@ -182,7 +187,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, JsonParser
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
         def job = TestRepoJob.findById(jobId)
 
-        def results = parseJsonBytes(job.data)
+        def results = parseJson(job.dataToString())
 
         then: "just 60 should have been inserted, not the entire list twice"
         results.size() == 60

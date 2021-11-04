@@ -4,6 +4,7 @@
 */
 package yakworks.commons.json
 
+
 import groovy.json.JsonGenerator
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
@@ -120,6 +121,35 @@ class JsonEngine {
     static JsonSlurper getSlurper(){
         if(!INSTANCE) INSTANCE = new JsonEngine().build()
         INSTANCE.jsonSlurper
+    }
+
+    /**
+     * Parse a JSON data structure from request body input stream.
+     * if no content then returns an empty map
+     */
+    static Object parseJson(String text) {
+        return getSlurper().parseText(text)
+    }
+
+    /**
+     * parse string and expect the class type back.
+     * usually would call this with parseJson(text, Map) or parseJson(text, List)
+     */
+    static <T> T parseJson(String text, Class<T> clazz) {
+        Object parsedObj = parseJson(text)
+
+        validateExpectedClass(clazz, parsedObj)
+
+        return (T)parsedObj
+    }
+
+    /**
+     * throw IllegalArgumentException if clazz is not a super of object
+     */
+    static void validateExpectedClass(Class clazz, Object parsedObj){
+        if(!clazz.isAssignableFrom(parsedObj.class))
+            throw new IllegalArgumentException("Json parsing expected a ${clazz.simpleName} but got a ${parsedObj.class.simpleName}")
+
     }
 
 }

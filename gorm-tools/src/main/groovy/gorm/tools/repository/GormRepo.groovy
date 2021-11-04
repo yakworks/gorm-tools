@@ -325,20 +325,15 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     }
 
     /**
-     * a get wrapped in a transaction.
+     * simple call to the gormStaticApi get, not in a trx to avoid overhead
      *
      * @param id required, the id to get
      * @return the retrieved entity
      */
     D get(Serializable id) {
-        entityTrx {
-            doGet(id)
-        }
-    }
-
-    D doGet(Serializable id) {
         (D)gormStaticApi().get(id)
     }
+
 
     /**
      * a read wrapped in a read-only transaction.

@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus
 
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
-import okhttp3.HttpUrl
 import okhttp3.Response
 import spock.lang.Specification
+import yakworks.commons.json.JsonEngine
 
 @Integration
 class KitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
@@ -17,7 +17,7 @@ class KitchenSinkApiSpec extends Specification implements OkHttpRestTrait {
         when:
         def resp = get("$path/1")
         String bodyText = resp.body().string()
-        Map body = parseJsonText(bodyText) as Map
+        Map body = JsonEngine.parseJson(bodyText, Map)
 
         then:
         resp.code() == HttpStatus.OK.value()

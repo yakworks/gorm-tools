@@ -80,6 +80,43 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         2           | 'bookAuthor.bookAuthor.age'
         4           | 'bookAuthor.book.cost'
         ["test": 1] | 'bookAuthor.book.bazMap'
+        1           | 'bookAuthor.book.bazMap.test'
+        null        | 'bookAuthor.book.enumThings'
+    }
+
+    void "getFieldValue2"() {
+        setup:
+        def obj = makeBookAuthor()
+
+        expect:
+        exp == BeanPathTools.getFieldValue2(obj, path)
+
+        where:
+        exp         | path
+        5           | 'age'
+        'atlas'     | 'book.name'
+        ["foo"]     | 'book.stringList'
+        2           | 'bookAuthor.bookAuthor.age'
+        4           | 'bookAuthor.book.cost'
+        ["test": 1] | 'bookAuthor.book.bazMap'
+        null        | 'bookAuthor.book.enumThings'
+    }
+
+    void "getFieldValue3"() {
+        setup:
+        def obj = makeBookAuthor()
+
+        expect:
+        exp == BeanPathTools.getFieldValue3(obj, path)
+
+        where:
+        exp         | path
+        5           | 'age'
+        'atlas'     | 'book.name'
+        ["foo"]     | 'book.stringList'
+        2           | 'bookAuthor.bookAuthor.age'
+        4           | 'bookAuthor.book.cost'
+        ["test": 1] | 'bookAuthor.book.bazMap'
         null        | 'bookAuthor.book.enumThings'
     }
 

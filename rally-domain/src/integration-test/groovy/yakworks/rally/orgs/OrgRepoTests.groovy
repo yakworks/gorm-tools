@@ -281,7 +281,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         when: "findWithData has type in daya"
         flushAndClear()
-        Org o = Org.repo.findWithData([type: 'Customer', source: [sourceId: 'foo']])
+        o = Org.repo.findWithData([type: 'Customer', source: [sourceId: 'foo']])
 
         then: "source id is the default"
         o
@@ -333,7 +333,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         o3
 
         when: "will uses type"
-        o3 = Org.repo.findWithData(source:[ sourceId: "foo"], , type: OrgType.Customer)
+        o3 = Org.repo.findWithData(source:[ sourceId: "foo"], type: OrgType.Customer)
 
         then: "not found because not unique"
         o3

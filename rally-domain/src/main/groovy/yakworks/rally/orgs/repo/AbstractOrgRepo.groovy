@@ -188,7 +188,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
             return orgTypeObj as OrgType
         } else if (orgTypeObj instanceof String) {
             //string should only really be used during tests but its here if needed
-            return OrgType.findByName(orgTypeObj as String) //must match exactly case sensitive
+            return OrgType.get(orgTypeObj) //must match exactly case sensitive
         }
     }
 
@@ -221,7 +221,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map
             if(!orgType && source.orgType) {
-                orgType = OrgType.findByName(source.orgType as String)
+                orgType = OrgType.get(source.orgType)
             }
 
             if(orgType){

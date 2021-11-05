@@ -22,28 +22,6 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         mockDomains Bookz, BookAuthor
     }
 
-    //List<Class> getDomainClasses() { [TestClazzA, TestClazzB, TestClazzC] }
-
-    void "Can get property value for a basic class"() {
-        setup:
-        def obj = new Bookz(
-            name: '1111',
-            cost: -12.52,
-            enumThings: null,
-            stringList: ["1", "test", "foo"],
-            bazMap: ["testKey": 1, "oneMore": 2]
-        )
-        expect:
-        exp == BeanPathTools.getFieldValue(obj, path)
-
-        where:
-        exp                          | path
-        '1111'                       | 'name'
-        -12.52                       | 'cost'
-        null                         | 'enumThings'
-        ["1", "test", "foo"]         | 'stringList'
-        ["testKey": 1, "oneMore": 2] | 'bazMap'
-    }
 
     BookAuthor makeBookAuthor(){
         return new BookAuthor(
@@ -63,44 +41,6 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
                 )
             )
         )
-    }
-
-    void "Can get property value for a class hierarchy"() {
-        setup:
-        def obj = makeBookAuthor()
-
-        expect:
-        exp == BeanPathTools.getFieldValue(obj, path)
-
-        where:
-        exp         | path
-        5           | 'age'
-        'atlas'     | 'book.name'
-        ["foo"]     | 'book.stringList'
-        2           | 'bookAuthor.bookAuthor.age'
-        4           | 'bookAuthor.book.cost'
-        ["test": 1] | 'bookAuthor.book.bazMap'
-        // 1           | 'bookAuthor.book.bazMap.test'
-        null        | 'bookAuthor.book.enumThings'
-    }
-
-    void "getFieldValue2"() {
-        setup:
-        def obj = makeBookAuthor()
-
-        expect:
-        exp == BeanPathTools.getPropertyValue(obj, path)
-
-        where:
-        exp         | path
-        5           | 'age'
-        'atlas'     | 'book.name'
-        ["foo"]     | 'book.stringList'
-        2           | 'bookAuthor.bookAuthor.age'
-        4           | 'bookAuthor.book.cost'
-        ["test": 1] | 'bookAuthor.book.bazMap'
-        // 1           | 'bookAuthor.book.bazMap.test'
-        null        | 'bookAuthor.book.enumThings'
     }
 
     void "propsToMap"() {

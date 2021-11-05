@@ -7,7 +7,7 @@ package gorm.tools.mango
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.lang3.EnumUtils
+import yakworks.commons.lang.EnumUtils
 
 /**
  * Statics for the operations

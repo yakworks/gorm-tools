@@ -6,14 +6,9 @@ package gorm.tools.utils
 
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.Identity
-
-import gorm.tools.beans.AppCtx
-import gorm.tools.databinding.EntityMapBinder
-import yakworks.commons.lang.Validate
 
 /**
  * GormUtils provides a set of static helpers for working with domain classes.
@@ -72,26 +67,6 @@ class GormUtils {
     }
 
     /**
-     * Faster, simplier binder. Copies properties from source to target object.
-     *
-     * @param target domain instance to copy properties to
-     * @param source - domain class to copy properties from
-     * @param override - properties to override after copying
-     * @param ignoreAssociations - should associations be copied ? - ignored by default
-     */
-    @CompileStatic
-    static <T> GormEntity<T> bind(GormEntity<T> target, Map<String, Object> source, Map<String, Object> override = [:], boolean ignoreAssociations = false) {
-        EntityMapBinder binder = (EntityMapBinder) AppCtx.get("entityMapBinder")
-        binder.bind(target, source)
-
-        if (override) {
-            setPropertiesFromMap(target, override)
-        }
-
-        return target
-    }
-
-    /**
      * iterates over map and sets property to target, no conversion or error catching, just a straight forward set
      * if target.hasProperty for the key
      */
@@ -135,28 +110,6 @@ class GormUtils {
             }
         }
 
-    }
-
-    /**
-     * Return the value of the (possibly nested) property of the specified name, for the specified source object
-     *
-     * Example getPropertyValue(source, "x.y.z")
-     *
-     * @param source - The source object
-     * @param property - the property
-     * @return value of the specified property or null if any of the intermediate objects are null
-     */
-    static Object getPropertyValue(Object source, String property) {
-        Validate.notNull(source, '[source]')
-        Validate.notEmpty(property, '[property]')
-
-        Object result = property.tokenize('.').inject(source) { Object obj, String prop ->
-            Object value = null
-            if (obj != null) value = obj[prop]
-            return value
-        }
-
-        return result
     }
 
     /**

@@ -6,7 +6,7 @@ package gorm.tools.repository.model
 
 import groovy.transform.CompileStatic
 
-import org.apache.commons.lang3.EnumUtils
+import yakworks.commons.lang.EnumUtils
 
 /**
  * valid op values for binding associations

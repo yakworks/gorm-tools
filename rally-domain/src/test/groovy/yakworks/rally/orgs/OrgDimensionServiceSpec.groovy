@@ -1,6 +1,6 @@
 package yakworks.rally.orgs
 
-import org.apache.commons.lang3.EnumUtils
+import yakworks.commons.lang.EnumUtils
 
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest

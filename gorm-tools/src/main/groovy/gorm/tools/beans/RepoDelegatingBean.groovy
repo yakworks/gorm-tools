@@ -14,6 +14,7 @@ import gorm.tools.repository.GormRepo
 /**
  * Delegates missing properties as method calls to the repository for the domain class.
  */
+@Deprecated
 @CompileStatic
 class RepoDelegatingBean extends DelegatingBean {
     GormRepo repo

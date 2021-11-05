@@ -8,7 +8,6 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import org.apache.commons.lang3.EnumUtils
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
@@ -19,6 +18,7 @@ import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntity
 import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.ClassUtils
+import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
 
 import static gorm.tools.mango.MangoOps.CompareOp

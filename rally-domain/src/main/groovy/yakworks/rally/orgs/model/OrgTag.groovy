@@ -4,6 +4,7 @@
 */
 package yakworks.rally.orgs.model
 
+import gorm.tools.model.Persistable
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -33,4 +34,8 @@ class OrgTag implements TagLinkTrait<OrgTag>, GormRepoEntity<OrgTag, OrgTagRepo>
         linkedEntity:[ description: 'dummy placeholder, will always be Org'],
     ]
 
+    //Override
+    static List<Tag> listTags(Persistable entity) {
+        getRepo().listTags(entity)
+    }
 }

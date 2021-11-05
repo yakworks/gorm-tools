@@ -188,6 +188,13 @@ class EntityMap extends AbstractMap<String, Object> {
         else if(val instanceof Map && !(val instanceof EntityMap)) {
             val = new EntityMap(val)
         }
+        else if(val instanceof List && !(val instanceof EntityMapList)) {
+            //check what first item is, we only do this if its a GormEntity
+            List valList = (List) val
+            if(valList.size() !=0 && valList[0] instanceof GormEntity){
+                val = new EntityMapList(valList)
+            }
+        }
         else if(val instanceof GormEntity) {
             // if it reached here then just generate the default id
             PersistentEntity domainClass = GormMetaUtils.getPersistentEntity(val)

@@ -186,4 +186,16 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
         ['bazMap', 'stringList']      | [bazMap: [foo: 'bar'], stringList:['red', 'blue', 'green']]
     }
 
+    void "non association list should be wrapped too"() {
+        when:
+        def ks = KitchenSink.build(1)
+        def emap = entityMapService.createEntityMap(ks, ['id', 'items'])
+
+        then:
+        ks.items
+        emap.items
+        emap.items instanceof EntityMapList
+
+    }
+
 }

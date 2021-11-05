@@ -13,6 +13,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
+import org.springframework.http.HttpStatus
 
 import gorm.tools.api.problem.Problem
 import gorm.tools.beans.EntityMap
@@ -96,8 +97,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def post() {
         try {
             D instance = (D) getRepo().create(bodyAsMap())
-            def entityMap = createEntityMap(instance)
-            respond([status: CREATED], entityMap)
+            respondWithEntityMap(instance, CREATED)
         } catch (Exception e) {
             handleException(e)
         }
@@ -114,8 +114,7 @@ trait RestRepoApiController<D> extends RestApiController {
         data.putAll(dataMap) // json data may not contains id because it passed in params
         try {
             D instance = (D) getRepo().update(data)
-            def entityMap = createEntityMap(instance)
-            respond([status: OK], entityMap)
+            respondWithEntityMap(instance)
         } catch (Exception e) {
             handleException(e)
         }
@@ -144,8 +143,7 @@ trait RestRepoApiController<D> extends RestApiController {
         try {
             D instance = (D) getRepo().read(params.id as Serializable)
             RepoUtil.checkFound(instance, params.id as  Serializable, entityClass.simpleName)
-            def entityMap = createEntityMap(instance)
-            respond(entityMap)
+            respondWithEntityMap(instance)
         } catch (Exception e) {
             handleException(e)
         }
@@ -165,13 +163,13 @@ trait RestRepoApiController<D> extends RestApiController {
     def list() {
         Pager pager = pagedQuery(params, 'list')
         // passing renderArgs args would be usefull for 'renderNulls' if we want to include/exclude
-        respond([status: OK], pager)
+        respond(pager)
     }
 
     @Action
     def picklist() {
         Pager pager = pagedQuery(params, 'picklist')
-        respond([status: OK], pager)
+        respond(pager)
     }
 
     // @Action
@@ -217,7 +215,11 @@ trait RestRepoApiController<D> extends RestApiController {
         respond([status: MULTI_STATUS], job)
     }
 
-    //@CompileDynamic
+    void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
+        EntityMap entityMap = createEntityMap(instance)
+        respond([status: status], entityMap)
+    }
+
     Pager pagedQuery(Map params, String includesKey) {
         Pager pager = new Pager(params)
         // println "params ${params.class} $params"
@@ -229,7 +231,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     List<D> query(Pager pager, Map p = [:]) {
         //copy the params into new map
-        def qryParams = p.findAll {
+        Map qryParams = p.findAll {
             //not if its in the the pager or the controller params
             !(it.key in ['max', 'offset', 'page', 'controller', 'action'])
         }
@@ -250,9 +252,20 @@ trait RestRepoApiController<D> extends RestApiController {
      */
     EntityMap createEntityMap(D instance, String includesKey = 'get'){
         List incs = getFieldIncludes(includesKey)
-        // def emap = BeanPathTools.buildMapFromPaths(instance, incs)
+        flushIfSession() //in testing need to flush before generating entitymap
         EntityMap emap = entityMapService.createEntityMap(instance, incs)
         return emap
+    }
+
+    /**
+     * In rare cases controller action will be inside a hibernate session
+     * primarily needed for testing but there are some edge cases where this is needed
+     * checks if repo datastore has a session and flushes if so
+     */
+    void flushIfSession(){
+        if(getRepo().datastore.hasCurrentSession()){
+            getRepo().flush()
+        }
     }
 
     Map getIncludesMap(){

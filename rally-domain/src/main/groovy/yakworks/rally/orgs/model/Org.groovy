@@ -105,6 +105,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
 
     @Override //hasTags trait
     List<Tag> getTags() {
+        // OrgTag.listTags(this)
         OrgTag.repo.listTags(this)
     }
 

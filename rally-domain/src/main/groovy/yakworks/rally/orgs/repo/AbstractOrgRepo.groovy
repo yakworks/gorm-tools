@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
 
+import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityValidationException
@@ -162,6 +163,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void doAssociations(Org org, Map data) {
         if(data.locations) persistAssociationData(org, Location.repo, data.locations as List<Map>, "org")
         if(data.contacts) persistAssociationData(org, Contact.repo, data.contacts as List<Map>, "org")
+        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 
     /**

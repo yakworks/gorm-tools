@@ -62,7 +62,7 @@ subprojects { subprj ->
     tasks.withType(GroovyCompile) {
         configure(groovyOptions) {
             // sets the path to sys properties so we can use it find grails-app/conf during AST
-            forkOptions.jvmArgs = ['-Xmx1524m', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+            forkOptions.jvmArgs = ['-Xmx1524m', '-XX:+UseSerialGC', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
         }
     }
   }

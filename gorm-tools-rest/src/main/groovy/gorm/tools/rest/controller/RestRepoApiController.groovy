@@ -251,8 +251,8 @@ trait RestRepoApiController<D> extends RestApiController {
      * @return the object to pass on to json views
      */
     EntityMap createEntityMap(D instance, String includesKey = 'get'){
-        List incs = getFieldIncludes(includesKey)
         flushIfSession() //in testing need to flush before generating entitymap
+        List incs = getFieldIncludes(includesKey)
         EntityMap emap = entityMapService.createEntityMap(instance, incs)
         return emap
     }

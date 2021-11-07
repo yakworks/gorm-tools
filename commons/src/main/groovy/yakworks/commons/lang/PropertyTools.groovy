@@ -33,7 +33,7 @@ class PropertyTools {
         Validate.notEmpty(property, '[property]')
 
         Object result = property.tokenize('.').inject(source) { Object obj, String prop ->
-            Object value = null
+            Object value
             if (obj != null){
                 try {
                     value = obj[prop]
@@ -41,7 +41,7 @@ class PropertyTools {
                 catch (MissingPropertyException e) {
                     // swallow the exceptin basically, if obj is a map then this never happens, but if prop doesn't exist
                     // then this get thrown for objects
-                    return null
+                    value = null
                 }
             }
             return value

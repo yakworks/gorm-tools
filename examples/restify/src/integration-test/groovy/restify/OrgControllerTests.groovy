@@ -60,7 +60,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         then:
         body.status == 422
         response.status == 422
-        body.detail == '[org.type] must not be null'
+        body.title == 'Org Validation Error(s)'
     }
 
     void "test post with tags"() {

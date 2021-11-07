@@ -6,10 +6,7 @@ package yakworks.commons.json
 
 import javax.servlet.http.HttpServletRequest
 
-import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
-
-import yakworks.commons.json.JsonEngine
 
 /**
  * Trait to adds parse methods for using JsonSlurper to parse HttpServletRequest body

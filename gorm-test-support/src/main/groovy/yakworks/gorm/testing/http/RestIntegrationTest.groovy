@@ -19,6 +19,7 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.core.GrailsApplication
 import grails.util.GrailsMetaClassUtils
+import grails.util.GrailsNameUtils
 import grails.util.GrailsWebMockUtil
 
 /**
@@ -61,12 +62,14 @@ trait RestIntegrationTest extends DataIntegrationTest {
 
     // set the controller bean from short name, such as OrgController.
     void setControllerName(String name){
-        def ctrls = grailsApplication.getArtefactInfo(ControllerArtefactHandler.TYPE).classes
-        def ctrlClass = ctrls.find{it.name == name || it.simpleName == name}
-        assert ctrlClass : "can't find controller name $name"
-        controllerName = ctrlClass.simpleName
-        controller = AppCtx.get(ctrlClass)
+        def ctrls = grailsApplication.getArtefactInfo(ControllerArtefactHandler.TYPE).grailsClasses
+
+        def grailsCtrlClass = ctrls.find{it.name == name || it.shortName == name}
+        assert grailsCtrlClass : "can't find controller name $name"
+        controller = AppCtx.get(grailsCtrlClass.getClazz())
+        controllerName = grailsCtrlClass.getLogicalPropertyName()
         assert controller
+        currentRequestAttributes.setControllerName(controllerName)
     }
     /**
      * Resets request attributes in request holder after each test case

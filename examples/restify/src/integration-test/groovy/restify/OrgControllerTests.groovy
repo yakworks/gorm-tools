@@ -3,10 +3,13 @@ package restify
 import gorm.tools.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.commons.map.Maps
 import yakworks.gorm.testing.http.RestIntegrationTest
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.Tag
 
 @Rollback
 @Integration
@@ -17,6 +20,13 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
     void setup() {
         controllerName = 'OrgController'
     }
+
+    void "is controller name working and does it have config"() {
+        expect:
+        controller.getControllerName() == 'org'
+        controller.getFieldIncludes('get') == ['*', 'info.*', "location.id", 'tags']
+    }
+
 
     void "get with id"() {
         when:
@@ -51,5 +61,24 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         body.status == 422
         response.status == 422
         body.detail == '[org.type] must not be null'
+    }
+
+    void "test post with tags"() {
+        when: "Create a test tag"
+        Tag tag1 = Tag.create(code: 'tagTest', entityName: 'Customer')
+
+        then:
+        tag1
+
+        when: "Create customer with tags"
+        request.json = [num:"tagTest", name:"tagTest", type: 'Customer', tags:[[id:tag1.id]]]
+        controller.post()
+        Map body = response.bodyToMap()
+
+        then: "Verify cust tags created"
+        body.status != 422
+        response.status == 201
+        body.tags.size() == 1
+        body.tags[0].code == 'foo'
     }
 }

@@ -3,10 +3,6 @@ grails:
   profile: rest-api
   codegen:
     defaultPackage: restify
-  config:
-    locations:
-      - classpath:restapi-config.yml
-
 info:
   app:
     name: '@info.app.name@'

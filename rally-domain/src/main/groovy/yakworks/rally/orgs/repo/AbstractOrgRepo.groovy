@@ -54,9 +54,6 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         wireAssociations(org)
     }
 
-    /**
-     * set up before a bind
-     */
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
@@ -102,6 +99,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         }
         //remove tags
         orgTagRepo.remove(org)
+        //remove contacts
+        contactRepo.removeAll(org)
     }
 
     /**
@@ -164,6 +163,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         if(data.locations) persistAssociationData(org, Location.repo, data.locations as List<Map>, "org")
         if(data.contacts) persistAssociationData(org, Contact.repo, data.contacts as List<Map>, "org")
         if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+        flush()
     }
 
     /**
@@ -245,7 +245,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
             String num = data.num as String
             List orgsForNum = orgType ? Org.findAllWhere(num:num, type: orgType) : Org.findAllWhere(num:num)
             if(orgsForNum?.size() == 1) {
-                org = orgsForNum[0]
+                org = (Org)orgsForNum[0]
             } else if (orgsForNum.size() > 1){
                 throw new DataRetrievalFailureException("Multiple Orgs found for num: ${data.num}, lookup key must return a unique Org")
             }

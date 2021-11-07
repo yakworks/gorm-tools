@@ -90,8 +90,8 @@ class ClassUtils {
      * trickery to set a private final field
      *
      * @param clazz the class
-     * @param fieldName the name of the field
      * @param instance the instance to set it on
+     * @param fieldName the name of the field
      * @param value the value to set
      */
     static void setPrivateFinal(Class clazz, Object instance, String fieldName, Object value){

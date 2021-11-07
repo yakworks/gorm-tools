@@ -9,6 +9,7 @@ import gorm.tools.beans.domain.BookAuthor
 import gorm.tools.beans.domain.BookTag
 import gorm.tools.beans.domain.Bookz
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.model.Enummy
 import yakworks.gorm.testing.model.KitchenSink
@@ -196,6 +197,11 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
         emap.items
         emap.items instanceof EntityMapList
 
+        when:
+        def items = emap.items as EntityMapList
+
+        then:
+        items[0].keySet() == ['id'] as Set
     }
 
 }

@@ -36,10 +36,9 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.title == "OrgSource Validation Error(s)"
-
-        // body.errors.find{ it.field == 'link.kind' }.message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
-        // body.errors.find{ it.field == 'link.name' }
+        body.title == "Org Validation Error(s)"
+        body.errors.size() == 1
+        body.errors.find{ it.field == 'field' }
     }
 
     void 'test post errors on org'() {

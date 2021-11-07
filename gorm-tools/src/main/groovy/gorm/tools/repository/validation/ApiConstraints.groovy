@@ -25,6 +25,8 @@ import yakworks.commons.map.Maps
 /**
  * A helper to find constraints that can find from yaml and a constraintsMap static block
  * that will also search the trait heirarchy.
+ * Adds defaults so that
+ * - when nullable:false then blank:false, set blank to true in cases where that is needed
  */
 @SuppressWarnings(['Println', 'FieldName'])
 @CompileStatic
@@ -34,7 +36,8 @@ class ApiConstraints {
     public static Map<Class, ApiConstraints> apiConstraintsMap = new ConcurrentHashMap<>()
     //PersistentEntity entity
     Class targetClass
-    //these are informational props such as for openapi etc that should not be validated, ie validate: false was set
+    // these are informational props such as for openapi etc that should not be validated, ie validate: false was set
+    // we track these so that docs can be built but these dont get processed for validation
     Map<String, ConstrainedProperty> nonValidatedProperties = [:] as Map<String, ConstrainedProperty>
     //the builder passed to constraints closure. will be either MappingConfigurationBuilder or ConstrainedPropertyBuilder
     Object delegateBuilder
@@ -125,15 +128,18 @@ class ApiConstraints {
             // DefaultConstrainedProperty cp //= (DefaultConstrainedProperty)builder.constrainedProperties[prop]
             // if(cp){
             //     addMaxSizeIfMissing(cp, attrs)
-            // } else {
+            // } else { }
             descriptionShortcut(attrs)
             addNullableIfMissing(attrs)
-            //}
+            addBlankFalseIfNullableFalse(attrs)
             invokeOnBuilder(prop, attrs)
         }
 
     }
 
+    /**
+     * calls the default builder to register the constraint
+     */
     @CompileDynamic
     void invokeOnBuilder(String prop, Map attrs){
         // builder.createNode(prop, attr)
@@ -170,6 +176,15 @@ class ApiConstraints {
         if(!attr.containsKey('nullable')){
             //make sure we have a default of nullable:true
             attr.nullable = true
+        }
+    }
+
+    /**
+     * if nullable is false then by default make blank false too
+     */
+    void addBlankFalseIfNullableFalse(Map attr){
+        if(attr.containsKey('nullable') && attr.nullable == false){
+            attr.blank = false
         }
     }
 

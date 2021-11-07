@@ -30,7 +30,7 @@ class SecRole implements NameDescription, RepoEntity<SecRole>, Serializable {
 
     static constraintsMap = [
         name: [d: "The name of the role",
-            blank: false, nullable: false, maxSize: 20],
+            nullable: false, maxSize: 20],
         description: [d: "A longer description",
             nullable: true, maxSize: 255],
         inactive: [d: "Whether role should be active", oapi:'U']

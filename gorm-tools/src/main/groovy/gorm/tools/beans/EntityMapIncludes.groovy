@@ -19,9 +19,17 @@ class EntityMapIncludes {
     //nestedIncludes has the associations and its included fields
     Map<String, EntityMapIncludes> nestedIncludes
 
+    EntityMapIncludes(Set<String> fields){
+        this.fields = fields
+    }
+
     EntityMapIncludes(String className, Set<String> fields, Set<String> excludeFields){
         this.className = className
         this.fields = fields - excludeFields
         this.excludeFields = excludeFields
+    }
+
+    static EntityMapIncludes of(List<String> fields){
+        new EntityMapIncludes(fields as Set)
     }
 }

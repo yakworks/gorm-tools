@@ -192,7 +192,7 @@ class EntityMap extends AbstractMap<String, Object> {
             //check what first item is, we only do this if its a GormEntity
             List valList = (List) val
             if(valList.size() !=0 && valList[0] instanceof GormEntity){
-                val = new EntityMapList(valList)
+                val = new EntityMapList(valList, EntityMapIncludes.of(['id']))
             }
         }
         else if(val instanceof GormEntity) {

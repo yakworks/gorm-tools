@@ -21,8 +21,9 @@ trait NameNum extends NamedEntity {
     ]
 
     static constraintsMap = [
-        name:[ description: 'Full name for this entity', nullable: false, blank: false, maxSize: 100],
-        num:[ description: 'Unique alpha-numeric identifier for this entity', nullable: false, blank: false, maxSize: 50]
+        //change max size for the name from 50 to 100
+        name:[ maxSize: 100 ],
+        num:[ d: 'Unique alpha-numeric identifier for this entity', nullable: false, maxSize: 50 ]
     ]
 
 }

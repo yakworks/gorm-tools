@@ -4,10 +4,12 @@
 */
 package gorm.tools.repository.validation
 
+import java.beans.Introspector
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
+import org.grails.datastore.gorm.validation.constraints.AbstractConstraint
 import org.grails.datastore.gorm.validation.constraints.NullableConstraint
 import org.grails.datastore.gorm.validation.constraints.eval.ConstraintsEvaluator
 import org.grails.datastore.mapping.model.MappingContext
@@ -17,6 +19,9 @@ import org.grails.datastore.mapping.model.config.GormProperties
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.reflect.EntityReflector
 import org.springframework.context.MessageSource
+import org.springframework.context.support.DefaultMessageSourceResolvable
+import org.springframework.validation.AbstractBindingResult
+import org.springframework.validation.BindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
@@ -27,12 +32,14 @@ import gorm.tools.repository.model.PersistableRepoEntity
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.Constraint
 import grails.gorm.validation.PersistentEntityValidator
+import yakworks.commons.lang.ClassUtils
 
 /**
- * A Validator that validates a {@link org.grails.datastore.mapping.model.PersistentEntity} against known constraints
- *
- * @author Graeme Rocher
- * @since 6.0
+ * Overrides the PersistentEntityValidator to adress a few things
+ * - assocations are validated correctly
+ * - beforeValidate event is fire for assocations properly too
+ * - slims down the validations so that if nullable:true then it skips those
+ * - cleans up the message codes to be a sane number
  */
 @SuppressWarnings(['Println', 'FieldName'])
 @CompileStatic
@@ -74,10 +81,10 @@ class RepoEntityValidator extends PersistentEntityValidator {
         for (entry in constrainedProperties) {
             def constrainedProp = (ConstrainedProperty) entry.value
             String prop = (String) entry.key
-            Collection<Constraint> appliedConst = constrainedProp.getAppliedConstraints()
+            Collection<Constraint> appliedConstraints = constrainedProp.getAppliedConstraints()
             //if the only applied constraint is nullable:true, which is default, then skip it for performance reasons
-            if(appliedConst?.size() == 1 && appliedConst[0] instanceof NullableConstraint){
-                def nullableConst = (NullableConstraint) appliedConst[0]
+            if(appliedConstraints?.size() == 1 && appliedConstraints[0] instanceof NullableConstraint){
+                def nullableConst = (NullableConstraint) appliedConstraints[0]
                 if(!nullableConst.isNullable()){ //only add it if nullable is false
                     slimConstrainedProperties[prop] = constrainedProp
                 }
@@ -85,11 +92,46 @@ class RepoEntityValidator extends PersistentEntityValidator {
                 //     //add it to the nonValidate onese
                 //     apiConstraints.addNonValidatedProperty(prop, constrainedProp)
                 // }
-            } else if(appliedConst) { //it has more so let it flow
+            } else if(appliedConstraints) { //it has more so let it flow
                 slimConstrainedProperties[prop] = constrainedProp
             }
+            for(appliedConst in appliedConstraints){
+                if(appliedConst instanceof AbstractConstraint){
+                    //TODO, not working
+                    replaceRejectValueWithDefaultMessage(appliedConst.class)
+                }
+            }
         }
-        // ClassUtils.setPrivateFinal(PersistentEntityValidator, super, 'constrainedProperties', slimConstrainedProperties)
+    }
+
+    //TODO not working, think we will need to replace the classes
+    @CompileDynamic
+    void replaceRejectValueWithDefaultMessage(Class clazz){
+        clazz.metaClass.rejectValueWithDefaultMessage = { Object target, Errors errors, String defaultMessage, String[] codes, Object[] args ->
+            def targetClass = target.class
+            String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
+            String propName = (String)args[0]
+            String code = (String)code[0]
+
+            def newCodes = [] as Set<String>
+            newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
+            newCodes.add("${classShortName}.${propName}.${code}".toString())
+            newCodes.add("${code}.${propName}".toString())
+            newCodes.add(code)
+
+            FieldError error = new FieldError(
+                errors.objectName,
+                errors.nestedPath + propName,
+                getPropertyValue(errors, target),
+                false, //bind failure
+                newCodes as String[],
+                args,
+                defaultMessage
+            )
+            ((BindingResult)errors).addError(error);
+            // def abrErrors = errors as AbstractBindingResult //this has the addError method
+            // abrErrors.addError(error)
+        }
     }
 
     //
@@ -275,7 +317,28 @@ class RepoEntityValidator extends PersistentEntityValidator {
                     constrainedProperty.validate(obj, ((GroovyObject)obj).getProperty(constrainedPropertyName), errors)
                 }
             }
+            def ferror = errors.getFieldError(constrainedPropertyName)
+            if(ferror) {
+                removeError(obj, constrainedPropertyName, errors, ferror)
+            }
         }
+    }
+
+    /**
+     * cleans up the insane number of message codes added for a validation error
+     * only adds 3 for className.propname.code, simpleName.propname.code and propname.code.error and code
+     */
+    void removeError(Object target, String propName, Errors errors, FieldError fieldError){
+        //base code
+        String code = fieldError.code
+        def newCodes = [] as Set<String>
+        String classShortName = Introspector.decapitalize(target.class.simpleName)
+        newCodes.add("${target.class.getName()}.${propName}.${code}".toString())
+        newCodes.add("${classShortName}.${propName}.${code}".toString())
+        newCodes.add("${code}.${propName}".toString())
+        newCodes.add(code)
+
+        ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'codes', newCodes as String[])
     }
 
 }

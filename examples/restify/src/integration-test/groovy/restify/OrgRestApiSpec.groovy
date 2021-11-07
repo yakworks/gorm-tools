@@ -253,16 +253,16 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         tag1
 
         when: "Create customer with tags"
-        Response resp = post(path, [num:"C1", name:"C1", tags:[[id:tag1.id]]])
+        Response resp = post(path, [num:"C1", name:"C1", type: 'Customer', tags:[[id:tag1.id]]])
         Map body = bodyToMap(resp)
 
         then: "Verify org tags created"
-
+        // resp.code() == 201
         //do an if then here so we get better display on failure
         if(resp.code() !=  201){
-            body = [WTF: "Work That Failed"]
+            assert body == [WTF: "Work That Failed"]
         }
-        body.tags[0].code == tag1.code
+        body.tags[0].id == tag1.id
 
         // delete(tagsPath, tag1.id)
         // delete(path, custBody.id)

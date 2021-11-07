@@ -7,6 +7,7 @@ package yakworks.rally.orgs.repo
 import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
+import org.springframework.validation.Errors
 
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
@@ -45,10 +46,12 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     OrgMemberService orgMemberService
 
     @RepoListener
-    void beforeValidate(Org org) {
+    void beforeValidate(Org org, Errors errors) {
         if(org.isNew()) {
-            Validate.notNull(org.type, "[org.type]")
-            //Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
+            //register error and exit fast if no orgType
+            if(! validateNotNull(org, 'type', errors)) return
+            // Validate.notNull(org.type, "[org.type]")
+            // Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
             generateId(org)
         }
         wireAssociations(org)
@@ -121,8 +124,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * called afterBind
      */
     boolean verifyNumAndOrgSource(Org org, Map data){
-        // if no org num then let it fall through and fail validation
-        if(!org.num) return false
+        // if no org num or orgType then let it fall through and fail validation
+        if(!org.num || !org.type) return false
 
         org.source = OrgSource.repo.createSource(org, data)
         org.source.persist()
@@ -163,7 +166,6 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         if(data.locations) persistAssociationData(org, Location.repo, data.locations as List<Map>, "org")
         if(data.contacts) persistAssociationData(org, Contact.repo, data.contacts as List<Map>, "org")
         if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
-        flush()
     }
 
     /**

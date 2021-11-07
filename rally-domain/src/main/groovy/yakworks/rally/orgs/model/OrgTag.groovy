@@ -34,8 +34,4 @@ class OrgTag implements TagLinkTrait<OrgTag>, GormRepoEntity<OrgTag, OrgTagRepo>
         linkedEntity:[ description: 'dummy placeholder, will always be Org'],
     ]
 
-    //Override
-    static List<Tag> listTags(Persistable entity) {
-        getRepo().listTags(entity)
-    }
 }

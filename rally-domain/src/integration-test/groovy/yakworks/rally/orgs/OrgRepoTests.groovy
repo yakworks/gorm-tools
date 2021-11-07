@@ -92,7 +92,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         when: "Create a test tag"
         Tag tag1 = Tag.create(code: 'foo')
         def cust = orgRepo.create([num:"C1", name:"C1", type: 'Customer', tags:[[id:tag1.id]]])
-        // flush() //flush to db because the query that gets tags will show 0 if not
+        flush() //flush to db because the query that gets tags will show 0 if not
 
         then:
         tag1

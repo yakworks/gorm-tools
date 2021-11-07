@@ -63,6 +63,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         body.detail == '[org.type] must not be null'
     }
 
+    @IgnoreRest
     void "test post with tags"() {
         when: "Create a test tag"
         Tag tag1 = Tag.create(code: 'tagTest', entityName: 'Customer')
@@ -79,6 +80,6 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         body.status != 422
         response.status == 201
         body.tags.size() == 1
-        body.tags[0].code == 'foo'
+        body.tags[0].id == tag1.id
     }
 }

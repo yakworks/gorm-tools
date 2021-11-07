@@ -18,7 +18,7 @@ trait VariableVal {
     ]
 
     static constraintsMap = [
-        variable:[ description: 'Parameter config prop name, unique', nullable: false, blank: false, maxSize: 50],
+        variable:[ description: 'Parameter config prop name, unique', nullable: false, maxSize: 50],
         value:[ description: 'The value', maxSize: 50]
     ]
 

@@ -4,7 +4,7 @@
 */
 package yakworks.rally.orgs.model
 
-import gorm.tools.model.Persistable
+
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity

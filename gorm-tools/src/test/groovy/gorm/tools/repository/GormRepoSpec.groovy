@@ -410,7 +410,7 @@ class TestTrxRollback implements RepoEntity<TestTrxRollback> {
     BigDecimal amount
 
     static constraints = {
-        name blank: false, nullable: false
+        name nullable: false
         amount nullable: true
     }
 }

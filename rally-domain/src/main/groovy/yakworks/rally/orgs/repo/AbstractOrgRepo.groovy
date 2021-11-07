@@ -49,7 +49,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void beforeValidate(Org org, Errors errors) {
         if(org.isNew()) {
             //register error and exit fast if no orgType
-            if(! validateNotNull(org, 'type', errors)) return
+            if(!validateNotNull(org, 'type', errors)) return
             // Validate.notNull(org.type, "[org.type]")
             // Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
             generateId(org)

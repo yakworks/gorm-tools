@@ -17,7 +17,6 @@ import org.springframework.validation.FieldError
 
 import gorm.tools.beans.AppCtx
 import grails.gorm.validation.ConstrainedProperty
-import yakworks.commons.lang.Validate
 
 /**
  * A helper trait for a repo to allow rejecting values for validation
@@ -41,11 +40,7 @@ trait RepoEntityErrors<D> {
     }
 
     /**
-     *
-     * @param target
-     * @param propName
-     * @param errors - the parent errors if any
-     * @return
+     * validates that the prop is not null and registers error if so
      */
     boolean validateNotNull(GormValidateable target, String propName, Errors errors = null){
         if (target[propName] == null) {
@@ -88,14 +83,15 @@ trait RepoEntityErrors<D> {
     void rejectValueWithMessage(GormValidateable target, Errors errors, String propName, Object val, String code,
                                 String defaultMessage = null, Object argsOverride = null){
         def targetClass = target.class
-        String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
-        if(argsOverride == null) argsOverride = [propName, classShortName, val]
+        String simpleName = targetClass.simpleName
+        String classShortName = Introspector.decapitalize(targetClass.simpleName)
+        if(argsOverride == null) argsOverride = [propName, simpleName, val]
         def newCodes = [] as Set<String>
         if(!errors) errors = target.errors
 
         newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
-        newCodes.add("${classShortName}.${propName}.${code}".toString())
-        newCodes.add("${code}.${propName}".toString())
+        newCodes.add("${simpleName}.${propName}.${code}".toString())
+        newCodes.add("${propName}.${code}".toString())
         newCodes.add(code)
 
         FieldError error = new FieldError(

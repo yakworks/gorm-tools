@@ -71,7 +71,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     static constraintsMap = [
         num:[ nullable: true, maxSize: 50],
-        name:[ nullable: false, blank: false, maxSize: 50],
+        name:[ nullable: false, maxSize: 50],
 
         entityName:[ nullable: true],
         inactive:[ nullable: false],
@@ -82,7 +82,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         phone:[ nullable: true],
         email:[ email: true, nullable: true],
 
-        firstName:[ blank: false, nullable: false, maxSize: 50],
+        firstName:[ nullable: false, maxSize: 50],
         middleName:[ nullable: true, maxSize: 50],
         lastName:[ nullable: true, maxSize: 50],
         nickName:[ nullable: true, maxSize: 50],

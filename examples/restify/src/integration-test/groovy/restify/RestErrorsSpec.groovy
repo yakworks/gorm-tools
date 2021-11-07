@@ -38,7 +38,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Org Validation Error(s)"
         body.errors.size() == 1
-        body.errors.find{ it.field == 'field' }
+        body.errors.find{ it.field == 'type' }
     }
 
     void 'test post errors on org'() {

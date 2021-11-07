@@ -89,20 +89,6 @@ class ApiConstraints {
         processProps(consMap)
     }
 
-    void processPropsList(List<Map> listOfMaps){
-        for(Map cfield : listOfMaps){
-            for (entry in cfield) {
-                def attrs = (Map) entry.value
-                String prop = (String) entry.key
-                if(isMappingBuilder){
-                    addMappingConstraint(prop, attrs)
-                } else {
-                    addConstraint(prop, attrs)
-                }
-            }
-        }
-    }
-
     void processProps(Map consMap){
         for (entry in consMap) {
             def attrs = (Map) entry.value
@@ -170,6 +156,19 @@ class ApiConstraints {
     }
 
     /**
+     * clean up description short cut
+     * if the attr map has a 'd' key shortcut change it to description
+     */
+    void replaceDescriptionShortcut(List<Map> mergedList){
+        //replace the shortcut d: with description before merge
+        for (Map item : mergedList) {
+            for (entry in item) {
+                descriptionShortcut((Map) entry.value)
+            }
+        }
+    }
+
+    /**
      * if nullable is not set then add it to be true
      */
     void addNullableIfMissing(Map attr){
@@ -196,6 +195,8 @@ class ApiConstraints {
 
         Map yamlMap = findYamlApiConfig(targetClass)
         if(yamlMap) mergedList.add(yamlMap)
+
+        replaceDescriptionShortcut(mergedList)
 
         //with order above, classMaps override traitMaps and yamlMaps override all
         Map<String, Map> mergedMap = Maps.merge(mergedList)

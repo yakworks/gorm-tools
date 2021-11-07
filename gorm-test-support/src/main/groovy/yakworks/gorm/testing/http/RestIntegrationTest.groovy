@@ -5,6 +5,7 @@
 package yakworks.gorm.testing.http
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.HandleMetaClass
 import org.grails.core.artefact.ControllerArtefactHandler
@@ -19,14 +20,13 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.core.GrailsApplication
 import grails.util.GrailsMetaClassUtils
-import grails.util.GrailsNameUtils
 import grails.util.GrailsWebMockUtil
 
 /**
  * Contains helpers for integration tests for controllers. Can be chained with some custom helper traits with the
  * application-specific initialization logic.
  */
-@CompileDynamic //ok for testing
+@CompileStatic //ok for testing
 trait RestIntegrationTest extends DataIntegrationTest {
 
     // Object controller
@@ -52,15 +52,18 @@ trait RestIntegrationTest extends DataIntegrationTest {
         currentRequestAttributes.setControllerName(controllerName)
     }
 
+    @CompileDynamic
     MockRestResponse getResponse(){
         (MockRestResponse) controller.response
     }
 
+    @CompileDynamic
     MockRestRequest getRequest(){
         (MockRestRequest) controller.request
     }
 
     // set the controller bean from short name, such as OrgController.
+    @CompileDynamic
     void setControllerName(String name){
         def ctrls = grailsApplication.getArtefactInfo(ControllerArtefactHandler.TYPE).grailsClasses
 
@@ -91,6 +94,7 @@ trait RestIntegrationTest extends DataIntegrationTest {
      *
      * @param controller a controller to mock the render method for.
      */
+    @CompileDynamic
     void mockRender(Object controller) {
         MetaClass metaClass = GrailsMetaClassUtils.getMetaClass(controller)
         metaClass.render = { Map args ->

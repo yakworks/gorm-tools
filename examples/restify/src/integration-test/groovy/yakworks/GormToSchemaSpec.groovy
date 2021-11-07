@@ -101,7 +101,6 @@ class GormToSchemaSpec extends Specification {
 
     }
 
-    @IgnoreRest
     def "sanity check Org Create"() {
         given:
         Map schema = gormToSchema.generate(Org, ApiSchemaEntity.CruType.Create)

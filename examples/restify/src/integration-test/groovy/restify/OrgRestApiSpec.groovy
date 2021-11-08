@@ -9,6 +9,7 @@ import okhttp3.HttpUrl
 import okhttp3.Response
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
+import yakworks.rally.tag.model.Tag
 
 @Integration
 class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
@@ -242,5 +243,28 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.id
         body.name == '9Galt'
 
+    }
+
+    void "test post with tags"() {
+        when: "Create a test tag"
+        Tag tag1 = Tag.create(code: 'T1', entityName: 'Customer')
+
+        then:
+        tag1
+
+        when: "Create customer with tags"
+        Response resp = post(path, [num:"C1", name:"C1", type: 'Customer', tags:[[id:tag1.id]]])
+        Map body = bodyToMap(resp)
+
+        then: "Verify org tags created"
+        // resp.code() == 201
+        //do an if then here so we get better display on failure
+        if(resp.code() !=  201){
+            assert body == [WTF: "Work That Failed"]
+        }
+        body.tags[0].id == tag1.id
+
+        // delete(tagsPath, tag1.id)
+        // delete(path, custBody.id)
     }
 }

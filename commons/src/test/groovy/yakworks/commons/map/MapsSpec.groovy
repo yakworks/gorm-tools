@@ -47,11 +47,12 @@ class MapsSpec extends Specification {
         ]
 
         def m1 = [
+            foo: 'buzz',
             baz: 'qux'
         ]
 
         def expected = [
-            foo: 'bar',
+            foo: 'buzz',
             baz: 'qux'
         ]
 
@@ -60,7 +61,7 @@ class MapsSpec extends Specification {
 
         then:
         m0.size() == 1
-        m1.size() == 1
+        m1.size() == 2
         mergedMap.size() == 2
         assertMapsEqual(expected, mergedMap)
     }
@@ -78,6 +79,7 @@ class MapsSpec extends Specification {
         def expected = [
             foo: 'baz'
         ]
+
         then:
         assertMapsEqual(expected, Maps.merge(m0, m1))
     }

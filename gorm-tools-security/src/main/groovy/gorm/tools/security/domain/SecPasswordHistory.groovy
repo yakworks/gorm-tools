@@ -19,7 +19,7 @@ class SecPasswordHistory {
 
     static constraints = {
         user nullable: false
-        password nullable: false, blank: false
+        password nullable: false
         dateCreated nullable: true
     }
 

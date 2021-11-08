@@ -21,8 +21,8 @@ trait CityTrait2 {
     // Country country2
 
     static constraintsMap = [
-        name2:[ d: 'fff', blank: false, nullable: false],
-        shortCode2:[ d: 'fff', blank: false, nullable: false],
+        name2:[ d: 'fff', nullable: false],
+        shortCode2:[ d: 'fff', nullable: false],
         latitude2:[ d: 'fff', nullable: false, scale: 4, max: 90.00],
         longitude2:[ d: 'fff', nullable: false, scale: 4, max: 380.00],
         state2:[ d: 'fff'],

@@ -37,6 +37,8 @@ trait TagLinkTrait<X> implements LinkedEntity {
         tag:[ description: 'The tag', nullable: false]
     ]
 
+    // will return the same repo as getRepo, just casts it to AbstractLinkedEntityRepo for compilestatic
+    // AST gets confused if we try using getRepo as we can't use abstract
     static AbstractLinkedEntityRepo<X, Tag> getTagLinkRepo() {
         (AbstractLinkedEntityRepo<X, Tag>) RepoUtil.findRepo(this)
     }

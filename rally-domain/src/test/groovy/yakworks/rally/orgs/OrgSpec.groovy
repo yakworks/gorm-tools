@@ -44,6 +44,28 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
     //     removeEntity()
     // }
 
+    void "test org errors, no type"() {
+        when:
+        Org org = new Org(num:'foo1', name: "foo")
+
+        then:
+        !org.validate()
+        org.errors.allErrors.size() == 1
+        org.errors['type']
+    }
+
+    void "empty string for name or num"() {
+        when:
+        Org org = Org.create("", "", OrgType.Customer)
+
+        then:
+        !org.validate()
+        org.errors['name'].code == 'blank'
+        org.errors['num'].code == 'blank'
+        org.errors.allErrors.size() == 2
+
+    }
+
     def testOrgSourceChange() {
         when:
         Org org = Org.create("foo", "bar", OrgType.Customer)

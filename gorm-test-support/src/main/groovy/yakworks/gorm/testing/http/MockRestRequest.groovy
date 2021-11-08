@@ -7,6 +7,9 @@ package yakworks.gorm.testing.http
 
 import javax.servlet.ServletContext
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
+
 import org.grails.plugins.testing.GrailsMockHttpServletRequest
 
 import yakworks.commons.json.JsonEngineTrait
@@ -15,16 +18,19 @@ import yakworks.commons.json.JsonEngineTrait
  * A custom mock HTTP servlet request that provides the extra properties
  * and methods normally injected by the "servlets" plugin.
  */
+@CompileStatic
 class MockRestRequest extends GrailsMockHttpServletRequest implements JsonEngineTrait {
 
-    public MockRestRequest() {
+    Object cachedJson
+
+    MockRestRequest() {
         super();
         method = 'GET'
         setContentType('application/json; charset=UTF-8')
         setFormat('json')
     }
 
-    public MockRestRequest(ServletContext servletContext) {
+    MockRestRequest(ServletContext servletContext) {
         super(servletContext);
         method = 'GET'
         setContentType('application/json; charset=UTF-8')
@@ -35,6 +41,7 @@ class MockRestRequest extends GrailsMockHttpServletRequest implements JsonEngine
      * overrides to use defualt groovy json parser
      */
     @Override
+    @CompileDynamic
     void setJson(Object sourceJson) {
         if (sourceJson instanceof String) {
             setContent(sourceJson.getBytes("UTF-8"))
@@ -53,9 +60,10 @@ class MockRestRequest extends GrailsMockHttpServletRequest implements JsonEngine
         getJson()
     }
 
+
     def getJson() {
         if (!cachedJson) {
-            if (req.contentLength == 0) {
+            if (this.contentLength == 0) {
                 cachedJson = Collections.emptyMap()
             } else {
                 cachedJson = jsonSlurper.parse(this.inputStream)

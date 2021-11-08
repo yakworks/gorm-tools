@@ -20,8 +20,8 @@ trait NameCode<D> extends NamedEntity implements Lookupable<D> {
     ]
 
     static constraintsMap = [
-        code:[ description: 'Short code, alphanumeric with no special characters except dash (for space) and underscore', nullable: false,
-               blank: false, maxSize: 10, matches: "[a-zA-Z0-9-_]+"]
+        code:[ d: 'Short code, alphanumeric with no special characters except dash (for space) and underscore',
+               nullable: false, maxSize: 10, matches: "[a-zA-Z0-9-_]+" ]
     ]
 
     void beforeValidate() {

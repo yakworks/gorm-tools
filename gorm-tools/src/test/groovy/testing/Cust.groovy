@@ -57,7 +57,7 @@ class Cust implements GormRepoEntity<Cust, CustRepo> {
     ]
 
     static constraints = {
-        name blank: false, nullable: false
+        name     nullable: false
         descId   nullable: true
         name2    nullable: true
         secret   nullable: true, display: false

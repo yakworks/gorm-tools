@@ -4,11 +4,14 @@
 */
 package yakworks.gorm.testing.http
 
+import groovy.transform.CompileStatic
+
 import org.grails.plugins.testing.GrailsMockHttpServletResponse
 
 import yakworks.commons.json.JsonEngineTrait
 
-public class MockRestResponse extends GrailsMockHttpServletResponse implements JsonEngineTrait {
+@CompileStatic
+class MockRestResponse extends GrailsMockHttpServletResponse implements JsonEngineTrait {
 
     /**
      * converts json body to map

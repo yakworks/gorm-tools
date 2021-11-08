@@ -90,6 +90,10 @@ class ContactRepo implements GormRepo<Contact> {
         syncChangesToUser(contact)
     }
 
+    void removeAll(Org org) {
+        gormStaticApi().executeUpdate 'DELETE FROM Contact WHERE org=:org', [org: org]
+    }
+
     /**
      * if email or name is changed the progate them to user
      */

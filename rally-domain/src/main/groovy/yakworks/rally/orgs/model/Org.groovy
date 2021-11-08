@@ -42,17 +42,17 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
     static mappedBy = [member: "org"]
 
     static constraintsMap = [
-        num: [description: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
-        name: [description: 'The full name for this organization', example: 'SpaceX Corp.'],
-        type:[ description: 'The type of org', example: 'Customer',
+        num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
+        name: [d: 'The full name for this organization', example: 'SpaceX Corp.'],
+        type:[ d: 'The type of org', example: 'Customer',
              nullable: false, bindable: false],
-        comments:[ description: 'A user visible comment', example: 'Lorem ipsum'],
-        companyId:[ description: 'Company id this org belongs to', example: 2],
-        inactive:[ description: 'indicator for an Org that is no longer active'],
+        comments:[ d: 'A user visible comment', example: 'Lorem ipsum'],
+        companyId:[ d: 'Company id this org belongs to', example: 2],
+        inactive:[ d: 'indicator for an Org that is no longer active'],
         //associations
-        flex:[ description: 'User flex fields', nullable: true],
-        info:[ description: 'Info such as phone and website for an organization'],
-        contact:[ description: 'The default or key Contact for this organization',
+        flex:[ d: 'User flex fields', nullable: true],
+        info:[ d: 'Info such as phone and website for an organization'],
+        contact:[ d: 'The default or key Contact for this organization',
              bindable: false, oapi:[read: true, create: ['$ref'], update: ['id']]
         ],
         source:[ description: 'Originator source info, used when this is sourced externally',
@@ -105,7 +105,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
 
     @Override //hasTags trait
     List<Tag> getTags() {
-        OrgTag.repo.listTags(this)
+        OrgTag.listTags(this)
     }
 
     /**

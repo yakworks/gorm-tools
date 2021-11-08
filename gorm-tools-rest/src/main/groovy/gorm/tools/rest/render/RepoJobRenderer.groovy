@@ -8,6 +8,8 @@ import groovy.json.JsonOutput
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.job.RepoJobEntity
 import gorm.tools.support.MsgService
 import grails.rest.render.RenderContext
@@ -21,7 +23,8 @@ import grails.rest.render.RenderContext
 @CompileStatic
 class RepoJobRenderer extends JsonGeneratorRenderer<RepoJobEntity>{
 
-    MsgService msgServiparseJsonce
+    @Autowired
+    MsgService msgService
 
     RepoJobRenderer() {
         super(RepoJobEntity)

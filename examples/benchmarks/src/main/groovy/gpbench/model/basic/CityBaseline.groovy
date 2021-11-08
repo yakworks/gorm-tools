@@ -33,8 +33,8 @@ class CityBaseline {
     // static belongsTo = [region: Region, country: Country]
 
     static constraints = {
-        name blank: false, nullable: false
-        shortCode blank: false, nullable: false
+        name nullable: false
+        shortCode nullable: false
         latitude nullable: false, scale: 4, max: 90.00
         longitude nullable: false, scale: 4, max: 380.00
         region nullable: false

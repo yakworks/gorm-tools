@@ -18,6 +18,7 @@ import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
+import yakworks.rally.tag.model.Tag
 import yakworks.rally.testing.MockData
 
 @Integration
@@ -85,6 +86,18 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.source.orgType == OrgType.Customer
         org.source.sourceType == SourceType.App
 
+    }
+
+    void "create with tags"() {
+        when: "Create a test tag"
+        Tag tag1 = Tag.create(code: 'foo')
+        def cust = orgRepo.create([num:"C1", name:"C1", type: 'Customer', tags:[[id:tag1.id]]])
+        flush() //flush to db because the query that gets tags will show 0 if not
+
+        then:
+        tag1
+        cust.tags.size() == 1
+        cust.tags[0].code == 'foo'
     }
 
     def "test create duplicate fail"() {
@@ -227,15 +240,24 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     @Ignore //FIXME whats the scoop with this one?
     def "delete contact with org"() {
         when:
-        def org = Org.get(101)
-        def contact = Contact.get(50)
-        assert org.contact == contact
-        org.remove()  // orgRepo.remove or orgRepo.removeById is not removing either
+        def org = Org.get(9)
+        def contact = Contact.get(9)
+        def contact2 = Contact.findWhere(num: 'secondary9')
 
         then:
-        null == Org.findById(101)
-        null == Contact.get(50)
-        null == Contact.findAllByOrg(org)
+        contact
+        contact2
+        org.contact == contact
+
+        then:
+        org.remove()  // orgRepo.remove or orgRepo.removeById is not removing either
+        flush()
+
+        then:
+        !Org.findById(9)
+        !Contact.get(9)
+        !Contact.findWhere(num: 'secondary9')
+        !Contact.findAllByOrg(org)
     }
 
     def "test create Org different orgType same sourceId"() {

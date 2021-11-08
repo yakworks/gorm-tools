@@ -7,7 +7,9 @@ package yakworks.rally.orgs.repo
 import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
+import org.springframework.validation.Errors
 
+import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityValidationException
@@ -44,18 +46,17 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     OrgMemberService orgMemberService
 
     @RepoListener
-    void beforeValidate(Org org) {
+    void beforeValidate(Org org, Errors errors) {
         if(org.isNew()) {
-            Validate.notNull(org.type, "[org.type]")
-            //Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
+            //register error and exit fast if no orgType
+            if(!validateNotNull(org, 'type', errors)) return
+            // Validate.notNull(org.type, "[org.type]")
+            // Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
             generateId(org)
         }
         wireAssociations(org)
     }
 
-    /**
-     * set up before a bind
-     */
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
@@ -101,6 +102,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         }
         //remove tags
         orgTagRepo.remove(org)
+        //remove contacts
+        contactRepo.removeAll(org)
     }
 
     /**
@@ -121,8 +124,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * called afterBind
      */
     boolean verifyNumAndOrgSource(Org org, Map data){
-        // if no org num then let it fall through and fail validation
-        if(!org.num) return false
+        // if no org num or orgType then let it fall through and fail validation
+        if(!org.num || !org.type) return false
 
         org.source = OrgSource.repo.createSource(org, data)
         org.source.persist()
@@ -162,6 +165,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void doAssociations(Org org, Map data) {
         if(data.locations) persistAssociationData(org, Location.repo, data.locations as List<Map>, "org")
         if(data.contacts) persistAssociationData(org, Contact.repo, data.contacts as List<Map>, "org")
+        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 
     /**
@@ -243,7 +247,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
             String num = data.num as String
             List orgsForNum = orgType ? Org.findAllWhere(num:num, type: orgType) : Org.findAllWhere(num:num)
             if(orgsForNum?.size() == 1) {
-                org = orgsForNum[0]
+                org = (Org)orgsForNum[0]
             } else if (orgsForNum.size() > 1){
                 throw new DataRetrievalFailureException("Multiple Orgs found for num: ${data.num}, lookup key must return a unique Org")
             }

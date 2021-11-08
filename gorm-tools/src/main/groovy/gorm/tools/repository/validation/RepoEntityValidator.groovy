@@ -335,7 +335,7 @@ class RepoEntityValidator extends PersistentEntityValidator {
         String classShortName = Introspector.decapitalize(target.class.simpleName)
         newCodes.add("${target.class.getName()}.${propName}.${code}".toString())
         newCodes.add("${classShortName}.${propName}.${code}".toString())
-        newCodes.add("${code}.${propName}".toString())
+        newCodes.add("${propName}.${code}".toString())
         newCodes.add(code)
 
         ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'codes', newCodes as String[])

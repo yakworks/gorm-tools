@@ -90,7 +90,7 @@ trait RepoEntityErrors<D> {
         if(!errors) errors = target.errors
 
         newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
-        newCodes.add("${simpleName}.${propName}.${code}".toString())
+        newCodes.add("${classShortName}.${propName}.${code}".toString())
         newCodes.add("${propName}.${code}".toString())
         newCodes.add(code)
 

@@ -290,7 +290,8 @@ trait RestRepoApiController<D> extends RestApiController {
     Map getIncludes(){ [:] }
 
     void handleException(Exception e) {
-        Problem apiError = problemHandler.handleException(entityClass, e)
+        assert getEntityClass()
+        Problem apiError = problemHandler.handleException(getEntityClass(), e)
         respond(apiError)
     }
 

@@ -15,7 +15,7 @@ class AddyNested implements RepoEntity<AddyNested> {
     BigDecimal value
 
     static constraints = {
-        name blank: false, nullable: false
+        name nullable: false
         value nullable: true
     }
 }

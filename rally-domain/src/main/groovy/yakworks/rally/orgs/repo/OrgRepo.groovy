@@ -6,6 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.validation.Errors
+
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import yakworks.rally.orgs.model.Company
@@ -18,8 +20,8 @@ class OrgRepo extends AbstractOrgRepo {
 
     // add @Override
     @RepoListener
-    void beforeValidate(Org org) {
-        super.beforeValidate(org)
+    void beforeValidate(Org org, Errors errors) {
+        super.beforeValidate(org, errors)
         verifyCompany(org)
     }
 

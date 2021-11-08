@@ -29,7 +29,7 @@ import yakworks.commons.json.JsonEngine
 class EntityMapService {
 
     //static cheater to get the bean, use sparingly if at all
-    static EntityMapService getBean(){
+    static EntityMapService get(){
         AppCtx.get('entityMapService', this)
     }
 

@@ -19,6 +19,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
@@ -395,7 +396,10 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     /** flush on the datastore's currentSession.*/
     void flush(){
-        getDatastore().currentSession.flush()
+        // only calls flush if we are actively in a trx
+        if(TransactionSynchronizationManager.isSynchronizationActive()) {
+            getDatastore().currentSession.flush()
+        }
     }
 
     /** cache clear on the datastore's currentSession.*/

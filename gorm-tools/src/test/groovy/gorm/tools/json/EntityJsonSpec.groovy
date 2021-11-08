@@ -168,7 +168,7 @@ class JsonifyDom implements RepoEntity<JsonifyDom> {
     }
 
     static constraints = {
-        name        nullable: false, blank: false
+        name        nullable: false
         name2       nullable: true
         isActive    nullable: false
         amount      nullable: false

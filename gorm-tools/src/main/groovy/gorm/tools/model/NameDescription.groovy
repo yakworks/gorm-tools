@@ -18,6 +18,6 @@ trait NameDescription extends NamedEntity {
     ]
 
     static constraintsMap = [
-        description:[ description: 'The description for this entity', nullable: true, maxSize: 255]
+        description:[ d: 'The description for this entity', nullable: true ]
     ]
 }

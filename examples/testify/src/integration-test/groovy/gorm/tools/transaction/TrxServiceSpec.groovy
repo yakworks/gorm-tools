@@ -1,27 +1,26 @@
-package gorm.tools.tramsaction
+package gorm.tools.transaction
 
-import gorm.tools.transaction.TrxService
-import grails.gorm.transactions.Rollback
+
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 
-@Rollback
 @Integration
-class TrxServiceRollbackSpec extends Specification {
+class TrxServiceSpec extends Specification {
 
     TrxService trxService
 
-    void "transaction status is setup"() {
+    void "transaction status is setup correctly"() {
         when:
         def stat = trxService.withTrx { trxStatus ->
             trxStatus.hasTransaction()
             trxStatus.newTransaction
             !trxStatus.readOnly
-            true
+            !trxStatus.isRollbackOnly()
+            trxStatus
         }
 
         then:
-        stat
+        stat.completed
         trxService.transactionManager
         trxService.targetDatastore
     }

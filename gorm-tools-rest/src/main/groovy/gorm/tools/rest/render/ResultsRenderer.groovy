@@ -7,6 +7,9 @@ package gorm.tools.rest.render
 import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.NoSuchMessageException
+
 import gorm.tools.beans.Pager
 import gorm.tools.support.MsgService
 import gorm.tools.support.Results
@@ -21,6 +24,7 @@ import grails.rest.render.RenderContext
 @CompileStatic
 class ResultsRenderer extends JsonGeneratorRenderer<Results>{
 
+    @Autowired
     MsgService msgService
 
     ResultsRenderer() {
@@ -34,15 +38,25 @@ class ResultsRenderer extends JsonGeneratorRenderer<Results>{
         builder.call([
             ok: result.ok,
             code: result.getCode(),
-            message: msgService.getMessage(result),
+            message: getMessage(result),
             success: collectMessages(result.success),
             failed: collectMessages(result.failed)
         ])
     }
 
+    // swallow no such message exception and returns empty string
+    String getMessage(Results result){
+        try {
+            msgService.getMessage(result)
+        }catch(NoSuchMessageException e){
+            //XXX is this what we want to do?
+            return ""
+        }
+    }
+
     List collectMessages(List<Results> results){
         results.collect {
-            [message: msgService.getMessage(it)]
+            [message: getMessage(it)]
         }.findAll{it.message}
     }
 }

@@ -13,6 +13,6 @@ class Foo {
     String name
 
     static constraints = {
-        name blank: false, nullable: false
+        name nullable: false
     }
 }

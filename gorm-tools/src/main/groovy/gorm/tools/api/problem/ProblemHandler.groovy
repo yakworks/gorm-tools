@@ -73,9 +73,8 @@ class ProblemHandler {
             return ValidationProblem.of(status, getMsg(e), detail).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof ValidationException) {
-            // grails has a ValidationException, so does gorm
-            def msg = getMsg(RepoMessage.validationError(entityName))
-            return ValidationProblem.of(status, msg).errors(toFieldErrorList(e.errors))
+            String msg = 'Validation Error'
+            return ValidationProblem.of(status, msg, e.message).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof MessageSourceResolvable) {
             return DefaultProblem.of(status, getMsg(e))

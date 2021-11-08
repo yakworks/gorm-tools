@@ -47,11 +47,6 @@ class Result {
      */
     Problem problem
 
-    // Result addTo(BulkableResults results){
-    //     results.add(this)
-    //     this
-    // }
-
     static Result of(Problem error){
         new Result(ok: false, problem: error, status: error.status)
 

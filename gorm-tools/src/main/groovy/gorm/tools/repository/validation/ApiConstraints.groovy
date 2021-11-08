@@ -25,6 +25,7 @@ import yakworks.commons.map.Maps
 /**
  * A helper to find constraints that can find from yaml and a constraintsMap static block
  * that will also search the trait heirarchy.
+ * PersistableRepoEntity overrides getConstraints and calls ApiConstraints.processConstraints to set this up
  * Adds defaults so that
  * - when nullable:false then blank:false, set blank to true in cases where that is needed
  */

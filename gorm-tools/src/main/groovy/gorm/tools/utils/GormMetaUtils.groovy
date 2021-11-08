@@ -116,6 +116,11 @@ class GormMetaUtils {
         return getMappingContext().mappingFactory?.entityToMapping?.get(pe)
     }
 
+    @CompileDynamic
+    static Map<String, ConstrainedProperty> findConstrainedProperties(Class pe) {
+        findConstrainedProperties(pe.getGormPersistentEntity())
+    }
+
     static Map<String, ConstrainedProperty> findConstrainedProperties(PersistentEntity entity) {
         Validator validator = entity.getMappingContext().getEntityValidator(entity)
         if(validator instanceof ConstrainedEntity) {

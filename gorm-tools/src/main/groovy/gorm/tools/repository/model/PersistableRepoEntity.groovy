@@ -69,16 +69,16 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, 
         ApiConstraints.processConstraints(this, builder)
     }
 
-    static ApiConstraints getApiConstraints(){
-        ApiConstraints.findApiConstraints(this)
-    }
+    // static ApiConstraints getApiConstraints(){
+    //     ApiConstraints.findApiConstraints(this)
+    // }
 
     /**
      * @return The constrained properties for this domain class
      */
-    @CompileDynamic //so it can access getGormPersistentEntity, FIXME look into implementing GormEntity
-    static Map<String, ConstrainedProperty> getConstrainedProperties() {
-        GormMetaUtils.findConstrainedProperties(getGormPersistentEntity())
-    }
+    // @CompileDynamic //so it can access getGormPersistentEntity, FIXME look into implementing GormEntity
+    // static Map<String, ConstrainedProperty> getConstrainedProperties() {
+    //     GormMetaUtils.findConstrainedProperties(getGormPersistentEntity())
+    // }
 
 }

@@ -1,5 +1,6 @@
 package yakworks.rally.orgs
 
+import gorm.tools.utils.GormMetaUtils
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
@@ -39,7 +40,8 @@ class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, S
     void "did it get the audit stamp fields"() {
         when:
         def org = build()
-        def orgProps = Org.constrainedProperties
+
+        Map orgProps = GormMetaUtils.findConstrainedProperties(Org)
 
         then:
         ['createdDate','editedDate','createdBy','editedBy'].each{key->
@@ -64,7 +66,7 @@ class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, S
     void "make sure name overrides happened"() {
         when:
         def org = build()
-        def orgProps = Org.constrainedProperties
+        Map orgProps = GormMetaUtils.findConstrainedProperties(Org)
 
         then:
         orgProps['name'].metaConstraints["description"] == "The full name for this organization"

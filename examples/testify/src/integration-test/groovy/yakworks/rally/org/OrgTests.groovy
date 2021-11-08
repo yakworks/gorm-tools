@@ -220,7 +220,7 @@ class OrgTests extends Specification implements DomainIntTest {
         org.location.city == 'Denver'
     }
 
-    @Ignore //XXX fix so it works here
+    @Ignore //XXX https://github.com/9ci/domain9/issues/493 fix so it works here
     void "test insert with orgmembers"() {
         given:
         orgDimensionService.testInit('Branch.Division.Business')
@@ -387,6 +387,20 @@ class OrgTests extends Specification implements DomainIntTest {
         then:
         org.name == 'new name'
         org.source.sourceId == 'foo'
+    }
+
+    def "create org with member branch lookup by num"() {
+        when:
+        Long orgId = 1111
+
+        Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: 30 ]]]
+        def org = Org.create(params, bindId: true)
+        orgRepo.flush()
+
+        then: "make sure member is created with branch"
+        org.id == orgId
+        org.member
+        30 == org.member.branch.num
     }
 
 }

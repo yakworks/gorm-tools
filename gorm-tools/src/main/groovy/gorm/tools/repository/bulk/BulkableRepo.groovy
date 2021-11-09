@@ -23,10 +23,6 @@ import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
 import gorm.tools.job.RepoSyncJobService
 import gorm.tools.job.SyncJobState
-import gorm.tools.repository.errors.api.ApiError
-import gorm.tools.repository.errors.api.ApiErrorHandler
-import gorm.tools.job.JobState
-import gorm.tools.job.RepoJobService
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.map.Maps
 

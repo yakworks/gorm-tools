@@ -12,9 +12,6 @@ import org.springframework.stereotype.Service
 
 import gorm.tools.job.RepoSyncJobService
 import gorm.tools.job.SyncJobState
-import gorm.tools.json.JsonTools
-import gorm.tools.job.JobState
-import gorm.tools.job.RepoJobService
 import gorm.tools.repository.bulk.BulkableResults
 import yakworks.commons.json.JsonEngine
 import yakworks.commons.lang.Validate

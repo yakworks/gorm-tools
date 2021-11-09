@@ -12,7 +12,6 @@ import spock.lang.Specification
 import yakworks.rally.job.SyncJob
 import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.repo.OrgRepo

@@ -5,8 +5,6 @@ import org.springframework.http.HttpStatus
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobState
-import gorm.tools.json.JsonParserTrait
-import gorm.tools.job.JobState
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
@@ -14,13 +12,7 @@ import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Issue
 import spock.lang.Specification
 import testing.TestRepoSyncJob
-import testing.Nested
-import testing.Project
-import testing.ProjectRepo
 import testing.TestRepoSyncJobService
-import testing.TestRepoJob
-import testing.TestRepoJobService
-import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.SecurityTest
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo

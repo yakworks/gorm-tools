@@ -52,7 +52,7 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
         def res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        Job job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
+        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"

@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.job.RepoJobEntity
+import gorm.tools.job.RepoSyncJobEntity
 import gorm.tools.support.MsgService
 import grails.rest.render.RenderContext
 
@@ -21,17 +21,17 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class RepoJobRenderer extends JsonGeneratorRenderer<RepoJobEntity>{
+class RepoJobRenderer extends JsonGeneratorRenderer<RepoSyncJobEntity>{
 
     @Autowired
     MsgService msgService
 
     RepoJobRenderer() {
-        super(RepoJobEntity)
+        super(RepoSyncJobEntity)
     }
 
     @Override
-    void render(RepoJobEntity job, RenderContext context) {
+    void render(RepoSyncJobEntity job, RenderContext context) {
         setContentType(context)
 
         // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion

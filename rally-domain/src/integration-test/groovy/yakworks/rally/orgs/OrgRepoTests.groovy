@@ -429,6 +429,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.source.sourceId == 'foo'
     }
 
+    @Ignore // xxx https://github.com/9ci/domain9/issues/493
     def "create org with member branch lookup by num"() {
         when:
         Long orgId = 1111

@@ -5,10 +5,6 @@ import groovy.transform.CompileStatic
 import gorm.tools.job.RepoSyncJobEntity
 import gorm.tools.job.RepoSyncJobService
 import gorm.tools.job.SyncJobState
-import gorm.tools.json.Jsonify
-import gorm.tools.job.RepoJobEntity
-import gorm.tools.job.RepoJobService
-import gorm.tools.job.JobState
 import gorm.tools.repository.bulk.BulkableResults
 import yakworks.commons.json.JsonEngine
 import yakworks.commons.lang.Validate
@@ -24,7 +20,7 @@ class TestRepoSyncJobService implements RepoSyncJobService {
         Validate.notNull(payload)
         byte[] reqData = JsonEngine.toJson(payload).bytes
         Map data = [source: source, sourceId: sourceId, state: SyncJobState.Running, requestData: reqData]
-        def job = TestRepoJob.repo.create((Map)data, (Map)[flush:true])
+        def job = TestRepoSyncJob.repo.create((Map)data, (Map)[flush:true])
 
         return job.id
     }

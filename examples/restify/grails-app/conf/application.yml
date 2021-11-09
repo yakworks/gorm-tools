@@ -3,10 +3,6 @@ grails:
   profile: rest-api
   codegen:
     defaultPackage: restify
-  config:
-    locations:
-      - classpath:restapi-config.yml
-
 info:
   app:
     name: '@info.app.name@'
@@ -66,7 +62,7 @@ grails:
 
 hibernate:
   format_sql: false
-  schema_management_tool: 'yakworks.rally.ddl.CustomSchemaManagementTool'
+  schema_management_tool: 'gorm.tools.hibernate.schema.CustomSchemaManagementTool'
   naming_strategy: 'org.hibernate.cfg.DefaultNamingStrategy'
   show_sql: false
   cache:

@@ -51,6 +51,11 @@ import static org.codehaus.groovy.ast.tools.GeneralUtils.sameX
 import static org.codehaus.groovy.ast.tools.GeneralUtils.varX
 import static org.codehaus.groovy.ast.tools.GenericsUtils.makeClassSafe
 
+/**
+ * The AST for identity objects. Used mostly for gorm and hibernate
+ *
+ * @author Joshua Burnett (@basejump)
+ */
 @SuppressWarnings
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
 @CompileStatic

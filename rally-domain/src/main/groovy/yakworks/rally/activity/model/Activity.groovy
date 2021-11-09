@@ -7,8 +7,9 @@ package yakworks.rally.activity.model
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStampTrait
+import gorm.tools.model.NamedEntity
+import gorm.tools.model.SourceTrait
 import gorm.tools.repository.model.GormRepoEntity
-import gorm.tools.source.SourceTrait
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
@@ -22,30 +23,44 @@ import yakworks.rally.tag.model.Taggable
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
+class Activity implements NamedEntity, AuditStampTrait, SourceTrait, GormRepoEntity<Activity, ActivityRepo>, Attachable, Taggable, Serializable {
     // static transients = ['hasAttachments']
+    // XXX Sync changes with database
+    //  - database has a whole bunch of fields that are not needed, like forCustome, templateId, etc...
+    //  - remove title as its just a dup of name
+    //  - rename summary to just name
+    //  - remove arTranId
 
     Kind kind = Kind.Note
-    ActivityNote note
 
     // Org is here to speed up search arTran activities for customer or custAccount -Activity.findAllByOrg(fromOrg.org)
     // If activity is on org level activityLink has org id as well.
     Org org
-    Long parentId //the parent note that this is a comment for.
-    String title // the title of this is a task / the subject for an email. Blank otherwise. I question the need for this
+    //the parent note that this is a comment for.
+    Long parentId
+
     // a 255 char string summary of the activity. Will be the title if its a task and if note it will ends with ... if there is more to the note.
-    String summary //don't set this, it will just get overriden during save
-    Task task //if this note has a todo task that needs to be /or was/ accomplished
-    Attachment template
+    String name
+    //don't set this, it will just get overriden during save
+
+    //if this note has a todo task that needs to be /or was/ accomplished
+    Task task
+
     //the template that was or will be used to generate this note or the todo's email/fax/letter/report,etc..
+    Attachment template
+
+    ActivityNote note
 
     VisibleTo visibleTo = VisibleTo.Everyone
-    Long visibleId //the id of the role that can see this note if visibleTo is Role
 
+    //the id of the role that can see this note if visibleTo is Role
+    Long visibleId
+
+    //
     @CompileDynamic
     static enum Kind {
-        Note, Comment, Promise,
-        Todo(true), Call(true), Meeting(true), Email(true), Fax(true), Parcel(true)
+        Note, Promise,
+        Todo(true), Call(true), Meeting(true), Email(true), Parcel(true)
 
         boolean isTaskKind
 
@@ -61,12 +76,65 @@ class Activity implements AuditStampTrait, SourceTrait, GormRepoEntity<Activity,
     enum VisibleTo { Company, Everyone, Owner, Role }
 
     static mapping = {
+        name column: 'summary' //XXX rename column
         note column: 'noteId'
         org column: 'orgId'
         template column: 'templateId'
         task column: 'taskId'
-        source column: 'sourceEntity'
+        source column: 'sourceEntity' //XXX why are we mapping this like this
     }
+
+    static Map constraintsMap = [
+        contacts: [
+            d: 'The contacts associated with this activity.', validate: false
+        ],
+        kind: [
+            d: 'The type of the activity, certain kinds are only valid for a Task.',
+            nullable: false,
+            default: 'Note',
+            opai: 'CR'
+        ],
+        links: [
+            d: 'The entities this is linked to.',
+            validate: false
+        ],
+        note: [
+            d: 'A note for this activity. Name will be built from this'
+        ],
+        org: [
+            d: 'The Org this activity belongs to',
+            nullable: false
+        ],
+        parentId: [
+            d: 'The parent note that this is a comment for'
+        ],
+        source: [
+            d: ''' The source description for where this activity came from.
+                The gorm domain name of the record that generated this such as CollectionStep, Promise'''
+        ],
+        sourceId: [
+            nullable: true,
+            d: 'The id from the outside source or of the collection step, promise or some future workflow template record that generated this'
+        ],
+        name: [
+            d: 'The short name or a 255 char string summary of the activity, if note it will ends with ... if there is more to the note.',
+            maxSize: 255
+        ],
+        task: [
+            d: 'The task info if this is a task kind'
+        ],
+        template: [
+            d: 'The template that was or will be used to generate this note or the tasks email/fax/letter/report,etc..'
+        ],
+        visibleId: [
+            d: 'The id fo the role or group this is visible to if set to role',
+        ],
+        visibleTo: [
+            d: 'Who can see this activity. Defaults to Everyone',
+            default: 'Everyone',
+            nullable: false
+        ]
+    ]
 
     List<ActivityLink> getLinks() {
         ActivityLink.list(this)

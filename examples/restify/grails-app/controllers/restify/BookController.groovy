@@ -6,22 +6,22 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepositoryApi
+import gorm.tools.rest.controller.RestRepoApiController
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class BookController implements RestRepositoryApi<Book> {
+class BookController implements RestRepoApiController<Book> {
 
     @Override
     def post() {
         try {
-            Map q = parseJson(request)
+            Map q = bodyAsMap()
             String comments = q.comments ?: ""
             q.comments = "$comments - post was here"
             Book instance = getRepo().create(q)
             def entityMap = createEntityMap(instance)
-            respondWithEntityMap(entityMap, [status: CREATED])
+            respond([status: CREATED], entityMap)
             // respond instance, [status: CREATED] //201
         } catch (RuntimeException e) {
             handleException(e)

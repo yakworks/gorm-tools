@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils
 
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
+import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
@@ -25,7 +26,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.services.SecService
-import gorm.tools.source.SourceType
 import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
@@ -42,7 +42,6 @@ import yakworks.rally.activity.model.TaskType
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
-import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.TagLink
 
@@ -68,15 +67,15 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             generateId(activity)
         }
         wireAssociations(activity)
-        updateSummary(activity)
+        updateNameSummary(activity)
     }
 
     @RepoListener
     void beforeBind(Activity activity, Map data, BeforeBindEvent e) {
         fixUpTaskParams(data)
         if (e.isBindUpdate()) {
-            if (activity.note && data.summary) {
-                activity.note.body = data.summary
+            if (activity.note && data.name) {
+                activity.note.body = data.name
                 activity.note.persist()
             }
         }
@@ -131,14 +130,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
         if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
-        // XXX fix this
-        // if(data.contacts) {
-        //     data.contacts.each { it["org"] = activity.org }
-        //     //XXX this is wrong, passing in Contact.repo? wont this create contacts, we dont want that here
-        //     List<Contact> contacts = doAssociation(activity, Contact.repo, data.contacts as List<Map>) as List<Contact>
-        //     contacts.each {new ActivityContact(activity: activity, contact: it).persist()}
-        // }
-
         // now do the links last do events will have the other data
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
@@ -151,19 +142,16 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         if (activity.task && !activity.task.id) activity.task.id = activity.id
     }
 
-    void updateSummary(Activity activity) {
+    void updateNameSummary(Activity activity) {
         //title to 255
-        String title = activity.title
-        if (title?.length() > 255) {
-            activity.title = StringUtils.abbreviate(title, 255)
+        if (activity.name?.length() > 255) {
+            activity.name = StringUtils.abbreviate(activity.name, 255)
         }
 
-        //update Summary
-        if (activity.kind in [ActKind.Note, ActKind.Comment] && activity.note) {
+        //update name
+        if (activity.kind == ActKind.Note && activity.note) {
             int endChar = activity.note.body.trim().length()
-            activity.summary = (endChar > 255) ? activity.note.body.trim().substring(0, 251) + " ..." : activity.note.body.trim()
-        } else if (activity.kind.isTaskKind) {
-            activity.summary = activity.title
+            activity.name = (endChar > 255) ? activity.note.body.trim().substring(0, 251) + " ..." : activity.note.body.trim()
         }
 
     }
@@ -178,13 +166,13 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             activity.kind = ActKind.Todo
         }
 
-        String summary = (data.summary as String)?.trim()
-        if (!activity.note && summary?.length() > 255 ) {
-            addNote(activity, summary)
+        String name = (data.name as String)?.trim()
+        if (!activity.note && name?.length() > 255 ) {
+            addNote(activity, name)
         }
 
-        if (activity.note && !activity.note.body && data.summary) {
-            activity.note.body = data.summary
+        if (activity.note && !activity.note.body && data.name) {
+            activity.note.body = data.name
             //activity.note.persist() Dont save it here, it will be cascaded
         }
 
@@ -214,7 +202,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         Validate.notNull(completedById, "[completedById]")
         task.bind(status: TaskStatus.COMPLETE,
                 state: TaskStatus.COMPLETE.id as Integer,
-                completedDate: new Date(),
+                completedDate: LocalDateTime.now(),
                 completedBy: completedById)
 
     }
@@ -224,16 +212,15 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * @param targets A list of domains which need to have the activity assigned.
      * @param entityName is the class name. Should be the same as target.getClass().getSimpleName()
      * @param org is an Org to which this target is related.  All targets must be related to the same Org.
-     * @param title The title of the activity.
+     * @param body the note body
      */
     @Transactional
-    Activity insertMassNote(List targets, String entityName, Org org, String title, String body, String source = null) {
+    Activity insertMassNote(List targets, String entityName, Org org, String body) {
         Activity activity = new Activity()
         activity.org = org
         addNote(activity, body)
-        updateSummary(activity)
+        updateNameSummary(activity)
 
-        activity.title = title
         activity.source = entityName
         activity.sourceType = SourceType.App
         activity.persist()
@@ -253,7 +240,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * @param activityData The data for new activity. Example below.
      *        <pre>
      *        [
-     *        summary: "The text for note/title/summary"
+     *        name: "The text for note/title/summary"
      *        task: [
      *          dueDate : "2017-04-28",
      *          priority: "10",
@@ -281,8 +268,8 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             attachments = attachmentRepo.createOrUpdate(attachmentData)
             if (targets[0].class.simpleName == "Payment") {
                 attachments.each { Attachment att ->
-                    String summary = activityData?.summary
-                    att.description = summary?.size() > 255 ? summary[0..254] : summary
+                    String name = activityData?.name
+                    att.description = name?.size() > 255 ? name[0..254] : name
                     att.persist()
                 }
             }
@@ -301,7 +288,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
                 if (i != 0 && newAttachments) {
                     copiedAttachments = attachments.collect { attachmentRepo.copy(it as Attachment)}
                 }
-                activity = createActivity(activityData.summary.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
+                activity = createActivity(activityData.name.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
                 createdActivities[org.id as Long] = activity
             }
 
@@ -331,7 +318,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
         Activity activity = new Activity(
             org         : org,
-            title       : text,
+                name: text,
             source      : entityName,
             sourceType: SourceType.App
         )
@@ -341,7 +328,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
             activity.kind = activity.task.taskType.kind
         } else {
             addNote(activity, text)
-            updateSummary(activity)
+            updateNameSummary(activity)
         }
         attachments?.each { attachment ->
             AttachmentLink.create(activity, attachment)
@@ -368,10 +355,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * quick easy way to create a Todo activity
      */
     @Transactional
-    Activity createTodo(Org org, Long userId, String title, String linkedEntity = null,
+    Activity createTodo(Org org, Long userId, String name, String linkedEntity = null,
                         List<Long> linkedIds = null, LocalDateTime dueDate = LocalDateTime.now()) {
 
-        Activity activity = create(org: org, title: title, kind : Activity.Kind.Todo)
+        Activity activity = create(org: org, name: name, kind : Activity.Kind.Todo)
 
         if(linkedIds){
             for(Long linkedId: linkedIds){

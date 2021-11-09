@@ -8,9 +8,7 @@ import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
-import org.springframework.http.HttpStatus
-
-import gorm.tools.repository.errors.api.ApiError
+import gorm.tools.api.Result
 
 /*
 transform example when in a job
@@ -60,68 +58,9 @@ class BulkableResults {
 
     boolean ok = true
     @Delegate List<Result> resultList
-    List<ApiError> globalErrors //These are errors caught during batch flush etc, and can not be identified/associated with a single record
 
     BulkableResults(boolean isSynchronized = true){
         resultList = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
-    }
-
-    @Builder(builderStrategy= SimpleStrategy, prefix="")
-    static class Result {
-        boolean ok = true
-
-        HttpStatus status
-
-        /**
-         * the entity that was created
-         */
-        Object entityObject
-
-        /**
-         * the entity fields for what was created or updated
-         * if it errored then this will be null
-         */
-        Map entityData
-
-        /**
-         * the data the was submitted to process.
-         * will either be one of the items in the list that was sent or the list slice that failed on flush/commit
-         */
-        Object requestData
-
-        /**
-         * On error this is the processed error based on exception type
-         */
-        ApiError error
-
-        Result status(int statusId){
-            this.status = HttpStatus.valueOf(statusId)
-            return this
-        }
-
-        Result addTo(BulkableResults results){
-            results.add(this)
-            this
-        }
-
-        static Result of(ApiError error){
-            new Result(ok: false, error: error, status: error.status)
-
-        }
-
-        static Result of(ApiError error, Object requestData){
-            new Result(ok: false, error: error, requestData: requestData, status: error.status)
-
-        }
-
-        static Result of(Object entity){
-            new Result(entityObject: entity)
-        }
-
-        static Result of(Object entity, int statusId){
-            of(entity).status(statusId)
-        }
-
     }
 
     @Override //changes default list delegate so we can add ok
@@ -147,7 +86,7 @@ class BulkableResults {
         List<Map> ret = []
         boolean ok = true
         for (Result r : resultList) {
-            def map = [ok: r.ok, status: r.status.value()] as Map<String, Object>
+            def map = [ok: r.ok, status: r.status] as Map<String, Object>
             //do the failed
             if (r.ok) {
                 // successful result would have entity, use the includes list to prepare result object
@@ -158,14 +97,14 @@ class BulkableResults {
                 //failed result transforms error and saves requestData
                 map.putAll([
                     data: r.requestData,
-                    title: r.error.title,
-                    detail: r.error.detail,
-                    errors: r.error.errors
+                    title: r.problem.title,
+                    detail: r.problem.detail,
+                    errors: r.problem.errors
                 ])
             }
             //run the customizer closure
             if(customizer) {
-                Map customizerResults = customizer(r as BulkableResults.Result)
+                Map customizerResults = customizer(r as Result)
                 if (customizerResults) map.putAll customizerResults
             }
             ret << map

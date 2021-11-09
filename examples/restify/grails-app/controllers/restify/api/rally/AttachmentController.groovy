@@ -6,16 +6,16 @@ package restify.api.rally
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepositoryApi
+import gorm.tools.rest.controller.RestRepoApiController
 import yakworks.rally.attachment.model.Attachment
 
 @CompileStatic
-class AttachmentController implements RestRepositoryApi<Attachment> {
+class AttachmentController implements RestRepoApiController<Attachment> {
 
     static namespace = 'rally'
 
     def upload() {
-        Map q = parseJson(request)
+        Map q = bodyAsMap()
         Map obj = [name: q.name]
         respond obj
     }

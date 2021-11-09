@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import gorm.tools.job.SyncJobState
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.gorm.transactions.Rollback
+import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
@@ -13,7 +14,9 @@ import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 
-@Rollback
+import static yakworks.commons.json.JsonEngine.parseJson
+
+@Rollback //we do finders
 @Integration
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
     String path = "/api/rally/org/bulk?jobSource=Oracle"
@@ -58,7 +61,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         job.source == "Oracle"
 
         when: "Verify job.data json, this is what come in from the request"
-        List dataList = parseJsonBytes(job.requestData)
+        List dataList = parseJson(job.requestDataToString())
 
         then:
         dataList.size() == 3
@@ -96,8 +99,8 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         job.data != null
 
         when:
-        List json = parseJsonBytes(job.data)
-        List requestData = parseJsonBytes(job.requestData)
+        List json = parseJson(job.dataToString())
+        List requestData = parseJson(job.requestDataToString())
 
         then:
         json != null

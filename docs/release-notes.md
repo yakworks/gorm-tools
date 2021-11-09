@@ -1,3 +1,14 @@
+### v7.0.8-v.37
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.36...v7.0.8-v.37)
+- release [link](https://github.com/yakworks/gorm-tools/commit/54b92bbaf24a0c8ef80609a5eb904a183e1a974b)
+- Rest controller rename exception (#396) [link](https://github.com/yakworks/gorm-tools/commit/0f55a74adb882680cd79a48ea727121e704e6dce)
+- secrole named (#395) [link](https://github.com/yakworks/gorm-tools/commit/1535ad86ffef94dd17d7e9b3bfd53a6680cf021d)
+- refactor so everything is in a common includes map on both domain and config (#394) [link](https://github.com/yakworks/gorm-tools/commit/aa5b3c551db0c709e874a5f142502322533d7373)
+- fix build for gsonviews [link](https://github.com/yakworks/gorm-tools/commit/0e688a30e1b2a668b730a4913360c53dd6d83a43)
+- exclude rally bootstrap.class from jar [link](https://github.com/yakworks/gorm-tools/commit/170b2f93b7095d1ce10656e1188a7d5e2047d33a)
+- Json entitymap (#389) [link](https://github.com/yakworks/gorm-tools/commit/703dc20b289e21716c5bad48f0073ed51c19f2a7)
+
 ### v7.0.8-v.36
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.35...v7.0.8-v.36)

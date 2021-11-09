@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+import gorm.tools.api.Result
+import gorm.tools.api.problem.Problem
+import gorm.tools.api.problem.ProblemHandler
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
@@ -22,11 +25,10 @@ import gorm.tools.job.RepoSyncJobService
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.errors.api.ApiError
 import gorm.tools.repository.errors.api.ApiErrorHandler
+import gorm.tools.job.JobState
+import gorm.tools.job.RepoJobService
 import gorm.tools.repository.model.DataOp
 import yakworks.commons.map.Maps
-
-import static gorm.tools.repository.bulk.BulkableResults.Result
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -50,7 +52,7 @@ trait BulkableRepo<D> {
     EntityMapService entityMapService
 
     @Autowired
-    ApiErrorHandler apiErrorHandler
+    ProblemHandler problemHandler
 
     //Here for @CompileStatic - GormRepo implements these
     abstract D create(Map data, Map args)
@@ -80,8 +82,8 @@ trait BulkableRepo<D> {
         asyncService.supplyAsync(asyncArgs, supplierFunc)
             .whenComplete { BulkableResults results, ex ->
                 if(ex){ //should never really happen
-                    def apiError = apiErrorHandler.handleException(getEntityClass(), ex)
-                    Result.of(apiError, null).addTo(results)
+                    def apiError = problemHandler.handleException(getEntityClass(), ex)
+                    results << Result.of(apiError, null)
                 }
                 finishJob(jobId, results, bulkablArgs.includes)
             }
@@ -90,7 +92,7 @@ trait BulkableRepo<D> {
     }
 
     BulkableResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
-        def results = new BulkableResults()
+        BulkableResults results = new BulkableResults()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
@@ -115,8 +117,8 @@ trait BulkableRepo<D> {
                 } catch(Exception e) {
                     // this is an unexpected errors and should not happen, we should have intercepted them all already
                     log.error(e.message, e)
-                    def apiError = new ApiError(INTERNAL_SERVER_ERROR, "Internal Server Error", e.message)
-                    Result.of(apiError, dataSlice).addTo(results)
+                    Problem apiError = problemHandler.handleException(entityClass, e)
+                    results << Result.of(apiError, dataSlice)
                 }
             }
         }
@@ -151,12 +153,12 @@ trait BulkableRepo<D> {
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                Result.of(entityInstance, isCreate ? 201 : 200).addTo(results)
+                results << Result.of(entityInstance, isCreate ? 201 : 200)
             } catch(Exception e) {
                 // if trx by item then collect the execeptions, otherwise throw so it can rollback
                 if(transactionalItem){
-                    def apiError = apiErrorHandler.handleException(getEntityClass(), e)
-                    Result.of(apiError, item).addTo(results)
+                    def apiError = problemHandler.handleException(getEntityClass(), e)
+                    results << Result.of(apiError, item)
                 } else {
                     throw e
                 }
@@ -196,8 +198,8 @@ trait BulkableRepo<D> {
      */
     List<Map> transformResults(BulkableResults results, List includes){
         // the transform closure will run for each enty in results list
-        List<Map> jsonResults = results.transform(includes){  result ->
-            result = result as BulkableResults.Result //compiler is getting confused on type
+        List<Map> jsonResults = results.transform(includes){ Result result ->
+            result = result as Result //compiler is getting confused on type
             //successful result would have entity, use the includes list to prepare result object
             if(result.ok) {
                 def data = entityMapService.createEntityMap(result.entityObject, includes) as Map<String, Object>

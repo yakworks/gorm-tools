@@ -4,6 +4,9 @@ apply plugin: "yakworks.grails-plugin"
 
 dependencies {
 
+  console "org.grails:grails-console"
+  profile "org.grails.profiles:rest-api"
+
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-tools-security")
 
@@ -15,17 +18,38 @@ dependencies {
     exclude group:"org.grails", module: "grails-gorm-testing-support"
   }
 
+  implementation "org.springframework.boot:spring-boot-starter-logging"
+  implementation "org.springframework.boot:spring-boot-autoconfigure"
+  implementation "org.grails:grails-core"
+  implementation "org.springframework.boot:spring-boot-starter-tomcat"
+
+  implementation "org.grails:grails-web-boot"
+  implementation "org.grails:grails-plugin-services"
+
+  testRuntime "org.grails.plugins:external-config:$vExternalConfig"
+  testRuntime "com.h2database:h2"
+  testRuntime "javax.xml.bind:jaxb-api:2.3.1"
+  testRuntime "com.zaxxer:HikariCP:$vHikari"
+
 }
 
-// XXX for now we exlude the Orgs and force and implementation of them in app until we figure out how to use shadowJar
-// and not have it mess with intellij
+bootRun {
+  ignoreExitValue true
+  jvmArgs(
+    '-Dspring.output.ansi.enabled=always',
+    '-noverify',
+    '-XX:TieredStopAtLevel=1',
+    '-Xmx1024m')
+  sourceResources sourceSets.main
+  String springProfilesActive = 'spring.profiles.active'
+  systemProperty springProfilesActive, System.getProperty(springProfilesActive)
+}
 
-// jar {
-//   exclude('yakworks/rally/orgs/model/Org.class')
-//   exclude('yakworks/rally/orgs/repo/OrgRepo.class')
-//   exclude('yakworks/rally/orgs/repo/OrgRepo$*.class')
-//   exclude('yakworks/rally/orgs/model/Org$*.class') //also the closure ones
-//
+//BootStrap fires for some reason in 4.x so exclude it
+jar {
+  exclude('yakworks/rally/BootStrap.class')
+  exclude('yakworks/rally/BootStrap$*.class')
+}
 
 // sourceSets.main.resources.srcDirs += "src/main/groovy"
 

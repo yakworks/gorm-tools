@@ -39,6 +39,17 @@ trait RepoEntityErrors<D> {
         AppCtx.getCtx()
     }
 
+    /**
+     * validates that the prop is not null and registers error if so
+     */
+    boolean validateNotNull(GormValidateable target, String propName, Errors errors = null){
+        if (target[propName] == null) {
+            rejectNullValue(target, propName, errors)
+            return false
+        }
+        return true
+    }
+
     // shortcut to reject a null value using the ConstrainedProperty defaults
     void rejectNullValue(GormValidateable target, String propName, Errors errors = null) {
         rejectValue(target, errors, propName, null, ConstrainedProperty.NULLABLE_CONSTRAINT, ConstrainedProperty.DEFAULT_NULL_MESSAGE_CODE)
@@ -56,16 +67,31 @@ trait RepoEntityErrors<D> {
     }
 
     //copied in from AbstractConstraint to keep it consistent
+    /**
+     * Build errors message, based on AbstractConstraint to keep it consistent
+     * passing in an errors will keep properties nested. so if target is Info is an association of Org
+     * or Info belongs to Org, then errors would have nested dot notation such as 'info.email' as error.
+     *
+     * @param target - the target object for error, can be nested
+     * @param errors - if part of a chain then this is the parent errors
+     * @param propName - the name of the property on target
+     * @param val - the value that is rejected
+     * @param code - message properties code
+     * @param defaultMessage - default message if any
+     * @param argsOverride - overrides for the arguments that are to be passed into the getMessage
+     */
     void rejectValueWithMessage(GormValidateable target, Errors errors, String propName, Object val, String code,
                                 String defaultMessage = null, Object argsOverride = null){
         def targetClass = target.class
-        if(argsOverride == null) argsOverride = [propName, targetClass, val]
+        String simpleName = targetClass.simpleName
+        String classShortName = Introspector.decapitalize(targetClass.simpleName)
+        if(argsOverride == null) argsOverride = [propName, simpleName, val]
         def newCodes = [] as Set<String>
         if(!errors) errors = target.errors
-        String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
+
         newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
         newCodes.add("${classShortName}.${propName}.${code}".toString())
-        newCodes.add("${code}.${propName}".toString())
+        newCodes.add("${propName}.${code}".toString())
         newCodes.add(code)
 
         FieldError error = new FieldError(

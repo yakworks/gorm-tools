@@ -125,7 +125,7 @@ class EventLogger {
     List<EventLog> getEventList(Map params) {
         Pager pager = new Pager(params)
         Criteria criteria = EventLog.createCriteria()
-        Date searchDate = LocalDateTime.now().minusDays(searchDays).clearTime()
+        def searchDate = LocalDateTime.now().minusDays(searchDays).clearTime()
         List<EventLog> events = criteria.list(max: pager.max, offset: pager.offset) {
             if (searchDays > 0) {
                 gt('createdDate', searchDate)

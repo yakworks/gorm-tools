@@ -8,18 +8,16 @@ dependencies {
   compileOnly "org.codehaus.gpars:gpars:$vGpars"
   implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 
-  // used for bundled Test traits
-  // compileOnly "org.grails:grails-gorm-testing-support"
-  // compileOnly "org.grails.plugins:build-test-data:$vBuildTestData"
-
   //used for json parsing but require it to be added to project that uses this
   compileOnly("org.grails.plugins:views-json:$vViews") {
     //exclude controllers since it messes with the domain compile and map constructor
     exclude group:"org.grails", module: "grails-plugin-controllers"
-    // exclude group:"org.grails", module: "grails-web-databinding"
   }
   compileOnly "org.grails.plugins:views-json-templates:$vViews"
   compileOnly "org.grails:grails-plugin-mimetypes"
+
+  testCompile project(":gorm-test-domain")
+  testCompile project(":gorm-tools-security")
 
   // compileOnly "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1" // needed for groovydoc?
 }

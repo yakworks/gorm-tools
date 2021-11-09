@@ -17,10 +17,8 @@ import org.springframework.validation.Validator
 import org.springframework.validation.annotation.Validated
 
 /**
- * A validator registry that creates validators
- *
- * @author Graeme Rocher
- * @since 6.1
+ * Replaces so that it returns the RepoEntityValidator.
+ * This gets setup in doWithApplicationContext with mappingContext.setValidatorRegistry
  */
 @CompileStatic
 class RepoValidatorRegistry extends JavaxValidatorRegistry {

@@ -8,10 +8,10 @@ package yakworks.rally.tag.model
 import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.model.NameCodeDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.rally.common.NameCodeDescription
 
 @AuditStamp
 @Entity
@@ -34,7 +34,7 @@ class Tag implements NameCodeDescription, RepoEntity<Tag>, Serializable {
         description:[ description: "The description for this tag",
             nullable: true, maxSize: 255],
         name:[ description: "The tag name",
-            nullable: false, blank: false, maxSize: 50, unique: ["entityName"] ],
+            nullable: false, maxSize: 50, unique: ["entityName"] ],
         entityName:[description: "The entity this tag can be applied to. May be a comma sep list of entity names", nullable: true],
     ]
 

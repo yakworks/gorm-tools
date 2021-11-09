@@ -4,6 +4,9 @@
 */
 package yakworks.commons.util
 
+import groovy.transform.CompileStatic
+
+@CompileStatic
 class BuildSupport {
 
     /**

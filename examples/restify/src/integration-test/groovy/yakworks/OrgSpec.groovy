@@ -5,7 +5,6 @@ import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Org
-import yakworks.testify.model.KitchenSink
 
 @Integration
 @Rollback

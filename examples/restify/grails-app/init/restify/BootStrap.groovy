@@ -4,7 +4,7 @@
 */
 package restify
 
-// import yakworks.testify.model.Taskify
+// import yakworks.gorm.testing.model.Taskify
 
 // import restify.domain.OrgType
 // import taskify.Project

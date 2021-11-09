@@ -17,8 +17,8 @@ trait CityTrait3 {
     // Country country3
 
     static constraintsMap = [
-        name3:[ d: 'The full name for this entity', blank: false, nullable: false],
-        shortCode3:[ d: 'The full name for this entity', blank: false, nullable: false],
+        name3:[ d: 'The full name for this entity', nullable: false],
+        shortCode3:[ d: 'The full name for this entity', nullable: false],
         latitude3:[ d: 'The full name for this entity', nullable: false, scale: 4, max: 90.00],
         longitude3:[ d: 'The full name for this entity', nullable: false, scale: 4, max: 380.00],
         state3:[ d: 'The full name for this entity'],

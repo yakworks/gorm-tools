@@ -29,9 +29,6 @@ restApi:
         entityClass: yakworks.rally.orgs.model.Location
       org:
         entityClass: yakworks.rally.orgs.model.Org
-        includes:
-          get: [ '*', 'info.*', 'location.id' ]
-          bulk: ['id', 'num', 'name', 'source.sourceId']
       orgTypeSetup:
         entityClass: yakworks.rally.orgs.model.OrgTypeSetup
       tag:
@@ -39,4 +36,4 @@ restApi:
 
     # no namespace
     kitchen:
-      entityClass: yakworks.testify.model.KitchenSink
+      entityClass: yakworks.gorm.testing.model.KitchenSink

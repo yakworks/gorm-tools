@@ -18,6 +18,7 @@ import org.grails.datastore.mapping.model.types.Association
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
 import grails.plugin.cache.Cacheable
+import yakworks.commons.json.JsonEngine
 
 /**
  * EntityMapService contains a set of helpers, which will create the EntityMap and Lists
@@ -28,7 +29,7 @@ import grails.plugin.cache.Cacheable
 class EntityMapService {
 
     //static cheater to get the bean, use sparingly if at all
-    static EntityMapService getBean(){
+    static EntityMapService get(){
         AppCtx.get('entityMapService', this)
     }
 
@@ -44,9 +45,26 @@ class EntityMapService {
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
-    EntityMap createEntityMap(Object entity, List<String> includes) {
+    EntityMap createEntityMap(Object entity, List<String> includes = null) {
         EntityMapIncludes includesMap = buildIncludesMap(entity.class.name, includes)
         return new EntityMap(entity, includesMap)
+    }
+
+    /**
+     * Calls createEntityMap and then passed to JsonEngine to generate json string
+     *
+     * @param entity the entity to wrap in a map
+     * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
+     * @return the json string
+     */
+    String toJson(Object entity, List<String> includes = null){
+        EntityMap emap = createEntityMap(entity, includes)
+        return JsonEngine.toJson(emap)
+    }
+
+    String toJson(List entityList, List<String> includes = null){
+        EntityMapList elist = createEntityMapList(entityList, includes)
+        return JsonEngine.toJson(elist)
     }
 
     /**
@@ -80,6 +98,12 @@ class EntityMapService {
     }
 
     /**
+     * buildIncludesMap with class
+     */
+    EntityMapIncludes buildIncludesMap(Class entityClazz, List<String> includes = []) {
+        buildIncludesMap(entityClazz.name, includes)
+    }
+    /**
      * builds a EntityMapIncludes object from a sql select like list. Used in EntityMap and EntityMapList
      *
      * @param className the class name of the PersistentEntity
@@ -90,13 +114,18 @@ class EntityMapService {
         includes = includes ?: ['*'] as List<String> //default to * if nothing
         // if(!entityClass && entity) entityClass = entity.class
         PersistentEntity persistentEntity = GormMetaUtils.findPersistentEntity(entityClassName)
-        //assert domain, "$entityClassName did not return a PersistentEntity"
-        List<PersistentProperty> properties = persistentEntity ? GormMetaUtils.getPersistentProperties(persistentEntity) : []
+        List<PersistentProperty> properties = []
+        if(persistentEntity){
+            //in case the short name was passed in make sure its full class name
+            entityClassName = persistentEntity.javaClass.name
+            properties = GormMetaUtils.getPersistentProperties(persistentEntity)
+        }
 
         Set<String> rootProps = [] as Set<String>
         Map<String, Object> nestedProps = [:]
 
         for (String field : includes) {
+            field = field.trim()
             Integer nestedIndex = field.indexOf('.')
             //no index then its just a property or its the *
             if (nestedIndex == -1) {
@@ -134,8 +163,7 @@ class EntityMapService {
         Set blacklist = getBlacklist(persistentEntity)
         def entIncludes = new EntityMapIncludes(entityClassName, rootProps, blacklist)
 
-        //Map<String, Object> propMap = [className: className, props: rootProps]
-        // now cycle through the nested props and recursively call this
+        // now we cycle through the nested props and recursively call this again for each associations includes
         Map<String, EntityMapIncludes> nestedMap = [:]
         for (entry in nestedProps.entrySet()) {
             def prop = entry.key as String

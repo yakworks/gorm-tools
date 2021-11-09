@@ -4,9 +4,13 @@
 */
 package gorm.tools.rest.controller
 
+
 import groovy.transform.CompileStatic
 
-import gorm.tools.json.JsonParserTrait
+import org.springframework.beans.factory.annotation.Autowired
+
+import gorm.tools.api.problem.Problem
+import gorm.tools.api.problem.ProblemHandler
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
@@ -19,7 +23,10 @@ import yakworks.commons.lang.NameUtils
  * see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
  */
 @CompileStatic
-trait RestApiController implements JsonParserTrait, RestResponder, ServletAttributes {
+trait RestApiController implements RequestJsonSupport, RestResponder, ServletAttributes {
+
+    @Autowired
+    ProblemHandler problemHandler
 
     //default responseFormats should be just json
     static List getResponseFormats() {
@@ -33,14 +40,6 @@ trait RestApiController implements JsonParserTrait, RestResponder, ServletAttrib
     String getLogicalControllerName(){
         String logicalName = GrailsNameUtils.getLogicalName(this.class, 'Controller')
         return NameUtils.getPropertyName(logicalName)
-    }
-
-    /**
-     * Deprecated, just calls parseJson(getRequest())
-     * TODO maybe keep this one and have it be the one that merges the json body with params
-     */
-    Map getDataMap() {
-        return parseJson(getRequest())
     }
 
     /**
@@ -62,4 +61,8 @@ trait RestApiController implements JsonParserTrait, RestResponder, ServletAttrib
         ClassUtils.getStaticPropertyValue(this.class.metaClass, 'namespace') as String
     }
 
+    void handleException(Exception e) {
+        Problem apiError = problemHandler.handleException(e)
+        respond(apiError)
+    }
 }

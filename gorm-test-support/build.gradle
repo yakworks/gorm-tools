@@ -6,6 +6,7 @@ dependencies {
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-tools-security")
 
+  compile "org.grails:grails-plugin-controllers"
   //used for bundled Test traits
   compile "org.grails:grails-gorm-testing-support"
   compile "org.grails.plugins:build-test-data:$vBuildTestData"

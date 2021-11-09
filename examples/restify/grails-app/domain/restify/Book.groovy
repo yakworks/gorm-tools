@@ -6,9 +6,9 @@ package restify
 
 import java.time.LocalDate
 
+import gorm.tools.model.NameDescription
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
-import yakworks.rally.common.NameDescription
 
 @GrailsCompileStatic
 class Book implements NameDescription, RepoEntity<Book> {

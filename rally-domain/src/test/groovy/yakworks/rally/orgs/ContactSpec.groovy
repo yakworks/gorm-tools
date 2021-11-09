@@ -176,12 +176,12 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         when:
         Contact contact = createEntity()
         contact.name = "Hello World"
-        Contact updatedContact = Contact.repo.assignUserNameFromContactName(contact) // call method
+        contact.email = "foo@bar.com"
+        Contact.repo.syncChangesToUser(contact) // call method
 
         then:
         contact.name == "Hello World"
         !contact.user
-        !updatedContact.user
     }
 
     def testAssignUserNameFromContactName_hasUser() {
@@ -194,17 +194,17 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         contact.user?.name != contact.name
 
         when:
-        contact.firstName = "John"
+        contact.firstName = "jj"
         contact.lastName = "Galt"
         contact.email = "galt@9ci.com"
         contact.validate()
 
-        Contact result = Contact.repo.assignUserNameFromContactName(contact)
+        Contact.repo.syncChangesToUser(contact)
 
         then:
-        result != null
-        result.user.name == "John Galt"
-        result.name == "John Galt"
+        contact.user.name == "jj Galt"
+        contact.name == "jj Galt"
+        contact.user.email == "galt@9ci.com"
     }
 
     def testCopy() {

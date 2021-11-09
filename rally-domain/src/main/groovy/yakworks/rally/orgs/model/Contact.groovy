@@ -7,13 +7,13 @@ package yakworks.rally.orgs.model
 import java.time.LocalDate
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.model.NameNum
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.security.domain.AppUser
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import yakworks.commons.transform.IdEqualsHashCode
-import yakworks.rally.common.NameNum
 import yakworks.rally.orgs.repo.ContactRepo
 import yakworks.rally.tag.model.Taggable
 
@@ -71,7 +71,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     static constraintsMap = [
         num:[ nullable: true, maxSize: 50],
-        name:[ nullable: false, blank: false, maxSize: 50],
+        name:[ nullable: false, maxSize: 50],
 
         entityName:[ nullable: true],
         inactive:[ nullable: false],
@@ -82,7 +82,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         phone:[ nullable: true],
         email:[ email: true, nullable: true],
 
-        firstName:[ blank: false, nullable: false, maxSize: 50],
+        firstName:[ nullable: false, maxSize: 50],
         middleName:[ nullable: true, maxSize: 50],
         lastName:[ nullable: true, maxSize: 50],
         nickName:[ nullable: true, maxSize: 50],
@@ -108,11 +108,6 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     boolean isUserEnabled() {
         return (user && user.enabled)
-    }
-
-    void concatName() {
-        String fullName = ((firstName ?: "") + ' ' + (lastName ?: "")).trim()
-        name = fullName.size() > 50 ? fullName[0..49] : fullName
     }
 
     /**

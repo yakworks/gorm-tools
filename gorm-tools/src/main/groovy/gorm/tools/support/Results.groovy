@@ -170,12 +170,10 @@ class Results implements MsgSourceResolvable{
         return this
     }
 
-    //Discouraged
-    String getMessage(){
-        //use a var so in future we can get a bit fancier on how we contruct the message
-        MessageSourceResolvable msr = this
-        //
-        return MsgService.get(msr)
-    }
+    // public static MsgService TESTING_MSG_SERVICE //used for testing
+    // //Discouraged
+    // String getMessage(){
+    //     return TESTING_MSG_SERVICE.get((MessageSourceResolvable)this)
+    // }
 
 }

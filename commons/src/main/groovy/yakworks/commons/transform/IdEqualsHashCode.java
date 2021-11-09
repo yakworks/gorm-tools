@@ -13,6 +13,9 @@ import java.lang.annotation.Target;
  * roughtly based on the following
  * https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
  * https://thorben-janssen.com/ultimate-guide-to-implementing-equals-and-hashcode-with-hibernate/
+ *
+ * @author Joshua Burnett (@basejump)
+ *
  */
 @java.lang.annotation.Documented
 @Retention(RetentionPolicy.RUNTIME)

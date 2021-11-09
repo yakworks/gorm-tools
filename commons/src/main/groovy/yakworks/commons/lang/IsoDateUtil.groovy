@@ -116,6 +116,10 @@ class IsoDateUtil {
         return DATE_TIME_FORMAT.get().format(date)
     }
 
+    static String format(LocalDateTime date) {
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(date)
+    }
+
     static String format(LocalDate date, String format = null) {
         DateTimeFormatter formatter = format ? DateTimeFormatter.ofPattern(format) : DateTimeFormatter.ISO_LOCAL_DATE
         return date.format(formatter)

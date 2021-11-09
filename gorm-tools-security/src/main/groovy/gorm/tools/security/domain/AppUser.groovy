@@ -11,6 +11,7 @@ import groovy.transform.CompileDynamic
 import groovy.transform.EqualsAndHashCode
 
 import gorm.tools.audit.AuditStampTrait
+import gorm.tools.model.NamedEntity
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -18,10 +19,12 @@ import grails.persistence.Entity
 @Entity
 @GrailsCompileStatic
 @EqualsAndHashCode(includes='username', useCanEqual=false)
-class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
+class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, Serializable {
 
-    static List qSearchIncludes = ['username', 'name', 'email'] // quick search includes
-    static List picklistIncludes = ['id', 'username', 'name'] //for picklist
+    static Map includes = [
+        qSearch: ['username', 'name', 'email'], // quick search includes
+        picklist: ['id', 'username', 'name']
+    ]
 
     static constraintsMap = [
         username:[ d: '''\
@@ -29,17 +32,17 @@ class AppUser implements AuditStampTrait, GormRepoEntity<AppUser, AppUserRepo>, 
             to mention others in comments or notes. appears in your profile URL. username is used to log in to your account,
             and is visible when sending and receiving. All lowercase and no spaces or special characters.
             ''',
-            blank: false, nullable: false, unique: true, maxSize: 50],
+            nullable: false, unique: true, maxSize: 50],
         name:[ d: "The full name, may come from contact, will default to username if not populated",
-                 blank: false, nullable: false, required: false,  maxSize: 50],
+                 nullable: false, required: false,  maxSize: 50],
         email:[ d: "The email",
-                 nullable: false, blank: false, email: true, unique: true],
+                 nullable: false, email: true, unique: true],
         inactive:[ d: 'True if user is inactive which means they cannot login but are still here for history',
                    editable: false],
         password:[ d: "The pwd", oapi:'CU', password: true],
         roles:[ d: 'The roles assigned to this user', oapi: [read: true, edit: ['id']]],
         passwordHash:[ d: "The pwd hash, internal use only, never show this",
-                 blank: false, nullable: false, maxSize: 60, bindable: false, display:false, password: true],
+                 nullable: false, maxSize: 60, bindable: false, display:false, password: true],
         passwordChangedDate:[ d: "The date password was changed",
                  nullable: true, bindable: false, oapi:'R'],
         passwordExpired:[ d: "The password expired",

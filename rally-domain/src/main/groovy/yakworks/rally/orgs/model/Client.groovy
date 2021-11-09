@@ -5,10 +5,10 @@
 package yakworks.rally.orgs.model
 
 import gorm.tools.audit.AuditStamp
+import gorm.tools.model.NameNum
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import yakworks.rally.common.NameNum
 
 @Entity
 @AuditStamp
@@ -29,7 +29,7 @@ class Client implements NameNum, RepoEntity<Client>, Serializable {
     }
 
     static constraintsMap = [
-        appUrl:[ description: 'The unique url prefix', nullable: false, blank: false, maxSize: 100],
+        appUrl:[ description: 'The unique url prefix', nullable: false, maxSize: 100],
         org:[ description: 'The org this client is tied to', nullable: false]
     ]
 

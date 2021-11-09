@@ -14,7 +14,7 @@ import grails.persistence.Entity
 @GrailsCompileStatic
 class Address implements RepoEntity<Address>{
     String address
-    Nested nested
+    AddyNested nested
 
     static constraints = {
         nested nullable: false

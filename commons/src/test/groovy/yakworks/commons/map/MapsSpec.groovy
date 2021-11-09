@@ -7,7 +7,6 @@ package yakworks.commons.map
 import spock.lang.Specification
 
 class MapsSpec extends Specification {
-    def instance = new Maps()
 
     def "merge a single map should return it self"(){
 
@@ -34,8 +33,11 @@ class MapsSpec extends Specification {
             foo: 'bar',
             baz: 'qux'
         ]
+        def merged = Maps.merge(m0, m1)
+
         then:
-        assertMapsEqual(expected, instance.merge(m0, m1))
+        expected == merged
+        // assertMapsEqual(expected, instance.merge(m0, m1))
     }
 
     void "merge with list" () {
@@ -45,20 +47,21 @@ class MapsSpec extends Specification {
         ]
 
         def m1 = [
+            foo: 'buzz',
             baz: 'qux'
         ]
 
         def expected = [
-            foo: 'bar',
+            foo: 'buzz',
             baz: 'qux'
         ]
 
         def listOfMaps = [m0, m1]
-        def mergedMap = instance.merge(listOfMaps)
+        def mergedMap = Maps.merge(listOfMaps)
 
         then:
         m0.size() == 1
-        m1.size() == 1
+        m1.size() == 2
         mergedMap.size() == 2
         assertMapsEqual(expected, mergedMap)
     }
@@ -76,8 +79,9 @@ class MapsSpec extends Specification {
         def expected = [
             foo: 'baz'
         ]
+
         then:
-        assertMapsEqual(expected, instance.merge(m0, m1))
+        assertMapsEqual(expected, Maps.merge(m0, m1))
     }
 
 
@@ -99,7 +103,7 @@ class MapsSpec extends Specification {
             foo: 'qux'
         ]
         then:
-        assertMapsEqual(expected, instance.merge(m0, m1, m2))
+        assertMapsEqual(expected, Maps.merge(m0, m1, m2))
     }
 
     void testMerge_Two_NestedOneLevel_NoOverwriting () {
@@ -125,7 +129,7 @@ class MapsSpec extends Specification {
             ]
         ]
         then:
-        assertMapsEqual(expected, instance.merge(m0, m1))
+        assertMapsEqual(expected, Maps.merge(m0, m1))
     }
 
 
@@ -155,7 +159,7 @@ class MapsSpec extends Specification {
             ]
         ]
         then:
-        assertMapsEqual(expected, instance.merge(m0, m1))
+        assertMapsEqual(expected, Maps.merge(m0, m1))
     }
 
 
@@ -215,7 +219,7 @@ class MapsSpec extends Specification {
             quiver: 'shatter'
         ]
         then:
-        assertMapsEqual(expected, instance.merge(m0, m1, m2))
+        assertMapsEqual(expected, Maps.merge(m0, m1, m2))
     }
 
 
@@ -237,12 +241,14 @@ class MapsSpec extends Specification {
 
         def expected = [
             foo: [
+                'bar',
+                'baz',
                 'qux',
                 'quux'
             ]
         ]
         then:
-        assertMapsEqual(expected, instance.merge(m0, m1))
+        assertMapsEqual(expected, Maps.merge(m0, m1))
     }
 
     void deepPrune () {
@@ -335,6 +341,10 @@ class MapsSpec extends Specification {
 
         when:
         Map copy = Maps.deepCopy(source)
+        //change source to make sure we are dealing with copy
+        source.nested.num1 = 99
+        source.list.add(9)
+        source.listOfMap[0]['one'] = 99
 
         then:
         !copy.is(source)
@@ -342,19 +352,24 @@ class MapsSpec extends Specification {
         !copy.list.is(source.list)
         !copy.listOfMap[0].is(source.listOfMap[0]) //maps inside list should not have been copied by reference
         copy.listOfMap[0].one == 1
-        assertMapsEqual(source, copy)
+        assertMapsEqual(copy, [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3], listOfMap:[[one:1]]])
     }
 
     void "test deep merge"() {
         given:
         Map m1 = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3]]
-        Map m2 = [num3:3, nested:[num3:3], list:[4]]
+        Map m2 = [num1:9, num3:3, nested:[num1:9, num3:3], list:[4]]
 
         when:
-        Map copy = Maps.deepMerge(m1, m2)
+        Map copy = Maps.merge(m1, m2)
+        //modify to make sure have copy
+        m1.nested.num1 = 99
+        m2.nested.num1 = 99
+        m1.list << 99
+        m2.list << 99
 
         then:
-        assertMapsEqual(copy, [num1:1, num2:2, num3:3, nested:[num1:1, num2:2, num3:3], list:[1,2,3,4]])
+        assertMapsEqual(copy, [num1:9, num2:2, num3:3, nested:[num1:9, num2:2, num3:3], list:[1,2,3,4]])
     }
 
     // A couple rather crude map equality testers.

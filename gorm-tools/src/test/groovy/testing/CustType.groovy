@@ -14,6 +14,6 @@ class CustType implements RepoEntity<CustType> {
     String name
 
     static constraints = {
-        name blank: false, nullable: false
+        name nullable: false
     }
 }

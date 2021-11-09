@@ -19,10 +19,14 @@ import grails.persistence.Entity
 import org.springframework.dao.OptimisticLockingFailureException
 
 import testing.*
+import yakworks.gorm.testing.model.KitchenSink
+import yakworks.gorm.testing.model.SinkExt
+import yakworks.gorm.testing.model.SinkItem
+import yakworks.gorm.testing.model.Thing
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
-    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback, Project, ProjectChild] }
+    List<Class> getDomainClasses() { [Cust, CustExt, TestTrxRollback, KitchenSink, SinkExt, SinkItem] }
 
     def "assert proper repos are setup"() {
         expect:
@@ -30,139 +34,126 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.entityClass == Cust
         Address.repo instanceof DefaultGormRepo
         Address.repo.entityClass == Address
-        Nested.repo instanceof DefaultGormRepo
-        Nested.repo.entityClass == Nested
+        AddyNested.repo instanceof DefaultGormRepo
+        AddyNested.repo.entityClass == AddyNested
     }
 
     def "test get"() {
         setup:
-        Cust org = build(Cust)
+        KitchenSink ks = build(KitchenSink)
 
         when:
-        Cust newOrg = Cust.repo.get(org.id, null)
+        KitchenSink newOrg = KitchenSink.repo.get(ks.id, null)
 
         then:
         null != newOrg
-        org.id == newOrg.id
-        org.name == newOrg.name
+        ks.id == newOrg.id
+        ks.name == newOrg.name
 
         when:
-        newOrg = Cust.repo.get(org.id)
+        newOrg = KitchenSink.repo.get(ks.id)
 
         then:
         null != newOrg
-        org.id == newOrg.id
-        org.name == newOrg.name
+        ks.id == newOrg.id
+        ks.name == newOrg.name
     }
 
     def "test get with version"() {
         when:
-        Cust org = build(Cust)//new Org(name: "get_test_version").save()
+        KitchenSink sink = build(KitchenSink)//new Org(name: "get_test_version").save()
 
         then: "version should be 0"
-        org.version == 0
+        sink.version == 0
 
         when:
-        org.name = "get_test_version_1"
-        org.persist(flush: true)
+        sink.name = "get_test_version_1"
+        sink.persist(flush: true)
 
         then: "version updated"
-        org.version == 1
+        sink.version == 1
 
         when: "test get() with old version"
-        Cust.repo.get(org.id, 0)
+        KitchenSink.repo.get(sink.id, 0)
 
         then:
         thrown(OptimisticLockingFailureException)
 
         when: "test get() with valid version"
-        Cust newOrg = Cust.repo.get(org.id, 1)
+        KitchenSink newOrg = KitchenSink.repo.get(sink.id, 1)
 
         then:
         noExceptionThrown()
         1 == newOrg.version
-        org.id == newOrg.id
+        sink.id == newOrg.id
 
     }
 
     def "test dirty checking works for traits"() {
         when:
-        Cust org = build(Cust)//new Org(name: "get_test_version").save()
-        org.ext  = build(CustExt, save:false)
-        org.ext.org = org
-        org.ext.save(failOnError: true, flush:true)
+        KitchenSink sink = build(KitchenSink)//new Org(name: "get_test_version").save()
+        sink.ext  = build(SinkExt, save:false)
+        sink.ext.kitchenSink = sink
+        sink.ext.save(failOnError: true, flush:true)
         //org.save(failOnError: true, flush:true)
 
         //RepoUtil.flush()
 
         then: "version should be 0"
-        org.version == 1
-        org.ext.version == 0
-        !org.isDirty()
-        !org.isDirty('ext')
+        sink.version == 1
+        sink.ext.version == 0
+        !sink.isDirty()
+        !sink.isDirty('ext')
 
         when: "changes happen to ext"
-        org.ext.text1 = "make dirtysss"
-        org.ext.text2 = "asfasfd"
+        sink.ext.name = "make dirtysss"
+        sink.ext.textMax = "as"
 
         then: "Org and ext is dirty"
         // org.isDirty()
         // org.isDirty('ext')
-        org.ext.getDirtyPropertyNames() == ['text1', 'text2']
-        org.ext.isDirty()
+        sink.ext.getDirtyPropertyNames().containsAll(['name', 'textMax'])
+        sink.ext.isDirty()
         // org.getDirtyPropertyNames() == ['ext']
 
         when: "changes happen to org"
-        RepoUtil.flushAndClear()
-        org = Cust.get(3)
-        assert org.name == 'name'
-        org['name'] = "make dirty1"
-        org.name2 = "make dirty2"
+        flushAndClear()
+        KitchenSink sink2 = KitchenSink.get(sink.id)
+        assert sink2.name == 'name'
+        sink2['name'] = "make dirty1"
+        sink2.name2 = "make dirty2"
         //org.persist(flush: true)
 
         then: "name and name2 should be dirty"
-        org.name == "make dirty1"
-        org.isDirty()
-        org.isDirty('name')
-        org.getDirtyPropertyNames() == ['name','name2']
-        org.getPersistentValue('name') == 'name'
+        sink2.name == "make dirty1"
+        sink2.isDirty()
+        sink2.isDirty('name')
+        sink2.getDirtyPropertyNames() == ['name','name2']
+        sink2.getPersistentValue('name') == 'name'
 
     }
 
     def "test get with non-existent id"() {
         setup:
-        Cust org = build(Cust)
+        KitchenSink sink = build(KitchenSink)
 
         when:
-        Cust.repo.get(Cust.last().id + 1, null)
+        KitchenSink.repo.get(KitchenSink.last().id + 1, null)
 
         then:
         thrown EntityNotFoundException
     }
 
-    def "test create with domain property"() {
-        setup:
-        def type = TestData.build(CustType)
-        Map params = [name: 'foo', type: type]
-
-        when:
-        Cust org = Cust.repo.create(params)
-
-        then:
-        org.name == "foo"
-        org.type
-    }
-
     def "test create without required field"() {
         setup:
-        Map params = [isActive: true, amount: 10.0]
+        Map params = [name: 'foo']
 
         when:
         Cust org = Cust.repo.create(params)
 
         then:
         def e = thrown(EntityValidationException)
-        e.message.contains("Field error in object 'testing.Cust' on field 'name': rejected value [null]")
+        e.message.contains("Field error in object 'testing.Cust' on field 'type': rejected value [null]")
     }
 
     def "test persist"() {
@@ -311,20 +302,20 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     void "test doAssociation"() {
         when:
-        Project p = Project.repo.create(name:"P1", testDate:"2017-01-01", isActive:"false", nested:[name: "Nested", value:"10.0"])
+        def ks = TestData.build(KitchenSink)
 
         then:
-        p != null
+        ks != null
 
         when:
-        List<Map> childs = [[name:"C1"], [name:"C2"]]
-        List<ProjectChild> result = Project.repo.persistAssociationData(p, ProjectChild.repo, childs, 'project')
+        List<Map> items = [[name:"C1"], [name:"C2"]]
+        List<SinkItem> result = KitchenSink.repo.persistAssociationData(ks, SinkItem.repo, items, 'kitchenSink')
 
         then:
         result.size() == 2
-        result[0].project == p
+        result[0].kitchenSink == ks
         result[0].name == "C1"
-        result[1].project == p
+        result[1].kitchenSink == ks
         result[1].name == "C2"
 
     }
@@ -419,7 +410,7 @@ class TestTrxRollback implements RepoEntity<TestTrxRollback> {
     BigDecimal amount
 
     static constraints = {
-        name blank: false, nullable: false
+        name nullable: false
         amount nullable: true
     }
 }
@@ -450,10 +441,4 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
         //throws the exception here to test transaction rollback
         throw new RuntimeException()
     }
-}
-
-@Entity @GrailsCompileStatic
-class ProjectChild implements RepoEntity<ProjectChild>{
-    String name
-    Project project
 }

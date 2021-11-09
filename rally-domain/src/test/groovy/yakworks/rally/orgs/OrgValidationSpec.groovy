@@ -27,7 +27,6 @@ class OrgValidationSpec extends Specification implements DomainRepoTest<Org>, Se
         )
     }
 
-    @IgnoreRest
     void "sanity check validation"() {
         when:
         Org org = Org.create("foo", "bar", OrgType.Customer)

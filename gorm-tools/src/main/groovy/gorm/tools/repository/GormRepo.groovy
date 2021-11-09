@@ -19,6 +19,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
@@ -30,7 +31,6 @@ import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.model.DataOp
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
 
@@ -160,7 +160,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @see #doPersist
      */
     D doUpdate(Map data, Map args) {
-        //FIXME #339 I think we do the lookup logic here, framed sample out sample below
         D entity = findWithData(data)
         bindAndUpdate(entity, data, args)
         return entity
@@ -207,10 +206,18 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
     void bindAndSave(D entity, Map data, BindAction bindAction, Map args){
+        //if data is empty then fire exception
+        RepoUtil.checkData(data, entityClass)
+
+        // throw error if id is passed in but bindId is false
+        if(BindAction.Create == bindAction && data.id){
+            RepoUtil.checkCreateData(data, args,  entityClass)
+            if(args.bindId) entity['id'] = data['id']
+        }
+
         args['bindAction'] = bindAction
         bind(entity, data, bindAction, args)
-        //set the id if it has one in data and bindId arg is passed in as true
-        if(args.remove('bindId') && BindAction.Create == bindAction && data['id']) entity['id'] = data['id']
+
         args['data'] = data
         doPersist(entity, args)
     }
@@ -319,20 +326,15 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     }
 
     /**
-     * a get wrapped in a transaction.
+     * simple call to the gormStaticApi get, not in a trx to avoid overhead
      *
      * @param id required, the id to get
      * @return the retrieved entity
      */
     D get(Serializable id) {
-        entityTrx {
-            doGet(id)
-        }
-    }
-
-    D doGet(Serializable id) {
         (D)gormStaticApi().get(id)
     }
+
 
     /**
      * a read wrapped in a read-only transaction.
@@ -392,12 +394,15 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         gormInstanceApi().datastore
     }
 
-    /** flush on the datastore's currentSession. When possible use the transactionStatus.flush(). see WithTrx trait */
+    /** flush on the datastore's currentSession.*/
     void flush(){
-        getDatastore().currentSession.flush()
+        // only calls flush if we are actively in a trx
+        if(TransactionSynchronizationManager.isSynchronizationActive()) {
+            getDatastore().currentSession.flush()
+        }
     }
 
-    /** cache clear on the datastore's currentSession. When possible use the transactionStatus. see WithTrx trait  */
+    /** cache clear on the datastore's currentSession.*/
     void clear(){
         getDatastore().currentSession.clear()
     }
@@ -443,7 +448,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         clear(status)
     }
 
-    //@CompileDynamic
     void clear(TransactionStatus status) {
         TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
         txObject.sessionHolder.getSession().clear()

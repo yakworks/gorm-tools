@@ -1,5 +1,4 @@
 import yakworks.commons.util.BuildSupport
-import yakworks.rally.ddl.CustomSchemaManagementTool
 
 grails {
     gorm.failOnError = true

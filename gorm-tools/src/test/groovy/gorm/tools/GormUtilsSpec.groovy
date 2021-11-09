@@ -8,6 +8,7 @@ import gorm.tools.utils.GormUtils
 import grails.gorm.annotation.Entity
 import grails.testing.gorm.DataTest
 import spock.lang.Specification
+import yakworks.commons.lang.PropertyTools
 
 class GormUtilsSpec extends Specification implements DataTest {
 
@@ -87,15 +88,15 @@ class GormUtilsSpec extends Specification implements DataTest {
         person2.address.city == person.address.city
     }
 
-    void "test getPropertyValue"() {
+    void "make sure PropertyTools.getProperty works on domains"() {
         setup:
         Address address = new Address(street: 'street1', city: 'city1').save()
         Person person = new Person(name: 'Joey', age: 35, address: address).save()
 
         when:
-        String name = GormUtils.getPropertyValue(person, 'name')
-        int age = GormUtils.getPropertyValue(person, 'age')
-        String street = GormUtils.getPropertyValue(person, 'address.street')
+        String name = PropertyTools.getProperty(person, 'name')
+        int age = PropertyTools.getProperty(person, 'age')
+        String street = PropertyTools.getProperty(person, 'address.street')
 
         then:
         name == person.name

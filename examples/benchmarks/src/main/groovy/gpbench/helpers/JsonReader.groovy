@@ -1,6 +1,5 @@
 package gpbench.helpers
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -8,12 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 
-import gorm.tools.json.JsonParserTrait
 import grails.core.GrailsApplication
+
+import static yakworks.commons.json.JsonEngine.parseJson
 
 @Component
 @CompileStatic
-class JsonReader extends RecordsLoader implements JsonParserTrait {
+class JsonReader extends RecordsLoader {
 
     @Autowired
     GrailsApplication grailsApplication
@@ -27,7 +27,7 @@ class JsonReader extends RecordsLoader implements JsonParserTrait {
         String line
         resource.inputStream.withReader { Reader reader ->
             while (line = reader.readLine()) {
-                Map json = parseJsonText(line) as Map
+                Map json = parseJson(line) as Map
                 results.add json
             }
         }

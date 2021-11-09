@@ -6,16 +6,16 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.rest.controller.RestRepositoryApi
+import gorm.tools.rest.controller.RestRepoApiController
 import yakworks.rally.orgs.model.Location
 
 import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
-class LocationController implements RestRepositoryApi<Location> {
+class LocationController implements RestRepoApiController<Location> {
 
     def post() {
-        Map q = new LinkedHashMap(parseJson(request))
+        Map q = bodyAsMap()
         q.street = q.street == null ? null : "foo street"
         Location instance = getRepo().create(q)
         respond instance, [status: CREATED] //201

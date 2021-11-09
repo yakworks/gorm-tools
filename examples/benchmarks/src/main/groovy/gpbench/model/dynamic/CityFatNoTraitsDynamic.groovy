@@ -54,8 +54,8 @@ class CityFatNoTraitsDynamic implements RepoEntity<CityFatNoTraitsDynamic> {
                          region3: Region, country3: Country ]
 
     static constraints = {
-        name blank: false, nullable: false
-        shortCode blank: false, nullable: false
+        name nullable: false
+        shortCode nullable: false
         latitude nullable: false, scale: 4, max: 90.00
         longitude nullable: false, scale: 4, max: 380.00
         region nullable: false
@@ -63,8 +63,8 @@ class CityFatNoTraitsDynamic implements RepoEntity<CityFatNoTraitsDynamic> {
         state nullable: true
         countryName nullable: true
 
-        name2 blank: false, nullable: false
-        shortCode2 blank: false, nullable: false
+        name2 nullable: false
+        shortCode2 nullable: false
         latitude2 nullable: false, scale: 4, max: 90.00
         longitude2 nullable: false, scale: 4, max: 380.00
         region2 nullable: false
@@ -72,8 +72,8 @@ class CityFatNoTraitsDynamic implements RepoEntity<CityFatNoTraitsDynamic> {
         state2 nullable: true
         countryName2 nullable: true
 
-        name3 blank: false, nullable: false
-        shortCode3 blank: false, nullable: false
+        name3 nullable: false
+        shortCode3 nullable: false
         latitude3 nullable: false, scale: 4, max: 90.00
         longitude3 nullable: false, scale: 4, max: 380.00
         region3 nullable: false

@@ -6,9 +6,14 @@ package yakworks.rally.orgs.model
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.model.IdEnum
+import yakworks.commons.lang.EnumUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.model.IdEnum
 
+/**
+ * OrgType enum for Orgs. Some are implemented as concrete entity classes.
+ * Any concrete class should match the name, for example CustAccount also has a CustAccount class.
+ */
 @CompileStatic
 enum OrgType implements IdEnum<OrgType, Long> {
     Customer(1),
@@ -55,10 +60,16 @@ enum OrgType implements IdEnum<OrgType, Long> {
     }
 
     /**
-     * case insensitive find
+     * getters based on Class
      */
-    static OrgType findByName(String key ){
-        if(!key) return null
-        return values().find { it.name().toLowerCase() == key.toLowerCase()}
+    static OrgType get(Class clazz){
+        EnumUtils.getEnum(OrgType, clazz.simpleName)
+    }
+
+    /**
+     * case insensitive getter, will convert object to string
+     */
+    static OrgType get(Object name){
+        EnumUtils.getEnumIgnoreCase(OrgType, name.toString())
     }
 }

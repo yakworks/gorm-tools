@@ -3,7 +3,6 @@ package gorm.tools.repository
 import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.json.JsonParserTrait
 import gorm.tools.repository.bulk.BulkableArgs
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -11,14 +10,18 @@ import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.rally.job.SyncJob
+import yakworks.commons.json.JsonEngine
+import yakworks.gorm.testing.DomainIntTest
+import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.repo.OrgRepo
-import yakworks.gorm.testing.DomainIntTest
+
+import static yakworks.commons.json.JsonEngine.parseJson
 
 @Integration
 @Rollback
-class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest, JsonParserTrait {
+class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest {
 
     JdbcTemplate jdbcTemplate
     OrgRepo orgRepo
@@ -44,7 +47,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "verify json"
-        List json = parseJsonBytes(job.data)
+        List json = parseJson(job.dataToString())
 
         then:
         json != null
@@ -64,7 +67,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "bulk update"
-        def results = parseJsonBytes(job.data)
+        def results = parseJson(job.dataToString())
         jsonList.eachWithIndex { it, idx ->
             it["id"] = results[idx].data.id
             it["comments"] = "flubber${it.id}"
@@ -102,8 +105,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when:
-        List json = parseJsonBytes(job.data)
-        List requestData = parseJsonBytes(job.requestData)
+        List json = parseJson(job.dataToString())
+        List requestData = parseJson(job.requestDataToString())
 
         then:
         json != null
@@ -124,8 +127,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         and: "data bad contact records which would fail"
         List<Map> jsonList = generateOrgData(20)
-        jsonList[5].contact = [name:"xxxx"]
-        jsonList[15].contact = [name:"xxxx"]
+        jsonList[5].contact = [name:""]
+        jsonList[15].contact = [name:""]
 
         when:
         Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
@@ -136,7 +139,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "verify json"
-        List json = parseJsonBytes(job.data)
+        List json = parseJson(job.dataToString())
 
         then: "job is good"
         json != null
@@ -185,7 +188,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         job.data != null
 
         when: "verify json"
-        List json = parseJsonBytes(job.data)
+        List json = parseJson(job.dataToString())
 
         then:
         json != null

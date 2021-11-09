@@ -36,10 +36,9 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.title == "OrgSource Validation Error(s)"
-
-        // body.errors.find{ it.field == 'link.kind' }.message == 'Property [kind] of class [class yakworks.taskify.domain.Org] cannot be null'
-        // body.errors.find{ it.field == 'link.name' }
+        body.title == "Org Validation Error(s)"
+        body.errors.size() == 1
+        body.errors.find{ it.field == 'type' }
     }
 
     void 'test post errors on org'() {
@@ -63,9 +62,6 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
     }
 
     void "test data access exception on db constraint violation"() {
-        setup:
-        jdbcTemplate.execute("CREATE UNIQUE INDEX org_num_unique ON Org(num)")
-
         when:
         Response resp = post('/api/rally/org', [ name:"Project-1", num:"P1", type: "Customer"])
         Map body = bodyToMap(resp)
@@ -83,10 +79,9 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Data Access Exception"
         ((String)body.detail).contains("ConstraintViolationException")
-        ((String)body.detail).contains("ORG_NUM_UNIQUE")
+        ((String)body.detail).contains("IX_ORGSOURCE_UNIQUE")
 
         delete("/api/rally/org", orgId)
-        jdbcTemplate.execute("DROP index org_num_unique")
     }
 
 }

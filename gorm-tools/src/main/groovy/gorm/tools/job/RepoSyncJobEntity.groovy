@@ -6,9 +6,9 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.model.SourceTrait
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
-import gorm.tools.source.SourceTrait
 
 @CompileStatic
 trait RepoSyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
@@ -23,4 +23,16 @@ trait RepoSyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, Gorm
     //The "data" is a response of resources that were successfully and unsuccessfully updated or created after processing.
     // The data differ depending on the sourceType of the job
     byte[] data
+
+    /**
+     * returns the data byte array as a raw json string.
+     * If no data then returns string repreentation of json empty array which is '[]'
+     */
+    String dataToString(){
+        return getData() ? new String(getData(), "UTF-8") : '[]'
+    }
+
+    String requestDataToString(){
+        return getRequestData() ? new String(getRequestData(), "UTF-8") : '[]'
+    }
 }

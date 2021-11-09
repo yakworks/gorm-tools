@@ -9,10 +9,10 @@ import java.time.LocalDateTime
 import groovy.transform.CompileDynamic
 
 import gorm.tools.audit.AuditStamp
-import gorm.tools.model.IdEnum
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import yakworks.commons.model.IdEnum
 import yakworks.commons.transform.IdEqualsHashCode
 import yakworks.rally.orgs.model.Contact
 

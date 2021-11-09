@@ -7,7 +7,10 @@ package yakworks.rally.orgs.repo
 import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataRetrievalFailureException
+import org.springframework.validation.Errors
 
+import gorm.tools.model.Persistable
+import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.events.AfterBindEvent
@@ -17,9 +20,9 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import gorm.tools.source.SourceType
 import gorm.tools.support.MsgKey
 import yakworks.commons.lang.Validate
+import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
@@ -32,31 +35,28 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
-    //@Inject @Nullable //required false so they dont need to be setup in unit tests
     LocationRepo locationRepo
 
-    //@Inject @Nullable
     ContactRepo contactRepo
 
-    //@Inject @Nullable
     OrgTagRepo orgTagRepo
 
-    //@Inject @Nullable
     OrgSourceRepo orgSourceRepo
 
+    OrgMemberService orgMemberService
+
     @RepoListener
-    void beforeValidate(Org org) {
+    void beforeValidate(Org org, Errors errors) {
         if(org.isNew()) {
-            Validate.notNull(org.type, "[org.type]")
-            //Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
+            //register error and exit fast if no orgType
+            if(!validateNotNull(org, 'type', errors)) return
+            // Validate.notNull(org.type, "[org.type]")
+            // Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
             generateId(org)
         }
         wireAssociations(org)
     }
 
-    /**
-     * set up before a bind
-     */
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
@@ -70,6 +70,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void afterBind(Org org, Map data, AfterBindEvent be) {
         if (be.isBindCreate()) {
             verifyNumAndOrgSource(org, data)
+            if(data.member) orgMemberService.setupMember(org, data.remove('member') as Map)
         }
 
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
@@ -77,6 +78,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         // do contact, support keyContact for legacy and Customers
         def contactData = data.contact ?: data.keyContact
         if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
+
     }
 
     /**
@@ -100,6 +102,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         }
         //remove tags
         orgTagRepo.remove(org)
+        //remove contacts
+        contactRepo.removeAll(org)
     }
 
     /**
@@ -120,8 +124,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * called afterBind
      */
     boolean verifyNumAndOrgSource(Org org, Map data){
-        // if no org num then let it fall through and fail validation
-        if(!org.num) return false
+        // if no org num or orgType then let it fall through and fail validation
+        if(!org.num || !org.type) return false
 
         org.source = OrgSource.repo.createSource(org, data)
         org.source.persist()
@@ -161,6 +165,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void doAssociations(Org org, Map data) {
         if(data.locations) persistAssociationData(org, Location.repo, data.locations as List<Map>, "org")
         if(data.contacts) persistAssociationData(org, Contact.repo, data.contacts as List<Map>, "org")
+        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 
     /**
@@ -170,17 +175,24 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      */
     OrgType getOrgTypeFromData(Map data) {
         if (data.type) {
-            if (data.type instanceof Map) {
-                //its should have an id, use that
-                return OrgType.get((data.type as Map)['id'] as Long)
-            } else if (data.type instanceof OrgType) {
-                //assume its the enum
-                return data.type as OrgType
-            } else if (data.type instanceof String) { //this is only really used during tests but its here if needed
-                return OrgType.valueOf(data.type as String) //must match exactly case sensitive
-            }
+            return coerceOrgType(data.type)
         } else if (data.orgTypeId) {
             return OrgType.get(data.orgTypeId as Long)
+        }
+    }
+
+    OrgType coerceOrgType(Object orgTypeObj) {
+        if(!orgTypeObj) return null
+
+        if (orgTypeObj instanceof Map) {
+            //its should have an id, use that
+            return OrgType.get((orgTypeObj as Map)['id'] as Long)
+        } else if (orgTypeObj instanceof OrgType) {
+            //assume its the enum
+            return orgTypeObj as OrgType
+        } else if (orgTypeObj instanceof String) {
+            //string should only really be used during tests but its here if needed
+            return OrgType.get(orgTypeObj) //must match exactly case sensitive
         }
     }
 
@@ -202,37 +214,45 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * where we have unique num. Search by sourceId is used when there is no org or org.id; for example to assign org on contact
      * @param data (num or source with sourceId and orgType)
      */
+    //XXX this needs its own test
     @Override
     Org lookup(Map data) {
         Org org
+        Long oid
+        //if type is set then coerce to OrgType enum
+        OrgType orgType = coerceOrgType(data.type)
+
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map
-            if(source.orgType) {
-                OrgType orgType = OrgType.findByName(source.orgType as String)
-                Long oid = OrgSource.repo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
+            if(!orgType && source.orgType) {
+                orgType = OrgType.get(source.orgType)
+            }
+
+            if(orgType){
+                oid = OrgSource.repo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
                 if(oid) org = get(oid)
-            } else {
+            }
+            else {
                 // lookup by just sourceId and see if it returns just one
                 List<Long> res = OrgSource.repo.findOrgIdBySourceId(source.sourceId as String)
-                if(res) {
-                    if(res.size() > 1)
-                        throw new DataRetrievalFailureException("Multiple Orgs found for sourceId: ${source.sourceId}, lookup key must return a unique Org")
-
-                    org = get(res[0])
+                if(res?.size() == 1) {
+                    oid = res[0]
+                } else if (res.size() > 1){
+                    throw new DataRetrievalFailureException("Multiple Orgs found for sourceId: ${source.sourceId}, lookup key must return a unique Org")
                 }
             }
+            //TODO change this to load or have it be an argument
+            org = get(oid)
         } else if(data.num)  {
-            List orgsForNum = Org.findAllWhere(num:data.num as String)
-            if(orgsForNum) {
-                if(orgsForNum.size() > 1)
-                    throw new DataRetrievalFailureException("Multiple Orgs found for num: ${data.num}, lookup key must return a unique Org")
-
-                org = orgsForNum[0]
+            String num = data.num as String
+            List orgsForNum = orgType ? Org.findAllWhere(num:num, type: orgType) : Org.findAllWhere(num:num)
+            if(orgsForNum?.size() == 1) {
+                org = (Org)orgsForNum[0]
+            } else if (orgsForNum.size() > 1){
+                throw new DataRetrievalFailureException("Multiple Orgs found for num: ${data.num}, lookup key must return a unique Org")
             }
         }
         return org
-
-
     }
 
 }

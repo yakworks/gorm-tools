@@ -4,11 +4,11 @@
 */
 package gorm.tools.job
 
-import gorm.tools.json.Jsonify
-import gorm.tools.source.SourceType
+import gorm.tools.model.SourceType
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
 import testing.*
+import yakworks.commons.json.JsonEngine
 
 class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestRepoSyncJob> {
 
@@ -31,10 +31,10 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestRepoS
 
     void "convert json to byte array"() {
         setup:
-        def res = Jsonify.render(["One", "Two", "Three"])
+        String res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        TestRepoSyncJob job = new TestRepoSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.jsonText.bytes)
+        TestRepoSyncJob job = new TestRepoSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
@@ -45,8 +45,8 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestRepoS
 
         then:
         j
-        res.jsonText.bytes == j.requestData
-        res.jsonText == new String(j.requestData, 'UTF-8')
+        res.bytes == j.requestData
+        res == new String(j.requestData, 'UTF-8')
 
     }
 

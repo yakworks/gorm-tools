@@ -9,10 +9,7 @@ import org.springframework.mock.web.MockHttpServletRequest
 
 import gorm.tools.beans.domain.BookAuthor
 import gorm.tools.beans.domain.Bookz
-import gorm.tools.beans.domain.EnumThing
 import gorm.tools.beans.domain.PropsToMapTest
-import gorm.tools.beans.domain.TestEnum
-import gorm.tools.beans.domain.TestEnumIdent
 import gorm.tools.testing.unit.DataRepoTest
 import grails.web.servlet.mvc.GrailsParameterMap
 import spock.lang.Ignore
@@ -22,31 +19,9 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         //mockDomain Person
-        mockDomains Bookz, BookAuthor, EnumThing
+        mockDomains Bookz, BookAuthor
     }
 
-    //List<Class> getDomainClasses() { [TestClazzA, TestClazzB, TestClazzC] }
-
-    void "Can get property value for a basic class"() {
-        setup:
-        def obj = new Bookz(
-            name: '1111',
-            cost: -12.52,
-            enumThings: null,
-            stringList: ["1", "test", "foo"],
-            bazMap: ["testKey": 1, "oneMore": 2]
-        )
-        expect:
-        exp == BeanPathTools.getFieldValue(obj, path)
-
-        where:
-        exp                          | path
-        '1111'                       | 'name'
-        -12.52                       | 'cost'
-        null                         | 'enumThings'
-        ["1", "test", "foo"]         | 'stringList'
-        ["testKey": 1, "oneMore": 2] | 'bazMap'
-    }
 
     BookAuthor makeBookAuthor(){
         return new BookAuthor(
@@ -68,25 +43,7 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         )
     }
 
-    void "Can get property value for a class hierarchy"() {
-        setup:
-        def obj = makeBookAuthor()
-
-        expect:
-        exp == BeanPathTools.getFieldValue(obj, path)
-
-        where:
-        exp         | path
-        5           | 'age'
-        'atlas'     | 'book.name'
-        ["foo"]     | 'book.stringList'
-        2           | 'bookAuthor.bookAuthor.age'
-        4           | 'bookAuthor.book.cost'
-        ["test": 1] | 'bookAuthor.book.bazMap'
-        null        | 'bookAuthor.book.enumThings'
-    }
-
-    void "Get properties by path"() {
+    void "propsToMap"() {
         setup:
         def obj = makeBookAuthor()
 
@@ -105,7 +62,6 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         'bookAuthor.book.bad'       | [bookAuthor: [book: [:]]]
         'bookAuthor.book.cost'      | [bookAuthor: [book: [cost: 4]]]
         'bookAuthor.book.*'         | [bookAuthor: [book: [cost: 4, hiddenProp:null, name: 'shrugged', id: 1, version: null, bazMap: [test: 1], stringList: null]]]
-        'bookAuthor.*'              | [bookAuthor: [id: 2, age: 0, version: null]]
     }
 
     @Ignore
@@ -131,29 +87,6 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         'bookAuthor.book.bar'    | [bookAuthor: [book: [cost: 4]]]
         'bookAuthor.book.*'      | [bookAuthor: [book: [cost: 4, name: 'shrugged', id: 1, version: null, bazMap: null, stringList: null]]]
         'bookAuthor.*'             | [bookAuthor: [id: 2, age: 0, version: null]]
-    }
-
-    @Ignore //FIXME
-    void "propsToMap with list and enums"() {
-        setup:
-        def obj = new EnumThing(
-            testEnum: TestEnum.FOO,
-            enumIdent: TestEnumIdent.Num2
-        )
-        obj.id = 1
-
-        expect:
-        Map act = [:]
-        exp == BeanPathTools.propsToMap(obj, path, act)
-        exp == act
-
-        where:
-        path        | exp
-        '*'         | [id: 1, testEnum: 'FOO', version:null, enumIdent: 'Num2']
-        'testEnum'  | [testEnum: 'FOO']
-        'enumIdent' | [enumIdent: 'Num2']
-        'books.*'   | [books: [[id: 1, hiddenProp:null, cost: null, name: 'val 1', version: null, bazMap: null, stringList: null], [id: 1, cost: null, name: 'val 2', version: null, bazMap: null, stringList: null]]]
-
     }
 
     void "test propsToMap for a non domain"() {
@@ -249,54 +182,6 @@ class BeanPathToolsSpec extends Specification implements DataRepoTest {
         fields             | result
         ['name','company'] | [name: 'foo', company: 'Tesla']
         ['*']              | [name: 'foo', cost: 10.00, id: 1, version: null, stringList: ["1", "test", "foo"], bazMap: ["testKey": 1, "oneMore": 2]]
-    }
-
-    @Ignore //FIXME
-    void "test buildMapFromPaths with EnumThing list"() {
-        when:
-        Bookz book = new Bookz(name: 'foo', cost: 10.00)
-        (1..2).each{id ->
-            def et = new EnumThing(
-                testEnum: TestEnum.FOO,
-                enumIdent: TestEnumIdent.Num2
-            )
-            et.id = id
-            book.addToEnumThings(et)
-        }
-        def result = BeanPathTools.buildMapFromPaths(book, ['*', 'enumThings.*'])
-
-        then:
-        result == [
-            id: 1,
-            version: null,
-            name: 'foo',
-            cost: 10.00,
-            bazMap: null,
-            stringList: null,
-            enumThings: [
-                [id: 1, testEnum: 'FOO', version:null, enumIdent: 'Num2'],
-                [id: 2, testEnum: 'FOO', version:null, enumIdent: 'Num2']
-            ]
-        ]
-
-    }
-
-    void "test buildMapFromPaths Enum"() {
-        when:
-        EnumThing et = new EnumThing(
-            testEnum: TestEnum.FOO,
-            enumIdent: TestEnumIdent.Num2
-        )
-        def res = BeanPathTools.buildMapFromPaths(et, ['testEnum', 'enumIdent'] )
-
-        then:
-        res == [testEnum:'FOO', enumIdent:'Num2']
-
-        // result == BeanPathTools.buildMapFromPaths(et, fields)
-
-        // where:
-        // fields                             | result
-        // ['value','testEnum', 'enumIdent']  | [value:9, testEnum:'FOO', enumIdent:'Num2']
     }
 
     void "test buildMapFromPaths with transient"() {

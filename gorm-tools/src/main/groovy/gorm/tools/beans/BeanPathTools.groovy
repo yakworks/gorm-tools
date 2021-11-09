@@ -28,6 +28,7 @@ import yakworks.commons.map.MapFlattener
  *
  * For example, it allows to retrieve object's properties using filters and place them in a map.
  */
+@Deprecated
 @Slf4j
 @CompileStatic
 class BeanPathTools {
@@ -38,36 +39,6 @@ class BeanPathTools {
     private BeanPathTools() {
         throw new AssertionError()
     }
-
-    static Object getFieldValue(Object domain, String field) {
-        GrailsClassUtils.getPropertyOrStaticPropertyOrFieldValue(domain, field)
-    }
-
-    /**
-     * Returns the deepest nested bean
-     */
-    static getNestedBean(Object bean, String path) {
-        int i = path.lastIndexOf(".")
-        if (i > -1) {
-            path = path.substring(0, i)
-            path.split('\\.').each { String it -> bean = bean[it] }
-        }
-        return bean
-    }
-
-//    @CompileDynamic
-//    static List getFields(Object domain) {
-//        List props = []
-//
-//        domain?.class?.properties?.declaredFields.each { field ->
-//            if (!EXCLUDES.contains(field.name) && !field.name.contains("class\$") && !field.name.startsWith("__timeStamp")) {
-//                props.add(field.name)
-//            }
-//        }
-//        props.sort()
-//
-//        return props
-//    }
 
     /**
      * Provides an ability to retrieve object's fields into a map.

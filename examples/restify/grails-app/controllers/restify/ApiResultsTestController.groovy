@@ -6,18 +6,16 @@ package restify
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.api.ApiResults
 import gorm.tools.rest.controller.RestRepoApiController
-import gorm.tools.support.Results
 import yakworks.rally.orgs.model.Org
 
-import static org.springframework.http.HttpStatus.CREATED
-
 @CompileStatic
-class ResultsTestController implements RestRepoApiController<Org> {
+class ApiResultsTestController implements RestRepoApiController<Org> {
 
     @Override
     def get() {
-        respond(Results.OK())
+        respond(ApiResults.OK())
     }
 
 }

@@ -4,26 +4,25 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.gorm.testing.http.RestIntegrationTest
-import yakworks.rally.tag.model.Tag
 
 @Rollback
 @Integration
-class ResultsTestControllerTests extends Specification implements RestIntegrationTest {
+class ApiResultsTestControllerTests extends Specification implements RestIntegrationTest {
 
-    ResultsTestController controller
+    ApiResultsTestController controller
 
     void setup() {
-        controllerName = 'ResultsTestController'
+        controllerName = 'ApiResultsTestController'
     }
 
     void "get"() {
         when:
-        // controller.params.id = 9
         controller.get()
         Map body = response.bodyToMap()
 
         then:
         body.ok == true
+        body.status == 207
         response.status == 200
 
     }

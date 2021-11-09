@@ -1,8 +1,8 @@
 package gorm.tools.support
 
 import gorm.tools.testing.support.GormToolsSpecHelper
-import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
+
 
 class ResultsSpec extends Specification implements GormToolsSpecHelper {
 

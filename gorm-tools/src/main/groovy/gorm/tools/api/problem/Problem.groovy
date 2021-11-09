@@ -6,6 +6,8 @@ package gorm.tools.api.problem
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.api.result.Result
+
 /**
  * This is the base error class.
  * See https://github.com/zalando/problem fro what this is based on.
@@ -39,18 +41,16 @@ import groovy.transform.CompileStatic
  * @since 7.0.8
  */
 @CompileStatic
-trait Problem {
-    int status
-    String title
+trait Problem extends Result {
     String detail
     URI type = URI.create("about:blank")
 
-    //the message properties code
-    String code
-
-    // Optional, additional attributes of the problem. Implementations can choose to ignore this in favor of concrete, typed fields.
-    Map<String, Object> params
+    /**
+     * optional, the request data, params or argument data used for the method/function or process.
+     * for example in a bulk or batch processing scenario will be one of the items in the list that was sent
+     * or the list slice that failed on flush/commit
+     */
+    Object params
 
     List<ProblemFieldError> errors
-
 }

@@ -16,7 +16,7 @@ import org.springframework.context.MessageSourceResolvable
  * @see org.springframework.context.MessageSource#getMessage(MessageSourceResolvable, java.util.Locale)
  */
 @CompileStatic
-trait MsgSourceResolvable implements MessageSourceResolvable{
+trait MsgSourceResolvable implements ToMessageSource, MessageSourceResolvable{
 
     List<String> msgCodes
     List args
@@ -26,9 +26,6 @@ trait MsgSourceResolvable implements MessageSourceResolvable{
      * Sets message params from a map
      * @param msgMap a map that contains keys for code (required), args(optional) and defaultMessage(optional)
      */
-    void setMessage(Map msgMap) {
-        setMessage([msgMap.code as String], msgMap.args as List, msgMap.defaultMessage as String)
-    }
 
     void setMessage(MessageSourceResolvable resolvable) {
         setMessage(resolvable.codes?.toList(), resolvable.arguments?.toList(), resolvable.defaultMessage)
@@ -67,6 +64,11 @@ trait MsgSourceResolvable implements MessageSourceResolvable{
     @Override //MessageSourceResolvable
     Object[] getArguments() {
         return this.args as Object[]
+    }
+
+    //MessageSourceResolvable
+    void setArguments(List args) {
+        this.args = args
     }
 
     Map getMessageMap(){

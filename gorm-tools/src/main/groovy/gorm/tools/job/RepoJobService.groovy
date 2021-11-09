@@ -6,7 +6,7 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.bulk.BulkableResults
+import gorm.tools.api.ApiResults
 
 @CompileStatic
 interface RepoJobService {
@@ -19,7 +19,7 @@ interface RepoJobService {
     /**
      * update a job with state and results
      */
-    void updateJob(Long id, JobState state, BulkableResults results, List<Map> renderResults)
+    void updateJob(Long id, JobState state, ApiResults results, List<Map> renderResults)
 
     RepoJobEntity getJob(Serializable id)
 

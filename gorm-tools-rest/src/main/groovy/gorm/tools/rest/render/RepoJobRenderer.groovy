@@ -5,13 +5,9 @@
 package gorm.tools.rest.render
 
 import groovy.json.JsonOutput
-import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-
 import gorm.tools.job.RepoJobEntity
-import gorm.tools.support.MsgService
 import grails.rest.render.RenderContext
 
 /**
@@ -21,14 +17,7 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class RepoJobRenderer extends JsonGeneratorRenderer<RepoJobEntity>{
-
-    @Autowired
-    MsgService msgService
-
-    RepoJobRenderer() {
-        super(RepoJobEntity)
-    }
+class RepoJobRenderer implements JsonRendererTrait<RepoJobEntity> {
 
     @Override
     void render(RepoJobEntity job, RenderContext context) {
@@ -38,8 +27,7 @@ class RepoJobRenderer extends JsonGeneratorRenderer<RepoJobEntity>{
         String dataString = job.dataToString()
         JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(dataString)
 
-        def builder = new StreamingJsonBuilder(context.writer, jsonGenerator)
-        builder.call(
+        jsonBuilder(context).call(
             id: job.id,
             ok:job.ok,
             state:job.state.name(),

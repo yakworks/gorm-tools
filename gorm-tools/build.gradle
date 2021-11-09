@@ -5,6 +5,8 @@ dependencies {
 
   api project(":commons")
 
+  api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
+
   compileOnly "org.codehaus.gpars:gpars:$vGpars"
   implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 

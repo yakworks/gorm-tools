@@ -15,7 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
-import gorm.tools.api.problem.ProblemHandler
+import gorm.tools.api.ProblemHandler
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.beans.EntityMapService

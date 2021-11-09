@@ -24,7 +24,9 @@ import org.springframework.http.HttpStatus
 @CompileStatic
 class ValidationProblem implements Problem, Serializable {
     //reimplement Problem fields so builder and ann can pick them up, easier to this than to redo builder
-    int status; String title; String detail
+    Integer status; String title; String detail
+
+    final Boolean ok = false
 
     //errors default val empty list
     List<ProblemFieldError> errors = []

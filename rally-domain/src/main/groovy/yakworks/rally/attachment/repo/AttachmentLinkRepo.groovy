@@ -6,10 +6,14 @@ package yakworks.rally.attachment.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
+
+import gorm.tools.api.ProblemHandler
+import gorm.tools.api.ApiResults
+import gorm.tools.api.result.Result
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
-import gorm.tools.support.Results
 import yakworks.rally.attachment.model.Attachable
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
@@ -17,6 +21,9 @@ import yakworks.rally.attachment.model.AttachmentLink
 @GormRepository
 @CompileStatic
 class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attachment> {
+
+    @Autowired(required = false)
+    ProblemHandler problemHandler
 
     AttachmentLinkRepo(){
         super(Attachment, 'attachment')
@@ -61,11 +68,11 @@ class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attach
      *
      * @param fromEntity entity to copy attachments from
      * @param toEntity entity to copy attachments to
-     * @return the Results which will be ok or have errors if problem occured with IO
+     * @return the ApiResults which will be ok or have errors if problem occured with IO
      */
-    //XXX needs good test
-    Results copy(Persistable fromEntity, Persistable toEntity) {
-        Results results = Results.OK
+    //FIXME needs a good test
+    Result copy(Persistable fromEntity, Persistable toEntity) {
+        ApiResults results = ApiResults.OK()
         List attachLinks = queryFor(fromEntity).list()
         for(AttachmentLink attachLink : attachLinks){
             //catch exceptions and move on in case attachment has a bad link we dont want to fail the whole thing
@@ -73,7 +80,7 @@ class AttachmentLinkRepo extends AbstractLinkedEntityRepo<AttachmentLink, Attach
                 Attachment attachmentCopy = Attachment.repo.copy(attachLink.attachment)
                 if (attachmentCopy) create(toEntity, attachmentCopy)
             } catch (ex){
-                results.addFailed(ex)
+                results << problemHandler.handleException(ex)
             }
         }
         return results

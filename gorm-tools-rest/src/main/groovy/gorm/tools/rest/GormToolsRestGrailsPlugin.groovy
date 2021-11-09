@@ -11,11 +11,11 @@ import org.grails.core.artefact.DomainClassArtefactHandler
 
 import gorm.tools.openapi.GormToSchema
 import gorm.tools.openapi.OpenApiGenerator
+import gorm.tools.rest.render.ApiResultsRenderer
 import gorm.tools.rest.render.JsonGeneratorRenderer
 import gorm.tools.rest.render.PagerRenderer
 import gorm.tools.rest.render.ProblemRenderer
 import gorm.tools.rest.render.RepoJobRenderer
-import gorm.tools.rest.render.ResultsRenderer
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
@@ -39,9 +39,9 @@ class GormToolsRestGrailsPlugin extends Plugin {
 
             //renderers
             mapJsonRenderer(JsonGeneratorRenderer, Map)
+            apiResultsRenderer(ApiResultsRenderer)
             problemRenderer(ProblemRenderer)
             pagerRenderer(PagerRenderer)
-            resultsRenderer(ResultsRenderer)
             repoJobRenderer(RepoJobRenderer)
 
             gormToSchema(GormToSchema) { bean ->

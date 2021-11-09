@@ -18,11 +18,7 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class ProblemRenderer extends JsonGeneratorRenderer<Problem>{
-
-    ProblemRenderer() {
-        super(Problem)
-    }
+class ProblemRenderer implements JsonRendererTrait<Problem> {
 
     @Override
     void render(Problem problem, RenderContext context) {

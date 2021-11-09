@@ -99,6 +99,18 @@ class MsgService {
     }
 
     /**
+     * If no message found then this one swallows the NoSuchMessageException
+     * and returns an empty string
+     */
+    String getMessageSafe(MessageSourceResolvable resolvable){
+        try {
+            getMessage(resolvable)
+        }catch(NoSuchMessageException e){
+            return ''
+        }
+    }
+
+    /**
      * AVOID, static cheater if in static context where we can't inject service
      */
     static MsgService get() {

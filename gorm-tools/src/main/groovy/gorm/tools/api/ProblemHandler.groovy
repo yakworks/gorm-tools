@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api.problem
+package gorm.tools.api
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -15,7 +15,10 @@ import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
-import gorm.tools.repository.RepoMessage
+import gorm.tools.api.problem.ApiProblem
+import gorm.tools.api.problem.Problem
+import gorm.tools.api.problem.ProblemFieldError
+import gorm.tools.api.problem.ValidationProblem
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
@@ -62,7 +65,7 @@ class ProblemHandler {
         HttpStatus status = UNPROCESSABLE_ENTITY
 
         if (e instanceof EntityNotFoundException) {
-            return DefaultProblem.of(NOT_FOUND, getMsg(e))
+            return ApiProblem.of(NOT_FOUND, getMsg(e))
         }
         else if (e instanceof EntityValidationException) {
             String detail
@@ -77,19 +80,19 @@ class ProblemHandler {
             return ValidationProblem.of(status, msg, e.message).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof MessageSourceResolvable) {
-            return DefaultProblem.of(status, getMsg(e))
+            return ApiProblem.of(status, getMsg(e))
         }
         else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return DefaultProblem.of(status, "Illegal Argument", e.message)
+            return ApiProblem.of(status, "Illegal Argument", e.message)
         }
         else if (e instanceof DataAccessException) {
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            return DefaultProblem.of(status, "Data Access Exception", e.message)
+            return ApiProblem.of(status, "Data Access Exception", e.message)
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return DefaultProblem.of(INTERNAL_SERVER_ERROR).detail(e.message)
+            return ApiProblem.of(INTERNAL_SERVER_ERROR).detail(e.message)
         }
     }
 
@@ -105,7 +108,7 @@ class ProblemHandler {
     List<ProblemFieldError> toFieldErrorList(Errors errs) {
         List<ProblemFieldError> errors = []
         for(ObjectError err : errs.allErrors) {
-            ProblemFieldError fieldError = new ProblemFieldError(getMsg(err))
+            ProblemFieldError fieldError = ProblemFieldError.of(err.code, getMsg(err))
             if(err instanceof FieldError) fieldError.field = err.field
             errors << fieldError
         }

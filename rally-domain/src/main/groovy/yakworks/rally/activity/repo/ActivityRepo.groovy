@@ -13,6 +13,9 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
+import gorm.tools.api.ProblemHandler
+import gorm.tools.api.ApiResults
+import gorm.tools.api.result.Result
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
@@ -26,7 +29,6 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.services.SecService
-import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
@@ -60,6 +62,9 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     @Inject @Nullable
     SecService secService
+
+    @Inject @Nullable
+    ProblemHandler problemHandler
 
     @RepoListener
     void beforeValidate(Activity activity) {
@@ -489,9 +494,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * Copies all activities from given org to target org
      */
     @Transactional
-    Results copyToOrg(Org fromOrg, Org toOrg) {
+    Result copyToOrg(Org fromOrg, Org toOrg) {
+        ApiResults results = ApiResults.OK()
         List<Activity> activities = Activity.findAllWhere(org: fromOrg)
-        List<Results> errorResults = [] as List<Results>
+
         activities.each { Activity activity ->
             try {
                 Activity copy = copy(activity, new Activity(org: toOrg))
@@ -500,10 +506,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
                     Activity.executeUpdate("update Activity act set act.editedDate=:edDate, act.createdDate=:crDate where act.id=:newid ", queryParams)
                 }
             } catch (EntityValidationException e) {
-                errorResults << Results.error("failed", ["Copy attachment"], e).id(activity.id)
+                results << problemHandler.handleException(e)
             }
         }
-        return errorResults ? Results.of(errorResults) : Results.OK()
+        return results
 
     }
 

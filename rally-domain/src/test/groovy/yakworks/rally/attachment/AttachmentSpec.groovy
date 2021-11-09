@@ -175,26 +175,6 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
 
     }
 
-    @Ignore
-    def "test create file in creditFile"() {
-        byte[] bytes = "A test string".bytes
-        Map params = [name:"test", extension:"jpg", bytes:bytes, isCreditFile: true]
-
-        when:
-        Attachment entity = attachmentRepo.create(params)
-        File attachedFile = appResourceLoader.getFile(entity.location)
-
-        then:
-        entity != null
-        entity instanceof Attachment
-        entity.name == "test"
-        entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
-        attachedFile.absolutePath.startsWith appResourceLoader.getLocation("attachments.creditFiles.location").absolutePath
-
-        cleanup:
-        attachedFile.delete()
-    }
-
     void testDeleteFileIfInsert_fail() {
         when:
         Path tempFile = createTempFile('grails_logo.jpg')

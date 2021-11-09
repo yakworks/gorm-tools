@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
+import gorm.tools.api.ApiResults
 import gorm.tools.job.JobState
 import gorm.tools.job.RepoJobService
-import gorm.tools.repository.bulk.BulkableResults
 import yakworks.commons.json.JsonEngine
 import yakworks.commons.lang.Validate
 
@@ -36,7 +36,7 @@ class DefaultRepoJobService implements RepoJobService {
     }
 
     @Override
-    void updateJob(Long id, JobState state, BulkableResults results, List<Map> renderResults) {
+    void updateJob(Long id, JobState state, ApiResults results, List<Map> renderResults) {
         byte[] resultBytes = JsonEngine.toJson(renderResults).bytes
         Map data = [id:id, ok: results.ok, data: resultBytes, state: state]
         jobRepo.update((Map)data, (Map)[flush: true])

@@ -13,6 +13,11 @@ import groovy.transform.TupleConstructor
 @TupleConstructor
 @CompileStatic
 class ProblemFieldError implements Serializable {
+    String code
     String message
     String field
+
+    static ProblemFieldError of(String code, String message) {
+        new ProblemFieldError(code, message)
+    }
 }

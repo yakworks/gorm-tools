@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.job.RepoJobEntity
 import gorm.tools.job.RepoJobService
 import gorm.tools.job.JobState
-import gorm.tools.repository.bulk.BulkableResults
+import gorm.tools.api.ApiResults
 import yakworks.commons.json.JsonEngine
 import yakworks.commons.lang.Validate
 
@@ -25,7 +25,7 @@ class TestRepoJobService implements RepoJobService {
     }
 
     @Override
-    void updateJob(Long id, JobState state, BulkableResults results, List<Map> renderResults) {
+    void updateJob(Long id, JobState state, ApiResults results, List<Map> renderResults) {
         byte[] resultBytes = JsonEngine.toJson(renderResults).bytes
         Map data = [id:id, ok: results.ok, data: resultBytes, state: state]
         TestRepoJob.repo.update((Map)data, (Map)[flush: true])

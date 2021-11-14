@@ -1,8 +1,7 @@
 package yakworks.api.problem;
 
 import org.junit.jupiter.api.Test;
-import yakworks.api.problem.Problem;
-import yakworks.api.problem.Status;
+import yakworks.api.HttpStatus;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -14,20 +13,20 @@ final class ProblemStaticFactoryTest {
 
     @Test
     void shouldCreateGenericProblem() {
-        final Problem problem = Problem.valueOf(Status.NOT_FOUND);
+        final Problem problem = Problem.of(HttpStatus.NOT_FOUND);
 
         assertThat(problem, hasFeature("type", Problem::getType, hasToString("about:blank")));
         assertThat(problem, hasFeature("title", Problem::getTitle, equalTo("Not Found")));
-        assertThat(problem, hasFeature("status", Problem::getStatus, equalTo(Status.NOT_FOUND)));
+        assertThat(problem, hasFeature("status", Problem::getStatus, equalTo(HttpStatus.NOT_FOUND)));
     }
 
     @Test
     void shouldCreateGenericProblemWithDetail() {
-        final Problem problem = Problem.valueOf(Status.NOT_FOUND, "Order 123");
+        final Problem problem = Problem.of(HttpStatus.NOT_FOUND, "Order 123");
 
         assertThat(problem, hasFeature("type", Problem::getType, hasToString("about:blank")));
         assertThat(problem, hasFeature("title", Problem::getTitle, equalTo("Not Found")));
-        assertThat(problem, hasFeature("status", Problem::getStatus, equalTo(Status.NOT_FOUND)));
+        assertThat(problem, hasFeature("status", Problem::getStatus, equalTo(HttpStatus.NOT_FOUND)));
         assertThat(problem, hasFeature("detail", Problem::getDetail, is("Order 123")));
     }
 

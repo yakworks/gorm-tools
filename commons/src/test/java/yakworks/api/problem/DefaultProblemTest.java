@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.hasEntry;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
 
-import static yakworks.api.problem.Status.BAD_REQUEST;
+import static yakworks.api.HttpStatus.BAD_REQUEST;
 
 @SuppressWarnings("ConstantConditions")
 final class DefaultProblemTest {

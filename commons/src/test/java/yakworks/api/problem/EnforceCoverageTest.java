@@ -1,14 +1,12 @@
 package yakworks.api.problem;
 
 import org.junit.jupiter.api.Test;
-import yakworks.api.problem.Exceptional;
-import yakworks.api.problem.StatusType;
-import yakworks.api.problem.ThrowableProblem;
+import yakworks.api.ApiStatus;
 
 import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static yakworks.api.problem.Status.BAD_REQUEST;
+import static yakworks.api.HttpStatus.BAD_REQUEST;
 
 class EnforceCoverageTest {
 
@@ -32,7 +30,7 @@ class EnforceCoverageTest {
         }
 
         @Override
-        public StatusType getStatus() {
+        public ApiStatus getStatus() {
             return BAD_REQUEST;
         }
 

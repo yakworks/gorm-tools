@@ -13,7 +13,7 @@ import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
-import static yakworks.api.problem.Status.NOT_FOUND;
+import static yakworks.api.HttpStatus.NOT_FOUND;
 
 final class ProblemTest {
 
@@ -29,13 +29,6 @@ final class ProblemTest {
         final Problem problem = new EmptyProblem();
 
         assertThat(problem, hasFeature("title", Problem::getTitle, is(nullValue())));
-    }
-
-    @Test
-    void shouldUseDefaultStatus() {
-        final Problem problem = new EmptyProblem();
-
-        assertThat(problem, hasFeature("status", Problem::getStatus, is(nullValue())));
     }
 
     @Test
@@ -88,7 +81,7 @@ final class ProblemTest {
     @Test
     void shouldRenderStatus() {
         final Problem problem = Problem.builder().status(NOT_FOUND).build();
-        assertThat(problem, hasToString("about:blank{404}"));
+        assertThat(problem, hasToString("about:blank{404, Not Found}"));
     }
 
     @Test
@@ -99,13 +92,13 @@ final class ProblemTest {
 
     @Test
     void shouldRenderInstance() {
-        final Problem problem = Problem.valueOf(NOT_FOUND, URI.create("https://example.org/"));
+        final Problem problem = Problem.of(NOT_FOUND, URI.create("https://example.org/"));
         assertThat(problem, hasToString("about:blank{404, Not Found, instance=https://example.org/}"));
     }
 
     @Test
     void shouldRenderFully() {
-        final Problem problem = Problem.valueOf(NOT_FOUND, "Order 123", URI.create("https://example.org/"));
+        final Problem problem = Problem.of(NOT_FOUND, "Order 123", URI.create("https://example.org/"));
         assertThat(problem, hasToString("about:blank{404, Not Found, Order 123, instance=https://example.org/}"));
     }
 
@@ -146,7 +139,7 @@ final class ProblemTest {
         final StringWriter writer = new StringWriter();
         problem.printStackTrace(new PrintWriter(writer));
 
-        assertThat(writer, hasToString(containsString("https://example.org/problem{404, foo=bar}")));
+        assertThat(writer, hasToString(containsString("https://example.org/problem{404, Not Found, foo=bar}")));
     }
 
 }

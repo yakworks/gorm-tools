@@ -1,5 +1,7 @@
 package yakworks.api.problem;
 
+import yakworks.api.ApiStatus;
+
 import javax.annotation.Nullable;
 
 import java.net.URI;
@@ -12,7 +14,7 @@ public abstract class AbstractThrowableProblem extends ThrowableProblem {
 
     private final URI type;
     private final String title;
-    private final StatusType status;
+    private final ApiStatus status;
     private final String detail;
     private final URI instance;
     private final Map<String, Object> parameters;
@@ -35,14 +37,14 @@ public abstract class AbstractThrowableProblem extends ThrowableProblem {
     protected AbstractThrowableProblem(
             @Nullable final URI type,
             @Nullable final String title,
-            @Nullable final StatusType status) {
+            @Nullable final ApiStatus status) {
         this(type, title, status, null);
     }
 
     protected AbstractThrowableProblem(
             @Nullable final URI type,
             @Nullable final String title,
-            @Nullable final StatusType status,
+            @Nullable final ApiStatus status,
             @Nullable final String detail) {
         this(type, title, status, detail, null);
     }
@@ -50,7 +52,7 @@ public abstract class AbstractThrowableProblem extends ThrowableProblem {
     protected AbstractThrowableProblem(
             @Nullable final URI type,
             @Nullable final String title,
-            @Nullable final StatusType status,
+            @Nullable final ApiStatus status,
             @Nullable final String detail,
             @Nullable final URI instance) {
         this(type, title, status, detail, instance, null);
@@ -59,7 +61,7 @@ public abstract class AbstractThrowableProblem extends ThrowableProblem {
     protected AbstractThrowableProblem(
             @Nullable final URI type,
             @Nullable final String title,
-            @Nullable final StatusType status,
+            @Nullable final ApiStatus status,
             @Nullable final String detail,
             @Nullable final URI instance,
             @Nullable final ThrowableProblem cause) {
@@ -69,7 +71,7 @@ public abstract class AbstractThrowableProblem extends ThrowableProblem {
     protected AbstractThrowableProblem(
             @Nullable final URI type,
             @Nullable final String title,
-            @Nullable final StatusType status,
+            @Nullable final ApiStatus status,
             @Nullable final String detail,
             @Nullable final URI instance,
             @Nullable final ThrowableProblem cause,
@@ -94,7 +96,7 @@ public abstract class AbstractThrowableProblem extends ThrowableProblem {
     }
 
     @Override
-    public StatusType getStatus() {
+    public ApiStatus getStatus() {
         return status;
     }
 

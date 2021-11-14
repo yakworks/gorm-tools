@@ -281,4 +281,8 @@ public enum HttpStatus implements CharSequence, ApiStatus {
     public CharSequence subSequence(int start, int end) {
         return name().subSequence(start, end);
     }
+
+    public String toString() {
+        return getCode() + ": " + getReason();
+    }
 }

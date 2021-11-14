@@ -1,11 +1,10 @@
 package yakworks.api.problem;
 
-import yakworks.api.problem.StatusType;
-import yakworks.api.problem.ThrowableProblem;
+import yakworks.api.ApiStatus;
 
 import java.net.URI;
 
-import static yakworks.api.problem.Status.BAD_REQUEST;
+import static yakworks.api.HttpStatus.BAD_REQUEST;
 
 public final class OutOfStockProblem extends ThrowableProblem {
 
@@ -29,7 +28,7 @@ public final class OutOfStockProblem extends ThrowableProblem {
     }
 
     @Override
-    public StatusType getStatus() {
+    public ApiStatus getStatus() {
         return BAD_REQUEST;
     }
 

@@ -5,7 +5,6 @@
 package yakworks.api;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * Simple OkResult with a Map as the data object

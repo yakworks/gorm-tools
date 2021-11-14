@@ -1,5 +1,7 @@
 package yakworks.api.problem;
 
+import yakworks.api.ApiStatus;
+
 import javax.annotation.Nullable;
 
 import java.net.URI;
@@ -10,7 +12,7 @@ public final class DefaultProblem extends AbstractThrowableProblem {
     // TODO needed for jackson
     DefaultProblem(@Nullable final URI type,
             @Nullable final String title,
-            @Nullable final StatusType status,
+            @Nullable final ApiStatus status,
             @Nullable final String detail,
             @Nullable final URI instance,
             @Nullable final ThrowableProblem cause) {
@@ -19,7 +21,7 @@ public final class DefaultProblem extends AbstractThrowableProblem {
 
     DefaultProblem(@Nullable final URI type,
             @Nullable final String title,
-            @Nullable final StatusType status,
+            @Nullable final ApiStatus status,
             @Nullable final String detail,
             @Nullable final URI instance,
             @Nullable final ThrowableProblem cause,

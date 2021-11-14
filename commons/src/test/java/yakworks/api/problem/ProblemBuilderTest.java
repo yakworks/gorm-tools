@@ -14,7 +14,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static yakworks.api.problem.Status.BAD_REQUEST;
+import static yakworks.api.HttpStatus.BAD_REQUEST;
 
 class ProblemBuilderTest {
 

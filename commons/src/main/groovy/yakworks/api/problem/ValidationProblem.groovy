@@ -15,7 +15,7 @@ import yakworks.api.ApiStatus
  * @since 7.0.8
  */
 @CompileStatic
-class ValidationProblem implements ProblemTrait<ValidationProblem, Object>, Serializable {
+class ValidationProblem implements ProblemTrait<ValidationProblem>, Serializable {
 
     static ValidationProblem of(int statusId){
         new ValidationProblem().status(statusId)

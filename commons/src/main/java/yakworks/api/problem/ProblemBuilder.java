@@ -1,5 +1,7 @@
 package yakworks.api.problem;
 
+import yakworks.api.ApiStatus;
+
 import javax.annotation.Nullable;
 
 import java.net.URI;
@@ -17,7 +19,7 @@ public final class ProblemBuilder {
 
     private URI type;
     private String title;
-    private StatusType status;
+    private ApiStatus status;
     private String detail;
     private URI instance;
     private ThrowableProblem cause;
@@ -40,8 +42,9 @@ public final class ProblemBuilder {
         return this;
     }
 
-    public ProblemBuilder status(@Nullable final StatusType status) {
+    public ProblemBuilder status(@Nullable final ApiStatus status) {
         this.status = status;
+        if(this.title == null) this.title = status.getReason();
         return this;
     }
 

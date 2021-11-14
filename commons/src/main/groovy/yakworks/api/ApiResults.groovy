@@ -13,7 +13,7 @@ import yakworks.api.problem.ProblemBase
  * The data in this case is a List of result/problem instances
  */
 @CompileStatic
-class ApiResults extends AbstractResult<ApiResults, List<Result>> implements Serializable {
+class ApiResults extends AbstractResult<ApiResults> implements Serializable {
     Boolean ok = true
     ApiStatus status = HttpStatus.MULTI_STATUS
 

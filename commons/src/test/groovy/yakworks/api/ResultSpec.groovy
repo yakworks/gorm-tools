@@ -14,10 +14,10 @@ class ResultSpec extends Specification {
         def okRes = Result.OK()
 
         then:
-        okRes.status == 200
+        okRes.status.code == 200
         okRes.title('foo').title == 'foo'
-        okRes.code('bar').args([key1:'go']).code == 'bar'
-        okRes.args == [key1:'go']
+        okRes.msg('bar', [key1:'go']).code == 'bar'
+        okRes.msg.args == [key1:'go']
     }
 
     // def "simple creation"(){

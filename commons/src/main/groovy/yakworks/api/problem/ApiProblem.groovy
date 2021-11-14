@@ -25,10 +25,6 @@ class ApiProblem implements ProblemTrait<ApiProblem> {
         new ApiProblem(status: status)
     }
 
-    // static ApiProblem of(HttpStatus httpStatus){
-    //     new ApiProblem(status: httpStatus.value(), title: httpStatus.reasonPhrase)
-    // }
-    //
     static ApiProblem of(Integer statusId, String title, String detail = null){
         new ApiProblem(title: title, detail: detail).status(statusId)
     }

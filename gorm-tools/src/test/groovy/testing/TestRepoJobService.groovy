@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.job.RepoJobEntity
 import gorm.tools.job.RepoJobService
 import gorm.tools.job.JobState
-import gorm.tools.api.ApiResults
+import yakworks.api.ApiResults
 import yakworks.commons.json.JsonEngine
 import yakworks.commons.lang.Validate
 

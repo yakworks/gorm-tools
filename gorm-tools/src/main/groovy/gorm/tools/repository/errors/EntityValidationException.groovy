@@ -9,8 +9,8 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.validation.ValidationException
 import org.springframework.validation.Errors
 
-import gorm.tools.support.MsgKey
 import gorm.tools.support.MsgSourceResolvable
+import gorm.tools.support.SpringMsgKey
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source
@@ -30,20 +30,20 @@ class EntityValidationException extends ValidationException implements MsgSource
         this(msg, new EmptyErrors("empty"), cause)
     }
 
-    EntityValidationException(String msg, Errors e) {
-        this(msg, e, null)
+    EntityValidationException(String msg, Errors errors) {
+        this(msg, errors, null)
     }
 
     EntityValidationException(String msg, Errors e, Throwable cause) {
-        this(new MsgKey([], null, msg), null, e, cause)
+        this(new SpringMsgKey([], null, msg), null, e, cause)
     }
 
     EntityValidationException(String code, List arguments, Throwable cause = null) {
-        this(new MsgKey(code, arguments, defMsg), null, null, null)
+        this(new SpringMsgKey(code, arguments, defMsg), null, null, null)
     }
 
     EntityValidationException(String code, Object entity) {
-        this(new MsgKey(code, [entity.class.simpleName], defMsg), entity, null, null)
+        this(new SpringMsgKey(code, [entity.class.simpleName], defMsg), entity, null, null)
     }
 
     EntityValidationException(MsgSourceResolvable msgKey, Throwable cause = null) {

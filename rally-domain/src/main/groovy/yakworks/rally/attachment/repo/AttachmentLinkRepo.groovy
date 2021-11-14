@@ -8,9 +8,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 
+import yakworks.api.ApiResults
 import gorm.tools.api.ProblemHandler
-import gorm.tools.api.ApiResults
-import gorm.tools.api.result.Result
+import yakworks.api.Result
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo

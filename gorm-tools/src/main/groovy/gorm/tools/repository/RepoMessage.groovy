@@ -7,13 +7,8 @@ package gorm.tools.repository
 
 import groovy.transform.CompileStatic
 
-import org.grails.web.servlet.mvc.GrailsWebRequest
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.web.servlet.support.RequestContextUtils
-
-import gorm.tools.support.MsgKey
 import gorm.tools.support.MsgSourceResolvable
+import gorm.tools.support.SpringMsgKey
 import yakworks.commons.lang.NameUtils
 
 /**
@@ -27,21 +22,21 @@ class RepoMessage {
 
     static MsgSourceResolvable validationError(Object entity) {
         String entityName = entity.class.simpleName
-        return new MsgKey("validation.error", [entityName], "$entityName validation errors")
+        return new SpringMsgKey("validation.error", [entityName], "$entityName validation errors")
     }
 
     static MsgSourceResolvable validationError(String entityName) {
-        return new MsgKey("validation.error", [entityName], "$entityName validation errors")
+        return new SpringMsgKey("validation.error", [entityName], "$entityName validation errors")
     }
 
     static MsgSourceResolvable notSaved(Object entity) {
         String entityName = entity.class.simpleName
-        return new MsgKey("persist.error", [entityName], "$entityName save failed")
+        return new SpringMsgKey("persist.error", [entityName], "$entityName save failed")
     }
 
     static MsgSourceResolvable notFoundId(Class entityClass, Serializable id) {
         String entityName = entityClass.simpleName
-        return new MsgKey("default.not.found.message", [entityName, id], "${entityName} not found for id:${id}")
+        return new SpringMsgKey("default.not.found.message", [entityName, id], "${entityName} not found for id:${id}")
     }
 
     // @CompileDynamic
@@ -54,12 +49,12 @@ class RepoMessage {
 
     static MsgSourceResolvable notDeleted(Object entity, Serializable ident) {
         String entityName = entity.class.simpleName
-        return new MsgKey('default.not.deleted.message', [entityName, ident], "${entityName} with id ${ident} could not be deleted")
+        return new SpringMsgKey('default.not.deleted.message', [entityName, ident], "${entityName} with id ${ident} could not be deleted")
     }
 
     static MsgSourceResolvable optimisticLockingFailure(Object entity) {
         String entityName = entity.class.simpleName
-        return new MsgKey("default.optimistic.locking.failure", [entityName], "Another user has updated the ${entityName} while you were editing")
+        return new SpringMsgKey("default.optimistic.locking.failure", [entityName], "Another user has updated the ${entityName} while you were editing")
     }
 
     // static String resolveDomainLabel(Object entity) {

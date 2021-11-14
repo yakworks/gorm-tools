@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.testing.support.ExternalConfigAwareSpec
 import gorm.tools.testing.support.GormToolsSpecHelper
-import gorm.tools.testing.support.JsonViewSpecSetup
 import grails.buildtestdata.BuildDataTest
 import grails.testing.spring.AutowiredTest
 
@@ -21,7 +20,7 @@ import grails.testing.spring.AutowiredTest
  * @since 6.1
  */
 @CompileStatic
-trait DataRepoTest implements JsonViewSpecSetup, GormToolsSpecHelper, BuildDataTest, AutowiredTest, ExternalConfigAwareSpec {
+trait DataRepoTest implements GormToolsSpecHelper, BuildDataTest, AutowiredTest, ExternalConfigAwareSpec {
 
     void mockDomains(Class<?>... domainClassesToMock) {
         BuildDataTest.super.mockDomains(domainClassesToMock)

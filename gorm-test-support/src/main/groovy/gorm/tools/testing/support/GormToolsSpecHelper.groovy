@@ -34,6 +34,8 @@ import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
+import yakworks.i18n.icu.DefaultICUMessageSource
+import yakworks.i18n.icu.GrailsICUMessageSource
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
@@ -86,6 +88,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         entityMapService(EntityMapService)
         msgService(MsgService)
         problemHandler(ProblemHandler)
+        messageSource(GrailsICUMessageSource)
     }}
 
     /**

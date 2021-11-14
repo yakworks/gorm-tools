@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
-import gorm.tools.api.problem.Problem
+import yakworks.api.problem.Problem
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
@@ -33,7 +33,6 @@ import grails.web.Action
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS
 import static org.springframework.http.HttpStatus.NO_CONTENT
-import static org.springframework.http.HttpStatus.OK
 
 /**
  * This is the CRUD controller for entities

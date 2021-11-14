@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.http.HttpStatus
 
-import gorm.tools.api.problem.Problem
+import yakworks.api.problem.Problem
 import grails.rest.render.RenderContext
 
 /**

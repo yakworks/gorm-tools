@@ -13,9 +13,9 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
+import yakworks.api.ApiResults
 import gorm.tools.api.ProblemHandler
-import gorm.tools.api.ApiResults
-import gorm.tools.api.result.Result
+import yakworks.api.Result
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType

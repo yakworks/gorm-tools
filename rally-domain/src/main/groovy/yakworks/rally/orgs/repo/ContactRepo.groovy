@@ -15,7 +15,7 @@ import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.security.domain.AppUser
-import gorm.tools.support.MsgKey
+import gorm.tools.support.SpringMsgKey
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.model.ActivityContact
@@ -42,16 +42,16 @@ class ContactRepo implements GormRepo<Contact> {
     void beforeRemove(Contact contact, BeforeRemoveEvent e) {
         AppUser user = contact.user
         if (user) {
-            def msgKey = new MsgKey("delete.error.reference", ['Contact', contact.name, 'User'], "contact delete error")
+            def msgKey = new SpringMsgKey("delete.error.reference", ['Contact', contact.name, 'User'], "contact delete error")
             throw new EntityValidationException(msgKey, contact)
         }
         if (Org.query(contact: contact).count()) {
-            def msgKey = new MsgKey("contact.not.deleted.iskey", [contact.name], "contact delete error")
+            def msgKey = new SpringMsgKey("contact.not.deleted.iskey", [contact.name], "contact delete error")
             throw new EntityValidationException(msgKey, contact)
         }
 
         if (ActivityContact.repo.count(contact)) {
-            def msgKey = new MsgKey("delete.error.reference",  ['Contact', contact.name, 'Activity'], "contact delete error")
+            def msgKey = new SpringMsgKey("delete.error.reference",  ['Contact', contact.name, 'Activity'], "contact delete error")
             throw new EntityValidationException(msgKey, contact)
         }
 

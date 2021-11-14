@@ -20,8 +20,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import gorm.tools.support.MsgKey
-import yakworks.commons.lang.Validate
+import gorm.tools.support.SpringMsgKey
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -97,7 +96,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     @RepoListener
     void beforeRemove(Org org, BeforeRemoveEvent e) {
         if (org.source?.sourceType == SourceType.ERP) { //might be more in future
-            def msgKey = new MsgKey("delete.error.source.external", ["Org ${org.name}", SourceType.ERP], "Org delete error")
+            def msgKey = new SpringMsgKey("delete.error.source.external", ["Org ${org.name}", SourceType.ERP], "Org delete error")
             throw new EntityValidationException(msgKey, org)
         }
         //remove tags

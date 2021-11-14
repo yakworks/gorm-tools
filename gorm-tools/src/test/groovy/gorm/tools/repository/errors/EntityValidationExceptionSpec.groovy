@@ -4,7 +4,7 @@
 */
 package gorm.tools.repository.errors
 
-import gorm.tools.support.MsgKey
+import gorm.tools.support.SpringMsgKey
 import spock.lang.Specification
 
 class EntityValidationExceptionSpec extends Specification {
@@ -23,7 +23,7 @@ class EntityValidationExceptionSpec extends Specification {
     void testNoErrors() {
         setup:
         Map entity = [someEntity: "go cubs"]
-        def msgKey = MsgKey.of('vtest', 'defmsg')
+        def msgKey = SpringMsgKey.of('vtest', 'defmsg')
 
         when:
         def e = new EntityValidationException(msgKey, entity)

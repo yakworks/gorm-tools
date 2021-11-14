@@ -8,10 +8,12 @@ dependencies {
   api "org.codehaus.groovy:groovy-datetime:$groovyVersion"
   api "org.codehaus.groovy:groovy-templates:$groovyVersion"
   api "org.codehaus.groovy:groovy-json:$groovyVersion"
-
   // compileOnly "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+
   //libs
   // implementation "commons-io:commons-io:$vCommonsIO"
+  api "org.yakworks:i18n:0.3.0-SNAPSHOT"
+
   // jasper uses itext 2.1.7 which uses bouncy 138, so until we sort that out we keep it stuck at this version
   // used only in commons password stuff
   compileOnly "bouncycastle:bcprov-jdk14:138"

@@ -16,7 +16,6 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.testing.support.GormToolsSpecHelper
-import gorm.tools.testing.support.JsonViewSpecSetup
 import gorm.tools.testing.support.MockJdbcIdGenerator
 import grails.buildtestdata.TestDataBuilder
 import grails.test.hibernate.HibernateSpec
@@ -31,7 +30,7 @@ import grails.testing.spring.AutowiredTest
  * @since 6.1
  */
 @CompileDynamic
-abstract class GormToolsHibernateSpec extends HibernateSpec implements AutowiredTest, JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
+abstract class GormToolsHibernateSpec extends HibernateSpec implements AutowiredTest, TestDataBuilder, GormToolsSpecHelper {
 
     //@OnceBefore
     void setupSpec() {

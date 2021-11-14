@@ -4,18 +4,20 @@ dependencies {
   console "org.grails:grails-console"
 
   api project(":commons")
-
   api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
+  api "org.yakworks:grails-icu4j:0.3.0-SNAPSHOT"
 
+  implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
   compileOnly "org.codehaus.gpars:gpars:$vGpars"
+
   implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 
   //used for json parsing but require it to be added to project that uses this
-  compileOnly("org.grails.plugins:views-json:$vViews") {
-    //exclude controllers since it messes with the domain compile and map constructor
-    exclude group:"org.grails", module: "grails-plugin-controllers"
-  }
-  compileOnly "org.grails.plugins:views-json-templates:$vViews"
+  // compileOnly("org.grails.plugins:views-json:$vViews") {
+  //   //exclude controllers since it messes with the domain compile and map constructor
+  //   exclude group:"org.grails", module: "grails-plugin-controllers"
+  // }
+  // compileOnly "org.grails.plugins:views-json-templates:$vViews"
   compileOnly "org.grails:grails-plugin-mimetypes"
 
   testCompile project(":gorm-test-domain")

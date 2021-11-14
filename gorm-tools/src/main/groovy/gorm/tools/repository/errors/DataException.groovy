@@ -6,11 +6,10 @@ package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
 
-import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 
-import gorm.tools.support.MsgKey
 import gorm.tools.support.MsgSourceResolvable
+import gorm.tools.support.SpringMsgKey
 
 /**
  * an extension of the DataRetrievalFailureException that is more performant. fillInStackTrace is overriden to show nothing
@@ -30,7 +29,7 @@ class DataException extends InvalidDataAccessResourceUsageException implements M
     DataException(String code, Class entityClass) {
         super(code)
         setMessage(
-            MsgKey.of(code, [entityClass.simpleName])
+            SpringMsgKey.of(code, [entityClass.simpleName])
         )
     }
 

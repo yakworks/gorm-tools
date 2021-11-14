@@ -12,8 +12,8 @@ import groovy.util.logging.Slf4j
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import gorm.tools.api.ApiResults
-import gorm.tools.api.result.Result
+import yakworks.api.ApiResults
+import yakworks.api.Result
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
 import yakworks.rally.activity.repo.ActivityRepo
@@ -47,7 +47,6 @@ class OrgCopier {
      */
     @Transactional
     Result copy(Org fromOrg, Org toOrg) {
-        ApiResults results = ApiResults.OK()
 
         GormUtils.copyDomain(toOrg, fromOrg)
         toOrg.type = fromOrg.type
@@ -71,6 +70,8 @@ class OrgCopier {
 
         orgTagRepo.copyToOrg(fromOrg, toOrg)
 
+        ApiResults results = ApiResults.OK()
+        //these return problems but dont throw errors so rollback doesn't happen if an attachment is bad
         results.merge attachmentLinkRepo.copy(fromOrg, toOrg)
 
         results.merge activityRepo.copyToOrg(fromOrg, toOrg)

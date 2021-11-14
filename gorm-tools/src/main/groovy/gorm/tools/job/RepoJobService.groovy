@@ -6,7 +6,7 @@ package gorm.tools.job
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.api.ApiResults
+import yakworks.api.ApiResults
 
 @CompileStatic
 interface RepoJobService {

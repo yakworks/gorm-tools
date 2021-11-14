@@ -17,15 +17,15 @@ trait ToMessageSource {
 
     MessageSourceResolvable toMessageSource() {
         if(MessageSourceResolvable.isAssignableFrom(this.class)){
-            return MsgKey.of(this as MessageSourceResolvable)
+            return SpringMsgKey.of(this as MessageSourceResolvable)
         }
         //pull it from the keys
         Map props = this.properties
         if(props.code) {
             def args = props.msgArgs?:props.arguments
-            return MsgKey.of(props.code as String, args as List, props.defaultMessage as String)
+            return SpringMsgKey.of(props.code as String, args as List, props.defaultMessage as String)
         } else if(props.defaultMessage) {
-            return MsgKey.ofDefault(props.defaultMessage as String)
+            return SpringMsgKey.ofDefault(props.defaultMessage as String)
         }
     }
 

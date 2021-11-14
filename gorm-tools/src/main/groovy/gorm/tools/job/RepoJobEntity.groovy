@@ -10,6 +10,43 @@ import gorm.tools.model.SourceTrait
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.model.PersistableRepoEntity
 
+/*
+transform example when in a job
+{
+  "id": 123, // jobId
+  "status": 200, //201 created?, do we send back a 400 if its ok:false? also a 207 Multi-Status options maybe?
+  "ok": false
+  "state": "finished", //from job
+  "errors": [
+     {
+        "title": "XXX constraint violation",
+        "detail" "Data Access Exception"
+        }
+   ],
+  "data": [
+    {
+      "ok": true,
+      "status": 201, //created
+      "data": {
+        "id": 356312,
+        "num": "78987",
+        "sourceId": "JOANNA75764-US123"
+      }
+    },
+    {
+      "ok": false,
+      "status": 422, //validation
+      "title": "Org Validation Error"
+      "errors": [ { "field": "num", "message": "num can't be null" } ]
+      "data": {
+        "sourceId": "JOANNA75764-US123" ...
+     },
+
+    },
+  ]
+}
+ */
+
 @CompileStatic
 trait RepoJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
 

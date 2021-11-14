@@ -117,7 +117,7 @@ class  RepoUtil {
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {
-            throw new DataException('data.empty.error', entityClass)
+            throw new DataException('error.data.empty', entityClass)
         }
     }
 
@@ -125,7 +125,7 @@ class  RepoUtil {
      * in create data, if id is passed then bindId must be set to true, if not throw exception
      */
     static void checkCreateData(Map data, Map args, Class entityClass) {
-        if(data['id'] && !args.bindId) throw new DataException('data.create.bindId.error', entityClass)
+        if(data['id'] && !args.bindId) throw new DataException('error.data.bindId', entityClass)
     }
 
     /**

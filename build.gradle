@@ -8,7 +8,6 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
-    classpath "org.grails.plugins:views-gradle:$vViews"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
     classpath "io.github.gradle-nexus:publish-plugin:$vMavenNexus"
   }
@@ -60,10 +59,12 @@ subprojects { subprj ->
     //   groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
     // }
     tasks.withType(GroovyCompile) {
-        configure(groovyOptions) {
-            // sets the path to sys properties so we can use it find grails-app/conf during AST
-            forkOptions.jvmArgs = ['-Xmx1524m', '-XX:+UseSerialGC', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
-        }
+      options.debug = true
+      configure(groovyOptions) {
+        verbose = true
+        // sets the path to sys properties so we can use it find grails-app/conf during AST
+        forkOptions.jvmArgs = ['-Xmx1524m', '-XX:+UseSerialGC', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+      }
     }
   }
 
@@ -111,7 +112,7 @@ subprojects { subprj ->
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"
       testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
-      testCompile "org.grails:views-json-testing-support:$vViews"
+      // testCompile "org.grails:views-json-testing-support:$vViews"
       testCompile "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
       testCompile "com.fasterxml.jackson.core:jackson-databind:2.9.10"
 

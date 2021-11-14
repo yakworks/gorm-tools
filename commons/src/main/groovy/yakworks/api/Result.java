@@ -2,11 +2,9 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api.result
+package yakworks.api;
 
-import groovy.transform.CompileStatic
-
-import gorm.tools.support.ToMessageSource
+import yakworks.i18n.MsgKey;
 
 /**
  * This is the base result trait for problems and results
@@ -22,42 +20,63 @@ import gorm.tools.support.ToMessageSource
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-@CompileStatic
-trait Result extends ToMessageSource {
+
+public interface Result<D> extends MsgKey {
 
     /**
      * the result message key or code
      */
-    String code
+    @Override
+    default String getCode() {
+        return null;
+    }
+    // Result<D> code(Object v);
 
     /**
      * A short, human-readable summary of the result type. It SHOULD NOT change from occurrence to occurrence of the
      * result, except for purposes of localization (e.g., using proactive content negotiation; see [RFC7231], Section 3.4).
      * in which case code can be used for lookup and the localization with message.properties
      */
-    String title
+    default String getTitle() {
+        return null;
+    }
+    // Result<D> title(Object v);
 
     /**
      * status code, normally an HttpStatus.value()
      */
-    Integer status
+    default Integer getStatus() {
+        return null;
+    }
+
+    // Result<D> params(Map v);
 
     /**
      * the response object or result of the method/function or process
      * Implementations might choose to ignore this in favor of concrete, typed fields.
      * Or this is generated from the target
      */
-    Object data
+    default D getData() { return null; }
 
     /**
      * Optional the return value or entity. Kind of like the value that Optional wraps.
      * internal in that its transient so it wont get serialized, can be used as the source to generate the data.
      */
-    transient Object target
+    default Object getTarget() { return null; }
 
     /**
      * success or fail? if ok is true then it still may mean that there are warnings and needs to be looked into
      */
-    abstract Boolean getOk()
+    default Boolean getOk() {
+        return true;
+    }
+
+    static OkResult OK() {
+        return new OkResult(200);
+    }
+
+    static OkResult of(Integer statusId){
+        return new OkResult(statusId);
+    }
 
 }

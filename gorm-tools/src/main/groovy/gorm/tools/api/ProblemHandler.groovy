@@ -15,10 +15,11 @@ import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
-import gorm.tools.api.problem.ApiProblem
-import gorm.tools.api.problem.Problem
-import gorm.tools.api.problem.ProblemFieldError
-import gorm.tools.api.problem.ValidationProblem
+import yakworks.api.problem.ApiProblem
+import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemFieldError
+import yakworks.api.problem.ProblemTrait
+import yakworks.api.problem.ValidationProblem
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
@@ -42,11 +43,11 @@ class ProblemHandler {
     @Autowired
     MsgService msgService
 
-    Problem handleException(Throwable e) {
+    ApiProblem handleException(Throwable e) {
         handleException("Entity", e)
     }
 
-    Problem handleException(Class entityClass, Throwable e) {
+    ApiProblem handleException(Class entityClass, Throwable e) {
         handleException(entityClass.simpleName, e)
     }
 
@@ -60,12 +61,12 @@ class ProblemHandler {
      * @param Exception e
      * @return ApiError
      */
-    Problem handleException(String entityName, Throwable e) {
+    ProblemTrait handleException(String entityName, Throwable e) {
         // default error status code is 422
-        HttpStatus status = UNPROCESSABLE_ENTITY
+        Integer statusId = UNPROCESSABLE_ENTITY.value()
 
         if (e instanceof EntityNotFoundException) {
-            return ApiProblem.of(NOT_FOUND, getMsg(e))
+            return Problem.of(NOT_FOUND.value(), getMsg(e))
         }
         else if (e instanceof EntityValidationException) {
             String detail
@@ -73,26 +74,26 @@ class ProblemHandler {
                 //this is some other exception wrapped in validation exception
                 detail = e.cause?.message
             }
-            return ValidationProblem.of(status, getMsg(e), detail).errors(toFieldErrorList(e.errors))
+            return ValidationProblem.of(statusId, getMsg(e), detail).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof ValidationException) {
             String msg = 'Validation Error'
-            return ValidationProblem.of(status, msg, e.message).errors(toFieldErrorList(e.errors))
+            return ValidationProblem.of(statusId, msg, e.message).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof MessageSourceResolvable) {
-            return ApiProblem.of(status, getMsg(e))
+            return Problem.of(statusId, getMsg(e))
         }
         else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return ApiProblem.of(status, "Illegal Argument", e.message)
+            return Problem.of(statusId, "Illegal Argument", e.message)
         }
         else if (e instanceof DataAccessException) {
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            return ApiProblem.of(status, "Data Access Exception", e.message)
+            return Problem.of(statusId, "Data Access Exception", e.message)
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return ApiProblem.of(INTERNAL_SERVER_ERROR).detail(e.message)
+            return Problem.of(INTERNAL_SERVER_ERROR.value()).code('error.unhandled').detail(e.message)
         }
     }
 

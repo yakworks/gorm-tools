@@ -14,11 +14,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
+import yakworks.api.ApiResults
+import yakworks.api.OkResult
 import gorm.tools.api.ProblemHandler
-import gorm.tools.api.ApiResults
-import gorm.tools.api.problem.Problem
-import gorm.tools.api.result.Result
-import gorm.tools.api.result.OkResult
+import yakworks.api.Result
+import yakworks.api.problem.Problem
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
@@ -89,7 +89,7 @@ trait BulkableRepo<D> {
     }
 
     ApiResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
-        ApiResults results = new ApiResults()
+        ApiResults results = ApiResults.OK()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
@@ -130,7 +130,7 @@ trait BulkableRepo<D> {
      * @param dataList the data chunk
      * @param bulkablArgs the persist args to pass to repo methods
      * @param transactionalItem defaults to false which assumes this method is wrapped in a trx and
-     *        any error processing the dataList will throw error so it rollsback.
+     *        any error processing the dataList will throw error so it rolls back.
      *        if true then its assumed that this method is not wrapped in a trx, and transactionalItem value
      *        will be passed to createOrUpdate where each item update or create is in its own trx.
      *        also, if true then this method will try not to throw an exception and
@@ -138,24 +138,22 @@ trait BulkableRepo<D> {
      * @return the BulkableResults object with what succeeded and what failed
      */
     ApiResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
-        def results = new ApiResults(false)
+        ApiResults results = new ApiResults(false)
         for (Map item : dataList) {
             Map itemCopy
             D entityInstance
-            ApiResults r
+
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                results << OkResult.of(entityInstance, isCreate ? 201 : 200)
+                results << OkResult.of(isCreate ? 201 : 200).target(entityInstance)
             } catch(Exception e) {
-                // if trx by item then collect the execeptions, otherwise throw so it can rollback
+                // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
-                    def apiError = problemHandler.handleException(e)
-                    apiError.params = item
-                    results << apiError
+                    results << problemHandler.handleException(e).data(item)
                 } else {
                     throw e
                 }
@@ -198,7 +196,7 @@ trait BulkableRepo<D> {
             //do the failed
             if (r instanceof Problem) {
                 map.putAll([
-                    data: r.params,
+                    data: r.data,
                     title: r.title,
                     detail: r.detail,
                     errors: r.errors

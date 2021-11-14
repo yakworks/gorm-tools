@@ -56,39 +56,28 @@ class Cust implements GormRepoEntity<Cust, CustRepo> {
         qSearch: ['name']
     ]
 
-    static constraints = {
-        name     nullable: false
-        descId   nullable: true
-        name2    nullable: true
-        secret   nullable: true, display: false
+    static constraintsMap = [
+        name:[      nullable: false],
+        descId:[    nullable: true ],
+        name2:[     nullable: true ],
+        secret:[    nullable: true, display: false ],
 
-        inactive nullable: true, required: false
-        amount   nullable: true
-        amount2  nullable: true
+        inactive:[  nullable: true, required: false ],
+        amount:[    nullable: true ],
+        amount2:[   nullable: true ],
 
         //dates
-        date        nullable: true, example: "2018-01-26T01:36:02Z"
-        locDate     nullable: true, example: "2018-01-25"
-        locDateTime nullable: true, example: "2018-01-01T01:01:01"
+        date:[        nullable: true, example: "2018-01-26T01:36:02Z"],
+        locDate:[     nullable: true, example: "2018-01-25"],
+        locDateTime:[ nullable: true, example: "2018-01-01T01:01:01"],
         //special
         //currency    nullable: true
 
         //Associations
-        type nullable: false
-        location nullable: true
-        ext  nullable: true
-
-    }
-
-    static config = """{
-        json {
-            includes = '*' //should be default
-            excludes = ['location']
-        }
-        query.quickSearch = ["name", "name2"]
-        audittrail.enabled = false
-        autotest.update = [name:'foo']
-    }"""
+        type:[      nullable: false],
+        location:[  nullable: true],
+        ext:[       nullable: true],
+    ]
 
     @CompileDynamic //bug in grailsCompileStatic requires this on internal enums
     enum Kind {CLIENT, COMPANY}

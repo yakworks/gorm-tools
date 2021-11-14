@@ -1,4 +1,8 @@
-package gorm.tools.api;
+package org.zalando.problem;
+
+import org.apiguardian.api.API;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,6 +11,7 @@ import java.util.Map;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
+import static org.apiguardian.api.API.Status.MAINTAINED;
 
 /**
  * Commonly used status codes defined by HTTP, see <a href=
@@ -14,8 +19,29 @@ import static java.util.stream.Collectors.toMap;
  * documentation</a> for the complete list. Additional status codes can be added
  * by applications by creating an implementation of StatusType.
  */
+@API(status = MAINTAINED)
 public enum Status implements StatusType {
 
+    /**
+     * @see <a href="http://tools.ietf.org/html/rfc7231#section-6.2.1">HTTP/1.1:
+     *      Semantics and Content, section 6.2.1</a>
+     */
+    CONTINUE(100, "Continue"),
+    /**
+     * @see <a href="http://tools.ietf.org/html/rfc7231#section-6.2.2">HTTP/1.1:
+     *      Semantics and Content, section 6.2.2</a>
+     */
+    SWITCHING_PROTOCOLS(101, "Switching Protocols"),
+    /**
+     * @see <a href="http://tools.ietf.org/html/rfc2518#section-10.1">WebDAV</a>
+     */
+    PROCESSING(102, "Processing"),
+    /**
+     * @see <a href=
+     *      "http://code.google.com/p/gears/wiki/ResumableHttpRequestsProposal">A
+     *      proposal for supporting resumable POST/PUT HTTP requests in HTTP/1.0</a>
+     */
+    CHECKPOINT(103, "Checkpoint"),
     /**
      * 200 OK, see <a href=
      * "http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">HTTP/1.1
@@ -332,7 +358,7 @@ public enum Status implements StatusType {
     NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required");
 
     private static final Map<Integer, Status> STATUSES = Arrays.stream(values())
-        .collect(collectingAndThen(toMap(Status::getStatusCode, identity()), Collections::unmodifiableMap));
+            .collect(collectingAndThen(toMap(Status::getStatusCode, identity()), Collections::unmodifiableMap));
 
     private final int code;
     private final String reason;
@@ -358,6 +384,7 @@ public enum Status implements StatusType {
      * @return the reason phrase.
      */
     @Override
+    @NonNull
     public String getReasonPhrase() {
         return reason;
     }
@@ -380,7 +407,7 @@ public enum Status implements StatusType {
      * @throws IllegalArgumentException if the given code does not correspond to a known HTTP status.
      */
     public static Status valueOf(final int code) {
-        final Status status = STATUSES.get(code);
+        @Nullable final Status status = STATUSES.get(code);
 
         if (status == null) {
             throw new IllegalArgumentException("There is no known status for this code (" + code + ").");

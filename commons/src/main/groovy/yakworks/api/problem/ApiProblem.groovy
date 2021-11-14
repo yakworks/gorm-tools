@@ -6,6 +6,8 @@ package yakworks.api.problem
 
 import groovy.transform.CompileStatic
 
+import yakworks.api.ApiStatus
+
 /**
  * Default problem
  *
@@ -16,7 +18,11 @@ import groovy.transform.CompileStatic
 class ApiProblem implements ProblemTrait<ApiProblem> {
 
     static ApiProblem of(Integer statusId){
-        new ApiProblem(status: statusId)
+        new ApiProblem().status(statusId)
+    }
+
+    static ApiProblem of(ApiStatus status){
+        new ApiProblem(status: status)
     }
 
     // static ApiProblem of(HttpStatus httpStatus){
@@ -24,7 +30,7 @@ class ApiProblem implements ProblemTrait<ApiProblem> {
     // }
     //
     static ApiProblem of(Integer statusId, String title, String detail = null){
-        new ApiProblem(status: statusId, title: title, detail: detail)
+        new ApiProblem(title: title, detail: detail).status(statusId)
     }
 
 

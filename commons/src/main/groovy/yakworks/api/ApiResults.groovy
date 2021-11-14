@@ -6,14 +6,14 @@ package yakworks.api
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemBase
 
 /**
  * A Parent Result that has a list of Result(s).
  * The data in this case is a List of result/problem instances
  */
 @CompileStatic
-class ApiResults extends OkResult<List<Result>> implements Serializable {
+class ApiResults extends AbstractResult<ApiResults, List<Result>> implements Serializable {
     Boolean ok = true
     ApiStatus status = HttpStatus.MULTI_STATUS
 
@@ -52,12 +52,12 @@ class ApiResults extends OkResult<List<Result>> implements Serializable {
     /**
      * returns the problems
      */
-    List<Problem> getProblems(){
+    List<ProblemBase> getProblems(){
         //only look if this is not ok as it should never have problems if ok=true
         if(this.ok){
-            [] as List<Problem>
+            [] as List<ProblemBase>
         } else {
-            data.find{ it instanceof Problem } as List<Problem>
+            data.find{ it instanceof ProblemBase } as List<ProblemBase>
         }
     }
 
@@ -69,7 +69,7 @@ class ApiResults extends OkResult<List<Result>> implements Serializable {
     }
 
     //Add these temporarily to be compatible with old Results
-    List<Problem> getFailed(){
+    List<ProblemBase> getFailed(){
         getProblems()
     }
     List<Result> getSuccess(){

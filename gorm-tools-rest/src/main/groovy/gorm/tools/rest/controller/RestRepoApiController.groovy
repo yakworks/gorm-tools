@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
-import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemBase
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
@@ -290,7 +290,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void handleException(Exception e) {
         assert getEntityClass()
-        Problem apiError = problemHandler.handleException(getEntityClass(), e)
+        ProblemBase apiError = problemHandler.handleException(getEntityClass(), e)
         respond(apiError)
     }
 

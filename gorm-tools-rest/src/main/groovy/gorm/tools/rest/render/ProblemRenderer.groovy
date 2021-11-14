@@ -8,7 +8,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.http.HttpStatus
 
-import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemBase
 import grails.rest.render.RenderContext
 
 /**
@@ -18,10 +18,10 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class ProblemRenderer implements JsonRendererTrait<Problem> {
+class ProblemRenderer implements JsonRendererTrait<ProblemBase> {
 
     @Override
-    void render(Problem problem, RenderContext context) {
+    void render(ProblemBase problem, RenderContext context) {
         setContentType(context)
         context.status = HttpStatus.valueOf(problem.status)
         context.writer.write(jsonGenerator.toJson(problem))

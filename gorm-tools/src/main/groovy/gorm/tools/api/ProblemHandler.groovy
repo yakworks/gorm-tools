@@ -10,13 +10,12 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
 import org.springframework.dao.DataAccessException
-import org.springframework.http.HttpStatus
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import yakworks.api.problem.ApiProblem
-import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemBase
 import yakworks.api.problem.ProblemFieldError
 import yakworks.api.problem.ProblemTrait
 import yakworks.api.problem.ValidationProblem
@@ -66,7 +65,7 @@ class ProblemHandler {
         Integer statusId = UNPROCESSABLE_ENTITY.value()
 
         if (e instanceof EntityNotFoundException) {
-            return Problem.of(NOT_FOUND.value(), getMsg(e))
+            return ProblemBase.of(NOT_FOUND.value(), getMsg(e))
         }
         else if (e instanceof EntityValidationException) {
             String detail
@@ -81,19 +80,19 @@ class ProblemHandler {
             return ValidationProblem.of(statusId, msg, e.message).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof MessageSourceResolvable) {
-            return Problem.of(statusId, getMsg(e))
+            return ProblemBase.of(statusId, getMsg(e))
         }
         else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return Problem.of(statusId, "Illegal Argument", e.message)
+            return ProblemBase.of(statusId, "Illegal Argument", e.message)
         }
         else if (e instanceof DataAccessException) {
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            return Problem.of(statusId, "Data Access Exception", e.message)
+            return ProblemBase.of(statusId, "Data Access Exception", e.message)
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return Problem.of(INTERNAL_SERVER_ERROR.value()).code('error.unhandled').detail(e.message)
+            return ProblemBase.of(INTERNAL_SERVER_ERROR.value()).code('error.unhandled').detail(e.message)
         }
     }
 

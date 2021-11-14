@@ -11,7 +11,7 @@ class ResultSpec extends Specification {
 
     void "simple Ok"(){
         when:
-        def okRes = Result.of(200)
+        def okRes = Result.OK()
 
         then:
         okRes.status == 200

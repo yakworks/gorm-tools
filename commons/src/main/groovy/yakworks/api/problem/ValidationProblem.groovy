@@ -15,10 +15,7 @@ import yakworks.api.ApiStatus
  * @since 7.0.8
  */
 @CompileStatic
-class ValidationProblem implements ProblemTrait<ValidationProblem>, Serializable {
-
-    //errors default val empty list
-    List<Violation> violations = [] as List<Violation>
+class ValidationProblem implements ProblemTrait<ValidationProblem, Object>, Serializable {
 
     static ValidationProblem of(int statusId){
         new ValidationProblem().status(statusId)

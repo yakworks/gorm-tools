@@ -18,7 +18,7 @@ import yakworks.api.ApiResults
 import yakworks.api.OkResult
 import gorm.tools.api.ProblemHandler
 import yakworks.api.Result
-import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemBase
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
@@ -149,7 +149,7 @@ trait BulkableRepo<D> {
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                results << OkResult.of(isCreate ? 201 : 200).target(entityInstance)
+                results << OkResult.of(isCreate ? 201 : 200).value(entityInstance)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
@@ -194,7 +194,7 @@ trait BulkableRepo<D> {
         for (Result r : results) {
             def map = [ok: r.ok, status: r.status] as Map<String, Object>
             //do the failed
-            if (r instanceof Problem) {
+            if (r instanceof ProblemBase) {
                 map.putAll([
                     data: r.data,
                     title: r.title,
@@ -202,7 +202,7 @@ trait BulkableRepo<D> {
                     errors: r.errors
                 ])
             } else {
-                def entityObj = r.target
+                def entityObj = r.value
                 Map entityMapData = entityMapService.createEntityMap(entityObj, includes) as Map<String, Object>
                 map.data = entityMapData
             }

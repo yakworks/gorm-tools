@@ -4,7 +4,6 @@
 */
 package yakworks.api;
 
-import org.zalando.problem.Problem;
 import yakworks.i18n.MsgKey;
 
 import java.util.Map;
@@ -23,17 +22,20 @@ import java.util.Map;
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-public interface Result<D> {
+public interface Result<E> {
 
     /**
      * the result message key, args can come from data or target
      */
-    default MsgKey getMsgKey() {
+    default MsgKey getMsg() {
         return null;
     }
+    default void setMsg(MsgKey msg) {}
+    default E msg(MsgKey v){ setMsg(v); return (E)this; }
+    default E msg(String v, Map args) { return msg(MsgKey.of(v, args));}
 
     default String getCode() {
-        return getMsgKey() != null ? getMsgKey().getCode() : null;
+        return getMsg() != null ? getMsg().getCode() : null;
     }
 
     /**
@@ -44,6 +46,8 @@ public interface Result<D> {
     default String getTitle() {
         return null;
     }
+    default void setTitle(String title){}
+    default E title(String v) { setTitle(v);  return (E)this; }
 
     /**
      * status code, normally an HttpStatus.value()
@@ -51,19 +55,26 @@ public interface Result<D> {
     default ApiStatus getStatus() {
         return HttpStatus.OK;
     }
+    default void setStatus(ApiStatus v){}
+    default E status(ApiStatus v) { setStatus(v); return (E)this; }
+    default E status(Integer v) { setStatus(HttpStatus.valueOf(v)); return (E)this; }
 
     /**
-     * the response object or result of the method/function or process
+     * the response object value or result of the method/function or process
      * Implementations might choose to ignore this in favor of concrete, typed fields.
      * Or this is generated from the target
      */
-    default D getData() { return null; }
+    default Object getData() { return null; }
+    default void setData(Object v){}
+    default E data(Object v) { setData(v); return (E)this; }
 
     /**
      * Optional the return value or entity. Kind of like the value that Optional wraps.
      * internal in that its transient so it wont get serialized, can be used as the source to generate the data.
      */
-    default Object getTarget() { return null; }
+    // default T getValue() { return null; }
+    // default void setValue(T v){}
+    // default E value(T v){ setValue(v); return (E)this; }
 
     /**
      * success or fail? if ok is true then it still may mean that there are warnings and needs to be looked into
@@ -73,15 +84,15 @@ public interface Result<D> {
     }
 
     static OkResult OK() {
-        return new OkResult();
+        return OkResult.get();
     }
 
     static OkResult of(String code) {
-        return new OkResult().msgKey(MsgKey.of(code));
+        return (OkResult) new OkResult().msg(MsgKey.of(code));
     }
 
     static OkResult of(String code, Map args) {
-        return new OkResult().msgKey(MsgKey.of(code, args));
+        return (OkResult) new OkResult().msg(MsgKey.of(code, args));
     }
 
 }

@@ -79,7 +79,10 @@ public interface Problem extends Result<Object> {
         return false;
     }
 
-    default List<ProblemFieldError> getErrors(){
+    /**
+     * The list of constraint violations or any others
+     */
+    default List<Violation> getViolations(){
         return Collections.emptyList();
     }
 

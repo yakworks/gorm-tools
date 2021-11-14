@@ -13,9 +13,9 @@ import yakworks.api.problem.Problem
  * The data in this case is a List of result/problem instances
  */
 @CompileStatic
-class ApiResults implements ResultTrait<ApiResults, List<Result>>, Serializable {
+class ApiResults extends OkResult<List<Result>> implements Serializable {
     Boolean ok = true
-    Integer status = 207
+    ApiStatus status = HttpStatus.MULTI_STATUS
 
     @Delegate List<Result> data
 

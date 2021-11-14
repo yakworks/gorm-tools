@@ -6,7 +6,10 @@ package yakworks.api.problem
 
 import groovy.transform.CompileStatic
 
+import yakworks.api.ApiStatus
+import yakworks.api.HttpStatus
 import yakworks.api.ResultTrait
+import yakworks.i18n.MsgKey
 
 /**
  * Trait implementation for the Problem
@@ -17,9 +20,8 @@ import yakworks.api.ResultTrait
 @CompileStatic
 trait ProblemTrait<E> extends ResultTrait<E, Object> implements Problem {
     Boolean ok = false
-    Integer status = 400
+    ApiStatus status = HttpStatus.BAD_REQUEST
     String detail
-
-    ProblemTrait detail(String v) { detail = v; return this }
+    URI typ= Problem.DEFAULT_TYPE
 
 }

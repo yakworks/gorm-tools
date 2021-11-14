@@ -1,7 +1,6 @@
 package org.zalando.problem;
 
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -10,9 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
-@API(status = STABLE)
 public final class ProblemBuilder {
 
     private static final Set<String> RESERVED_PROPERTIES = new HashSet<>(Arrays.asList(

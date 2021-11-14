@@ -1,15 +1,12 @@
 package org.zalando.problem;
 
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static org.apiguardian.api.API.Status.INTERNAL;
 
 public abstract class AbstractThrowableProblem extends ThrowableProblem {
 
@@ -117,14 +114,13 @@ public abstract class AbstractThrowableProblem extends ThrowableProblem {
     }
 
     /**
-     * This is required to workaround missing support for {@link com.fasterxml.jackson.annotation.JsonAnySetter} on
-     * constructors annotated with {@link com.fasterxml.jackson.annotation.JsonCreator}.
+     * This is required to workaround missing support for com.fasterxml.jackson.annotation.JsonAnySetter on
+     * constructors annotated with com.fasterxml.jackson.annotation.JsonCreator.
      *
      * @param key   the custom key
      * @param value the custom value
      * @see <a href="https://github.com/FasterXML/jackson-databind/issues/562">Jackson Issue 562</a>
      */
-    @API(status = INTERNAL)
     void set(final String key, final Object value) {
         parameters.put(key, value);
     }

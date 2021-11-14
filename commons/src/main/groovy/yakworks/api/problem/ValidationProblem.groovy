@@ -6,6 +6,8 @@ package yakworks.api.problem
 
 import groovy.transform.CompileStatic
 
+import yakworks.api.ApiStatus
+
 /**
  * For validation/violation and contraint errors where we need to report on fields
  *
@@ -16,14 +18,14 @@ import groovy.transform.CompileStatic
 class ValidationProblem implements ProblemTrait<ValidationProblem>, Serializable {
 
     //errors default val empty list
-    List<ProblemFieldError> errors = []
+    List<Violation> violations = [] as List<Violation>
 
     static ValidationProblem of(int statusId){
         new ValidationProblem().status(statusId)
     }
 
-    static ValidationProblem of(Integer statusId, String title, String detail = null){
-        new ValidationProblem(status: statusId, title: title, detail: detail)
+    static ValidationProblem of(ApiStatus status, String title, String detail = null){
+        new ValidationProblem(status: status, title: title, detail: detail)
     }
 
 }

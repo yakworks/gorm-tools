@@ -19,10 +19,10 @@ package yakworks.api;
 import java.util.Objects;
 
 /**
- * Represents HTTP status codes. See https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html.
+ * While these are HttpStatus code they seve well for general purpose Api codes
  *
- * @author Graeme Rocher
- * @since 1.0
+ * Copied in from micronaut.
+ *
  */
 public enum HttpStatus implements CharSequence, ApiStatus {
     CONTINUE(100, "Continue"),

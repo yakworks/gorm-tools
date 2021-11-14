@@ -1,7 +1,6 @@
 package org.zalando.problem;
 
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 
 import java.net.URI;
 import java.util.Collections;
@@ -10,14 +9,12 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
-import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * {@link Problem} instances are required to be immutable.
  *
  * @see <a href="https://tools.ietf.org/html/rfc7807">RFC 7807: Problem Details for HTTP APIs</a>
  */
-@API(status = STABLE)
 public interface Problem {
 
     URI DEFAULT_TYPE = URI.create("about:blank");

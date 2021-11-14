@@ -4,7 +4,10 @@
 */
 package yakworks.api;
 
+import org.zalando.problem.Problem;
 import yakworks.i18n.MsgKey;
+
+import java.util.Map;
 
 /**
  * This is the base result trait for problems and results
@@ -20,17 +23,18 @@ import yakworks.i18n.MsgKey;
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-
-public interface Result<D> extends MsgKey {
+public interface Result<D> {
 
     /**
-     * the result message key or code
+     * the result message key, args can come from data or target
      */
-    @Override
-    default String getCode() {
+    default MsgKey getMsgKey() {
         return null;
     }
-    // Result<D> code(Object v);
+
+    default String getCode() {
+        return getMsgKey() != null ? getMsgKey().getCode() : null;
+    }
 
     /**
      * A short, human-readable summary of the result type. It SHOULD NOT change from occurrence to occurrence of the
@@ -40,16 +44,13 @@ public interface Result<D> extends MsgKey {
     default String getTitle() {
         return null;
     }
-    // Result<D> title(Object v);
 
     /**
      * status code, normally an HttpStatus.value()
      */
-    default Integer getStatus() {
-        return null;
+    default ApiStatus getStatus() {
+        return HttpStatus.OK;
     }
-
-    // Result<D> params(Map v);
 
     /**
      * the response object or result of the method/function or process
@@ -72,11 +73,15 @@ public interface Result<D> extends MsgKey {
     }
 
     static OkResult OK() {
-        return new OkResult(200);
+        return new OkResult();
     }
 
-    static OkResult of(Integer statusId){
-        return new OkResult(statusId);
+    static OkResult of(String code) {
+        return new OkResult().msgKey(MsgKey.of(code));
+    }
+
+    static OkResult of(String code, Map args) {
+        return new OkResult().msgKey(MsgKey.of(code, args));
     }
 
 }

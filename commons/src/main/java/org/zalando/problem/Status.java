@@ -1,8 +1,7 @@
 package org.zalando.problem;
 
-import org.apiguardian.api.API;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +10,6 @@ import java.util.Map;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
-import static org.apiguardian.api.API.Status.MAINTAINED;
 
 /**
  * Commonly used status codes defined by HTTP, see <a href=
@@ -19,7 +17,6 @@ import static org.apiguardian.api.API.Status.MAINTAINED;
  * documentation</a> for the complete list. Additional status codes can be added
  * by applications by creating an implementation of StatusType.
  */
-@API(status = MAINTAINED)
 public enum Status implements StatusType {
 
     /**
@@ -384,7 +381,7 @@ public enum Status implements StatusType {
      * @return the reason phrase.
      */
     @Override
-    @NonNull
+    @Nonnull
     public String getReasonPhrase() {
         return reason;
     }

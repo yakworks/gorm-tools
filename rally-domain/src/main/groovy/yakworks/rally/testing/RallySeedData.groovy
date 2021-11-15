@@ -38,7 +38,6 @@ class RallySeedData {
         createOrgTypeSetups()
         buildClientOrg()
         buildOrgs(100)
-        // buildMembers()
         buildTags()
         createIndexes()
     }
@@ -131,13 +130,6 @@ class RallySeedData {
         // assert org.flex.date1.toString() == '2021-04-20'
         return org
     }
-
-    // static void buildMembers(){
-    //     Tag.withTransaction {
-    //         def t1 = new Org(id: 30, code: "CPG", entityName: 'Customer').persist(flush: true)
-    //         def t2 = new Tag(id: 31, code: "MFG", entityName: 'Customer').persist(flush: true)
-    //     }
-    // }
 
     static void buildTags(){
         Tag.withTransaction {

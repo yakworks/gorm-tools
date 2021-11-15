@@ -104,6 +104,52 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         orgDimensionService.testInit(null)
     }
 
+    void "test create customer with branch by id"() {
+        given:
+        orgDimensionService.testInit('Branch')
+        orgDimensionService.dimensionsConfig = [ test1: "Customer.Branch" ]
+        orgDimensionService.clearCache()
+        orgDimensionService.init()
+        when:
+        Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
+        assert branch
+        Map params = [name: "test", num: "test", orgTypeId: 1, member: [branch: [id: branch.id]]]
+        Org result = Org.create(params)
+
+        then:
+        result != null
+        result.name == "test"
+        result.num == "test"
+        result.member != null
+        result.member.branch.id == branch.id
+
+        cleanup:
+        orgDimensionService.testInit(null)
+    }
+
+    void "test create customer with branch by num"() {
+        given:
+        orgDimensionService.testInit('Branch')
+        orgDimensionService.dimensionsConfig = [ test1: "Customer.Branch" ]
+        orgDimensionService.clearCache()
+        orgDimensionService.init()
+        when:
+        Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
+        assert branch
+        Map params = [name: "test", num: "test", orgTypeId: 1, member: [branch: [num: branch.num]]]
+        Org result = Org.create(params)
+
+        then:
+        result != null
+        result.name == "test"
+        result.num == "test"
+        result.member != null
+        result.member.branch.id == branch.id
+
+        cleanup:
+        orgDimensionService.testInit(null)
+    }
+
     void "test delete is cascaded"() {
         setup:
         orgDimensionService.testInit(null)

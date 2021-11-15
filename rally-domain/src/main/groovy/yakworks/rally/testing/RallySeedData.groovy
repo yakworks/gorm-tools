@@ -57,8 +57,16 @@ class RallySeedData {
                 company.location.kind = Location.Kind.remittance
                 company.location.persist()
             }
-            if(count < 3) return
-            (4..count).each { id ->
+            (4..5).each{
+                def branch = createOrg(it , OrgType.Branch)
+                branch.persist()
+            }
+            (6..7).each{
+                def division = createOrg(it , OrgType.Division)
+                division.persist()
+            }
+            if(count < 7) return
+            (8..count).each { id ->
                 def org = createOrg(id, OrgType.Customer)
             }
         }

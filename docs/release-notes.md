@@ -1,3 +1,19 @@
+### v7.0.8-v.39
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.38...v7.0.8-v.39)
+- release [link](https://github.com/yakworks/gorm-tools/commit/0082746655303561dabeb7658399d760d917e792)
+- lookup for member orgs (#402) [link](https://github.com/yakworks/gorm-tools/commit/0d7e9aac3e0d58c601512ce8595857b862ebfd11)
+
+### v7.0.8-v.38
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.37...v7.0.8-v.38)
+- release [link](https://github.com/yakworks/gorm-tools/commit/1cc17d9309dd8f4d5736d00625b1a991ebb8b4da)
+- Fix entitymap lists (#401) [link](https://github.com/yakworks/gorm-tools/commit/4631dfcdb8750dd424fca178fdcae923e5ed6dbf)
+- getProperty working, added in EnumUtils and getter for OrgType (#400) [link](https://github.com/yakworks/gorm-tools/commit/fcecd6b31ecbd2505e1b988b8376a1026d8e15c7)
+- Oeg find lookup test (#399) [link](https://github.com/yakworks/gorm-tools/commit/6c4b871f15434469589d345675b17d8a3694e341)
+- remove bad views that had old apiError (#398) [link](https://github.com/yakworks/gorm-tools/commit/d709cec8d5a5302396b081845637ad98f9463d66)
+- Api includes (#397) [link](https://github.com/yakworks/gorm-tools/commit/9ec8ef6ae8e13923799a81a9b3615c33cfb4e3b0)
+
 ### v7.0.8-v.37
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.36...v7.0.8-v.37)

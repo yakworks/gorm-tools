@@ -12,10 +12,10 @@ import groovy.util.logging.Slf4j
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import yakworks.api.ApiResults
-import yakworks.api.Result
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
+import yakworks.api.ApiResults
+import yakworks.api.Result
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
 import yakworks.rally.orgs.model.Contact

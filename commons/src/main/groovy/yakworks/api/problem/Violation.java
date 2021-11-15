@@ -12,10 +12,10 @@ import java.util.List;
  */
 public interface Violation {
 
-    MsgKey getMsgKey();
+    MsgKey getMsg();
 
     default String getCode() {
-        return getMsgKey() != null ? getMsgKey().getCode() : null;
+        return getMsg() != null ? getMsg().getCode() : null;
     }
 
     String getField();

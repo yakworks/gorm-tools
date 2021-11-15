@@ -9,15 +9,17 @@ import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import groovy.transform.TupleConstructor
 
+import yakworks.i18n.MsgKey
+
 @ToString @EqualsAndHashCode
 @TupleConstructor
 @CompileStatic
-class ProblemFieldError implements Serializable {
-    String code
+class ProblemFieldError implements Violation, Serializable {
+    MsgKey msg
     String message
     String field
 
     static ProblemFieldError of(String code, String message) {
-        new ProblemFieldError(code, message)
+        new ProblemFieldError(MsgKey.of(code), message)
     }
 }

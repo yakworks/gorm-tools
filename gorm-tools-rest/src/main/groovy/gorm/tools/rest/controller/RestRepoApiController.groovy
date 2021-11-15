@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
-import yakworks.api.problem.ProblemBase
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
@@ -29,6 +28,7 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
 import gorm.tools.rest.RestApiConfig
 import grails.web.Action
+import yakworks.api.problem.ProblemBase
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS

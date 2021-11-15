@@ -13,9 +13,7 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
-import yakworks.api.ApiResults
 import gorm.tools.api.ProblemHandler
-import yakworks.api.Result
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
@@ -33,6 +31,8 @@ import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
+import yakworks.api.ApiResults
+import yakworks.api.Result
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact

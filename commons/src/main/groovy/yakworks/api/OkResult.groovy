@@ -4,14 +4,23 @@
 */
 package yakworks.api;
 
-import java.io.Serializable;
+import groovy.transform.CompileStatic
+import groovy.transform.MapConstructor
+
+import yakworks.i18n.MsgKey
 
 /**
  * Simple OkResult with a Map as the data object
  *
  * @author Joshua Burnett (@basejump)
  */
-public class OkResult extends AbstractResult<OkResult> implements Serializable {
+// @MapConstructor
+@CompileStatic
+class OkResult implements ResultTrait {
+
+    OkResult(){}
+    OkResult(ApiStatus v){ this.status = v }
+    OkResult(MsgKey mk){ this.msg = mk }
 
     static OkResult get() {
         return new OkResult();

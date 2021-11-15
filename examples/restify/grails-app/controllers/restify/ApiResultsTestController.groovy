@@ -6,8 +6,8 @@ package restify
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.ApiResults
 import gorm.tools.rest.controller.RestRepoApiController
+import yakworks.api.ApiResults
 import yakworks.rally.orgs.model.Org
 
 @CompileStatic

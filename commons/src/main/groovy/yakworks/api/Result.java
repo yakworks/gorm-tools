@@ -22,7 +22,7 @@ import java.util.Map;
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-public interface Result<E> {
+public interface Result {
 
     /**
      * the result message key, args can come from data or target
@@ -31,8 +31,6 @@ public interface Result<E> {
         return null;
     }
     default void setMsg(MsgKey msg) {}
-    default E msg(MsgKey v){ setMsg(v); return (E)this; }
-    default E msg(String v, Map args) { return msg(MsgKey.of(v, args));}
 
     default String getCode() {
         return getMsg() != null ? getMsg().getCode() : null;
@@ -47,7 +45,6 @@ public interface Result<E> {
         return null;
     }
     default void setTitle(String title){}
-    default E title(String v) { setTitle(v);  return (E)this; }
 
     /**
      * status code, normally an HttpStatus.value()
@@ -56,8 +53,6 @@ public interface Result<E> {
         return HttpStatus.OK;
     }
     default void setStatus(ApiStatus v){}
-    default E status(ApiStatus v) { setStatus(v); return (E)this; }
-    default E status(Integer v) { setStatus(HttpStatus.valueOf(v)); return (E)this; }
 
     /**
      * the response object value or result of the method/function or process
@@ -66,7 +61,6 @@ public interface Result<E> {
      */
     default Object getData() { return null; }
     default void setData(Object v){}
-    default E data(Object v) { setData(v); return (E)this; }
 
     /**
      * Optional the return value or entity. Kind of like the value that Optional wraps.
@@ -87,12 +81,18 @@ public interface Result<E> {
         return OkResult.get();
     }
 
+    static OkResult of(Integer statusCode) {
+        return new OkResult(HttpStatus.valueOf(statusCode));
+    }
+    static OkResult of(ApiStatus status) {
+        return new OkResult(status);
+    }
     static OkResult of(String code) {
-        return (OkResult) new OkResult().msg(MsgKey.of(code));
+        return new OkResult(MsgKey.of(code));
     }
 
     static OkResult of(String code, Map args) {
-        return (OkResult) new OkResult().msg(MsgKey.of(code, args));
+        return new OkResult(MsgKey.of(code, args));
     }
 
 }

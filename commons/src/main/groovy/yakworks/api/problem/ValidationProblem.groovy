@@ -15,10 +15,10 @@ import yakworks.api.ApiStatus
  * @since 7.0.8
  */
 @CompileStatic
-class ValidationProblem implements ProblemTrait<ValidationProblem>, Serializable {
+class ValidationProblem implements ProblemTrait, Serializable {
 
     static ValidationProblem of(int statusId){
-        new ValidationProblem().status(statusId)
+        return (ValidationProblem) new ValidationProblem().status(statusId)
     }
 
     static ValidationProblem of(ApiStatus status, String title, String detail = null){

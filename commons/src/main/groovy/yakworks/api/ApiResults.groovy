@@ -6,33 +6,39 @@ package yakworks.api
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.problem.ProblemBase
+import yakworks.api.problem.Problem
 
 /**
  * A Parent Result that has a list of Result(s).
  * The data in this case is a List of result/problem instances
  */
 @CompileStatic
-class ApiResults extends AbstractResult<ApiResults> implements Serializable {
+class ApiResults implements ResultTrait, Serializable {
     Boolean ok = true
     ApiStatus status = HttpStatus.MULTI_STATUS
 
-    @Delegate List<Result> data
+    //internal rep
+    @Delegate List<Result> results
+
+    //override so data is the result
+    @Override Object getData() { return results; }
+    @Override void setData(Object v){ }
 
     /**
      * New result
      * @param isSynchronized defaults to true to create the data list as synchronizedList
      */
     ApiResults(boolean isSynchronized = true){
-        data = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
+        results = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
     }
 
+    static ApiResults create(boolean isSynchronized = true){ new ApiResults(isSynchronized) }
     static ApiResults OK(){ new ApiResults() }
 
     @Override //changes default list delegate so we can add ok
     boolean add(Result result){
         if(!result.ok) ok = false
-        data << result
+        results << result
     }
 
     /**
@@ -42,9 +48,9 @@ class ApiResults extends AbstractResult<ApiResults> implements Serializable {
     void merge(Result resultToMerge){
         if(!resultToMerge.ok) ok = false
         if(resultToMerge instanceof ApiResults){
-            data.addAll(resultToMerge.data as List<Result>)
+            results.addAll(resultToMerge.results as List<Result>)
         } else {
-            data << resultToMerge
+            results << resultToMerge
         }
 
     }
@@ -52,12 +58,12 @@ class ApiResults extends AbstractResult<ApiResults> implements Serializable {
     /**
      * returns the problems
      */
-    List<ProblemBase> getProblems(){
+    List<Problem> getProblems(){
         //only look if this is not ok as it should never have problems if ok=true
         if(this.ok){
-            [] as List<ProblemBase>
+            [] as List<Problem>
         } else {
-            data.find{ it instanceof ProblemBase } as List<ProblemBase>
+            results.find{ it instanceof Problem } as List<Problem>
         }
     }
 
@@ -65,11 +71,11 @@ class ApiResults extends AbstractResult<ApiResults> implements Serializable {
      * returns the successful results
      */
     List<Result> getOkResults(){
-        data.find{ it.ok } as List<Result>
+        results.find{ it.ok } as List<Result>
     }
 
     //Add these temporarily to be compatible with old Results
-    List<ProblemBase> getFailed(){
+    List<Problem> getFailed(){
         getProblems()
     }
     List<Result> getSuccess(){

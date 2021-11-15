@@ -10,9 +10,9 @@ import groovy.transform.CompileStatic
 
 import org.springframework.context.MessageSourceResolvable
 
-import yakworks.api.ApiResults
 import gorm.tools.support.SpringMsgKey
 import grails.rest.render.RenderContext
+import yakworks.api.ApiResults
 
 /**
  * Renderer for paged list data

@@ -14,11 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import yakworks.api.ApiResults
-import yakworks.api.OkResult
 import gorm.tools.api.ProblemHandler
-import yakworks.api.Result
-import yakworks.api.problem.ProblemBase
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
@@ -26,6 +22,10 @@ import gorm.tools.beans.EntityMapService
 import gorm.tools.job.JobState
 import gorm.tools.job.RepoJobService
 import gorm.tools.repository.model.DataOp
+import yakworks.api.ApiResults
+import yakworks.api.OkResult
+import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.commons.map.Maps
 
 /**
@@ -89,7 +89,7 @@ trait BulkableRepo<D> {
     }
 
     ApiResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
-        ApiResults results = ApiResults.OK()
+        ApiResults results = ApiResults.create()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
@@ -129,16 +129,16 @@ trait BulkableRepo<D> {
      *
      * @param dataList the data chunk
      * @param bulkablArgs the persist args to pass to repo methods
-     * @param transactionalItem defaults to false which assumes this method is wrapped in a trx and
+     * @param transactionalItem default=false which assumes this method is wrapped in a trx and
      *        any error processing the dataList will throw error so it rolls back.
-     *        if true then its assumed that this method is not wrapped in a trx, and transactionalItem value
-     *        will be passed to createOrUpdate where each item update or create is in its own trx.
+     *        if transactionalItem=true then its assumed that this method is not wrapped in a trx,
+     *        and transactionalItem value will be passed to createOrUpdate where each item update or create is in its own trx.
      *        also, if true then this method will try not to throw an exception and
      *        it will collect the errors in the results.
      * @return the BulkableResults object with what succeeded and what failed
      */
     ApiResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
-        ApiResults results = new ApiResults(false)
+        ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             Map itemCopy
             D entityInstance
@@ -149,7 +149,7 @@ trait BulkableRepo<D> {
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                results << OkResult.of(isCreate ? 201 : 200).value(entityInstance)
+                results << OkResult.of(isCreate ? 201 : 200).data(entityInstance)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
@@ -192,9 +192,9 @@ trait BulkableRepo<D> {
         List<Map> ret = []
         boolean ok = true
         for (Result r : results) {
-            def map = [ok: r.ok, status: r.status] as Map<String, Object>
+            def map = [ok: r.ok, status: r.status.code] as Map<String, Object>
             //do the failed
-            if (r instanceof ProblemBase) {
+            if (r instanceof Problem) {
                 map.putAll([
                     data: r.data,
                     title: r.title,
@@ -202,7 +202,7 @@ trait BulkableRepo<D> {
                     errors: r.errors
                 ])
             } else {
-                def entityObj = r.value
+                def entityObj = r.data
                 Map entityMapData = entityMapService.createEntityMap(entityObj, includes) as Map<String, Object>
                 map.data = entityMapData
             }

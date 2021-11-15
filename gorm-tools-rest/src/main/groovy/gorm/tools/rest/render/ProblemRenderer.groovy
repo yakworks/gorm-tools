@@ -8,8 +8,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.http.HttpStatus
 
-import yakworks.api.problem.ProblemBase
 import grails.rest.render.RenderContext
+import yakworks.api.problem.ProblemBase
 
 /**
  * Default renderer for JSON

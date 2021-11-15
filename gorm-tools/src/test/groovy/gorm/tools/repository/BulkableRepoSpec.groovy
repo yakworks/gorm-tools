@@ -9,6 +9,7 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import testing.TestRepoJob
@@ -44,7 +45,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         KitchenSink.repo instanceof BulkableRepo
     }
 
-    void "test bulk insert"() {
+    void "success bulk insert"() {
         given:
         List list = KitchenSink.generateDataList(20)
 
@@ -177,6 +178,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
     }
 
 
+    // @IgnoreRest
     @Issue("domain9#413")
     void "test batching"() {
         setup: "Set batchSize of 10 to trigger batching/slicing"

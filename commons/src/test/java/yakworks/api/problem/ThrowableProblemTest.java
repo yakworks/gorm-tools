@@ -1,8 +1,6 @@
 package yakworks.api.problem;
 
 import org.junit.jupiter.api.Test;
-import yakworks.api.problem.Problem;
-import yakworks.api.problem.ThrowableProblem;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -11,7 +9,6 @@ import java.net.URI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
@@ -26,7 +23,7 @@ final class ThrowableProblemTest {
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
-                .cause(Problem.builder()
+                .cause(ProblemBuilder.create()
                         .type(URI.create("https://example.org/expired-credit-card"))
                         .title("Expired Credit Card")
                         .status(BAD_REQUEST)
@@ -49,7 +46,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldReturnTitleAsMessage() {
-        final ThrowableProblem problem = Problem.builder()
+        final ThrowableProblem problem = ProblemBuilder.create()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -103,10 +100,10 @@ final class ThrowableProblemTest {
         final String stacktrace = getStackTrace(problem);
 
         assertThat(stacktrace,
-                startsWith("https://example.org/preauthorization-failed{400, Preauthorization Failed}"));
+                startsWith("{400, Preauthorization Failed"));
 
         assertThat(stacktrace,
-                containsString("Caused by: https://example.org/expired-credit-card{400, Expired Credit Card}"));
+                containsString("Caused by: {400, Expired Credit Card"));
     }
 
     @Test

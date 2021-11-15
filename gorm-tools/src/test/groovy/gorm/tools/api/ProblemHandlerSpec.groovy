@@ -8,9 +8,9 @@ import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 import yakworks.i18n.icu.DefaultICUMessageSource
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import static org.springframework.http.HttpStatus.NOT_FOUND
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
+import static yakworks.api.HttpStatus.INTERNAL_SERVER_ERROR
+import static yakworks.api.HttpStatus.NOT_FOUND
+import static yakworks.api.HttpStatus.UNPROCESSABLE_ENTITY
 
 class ProblemHandlerSpec extends Specification implements GormToolsSpecHelper, AutowiredTest {
 
@@ -33,7 +33,7 @@ class ProblemHandlerSpec extends Specification implements GormToolsSpecHelper, A
         def problem = problemHandler.handleException(new RuntimeException("test error"))
 
         then:
-        problem.status == INTERNAL_SERVER_ERROR.value()
+        problem.status == INTERNAL_SERVER_ERROR
         problem.code == 'error.unhandled'
         // problem.title == 'Unhandled Problem'
         problem.detail == "test error"

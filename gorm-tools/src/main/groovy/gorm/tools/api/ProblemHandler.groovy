@@ -14,16 +14,20 @@ import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
-import yakworks.api.problem.ApiProblem
-import yakworks.api.problem.ProblemBase
-import yakworks.api.problem.ProblemFieldError
-import yakworks.api.problem.ProblemTrait
-import yakworks.api.problem.ValidationProblem
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.support.MsgService
 import grails.validation.ValidationException
+import yakworks.api.ApiStatus
+import yakworks.api.HttpStatus
+import yakworks.api.problem.ApiProblem
+import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemFieldError
+import yakworks.api.problem.ProblemTrait
+import yakworks.api.problem.ValidationProblem
+import yakworks.api.problem.Violation
+import yakworks.i18n.MsgKey
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import static org.springframework.http.HttpStatus.NOT_FOUND
@@ -42,11 +46,11 @@ class ProblemHandler {
     @Autowired
     MsgService msgService
 
-    ApiProblem handleException(Throwable e) {
+    ProblemTrait handleException(Throwable e) {
         handleException("Entity", e)
     }
 
-    ApiProblem handleException(Class entityClass, Throwable e) {
+    ProblemTrait handleException(Class entityClass, Throwable e) {
         handleException(entityClass.simpleName, e)
     }
 
@@ -62,10 +66,12 @@ class ProblemHandler {
      */
     ProblemTrait handleException(String entityName, Throwable e) {
         // default error status code is 422
+        ApiStatus status400 = HttpStatus.BAD_REQUEST
+        ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
         Integer statusId = UNPROCESSABLE_ENTITY.value()
 
         if (e instanceof EntityNotFoundException) {
-            return ProblemBase.of(NOT_FOUND.value(), getMsg(e))
+            return ApiProblem.of(NOT_FOUND.value(), getMsg(e))
         }
         else if (e instanceof EntityValidationException) {
             String detail
@@ -73,26 +79,26 @@ class ProblemHandler {
                 //this is some other exception wrapped in validation exception
                 detail = e.cause?.message
             }
-            return ValidationProblem.of(statusId, getMsg(e), detail).errors(toFieldErrorList(e.errors))
+            return ValidationProblem.of(status422, getMsg(e), detail).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof ValidationException) {
             String msg = 'Validation Error'
-            return ValidationProblem.of(statusId, msg, e.message).errors(toFieldErrorList(e.errors))
+            return ValidationProblem.of(status422, msg, e.message).errors(toFieldErrorList(e.errors))
         }
         else if (e instanceof MessageSourceResolvable) {
-            return ProblemBase.of(statusId, getMsg(e))
+            return Problem.of(status400, getMsg(e))
         }
         else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return ProblemBase.of(statusId, "Illegal Argument", e.message)
+            return Problem.of(status400).msg(MsgKey.of('error.illegalArgument')).detail(e.message)
         }
         else if (e instanceof DataAccessException) {
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            return ProblemBase.of(statusId, "Data Access Exception", e.message)
+            return Problem.of(status400).msg(MsgKey.of('error.dataAccess')).detail(e.message)
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return ProblemBase.of(INTERNAL_SERVER_ERROR.value()).code('error.unhandled').detail(e.message)
+            return Problem.of(HttpStatus.INTERNAL_SERVER_ERROR).msg(MsgKey.of('error.unhandled')).detail(e.message)
         }
     }
 
@@ -105,13 +111,13 @@ class ProblemHandler {
      * @param errs the erros object to convert
      */
     //FIXME #339 see errormessageService, do we need some of that logic?
-    List<ProblemFieldError> toFieldErrorList(Errors errs) {
+    List<Violation> toFieldErrorList(Errors errs) {
         List<ProblemFieldError> errors = []
         for(ObjectError err : errs.allErrors) {
             ProblemFieldError fieldError = ProblemFieldError.of(err.code, getMsg(err))
             if(err instanceof FieldError) fieldError.field = err.field
             errors << fieldError
         }
-        return errors
+        return errors as List<Violation>
     }
 }

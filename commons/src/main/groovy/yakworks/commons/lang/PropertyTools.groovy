@@ -7,8 +7,6 @@ package yakworks.commons.lang
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import yakworks.commons.lang.Validate
-
 /**
  * BeanPathTools contains a set of static helpers, which provides a convenient way
  * for manipulating the object's properties.

@@ -10,11 +10,11 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.api.ProblemHandler
-import yakworks.api.problem.ProblemBase
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
+import yakworks.api.problem.ProblemBase
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
 

@@ -40,15 +40,20 @@ class OrgMemberService {
      */
     void setupMember(Org org, Map params) {
         if(!orgDimensionService.orgMemberEnabled) return
-
+        
         List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]
             Validate.notEmpty(orgParam, "setupMember called but params does not contain ${type.propertyName}")
-
-            Org parent = Org.get(orgParam['id'] as Long)
-            Validate.notNull(parent, "setupMember failed trying to get Org from param ${orgParam} with ${orgParam['id']}")
+            Org parent
+            if(orgParam['id']) {
+                parent = Org.get(orgParam['id'] as Long)
+            } else {
+                orgParam.type = type
+                parent = Org.repo.lookup(orgParam as Map)
+            }
+            Validate.notNull(parent, "setupMember failed trying to get Org from param ${orgParam}}")
 
             //if its has no parents then its a toplevel
             boolean isTopLevel = orgDimensionService.getImmediateParents(type).isEmpty()

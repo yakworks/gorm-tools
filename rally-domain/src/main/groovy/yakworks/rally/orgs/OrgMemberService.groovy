@@ -40,7 +40,6 @@ class OrgMemberService {
      */
     void setupMember(Org org, Map params) {
         if(!orgDimensionService.orgMemberEnabled) return
-
         List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {

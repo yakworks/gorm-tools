@@ -81,4 +81,22 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         orgDimensionService.testInit(null)
     }
 
+    void "test setupMember lookup by num"() {
+        setup:
+        initOrgDimensions([primary: "Branch.Division"])
+        Org division = Org.findByOrgTypeId(OrgType.Division.id)
+
+        when:
+        Org branch = Org.create("Branch", "Branch", OrgType.Branch).persist()
+        orgMemberService.setupMember(branch, [division:[num:division.num]])
+
+        then:
+        branch.member != null
+        branch.member.org == branch
+        branch.member.division == division
+
+        cleanup:
+        orgDimensionService.testInit(null)
+    }
+
 }

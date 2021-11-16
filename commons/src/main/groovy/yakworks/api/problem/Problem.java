@@ -1,6 +1,7 @@
 package yakworks.api.problem;
 
 import yakworks.api.ApiStatus;
+import yakworks.api.OkResult;
 import yakworks.api.Result;
 import yakworks.i18n.MsgKey;
 
@@ -9,6 +10,7 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
@@ -94,6 +96,10 @@ public interface Problem extends Result {
 
     static RuntimeProblem of(MsgKey msg) {
         return (RuntimeProblem) create().msg(msg);
+    }
+
+    static RuntimeProblem of(String code, Map args) {
+        return (RuntimeProblem) create().msg(MsgKey.of(code, args));
     }
 
     // static ThrowableProblem of(final ApiStatus status, final URI instance) {

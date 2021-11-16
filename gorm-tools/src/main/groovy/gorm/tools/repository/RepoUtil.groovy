@@ -15,12 +15,13 @@ import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
-import gorm.tools.api.DataProblem
 import gorm.tools.api.EntityNotFoundProblem
 import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import grails.util.Environment
+import yakworks.api.problem.Problem
+import yakworks.api.problem.RuntimeProblem
 import yakworks.commons.lang.NameUtils
 import yakworks.i18n.MsgKey
 
@@ -117,11 +118,11 @@ class  RepoUtil {
 
     /**
      * check that the passed in data is not empty and throws EmptyDataException if so
-     * @throws DataProblem if it not found
+     * @throws RuntimeProblem if it not found
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {
-            throw new DataProblem('error.data.empty', entityClass)
+            throw Problem.of('error.data.empty', [entityName: entityClass.simpleName])
         }
     }
 
@@ -129,7 +130,8 @@ class  RepoUtil {
      * in create data, if id is passed then bindId must be set to true, if not throw exception
      */
     static void checkCreateData(Map data, Map args, Class entityClass) {
-        if(data['id'] && !args.bindId) throw new DataProblem('error.data.bindId', entityClass)
+        if(data['id'] && !args.bindId)
+            throw Problem.of('error.data.empty', [entityName: entityClass.simpleName])
     }
 
     /**

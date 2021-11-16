@@ -7,6 +7,7 @@ package yakworks.api.problem
 import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
+import yakworks.i18n.MsgKey
 
 /**
  * For validation/violation and contraint errors where we need to report on fields
@@ -17,12 +18,19 @@ import yakworks.api.ApiStatus
 @CompileStatic
 class ValidationProblem implements ProblemTrait, Serializable {
 
+
+
+
     static ValidationProblem of(int statusId){
         return (ValidationProblem) new ValidationProblem().status(statusId)
     }
 
     static ValidationProblem of(ApiStatus status, String title, String detail = null){
         new ValidationProblem(status: status, title: title, detail: detail)
+    }
+
+    static ValidationProblem of(MsgKey msg){
+        new ValidationProblem(msg: msg)
     }
 
 }

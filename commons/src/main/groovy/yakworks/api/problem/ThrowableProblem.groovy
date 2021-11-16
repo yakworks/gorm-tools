@@ -45,7 +45,8 @@ class ThrowableProblem extends RuntimeException implements ProblemTrait, Excepti
 
     static String genString(final Problem p) {
         String concat = "${p.status.code}"
-        concat = [concat, p.title, p.detail].findAll{it != null}.join(', ')
+        String title = p.title ?: p.status.reason
+        concat = [concat, title, p.detail].findAll{it != null}.join(', ')
         if(p.instance) concat = "$concat, instance=${p.instance}"
         if(p.type) concat = "$concat, type=${p.type}"
         return "{$concat}"

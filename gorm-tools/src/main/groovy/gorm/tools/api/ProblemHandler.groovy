@@ -18,18 +18,18 @@ import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.support.MsgService
+import gorm.tools.support.MsgSourceResolvable
 import grails.validation.ValidationException
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.api.problem.ApiProblem
 import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemFieldError
 import yakworks.api.problem.ProblemTrait
 import yakworks.api.problem.ValidationProblem
 import yakworks.api.problem.Violation
+import yakworks.api.problem.ViolationFieldError
 import yakworks.i18n.MsgKey
 
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
@@ -67,11 +67,13 @@ class ProblemHandler {
     ProblemTrait handleException(String entityName, Throwable e) {
         // default error status code is 422
         ApiStatus status400 = HttpStatus.BAD_REQUEST
+        ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
         Integer statusId = UNPROCESSABLE_ENTITY.value()
 
         if (e instanceof EntityNotFoundException) {
-            return ApiProblem.of(NOT_FOUND.value(), getMsg(e))
+            // return Problem.of(status404).msg(MsgKey.of('error.notFound')).detail(e.message)
+            return ApiProblem.of(NOT_FOUND.value(), getMsg(e)).msg(MsgKey.of('error.notFound'))
         }
         else if (e instanceof EntityValidationException) {
             String detail
@@ -85,8 +87,8 @@ class ProblemHandler {
             String msg = 'Validation Error'
             return ValidationProblem.of(status422, msg, e.message).errors(toFieldErrorList(e.errors))
         }
-        else if (e instanceof MessageSourceResolvable) {
-            return Problem.of(status400, getMsg(e))
+        else if (e instanceof MsgSourceResolvable) { //legacy
+            return Problem.of(status400).msg(MsgKey.of(e.code)).detail(getMsg(e))
         }
         else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
@@ -103,7 +105,8 @@ class ProblemHandler {
     }
 
     String getMsg(MessageSourceResolvable msr){
-        msgService.getMessage(msr)
+        String msg = msgService.getMessage(msr)
+        return msg
     }
 
     /**
@@ -112,9 +115,9 @@ class ProblemHandler {
      */
     //FIXME #339 see errormessageService, do we need some of that logic?
     List<Violation> toFieldErrorList(Errors errs) {
-        List<ProblemFieldError> errors = []
+        List<ViolationFieldError> errors = []
         for(ObjectError err : errs.allErrors) {
-            ProblemFieldError fieldError = ProblemFieldError.of(err.code, getMsg(err))
+            ViolationFieldError fieldError = ViolationFieldError.of(err.code, getMsg(err))
             if(err instanceof FieldError) fieldError.field = err.field
             errors << fieldError
         }

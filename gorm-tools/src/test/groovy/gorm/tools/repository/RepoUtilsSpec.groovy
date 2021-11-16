@@ -8,13 +8,27 @@ import org.springframework.util.ReflectionUtils
 
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.support.MsgSourceResolvable
+import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
 import grails.testing.gorm.DataTest
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
 import testing.Cust
+import yakworks.gorm.testing.model.Enummy
+import yakworks.gorm.testing.model.KitchenSink
+import yakworks.gorm.testing.model.SinkExt
+import yakworks.gorm.testing.model.SinkItem
+import yakworks.gorm.testing.model.Thing
+import yakworks.i18n.icu.ICUMessageSource
 
-class RepoUtilsSpec extends Specification implements DataTest {
+class RepoUtilsSpec extends Specification implements DataRepoTest {
+
+    ICUMessageSource messageSource
+
+    void setupSpec() {
+        mockDomains MockDomain
+    }
 
     void 'instanceControllersDomainBindingApi'() {
         expect:
@@ -47,7 +61,7 @@ class RepoUtilsSpec extends Specification implements DataTest {
         then:
         EntityNotFoundException e = thrown(EntityNotFoundException)
         e.code == 'default.not.found.message'
-        e.message == 'xxx not found for id:99'
+        e.message == 'xxx not found with id:99'
     }
 
     void "test propName"() {
@@ -60,12 +74,13 @@ class RepoUtilsSpec extends Specification implements DataTest {
 
     void "test notFound"() {
         when:
-        def r = RepoMessage.notFoundId(MockDomain, 2)
+        MsgSourceResolvable r = RepoMessage.notFoundId(MockDomain, 2)
 
         then:
         r.code == "default.not.found.message"
         r.args == ['MockDomain', 2]
-        r.defaultMessage == "MockDomain not found for id:2"
+        "MockDomain not found with id 2" == messageSource.getMessage(r.code, r.args)
+        // r.defaultMessage == "MockDomain not found for id:2"
     }
 
 

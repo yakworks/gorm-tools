@@ -30,12 +30,12 @@ trait ProblemTrait implements Problem {
 
     Map<String, Object> parameters = Collections.emptyMap()
 
-    List<Violation> errors = Collections.emptyList();
+    List<Violation> errors = [] as List<Violation> //Collections.emptyList();
 
     ProblemTrait status(Integer v) { setStatus(HttpStatus.valueOf(v)); return this; }
     ProblemTrait status(ApiStatus v) {
         setStatus(v)
-        if(getTitle() == null) setTitle(status.getReason())
+        // if(getTitle() == null) setTitle(status.getReason())
         return this
     }
 
@@ -51,6 +51,15 @@ trait ProblemTrait implements Problem {
     ProblemTrait instance(String v) { setInstance(URI.create(v)); return this; }
 
     ProblemTrait errors(List<Violation> v) { setErrors(v); return this; }
+
+
+    ProblemTrait addErrors(List<MsgKey> keyedErrors){
+        def ers = getErrors()
+        keyedErrors.each {
+            ers << ViolationFieldError.of(it)
+        }
+        return this
+    }
 
     // E value(T v){ setValue(v); return (E)this; }
 

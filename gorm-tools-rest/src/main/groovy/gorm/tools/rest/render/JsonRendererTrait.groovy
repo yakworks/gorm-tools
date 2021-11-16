@@ -8,10 +8,8 @@ import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.MessageSourceResolvable
 import org.springframework.core.GenericTypeResolver
 
-import gorm.tools.support.MsgService
 import grails.core.GrailsApplication
 import grails.core.support.proxy.DefaultProxyHandler
 import grails.core.support.proxy.ProxyHandler
@@ -20,6 +18,8 @@ import grails.rest.render.Renderer
 import grails.util.GrailsWebUtil
 import grails.web.mime.MimeType
 import yakworks.commons.json.JsonEngineTrait
+import yakworks.i18n.MsgKey
+import yakworks.i18n.icu.ICUMessageSource
 
 /**
  * Json Renderer that uses the default groovy2.5 jsonGenerator
@@ -40,7 +40,7 @@ trait JsonRendererTrait<T> implements Renderer<T>, JsonEngineTrait {
     ProxyHandler proxyHandler = new DefaultProxyHandler()
 
     @Autowired
-    MsgService msgService
+    ICUMessageSource msgService
 
     Class<T> targetType
 
@@ -75,7 +75,7 @@ trait JsonRendererTrait<T> implements Renderer<T>, JsonEngineTrait {
     }
 
     // swallow no such message exception and returns empty string
-    String getMessage(MessageSourceResolvable resolvable){
-        msgService.getMessageSafe(resolvable)
+    String getMessage(MsgKey msgKey){
+        msgService.getMessage(msgKey)
     }
 }

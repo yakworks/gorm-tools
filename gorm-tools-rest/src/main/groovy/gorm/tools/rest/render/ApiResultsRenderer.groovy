@@ -4,13 +4,9 @@
 */
 package gorm.tools.rest.render
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.springframework.context.MessageSourceResolvable
-
-import gorm.tools.support.SpringMsgKey
 import grails.rest.render.RenderContext
 import yakworks.api.ApiResults
 
@@ -29,7 +25,7 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
         setContentType(context)
         jsonBuilder(context).call {
             ok results.ok
-            status results.status
+            status results.status.code
             code results.getCode()
             title getMessage(results)
         }
@@ -37,30 +33,13 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
 
     // checks for title
     String getMessage(ApiResults results){
-        String message = results.title
-        if(!message){
-            if(results.code){
-                msgService.getMessageSafe(toMessageSource(results))
-            } else if(results.size() != 0) {
-                //check first one
-                results.code = results[0].code
-            }
-        }
-        return message
-    }
 
-    MessageSourceResolvable toMessageSource(ApiResults results) {
-        if(MessageSourceResolvable.isAssignableFrom(results.class)){
-            return SpringMsgKey.of(results as MessageSourceResolvable)
+        if(results.msg) {
+            return getMessage(results.msg)
+        } else if(results.size() != 0) {
+            return getMessage(results[0].msg)
         }
-        //pull it from the keys
-        Map props = results.properties
-        if(props.code) {
-            def args = props.msgArgs?:props.arguments
-            return SpringMsgKey.of(props.code as String, args as List, props.defaultMessage as String)
-        } else if(props.defaultMessage) {
-            return SpringMsgKey.ofDefault(props.defaultMessage as String)
-        }
+        return ""
     }
 
 }

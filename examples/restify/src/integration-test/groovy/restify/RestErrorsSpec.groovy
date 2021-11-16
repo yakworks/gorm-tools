@@ -6,7 +6,10 @@ import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import org.springframework.jdbc.core.JdbcTemplate
+
+import spock.lang.IgnoreRest
 import spock.lang.Specification
+import yakworks.commons.json.JsonEngine
 
 @Integration
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {
@@ -17,7 +20,9 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         when:
         Map invalidData2 = [num:'foo1', name: "foo"]
         Response resp = get('/api/rally/org/10001')
-        Map body = bodyToMap(resp)
+        String bodyText = resp.body().string()
+        // assert bodyText == 'foo'
+        Map body = JsonEngine.parseJson(bodyText, Map)
 
         then:
         resp.code() == HttpStatus.NOT_FOUND.value()
@@ -63,6 +68,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
     }
 
+    @IgnoreRest
     void "test data access exception on db constraint violation"() {
         when:
         Response resp = post('/api/rally/org', [ name:"Project-1", num:"P1", type: "Customer"])
@@ -77,8 +83,8 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         body = bodyToMap(resp)
 
         then: "Would cause DataAccessException"
-        resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
+        resp.code() == HttpStatus.BAD_REQUEST.value()
+        body.status == HttpStatus.BAD_REQUEST.value()
         body.title == "Data Access Exception"
         ((String)body.detail).contains("ConstraintViolationException")
         ((String)body.detail).contains("IX_ORGSOURCE_UNIQUE")

@@ -71,6 +71,11 @@ trait MsgSourceResolvable implements ToMessageSource, MessageSourceResolvable{
         this.args = args
     }
 
+    // MsgKey getMsgKey(){
+    //     return MsgKey.of(getCode())
+    //     [code: getCode(), args: getArgs(), defaultMessage: getDefaultMessage()]
+    // }
+
     Map getMessageMap(){
         [code: getCode(), args: getArgs(), defaultMessage: getDefaultMessage()]
     }

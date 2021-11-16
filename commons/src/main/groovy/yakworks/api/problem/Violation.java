@@ -18,7 +18,7 @@ public interface Violation {
         return getMsg() != null ? getMsg().getCode() : null;
     }
 
-    String getField();
+    default String getField(){ return null; }
 
     default String getMessage() {
         return null;

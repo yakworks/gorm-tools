@@ -28,7 +28,7 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
 import gorm.tools.rest.RestApiConfig
 import grails.web.Action
-import yakworks.api.problem.ProblemBase
+import yakworks.api.problem.Problem
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS
@@ -290,7 +290,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void handleException(Exception e) {
         assert getEntityClass()
-        ProblemBase apiError = problemHandler.handleException(getEntityClass(), e)
+        Problem apiError = problemHandler.handleException(getEntityClass(), e)
         respond(apiError)
     }
 

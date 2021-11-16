@@ -14,7 +14,7 @@ import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
-import yakworks.api.problem.ProblemBase
+import yakworks.api.problem.Problem
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
 
@@ -62,7 +62,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, ServletAtt
     }
 
     void handleException(Exception e) {
-        ProblemBase apiError = problemHandler.handleException(e)
+        Problem apiError = problemHandler.handleException(e)
         respond(apiError)
     }
 }

@@ -28,7 +28,7 @@ class EntityNotFoundException extends DataRetrievalFailureException implements M
     EntityNotFoundException(Serializable id, String domainName) {
         this('default.not.found.message',
             [domainName, (id instanceof Number ? "id:$id" : id.toString())],
-            "${domainName} not found for ${id instanceof Number ? "id:$id" : id.toString()}"
+            "${domainName} not found with ${id instanceof Number ? "id:$id" : id.toString()}"
         )
     }
 

@@ -36,7 +36,7 @@ class RepoMessage {
 
     static MsgSourceResolvable notFoundId(Class entityClass, Serializable id) {
         String entityName = entityClass.simpleName
-        return new SpringMsgKey("default.not.found.message", [entityName, id], "${entityName} not found for id:${id}")
+        return new SpringMsgKey("default.not.found.message", [entityName, id])
     }
 
     // @CompileDynamic

@@ -46,9 +46,9 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         Map body = response.bodyToMap()
 
         then:
-        body.status == 422
-        response.status == 422
-        body.title == 'Empty Data'
+        body.status == 400
+        response.status == 400
+        body.detail == 'Empty Data'
     }
 
     void "post with no orgType"() {

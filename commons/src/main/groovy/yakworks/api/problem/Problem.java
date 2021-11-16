@@ -2,12 +2,14 @@ package yakworks.api.problem;
 
 import yakworks.api.ApiStatus;
 import yakworks.api.Result;
+import yakworks.i18n.MsgKey;
 
 import javax.annotation.Nullable;
 
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
@@ -89,6 +91,10 @@ public interface Problem extends Result {
 
     static ThrowableProblem of(final ApiStatus status, final String detail) {
         return (ThrowableProblem) create().status(status).detail(detail);
+    }
+
+    static ThrowableProblem of(MsgKey msg) {
+        return (ThrowableProblem) create().msg(msg);
     }
 
     // static ThrowableProblem of(final ApiStatus status, final URI instance) {

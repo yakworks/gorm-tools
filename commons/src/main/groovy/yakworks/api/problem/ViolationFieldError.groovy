@@ -14,12 +14,19 @@ import yakworks.i18n.MsgKey
 @ToString @EqualsAndHashCode
 @TupleConstructor
 @CompileStatic
-class ProblemFieldError implements Violation, Serializable {
+class ViolationFieldError implements Violation, Serializable {
     MsgKey msg
+    // message should come from msg but can be set here
     String message
     String field
 
-    static ProblemFieldError of(String code, String message) {
-        new ProblemFieldError(MsgKey.of(code), message)
+    ViolationFieldError field(String v) { setField(v);  return this; }
+
+    static ViolationFieldError of(MsgKey msg) {
+        new ViolationFieldError(msg)
+    }
+
+    static ViolationFieldError of(String code, String message) {
+        new ViolationFieldError(MsgKey.of(code), message)
     }
 }

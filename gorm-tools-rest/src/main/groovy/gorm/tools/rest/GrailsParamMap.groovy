@@ -7,12 +7,17 @@ package gorm.tools.rest
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 
 import grails.web.servlet.mvc.GrailsParameterMap
 
+/**
+ * Legacy, should not be used for future dev
+ */
+@CompileDynamic
 class GrailsParamMap {
 
-    @CompileDynamic
+
     static GrailsParameterMap getGrailsParameterMap(Map p, HttpServletRequest request) {
         GrailsParameterMap gpm = new GrailsParameterMap(p, request)
         gpm.updateNestedKeys(p)

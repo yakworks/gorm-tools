@@ -14,7 +14,6 @@ class BadUrlSpec extends Specification implements OkHttpRestTrait {
 
     String path = "/api/this/is/no/good"
 
-    //@IgnoreRest
     void "good url"() {
         when:
         Response resp = get('/api/appConfig/rally/org')

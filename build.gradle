@@ -10,6 +10,7 @@ buildscript {
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
     classpath "io.github.gradle-nexus:publish-plugin:$vMavenNexus"
+    classpath "org.grails.plugins:views-gradle:$vViews"
   }
 }
 

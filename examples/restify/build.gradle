@@ -1,7 +1,7 @@
 apply plugin:"groovy"
 //apply plugin:"war"
 apply plugin:"org.grails.grails-web"
-// apply plugin:"org.grails.plugins.views-json"
+apply plugin:"org.grails.plugins.views-json"
 
 
 dependencies {
@@ -18,8 +18,8 @@ dependencies {
 
   // compile vs implementation required for json views in gradle5/grails4
   compile project(":gorm-tools") //compileGsonViews fails without this
-  // compile ("org.grails.plugins:views-json:$vViews")
-  // compile "org.grails.plugins:views-json-templates:$vViews"
+  compile ("org.grails.plugins:views-json:$vViews")
+  compile "org.grails.plugins:views-json-templates:$vViews"
 
   // compile "org.slf4j:slf4j-simple:1.7.30"
   // compile "org.slf4j:slf4j-api:1.7.30"

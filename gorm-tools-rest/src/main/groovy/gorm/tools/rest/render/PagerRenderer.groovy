@@ -4,7 +4,6 @@
 */
 package gorm.tools.rest.render
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 

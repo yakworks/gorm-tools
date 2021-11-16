@@ -39,6 +39,11 @@ import yakworks.i18n.icu.GrailsICUMessageSource
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
+ * if using alone and not as part of DataRepoTest or DomainRepoTest then
+ *
+    void setupSpec() {
+        defineCommonBeans()
+    }
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1

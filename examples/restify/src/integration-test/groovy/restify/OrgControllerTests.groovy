@@ -48,7 +48,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         then:
         body.status == 400
         response.status == 400
-        body.detail == 'Empty Data'
+        body.title == 'Empty Data'
     }
 
     void "post with no orgType"() {

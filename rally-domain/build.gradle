@@ -1,5 +1,3 @@
-description "gorm rally domain entities"
-
 apply plugin: "yakworks.grails-plugin"
 
 dependencies {

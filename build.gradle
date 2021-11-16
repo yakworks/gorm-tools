@@ -36,19 +36,16 @@ subprojects { subprj ->
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     mavenCentral()
+    maven { url "http://repo.9ci.com/oss-snapshots" }
   }
+  // get prop with default if null, converts to boolean
+  Closure getProp = { pname, defualtv -> (subprj.findProperty(pname)?:defualtv).toBoolean() }
 
-  ext {
-    //consider them all java libs, set to false for examples/testing
-    isPublishable = true
-    isExample = false
-    // all but commons are gorm
-    isGormLib = subprj.name != 'commons'
-    // example test projects
-    if (subprj.name in [ 'testify', 'restify', 'benchmarks' ]){
-      isPublishable = false
-      isExample = true
-    }
+  ext { // see gradle.properties in sub-projects
+    //default true for isGormLibrary and isPublishable, set to false in gradle.props
+    isPublishable = getProp('isPublishable', true)
+    isGormLibrary = getProp('isGormLibrary', true)
+    isExample = getProp('isExample', false)
   }
 
   plugins.withId('groovy') {
@@ -72,7 +69,6 @@ subprojects { subprj ->
   // if its a lib then setup gpg signing, see signing.gnupg.keyName
   if (isPublishable){
     apply plugin: 'java-library'
-
     // gpg signing required by nexus/sonatype
     apply plugin: 'signing'
     afterEvaluate {
@@ -87,7 +83,7 @@ subprojects { subprj ->
 
   } // end isPublishable
 
-  if (isGormLib) {
+  if (isGormLibrary) {
     apply plugin: 'groovy'
 
     dependencies {
@@ -121,26 +117,17 @@ subprojects { subprj ->
   }
 
   if (isExample) {
-    apply plugin: 'groovy'
-
     dependencies {
-      compileOnly "io.micronaut:micronaut-inject-groovy"
       implementation "org.springframework.boot:spring-boot-starter-logging"
-      implementation "org.springframework.boot:spring-boot-autoconfigure"
-      implementation "org.grails:grails-core"
       implementation "org.springframework.boot:spring-boot-starter-tomcat"
-
-      implementation "org.grails:grails-web-boot"
       implementation "org.grails:grails-plugin-services"
 
       // implementation 'org.codehaus.groovy:groovy-dateutil'
-
       // implementation "io.activej:activej-boot:5.0-rc3"
       // implementation "io.activej:activej-promise:5.0-rc3"
-
     }
 
-  } //end isGormLib
+  }
 
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice

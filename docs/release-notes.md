@@ -1,3 +1,9 @@
+### v7.0.8-v.39
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.38...v7.0.8-v.39)
+- release [link](https://github.com/yakworks/gorm-tools/commit/0082746655303561dabeb7658399d760d917e792)
+- lookup for member orgs (#402) [link](https://github.com/yakworks/gorm-tools/commit/0d7e9aac3e0d58c601512ce8595857b862ebfd11)
+
 ### v7.0.8-v.38
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.37...v7.0.8-v.38)

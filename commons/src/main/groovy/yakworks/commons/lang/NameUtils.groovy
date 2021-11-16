@@ -4,7 +4,12 @@
 */
 package yakworks.commons.lang
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 import groovy.transform.CompileStatic
+
+import yakworks.commons.util.StringUtils
 
 /**
  * Copied in from grails.util.GrailsNameUtils and converted to groovy
@@ -12,21 +17,54 @@ import groovy.transform.CompileStatic
  * for example from class names -> property names and vice-versa. The
  * key aspect of this class is that it has no dependencies outside stock groovy!
  */
+@SuppressWarnings(['ClassSize', 'NestedBlockDepth', 'InvertedIfElse', 'UnnecessaryToString'])
 @CompileStatic
 class NameUtils {
-
+    private static final Pattern DOT_UPPER = Pattern.compile('\\.[A-Z\\$]');
     private static final String PROPERTY_SET_PREFIX = "set"
     private static final String PROPERTY_GET_PREFIX = "get"
     public static final String DOLLAR_SEPARATOR = '$'
+    private static final Pattern SERVICE_ID_REGEX = Pattern.compile('[\\p{javaLowerCase}\\d-]+');
+    // private static final Pattern KEBAB_CASE_SEQUENCE = Pattern.compile('^(([a-z0-9])+(\\-|\\.|:)?)*([a-z0-9])+$');
+    private static final Pattern KEBAB_REPLACEMENTS = Pattern.compile('[_ ]');
 
     /**
-     * converts SOME_PROP to someProp
+     * The camel case version of the string with the first letter in lower case.
+     *
+     * @param str The string
+     * @return The new string in camel case
      */
+    public static String camelCase(String str) {
+        return camelCase(str, true);
+    }
+
     static String toCamelCase( String text ) {
-        text = text.toLowerCase().replaceAll( "(_)([A-Za-z0-9])"){ List<String> it -> it[2].toUpperCase() }
+        text = text.toLowerCase().replaceAll("(_)([A-Za-z0-9])") { List<String> it -> it[2].toUpperCase() }
         //println text
         return text
     }
+
+    /**
+     * The camel case version of the string with the first letter in lower case.
+     *
+     * @param str                  The string
+     * @param lowerCaseFirstLetter Whether the first letter is in upper case or lower case
+     * @return The new string in camel case
+     */
+    public static String camelCase(String str, boolean lowerCaseFirstLetter) {
+        str = str.toLowerCase().replaceAll("(_)([A-Za-z0-9])") { List<String> it -> it[2].toUpperCase() }
+        StringBuilder sb = new StringBuilder(str.length());
+        for (String s : str.split("[\\s_-]")) {
+            String capitalize = capitalize(s);
+            sb.append(capitalize);
+        }
+        String result = sb.toString();
+        if (lowerCaseFirstLetter) {
+            return decapitalize(result);
+        }
+        return result;
+    }
+
     /**
      * Retrieves the name of a setter for the specified property name
      * @param propertyName The property name
@@ -297,32 +335,39 @@ class NameUtils {
     }
 
     /**
-     * Retrieves the script name representation of the supplied class. For example
-     * MyFunkyGrailsScript would be my-funky-grails-script.
+     * Checks whether the given name is a valid service identifier.
      *
-     * @param clazz The class to convert
-     * @return The script name representation
+     * @param name The name
+     * @return True if it is
      */
-    static String getKebabCase(Class<?> clazz) {
-        return clazz == null ? null : getKebabCase(clazz.getName());
+    public static boolean isHyphenatedLowerCase(String name) {
+        return StringUtils.isNotEmpty(name) && SERVICE_ID_REGEX.matcher(name).matches() && Character.isLetter(name.charAt(0));
     }
 
     /**
-     * Retrieves the script name representation of the given class name.
-     * For example MyFunkyGrailsScript would be my-funky-grails-script.
+     * Converts camel case to hyphenated, lowercase form.
      *
-     * @param name The class name to convert.
-     * @return The script name representation.
+     * @param name The name
+     * @return The hyphenated string
      */
-    static String getKebabCase(String name) {
-        if (name == null) {
-            return null;
-        }
+    public static String hyphenate(String name) {
+        return hyphenate(name, true);
+    }
 
-        if (name.endsWith(".groovy")) {
-            name = name.substring(0, name.length()-7);
+    /**
+     * Converts camel case to hyphenated, lowercase form.
+     *
+     * @param name      The name
+     * @param lowerCase Whether the result should be converted to lower case
+     * @return The hyphenated string
+     */
+    public static String hyphenate(String name, boolean lowerCase) {
+        if (isHyphenatedLowerCase(name)) {
+            return KEBAB_REPLACEMENTS.matcher(name).replaceAll("-");
+        } else {
+            char separatorChar = '-';
+            return separateCamelCase(KEBAB_REPLACEMENTS.matcher(name).replaceAll("-"), lowerCase, separatorChar);
         }
-        return getNaturalName(name).replaceAll("\\s", "-").toLowerCase();
     }
 
     /**
@@ -655,5 +700,131 @@ class NameUtils {
             return convertValidPropertyMethodSuffix(prop);
         }
         return null;
+    }
+
+    /**
+     * Decapitalizes a given string according to the rule:
+     * <ul>
+     * <li>If the first or only character is Upper Case, it is made Lower Case
+     * <li>UNLESS the second character is also Upper Case, when the String is
+     * returned unchanged <eul>.
+     * </ul>
+     *
+     * @param name The String to decapitalize
+     * @return The decapitalized version of the String
+     */
+    public static String decapitalize(String name) {
+        if (name == null) {
+            return null;
+        }
+        int length = name.length();
+        if (length == 0) {
+            return name;
+        }
+        // Decapitalizes the first character if a lower case
+        // letter is found within 2 characters after the first
+        // Abc -> abc
+        // AB  -> AB
+        // ABC -> ABC
+        // ABc -> aBc
+        boolean firstUpper = Character.isUpperCase(name.charAt(0));
+        if (firstUpper) {
+            if (length == 1) {
+                return Character.toString(Character.toLowerCase(name.charAt(0)));
+            }
+            for (int i = 1; i < Math.min(length, 3); i++) {
+                if (Character.isLowerCase(name.charAt(i))) {
+                    char[] chars = name.toCharArray();
+                    chars[0] = Character.toLowerCase(chars[0]);
+                    return new String(chars);
+                }
+            }
+        }
+
+        return name;
+    }
+
+    /**
+     * Returns the simple name for a class represented as string.
+     *
+     * @param className The class name
+     * @return The simple name of the class
+     */
+    public static String getSimpleName(String className) {
+        Matcher matcher = DOT_UPPER.matcher(className);
+        if (matcher.find()) {
+            int position = matcher.start();
+            return className.substring(position + 1);
+        }
+        return className;
+    }
+
+    private static String separateCamelCase(String name, boolean lowerCase, char separatorChar) {
+        if (!lowerCase) {
+            StringBuilder newName = new StringBuilder();
+            boolean first = true;
+            char last = '0';
+            for (char c : name.toCharArray()) {
+                if (first) {
+                    newName.append(c);
+                    first = false;
+                } else {
+                    if (Character.isUpperCase(c) && !Character.isUpperCase(last)) {
+                        if (c != separatorChar) {
+                            newName.append(separatorChar);
+                        }
+                        newName.append(c);
+                    } else {
+                        if (c == '.') {
+                            first = true;
+                        }
+                        if (c != separatorChar) {
+                            if (last == separatorChar) {
+                                newName.append(separatorChar);
+                            }
+                            newName.append(c);
+                        }
+                    }
+                }
+                last = c;
+            }
+            return newName.toString();
+        } else {
+            StringBuilder newName = new StringBuilder();
+            char[] chars = name.toCharArray();
+            boolean first = true;
+            char last = '0';
+            char secondLast = separatorChar;
+            for (int i = 0; i < chars.length; i++) {
+                char c = chars[i];
+                if (Character.isLowerCase(c) || !Character.isLetter(c)) {
+                    first = false;
+                    if (c != separatorChar) {
+                        if (last == separatorChar) {
+                            newName.append(separatorChar);
+                        }
+                        newName.append(c);
+                    }
+                } else {
+                    char lowerCaseChar = Character.toLowerCase(c);
+                    if (first) {
+                        first = false;
+                        newName.append(lowerCaseChar);
+                    } else if (Character.isUpperCase(last) || last == '.') {
+                        newName.append(lowerCaseChar);
+                    } else if (Character.isDigit(last) && (Character.isUpperCase(secondLast) || secondLast == separatorChar)) {
+                        newName.append(lowerCaseChar);
+                    } else {
+                        newName.append(separatorChar).append(lowerCaseChar);
+                    }
+                }
+                if (i > 1) {
+                    secondLast = last;
+                }
+                last = c;
+            }
+
+            return newName.toString();
+        }
     }
 }

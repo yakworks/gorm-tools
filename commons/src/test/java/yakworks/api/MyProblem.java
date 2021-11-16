@@ -1,16 +1,13 @@
 package yakworks.api;
 
-import yakworks.api.problem.ThrowableProblem;
-
-import java.net.URI;
-import java.util.Map;
+import yakworks.api.problem.RuntimeProblem;
 
 @SuppressWarnings("unused") // since we're testing access levels we're fine if this compiles
-public final class MyProblem extends ThrowableProblem {
+public final class MyProblem extends RuntimeProblem {
 
     MyProblem() {}
 
-    MyProblem(final ThrowableProblem cause) {
+    MyProblem(final RuntimeProblem cause) {
         super(cause);
     }
 

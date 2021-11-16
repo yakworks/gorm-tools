@@ -8,6 +8,8 @@ import javax.annotation.Nullable
 
 import groovy.transform.CompileStatic
 
+import yakworks.commons.lang.NestedRuntimeException
+
 import static java.util.Arrays.asList
 import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
 
@@ -15,13 +17,13 @@ import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
  * Throwable Exception Problem
  */
 @CompileStatic
-class ThrowableProblem extends RuntimeException implements ProblemTrait, Exceptional {
+class RuntimeProblem extends NestedRuntimeException implements ProblemTrait, Exceptional {
 
-    protected ThrowableProblem() {
+    protected RuntimeProblem() {
         this(null);
     }
 
-    protected ThrowableProblem(@Nullable final ThrowableProblem cause) {
+    protected RuntimeProblem(@Nullable final RuntimeProblem cause) {
         super(cause);
         final Collection<StackTraceElement> stackTrace = COMPOUND.process(asList(getStackTrace()));
         setStackTrace(stackTrace as StackTraceElement[]);
@@ -29,21 +31,27 @@ class ThrowableProblem extends RuntimeException implements ProblemTrait, Excepti
 
     @Override //throwable
     String getMessage() {
-        return title + (detail? ": $detail" : '')
+        return RuntimeProblem.buildMessage(this)
+    }
+
+    static String buildMessage(final Problem p) {
+        String code = p.code? "code: $p.code" : ''
+        String detail = p.detail? "detail: $p.detail" : ''
+        return [p.title, code, detail].findAll{it}.join(', ')
     }
 
     @Override
-    ThrowableProblem getCause() {
+    RuntimeProblem getCause() {
         // cast is safe, since the only way to set this is our constructor
-        return (ThrowableProblem) super.getCause()
+        return (RuntimeProblem) super.getCause()
     }
 
     @Override
     String toString() {
-        return genString(this)
+        return RuntimeProblem.buildToString(this)
     }
 
-    static String genString(final Problem p) {
+    static String buildToString(final Problem p) {
         String concat = "${p.status.code}"
         String title = p.title ?: p.status.reason
         concat = [concat, title, p.detail].findAll{it != null}.join(', ')
@@ -52,8 +60,8 @@ class ThrowableProblem extends RuntimeException implements ProblemTrait, Excepti
         return "{$concat}"
     }
 
-    static ThrowableProblem of(final ThrowableProblem cause) {
-        return new ThrowableProblem(cause);
+    static RuntimeProblem of(final RuntimeProblem cause) {
+        return new RuntimeProblem(cause);
     }
 
 }

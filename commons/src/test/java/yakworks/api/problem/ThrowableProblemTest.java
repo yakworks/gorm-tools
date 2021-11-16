@@ -19,7 +19,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldReturnThrowableProblemCause() {
-        final ThrowableProblem problem = Problem.builder()
+        final RuntimeProblem problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -30,23 +30,23 @@ final class ThrowableProblemTest {
                         .build())
                 .build();
 
-        assertThat(problem, hasFeature("cause", ThrowableProblem::getCause, notNullValue()));
+        assertThat(problem, hasFeature("cause", RuntimeProblem::getCause, notNullValue()));
     }
 
     @Test
     void shouldReturnNullCause() {
-        final ThrowableProblem problem = Problem.builder()
+        final RuntimeProblem problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
                 .build();
 
-        assertThat(problem, hasFeature("cause", ThrowableProblem::getCause, nullValue()));
+        assertThat(problem, hasFeature("cause", RuntimeProblem::getCause, nullValue()));
     }
 
     @Test
     void shouldReturnTitleAsMessage() {
-        final ThrowableProblem problem = ProblemBuilder.create()
+        final RuntimeProblem problem = ProblemBuilder.create()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -57,19 +57,19 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldReturnTitleAndDetailAsMessage() {
-        final ThrowableProblem problem = Problem.builder()
+        final RuntimeProblem problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
                 .detail("CVC invalid")
                 .build();
 
-        assertThat(problem, hasFeature("message", Throwable::getMessage, is("Preauthorization Failed: CVC invalid")));
+        assertThat(problem, hasFeature("message", Throwable::getMessage, is("Preauthorization Failed, detail: CVC invalid")));
     }
 
     @Test
     void shouldReturnCausesMessage() {
-        final ThrowableProblem problem = Problem.builder()
+        final RuntimeProblem problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -86,7 +86,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldPrintStackTrace() {
-        final ThrowableProblem problem = Problem.builder()
+        final RuntimeProblem problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -108,7 +108,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldProcessStackTrace() {
-        final ThrowableProblem problem = Problem.builder()
+        final RuntimeProblem problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)

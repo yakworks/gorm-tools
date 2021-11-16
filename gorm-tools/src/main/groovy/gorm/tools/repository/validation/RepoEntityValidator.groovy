@@ -37,7 +37,7 @@ import yakworks.commons.lang.ClassUtils
 /**
  * Overrides the PersistentEntityValidator to adress a few things
  * - assocations are validated correctly
- * - beforeValidate event is fire for assocations properly too
+ * - beforeValidate event is fired for assocations properly too
  * - slims down the validations so that if nullable:true then it skips those
  * - cleans up the message codes to be a sane number
  */

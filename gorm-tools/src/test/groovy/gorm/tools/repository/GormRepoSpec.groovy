@@ -4,9 +4,10 @@
 */
 package gorm.tools.repository
 
+import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.api.EntityNotFoundProblem
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.artefact.Artefact
@@ -22,7 +23,6 @@ import testing.*
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
-import yakworks.gorm.testing.model.Thing
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
@@ -77,7 +77,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         KitchenSink.repo.get(sink.id, 0)
 
         then:
-        thrown(OptimisticLockingFailureException)
+        thrown(OptimisticLockingProblem)
 
         when: "test get() with valid version"
         KitchenSink newOrg = KitchenSink.repo.get(sink.id, 1)
@@ -141,7 +141,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         KitchenSink.repo.get(KitchenSink.last().id + 1, null)
 
         then:
-        thrown EntityNotFoundException
+        thrown EntityNotFoundProblem
     }
 
     def "test create without required field"() {
@@ -199,7 +199,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.update([name: 'foo', id: 99999999])
 
         then:
-        thrown EntityNotFoundException
+        thrown EntityNotFoundProblem
     }
 
     def "test remove"() {
@@ -229,7 +229,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.removeById(99999999)
 
         then:
-        thrown EntityNotFoundException
+        thrown EntityNotFoundProblem
     }
 
     def "test bind"() {

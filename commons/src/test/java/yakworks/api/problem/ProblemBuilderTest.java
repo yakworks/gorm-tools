@@ -1,7 +1,7 @@
 package yakworks.api.problem;
 
 import org.junit.jupiter.api.Test;
-import yakworks.api.problem.ThrowableProblem;
+import yakworks.api.problem.RuntimeProblem;
 
 import java.net.URI;
 
@@ -70,7 +70,7 @@ class ProblemBuilderTest {
 
     @Test
     void shouldCreateProblemWithCause() {
-        final ThrowableProblem problem = ProblemBuilder.create()
+        final RuntimeProblem problem = ProblemBuilder.create()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -81,9 +81,9 @@ class ProblemBuilderTest {
                         .build())
                 .build();
 
-        assertThat(problem, hasFeature("cause", ThrowableProblem::getCause, notNullValue()));
+        assertThat(problem, hasFeature("cause", RuntimeProblem::getCause, notNullValue()));
 
-        final ThrowableProblem cause = problem.getCause();
+        final RuntimeProblem cause = problem.getCause();
         assertThat(cause, hasFeature("type", Problem::getType, hasToString("https://example.org/expired-credit-card")));
         assertThat(cause, hasFeature("title", Problem::getTitle, is("Expired Credit Card")));
         assertThat(cause, hasFeature("status", Problem::getStatus, is(BAD_REQUEST)));

@@ -15,23 +15,18 @@ import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.support.MsgService
 import gorm.tools.support.MsgSourceResolvable
 import grails.validation.ValidationException
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.api.problem.ApiProblem
 import yakworks.api.problem.Problem
 import yakworks.api.problem.ProblemTrait
 import yakworks.api.problem.ValidationProblem
 import yakworks.api.problem.Violation
 import yakworks.api.problem.ViolationFieldError
 import yakworks.i18n.MsgKey
-
-import static org.springframework.http.HttpStatus.NOT_FOUND
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 /**
  * Service to prepare ApiError / ApiValidationError for given exception
@@ -69,11 +64,10 @@ class ProblemHandler {
         ApiStatus status400 = HttpStatus.BAD_REQUEST
         ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
-        Integer statusId = UNPROCESSABLE_ENTITY.value()
 
-        if (e instanceof EntityNotFoundException) {
-            // return Problem.of(status404).msg(MsgKey.of('error.notFound')).detail(e.message)
-            return ApiProblem.of(NOT_FOUND.value(), getMsg(e)).msg(MsgKey.of('error.notFound'))
+        if (e instanceof ProblemTrait) {
+            // already a problem then just return it
+            return (ProblemTrait) e
         }
         else if (e instanceof EntityValidationException) {
             String detail

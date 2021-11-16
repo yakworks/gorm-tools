@@ -22,7 +22,7 @@ public final class ProblemBuilder {
     private ApiStatus status;
     private String detail;
     private URI instance;
-    private ThrowableProblem cause;
+    private RuntimeProblem cause;
     private final Map<String, Object> parameters = new LinkedHashMap<>();
 
     /**
@@ -62,7 +62,7 @@ public final class ProblemBuilder {
         return this;
     }
 
-    public ProblemBuilder cause(@Nullable final ThrowableProblem cause) {
+    public ProblemBuilder cause(@Nullable final RuntimeProblem cause) {
         this.cause = cause;
         return this;
     }
@@ -82,8 +82,8 @@ public final class ProblemBuilder {
     //     return this;
     // }
 
-    public ThrowableProblem build() {
-        return (ThrowableProblem) ThrowableProblem.of(cause)
+    public RuntimeProblem build() {
+        return (RuntimeProblem) RuntimeProblem.of(cause)
             .type(type).title(title).status(status).detail(detail).instance(instance);
     }
 

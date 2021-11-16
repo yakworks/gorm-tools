@@ -6,12 +6,6 @@ package yakworks.api.problem
 
 import spock.lang.Specification
 
-import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.containsString
-import static org.hamcrest.Matchers.hasToString
-import static org.hamcrest.Matchers.is
-import static org.hamcrest.Matchers.nullValue
-import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature
 import static yakworks.api.HttpStatus.NOT_FOUND
 
 class ProblemSpec extends Specification {
@@ -24,7 +18,7 @@ class ProblemSpec extends Specification {
 
     void shouldRenderCustomDetailAndInstance() {
         when:
-        final ThrowableProblem p = Problem.create()
+        final RuntimeProblem p = Problem.create()
             .type(URI.create("https://example.org/problem"))
             .status(NOT_FOUND)
             .detail("Order 123")
@@ -41,7 +35,7 @@ class ProblemSpec extends Specification {
 
     void shouldRenderCustomPropertiesWhenPrintingStackTrace() {
         when:
-        final ThrowableProblem problem = Problem.create()
+        final RuntimeProblem problem = Problem.create()
             .type(URI.create("https://example.org/problem"))
             .status(NOT_FOUND)
 

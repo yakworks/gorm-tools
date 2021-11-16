@@ -6,20 +6,16 @@ package gorm.tools.repository
 
 import org.springframework.util.ReflectionUtils
 
+import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.api.EntityNotFoundProblem
 import gorm.tools.support.MsgSourceResolvable
 import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
-import grails.testing.gorm.DataTest
+
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
 import testing.Cust
-import yakworks.gorm.testing.model.Enummy
-import yakworks.gorm.testing.model.KitchenSink
-import yakworks.gorm.testing.model.SinkExt
-import yakworks.gorm.testing.model.SinkItem
-import yakworks.gorm.testing.model.Thing
 import yakworks.i18n.icu.ICUMessageSource
 
 class RepoUtilsSpec extends Specification implements DataRepoTest {
@@ -49,8 +45,8 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
         RepoUtil.checkVersion(mocke, 0)
 
         then:
-        def e = thrown(OptimisticLockingFailureException)
-        e.message == "Another user has updated the MockDomain while you were editing"
+        def e = thrown(OptimisticLockingProblem)
+        e.code
 
     }
 
@@ -59,9 +55,8 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
         RepoUtil.checkFound(null, 99, 'xxx')
 
         then:
-        EntityNotFoundException e = thrown(EntityNotFoundException)
-        e.code == 'default.not.found.message'
-        e.message == 'xxx not found with id:99'
+        EntityNotFoundProblem e = thrown(EntityNotFoundProblem)
+        e.code == 'error.notFound'
     }
 
     void "test propName"() {

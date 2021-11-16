@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.errors
+package gorm.tools.api
 
 import groovy.transform.CompileStatic
 
@@ -19,14 +19,14 @@ import gorm.tools.support.SpringMsgKey
  * @since 6.1
  */
 @CompileStatic
-class DataException extends InvalidDataAccessResourceUsageException implements MsgSourceResolvable {
+class DataProblem extends InvalidDataAccessResourceUsageException implements MsgSourceResolvable {
 
-    DataException(String msg) {
+    DataProblem(String msg) {
         super(msg)
         defaultMessage = msg
     }
 
-    DataException(String code, Class entityClass) {
+    DataProblem(String code, Class entityClass) {
         super(code)
         setMessage(
             SpringMsgKey.of(code, [entityClass.simpleName])

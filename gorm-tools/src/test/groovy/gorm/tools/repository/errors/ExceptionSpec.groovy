@@ -4,6 +4,7 @@
 */
 package gorm.tools.repository.errors
 
+import gorm.tools.api.EntityNotFoundProblem
 import gorm.tools.repository.RepoUtil
 import spock.lang.Specification
 
@@ -14,8 +15,8 @@ class ExceptionSpec extends Specification {
         when:
             RepoUtil.checkFound(null, 1, "Bla")
         then:
-            def e = thrown(EntityNotFoundException)
-            e.message == "Bla not found with id:1"
+            def e = thrown(EntityNotFoundProblem)
+            e.message == "code: error.notFound, detail: Lookup failed for Bla using data [id: 1]"
 
     }
 

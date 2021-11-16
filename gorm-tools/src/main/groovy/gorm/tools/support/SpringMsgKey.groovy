@@ -11,7 +11,7 @@ import groovy.transform.ToString
 import org.springframework.context.MessageSourceResolvable
 
 /**
- * A concrete implementation of the MsgSourceResolvableTrait
+ * A concrete implementation of the MsgSourceResolvable
  * and thus the {@link MessageSourceResolvable} interface.
  * similiar to {@link org.springframework.context.support.DefaultMessageSourceResolvable} but groovified
  * @see org.springframework.context.MessageSource#getMessage(MessageSourceResolvable, java.util.Locale)

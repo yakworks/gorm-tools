@@ -15,12 +15,14 @@ import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
+import gorm.tools.api.DataProblem
+import gorm.tools.api.EntityNotFoundProblem
+import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import gorm.tools.repository.errors.DataException
-import gorm.tools.repository.errors.EntityNotFoundException
 import grails.util.Environment
 import yakworks.commons.lang.NameUtils
+import yakworks.i18n.MsgKey
 
 /**
  * A bunch of statics to support the repositories.
@@ -91,8 +93,10 @@ class  RepoUtil {
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
             if (currentVersion > oldVersion) {
-                def msgKey = RepoMessage.optimisticLockingFailure(entity)
-                throw new OptimisticLockingFailureException(msgKey.defaultMessage)
+                def msgKey = MsgKey.of('error.optimisticLocking', [entityName: entity.class.simpleName])
+                throw OptimisticLockingProblem
+                    .of(msgKey)
+                    .detail("server version:${currentVersion} > edited version:${oldVersion}") as OptimisticLockingProblem
             }
         }
     }
@@ -103,21 +107,21 @@ class  RepoUtil {
      * @param entity - the domain object the check
      * @param id - the identifier use when trying to find it. Will be used to construct the exception message
      * @param domainClassName - the name of the domain that will be used to build error message if thrown
-     * @throws EntityNotFoundException if it not found
+     * @throws EntityNotFoundProblem if it not found
      */
     static void checkFound(Object entity, Serializable id, String domainClassName) {
         if (!entity) {
-            throw new EntityNotFoundException(id, domainClassName)
+            throw new EntityNotFoundProblem(id, domainClassName)
         }
     }
 
     /**
      * check that the passed in data is not empty and throws EmptyDataException if so
-     * @throws DataException if it not found
+     * @throws DataProblem if it not found
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {
-            throw new DataException('error.data.empty', entityClass)
+            throw new DataProblem('error.data.empty', entityClass)
         }
     }
 
@@ -125,7 +129,7 @@ class  RepoUtil {
      * in create data, if id is passed then bindId must be set to true, if not throw exception
      */
     static void checkCreateData(Map data, Map args, Class entityClass) {
-        if(data['id'] && !args.bindId) throw new DataException('error.data.bindId', entityClass)
+        if(data['id'] && !args.bindId) throw new DataProblem('error.data.bindId', entityClass)
     }
 
     /**

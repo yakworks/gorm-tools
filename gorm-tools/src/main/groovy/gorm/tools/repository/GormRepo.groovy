@@ -21,12 +21,12 @@ import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
+import gorm.tools.api.EntityNotFoundProblem
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
 import gorm.tools.repository.bulk.BulkableRepo
-import gorm.tools.repository.errors.EntityNotFoundException
 import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
@@ -173,7 +173,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param data - the map with the keys for lookup
      * @param boolean mustExist - if the record must exist, default true
      * @return the found entity
-     * @throws EntityNotFoundException if mustExist is true, and entity not found
+     * @throws EntityNotFoundProblem if mustExist is true, and entity not found
      */
     D findWithData(Map data, boolean mustExist = true) {
         D foundEntity
@@ -248,7 +248,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
-     * @throws EntityNotFoundException if its not found or if a DataIntegrityViolationException is thrown
+     * @throws EntityNotFoundProblem if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
         withTrx {
@@ -315,7 +315,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
      * @return the retrieved entity. Will always be an entity as this throws an error if not
      *
-     * @throws EntityNotFoundException if its not found
+     * @throws EntityNotFoundProblem if its not found
      * @throws gorm.tools.repository.errors.EntityValidationException if the versions mismatch
      */
     D get(Serializable id, Long version) {

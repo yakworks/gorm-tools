@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
@@ -81,20 +80,20 @@ public interface Problem extends Result {
         return new ProblemBuilder();
     }
 
-    static ThrowableProblem create() {
-        return new ThrowableProblem();
+    static RuntimeProblem create() {
+        return new RuntimeProblem();
     }
 
-    static ThrowableProblem of(final ApiStatus status) {
-        return (ThrowableProblem) create().status(status);
+    static RuntimeProblem of(final ApiStatus status) {
+        return (RuntimeProblem) create().status(status);
     }
 
-    static ThrowableProblem of(final ApiStatus status, final String detail) {
-        return (ThrowableProblem) create().status(status).detail(detail);
+    static RuntimeProblem of(final ApiStatus status, final String detail) {
+        return (RuntimeProblem) create().status(status).detail(detail);
     }
 
-    static ThrowableProblem of(MsgKey msg) {
-        return (ThrowableProblem) create().msg(msg);
+    static RuntimeProblem of(MsgKey msg) {
+        return (RuntimeProblem) create().msg(msg);
     }
 
     // static ThrowableProblem of(final ApiStatus status, final URI instance) {

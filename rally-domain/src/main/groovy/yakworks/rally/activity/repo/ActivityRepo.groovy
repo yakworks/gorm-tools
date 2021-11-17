@@ -13,13 +13,13 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.api.ProblemHandler
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.api.EntityValidationProblem
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforePersistEvent

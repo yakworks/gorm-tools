@@ -22,12 +22,12 @@ import org.springframework.transaction.support.DefaultTransactionStatus
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.api.EntityNotFoundProblem
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
 import gorm.tools.repository.bulk.BulkableRepo
-import gorm.tools.api.EntityValidationProblem
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher

@@ -9,10 +9,10 @@ import groovy.transform.CompileStatic
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.validation.Errors
 
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
-import gorm.tools.api.EntityValidationProblem
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.AfterRemoveEvent

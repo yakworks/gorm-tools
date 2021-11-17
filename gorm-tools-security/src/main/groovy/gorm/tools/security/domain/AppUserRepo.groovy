@@ -9,10 +9,10 @@ import javax.inject.Inject
 
 import org.springframework.security.crypto.password.PasswordEncoder
 
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.api.EntityValidationProblem
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent

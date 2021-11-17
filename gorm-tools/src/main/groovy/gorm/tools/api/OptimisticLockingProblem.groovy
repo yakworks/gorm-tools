@@ -16,6 +16,9 @@ import yakworks.i18n.MsgKey
  */
 @CompileStatic
 class OptimisticLockingProblem extends RuntimeProblem {
+    public static String DEFAULT_CODE = 'error.optimisticLocking'
+    String defaultCode = DEFAULT_CODE
+    Object entity
 
     protected OptimisticLockingProblem() {
         super(null);
@@ -31,12 +34,17 @@ class OptimisticLockingProblem extends RuntimeProblem {
         return (OptimisticLockingProblem) super.getCause()
     }
 
-    static OptimisticLockingProblem of(MsgKey msg) {
-        return (OptimisticLockingProblem) new OptimisticLockingProblem().msg(msg);
+    OptimisticLockingProblem entity(Object v) {
+        if(v == null) return this
+        this.entity = v
+        putArgIfAbsent('name', v.class.simpleName)
+        return this;
     }
 
-    static OptimisticLockingProblem of(final OptimisticLockingProblem cause) {
-        return new OptimisticLockingProblem(cause);
+    static OptimisticLockingProblem of(Object entity) {
+        def opProb = new OptimisticLockingProblem()
+        opProb.msg = MsgKey.of(DEFAULT_CODE, [name: entity.class.simpleName])
+        return opProb;
     }
 
 }

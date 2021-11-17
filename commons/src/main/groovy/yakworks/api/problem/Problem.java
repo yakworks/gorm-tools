@@ -53,10 +53,10 @@ public interface Problem extends Result {
     /**
      * The list of constraint violations or any others
      */
-    default List<Violation> getErrors(){
+    default List<Violation> getViolations(){
         return Collections.emptyList();
     }
-    default void setErrors(List<Violation> v){}
+    default void setViolations(List<Violation> v){}
     // default E violations(List<Violation> v) { setViolations(v); return (E)this; }
 
     /**

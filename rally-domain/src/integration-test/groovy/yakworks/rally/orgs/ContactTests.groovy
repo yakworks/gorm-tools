@@ -105,7 +105,7 @@ class ContactTests extends Specification implements DomainIntTest {
 
         then:
         EntityValidationException e = thrown()
-        e.code == "contact.not.deleted.iskey"
+        e.code == "error.delete.reference"
     }
 
     void "test create Contact with org lookup by orgSource"() {

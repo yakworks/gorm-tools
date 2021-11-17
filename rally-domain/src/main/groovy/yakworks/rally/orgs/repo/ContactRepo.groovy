@@ -15,9 +15,9 @@ import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.security.domain.AppUser
-import gorm.tools.support.SpringMsgKey
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
+import yakworks.i18n.MsgKey
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
@@ -41,19 +41,22 @@ class ContactRepo implements GormRepo<Contact> {
     @RepoListener
     void beforeRemove(Contact contact, BeforeRemoveEvent e) {
         AppUser user = contact.user
+        Map args = [name: "Contact: ${contact.name}"] as Map
+        MsgKey errorMsgKey
         if (user) {
-            def msgKey = new SpringMsgKey("delete.error.reference", ['Contact', contact.name, 'User'], "contact delete error")
-            throw new EntityValidationException(msgKey, contact)
+            args['other'] = 'User'
+            errorMsgKey = MsgKey.of("error.delete.reference", args)
         }
         if (Org.query(contact: contact).count()) {
-            def msgKey = new SpringMsgKey("contact.not.deleted.iskey", [contact.name], "contact delete error")
-            throw new EntityValidationException(msgKey, contact)
+            args['other'] = 'Org primary contact'
+            errorMsgKey = MsgKey.of("error.delete.reference", args)
         }
 
         if (ActivityContact.repo.count(contact)) {
-            def msgKey = new SpringMsgKey("delete.error.reference",  ['Contact', contact.name, 'Activity'], "contact delete error")
-            throw new EntityValidationException(msgKey, contact)
+            args['other'] = 'ActivityContact'
+            errorMsgKey = MsgKey.of("error.delete.reference", args)
         }
+        if(errorMsgKey) throw EntityValidationException.of(errorMsgKey).entity(contact)
 
         //remove
         TagLink.remove(contact)

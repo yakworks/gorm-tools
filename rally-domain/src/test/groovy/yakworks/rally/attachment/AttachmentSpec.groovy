@@ -183,7 +183,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
 
         then: "will fail on name"
         EntityValidationException g = thrown()
-        'validation.error' == g.code
+        'validation.problem' == g.code
         // XXX fix way to verify the file got delted
         // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
         // File monthDir = appResourceLoader.getMonthDirectory("attachments.location")

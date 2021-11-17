@@ -22,15 +22,15 @@ class ProblemMsgKeys {
     }
 
     static MsgKey validationError(String entityName) {
-        MsgKey.of('error.validation', [entityName: entityName])
+        MsgKey.of('error.validation', [name: entityName])
     }
 
     static MsgKey notSaved(Object entity) {
-        MsgKey.of('error.persist', [entityName: entity.class.simpleName])
+        MsgKey.of('error.persist', [name: entity.class.simpleName])
     }
 
     static MsgKey notFoundId(Class entityClass, Serializable id) {
-        MsgKey.of('error.notFound', [entityName: entityClass.simpleName, id: id])
+        MsgKey.of('error.notFound', [name: entityClass.simpleName, id: id])
     }
 
     // static MsgKey notDeleted(Object entity, Serializable ident) {
@@ -39,7 +39,7 @@ class ProblemMsgKeys {
     // }
 
     static MsgKey optimisticLockingFailure(Object entity) {
-        MsgKey.of('error.optimisticLocking', [entityName: entity.class.simpleName])
+        MsgKey.of('error.optimisticLocking', [name: entity.class.simpleName])
     }
 
 }

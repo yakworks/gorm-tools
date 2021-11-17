@@ -16,7 +16,7 @@ package yakworks.api.problem;
  */
 public interface Exceptional extends Problem {
 
-    Exceptional getCause();
+    // Exceptional getCause();
 
     default Exception propagate() throws Exception {
         throw propagateAs(Exception.class);

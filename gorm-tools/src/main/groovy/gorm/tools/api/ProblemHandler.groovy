@@ -16,7 +16,6 @@ import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.support.MsgService
 import gorm.tools.support.MsgSourceResolvable
 import grails.validation.ValidationException
 import yakworks.api.ApiStatus
@@ -27,6 +26,7 @@ import yakworks.api.problem.ValidationProblem
 import yakworks.api.problem.Violation
 import yakworks.api.problem.ViolationFieldError
 import yakworks.i18n.MsgKey
+import yakworks.i18n.icu.ICUMessageSource
 
 /**
  * Service to prepare ApiError / ApiValidationError for given exception
@@ -38,8 +38,7 @@ import yakworks.i18n.MsgKey
 @CompileStatic
 class ProblemHandler {
 
-    @Autowired
-    MsgService msgService
+    @Autowired ICUMessageSource messageSource
 
     ProblemTrait handleException(Throwable e) {
         handleException("Entity", e)
@@ -65,21 +64,21 @@ class ProblemHandler {
         ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
 
-        if (e instanceof ProblemTrait) {
+        if (e instanceof EntityValidationException) {
+            if(e.errors instanceof EmptyErrors){
+                //this is some other exception wrapped in validation exception
+                e.detail( e.cause?.message)
+            }
+            e.violations(toFieldErrorList(e.errors))
+            return e
+        }
+        else if (e instanceof ProblemTrait) {
             // already a problem then just return it
             return (ProblemTrait) e
         }
-        else if (e instanceof EntityValidationException) {
-            String detail
-            if(e.errors instanceof EmptyErrors){
-                //this is some other exception wrapped in validation exception
-                detail = e.cause?.message
-            }
-            return ValidationProblem.of(status422, getMsg(e), detail).errors(toFieldErrorList(e.errors))
-        }
         else if (e instanceof ValidationException) {
             String msg = 'Validation Error'
-            return ValidationProblem.of(status422, msg, e.message).errors(toFieldErrorList(e.errors))
+            return ValidationProblem.of(status422, msg, e.message).violations(toFieldErrorList(e.errors))
         }
         else if (e instanceof MsgSourceResolvable) { //legacy
             return Problem.of(status400).msg(MsgKey.of(e.code)).detail(getMsg(e))
@@ -99,7 +98,7 @@ class ProblemHandler {
     }
 
     String getMsg(MessageSourceResolvable msr){
-        String msg = msgService.getMessage(msr)
+        String msg = messageSource.getMessage(msr)
         return msg
     }
 

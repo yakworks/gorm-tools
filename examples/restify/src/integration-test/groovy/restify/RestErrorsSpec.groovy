@@ -68,7 +68,6 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
 
     }
 
-    @IgnoreRest
     void "test data access exception on db constraint violation"() {
         when:
         Response resp = post('/api/rally/org', [ name:"Project-1", num:"P1", type: "Customer"])

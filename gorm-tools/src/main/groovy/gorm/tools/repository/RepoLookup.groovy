@@ -53,9 +53,7 @@ class RepoLookup {
     }
 
     /**
-     *
-     * @param entity
-     * @return
+     * primary method to find the repo in the cache
      */
     static <D> GormRepo<D> findRepo(Class<D> entity) {
         if(shouldCache()){

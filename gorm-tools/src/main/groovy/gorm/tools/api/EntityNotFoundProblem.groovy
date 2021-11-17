@@ -26,6 +26,8 @@ import yakworks.i18n.MsgKey
 @CompileStatic
 class EntityNotFoundProblem extends DataRetrievalFailureException implements ProblemTrait, Exceptional {
     public static String DEFAULT_CODE = 'error.notFound'
+
+    String defaultCode = DEFAULT_CODE
     ApiStatus status = HttpStatus.NOT_FOUND
 
     // the look up key, mostly will be the id, but could be code or map with sourceId combos
@@ -42,7 +44,7 @@ class EntityNotFoundProblem extends DataRetrievalFailureException implements Pro
         if(data instanceof Number) dataMap = [id: data]
         if(data instanceof Map) dataMap = data
         // if(data instanceof Number)
-        this.msg = MsgKey.of(DEFAULT_CODE, [entityName: entityName, id: data])
+        this.msg = MsgKey.of(DEFAULT_CODE, [name: entityName, id: data])
         this.detail = "Lookup failed for $entityName using data $dataMap"
     }
 

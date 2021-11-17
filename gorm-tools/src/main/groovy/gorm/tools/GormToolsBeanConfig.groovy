@@ -32,7 +32,6 @@ import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoValidatorRegistry
-import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
 import grails.config.Config
 import grails.core.GrailsApplication
@@ -59,7 +58,7 @@ class GormToolsBeanConfig {
     }
 
     Closure getBeanDefinitions() {{->
-        msgService(MsgService)
+
         jdbcTemplate(JdbcTemplate, ref("dataSource"), lazy())
 
         jdbcIdGenerator(JdbcIdGenerator) { bean ->

@@ -17,9 +17,9 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
-import gorm.tools.support.SpringMsgKey
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import yakworks.i18n.MsgKey
 
 @GormRepository
 @GrailsCompileStatic
@@ -107,8 +107,9 @@ class AppUserRepo implements GormRepo<AppUser> {
     /** throws EntityValidationException if not. NOTE: keep the real pas**ord name out so scanners dont pick this up */
     void isSamePass(String pass, String rePass, AppUser user) {
         if (pass.trim() != rePass.trim()) {
-            def msg = SpringMsgKey.of('password.mismatch', "The passwords you entered do not match")
-            throw new EntityValidationException(msg, user)
+            def msgKey = MsgKey.of('password.mismatch').fallbackMessage("The passwords you entered do not match")
+
+            throw EntityValidationException.of(msgKey).entity(user)
         }
     }
 

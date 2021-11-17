@@ -150,6 +150,7 @@ subprojects { subprj ->
 ext.codenarcRuleset= '''
   // getRule('Println').enabled = false
   // getRule('AbcMetric').enabled = false
+  getRule('FieldName').enabled = false
 '''
 
 //logging

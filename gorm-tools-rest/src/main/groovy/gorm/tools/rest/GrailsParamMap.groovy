@@ -7,7 +7,6 @@ package gorm.tools.rest
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
 
 import grails.web.servlet.mvc.GrailsParameterMap
 

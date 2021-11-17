@@ -6,16 +6,8 @@ package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
 
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
-
-import gorm.tools.beans.AppCtx
-import gorm.tools.support.MsgSourceResolvable
-import gorm.tools.support.SpringMsgKey
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -48,12 +40,12 @@ class RepoExceptionSupport {
         }
         else if (ex instanceof grails.validation.ValidationException) {
             def ve = (grails.validation.ValidationException) ex
-            return new EntityValidationException(entity, ve.errors, ve)
+            return EntityValidationException.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
             // Gorm's stock ValidationException
             def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
-            return new EntityValidationException(entity, ve.errors, ve)
+            return EntityValidationException.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof OptimisticLockingFailureException) {
             return ex //just return unchanged
@@ -61,25 +53,21 @@ class RepoExceptionSupport {
         }
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
-            return new EntityValidationException(notSaved(entity), entity, null, ex)
+            return EntityValidationException.of(entity, ex).notSavedMsg()
         }
         return ex
     }
 
-    static List<Map<String, String>> toErrorList(Errors errs) {
-        List<Map<String, String>> errors = []
-        MessageSource messageSource =  AppCtx.getCtx()
-        errs.allErrors.each {def err ->
-            Map m = [message:messageSource.getMessage(err, LocaleContextHolder.getLocale())]
-            if(err instanceof FieldError) m['field'] = err.field
-            errors << m
-        }
-        return errors
-    }
+    // static List<Map<String, String>> toErrorList(Errors errs) {
+    //     List<Map<String, String>> errors = []
+    //     MessageSource messageSource =  AppCtx.getCtx()
+    //     errs.allErrors.each {def err ->
+    //         Map m = [message:messageSource.getMessage(err, LocaleContextHolder.getLocale())]
+    //         if(err instanceof FieldError) m['field'] = err.field
+    //         errors << m
+    //     }
+    //     return errors
+    // }
 
-    static MsgSourceResolvable notSaved(Object entity) {
-        String entityName = entity.class.simpleName
-        return new SpringMsgKey("persist.error", [entityName], "$entityName save failed")
-    }
 
 }

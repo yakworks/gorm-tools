@@ -64,7 +64,7 @@ final class ThrowableProblemTest {
                 .detail("CVC invalid")
                 .build();
 
-        assertThat(problem, hasFeature("message", Throwable::getMessage, is("Preauthorization Failed, detail: CVC invalid")));
+        assertThat(problem, hasFeature("message", Throwable::getMessage, is("Preauthorization Failed: CVC invalid")));
     }
 
     @Test

@@ -162,13 +162,13 @@ trait RestRepoApiController<D> extends RestApiController {
     def list() {
         Pager pager = pagedQuery(params, 'list')
         // passing renderArgs args would be usefull for 'renderNulls' if we want to include/exclude
-        respond(pager)
+        respondWith pager
     }
 
     @Action
     def picklist() {
         Pager pager = pagedQuery(params, 'picklist')
-        respond(pager)
+        respondWith pager
     }
 
     // @Action
@@ -211,12 +211,12 @@ trait RestRepoApiController<D> extends RestApiController {
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         RepoJobEntity job = repoJobService.getJob(jobId)
-        respond([status: MULTI_STATUS], job)
+        respondWith(job, [status: MULTI_STATUS])
     }
 
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
         EntityMap entityMap = createEntityMap(instance)
-        respond([status: status], entityMap)
+        respondWith(entityMap, [status: status])
     }
 
     Pager pagedQuery(Map params, String includesKey) {
@@ -291,7 +291,7 @@ trait RestRepoApiController<D> extends RestApiController {
     void handleException(Exception e) {
         assert getEntityClass()
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
-        respond(apiError)
+        respondWith(apiError)
     }
 
 }

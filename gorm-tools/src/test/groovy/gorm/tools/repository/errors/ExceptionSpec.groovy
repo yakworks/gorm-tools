@@ -16,7 +16,7 @@ class ExceptionSpec extends Specification {
             RepoUtil.checkFound(null, 1, "Bla")
         then:
             def e = thrown(EntityNotFoundProblem)
-            e.message == "code: error.notFound, detail: Lookup failed for Bla using data [id:1]"
+            e.message == "Lookup failed for Bla using data [id:1]: code=error.notFound"
 
     }
 

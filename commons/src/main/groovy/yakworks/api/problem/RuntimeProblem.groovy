@@ -35,9 +35,8 @@ class RuntimeProblem extends NestedRuntimeException implements ProblemTrait, Exc
     }
 
     static String buildMessage(final Problem p) {
-        String code = p.code? "code: $p.code" : ''
-        String detail = p.detail? "detail: $p.detail" : ''
-        return [p.title, code, detail].findAll{it}.join(', ')
+        String code = p.code? "code=$p.code" : ''
+        return [p.title, p.detail, code].findAll{it}.join(': ')
     }
 
     @Override

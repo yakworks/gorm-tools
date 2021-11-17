@@ -31,11 +31,9 @@ import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
-import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
-import yakworks.i18n.icu.DefaultICUMessageSource
 import yakworks.i18n.icu.GrailsICUMessageSource
 
 /**
@@ -92,7 +90,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         parallelTools(ParallelStreamTools)
         asyncService(AsyncService)
         entityMapService(EntityMapService)
-        msgService(MsgService)
         problemHandler(ProblemHandler)
         messageSource(GrailsICUMessageSource)
     }}

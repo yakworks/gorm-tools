@@ -4,13 +4,23 @@
 */
 package gorm.tools.repository.errors
 
+
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.mapping.validation.ValidationException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
+import org.springframework.validation.ObjectError
 
 import gorm.tools.support.MsgSourceResolvable
-import gorm.tools.support.SpringMsgKey
+import yakworks.api.ApiStatus
+import yakworks.api.HttpStatus
+import yakworks.api.problem.Exceptional
+import yakworks.api.problem.ProblemTrait
+import yakworks.api.problem.RuntimeProblem
+import yakworks.i18n.MsgKey
+
+import static java.util.Arrays.asList
+import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source
@@ -19,50 +29,99 @@ import gorm.tools.support.SpringMsgKey
  * @since 6.1
  */
 @CompileStatic
-class EntityValidationException extends ValidationException implements MsgSourceResolvable {
-    public static String defMsg = "Save or Validation Error(s) occurred"
+class EntityValidationException extends DataIntegrityViolationException implements ProblemTrait, Exceptional  {
+    public static String DEFAULT_CODE ='validation.problem'
+    public static String DEFAULT_TITLE ='Validation Error(s)'
     Object entity //the entity that the error occured on
-    Map meta //any meta that can be set and passed up the chain for an error
-    // Map messageMap //map with message info code,args and defaultMessage
-    // MsgSourceResolvable messageKey
+    Errors errors
+    String exMessage
 
-    EntityValidationException(String msg, Throwable cause = null) {
-        this(msg, new EmptyErrors("empty"), cause)
+    //overrides
+    String defaultCode = DEFAULT_CODE
+    String title = DEFAULT_TITLE
+    ApiStatus status = HttpStatus.UNPROCESSABLE_ENTITY
+
+    EntityValidationException(Throwable cause) {
+        this("", null, cause)
     }
 
-    EntityValidationException(String msg, Errors errors) {
-        this(msg, errors, null)
+    // deprecated, provided for backward compat
+    EntityValidationException(String message) {
+        this(message, null, null)
     }
 
-    EntityValidationException(String msg, Errors e, Throwable cause) {
-        this(new SpringMsgKey([], null, msg), null, e, cause)
+    // deprecated, provided for backward compat
+    EntityValidationException(String message, Errors e, Throwable cause) {
+        super(DEFAULT_CODE, cause)
+        setMsg(MsgKey.of(DEFAULT_CODE))
+        setDetail(message?:cause?.message)
+        errors = errors ?: new EmptyErrors("empty")
     }
 
-    EntityValidationException(String code, List arguments, Throwable cause = null) {
-        this(new SpringMsgKey(code, arguments, defMsg), null, null, null)
+    EntityValidationException(final EntityValidationException cause) {
+        super(DEFAULT_CODE, cause);
+        final Collection<StackTraceElement> stackTrace = COMPOUND.process(asList(getStackTrace()));
+        setStackTrace(stackTrace as StackTraceElement[]);
     }
 
-    EntityValidationException(String code, Object entity) {
-        this(new SpringMsgKey(code, [entity.class.simpleName], defMsg), entity, null, null)
-    }
-
-    EntityValidationException(MsgSourceResolvable msgKey, Throwable cause = null) {
-        this(msgKey, null, null, cause)
-    }
-
-    EntityValidationException(MsgSourceResolvable msgKey, Object entity, Errors errors = null, Throwable cause = null) {
-        super(msgKey.defaultMessage ?: msgKey.code, errors ?: new EmptyErrors("empty"))
-        if(cause) initCause(cause)
-        setMessage(msgKey.msgCodes, msgKey.args, msgKey.defaultMessage)
+    // legacy
+    EntityValidationException(MsgSourceResolvable msrKey, Object entity, Errors ers) {
+        super(msrKey.code)
         this.entity = entity
+        this.errors = ers ?: new EmptyErrors("empty")
+        msg = MsgKey.of(msrKey.code, msrKey.args)
     }
 
-    EntityValidationException(Object entity, Errors errors, Throwable cause) {
-        this(validationError(entity), entity, errors, cause)
+    EntityValidationException entity(Object v) {
+        if(v == null) return this
+        this.entity = v
+        putArgIfAbsent('name', v.class.simpleName)
+        return this;
     }
 
-    static MsgSourceResolvable validationError(Object entity) {
-        String entityName = entity.class.simpleName
-        return new SpringMsgKey("validation.error", [entityName], "$entityName validation errors")
+    EntityValidationException errors(Errors v) {this.errors = v; return this;}
+
+    @Override //throwable
+    String getMessage() {
+        return RuntimeProblem.buildMessage(this)
+    }
+
+    @Override
+    String toString() {
+        return RuntimeProblem.buildToString(this)
+    }
+
+    EntityValidationException notSavedMsg() {
+        msg = MsgKey.of('error.persist', [entityName: entity.class.simpleName])
+        return this
+    }
+
+    //Legacy from ValidationException
+    public static String formatErrors(Errors errors, String msg ) {
+        String ls = System.getProperty("line.separator");
+        StringBuilder b = new StringBuilder();
+        if (msg != null) {
+            b.append(msg).append(" : ").append(ls);
+        }
+
+        for (ObjectError error : errors.getAllErrors()) {
+            b.append(ls)
+                .append(" - ")
+                .append(error)
+                .append(ls);
+        }
+        return b.toString();
+    }
+
+    static EntityValidationException of(MsgKey msg) {
+        return (EntityValidationException) new EntityValidationException('').msg(msg)
+    }
+
+    static EntityValidationException of(final Throwable cause) {
+        return new EntityValidationException(cause);
+    }
+
+    static EntityValidationException of(Object entity, Throwable cause) {
+        return new EntityValidationException(cause).entity(entity);
     }
 }

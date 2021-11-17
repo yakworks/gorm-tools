@@ -19,7 +19,7 @@ import yakworks.i18n.MsgKey
  */
 @CompileStatic
 trait ProblemTrait implements Problem {
-
+    String defaultCode = 'error.default'
     URI type //= Problem.DEFAULT_TYPE
     ApiStatus status = HttpStatus.BAD_REQUEST
     MsgKey msg
@@ -30,7 +30,7 @@ trait ProblemTrait implements Problem {
 
     Map<String, Object> parameters = Collections.emptyMap()
 
-    List<Violation> errors = [] as List<Violation> //Collections.emptyList();
+    List<Violation> violations = [] as List<Violation> //Collections.emptyList();
 
     ProblemTrait status(Integer v) { setStatus(HttpStatus.valueOf(v)); return this; }
     ProblemTrait status(ApiStatus v) {
@@ -50,11 +50,11 @@ trait ProblemTrait implements Problem {
     ProblemTrait instance(URI v) { setInstance(v); return this; }
     ProblemTrait instance(String v) { setInstance(URI.create(v)); return this; }
 
-    ProblemTrait errors(List<Violation> v) { setErrors(v); return this; }
+    ProblemTrait violations(List<Violation> v) { setViolations(v); return this; }
 
 
     ProblemTrait addErrors(List<MsgKey> keyedErrors){
-        def ers = getErrors()
+        def ers = getViolations()
         keyedErrors.each {
             ers << ViolationFieldError.of(it)
         }
@@ -65,6 +65,14 @@ trait ProblemTrait implements Problem {
 
     void set(String key, Object value) {
         parameters.put(key, value);
+    }
+
+    /**
+     * adds an enrty to the msg arg map
+     */
+    Map putArgIfAbsent(Object key, Object val){
+        if(!msg) msg = MsgKey.of(defaultCode)
+        return msg.putArg(key, val)
     }
 
     // static String genString(final Problem p) {

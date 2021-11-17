@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository
 
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -20,7 +19,6 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import yakworks.api.problem.Problem
 import yakworks.api.problem.RuntimeProblem
-import yakworks.i18n.MsgKey
 
 /**
  * A bunch of statics to support the repositories.
@@ -55,9 +53,8 @@ class RepoUtil {
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
             if (currentVersion > oldVersion) {
-                def msgKey = MsgKey.of('error.optimisticLocking', [entityName: entity.class.simpleName])
                 throw OptimisticLockingProblem
-                    .of(msgKey)
+                    .of(entity)
                     .detail("server version:${currentVersion} > edited version:${oldVersion}") as OptimisticLockingProblem
             }
         }
@@ -83,7 +80,7 @@ class RepoUtil {
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {
-            throw Problem.of('error.data.empty', [entityName: entityClass.simpleName])
+            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
         }
     }
 
@@ -92,7 +89,7 @@ class RepoUtil {
      */
     static void checkCreateData(Map data, Map args, Class entityClass) {
         if(data['id'] && !args.bindId)
-            throw Problem.of('error.data.empty', [entityName: entityClass.simpleName])
+            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
     }
 
     /**

@@ -34,16 +34,17 @@ class ProblemRenderer implements JsonRendererTrait<Problem> {
             code problem.code
             title getMessage(problem)
             detail problem.detail
-            errors problem.errors
+            errors problem.violations
         }
     }
 
     // swallow no such message exception and returns empty string
     String getMessage(Problem problem){
-        if(problem.title) {
+        String message
+        if(problem.msg) {
+            message = getMessage(problem.msg)
+        } else if(problem.title) {
             return problem.title
-        } else if(problem.msg) {
-            return getMessage(problem.msg)
         }
         return ""
     }

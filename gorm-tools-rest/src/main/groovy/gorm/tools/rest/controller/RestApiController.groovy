@@ -6,6 +6,7 @@ package gorm.tools.rest.controller
 
 
 import groovy.transform.CompileStatic
+import groovy.transform.Generated
 
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -23,7 +24,7 @@ import yakworks.commons.lang.NameUtils
  * see grails-core/grails-plugin-rest/src/main/groovy/grails/artefact/controller/RestResponder.groovy
  */
 @CompileStatic
-trait RestApiController implements RequestJsonSupport, RestResponder, ServletAttributes {
+trait RestApiController implements RequestJsonSupport, RestResponder, RestRegistryResponder, ServletAttributes {
 
     @Autowired
     ProblemHandler problemHandler
@@ -65,4 +66,20 @@ trait RestApiController implements RequestJsonSupport, RestResponder, ServletAtt
         Problem apiError = problemHandler.handleException(e)
         respond(apiError)
     }
+
+    //*** RestResponder Overrides to use the RestRegistryResponder.respondWith
+    @Generated @Override
+    def respond(Object obj) { respondWith obj, [:] }
+
+    @Generated @Override
+    def respond(Object obj, Map args){ respondWith(obj, args) }
+
+    @Generated @Override
+    def respond(Map args, Object value) { respondWith value, args }
+
+    @Generated @Override
+    def respond(Map namedArgs, Map value) { respondWith value, namedArgs }
+
+    @Generated @Override
+    def respond(Map value) { respondWith value }
 }

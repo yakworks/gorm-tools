@@ -20,6 +20,7 @@ import gorm.tools.testing.support.MockJdbcIdGenerator
 import grails.buildtestdata.TestDataBuilder
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
+import yakworks.i18n.icu.GrailsICUMessageSource
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
@@ -52,6 +53,7 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             }
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
+            messageSource(GrailsICUMessageSource)
         }
 
         // defineBeans(doWithSpringFirst())

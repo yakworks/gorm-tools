@@ -233,7 +233,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
         then:
         EntityValidationException e = thrown()
-        e.code == 'delete.error.source.external'
+        e.code == 'error.delete.externalSource'
     }
 
     //XXX https://github.com/9ci/domain9/issues/268 need better tests for success delete, make sure contacts are deleted, etc..

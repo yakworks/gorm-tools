@@ -16,6 +16,7 @@ import yakworks.i18n.MsgKey
  */
 @CompileStatic
 trait ResultTrait implements Result {
+    String defaultCode = 'result.ok'
     Boolean ok = true
     ApiStatus status = HttpStatus.OK
     MsgKey msg
@@ -30,4 +31,11 @@ trait ResultTrait implements Result {
     ResultTrait data(Object v) { setData(v); return this; }
     // E value(T v){ setValue(v); return (E)this; }
 
+    /**
+     * adds an enrty to the msg arg map
+     */
+    Map putArgIfAbsent(Object key, Object val){
+        if(!msg) msg = MsgKey.of(defaultCode)
+        return msg.putArg(key, val)
+    }
 }

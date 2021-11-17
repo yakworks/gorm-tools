@@ -4,35 +4,44 @@
 */
 package gorm.tools.repository.errors
 
-import gorm.tools.support.SpringMsgKey
+
 import spock.lang.Specification
+import testing.Cust
+import yakworks.i18n.MsgKey
 
 class EntityValidationExceptionSpec extends Specification {
 
-    void testSimple() {
+    void "simpl string constructor"() {
         when:
-        def e = new EntityValidationException("fubar", new EmptyErrors("blah"))
+        def e = new EntityValidationException("foo message")
 
         then:
-        //"validation.error" == e.code
-        !e.args
-        "fubar" == e.defaultMessage
-        e.message.contains('fubar')
+        e.title == EntityValidationException.DEFAULT_TITLE
+        e.message.contains "Validation Error(s): foo message: code=validation.problem"
     }
 
-    void testNoErrors() {
-        setup:
-        Map entity = [someEntity: "go cubs"]
-        def msgKey = SpringMsgKey.of('vtest', 'defmsg')
-
+    void "test cause"() {
         when:
-        def e = new EntityValidationException(msgKey, entity)
+        def rte = new RuntimeException("bad stuff")
+        def e = new EntityValidationException(rte)
 
         then:
-        "vtest" == e.code
-        !e.args
-        "defmsg" == e.defaultMessage
-        entity == e.entity
+        e.title == EntityValidationException.DEFAULT_TITLE
+        e.message.contains "Validation Error(s): bad stuff: code=validation.problem"
+    }
+
+    void "test msgKey and entity"() {
+        when:
+        def msgKey = MsgKey.of('password.mismatch').fallbackMessage("The passwords you entered do not match")
+
+        def cust = new Cust()
+        def e =  EntityValidationException.of(msgKey).entity(cust)
+
+        then:
+        e.msg.code == 'password.mismatch'
+        e.msg.args == [name: 'Cust']
+        e.title == EntityValidationException.DEFAULT_TITLE
+        e.message == 'Validation Error(s): code=password.mismatch'
     }
 
 }

@@ -199,7 +199,7 @@ trait BulkableRepo<D> {
                     data: r.data,
                     title: r.title,
                     detail: r.detail,
-                    errors: r.errors
+                    errors: r.violations
                 ])
             } else {
                 def entityObj = r.data

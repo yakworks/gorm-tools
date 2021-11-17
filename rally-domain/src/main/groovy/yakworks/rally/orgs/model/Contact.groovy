@@ -8,7 +8,7 @@ import java.time.LocalDate
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.model.NameNum
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.security.domain.AppUser
 import grails.compiler.GrailsCompileStatic
@@ -100,7 +100,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         user:[ nullable: true],
     ]
 
-    static ContactRepo getRepo() { RepoUtil.findRepo(this) as ContactRepo }
+    static ContactRepo getRepo() { RepoLookup.findRepo(this) as ContactRepo }
 
     List<Location> getLocations(){
         Location.listByContact(this)

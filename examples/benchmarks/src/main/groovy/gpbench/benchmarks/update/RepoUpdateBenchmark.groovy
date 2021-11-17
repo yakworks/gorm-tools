@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.async.AsyncConfig
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gpbench.model.basic.CityBasic
 
 @CompileStatic
@@ -17,7 +17,7 @@ class RepoUpdateBenchmark<T> extends BaseUpdateBenchmark<T>{
 
     RepoUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
-        repo = RepoUtil.findRepo(clazz)
+        repo = RepoLookup.findRepo(clazz)
     }
 
     @Override

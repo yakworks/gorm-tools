@@ -56,4 +56,13 @@ class EntityValidationException extends ValidationException implements MsgSource
         setMessage(msgKey.msgCodes, msgKey.args, msgKey.defaultMessage)
         this.entity = entity
     }
+
+    EntityValidationException(Object entity, Errors errors, Throwable cause) {
+        this(validationError(entity), entity, errors, cause)
+    }
+
+    static MsgSourceResolvable validationError(Object entity) {
+        String entityName = entity.class.simpleName
+        return new SpringMsgKey("validation.error", [entityName], "$entityName validation errors")
+    }
 }

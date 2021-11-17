@@ -91,7 +91,7 @@ public interface Result {
         return new OkResult(MsgKey.of(code));
     }
 
-    static OkResult of(String code, Map args) {
+    static OkResult of(String code, Object args) {
         return new OkResult(MsgKey.of(code, args));
     }
 

@@ -5,7 +5,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEntity
 
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 
 /**
  * Runs batch inserts in parallel using gparse.
@@ -17,7 +17,7 @@ class GparsRepoBenchmark<T extends GormEntity> extends BaseBatchInsertBenchmark<
 
     GparsRepoBenchmark(Class<T> clazz, String bindingMethod = 'grails') {
         super(clazz, bindingMethod)
-        repo = RepoUtil.findRepo(clazz)
+        repo = RepoLookup.findRepo(clazz)
     }
 
     @Override

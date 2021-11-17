@@ -18,9 +18,6 @@ import yakworks.i18n.MsgKey
 @CompileStatic
 class ValidationProblem implements ProblemTrait, Serializable {
 
-
-
-
     static ValidationProblem of(int statusId){
         return (ValidationProblem) new ValidationProblem().status(statusId)
     }

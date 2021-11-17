@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource
 import gorm.tools.audit.AuditStamp
 import gorm.tools.audit.AuditStampTrait
 import gorm.tools.model.NameDescription
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -114,7 +114,7 @@ class Attachment implements NameDescription, Taggable, AuditStampTrait, RepoEnti
                  nullable: true, maxSize: 50],
     ]
 
-    static AttachmentRepo getRepo() { RepoUtil.findRepo(this) as AttachmentRepo }
+    static AttachmentRepo getRepo() { RepoLookup.findRepo(this) as AttachmentRepo }
 
     void setLocation(String val) {
         resource = null

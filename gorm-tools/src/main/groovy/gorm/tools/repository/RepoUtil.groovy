@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository
 
-import java.util.concurrent.ConcurrentHashMap
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -19,10 +18,8 @@ import gorm.tools.api.EntityNotFoundProblem
 import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import grails.util.Environment
 import yakworks.api.problem.Problem
 import yakworks.api.problem.RuntimeProblem
-import yakworks.commons.lang.NameUtils
 import yakworks.i18n.MsgKey
 
 /**
@@ -35,46 +32,10 @@ import yakworks.i18n.MsgKey
 @SuppressWarnings(['FieldName'])
 @CompileStatic
 @SuppressWarnings(["FieldName"])
-class  RepoUtil {
-
-    private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
-    //set to false when doing unit tests so it doesnt cache old ones
-    public static Boolean USE_CACHE
-
-    static Boolean shouldCache(){
-        //if reload enabled then dont cache
-        if(USE_CACHE == null) USE_CACHE = !Environment.getCurrent().isReloadEnabled()
-        return USE_CACHE
-    }
-
-    static <D> GormRepo<D> findRepoCached(Class<D> entity) {
-        String className = NameUtils.getClassName(entity)
-        def repo = REPO_CACHE.get(className)
-        if(repo == null) {
-            repo = getRepoFromAppContext(entity)
-            REPO_CACHE.put(className, repo)
-        }
-        return repo as GormRepo<D>
-    }
-
-    static <D> GormRepo<D> findRepo(Class<D> entity) {
-        if(shouldCache()){
-            return findRepoCached(entity)
-        } else {
-            return getRepoFromAppContext(entity)
-        }
-    }
+class RepoUtil {
 
     static List<Class> getRepoClasses(){
         AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
-    }
-
-    static <D> GormRepo<D> getRepoFromAppContext(Class<D> entity){
-        return AppCtx.get(getRepoBeanName(entity), GormRepo) as GormRepo<D>
-    }
-
-    static String getRepoClassName(Class domainClass) {
-        RepositoryArtefactHandler.getRepoClassName(domainClass)
     }
 
     static String getRepoBeanName(Class domainClass) {

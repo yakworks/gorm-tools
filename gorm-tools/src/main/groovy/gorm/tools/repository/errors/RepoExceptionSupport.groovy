@@ -14,7 +14,8 @@ import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.repository.RepoMessage
+import gorm.tools.support.MsgSourceResolvable
+import gorm.tools.support.SpringMsgKey
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -47,12 +48,12 @@ class RepoExceptionSupport {
         }
         else if (ex instanceof grails.validation.ValidationException) {
             def ve = (grails.validation.ValidationException) ex
-            return new EntityValidationException(RepoMessage.validationError(entity), entity, ve.errors, ve)
+            return new EntityValidationException(entity, ve.errors, ve)
         }
         else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
             // Gorm's stock ValidationException
             def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
-            return new EntityValidationException(RepoMessage.validationError(entity), entity, ve.errors, ve)
+            return new EntityValidationException(entity, ve.errors, ve)
         }
         else if (ex instanceof OptimisticLockingFailureException) {
             return ex //just return unchanged
@@ -60,7 +61,7 @@ class RepoExceptionSupport {
         }
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
-            return new EntityValidationException(RepoMessage.notSaved(entity), entity, null, ex)
+            return new EntityValidationException(notSaved(entity), entity, null, ex)
         }
         return ex
     }
@@ -74,6 +75,11 @@ class RepoExceptionSupport {
             errors << m
         }
         return errors
+    }
+
+    static MsgSourceResolvable notSaved(Object entity) {
+        String entityName = entity.class.simpleName
+        return new SpringMsgKey("persist.error", [entityName], "$entityName save failed")
     }
 
 }

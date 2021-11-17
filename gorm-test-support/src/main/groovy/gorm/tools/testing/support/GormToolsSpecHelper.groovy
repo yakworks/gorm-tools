@@ -25,6 +25,7 @@ import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
@@ -62,7 +63,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
      * returns a default DefaultGormRepo if no explicit ones are found
      */
     Class findRepoClass(Class entityClass) {
-        String repoClassName = RepoUtil.getRepoClassName(entityClass)
+        String repoClassName = RepositoryArtefactHandler.getRepoClassName(entityClass)
         //println "finding $repoClassName"
         if (ClassUtils.isPresent(repoClassName, grailsApplication.classLoader)) {
             return ClassUtils.forName(repoClassName)
@@ -103,7 +104,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         defineBeans(commonBeans())
     }
     void defineRepoBeans(Class<?>... domainClassesToMock){
-        RepoUtil.USE_CACHE = false
+        RepoLookup.USE_CACHE = false
 
         Closure beanClos = {
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities

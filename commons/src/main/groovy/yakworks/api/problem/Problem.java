@@ -98,7 +98,7 @@ public interface Problem extends Result {
         return (RuntimeProblem) create().msg(msg);
     }
 
-    static RuntimeProblem of(String code, Map args) {
+    static RuntimeProblem of(String code, Object args) {
         return (RuntimeProblem) create().msg(MsgKey.of(code, args));
     }
 

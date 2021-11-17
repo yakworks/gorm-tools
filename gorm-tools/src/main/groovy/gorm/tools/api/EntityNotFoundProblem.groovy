@@ -25,7 +25,7 @@ import yakworks.i18n.MsgKey
  */
 @CompileStatic
 class EntityNotFoundProblem extends DataRetrievalFailureException implements ProblemTrait, Exceptional {
-
+    public static String DEFAULT_CODE = 'error.notFound'
     ApiStatus status = HttpStatus.NOT_FOUND
 
     // the look up key, mostly will be the id, but could be code or map with sourceId combos
@@ -36,11 +36,13 @@ class EntityNotFoundProblem extends DataRetrievalFailureException implements Pro
     }
 
     EntityNotFoundProblem(Serializable data, String entityName) {
-        super('error.notFound')
+        super(DEFAULT_CODE)
         identifier = data
-        Map dataMap = [id: data]
+        Map dataMap
+        if(data instanceof Number) dataMap = [id: data]
+        if(data instanceof Map) dataMap = data
         // if(data instanceof Number)
-        this.msg = MsgKey.of('error.notFound', [entityName: entityName, id: data])
+        this.msg = MsgKey.of(DEFAULT_CODE, [entityName: entityName, id: data])
         this.detail = "Lookup failed for $entityName using data $dataMap"
     }
 
@@ -60,9 +62,11 @@ class EntityNotFoundProblem extends DataRetrievalFailureException implements Pro
         return (EntityNotFoundProblem) super.getCause()
     }
 
-    static EntityNotFoundProblem of(MsgKey msg) {
-        return (EntityNotFoundProblem) new EntityNotFoundProblem().msg(msg);
+    static EntityNotFoundProblem of(Serializable data, String entityName) {
+        new EntityNotFoundProblem(data, entityName)
     }
+
+
 
     //Override it for performance improvement, because filling in the stack trace is quit expensive
     @SuppressWarnings(['SynchronizedMethod'])

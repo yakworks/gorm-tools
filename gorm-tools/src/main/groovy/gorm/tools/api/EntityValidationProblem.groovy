@@ -30,7 +30,7 @@ import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
  * @since 6.1
  */
 @CompileStatic
-class EntityValidationProblem extends DataIntegrityViolationException implements ProblemTrait, Exceptional  {
+class EntityValidationProblem extends DataIntegrityViolationException implements ProblemTrait<EntityValidationProblem>, Exceptional  {
     public static String DEFAULT_CODE ='validation.problem'
     public static String DEFAULT_TITLE ='Validation Error(s)'
     Object entity //the entity that the error occured on
@@ -115,7 +115,7 @@ class EntityValidationProblem extends DataIntegrityViolationException implements
     }
 
     static EntityValidationProblem of(MsgKey msg) {
-        return (EntityValidationProblem) new EntityValidationProblem('').msg(msg)
+        return new EntityValidationProblem('').msg(msg)
     }
 
     static EntityValidationProblem of(final Throwable cause) {

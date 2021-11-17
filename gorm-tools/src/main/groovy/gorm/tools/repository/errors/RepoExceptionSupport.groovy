@@ -10,6 +10,7 @@ import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 
 import gorm.tools.api.EntityValidationProblem
+import yakworks.api.problem.Problem
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -37,7 +38,8 @@ class RepoExceptionSupport {
          * It happens because EntityValidationException is inherited from DataIntegrityViolationException and DataAccessException,
          * thus checks for these exceptions also cover EntityValidationException case.
          */
-        if (ex instanceof EntityValidationProblem) {
+        //if its an instance of Problem then we dont need to transalate
+        if (ex instanceof Problem || ex instanceof EntityValidationProblem) {
             return ex
         }
         else if (ex instanceof grails.validation.ValidationException) {

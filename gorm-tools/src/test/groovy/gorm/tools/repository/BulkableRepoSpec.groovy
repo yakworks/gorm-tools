@@ -54,6 +54,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         def job = TestRepoJob.get(jobId)
 
         then: "verify job"
+
         job != null
         job.source == "test"
         job.sourceId == "test"

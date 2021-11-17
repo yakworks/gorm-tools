@@ -118,7 +118,7 @@ class ApiConstraints {
             // } else { }
             descriptionShortcut(attrs)
             addNullableIfMissing(attrs)
-            addBlankFalseIfNullableFalse(attrs)
+            addBlankFalseIfNullableFalse(prop, attrs)
             invokeOnBuilder(prop, attrs)
         }
 
@@ -182,9 +182,13 @@ class ApiConstraints {
     /**
      * if nullable is false then by default make blank false too
      */
-    void addBlankFalseIfNullableFalse(Map attr){
+    void addBlankFalseIfNullableFalse(String propName, Map attr){
         if(attr.containsKey('nullable') && attr.nullable == false){
-            attr.blank = false
+            //only if its a string type
+            Class<?> propertyType = determinePropertyType(propName)
+            if(propertyType && String.isAssignableFrom(propertyType)){
+                attr.blank = false
+            }
         }
     }
 

@@ -149,11 +149,11 @@ trait BulkableRepo<D> {
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                results << OkResult.of(isCreate ? 201 : 200).data(entityInstance)
+                results << OkResult.of(isCreate ? 201 : 200).payload(entityInstance)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
-                    results << problemHandler.handleException(e).data(item)
+                    results << problemHandler.handleException(e).payload(item)
                 } else {
                     throw e
                 }
@@ -196,13 +196,13 @@ trait BulkableRepo<D> {
             //do the failed
             if (r instanceof Problem) {
                 map.putAll([
-                    data: r.data,
+                    data: r.payload,
                     title: r.title,
                     detail: r.detail,
                     errors: r.violations
                 ])
             } else {
-                def entityObj = r.data
+                def entityObj = r.payload
                 Map entityMapData = entityMapService.createEntityMap(entityObj, includes) as Map<String, Object>
                 map.data = entityMapData
             }

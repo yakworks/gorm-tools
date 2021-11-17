@@ -17,7 +17,7 @@ import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
  * Throwable Exception Problem
  */
 @CompileStatic
-class RuntimeProblem extends NestedRuntimeException implements ProblemTrait, Exceptional {
+class RuntimeProblem extends NestedRuntimeException implements ProblemTrait<RuntimeProblem>, Exceptional {
 
     protected RuntimeProblem() {
         this(null);

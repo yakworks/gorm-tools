@@ -4,27 +4,21 @@
 */
 package gorm.tools.api
 
-
 import groovy.transform.CompileStatic
-
-import org.springframework.dao.DataRetrievalFailureException
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.api.problem.Exceptional
-import yakworks.api.problem.ProblemTrait
-import yakworks.api.problem.RuntimeProblem
 import yakworks.i18n.MsgKey
 
 /**
- * an extension of the DataRetrievalFailureException that is more performant. fillInStackTrace is overriden to show nothing
+ * fillInStackTrace is overriden to show nothing
  * so it will be faster and consume less memory when thrown.
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileStatic
-class EntityNotFoundProblem extends DataRetrievalFailureException implements ProblemTrait, Exceptional {
+class EntityNotFoundProblem extends DataAccessProblem<EntityNotFoundProblem> {
     public static String DEFAULT_CODE = 'error.notFound'
 
     String defaultCode = DEFAULT_CODE
@@ -46,16 +40,6 @@ class EntityNotFoundProblem extends DataRetrievalFailureException implements Pro
         // if(data instanceof Number)
         this.msg = MsgKey.of(DEFAULT_CODE, [name: entityName, id: data])
         this.detail = "Lookup failed for $entityName using data $dataMap"
-    }
-
-    @Override //throwable
-    String getMessage() {
-        return RuntimeProblem.buildMessage(this)
-    }
-
-    @Override
-    String toString() {
-        return RuntimeProblem.buildToString(this)
     }
 
     @Override

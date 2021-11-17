@@ -16,7 +16,7 @@ import yakworks.i18n.MsgKey
  */
 // @MapConstructor
 @CompileStatic
-class OkResult implements ResultTrait {
+class OkResult implements ResultTrait<OkResult> {
 
     OkResult(){}
     OkResult(ApiStatus v){ this.status = v }
@@ -24,6 +24,13 @@ class OkResult implements ResultTrait {
 
     static OkResult get() {
         return new OkResult();
+    }
+
+    static OkResult of(Integer statusCode) {
+        return new OkResult(HttpStatus.valueOf(statusCode));
+    }
+    static OkResult of(String code, Object args) {
+        return new OkResult(MsgKey.of(code, args));
     }
 
 }

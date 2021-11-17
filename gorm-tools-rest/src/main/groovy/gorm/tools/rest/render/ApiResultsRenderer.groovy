@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 
 import grails.rest.render.RenderContext
 import yakworks.api.ApiResults
+import yakworks.api.problem.Problem
 
 /**
  * Renderer for paged list data
@@ -31,15 +32,17 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
         }
     }
 
-    // checks for title
+    // swallow no such message exception and returns empty string
     String getMessage(ApiResults results){
+        String message
+        if(results.msg) message = getMessage(results.msg)
 
-        if(results.msg) {
-            return getMessage(results.msg)
+        if(!message && results.title) {
+            message = results.title
         } else if(results.size() != 0) {
-            return getMessage(results[0].msg)
+            message = getMessage(results[0].msg)
         }
-        return ""
+        return message
     }
 
 }

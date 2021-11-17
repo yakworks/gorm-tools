@@ -16,6 +16,17 @@ class ProblemSpec extends Specification {
         problem.toString() == "{400, Bad Request}"
     }
 
+    void "problem of"() {
+        when:
+        def p = Problem.of('error.data.empty', [name: 'foo'])
+
+        then:
+        p.toString()
+        p.message == 'code=error.data.empty'
+        p.code == 'error.data.empty'
+        p.msg.args.name == 'foo'
+    }
+
     void shouldRenderCustomDetailAndInstance() {
         when:
         final RuntimeProblem p = Problem.create()

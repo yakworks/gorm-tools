@@ -11,13 +11,22 @@ class ResultSpec extends Specification {
 
     void "simple Ok"(){
         when:
-        def okRes = Result.OK()
-
+        Result okRes = Result.OK().payload([foo:'bar'])
+        okRes.payload
         then:
         okRes.status.code == 200
         okRes.title('foo').title == 'foo'
         okRes.msg('bar', [key1:'go']).code == 'bar'
         okRes.msg.args == [key1:'go']
+    }
+
+    void "payload"(){
+        when:
+        Result okRes = Result.OK().payload([foo:'bar'])
+
+        then:
+        okRes.status.code == 200
+        okRes.payload == [foo:'bar']
     }
 
     // def "simple creation"(){

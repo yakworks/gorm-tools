@@ -87,19 +87,19 @@ public interface Problem extends Result {
     }
 
     static RuntimeProblem of(final ApiStatus status) {
-        return (RuntimeProblem) create().status(status);
+        return builder().status(status).build();
     }
 
     static RuntimeProblem of(final ApiStatus status, final String detail) {
-        return (RuntimeProblem) create().status(status).detail(detail);
+        return builder().status(status).detail(detail).build();
     }
 
     static RuntimeProblem of(MsgKey msg) {
-        return (RuntimeProblem) create().msg(msg);
+        return builder().msg(msg).build();
     }
 
     static RuntimeProblem of(String code, Object args) {
-        return (RuntimeProblem) create().msg(MsgKey.of(code, args));
+        return builder().msg(MsgKey.of(code, args)).build();
     }
 
     // static ThrowableProblem of(final ApiStatus status, final URI instance) {

@@ -3,6 +3,7 @@ package yakworks.rally.orgs
 import gorm.tools.api.ReferenceKeyProblem
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.model.Contact

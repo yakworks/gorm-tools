@@ -16,7 +16,7 @@ import yakworks.i18n.MsgKey
  * @since 7.0.8
  */
 @CompileStatic
-class ApiProblem implements ProblemTrait {
+class ApiProblem implements ProblemTrait<ApiProblem> {
 
     static ApiProblem of(String code, Object args){
         return (ApiProblem) new ApiProblem().msg(MsgKey.of(code, args))

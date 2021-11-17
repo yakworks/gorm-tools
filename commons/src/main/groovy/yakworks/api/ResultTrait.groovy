@@ -15,20 +15,20 @@ import yakworks.i18n.MsgKey
  * @since 1
  */
 @CompileStatic
-trait ResultTrait implements Result {
+trait ResultTrait<E> implements Result {
     String defaultCode = 'result.ok'
     Boolean ok = true
     ApiStatus status = HttpStatus.OK
     MsgKey msg
     String title
-    Object data
+    Object payload
 
-    ResultTrait msg(MsgKey v){ setMsg(v); return this; }
-    ResultTrait msg(String v, Object args) { return msg(MsgKey.of(v, args));}
-    ResultTrait title(String v) { setTitle(v);  return this; }
-    ResultTrait status(ApiStatus v) { setStatus(v); return this; }
-    ResultTrait status(Integer v) { setStatus(HttpStatus.valueOf(v)); return this; }
-    ResultTrait data(Object v) { setData(v); return this; }
+    E msg(MsgKey v){ setMsg(v); return (E)this; }
+    E msg(String v, Object args) { return msg(MsgKey.of(v, args));}
+    E title(String v) { setTitle(v);  return (E)this; }
+    E status(ApiStatus v) { setStatus(v); return (E)this; }
+    E status(Integer v) { setStatus(HttpStatus.valueOf(v)); return (E)this; }
+    E payload(Object v) { setPayload(v); return (E)this; }
     // E value(T v){ setValue(v); return (E)this; }
 
     /**

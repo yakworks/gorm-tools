@@ -55,7 +55,7 @@ class RepoUtil {
             if (currentVersion > oldVersion) {
                 throw OptimisticLockingProblem
                     .of(entity)
-                    .detail("server version:${currentVersion} > edited version:${oldVersion}") as OptimisticLockingProblem
+                    .detail("server version:${currentVersion} > edited version:${oldVersion}")
             }
         }
     }

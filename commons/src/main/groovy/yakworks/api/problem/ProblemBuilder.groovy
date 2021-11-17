@@ -1,29 +1,30 @@
-package yakworks.api.problem;
+/*
+* Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
+* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+*/
+package yakworks.api.problem
 
-import yakworks.api.ApiStatus;
+import javax.annotation.Nullable
 
-import javax.annotation.Nullable;
+import groovy.transform.CompileStatic
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import yakworks.api.ApiStatus
+import yakworks.i18n.MsgKey
 
-public final class ProblemBuilder {
+@CompileStatic
+final class ProblemBuilder {
 
     private static final Set<String> RESERVED_PROPERTIES = new HashSet<>(Arrays.asList(
             "type", "title", "status", "detail", "instance", "cause"
     ));
 
-    private URI type;
-    private String title;
-    private ApiStatus status;
-    private String detail;
-    private URI instance;
-    private RuntimeProblem cause;
-    private final Map<String, Object> parameters = new LinkedHashMap<>();
+    private URI type
+    private String title
+    private ApiStatus status
+    private String detail
+    private URI instance
+    private RuntimeProblem cause
+    private MsgKey msg
 
     /**
      * @see Problem#create()
@@ -34,6 +35,11 @@ public final class ProblemBuilder {
 
     static ProblemBuilder create() {
         return new ProblemBuilder();
+    }
+
+    public ProblemBuilder msg(MsgKey msg) {
+        this.msg = msg;
+        return this;
     }
 
     public ProblemBuilder type(@Nullable final URI type) {
@@ -48,7 +54,7 @@ public final class ProblemBuilder {
 
     public ProblemBuilder status(@Nullable final ApiStatus status) {
         this.status = status;
-        if(this.title == null) this.title = status.getReason();
+        // if(this.title == null) this.title = status.getReason();
         return this;
     }
 
@@ -83,8 +89,15 @@ public final class ProblemBuilder {
     // }
 
     public RuntimeProblem build() {
-        return (RuntimeProblem) RuntimeProblem.of(cause)
-            .type(type).title(title).status(status).detail(detail).instance(instance);
+        def rp = RuntimeProblem.of(cause)
+        //ugly but getting it working for now
+        if(msg) rp.msg(msg)
+        if(type) rp.type(type)
+        if(title) rp.title(title)
+        if(status) rp.status(status)
+        if(detail) rp.detail(detail)
+        if(instance) rp.instance(instance)
+        return rp
     }
 
 }

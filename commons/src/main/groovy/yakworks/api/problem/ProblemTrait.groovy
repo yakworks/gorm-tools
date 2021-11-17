@@ -18,47 +18,47 @@ import yakworks.i18n.MsgKey
  * @since 7.0.8
  */
 @CompileStatic
-trait ProblemTrait implements Problem {
+trait ProblemTrait<E extends Problem> implements Problem {
     String defaultCode = 'error.default'
     URI type //= Problem.DEFAULT_TYPE
     ApiStatus status = HttpStatus.BAD_REQUEST
     MsgKey msg
     String title
     String detail
-    Object data
+    Object payload
     URI instance
 
     Map<String, Object> parameters = Collections.emptyMap()
 
     List<Violation> violations = [] as List<Violation> //Collections.emptyList();
 
-    ProblemTrait status(Integer v) { setStatus(HttpStatus.valueOf(v)); return this; }
-    ProblemTrait status(ApiStatus v) {
+    E status(Integer v) { setStatus(HttpStatus.valueOf(v)); return (E)this; }
+    E status(ApiStatus v) {
         setStatus(v)
         // if(getTitle() == null) setTitle(status.getReason())
-        return this
+        return (E)this
     }
 
-    ProblemTrait msg(MsgKey v){ setMsg(v); return this; }
-    ProblemTrait msg(String code, Object args) { return msg(MsgKey.of(code, args));}
-    ProblemTrait title(String v) { setTitle(v);  return this; }
-    ProblemTrait detail(String v) { setDetail(v);  return this; }
-    ProblemTrait data(Object v) { setData(v); return this; }
+    E msg(MsgKey v){ setMsg(v); return (E)this; }
+    E msg(String code, Object args) { return msg(MsgKey.of(code, args));}
+    E title(String v) { setTitle(v);  return (E)this; }
+    E detail(String v) { setDetail(v);  return (E)this; }
+    E payload(Object v) { setPayload(v); return (E)this; }
 
-    ProblemTrait type(URI v) { setType(v); return this; }
-    ProblemTrait type(String v) { setType(URI.create(v)); return this; }
-    ProblemTrait instance(URI v) { setInstance(v); return this; }
-    ProblemTrait instance(String v) { setInstance(URI.create(v)); return this; }
+    E type(URI v) { setType(v); return (E)this; }
+    E type(String v) { setType(URI.create(v)); return (E)this; }
+    E instance(URI v) { setInstance(v); return (E)this; }
+    E instance(String v) { setInstance(URI.create(v)); return (E)this; }
 
-    ProblemTrait violations(List<Violation> v) { setViolations(v); return this; }
+    E violations(List<Violation> v) { setViolations(v); return (E)this; }
 
 
-    ProblemTrait addErrors(List<MsgKey> keyedErrors){
+    E addErrors(List<MsgKey> keyedErrors){
         def ers = getViolations()
         keyedErrors.each {
             ers << ViolationFieldError.of(it)
         }
-        return this
+        return (E)this
     }
 
     // E value(T v){ setValue(v); return (E)this; }

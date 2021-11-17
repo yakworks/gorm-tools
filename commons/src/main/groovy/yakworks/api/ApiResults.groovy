@@ -13,16 +13,16 @@ import yakworks.api.problem.Problem
  * The data in this case is a List of result/problem instances
  */
 @CompileStatic
-class ApiResults implements ResultTrait, Serializable {
+class ApiResults implements ResultTrait<ApiResults>, Serializable {
     Boolean ok = true
     ApiStatus status = HttpStatus.MULTI_STATUS
 
     //internal rep
     @Delegate List<Result> results
 
-    //override so data is the result
-    @Override Object getData() { return results; }
-    @Override void setData(Object v){ }
+    //override so payload is the list of results
+    @Override Object getPayload() { return results; }
+    @Override void setPayload(Object v){ }
 
     /**
      * New result
@@ -34,6 +34,7 @@ class ApiResults implements ResultTrait, Serializable {
 
     static ApiResults create(boolean isSynchronized = true){ new ApiResults(isSynchronized) }
     static ApiResults OK(){ new ApiResults() }
+
 
     @Override //changes default list delegate so we can add ok
     boolean add(Result result){
@@ -63,7 +64,7 @@ class ApiResults implements ResultTrait, Serializable {
         if(this.ok){
             [] as List<Problem>
         } else {
-            results.find{ it instanceof Problem } as List<Problem>
+            results.findAll{ it instanceof Problem } as List<Problem>
         }
     }
 
@@ -71,7 +72,7 @@ class ApiResults implements ResultTrait, Serializable {
      * returns the successful results
      */
     List<Result> getOkResults(){
-        results.find{ it.ok } as List<Result>
+        results.findAll{ it.ok } as List<Result>
     }
 
     //Add these temporarily to be compatible with old Results

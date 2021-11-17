@@ -4,28 +4,22 @@
 */
 package gorm.tools.api
 
-import javax.annotation.Nullable
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.problem.RuntimeProblem
 import yakworks.i18n.MsgKey
 
 /**
  * Throwable Exception Problem
  */
 @CompileStatic
-class OptimisticLockingProblem extends RuntimeProblem {
+class OptimisticLockingProblem extends DataAccessProblem<OptimisticLockingProblem> {
     public static String DEFAULT_CODE = 'error.optimisticLocking'
     String defaultCode = DEFAULT_CODE
     Object entity
 
     protected OptimisticLockingProblem() {
         super(null);
-    }
-
-    protected OptimisticLockingProblem(@Nullable final OptimisticLockingProblem cause) {
-        super(cause);
     }
 
     @Override

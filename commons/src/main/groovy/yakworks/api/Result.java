@@ -59,8 +59,8 @@ public interface Result {
      * Implementations might choose to ignore this in favor of concrete, typed fields.
      * Or this is generated from the target
      */
-    default Object getData() { return null; }
-    default void setData(Object v){}
+    default Object getPayload() { return null; }
+    default void setPayload(Object v){}
 
     /**
      * Optional the return value or entity. Kind of like the value that Optional wraps.
@@ -81,18 +81,8 @@ public interface Result {
         return OkResult.get();
     }
 
-    static OkResult of(Integer statusCode) {
-        return new OkResult(HttpStatus.valueOf(statusCode));
-    }
-    static OkResult of(ApiStatus status) {
-        return new OkResult(status);
-    }
-    static OkResult of(String code) {
-        return new OkResult(MsgKey.of(code));
-    }
-
-    static OkResult of(String code, Object args) {
-        return new OkResult(MsgKey.of(code, args));
-    }
+    // static OkResult of(String code) {
+    //     return new OkResult(MsgKey.of(code));
+    // }
 
 }

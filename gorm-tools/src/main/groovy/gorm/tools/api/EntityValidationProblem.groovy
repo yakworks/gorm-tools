@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.errors
+package gorm.tools.api
 
 
 import groovy.transform.CompileStatic
@@ -11,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.validation.Errors
 import org.springframework.validation.ObjectError
 
+import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.support.MsgSourceResolvable
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
@@ -29,7 +30,7 @@ import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
  * @since 6.1
  */
 @CompileStatic
-class EntityValidationException extends DataIntegrityViolationException implements ProblemTrait, Exceptional  {
+class EntityValidationProblem extends DataIntegrityViolationException implements ProblemTrait, Exceptional  {
     public static String DEFAULT_CODE ='validation.problem'
     public static String DEFAULT_TITLE ='Validation Error(s)'
     Object entity //the entity that the error occured on
@@ -41,45 +42,45 @@ class EntityValidationException extends DataIntegrityViolationException implemen
     String title = DEFAULT_TITLE
     ApiStatus status = HttpStatus.UNPROCESSABLE_ENTITY
 
-    EntityValidationException(Throwable cause) {
+    EntityValidationProblem(Throwable cause) {
         this("", null, cause)
     }
 
     // deprecated, provided for backward compat
-    EntityValidationException(String message) {
+    EntityValidationProblem(String message) {
         this(message, null, null)
     }
 
     // deprecated, provided for backward compat
-    EntityValidationException(String message, Errors e, Throwable cause) {
+    EntityValidationProblem(String message, Errors e, Throwable cause) {
         super(DEFAULT_CODE, cause)
         setMsg(MsgKey.of(DEFAULT_CODE))
         setDetail(message?:cause?.message)
         errors = errors ?: new EmptyErrors("empty")
     }
 
-    EntityValidationException(final EntityValidationException cause) {
+    EntityValidationProblem(final EntityValidationProblem cause) {
         super(DEFAULT_CODE, cause);
         final Collection<StackTraceElement> stackTrace = COMPOUND.process(asList(getStackTrace()));
         setStackTrace(stackTrace as StackTraceElement[]);
     }
 
     // legacy
-    EntityValidationException(MsgSourceResolvable msrKey, Object entity, Errors ers) {
+    EntityValidationProblem(MsgSourceResolvable msrKey, Object entity, Errors ers) {
         super(msrKey.code)
         this.entity = entity
         this.errors = ers ?: new EmptyErrors("empty")
         msg = MsgKey.of(msrKey.code, msrKey.args)
     }
 
-    EntityValidationException entity(Object v) {
+    EntityValidationProblem entity(Object v) {
         if(v == null) return this
         this.entity = v
         putArgIfAbsent('name', v.class.simpleName)
         return this;
     }
 
-    EntityValidationException errors(Errors v) {this.errors = v; return this;}
+    EntityValidationProblem errors(Errors v) {this.errors = v; return this;}
 
     @Override //throwable
     String getMessage() {
@@ -91,7 +92,7 @@ class EntityValidationException extends DataIntegrityViolationException implemen
         return RuntimeProblem.buildToString(this)
     }
 
-    EntityValidationException notSavedMsg() {
+    EntityValidationProblem notSavedMsg() {
         msg = MsgKey.of('error.persist', [entityName: entity.class.simpleName])
         return this
     }
@@ -113,15 +114,15 @@ class EntityValidationException extends DataIntegrityViolationException implemen
         return b.toString();
     }
 
-    static EntityValidationException of(MsgKey msg) {
-        return (EntityValidationException) new EntityValidationException('').msg(msg)
+    static EntityValidationProblem of(MsgKey msg) {
+        return (EntityValidationProblem) new EntityValidationProblem('').msg(msg)
     }
 
-    static EntityValidationException of(final Throwable cause) {
-        return new EntityValidationException(cause);
+    static EntityValidationProblem of(final Throwable cause) {
+        return new EntityValidationProblem(cause);
     }
 
-    static EntityValidationException of(Object entity, Throwable cause) {
-        return new EntityValidationException(cause).entity(entity);
+    static EntityValidationProblem of(Object entity, Throwable cause) {
+        return new EntityValidationProblem(cause).entity(entity);
     }
 }

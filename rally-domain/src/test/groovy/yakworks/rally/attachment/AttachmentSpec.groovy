@@ -7,11 +7,10 @@ import java.nio.file.Paths
 import org.apache.commons.io.FileUtils
 import org.springframework.mock.web.MockMultipartFile
 
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import grails.plugin.viewtools.AppResourceLoader
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
@@ -182,7 +181,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         Attachment attachment = attachmentRepo.create(params)
 
         then: "will fail on name"
-        EntityValidationException g = thrown()
+        EntityValidationProblem g = thrown()
         'validation.problem' == g.code
         // XXX fix way to verify the file got delted
         // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"

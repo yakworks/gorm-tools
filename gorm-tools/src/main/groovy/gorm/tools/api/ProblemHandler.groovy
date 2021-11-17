@@ -15,7 +15,6 @@ import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.repository.errors.EntityValidationException
 import gorm.tools.support.MsgSourceResolvable
 import grails.validation.ValidationException
 import yakworks.api.ApiStatus
@@ -64,7 +63,7 @@ class ProblemHandler {
         ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
 
-        if (e instanceof EntityValidationException) {
+        if (e instanceof EntityValidationProblem) {
             if(e.errors instanceof EmptyErrors){
                 //this is some other exception wrapped in validation exception
                 e.detail( e.cause?.message)

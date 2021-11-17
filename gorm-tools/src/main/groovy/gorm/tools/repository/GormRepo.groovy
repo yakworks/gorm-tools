@@ -27,7 +27,7 @@ import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
 import gorm.tools.repository.bulk.BulkableRepo
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
@@ -261,7 +261,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
-     * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
+     * @throws EntityValidationProblem if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
         withTrx {
@@ -316,7 +316,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @return the retrieved entity. Will always be an entity as this throws an error if not
      *
      * @throws EntityNotFoundProblem if its not found
-     * @throws gorm.tools.repository.errors.EntityValidationException if the versions mismatch
+     * @throws EntityValidationProblem if the versions mismatch
      */
     D get(Serializable id, Long version) {
         D entity = get(id)

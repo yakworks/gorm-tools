@@ -8,7 +8,7 @@ import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.api.EntityNotFoundProblem
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.artefact.Artefact
 import grails.buildtestdata.TestData
@@ -16,8 +16,6 @@ import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
 //import static grails.buildtestdata.TestData.build
-
-import org.springframework.dao.OptimisticLockingFailureException
 
 import testing.*
 import yakworks.gorm.testing.model.KitchenSink
@@ -152,7 +150,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust org = Cust.repo.create(params)
 
         then:
-        def e = thrown(EntityValidationException)
+        def e = thrown(EntityValidationProblem)
         e.message.contains("Field error in object 'testing.Cust' on field 'type': rejected value [null]")
     }
 
@@ -172,7 +170,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.persist(new Cust(amount: 500))
 
         then:
-        def e = thrown(EntityValidationException)
+        def e = thrown(EntityValidationProblem)
         e.message.contains("Field error in object 'testing.Cust' on field 'name': rejected value [null]")
     }
 

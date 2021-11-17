@@ -12,7 +12,7 @@ import org.springframework.validation.Errors
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.AfterRemoveEvent
@@ -97,7 +97,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void beforeRemove(Org org, BeforeRemoveEvent e) {
         if (org.source?.sourceType == SourceType.ERP) { //might be more in future
             def msgKey = MsgKey.of("error.delete.externalSource", [name: "Org: ${org.name}, source:${SourceType.ERP}"])
-            throw EntityValidationException.of(msgKey).entity(org)
+            throw EntityValidationProblem.of(msgKey).entity(org)
         }
         //remove tags
         orgTagRepo.remove(org)
@@ -109,7 +109,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * deletes org and all associated persons or users but only if is doesn't have invoices
      *
      * @param org the org domain object
-     * @throws EntityValidationException if a spring DataIntegrityViolationException is thrown
+     * @throws EntityValidationProblem if a spring DataIntegrityViolationException is thrown
      */
     @RepoListener
     void afterRemove(Org org, AfterRemoveEvent e) {

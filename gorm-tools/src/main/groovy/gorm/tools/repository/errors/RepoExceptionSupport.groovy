@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 
+import gorm.tools.api.EntityValidationProblem
+
 /**
  * Handler and translator for exceptions thrown by the Repository
  *
@@ -35,17 +37,17 @@ class RepoExceptionSupport {
          * It happens because EntityValidationException is inherited from DataIntegrityViolationException and DataAccessException,
          * thus checks for these exceptions also cover EntityValidationException case.
          */
-        if (ex instanceof EntityValidationException) {
+        if (ex instanceof EntityValidationProblem) {
             return ex
         }
         else if (ex instanceof grails.validation.ValidationException) {
             def ve = (grails.validation.ValidationException) ex
-            return EntityValidationException.of(entity, ve).errors(ve.errors)
+            return EntityValidationProblem.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
             // Gorm's stock ValidationException
             def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
-            return EntityValidationException.of(entity, ve).errors(ve.errors)
+            return EntityValidationProblem.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof OptimisticLockingFailureException) {
             return ex //just return unchanged
@@ -53,7 +55,7 @@ class RepoExceptionSupport {
         }
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
-            return EntityValidationException.of(entity, ex).notSavedMsg()
+            return EntityValidationProblem.of(entity, ex).notSavedMsg()
         }
         return ex
     }

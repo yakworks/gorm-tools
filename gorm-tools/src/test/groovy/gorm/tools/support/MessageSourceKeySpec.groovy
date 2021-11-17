@@ -4,6 +4,7 @@ import org.grails.testing.GrailsUnitTest
 
 import spock.lang.*
 
+// tests the stock messageSourceKey for spring
 class MessageSourceKeySpec extends Specification implements GrailsUnitTest {
 
     def setup() {

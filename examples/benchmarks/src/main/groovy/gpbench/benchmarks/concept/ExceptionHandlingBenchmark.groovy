@@ -4,8 +4,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.dao.DataAccessException
 
-import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import gpbench.repo.CityBasicRepo
 import grails.gorm.transactions.Transactional
@@ -21,7 +20,7 @@ class ExceptionHandlingBenchmark extends BaseBatchInsertBenchmark {
     Class exceptionToCatch
 
 
-    ExceptionHandlingBenchmark(boolean databinding, Class exceptionToThrow = EntityValidationException, Class exceptionToCatch=DataAccessException) {
+    ExceptionHandlingBenchmark(boolean databinding, Class exceptionToThrow = EntityValidationProblem, Class exceptionToCatch=DataAccessException) {
         super(databinding)
         this.exceptionToThrow = exceptionToThrow
         this.exceptionToCatch = exceptionToCatch

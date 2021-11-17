@@ -2,7 +2,7 @@ package gorm.tools.security
 
 import org.apache.commons.lang3.RandomStringUtils
 
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
@@ -100,7 +100,7 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         AppUser.update(params)
 
         then:
-        thrown EntityValidationException
+        thrown EntityValidationProblem
     }
 
     def "insert with roles"() {

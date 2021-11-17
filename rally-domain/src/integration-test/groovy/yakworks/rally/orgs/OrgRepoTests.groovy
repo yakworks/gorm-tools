@@ -5,7 +5,7 @@ import java.time.LocalDate
 import org.springframework.core.NestedExceptionUtils
 import org.springframework.dao.DataRetrievalFailureException
 
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.model.SourceType
 import gorm.tools.testing.TestDataJson
 import grails.gorm.transactions.Rollback
@@ -127,7 +127,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         orgRepo.flush()
 
         then:
-        EntityValidationException exception = thrown()
+        EntityValidationProblem exception = thrown()
         exception.errors.objectName == 'yakworks.rally.orgs.model.Org'
         exception.errors['num'].code == "nullable"
     }
@@ -232,7 +232,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         orgRepo.removeById(org.id)
 
         then:
-        EntityValidationException e = thrown()
+        EntityValidationProblem e = thrown()
         e.code == 'error.delete.externalSource'
     }
 

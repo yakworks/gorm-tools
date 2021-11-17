@@ -40,7 +40,7 @@ trait ProblemTrait implements Problem {
     }
 
     ProblemTrait msg(MsgKey v){ setMsg(v); return this; }
-    ProblemTrait msg(String code, Map args) { return msg(MsgKey.of(code, args));}
+    ProblemTrait msg(String code, Object args) { return msg(MsgKey.of(code, args));}
     ProblemTrait title(String v) { setTitle(v);  return this; }
     ProblemTrait detail(String v) { setDetail(v);  return this; }
     ProblemTrait data(Object v) { setData(v); return this; }
@@ -72,7 +72,9 @@ trait ProblemTrait implements Problem {
      */
     Map putArgIfAbsent(Object key, Object val){
         if(!msg) msg = MsgKey.of(defaultCode)
-        return msg.putArg(key, val)
+        def argMap = msg.getArgMap()
+        if(argMap) argMap.putIfAbsent(key, val)
+        return argMap
     }
 
     // static String genString(final Problem p) {

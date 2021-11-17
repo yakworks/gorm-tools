@@ -6,6 +6,7 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.api.ReferenceKeyProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.errors.EntityValidationException
@@ -41,22 +42,16 @@ class ContactRepo implements GormRepo<Contact> {
     @RepoListener
     void beforeRemove(Contact contact, BeforeRemoveEvent e) {
         AppUser user = contact.user
-        Map args = [name: "Contact: ${contact.name}"] as Map
-        MsgKey errorMsgKey
+        String stamp = "Contact: ${contact.name}, id: ${contact.id}"
         if (user) {
-            args['other'] = 'User'
-            errorMsgKey = MsgKey.of("error.delete.reference", args)
+            throw ReferenceKeyProblem.of(stamp).reference('User')
         }
         if (Org.query(contact: contact).count()) {
-            args['other'] = 'Org primary contact'
-            errorMsgKey = MsgKey.of("error.delete.reference", args)
+            throw ReferenceKeyProblem.of(stamp).reference('Org primary contact')
         }
-
         if (ActivityContact.repo.count(contact)) {
-            args['other'] = 'ActivityContact'
-            errorMsgKey = MsgKey.of("error.delete.reference", args)
+            throw ReferenceKeyProblem.of(stamp).reference('ActivityContact')
         }
-        if(errorMsgKey) throw EntityValidationException.of(errorMsgKey).entity(contact)
 
         //remove
         TagLink.remove(contact)

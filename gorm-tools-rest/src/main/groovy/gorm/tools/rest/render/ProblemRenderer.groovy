@@ -41,12 +41,12 @@ class ProblemRenderer implements JsonRendererTrait<Problem> {
     // swallow no such message exception and returns empty string
     String getMessage(Problem problem){
         String message
-        if(problem.msg) {
-            message = getMessage(problem.msg)
-        } else if(problem.title) {
-            return problem.title
+        if(problem.msg) message = getMessage(problem.msg)
+
+        if(!message && problem.title) {
+            message = problem.title
         }
-        return ""
+        return message
     }
 
 }

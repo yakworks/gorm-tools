@@ -7,6 +7,7 @@ package yakworks.api.problem
 import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
+import yakworks.i18n.MsgKey
 
 /**
  * Default problem
@@ -16,6 +17,18 @@ import yakworks.api.ApiStatus
  */
 @CompileStatic
 class ApiProblem implements ProblemTrait {
+
+    static ApiProblem of(String code, Object args){
+        return (ApiProblem) new ApiProblem().msg(MsgKey.of(code, args))
+    }
+
+    static ApiProblem of(MsgKey mkey){
+        return (ApiProblem) new ApiProblem().msg(mkey)
+    }
+
+    static ApiProblem of(String code){
+        return (ApiProblem) new ApiProblem().msg(MsgKey.of(code))
+    }
 
     static ApiProblem of(Integer statusId){
         return (ApiProblem) new ApiProblem().status(statusId)

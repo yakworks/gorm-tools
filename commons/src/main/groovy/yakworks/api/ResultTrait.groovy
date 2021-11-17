@@ -24,7 +24,7 @@ trait ResultTrait implements Result {
     Object data
 
     ResultTrait msg(MsgKey v){ setMsg(v); return this; }
-    ResultTrait msg(String v, Map args) { return msg(MsgKey.of(v, args));}
+    ResultTrait msg(String v, Object args) { return msg(MsgKey.of(v, args));}
     ResultTrait title(String v) { setTitle(v);  return this; }
     ResultTrait status(ApiStatus v) { setStatus(v); return this; }
     ResultTrait status(Integer v) { setStatus(HttpStatus.valueOf(v)); return this; }

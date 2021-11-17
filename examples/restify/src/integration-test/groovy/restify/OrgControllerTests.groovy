@@ -51,6 +51,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         body.title == 'Empty Data'
     }
 
+    @IgnoreRest
     void "post with no orgType"() {
         when:
         request.json = [foo: 'bar']

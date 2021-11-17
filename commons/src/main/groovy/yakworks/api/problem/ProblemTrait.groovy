@@ -73,7 +73,7 @@ trait ProblemTrait implements Problem {
     Map putArgIfAbsent(Object key, Object val){
         if(!msg) msg = MsgKey.of(defaultCode)
         def argMap = msg.getArgMap()
-        if(argMap) argMap.putIfAbsent(key, val)
+        if(argMap != null) argMap.putIfAbsent(key, val)
         return argMap
     }
 

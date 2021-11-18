@@ -3,7 +3,7 @@ package restify
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 
-import gorm.tools.job.JobState
+import gorm.tools.job.SyncJobState
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.gorm.transactions.Rollback
 import grails.gorm.transactions.Transactional
@@ -12,7 +12,7 @@ import jdk.nashorn.internal.ir.annotations.Ignore
 import okhttp3.Response
 import spock.lang.IgnoreRest
 import spock.lang.Specification
-import yakworks.rally.job.Job
+import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 
@@ -52,13 +52,13 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].data.name == "Foox1"
 
         when: "Verify job.data"
-        Job job = Job.get(body.id as Long)
+        SyncJob job = SyncJob.get(body.id as Long)
 
         then:
         job != null
         job.data != null
         job.requestData != null
-        job.state == JobState.Finished
+        job.state == SyncJobState.Finished
         job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle"
         job.source == "Oracle"
 
@@ -95,7 +95,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         noExceptionThrown()
 
         when:
-        Job job = Job.get(body.id as Long)
+        SyncJob job = SyncJob.get(body.id as Long)
 
         then:
         job.data != null

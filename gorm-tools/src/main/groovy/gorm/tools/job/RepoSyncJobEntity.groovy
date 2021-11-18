@@ -48,10 +48,10 @@ transform example when in a job
  */
 
 @CompileStatic
-trait RepoJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
+trait RepoSyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
 
     Boolean ok = false // change to TRUE if State.Finished without any issues
-    JobState state = JobState.Running
+    SyncJobState state = SyncJobState.Running
     // data we are getting. For RestApi calls it's data body
     byte[] requestData
 

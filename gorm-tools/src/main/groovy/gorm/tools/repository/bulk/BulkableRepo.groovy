@@ -19,8 +19,8 @@ import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
-import gorm.tools.job.JobState
-import gorm.tools.job.RepoJobService
+import gorm.tools.job.RepoSyncJobService
+import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.OkResult
@@ -37,7 +37,7 @@ trait BulkableRepo<D> {
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
 
     @Autowired(required = false)
-    RepoJobService repoJobService
+    RepoSyncJobService repoJobService
 
     @Autowired
     @Qualifier("parallelTools")
@@ -181,7 +181,7 @@ trait BulkableRepo<D> {
 
     void finishJob(Long jobId, ApiResults results, List includes){
         List<Map> jsonResults = transformResults(results, includes?:['id'])
-        repoJobService.updateJob(jobId, JobState.Finished, results, jsonResults)
+        repoJobService.updateJob(jobId, SyncJobState.Finished, results, jsonResults)
     }
 
     /**

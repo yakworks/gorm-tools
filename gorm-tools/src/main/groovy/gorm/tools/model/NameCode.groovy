@@ -4,6 +4,8 @@
 */
 package gorm.tools.model
 
+import javax.persistence.Transient
+
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.RepoLookup
@@ -13,6 +15,10 @@ import gorm.tools.repository.RepoLookup
 trait NameCode<D> extends NamedEntity implements Lookupable<D> {
 
     String code
+
+    // like to string but as a field and for sending across the wire
+    @Transient
+    String getStamp(){ "${getCode()} : ${getName()}"}
 
     static Map includes = [
         qSearch: ['name', 'code'],

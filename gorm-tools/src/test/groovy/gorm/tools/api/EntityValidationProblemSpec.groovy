@@ -23,7 +23,7 @@ class EntityValidationProblemSpec extends Specification {
     void "test cause"() {
         when:
         def rte = new RuntimeException("bad stuff")
-        def e = new EntityValidationProblem(rte)
+        def e = EntityValidationProblem.of(rte)
 
         then:
         e.title == EntityValidationProblem.DEFAULT_TITLE

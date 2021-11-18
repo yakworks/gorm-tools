@@ -93,7 +93,7 @@ class GormToolsBeanConfig {
         }
 
         trxService(TrxService, lazy())
-        problemErrorHandler(ProblemHandler, lazy())
+        problemHandler(ProblemHandler, lazy())
 
         def repoClasses = application.repositoryClasses
         for(GrailsRepositoryClass repoClass : repoClasses){

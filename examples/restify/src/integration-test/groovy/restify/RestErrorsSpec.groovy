@@ -27,7 +27,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then:
         resp.code() == HttpStatus.NOT_FOUND.value()
         body.status == HttpStatus.NOT_FOUND.value()
-        body.title == "Org not found with identity 10001"
+        body.title == "Org lookup failed using key {id=10001}"
         // body.detail == 'Org not found for 10001'
     }
 

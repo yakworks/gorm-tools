@@ -23,7 +23,7 @@ final class ProblemBuilder {
     private ApiStatus status
     private String detail
     private URI instance
-    private RuntimeProblem cause
+    private ProblemException cause
     private MsgKey msg
 
     /**
@@ -68,7 +68,7 @@ final class ProblemBuilder {
         return this;
     }
 
-    public ProblemBuilder cause(@Nullable final RuntimeProblem cause) {
+    public ProblemBuilder cause(@Nullable final ProblemException cause) {
         this.cause = cause;
         return this;
     }
@@ -88,8 +88,8 @@ final class ProblemBuilder {
     //     return this;
     // }
 
-    public RuntimeProblem build() {
-        def rp = RuntimeProblem.of(cause)
+    public ProblemException build() {
+        def rp = ProblemException.of(cause)
         //ugly but getting it working for now
         if(msg) rp.msg(msg)
         if(type) rp.type(type)

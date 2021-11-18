@@ -88,7 +88,7 @@ class ProblemHandler {
         }
         else if (e instanceof DataAccessException) {
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            return Problem.of(status400).msg(MsgKey.of('error.dataAccess')).detail(e.message)
+            return DataAccessProblem.of(e).status(status400)
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)

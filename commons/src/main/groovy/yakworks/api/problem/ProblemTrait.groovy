@@ -19,7 +19,7 @@ import yakworks.i18n.MsgKey
  */
 @CompileStatic
 trait ProblemTrait<E extends Problem> implements Problem {
-    String defaultCode = 'error.default'
+    // String defaultCode = 'error.default'
     URI type //= Problem.DEFAULT_TYPE
     ApiStatus status = HttpStatus.BAD_REQUEST
     MsgKey msg
@@ -61,27 +61,4 @@ trait ProblemTrait<E extends Problem> implements Problem {
         return (E)this
     }
 
-    // E value(T v){ setValue(v); return (E)this; }
-
-    void set(String key, Object value) {
-        parameters.put(key, value);
-    }
-
-    /**
-     * adds an enrty to the msg arg map
-     */
-    Map putArgIfAbsent(Object key, Object val){
-        if(!msg) msg = MsgKey.of(defaultCode)
-        def argMap = msg.getArgMap()
-        if(argMap != null) argMap.putIfAbsent(key, val)
-        return argMap
-    }
-
-    // static String genString(final Problem p) {
-    //     String concat = "${p.status.code}"
-    //     concat = [concat, p.title, p.detail].findAll({it != null}).join(', ')
-    //     if(p.instance) concat = "$concat, instance=${p.instance}"
-    //     if(p.type) concat = "$concat, type=${p.type}"
-    //     return "{$concat}"
-    // }
 }

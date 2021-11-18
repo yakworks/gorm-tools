@@ -141,7 +141,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def get() {
         try {
             D instance = (D) getRepo().read(params.id as Serializable)
-            RepoUtil.checkFound(instance, params.id as  Serializable, entityClass.simpleName)
+            RepoUtil.checkFound(instance, params.id as Serializable, entityClass.simpleName)
             respondWithEntityMap(instance)
         } catch (Exception e) {
             handleException(e)

@@ -10,7 +10,7 @@ import spock.lang.Specification
 import testing.*
 import yakworks.commons.json.JsonEngine
 
-class JobImplSpec extends Specification  implements DomainRepoTest<TestRepoJob> {
+class JobImplSpec extends Specification implements DomainRepoTest<TestRepoJob> {
 
     void "sanity check validation with String as data"() {
         expect:

@@ -35,7 +35,7 @@ class EnforceCoverageTest {
         }
 
         @Override
-        public RuntimeProblem getCause() {
+        public ProblemException getCause() {
             return null;
         }
 

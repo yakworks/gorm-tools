@@ -45,21 +45,17 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             ctx.beanFactory.registerSingleton("persistenceInterceptor", pci)
         }
 
-        defineBeans(new GormToolsBeanConfig(ctx).getBeanDefinitions())
+        // defineBeans(new GormToolsBeanConfig(ctx).getBeanDefinitions())
 
-        defineBeans{
+        //finds and register repositories for all the persistentEntities that got setup
+        Closure beanClos = {
             persistenceInterceptor(HibernatePersistenceContextInterceptor){
                 hibernateDatastore = (HibernateDatastore)hibernateDatastore
             }
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
             messageSource(GrailsICUMessageSource)
-        }
 
-        // defineBeans(doWithSpringFirst())
-
-        //finds and register repositories for all the persistentEntities that got setup
-        defineBeans {
             for(Class domainClass in datastore.mappingContext.persistentEntities*.javaClass){
                 Class repoClass = findRepoClass(domainClass)
                 grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
@@ -76,6 +72,16 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             }
         }
 
+        defineBeansMany([commonBeans(), beanClos])
+
+        // if(_hasCommonBeansSetup){
+        //     defineBeansMany([beanClos])
+        // } else {
+        //
+        //     _hasCommonBeansSetup = true
+        // }
+
+        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
         // doWithSpringAfter()
     }
 

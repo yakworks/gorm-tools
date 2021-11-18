@@ -29,7 +29,7 @@ class ProblemSpec extends Specification {
 
     void shouldRenderCustomDetailAndInstance() {
         when:
-        final RuntimeProblem p = Problem.create()
+        final ProblemException p = Problem.create()
             .type(URI.create("https://example.org/problem"))
             .status(NOT_FOUND)
             .detail("Order 123")
@@ -46,7 +46,7 @@ class ProblemSpec extends Specification {
 
     void shouldRenderCustomPropertiesWhenPrintingStackTrace() {
         when:
-        final RuntimeProblem problem = Problem.create()
+        final ProblemException problem = Problem.create()
             .type(URI.create("https://example.org/problem"))
             .status(NOT_FOUND)
 

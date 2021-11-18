@@ -32,6 +32,7 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.transaction.TrxService
+import grails.core.GrailsApplication
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
 import yakworks.i18n.icu.GrailsICUMessageSource
@@ -48,12 +49,32 @@ import yakworks.i18n.icu.GrailsICUMessageSource
  * @since 6.1
  */
 @CompileDynamic
-@SuppressWarnings(["Indentation"])
+@SuppressWarnings(["Indentation","AssignmentToStaticFieldFromInstanceMethod"])
 trait GormToolsSpecHelper extends GrailsUnitTest {
+
+    private static GrailsApplication _grailsApplication
+    private static boolean _hasCommonBeansSetup = false
 
     /** conveinince shortcut for applicationContext */
     ConfigurableApplicationContext getCtx() {
         getApplicationContext()
+    }
+
+    @Override
+    GrailsApplication getGrailsApplication() {
+        if (_grailsApplication == null) {
+            _grailsApplication = GrailsUnitTest.super.getGrailsApplication()
+            defineCommonBeans()
+        }
+        _grailsApplication
+    }
+
+    @Override
+    void cleanupGrailsApplication() {
+        if (_grailsApplication != null) {
+            GrailsUnitTest.super.cleanupGrailsApplication()
+            this._grailsApplication = null
+        }
     }
 
     /**
@@ -98,8 +119,12 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
      * see commonBeans, sets up beans for common services for binders, mango, idegen, parralelTools and msgService
      */
     void defineCommonBeans(){
-        defineBeans(commonBeans())
+        if(!_hasCommonBeansSetup){
+            defineBeans(commonBeans())
+            _hasCommonBeansSetup = true
+        }
     }
+
     void defineRepoBeans(Class<?>... domainClassesToMock){
         RepoLookup.USE_CACHE = false
 
@@ -125,7 +150,16 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             }
         }
 
-        defineBeansMany([commonBeans(), beanClos])
+        if(_hasCommonBeansSetup){
+            defineBeansMany([beanClos])
+        } else {
+            defineBeansMany([commonBeans(), beanClos])
+            _hasCommonBeansSetup = true
+        }
+
+        // redo the cache for the repo event methods in the repos
+        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
+
     }
 
     /**

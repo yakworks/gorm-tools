@@ -23,19 +23,14 @@ trait ResultTrait<E> implements Result {
     String title
     Object payload
 
-    E msg(MsgKey v){ setMsg(v); return (E)this; }
-    E msg(String v, Object args) { return msg(MsgKey.of(v, args));}
     E title(String v) { setTitle(v);  return (E)this; }
     E status(ApiStatus v) { setStatus(v); return (E)this; }
     E status(Integer v) { setStatus(HttpStatus.valueOf(v)); return (E)this; }
     E payload(Object v) { setPayload(v); return (E)this; }
     // E value(T v){ setValue(v); return (E)this; }
 
-    /**
-     * adds an enrty to the msg arg map
-     */
-    Map putArgIfAbsent(Object key, Object val){
-        if(!msg) msg = MsgKey.of(defaultCode)
-        return msg.putArg(key, val)
-    }
+    E msg(MsgKey v){ setMsg(v); return (E)this; }
+    E msg(String v, Object args) { return msg(MsgKey.of(v, args));}
+
+
 }

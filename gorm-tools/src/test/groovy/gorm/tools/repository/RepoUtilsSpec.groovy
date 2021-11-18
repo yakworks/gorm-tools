@@ -50,13 +50,26 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
 
     }
 
-    void "test checkFound"() {
-        when:
-        RepoUtil.checkFound(null, 99, 'xxx')
+    def "checkFound id number"() {
 
+        when:
+        RepoUtil.checkFound(null, 1, "Bloo")
         then:
-        EntityNotFoundProblem e = thrown(EntityNotFoundProblem)
+        def e = thrown(EntityNotFoundProblem)
         e.code == 'error.notFound'
+        e.message == "Bloo lookup failed using key [id:1]: code=error.notFound"
+
+    }
+
+    def "checkFound lookup is map"() {
+
+        when:
+        RepoUtil.checkFound(null, [code: 'abc'], "Bloo")
+        then:
+        def e = thrown(EntityNotFoundProblem)
+        e.code == 'error.notFound'
+        e.message == 'Bloo lookup failed using key [code:abc]: code=error.notFound'
+
     }
 
 

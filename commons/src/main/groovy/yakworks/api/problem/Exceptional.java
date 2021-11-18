@@ -2,9 +2,9 @@ package yakworks.api.problem;
 
 /**
  * An extension of the {@link Problem} interface for problems that extend {@link Exception}. Since {@link Exception}
- * is a concrete type any class can only extend one exception type. {@link RuntimeProblem} is one choice, but we
+ * is a concrete type any class can only extend one exception type. {@link ProblemException} is one choice, but we
  * don't want to force people to extend from this but choose their own super class. For this they can implement this
- * interface and get the same handling as {@link RuntimeProblem} for free. A common use case would be:
+ * interface and get the same handling as {@link ProblemException} for free. A common use case would be:
  *
  * <pre>{@code
  * public final class OutOfStockException extends BusinessException implements Exceptional
@@ -12,7 +12,7 @@ package yakworks.api.problem;
  *
  * @see Exception
  * @see Problem
- * @see RuntimeProblem
+ * @see ProblemException
  */
 public interface Exceptional extends Problem {
 

@@ -6,7 +6,7 @@ import java.net.URI;
 
 import static yakworks.api.HttpStatus.BAD_REQUEST;
 
-public final class OutOfStockProblem extends RuntimeProblem {
+public final class OutOfStockProblem extends ProblemException {
 
     private static final String TYPE_VALUE = "https://example.org/out-of-stock";
     private static final URI TYPE = URI.create(TYPE_VALUE);

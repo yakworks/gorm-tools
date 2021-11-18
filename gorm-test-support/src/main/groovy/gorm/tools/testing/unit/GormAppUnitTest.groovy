@@ -19,18 +19,17 @@ import grails.testing.spring.AutowiredTest
  * @since 6.1
  */
 @CompileStatic
-trait DataRepoTest implements BuildDataTest, AutowiredTest, GormToolsSpecHelper {
+trait GormAppUnitTest implements AutowiredTest, BuildDataTest, GormToolsSpecHelper {
 
+    /**
+     * Overrides the BuildDataTest so we can register the repo beans after mock
+     */
+    @Override //BuildDataTest
     void mockDomains(Class<?>... domainClassesToMock) {
         BuildDataTest.super.mockDomains(domainClassesToMock)
         defineRepoBeans(domainClassesToMock)
         setupValidatorRegistry()
-    }
 
-    //called from BuildDataTest as it setups and mocks the domains
-    // void onMockDomains(Class<?>... entityClasses) {
-    //     defineBeans(doWithSpringFirst())
-    //     //mockRepositories(entityClasses)
-    // }
+    }
 
 }

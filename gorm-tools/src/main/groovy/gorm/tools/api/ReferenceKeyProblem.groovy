@@ -13,10 +13,9 @@ import yakworks.i18n.MsgKey
  * Throwable Exception Problem
  */
 @CompileStatic
-class ReferenceKeyProblem extends DataAccessProblem<ReferenceKeyProblem> {
+class ReferenceKeyProblem extends AbstractDataAccessProblem<ReferenceKeyProblem> {
     public static String DEFAULT_CODE = 'error.reference.key'
     String defaultCode = DEFAULT_CODE
-    Object entity
 
     protected ReferenceKeyProblem() {
         super(null);
@@ -28,17 +27,15 @@ class ReferenceKeyProblem extends DataAccessProblem<ReferenceKeyProblem> {
     }
 
     //pass in an entity desc instead
-    static ReferenceKeyProblem of(String entityDesc) {
+    static ReferenceKeyProblem ofStamp(String entityDesc) {
         def opProb = new ReferenceKeyProblem()
-        opProb.msg = MsgKey.of(DEFAULT_CODE, [name: entityDesc])
+        opProb.msg = MsgKey.of(DEFAULT_CODE, [stamp: entityDesc])
         return opProb;
     }
 
     static ReferenceKeyProblem of(Object entity) {
         def opProb = new ReferenceKeyProblem()
-        def id = entity['id']
-        opProb.msg = MsgKey.of(DEFAULT_CODE, [name: entity.class.simpleName, id:id])
-        return opProb;
+        return opProb.entity(entity);
     }
 
 }

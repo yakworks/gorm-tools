@@ -18,7 +18,7 @@ import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import yakworks.api.problem.Problem
-import yakworks.api.problem.RuntimeProblem
+import yakworks.api.problem.ProblemException
 
 /**
  * A bunch of statics to support the repositories.
@@ -70,13 +70,13 @@ class RepoUtil {
      */
     static void checkFound(Object entity, Serializable id, String domainClassName) {
         if (!entity) {
-            throw new EntityNotFoundProblem(id, domainClassName)
+            throw EntityNotFoundProblem.of(id, domainClassName)
         }
     }
 
     /**
      * check that the passed in data is not empty and throws EmptyDataException if so
-     * @throws RuntimeProblem if it not found
+     * @throws ProblemException if it not found
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {

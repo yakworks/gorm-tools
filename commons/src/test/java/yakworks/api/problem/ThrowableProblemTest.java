@@ -19,7 +19,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldReturnThrowableProblemCause() {
-        final RuntimeProblem problem = Problem.builder()
+        final ProblemException problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -30,23 +30,23 @@ final class ThrowableProblemTest {
                         .build())
                 .build();
 
-        assertThat(problem, hasFeature("cause", RuntimeProblem::getCause, notNullValue()));
+        assertThat(problem, hasFeature("cause", ProblemException::getCause, notNullValue()));
     }
 
     @Test
     void shouldReturnNullCause() {
-        final RuntimeProblem problem = Problem.builder()
+        final ProblemException problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
                 .build();
 
-        assertThat(problem, hasFeature("cause", RuntimeProblem::getCause, nullValue()));
+        assertThat(problem, hasFeature("cause", ProblemException::getCause, nullValue()));
     }
 
     @Test
     void shouldReturnTitleAsMessage() {
-        final RuntimeProblem problem = ProblemBuilder.create()
+        final ProblemException problem = ProblemBuilder.create()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -57,7 +57,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldReturnTitleAndDetailAsMessage() {
-        final RuntimeProblem problem = Problem.builder()
+        final ProblemException problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -69,7 +69,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldReturnCausesMessage() {
-        final RuntimeProblem problem = Problem.builder()
+        final ProblemException problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -86,7 +86,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldPrintStackTrace() {
-        final RuntimeProblem problem = Problem.builder()
+        final ProblemException problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
@@ -108,7 +108,7 @@ final class ThrowableProblemTest {
 
     @Test
     void shouldProcessStackTrace() {
-        final RuntimeProblem problem = Problem.builder()
+        final ProblemException problem = Problem.builder()
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)

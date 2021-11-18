@@ -17,13 +17,13 @@ import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
  * Throwable Exception Problem
  */
 @CompileStatic
-class RuntimeProblem extends NestedRuntimeException implements ProblemTrait<RuntimeProblem>, Exceptional {
+class ProblemException extends NestedRuntimeException implements ProblemTrait<ProblemException>, Exceptional {
 
-    protected RuntimeProblem() {
+    protected ProblemException() {
         this(null);
     }
 
-    protected RuntimeProblem(@Nullable final RuntimeProblem cause) {
+    protected ProblemException(@Nullable final ProblemException cause) {
         super(cause);
         final Collection<StackTraceElement> stackTrace = COMPOUND.process(asList(getStackTrace()));
         setStackTrace(stackTrace as StackTraceElement[]);
@@ -31,23 +31,23 @@ class RuntimeProblem extends NestedRuntimeException implements ProblemTrait<Runt
 
     @Override //throwable
     String getMessage() {
-        return RuntimeProblem.buildMessage(this)
+        return ProblemException.buildMessage(this)
     }
 
     static String buildMessage(final Problem p) {
-        String code = p.code? "code=$p.code" : ''
+        String code = p.code ? "code=$p.code" : ''
         return [p.title, p.detail, code].findAll{it}.join(': ')
     }
 
     @Override
-    RuntimeProblem getCause() {
+    ProblemException getCause() {
         // cast is safe, since the only way to set this is our constructor
-        return (RuntimeProblem) super.getCause()
+        return (ProblemException) super.getCause()
     }
 
     @Override
     String toString() {
-        return RuntimeProblem.buildToString(this)
+        return ProblemException.buildToString(this)
     }
 
     static String buildToString(final Problem p) {
@@ -59,8 +59,8 @@ class RuntimeProblem extends NestedRuntimeException implements ProblemTrait<Runt
         return "{$concat}"
     }
 
-    static RuntimeProblem of(final RuntimeProblem cause) {
-        return new RuntimeProblem(cause);
+    static ProblemException of(final ProblemException cause) {
+        return new ProblemException(cause);
     }
 
 }

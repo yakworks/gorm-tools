@@ -4,16 +4,13 @@
 */
 package gorm.tools.api
 
-
 import groovy.transform.CompileStatic
-
-import yakworks.i18n.MsgKey
 
 /**
  * Throwable Exception Problem
  */
 @CompileStatic
-class OptimisticLockingProblem extends DataAccessProblem<OptimisticLockingProblem> {
+class OptimisticLockingProblem extends AbstractDataAccessProblem<OptimisticLockingProblem> {
     public static String DEFAULT_CODE = 'error.optimisticLocking'
     String defaultCode = DEFAULT_CODE
     Object entity
@@ -28,17 +25,9 @@ class OptimisticLockingProblem extends DataAccessProblem<OptimisticLockingProble
         return (OptimisticLockingProblem) super.getCause()
     }
 
-    OptimisticLockingProblem entity(Object v) {
-        if(v == null) return this
-        this.entity = v
-        putArgIfAbsent('name', v.class.simpleName)
-        return this;
-    }
-
     static OptimisticLockingProblem of(Object entity) {
         def opProb = new OptimisticLockingProblem()
-        opProb.msg = MsgKey.of(DEFAULT_CODE, [name: entity.class.simpleName])
-        return opProb;
+        opProb.entity(entity)
     }
 
 }

@@ -9,7 +9,9 @@ import groovy.transform.CompileStatic
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 
+import gorm.tools.api.DataAccessProblem
 import gorm.tools.api.EntityValidationProblem
+import gorm.tools.api.UniqueConstraintProblem
 import yakworks.api.problem.Problem
 
 /**
@@ -57,9 +59,27 @@ class RepoExceptionSupport {
         }
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
-            return EntityValidationProblem.of(entity, ex).notSavedMsg()
+            if(isUniqueIndexViolation(ex)){
+                return UniqueConstraintProblem.of(ex).entity(entity)
+            } else {
+                return DataAccessProblem.of(ex).entity(entity)
+            }
         }
         return ex
+    }
+
+    //Unique index unique constraint or primary key violation
+    static String isUniqueIndexViolation(DataAccessException dax){
+        String rootMessage = dax.rootCause.message
+        if(rootMessage.contains("Unique index or primary key violation") || //mysql and H2
+            rootMessage.contains("Duplicate entry") || //mysql
+            rootMessage.contains("Violation of UNIQUE KEY constraint") || //sql server
+            rootMessage.contains("unique constraint"))
+        {
+           return rootMessage
+        } else {
+            return null
+        }
     }
 
     // static List<Map<String, String>> toErrorList(Errors errs) {

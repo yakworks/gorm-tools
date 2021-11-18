@@ -32,8 +32,35 @@ public interface Result {
     }
     default void setMsg(MsgKey msg) {}
 
+    default String getDefaultCode() {
+        return null;
+    }
+
+    default MsgKey getOrCreateMsg(){
+        if(getMsg() == null) setMsg(MsgKey.of(getDefaultCode()));
+        return getMsg();
+    }
+
     default String getCode() {
-        return getMsg() != null ? getMsg().getCode() : null;
+        return getOrCreateMsg().getCode();
+    }
+    default void setCode(String v) {
+        getOrCreateMsg().setCode(v);
+    }
+    default void setArgs(Object v) {
+        getOrCreateMsg().setArgs(v);
+    }
+    default Map getArgMap(){
+        return getOrCreateMsg().getArgMap();
+    }
+
+    /**
+     * adds an enrty to the msg arg map
+     */
+    default Map putArgIfAbsent(Object key, Object val){
+        Map argsMap = getArgMap();
+        if(argsMap != null) argsMap.putIfAbsent(key, val);
+        return argsMap;
     }
 
     /**

@@ -13,22 +13,22 @@ import yakworks.api.HttpStatus
  * generic problem
  */
 @CompileStatic
-class DataAccessProblem extends AbstractDataAccessProblem<DataAccessProblem> {
-    public static String DEFAULT_CODE = 'error.dataAccessException'
+class UniqueConstraintProblem extends AbstractDataAccessProblem<UniqueConstraintProblem> {
+    public static String DEFAULT_CODE = 'error.uniqueConstraintViolation'
 
     String defaultCode = DEFAULT_CODE
     ApiStatus status = HttpStatus.BAD_REQUEST
 
-    protected DataAccessProblem() {
+    protected UniqueConstraintProblem() {
         super(DEFAULT_CODE)
     }
 
-    protected DataAccessProblem(Throwable cause) {
+    protected UniqueConstraintProblem(Throwable cause) {
         super(DEFAULT_CODE, cause)
     }
 
-    static DataAccessProblem of(final Throwable cause) {
-        def dap = new DataAccessProblem(cause)
+    static UniqueConstraintProblem of(final Throwable cause) {
+        def dap = new UniqueConstraintProblem(cause)
         dap.detail(dap.rootCause.message)
     }
 

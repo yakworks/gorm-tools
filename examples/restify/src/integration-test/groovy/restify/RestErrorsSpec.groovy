@@ -84,8 +84,7 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         then: "Would cause DataAccessException"
         resp.code() == HttpStatus.BAD_REQUEST.value()
         body.status == HttpStatus.BAD_REQUEST.value()
-        body.title == "Data Access Exception"
-        ((String)body.detail).contains("ConstraintViolationException")
+        body.title == "Unique index or primary key violation"
         ((String)body.detail).contains("IX_ORGSOURCE_UNIQUE")
 
         delete("/api/rally/org", orgId)

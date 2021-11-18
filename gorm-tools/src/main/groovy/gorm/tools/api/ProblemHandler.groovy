@@ -87,8 +87,14 @@ class ProblemHandler {
             return Problem.of(status400).msg(MsgKey.of('error.illegalArgument')).detail(e.message)
         }
         else if (e instanceof DataAccessException) {
+            //Not all will get translated in the repo as some get thrown after flush
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
-            return DataAccessProblem.of(e).status(status400)
+            // Root of the hierarchy of data access exceptions
+            if(isUniqueIndexViolation((DataAccessException)e)){
+                return UniqueConstraintProblem.of(e)
+            } else {
+                return DataAccessProblem.of(e)
+            }
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
@@ -114,5 +120,19 @@ class ProblemHandler {
             errors << fieldError
         }
         return errors as List<Violation>
+    }
+
+    //Unique index unique constraint or primary key violation
+    static String isUniqueIndexViolation(DataAccessException dax){
+        String rootMessage = dax.rootCause.message
+        if(rootMessage.contains("Unique index or primary key violation") || //mysql and H2
+            rootMessage.contains("Duplicate entry") || //mysql
+            rootMessage.contains("Violation of UNIQUE KEY constraint") || //sql server
+            rootMessage.contains("unique constraint"))
+        {
+            return rootMessage
+        } else {
+            return null
+        }
     }
 }

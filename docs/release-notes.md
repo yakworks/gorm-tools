@@ -1,3 +1,9 @@
+### v7.0.8-v.40
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.39...v7.0.8-v.40)
+- release 40 [link](https://github.com/yakworks/gorm-tools/commit/5a8141c1c5fdd8655b090ad5dd4d2bcf6e290cab)
+- REST outapi (In progress) (#390) [link](https://github.com/yakworks/gorm-tools/commit/575ac45f3f3fe73c8bee35b8ee19421132405ea2)
+
 ### v7.0.8-v.39
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.38...v7.0.8-v.39)

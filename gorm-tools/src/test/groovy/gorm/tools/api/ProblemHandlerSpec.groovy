@@ -18,9 +18,9 @@ class ProblemHandlerSpec extends Specification implements GormAppUnitTest {
     MessageSource messageSource
     ProblemHandler problemHandler
 
-    // void setupSpec() {
-    //     defineCommonBeans()
-    // }
+    void setupSpec() {
+        defineCommonBeans()
+    }
 
     void "sanity check"(){
         expect:

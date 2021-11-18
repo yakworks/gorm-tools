@@ -60,22 +60,22 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         getApplicationContext()
     }
 
-    @Override
-    GrailsApplication getGrailsApplication() {
-        if (_grailsApplication == null) {
-            _grailsApplication = GrailsUnitTest.super.getGrailsApplication()
-            defineCommonBeans()
-        }
-        _grailsApplication
-    }
+    // @Override
+    // GrailsApplication getGrailsApplication() {
+    //     if (_grailsApplication == null) {
+    //         _grailsApplication = GrailsUnitTest.super.getGrailsApplication()
+    //         defineCommonBeans()
+    //     }
+    //     _grailsApplication
+    // }
 
-    @Override
-    void cleanupGrailsApplication() {
-        if (_grailsApplication != null) {
-            GrailsUnitTest.super.cleanupGrailsApplication()
-            this._grailsApplication = null
-        }
-    }
+    // @Override
+    // void cleanupGrailsApplication() {
+    //     if (_grailsApplication != null) {
+    //         GrailsUnitTest.super.cleanupGrailsApplication()
+    //         this._grailsApplication = null
+    //     }
+    // }
 
     /**
      * Finds repository class in same package as domain class.
@@ -150,12 +150,14 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
             }
         }
 
-        if(_hasCommonBeansSetup){
-            defineBeansMany([beanClos])
-        } else {
-            defineBeansMany([commonBeans(), beanClos])
-            _hasCommonBeansSetup = true
-        }
+        defineBeansMany([commonBeans(), beanClos])
+
+        // if(_hasCommonBeansSetup){
+        //     defineBeansMany([beanClos])
+        // } else {
+        //     defineBeansMany([commonBeans(), beanClos])
+        //     _hasCommonBeansSetup = true
+        // }
 
         // redo the cache for the repo event methods in the repos
         ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()

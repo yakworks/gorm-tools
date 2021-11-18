@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.repository.bulk.BulkableResults
 
 @CompileStatic
-interface RepoJobService {
+interface RepoSyncJobService {
 
     /**
      * create Job and returns the job id
@@ -19,8 +19,8 @@ interface RepoJobService {
     /**
      * update a job with state and results
      */
-    void updateJob(Long id, JobState state, BulkableResults results, List<Map> renderResults)
+    void updateJob(Long id, SyncJobState state, BulkableResults results, List<Map> renderResults)
 
-    RepoJobEntity getJob(Serializable id)
+    RepoSyncJobEntity getJob(Serializable id)
 
 }

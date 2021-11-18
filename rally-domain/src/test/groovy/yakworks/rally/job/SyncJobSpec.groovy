@@ -11,11 +11,11 @@ import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Ignore
 import spock.lang.Specification
 
-class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTest {
+class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, SecurityTest {
 
     void "sanity check validation with String as data"() {
         expect:
-        Job job = new Job([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         job.validate()
         job.persist()
     }
@@ -23,7 +23,7 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
     @Ignore //XXX put ot back in when we add sourceId to be required in SourceTrait. Too many tests were failing
     void "sanity check validation no sourceId"() {
         when:
-        Job job = new Job()
+        SyncJob job = new SyncJob()
         // job.persist()
         then:
         job
@@ -39,7 +39,7 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
         def sourceId = "api/ar/org"
         def source = "Oracle"
         def sourceType = SourceType.RestApi
-        def job = Job.repo.create(dataPayload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
+        def job = SyncJob.repo.create(dataPayload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
 
         then:
         job
@@ -52,14 +52,14 @@ class JobSpec extends Specification  implements DomainRepoTest<Job>, SecurityTes
         def res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        Job job = new Job(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
+        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
         jobId
 
         when: "query the db for job we can read the data"
-        Job j = Job.get(jobId)
+        SyncJob j = SyncJob.get(jobId)
 
         then:
         j

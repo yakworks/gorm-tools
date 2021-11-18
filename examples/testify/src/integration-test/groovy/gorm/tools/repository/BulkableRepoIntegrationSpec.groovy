@@ -9,9 +9,9 @@ import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
+import yakworks.rally.job.SyncJob
 import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.rally.job.Job
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.repo.OrgRepo
@@ -39,7 +39,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        Job job = Job.get(jobId)
+        SyncJob job = SyncJob.get(jobId)
 
         then:
         noExceptionThrown()
@@ -59,7 +59,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        Job job = Job.get(jobId)
+        SyncJob job = SyncJob.get(jobId)
 
         then:
         noExceptionThrown()
@@ -73,7 +73,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         }
 
         jobId = orgRepo.bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
-        job = Job.get(jobId)
+        job = SyncJob.get(jobId)
         flushAndClear()
 
         then:
@@ -96,7 +96,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        Job job = Job.get(jobId)
+        SyncJob job = SyncJob.get(jobId)
         flush()
 
         then:
@@ -131,7 +131,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        Job job = Job.get(jobId)
+        SyncJob job = SyncJob.get(jobId)
 
         then:
         noExceptionThrown()
@@ -180,7 +180,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create())
-        Job job = Job.get(jobId)
+        SyncJob job = SyncJob.get(jobId)
 
         then:
         noExceptionThrown()

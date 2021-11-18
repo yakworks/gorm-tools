@@ -224,6 +224,47 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.location.city == 'Denver'
     }
 
+    @Ignore //XXX https://github.com/9ci/domain9/issues/493 fix so it works here
+    void "test insert with orgmembers"() {
+        given:
+        orgDimensionService.testInit('Branch.Division.Business')
+        Org division = Org.create("Division", "Division", OrgType.Division).persist()
+        division.member = OrgMember.make(division)
+        division.member.business = Org.create("Business", "Business", OrgType.Business).persist()
+        division.persist()
+        division.member.persist()
+
+        Map params = [name: "test", num: "test", orgTypeId: 3, member: [division: [id: division.id]]]
+
+        when:
+        Org result = Org.create(params)
+
+        then:
+        result != null
+        result.name == "test"
+        result.num == "test"
+        result.member != null
+        result.member.division.id == division.id
+        result.member.business.id == division.member.business.id
+
+        when:
+        Org otherBusiness = Org.create("b2", "b2", OrgType.Business).persist([flush: true])
+        params = [
+            name: "test", num: "test", orgTypeId: "3",
+            member: [
+                division: [id: division.id],
+                business: [id: otherBusiness.id]
+            ]
+        ]
+        result = orgRepo.create(params)
+
+        then: "Specified business should NOT take precedence parents set from division"
+        result.member.business == division.member.business
+
+        cleanup:
+        orgDimensionService.testInit(null)
+    }
+
     def "delete should fail when source is ERP"() {
         when:
         def org = Org.get(99)
@@ -386,6 +427,21 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         then:
         org.name == 'new name'
         org.source.sourceId == 'foo'
+    }
+
+    @Ignore // xxx https://github.com/9ci/domain9/issues/493
+    def "create org with member branch lookup by num"() {
+        when:
+        Long orgId = 1111
+
+        Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: 30 ]]]
+        def org = Org.create(params, bindId: true)
+        orgRepo.flush()
+
+        then: "make sure member is created with branch"
+        org.id == orgId
+        org.member
+        30 == org.member.branch.num
     }
 
 }

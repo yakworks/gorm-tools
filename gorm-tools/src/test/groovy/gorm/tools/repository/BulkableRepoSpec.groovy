@@ -4,16 +4,15 @@ import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
-import gorm.tools.job.JobState
+import gorm.tools.job.SyncJobState
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Issue
 import spock.lang.Specification
-import testing.TestRepoJob
-import testing.TestRepoJobService
-import yakworks.commons.json.JsonEngine
+import testing.TestRepoSyncJob
+import testing.TestRepoSyncJobService
 import yakworks.gorm.testing.SecurityTest
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo
@@ -29,9 +28,9 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
     void setupSpec() {
         defineBeans{
-            repoJobService(TestRepoJobService)
+            repoJobService(TestRepoSyncJobService)
         }
-        mockDomains(KitchenSink, SinkExt, TestRepoJob)
+        mockDomains(KitchenSink, SinkExt, TestRepoSyncJob)
     }
 
     BulkableArgs setupBulkableArgs(DataOp op = DataOp.add){
@@ -49,8 +48,10 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         List list = KitchenSink.generateDataList(20)
 
         when: "bulk insert 20 records"
+
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.get(jobId)
+        def job = TestRepoSyncJob.get(jobId)
+
 
         then: "verify job"
         job != null
@@ -58,7 +59,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         job.sourceId == "test"
         job.requestData != null
         job.data != null
-        job.state == JobState.Finished
+        job.state == SyncJobState.Finished
 
         when: "Verify job.requestData (incoming json)"
         def payload = parseJson(job.requestDataToString())
@@ -101,11 +102,12 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         List list = KitchenSink.generateDataList(10)
 
         when: "insert records"
+
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.get(jobId)
+        def job = TestRepoSyncJob.get(jobId)
 
         then:
-        job.state == JobState.Finished
+        job.state == SyncJobState.Finished
 
         and: "Verify db records"
         KitchenSink.count() == 10
@@ -117,13 +119,13 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         }
 
         jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs(DataOp.update))
-        job = TestRepoJob.get(jobId)
+        job = TestRepoSyncJob.get(jobId)
 
         then:
         noExceptionThrown()
         job != null
         job.data != null
-        job.state == JobState.Finished
+        job.state == SyncJobState.Finished
 
         and: "Verify db records"
         KitchenSink.count() == 10
@@ -141,8 +143,9 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         list[19].ext.name = ""
 
         when: "bulk insert"
+
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.get(jobId)
+        def job = TestRepoSyncJob.get(jobId)
 
         then: "verify job"
         job.ok == false
@@ -185,7 +188,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         when: "bulk insert in multi batches"
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoJob.findById(jobId)
+        def job = TestRepoSyncJob.findById(jobId)
 
         def results = parseJson(job.dataToString())
 

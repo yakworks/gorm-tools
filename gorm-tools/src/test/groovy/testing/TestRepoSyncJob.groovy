@@ -4,7 +4,7 @@
 */
 package testing
 
-import gorm.tools.job.RepoJobEntity
+import gorm.tools.job.RepoSyncJobEntity
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -13,7 +13,7 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class TestRepoJob implements RepoJobEntity<TestRepoJob>, RepoEntity<TestRepoJob> {
+class TestRepoSyncJob implements RepoSyncJobEntity<TestRepoSyncJob>, RepoEntity<TestRepoSyncJob> {
     String message  // not sure if needed
 
     // String fileWithJson  // option if json is too big

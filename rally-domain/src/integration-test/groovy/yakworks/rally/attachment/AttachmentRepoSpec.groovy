@@ -1,21 +1,15 @@
 package yakworks.rally.attachment
 
-import java.nio.file.Path
-
-import gorm.tools.repository.errors.EntityValidationException
-import grails.gorm.transactions.Rollback
-import grails.plugin.viewtools.AppResourceLoader
-import grails.testing.mixin.integration.Integration
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.FilenameUtils
-import org.springframework.mock.web.MockMultipartFile
 
+import grails.gorm.transactions.Rollback
+import grails.plugin.viewtools.AppResourceLoader
+import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
-import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.gorm.testing.SecuritySpecHelper
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 

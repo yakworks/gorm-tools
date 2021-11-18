@@ -4,15 +4,21 @@
 */
 package gorm.tools.model
 
+import javax.persistence.Transient
+
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 
 @SuppressWarnings(['MethodName'])
 @CompileStatic
 trait NameCode<D> extends NamedEntity implements Lookupable<D> {
 
     String code
+
+    // like to string but as a field and for sending across the wire
+    @Transient
+    String getStamp(){ "${getCode()} : ${getName()}"}
 
     static Map includes = [
         qSearch: ['name', 'code'],
@@ -31,7 +37,7 @@ trait NameCode<D> extends NamedEntity implements Lookupable<D> {
     //FIXME #339 framed out example
     static D lookup(Map data){
         if(data['code']) {
-            (D) RepoUtil.findRepo(this).query(code: data['code']).get()
+            (D) RepoLookup.findRepo(this).query(code: data['code']).get()
         }
     }
 

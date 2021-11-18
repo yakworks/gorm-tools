@@ -6,15 +6,13 @@ package gorm.tools.repository.errors
 
 import groovy.transform.CompileStatic
 
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.validation.Errors
-import org.springframework.validation.FieldError
 
-import gorm.tools.beans.AppCtx
-import gorm.tools.repository.RepoMessage
+import gorm.tools.api.DataAccessProblem
+import gorm.tools.api.EntityValidationProblem
+import gorm.tools.api.UniqueConstraintProblem
+import yakworks.api.problem.Problem
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -42,17 +40,18 @@ class RepoExceptionSupport {
          * It happens because EntityValidationException is inherited from DataIntegrityViolationException and DataAccessException,
          * thus checks for these exceptions also cover EntityValidationException case.
          */
-        if (ex instanceof EntityValidationException) {
+        //if its an instance of Problem then we dont need to transalate
+        if (ex instanceof Problem || ex instanceof EntityValidationProblem) {
             return ex
         }
         else if (ex instanceof grails.validation.ValidationException) {
             def ve = (grails.validation.ValidationException) ex
-            return new EntityValidationException(RepoMessage.validationError(entity), entity, ve.errors, ve)
+            return EntityValidationProblem.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
             // Gorm's stock ValidationException
             def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
-            return new EntityValidationException(RepoMessage.validationError(entity), entity, ve.errors, ve)
+            return EntityValidationProblem.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof OptimisticLockingFailureException) {
             return ex //just return unchanged
@@ -60,20 +59,40 @@ class RepoExceptionSupport {
         }
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
-            return new EntityValidationException(RepoMessage.notSaved(entity), entity, null, ex)
+            if(isUniqueIndexViolation(ex)){
+                return UniqueConstraintProblem.of(ex).entity(entity)
+            } else {
+                return DataAccessProblem.of(ex).entity(entity)
+            }
         }
         return ex
     }
 
-    static List<Map<String, String>> toErrorList(Errors errs) {
-        List<Map<String, String>> errors = []
-        MessageSource messageSource =  AppCtx.getCtx()
-        errs.allErrors.each {def err ->
-            Map m = [message:messageSource.getMessage(err, LocaleContextHolder.getLocale())]
-            if(err instanceof FieldError) m['field'] = err.field
-            errors << m
+    //Unique index unique constraint or primary key violation
+    @SuppressWarnings('BracesForIfElse')
+    static String isUniqueIndexViolation(DataAccessException dax){
+        String rootMessage = dax.rootCause.message
+        if(rootMessage.contains("Unique index or primary key violation") || //mysql and H2
+            rootMessage.contains("Duplicate entry") || //mysql
+            rootMessage.contains("Violation of UNIQUE KEY constraint") || //sql server
+            rootMessage.contains("unique constraint"))
+        {
+           return rootMessage
+        } else {
+            return null
         }
-        return errors
     }
+
+    // static List<Map<String, String>> toErrorList(Errors errs) {
+    //     List<Map<String, String>> errors = []
+    //     MessageSource messageSource =  AppCtx.getCtx()
+    //     errs.allErrors.each {def err ->
+    //         Map m = [message:messageSource.getMessage(err, LocaleContextHolder.getLocale())]
+    //         if(err instanceof FieldError) m['field'] = err.field
+    //         errors << m
+    //     }
+    //     return errors
+    // }
+
 
 }

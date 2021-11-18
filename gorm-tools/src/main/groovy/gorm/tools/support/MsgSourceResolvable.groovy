@@ -26,9 +26,6 @@ trait MsgSourceResolvable implements MessageSourceResolvable{
      * Sets message params from a map
      * @param msgMap a map that contains keys for code (required), args(optional) and defaultMessage(optional)
      */
-    void setMessage(Map msgMap) {
-        setMessage([msgMap.code as String], msgMap.args as List, msgMap.defaultMessage as String)
-    }
 
     void setMessage(MessageSourceResolvable resolvable) {
         setMessage(resolvable.codes?.toList(), resolvable.arguments?.toList(), resolvable.defaultMessage)
@@ -48,7 +45,7 @@ trait MsgSourceResolvable implements MessageSourceResolvable{
      * Return the default code of this resolvable, that is, the last one in the codes array.
      */
     String getCode() {
-        return codes?.last()
+        return msgCodes ? msgCodes.last() : null
     }
 
     void setCode(String cd) {
@@ -68,6 +65,16 @@ trait MsgSourceResolvable implements MessageSourceResolvable{
     Object[] getArguments() {
         return this.args as Object[]
     }
+
+    //MessageSourceResolvable
+    void setArguments(List args) {
+        this.args = args
+    }
+
+    // MsgKey getMsgKey(){
+    //     return MsgKey.of(getCode())
+    //     [code: getCode(), args: getArgs(), defaultMessage: getDefaultMessage()]
+    // }
 
     Map getMessageMap(){
         [code: getCode(), args: getArgs(), defaultMessage: getDefaultMessage()]

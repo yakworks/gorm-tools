@@ -17,11 +17,14 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecPasswordHistory
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
+import yakworks.api.ApiResults
+import yakworks.api.Result
+import yakworks.api.problem.ValidationProblem
+import yakworks.i18n.MsgKey
 
 @CompileStatic
 class PasswordValidator {
 
-    @Inject MessageSource messageSource
     @Inject PasswordEncoder passwordEncoder
 
     @Value('${gorm.tools.security.password.minLength:4}')
@@ -45,41 +48,42 @@ class PasswordValidator {
     @Value('${gorm.tools.security.password.historyLength:4}')
     int passwordHistoryLength
 
-    private String message(String key, def ...args) {
-        messageSource.getMessage(key, args as Object[], key, LocaleContextHolder.locale)
-    }
-
     @SuppressWarnings(['IfStatementCouldBeTernary'])
-    Map validate(AppUser user, String pass, String passConfirm) {
+    Result validate(AppUser user, String pass, String passConfirm) {
+        List problemKeys = [] as List<MsgKey>
         if (!pass || (pass.length() < passwordMinLength)) {
-            return [ok: false, message: message("gorm.tools.security.password.minlength", passwordMinLength)]
+            problemKeys << MsgKey.of("security.validation.password.minlength", [min: passwordMinLength])
         }
 
         if (passConfirm != pass) {
-            return [ok: false, message: message("gorm.tools.security.password.match")]
+            problemKeys << MsgKey.of("security.validation.password.match")
         }
 
         if (passwordMustContainLowercaseLetter && !(pass =~ /^.*[a-z].*$/)) {
-            return [ok: false, message: message("gorm.tools.security.password.mustcontain.lowercase")]
+            problemKeys << MsgKey.of("security.validation.password.mustcontain.lowercase")
         }
 
         if (passwordMustContainUpperaseLetter && !(pass =~ /^.*[A-Z].*$/)) {
-            return [ok: false, message: message("gorm.tools.security.password.mustcontain.uppercase")]
+            problemKeys << MsgKey.of("security.validation.password.mustcontain.uppercase")
         }
 
         if (passwordMustContainNumbers && !(pass =~ /^.*[0-9].*$/)) {
-            return [ok: false, message: message("gorm.tools.security.password.mustcontain.numbers")]
+            problemKeys << MsgKey.of("security.validation.password.mustcontain.numbers")
         }
 
         if (passwordMustContainSymbols && !(pass =~ /^.*\W.*$/)) {
-            return [ok: false, message: message("gorm.tools.security.password.mustcontain.symbol")]
+            problemKeys << MsgKey.of("security.validation.password.mustcontain.symbol")
         }
 
         if (passwordHistoryEnabled && passwordExistInHistory(user, pass)) {
-            return [ok: false, message: message("gorm.tools.security.password.existsinhistory", passwordHistoryLength)]
+            problemKeys << MsgKey.of("security.validation.password.minlength", [value: passwordHistoryLength])
         }
 
-        return [ok: true]
+        if(problemKeys){
+            return ValidationProblem.of(MsgKey.of('security.validation.password.error')).addErrors(problemKeys)
+        } else {
+            return  Result.OK()
+        }
     }
 
     /**

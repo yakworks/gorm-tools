@@ -44,11 +44,16 @@ class RepoEventPublisher {
 
     @PostConstruct
     void init() {
+        scanAndCacheEventsMethods()
+        def mainContext = grailsApplication.mainContext
+        applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
+    }
+
+    //iterates over Repos and cache events
+    void scanAndCacheEventsMethods() {
         for (Class repoClass : grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz) {
             cacheEventsMethods(repoClass)
         }
-        def mainContext = grailsApplication.mainContext
-        applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
     }
 
     void cacheEventsMethods(Class repoClass) {

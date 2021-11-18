@@ -74,17 +74,6 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
     }
 
-    @Ignore //Need to setup a JsonEngine option than can render nulls
-    void "test JsonifyDom renderNulls: true"() {
-        when: "ext association is in includes and deep:true and not renderNulls"
-        def jdom = TestData.build(JsonifyDom, includes: ['ext'])
-        def res = entityMapService.toJson(jdom, ['id', 'name', 'name2', 'ext.*'])
-
-        then: 'ext fields should be shown'
-        res == '{"id":1,"ext":{"id":1,"nameExt":"nameExt"},"name":"name","name2":null}'
-
-    }
-
     void "currency converter should work"() {
         when:
         def jdom = TestData.build(JsonifyDom, currency: Currency.getInstance('USD'))

@@ -12,11 +12,11 @@ dependencies {
   compile "org.grails.plugins:build-test-data:$vBuildTestData"
 
   //used for json parsing but require it to be added to project that uses this
-  compile("org.grails.plugins:views-json:$vViews") {
+  compileOnly("org.grails.plugins:views-json:$vViews") {
     //exclude controllers since it messes with the domain compile and map constructor
     exclude group:"org.grails", module: "grails-plugin-controllers"
     // exclude group:"org.grails", module: "grails-web-databinding"
   }
-  compile "org.grails.plugins:views-json-templates:$vViews"
+  // compile "org.grails.plugins:views-json-templates:$vViews"
 
 }

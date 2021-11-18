@@ -1,10 +1,11 @@
 package yakworks.rally.orgs
 
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.DataAccessProblem
+import gorm.tools.api.EntityValidationProblem
+import gorm.tools.api.UniqueConstraintProblem
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.repo.OrgSourceRepo
@@ -23,11 +24,11 @@ class OrgSourceRepoTests extends Specification implements DataIntegrationTest {
         //orgSourceRepo.flushAndClear()
 
         then:
-        EntityValidationException ge = thrown()
-        ge.rootCause.message.contains("Unique index or primary key violation") || //mysql and H2
-                ge.rootCause.message.contains("Duplicate entry") || //mysql
-                ge.rootCause.message.contains("Violation of UNIQUE KEY constraint") || //sql server
-                ge.rootCause.message.contains("duplicate key value violates unique constraint") //postgres
+        UniqueConstraintProblem ge = thrown()
+        ge.detail.contains("Unique index or primary key violation") || //mysql and H2
+                ge.detail.contains("Duplicate entry") || //mysql
+                ge.detail.contains("Violation of UNIQUE KEY constraint") || //sql server
+                ge.detail.contains("duplicate key value violates unique constraint") //postgres
     }
 
     void "testSave success same sourceId on different orgTypes"() {

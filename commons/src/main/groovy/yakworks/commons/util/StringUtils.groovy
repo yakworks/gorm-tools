@@ -59,9 +59,22 @@ class StringUtils {
     }
 
     /**
-     * Checks if input is empty
+     * Return whether the given string is empty.
+     *
+     * @param str The string
+     * @return True if str is empty or null
      */
-    static boolean isEmpty(String input) {
-        return input == null || input.isEmpty()
+    public static boolean isEmpty(CharSequence str) {
+        return str == null || str.length() == 0;
+    }
+
+    /**
+     * Return whether the given string is not empty.
+     *
+     * @param str The string
+     * @return True if str is not null and not empty
+     */
+    public static boolean isNotEmpty(CharSequence str) {
+        return !isEmpty(str);
     }
 }

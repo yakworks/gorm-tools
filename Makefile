@@ -91,6 +91,13 @@ api-check-deployed-with-token:
 	curl -i -G -H "Authorization: Bearer $(TOKEN)" https://$(APP_KUBE_INGRESS_URL)/api/rally/org/1
 
 # -- helpers --
+
+ifdef IS_SNAPSHOT
+# publish snapsot to repo.9ci
+ publish.snapshot.repo:
+	./gradlew publishJavaLibraryPublicationToMavenRepository
+endif
+
 ## shows gorm-tools:dependencies --configuration runtime
 gradle.dependencies:
 	# ./gradlew gorm-tools:dependencies --configuration compileClasspath

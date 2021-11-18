@@ -1,6 +1,7 @@
 package gorm.tools.security
 
 import gorm.tools.security.domain.AppUser
+import yakworks.api.problem.Problem
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
@@ -15,67 +16,58 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
     void test_validate() {
         setup:
         PasswordValidator validator = new PasswordValidator()
-        validator.messageSource = messageSource
-
-        Map result
 
         when: "password length"
         validator.passwordMinLength = 4
-        result = validator.validate(AppUser.get(1), "123", "123")
+        Problem problem = validator.validate(AppUser.get(1), "123", "123")
 
         then:
-        result.ok == false
-        result.message == "gorm.tools.security.password.minlength"
+        problem.violations.find{ it.code == "security.validation.password.minlength" }
 
         when: "password match"
         validator.passwordMinLength = 3
-        result = validator.validate(AppUser.get(1), "123", "1234")
+        problem = validator.validate(AppUser.get(1), "123", "1234")
 
         then:
-        result.ok == false
-        result.message == "gorm.tools.security.password.match"
+        problem.violations.find{ it.code == "security.validation.password.match" }
 
         when: "require lowercase"
         validator.passwordMinLength = 4
         validator.passwordMustContainLowercaseLetter = true
-        result = validator.validate(AppUser.get(1), "ABCD", "ABCD")
+        problem = validator.validate(AppUser.get(1), "ABCD", "ABCD")
 
         then:
-        result.ok == false
-        result.message == "gorm.tools.security.password.mustcontain.lowercase"
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.lowercase" }
 
         when: "require uppercase"
         validator.passwordMinLength = 4
         validator.passwordMustContainUpperaseLetter = true
-        result = validator.validate(AppUser.get(1), "abcd", "abcd")
+        problem = validator.validate(AppUser.get(1), "abcd", "abcd")
 
         then:
-        result.ok == false
-        result.message == "gorm.tools.security.password.mustcontain.uppercase"
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.uppercase" }
 
         when: "require numbers"
         validator.passwordMinLength = 4
         validator.passwordMustContainNumbers = true
-        result = validator.validate(AppUser.get(1), "abcD", "abcD")
+        problem = validator.validate(AppUser.get(1), "abcD", "abcD")
 
         then:
-        result.ok == false
-        result.message == "gorm.tools.security.password.mustcontain.numbers"
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.numbers" }
 
 
         when: "require symbol"
         validator.passwordMinLength = 4
         validator.passwordMustContainSymbols = true
-        result = validator.validate(AppUser.get(1), "ab1D", "ab1D")
+        problem = validator.validate(AppUser.get(1), "ab1D", "ab1D")
 
         then:
-        result.ok == false
-        result.message == "gorm.tools.security.password.mustcontain.symbol"
+        problem.violations.find{ it.code == "security.validation.password.mustcontain.symbol" }
 
         when: "all good"
         validator.passwordMinLength = 4
         validator.passwordMustContainSymbols = true
-        result = validator.validate(AppUser.get(1), "ab1D#", "ab1D#")
+        def result = validator.validate(AppUser.get(1), "ab1D#", "ab1D#")
 
         then:
         result.ok == true

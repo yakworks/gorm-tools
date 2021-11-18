@@ -5,7 +5,7 @@
 package yakworks.rally.job
 
 import gorm.tools.audit.AuditStamp
-import gorm.tools.job.RepoSyncJobEntity
+import gorm.tools.job.SyncJobEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 
@@ -15,7 +15,7 @@ import grails.gorm.annotation.Entity
 @Entity
 @AuditStamp
 @GrailsCompileStatic
-class SyncJob implements RepoSyncJobEntity<SyncJob>, Serializable {
+class SyncJob implements SyncJobEntity<SyncJob>, Serializable {
 
 
     // int persistenceDuration  //job can be purged after that time (number of days???)

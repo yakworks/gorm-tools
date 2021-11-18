@@ -1,7 +1,7 @@
 package yakworks.testify
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import yakworks.gorm.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
@@ -88,7 +88,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         //flushAndClear()
 
         then:
-        def ex = thrown(EntityValidationException)
+        def ex = thrown(EntityValidationProblem)
         ex.errors.errorCount == 4
         //normal validation errors
         sink.errors['ext.textMax'].code == 'maxSize.exceeded'
@@ -104,7 +104,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         KitchenSink.create(invalidData2)
 
         then:
-        def ex = thrown(EntityValidationException)
+        def ex = thrown(EntityValidationProblem)
         //its only 2 on this one as a default kind is set in the repo during create
         ex.errors.errorCount == 2
         ex.errors['sinkLink.kind']

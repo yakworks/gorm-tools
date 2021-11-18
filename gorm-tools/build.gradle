@@ -4,18 +4,24 @@ dependencies {
   console "org.grails:grails-console"
 
   api project(":commons")
+  // TODO use this standard for json converters
+  // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
+  api "org.yakworks:grails-icu4j:$vYakworksICU4J"
 
+  implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
   compileOnly "org.codehaus.gpars:gpars:$vGpars"
-  implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
+
+  // implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 
   //used for json parsing but require it to be added to project that uses this
-  compileOnly("org.grails.plugins:views-json:$vViews") {
-    //exclude controllers since it messes with the domain compile and map constructor
-    exclude group:"org.grails", module: "grails-plugin-controllers"
-  }
-  compileOnly "org.grails.plugins:views-json-templates:$vViews"
+  // compileOnly("org.grails.plugins:views-json:$vViews") {
+  //   //exclude controllers since it messes with the domain compile and map constructor
+  //   exclude group:"org.grails", module: "grails-plugin-controllers"
+  // }
+  // compileOnly "org.grails.plugins:views-json-templates:$vViews"
   compileOnly "org.grails:grails-plugin-mimetypes"
 
+  testCompile "org.slf4j:slf4j-simple:${vSlf4j}"
   testCompile project(":gorm-test-domain")
   testCompile project(":gorm-tools-security")
 

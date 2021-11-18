@@ -4,10 +4,6 @@
 */
 package gorm.tools.beans
 
-
-import gorm.tools.beans.domain.BookAuthor
-import gorm.tools.beans.domain.BookTag
-import gorm.tools.beans.domain.Bookz
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.IgnoreRest
 import spock.lang.Specification
@@ -15,7 +11,6 @@ import yakworks.gorm.testing.model.Enummy
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
-import yakworks.gorm.testing.model.SinkStatus
 import yakworks.gorm.testing.model.TestEnum
 import yakworks.gorm.testing.model.TestEnumIdent
 import yakworks.gorm.testing.model.Thing

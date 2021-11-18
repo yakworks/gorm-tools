@@ -2,10 +2,11 @@ package gorm.tools.security
 
 import org.apache.commons.lang3.RandomStringUtils
 
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
+import gorm.tools.utils.GormMetaUtils
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
@@ -59,7 +60,8 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         def con = build()
         con.validate()
 
-        def conProps = AppUser.constrainedProperties
+        Map conProps = GormMetaUtils.findConstrainedProperties(AppUser)
+
         then:
         //sanity check the main ones
         conProps.username.nullable == false
@@ -98,7 +100,7 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         AppUser.update(params)
 
         then:
-        thrown EntityValidationException
+        thrown EntityValidationProblem
     }
 
     def "insert with roles"() {

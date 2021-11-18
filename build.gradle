@@ -8,9 +8,9 @@ buildscript {
   dependencies {
     classpath "org.grails:grails-gradle-plugin:$grailsVersion"
     classpath "org.grails.plugins:hibernate5:$vGormHibernate"
-    classpath "org.grails.plugins:views-gradle:$vViews"
     classpath "org.yakworks:gradle-plugins:$vShipyak"
     classpath "io.github.gradle-nexus:publish-plugin:$vMavenNexus"
+    classpath "org.grails.plugins:views-gradle:$vViews"
   }
 }
 
@@ -36,19 +36,16 @@ subprojects { subprj ->
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     mavenCentral()
+    maven { url "http://repo.9ci.com/oss-snapshots" }
   }
+  // get prop with default if null, converts to boolean
+  Closure getProp = { pname, defualtv -> (subprj.findProperty(pname)?:defualtv).toBoolean() }
 
-  ext {
-    //consider them all java libs, set to false for examples/testing
-    isPublishable = true
-    isExample = false
-    // all but commons are gorm
-    isGormLib = subprj.name != 'commons'
-    // example test projects
-    if (subprj.name in [ 'testify', 'restify', 'benchmarks' ]){
-      isPublishable = false
-      isExample = true
-    }
+  ext { // see gradle.properties in sub-projects
+    //default true for isGormLibrary and isPublishable, set to false in gradle.props
+    isPublishable = getProp('isPublishable', true)
+    isGormLibrary = getProp('isGormLibrary', true)
+    isExample = getProp('isExample', false)
   }
 
   plugins.withId('groovy') {
@@ -60,17 +57,18 @@ subprojects { subprj ->
     //   groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
     // }
     tasks.withType(GroovyCompile) {
-        configure(groovyOptions) {
-            // sets the path to sys properties so we can use it find grails-app/conf during AST
-            forkOptions.jvmArgs = ['-Xmx1524m', '-XX:+UseSerialGC', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
-        }
+      options.debug = true
+      configure(groovyOptions) {
+        verbose = true
+        // sets the path to sys properties so we can use it find grails-app/conf during AST
+        forkOptions.jvmArgs = ['-Xmx1524m', '-XX:+UseSerialGC', '-Dgradle.projectDir=' + project.projectDir.absolutePath]
+      }
     }
   }
 
   // if its a lib then setup gpg signing, see signing.gnupg.keyName
   if (isPublishable){
     apply plugin: 'java-library'
-
     // gpg signing required by nexus/sonatype
     apply plugin: 'signing'
     afterEvaluate {
@@ -85,7 +83,7 @@ subprojects { subprj ->
 
   } // end isPublishable
 
-  if (isGormLib) {
+  if (isGormLibrary) {
     apply plugin: 'groovy'
 
     dependencies {
@@ -107,11 +105,12 @@ subprojects { subprj ->
 
       testCompile project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
 
+      testCompile "org.apache.commons:commons-lang3:$vCommonsLang3"
       testCompile "org.mockito:mockito-core"
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"
       testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
-      testCompile "org.grails:views-json-testing-support:$vViews"
+      // testCompile "org.grails:views-json-testing-support:$vViews"
       testCompile "net.javacrumbs.json-unit:json-unit-assertj:2.28.0"
       testCompile "com.fasterxml.jackson.core:jackson-databind:2.9.10"
 
@@ -119,26 +118,17 @@ subprojects { subprj ->
   }
 
   if (isExample) {
-    apply plugin: 'groovy'
-
     dependencies {
-      compileOnly "io.micronaut:micronaut-inject-groovy"
       implementation "org.springframework.boot:spring-boot-starter-logging"
-      implementation "org.springframework.boot:spring-boot-autoconfigure"
-      implementation "org.grails:grails-core"
       implementation "org.springframework.boot:spring-boot-starter-tomcat"
-
-      implementation "org.grails:grails-web-boot"
       implementation "org.grails:grails-plugin-services"
 
       // implementation 'org.codehaus.groovy:groovy-dateutil'
-
       // implementation "io.activej:activej-boot:5.0-rc3"
       // implementation "io.activej:activej-promise:5.0-rc3"
-
     }
 
-  } //end isGormLib
+  }
 
   configurations {
     testCompile.extendsFrom compileOnly //includes the compileOnly in tests too so we don't have to list twice
@@ -161,6 +151,7 @@ subprojects { subprj ->
 ext.codenarcRuleset= '''
   // getRule('Println').enabled = false
   // getRule('AbcMetric').enabled = false
+  getRule('FieldName').enabled = false
 '''
 
 //logging

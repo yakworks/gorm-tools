@@ -2,7 +2,7 @@ package gpbench.model.traits
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gpbench.model.Country
 import gpbench.model.Region
 import yakworks.commons.lang.IsoDateUtil
@@ -59,7 +59,7 @@ class StaticSetter {
     static void setAssociation(CityTraitFatWithAssoc entity, String key, Class assocClass, Map row) {
         if (row[key] != null) {
             Long id = row[key]['id'] as Long
-            entity[key] = RepoUtil.findRepo(assocClass).load(id)
+            entity[key] = RepoLookup.findRepo(assocClass).load(id)
             // this[key] = GormEnhancer.findStaticApi(assocClass).load(id)
         }
     }

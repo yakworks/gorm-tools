@@ -21,7 +21,7 @@ import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import grails.gorm.transactions.GrailsTransactionTemplate
 
 /**
@@ -58,7 +58,7 @@ class TrxService {
     }
 
     Datastore getDatastore(Class entityClass) {
-        def repo = RepoUtil.findRepo(entityClass)
+        def repo = RepoLookup.findRepo(entityClass)
         return repo != null? repo.datastore : getTargetDatastore()
     }
 

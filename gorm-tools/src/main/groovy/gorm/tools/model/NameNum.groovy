@@ -4,6 +4,8 @@
 */
 package gorm.tools.model
 
+import javax.persistence.Transient
+
 import groovy.transform.CompileStatic
 
 /**
@@ -14,6 +16,10 @@ import groovy.transform.CompileStatic
 trait NameNum extends NamedEntity {
 
     String num
+
+    // like to string but as a field and for sending across the wire
+    @Transient
+    String getStamp(){ "${getNum()} : ${getName()}"}
 
     static Map includes = [
         qSearch: ['num', 'name'],

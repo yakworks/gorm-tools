@@ -6,7 +6,10 @@ import gorm.tools.rest.client.OkHttpRestTrait
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import org.springframework.jdbc.core.JdbcTemplate
+
+import spock.lang.IgnoreRest
 import spock.lang.Specification
+import yakworks.commons.json.JsonEngine
 
 @Integration
 class RestErrorsSpec extends Specification implements OkHttpRestTrait {
@@ -17,12 +20,14 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         when:
         Map invalidData2 = [num:'foo1', name: "foo"]
         Response resp = get('/api/rally/org/10001')
-        Map body = bodyToMap(resp)
+        String bodyText = resp.body().string()
+        // assert bodyText == 'foo'
+        Map body = JsonEngine.parseJson(bodyText, Map)
 
         then:
         resp.code() == HttpStatus.NOT_FOUND.value()
         body.status == HttpStatus.NOT_FOUND.value()
-        body.title == "Org not found with id 10001"
+        body.title == "Org lookup failed using key {id=10001}"
         // body.detail == 'Org not found for 10001'
     }
 
@@ -54,8 +59,10 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Org Validation Error(s)"
+        body.errors[0].code == 'nullable'
         body.errors[0].message == "Property [name] of class [class yakworks.rally.orgs.model.Org] cannot be null"
         body.errors[0].field == "name"
+        body.errors[1].code == 'nullable'
         body.errors[1].message == "Property [num] of class [class yakworks.rally.orgs.model.Org] cannot be null"
         body.errors[1].field == "num"
 
@@ -75,10 +82,9 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         body = bodyToMap(resp)
 
         then: "Would cause DataAccessException"
-        resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
-        body.title == "Data Access Exception"
-        ((String)body.detail).contains("ConstraintViolationException")
+        resp.code() == HttpStatus.BAD_REQUEST.value()
+        body.status == HttpStatus.BAD_REQUEST.value()
+        body.title == "Unique index or primary key violation"
         ((String)body.detail).contains("IX_ORGSOURCE_UNIQUE")
 
         delete("/api/rally/org", orgId)

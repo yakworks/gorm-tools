@@ -1,9 +1,9 @@
 package yakworks.rally.orgs
 
-import gorm.tools.repository.errors.EntityValidationException
-import gorm.tools.testing.integration.DataIntegrationTest
+import gorm.tools.api.ReferenceKeyProblem
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.model.Contact
@@ -57,7 +57,7 @@ class ContactTests extends Specification implements DomainIntTest {
         contactRepo.remove(contact)
 
         then:
-        thrown(EntityValidationException)
+        thrown(ReferenceKeyProblem)
     }
 
     def testDelete() {
@@ -104,8 +104,7 @@ class ContactTests extends Specification implements DomainIntTest {
         Org.get(50).contact.remove()
 
         then:
-        EntityValidationException e = thrown()
-        e.code == "contact.not.deleted.iskey"
+        thrown ReferenceKeyProblem
     }
 
     void "test create Contact with org lookup by orgSource"() {

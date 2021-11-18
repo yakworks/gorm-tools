@@ -4,7 +4,7 @@
 */
 package gorm.tools.rest.render
 
-import groovy.json.StreamingJsonBuilder
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
@@ -17,23 +17,19 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class PagerRenderer extends JsonGeneratorRenderer<Pager>{
-
-    PagerRenderer() {
-        super(Pager)
-    }
+class PagerRenderer implements JsonRendererTrait<Pager> {
 
     @Override
+    @CompileDynamic
     void render(Pager pager, RenderContext context) {
         setContentType(context)
 
-        def builder = new StreamingJsonBuilder(context.writer, jsonGenerator)
-        builder.call([
-            page: pager.page,
-            total: pager.getPageCount(),
-            records: pager.recordCount,
-            data: pager.data
-        ])
+        jsonBuilder(context).call {
+            page pager.page
+            total pager.getPageCount()
+            records pager.recordCount
+            data pager.data
+        }
     }
 
 }

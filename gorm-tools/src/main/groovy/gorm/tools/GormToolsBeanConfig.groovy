@@ -15,7 +15,7 @@ import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.api.problem.ProblemHandler
+import gorm.tools.api.ProblemHandler
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.beans.EntityMapService
@@ -32,8 +32,6 @@ import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoValidatorRegistry
-import gorm.tools.support.ErrorMessageService
-import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
 import grails.config.Config
 import grails.core.GrailsApplication
@@ -60,8 +58,7 @@ class GormToolsBeanConfig {
     }
 
     Closure getBeanDefinitions() {{->
-        msgService(MsgService)
-        errorMessageService(ErrorMessageService, lazy())
+
         jdbcTemplate(JdbcTemplate, ref("dataSource"), lazy())
 
         jdbcIdGenerator(JdbcIdGenerator) { bean ->
@@ -96,7 +93,7 @@ class GormToolsBeanConfig {
         }
 
         trxService(TrxService, lazy())
-        problemErrorHandler(ProblemHandler, lazy())
+        problemHandler(ProblemHandler, lazy())
 
         def repoClasses = application.repositoryClasses
         for(GrailsRepositoryClass repoClass : repoClasses){

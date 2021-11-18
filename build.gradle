@@ -105,6 +105,7 @@ subprojects { subprj ->
 
       testCompile project(":gorm-test-support") //this might seem circular but it can be added to itself as it dif config
 
+      testCompile "org.apache.commons:commons-lang3:$vCommonsLang3"
       testCompile "org.mockito:mockito-core"
       testCompile "org.grails:grails-gorm-testing-support"
       testCompile "org.grails:grails-web-testing-support"

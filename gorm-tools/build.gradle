@@ -4,13 +4,14 @@ dependencies {
   console "org.grails:grails-console"
 
   api project(":commons")
-  api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
-  api "org.yakworks:grails-icu4j:0.3.0-SNAPSHOT"
+  // TODO use this standard for json converters
+  // api "jakarta.json.bind:jakarta.json.bind-api:2.0.0"
+  api "org.yakworks:grails-icu4j:$vYakworksICU4J"
 
   implementation "org.codehaus.groovy:groovy-sql:$groovyVersion"
   compileOnly "org.codehaus.gpars:gpars:$vGpars"
 
-  implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
+  // implementation "org.apache.commons:commons-lang3:$vCommonsLang3"
 
   //used for json parsing but require it to be added to project that uses this
   // compileOnly("org.grails.plugins:views-json:$vViews") {

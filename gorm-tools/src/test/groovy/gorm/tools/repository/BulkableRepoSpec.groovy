@@ -9,11 +9,10 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
-import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
-import testing.TestRepoSyncJob
-import testing.TestRepoSyncJobService
+import testing.TestSyncJob
+import testing.TestSyncJobService
 import yakworks.gorm.testing.SecurityTest
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo
@@ -29,9 +28,9 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
     void setupSpec() {
         defineBeans{
-            repoJobService(TestRepoSyncJobService)
+            syncJobService(TestSyncJobService)
         }
-        mockDomains(KitchenSink, SinkExt, TestRepoSyncJob)
+        mockDomains(KitchenSink, SinkExt, TestSyncJob)
     }
 
     BulkableArgs setupBulkableArgs(DataOp op = DataOp.add){
@@ -51,7 +50,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         when: "bulk insert 20 records"
 
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoSyncJob.get(jobId)
+        def job = TestSyncJob.get(jobId)
 
 
         then: "verify job"
@@ -106,7 +105,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         when: "insert records"
 
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoSyncJob.get(jobId)
+        def job = TestSyncJob.get(jobId)
 
         then:
         job.state == SyncJobState.Finished
@@ -121,7 +120,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         }
 
         jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs(DataOp.update))
-        job = TestRepoSyncJob.get(jobId)
+        job = TestSyncJob.get(jobId)
 
         then:
         noExceptionThrown()
@@ -147,7 +146,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         when: "bulk insert"
 
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoSyncJob.get(jobId)
+        def job = TestSyncJob.get(jobId)
 
         then: "verify job"
         job.ok == false
@@ -191,7 +190,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         when: "bulk insert in multi batches"
         Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
-        def job = TestRepoSyncJob.findById(jobId)
+        def job = TestSyncJob.findById(jobId)
 
         def results = parseJson(job.dataToString())
 

@@ -19,7 +19,7 @@ import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
-import gorm.tools.job.RepoSyncJobService
+import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
@@ -37,7 +37,7 @@ trait BulkableRepo<D> {
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
 
     @Autowired(required = false)
-    RepoSyncJobService repoJobService
+    SyncJobService syncJobService
 
     @Autowired
     @Qualifier("parallelTools")
@@ -72,7 +72,7 @@ trait BulkableRepo<D> {
      */
     Long bulk(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
         Map params = bulkablArgs.params
-        Long jobId = repoJobService.createJob((String)params.source, (String)params.sourceId, dataList)
+        Long jobId = syncJobService.createJob((String)params.source, (String)params.sourceId, dataList)
 
         def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<ApiResults>
         def asyncArgs = new AsyncConfig(enabled: bulkablArgs.asyncEnabled)
@@ -181,7 +181,7 @@ trait BulkableRepo<D> {
 
     void finishJob(Long jobId, ApiResults results, List includes){
         List<Map> jsonResults = transformResults(results, includes?:['id'])
-        repoJobService.updateJob(jobId, SyncJobState.Finished, results, jsonResults)
+        syncJobService.updateJob(jobId, SyncJobState.Finished, results, jsonResults)
     }
 
     /**

@@ -7,7 +7,7 @@ package gorm.tools.rest.render
 import groovy.json.JsonOutput
 import groovy.transform.CompileStatic
 
-import gorm.tools.job.RepoSyncJobEntity
+import gorm.tools.job.SyncJobEntity
 import grails.rest.render.RenderContext
 
 /**
@@ -17,10 +17,10 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class RepoJobRenderer implements JsonRendererTrait<RepoJobEntity> {
+class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
 
     @Override
-    void render(RepoSyncJobEntity job, RenderContext context) {
+    void render(SyncJobEntity job, RenderContext context) {
         setContentType(context)
 
         // gets the raw json string and use the unescaped to it just dumps it to writer without any round robin conversion

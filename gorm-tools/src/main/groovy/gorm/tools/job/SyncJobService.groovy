@@ -9,7 +9,7 @@ import groovy.transform.CompileStatic
 import yakworks.api.ApiResults
 
 @CompileStatic
-interface RepoSyncJobService {
+interface SyncJobService {
 
     /**
      * create Job and returns the job id
@@ -21,6 +21,6 @@ interface RepoSyncJobService {
      */
     void updateJob(Long id, SyncJobState state, ApiResults results, List<Map> renderResults)
 
-    RepoSyncJobEntity getJob(Serializable id)
+    SyncJobEntity getJob(Serializable id)
 
 }

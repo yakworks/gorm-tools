@@ -48,7 +48,7 @@ transform example when in a job
  */
 
 @CompileStatic
-trait RepoSyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
+trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
 
     Boolean ok = false // change to TRUE if State.Finished without any issues
     SyncJobState state = SyncJobState.Running

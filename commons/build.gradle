@@ -12,7 +12,7 @@ dependencies {
 
   //libs
   // implementation "commons-io:commons-io:$vCommonsIO"
-  api "org.yakworks:i18n:0.3.0-SNAPSHOT"
+  api "org.yakworks:i18n:$vYakworksICU4J"
 
   // javax val
   compileOnly "javax.validation:validation-api:$vValidation"

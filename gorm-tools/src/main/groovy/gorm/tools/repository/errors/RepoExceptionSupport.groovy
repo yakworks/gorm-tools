@@ -69,6 +69,7 @@ class RepoExceptionSupport {
     }
 
     //Unique index unique constraint or primary key violation
+    @SuppressWarnings('BracesForIfElse')
     static String isUniqueIndexViolation(DataAccessException dax){
         String rootMessage = dax.rootCause.message
         if(rootMessage.contains("Unique index or primary key violation") || //mysql and H2

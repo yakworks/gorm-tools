@@ -33,7 +33,7 @@ class EntityNotFoundProblem extends AbstractDataAccessProblem<EntityNotFoundProb
 
     EntityNotFoundProblem name(String nm){
         this.name = nm
-        putArgIfAbsent('name',nm)
+        putArgIfAbsent('name', nm)
         return this
     }
 

@@ -73,5 +73,6 @@ abstract class AbstractDataAccessProblem<E extends AbstractDataAccessProblem>
     @Override
     synchronized Throwable fillInStackTrace() { return this }
 
+    @SuppressWarnings(['SynchronizedMethod', 'BracesForIfElse'])
     synchronized Throwable fillInStackTraceSuper() { return super.fillInStackTrace() }
 }

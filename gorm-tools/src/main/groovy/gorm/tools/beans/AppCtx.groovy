@@ -11,6 +11,7 @@ import org.springframework.context.ApplicationContext
 import grails.config.Config
 import grails.core.GrailsApplication
 import grails.util.Holders
+import yakworks.i18n.icu.ICUMessageSource
 
 /**
  * A static that uses the Holder to get the spring ApplicationContext it beans and the GrailsApplication
@@ -51,6 +52,13 @@ class AppCtx {
      */
     static Config getConfig() {
         Holders.config
+    }
+
+    /**
+     * @return the merged configs from application.yml, application.groovy, etc...
+     */
+    static ICUMessageSource getMsgService() {
+        get('messageSource', ICUMessageSource)
     }
 
     /**

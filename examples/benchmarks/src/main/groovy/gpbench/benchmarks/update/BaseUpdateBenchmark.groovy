@@ -7,7 +7,7 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import gpbench.model.Region
 
@@ -24,7 +24,7 @@ abstract class BaseUpdateBenchmark<T> extends BaseBatchInsertBenchmark<T> {
 
     BaseUpdateBenchmark(Class<T> clazz, String bindingMethod = 'grails', boolean validate = true) {
         super(clazz, bindingMethod, validate)
-        repo = RepoUtil.findRepo(clazz)
+        repo = RepoLookup.findRepo(clazz)
     }
 
     //region ids are not sequential, so we need to keep reference of list of region ids to select one of it randomly)

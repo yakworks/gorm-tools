@@ -14,16 +14,18 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.api.Result
-import gorm.tools.api.problem.Problem
-import gorm.tools.api.problem.ProblemHandler
+import gorm.tools.api.ProblemHandler
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
-import gorm.tools.job.RepoSyncJobService
+import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
 import gorm.tools.repository.model.DataOp
+import yakworks.api.ApiResults
+import yakworks.api.OkResult
+import yakworks.api.Result
+import yakworks.api.problem.Problem
 import yakworks.commons.map.Maps
 
 /**
@@ -35,7 +37,7 @@ trait BulkableRepo<D> {
     final private static Logger log = LoggerFactory.getLogger(BulkableRepo)
 
     @Autowired(required = false)
-    RepoSyncJobService repoJobService
+    SyncJobService syncJobService
 
     @Autowired
     @Qualifier("parallelTools")
@@ -70,16 +72,15 @@ trait BulkableRepo<D> {
      */
     Long bulk(List<Map> dataList, BulkableArgs bulkablArgs = new BulkableArgs()) {
         Map params = bulkablArgs.params
-        Long jobId = repoJobService.createJob((String)params.source, (String)params.sourceId, dataList)
+        Long jobId = syncJobService.createJob((String)params.source, (String)params.sourceId, dataList)
 
-        def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<BulkableResults>
+        def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<ApiResults>
         def asyncArgs = new AsyncConfig(enabled: bulkablArgs.asyncEnabled)
 
         asyncService.supplyAsync(asyncArgs, supplierFunc)
-            .whenComplete { BulkableResults results, ex ->
+            .whenComplete { ApiResults results, ex ->
                 if(ex){ //should never really happen
-                    def apiError = problemHandler.handleException(getEntityClass(), ex)
-                    results << Result.of(apiError, null)
+                    results << problemHandler.handleException(getEntityClass(), ex)
                 }
                 finishJob(jobId, results, bulkablArgs.includes)
             }
@@ -87,8 +88,8 @@ trait BulkableRepo<D> {
         return jobId
     }
 
-    BulkableResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
-        BulkableResults results = new BulkableResults()
+    ApiResults doBulkParallel(List<Map> dataList, BulkableArgs bulkablArgs){
+        ApiResults results = ApiResults.create()
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
@@ -96,8 +97,8 @@ trait BulkableRepo<D> {
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
                 withTrx {
-                    BulkableResults res = doBulk((List<Map>) dataSlice, bulkablArgs)
-                    results.merge(res)
+                    ApiResults res = doBulk((List<Map>) dataSlice, bulkablArgs)
+                    results.merge res
                 }
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
@@ -111,10 +112,9 @@ trait BulkableRepo<D> {
                 try {
                     results.merge doBulk((List<Map>) dataSlice, bulkablArgs, true)
                 } catch(Exception e) {
-                    // this is an unexpected errors and should not happen, we should have intercepted them all already
+                    // just in case, this is an unexpected errors and should not really happen as we should have intercepted them all already in doBulk
                     log.error(e.message, e)
-                    Problem apiError = problemHandler.handleException(entityClass, e)
-                    results << Result.of(apiError, dataSlice)
+                    results << problemHandler.handleException(e)
                 }
             }
         }
@@ -129,32 +129,31 @@ trait BulkableRepo<D> {
      *
      * @param dataList the data chunk
      * @param bulkablArgs the persist args to pass to repo methods
-     * @param transactionalItem defaults to false which assumes this method is wrapped in a trx and
-     *        any error processing the dataList will throw error so it rollsback.
-     *        if true then its assumed that this method is not wrapped in a trx, and transactionalItem value
-     *        will be passed to createOrUpdate where each item update or create is in its own trx.
+     * @param transactionalItem default=false which assumes this method is wrapped in a trx and
+     *        any error processing the dataList will throw error so it rolls back.
+     *        if transactionalItem=true then its assumed that this method is not wrapped in a trx,
+     *        and transactionalItem value will be passed to createOrUpdate where each item update or create is in its own trx.
      *        also, if true then this method will try not to throw an exception and
      *        it will collect the errors in the results.
      * @return the BulkableResults object with what succeeded and what failed
      */
-    BulkableResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
-        def results = new BulkableResults(false)
+    ApiResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
+        ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             Map itemCopy
             D entityInstance
-            BulkableResults r
+
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                results << Result.of(entityInstance, isCreate ? 201 : 200)
+                results << OkResult.of(isCreate ? 201 : 200).payload(entityInstance)
             } catch(Exception e) {
-                // if trx by item then collect the execeptions, otherwise throw so it can rollback
+                // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
-                    def apiError = problemHandler.handleException(getEntityClass(), e)
-                    results << Result.of(apiError, item)
+                    results << problemHandler.handleException(e).payload(item)
                 } else {
                     throw e
                 }
@@ -180,29 +179,36 @@ trait BulkableRepo<D> {
         return entityInstance
     }
 
-    void finishJob(Long jobId, BulkableResults results, List includes){
+    void finishJob(Long jobId, ApiResults results, List includes){
         List<Map> jsonResults = transformResults(results, includes?:['id'])
-        repoJobService.updateJob(jobId, SyncJobState.Finished, results, jsonResults)
+        syncJobService.updateJob(jobId, SyncJobState.Finished, results, jsonResults)
     }
 
     /**
-     * transforms the BulkableResults to a list of maps that can be serialzied or rendered
-     *
-     * @param results the BulkableResults
-     * @param includes if results are successfull then this is the entity inlcludes on what fields to serialize
-     * @return the transformed list of data maps
+     * transform results to list of maps, see above.
+     * @param customizer closure that ruturns a map that should be merged in, runs for each item in results
      */
-    List<Map> transformResults(BulkableResults results, List includes){
-        // the transform closure will run for each enty in results list
-        List<Map> jsonResults = results.transform(includes){ Result result ->
-            result = result as Result //compiler is getting confused on type
-            //successful result would have entity, use the includes list to prepare result object
-            if(result.ok) {
-                def data = entityMapService.createEntityMap(result.entityObject, includes) as Map<String, Object>
-                return [data: data]
+    List<Map> transformResults(ApiResults results, List includes) {
+        List<Map> ret = []
+        boolean ok = true
+        for (Result r : results) {
+            def map = [ok: r.ok, status: r.status.code] as Map<String, Object>
+            //do the failed
+            if (r instanceof Problem) {
+                map.putAll([
+                    data: r.payload,
+                    title: r.title,
+                    detail: r.detail,
+                    errors: r.violations
+                ])
+            } else {
+                def entityObj = r.payload
+                Map entityMapData = entityMapService.createEntityMap(entityObj, includes) as Map<String, Object>
+                map.data = entityMapData
             }
-            return [:]
+            ret << map
         }
+        return ret
     }
 
 }

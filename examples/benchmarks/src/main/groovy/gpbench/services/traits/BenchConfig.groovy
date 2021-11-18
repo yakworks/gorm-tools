@@ -6,8 +6,6 @@ import groovy.json.JsonBuilder
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormStaticApi
 import org.grails.orm.hibernate.HibernateDatastore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -18,12 +16,11 @@ import org.springframework.util.StopWatch
 import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.transaction.TrxService
 import gpbench.helpers.CsvReader
 import gpbench.helpers.JsonReader
 import grails.core.GrailsApplication
-import grails.gorm.transactions.GrailsTransactionTemplate
 
 @CompileStatic
 trait BenchConfig {
@@ -92,7 +89,7 @@ trait BenchConfig {
 
 
     void setRepo(Class domainClass){
-        repository = (GormRepo) RepoUtil.findRepo(domainClass) //domainClass.repo
+        repository = (GormRepo) RepoLookup.findRepo(domainClass) //domainClass.repo
     }
 
     void setup() {

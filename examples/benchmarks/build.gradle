@@ -1,7 +1,7 @@
 apply plugin:"groovy"
 //apply plugin:"war"
 apply plugin:"org.grails.grails-web"
-apply plugin:"org.grails.plugins.views-json"
+// apply plugin:"org.grails.plugins.views-json"
 
 
 dependencies {
@@ -13,8 +13,8 @@ dependencies {
 
   implementation "org.grails.plugins:async"
 
-  compile "org.grails.plugins:views-json:$vViews"
-  compile "org.grails.plugins:views-json-templates:$vViews"
+  // compile "org.grails.plugins:views-json:$vViews"
+  // compile "org.grails.plugins:views-json-templates:$vViews"
 
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"

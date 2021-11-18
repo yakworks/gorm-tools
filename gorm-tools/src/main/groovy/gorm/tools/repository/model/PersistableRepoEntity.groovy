@@ -9,10 +9,8 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.validation.ApiConstraints
-import gorm.tools.utils.GormMetaUtils
-import grails.gorm.validation.ConstrainedProperty
 
 /**
  * core trait for repo methods that use the repo for persistance
@@ -23,9 +21,9 @@ import grails.gorm.validation.ConstrainedProperty
 @CompileStatic
 trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, Persistable {
 
-    static R getRepo() { return (R) RepoUtil.findRepo(this) }
+    static R getRepo() { return (R) RepoLookup.findRepo(this) }
 
-    R findRepo() { return (R) RepoUtil.findRepo(getClass()) }
+    R findRepo() { return (R) RepoLookup.findRepo(getClass()) }
 
     D persist(Map args = [:]) {
         return findRepo().persist((D) this, args)
@@ -69,16 +67,16 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, 
         ApiConstraints.processConstraints(this, builder)
     }
 
-    static ApiConstraints getApiConstraints(){
-        ApiConstraints.findApiConstraints(this)
-    }
+    // static ApiConstraints getApiConstraints(){
+    //     ApiConstraints.findApiConstraints(this)
+    // }
 
     /**
      * @return The constrained properties for this domain class
      */
-    @CompileDynamic //so it can access getGormPersistentEntity, FIXME look into implementing GormEntity
-    static Map<String, ConstrainedProperty> getConstrainedProperties() {
-        GormMetaUtils.findConstrainedProperties(getGormPersistentEntity())
-    }
+    // @CompileDynamic //so it can access getGormPersistentEntity, FIXME look into implementing GormEntity
+    // static Map<String, ConstrainedProperty> getConstrainedProperties() {
+    //     GormMetaUtils.findConstrainedProperties(getGormPersistentEntity())
+    // }
 
 }

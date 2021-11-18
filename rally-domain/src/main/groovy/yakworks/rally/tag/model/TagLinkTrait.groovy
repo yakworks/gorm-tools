@@ -12,7 +12,7 @@ import org.codehaus.groovy.util.HashCodeHelper
 
 import gorm.tools.model.LinkedEntity
 import gorm.tools.model.Persistable
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.events.RepositoryEvent
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 
@@ -40,7 +40,7 @@ trait TagLinkTrait<X> implements LinkedEntity {
     // will return the same repo as getRepo, just casts it to AbstractLinkedEntityRepo for compilestatic
     // AST gets confused if we try using getRepo as we can't use abstract
     static AbstractLinkedEntityRepo<X, Tag> getTagLinkRepo() {
-        (AbstractLinkedEntityRepo<X, Tag>) RepoUtil.findRepo(this)
+        (AbstractLinkedEntityRepo<X, Tag>) RepoLookup.findRepo(this)
     }
 
     static Integer remove(Persistable entity) {

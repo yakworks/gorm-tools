@@ -15,7 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
-import gorm.tools.api.problem.ProblemHandler
+import gorm.tools.api.ProblemHandler
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.beans.EntityMapService
@@ -25,37 +25,64 @@ import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.validation.RepoEntityValidator
-import gorm.tools.support.MsgService
 import gorm.tools.transaction.TrxService
+import grails.core.GrailsApplication
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
+import yakworks.i18n.icu.GrailsICUMessageSource
 
 /**
  * Helper utils for mocking spring beans needed to test repository's and domains.
+ * if using alone and not as part of DataRepoTest or DomainRepoTest then
+ *
+    void setupSpec() {
+        defineCommonBeans()
+    }
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileDynamic
-@SuppressWarnings(["Indentation"])
+@SuppressWarnings(["Indentation","AssignmentToStaticFieldFromInstanceMethod"])
 trait GormToolsSpecHelper extends GrailsUnitTest {
+
+    private static GrailsApplication _grailsApplication
+    private static boolean _hasCommonBeansSetup = false
 
     /** conveinince shortcut for applicationContext */
     ConfigurableApplicationContext getCtx() {
         getApplicationContext()
     }
 
+    // @Override
+    // GrailsApplication getGrailsApplication() {
+    //     if (_grailsApplication == null) {
+    //         _grailsApplication = GrailsUnitTest.super.getGrailsApplication()
+    //         defineCommonBeans()
+    //     }
+    //     _grailsApplication
+    // }
+
+    // @Override
+    // void cleanupGrailsApplication() {
+    //     if (_grailsApplication != null) {
+    //         GrailsUnitTest.super.cleanupGrailsApplication()
+    //         this._grailsApplication = null
+    //     }
+    // }
+
     /**
      * Finds repository class in same package as domain class.
      * returns a default DefaultGormRepo if no explicit ones are found
      */
     Class findRepoClass(Class entityClass) {
-        String repoClassName = RepoUtil.getRepoClassName(entityClass)
+        String repoClassName = RepositoryArtefactHandler.getRepoClassName(entityClass)
         //println "finding $repoClassName"
         if (ClassUtils.isPresent(repoClassName, grailsApplication.classLoader)) {
             return ClassUtils.forName(repoClassName)
@@ -84,18 +111,22 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         parallelTools(ParallelStreamTools)
         asyncService(AsyncService)
         entityMapService(EntityMapService)
-        msgService(MsgService)
         problemHandler(ProblemHandler)
+        messageSource(GrailsICUMessageSource)
     }}
 
     /**
      * see commonBeans, sets up beans for common services for binders, mango, idegen, parralelTools and msgService
      */
     void defineCommonBeans(){
-        defineBeans(commonBeans())
+        if(!_hasCommonBeansSetup){
+            defineBeans(commonBeans())
+            _hasCommonBeansSetup = true
+        }
     }
+
     void defineRepoBeans(Class<?>... domainClassesToMock){
-        RepoUtil.USE_CACHE = false
+        RepoLookup.USE_CACHE = false
 
         Closure beanClos = {
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
@@ -120,6 +151,17 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         }
 
         defineBeansMany([commonBeans(), beanClos])
+
+        // if(_hasCommonBeansSetup){
+        //     defineBeansMany([beanClos])
+        // } else {
+        //     defineBeansMany([commonBeans(), beanClos])
+        //     _hasCommonBeansSetup = true
+        // }
+
+        // redo the cache for the repo event methods in the repos
+        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
+
     }
 
     /**

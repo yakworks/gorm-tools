@@ -4,12 +4,13 @@
 */
 package gorm.tools.rest.render
 
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import org.springframework.http.HttpStatus
 
-import gorm.tools.api.problem.Problem
 import grails.rest.render.RenderContext
+import yakworks.api.problem.Problem
 
 /**
  * Default renderer for JSON
@@ -18,17 +19,34 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class ProblemRenderer extends JsonGeneratorRenderer<Problem>{
-
-    ProblemRenderer() {
-        super(Problem)
-    }
+class ProblemRenderer implements JsonRendererTrait<Problem> {
 
     @Override
+    @CompileDynamic
     void render(Problem problem, RenderContext context) {
         setContentType(context)
-        context.status = HttpStatus.valueOf(problem.status)
-        context.writer.write(jsonGenerator.toJson(problem))
+        context.status = HttpStatus.valueOf(problem.status.code)
+        // context.writer.write(jsonGenerator.toJson(problem))
+
+        jsonBuilder(context).call {
+            ok problem.ok
+            status problem.status.code
+            code problem.code
+            title getMessage(problem)
+            detail problem.detail
+            errors problem.violations
+        }
+    }
+
+    // swallow no such message exception and returns empty string
+    String getMessage(Problem problem){
+        String message
+        if(problem.msg) message = getMessage(problem.msg)
+
+        if(!message && problem.title) {
+            message = problem.title
+        }
+        return message
     }
 
 }

@@ -7,11 +7,10 @@ import java.nio.file.Paths
 import org.apache.commons.io.FileUtils
 import org.springframework.mock.web.MockMultipartFile
 
-import gorm.tools.repository.errors.EntityValidationException
+import gorm.tools.api.EntityValidationProblem
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import grails.plugin.viewtools.AppResourceLoader
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
@@ -175,26 +174,6 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
 
     }
 
-    @Ignore
-    def "test create file in creditFile"() {
-        byte[] bytes = "A test string".bytes
-        Map params = [name:"test", extension:"jpg", bytes:bytes, isCreditFile: true]
-
-        when:
-        Attachment entity = attachmentRepo.create(params)
-        File attachedFile = appResourceLoader.getFile(entity.location)
-
-        then:
-        entity != null
-        entity instanceof Attachment
-        entity.name == "test"
-        entity.location == appResourceLoader.getRelativePath('attachments.location', attachedFile)
-        attachedFile.absolutePath.startsWith appResourceLoader.getLocation("attachments.creditFiles.location").absolutePath
-
-        cleanup:
-        attachedFile.delete()
-    }
-
     void testDeleteFileIfInsert_fail() {
         when:
         Path tempFile = createTempFile('grails_logo.jpg')
@@ -202,8 +181,8 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         Attachment attachment = attachmentRepo.create(params)
 
         then: "will fail on name"
-        EntityValidationException g = thrown()
-        'validation.error' == g.code
+        EntityValidationProblem g = thrown()
+        'validation.problem' == g.code
         // XXX fix way to verify the file got delted
         // String destFileName = tmpFile.name.split("/")[-1]+"_12345999999.jpg"
         // File monthDir = appResourceLoader.getMonthDirectory("attachments.location")

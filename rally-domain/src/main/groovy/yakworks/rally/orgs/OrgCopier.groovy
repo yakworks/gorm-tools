@@ -12,9 +12,10 @@ import groovy.util.logging.Slf4j
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
-import gorm.tools.support.Results
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
+import yakworks.api.ApiResults
+import yakworks.api.Result
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
 import yakworks.rally.orgs.model.Contact
@@ -45,9 +46,8 @@ class OrgCopier {
      * @return the results object which may contain failures if attachments or activity didn't succeed
      */
     @Transactional
-    Results copy(Org fromOrg, Org toOrg) {
-        if(fromOrg == null) return null
-        List<Results> resultList = [] as List<Results>
+    Result copy(Org fromOrg, Org toOrg) {
+
         GormUtils.copyDomain(toOrg, fromOrg)
         toOrg.type = fromOrg.type
         toOrg.persist()
@@ -70,11 +70,13 @@ class OrgCopier {
 
         orgTagRepo.copyToOrg(fromOrg, toOrg)
 
-        resultList << attachmentLinkRepo.copy(fromOrg, toOrg)
+        ApiResults results = ApiResults.OK()
+        //these return problems but dont throw errors so rollback doesn't happen if an attachment is bad
+        results.merge attachmentLinkRepo.copy(fromOrg, toOrg)
 
-        resultList << activityRepo.copyToOrg(fromOrg, toOrg)
+        results.merge activityRepo.copyToOrg(fromOrg, toOrg)
 
-        return Results.of(resultList).id(fromOrg.id)
+        return results
 
     }
 

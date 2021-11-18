@@ -15,13 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
-import gorm.tools.api.problem.Problem
 import gorm.tools.beans.EntityMap
 import gorm.tools.beans.EntityMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
-import gorm.tools.job.RepoSyncJobEntity
-import gorm.tools.job.RepoSyncJobService
+import gorm.tools.job.SyncJobEntity
+import gorm.tools.job.SyncJobService
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
@@ -29,11 +28,11 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
 import gorm.tools.rest.RestApiConfig
 import grails.web.Action
+import yakworks.api.problem.Problem
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS
 import static org.springframework.http.HttpStatus.NO_CONTENT
-import static org.springframework.http.HttpStatus.OK
 
 /**
  * This is the CRUD controller for entities
@@ -62,7 +61,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
 
     @Autowired(required = false)
-    RepoSyncJobService repoJobService
+    SyncJobService syncJobService
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -142,7 +141,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def get() {
         try {
             D instance = (D) getRepo().read(params.id as Serializable)
-            RepoUtil.checkFound(instance, params.id as  Serializable, entityClass.simpleName)
+            RepoUtil.checkFound(instance, params.id as Serializable, entityClass.simpleName)
             respondWithEntityMap(instance)
         } catch (Exception e) {
             handleException(e)
@@ -163,13 +162,13 @@ trait RestRepoApiController<D> extends RestApiController {
     def list() {
         Pager pager = pagedQuery(params, 'list')
         // passing renderArgs args would be usefull for 'renderNulls' if we want to include/exclude
-        respond(pager)
+        respondWith pager
     }
 
     @Action
     def picklist() {
         Pager pager = pagedQuery(params, 'picklist')
-        respond(pager)
+        respondWith pager
     }
 
     // @Action
@@ -211,13 +210,14 @@ trait RestRepoApiController<D> extends RestApiController {
         BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
-        RepoSyncJobEntity job = repoJobService.getJob(jobId)
-        respond([status: MULTI_STATUS], job)
+        SyncJobEntity job = syncJobService.getJob(jobId)
+        respondWith(job, [status: MULTI_STATUS])
+
     }
 
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
         EntityMap entityMap = createEntityMap(instance)
-        respond([status: status], entityMap)
+        respondWith(entityMap, [status: status])
     }
 
     Pager pagedQuery(Map params, String includesKey) {
@@ -292,7 +292,7 @@ trait RestRepoApiController<D> extends RestApiController {
     void handleException(Exception e) {
         assert getEntityClass()
         Problem apiError = problemHandler.handleException(getEntityClass(), e)
-        respond(apiError)
+        respondWith(apiError)
     }
 
 }

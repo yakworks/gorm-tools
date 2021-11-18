@@ -16,11 +16,11 @@ import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.testing.support.GormToolsSpecHelper
-import gorm.tools.testing.support.JsonViewSpecSetup
 import gorm.tools.testing.support.MockJdbcIdGenerator
 import grails.buildtestdata.TestDataBuilder
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
+import yakworks.i18n.icu.GrailsICUMessageSource
 
 /**
  * Can be a drop in replacement for the HibernateSpec. Makes sure repositories are setup for the domains
@@ -31,7 +31,7 @@ import grails.testing.spring.AutowiredTest
  * @since 6.1
  */
 @CompileDynamic
-abstract class GormToolsHibernateSpec extends HibernateSpec implements AutowiredTest, JsonViewSpecSetup, TestDataBuilder, GormToolsSpecHelper {
+abstract class GormToolsHibernateSpec extends HibernateSpec implements AutowiredTest, TestDataBuilder, GormToolsSpecHelper {
 
     //@OnceBefore
     void setupSpec() {
@@ -45,20 +45,17 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             ctx.beanFactory.registerSingleton("persistenceInterceptor", pci)
         }
 
-        defineBeans(new GormToolsBeanConfig(ctx).getBeanDefinitions())
+        // defineBeans(new GormToolsBeanConfig(ctx).getBeanDefinitions())
 
-        defineBeans{
+        //finds and register repositories for all the persistentEntities that got setup
+        Closure beanClos = {
             persistenceInterceptor(HibernatePersistenceContextInterceptor){
                 hibernateDatastore = (HibernateDatastore)hibernateDatastore
             }
             jdbcIdGenerator(MockJdbcIdGenerator)
             idGenerator(PooledIdGenerator, ref("jdbcIdGenerator"))
-        }
+            messageSource(GrailsICUMessageSource)
 
-        // defineBeans(doWithSpringFirst())
-
-        //finds and register repositories for all the persistentEntities that got setup
-        defineBeans {
             for(Class domainClass in datastore.mappingContext.persistentEntities*.javaClass){
                 Class repoClass = findRepoClass(domainClass)
                 grailsApplication.addArtefact(RepositoryArtefactHandler.TYPE, repoClass)
@@ -75,6 +72,16 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             }
         }
 
+        defineBeansMany([commonBeans(), beanClos])
+
+        // if(_hasCommonBeansSetup){
+        //     defineBeansMany([beanClos])
+        // } else {
+        //
+        //     _hasCommonBeansSetup = true
+        // }
+
+        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
         // doWithSpringAfter()
     }
 

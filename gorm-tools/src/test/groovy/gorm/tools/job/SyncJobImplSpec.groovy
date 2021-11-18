@@ -10,11 +10,11 @@ import spock.lang.Specification
 import testing.*
 import yakworks.commons.json.JsonEngine
 
-class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestRepoSyncJob> {
+class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestSyncJob> {
 
     void "sanity check validation with String as data"() {
         expect:
-        TestRepoSyncJob job = new TestRepoSyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        TestSyncJob job = new TestSyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         job.validate()
         job.persist()
         //job.source == "foo"  //XXX It should pick up TestRepoJobService
@@ -22,7 +22,7 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestRepoS
 
     void "sanity check validation no sourceId"() {
         when:
-        TestRepoSyncJob job = new TestRepoSyncJob()
+        TestSyncJob job = new TestSyncJob()
         // job.persist()
         then:
         job
@@ -34,14 +34,14 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestRepoS
         String res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        TestRepoSyncJob job = new TestRepoSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
+        TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
         jobId
 
         when: "query the db for job we can read the data"
-        TestRepoSyncJob j = TestRepoSyncJob.get(jobId)
+        TestSyncJob j = TestSyncJob.get(jobId)
 
         then:
         j

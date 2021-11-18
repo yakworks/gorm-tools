@@ -10,7 +10,7 @@ import groovy.transform.builder.SimpleStrategy
 
 import org.grails.datastore.mapping.core.Datastore
 
-import gorm.tools.repository.RepoUtil
+import gorm.tools.repository.RepoLookup
 
 /**
  * common config settings for async operations, such as Futures and Parralel processing
@@ -70,7 +70,7 @@ class AsyncConfig {
     }
 
     static AsyncConfig of(Class entity){
-        def repo = RepoUtil.findRepo(entity)
+        def repo = RepoLookup.findRepo(entity)
         AsyncConfig.of(repo.datastore)
     }
 }

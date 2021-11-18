@@ -4,8 +4,6 @@
 */
 package gorm.tools.repository
 
-import java.util.concurrent.ConcurrentHashMap
-
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -15,12 +13,12 @@ import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
+import gorm.tools.api.EntityNotFoundProblem
+import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import gorm.tools.repository.errors.DataException
-import gorm.tools.repository.errors.EntityNotFoundException
-import grails.util.Environment
-import yakworks.commons.lang.NameUtils
+import yakworks.api.problem.Problem
+import yakworks.api.problem.ProblemException
 
 /**
  * A bunch of statics to support the repositories.
@@ -32,46 +30,10 @@ import yakworks.commons.lang.NameUtils
 @SuppressWarnings(['FieldName'])
 @CompileStatic
 @SuppressWarnings(["FieldName"])
-class  RepoUtil {
-
-    private static final Map<String, GormRepo> REPO_CACHE = new ConcurrentHashMap<String, GormRepo>()
-    //set to false when doing unit tests so it doesnt cache old ones
-    public static Boolean USE_CACHE
-
-    static Boolean shouldCache(){
-        //if reload enabled then dont cache
-        if(USE_CACHE == null) USE_CACHE = !Environment.getCurrent().isReloadEnabled()
-        return USE_CACHE
-    }
-
-    static <D> GormRepo<D> findRepoCached(Class<D> entity) {
-        String className = NameUtils.getClassName(entity)
-        def repo = REPO_CACHE.get(className)
-        if(repo == null) {
-            repo = getRepoFromAppContext(entity)
-            REPO_CACHE.put(className, repo)
-        }
-        return repo as GormRepo<D>
-    }
-
-    static <D> GormRepo<D> findRepo(Class<D> entity) {
-        if(shouldCache()){
-            return findRepoCached(entity)
-        } else {
-            return getRepoFromAppContext(entity)
-        }
-    }
+class RepoUtil {
 
     static List<Class> getRepoClasses(){
         AppCtx.grails.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz
-    }
-
-    static <D> GormRepo<D> getRepoFromAppContext(Class<D> entity){
-        return AppCtx.get(getRepoBeanName(entity), GormRepo) as GormRepo<D>
-    }
-
-    static String getRepoClassName(Class domainClass) {
-        RepositoryArtefactHandler.getRepoClassName(domainClass)
     }
 
     static String getRepoBeanName(Class domainClass) {
@@ -91,8 +53,9 @@ class  RepoUtil {
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
             if (currentVersion > oldVersion) {
-                def msgKey = RepoMessage.optimisticLockingFailure(entity)
-                throw new OptimisticLockingFailureException(msgKey.defaultMessage)
+                throw OptimisticLockingProblem
+                    .of(entity)
+                    .detail("server version:${currentVersion} > edited version:${oldVersion}")
             }
         }
     }
@@ -103,21 +66,21 @@ class  RepoUtil {
      * @param entity - the domain object the check
      * @param id - the identifier use when trying to find it. Will be used to construct the exception message
      * @param domainClassName - the name of the domain that will be used to build error message if thrown
-     * @throws EntityNotFoundException if it not found
+     * @throws EntityNotFoundProblem if it not found
      */
     static void checkFound(Object entity, Serializable id, String domainClassName) {
         if (!entity) {
-            throw new EntityNotFoundException(id, domainClassName)
+            throw EntityNotFoundProblem.of(id, domainClassName)
         }
     }
 
     /**
      * check that the passed in data is not empty and throws EmptyDataException if so
-     * @throws DataException if it not found
+     * @throws ProblemException if it not found
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {
-            throw new DataException('data.empty.error', entityClass)
+            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
         }
     }
 
@@ -125,7 +88,8 @@ class  RepoUtil {
      * in create data, if id is passed then bindId must be set to true, if not throw exception
      */
     static void checkCreateData(Map data, Map args, Class entityClass) {
-        if(data['id'] && !args.bindId) throw new DataException('data.create.bindId.error', entityClass)
+        if(data['id'] && !args.bindId)
+            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
     }
 
     /**

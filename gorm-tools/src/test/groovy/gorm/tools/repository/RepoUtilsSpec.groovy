@@ -6,15 +6,25 @@ package gorm.tools.repository
 
 import org.springframework.util.ReflectionUtils
 
+import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.repository.errors.EntityNotFoundException
+import gorm.tools.api.EntityNotFoundProblem
+import gorm.tools.support.MsgSourceResolvable
+import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
-import grails.testing.gorm.DataTest
+
 import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
 import testing.Cust
+import yakworks.i18n.icu.ICUMessageSource
 
-class RepoUtilsSpec extends Specification implements DataTest {
+class RepoUtilsSpec extends Specification implements DataRepoTest {
+
+    ICUMessageSource messageSource
+
+    void setupSpec() {
+        mockDomains MockDomain
+    }
 
     void 'instanceControllersDomainBindingApi'() {
         expect:
@@ -35,38 +45,33 @@ class RepoUtilsSpec extends Specification implements DataTest {
         RepoUtil.checkVersion(mocke, 0)
 
         then:
-        def e = thrown(OptimisticLockingFailureException)
-        e.message == "Another user has updated the MockDomain while you were editing"
+        def e = thrown(OptimisticLockingProblem)
+        e.code
 
     }
 
-    void "test checkFound"() {
+    def "checkFound id number"() {
+
         when:
-        RepoUtil.checkFound(null, 99, 'xxx')
-
+        RepoUtil.checkFound(null, 1, "Bloo")
         then:
-        EntityNotFoundException e = thrown(EntityNotFoundException)
-        e.code == 'default.not.found.message'
-        e.message == 'xxx not found for id:99'
+        def e = thrown(EntityNotFoundProblem)
+        e.code == 'error.notFound'
+        e.message == "Bloo lookup failed using key [id:1]: code=error.notFound"
+
     }
 
-    void "test propName"() {
+    def "checkFound lookup is map"() {
+
         when:
-        String propname = RepoMessage.propName('xxx.yyy.ArDoc')
-
+        RepoUtil.checkFound(null, [code: 'abc'], "Bloo")
         then:
-        propname == 'arDoc'
+        def e = thrown(EntityNotFoundProblem)
+        e.code == 'error.notFound'
+        e.message == 'Bloo lookup failed using key [code:abc]: code=error.notFound'
+
     }
 
-    void "test notFound"() {
-        when:
-        def r = RepoMessage.notFoundId(MockDomain, 2)
-
-        then:
-        r.code == "default.not.found.message"
-        r.args == ['MockDomain', 2]
-        r.defaultMessage == "MockDomain not found for id:2"
-    }
 
 
 }

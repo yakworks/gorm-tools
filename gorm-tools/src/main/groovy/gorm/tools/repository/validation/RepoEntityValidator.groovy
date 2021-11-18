@@ -37,7 +37,7 @@ import yakworks.commons.lang.ClassUtils
 /**
  * Overrides the PersistentEntityValidator to adress a few things
  * - assocations are validated correctly
- * - beforeValidate event is fire for assocations properly too
+ * - beforeValidate event is fired for assocations properly too
  * - slims down the validations so that if nullable:true then it skips those
  * - cleans up the message codes to be a sane number
  */
@@ -74,8 +74,6 @@ class RepoEntityValidator extends PersistentEntityValidator {
      * in an entity and 100's of 100's of rows.
      */
     void setupSlimConstraints(){
-        //Map<String, ConstrainedProperty> slimConstrainedProps = [:]
-        //newConstrainedProps.putAll(getConstrainedProperties())
         ApiConstraints apiConstraints = ApiConstraints.findApiConstraints(targetClass)
         //remove contraints that only have nullable so we dont validate them
         for (entry in constrainedProperties) {
@@ -88,10 +86,6 @@ class RepoEntityValidator extends PersistentEntityValidator {
                 if(!nullableConst.isNullable()){ //only add it if nullable is false
                     slimConstrainedProperties[prop] = constrainedProp
                 }
-                // else {
-                //     //add it to the nonValidate onese
-                //     apiConstraints.addNonValidatedProperty(prop, constrainedProp)
-                // }
             } else if(appliedConstraints) { //it has more so let it flow
                 slimConstrainedProperties[prop] = constrainedProp
             }
@@ -133,16 +127,6 @@ class RepoEntityValidator extends PersistentEntityValidator {
             // abrErrors.addError(error)
         }
     }
-
-    //
-    // @Override
-    // void validate(Object obj, Errors errors, boolean cascade = true) {
-    //     if (obj == null || !targetClass.isInstance(obj)) {
-    //         throw new IllegalArgumentException("Argument [$obj] is not an instance of [$targetClass] which this validator is configured for")
-    //     }
-    //     fireValidateEvent(obj, errors)
-    //     super.validate(obj, errors, cascade)
-    // }
 
     @Override
     void validate(Object obj, Errors errors, boolean cascade = true) {

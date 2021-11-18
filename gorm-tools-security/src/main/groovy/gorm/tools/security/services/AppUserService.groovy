@@ -20,6 +20,7 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.security.domain.SecLoginHistory
 import gorm.tools.security.domain.SecPasswordHistory
 import grails.gorm.transactions.Transactional
+import yakworks.api.Result
 
 /**
  * AppUserService is for user level helpers, such as sending emails to user,
@@ -77,7 +78,7 @@ class AppUserService {
     /**
      * Validate presented user passwords against config to ensure it meets password requirements.
      */
-    Map validatePassword(AppUser user, String pass, String passConfirm) {
+    Result validatePassword(AppUser user, String pass, String passConfirm) {
         return passwordValidator.validate(user, pass, passConfirm)
     }
 

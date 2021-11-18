@@ -1,6 +1,7 @@
 package gorm.tools.audit
 
-
+import gorm.tools.security.domain.AppUser
+import gorm.tools.utils.GormMetaUtils
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import spock.lang.Specification
@@ -16,7 +17,10 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
         def con = build()
         con.validate()
 
-        def conProps = StampedEntity.constrainedProperties
+        // def conProps = StampedEntity.constrainedProperties
+        // def conProps = GormMetaUtils.findConstrainedProperties(StampedEntity.getGormPersistentEntity())
+        Map conProps = GormMetaUtils.findConstrainedProperties(StampedEntity)
+
         then:
         ['createdDate','editedDate','createdBy','editedBy'].each{key->
             assert con.hasProperty(key)
@@ -42,7 +46,9 @@ class AuditStampAnnSpec extends Specification implements DomainRepoTest<StampedE
         def con = build(StampedNoConstraintsClosure)
         con.validate()
 
-        def conProps = StampedNoConstraintsClosure.constrainedProperties
+        // def conProps = StampedNoConstraintsClosure.constrainedProperties
+        Map conProps = GormMetaUtils.findConstrainedProperties(StampedNoConstraintsClosure)
+
         then:
         ['createdDate','editedDate','createdBy','editedBy'].each{key->
             assert con.hasProperty(key)

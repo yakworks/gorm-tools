@@ -14,6 +14,7 @@ class ProblemSpec extends Specification {
         expect:
         Problem problem = Problem.create()
         problem.toString() == "{400, Bad Request}"
+        !problem.ok
     }
 
     void "problem of"() {
@@ -21,10 +22,11 @@ class ProblemSpec extends Specification {
         def p = Problem.of('error.data.empty', [name: 'foo'])
 
         then:
+        !p.ok
         p.toString()
         p.message == 'code=error.data.empty'
         p.code == 'error.data.empty'
-        p.msg.args.name == 'foo'
+        p.args.asMap().name == 'foo'
     }
 
     void shouldRenderCustomDetailAndInstance() {

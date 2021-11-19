@@ -10,14 +10,14 @@ import groovy.transform.Generated
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.api.ProblemHandler
+import gorm.tools.problem.ProblemHandler
 import grails.artefact.controller.RestResponder
 import grails.artefact.controller.support.ResponseRenderer
 import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
-import yakworks.problem.Problem
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.problem.Problem
 
 /**
  * Marker trait with common helpers for a Restfull api type controller.

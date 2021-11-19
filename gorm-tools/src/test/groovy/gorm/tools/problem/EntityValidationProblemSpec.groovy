@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api
+package gorm.tools.problem
 
 
 import spock.lang.Specification
@@ -13,20 +13,20 @@ class EntityValidationProblemSpec extends Specification {
 
     void "simpl string constructor"() {
         when:
-        def e = new EntityValidationProblem("foo message")
+        def e = new ValidationProblem("foo message")
 
         then:
-        e.title == EntityValidationProblem.DEFAULT_TITLE
+        e.title == ValidationProblem.DEFAULT_TITLE
         e.message.contains "Validation Error(s): foo message: code=validation.problem"
     }
 
     void "test cause"() {
         when:
         def rte = new RuntimeException("bad stuff")
-        def e = EntityValidationProblem.of(rte)
+        def e = ValidationProblem.of(rte)
 
         then:
-        e.title == EntityValidationProblem.DEFAULT_TITLE
+        e.title == ValidationProblem.DEFAULT_TITLE
         e.message.contains "Validation Error(s): bad stuff: code=validation.problem"
     }
 
@@ -35,12 +35,12 @@ class EntityValidationProblemSpec extends Specification {
         def msgKey = MsgKey.of('password.mismatch').fallbackMessage("The passwords you entered do not match")
 
         def cust = new Cust()
-        def e =  EntityValidationProblem.of(msgKey).entity(cust)
+        def e =  ValidationProblem.of(msgKey).entity(cust)
 
         then:
-        e.msg.code == 'password.mismatch'
-        e.msg.args == [name: 'Cust']
-        e.title == EntityValidationProblem.DEFAULT_TITLE
+        e.code == 'password.mismatch'
+        e.msg.args.asMap() == [name: 'Cust']
+        e.title == ValidationProblem.DEFAULT_TITLE
         e.message == 'Validation Error(s): code=password.mismatch'
     }
 
@@ -48,12 +48,12 @@ class EntityValidationProblemSpec extends Specification {
         when:
         def rte = new RuntimeException("bad stuff")
         def cust = new Cust()
-        def e =  EntityValidationProblem.of(cust, rte)
+        def e =  ValidationProblem.of(cust, rte)
 
         then:
-        e.msg.code == 'validation.problem'
-        e.msg.args == [name: 'Cust']
-        e.title == EntityValidationProblem.DEFAULT_TITLE
+        e.code == 'validation.problem'
+        e.msg.args.asMap() == [name: 'Cust']
+        e.title == ValidationProblem.DEFAULT_TITLE
         e.message == 'Validation Error(s): bad stuff: code=validation.problem'
     }
 

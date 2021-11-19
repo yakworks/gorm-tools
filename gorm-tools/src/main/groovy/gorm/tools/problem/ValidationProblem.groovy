@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api
+package gorm.tools.problem
 
 import groovy.transform.CompileStatic
 
@@ -12,9 +12,7 @@ import org.springframework.validation.ObjectError
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.i18n.MsgKey
-
-import static java.util.Arrays.asList
-import static yakworks.problem.spi.StackTraceProcessor.COMPOUND
+import yakworks.problem.data.AbstractDataAccessProblem
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source
@@ -23,7 +21,7 @@ import static yakworks.problem.spi.StackTraceProcessor.COMPOUND
  * @since 6.1
  */
 @CompileStatic
-class EntityValidationProblem extends AbstractDataAccessProblem<EntityValidationProblem>   {
+class ValidationProblem extends AbstractDataAccessProblem<ValidationProblem> {
     public static String DEFAULT_CODE ='validation.problem'
     public static String DEFAULT_TITLE ='Validation Error(s)'
 
@@ -34,16 +32,16 @@ class EntityValidationProblem extends AbstractDataAccessProblem<EntityValidation
     String title = DEFAULT_TITLE
     ApiStatus status = HttpStatus.UNPROCESSABLE_ENTITY
 
-    EntityValidationProblem() {
+    ValidationProblem() {
         super('')
     }
 
-    EntityValidationProblem(String message) {
+    ValidationProblem(String message) {
         super(message)
         detail(message)
     }
 
-    EntityValidationProblem(Throwable cause) {
+    ValidationProblem(Throwable cause) {
         super('', cause)
         detail(cause.message)
     }
@@ -55,10 +53,10 @@ class EntityValidationProblem extends AbstractDataAccessProblem<EntityValidation
     //     setStackTrace(stackTrace as StackTraceElement[])
     // }
 
-    EntityValidationProblem errors(Errors v) {this.errors = v; return this;}
+    ValidationProblem errors(Errors v) {this.errors = v; return this;}
 
-    EntityValidationProblem name(String nm){
-        putArgIfAbsent('name', nm)
+    ValidationProblem name(String nm){
+        args.putIfAbsent('name', nm)
         return this
     }
 
@@ -79,15 +77,15 @@ class EntityValidationProblem extends AbstractDataAccessProblem<EntityValidation
         return b.toString();
     }
 
-    static EntityValidationProblem of(MsgKey msg) {
-        return new EntityValidationProblem().msg(msg)
+    static ValidationProblem of(MsgKey msg) {
+        return new ValidationProblem().msg(msg)
     }
 
-    static EntityValidationProblem of(final Throwable cause) {
-        return new EntityValidationProblem(cause);
+    static ValidationProblem of(final Throwable cause) {
+        return new ValidationProblem(cause);
     }
 
-    static EntityValidationProblem of(Object entity, Throwable cause) {
-        return EntityValidationProblem.of(cause).entity(entity);
+    static ValidationProblem of(Object entity, Throwable cause) {
+        return ValidationProblem.of(cause).entity(entity);
     }
 }

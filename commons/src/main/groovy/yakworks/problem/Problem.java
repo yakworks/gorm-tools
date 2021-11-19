@@ -24,6 +24,11 @@ public interface Problem extends Result {
     //this should be rendered to json if type is null
     URI DEFAULT_TYPE = URI.create("about:blank");
 
+    @Override
+    default MsgKey getMsg() {
+        return MsgKey.of("problem.blank");
+    }
+
     /**
      * An absolute URI that identifies the problem type. When dereferenced,
      * it SHOULD provide human-readable documentation for the problem type

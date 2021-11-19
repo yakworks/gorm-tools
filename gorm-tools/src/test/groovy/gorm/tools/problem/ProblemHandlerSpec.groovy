@@ -1,17 +1,11 @@
-package gorm.tools.api
+package gorm.tools.problem
 
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.context.MessageSource
 
-import gorm.tools.testing.support.GormToolsSpecHelper
 import gorm.tools.testing.unit.GormAppUnitTest
-import grails.testing.spring.AutowiredTest
 import spock.lang.Specification
 import yakworks.i18n.icu.DefaultICUMessageSource
-
-import static yakworks.api.HttpStatus.INTERNAL_SERVER_ERROR
-import static yakworks.api.HttpStatus.NOT_FOUND
-import static yakworks.api.HttpStatus.UNPROCESSABLE_ENTITY
 
 class ProblemHandlerSpec extends Specification implements GormAppUnitTest {
 

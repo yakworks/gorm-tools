@@ -4,11 +4,11 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.api.OptimisticLockingProblem
+import yakworks.problem.data.OptimisticLockingProblem
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.api.EntityNotFoundProblem
-import gorm.tools.api.EntityValidationProblem
+import yakworks.problem.data.EntityNotFoundProblem
+import gorm.tools.problem.ValidationProblem
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.artefact.Artefact
 import grails.buildtestdata.TestData
@@ -150,7 +150,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust org = Cust.repo.create(params)
 
         then:
-        def e = thrown(EntityValidationProblem)
+        def e = thrown(ValidationProblem)
         e.message.contains("Field error in object 'testing.Cust' on field 'type': rejected value [null]")
     }
 
@@ -170,7 +170,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.persist(new Cust(amount: 500))
 
         then:
-        def e = thrown(EntityValidationProblem)
+        def e = thrown(ValidationProblem)
         e.message.contains("Field error in object 'testing.Cust' on field 'name': rejected value [null]")
     }
 

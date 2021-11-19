@@ -17,7 +17,7 @@ class ResultSpec extends Specification {
         okRes.status.code == 200
         okRes.title('foo').title == 'foo'
         okRes.msg('bar', [key1:'go']).code == 'bar'
-        okRes.msg.args == [key1:'go']
+        okRes.args.asMap() == [key1:'go']
     }
 
     void "payload"(){

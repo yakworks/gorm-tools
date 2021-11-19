@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api
+package gorm.tools.problem
 
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -18,15 +18,16 @@ import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.support.MsgSourceResolvable
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
+import yakworks.i18n.icu.ICUMessageSource
 import yakworks.problem.Problem
 import yakworks.problem.ProblemTrait
 import yakworks.problem.Violation
 import yakworks.problem.ViolationFieldError
-import yakworks.i18n.MsgKey
-import yakworks.i18n.icu.ICUMessageSource
+import yakworks.problem.data.DataAccessProblem
+import yakworks.problem.data.UniqueConstraintProblem
 
 /**
- * Service to prepare ApiError / ApiValidationError for given exception
+ * Service to prepare ApiError / ApiValidationError for given a given exception
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
@@ -61,7 +62,7 @@ class ProblemHandler {
         ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
 
-        if (e instanceof EntityValidationProblem) {
+        if (e instanceof ValidationProblem) {
             if(e.errors instanceof EmptyErrors){
                 //this is some other exception wrapped in validation exception
                 e.detail( e.cause?.message)
@@ -80,11 +81,11 @@ class ProblemHandler {
             return buildFromErrorException(entityName, e)
         }
         else if (e instanceof MsgSourceResolvable) { //legacy
-            return Problem.of(status400).msg(MsgKey.of(e.code)).detail(getMsg(e))
+            return Problem.of(status400).msg(e.code).detail(getMsg(e))
         }
         else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return Problem.of(status400).msg(MsgKey.of('error.illegalArgument')).detail(e.message)
+            return Problem.of(status400).msg('error.illegalArgument').detail(e.message)
         }
         else if (e instanceof DataAccessException) {
             //Not all will get translated in the repo as some get thrown after flush
@@ -98,13 +99,13 @@ class ProblemHandler {
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return Problem.of(HttpStatus.INTERNAL_SERVER_ERROR).msg(MsgKey.of('error.unhandled')).detail(e.message)
+            return Problem.of(HttpStatus.INTERNAL_SERVER_ERROR).msg('error.unhandled').detail(e.message)
         }
     }
 
-    EntityValidationProblem buildFromErrorException(String entityName, Throwable valEx){
+    ValidationProblem buildFromErrorException(String entityName, Throwable valEx){
         Errors ers = valEx['errors'] as Errors
-        def valProb = EntityValidationProblem.of(valEx).name(entityName).errors(ers)
+        def valProb = ValidationProblem.of(valEx).name(entityName).errors(ers)
         return valProb.violations(transateErrorsToViolations(ers))
     }
 

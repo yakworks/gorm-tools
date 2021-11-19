@@ -1,8 +1,7 @@
 package yakworks.rally.orgs
 
-import gorm.tools.api.DataAccessProblem
-import gorm.tools.api.EntityValidationProblem
-import gorm.tools.api.UniqueConstraintProblem
+
+import yakworks.problem.data.UniqueConstraintProblem
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration

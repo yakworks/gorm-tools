@@ -2,6 +2,7 @@ package yakworks.problem;
 
 import org.junit.jupiter.api.Test;
 import yakworks.api.ApiStatus;
+import yakworks.i18n.MsgKey;
 
 import java.net.URI;
 
@@ -18,6 +19,11 @@ class EnforceCoverageTest {
     }
 
     static final class FakeProblem extends Exception implements Exceptional {
+
+        @Override
+        public MsgKey getMsg() {
+            return MsgKey.of("foo.bar");
+        }
 
         @Override
         public URI getType() {

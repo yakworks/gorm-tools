@@ -4,9 +4,7 @@
 */
 package yakworks.api;
 
-import yakworks.i18n.MsgKey;
-
-import java.util.Map;
+import yakworks.i18n.MsgKeyDecorator;
 
 /**
  * This is the base result trait for problems and results
@@ -22,45 +20,10 @@ import java.util.Map;
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-public interface Result {
-
-    /**
-     * the result message key, args can come from data or target
-     */
-    default MsgKey getMsg() {
-        return null;
-    }
-    default void setMsg(MsgKey msg) {}
+public interface Result extends MsgKeyDecorator {
 
     default String getDefaultCode() {
         return null;
-    }
-
-    default MsgKey getOrCreateMsg(){
-        if(getMsg() == null) setMsg(MsgKey.of(getDefaultCode()));
-        return getMsg();
-    }
-
-    default String getCode() {
-        return getOrCreateMsg().getCode();
-    }
-    default void setCode(String v) {
-        getOrCreateMsg().setCode(v);
-    }
-    default void setArgs(Object v) {
-        getOrCreateMsg().setArgs(v);
-    }
-    default Map getArgMap(){
-        return getOrCreateMsg().getArgMap();
-    }
-
-    /**
-     * adds an enrty to the msg arg map
-     */
-    default Map putArgIfAbsent(Object key, Object val){
-        Map argsMap = getArgMap();
-        if(argsMap != null) argsMap.putIfAbsent(key, val);
-        return argsMap;
     }
 
     /**

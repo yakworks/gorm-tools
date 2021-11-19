@@ -2,7 +2,7 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.api
+package yakworks.problem.data
 
 import groovy.transform.CompileStatic
 
@@ -33,13 +33,13 @@ class EntityNotFoundProblem extends AbstractDataAccessProblem<EntityNotFoundProb
 
     EntityNotFoundProblem name(String nm){
         this.name = nm
-        putArgIfAbsent('name', nm)
+        args.putIfAbsent('name', nm)
         return this
     }
 
     EntityNotFoundProblem lookupKey(Serializable k){
         this.key = (k instanceof Map ? k : [id: k]) as Serializable
-        putArgIfAbsent('key', key)
+        args.putIfAbsent('key', key)
         return this
     }
 

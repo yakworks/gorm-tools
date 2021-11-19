@@ -14,9 +14,9 @@ import yakworks.i18n.MsgKey
 @CompileStatic
 final class ProblemBuilder {
 
-    private static final Set<String> RESERVED_PROPERTIES = new HashSet<>(Arrays.asList(
-            "type", "title", "status", "detail", "instance", "cause"
-    ));
+    // private static final Set<String> RESERVED_PROPERTIES = new HashSet<>(Arrays.asList(
+    //         "type", "title", "status", "detail", "instance", "cause"
+    // ));
 
     private URI type
     private String title
@@ -29,9 +29,9 @@ final class ProblemBuilder {
     /**
      * @see Problem#create()
      */
-    ProblemBuilder() {
-
-    }
+    // ProblemBuilder() {
+    //
+    // }
 
     static ProblemBuilder create() {
         return new ProblemBuilder();

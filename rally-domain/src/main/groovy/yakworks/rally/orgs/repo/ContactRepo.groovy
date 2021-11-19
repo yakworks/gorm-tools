@@ -6,7 +6,6 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.api.ReferenceKeyProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.AfterBindEvent
@@ -17,6 +16,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
+import yakworks.problem.data.ReferenceKeyProblem
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail

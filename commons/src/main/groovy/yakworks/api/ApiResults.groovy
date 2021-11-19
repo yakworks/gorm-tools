@@ -6,7 +6,7 @@ package yakworks.api
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.problem.Problem
+import yakworks.problem.Problem
 
 /**
  * A Parent Result that has a list of Result(s).

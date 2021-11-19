@@ -21,18 +21,18 @@ import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
-import gorm.tools.api.EntityNotFoundProblem
-import gorm.tools.api.EntityValidationProblem
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
+import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
+import yakworks.problem.data.EntityNotFoundProblem
 
 /**
  * A trait that turns a class into a Repository
@@ -261,7 +261,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
-     * @throws EntityValidationProblem if a spring DataIntegrityViolationException is thrown
+     * @throws ValidationProblem if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
         withTrx {
@@ -316,7 +316,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @return the retrieved entity. Will always be an entity as this throws an error if not
      *
      * @throws EntityNotFoundProblem if its not found
-     * @throws EntityValidationProblem if the versions mismatch
+     * @throws ValidationProblem if the versions mismatch
      */
     D get(Serializable id, Long version) {
         D entity = get(id)

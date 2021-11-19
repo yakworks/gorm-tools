@@ -6,6 +6,7 @@ package yakworks.api
 
 import groovy.transform.CompileStatic
 
+import yakworks.i18n.MsgArgs
 import yakworks.i18n.MsgKey
 
 /**
@@ -15,11 +16,11 @@ import yakworks.i18n.MsgKey
  * @since 1
  */
 @CompileStatic
-trait ResultTrait<E> implements Result {
-    String defaultCode = 'result.ok'
+trait ResultTrait<E extends Result> implements Result {
+    String defaultCode //= 'result.ok'
     Boolean ok = true
     ApiStatus status = HttpStatus.OK
-    MsgKey msg
+    MsgKey msgKey
     String title
     Object payload
 
@@ -29,7 +30,14 @@ trait ResultTrait<E> implements Result {
     E payload(Object v) { setPayload(v); return (E)this; }
     // E value(T v){ setValue(v); return (E)this; }
 
+    MsgKey getMsg() {
+        if(msgKey == null) msgKey = MsgKey.of(getDefaultCode())
+        return msgKey
+    }
+    void setMsg(MsgKey v) { msgKey = v }
+
     E msg(MsgKey v){ setMsg(v); return (E)this; }
+    E msg(String v) { return msg(MsgKey.of(v));}
     E msg(String v, Object args) { return msg(MsgKey.of(v, args));}
 
 

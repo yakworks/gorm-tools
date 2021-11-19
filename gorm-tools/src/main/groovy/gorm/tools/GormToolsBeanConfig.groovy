@@ -15,7 +15,6 @@ import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.api.ProblemHandler
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
 import gorm.tools.beans.EntityMapService
@@ -25,6 +24,7 @@ import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.GrailsRepositoryClass

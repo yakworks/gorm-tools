@@ -1,6 +1,6 @@
 package yakworks.rally.orgs
 
-import gorm.tools.api.EntityValidationProblem
+import gorm.tools.problem.ValidationProblem
 import gorm.tools.security.domain.AppUser
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
@@ -51,7 +51,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         // createEntity(email: 'foo@bar.comx')
 
         then:
-        thrown(EntityValidationProblem)
+        thrown(ValidationProblem)
     }
 
     def testEquals() {

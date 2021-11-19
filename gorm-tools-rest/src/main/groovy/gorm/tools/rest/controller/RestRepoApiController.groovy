@@ -28,7 +28,7 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
 import gorm.tools.rest.RestApiConfig
 import grails.web.Action
-import yakworks.api.problem.Problem
+import yakworks.problem.Problem
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.MULTI_STATUS

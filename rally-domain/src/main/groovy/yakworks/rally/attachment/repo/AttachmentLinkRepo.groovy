@@ -8,8 +8,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.api.ProblemHandler
 import gorm.tools.model.Persistable
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
 import yakworks.api.ApiResults

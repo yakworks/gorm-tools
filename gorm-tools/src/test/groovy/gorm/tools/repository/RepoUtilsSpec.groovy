@@ -6,14 +6,11 @@ package gorm.tools.repository
 
 import org.springframework.util.ReflectionUtils
 
-import gorm.tools.api.OptimisticLockingProblem
+import yakworks.problem.data.OptimisticLockingProblem
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.api.EntityNotFoundProblem
-import gorm.tools.support.MsgSourceResolvable
+import yakworks.problem.data.EntityNotFoundProblem
 import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
-
-import org.springframework.dao.OptimisticLockingFailureException
 import spock.lang.Specification
 import testing.Cust
 import yakworks.i18n.icu.ICUMessageSource
@@ -32,7 +29,7 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
         //Org.hasProperty('instanceControllersDomainBindingApi')
     }
 
-    void testCheckVersion() {
+    void "checkVersion OptimisticLockingProblem"() {
         when:
         def mocke = new MockDomain([name: "Billy"])
         mocke.version = 1

@@ -14,19 +14,19 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-import gorm.tools.api.ProblemHandler
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.EntityMapService
 import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
+import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.OkResult
 import yakworks.api.Result
-import yakworks.api.problem.Problem
 import yakworks.commons.map.Maps
+import yakworks.problem.Problem
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>

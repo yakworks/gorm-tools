@@ -9,10 +9,10 @@ import groovy.transform.CompileStatic
 import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 
-import gorm.tools.api.DataAccessProblem
-import gorm.tools.api.EntityValidationProblem
-import gorm.tools.api.UniqueConstraintProblem
-import yakworks.api.problem.Problem
+import gorm.tools.problem.ValidationProblem
+import yakworks.problem.Problem
+import yakworks.problem.data.DataAccessProblem
+import yakworks.problem.data.UniqueConstraintProblem
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -41,17 +41,17 @@ class RepoExceptionSupport {
          * thus checks for these exceptions also cover EntityValidationException case.
          */
         //if its an instance of Problem then we dont need to transalate
-        if (ex instanceof Problem || ex instanceof EntityValidationProblem) {
+        if (ex instanceof Problem || ex instanceof ValidationProblem) {
             return ex
         }
         else if (ex instanceof grails.validation.ValidationException) {
             def ve = (grails.validation.ValidationException) ex
-            return EntityValidationProblem.of(entity, ve).errors(ve.errors)
+            return ValidationProblem.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
             // Gorm's stock ValidationException
             def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
-            return EntityValidationProblem.of(entity, ve).errors(ve.errors)
+            return ValidationProblem.of(entity, ve).errors(ve.errors)
         }
         else if (ex instanceof OptimisticLockingFailureException) {
             return ex //just return unchanged

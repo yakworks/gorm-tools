@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package yakworks.commons.lang;
+package yakworks.problem;
 
 import javax.annotation.Nullable;
 
@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  *
  * @author Juergen Hoeller
  * @since 2.0
- * @see NestedRuntimeException
+ * @see NestedProblemException
  */
 public abstract class NestedExceptionUtils {
 

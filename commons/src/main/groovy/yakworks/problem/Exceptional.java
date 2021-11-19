@@ -1,4 +1,4 @@
-package yakworks.api.problem;
+package yakworks.problem;
 
 /**
  * An extension of the {@link Problem} interface for problems that extend {@link Exception}. Since {@link Exception}

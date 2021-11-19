@@ -16,14 +16,12 @@ import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.support.MsgSourceResolvable
-import grails.validation.ValidationException
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemTrait
-import yakworks.api.problem.ValidationProblem
-import yakworks.api.problem.Violation
-import yakworks.api.problem.ViolationFieldError
+import yakworks.problem.Problem
+import yakworks.problem.ProblemTrait
+import yakworks.problem.Violation
+import yakworks.problem.ViolationFieldError
 import yakworks.i18n.MsgKey
 import yakworks.i18n.icu.ICUMessageSource
 
@@ -68,16 +66,18 @@ class ProblemHandler {
                 //this is some other exception wrapped in validation exception
                 e.detail( e.cause?.message)
             }
-            e.violations(toFieldErrorList(e.errors))
+            e.violations(transateErrorsToViolations(e.errors))
             return e
         }
         else if (e instanceof ProblemTrait) {
             // already a problem then just return it
             return (ProblemTrait) e
         }
-        else if (e instanceof ValidationException) {
-            String msg = 'Validation Error'
-            return ValidationProblem.of(status422, msg, e.message).violations(toFieldErrorList(e.errors))
+        else if (e instanceof grails.validation.ValidationException) {
+            return buildFromErrorException(entityName, e)
+        }
+        else if (e instanceof org.grails.datastore.mapping.validation.ValidationException) {
+            return buildFromErrorException(entityName, e)
         }
         else if (e instanceof MsgSourceResolvable) { //legacy
             return Problem.of(status400).msg(MsgKey.of(e.code)).detail(getMsg(e))
@@ -102,6 +102,12 @@ class ProblemHandler {
         }
     }
 
+    EntityValidationProblem buildFromErrorException(String entityName, Throwable valEx){
+        Errors ers = valEx['errors'] as Errors
+        def valProb = EntityValidationProblem.of(valEx).name(entityName).errors(ers)
+        return valProb.violations(transateErrorsToViolations(ers))
+    }
+
     String getMsg(MessageSourceResolvable msr){
         String msg = messageSource.getMessage(msr)
         return msg
@@ -112,7 +118,7 @@ class ProblemHandler {
      * @param errs the erros object to convert
      */
     //FIXME #339 see errormessageService, do we need some of that logic?
-    List<Violation> toFieldErrorList(Errors errs) {
+    List<Violation> transateErrorsToViolations(Errors errs) {
         List<ViolationFieldError> errors = []
         for(ObjectError err : errs.allErrors) {
             ViolationFieldError fieldError = ViolationFieldError.of(err.code, getMsg(err))

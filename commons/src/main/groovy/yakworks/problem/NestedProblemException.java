@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package yakworks.commons.lang;
+package yakworks.problem;
 
 import javax.annotation.Nullable;
 
@@ -22,39 +22,25 @@ import javax.annotation.Nullable;
  * Handy class for wrapping runtime {@code Exceptions} with a root cause.
  *
  * <p>This class is {@code abstract} to force the programmer to extend
- * the class. {@code getMessage} will include nested exception
- * information; {@code printStackTrace} and other like methods will
+ * the class. {@code printStackTrace} and other like methods will
  * delegate to the wrapped exception, if any.
  *
- * <p>The similarity between this class and the NestedCheckedException
- * class is unavoidable, as Java forces these two classes to have different
- * superclasses (ah, the inflexibility of concrete inheritance!).
- *
+ * Base on springsource
  * @author Rod Johnson
  * @author Juergen Hoeller
  * @see #getMessage
  */
-public abstract class NestedRuntimeException extends RuntimeException {
-
-	/** Use serialVersionUID from Spring 1.2 for interoperability. */
-	private static final long serialVersionUID = 5439915454935047936L;
-
-	static {
-		// Eagerly load the NestedExceptionUtils class to avoid classloader deadlock
-		// issues on OSGi when calling getMessage(). Reported by Don Brown; SPR-5607.
-		NestedExceptionUtils.class.getName();
-	}
-
+public abstract class NestedProblemException extends RuntimeException {
 
 	/**
 	 * Construct a {@code NestedRuntimeException} with the specified detail message.
 	 * @param msg the detail message
 	 */
-	public NestedRuntimeException(String msg) {
+	public NestedProblemException(String msg) {
 		super(msg);
 	}
 
-    public NestedRuntimeException(Throwable cause) {
+    public NestedProblemException(Throwable cause) {
         super(cause);
     }
 
@@ -64,20 +50,40 @@ public abstract class NestedRuntimeException extends RuntimeException {
 	 * @param msg the detail message
 	 * @param cause the nested exception
 	 */
-	public NestedRuntimeException(@Nullable String msg, @Nullable Throwable cause) {
+	public NestedProblemException(@Nullable String msg, @Nullable Throwable cause) {
 		super(msg, cause);
 	}
 
+    /**
+     * Constructs a new runtime exception with the specified detail
+     * message, cause, suppression enabled or disabled, and writable
+     * stack trace enabled or disabled.
+     *
+     * @param  message the detail message.
+     * @param cause the cause.  (A {@code null} value is permitted,
+     * and indicates that the cause is nonexistent or unknown.)
+     * @param enableSuppression whether or not suppression is enabled
+     *                          or disabled
+     * @param writableStackTrace whether or not the stack trace should
+     *                           be writable
+     *
+     * @since 1.7
+     */
+    protected NestedProblemException(String message, Throwable cause,
+                               boolean enableSuppression,
+                               boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
 	/**
 	 * Return the detail message, including the message from the nested exception
 	 * if there is one.
 	 */
-	@Override
-	@Nullable
-	public String getMessage() {
-		return NestedExceptionUtils.buildMessage(super.getMessage(), getCause());
-	}
+	// @Override
+	// @Nullable
+	// public String getMessage() {
+	// 	return NestedExceptionUtils.buildMessage(super.getMessage(), getCause());
+	// }
 
 
 	/**
@@ -121,8 +127,8 @@ public abstract class NestedRuntimeException extends RuntimeException {
 		if (cause == this) {
 			return false;
 		}
-		if (cause instanceof NestedRuntimeException) {
-			return ((NestedRuntimeException) cause).contains(exType);
+		if (cause instanceof NestedProblemException) {
+			return ((NestedProblemException) cause).contains(exType);
 		}
 		else {
 			while (cause != null) {

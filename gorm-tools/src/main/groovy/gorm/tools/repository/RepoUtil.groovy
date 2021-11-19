@@ -17,8 +17,8 @@ import gorm.tools.api.EntityNotFoundProblem
 import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemException
+import yakworks.problem.Problem
+import yakworks.problem.ProblemException
 
 /**
  * A bunch of statics to support the repositories.

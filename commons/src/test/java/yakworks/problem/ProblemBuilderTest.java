@@ -1,7 +1,7 @@
-package yakworks.api.problem;
+package yakworks.problem;
 
 import org.junit.jupiter.api.Test;
-import yakworks.api.problem.ProblemException;
+import yakworks.problem.ProblemException;
 
 import java.net.URI;
 

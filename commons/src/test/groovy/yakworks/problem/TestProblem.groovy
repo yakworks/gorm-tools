@@ -1,4 +1,4 @@
-package yakworks.api.problem;
+package yakworks.problem;
 
 class TestProblem implements Problem {
 

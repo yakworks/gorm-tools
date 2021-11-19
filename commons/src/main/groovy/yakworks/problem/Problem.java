@@ -1,4 +1,4 @@
-package yakworks.api.problem;
+package yakworks.problem;
 
 import yakworks.api.ApiStatus;
 import yakworks.api.Result;

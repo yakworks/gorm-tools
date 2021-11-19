@@ -1,10 +1,6 @@
-package yakworks.api.problem;
+package yakworks.problem;
 
 import yakworks.i18n.MsgKey;
-
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Joshua Burnett (@basejump)

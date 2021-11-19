@@ -1,4 +1,4 @@
-package yakworks.api.problem;
+package yakworks.problem;
 
 import org.junit.jupiter.api.Test;
 import yakworks.api.ApiStatus;

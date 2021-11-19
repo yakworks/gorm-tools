@@ -1,4 +1,4 @@
-package yakworks.api.problem.spi;
+package yakworks.problem.spi;
 
 import java.util.Collection;
 

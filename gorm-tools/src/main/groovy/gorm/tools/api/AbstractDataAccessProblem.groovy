@@ -10,9 +10,9 @@ import org.springframework.dao.NonTransientDataAccessException
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.api.problem.Exceptional
-import yakworks.api.problem.ProblemException
-import yakworks.api.problem.ProblemTrait
+import yakworks.problem.Exceptional
+import yakworks.problem.ProblemException
+import yakworks.problem.ProblemTrait
 
 /**
  * Root Problem for spring data access

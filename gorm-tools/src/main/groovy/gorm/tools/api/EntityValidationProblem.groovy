@@ -14,7 +14,7 @@ import yakworks.api.HttpStatus
 import yakworks.i18n.MsgKey
 
 import static java.util.Arrays.asList
-import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
+import static yakworks.problem.spi.StackTraceProcessor.COMPOUND
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source
@@ -48,6 +48,7 @@ class EntityValidationProblem extends AbstractDataAccessProblem<EntityValidation
         detail(cause.message)
     }
 
+
     // EntityValidationProblem(final EntityValidationProblem cause) {
     //     super(DEFAULT_CODE, cause)
     //     final Collection<StackTraceElement> stackTrace = COMPOUND.process(asList(getStackTrace()))
@@ -55,6 +56,11 @@ class EntityValidationProblem extends AbstractDataAccessProblem<EntityValidation
     // }
 
     EntityValidationProblem errors(Errors v) {this.errors = v; return this;}
+
+    EntityValidationProblem name(String nm){
+        putArgIfAbsent('name', nm)
+        return this
+    }
 
     //Legacy from ValidationException
     public static String formatErrors(Errors errors, String msg ) {

@@ -1,7 +1,7 @@
 package gorm.tools.security
 
 import gorm.tools.security.domain.AppUser
-import yakworks.api.problem.Problem
+import yakworks.problem.Problem
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification

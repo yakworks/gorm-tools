@@ -2,22 +2,20 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.api.problem
+package yakworks.problem
 
 import javax.annotation.Nullable
 
 import groovy.transform.CompileStatic
 
-import yakworks.commons.lang.NestedRuntimeException
-
 import static java.util.Arrays.asList
-import static yakworks.api.problem.spi.StackTraceProcessor.COMPOUND
+import static yakworks.problem.spi.StackTraceProcessor.COMPOUND
 
 /**
  * Throwable Exception Problem
  */
 @CompileStatic
-class ProblemException extends NestedRuntimeException implements ProblemTrait<ProblemException>, Exceptional {
+class ProblemException extends NestedProblemException implements ProblemTrait<ProblemException>, Exceptional {
 
     protected ProblemException() {
         this(null);

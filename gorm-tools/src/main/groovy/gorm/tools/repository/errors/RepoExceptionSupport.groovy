@@ -12,7 +12,7 @@ import org.springframework.dao.OptimisticLockingFailureException
 import gorm.tools.api.DataAccessProblem
 import gorm.tools.api.EntityValidationProblem
 import gorm.tools.api.UniqueConstraintProblem
-import yakworks.api.problem.Problem
+import yakworks.problem.Problem
 
 /**
  * Handler and translator for exceptions thrown by the Repository

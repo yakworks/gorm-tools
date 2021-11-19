@@ -13,7 +13,6 @@ import groovy.transform.CompileStatic
 class OptimisticLockingProblem extends AbstractDataAccessProblem<OptimisticLockingProblem> {
     public static String DEFAULT_CODE = 'error.optimisticLocking'
     String defaultCode = DEFAULT_CODE
-    Object entity
 
     protected OptimisticLockingProblem() {
         super(null);

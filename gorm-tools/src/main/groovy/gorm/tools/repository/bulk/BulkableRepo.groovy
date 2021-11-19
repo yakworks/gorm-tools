@@ -25,7 +25,7 @@ import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.OkResult
 import yakworks.api.Result
-import yakworks.api.problem.Problem
+import yakworks.problem.Problem
 import yakworks.commons.map.Maps
 
 /**

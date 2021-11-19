@@ -16,8 +16,8 @@ import org.apache.commons.lang3.StringUtils
 import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
-import gorm.tools.problem.ValidationProblem
 import gorm.tools.problem.ProblemHandler
+import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.AfterPersistEvent

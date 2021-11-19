@@ -13,12 +13,12 @@ import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
 
-import gorm.tools.api.EntityNotFoundProblem
-import gorm.tools.api.OptimisticLockingProblem
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import yakworks.api.problem.Problem
-import yakworks.api.problem.ProblemException
+import yakworks.problem.Problem
+import yakworks.problem.ProblemException
+import yakworks.problem.data.EntityNotFoundProblem
+import yakworks.problem.data.OptimisticLockingProblem
 
 /**
  * A bunch of statics to support the repositories.

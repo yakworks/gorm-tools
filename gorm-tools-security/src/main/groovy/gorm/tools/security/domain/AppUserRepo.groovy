@@ -9,8 +9,8 @@ import javax.inject.Inject
 
 import org.springframework.security.crypto.password.PasswordEncoder
 
-import gorm.tools.api.EntityValidationProblem
 import gorm.tools.databinding.BindAction
+import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.AfterBindEvent
@@ -108,7 +108,7 @@ class AppUserRepo implements GormRepo<AppUser> {
     void isSamePass(String pass, String rePass, AppUser user) {
         if (pass.trim() != rePass.trim()) {
             def msgKey = MsgKey.of('password.mismatch').fallbackMessage("The passwords you entered do not match")
-            throw EntityValidationProblem.of(msgKey).entity(user)
+            throw ValidationProblem.of(msgKey).entity(user)
         }
     }
 

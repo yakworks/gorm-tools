@@ -5,7 +5,7 @@
 package gorm.tools.testing.hibernate
 
 import gorm.tools.repository.model.RepoEntity
-import gorm.tools.api.EntityValidationProblem
+import gorm.tools.problem.ValidationProblem
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 
@@ -55,7 +55,7 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         //flushAndClear()
 
         then: "should get an error for child.name field"
-        def e = thrown(EntityValidationProblem)
+        def e = thrown(ValidationProblem)
         e.entity == master
         e.cause.class == grails.validation.ValidationException
         e.errors.objectName == "gorm.tools.testing.hibernate.FidMaster"

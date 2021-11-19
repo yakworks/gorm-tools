@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 import org.springframework.http.HttpStatus
 
 import grails.rest.render.RenderContext
-import yakworks.api.problem.Problem
+import yakworks.problem.Problem
 
 /**
  * Default renderer for JSON

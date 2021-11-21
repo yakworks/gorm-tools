@@ -20,11 +20,12 @@ import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.problem.Problem
+import yakworks.problem.ProblemException
 import yakworks.problem.ProblemTrait
 import yakworks.problem.Violation
 import yakworks.problem.ViolationFieldError
-import yakworks.problem.data.DataAccessProblem
-import yakworks.problem.data.UniqueConstraintProblem
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemCodes
 
 /**
  * Service to prepare ApiError / ApiValidationError for given a given exception
@@ -47,10 +48,11 @@ class ProblemHandler {
     }
 
     /**
-     * Prepares ApiError for given entity and exception
-     * - ApiError(status:422) for EntityValidationException, ValidationException and DataAccessException
-     * - ApiError(status:404) for EntityNotFoundException
-     * - ApiError(status:500) for other exceptions
+     * Prepares Problem for given entity and exception
+     * - Problem(status:422) for ValidationException
+     * - Problem(status:400) for DataAccessException
+     * - Problem(status:404) for NotFoundException
+     * - Problem(status:500) for other exceptions
      *
      * @param entityName domain class
      * @param Exception e
@@ -62,55 +64,49 @@ class ProblemHandler {
         ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
 
-        if (e instanceof ValidationProblem) {
-            if(e.errors instanceof EmptyErrors){
+        if (e instanceof ValidationProblem.Exception) {
+            def valProblem = e.getValidationProblem()
+            if (valProblem.errors instanceof EmptyErrors) {
                 //this is some other exception wrapped in validation exception
-                e.detail( e.cause?.message)
+                valProblem.detail(e.cause?.message)
             }
-            e.violations(transateErrorsToViolations(e.errors))
-            return e
+            valProblem.violations(transateErrorsToViolations(valProblem.errors))
+            return valProblem
         }
-        else if (e instanceof ProblemTrait) {
-            // already a problem then just return it
-            return (ProblemTrait) e
-        }
-        else if (e instanceof grails.validation.ValidationException) {
+        else if (e instanceof ProblemTrait) { return (ProblemTrait) e }
+        else if (e instanceof ProblemException) { return (ProblemTrait) e.problem }
+        else if (e instanceof grails.validation.ValidationException
+            || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
             return buildFromErrorException(entityName, e)
-        }
-        else if (e instanceof org.grails.datastore.mapping.validation.ValidationException) {
-            return buildFromErrorException(entityName, e)
-        }
-        else if (e instanceof MsgSourceResolvable) { //legacy
+        } else if (e instanceof MsgSourceResolvable) {
+            //legacy
             return Problem.ofCode(e.code).status(status400).detail(getMsg(e))
-        }
-        else if (e instanceof IllegalArgumentException) {
+        } else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
             return Problem.ofCode('error.illegalArgument').status(status400).detail(e.message)
-        }
-        else if (e instanceof DataAccessException) {
+        } else if (e instanceof DataAccessException) {
             //Not all will get translated in the repo as some get thrown after flush
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
             // Root of the hierarchy of data access exceptions
-            if(isUniqueIndexViolation((DataAccessException)e)){
-                return UniqueConstraintProblem.cause(e)
+            if (isUniqueIndexViolation((DataAccessException) e)) {
+                return DataProblemCodes.UniqueConstraint.ofCause(e)
             } else {
-                return DataAccessProblem.cause(e)
+                return DataProblem.ofCause(e)
             }
-        }
-        else {
+        } else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
             return Problem.ofCode('error.unhandled')
                 .status(HttpStatus.INTERNAL_SERVER_ERROR).detail(e.message)
         }
     }
 
-    ValidationProblem buildFromErrorException(String entityName, Throwable valEx){
+    ValidationProblem buildFromErrorException(String entityName, Throwable valEx) {
         Errors ers = valEx['errors'] as Errors
-        def valProb = ValidationProblem.cause(valEx).name(entityName).errors(ers)
+        def valProb = ValidationProblem.ofCause(valEx).name(entityName).errors(ers)
         return valProb.violations(transateErrorsToViolations(ers))
     }
 
-    String getMsg(MessageSourceResolvable msr){
+    String getMsg(MessageSourceResolvable msr) {
         String msg = messageSource.getMessage(msr)
         return msg
     }
@@ -122,9 +118,9 @@ class ProblemHandler {
     //FIXME #339 see errormessageService, do we need some of that logic?
     List<Violation> transateErrorsToViolations(Errors errs) {
         List<ViolationFieldError> errors = []
-        for(ObjectError err : errs.allErrors) {
+        for (ObjectError err : errs.allErrors) {
             ViolationFieldError fieldError = ViolationFieldError.of(err.code, getMsg(err))
-            if(err instanceof FieldError) fieldError.field = err.field
+            if (err instanceof FieldError) fieldError.field = err.field
             errors << fieldError
         }
         return errors as List<Violation>
@@ -132,16 +128,32 @@ class ProblemHandler {
 
     //Unique index unique constraint or primary key violation
     @SuppressWarnings('BracesForIfElse')
-    static String isUniqueIndexViolation(DataAccessException dax){
+    static String isUniqueIndexViolation(DataAccessException dax) {
         String rootMessage = dax.rootCause.message
-        if(rootMessage.contains("Unique index or primary key violation") || //mysql and H2
+        if (rootMessage.contains("Unique index or primary key violation") || //mysql and H2
             rootMessage.contains("Duplicate entry") || //mysql
             rootMessage.contains("Violation of UNIQUE KEY constraint") || //sql server
-            rootMessage.contains("unique constraint"))
-        {
+            rootMessage.contains("unique constraint")) {
             return rootMessage
         } else {
             return null
         }
+    }
+
+    //Legacy from ValidationException
+    static String formatErrors(Errors errors, String msg) {
+        String ls = System.getProperty("line.separator");
+        StringBuilder b = new StringBuilder();
+        if (msg != null) {
+            b.append(msg).append(" : ").append(ls);
+        }
+
+        for (ObjectError error : errors.getAllErrors()) {
+            b.append(ls)
+                .append(" - ")
+                .append(error)
+                .append(ls);
+        }
+        return b.toString();
     }
 }

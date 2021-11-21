@@ -18,13 +18,13 @@ import static yakworks.problem.spi.StackTraceProcessor.COMPOUND
  * Throwable Exception Problem
  */
 @CompileStatic
-class ProblemException extends NestedProblemException implements ProblemTrait<ProblemException>, Exceptional {
+class ProblemRuntime extends NestedProblemException implements ProblemTrait<ProblemRuntime>, Exceptional {
 
-    ProblemException() {
+    ProblemRuntime() {
         this(null);
     }
 
-    ProblemException(@Nullable final ProblemException cause) {
+    ProblemRuntime(@Nullable final ProblemRuntime cause) {
         super(cause);
         final Collection<StackTraceElement> stackTrace = COMPOUND.process(asList(getStackTrace()));
         setStackTrace(stackTrace as StackTraceElement[]);
@@ -36,13 +36,13 @@ class ProblemException extends NestedProblemException implements ProblemTrait<Pr
     }
 
     @Override
-    ProblemException getCause() {
+    ProblemRuntime getCause() {
         // cast is safe, since the only way to set this is our constructor
-        return (ProblemException) super.getCause()
+        return (ProblemRuntime) super.getCause()
     }
 
-    static ProblemException cause(final ProblemException cause) {
-        return new ProblemException(cause);
+    static ProblemRuntime cause(final ProblemRuntime cause) {
+        return new ProblemRuntime(cause);
     }
 
 }

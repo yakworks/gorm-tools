@@ -4,17 +4,20 @@
 */
 package yakworks.problem
 
+import javax.annotation.Nullable
+
 import groovy.transform.CompileStatic
+
+import yakworks.api.ResultUtils
 
 @CompileStatic
 class ProblemUtils {
 
-    static String buildToString(final IProblem p) {
-        String concat = "${p.status.code}"
-        String title = p.title ?: p.status.reason
-        concat = [concat, title, p.detail].findAll{it != null}.join(', ')
-        if(p.type) concat = "$concat, type=${p.type}"
-        return "{$concat}"
+    static String problemToString(final IProblem p) {
+        String concat = ResultUtils.resultToString(p)
+        String type = p.type ? "type=$p.type" : null
+        concat = [concat, type, p.detail].findAll{it != null}.join(', ')
+        return "Problem(${concat})"
     }
 
     static String buildMessage(final Object problem) {
@@ -24,19 +27,22 @@ class ProblemUtils {
     }
 
     /**
-     * add arguments for things in entity
-     * - add name as class.simpleName
-     * - add id if it has one
-     * - add stamp if it has one
-     * returns null if the msg
+     * Retrieve the innermost cause of the given exception
+     * Returns the original passed in exception if there is no root cause
+     * so this alway returns something. to check if it hsa a root cause then
+     * can just do getRootCause(ex) == ex
      */
-    static Map addCommonArgs(Map args, Object entity){
-        if(args == null) return args
-        args.putIfAbsent('name', entity.class.simpleName)
-        if (entity.hasProperty('id') && entity['id'])
-            args.putIfAbsent('id', entity['id'])
-
-        if (entity.hasProperty('stamp'))
-            args.putIfAbsent('stamp', entity['stamp'])
+    static Throwable getRootCause(Throwable original) {
+        if (original == null) {
+            return null
+        }
+        Throwable rootCause = null
+        Throwable cause = original.getCause()
+        while (cause != null && cause != rootCause) {
+            rootCause = cause;
+            cause = cause.getCause()
+        }
+        return (rootCause != null ? rootCause : original)
     }
+
 }

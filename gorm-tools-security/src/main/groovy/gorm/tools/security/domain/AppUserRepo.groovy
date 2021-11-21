@@ -110,6 +110,7 @@ class AppUserRepo implements GormRepo<AppUser> {
             throw ValidationProblem.ofCode('password.mismatch')
                 .detail("The passwords you entered do not match")
                 .entity(user)
+                .toException()
         }
     }
 

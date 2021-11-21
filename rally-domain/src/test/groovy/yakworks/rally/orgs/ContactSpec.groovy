@@ -51,7 +51,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         // createEntity(email: 'foo@bar.comx')
 
         then:
-        thrown(ValidationProblem)
+        thrown(ValidationProblem.Exception)
     }
 
     def testEquals() {

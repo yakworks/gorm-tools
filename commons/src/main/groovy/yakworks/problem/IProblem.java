@@ -55,11 +55,8 @@ public interface IProblem extends Result {
     /**
      * An absolute URI that identifies the specific occurrence of the problem.
      * It may or may not yield further information if dereferenced.
-     *
-     * @return an absolute URI that identifies this specific problem
      */
-    // @Nullable
-    // default URI getInstance() { return null; }
+    default URI getInstanceURI() { return null; }
 
     interface Fluent<E extends Fluent> extends IProblem, Result.Fluent<E> {
         //Problem builders

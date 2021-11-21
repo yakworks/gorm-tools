@@ -6,14 +6,16 @@ package gorm.tools.repository
 
 import org.springframework.util.ReflectionUtils
 
-import yakworks.problem.data.OptimisticLockingProblem
 import gorm.tools.repository.errors.EmptyErrors
-import yakworks.problem.data.EntityNotFoundProblem
 import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
 import spock.lang.Specification
 import testing.Cust
 import yakworks.i18n.icu.ICUMessageSource
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemException
+import yakworks.problem.data.DataProblemCodes
+import yakworks.problem.data.NotFoundProblem
 
 class RepoUtilsSpec extends Specification implements DataRepoTest {
 
@@ -42,8 +44,9 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
         RepoUtil.checkVersion(mocke, 0)
 
         then:
-        def e = thrown(OptimisticLockingProblem)
-        e.code
+        def ex = thrown(DataProblemException)
+        ex.problem instanceof DataProblem
+        ex.code == DataProblemCodes.OptimisticLocking.code
 
     }
 
@@ -52,7 +55,7 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
         when:
         RepoUtil.checkFound(null, 1, "Bloo")
         then:
-        def e = thrown(EntityNotFoundProblem)
+        def e = thrown(NotFoundProblem.Exception)
         e.code == 'error.notFound'
         e.message == "Bloo lookup failed using key [id:1]: code=error.notFound"
 
@@ -63,7 +66,7 @@ class RepoUtilsSpec extends Specification implements DataRepoTest {
         when:
         RepoUtil.checkFound(null, [code: 'abc'], "Bloo")
         then:
-        def e = thrown(EntityNotFoundProblem)
+        def e = thrown(NotFoundProblem.Exception)
         e.code == 'error.notFound'
         e.message == 'Bloo lookup failed using key [code:abc]: code=error.notFound'
 

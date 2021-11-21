@@ -7,12 +7,12 @@ package gorm.tools.problem
 import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
-import org.springframework.validation.ObjectError
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
+import yakworks.problem.ProblemException
+import yakworks.problem.data.DataProblemException
 import yakworks.problem.data.DataProblemTrait
-import yakworks.problem.exception.NestedProblemException
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source
@@ -21,8 +21,7 @@ import yakworks.problem.exception.NestedProblemException
  * @since 6.1
  */
 @CompileStatic
-class ValidationProblem extends NestedProblemException
-    implements DataProblemTrait<ValidationProblem> {
+class ValidationProblem implements DataProblemTrait<ValidationProblem>  {
 
     public static String DEFAULT_CODE ='validation.problem'
     public static String DEFAULT_TITLE ='Validation Error(s)'
@@ -34,18 +33,10 @@ class ValidationProblem extends NestedProblemException
     String title = DEFAULT_TITLE
     ApiStatus status = HttpStatus.UNPROCESSABLE_ENTITY
 
-    ValidationProblem() {
-        super()
-    }
+    ValidationProblem() {}
 
     ValidationProblem(String message) {
-        super(message)
         detail(message)
-    }
-
-    ValidationProblem(Throwable cause) {
-        super(cause)
-        detail(cause.message)
     }
 
     ValidationProblem errors(Errors v) {this.errors = v; return this;}
@@ -55,24 +46,33 @@ class ValidationProblem extends NestedProblemException
         return this
     }
 
-    //Legacy from ValidationException
-    static String formatErrors(Errors errors, String msg ) {
-        String ls = System.getProperty("line.separator");
-        StringBuilder b = new StringBuilder();
-        if (msg != null) {
-            b.append(msg).append(" : ").append(ls);
-        }
-
-        for (ObjectError error : errors.getAllErrors()) {
-            b.append(ls)
-                .append(" - ")
-                .append(error)
-                .append(ls);
-        }
-        return b.toString();
+    @Override
+    ProblemException toException(){
+        return getCause() ? new ValidationProblem.Exception(getCause()).problem(this) : new ValidationProblem.Exception().problem(this)
     }
 
     static ValidationProblem of(Object entity, Throwable cause) {
-        return ValidationProblem.cause(cause).entity(entity);
+        return ValidationProblem.ofCause(cause).entity(entity);
+    }
+
+    static class Exception extends DataProblemException {
+
+        Exception(){ }
+        Exception(Throwable cause){ super(cause)}
+
+        ValidationProblem getValidationProblem() { return (ValidationProblem) problem }
+
+        //helpers
+        Errors getErrors() { getValidationProblem().errors}
+
+        // @Override
+        // ProblemException problem(ValidationProblem prob){
+        //     this.problem = prob
+        //     return this
+        // }
+
+        //Override it for performance improvement, because filling in the stack trace is quit expensive
+        @Override
+        synchronized Throwable fillInStackTrace() { return this }
     }
 }

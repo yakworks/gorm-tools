@@ -44,7 +44,7 @@ final class ProblemBuilder<T extends IProblem> {
         return this;
     }
 
-   ProblemBuilder<T> type(@Nullable final URI type) {
+    ProblemBuilder<T> type(@Nullable final URI type) {
         this.type = type;
         return this;
     }
@@ -79,12 +79,12 @@ final class ProblemBuilder<T extends IProblem> {
         T rp = cause ? problemClass.newInstance(cause) : problemClass.newInstance()
 
         //ugly but getting it working for now
-        if(payload) rp.payload = payload
-        if(msg) rp['msg'] = msg //not sure why we are getting 'Cannot set read-only property'
-        if(type) rp.type = type
-        if(title) rp.title = title
-        if(status) rp.status = status
-        if(detail) rp.detail = detail
+        if (payload) rp.payload = payload
+        if (msg) rp['msg'] = msg //not sure why we are getting 'Cannot set read-only property'
+        if (type) rp.type = type
+        if (title) rp.title = title
+        if (status) rp.status = status
+        if (detail) rp.detail = detail
         // if(instance) rp.instance = instance
         return rp
     }

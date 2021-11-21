@@ -2,7 +2,7 @@ package yakworks.problem;
 
 import org.junit.jupiter.api.Test;
 import yakworks.problem.exception.ProblemBuilder;
-import yakworks.problem.exception.ProblemException;
+import yakworks.problem.exception.ProblemRuntime;
 
 import java.net.URI;
 
@@ -16,6 +16,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static yakworks.api.HttpStatus.BAD_REQUEST;
 
+@SuppressWarnings("unchecked")
 class ProblemBuilderTest {
 
     private final URI type = URI.create("https://example.org/out-of-stock");
@@ -30,7 +31,7 @@ class ProblemBuilderTest {
 
     @Test
     void shouldCreateProblem() {
-        final IProblem problem = ProblemBuilder.of(ProblemException.class)
+        final IProblem problem = ProblemBuilder.of(ProblemRuntime.class)
                 .type(type)
                 .title("Out of Stock")
                 .status(BAD_REQUEST)
@@ -56,20 +57,20 @@ class ProblemBuilderTest {
 
     @Test
     void shouldCreateProblemWithCause() {
-        final ProblemException problem = (ProblemException) new ProblemBuilder(ProblemException.class)
+        final ProblemRuntime problem = (ProblemRuntime) new ProblemBuilder(ProblemRuntime.class)
                 .type(URI.create("https://example.org/preauthorization-failed"))
                 .title("Preauthorization Failed")
                 .status(BAD_REQUEST)
-                .cause((Throwable) new ProblemBuilder(ProblemException.class)
+                .cause((Throwable) new ProblemBuilder(ProblemRuntime.class)
                         .type(URI.create("https://example.org/expired-credit-card"))
                         .title("Expired Credit Card")
                         .status(BAD_REQUEST)
                         .build())
                 .build();
 
-        assertThat(problem, hasFeature("cause", ProblemException::getCause, notNullValue()));
+        assertThat(problem, hasFeature("cause", ProblemRuntime::getCause, notNullValue()));
 
-        final ProblemException cause = problem.getCause();
+        final ProblemRuntime cause = problem.getCause();
         assertThat(cause, hasFeature("type", IProblem::getType, hasToString("https://example.org/expired-credit-card")));
         assertThat(cause, hasFeature("title", IProblem::getTitle, is("Expired Credit Card")));
         assertThat(cause, hasFeature("status", IProblem::getStatus, is(BAD_REQUEST)));

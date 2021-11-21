@@ -6,9 +6,11 @@ package yakworks.problem.data
 
 import groovy.transform.CompileStatic
 
+import yakworks.api.ResultUtils
+import yakworks.problem.DefaultProblemException
+import yakworks.problem.ProblemException
 import yakworks.problem.ProblemTrait
 import yakworks.problem.ProblemUtils
-import yakworks.problem.exception.NestedProblemException
 
 /**
  * Trait implementation for the Problem that has setters and builders
@@ -32,7 +34,7 @@ trait DataProblemTrait<E extends DataProblemTrait> extends ProblemTrait<E> {
     E entity(Object v) {
         if(v != null) {
             this.payload = v
-            ProblemUtils.addCommonArgs(args.asMap(), v)
+            ResultUtils.addCommonArgs(args.asMap(), v)
         }
         return (E)this;
     }
@@ -43,10 +45,15 @@ trait DataProblemTrait<E extends DataProblemTrait> extends ProblemTrait<E> {
         entity(v)
     }
 
+    @Override
+    ProblemException toException(){
+        return getCause() ? new DataProblemException(getCause()).problem(this) : new DataProblemException().problem(this)
+    }
+
     //override ProblemTrait static to get rootCause into detail message
-    static E cause(final Throwable cause) {
-        def dap = this.newInstance(cause)
-        dap.detail(((NestedProblemException)dap).rootCause.message)
+    static E ofCause(final Throwable cause) {
+        def dap = this.newInstance([cause: cause])
+        dap.detail(ProblemUtils.getRootCause(cause).message)
     }
 
 }

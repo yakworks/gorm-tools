@@ -32,7 +32,7 @@ import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
-import yakworks.problem.data.EntityNotFoundProblem
+import yakworks.problem.data.NotFoundProblem
 
 /**
  * A trait that turns a class into a Repository
@@ -173,7 +173,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param data - the map with the keys for lookup
      * @param boolean mustExist - if the record must exist, default true
      * @return the found entity
-     * @throws EntityNotFoundProblem if mustExist is true, and entity not found
+     * @throws NotFoundProblem.Exception if mustExist is true, and entity not found
      */
     D findWithData(Map data, boolean mustExist = true) {
         D foundEntity
@@ -248,7 +248,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param id - the id to delete
      * @param args - the args to pass to delete. flush being the most common
      *
-     * @throws EntityNotFoundProblem if its not found or if a DataIntegrityViolationException is thrown
+     * @throws NotFoundProblem.Exception if its not found or if a DataIntegrityViolationException is thrown
      */
     void removeById(Serializable id, Map args = [:]) {
         withTrx {
@@ -261,7 +261,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Transactional, Calls delete always with flush = true so we can intercept any DataIntegrityViolationExceptions.
      *
      * @param entity the domain entity
-     * @throws ValidationProblem if a spring DataIntegrityViolationException is thrown
+     * @throws ValidationProblem.Exception if a spring DataIntegrityViolationException is thrown
      */
     void remove(D entity, Map args = [:]) {
         withTrx {
@@ -315,8 +315,8 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param version - can be null. if its passed in then it validates its that same as the version in the retrieved entity.
      * @return the retrieved entity. Will always be an entity as this throws an error if not
      *
-     * @throws EntityNotFoundProblem if its not found
-     * @throws ValidationProblem if the versions mismatch
+     * @throws NotFoundProblem.Exception if its not found
+     * @throws ValidationProblem.Exception if the versions mismatch
      */
     D get(Serializable id, Long version) {
         D entity = get(id)

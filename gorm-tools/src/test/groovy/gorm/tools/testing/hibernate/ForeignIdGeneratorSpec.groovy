@@ -55,12 +55,13 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         //flushAndClear()
 
         then: "should get an error for child.name field"
-        def e = thrown(ValidationProblem)
-        e.entity == master
+        def e = thrown(ValidationProblem.Exception)
+        def problem = e.problem
+        problem.entity == master
         e.cause.class == grails.validation.ValidationException
-        e.errors.objectName == "gorm.tools.testing.hibernate.FidMaster"
-        e.errors.allErrors.size() == 1
-        def fe = e.errors.getFieldError("child.name")
+        problem.errors.objectName == "gorm.tools.testing.hibernate.FidMaster"
+        problem.errors.allErrors.size() == 1
+        def fe = problem.errors.getFieldError("child.name")
         fe.code == 'nullable'
         fe.rejectedValue == null
         fe.arguments as List == ['name', FidChild]

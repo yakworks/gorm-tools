@@ -9,7 +9,6 @@ import groovy.transform.CompileStatic
 
 import yakworks.api.HttpStatus
 import yakworks.i18n.MsgKey
-import yakworks.problem.exception.ThrowableProblem
 
 /**
  * This is for the statics in the Problem interface.
@@ -49,11 +48,4 @@ class CreateProblem {
         return create().payload(value);
     }
 
-    static ProblemTrait withCause(Throwable cause) {
-        return new ThrowableProblem(cause);
-    }
-
-    static ProblemTrait emptyThrowable() {
-        return new ThrowableProblem();
-    }
 }

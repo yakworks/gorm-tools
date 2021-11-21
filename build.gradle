@@ -49,10 +49,15 @@ subprojects { subprj ->
     isExample = getProp('isExample', false)
   }
 
-  plugins.withId('groovy') {
+  plugins.withId('java') {
     sourceCompatibility = "$javaCompatibility"
     targetCompatibility = "$javaCompatibility"
+    tasks.withType(JavaCompile) {
+      options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+  }
 
+  plugins.withId('groovy') {
     // compileGroovy {
     //   groovyOptions.fork = true
     //   groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
@@ -153,6 +158,7 @@ ext.codenarcRuleset= '''
   // getRule('Println').enabled = false
   // getRule('AbcMetric').enabled = false
   getRule('FieldName').enabled = false
+  getRule('SynchronizedMethod').enabled = false
 '''
 
 //logging

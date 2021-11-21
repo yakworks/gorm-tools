@@ -4,10 +4,10 @@
 */
 package yakworks.problem
 
+
 import spock.lang.Specification
 import spock.lang.Unroll
 import yakworks.i18n.MsgKey
-import yakworks.problem.exception.ThrowableProblem
 
 import static yakworks.api.HttpStatus.NOT_FOUND
 
@@ -16,7 +16,7 @@ class ProblemSpec extends Specification {
     void shouldRenderTestProblem() {
         expect:
         Problem problem = Problem.create()
-        problem.toString() == "{400, Bad Request}"
+        problem.toString() == "Problem(400, Bad Request)"
         !problem.ok
     }
 
@@ -29,6 +29,36 @@ class ProblemSpec extends Specification {
         p.toString()
         p.code == 'error.data.empty'
         p.args.asMap().name == 'foo'
+    }
+
+    void "problem throw"() {
+        when:
+        def p = Problem.of('error.data.empty', [name: 'foo'])
+        throw p.toException()
+
+        then:
+        def ex = thrown(ProblemException)
+        ex.problem == p
+
+        when:
+        throw p as Exception
+
+        then:
+        def ex2 = thrown(ProblemException)
+        ex2.problem == p
+    }
+
+    void "problem throw with cause"() {
+        when:
+        def rte = new RuntimeException("bad stuff")
+        def p = Problem.of('error.data.empty', [name: 'foo']).cause(rte)
+        throw p as Exception
+
+        then:
+        def ex = thrown(ProblemException)
+        ex.problem == p
+        ex.rootCause == rte
+
     }
 
     @Unroll
@@ -45,9 +75,9 @@ class ProblemSpec extends Specification {
 
     }
 
-    void shouldRenderCustomDetailAndInstance() {
+    void "should Render Custom Detail And Instance"() {
         when:
-        final ThrowableProblem p = ThrowableProblem.of(NOT_FOUND)
+        final Problem p = Problem.withStatus(NOT_FOUND)
             .type(URI.create("https://example.org/problem"))
             .detail("Order 123")
 
@@ -61,15 +91,16 @@ class ProblemSpec extends Specification {
 
     void shouldRenderCustomPropertiesWhenPrintingStackTrace() {
         when:
-        final ThrowableProblem problem = ThrowableProblem.of(NOT_FOUND)
+        final Problem problem = Problem.withStatus(NOT_FOUND)
             .type(URI.create("https://example.org/problem"));
 
 
         final StringWriter writer = new StringWriter()
-        problem.printStackTrace(new PrintWriter(writer))
+        problem.toException().printStackTrace(new PrintWriter(writer))
 
         then:
-        writer.toString().startsWith("{404, Not Found")
+        writer.toString()
+        writer.toString().startsWith("Problem(404, Not Found")
     }
 
 }

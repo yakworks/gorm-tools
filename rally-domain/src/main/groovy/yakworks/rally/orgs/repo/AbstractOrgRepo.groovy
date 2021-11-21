@@ -97,7 +97,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     void beforeRemove(Org org, BeforeRemoveEvent e) {
         if (org.source?.sourceType == SourceType.ERP) { //might be more in future
             def args = [name: "Org: ${org.name}, source:${SourceType.ERP}"]
-            throw ValidationProblem.of("error.delete.externalSource", args).entity(org)
+            throw ValidationProblem.of("error.delete.externalSource", args)
+                .entity(org).toException()
         }
         //remove tags
         orgTagRepo.remove(org)
@@ -109,7 +110,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * deletes org and all associated persons or users but only if is doesn't have invoices
      *
      * @param org the org domain object
-     * @throws ValidationProblem if a spring DataIntegrityViolationException is thrown
+     * @throws ValidationProblem.Exception if a spring DataIntegrityViolationException is thrown
      */
     @RepoListener
     void afterRemove(Org org, AfterRemoveEvent e) {

@@ -104,7 +104,14 @@ public interface Result extends MsgKeyDecorator {
         default E value(Object v) { return payload(v); }
 
         default E msg(MsgKey v){ setMsg(v); return (E)this; }
-        default E msg(String v) { return msg(MsgKey.ofCode(v));}
+        default E msg(String v) {
+            if(getMsg() == null){
+                return msg(MsgKey.ofCode(v));
+            } else {
+                getMsg().setCode(v);
+                return (E)this;
+            }
+        }
         default E msg(String v, Object args) { return msg(MsgKey.of(v, args));}
     }
 }

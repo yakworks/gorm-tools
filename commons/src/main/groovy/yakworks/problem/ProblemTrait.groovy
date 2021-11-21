@@ -19,15 +19,21 @@ import yakworks.i18n.MsgKey
  */
 @CompileStatic
 trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IProblem.Fluent<E> {
-    // result overrides
+    // result overrides, always false
     Boolean getOk(){ false } //always false
+    //status default to 400
     ApiStatus status = HttpStatus.BAD_REQUEST
-
     //this should be rendered to json if type is null
-    URI DEFAULT_TYPE = URI.create("about:blank")
+    // URI DEFAULT_TYPE = URI.create("about:blank")
+
     // Problem impls
     URI type //= Problem.DEFAULT_TYPE
+    //the extra detail for this message
     String detail
+
+    //if there is a cause we want to retian when we convert to exception
+    Throwable cause
+
     // URI instance
     List<Violation> violations = [] as List<Violation> //Collections.emptyList();
 
@@ -39,9 +45,18 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
         return (E)this
     }
 
+    E cause(Throwable exCause){
+        this.cause = exCause
+        return (E)this
+    }
+
     @Override
     String toString() {
-        return ProblemUtils.buildToString(this)
+        return ProblemUtils.problemToString(this)
+    }
+
+    ProblemException toException(){
+        return getCause() ? new DefaultProblemException(getCause()).problem(this) : new DefaultProblemException().problem(this)
     }
 
     //static builders
@@ -66,6 +81,10 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
         return this.newInstance().msg(mkey)
     }
 
+    static E withStatus(ApiStatus status) {
+        return this.newInstance().status(status)
+    }
+
     static E withTitle(String title) {
         return this.newInstance().title(title)
     }
@@ -74,7 +93,7 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
         return this.newInstance().detail(detail)
     }
 
-    static E cause(Throwable cause) {
-        return (E)this.newInstance(cause)
+    static E ofCause(Throwable cause) {
+        return (E)this.newInstance([cause: cause])
     }
 }

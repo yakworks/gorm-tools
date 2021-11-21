@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import yakworks.api.ApiStatus;
 import yakworks.i18n.MsgKey;
 import yakworks.problem.exception.Exceptional;
-import yakworks.problem.exception.ProblemException;
+import yakworks.problem.exception.ProblemRuntime;
 
 import java.net.URI;
 
@@ -43,7 +43,7 @@ class EnforceCoverageTest {
         }
 
         @Override
-        public ProblemException getCause() {
+        public ProblemRuntime getCause() {
             return null;
         }
 

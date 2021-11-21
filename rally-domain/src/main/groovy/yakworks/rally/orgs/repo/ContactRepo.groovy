@@ -16,7 +16,7 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
-import yakworks.problem.data.ReferenceKeyProblem
+import yakworks.problem.data.DataProblemCodes
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
@@ -40,17 +40,20 @@ class ContactRepo implements GormRepo<Contact> {
     @RepoListener
     void beforeRemove(Contact contact, BeforeRemoveEvent e) {
         AppUser user = contact.user
-        String stamp = "Contact: ${contact.name}, id: ${contact.id}"
+        String hasRefName
         if (user) {
-            throw ReferenceKeyProblem.withStamp(stamp).reference('User')
+            hasRefName = 'User'
         }
         if (Org.query(contact: contact).count()) {
-            throw ReferenceKeyProblem.withStamp(stamp).reference('Org primary contact')
+            hasRefName = 'Org primary contact'
         }
         if (ActivityContact.repo.count(contact)) {
-            throw ReferenceKeyProblem.withStamp(stamp).reference('ActivityContact')
+            hasRefName = 'ActivityContact'
         }
-
+        if(hasRefName){
+            Map refArgs = [stamp: "Contact: ${contact.name}, id: ${contact.id}", other: hasRefName]
+            throw DataProblemCodes.ReferenceKey.withArgs(refArgs).toException()
+        }
         //remove
         TagLink.remove(contact)
 

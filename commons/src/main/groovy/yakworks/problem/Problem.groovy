@@ -6,10 +6,6 @@ package yakworks.problem
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.ApiStatus
-import yakworks.api.ResultTrait
-import yakworks.i18n.MsgKey
-
 /**
  * Default problem
  *
@@ -17,23 +13,11 @@ import yakworks.i18n.MsgKey
  * @since 7.0.8
  */
 @CompileStatic
-class Problem implements ResultTrait<Problem>, ProblemTrait<Problem> {
+class Problem implements ProblemTrait<Problem> {
 
-    Problem(){}
-
-    Problem(ApiStatus v){ this.status = v }
-
-    Problem(MsgKey mk){ this.msg = mk }
-
-    class Exception extends RuntimeException {
-
-        Problem getProblem(){
-            return Problem.this
-        }
+    // allows to do 'someProblem as Exception'
+    // @Override
+    public <T> T asType(Class<T> clazz) {
+        Exception.isAssignableFrom(clazz) ? (T) toException() : super.asType(clazz)
     }
-
-    Problem.Exception toThrowable(){
-        return new Problem.Exception();
-    }
-
 }

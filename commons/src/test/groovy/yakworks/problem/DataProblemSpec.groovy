@@ -5,32 +5,32 @@
 package yakworks.problem
 
 import spock.lang.Specification
-import spock.lang.Unroll
-import yakworks.i18n.MsgKey
-import yakworks.problem.data.OptimisticLockingProblem
-import yakworks.problem.exception.ThrowableProblem
-
-import static yakworks.api.HttpStatus.NOT_FOUND
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemException
+import yakworks.problem.data.DataProblemCodes
 
 class DataProblemSpec extends Specification {
 
-    void "OptimisticLockingProblem cause"() {
+    void "DataProblemKinds sanity check"() {
         when:
         def rte = new RuntimeException("bad stuff")
-        def e = OptimisticLockingProblem.cause(rte)
+        def e = DataProblemCodes.ReferenceKey.get().cause(rte).toException()
 
         then:
-        e.code == 'error.optimisticLocking'
+        e.code == 'error.reference.key'
         e.rootCause == rte
     }
 
-    void "OptimisticLockingProblem entity payload"() {
+    void "DataProblem entity payload"() {
         when:
         def someEntity = new SomeEntity()
-        def e = OptimisticLockingProblem.of(someEntity)
+        def e = DataProblem.of(someEntity).msg('foo').toException()
 
         then:
-        e.code == 'error.optimisticLocking'
+        e instanceof DataProblemException
+        e instanceof ProblemException
+        e.problem
+        e.code == 'foo'
         e.args.asMap().name == 'SomeEntity'
     }
 

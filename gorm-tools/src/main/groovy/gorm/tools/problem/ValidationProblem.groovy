@@ -11,7 +11,6 @@ import org.springframework.validation.ObjectError
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.i18n.MsgKey
 import yakworks.problem.data.DataProblemTrait
 import yakworks.problem.exception.NestedProblemException
 

@@ -105,25 +105,22 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         cust.tags[0].code == 'foo'
     }
 
-    @IgnoreRest
     void "test create duplicate fail"() {
         when:
         def params = MockData.createOrg
         params.num = '99' //should already exist in test db
         //flush during create so it forces the error catching
-        // def org = orgRepo.create(params.asUnmodifiable(), [flush: true])
-        def org = orgRepo.create(params.asUnmodifiable())
-        // def org = orgRepo.create(params.asUnmodifiable())
-        orgRepo.flush()
+        def org = orgRepo.create(params.asUnmodifiable(), [flush: true])
+        // orgRepo.flush()
 
         then:
-        thrown DataIntegrityViolationException
-        // UniqueConstraintProblem ge = thrown()
+        // thrown DataIntegrityViolationException
+        UniqueConstraintProblem ge = thrown()
         // def rootCause = NestedExceptionUtils.getRootCause(ge)
-        // ge.detail.contains("Unique index or primary key violation") || //mysql and H2
-        //     ge.detail.contains("Duplicate entry") || //mysql
-        //     ge.detail.contains("Violation of UNIQUE KEY constraint") || //sql server
-        //     ge.detail.contains("duplicate key value violates unique constraint") //postgres
+        ge.detail.contains("Unique index or primary key violation") || //mysql and H2
+            ge.detail.contains("Duplicate entry") || //mysql
+            ge.detail.contains("Violation of UNIQUE KEY constraint") || //sql server
+            ge.detail.contains("duplicate key value violates unique constraint") //postgres
 
     }
 

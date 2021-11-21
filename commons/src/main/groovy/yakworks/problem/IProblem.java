@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @see <a href="https://tools.ietf.org/html/rfc7807">RFC 7807: Problem Details for HTTP APIs</a>
  */
-public interface IProblem extends Result {
+public interface IProblem<E extends IProblem> extends Result<E> {
 
     @Override default Boolean getOk() { return false; }
 
@@ -61,41 +61,10 @@ public interface IProblem extends Result {
     // @Nullable
     // default URI getInstance() { return null; }
 
-    // static ProblemTrait empty() {
-    //     return CreateProblem.create();
-    // }
-    //
-    // static ProblemTrait withCode(String code) {
-    //     return CreateProblem.code(code);
-    // }
-    //
-    // static ProblemTrait of(Object value) {
-    //     return CreateProblem.of(value);
-    // }
-    //
-    // static ProblemTrait of(String code, Object args) {
-    //     return CreateProblem.code(code, args);
-    // }
-    //
-    // static ProblemTrait withMsg(MsgKey code) {
-    //     return CreateProblem.msg(code);
-    // }
-    //
-    // static ProblemTrait withDetail(String detail) {
-    //     return CreateProblem.detail(detail);
-    // }
-
-    //
-    // static ProblemTrait of(Throwable cause) {
-    //     return ProblemBuilder.create(cause);
-    // }
-
-    // static ThrowableProblem of(final ApiStatus status, final URI instance) {
-    //     return create().status(status).instance(instance);
-    // }
-    //
-    // static ThrowableProblem of(final ApiStatus status, final String detail, final URI instance) {
-    //     return create().status(status).detail(detail).instance(instance);
-    // }
+    //FLUENT setters
+    default E detail(String v) { setDetail(v);  return (E)this; }
+    default E type(URI v) { setType(v); return (E)this; }
+    default E type(String v) { setType(URI.create(v)); return (E)this; }
+    default E violations(List<Violation> v) { setViolations(v); return (E)this; }
 
 }

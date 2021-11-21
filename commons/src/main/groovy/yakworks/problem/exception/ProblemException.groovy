@@ -8,7 +8,6 @@ import javax.annotation.Nullable
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.ResultTrait
 import yakworks.problem.ProblemTrait
 import yakworks.problem.ProblemUtils
 
@@ -19,7 +18,7 @@ import static yakworks.problem.spi.StackTraceProcessor.COMPOUND
  * Throwable Exception Problem
  */
 @CompileStatic
-class ProblemException extends NestedProblemException implements ResultTrait<ProblemException>, ProblemTrait<ProblemException>, Exceptional {
+class ProblemException extends NestedProblemException implements ProblemTrait<ProblemException>, Exceptional {
 
     ProblemException() {
         this(null);

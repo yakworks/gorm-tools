@@ -18,7 +18,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     ApiStatus status = HttpStatus.MULTI_STATUS
 
     //internal rep
-    @Delegate List<Result> results
+    @Delegate List<Result<?>> results
 
     //override so payload is the list of results
     @Override Object getPayload() { return results; }
@@ -29,7 +29,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
      * @param isSynchronized defaults to true to create the data list as synchronizedList
      */
     ApiResults(boolean isSynchronized = true){
-        results = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
+        results = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result<?>>
     }
 
     // ** BUILDERS STATIC OVERRIDES **
@@ -43,7 +43,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     }
 
     @Override //changes default list delegate so we can add ok
-    boolean add(Result result){
+    boolean add(Result<?> result){
         if(!result.ok) ok = false
         results << result
     }
@@ -52,10 +52,10 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
      * if resultToMerge is ApiResults then add all from its resultList
      * else just call add to list
      */
-    void merge(Result resultToMerge){
+    void merge(Result<?> resultToMerge){
         if(!resultToMerge.ok) ok = false
         if(resultToMerge instanceof ApiResults){
-            results.addAll(resultToMerge.results as List<Result>)
+            results.addAll(resultToMerge.results as List<Result<?>>)
         } else {
             results << resultToMerge
         }
@@ -77,15 +77,15 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     /**
      * returns the successful results
      */
-    List<Result> getOkResults(){
-        results.findAll{ it.ok } as List<Result>
+    List<Result<?>> getOkResults(){
+        results.findAll{ it.ok } as List<Result<?>>
     }
 
     //Add these temporarily to be compatible with old Results
     List<IProblem> getFailed(){
         getProblems()
     }
-    List<Result> getSuccess(){
+    List<Result<?>> getSuccess(){
         getOkResults()
     }
 

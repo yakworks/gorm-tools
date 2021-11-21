@@ -2,7 +2,7 @@ package yakworks.problem;
 
 import yakworks.i18n.MsgKey;
 
-public final class EmptyProblem implements IProblem {
+public final class EmptyProblem implements IProblem<EmptyProblem> {
 
     @Override
     public MsgKey getMsg() {

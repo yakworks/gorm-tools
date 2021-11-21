@@ -6,8 +6,6 @@ package yakworks.problem.data
 
 import groovy.transform.CompileStatic
 
-import yakworks.api.ApiStatus
-import yakworks.api.HttpStatus
 import yakworks.problem.exception.NestedProblemException
 
 /**

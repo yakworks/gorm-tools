@@ -38,11 +38,11 @@ class ProblemHandler {
 
     @Autowired ICUMessageSource messageSource
 
-    ProblemTrait handleException(Throwable e) {
+    ProblemTrait<?> handleException(Throwable e) {
         handleException("Entity", e)
     }
 
-    ProblemTrait handleException(Class entityClass, Throwable e) {
+    ProblemTrait<?> handleException(Class entityClass, Throwable e) {
         handleException(entityClass.simpleName, e)
     }
 
@@ -56,7 +56,7 @@ class ProblemHandler {
      * @param Exception e
      * @return ApiError
      */
-    ProblemTrait handleException(String entityName, Throwable e) {
+    ProblemTrait<?> handleException(String entityName, Throwable e) {
         // default error status code is 422
         ApiStatus status400 = HttpStatus.BAD_REQUEST
         ApiStatus status404 = HttpStatus.NOT_FOUND

@@ -21,7 +21,7 @@ import yakworks.i18n.MsgKeyDecorator;
  * @author Joshua Burnett (@basejump)
  * @since 7.0.8
  */
-public interface Result extends MsgKeyDecorator {
+public interface Result<E extends Result> extends MsgKeyDecorator {
 
     default String getDefaultCode() {
         return null;
@@ -72,6 +72,18 @@ public interface Result extends MsgKeyDecorator {
      * get the value of the payload, keeps api similiar to Optional.
      */
     default Object get(){ return getPayload(); }
+
+    //FLUENT methods
+    default E title(String v) { setTitle(v);  return (E)this; }
+    default E status(ApiStatus v) { setStatus(v); return (E)this; }
+    default E status(Integer v) { setStatus(HttpStatus.valueOf(v)); return (E)this; }
+    default E payload(Object v) { setPayload(v); return (E)this; }
+    //aliases to payload
+    default E value(Object v) { return payload(v); }
+
+    default E msg(MsgKey v){ setMsg(v); return (E)this; }
+    default E msg(String v) { return msg(MsgKey.ofCode(v));}
+    default E msg(String v, Object args) { return msg(MsgKey.of(v, args));}
 
     //STATIC HELPERS
 

@@ -16,7 +16,7 @@ import yakworks.problem.IProblem;
  * @see IProblem
  * @see ProblemException
  */
-public interface Exceptional extends IProblem {
+public interface Exceptional {
 
     // Exceptional getCause();
 

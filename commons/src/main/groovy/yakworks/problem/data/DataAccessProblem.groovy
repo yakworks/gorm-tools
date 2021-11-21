@@ -6,26 +6,27 @@ package yakworks.problem.data
 
 import groovy.transform.CompileStatic
 
+import yakworks.problem.exception.NestedProblemException
+
 /**
  * generic problem
  */
 @CompileStatic
-class DataAccessProblem extends AbstractDataAccessProblem<DataAccessProblem> {
-    public static String DEFAULT_CODE = 'error.dataAccessException'
-    String defaultCode = DEFAULT_CODE
+class DataAccessProblem extends NestedProblemException implements DataProblemTrait<DataAccessProblem>  {
+    String defaultCode = 'error.dataAccess'
 
-    protected DataAccessProblem() {
-        super(DEFAULT_CODE)
+    DataAccessProblem() {
+        super()
     }
 
-    protected DataAccessProblem(Throwable cause) {
-        super(DEFAULT_CODE, cause)
+    DataAccessProblem(Throwable cause) {
+        super(cause)
     }
-
-    static DataAccessProblem of(final Throwable cause) {
-        def dap = new DataAccessProblem(cause)
-        dap.detail(dap.rootCause.message)
-    }
+    //
+    // static DataAccessProblem cause(final Throwable cause) {
+    //     def dap = new DataAccessProblem(cause)
+    //     dap.detail(dap.rootCause.message)
+    // }
 
     //Override it for performance improvement, because filling in the stack trace is quit expensive
     // @SuppressWarnings(['SynchronizedMethod'])

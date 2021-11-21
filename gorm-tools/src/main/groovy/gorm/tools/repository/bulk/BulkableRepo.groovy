@@ -23,10 +23,9 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
-import yakworks.api.OkResult
 import yakworks.api.Result
 import yakworks.commons.map.Maps
-import yakworks.problem.Problem
+import yakworks.problem.ProblemTrait
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -149,7 +148,7 @@ trait BulkableRepo<D> {
                 itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                results << OkResult.of(isCreate ? 201 : 200).payload(entityInstance)
+                results << Result.of(entityInstance).status(isCreate ? 201 : 200)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
@@ -194,7 +193,7 @@ trait BulkableRepo<D> {
         for (Result r : results) {
             def map = [ok: r.ok, status: r.status.code] as Map<String, Object>
             //do the failed
-            if (r instanceof Problem) {
+            if (r instanceof ProblemTrait) {
                 map.putAll([
                     data: r.payload,
                     title: r.title,

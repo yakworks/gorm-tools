@@ -3,6 +3,8 @@ package yakworks.problem;
 import org.junit.jupiter.api.Test;
 import yakworks.api.ApiStatus;
 import yakworks.i18n.MsgKey;
+import yakworks.problem.exception.Exceptional;
+import yakworks.problem.exception.ProblemException;
 
 import java.net.URI;
 
@@ -22,7 +24,7 @@ class EnforceCoverageTest {
 
         @Override
         public MsgKey getMsg() {
-            return MsgKey.of("foo.bar");
+            return MsgKey.ofCode("foo.bar");
         }
 
         @Override

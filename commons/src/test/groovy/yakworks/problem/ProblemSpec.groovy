@@ -5,6 +5,9 @@
 package yakworks.problem
 
 import spock.lang.Specification
+import spock.lang.Unroll
+import yakworks.i18n.MsgKey
+import yakworks.problem.exception.ThrowableProblem
 
 import static yakworks.api.HttpStatus.NOT_FOUND
 
@@ -24,33 +27,43 @@ class ProblemSpec extends Specification {
         then:
         !p.ok
         p.toString()
-        p.message == 'code=error.data.empty'
         p.code == 'error.data.empty'
         p.args.asMap().name == 'foo'
     }
 
+    @Unroll
+    void "init with code statics #code"(Problem problem, String code) {
+        expect:
+        problem instanceof Problem
+        problem.code == code
+
+        where:
+        problem                               | code
+        Problem.of('code.args', [name: 'foo'])      | 'code.args'
+        Problem.ofCode('ofCode')  | 'ofCode'
+        Problem.ofMsg(MsgKey.ofCode('withMsg')) | 'withMsg'
+
+    }
+
     void shouldRenderCustomDetailAndInstance() {
         when:
-        final ProblemException p = Problem.create()
+        final ThrowableProblem p = ThrowableProblem.of(NOT_FOUND)
             .type(URI.create("https://example.org/problem"))
-            .status(NOT_FOUND)
             .detail("Order 123")
-            .instance(URI.create("https://example.org/"))
 
         then:
         p.type.toString() == "https://example.org/problem"
         // p.title == "Not Found"
         p.status == NOT_FOUND
         p.detail == "Order 123"
-        p.instance as String == "https://example.org/"
 
     }
 
     void shouldRenderCustomPropertiesWhenPrintingStackTrace() {
         when:
-        final ProblemException problem = Problem.create()
-            .type(URI.create("https://example.org/problem"))
-            .status(NOT_FOUND)
+        final ThrowableProblem problem = ThrowableProblem.of(NOT_FOUND)
+            .type(URI.create("https://example.org/problem"));
+
 
         final StringWriter writer = new StringWriter()
         problem.printStackTrace(new PrintWriter(writer))

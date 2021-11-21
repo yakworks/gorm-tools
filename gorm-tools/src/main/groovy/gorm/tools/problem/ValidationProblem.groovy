@@ -12,7 +12,8 @@ import org.springframework.validation.ObjectError
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.i18n.MsgKey
-import yakworks.problem.data.AbstractDataAccessProblem
+import yakworks.problem.data.DataProblemTrait
+import yakworks.problem.exception.NestedProblemException
 
 /**
  * an extension of the default ValidationException so you can pass the entity and the message source
@@ -21,7 +22,9 @@ import yakworks.problem.data.AbstractDataAccessProblem
  * @since 6.1
  */
 @CompileStatic
-class ValidationProblem extends AbstractDataAccessProblem<ValidationProblem> {
+class ValidationProblem extends NestedProblemException
+    implements DataProblemTrait<ValidationProblem> {
+
     public static String DEFAULT_CODE ='validation.problem'
     public static String DEFAULT_TITLE ='Validation Error(s)'
 
@@ -33,7 +36,7 @@ class ValidationProblem extends AbstractDataAccessProblem<ValidationProblem> {
     ApiStatus status = HttpStatus.UNPROCESSABLE_ENTITY
 
     ValidationProblem() {
-        super('')
+        super()
     }
 
     ValidationProblem(String message) {
@@ -42,16 +45,9 @@ class ValidationProblem extends AbstractDataAccessProblem<ValidationProblem> {
     }
 
     ValidationProblem(Throwable cause) {
-        super('', cause)
+        super(cause)
         detail(cause.message)
     }
-
-
-    // EntityValidationProblem(final EntityValidationProblem cause) {
-    //     super(DEFAULT_CODE, cause)
-    //     final Collection<StackTraceElement> stackTrace = COMPOUND.process(asList(getStackTrace()))
-    //     setStackTrace(stackTrace as StackTraceElement[])
-    // }
 
     ValidationProblem errors(Errors v) {this.errors = v; return this;}
 
@@ -61,7 +57,7 @@ class ValidationProblem extends AbstractDataAccessProblem<ValidationProblem> {
     }
 
     //Legacy from ValidationException
-    public static String formatErrors(Errors errors, String msg ) {
+    static String formatErrors(Errors errors, String msg ) {
         String ls = System.getProperty("line.separator");
         StringBuilder b = new StringBuilder();
         if (msg != null) {
@@ -77,15 +73,7 @@ class ValidationProblem extends AbstractDataAccessProblem<ValidationProblem> {
         return b.toString();
     }
 
-    static ValidationProblem of(MsgKey msg) {
-        return new ValidationProblem().msg(msg)
-    }
-
-    static ValidationProblem of(final Throwable cause) {
-        return new ValidationProblem(cause);
-    }
-
     static ValidationProblem of(Object entity, Throwable cause) {
-        return ValidationProblem.of(cause).entity(entity);
+        return ValidationProblem.cause(cause).entity(entity);
     }
 }

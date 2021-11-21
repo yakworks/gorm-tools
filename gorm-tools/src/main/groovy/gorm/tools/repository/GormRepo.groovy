@@ -14,6 +14,8 @@ import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
+import org.grails.orm.hibernate.GrailsHibernateTemplate
+import org.grails.orm.hibernate.HibernateSession
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
@@ -30,6 +32,7 @@ import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.transaction.TrxService
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
 import yakworks.problem.data.EntityNotFoundProblem
@@ -396,10 +399,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     /** flush on the datastore's currentSession.*/
     void flush(){
-        // only calls flush if we are actively in a trx
-        if(TransactionSynchronizationManager.isSynchronizationActive()) {
-            getDatastore().currentSession.flush()
-        }
+        TrxService.flush(getDatastore())
     }
 
     /** cache clear on the datastore's currentSession.*/

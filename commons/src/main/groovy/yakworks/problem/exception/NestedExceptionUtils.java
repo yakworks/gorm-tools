@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package yakworks.problem;
+package yakworks.problem.exception;
 
 import javax.annotation.Nullable;
 

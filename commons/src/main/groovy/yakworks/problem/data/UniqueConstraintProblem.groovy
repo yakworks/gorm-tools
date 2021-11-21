@@ -8,31 +8,23 @@ import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
+import yakworks.problem.exception.NestedProblemException
 
 /**
  * generic problem
  */
 @CompileStatic
-class UniqueConstraintProblem extends AbstractDataAccessProblem<UniqueConstraintProblem> {
-    public static String DEFAULT_CODE = 'error.uniqueConstraintViolation'
-    String defaultCode = DEFAULT_CODE
-    ApiStatus status = HttpStatus.BAD_REQUEST
+class UniqueConstraintProblem extends NestedProblemException
+    implements DataProblemTrait<UniqueConstraintProblem>  {
 
-    protected UniqueConstraintProblem() {
-        super(DEFAULT_CODE)
+    String defaultCode = 'error.uniqueConstraintViolation'
+
+    UniqueConstraintProblem() {
+        super()
     }
 
-    protected UniqueConstraintProblem(Throwable cause) {
-        super(DEFAULT_CODE, cause)
+    UniqueConstraintProblem(Throwable cause) {
+        super(cause)
     }
 
-    static UniqueConstraintProblem of(final Throwable cause) {
-        def dap = new UniqueConstraintProblem(cause)
-        dap.detail(dap.rootCause.message)
-    }
-
-    //Override it for performance improvement, because filling in the stack trace is quit expensive
-    // @SuppressWarnings(['SynchronizedMethod'])
-    // @Override
-    // synchronized Throwable fillInStackTrace() { return this }
 }

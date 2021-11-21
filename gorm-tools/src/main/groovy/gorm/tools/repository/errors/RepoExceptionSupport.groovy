@@ -10,7 +10,7 @@ import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 
 import gorm.tools.problem.ValidationProblem
-import yakworks.problem.Problem
+import yakworks.problem.ProblemTrait
 import yakworks.problem.data.DataAccessProblem
 import yakworks.problem.data.UniqueConstraintProblem
 
@@ -41,7 +41,7 @@ class RepoExceptionSupport {
          * thus checks for these exceptions also cover EntityValidationException case.
          */
         //if its an instance of Problem then we dont need to transalate
-        if (ex instanceof Problem || ex instanceof ValidationProblem) {
+        if (ex instanceof ProblemTrait ) {
             return ex
         }
         else if (ex instanceof grails.validation.ValidationException) {
@@ -60,9 +60,9 @@ class RepoExceptionSupport {
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
             if(isUniqueIndexViolation(ex)){
-                return UniqueConstraintProblem.of(ex).entity(entity)
+                return UniqueConstraintProblem.cause(ex).entity(entity)
             } else {
-                return DataAccessProblem.of(ex).entity(entity)
+                return DataAccessProblem.cause(ex).entity(entity)
             }
         }
         return ex

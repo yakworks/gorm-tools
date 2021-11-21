@@ -42,13 +42,13 @@ class ContactRepo implements GormRepo<Contact> {
         AppUser user = contact.user
         String stamp = "Contact: ${contact.name}, id: ${contact.id}"
         if (user) {
-            throw ReferenceKeyProblem.ofStamp(stamp).reference('User')
+            throw ReferenceKeyProblem.withStamp(stamp).reference('User')
         }
         if (Org.query(contact: contact).count()) {
-            throw ReferenceKeyProblem.ofStamp(stamp).reference('Org primary contact')
+            throw ReferenceKeyProblem.withStamp(stamp).reference('Org primary contact')
         }
         if (ActivityContact.repo.count(contact)) {
-            throw ReferenceKeyProblem.ofStamp(stamp).reference('ActivityContact')
+            throw ReferenceKeyProblem.withStamp(stamp).reference('ActivityContact')
         }
 
         //remove

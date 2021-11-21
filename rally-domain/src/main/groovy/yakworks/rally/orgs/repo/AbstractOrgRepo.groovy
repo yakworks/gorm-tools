@@ -96,8 +96,8 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     @RepoListener
     void beforeRemove(Org org, BeforeRemoveEvent e) {
         if (org.source?.sourceType == SourceType.ERP) { //might be more in future
-            def msgKey = MsgKey.of("error.delete.externalSource", [name: "Org: ${org.name}, source:${SourceType.ERP}"])
-            throw ValidationProblem.of(msgKey).entity(org)
+            def args = [name: "Org: ${org.name}, source:${SourceType.ERP}"]
+            throw ValidationProblem.of("error.delete.externalSource", args).entity(org)
         }
         //remove tags
         orgTagRepo.remove(org)

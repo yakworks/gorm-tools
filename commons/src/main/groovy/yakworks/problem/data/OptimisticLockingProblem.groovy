@@ -6,21 +6,19 @@ package yakworks.problem.data
 
 import groovy.transform.CompileStatic
 
+import yakworks.problem.exception.NestedProblemException
+
 /**
  * Throwable Exception Problem
  */
 @CompileStatic
-class OptimisticLockingProblem extends AbstractDataAccessProblem<OptimisticLockingProblem> {
-    public static String DEFAULT_CODE = 'error.optimisticLocking'
-    String defaultCode = DEFAULT_CODE
+class OptimisticLockingProblem extends NestedProblemException
+    implements DataProblemTrait<OptimisticLockingProblem> {
 
-    protected OptimisticLockingProblem() {
-        super(null);
-    }
+    String defaultCode = 'error.optimisticLocking'
 
-    static OptimisticLockingProblem of(Object entity) {
-        def opProb = new OptimisticLockingProblem()
-        opProb.entity(entity)
+    OptimisticLockingProblem(Throwable cause) {
+        super(cause)
     }
 
 }

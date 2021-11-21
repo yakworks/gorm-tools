@@ -23,7 +23,7 @@ class EntityValidationProblemSpec extends Specification {
     void "test cause"() {
         when:
         def rte = new RuntimeException("bad stuff")
-        def e = ValidationProblem.of(rte)
+        def e = ValidationProblem.cause(rte)
 
         then:
         e.title == ValidationProblem.DEFAULT_TITLE
@@ -32,16 +32,16 @@ class EntityValidationProblemSpec extends Specification {
 
     void "test msgKey and entity"() {
         when:
-        def msgKey = MsgKey.of('password.mismatch').fallbackMessage("The passwords you entered do not match")
-
         def cust = new Cust()
-        def e =  ValidationProblem.of(msgKey).entity(cust)
+        def e =  ValidationProblem.ofCode('password.mismatch')
+            .detail("The passwords you entered do not match")
+            .entity(cust)
 
         then:
         e.code == 'password.mismatch'
         e.msg.args.asMap() == [name: 'Cust']
         e.title == ValidationProblem.DEFAULT_TITLE
-        e.message == 'Validation Error(s): code=password.mismatch'
+        e.message.contains("The passwords you entered")
     }
 
     void "entity and cause"() {

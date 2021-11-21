@@ -6,7 +6,7 @@ package yakworks.api
 
 import groovy.transform.CompileStatic
 
-import yakworks.problem.Problem
+import yakworks.problem.IProblem
 
 /**
  * A Parent Result that has a list of Result(s).
@@ -32,9 +32,15 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
         results = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
     }
 
+    // ** BUILDERS STATIC OVERRIDES **
     static ApiResults create(boolean isSynchronized = true){ new ApiResults(isSynchronized) }
     static ApiResults OK(){ new ApiResults() }
-
+    static ApiResults of(String code, Object args) {
+        return new ApiResults().msg(code, args)
+    }
+    static ApiResults of(Object payload) {
+        return new ApiResults().payload(payload);
+    }
 
     @Override //changes default list delegate so we can add ok
     boolean add(Result result){
@@ -59,12 +65,12 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     /**
      * returns the problems
      */
-    List<Problem> getProblems(){
+    List<IProblem> getProblems(){
         //only look if this is not ok as it should never have problems if ok=true
         if(this.ok){
-            [] as List<Problem>
+            [] as List<IProblem>
         } else {
-            results.findAll{ it instanceof Problem } as List<Problem>
+            results.findAll{ it instanceof IProblem } as List<IProblem>
         }
     }
 
@@ -76,7 +82,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     }
 
     //Add these temporarily to be compatible with old Results
-    List<Problem> getFailed(){
+    List<IProblem> getFailed(){
         getProblems()
     }
     List<Result> getSuccess(){

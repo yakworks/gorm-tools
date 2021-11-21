@@ -1,7 +1,7 @@
 package gorm.tools.security
 
 import gorm.tools.security.domain.AppUser
-import yakworks.problem.Problem
+import yakworks.problem.IProblem
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
@@ -19,7 +19,7 @@ class PasswordValidatorSpec extends Specification implements  DataRepoTest, Secu
 
         when: "password length"
         validator.passwordMinLength = 4
-        Problem problem = validator.validate(AppUser.get(1), "123", "123")
+        IProblem problem = validator.validate(AppUser.get(1), "123", "123")
 
         then:
         problem.violations.find{ it.code == "security.validation.password.minlength" }

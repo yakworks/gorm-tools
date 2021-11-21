@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
+import yakworks.problem.exception.NestedProblemException
 
 /**
  * fillInStackTrace is overriden to show nothing
@@ -17,7 +18,9 @@ import yakworks.api.HttpStatus
  * @since 6.1
  */
 @CompileStatic
-class EntityNotFoundProblem extends AbstractDataAccessProblem<EntityNotFoundProblem> {
+class EntityNotFoundProblem extends NestedProblemException
+    implements DataProblemTrait<EntityNotFoundProblem>  {
+
     String defaultCode = 'error.notFound'
     ApiStatus status = HttpStatus.NOT_FOUND
 
@@ -27,7 +30,7 @@ class EntityNotFoundProblem extends AbstractDataAccessProblem<EntityNotFoundProb
     // the name of the entity that was being looked up
     String name
 
-    protected EntityNotFoundProblem() {
+    EntityNotFoundProblem() {
         super('error.notFound')
     }
 

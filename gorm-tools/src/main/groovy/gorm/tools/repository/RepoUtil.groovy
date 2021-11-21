@@ -15,10 +15,10 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import yakworks.problem.Problem
-import yakworks.problem.ProblemException
+import yakworks.problem.data.DataAccessProblem
 import yakworks.problem.data.EntityNotFoundProblem
 import yakworks.problem.data.OptimisticLockingProblem
+import yakworks.problem.exception.ProblemException
 
 /**
  * A bunch of statics to support the repositories.
@@ -80,7 +80,7 @@ class RepoUtil {
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {
-            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
+            throw DataAccessProblem.of('error.data.empty', [name: entityClass.simpleName])
         }
     }
 
@@ -89,7 +89,7 @@ class RepoUtil {
      */
     static void checkCreateData(Map data, Map args, Class entityClass) {
         if(data['id'] && !args.bindId)
-            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
+            throw DataAccessProblem.of('error.data.empty', [name: entityClass.simpleName])
     }
 
     /**

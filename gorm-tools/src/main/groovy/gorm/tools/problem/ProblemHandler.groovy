@@ -81,31 +81,32 @@ class ProblemHandler {
             return buildFromErrorException(entityName, e)
         }
         else if (e instanceof MsgSourceResolvable) { //legacy
-            return Problem.of(status400).msg(e.code).detail(getMsg(e))
+            return Problem.ofCode(e.code).status(status400).detail(getMsg(e))
         }
         else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return Problem.of(status400).msg('error.illegalArgument').detail(e.message)
+            return Problem.ofCode('error.illegalArgument').status(status400).detail(e.message)
         }
         else if (e instanceof DataAccessException) {
             //Not all will get translated in the repo as some get thrown after flush
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
             // Root of the hierarchy of data access exceptions
             if(isUniqueIndexViolation((DataAccessException)e)){
-                return UniqueConstraintProblem.of(e)
+                return UniqueConstraintProblem.cause(e)
             } else {
-                return DataAccessProblem.of(e)
+                return DataAccessProblem.cause(e)
             }
         }
         else {
             log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return Problem.of(HttpStatus.INTERNAL_SERVER_ERROR).msg('error.unhandled').detail(e.message)
+            return Problem.ofCode('error.unhandled')
+                .status(HttpStatus.INTERNAL_SERVER_ERROR).detail(e.message)
         }
     }
 
     ValidationProblem buildFromErrorException(String entityName, Throwable valEx){
         Errors ers = valEx['errors'] as Errors
-        def valProb = ValidationProblem.of(valEx).name(entityName).errors(ers)
+        def valProb = ValidationProblem.cause(valEx).name(entityName).errors(ers)
         return valProb.violations(transateErrorsToViolations(ers))
     }
 

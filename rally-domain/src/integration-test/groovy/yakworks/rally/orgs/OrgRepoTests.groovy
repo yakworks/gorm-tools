@@ -3,6 +3,8 @@ package yakworks.rally.orgs
 import java.time.LocalDate
 
 import org.springframework.core.NestedExceptionUtils
+import org.springframework.dao.DataAccessResourceFailureException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.DataRetrievalFailureException
 
 import gorm.tools.problem.ValidationProblem
@@ -11,8 +13,11 @@ import gorm.tools.testing.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.problem.data.OptimisticLockingProblem
+import yakworks.problem.data.UniqueConstraintProblem
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
@@ -100,20 +105,25 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         cust.tags[0].code == 'foo'
     }
 
-    def "test create duplicate fail"() {
+    @IgnoreRest
+    void "test create duplicate fail"() {
         when:
         def params = MockData.createOrg
         params.num = '99' //should already exist in test db
+        //flush during create so it forces the error catching
+        // def org = orgRepo.create(params.asUnmodifiable(), [flush: true])
         def org = orgRepo.create(params.asUnmodifiable())
+        // def org = orgRepo.create(params.asUnmodifiable())
         orgRepo.flush()
 
         then:
-        RuntimeException ge = thrown()
-        def rootCause = NestedExceptionUtils.getRootCause(ge)
-        rootCause.message.contains("Unique index or primary key violation") || //mysql and H2
-            rootCause.message.contains("Duplicate entry") || //mysql
-            rootCause.message.contains("Violation of UNIQUE KEY constraint") || //sql server
-            rootCause.message.contains("duplicate key value violates unique constraint") //postgres
+        thrown DataIntegrityViolationException
+        // UniqueConstraintProblem ge = thrown()
+        // def rootCause = NestedExceptionUtils.getRootCause(ge)
+        // ge.detail.contains("Unique index or primary key violation") || //mysql and H2
+        //     ge.detail.contains("Duplicate entry") || //mysql
+        //     ge.detail.contains("Violation of UNIQUE KEY constraint") || //sql server
+        //     ge.detail.contains("duplicate key value violates unique constraint") //postgres
 
     }
 

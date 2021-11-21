@@ -8,17 +8,17 @@ package yakworks.problem.data
 import groovy.transform.CompileStatic
 
 import yakworks.i18n.MsgKey
+import yakworks.problem.exception.NestedProblemException
 
 /**
  * Throwable Exception Problem
  */
 @CompileStatic
-class ReferenceKeyProblem extends AbstractDataAccessProblem<ReferenceKeyProblem> {
-    public static String DEFAULT_CODE = 'error.reference.key'
-    String defaultCode = DEFAULT_CODE
+class ReferenceKeyProblem extends NestedProblemException implements DataProblemTrait<ReferenceKeyProblem>  {
+    String defaultCode = 'error.reference.key'
 
-    protected ReferenceKeyProblem() {
-        super(null);
+    ReferenceKeyProblem() {
+        super();
     }
 
     ReferenceKeyProblem reference(String otherName) {
@@ -27,15 +27,10 @@ class ReferenceKeyProblem extends AbstractDataAccessProblem<ReferenceKeyProblem>
     }
 
     //pass in an entity desc instead
-    static ReferenceKeyProblem ofStamp(String entityDesc) {
+    static ReferenceKeyProblem withStamp(String entityDesc) {
         def opProb = new ReferenceKeyProblem()
-        opProb.msg = MsgKey.of(DEFAULT_CODE, [stamp: entityDesc])
+        opProb.msg = MsgKey.of(opProb.defaultCode, [stamp: entityDesc])
         return opProb;
-    }
-
-    static ReferenceKeyProblem of(Object entity) {
-        def opProb = new ReferenceKeyProblem()
-        return opProb.entity(entity);
     }
 
 }

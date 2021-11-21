@@ -1,6 +1,7 @@
 package yakworks.problem;
 
 import yakworks.api.ApiStatus;
+import yakworks.problem.exception.ProblemException;
 
 import java.net.URI;
 

@@ -17,7 +17,7 @@ import grails.util.GrailsNameUtils
 import grails.web.api.ServletAttributes
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
-import yakworks.problem.Problem
+import yakworks.problem.ProblemTrait
 
 /**
  * Marker trait with common helpers for a Restfull api type controller.
@@ -63,7 +63,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
     }
 
     void handleException(Exception e) {
-        Problem apiError = problemHandler.handleException(e)
+        ProblemTrait apiError = problemHandler.handleException(e)
         respond(apiError)
     }
 

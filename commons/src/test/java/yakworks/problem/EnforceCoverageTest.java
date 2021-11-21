@@ -20,7 +20,7 @@ class EnforceCoverageTest {
         });
     }
 
-    static final class FakeProblem extends Exception implements IProblem<FakeProblem>, Exceptional {
+    static final class FakeProblem extends Exception implements IProblem.Fluent<FakeProblem>, Exceptional {
 
         @Override
         public MsgKey getMsg() {

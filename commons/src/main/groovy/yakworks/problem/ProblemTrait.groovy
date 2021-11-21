@@ -18,9 +18,9 @@ import yakworks.i18n.MsgKey
  * @since 7.0.8
  */
 @CompileStatic
-trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IProblem<E> {
+trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IProblem.Fluent<E> {
     // result overrides
-    Boolean getOk(){ false }
+    Boolean getOk(){ false } //always false
     ApiStatus status = HttpStatus.BAD_REQUEST
 
     //this should be rendered to json if type is null

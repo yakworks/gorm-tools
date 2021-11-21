@@ -36,6 +36,7 @@ subprojects { subprj ->
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     mavenCentral()
+    maven { url "http://repo.9ci.com/public-libs" }
     maven { url "http://repo.9ci.com/oss-snapshots" }
   }
   // get prop with default if null, converts to boolean

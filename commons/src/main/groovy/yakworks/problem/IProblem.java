@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @see <a href="https://tools.ietf.org/html/rfc7807">RFC 7807: Problem Details for HTTP APIs</a>
  */
-public interface IProblem<E extends IProblem> extends Result<E> {
+public interface IProblem extends Result {
 
     @Override default Boolean getOk() { return false; }
 
@@ -61,10 +61,12 @@ public interface IProblem<E extends IProblem> extends Result<E> {
     // @Nullable
     // default URI getInstance() { return null; }
 
-    //FLUENT setters
-    default E detail(String v) { setDetail(v);  return (E)this; }
-    default E type(URI v) { setType(v); return (E)this; }
-    default E type(String v) { setType(URI.create(v)); return (E)this; }
-    default E violations(List<Violation> v) { setViolations(v); return (E)this; }
+    interface Fluent<E extends Fluent> extends IProblem, Result.Fluent<E> {
+        //Problem builders
+        default E detail(String v) { setDetail(v);  return (E)this; }
+        default E type(URI v) { setType(v); return (E)this; }
+        default E type(String v) { setType(URI.create(v)); return (E)this; }
+        default E violations(List<Violation> v) { setViolations(v); return (E)this; }
 
+    }
 }

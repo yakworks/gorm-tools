@@ -15,7 +15,7 @@ import yakworks.i18n.MsgKey
  * @since 1
  */
 @CompileStatic
-trait ResultTrait<E extends Result> implements Result<E> {
+trait ResultTrait<E extends Result.Fluent> implements Result.Fluent<E> {
     String defaultCode //= 'result.ok'
     Boolean ok = true
     ApiStatus status = HttpStatus.OK

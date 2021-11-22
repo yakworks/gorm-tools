@@ -21,10 +21,6 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     //internal rep
     @Delegate List<Result> results
 
-    //override so payload is the list of results
-    @Override Object getPayload() { return results; }
-    @Override void setPayload(Object v){ }
-
     /**
      * New result
      * @param isSynchronized defaults to true to create the data list as synchronizedList
@@ -43,11 +39,18 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
         return new ApiResults().payload(payload);
     }
 
+    ApiResults ok(boolean v){
+        ok = v
+        return this
+    }
+
+
     @Override //changes default list delegate so we can add ok
     boolean add(Result result){
         if(!result.ok) ok = false
         results << result
     }
+
 
     /**
      * if resultToMerge is ApiResults then add all from its resultList
@@ -64,14 +67,15 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     }
 
     /**
-     * returns the problems
+     * returns the problems or results.ok=false as could contain other container apiResults
+     * that are not problems but apiResults with problems
      */
-    List<ProblemTrait> getProblems(){
+    List<Result> getProblems(){
         //only look if this is not ok as it should never have problems if ok=true
         if(this.ok){
-            [] as List<ProblemTrait>
+            [] as List<Result>
         } else {
-            results.findAll{ it instanceof IProblem } as List<ProblemTrait>
+            results.findAll{ !it.ok } as List<Result>
         }
     }
 
@@ -83,7 +87,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     }
 
     //Add these temporarily to be compatible with old Results
-    List<ProblemTrait> getFailed(){
+    List<Result> getFailed(){
         getProblems()
     }
     List<Result> getSuccess(){

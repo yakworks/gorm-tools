@@ -40,12 +40,8 @@ class ProblemHandler {
 
     @Autowired ICUMessageSource messageSource
 
-    ProblemTrait<?> handleException(Throwable e) {
-        handleException("Entity", e)
-    }
-
     ProblemTrait<?> handleException(Class entityClass, Throwable e) {
-        handleException(entityClass.simpleName, e)
+        handleException(e, entityClass.simpleName)
     }
 
     /**
@@ -55,11 +51,11 @@ class ProblemHandler {
      * - Problem(status:404) for NotFoundException
      * - Problem(status:500) for other exceptions
      *
-     * @param entityName domain class
+     * @param simpleName used for validation conversion
      * @param Exception e
      * @return ApiError
      */
-    ProblemTrait<?> handleException(String entityName, Throwable e) {
+    ProblemTrait<?> handleException(Throwable e, String simpleName = null) {
         // default error status code is 422
         ApiStatus status400 = HttpStatus.BAD_REQUEST
         ApiStatus status404 = HttpStatus.NOT_FOUND
@@ -78,7 +74,7 @@ class ProblemHandler {
         else if (e instanceof ProblemException) { return (ProblemTrait) e.problem }
         else if (e instanceof grails.validation.ValidationException
             || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
-            return buildFromErrorException(entityName, e)
+            return buildFromErrorException(e, simpleName)
         } else if (e instanceof MsgSourceResolvable) {
             //legacy
             return Problem.ofCode(e.code).status(status400).detail(getMsg(e))
@@ -104,9 +100,10 @@ class ProblemHandler {
         return UnexpectedProblem.ofCause(e).detail(e.message)
     }
 
-    ValidationProblem buildFromErrorException(String entityName, Throwable valEx) {
+    ValidationProblem buildFromErrorException(Throwable valEx, String entityName = null) {
         Errors ers = valEx['errors'] as Errors
-        def valProb = ValidationProblem.ofCause(valEx).name(entityName).errors(ers)
+        def valProb = ValidationProblem.ofCause(valEx).errors(ers)
+        if(entityName) valProb.name(entityName)
         return valProb.violations(transateErrorsToViolations(ers))
     }
 

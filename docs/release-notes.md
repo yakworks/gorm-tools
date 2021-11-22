@@ -1,3 +1,10 @@
+### v7.0.8-v.41
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.40...v7.0.8-v.41)
+- release [link](https://github.com/yakworks/gorm-tools/commit/1b77ce7a068e174a11e2c68a978f1d094a675947)
+- problem move (#404) [link](https://github.com/yakworks/gorm-tools/commit/0c7332cb42bd7f7940d5c256b9174be98cdee63c)
+- results and problem api with new ICU messageSource (#403) [link](https://github.com/yakworks/gorm-tools/commit/885eff8ab12f20e55dabc05f3bd4661c557f1a45)
+
 ### v7.0.8-v.40
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.39...v7.0.8-v.40)

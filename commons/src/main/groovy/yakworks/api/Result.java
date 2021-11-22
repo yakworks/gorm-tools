@@ -54,6 +54,11 @@ public interface Result extends MsgKeyDecorator {
     default void setPayload(Object v){}
 
     /**
+     * alias to payload
+     */
+    default Object getValue(){ return getPayload(); }
+
+    /**
      * Optional the return value or entity. Kind of like the value that Optional wraps.
      * internal in that its transient so it wont get serialized, can be used as the source to generate the data.
      */

@@ -22,6 +22,7 @@ import yakworks.i18n.icu.ICUMessageSource
 import yakworks.problem.Problem
 import yakworks.problem.ProblemException
 import yakworks.problem.ProblemTrait
+import yakworks.problem.UnexpectedProblem
 import yakworks.problem.Violation
 import yakworks.problem.ViolationFieldError
 import yakworks.problem.data.DataProblem
@@ -94,10 +95,13 @@ class ProblemHandler {
                 return DataProblem.ofCause(e)
             }
         } else {
-            log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return Problem.ofCode('error.unhandled')
-                .status(HttpStatus.INTERNAL_SERVER_ERROR).detail(e.message)
+            return handleUnexpected(e)
         }
+    }
+
+    ProblemTrait<?> handleUnexpected(Throwable e){
+        log.error("UNEXPECTED Internal Server Error ${e.message}", e)
+        return UnexpectedProblem.ofCause(e).detail(e.message)
     }
 
     ValidationProblem buildFromErrorException(String entityName, Throwable valEx) {
@@ -156,4 +160,5 @@ class ProblemHandler {
         }
         return b.toString();
     }
+
 }

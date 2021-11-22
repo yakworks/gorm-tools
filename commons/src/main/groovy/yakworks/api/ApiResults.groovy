@@ -7,6 +7,7 @@ package yakworks.api
 import groovy.transform.CompileStatic
 
 import yakworks.problem.IProblem
+import yakworks.problem.ProblemTrait
 
 /**
  * A Parent Result that has a list of Result(s).
@@ -65,12 +66,12 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     /**
      * returns the problems
      */
-    List<IProblem> getProblems(){
+    List<ProblemTrait> getProblems(){
         //only look if this is not ok as it should never have problems if ok=true
         if(this.ok){
-            [] as List<IProblem>
+            [] as List<ProblemTrait>
         } else {
-            results.findAll{ it instanceof IProblem } as List<IProblem>
+            results.findAll{ it instanceof IProblem } as List<ProblemTrait>
         }
     }
 
@@ -82,7 +83,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     }
 
     //Add these temporarily to be compatible with old Results
-    List<IProblem> getFailed(){
+    List<ProblemTrait> getFailed(){
         getProblems()
     }
     List<Result> getSuccess(){

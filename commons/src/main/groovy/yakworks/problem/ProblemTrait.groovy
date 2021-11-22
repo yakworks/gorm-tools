@@ -74,7 +74,7 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
     }
 
     static E of(String code, Object args){
-        return create().msg(MsgKey.of(code, args))
+        return create().msg(code, args)
     }
 
     static E ofMsg(MsgKey mkey){
@@ -93,7 +93,9 @@ trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IPr
         return this.newInstance().detail(detail)
     }
 
-    static E ofCause(Throwable cause) {
-        return (E)this.newInstance([cause: cause])
+    static E ofCause(final Throwable cause) {
+        def dap = this.newInstance([cause: cause])
+        dap.detail(ProblemUtils.getRootCause(cause).message)
     }
+
 }

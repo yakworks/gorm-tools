@@ -20,7 +20,7 @@ import yakworks.i18n.MsgKeyDecorator
  *
  */
 @CompileStatic
-abstract class ProblemException<P extends IProblem> extends RuntimeException implements MsgKeyDecorator{
+abstract class ProblemException<P extends ProblemTrait> extends RuntimeException implements MsgKeyDecorator{
 
     P problem
 
@@ -69,7 +69,7 @@ abstract class ProblemException<P extends IProblem> extends RuntimeException imp
         return this
     }
 
-    static ProblemException of(IProblem prob){
+    static ProblemException of(ProblemTrait prob){
         this.newInstance().problem(prob)
     }
 

@@ -8,7 +8,6 @@ import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.problem.DefaultProblemException
 import yakworks.problem.ProblemException
 
 /**

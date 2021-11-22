@@ -26,6 +26,7 @@ import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.commons.map.Maps
 import yakworks.problem.ProblemTrait
+import yakworks.problem.UnexpectedProblem
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
@@ -78,8 +79,8 @@ trait BulkableRepo<D> {
 
         asyncService.supplyAsync(asyncArgs, supplierFunc)
             .whenComplete { ApiResults results, ex ->
-                if(ex){ //should never really happen
-                    results << problemHandler.handleException(getEntityClass(), ex)
+                if(ex){ //should never really happen as we should have already handled them
+                    results << problemHandler.handleUnexpected(ex)
                 }
                 finishJob(jobId, results, bulkablArgs.includes)
             }
@@ -110,10 +111,9 @@ trait BulkableRepo<D> {
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
                     results.merge doBulk((List<Map>) dataSlice, bulkablArgs, true)
-                } catch(Exception e) {
-                    // just in case, this is an unexpected errors and should not really happen as we should have intercepted them all already in doBulk
-                    log.error(e.message, e)
-                    results << problemHandler.handleException(e)
+                } catch(Exception ex) {
+                    // just in case, unexpected errors as we should have intercepted them all already in doBulk
+                    results << problemHandler.handleUnexpected(ex)
                 }
             }
         }

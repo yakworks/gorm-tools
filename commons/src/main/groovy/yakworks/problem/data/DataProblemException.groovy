@@ -6,7 +6,6 @@ package yakworks.problem.data
 
 import groovy.transform.CompileStatic
 
-import yakworks.problem.DefaultProblemException
 import yakworks.problem.ProblemException
 
 /**
@@ -15,12 +14,8 @@ import yakworks.problem.ProblemException
 @CompileStatic
 class DataProblemException extends ProblemException<DataProblemTrait<?>> {
 
-    // @Delegate DataProblem dataProblem
-    //
-    // IProblem getProblem(){ dataProblem }
-    // void setProblem(IProblem v){ setDataProblem((DataProblem)v) }
-
     DataProblemException() {super()}
     DataProblemException(Throwable cause) {super(cause)}
 
+    Object getEntity(){ problem.getEntity() }
 }

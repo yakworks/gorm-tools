@@ -4,7 +4,6 @@
 */
 package yakworks.problem
 
-import javax.annotation.Nullable
 
 import groovy.transform.CompileStatic
 

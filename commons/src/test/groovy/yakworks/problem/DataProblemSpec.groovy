@@ -34,6 +34,16 @@ class DataProblemSpec extends Specification {
         e.args.asMap().name == 'SomeEntity'
     }
 
+    void "DataProblem ex exception"() {
+        when:
+        DataProblemException e = DataProblem.ex("foo error")
+
+        then:
+        e.message.startsWith "foo error"
+        e instanceof ProblemException
+        e.problem instanceof DataProblem
+    }
+
     static class SomeEntity {
 
     }

@@ -17,11 +17,27 @@ import org.codehaus.groovy.transform.trait.Traits
 @CompileStatic
 class ClassUtils {
 
+    protected static final List BASIC_TYPES = [
+        String, Boolean, Byte, Short, Integer, Long, Float, Double, Character
+    ] as List<Class>
+
     /**
      * Wrapper around InvokerHelper.invokeStaticMethod, here just so we can remember it
      */
     static Object callStaticMethod(Class type, String method, Object arguments) {
         return InvokerHelper.invokeStaticMethod(type, method, arguments)
+    }
+
+    /**
+     * checks if Class is basic type (String, long/Long, boolean/Boolean, etc...)
+     */
+    static boolean isBasicType(Class c) {
+        BASIC_TYPES.contains(c) || c.isPrimitive()
+    }
+
+    static boolean isBasicType(Object o) {
+        if(o == null) return false
+        return isBasicType(o.class)
     }
 
     /**

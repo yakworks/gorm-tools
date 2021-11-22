@@ -4,6 +4,7 @@
 */
 package yakworks.api;
 
+import yakworks.i18n.MsgKey;
 import yakworks.i18n.MsgKeyDecorator;
 
 /**
@@ -53,6 +54,11 @@ public interface Result extends MsgKeyDecorator {
     default void setPayload(Object v){}
 
     /**
+     * alias to payload
+     */
+    default Object getValue(){ return getPayload(); }
+
+    /**
      * Optional the return value or entity. Kind of like the value that Optional wraps.
      * internal in that its transient so it wont get serialized, can be used as the source to generate the data.
      */
@@ -67,12 +73,50 @@ public interface Result extends MsgKeyDecorator {
         return true;
     }
 
+    /**
+     * get the value of the payload, keeps api similiar to Optional.
+     */
+    default Object get(){ return getPayload(); }
+
+    //STATIC HELPERS
+
     static OkResult OK() {
-        return OkResult.get();
+        return new OkResult();
     }
 
-    // static OkResult of(String code) {
-    //     return new OkResult(MsgKey.of(code));
-    // }
+    static OkResult ofCode(String code) {
+        return of(code, null);
+    }
 
+    static OkResult of(String code, Object args) {
+        return new OkResult(MsgKey.of(code, args));
+    }
+
+    /**
+     * java.util.Optional api consitency. Creates a result with the value as the payload
+     */
+    static OkResult of(Object value) {
+        return new OkResult(value);
+    }
+
+
+    interface Fluent<E extends Fluent> extends Result {
+        default E title(String v) { setTitle(v);  return (E)this; }
+        default E status(ApiStatus v) { setStatus(v); return (E)this; }
+        default E status(Integer v) { setStatus(HttpStatus.valueOf(v)); return (E)this; }
+        default E payload(Object v) { setPayload(v); return (E)this; }
+        //aliases to payload
+        default E value(Object v) { return payload(v); }
+
+        default E msg(MsgKey v){ setMsg(v); return (E)this; }
+        default E msg(String v) {
+            if(getMsg() == null){
+                return msg(MsgKey.ofCode(v));
+            } else {
+                getMsg().setCode(v);
+                return (E)this;
+            }
+        }
+        default E msg(String v, Object args) { return msg(MsgKey.of(v, args));}
+    }
 }

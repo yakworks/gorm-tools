@@ -1,11 +1,11 @@
 package yakworks.rally.orgs
 
-
-import yakworks.problem.data.UniqueConstraintProblem
 import gorm.tools.testing.integration.DataIntegrationTest
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
+import yakworks.problem.data.DataProblemException
+import yakworks.problem.data.DataProblemCodes
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.repo.OrgSourceRepo
 
@@ -23,11 +23,13 @@ class OrgSourceRepoTests extends Specification implements DataIntegrationTest {
         //orgSourceRepo.flushAndClear()
 
         then:
-        UniqueConstraintProblem ge = thrown()
-        ge.detail.contains("Unique index or primary key violation") || //mysql and H2
-                ge.detail.contains("Duplicate entry") || //mysql
-                ge.detail.contains("Violation of UNIQUE KEY constraint") || //sql server
-                ge.detail.contains("duplicate key value violates unique constraint") //postgres
+        DataProblemException ge = thrown()
+        def problem = ge.problem
+        problem.code == DataProblemCodes.UniqueConstraint.code
+        problem.detail.contains("Unique index or primary key violation") || //mysql and H2
+            problem.detail.contains("Duplicate entry") || //mysql
+            problem.detail.contains("Violation of UNIQUE KEY constraint") || //sql server
+            problem.detail.contains("duplicate key value violates unique constraint") //postgres
     }
 
     void "testSave success same sourceId on different orgTypes"() {

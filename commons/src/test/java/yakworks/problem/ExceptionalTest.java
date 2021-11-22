@@ -1,6 +1,7 @@
 package yakworks.problem;
 
 import org.junit.jupiter.api.Test;
+import yakworks.problem.exception.Exceptional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;

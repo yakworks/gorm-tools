@@ -13,7 +13,9 @@ class ResultSpec extends Specification {
         when:
         Result okRes = Result.OK().payload([foo:'bar'])
         okRes.payload
+
         then:
+        okRes.ok
         okRes.status.code == 200
         okRes.title('foo').title == 'foo'
         okRes.msg('bar', [key1:'go']).code == 'bar'

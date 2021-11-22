@@ -1,5 +1,5 @@
 package yakworks.problem;
 
-class TestProblem implements Problem {
+class TestProblem implements IProblem {
 
 }

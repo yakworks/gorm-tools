@@ -2,17 +2,18 @@ package yakworks.rally.orgs
 
 import java.time.LocalDate
 
-import org.springframework.core.NestedExceptionUtils
 import org.springframework.dao.DataRetrievalFailureException
 
-import gorm.tools.problem.ValidationProblem
 import gorm.tools.model.SourceType
+import gorm.tools.problem.ValidationProblem
 import gorm.tools.testing.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.problem.data.DataProblemException
+import yakworks.problem.data.DataProblemCodes
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
@@ -100,20 +101,25 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         cust.tags[0].code == 'foo'
     }
 
-    def "test create duplicate fail"() {
+    void "test create duplicate fail"() {
         when:
         def params = MockData.createOrg
         params.num = '99' //should already exist in test db
-        def org = orgRepo.create(params.asUnmodifiable())
-        orgRepo.flush()
+        //flush during create so it forces the error catching
+        def org = orgRepo.create(params.asUnmodifiable(), [flush: true])
+        // orgRepo.flush()
 
         then:
-        RuntimeException ge = thrown()
-        def rootCause = NestedExceptionUtils.getRootCause(ge)
-        rootCause.message.contains("Unique index or primary key violation") || //mysql and H2
-            rootCause.message.contains("Duplicate entry") || //mysql
-            rootCause.message.contains("Violation of UNIQUE KEY constraint") || //sql server
-            rootCause.message.contains("duplicate key value violates unique constraint") //postgres
+        // thrown DataIntegrityViolationException
+        DataProblemException ge = thrown()
+        def problem = ge.problem
+        ge.code == DataProblemCodes.UniqueConstraint.code
+
+        // def rootCause = NestedExceptionUtils.getRootCause(ge)
+        problem.detail.contains("Unique index or primary key violation") || //mysql and H2
+            problem.contains("Duplicate entry") || //mysql
+            problem.contains("Violation of UNIQUE KEY constraint") || //sql server
+            problem.contains("duplicate key value violates unique constraint") //postgres
 
     }
 
@@ -127,7 +133,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         orgRepo.flush()
 
         then:
-        ValidationProblem exception = thrown()
+        ValidationProblem.Exception exception = thrown()
         exception.errors.objectName == 'yakworks.rally.orgs.model.Org'
         exception.errors['num'].code == "nullable"
     }
@@ -273,7 +279,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         orgRepo.removeById(org.id)
 
         then:
-        ValidationProblem e = thrown()
+        ValidationProblem.Exception e = thrown()
         e.code == 'error.delete.externalSource'
     }
 

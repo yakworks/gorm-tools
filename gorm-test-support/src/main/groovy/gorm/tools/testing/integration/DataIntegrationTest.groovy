@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.jdbc.DbDialectService
+import gorm.tools.transaction.TrxService
 import grails.build.support.MetaClassRegistryCleaner
 import grails.buildtestdata.TestDataBuilder
 import grails.config.Config
@@ -58,7 +59,7 @@ trait DataIntegrationTest implements TestDataBuilder {
     }
 
     void flushAndClear(){
-        getDatastore().currentSession.flush()
+        flush()
         getDatastore().currentSession.clear()
     }
 
@@ -66,7 +67,7 @@ trait DataIntegrationTest implements TestDataBuilder {
      * Flushes the current datastore session.
      */
     void flush() {
-        getDatastore().currentSession.flush()
+        TrxService.flush(getDatastore())
     }
 
     /**

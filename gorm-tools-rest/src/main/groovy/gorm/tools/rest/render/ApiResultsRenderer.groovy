@@ -9,7 +9,6 @@ import groovy.transform.CompileStatic
 
 import grails.rest.render.RenderContext
 import yakworks.api.ApiResults
-import yakworks.problem.Problem
 
 /**
  * Renderer for paged list data

@@ -10,7 +10,7 @@ import groovy.transform.CompileStatic
 import org.springframework.http.HttpStatus
 
 import grails.rest.render.RenderContext
-import yakworks.problem.Problem
+import yakworks.problem.IProblem
 
 /**
  * Default renderer for JSON
@@ -19,11 +19,11 @@ import yakworks.problem.Problem
  * @since 7.0.8
  */
 @CompileStatic
-class ProblemRenderer implements JsonRendererTrait<Problem> {
+class ProblemRenderer implements JsonRendererTrait<IProblem> {
 
     @Override
     @CompileDynamic
-    void render(Problem problem, RenderContext context) {
+    void render(IProblem problem, RenderContext context) {
         setContentType(context)
         context.status = HttpStatus.valueOf(problem.status.code)
         // context.writer.write(jsonGenerator.toJson(problem))
@@ -39,7 +39,7 @@ class ProblemRenderer implements JsonRendererTrait<Problem> {
     }
 
     // swallow no such message exception and returns empty string
-    String getMessage(Problem problem){
+    String getMessage(IProblem problem){
         String message
         if(problem.msg) message = getMessage(problem.msg)
 

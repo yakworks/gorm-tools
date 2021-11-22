@@ -36,6 +36,7 @@ subprojects { subprj ->
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     mavenCentral()
+    maven { url "http://repo.9ci.com/public-libs" }
     maven { url "http://repo.9ci.com/oss-snapshots" }
   }
   // get prop with default if null, converts to boolean
@@ -48,10 +49,15 @@ subprojects { subprj ->
     isExample = getProp('isExample', false)
   }
 
-  plugins.withId('groovy') {
+  plugins.withId('java') {
     sourceCompatibility = "$javaCompatibility"
     targetCompatibility = "$javaCompatibility"
+    tasks.withType(JavaCompile) {
+      options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+    }
+  }
 
+  plugins.withId('groovy') {
     // compileGroovy {
     //   groovyOptions.fork = true
     //   groovyOptions.forkOptions.jvmArgs = ['-Dgradle.projectDir=' + project.projectDir.absolutePath]
@@ -152,6 +158,7 @@ ext.codenarcRuleset= '''
   // getRule('Println').enabled = false
   // getRule('AbcMetric').enabled = false
   getRule('FieldName').enabled = false
+  getRule('SynchronizedMethod').enabled = false
 '''
 
 //logging

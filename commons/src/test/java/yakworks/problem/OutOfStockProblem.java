@@ -1,12 +1,13 @@
 package yakworks.problem;
 
 import yakworks.api.ApiStatus;
+import yakworks.problem.exception.ProblemRuntime;
 
 import java.net.URI;
 
 import static yakworks.api.HttpStatus.BAD_REQUEST;
 
-public final class OutOfStockProblem extends ProblemException {
+public final class OutOfStockProblem extends ProblemRuntime {
 
     private static final String TYPE_VALUE = "https://example.org/out-of-stock";
     private static final URI TYPE = URI.create(TYPE_VALUE);

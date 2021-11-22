@@ -27,6 +27,6 @@ class ViolationFieldError implements Violation, Serializable {
     }
 
     static ViolationFieldError of(String code, String message) {
-        new ViolationFieldError(MsgKey.of(code), message)
+        new ViolationFieldError(MsgKey.ofCode(code), message)
     }
 }

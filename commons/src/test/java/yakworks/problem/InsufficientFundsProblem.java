@@ -1,13 +1,13 @@
 package yakworks.problem;
 
 import yakworks.api.ApiStatus;
-import yakworks.problem.ProblemException;
+import yakworks.problem.exception.ProblemRuntime;
 
 import java.net.URI;
 
 import static yakworks.api.HttpStatus.BAD_REQUEST;
 
-public final class InsufficientFundsProblem extends ProblemException {
+public final class InsufficientFundsProblem extends ProblemRuntime {
 
     static final String TYPE_VALUE = "https://example.org/insufficient-funds";
     static final URI TYPE = URI.create(TYPE_VALUE);

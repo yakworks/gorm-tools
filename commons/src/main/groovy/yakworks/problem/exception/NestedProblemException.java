@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package yakworks.problem;
+package yakworks.problem.exception;
+
+import yakworks.problem.ProblemUtils;
 
 import javax.annotation.Nullable;
 
@@ -31,6 +33,10 @@ import javax.annotation.Nullable;
  * @see #getMessage
  */
 public abstract class NestedProblemException extends RuntimeException {
+
+    public NestedProblemException() {
+        super();
+    }
 
 	/**
 	 * Construct a {@code NestedRuntimeException} with the specified detail message.
@@ -79,12 +85,10 @@ public abstract class NestedProblemException extends RuntimeException {
 	 * Return the detail message, including the message from the nested exception
 	 * if there is one.
 	 */
-	// @Override
-	// @Nullable
-	// public String getMessage() {
-	// 	return NestedExceptionUtils.buildMessage(super.getMessage(), getCause());
-	// }
-
+    @Override //throwable
+    public String getMessage() {
+        return ProblemUtils.buildMessage(this);
+    }
 
 	/**
 	 * Retrieve the innermost cause of this exception, if any.
@@ -143,5 +147,18 @@ public abstract class NestedProblemException extends RuntimeException {
 			return false;
 		}
 	}
+
+    //Override it for performance improvement, because filling in the stack trace is quit expensive
+    /**
+     * By default this is called in Throwable constructor
+     * for performance improvement Override to disable by default.
+     * to turn it back on call fillInStackTraceSuper
+     */
+    // @SuppressWarnings(['SynchronizedMethod'])
+    // @Override
+    // synchronized Throwable fillInStackTrace() { return this }
+    //
+    // @SuppressWarnings(['SynchronizedMethod', 'BracesForIfElse'])
+    // synchronized Throwable fillInStackTraceSuper() { return super.fillInStackTrace() }
 
 }

@@ -3,6 +3,8 @@ package yakworks.problem;
 import org.junit.jupiter.api.Test;
 import yakworks.api.ApiStatus;
 import yakworks.i18n.MsgKey;
+import yakworks.problem.exception.Exceptional;
+import yakworks.problem.exception.ProblemRuntime;
 
 import java.net.URI;
 
@@ -18,11 +20,11 @@ class EnforceCoverageTest {
         });
     }
 
-    static final class FakeProblem extends Exception implements Exceptional {
+    static final class FakeProblem extends Exception implements IProblem.Fluent<FakeProblem>, Exceptional {
 
         @Override
         public MsgKey getMsg() {
-            return MsgKey.of("foo.bar");
+            return MsgKey.ofCode("foo.bar");
         }
 
         @Override
@@ -41,7 +43,7 @@ class EnforceCoverageTest {
         }
 
         @Override
-        public ProblemException getCause() {
+        public ProblemRuntime getCause() {
             return null;
         }
 

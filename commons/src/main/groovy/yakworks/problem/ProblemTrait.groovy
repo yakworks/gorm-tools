@@ -4,12 +4,10 @@
 */
 package yakworks.problem
 
-
 import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.api.Result
 import yakworks.api.ResultTrait
 import yakworks.i18n.MsgKey
 
@@ -20,24 +18,24 @@ import yakworks.i18n.MsgKey
  * @since 7.0.8
  */
 @CompileStatic
-trait ProblemTrait<E extends Problem> extends ResultTrait<E> implements Problem {
-    // result overrides
-    Boolean getOk(){ false }
+trait ProblemTrait<E extends ProblemTrait> extends ResultTrait<E> implements IProblem.Fluent<E> {
+    // result overrides, always false
+    Boolean getOk(){ false } //always false
+    //status default to 400
     ApiStatus status = HttpStatus.BAD_REQUEST
+    //this should be rendered to json if type is null
+    // URI DEFAULT_TYPE = URI.create("about:blank")
 
     // Problem impls
     URI type //= Problem.DEFAULT_TYPE
+    //the extra detail for this message
     String detail
-    URI instance
 
+    //if there is a cause we want to retian when we convert to exception
+    Throwable cause
+
+    // URI instance
     List<Violation> violations = [] as List<Violation> //Collections.emptyList();
-
-    E detail(String v) { setDetail(v);  return (E)this; }
-    E type(URI v) { setType(v); return (E)this; }
-    E type(String v) { setType(URI.create(v)); return (E)this; }
-    E instance(URI v) { setInstance(v); return (E)this; }
-    E instance(String v) { setInstance(URI.create(v)); return (E)this; }
-    E violations(List<Violation> v) { setViolations(v); return (E)this; }
 
     E addErrors(List<MsgKey> keyedErrors){
         def ers = getViolations()
@@ -45,6 +43,59 @@ trait ProblemTrait<E extends Problem> extends ResultTrait<E> implements Problem 
             ers << ViolationFieldError.of(it)
         }
         return (E)this
+    }
+
+    E cause(Throwable exCause){
+        this.cause = exCause
+        return (E)this
+    }
+
+    @Override
+    String toString() {
+        return ProblemUtils.problemToString(this)
+    }
+
+    ProblemException toException(){
+        return getCause() ? new DefaultProblemException(getCause()).problem(this) : new DefaultProblemException().problem(this)
+    }
+
+    //static builders
+    //overrides the Result/MsgKey builders
+    static E create(){
+        return (E)this.newInstance()
+    }
+
+    static E of(Object payload) {
+        return this.newInstance().payload(payload)
+    }
+
+    static E ofCode(String code){
+        return create().msg(code)
+    }
+
+    static E of(String code, Object args){
+        return create().msg(code, args)
+    }
+
+    static E ofMsg(MsgKey mkey){
+        return this.newInstance().msg(mkey)
+    }
+
+    static E withStatus(ApiStatus status) {
+        return this.newInstance().status(status)
+    }
+
+    static E withTitle(String title) {
+        return this.newInstance().title(title)
+    }
+
+    static E withDetail(String detail) {
+        return this.newInstance().detail(detail)
+    }
+
+    static E ofCause(final Throwable cause) {
+        def dap = this.newInstance([cause: cause])
+        dap.detail(ProblemUtils.getRootCause(cause).message)
     }
 
 }

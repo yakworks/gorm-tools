@@ -4,23 +4,28 @@
 */
 package gorm.tools.repository
 
-import yakworks.problem.data.OptimisticLockingProblem
 import gorm.tools.databinding.BindAction
-import gorm.tools.repository.model.RepoEntity
-import yakworks.problem.data.EntityNotFoundProblem
 import gorm.tools.problem.ValidationProblem
+import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import grails.artefact.Artefact
 import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-
-//import static grails.buildtestdata.TestData.build
-
-import testing.*
+import testing.Address
+import testing.AddyNested
+import testing.Cust
+import testing.CustExt
+import testing.CustRepo
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemException
+import yakworks.problem.data.DataProblemCodes
+import yakworks.problem.data.NotFoundProblem
+
+//import static grails.buildtestdata.TestData.build
 
 class GormRepoSpec extends GormToolsHibernateSpec {
 
@@ -75,7 +80,9 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         KitchenSink.repo.get(sink.id, 0)
 
         then:
-        thrown(OptimisticLockingProblem)
+        def ex = thrown(DataProblemException)
+        ex.problem instanceof DataProblem
+        ex.code == DataProblemCodes.OptimisticLocking.code
 
         when: "test get() with valid version"
         KitchenSink newOrg = KitchenSink.repo.get(sink.id, 1)
@@ -139,7 +146,8 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         KitchenSink.repo.get(KitchenSink.last().id + 1, null)
 
         then:
-        thrown EntityNotFoundProblem
+        def prob = thrown(NotFoundProblem.Exception)
+
     }
 
     def "test create without required field"() {
@@ -150,7 +158,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust org = Cust.repo.create(params)
 
         then:
-        def e = thrown(ValidationProblem)
+        def e = thrown(ValidationProblem.Exception)
         e.message.contains("Field error in object 'testing.Cust' on field 'type': rejected value [null]")
     }
 
@@ -170,7 +178,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.persist(new Cust(amount: 500))
 
         then:
-        def e = thrown(ValidationProblem)
+        def e = thrown(ValidationProblem.Exception)
         e.message.contains("Field error in object 'testing.Cust' on field 'name': rejected value [null]")
     }
 
@@ -197,7 +205,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.update([name: 'foo', id: 99999999])
 
         then:
-        thrown EntityNotFoundProblem
+        thrown NotFoundProblem.Exception
     }
 
     def "test remove"() {
@@ -227,7 +235,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.repo.removeById(99999999)
 
         then:
-        thrown EntityNotFoundProblem
+        thrown NotFoundProblem.Exception
     }
 
     def "test bind"() {

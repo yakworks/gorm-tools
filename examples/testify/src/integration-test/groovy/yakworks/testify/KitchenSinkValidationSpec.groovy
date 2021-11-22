@@ -88,7 +88,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         //flushAndClear()
 
         then:
-        def ex = thrown(ValidationProblem)
+        def ex = thrown(ValidationProblem.Exception)
         ex.errors.errorCount == 4
         //normal validation errors
         sink.errors['ext.textMax'].code == 'maxSize.exceeded'
@@ -104,7 +104,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         KitchenSink.create(invalidData2)
 
         then:
-        def ex = thrown(ValidationProblem)
+        def ex = thrown(ValidationProblem.Exception)
         //its only 2 on this one as a default kind is set in the repo during create
         ex.errors.errorCount == 2
         ex.errors['sinkLink.kind']

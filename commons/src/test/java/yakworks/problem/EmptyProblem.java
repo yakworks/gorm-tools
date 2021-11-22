@@ -1,12 +1,11 @@
 package yakworks.problem;
 
 import yakworks.i18n.MsgKey;
-import yakworks.problem.Problem;
 
-public final class EmptyProblem implements Problem {
+public final class EmptyProblem implements IProblem.Fluent<EmptyProblem> {
 
     @Override
     public MsgKey getMsg() {
-        return MsgKey.of("some.problem.key");
+        return MsgKey.ofCode("some.problem.key");
     }
 }

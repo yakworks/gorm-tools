@@ -9,8 +9,6 @@ import javax.inject.Inject
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 
 import gorm.tools.security.domain.AppUser
@@ -19,7 +17,7 @@ import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
 import yakworks.api.Result
 import yakworks.i18n.MsgKey
-import yakworks.problem.ApiProblem
+import yakworks.problem.Problem
 
 @CompileStatic
 class PasswordValidator {
@@ -55,23 +53,23 @@ class PasswordValidator {
         }
 
         if (passConfirm != pass) {
-            problemKeys << MsgKey.of("security.validation.password.match")
+            problemKeys << MsgKey.ofCode("security.validation.password.match")
         }
 
         if (passwordMustContainLowercaseLetter && !(pass =~ /^.*[a-z].*$/)) {
-            problemKeys << MsgKey.of("security.validation.password.mustcontain.lowercase")
+            problemKeys << MsgKey.ofCode("security.validation.password.mustcontain.lowercase")
         }
 
         if (passwordMustContainUpperaseLetter && !(pass =~ /^.*[A-Z].*$/)) {
-            problemKeys << MsgKey.of("security.validation.password.mustcontain.uppercase")
+            problemKeys << MsgKey.ofCode("security.validation.password.mustcontain.uppercase")
         }
 
         if (passwordMustContainNumbers && !(pass =~ /^.*[0-9].*$/)) {
-            problemKeys << MsgKey.of("security.validation.password.mustcontain.numbers")
+            problemKeys << MsgKey.ofCode("security.validation.password.mustcontain.numbers")
         }
 
         if (passwordMustContainSymbols && !(pass =~ /^.*\W.*$/)) {
-            problemKeys << MsgKey.of("security.validation.password.mustcontain.symbol")
+            problemKeys << MsgKey.ofCode("security.validation.password.mustcontain.symbol")
         }
 
         if (passwordHistoryEnabled && passwordExistInHistory(user, pass)) {
@@ -79,7 +77,7 @@ class PasswordValidator {
         }
 
         if(problemKeys){
-            return ApiProblem.of(MsgKey.of('security.validation.password.error')).addErrors(problemKeys)
+            return Problem.ofCode('security.validation.password.error').addErrors(problemKeys)
         } else {
             return  Result.OK()
         }

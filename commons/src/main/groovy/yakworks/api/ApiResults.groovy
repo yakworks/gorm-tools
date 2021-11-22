@@ -6,7 +6,8 @@ package yakworks.api
 
 import groovy.transform.CompileStatic
 
-import yakworks.problem.Problem
+import yakworks.problem.IProblem
+import yakworks.problem.ProblemTrait
 
 /**
  * A Parent Result that has a list of Result(s).
@@ -20,10 +21,6 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     //internal rep
     @Delegate List<Result> results
 
-    //override so payload is the list of results
-    @Override Object getPayload() { return results; }
-    @Override void setPayload(Object v){ }
-
     /**
      * New result
      * @param isSynchronized defaults to true to create the data list as synchronizedList
@@ -32,8 +29,20 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
         results = ( isSynchronized ? Collections.synchronizedList([]) : [] ) as List<Result>
     }
 
+    // ** BUILDERS STATIC OVERRIDES **
     static ApiResults create(boolean isSynchronized = true){ new ApiResults(isSynchronized) }
     static ApiResults OK(){ new ApiResults() }
+    static ApiResults of(String code, Object args) {
+        return new ApiResults().msg(code, args)
+    }
+    static ApiResults of(Object payload) {
+        return new ApiResults().payload(payload);
+    }
+
+    ApiResults ok(boolean v){
+        ok = v
+        return this
+    }
 
 
     @Override //changes default list delegate so we can add ok
@@ -41,6 +50,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
         if(!result.ok) ok = false
         results << result
     }
+
 
     /**
      * if resultToMerge is ApiResults then add all from its resultList
@@ -57,14 +67,15 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     }
 
     /**
-     * returns the problems
+     * returns the problems or results.ok=false as could contain other container apiResults
+     * that are not problems but apiResults with problems
      */
-    List<Problem> getProblems(){
+    List<Result> getProblems(){
         //only look if this is not ok as it should never have problems if ok=true
         if(this.ok){
-            [] as List<Problem>
+            [] as List<Result>
         } else {
-            results.findAll{ it instanceof Problem } as List<Problem>
+            results.findAll{ !it.ok } as List<Result>
         }
     }
 
@@ -76,7 +87,7 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
     }
 
     //Add these temporarily to be compatible with old Results
-    List<Problem> getFailed(){
+    List<Result> getFailed(){
         getProblems()
     }
     List<Result> getSuccess(){

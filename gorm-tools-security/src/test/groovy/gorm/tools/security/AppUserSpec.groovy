@@ -100,7 +100,7 @@ class AppUserSpec extends Specification implements DomainRepoTest<AppUser>, Secu
         AppUser.update(params)
 
         then:
-        thrown ValidationProblem
+        thrown ValidationProblem.Exception
     }
 
     def "insert with roles"() {

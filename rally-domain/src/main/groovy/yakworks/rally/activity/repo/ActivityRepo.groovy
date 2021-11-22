@@ -17,7 +17,6 @@ import gorm.tools.beans.Pager
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
-import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.AfterPersistEvent
@@ -505,7 +504,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
                     Map queryParams = [edDate: activity['editedDate'], crDate: activity['createdDate'], newid: copy.id]
                     Activity.executeUpdate("update Activity act set act.editedDate=:edDate, act.createdDate=:crDate where act.id=:newid ", queryParams)
                 }
-            } catch (ValidationProblem e) {
+            } catch (e) {
                 results << problemHandler.handleException(e)
             }
         }

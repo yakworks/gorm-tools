@@ -20,11 +20,13 @@ import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.i18n.icu.ICUMessageSource
 import yakworks.problem.Problem
+import yakworks.problem.ProblemException
 import yakworks.problem.ProblemTrait
+import yakworks.problem.UnexpectedProblem
 import yakworks.problem.Violation
 import yakworks.problem.ViolationFieldError
-import yakworks.problem.data.DataAccessProblem
-import yakworks.problem.data.UniqueConstraintProblem
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemCodes
 
 /**
  * Service to prepare ApiError / ApiValidationError for given a given exception
@@ -38,78 +40,74 @@ class ProblemHandler {
 
     @Autowired ICUMessageSource messageSource
 
-    ProblemTrait handleException(Throwable e) {
-        handleException("Entity", e)
-    }
-
-    ProblemTrait handleException(Class entityClass, Throwable e) {
-        handleException(entityClass.simpleName, e)
+    ProblemTrait<?> handleException(Class entityClass, Throwable e) {
+        handleException(e, entityClass.simpleName)
     }
 
     /**
-     * Prepares ApiError for given entity and exception
-     * - ApiError(status:422) for EntityValidationException, ValidationException and DataAccessException
-     * - ApiError(status:404) for EntityNotFoundException
-     * - ApiError(status:500) for other exceptions
+     * Prepares Problem for given entity and exception
+     * - Problem(status:422) for ValidationException
+     * - Problem(status:400) for DataAccessException
+     * - Problem(status:404) for NotFoundException
+     * - Problem(status:500) for other exceptions
      *
-     * @param entityName domain class
+     * @param simpleName used for validation conversion
      * @param Exception e
      * @return ApiError
      */
-    ProblemTrait handleException(String entityName, Throwable e) {
+    ProblemTrait<?> handleException(Throwable e, String simpleName = null) {
         // default error status code is 422
         ApiStatus status400 = HttpStatus.BAD_REQUEST
         ApiStatus status404 = HttpStatus.NOT_FOUND
         ApiStatus status422 = HttpStatus.UNPROCESSABLE_ENTITY
 
-        if (e instanceof ValidationProblem) {
-            if(e.errors instanceof EmptyErrors){
+        if (e instanceof ValidationProblem.Exception) {
+            def valProblem = e.getValidationProblem()
+            if (valProblem.errors instanceof EmptyErrors) {
                 //this is some other exception wrapped in validation exception
-                e.detail( e.cause?.message)
+                valProblem.detail(e.cause?.message)
             }
-            e.violations(transateErrorsToViolations(e.errors))
-            return e
+            valProblem.violations(transateErrorsToViolations(valProblem.errors))
+            return valProblem
         }
-        else if (e instanceof ProblemTrait) {
-            // already a problem then just return it
-            return (ProblemTrait) e
-        }
-        else if (e instanceof grails.validation.ValidationException) {
-            return buildFromErrorException(entityName, e)
-        }
-        else if (e instanceof org.grails.datastore.mapping.validation.ValidationException) {
-            return buildFromErrorException(entityName, e)
-        }
-        else if (e instanceof MsgSourceResolvable) { //legacy
-            return Problem.of(status400).msg(e.code).detail(getMsg(e))
-        }
-        else if (e instanceof IllegalArgumentException) {
+        else if (e instanceof ProblemTrait) { return (ProblemTrait) e }
+        else if (e instanceof ProblemException) { return (ProblemTrait) e.problem }
+        else if (e instanceof grails.validation.ValidationException
+            || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
+            return buildFromErrorException(e, simpleName)
+        } else if (e instanceof MsgSourceResolvable) {
+            //legacy
+            return Problem.ofCode(e.code).status(status400).detail(getMsg(e))
+        } else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
-            return Problem.of(status400).msg('error.illegalArgument').detail(e.message)
-        }
-        else if (e instanceof DataAccessException) {
+            return Problem.ofCode('error.illegalArgument').status(status400).detail(e.message)
+        } else if (e instanceof DataAccessException) {
             //Not all will get translated in the repo as some get thrown after flush
             log.error("UNEXPECTED Data Access Exception ${e.message}", e)
             // Root of the hierarchy of data access exceptions
-            if(isUniqueIndexViolation((DataAccessException)e)){
-                return UniqueConstraintProblem.of(e)
+            if (isUniqueIndexViolation((DataAccessException) e)) {
+                return DataProblemCodes.UniqueConstraint.ofCause(e)
             } else {
-                return DataAccessProblem.of(e)
+                return DataProblem.ofCause(e)
             }
-        }
-        else {
-            log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-            return Problem.of(HttpStatus.INTERNAL_SERVER_ERROR).msg('error.unhandled').detail(e.message)
+        } else {
+            return handleUnexpected(e)
         }
     }
 
-    ValidationProblem buildFromErrorException(String entityName, Throwable valEx){
+    ProblemTrait<?> handleUnexpected(Throwable e){
+        log.error("UNEXPECTED Internal Server Error ${e.message}", e)
+        return UnexpectedProblem.ofCause(e).detail(e.message)
+    }
+
+    ValidationProblem buildFromErrorException(Throwable valEx, String entityName = null) {
         Errors ers = valEx['errors'] as Errors
-        def valProb = ValidationProblem.of(valEx).name(entityName).errors(ers)
+        def valProb = ValidationProblem.ofCause(valEx).errors(ers)
+        if(entityName) valProb.name(entityName)
         return valProb.violations(transateErrorsToViolations(ers))
     }
 
-    String getMsg(MessageSourceResolvable msr){
+    String getMsg(MessageSourceResolvable msr) {
         String msg = messageSource.getMessage(msr)
         return msg
     }
@@ -121,9 +119,9 @@ class ProblemHandler {
     //FIXME #339 see errormessageService, do we need some of that logic?
     List<Violation> transateErrorsToViolations(Errors errs) {
         List<ViolationFieldError> errors = []
-        for(ObjectError err : errs.allErrors) {
+        for (ObjectError err : errs.allErrors) {
             ViolationFieldError fieldError = ViolationFieldError.of(err.code, getMsg(err))
-            if(err instanceof FieldError) fieldError.field = err.field
+            if (err instanceof FieldError) fieldError.field = err.field
             errors << fieldError
         }
         return errors as List<Violation>
@@ -131,16 +129,33 @@ class ProblemHandler {
 
     //Unique index unique constraint or primary key violation
     @SuppressWarnings('BracesForIfElse')
-    static String isUniqueIndexViolation(DataAccessException dax){
+    static String isUniqueIndexViolation(DataAccessException dax) {
         String rootMessage = dax.rootCause.message
-        if(rootMessage.contains("Unique index or primary key violation") || //mysql and H2
+        if (rootMessage.contains("Unique index or primary key violation") || //mysql and H2
             rootMessage.contains("Duplicate entry") || //mysql
             rootMessage.contains("Violation of UNIQUE KEY constraint") || //sql server
-            rootMessage.contains("unique constraint"))
-        {
+            rootMessage.contains("unique constraint")) {
             return rootMessage
         } else {
             return null
         }
     }
+
+    //Legacy from ValidationException
+    static String formatErrors(Errors errors, String msg) {
+        String ls = System.getProperty("line.separator");
+        StringBuilder b = new StringBuilder();
+        if (msg != null) {
+            b.append(msg).append(" : ").append(ls);
+        }
+
+        for (ObjectError error : errors.getAllErrors()) {
+            b.append(ls)
+                .append(" - ")
+                .append(error)
+                .append(ls);
+        }
+        return b.toString();
+    }
+
 }

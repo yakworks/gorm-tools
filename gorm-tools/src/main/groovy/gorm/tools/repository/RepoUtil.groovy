@@ -15,10 +15,10 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import yakworks.problem.Problem
-import yakworks.problem.ProblemException
-import yakworks.problem.data.EntityNotFoundProblem
-import yakworks.problem.data.OptimisticLockingProblem
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemCodes
+import yakworks.problem.data.NotFoundProblem
+import yakworks.problem.exception.ProblemRuntime
 
 /**
  * A bunch of statics to support the repositories.
@@ -53,9 +53,10 @@ class RepoUtil {
         if (entity.hasProperty('version')) {
             Long currentVersion = entity['version'] as Long
             if (currentVersion > oldVersion) {
-                throw OptimisticLockingProblem
-                    .of(entity)
+                throw DataProblemCodes.OptimisticLocking.get()
+                    .entity(entity)
                     .detail("server version:${currentVersion} > edited version:${oldVersion}")
+                    .toException()
             }
         }
     }
@@ -66,21 +67,21 @@ class RepoUtil {
      * @param entity - the domain object the check
      * @param id - the identifier use when trying to find it. Will be used to construct the exception message
      * @param domainClassName - the name of the domain that will be used to build error message if thrown
-     * @throws EntityNotFoundProblem if it not found
+     * @throws NotFoundProblem if it not found
      */
     static void checkFound(Object entity, Serializable id, String domainClassName) {
         if (!entity) {
-            throw EntityNotFoundProblem.of(id, domainClassName)
+            throw NotFoundProblem.of(id, domainClassName).toException()
         }
     }
 
     /**
      * check that the passed in data is not empty and throws EmptyDataException if so
-     * @throws ProblemException if it not found
+     * @throws ProblemRuntime if it not found
      */
     static void checkData(Map data, Class entityClass) {
         if (!data) {
-            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
+            throw DataProblem.of('error.data.empty', [name: entityClass.simpleName]).toException()
         }
     }
 
@@ -89,7 +90,7 @@ class RepoUtil {
      */
     static void checkCreateData(Map data, Map args, Class entityClass) {
         if(data['id'] && !args.bindId)
-            throw Problem.of('error.data.empty', [name: entityClass.simpleName])
+            throw DataProblem.of('error.data.empty', [name: entityClass.simpleName]).toException()
     }
 
     /**

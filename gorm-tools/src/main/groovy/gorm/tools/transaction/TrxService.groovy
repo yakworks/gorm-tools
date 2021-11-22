@@ -15,10 +15,12 @@ import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.core.Session
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionCapableDatastore
+import org.grails.orm.hibernate.GrailsHibernateTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.RepoLookup
@@ -146,6 +148,20 @@ class TrxService {
         status.flush()
         def ses = getCurrentSession()
         ses.clear()
+    }
+
+    static void flush(Datastore datastore) {
+        // only calls flush if we are actively in a trx
+        if(TransactionSynchronizationManager.isSynchronizationActive()) {
+            GrailsHibernateTemplate htemp = (GrailsHibernateTemplate)datastore.currentSession.nativeInterface
+            //the flush method with object arg will run the flush inside of templates execute which will
+            //transalate the exeptions to spring exceptions, the object arg does nothing
+            htemp.flush("nothing")
+        }
+    }
+
+    void flush() {
+        flush(getTargetDatastore())
     }
 
     static TrxService bean(){

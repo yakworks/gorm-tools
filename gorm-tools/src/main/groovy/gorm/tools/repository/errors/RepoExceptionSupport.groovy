@@ -10,9 +10,9 @@ import org.springframework.dao.DataAccessException
 import org.springframework.dao.OptimisticLockingFailureException
 
 import gorm.tools.problem.ValidationProblem
-import yakworks.problem.Problem
-import yakworks.problem.data.DataAccessProblem
-import yakworks.problem.data.UniqueConstraintProblem
+import yakworks.problem.ProblemTrait
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemCodes
 
 /**
  * Handler and translator for exceptions thrown by the Repository
@@ -41,17 +41,17 @@ class RepoExceptionSupport {
          * thus checks for these exceptions also cover EntityValidationException case.
          */
         //if its an instance of Problem then we dont need to transalate
-        if (ex instanceof Problem || ex instanceof ValidationProblem) {
+        if (ex instanceof ProblemTrait ) {
             return ex
         }
         else if (ex instanceof grails.validation.ValidationException) {
             def ve = (grails.validation.ValidationException) ex
-            return ValidationProblem.of(entity, ve).errors(ve.errors)
+            return ValidationProblem.of(entity, ve).errors(ve.errors).toException()
         }
         else if (ex instanceof org.grails.datastore.mapping.validation.ValidationException) {
             // Gorm's stock ValidationException
             def ve = (org.grails.datastore.mapping.validation.ValidationException) ex
-            return ValidationProblem.of(entity, ve).errors(ve.errors)
+            return ValidationProblem.of(entity, ve).errors(ve.errors).toException()
         }
         else if (ex instanceof OptimisticLockingFailureException) {
             return ex //just return unchanged
@@ -60,9 +60,10 @@ class RepoExceptionSupport {
         else if (ex instanceof DataAccessException) {
             // Root of the hierarchy of data access exceptions
             if(isUniqueIndexViolation(ex)){
-                return UniqueConstraintProblem.of(ex).entity(entity)
+                return DataProblemCodes.UniqueConstraint.ofCause(ex)
+                    .entity(entity).toException()
             } else {
-                return DataAccessProblem.of(ex).entity(entity)
+                return DataProblem.ofCause(ex).entity(entity).toException()
             }
         }
         return ex
@@ -77,7 +78,7 @@ class RepoExceptionSupport {
             rootMessage.contains("Violation of UNIQUE KEY constraint") || //sql server
             rootMessage.contains("unique constraint"))
         {
-           return rootMessage
+            return rootMessage
         } else {
             return null
         }

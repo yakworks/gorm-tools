@@ -14,11 +14,12 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.security.services.SecService
+import gorm.tools.transaction.WithTrx
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.testing.spock.OnceBefore
 
 @CompileDynamic
-trait SecuritySpecHelper {
+trait SecuritySpecHelper implements WithTrx{
 
     @Autowired @Qualifier("secService")
     SecService secService
@@ -26,7 +27,9 @@ trait SecuritySpecHelper {
     //need to name it like this, otherwise subclasses cant use setupSpec method
     @OnceBefore
     void setupSecuritySpec() {
-        secService.loginAsSystemUser()
+        withTrx {
+            secService.loginAsSystemUser()
+        }
     }
 
     void authenticate(AppUser user, String... roles) {

@@ -1,10 +1,12 @@
 package yakworks.rally.orgs
 
-import yakworks.problem.data.ReferenceKeyProblem
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.problem.data.DataProblem
+import yakworks.problem.data.DataProblemCodes
+import yakworks.problem.data.DataProblemException
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -56,7 +58,9 @@ class ContactTests extends Specification implements DomainIntTest {
         contactRepo.remove(contact)
 
         then:
-        thrown(ReferenceKeyProblem)
+        def ex = thrown(DataProblemException)
+        ex.problem instanceof DataProblem
+        ex.code == DataProblemCodes.ReferenceKey.code
     }
 
     def testDelete() {
@@ -103,7 +107,9 @@ class ContactTests extends Specification implements DomainIntTest {
         Org.get(50).contact.remove()
 
         then:
-        thrown ReferenceKeyProblem
+        def ex = thrown(DataProblemException)
+        ex.problem instanceof DataProblem
+        ex.code == DataProblemCodes.ReferenceKey.code
     }
 
     void "test create Contact with org lookup by orgSource"() {

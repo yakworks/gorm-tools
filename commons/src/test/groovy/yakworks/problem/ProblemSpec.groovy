@@ -16,7 +16,7 @@ class ProblemSpec extends Specification {
     void shouldRenderTestProblem() {
         expect:
         Problem problem = Problem.create()
-        problem.toString() == "Problem(400, Bad Request)"
+        problem.toString() == "Problem(400)"
         !problem.ok
     }
 
@@ -100,7 +100,7 @@ class ProblemSpec extends Specification {
 
         then:
         writer.toString()
-        writer.toString().startsWith("Problem(404, Not Found")
+        writer.toString().startsWith("Problem(404")
     }
 
 }

@@ -9,15 +9,19 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.HandleMetaClass
 import org.grails.core.artefact.ControllerArtefactHandler
+import org.grails.datastore.mapping.core.DatastoreUtils
+import org.grails.datastore.mapping.core.Session
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.junit.After
 import org.junit.Before
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.testing.integration.DataIntegrationTest
+import gorm.tools.transaction.TrxService
 import grails.core.GrailsApplication
 import grails.util.GrailsMetaClassUtils
 import grails.util.GrailsWebMockUtil
@@ -41,6 +45,9 @@ trait RestIntegrationTest extends DataIntegrationTest {
     @Autowired
     GrailsApplication grailsApplication
 
+    @Autowired
+    TrxService trxService
+
     /**
      * Sets up mock request/response pair and performs a dynamic call to the 'specificSetup' method on the test class.
      */
@@ -50,6 +57,7 @@ trait RestIntegrationTest extends DataIntegrationTest {
         MockRestResponse response = new MockRestResponse()
         GrailsWebMockUtil.bindMockWebRequest(ctx, request, response)
         currentRequestAttributes.setControllerName(controllerName)
+
     }
 
     @CompileDynamic

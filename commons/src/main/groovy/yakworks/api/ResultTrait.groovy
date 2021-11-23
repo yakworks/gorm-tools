@@ -29,4 +29,9 @@ trait ResultTrait<E extends Result.Fluent> implements Result.Fluent<E> {
     }
     void setMsg(MsgKey v) { msgKey = v }
 
+    @Override
+    String toString() {
+        return ResultUtils.resultToString(this)
+    }
+
 }

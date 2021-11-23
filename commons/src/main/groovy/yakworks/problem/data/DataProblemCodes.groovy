@@ -13,9 +13,9 @@ import groovy.transform.CompileStatic
 enum DataProblemCodes {
 
     NotFound('error.notFound'),
-    OptimisticLocking('error.optimisticLocking'),
-    ReferenceKey('error.reference.key'),
-    UniqueConstraint('error.uniqueConstraintViolation')
+    OptimisticLocking('error.data.optimisticLocking'),
+    ReferenceKey('error.data.reference'),
+    UniqueConstraint('error.data.uniqueConstraintViolation')
 
     final String code
 

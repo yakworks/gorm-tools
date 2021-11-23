@@ -13,10 +13,11 @@ import yakworks.api.ResultUtils
 class ProblemUtils {
 
     static String problemToString(final IProblem p) {
-        String concat = ResultUtils.resultToString(p)
+        String concat = ResultUtils.resultToStringCommon(p)
         String type = p.type ? "type=$p.type" : null
         concat = [concat, type, p.detail].findAll{it != null}.join(', ')
-        return "Problem(${concat})"
+        String probName = p.class.simpleName
+        return "${probName}(${concat})"
     }
 
     static String buildMessage(final Object problem) {

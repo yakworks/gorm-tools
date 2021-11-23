@@ -28,10 +28,11 @@ import grails.gorm.transactions.GrailsTransactionTemplate
 
 /**
  * A generic way to wrap transaction with closures. Used in the WithTrx trait.
- * Work on same principal as @Transactional annotation.
- * Doesn't require a domain to use the closure
- * and uses CustomizableRollbackTransactionAttribute which rollsback on any error
- * where the domain.withTransaction uses DefaultTransactionDefinition
+ *  - Work on same principal as @Transactional annotation.
+ *  - Doesn't require a domain to use the closure
+ *  - uses CustomizableRollbackTransactionAttribute which rollsback on any error
+ *    where the domain.withTransaction uses DefaultTransactionDefinition
+ *  - Also used as a central place to get the defualt Datastore
  *
  * @author Joshua Burnett (@basejump)
  * @since 7.x

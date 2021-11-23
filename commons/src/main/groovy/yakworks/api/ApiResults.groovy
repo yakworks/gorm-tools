@@ -6,9 +6,6 @@ package yakworks.api
 
 import groovy.transform.CompileStatic
 
-import yakworks.problem.IProblem
-import yakworks.problem.ProblemTrait
-
 /**
  * A Parent Result that has a list of Result(s).
  * The data in this case is a List of result/problem instances
@@ -44,13 +41,11 @@ class ApiResults implements ResultTrait<ApiResults>, Serializable {
         return this
     }
 
-
     @Override //changes default list delegate so we can add ok
     boolean add(Result result){
         if(!result.ok) ok = false
         results << result
     }
-
 
     /**
      * if resultToMerge is ApiResults then add all from its resultList

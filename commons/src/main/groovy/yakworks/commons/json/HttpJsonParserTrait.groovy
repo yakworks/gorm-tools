@@ -22,11 +22,13 @@ trait HttpJsonParserTrait extends JsonEngineTrait{
      * Clazz should be either list or map
      */
     public <T> T parseJson(HttpServletRequest req, Class<T> clazz) {
-        boolean hasContent = req.contentLength
-        Object parsedObj = parseJson(req)
-        //if its not a map type then assume its list
-        if(!hasContent && !Map.isAssignableFrom(clazz)){
-            parsedObj = Collections.emptyList()
+        boolean hasContent = req.contentLength > 0
+        Object parsedObj
+        if(hasContent){
+            parsedObj = parseJson(req)
+        } else {
+            //if its not a map type then assume its list
+            parsedObj = Map.isAssignableFrom(clazz) ? Collections.emptyMap() : Collections.emptyList()
         }
         JsonEngine.validateExpectedClass(clazz, parsedObj)
         return (T)parsedObj

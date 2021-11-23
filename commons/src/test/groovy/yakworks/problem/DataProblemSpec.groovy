@@ -17,7 +17,7 @@ class DataProblemSpec extends Specification {
         def e = DataProblemCodes.ReferenceKey.get().cause(rte).toException()
 
         then:
-        e.code == 'error.reference.key'
+        e.code == 'error.data.reference'
         e.rootCause == rte
     }
 

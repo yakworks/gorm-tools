@@ -7,18 +7,25 @@ package yakworks.api
 import groovy.transform.CompileStatic
 
 import yakworks.commons.lang.ClassUtils
+import yakworks.problem.IProblem
 
 @CompileStatic
 class ResultUtils {
 
-    static String resultToString(final Result p) {
-        String concat = "${p.status.code}"
-        String title = p.title ?: p.status.reason
+    static String resultToStringCommon(final Result p) {
+        String title = p.title ? "title=$p.title" : null
         String code = p.code ? "code=$p.code" : null
         String value = ClassUtils.isBasicType(p.payload) ? "payload=$p.payload" : null
-        concat = [concat, title, code].findAll{it != null}.join(', ')
-        return concat
+        String status = p.status.code
+        return [title, code, value, status ].findAll{it != null}.join(', ')
     }
+
+    static String resultToString(final Result p) {
+        String concat = "ok=${p.ok}, " + resultToStringCommon(p)
+        String cname = p.class.simpleName
+        return "${cname}(${concat})"
+    }
+
 
     /**
      * add message arguments for things in entity

@@ -25,9 +25,25 @@ import yakworks.rally.orgs.model.OrgType
 @Slf4j
 @CompileStatic
 class OrgMemberService {
+    private static final List<String> VALID_ORG_MEMBERS = ["Branch", "Division", "Business", "Sales", "Region", "Factory"]
 
     @Inject @Nullable
     OrgDimensionService orgDimensionService
+
+    /*
+     * Make dimension path such as "CustAccount.Customer.Branch.Division" work, as Customer is not a org member
+     * So, when a type is not a valid org member property, eg customer, its immediate parents will be returned
+     * See domain9#526
+     */
+    List<OrgType> getImmediateParentsToSet(OrgType type) {
+        List<OrgType> parents = []
+        List<OrgType> immediateParents = orgDimensionService.getImmediateParents(type)
+        for (OrgType p : immediateParents) {
+            if(p.name() in VALID_ORG_MEMBERS) parents.add(p)
+            else parents.addAll(getImmediateParentsToSet(p))
+        }
+        return parents.unique()
+    }
 
     /**
      * Sets up OrgMember
@@ -40,12 +56,14 @@ class OrgMemberService {
      */
     void setupMember(Org org, Map params) {
         if(!orgDimensionService.orgMemberEnabled) return
-        List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
+        List<OrgType> immediateParents = getImmediateParentsToSet(org.type)
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]
+
             Validate.notEmpty(orgParam, "setupMember called but params does not contain ${type.propertyName}")
             Org parent
+
             if(orgParam['id']) {
                 parent = Org.get(orgParam['id'] as Long)
             } else {

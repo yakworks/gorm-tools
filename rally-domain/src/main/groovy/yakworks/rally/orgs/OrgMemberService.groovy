@@ -34,6 +34,7 @@ class OrgMemberService {
      * Make dimension path such as "CustAccount.Customer.Branch.Division" work, as Customer is not a org member
      * So, when a type is not a valid org member property, eg customer, its immediate parents will be returned
      * See domain9#526
+     * XXX this still needs work as it blows up the CustAccountRepo tests in domain9
      */
     List<OrgType> getImmediateParentsToSet(OrgType type) {
         List<OrgType> parents = []
@@ -56,7 +57,7 @@ class OrgMemberService {
      */
     void setupMember(Org org, Map params) {
         if(!orgDimensionService.orgMemberEnabled) return
-        List<OrgType> immediateParents = getImmediateParentsToSet(org.type)
+        List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]

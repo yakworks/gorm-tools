@@ -3,6 +3,7 @@ package yakworks.rally.orgs.members
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.OrgMemberService
@@ -99,6 +100,10 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         orgDimensionService.testInit(null)
     }
 
+    //XXX this test appears to make a bad assumption.
+    // the scenario laid out here creates a CustAccount without a Customer
+    // you would never create a CustAccount without a Customer.
+    @Ignore
     void "test setupMember : validate member params"() {
         setup:
         initOrgDimensions([primary: "CustAccount.Customer.Branch.Division"])

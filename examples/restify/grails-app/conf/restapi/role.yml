@@ -1,18 +1,18 @@
 restApi:
-  role:
-    includes:
-      qSearch: [ name, description ]
-      picklist: [ id, name ]
-    gridOptions:
-      colModel:
-        - { name: id, hidden: true }
-        - { name: name, width: 120, formatter: editActionLink }
-        - { name: description, width: 120 }
-        - { name: inactive, width: 40, formatter: okIcon }
+  paths:
+    # Security namespace
+    security:
+      role:
+        gridOptions:
+          colModel:
+            - { name: id, hidden: true }
+            - { name: name, width: 120, formatter: editActionLink }
+            - { name: description, width: 120 }
+            - { name: inactive, width: 40, formatter: okIcon }
 
-    editForm:
-      name:
-        required: true
-      description: {}
-      inactive:
-        type: checkbox
+        editForm:
+          name:
+            required: true
+          description: {}
+          inactive:
+            type: checkbox

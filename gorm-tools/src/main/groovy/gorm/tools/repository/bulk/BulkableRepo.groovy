@@ -26,7 +26,6 @@ import yakworks.api.ApiResults
 import yakworks.api.Result
 import yakworks.commons.map.Maps
 import yakworks.problem.ProblemTrait
-import yakworks.problem.UnexpectedProblem
 
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>

@@ -16,7 +16,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
 import gorm.tools.beans.EntityMap
-import gorm.tools.beans.EntityMapList
+import yakworks.commons.map.MetaMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
@@ -167,7 +167,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     @Action
     def picklist() {
-        Pager pager = pagedQuery(params, 'picklist')
+        Pager pager = pagedQuery(params, 'stamp')
         respondWith pager
     }
 
@@ -225,7 +225,7 @@ trait RestRepoApiController<D> extends RestApiController {
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List incs = getFieldIncludes(includesKey)
-        EntityMapList entityMapList = entityMapService.createEntityMapList(dlist, incs)
+        MetaMapList entityMapList = entityMapService.createEntityMapList(dlist, incs)
         return pager.setEntityMapList(entityMapList)
     }
 
@@ -271,6 +271,18 @@ trait RestRepoApiController<D> extends RestApiController {
     Map getIncludesMap(){
         //we are in trait, always use getters in case they are overrriden in implementing class
         return getRestApiConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
+    }
+
+    /**
+     * Strickle down, will look for includesKey but fallback to 'stamp' key and if not
+     * then falls back to the get key, used for picklist primarily
+     */
+    List<String> getStampFieldIncludes(String includesKey){
+        //we are in trait, always use getters in case they are overrriden in implementing class
+        def includesMap = getIncludesMap()
+        def incs = includesMap[includesKey] ?: includesMap['stamp']
+        incs = incs ?: includesMap['get']
+        return incs as List<String>
     }
 
     /**

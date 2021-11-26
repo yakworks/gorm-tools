@@ -4,7 +4,7 @@
 */
 package gorm.tools
 
-import gorm.tools.beans.EntityMapList
+import yakworks.commons.map.MetaMapList
 import gorm.tools.beans.EntityMapService
 import gorm.tools.beans.Pager
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
@@ -53,7 +53,7 @@ class PagerSpec extends GormToolsHibernateSpec {
         Pager pager = new Pager()
         def entityMapService = new EntityMapService()
         def dlist = Cust.list(max: pager.max, offset: pager.offset)
-        EntityMapList entityMapList = entityMapService.createEntityMapList(dlist, ["*"])
+        MetaMapList entityMapList = entityMapService.createEntityMapList(dlist, ["*"])
 
         when:
         pager.setEntityMapList(entityMapList)

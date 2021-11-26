@@ -21,7 +21,7 @@ class Thing implements NamedEntity, GormRepoEntity<Thing, ThingRepo> {
 
     static Map includes = [
         qSearch: ['name', 'city'],
-        picklist: ['id', 'name']
+        stamp: ['id', 'name']
     ]
 
     static mapping = {

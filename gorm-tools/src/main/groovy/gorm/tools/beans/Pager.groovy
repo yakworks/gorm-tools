@@ -8,6 +8,8 @@ import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
+import yakworks.commons.map.MetaMapList
+
 /**
  * a holder object for paged data, used mostly in the rest and views
  * but can also be used for paging through and processing data
@@ -165,7 +167,7 @@ class Pager {
      */
     @Deprecated //use setupList
     Pager setupData(List dlist, List includes = null) {
-        EntityMapList entityMapList = AppCtx.get('entityMapService', EntityMapService).createEntityMapList(dlist, includes)
+        MetaMapList entityMapList = AppCtx.get('entityMapService', EntityMapService).createEntityMapList(dlist, includes)
         setEntityMapList(entityMapList)
         return this
     }
@@ -178,7 +180,7 @@ class Pager {
      * @param includes list of fields names which values should be in the result list based on dlist
      * @return new list with values selected from dlist based on fieldLists field names
      */
-    Pager setEntityMapList(EntityMapList entityMapList) {
+    Pager setEntityMapList(MetaMapList entityMapList) {
         if(entityMapList){
             setRecordCount(entityMapList.getTotalCount())
             setData(entityMapList)

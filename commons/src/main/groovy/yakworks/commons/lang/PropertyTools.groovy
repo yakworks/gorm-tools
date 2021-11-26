@@ -4,8 +4,12 @@
 */
 package yakworks.commons.lang
 
+import java.lang.reflect.ParameterizedType
+
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
+import org.codehaus.groovy.reflection.CachedMethod
 
 /**
  * PropertyTools contains a set of static helpers, which provides a convenient way
@@ -79,6 +83,36 @@ class PropertyTools {
             path.split('\\.').each { String it -> bean = bean[it] }
         }
         return bean
+    }
+
+    /**
+     * finds the property in an entity class and returns is MetaBeanProperty which is useful for
+     * things like getting the return type
+     */
+    static MetaBeanProperty getMetaBeanProp(Class entityClass, String prop) {
+        return entityClass.metaClass.properties.find{ it.name == prop} as MetaBeanProperty
+    }
+
+    /**
+     * see getMetaBeanProp, this calls that and returns the getter MetaMethod's returnType
+     */
+    static Class getPropertyReturnType(Class entityClass, String prop){
+        return getMetaBeanProp(entityClass, prop).getter.returnType
+    }
+
+    /**
+     * Trys to find the generic type for a collection property
+     * For example if its a List<Foo> the this will return 'x.y.Foo' assuming its in the x.y package
+     * @param entityClass the class to look on
+     * @param prop the class property to check
+     * @return
+     */
+    static String findGenericForCollection(Class entityClass, String prop){
+        MetaBeanProperty metaProp = PropertyTools.getMetaBeanProp(entityClass, prop)
+        CachedMethod gen = metaProp.getter as CachedMethod
+        def genericReturnType = gen.cachedMethod.genericReturnType as ParameterizedType
+        def actualTypeArguments = genericReturnType.actualTypeArguments
+        actualTypeArguments ? actualTypeArguments[0].typeName : null
     }
 
 }

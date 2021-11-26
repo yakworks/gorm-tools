@@ -14,7 +14,7 @@ trait NameCodeDescription<D> extends NameCode<D> {
 
     static Map includes = [
         qSearch: ['name', 'code', 'description'],
-        picklist: ['id', 'code', 'name']
+        stamp: ['id', 'code', 'name']  //picklist or minimal for joins
     ]
 
     static constraintsMap = [

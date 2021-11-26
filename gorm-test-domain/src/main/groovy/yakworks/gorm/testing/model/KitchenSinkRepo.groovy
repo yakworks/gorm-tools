@@ -31,7 +31,7 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         if(o.name == 'foos'){
             rejectValue(o, 'name', o.name, 'no.foos')
         }
-        stamp(o)
+        auditStamp(o)
     }
 
     @RepoListener
@@ -48,7 +48,7 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         o
     }
 
-    void stamp(Object ent){
+    void auditStamp(Object ent){
         ent['createdBy'] = 1
         ent['createdDate'] = LocalDateTime.now()
         ent['editedBy'] = 1

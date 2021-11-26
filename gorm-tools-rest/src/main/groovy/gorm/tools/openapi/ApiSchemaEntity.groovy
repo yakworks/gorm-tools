@@ -25,6 +25,7 @@ import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.Maps
 
 
@@ -434,7 +435,7 @@ class ApiSchemaEntity {
 
     @CompileDynamic
     static Class findGenericClassForCollection(Class entityClass, String prop){
-        MetaBeanProperty metaProp = EntityMapService.getMetaBeanProp(entityClass, prop)
+        MetaBeanProperty metaProp = PropertyTools.getMetaBeanProp(entityClass, prop)
         CachedMethod gen = metaProp.getter as CachedMethod
         def genericReturnType = gen.cachedMethod.genericReturnType as ParameterizedType
         def actualTypeArguments = genericReturnType.actualTypeArguments

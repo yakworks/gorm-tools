@@ -16,6 +16,9 @@ class ContactPhone implements RepoEntity<ContactPhone>, Serializable {
     String num
     Boolean isPrimary = false
 
+    static Map includes = [
+        stamp: ['id', 'num', 'kind']  //picklist or minimal for joins
+    ]
     static belongsTo = [contact: Contact]
     static mapping = {
         cache true

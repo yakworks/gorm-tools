@@ -12,6 +12,7 @@ import groovy.util.logging.Slf4j
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.ToMany
 
 import gorm.tools.api.IncludesConfig
 import gorm.tools.utils.GormMetaUtils
@@ -94,7 +95,9 @@ class EntityIncludesBuilder {
                 if (field == '*') {
                     // * only works if it has properties
                     if(properties){
-                        List<String> props = properties*.name
+                        List<String> props = properties.findAll {
+                            !(it instanceof ToMany)
+                        }*.name
                         metaMapIncludes.fields.addAll(props)
                     }
                 }

@@ -187,9 +187,9 @@ class MetaMap extends AbstractMap<String, Object> {
         else if(val instanceof Map && !(val instanceof MetaMap)) {
             val = new MetaMap(val)
         }
-        else if(val instanceof List && !(val instanceof MetaMapList)) {
+        else if(val instanceof Collection && !(val instanceof MetaMapList)) {
             //check what first item is, we only do this if its a GormEntity
-            List valList = (List) val
+            List valList = val as List
             if(valList.size() !=0 && valList[0] instanceof GormEntity){
                 val = new MetaMapList(valList, MetaMapIncludes.of(['id']))
             }

@@ -18,6 +18,10 @@ class ContactEmail implements RepoEntity<ContactEmail>, Serializable {
     String address
     Boolean isPrimary = false
 
+    static Map includes = [
+        stamp: ['id', 'address', 'kind']  //picklist or minimal for joins
+    ]
+
     static belongsTo = [contact: Contact]
 
     static mapping = {

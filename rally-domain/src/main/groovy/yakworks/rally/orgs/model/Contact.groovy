@@ -22,39 +22,52 @@ import yakworks.rally.tag.model.Taggable
 @IdEqualsHashCode
 @GrailsCompileStatic
 class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
+    // some Contacts get a num, such as for job contacts
     String num
+    //the joined name from firstName lastName
     String name
-    String entityName // used for jobs contacts at ced
+    // alternate name,nicknames and used for jobs contacts at ced
+    String altName
+
+    String firstName
+    String lastName
+
+    String email
+    String phone
 
     // belongs to Org, we don't use static belongsTo because Org also has contactId
     Org org
 
-    Long visibleToOrgType //which orgs type is this visible to (prospects and customers)
-
-    Boolean tagForReminders = false
+    Boolean tagForReminders = false //make an actual tag
     Boolean inactive = false
-    Boolean isPrimary = false  //XXX do we need it ?
-    //ContactType type  // billing, shipping, etc
 
-    String email //default
-    String phone //default
-
-    String firstName
-    String middleName
-    String lastName
-    String nickName
-    String salutation
-    String jobTitle
-    String department
-    LocalDate birthday
     String comments
 
-    Boolean isLocationDifferent = false
+    //remove
+    //Long visibleToOrgType //which orgs type is this visible to (prospects and customers)
+    //ContactType type  // billing, shipping, etc
+    //Boolean isPrimary = false
+    //Boolean isLocationDifferent = false
+
+    //FIXME move to ContactInfo or remove from db
+    // String middleName
+    // String nickName
+    // String salutation
+    // String jobTitle
+    // String department
+    // LocalDate birthday
+
     Location location
-    ContactFlex flex //user fields
+    ContactFlex flex
     AppUser user
 
     static hasMany = [phones: ContactPhone, emails: ContactEmail, sources: ContactSource]
+
+    static Map includes = [
+        get: ['id', 'num', 'name', 'altName', 'firstName', 'lastName', 'email', 'phone', 'inactive', 'org', 'user'],
+        qSearch: ['num', 'name', 'altName', 'email'],
+        stamp: ['id', 'name']  //picklist or minimal for joins
+    ]
 
     static mapping = {
         cache true
@@ -62,6 +75,9 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         flex column: 'flexId'
         location column: 'locationId'
         user column: 'userId'
+        //temp mapping until column change
+        altName column: 'entityName'
+
 
         flex cascade: "all"
         emails cascade: "all-delete-orphan"
@@ -70,34 +86,34 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     }
 
     static constraintsMap = [
-        num:[ nullable: true, maxSize: 50],
+        num:[ d:'num, used for job or orgnization type contacts', nullable: true, maxSize: 50],
         name:[ nullable: false, maxSize: 50],
 
-        entityName:[ nullable: true],
-        inactive:[ nullable: false],
-        isPrimary:[ nullable: false],
+        altName:[d:'alternate name, nickname or job name', nullable: true],
+        inactive:[ d:'is active', nullable: false],
+        // isPrimary:[ nullable: false],
 
-        isLocationDifferent:[ nullable: false],
+        // isLocationDifferent:[ nullable: false],
         location:[ nullable: true],
-        phone:[ nullable: true],
-        email:[ email: true, nullable: true],
+        phone:[ d:'default email', nullable: true],
+        email:[ d:'default phone', email: true, nullable: true],
 
         firstName:[ nullable: false, maxSize: 50],
-        middleName:[ nullable: true, maxSize: 50],
+        // middleName:[ nullable: true, maxSize: 50],
         lastName:[ nullable: true, maxSize: 50],
-        nickName:[ nullable: true, maxSize: 50],
-        salutation:[ nullable: true, maxSize: 50],
-        jobTitle:[ nullable: true, maxSize: 50],
-        department:[ nullable: true, maxSize: 50],
-        birthday:[ nullable: true],
-        comments:[ nullable: true],
+        // nickName:[ nullable: true, maxSize: 50],
+        // salutation:[ nullable: true, maxSize: 50],
+        // jobTitle:[ nullable: true, maxSize: 50],
+        // department:[ nullable: true, maxSize: 50],
+        // birthday:[ nullable: true],
+        comments:[ d:'notes about the contact', nullable: true],
 
-        tagForReminders:[ nullable: false],
-        org:[ nullable: false],
-        visibleToOrgType:[ nullable: true],
+        tagForReminders:[ d:'if this contact should get correspondence', nullable: false],
+        org:[ d:'the organization this contact belongs to', nullable: false],
+        // visibleToOrgType:[ nullable: true],
 
-        flex:[ nullable: true],
-        user:[ nullable: true],
+        flex:[ d:'custom user fields for this contact', nullable: true],
+        user:[ d:'the user if this contact is able to login', nullable: true],
     ]
 
     static ContactRepo getRepo() { RepoLookup.findRepo(this) as ContactRepo }

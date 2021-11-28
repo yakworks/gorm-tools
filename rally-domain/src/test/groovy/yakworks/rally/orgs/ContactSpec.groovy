@@ -234,7 +234,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         copy.num == old.num
         copy.email == old.email
         copy.firstName == old.firstName
-        copy.nickName == old.nickName
+        copy.altName == old.altName
         copy.comments == old.comments
 
         copy.phones.size() == 1

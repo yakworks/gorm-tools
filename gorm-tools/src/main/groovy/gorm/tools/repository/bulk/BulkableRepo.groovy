@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
-import gorm.tools.beans.EntityMapService
+import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
@@ -46,7 +46,7 @@ trait BulkableRepo<D> {
     AsyncService asyncService
 
     @Autowired
-    EntityMapService entityMapService
+    MetaMapEntityService metaMapEntityService
 
     @Autowired
     ProblemHandler problemHandler
@@ -201,7 +201,7 @@ trait BulkableRepo<D> {
                 ])
             } else {
                 def entityObj = r.payload
-                Map entityMapData = entityMapService.createEntityMap(entityObj, includes) as Map<String, Object>
+                Map entityMapData = metaMapEntityService.createMetaMap(entityObj, includes) as Map<String, Object>
                 map.data = entityMapData
             }
             ret << map

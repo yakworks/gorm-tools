@@ -11,6 +11,13 @@ import yakworks.commons.testing.pogos.Gadget
 
 class PropertyToolsSpec extends Specification{
 
+    static class Thing {
+        List<Map> mapList
+        List<String> stringList
+        List<Object> objectList
+        List simpleList
+    }
+
     void "getPropertyValue for object"() {
         setup:
         def obj = Gadget.create(1)
@@ -69,6 +76,19 @@ class PropertyToolsSpec extends Specification{
 
         expect:
         val == 9.0
+
+    }
+
+    void "findGenericForCollection"(String prop, String genericClass) {
+        expect:
+        genericClass == PropertyTools.findGenericForCollection(Thing, prop)
+
+        where:
+        prop         | genericClass
+        'mapList'    | 'java.util.Map'
+        'stringList' | 'java.lang.String'
+        'objectList' | 'java.lang.Object'
+        'simpleList' | 'java.lang.Object'
 
     }
 

@@ -2,12 +2,11 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.beans
+package gorm.tools.beans.map
 
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.config.GormProperties
 
 import gorm.tools.utils.GormMetaUtils
@@ -30,7 +29,7 @@ import yakworks.commons.model.IdEnum
  */
 @SuppressWarnings(["CompileStatic", "FieldName", "ExplicitCallToEqualsMethod"])
 @CompileStatic
-class EntityMap extends AbstractMap<String, Object> {
+class MetaMap extends AbstractMap<String, Object> {
 
     private MetaClass entityMetaClass;
     private Object entity
@@ -43,7 +42,7 @@ class EntityMap extends AbstractMap<String, Object> {
         'domainClass', 'dirty', GormProperties.ERRORS, 'dirtyPropertyNames']
 
     private Set<String> _includes = []
-    private EntityMapIncludes _includeMap
+    private MetaMapIncludes _includeMap
 
     private Map<String, Object> shadowMap = [:]
 
@@ -52,7 +51,7 @@ class EntityMap extends AbstractMap<String, Object> {
      * cant be null
      * @param entity The object to inspect
      */
-    EntityMap(Object entity) {
+    MetaMap(Object entity) {
         Validate.notNull(entity)
         this.entity = entity
         entityMetaClass = GroovySystem.getMetaClassRegistry().getMetaClass(entity.getClass())
@@ -67,12 +66,12 @@ class EntityMap extends AbstractMap<String, Object> {
      * @param entity The object to inspect
      * @param entity The object to inspect
      */
-    EntityMap(Object entity, EntityMapIncludes includeMap) {
+    MetaMap(Object entity, MetaMapIncludes includeMap) {
         this(entity)
         initialise(includeMap)
     }
 
-    private void initialise(EntityMapIncludes includeMap) {
+    private void initialise(MetaMapIncludes includeMap) {
         if(includeMap){
             _includeMap = includeMap
             _includes = includeMap.fields as Set<String>
@@ -163,10 +162,10 @@ class EntityMap extends AbstractMap<String, Object> {
     Object convertValue(Object source, String prop){
         Object val = source[prop]
         if(val == null) return null
-        def incNested = getNestedIncludes()
-        EntityMapIncludes incMap = incNested[prop]
+        Map nestesIncludes = getNestedIncludes()
+        MetaMapIncludes mapIncludes = nestesIncludes[prop]
         // if its an enum and doesnt have any include field specifed (which it normally should not)
-        if( val.class.isEnum() && !(incMap?.fields)) {
+        if( val.class.isEnum() && !(mapIncludes?.fields)) {
             if(val instanceof IdEnum){
                 // convert Enums to string or id,name object if its IdEnum
                 Map<String, Object> idEnumMap = [id: (val as IdEnum).id, name: (val as Enum).name()]
@@ -176,31 +175,27 @@ class EntityMap extends AbstractMap<String, Object> {
                 val = (val as Enum).name()
             }
         }
-        else if(incMap){
+        else if(mapIncludes){
             //its has its own includes so its either an object or an iterable
             if(val instanceof Iterable){
-                val = new EntityMapList(val as List, incMap)
+                val = new MetaMapList(val as List, mapIncludes)
             } else {
                 //assume its an object then
-                val = new EntityMap(val, incMap)
+                val = new MetaMap(val, mapIncludes)
             }
         }
-        else if(val instanceof Map && !(val instanceof EntityMap)) {
-            val = new EntityMap(val)
+        else if(val instanceof Map && !(val instanceof MetaMap)) {
+            val = new MetaMap(val)
         }
-        else if(val instanceof List && !(val instanceof EntityMapList)) {
+        else if(val instanceof List && !(val instanceof MetaMapList)) {
             //check what first item is, we only do this if its a GormEntity
             List valList = (List) val
             if(valList.size() !=0 && valList[0] instanceof GormEntity){
-                val = new EntityMapList(valList, EntityMapIncludes.of(['id']))
+                val = new MetaMapList(valList, MetaMapIncludes.of(['id']))
             }
         }
         else if(val instanceof GormEntity) {
-            // if it reached here then just generate the default id
-            PersistentEntity domainClass = GormMetaUtils.getPersistentEntity(val)
-            String id = domainClass.identity.name
-            Map idMap = [id: val[id]]
-            val = idMap
+            val = GormMetaUtils.getIdMap(val)
         }
         return val
     }
@@ -255,8 +250,8 @@ class EntityMap extends AbstractMap<String, Object> {
 
     @Override
     boolean equals(Object o) {
-        if (o instanceof EntityMap) {
-            EntityMap other = (EntityMap)o
+        if (o instanceof MetaMap) {
+            MetaMap other = (MetaMap)o
             return entity.equals(other.entity)
         }
         return false
@@ -279,19 +274,19 @@ class EntityMap extends AbstractMap<String, Object> {
 
             @Override
             int size() {
-                return EntityMap.this.size()
+                return MetaMap.this.size()
             }
         }
         return Collections.unmodifiableSet(eset)
     }
 
     //------- Helper methods --------
-    EntityMapIncludes getIncludeMap(){
+    MetaMapIncludes getIncludeMap(){
         return _includeMap
     }
 
-    Map<String, EntityMapIncludes> getNestedIncludes(){
-        return (includeMap?.nestedIncludes) ?: [:] as Map<String, EntityMapIncludes>
+    Map<String, MetaMapIncludes> getNestedIncludes(){
+        return (includeMap?.nestedIncludes) ?: [:] as Map<String, MetaMapIncludes>
     }
 
     boolean isIncluded(String mp) {
@@ -351,10 +346,10 @@ class EntityMap extends AbstractMap<String, Object> {
             @Override
             Map.Entry<String, Object> next() {
                 final String key = iter.next()
-                final Object value = EntityMap.this.get(key)
+                final Object value = MetaMap.this.get(key)
                 // This should not cause any problems; the key is actually a
                 // string, but it does no harm to expose it as Object
-                return new Entry(EntityMap.this, key, value)
+                return new Entry(MetaMap.this, key, value)
             }
 
             @Override
@@ -365,12 +360,12 @@ class EntityMap extends AbstractMap<String, Object> {
     }
 
     /**
-     * Map entry used by {@link EntityMap}.
+     * Map entry used by {@link MetaMap}.
      */
     protected static class Entry extends AbstractMap.SimpleEntry<String, Object> {
 
         private static final long serialVersionUID = 1L;
-        private final EntityMap owner;
+        private final MetaMap owner;
 
         /**
          * Constructs a new {@code Entry}.
@@ -379,7 +374,7 @@ class EntityMap extends AbstractMap<String, Object> {
          * @param key the key for this entry
          * @param value the value for this entry
          */
-        protected Entry(final EntityMap owner, final String key, final Object value) {
+        protected Entry(final MetaMap owner, final String key, final Object value) {
             super(key, value);
             this.owner = owner;
         }

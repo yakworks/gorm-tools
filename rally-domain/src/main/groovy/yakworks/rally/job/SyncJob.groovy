@@ -9,9 +9,12 @@ import gorm.tools.job.SyncJobEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 
-/** An instance created right away when "any job" in 9ci is called. Either called through restApi from outside, scheduled job in quartz or
+/**
+ * An instance created right away when "any job" in 9ci is called.
+ * Either called through restApi from outside, scheduled job in quartz or
  * manually started job (Look at SourceTrait)
- * Job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour. */
+ * Job may no longer exist to query. 9ci only logs the last 100 jobs. Jobs also expire within an hour.
+ */
 @Entity
 @AuditStamp
 @GrailsCompileStatic

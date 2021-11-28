@@ -1,9 +1,9 @@
-restApi:
+api:
   paths:
     rally:
       contact:
         includes:
-          get: [ id, num, name, type, calc.totalDue , comments ]
+          get: [ id, num, firstName, lastName, name, type, comments ]
 
         gridOptions:
           colModel:

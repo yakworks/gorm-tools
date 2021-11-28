@@ -19,7 +19,6 @@ import org.grails.datastore.mapping.model.types.OneToMany
 import org.grails.orm.hibernate.cfg.HibernateMappingContext
 import org.grails.orm.hibernate.cfg.Mapping
 
-import gorm.tools.beans.EntityMapService
 import gorm.tools.utils.GormMetaUtils
 import grails.gorm.validation.ConstrainedProperty
 import grails.gorm.validation.DefaultConstrainedProperty

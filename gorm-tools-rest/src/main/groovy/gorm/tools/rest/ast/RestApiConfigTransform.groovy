@@ -51,7 +51,7 @@ class RestApiConfigTransform implements ASTTransformation, CompilationUnitAware 
         def config = new CodeGenConfig()
         config.loadYml(new File("${projectDir}grails-app/conf/restapi-config.yml"))
 
-        Map restApi = config.getProperty('restApi', Map) as Map<String, Map>
+        Map restApi = config.getProperty('api', Map) as Map<String, Map>
         String defaultPackage = restApi.defaultPackage as String
         Map namespaces = (Map)restApi.namespaces
 

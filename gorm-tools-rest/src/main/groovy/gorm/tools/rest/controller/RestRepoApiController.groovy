@@ -15,10 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
-import gorm.tools.beans.EntityMap
-import yakworks.commons.map.MetaMapList
-import gorm.tools.beans.EntityMapService
+import gorm.tools.api.IncludesConfig
 import gorm.tools.beans.Pager
+import gorm.tools.beans.map.MetaMap
+import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.beans.map.MetaMapList
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.mango.api.QueryMangoEntityApi
@@ -26,7 +27,6 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
-import gorm.tools.rest.RestApiConfig
 import grails.web.Action
 import yakworks.problem.ProblemTrait
 
@@ -52,12 +52,12 @@ trait RestRepoApiController<D> extends RestApiController {
     final private static Logger log = LoggerFactory.getLogger(RestRepoApiController)
 
     @Autowired
-    RestApiConfig restApiConfig
+    IncludesConfig includesConfig
 
     // @Resource MessageSource messageSource
 
     @Autowired
-    EntityMapService entityMapService
+    MetaMapEntityService metaMapEntityService
 
 
     @Autowired(required = false)
@@ -216,7 +216,7 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
-        EntityMap entityMap = createEntityMap(instance)
+        MetaMap entityMap = createEntityMap(instance)
         respondWith(entityMap, [status: status])
     }
 
@@ -225,7 +225,7 @@ trait RestRepoApiController<D> extends RestApiController {
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List incs = getFieldIncludes(includesKey)
-        MetaMapList entityMapList = entityMapService.createEntityMapList(dlist, incs)
+        MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
         return pager.setEntityMapList(entityMapList)
     }
 
@@ -250,10 +250,10 @@ trait RestRepoApiController<D> extends RestApiController {
      * @param includeKey the key to use in the includes map, use default by default
      * @return the object to pass on to json views
      */
-    EntityMap createEntityMap(D instance, String includesKey = 'get'){
+    MetaMap createEntityMap(D instance, String includesKey = 'get'){
         flushIfSession() //in testing need to flush before generating entitymap
         List incs = getFieldIncludes(includesKey)
-        EntityMap emap = entityMapService.createEntityMap(instance, incs)
+        MetaMap emap = metaMapEntityService.createMetaMap(instance, incs)
         return emap
     }
 
@@ -270,7 +270,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     Map getIncludesMap(){
         //we are in trait, always use getters in case they are overrriden in implementing class
-        return getRestApiConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
+        return getIncludesConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
     }
 
     /**

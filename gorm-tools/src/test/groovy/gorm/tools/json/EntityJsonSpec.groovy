@@ -7,7 +7,7 @@ package gorm.tools.json
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-import gorm.tools.beans.EntityMapService
+import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.buildtestdata.TestData
@@ -26,7 +26,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 
 class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
-    EntityMapService entityMapService
+    MetaMapEntityService metaMapEntityService
 
     void setupSpec(){
         //these won't automatically get picked up as thet are not required.
@@ -37,7 +37,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
     void "test Org json stock"() {
         when:
         def org = build()
-        def res = entityMapService.toJson(org, ['*', 'type'])
+        def res = metaMapEntityService.toJson(org, ['*', 'type'])
 
         then:
         assertThatJson(res).isEqualTo('''{
@@ -53,31 +53,36 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
     void "test JsonifyDom json stock"() {
         when: "no includes"
         def jdom = TestData.build([:], JsonifyDom)
-        def res = entityMapService.toJson(jdom)
+        def res = metaMapEntityService.toJson(jdom)
 
         then: 'should not include the ext because its null'
         assertThatJson(res).isEqualTo('{"id":1,"localDate":"2018-01-25","isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
         when: "ext association is mocked up in data"
         jdom = TestData.build(JsonifyDom, includes: ['ext'])
-        res = entityMapService.toJson(jdom, ['*', 'ext'])
+        res = metaMapEntityService.toJson(jdom, ['*', 'ext'])
 
         then: 'the default will be just the ext.id'
         assertThatJson(res).isEqualTo('{"id":2,"localDate":"2018-01-25","ext":{"id":1},"isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
-        when: "ext association is in includes and deep:true and not renderNulls"
-        res = entityMapService.toJson(jdom, ['id', 'name', 'name2', 'ext.*'])
+        when: "ext association is in includes with \$stamp"
+        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$stamp'])
 
         then: 'ext fields should be shown'
-        assertThatJson(res).isEqualTo('{"id":2,"ext":{"id":1,"nameExt":"nameExt"},"name":"name"}')
+        assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
 
+        when: "ext association is in includes and \$* should use stamp"
+        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$*'])
+
+        then: 'ext fields should be shown'
+        assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
 
     }
 
     void "currency converter should work"() {
         when:
         def jdom = TestData.build(JsonifyDom, currency: Currency.getInstance('USD'))
-        def res = entityMapService.toJson(jdom, ['id', 'currency'])
+        def res = metaMapEntityService.toJson(jdom, ['id', 'currency'])
 
         then:
         res == '{"id":1,"currency":"USD"}'
@@ -89,7 +94,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         def jdom = TestData.build(JsonifyDom, includes: ['ext'])
         def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
         String incTrans = 'company'
-        def res = entityMapService.toJson(jdom, ['id', 'ext.nameExt', 'company'])
+        def res = metaMapEntityService.toJson(jdom, ['id', 'ext.nameExt', 'company'])
 
         then:
         res == '{"id":1,"ext":{"nameExt":"nameExt"},"company":"Tesla"}'
@@ -101,7 +106,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         def org = build()
         def org2 = build()
         def orgList = [org, org2]
-        def result = entityMapService.toJson(orgList, ['name'])
+        def result = metaMapEntityService.toJson(orgList, ['name'])
 
         then:
         result == '[{"name":"name"},{"name":"name"}]'
@@ -112,7 +117,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         when:
         def org = build(includes: '*')
         //FIXME it should automtically exclude the ext.org since its the other side of the association
-        def result =  entityMapService.toJson(org, [excludes:['ext.org']])
+        def result =  metaMapEntityService.toJson(org, [excludes:['ext.org']])
 
         def expected = '''{
             id:1, name:'name', ext:[id:1, text1:'text1'],
@@ -127,10 +132,10 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
     void "test json includes ext.*"() {
         when:
         def org = build(includes: '*')
-        def result = entityMapService.toJson(org, ["name", "ext.*"])
+        def result = metaMapEntityService.toJson(org, ["name", 'ext.*'])
 
         then:
-        assertThatJson(result).isEqualTo('{"ext":{"id":1,"text1":"text1"},"name":"name"}')
+        assertThatJson(result).isEqualTo('{"ext":{"id":1,"text1":"text1","org":{"id":1}},"name":"name"}')
 
     }
 
@@ -177,6 +182,10 @@ class JsonifyDomExt {
     NestedDom nested
 
     static belongsTo = [testJsonifyDom: JsonifyDom]
+
+    static Map includes = [
+        stamp: ['id', 'nameExt']  //picklist or minimal for joins
+    ]
 
     static mapping = {
         id generator:'foreign', params:[property:'testJsonifyDom']

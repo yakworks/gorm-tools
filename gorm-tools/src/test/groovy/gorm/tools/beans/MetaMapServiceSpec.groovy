@@ -4,9 +4,12 @@
 */
 package gorm.tools.beans
 
+import gorm.tools.beans.map.MetaMap
+import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.beans.map.MetaMapList
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.IgnoreRest
 import spock.lang.Specification
-import yakworks.commons.map.MetaMapList
 import yakworks.gorm.testing.model.Enummy
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.SinkExt
@@ -15,85 +18,18 @@ import yakworks.gorm.testing.model.TestEnum
 import yakworks.gorm.testing.model.TestEnumIdent
 import yakworks.gorm.testing.model.Thing
 
-class EntityMapServiceSpec extends Specification implements DataRepoTest {
+class MetaMapServiceSpec extends Specification implements DataRepoTest {
 
-    EntityMapService entityMapService = new EntityMapService()
+    MetaMapEntityService metaMapEntityService = new MetaMapEntityService()
 
     void setupSpec() {
         //mockDomain Person
         mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
     }
 
-    void "test buildIncludesMap"(){
-        when:
-        def res = entityMapService.buildIncludesMap("Thing", ['name'])
-
-        then:
-        res.className == 'yakworks.gorm.testing.model.Thing'
-        res.fields == ['name'] as Set
-
-        when:
-        res = entityMapService.buildIncludesMap(Thing)
-
-        then:
-        res.className.contains('Thing') // [className: 'Bookz', props: ['name']]
-        res.fields == ['id', 'version', 'name', 'country'] as Set
-
-        when: "check on collections"
-        res = entityMapService.buildIncludesMap(KitchenSink, ['name', 'items.*'])
-
-        then:
-        res.className.contains('KitchenSink') // [className: 'Bookz', props: ['name']]
-        res.fields == ['name', 'items'] as Set
-        res.nestedIncludes.size() == 1
-
-        def itemsIncs = res.nestedIncludes['items']
-        itemsIncs.className == 'yakworks.gorm.testing.model.SinkItem'
-        itemsIncs.fields == ['id', 'version', 'name'] as Set
-
-    }
-
-    void "test buildIncludesMap * should return stamp"(){
-
-        when:
-        def includes = ['id', 'ext.*']
-        def emapIncs = entityMapService.buildIncludesMap(KitchenSink, includes)
-
-        then:
-        emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
-        emapIncs.fields == ['id', 'ext'] as Set
-        emapIncs.nestedIncludes.size() == 1
-
-        // def extIncs = emapIncs.nestedIncludes['ext']
-        // extIncs.className == SinkExt.name
-        // extIncs.fields == ['id', 'name'] as Set
-
-    }
-
-    void "test buildIncludesMap nested"(){
-
-        when:
-        def includes = ['id', 'num', 'ext.*', 'sinkLink.id', 'sinkLink.num']
-        def emapIncs = entityMapService.buildIncludesMap(KitchenSink, includes)
-
-        then:
-        emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
-        emapIncs.fields == ['id', 'num', 'ext', 'sinkLink'] as Set
-        emapIncs.nestedIncludes.size() == 2
-
-        def extIncs = emapIncs.nestedIncludes['ext']
-        extIncs.className == SinkExt.name
-        extIncs.fields == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name', 'kitchenSink'] as Set
-
-        def sinkLinkIncs = emapIncs.nestedIncludes['sinkLink']
-        sinkLinkIncs.className == KitchenSink.name
-        sinkLinkIncs.fields == ['id', 'num'] as Set
-
-    }
-
     void "createEntityMap with includes"() {
         when: 'sanity check'
-        EntityMap emap = entityMapService.createEntityMap(KitchenSink.build(1), ['id', 'num', 'ext.id'])
+        MetaMap emap = metaMapEntityService.createMetaMap(KitchenSink.build(1), ['id', 'num', 'ext.id'])
 
         then:
         3 == emap.size()
@@ -103,7 +39,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
     void "test null assoc"() {
         when:
         def ks = KitchenSink.build(1)
-        def result = entityMapService.createEntityMap(ks, ['id', 'sinkLink.thing.name'])
+        def result = metaMapEntityService.createMetaMap(ks, ['id', 'sinkLink.thing.name'])
 
         then:
         result.size() == 2
@@ -114,7 +50,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
         setup:
         def ks = KitchenSink.build(1)
         expect:
-        result == entityMapService.createEntityMap(ks, fields) //BeanPathTools.buildMapFromPaths(book, fields)
+        result == metaMapEntityService.createMetaMap(ks, fields) //BeanPathTools.buildMapFromPaths(book, fields)
 
         where:
         fields                        | result
@@ -126,7 +62,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
     void "createEntityMap enums on kitchenSink"() {
         when:
         def ks = KitchenSink.build(1)
-        def result = entityMapService.createEntityMap(ks, ['num', 'kind', 'status', 'thing.name'])
+        def result = metaMapEntityService.createMetaMap(ks, ['num', 'kind', 'status', 'thing.name'])
 
         then:
         result == [num: '1', kind: 'VENDOR', status:[id:2, name:'Inactive'], thing: [name: 'Thing1']]
@@ -135,7 +71,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
     void "works with space in field and its null"() {
         when: 'a field has spaces'
         def ks = KitchenSink.build(1)
-        def result = entityMapService.createEntityMap(ks, ['num', '  simplePogo.foo'])
+        def result = metaMapEntityService.createMetaMap(ks, ['num', '  simplePogo.foo'])
 
         then: 'its should trim them and still work'
         result == [num: '1', simplePogo: [ foo: 'fly']]
@@ -150,7 +86,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
         )
 
         expect:
-        exp == entityMapService.createEntityMap(et, path)
+        exp == metaMapEntityService.createMetaMap(et, path)
 
         where:
 
@@ -172,7 +108,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
             )
             enummyList.add(et)
         }
-        def resultsList = entityMapService.createEntityMapList(enummyList, ['*'])
+        def resultsList = metaMapEntityService.createMetaMapList(enummyList, ['*'])
 
         then:
         resultsList.size() == 2
@@ -180,7 +116,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
         resultsList[1] == [id: 2, testEnum: 'FOO', version:null, enumIdent: [id:2, name:'Num2']]
 
         when:
-        resultsList = entityMapService.createEntityMapList(enummyList, ['testEnum', 'enumIdent'])
+        resultsList = metaMapEntityService.createMetaMapList(enummyList, ['testEnum', 'enumIdent'])
 
         then:
         resultsList[0] == [testEnum: 'FOO', enumIdent: [id:2, name:'Num2']]
@@ -195,10 +131,12 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
         ks.stringList = ['red', 'blue', 'green']
 
         expect:
-        exp == entityMapService.createEntityMap(ks, path)
+        exp == metaMapEntityService.createMetaMap(ks, path)
 
         where:
         path                          | exp
+        ['thing.$*']                  | [thing: [id:1, name:'Thing1']]
+        ['thing.$stamp']              | [thing: [id:1, name:'Thing1']]
         ['thing.*']                   | [thing: [id:1, version:0, name:'Thing1', country:'US']]
         ['ext.name']                  | [ext: [name: 'SinkExt1']]
         ['sinkLink.ext.name']         | [sinkLink: [ext: [name: 'SinkExt1']]]
@@ -208,7 +146,7 @@ class EntityMapServiceSpec extends Specification implements DataRepoTest {
     void "non association list should be wrapped too"() {
         when:
         def ks = KitchenSink.build(1)
-        def emap = entityMapService.createEntityMap(ks, ['id', 'items'])
+        def emap = metaMapEntityService.createMetaMap(ks, ['id', 'items'])
 
         then:
         ks.items

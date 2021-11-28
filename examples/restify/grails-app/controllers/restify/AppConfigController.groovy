@@ -1,18 +1,20 @@
 package restify
 
-import gorm.tools.rest.RestApiConfig
+import groovy.transform.CompileStatic
+
+import gorm.tools.api.IncludesConfig
 import gorm.tools.rest.controller.RestApiController
-import grails.core.GrailsApplication
 import yakworks.commons.map.Maps
 
+@CompileStatic
 class AppConfigController implements RestApiController {
 
-    RestApiConfig restApiConfig
+    IncludesConfig includesConfig
 
     def get() {
         String namespace = params.nspace
         String controllerKey = params.id
-        def resourceConfig = restApiConfig.getPathConfig(controllerKey, namespace)
+        def resourceConfig = includesConfig.getPathConfig(controllerKey, namespace)
         assert resourceConfig
         def fixedMap = Maps.removePropertyListKeys(resourceConfig)
         respond fixedMap

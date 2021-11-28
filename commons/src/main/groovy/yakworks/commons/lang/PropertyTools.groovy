@@ -23,9 +23,9 @@ import org.codehaus.groovy.reflection.CachedMethod
 class PropertyTools {
 
     /**
-     * Return the value of the (probably nested is your using this) property of the specified name, for the specified source object
+     * Return the value of the (probably nested if your using this) property of the specified name, for the specified source object
      *
-     * Example getPropertyValue(source, "x.y.z")
+     * Example getProperty(source, "x.y.z")
      *
      * @param source - The source object
      * @param property - the property

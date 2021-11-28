@@ -32,21 +32,6 @@ class IncludesConfig implements ConfigAware {
         AppCtx.get('includesConfig', this)
     }
 
-    @PostConstruct
-    void setupEntityClassPathKeys() {
-        // setup pathKeys for entityClass
-        // this scans the api.paths base for entityClassName and store the pathKey with namespace.
-        // when it finds  api.paths.security.user.entityClass: gorm.tools.security.domain.AppUser
-        // it will store ['gorm.tools.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
-        Set keySet = config.toProperties().keySet() as Set<String>
-        Set entClassKeySets = keySet.findAll{ it.matches(/api\.paths.*\.entityClass/) }
-        for(String ckey: entClassKeySets){
-            String entityClass = config.getProperty(ckey, String)
-            String rootCfgKey = ckey.replace(".entityClass", '')
-            EntityClassPathKeys[entityClass] = rootCfgKey
-        }
-    }
-
     @Cacheable('apiConfig.includes')
     Map getIncludes(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
@@ -115,10 +100,33 @@ class IncludesConfig implements ConfigAware {
      * looks for the entityClass key that matches the className
      */
     Map findConfigByEntityClass(String className){
+        if(EntityClassPathKeys.isEmpty()){
+            setupEntityClassPathKeys()
+        }
         String rootCfgKey = EntityClassPathKeys[className]
         return rootCfgKey ? config.getProperty(rootCfgKey, Map) : [:]
     }
 
+    /**
+     * setup pathKeys for entityClass
+     * this scans the api.paths base for entityClassName and store the pathKey with namespace.
+     * when it finds  api.paths.security.user.entityClass: gorm.tools.security.domain.AppUser
+     * it will store ['gorm.tools.security.domain.AppUser': 'api.paths.security.user'] for faster lookup
+     */
+    void setupEntityClassPathKeys() {
+        Properties cfgProps = config.toProperties()
+        Set keySet = cfgProps.keySet() as Set<String>
+        Set entClassKeySets = keySet.findAll{ it.matches(/api\.paths.*\.entityClass/) }
+        for(String ckey: entClassKeySets){
+            String entityClass = cfgProps.getProperty(ckey)
+            String rootCfgKey = ckey.replace(".entityClass", '')
+            EntityClassPathKeys[entityClass] = rootCfgKey
+        }
+    }
+
+    /**
+     * FIXME whats this for? can we remove or is it used?
+     */
     Map getPathConfig(String pathkey){
         Map pathConfig
         if(pathkey.contains('_')){
@@ -128,6 +136,22 @@ class IncludesConfig implements ConfigAware {
             pathConfig = getPathConfig(pathkey, null)
         }
         return pathConfig
+    }
+
+    /**
+     * get the fields includes with a list of keys to search in order, stopping at the first found
+     * and falling back to 'get' which should always exist
+     *
+     * @param includesKeys the List of keys to get in order of priority
+     * @return the includes list that can be passed into MetMap creation
+     */
+    static List<String> getFieldIncludes(Map includesMap, List<String> includesKeys){
+        if(!includesKeys.contains('get')) includesKeys << 'get'
+        for(String key : includesKeys){
+            if(includesMap.containsKey(key)) return includesMap[key] as List<String>
+        }
+        //its should never get here but in case it does and config is messed then fall back *
+        return ['*']
     }
 
 }

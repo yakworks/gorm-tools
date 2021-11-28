@@ -160,14 +160,14 @@ trait RestRepoApiController<D> extends RestApiController {
      */
     @Action
     def list() {
-        Pager pager = pagedQuery(params, 'list')
+        Pager pager = pagedQuery(params, ['list'])
         // passing renderArgs args would be usefull for 'renderNulls' if we want to include/exclude
         respondWith pager
     }
 
     @Action
     def picklist() {
-        Pager pager = pagedQuery(params, 'stamp')
+        Pager pager = pagedQuery(params, ['picklist', 'stamp'])
         respondWith pager
     }
 
@@ -220,13 +220,35 @@ trait RestRepoApiController<D> extends RestApiController {
         respondWith(entityMap, [status: status])
     }
 
-    Pager pagedQuery(Map params, String includesKey) {
+    Pager pagedQuery(Map params, List<String> includesKeys) {
         Pager pager = new Pager(params)
         // println "params ${params.class} $params"
         List dlist = query(pager, params)
-        List incs = getFieldIncludes(includesKey)
+        List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
         return pager.setEntityMapList(entityMapList)
+    }
+
+    /**
+     * finds the right includes.
+     *   - looks for includes param and uses that if passed in
+     *   - looks for includesKey param and uses that if set, falling back to the defaultIncludesKey
+     *   - falls back to the passed fallbackKeys if not set
+     *   - the fallbackKeys will itself unlimately fallback to the 'get' includes if it can't be found
+     *
+     * @param params the request params
+     * @return the List of includes field that can be passed to the MetaMap creation
+     */
+    List<String> findIncludes(Map params, List<String> fallbackKeys = []){
+        List<String> keyList = []
+        //if it has a includes then just parse that and pass it back
+        if(params.containsKey('includes')) {
+            return (params['includes'] as String).tokenize(',')*.trim()
+        } else if(params.containsKey('includesKey')){
+            keyList << (params['includesKey'] as String)
+        }
+        keyList.addAll(fallbackKeys)
+        return IncludesConfig.getFieldIncludes(getIncludesMap(), keyList)
     }
 
     List<D> query(Pager pager, Map p = [:]) {
@@ -250,9 +272,9 @@ trait RestRepoApiController<D> extends RestApiController {
      * @param includeKey the key to use in the includes map, use default by default
      * @return the object to pass on to json views
      */
-    MetaMap createEntityMap(D instance, String includesKey = 'get'){
+    MetaMap createEntityMap(D instance){
         flushIfSession() //in testing need to flush before generating entitymap
-        List incs = getFieldIncludes(includesKey)
+        List<String> incs = findIncludes(params)
         MetaMap emap = metaMapEntityService.createMetaMap(instance, incs)
         return emap
     }
@@ -268,31 +290,19 @@ trait RestRepoApiController<D> extends RestApiController {
         }
     }
 
+    /**
+     * calls the IncludesConfig's getIncludes passing in any controller overrides
+     */
     Map getIncludesMap(){
         //we are in trait, always use getters in case they are overrriden in implementing class
         return getIncludesConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
     }
 
     /**
-     * Strickle down, will look for includesKey but fallback to 'stamp' key and if not
-     * then falls back to the get key, used for picklist primarily
+     * calls IncludesConfig.getFieldIncludes with this controllers getIncludesMap()
      */
-    List<String> getStampFieldIncludes(String includesKey){
-        //we are in trait, always use getters in case they are overrriden in implementing class
-        def includesMap = getIncludesMap()
-        def incs = includesMap[includesKey] ?: includesMap['stamp']
-        incs = incs ?: includesMap['get']
-        return incs as List<String>
-    }
-
-    /**
-     * get the fields includes, returns 'get' as the default if nothing found for includesKey
-     */
-    List<String> getFieldIncludes(String includesKey){
-        //we are in trait, always use getters in case they are overrriden in implementing class
-        def includesMap = getIncludesMap()
-        List incs = (includesMap[includesKey] ?: includesMap['get'] ) as List<String>
-        return incs
+    List<String> getFieldIncludes(List<String> includesKeys){
+        return IncludesConfig.getFieldIncludes(getIncludesMap(), ['get'])
     }
 
     /**

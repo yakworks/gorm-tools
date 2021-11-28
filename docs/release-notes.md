@@ -1,3 +1,13 @@
+### v7.0.8-v.42
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.41...v7.0.8-v.42)
+- release so I can release domain9 [link](https://github.com/yakworks/gorm-tools/commit/bb12403e6c643db884ce3d907e42a321b46a4001)
+- reverts #407 which was for 9ci/domain9#526 (#408) [link](https://github.com/yakworks/gorm-tools/commit/6e95cb5d1bae82203d5ad3776cb36ef64c76acce)
+- Merge pull request #407 from yakworks/526-custaccount-org-dims [link](https://github.com/yakworks/gorm-tools/commit/34dc851cfeb03f0b466ff47f9a124286c851a758)
+- #526 Handle orgdimensions for custAccount [link](https://github.com/yakworks/gorm-tools/commit/e4c7d006afc22ec1ace20e808224213642f595ca)
+- fix json parsing when body is empty with tests Request, toString bett… (#406) [link](https://github.com/yakworks/gorm-tools/commit/11a1107f6483f6a2179289639160ca6db18c99bd)
+- result and problem traits (#405) [link](https://github.com/yakworks/gorm-tools/commit/99f1b47afadb08e06d2d2e7b339a0704dc9e7f28)
+
 ### v7.0.8-v.41
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.40...v7.0.8-v.41)

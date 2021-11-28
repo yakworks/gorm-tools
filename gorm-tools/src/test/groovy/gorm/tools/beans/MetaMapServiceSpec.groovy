@@ -160,4 +160,16 @@ class MetaMapServiceSpec extends Specification implements DataRepoTest {
         items[0].keySet() == ['id'] as Set
     }
 
+    void "with named includes key"() {
+        when:
+        def ks = KitchenSink.build(1)
+        ks.ext.thing = new Thing(id: 99, name: "Thing99").persist()
+
+        def emap = metaMapEntityService.createMetaMap(ks, ['id', 'ext.$getCustom'])
+
+        then:
+        emap == [id: 1, ext: [id:1, name:'SinkExt1', thing: [id: 99, name: 'Thing99']]]
+
+    }
+
 }

@@ -5,7 +5,6 @@
 package gorm.tools.api
 
 import java.util.concurrent.ConcurrentHashMap
-import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 

@@ -75,11 +75,11 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
         emapIncs.className == Enummy.name // [className: 'Bookz', props: ['name']]
         emapIncs.fields == ['testEnum'] as Set
         // shouln not end up with a nested
-        emapIncs.nestedIncludes == null
+        emapIncs.nestedIncludes.isEmpty()
 
     }
 
-    void "test buildIncludesMap nested *"(){
+    void "build with nested *"(){
 
         when:
         def includes = ['id', 'num', 'ext.*']
@@ -107,7 +107,45 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
         //ext will still get added and end up giving the id
         emapIncs.fields == ['id', 'ext'] as Set
         //and no nestedIncludes should get set
-        emapIncs.nestedIncludes == null
+        emapIncs.nestedIncludes.isEmpty()
+    }
+
+    void "build nested in nested"(){
+
+        when:
+        //getCustom should be setup in the config
+        def includes = ['id', 'ext.id', 'ext.thing.id']
+        def emapIncs = EntityIncludesBuilder.build(KitchenSink, includes)
+
+        then:
+        emapIncs.fields == ['id', 'ext'] as Set
+        emapIncs.nestedIncludes.size() == 1
+        //will have nested includes
+        def extIncs = emapIncs.nestedIncludes['ext']
+        extIncs.className == SinkExt.name
+        extIncs.fields == ['id', 'thing'] as Set
+
+        def thingLevel = extIncs.nestedIncludes['thing']
+        thingLevel.fields == ['id'] as Set
+    }
+
+    void "build with customer includes key"(){
+
+        when:
+        //getCustom should be setup in the config
+        def includes = ['id', 'ext.$getCustom']
+        def emapIncs = EntityIncludesBuilder.build(KitchenSink, includes)
+
+        then:
+        emapIncs.fields == ['id', 'ext'] as Set
+        emapIncs.nestedIncludes.size() == 1
+        //will have nested includes
+        def extIncs = emapIncs.nestedIncludes['ext']
+        extIncs.className == SinkExt.name
+        extIncs.fields == ['id', 'name', 'thing'] as Set
+
+        def thingLevel = extIncs.nestedIncludes['thing']
+        thingLevel.fields == ['id', 'name'] as Set
     }
 
 }

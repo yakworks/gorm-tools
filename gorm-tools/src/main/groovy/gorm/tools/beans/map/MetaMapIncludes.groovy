@@ -14,10 +14,14 @@ import groovy.util.logging.Slf4j
 @CompileStatic
 class MetaMapIncludes {
     String className
-    Set<String> fields
+    Set<String> fields = [] as Set<String>
     Set<String> excludeFields
     //nestedIncludes has the associations and its included fields
-    Map<String, MetaMapIncludes> nestedIncludes
+    Map<String, MetaMapIncludes> nestedIncludes = [:] as Map<String, MetaMapIncludes>
+
+    MetaMapIncludes(String className){
+        this.className = className
+    }
 
     MetaMapIncludes(Set<String> fields){
         this.fields = fields
@@ -25,11 +29,23 @@ class MetaMapIncludes {
 
     MetaMapIncludes(String className, Set<String> fields, Set<String> excludeFields){
         this.className = className
-        this.fields = fields - excludeFields
-        this.excludeFields = excludeFields
+        addBlacklist(excludeFields)
     }
 
     static MetaMapIncludes of(List<String> fields){
         new MetaMapIncludes(fields as Set)
+    }
+
+    void addBlacklist(Set<String> excludeFields) {
+        this.excludeFields = excludeFields
+        this.fields = fields - excludeFields
+    }
+
+    /**
+     * meges another MetaMapIncludes fields and nested includes
+     */
+    void merge(MetaMapIncludes toMerge) {
+        this.fields.addAll(toMerge.fields)
+        if(toMerge.nestedIncludes) this.nestedIncludes.putAll(toMerge.nestedIncludes)
     }
 }

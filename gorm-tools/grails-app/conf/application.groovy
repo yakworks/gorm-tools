@@ -16,7 +16,7 @@ api {
         security {
             sinkExt {
                 includes {
-                    getCustom = ['id', 'thing.id' ]
+                    getCustom = ['id', 'name', 'thing.$stamp' ]
                 }
                 entityClass = 'yakworks.gorm.testing.model.SinkExt'
             }

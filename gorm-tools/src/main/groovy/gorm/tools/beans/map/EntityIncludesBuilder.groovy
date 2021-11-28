@@ -37,6 +37,7 @@ class EntityIncludesBuilder {
     Class entityClass
     PersistentEntity persistentEntity
     List<PersistentProperty> properties = []
+    MetaMapIncludes metaMapIncludes
 
     EntityIncludesBuilder(String entityClassName, List<String> includes = []){
         this.entityClassName = entityClassName
@@ -53,6 +54,7 @@ class EntityIncludesBuilder {
             properties = GormMetaUtils.getPersistentProperties(persistentEntity)
         }
         this.entityClass = ClassUtils.loadClass(entityClassName)
+        this.metaMapIncludes = new MetaMapIncludes(entityClassName)
     }
 
     static MetaMapIncludes build(Class entityClass, List<String> includes){
@@ -93,26 +95,29 @@ class EntityIncludesBuilder {
                     // * only works if it has properties
                     if(properties){
                         List<String> props = properties*.name
-                        rootProps.addAll(props)
+                        metaMapIncludes.fields.addAll(props)
                     }
                 }
-                else if (field == '$stamp') {
-                    Map incs = IncludesConfig.bean().getIncludes(entityClass)
-                    if(incs){
-                        List props = ( incs.stamp ?: ['id'] ) as List<String>
-                        rootProps.addAll(props)
+                //if it start with a $ then use it as includesKey
+                else if (field.startsWith('$')) {
+                    String incKey = field.replace('$','')
+                    Map incsMap = IncludesConfig.bean().getIncludes(entityClass)
+                    if(incsMap){
+                        List props = ( incsMap[incKey] ?: ['id'] ) as List<String>
+                        def toMerge = EntityIncludesBuilder.build(entityClass, props)
+                        metaMapIncludes.merge(toMerge)
                     }
                 }
                 //just a normal prop but make sure it exists
                 else {
                     if(propertyExists(field)){
-                        rootProps.add(field)
+                        metaMapIncludes.fields.add(field)
                     }
                     // TODO should add check for transient?
                 }
             } else {
                 //we are sure its exists at this point as we alread checked above
-                rootProps.add(nestedPropName)
+                metaMapIncludes.fields.add(nestedPropName)
 
                 //set it up if it has not been yet
                 if (!nestedProps[nestedPropName]) {
@@ -141,16 +146,17 @@ class EntityIncludesBuilder {
         //create the includes class for what we have now along with the the blacklist
         Set blacklist = getBlacklist(persistentEntity)
 
-        MetaMapIncludes entIncludes
         //only if it has rootProps
-        if (rootProps) {
-            entIncludes = new MetaMapIncludes(entityClassName, rootProps, blacklist)
+        if (metaMapIncludes.fields) {
+            if(blacklist) metaMapIncludes.addBlacklist(blacklist)
             //if it has nestedProps then go recursive
             if(nestedProps){
-                buildNested(entIncludes, nestedProps)
+                buildNested(nestedProps)
             }
+            return metaMapIncludes
+        } else {
+            return null
         }
-        return entIncludes
     }
 
     boolean propertyExists(String propName){
@@ -163,7 +169,7 @@ class EntityIncludesBuilder {
     }
 
     //will recursivily call build and add to the metaMapIncludes
-    MetaMapIncludes buildNested(MetaMapIncludes metaMapIncludes, Map<String, Object> nestedProps){
+    MetaMapIncludes buildNested(Map<String, Object> nestedProps){
 
         // now we cycle through the nested props and recursively call this again for each associations includes
         Map<String, MetaMapIncludes> nestedIncludesMap = [:]

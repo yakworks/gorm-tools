@@ -1,3 +1,9 @@
+### v7.0.8-v.43
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.42...v7.0.8-v.43)
+- release v43 [link](https://github.com/yakworks/gorm-tools/commit/5c58e382f9be3bf4215ddb3e1a51ecbeee6b11a0)
+- Meta map (#409) [link](https://github.com/yakworks/gorm-tools/commit/7fb78925cc6cffaa0ef205b653da7037a4093c92)
+
 ### v7.0.8-v.42
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.41...v7.0.8-v.42)

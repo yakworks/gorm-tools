@@ -4,7 +4,7 @@
 */
 package gorm.tools.beans
 
-
+import gorm.tools.beans.map.MetaMap
 import spock.lang.Specification
 
 class EntityMapPogoSpec extends Specification {
@@ -44,7 +44,7 @@ class EntityMapPogoSpec extends Specification {
     void 'test default get includes'() {
 
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
 
         def includes = map.getIncludes()
 
@@ -56,13 +56,13 @@ class EntityMapPogoSpec extends Specification {
 
     void testIsEmpty() {
         expect:
-        def map = new EntityMap(new PogoBean())
+        def map = new MetaMap(new PogoBean())
         !map.isEmpty()
     }
 
     void testContainsKey() {
         expect:
-        def map = new EntityMap(new PogoBean())
+        def map = new MetaMap(new PogoBean())
         map.containsKey("name")
         map.containsKey("age")
         !map.containsKey("fo")
@@ -70,7 +70,7 @@ class EntityMapPogoSpec extends Specification {
 
     void testContainsValue() {
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
 
         then:
         map.containsValue("Bart")
@@ -80,7 +80,7 @@ class EntityMapPogoSpec extends Specification {
 
     void testGet() {
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
 
         then:
         "Bart" == map.get("name")
@@ -98,7 +98,7 @@ class EntityMapPogoSpec extends Specification {
 
     void "put test"() {
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
         def old = map.put("name", "lisa")
 
         then:
@@ -108,7 +108,7 @@ class EntityMapPogoSpec extends Specification {
 
     void testKeySet() {
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
         def keys = map.keySet()
 
         then:
@@ -119,7 +119,7 @@ class EntityMapPogoSpec extends Specification {
 
     void testValues() {
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
         def values = map.values()
 
         then:
@@ -129,7 +129,7 @@ class EntityMapPogoSpec extends Specification {
 
     void "test entrySet"() {
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
         def entset = map.entrySet()
 
         then:
@@ -142,10 +142,10 @@ class EntityMapPogoSpec extends Specification {
 
     void "test nested pogo"() {
         when:
-        def map = new EntityMap(pogoBean())
+        def map = new MetaMap(pogoBean())
 
         then:
-        map.info instanceof EntityMap
+        map.info instanceof MetaMap
         // pogos dont get wrapped unless they are refed in includes
         map.nested instanceof NestedBean
     }

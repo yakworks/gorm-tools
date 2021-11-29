@@ -4,7 +4,6 @@
 */
 package gorm.tools.async
 
-
 import groovy.transform.CompileStatic
 import groovyx.gpars.GParsPoolUtil
 

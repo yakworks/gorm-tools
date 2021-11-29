@@ -1,6 +1,6 @@
 package gorm.tools.beans
 
-
+import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.security.domain.AppUser
 import yakworks.gorm.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest
@@ -13,7 +13,7 @@ import spock.lang.Specification
 @Rollback
 class EntityMapIntSpec extends Specification implements DataIntegrationTest, SecuritySpecHelper {
 
-    EntityMapService entityMapService
+    MetaMapEntityService metaMapEntityService
 
     @Ignore
     void "MetaBeanProperty playground"() {
@@ -57,7 +57,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
         def user = AppUser.get(1)
         assert user.roles.size() == 2
         // def emap = EntityMapFactory.createEntityMap(user, ['username', 'stringList'])
-        def emap = entityMapService.createEntityMap(user, ['username', 'roles.id', 'roles.name'])
+        def emap = metaMapEntityService.createMetaMap(user, ['username', 'roles.id', 'roles.name'])
 
         then:
         emap['roles'] == [ [id:1, name:'Administrator'] , [id:2, name:'Power User']]
@@ -69,7 +69,7 @@ class EntityMapIntSpec extends Specification implements DataIntegrationTest, Sec
         def user = AppUser.get(2)
         assert user.roles.size() == 0
         // def emap = EntityMapFactory.createEntityMap(user, ['username', 'stringList'])
-        def emap = entityMapService.createEntityMap(user, ['username', 'roles.id', 'roles.name'])
+        def emap = metaMapEntityService.createMetaMap(user, ['username', 'roles.id', 'roles.name'])
 
         then:
         emap['roles'] == []

@@ -16,13 +16,13 @@ trait NameCode<D> extends NamedEntity implements Lookupable<D> {
 
     String code
 
-    // like to string but as a field and for sending across the wire
+    // like toString but as a field and for sending across the wire
     @Transient
     String getStamp(){ "${getCode()} : ${getName()}"}
 
     static Map includes = [
         qSearch: ['name', 'code'],
-        picklist: ['id', 'code', 'name']
+        stamp: ['id', 'code', 'name']  //picklist or minimal for joins
     ]
 
     static constraintsMap = [

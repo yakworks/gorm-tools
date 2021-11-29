@@ -1,0 +1,6 @@
+api:
+  paths:
+    rally:
+        entityClass: yakworks.rally.orgs.model.Contact
+        includes:
+          get: [ '*', 'org.$stamp' ]

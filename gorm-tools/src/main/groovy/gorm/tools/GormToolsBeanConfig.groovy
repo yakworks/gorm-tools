@@ -15,9 +15,10 @@ import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 
+import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
-import gorm.tools.beans.EntityMapService
+import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
@@ -59,6 +60,8 @@ class GormToolsBeanConfig {
 
     Closure getBeanDefinitions() {{->
 
+        includesConfig(IncludesConfig, lazy())
+
         jdbcTemplate(JdbcTemplate, ref("dataSource"), lazy())
 
         jdbcIdGenerator(JdbcIdGenerator) { bean ->
@@ -75,7 +78,7 @@ class GormToolsBeanConfig {
         mangoBuilder(MangoBuilder, lazy())
 
         entityMapBinder(EntityMapBinder, ref('grailsApplication'), lazy())
-        entityMapService(EntityMapService, lazy())
+        metaMapEntityService(MetaMapEntityService, lazy())
 
         repoEventPublisher(RepoEventPublisher)
 

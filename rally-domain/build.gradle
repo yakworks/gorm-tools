@@ -24,6 +24,8 @@ dependencies {
   implementation "org.grails:grails-web-boot"
   implementation "org.grails:grails-plugin-services"
 
+  runtime "org.grails.plugins:external-config:$vExternalConfig"
+
   testRuntime "org.grails.plugins:external-config:$vExternalConfig"
   testRuntime "com.h2database:h2"
   testRuntime "javax.xml.bind:jaxb-api:2.3.1"

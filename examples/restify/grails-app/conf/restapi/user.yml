@@ -1,27 +1,30 @@
-restApi:
-  user:
-    includes:
-      get: [ id, username , name, email, inactive, roles.id, roles.name ]
-      picklist: [ id, username, name]
-      qSearch: [ username, name, email ]
-    gridOptions:
-      colModel:
-        - { name: id, hidden: true }
-        - { name: username, width: 120, formatter: editActionLink }
-        - { name: name, width: 120 }
-        - { name: email, width: 120 }
-        - { name: inactive, width: 40, formatter: okIcon }
+api:
+  paths:
+    # Security namespace
+    security:
+      user:
+        includes:
+          get: [ id, username , name, email, inactive ]
+          stamp: [ id, username, name]
+          qSearch: [ username, name, email ]
+        gridOptions:
+          colModel:
+            - { name: id, hidden: true }
+            - { name: username, width: 120, formatter: editActionLink }
+            - { name: name, width: 120 }
+            - { name: email, width: 120 }
+            - { name: inactive, width: 40, formatter: okIcon }
 
-    editForm:
-      username:
-        required: true
-      name:
-        required: true
-      email:
-        required: true
-      inactive:
-        type: checkbox
-      roles:
-        type: select
-        dataApiKey: role
-        selectOptions: { multiple: true }
+        editForm:
+          username:
+            required: true
+          name:
+            required: true
+          email:
+            required: true
+          inactive:
+            type: checkbox
+          roles:
+            type: select
+            dataApiKey: role
+            selectOptions: { multiple: true }

@@ -23,7 +23,7 @@ class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, A
 
     static Map includes = [
         qSearch: ['username', 'name', 'email'], // quick search includes
-        picklist: ['id', 'username', 'name']
+        stamp: ['id', 'username', 'name']  //picklist or minimal for joins
     ]
 
     static constraintsMap = [

@@ -4,8 +4,13 @@
 */
 package yakworks.commons.lang
 
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
+
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
+
+import org.codehaus.groovy.reflection.CachedMethod
 
 /**
  * PropertyTools contains a set of static helpers, which provides a convenient way
@@ -18,9 +23,9 @@ import groovy.util.logging.Slf4j
 class PropertyTools {
 
     /**
-     * Return the value of the (probably nested is your using this) property of the specified name, for the specified source object
+     * Return the value of the (probably nested if your using this) property of the specified name, for the specified source object
      *
-     * Example getPropertyValue(source, "x.y.z")
+     * Example getProperty(source, "x.y.z")
      *
      * @param source - The source object
      * @param property - the property
@@ -79,6 +84,48 @@ class PropertyTools {
             path.split('\\.').each { String it -> bean = bean[it] }
         }
         return bean
+    }
+
+    /**
+     * finds the property in an entity class and returns is MetaBeanProperty which is useful for
+     * things like getting the return type
+     * @param clazz the the class to look in
+     * @param prop the property name
+     * @return the type Class or null if non found
+     */
+    static MetaBeanProperty getMetaBeanProp(Class clazz, String prop) {
+        return clazz.metaClass.properties.find{ it.name == prop} as MetaBeanProperty
+    }
+
+    /**
+     * see getMetaBeanProp, this calls that and returns the getter MetaMethod's returnType
+     * @param clazz the the class to look in
+     * @param prop the property name
+     * @return the type Class or null if non found
+     */
+    static Class getPropertyReturnType(Class clazz, String prop){
+        return getMetaBeanProp(clazz, prop)?.getter?.returnType
+    }
+
+    /**
+     * Trys to find the generic type for a collection property
+     * For example if its a List<Foo> the this will return 'x.y.Foo' assuming its in the x.y package
+     *
+     * @param clazz the class to look on
+     * @param prop the class property to check
+     * @return the generic class name or implies 'java.lang.Object' if no generic found
+     */
+    static String findGenericForCollection(Class clazz, String prop){
+        MetaBeanProperty metaProp = PropertyTools.getMetaBeanProp(clazz, prop)
+        CachedMethod gen = metaProp.getter as CachedMethod
+        Type genericReturnType = gen.cachedMethod.genericReturnType
+        if(genericReturnType && genericReturnType instanceof ParameterizedType){
+            Type[] actualTypeArguments = genericReturnType.getActualTypeArguments()
+            return actualTypeArguments[0].typeName
+        } else {
+            //return the default 'java.lang.Object'
+            return 'java.lang.Object'
+        }
     }
 
 }

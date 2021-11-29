@@ -4,7 +4,7 @@
 */
 package gorm.tools.beans
 
-import spock.lang.IgnoreRest
+import gorm.tools.beans.map.MetaMap
 import spock.lang.Specification
 
 class EntityMapMapSpec extends Specification {
@@ -17,7 +17,7 @@ class EntityMapMapSpec extends Specification {
 
         when:
         Map tobj = testMap()
-        def map = new EntityMap(tobj)
+        def map = new MetaMap(tobj)
 
         def includes = map.getIncludes()
 
@@ -30,7 +30,7 @@ class EntityMapMapSpec extends Specification {
     void testSelectSubMap() {
 
         when:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
 
         def submap = map['name', 'age']
 
@@ -42,18 +42,18 @@ class EntityMapMapSpec extends Specification {
 
     void testIsEmpty() {
         expect:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
         !map.isEmpty()
 
         def emptyMap = [:]
         emptyMap.isEmpty()
-        def mapEmpty = new EntityMap(emptyMap)
+        def mapEmpty = new MetaMap(emptyMap)
         mapEmpty.isEmpty()
     }
 
     void testContainsKey() {
         expect:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
         map.containsKey("name")
         map.containsKey("age")
         !map.containsKey("fo")
@@ -61,7 +61,7 @@ class EntityMapMapSpec extends Specification {
 
     void testContainsValue() {
         when:
-        def map = new EntityMap([name:"Homer", age:45])
+        def map = new MetaMap([name:"Homer", age:45])
 
         then:
         map == [name:"Homer", age:45]
@@ -72,7 +72,7 @@ class EntityMapMapSpec extends Specification {
 
     void testGet() {
         when:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
 
         then:
         "Bart" == map.get("name")
@@ -92,16 +92,16 @@ class EntityMapMapSpec extends Specification {
 
     void "get nested"() {
         when:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
 
         then:
-        map.info instanceof EntityMap
+        map.info instanceof MetaMap
 
     }
 
     void "put test"() {
         when:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
         def old = map.put("name", "lisa")
 
         then:
@@ -111,7 +111,7 @@ class EntityMapMapSpec extends Specification {
 
     void testKeySet() {
         when:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
         def keys = map.keySet()
 
         then:
@@ -122,7 +122,7 @@ class EntityMapMapSpec extends Specification {
 
     void testValues() {
         when:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
         def values = map.values()
 
         then:
@@ -132,7 +132,7 @@ class EntityMapMapSpec extends Specification {
 
     void "test entrySet"() {
         when:
-        def map = new EntityMap(testMap())
+        def map = new MetaMap(testMap())
         def entset = map.entrySet()
 
         then:

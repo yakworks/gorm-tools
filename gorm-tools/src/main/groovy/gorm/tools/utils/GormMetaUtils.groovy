@@ -18,6 +18,7 @@ import gorm.tools.beans.AppCtx
 import gorm.tools.repository.validation.ApiConstraints
 import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
+import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.NameUtils
 
 /**
@@ -52,15 +53,14 @@ class GormMetaUtils {
     }
 
     /**
-     * Returns a persistent entity using a domain instance.
-     *
-     * Note: shortcut for getPersistentEntity(instance.class.name)
+     * calls the static getter method getGormPersistentEntity on the instace
+     * to get the PersistentEntity
      *
      * @param instance the domain instance
      * @return The entity or null
      */
     static PersistentEntity getPersistentEntity(GormEntity instance) {
-        getPersistentEntity(instance.class.name)
+        return (PersistentEntity)ClassUtils.getStaticPropertyValue(instance.class, "gormPersistentEntity")
     }
 
     /**
@@ -193,6 +193,33 @@ class GormMetaUtils {
         if(domain.compositeIdentity) result.addAll(domain.compositeIdentity)
         result.add(0, domain.getIdentity())
         result.unique()
+    }
+
+    /**
+     * gets the id on the instance using entity reflector and trying not to init the proxy if its is one
+     */
+    static Serializable getId(GormEntity instance) {
+        PersistentEntity persistentEntity = getPersistentEntity(instance)
+        def proxyHandler = persistentEntity.mappingContext.proxyHandler
+        if(proxyHandler.isProxy(instance)) {
+            return proxyHandler.getIdentifier(instance)
+        }
+        else {
+            persistentEntity.mappingContext.getEntityReflector(persistentEntity).getIdentifier(instance)
+        }
+    }
+
+    /**
+     * gets a Map representing the id key trying not to init the proxy if its is one.
+     * see getId helper here as well.
+     * If no defaults changed and id field is named id and is a of Long type
+     * its would return '[id: 123]' as an example.
+     */
+    static Map getIdMap(GormEntity instance) {
+        PersistentEntity persistentEntity = getPersistentEntity(instance)
+        Serializable idVal = getId(instance)
+        String idName = persistentEntity.identity.name
+        return  [(idName): idVal]
     }
 
 }

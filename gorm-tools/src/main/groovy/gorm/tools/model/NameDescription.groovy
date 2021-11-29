@@ -14,7 +14,7 @@ trait NameDescription extends NamedEntity {
 
     static Map includes = [
         qSearch: ['name', 'description'],
-        picklist: ['id', 'name']
+        stamp: ['id', 'name'] //picklist or minimal for joins
     ]
 
     static constraintsMap = [

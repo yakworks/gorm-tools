@@ -2,7 +2,7 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.beans
+package gorm.tools.beans.map
 
 import groovy.transform.CompileStatic
 
@@ -16,17 +16,17 @@ import grails.gorm.PagedResultList
  */
 @SuppressWarnings(["CompileStatic", "ExplicitCallToEqualsMethod"])
 @CompileStatic
-class EntityMapList extends AbstractList<EntityMap> {
+class MetaMapList extends AbstractList<MetaMap> {
 
     protected List resultList
-    protected EntityMapIncludes includeMap
+    protected MetaMapIncludes includeMap
     protected int totalCount = Integer.MIN_VALUE
 
-    EntityMapList(List resultList) {
+    MetaMapList(List resultList) {
         this.resultList = resultList
     }
 
-    EntityMapList(List resultList, EntityMapIncludes includeMap) {
+    MetaMapList(List resultList, MetaMapIncludes includeMap) {
         this.resultList = resultList
         this.includeMap = includeMap
     }
@@ -43,9 +43,9 @@ class EntityMapList extends AbstractList<EntityMap> {
      * wraps the item in a
      */
     @Override
-    EntityMap get(int i) {
+    MetaMap get(int i) {
         def origObj = resultList.get(i)
-        def eb = new EntityMap(origObj, includeMap)
+        def eb = new MetaMap(origObj, includeMap)
         return eb
     }
 

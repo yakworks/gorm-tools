@@ -20,7 +20,6 @@ import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.reflect.EntityReflector
 import org.springframework.context.MessageSource
 import org.springframework.context.support.DefaultMessageSourceResolvable
-import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.BindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError

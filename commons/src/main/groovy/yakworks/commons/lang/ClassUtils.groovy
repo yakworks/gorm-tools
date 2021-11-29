@@ -41,6 +41,18 @@ class ClassUtils {
     }
 
     /**
+     * simple helper to load the class from the currentThread.classLoader
+     * @param clazz the class name
+     * @return the loaded class
+     * @throws  ClassNotFoundException
+     *          If the class was not found
+     */
+    static Class loadClass(String clazz){
+        def classLoader = Thread.currentThread().contextClassLoader
+        classLoader.loadClass(clazz)
+    }
+
+    /**
      * gets the static properties from implemented traits on a class
      * @param mainClass the class to look for traits on.
      * @param name the name of the property
@@ -84,6 +96,10 @@ class ClassUtils {
             return (T)value;
         }
         return null;
+    }
+
+    static Object getStaticPropertyValue(Class clazz, String name) {
+        return getStaticPropertyValue(clazz.metaClass, name);
     }
 
     static Object getStaticPropertyValue(MetaClass theMetaClass, String name) {

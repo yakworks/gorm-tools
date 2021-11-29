@@ -85,12 +85,12 @@ class OpenApiGenerator implements ConfigAware {
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api, List namespaceList){
-        Map restApiPaths = config.getProperty('restApi.paths', Map)
+        Map restApiPaths = config.getProperty('api.paths', Map)
 
         List tags = (List)api.tags
         Map<String, List> xTagGroups = [:]
 
-        Map namespaces = config.getProperty('restApi.namespaces', Map, [:])
+        Map namespaces = config.getProperty('api.namespaces', Map, [:])
 
         for(entry in restApiPaths){
             if(namespaces.containsKey(entry.key)){

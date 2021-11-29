@@ -15,9 +15,10 @@ import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
 
+import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
-import gorm.tools.beans.EntityMapService
+import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
@@ -110,7 +111,8 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         persistenceContextInterceptor(NullPersistentContextInterceptor) //required for parallelTools
         parallelTools(ParallelStreamTools)
         asyncService(AsyncService)
-        entityMapService(EntityMapService)
+        includesConfig(IncludesConfig)
+        metaMapEntityService(MetaMapEntityService)
         problemHandler(ProblemHandler)
         messageSource(GrailsICUMessageSource)
     }}

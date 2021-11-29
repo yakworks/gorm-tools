@@ -1,3 +1,4 @@
+# FOR TESTING ONLY, reminder that nothing here get published with jar
 ---
 hibernate:
     naming_strategy: org.hibernate.cfg.DefaultNamingStrategy

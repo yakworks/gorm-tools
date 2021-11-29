@@ -1,4 +1,4 @@
-// THIS IS ALL HERE FOR TESTING/DEV RALLY.. DOES NOT GET DEPLOYED ANYWHERE OVERRIDES Plugin.groovy configs
+// THIS IS ALL HERE FOR TESTING/DEV RALLY.. Reminder, DOES NOT GET DEPLOYED ANYWHERE OVERRIDES Plugin.groovy configs
 grails {
     //gorm.flushMode = 'AUTO'
     gorm.failOnError = true
@@ -10,6 +10,8 @@ grails {
         '*'(nullable: true)
     }
 }
+
+grails.config.locations = ["classpath:api.yml"]
 
 app {
     resources {

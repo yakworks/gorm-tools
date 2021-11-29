@@ -1,4 +1,4 @@
-restApi:
+api:
   paths:
     rally:
       org:

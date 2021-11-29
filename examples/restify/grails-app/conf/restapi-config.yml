@@ -1,5 +1,5 @@
 ---
-restApi:
+api:
   defaultPackage: restify.api
   namespaces: {security: 'Users/Roles', rally: 'Rally Core'}
   paths:

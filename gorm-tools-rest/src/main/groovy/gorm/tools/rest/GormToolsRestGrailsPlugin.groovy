@@ -35,8 +35,6 @@ class GormToolsRestGrailsPlugin extends Plugin {
 
             tomcatWebServerCustomizer(RestTomcatWebServerCustomizer)
 
-            restApiConfig(RestApiConfig){ bean -> bean.lazyInit = true}
-
             //renderers
             mapJsonRenderer(JsonGeneratorRenderer, Map)
             apiResultsRenderer(ApiResultsRenderer)
@@ -107,7 +105,7 @@ class GormToolsRestGrailsPlugin extends Plugin {
         List<GrailsControllerClass> ctrlList = getExistingControllers(app)
         // println ctrlNames
 
-        Map restApi = app.config.getProperty('restApi', Map)
+        Map restApi = app.config.getProperty('api', Map)
         restApi.each { k, v ->
             Map entry = v as Map
             if(entry?.entityClass){

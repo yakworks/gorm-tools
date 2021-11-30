@@ -4,6 +4,7 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.testing.unit.DataRepoTest
 import grails.buildtestdata.TestData
 import grails.plugin.viewtools.AppResourceLoader
+import org.junit.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.SecurityTest
 import yakworks.rally.activity.model.Activity
@@ -97,4 +98,25 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
         activity.task.status == TaskStatus.getOPEN()
     }
 
+    // FIXME https://github.com/yakworks/gorm-tools/issues/410
+    //  fails because we look up only by id, code is in AbsractCrossRefRepo.
+    //  We can call lookup, but it doesn;t do it automatically
+    @Ignore
+    def "create task lookup TaskType by code"(){
+        when:
+        TaskType testType = TestData.build(TaskType, [id:3, name: "test", code: "test"])
+        testType.persist()
+
+        assert TaskType.lookup(code: "test")
+
+        def org = MockData.org()
+        Map params = getActTaskData(org.id)
+        Activity act = Activity.create([taskType: ["code": "test"], org: org, name: 'test me'])
+
+        then:
+        act
+        act.task
+        act.task.code == 'test'
+    }
+    
 }

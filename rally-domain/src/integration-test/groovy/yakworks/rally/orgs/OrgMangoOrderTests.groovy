@@ -25,7 +25,7 @@ import yakworks.rally.testing.MockData
 
 @Integration
 @Rollback
-class OrgMangoTests extends Specification implements DomainIntTest {
+class OrgMangoOrderTests extends Specification implements DomainIntTest {
 
     def "order query"() {
         when:

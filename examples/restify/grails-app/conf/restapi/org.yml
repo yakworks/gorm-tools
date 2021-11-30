@@ -3,7 +3,7 @@ api:
     rally:
       org:
         includes:
-          get: [ '*', info.*, location.id, tags ]
+          get: [ '*', info.*, location.id, tags, contact.$*, contact.flex.num1 ]
           bulk: ['id', 'num', 'name', 'source.sourceId']
         gridOptions:
           colModel:

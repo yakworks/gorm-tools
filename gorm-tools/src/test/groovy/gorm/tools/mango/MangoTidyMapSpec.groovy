@@ -208,7 +208,7 @@ class MangoTidyMapSpec extends Specification {
         mmap = tidy('$sort':['foo.bar.baz': "asc"])
 
         then:
-        mmap == ['$sort':['foo.bar.baz': "desc"]]
+        mmap == ['$sort':['foo.bar.baz': "asc"]]
 
         when:
         mmap = tidy('$sort':'location.address')

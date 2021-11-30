@@ -29,20 +29,20 @@ class OrgMangoTests extends Specification implements DomainIntTest {
 
     def "order query"() {
         when:
-        def list = Org.query {
+        def qry = Org.query {
             createAlias('contact', 'contact')
             createAlias('contact.flex', 'contact_flex')
             order "contact_flex.num1", 'desc'
-        }.list()
-
+        }
+        def list = qry.list()
         then:
         list[0].contact.flex.num1 > list[1].contact.flex.num1
     }
 
     def "order query mango"() {
         when:
-        def list = Org.queryList('$sort':"contact.flex.num1")
-
+        def qry = Org.query('$sort':["contact.flex.num1": 'desc'])
+        def list = qry.list()
         then:
         list[0].contact.flex.num1 > list[1].contact.flex.num1
     }

@@ -118,5 +118,5 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
         act.task
         act.task.code == 'test'
     }
-    
+
 }

@@ -12,6 +12,7 @@ import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
+import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
 
 import gorm.tools.databinding.EntityMapBinder
@@ -200,13 +201,61 @@ class MangoBuilder {
     }
 
     DetachedCriteria order(DetachedCriteria criteria, Object sort) {
-        if (sort instanceof String) return criteria.order(sort as String)
         DetachedCriteria result
-        (sort as Map).each { k, v ->
-            result = criteria.order(k.toString(), v.toString())
+        Map<String,String> sortMap
+
+        if (sort instanceof String)
+            sortMap = [(sort): 'asc'] as Map<String,String>
+        else
+            sortMap = sort as Map<String,String>
+
+        //assume its a map
+        sortMap.each { k, v ->
+            if(k.count('.') > 1 ){
+                //TODO gails default only allows one leve, this is a quick hack to allow 2.
+                //so contact.flex.num works
+                List<String> props = k.split(/\./) as List<String>
+                String first = props[0]
+                String field = props.removeLast()
+
+                String joined = props.join('.')
+                String joined_alias = props.join('_')
+
+                result = createAlias(criteria, first, first)
+                result = createAlias(criteria, joined, joined_alias)
+                // result = createAlias(result, props[1], joined_alias)
+
+                result = criteria.order("${joined_alias}.${field}", v.toString())
+            } else {
+                result = criteria.order(k.toString(), v.toString())
+            }
         }
         return result
     }
+
+    /**
+     * simple overrride so we can return DetachedCriteria and chain
+     */
+    DetachedCriteria createAlias(DetachedCriteria criteria, String associationPath, String alias) {
+        criteria.createAlias(associationPath, alias) as DetachedCriteria
+    }
+
+
+
+    @CompileDynamic
+    // Criteria order(String propertyName, String direction, boolean forceSuper = false) {
+    //     if (forceSuper || !propertyName.contains('.')) {
+    //         return super.order(propertyName, direction)
+    //     }
+    //     List props = propertyName.split(/\./) as List
+    //     String last = props.removeLast()
+    //     Closure toDo = { order(last, direction) }
+    //     Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
+    //         { -> "$prop"(acc) }
+    //     }
+    //     newOrderBy.call()
+    //     return this
+    // }
 
     DetachedCriteria qSearch(DetachedCriteria criteria, Object val) {
         List<String> qSearchFields

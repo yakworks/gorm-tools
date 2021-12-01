@@ -24,7 +24,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
     void "is controller name working and does it have config"() {
         expect:
         controller.getControllerName() == 'org'
-        controller.getFieldIncludes(['get']) == ['*', 'info.*', "location.id", 'tags']
+        controller.getFieldIncludes(['get']) == ['*', 'info.*', "location.id", 'tags', 'contact.$*', 'contact.flex.num1']
     }
 
 
@@ -81,4 +81,18 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         body.tags.size() == 1
         body.tags[0].id == tag1.id
     }
+
+    void "list sort"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [max:20, sort:'contact.flex.num1', order:'desc']
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        data[0].contact.flex.num1 > data[1].contact.flex.num1
+    }
+
 }

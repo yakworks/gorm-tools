@@ -92,6 +92,8 @@ trait BulkableRepo<D> {
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
+        pconfig.enabled = bulkablArgs.asyncEnabled //same as above, ability to override through params
+
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
@@ -144,7 +146,7 @@ trait BulkableRepo<D> {
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
-                itemCopy = Maps.deepCopy(item)
+                    itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
                 results << Result.of(entityInstance).status(isCreate ? 201 : 200)

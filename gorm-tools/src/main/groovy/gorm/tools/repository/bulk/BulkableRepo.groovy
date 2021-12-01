@@ -109,6 +109,7 @@ trait BulkableRepo<D> {
         // if it has slice errors try again but this time run each item in its own transaction
         if(sliceErrors.size()) {
             AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
+            asynArgsNoTrx.enabled = bulkablArgs.asyncEnabled
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
                     results.merge doBulk((List<Map>) dataSlice, bulkablArgs, true)
@@ -146,7 +147,7 @@ trait BulkableRepo<D> {
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
-                    itemCopy = Maps.deepCopy(item)
+                itemCopy = Maps.deepCopy(item)
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
                 results << Result.of(entityInstance).status(isCreate ? 201 : 200)

@@ -16,6 +16,7 @@ import gorm.tools.security.domain.SecRole
 import gorm.tools.security.domain.SecRoleUser
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.model.Contact
+import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
@@ -117,7 +118,10 @@ class RallySeedData {
             email    : "jgalt$id@taggart.com",
             firstName: "John$id",
             lastName : "Galt$id",
-            org: org
+            org: org,
+            flex: new ContactFlex(
+                num1: id * 1.01
+            )
         )
         contact.user = AppUser.get(1)
         contact.persist()

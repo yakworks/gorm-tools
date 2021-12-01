@@ -88,7 +88,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         and: "verify includes"
         results[0].data.size() == 3 //id, project name, nested name
-        results[0].data.id == 1
+        //results[0].data.id == 1
         results[0].data.name == "Sink1"
         results[0].data.ext.name == "SinkExt1"
 

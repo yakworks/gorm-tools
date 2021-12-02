@@ -22,6 +22,7 @@ import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.beans.map.MetaMapList
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
@@ -160,40 +161,42 @@ trait RestRepoApiController<D> extends RestApiController {
      */
     @Action
     def list() {
-        Pager pager = pagedQuery(params, ['list'])
-        // passing renderArgs args would be usefull for 'renderNulls' if we want to include/exclude
-        respondWith pager
+        try {
+            Pager pager = pagedQuery(params, ['list'])
+            respondWith pager
+        } catch (Exception e) {
+            handleException(e)
+        }
     }
 
     @Action
     def picklist() {
-        Pager pager = pagedQuery(params, ['picklist', 'stamp'])
-        respondWith pager
+        try {
+            Pager pager = pagedQuery(params, ['picklist', 'stamp'])
+            respondWith pager
+        } catch (Exception e) {
+            handleException(e)
+        }
     }
-
-    // @Action
-    // def bulkUpdate() {
-    //     Map dataMap = parseJson(request)
-    //     List<Map> data = getRepo().bulkUpdate(dataMap.ids as List, dataMap.data as Map)
-    //     respond([data: data])
-    // }
-
-    //FIXME #339 we need to see if we can rethink this.
-    // in bulkCreate we convert the object to json bytes ( need to save to db so have to do this)
-    // then here we pull the json bytes from the jsonB and turn it back into object (here we can optimize)
-    // and then repond is going to take that object and turn it back into json bytes
-    // seems we should be able to skip some steps here somehow.
 
     /** Used for bulk create calls when Job object is returned */
     @Action
     def bulkCreate() {
-        bulkProcess(request, params, DataOp.add)
+        try {
+            bulkProcess(request, params, DataOp.add)
+        } catch (Exception e) {
+            handleException(e)
+        }
     }
 
     /** Used for bulk create calls when Job object is returned */
     @Action
     def bulkUpdate() {
-        bulkProcess(request, params, DataOp.update)
+        try {
+            bulkProcess(request, params, DataOp.update)
+        } catch (Exception e) {
+            handleException(e)
+        }
     }
 
 
@@ -251,18 +254,29 @@ trait RestRepoApiController<D> extends RestApiController {
         return IncludesConfig.getFieldIncludes(getIncludesMap(), keyList)
     }
 
-    List<D> query(Pager pager, Map p = [:]) {
-        //copy the params into new map
-        Map qryParams = p.findAll {
-            //not if its in the the pager or the controller params
-            !(it.key in ['max', 'offset', 'page', 'controller', 'action'])
-        }
-        qryParams.pager = pager
-        //setup quick search
-        List qsFields = getIncludesMap()['qSearch'] as List
-        if(qsFields) qryParams.qSearchFields = qsFields
+    // List<D> query(Pager pager, Map p = [:]) {
+    //     //copy the params into new map
+    //     Map qryParams = p.findAll {
+    //         //max, offset and page are in pager so we dont need them,
+    //         // dont need controller or action either which grails adds in
+    //         !(it.key in ['max', 'offset', 'page', 'controller', 'action'])
+    //     }
+    //     qryParams.pager = pager
+    //
+    //     //setup quick search
+    //     List qsFields = getIncludesMap()['qSearch'] as List
+    //     if(qsFields) qryParams.qSearchFields = qsFields
+    //
+    //     ((QueryMangoEntityApi)getRepo()).queryList(qryParams)
+    // }
 
-        ((QueryMangoEntityApi)getRepo()).queryList(qryParams)
+    List<D> query(Pager pager, Map parms = [:]) {
+
+        QueryArgs qargs = QueryArgs.of(pager)
+        qargs.qSearchFields = getIncludesMap()['qSearch'] as List
+        qargs.build(parms)
+
+        ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }
 
     /**

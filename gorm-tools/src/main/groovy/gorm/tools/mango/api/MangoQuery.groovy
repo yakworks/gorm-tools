@@ -31,4 +31,6 @@ interface MangoQuery {
      * @return query of entities restricted by mango params
      */
     public <D> List<D> queryList(Class<D> domainClass, Map params, Closure closure)
+
+    public <D> List<D> queryList(Class<D> domainClass, QueryArgs qargs, Closure closure)
 }

@@ -83,7 +83,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested id inList"() {
         when:
-        List list = Org.repo.queryList([criteria: [flex: [id: [24, 25, 26]]]])
+        List list = Org.repo.queryList([q: [flex: [id: [24, 25, 26]]]])
         then:
         list.size() == 3
         list[0].name == "Org24" //sanity check
@@ -306,7 +306,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `lt()`"() {
         when:
-        List list = Org.repo.queryList([criteria: [id: ['$lt': 5]], max: 150]).sort { it.id }
+        List list = Org.repo.queryList([q: [id: ['$lt': 5]], max: 150]).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { lt "id", 5L }.size()
         list[0].name == Org.createCriteria().list() { lt "id", 5L }[0].name
@@ -314,7 +314,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `le()`"() {
         when:
-        List list = Org.repo.queryList([criteria: [id: ['$lte': 5]], max: 150]).sort { it.id }
+        List list = Org.repo.queryList([q: [id: ['$lte': 5]], max: 150]).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { le "id", 5L }.size()
         list[0].name == Org.createCriteria().list() { le "id", 5L }[0].name

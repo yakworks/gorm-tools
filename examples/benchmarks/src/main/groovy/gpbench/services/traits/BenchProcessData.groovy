@@ -15,6 +15,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
 import gorm.tools.mango.MangoTidyMap
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.WithTrx
 import gpbench.model.Region
@@ -169,7 +170,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
     }
 
     void testQuery4(Map map){
-        Map<String, Object> p = mangoQuery.parseParams(map)
+        Map<String, Object> p = QueryArgs.of(map).criteria
         DetachedCriteria dcrit = mangoQuery.query(Region, p.criteria as Map, null)
         mangoQuery.list(dcrit, p.pager as Pager)
         //DetachedCriteria criteria = MangoBuilder.build(Region, map, null)

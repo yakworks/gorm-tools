@@ -254,26 +254,10 @@ trait RestRepoApiController<D> extends RestApiController {
         return IncludesConfig.getFieldIncludes(getIncludesMap(), keyList)
     }
 
-    // List<D> query(Pager pager, Map p = [:]) {
-    //     //copy the params into new map
-    //     Map qryParams = p.findAll {
-    //         //max, offset and page are in pager so we dont need them,
-    //         // dont need controller or action either which grails adds in
-    //         !(it.key in ['max', 'offset', 'page', 'controller', 'action'])
-    //     }
-    //     qryParams.pager = pager
-    //
-    //     //setup quick search
-    //     List qsFields = getIncludesMap()['qSearch'] as List
-    //     if(qsFields) qryParams.qSearchFields = qsFields
-    //
-    //     ((QueryMangoEntityApi)getRepo()).queryList(qryParams)
-    // }
-
     List<D> query(Pager pager, Map parms = [:]) {
 
         QueryArgs qargs = QueryArgs.of(pager)
-        qargs.qSearchFields = getIncludesMap()['qSearch'] as List
+        qargs.qSearchFields = getQSearchFields()
         qargs.build(parms)
 
         ((QueryMangoEntityApi)getRepo()).queryList(qargs)
@@ -310,6 +294,14 @@ trait RestRepoApiController<D> extends RestApiController {
     Map getIncludesMap(){
         //we are in trait, always use getters in case they are overrriden in implementing class
         return getIncludesConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
+    }
+
+    /**
+     * 'qSearch' key from getIncludesMap()
+     */
+    List getQSearchFields(){
+        //we are in trait, always use getters in case they are overrriden in implementing class
+        return getIncludesMap()['qSearch'] as List
     }
 
     /**

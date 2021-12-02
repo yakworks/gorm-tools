@@ -7,6 +7,7 @@ package gorm.tools.rest.controller
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
+import groovy.transform.Generated
 
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.Logger
@@ -254,7 +255,7 @@ trait RestRepoApiController<D> extends RestApiController {
         return IncludesConfig.getFieldIncludes(getIncludesMap(), keyList)
     }
 
-    List<D> query(Pager pager, Map parms = [:]) {
+    List<D> query(Pager pager, Map parms) {
 
         QueryArgs qargs = QueryArgs.of(pager)
         qargs.qSearchFields = getQSearchFields()

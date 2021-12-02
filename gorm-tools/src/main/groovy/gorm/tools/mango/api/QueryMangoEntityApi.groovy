@@ -47,4 +47,8 @@ trait QueryMangoEntityApi<D> {
     List<D> queryList(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         getMangoQuery().queryList(getEntityClass(), params, closure)
     }
+
+    List<D> queryList(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        getMangoQuery().queryList(getEntityClass(), qargs, closure)
+    }
 }

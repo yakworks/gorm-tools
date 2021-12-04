@@ -4,17 +4,14 @@
 */
 package gorm.tools.repository
 
-import groovy.transform.CompileDynamic
+
 import groovy.transform.CompileStatic
 
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.mapping.core.Datastore
 import org.springframework.dao.OptimisticLockingFailureException
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.interceptor.TransactionAspectSupport
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
+import gorm.tools.transaction.TrxService
 import yakworks.problem.data.DataProblem
 import yakworks.problem.data.DataProblemCodes
 import yakworks.problem.data.NotFoundProblem
@@ -94,15 +91,9 @@ class RepoUtil {
     }
 
     /**
-     * force a roll back if in a transaction
-     */
-    static void rollback() {
-        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
-    }
-
-    /**
      * flushes the session and clears the session cache and the DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
      */
+    @Deprecated
     static void flushAndClear() {
         flush()
         clear()
@@ -111,46 +102,17 @@ class RepoUtil {
     /**
      * flushes the session
      */
-    @CompileDynamic
     @Deprecated
     static void flush() {
-        Datastore ds = GormEnhancer.findSingleDatastore()
-        if(ds.hasCurrentSession()) ds.getCurrentSession().flush()
+        TrxService.bean().flush()
     }
 
     /**
      * clears the session cache
      */
-    @CompileDynamic
     @Deprecated
     static void clear() {
-        Datastore ds = GormEnhancer.findSingleDatastore()
-        if(ds.hasCurrentSession()) ds.getCurrentSession().clear()
+        TrxService.bean().clear()
     }
-
-    @CompileDynamic
-    static void flushAndClear(TransactionStatus status) {
-        //TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
-        status.flush()
-        clear(status)
-    }
-
-    @CompileDynamic
-    static void clear(TransactionStatus status) {
-        status.transaction.sessionHolder.getSession().clear()
-    }
-
-    /**
-     * no used right now, but kept for refernce
-     */
-    // public <D> List<D> doAssociation(D entity, Class associatedEntityClass, List<Map> assocList) {
-    //     PersistentEntity associatedEntity = GormMetaUtils.getPersistentEntity(associatedEntityClass)
-    //     GormRepo assocRepo = RepoUtil.findRepo(associatedEntity.javaClass)
-    //
-    //     //if the associated entity has a reference to entity, set it on data map.
-    //     //eg. set contact.org = org
-    //     PersistentProperty p = associatedEntity.getPropertyByName(NameUtils.getPropertyName(entity.class))
-    //     doAssociation(entity, assocRepo, assocList, p?.name)
-    // }
 
 }

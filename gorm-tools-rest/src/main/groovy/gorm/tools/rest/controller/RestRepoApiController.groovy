@@ -17,6 +17,7 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
 import gorm.tools.api.IncludesConfig
+import gorm.tools.api.IncludesKey
 import gorm.tools.beans.Pager
 import gorm.tools.beans.map.MetaMap
 import gorm.tools.beans.map.MetaMapEntityService
@@ -163,7 +164,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def list() {
         try {
-            Pager pager = pagedQuery(params, ['list'])
+            Pager pager = pagedQuery(params, [IncludesKey.list.name()])
             respondWith pager
         } catch (Exception e) {
             handleException(e)
@@ -173,7 +174,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def picklist() {
         try {
-            Pager pager = pagedQuery(params, ['picklist', 'stamp'])
+            Pager pager = pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
             respondWith pager
         } catch (Exception e) {
             handleException(e)
@@ -210,7 +211,7 @@ trait RestRepoApiController<D> extends RestApiController {
         // XXX for now default is false, but we should change
         boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
-        List bulkIncludes = getIncludesMap()['bulk'] as List
+        List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
         BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
@@ -256,11 +257,7 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     List<D> query(Pager pager, Map parms) {
-
-        QueryArgs qargs = QueryArgs.of(pager)
-        qargs.qSearchFields = getQSearchFields()
-        qargs.build(parms)
-
+        QueryArgs qargs = QueryArgs.of(pager).build(parms)
         ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }
 
@@ -294,29 +291,15 @@ trait RestRepoApiController<D> extends RestApiController {
      */
     Map getIncludesMap(){
         //we are in trait, always use getters in case they are overrriden in implementing class
-        return getIncludesConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), getIncludes())
-    }
-
-    /**
-     * 'qSearch' key from getIncludesMap()
-     */
-    List getQSearchFields(){
-        //we are in trait, always use getters in case they are overrriden in implementing class
-        return getIncludesMap()['qSearch'] as List
+        return getIncludesConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), [:])
     }
 
     /**
      * calls IncludesConfig.getFieldIncludes with this controllers getIncludesMap()
      */
     List<String> getFieldIncludes(List<String> includesKeys){
-        return IncludesConfig.getFieldIncludes(getIncludesMap(), ['get'])
+        return IncludesConfig.getFieldIncludes(getIncludesMap(), [IncludesKey.get.name()])
     }
-
-    /**
-     * implementing controller class can provide the includes map property.
-     * This will override whats in the entity and the config
-     */
-    Map getIncludes(){ [:] }
 
     void handleException(Exception e) {
         assert getEntityClass()

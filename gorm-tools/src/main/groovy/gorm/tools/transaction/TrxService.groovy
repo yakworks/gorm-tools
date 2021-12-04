@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.interceptor.TransactionAspectSupport
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.beans.AppCtx
@@ -151,6 +152,36 @@ class TrxService {
         ses.clear()
     }
 
+    /**
+     * see the static flush method which is called with the getTargetDatastore()
+     */
+    void flush() {
+        flush(getTargetDatastore())
+    }
+
+    /**
+     * see the static clear method which is called with the getTargetDatastore()
+     */
+    void clear() {
+        clear(getTargetDatastore())
+    }
+
+    /**
+     * force a roll back if in a transaction
+     * Can be used if wanting to rollback without firing an exception
+     */
+    static void rollback() {
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
+    }
+
+    /**
+     * Calls flush if we are actively in a transaction, uses TransactionSynchronizationManager
+     * if not in a transaction then flush is not valid concept anymore.
+     * Everything is in a transaction if its db or datastore related
+     * See the instance flush method if dont ahve datastore or are using the default one
+     *
+     * @param datastore the datastore for the flush
+     */
     static void flush(Datastore datastore) {
         // only calls flush if we are actively in a trx
         if(TransactionSynchronizationManager.isSynchronizationActive()) {
@@ -161,8 +192,14 @@ class TrxService {
         }
     }
 
-    void flush() {
-        flush(getTargetDatastore())
+    /**
+     * Clears the cache for datastore if is has a current session
+     * See the instance flush method if dont have datastore or are using the default one
+     *
+     * @param datastore the datastore for the flush
+     */
+    static void clear(Datastore ds) {
+        if(ds.hasCurrentSession()) ds.currentSession.clear()
     }
 
     static TrxService bean(){

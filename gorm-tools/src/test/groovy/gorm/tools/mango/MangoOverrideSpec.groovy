@@ -51,6 +51,11 @@ class NewMangoQuery implements MangoQuery {
     }
 
     @Override
+    MangoDetachedCriteria query(Class domainClass, QueryArgs qargs, Closure closure = null) {
+        new MangoDetachedCriteria(domainClass).build { eq "id", 2 }
+    }
+
+    @Override
     List queryList(Class domainClass, Map params, Closure closure = null) {
         query(domainClass, [:], null).list()
     }

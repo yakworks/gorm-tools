@@ -24,7 +24,7 @@ trait QueryMangoEntity<D> {
      * @param params the mango criteria language map
      * @param closure optional closure
      */
-    static MangoDetachedCriteria<D> query(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    static MangoDetachedCriteria<D> query(Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).query(params, closure)
     }
 
@@ -34,7 +34,7 @@ trait QueryMangoEntity<D> {
      * @return a DetachedCriteria instance
      */
     static MangoDetachedCriteria<D> query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
-        ((QueryMangoEntityApi)getRepo()).query([:], closure)
+        query([:], closure)
     }
 
     /**
@@ -44,7 +44,12 @@ trait QueryMangoEntity<D> {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    static List<D> queryList(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    static List<D> queryList(Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         ((QueryMangoEntityApi)getRepo()).queryList(params, closure)
     }
+
+    static List<D> queryList(@DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        ((QueryMangoEntityApi)getRepo()).queryList([:], closure)
+    }
+
 }

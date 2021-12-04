@@ -9,15 +9,12 @@ import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.api.MangoQuery
 import gorm.tools.mango.api.QueryArgs
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
-
-import static gorm.tools.mango.MangoOps.CRITERIA
 
 /**
  * Default implementation of MangoQuery. Setup as spring bean that is used by all the repos
@@ -33,16 +30,22 @@ class DefaultMangoQuery implements MangoQuery {
 
     JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
 
-    /**
-     * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
-     *
-     * @param params mango language criteria map
-     * @param closure additional restriction for criteria
-     * @return Detached criteria build based on mango language params and criteria closure
-     */
-    public <D> MangoDetachedCriteria<D> query(Class<D> domainClass, Map criteria = [:],
+    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, Map params,
                                               @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        mangoBuilder.build(domainClass, criteria, closure)
+        return query(entityClass, QueryArgs.of(params), closure)
+    }
+
+    /**
+     *  Builds detached criteria for repository's domain based on mango criteria language
+     *
+     * @param entityClass the base entity class
+     * @param qargs the QueryArgs with the prepared criteria in it.
+     * @param closure extra criterai closure
+     * @return the detached criteria to call list or get on
+     */
+    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs,
+                                              @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+        mangoBuilder.build(entityClass, qargs.criteria, closure)
     }
 
     /**
@@ -52,12 +55,12 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    public <D> List<D> queryList(Class<D> domainClass, Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    public <D> List<D> queryList(Class<D> domainClass, Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         return queryList(domainClass, QueryArgs.of(params), closure)
     }
 
     public <D> List<D> queryList(Class<D> domainClass, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        DetachedCriteria<D> dcrit = query(domainClass, qargs.criteria, closure)
+        DetachedCriteria<D> dcrit = query(domainClass, qargs, closure)
         list(dcrit, qargs.pager)
     }
 

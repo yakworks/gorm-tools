@@ -31,6 +31,14 @@ class IncludesConfig implements ConfigAware {
         AppCtx.get('includesConfig', this)
     }
 
+    /**
+     * pulls the value for key from includes map
+     */
+    List<String> getIncludes(Class entityClass, String key){
+        Map incsMap = getIncludes(entityClass)
+        return (incsMap ? incsMap[IncludesKey.qSearch.name()] : []) as List<String>
+    }
+
     @Cacheable('apiConfig.includes')
     Map getIncludes(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
@@ -49,7 +57,7 @@ class IncludesConfig implements ConfigAware {
      * @param entityKey the name of the controller key in the restApi config
      * @param namespace the namespace it falls under
      * @param entityClass the entity class to look for statics on
-     * @param mergeIncludes passed in from controller, overrrides for whats in config and domain
+     * @param mergeIncludes may be passed in from controller etc, provides overrrides for whats in config and domain
      */
     @Cacheable('apiConfig.includes')
     Map getIncludes(String entityKey, String namespace, Class entityClass, Map mergeIncludes){

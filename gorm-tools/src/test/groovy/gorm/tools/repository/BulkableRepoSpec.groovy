@@ -88,15 +88,15 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         and: "verify includes"
         results[0].data.size() == 3 //id, project name, nested name
-        results[0].data.id == 1
+        //results[0].data.id == 1
         results[0].data.name == "Sink1"
         results[0].data.ext.name == "SinkExt1"
 
         and: "Verify database records"
         KitchenSink.count() == 20
-        KitchenSink.get(1).name == "Sink1"
-        KitchenSink.get(1).ext.name == "SinkExt1"
-        KitchenSink.get(20).name == "Sink20"
+        KitchenSink.findByName("Sink1") != null
+        KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
+        KitchenSink.findByName("Sink20") != null
     }
 
     void "test bulk update"() {

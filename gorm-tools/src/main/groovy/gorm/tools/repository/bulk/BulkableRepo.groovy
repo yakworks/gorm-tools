@@ -92,6 +92,8 @@ trait BulkableRepo<D> {
         List<Collection<Map>> sliceErrors = Collections.synchronizedList([] as List<Collection<Map>> )
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
+        pconfig.enabled = bulkablArgs.asyncEnabled //same as above, ability to override through params
+
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
@@ -107,6 +109,7 @@ trait BulkableRepo<D> {
         // if it has slice errors try again but this time run each item in its own transaction
         if(sliceErrors.size()) {
             AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
+            asynArgsNoTrx.enabled = bulkablArgs.asyncEnabled
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
                     results.merge doBulk((List<Map>) dataSlice, bulkablArgs, true)

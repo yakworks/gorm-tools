@@ -9,6 +9,7 @@ import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
+import gorm.tools.mango.MangoOps
 import yakworks.commons.map.Maps
 
 import static gorm.tools.mango.MangoOps.CRITERIA
@@ -49,12 +50,6 @@ class QueryArgs {
     Pager pager
 
     /**
-     * If q is a string then these are the field to use to build the queryCriteria
-     * Should get populated from the includes map thats in config or domain static
-     */
-    List<String> qSearchFields
-
-    /**
      * holder for sort configuration to make it easier to grok
      * The key is the field, can be dot path for nested like foo.bar.baz
      * The value is either 'asc' or 'desc'
@@ -62,13 +57,24 @@ class QueryArgs {
     Map<String, String> sort
 
     /**
-     * Setups the criteria and pager
+     * Intelligent defaults to setup the criteria and pager from the paramsMap
+     *  - looks for q param and parse if json object (starts with {)
+     *  - or sets up the $qSearch map if its text
+     *  - if qSearch is provided as separate param along with q then adds it as a $qSearch
+     *  - for any of above options for $qSearch sets up object with configured qSearchIncludes
+     *
+     * Pager
+     *  - if pager key is passed in then uses that
+     *  - removes 'max', 'offset', 'page' and sets up pager object if not passed in
+     *
+     * Sort and Order
+     *  - sets up an '$sort' map if sort or order key are passed in
      *
      * Translates q from json
      * example params= [q: "{foo: 'test*'}", sort:'foo', page: 2, offset: 10]
      * criteria= [foo:'test*', $sort:'foo'] and pager will be setup
      *
-     * Transalates qSearch fields when string
+     * Transalates qSearch fields when q is a string
      * params= [q: "foo", qSearchFields:['name', 'num']]
      * criteria= [$q: [text: "foo", 'fields': ['name', 'num']
      *
@@ -79,7 +85,6 @@ class QueryArgs {
     QueryArgs build(Map<String, ?> paramsMap){
         //copy it
         Map params = Maps.deepCopy(paramsMap) as Map<String, Object>
-
 
         //remove the fields that grails adds for controller and action
         params.removeAll {it.key in ['controller', 'action'] }
@@ -100,44 +105,71 @@ class QueryArgs {
             sort = [(sortField): orderBy] as Map<String, String>
         }
 
-        //jsonSlurper LAX allows fields to not be quoted
-        JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
-
         // check for and remove the q param
         // whatever is in q if its parsed as a map and set to the criteria so it overrides everything
-        def qProp = params.q ? params.remove('q') : params.remove(CRITERIA)
+        def qParam = params.q ? params.remove('q') : params.remove(CRITERIA)
+        if(qParam && qParam instanceof String) qParam = qParam.trim()
 
-        if(qProp && qProp instanceof String) {
-            String qString = qProp as String
-
-            //if the q param start with { then assume its json and parse it
-            //the parsed map will be set to the criteria.
-            if (qString.trim().startsWith('{')) {
-                // parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key
-                criteria = new HashMap(jsonSlurper.parseText(qString) as Map)
+        if(qParam) {
+            if (qParam instanceof String) {
+                String qString = qParam as String
+                Map parsedMap
+                //if the q param start with { then assume its json and parse it
+                //the parsed map will be set to the criteria.
+                if (qString.trim().startsWith('{')) {
+                    criteria = buildWithJson(qString)
+                } else {
+                    criteria[MangoOps.QSEARCH] = qString
+                }
             }
-            //if it doesn't start with { then its quick search so check for qSearchFields
-            else if (qSearchFields) {
-                //if it has a qsFields then set up the map
-                Map qMap = ['text': qString, 'fields': qSearchFields]
-                criteria['$q'] = qMap
-            } else {
-                criteria['$q'] = qString
+            //as is, mostly for testing and programtic stuff
+            else if(qParam instanceof Map) {
+                criteria = qParam as Map
             }
         }
-        //if qprop exists and its a Map then its programatic execution and just set criteria to it
-        else if(qProp && qProp instanceof Map){
-            criteria = qProp as Map
-        }
-        //finally if no q was passed in then use whatever is left in params for the criteria
+        //if no q was passed in then use whatever is left in the params as the criteria
         else {
             criteria = params
         }
 
-        // if sort is populated, add it to the criteria with the $sort
-        if(sort) criteria['$sort'] = sort
+        //now check if qSearch was passed as a separate param and its doesn't already exists in the criteria
+        String qSearchParam = params.remove('qSearch')
+        if(qSearchParam && !criteria.containsKey(MangoOps.QSEARCH)){
+            criteria[MangoOps.QSEARCH] = qSearchParam
+        }
+
+        // if sort was populated, add it to the criteria with the $sort if its doesn't exist
+        if(sort && !criteria.containsKey('$sort') ) {
+            criteria['$sort'] = sort
+        }
 
         return this
     }
+
+    /**
+     * if the string is known to be json then parse the json and returns the map
+     * also adds in the includes if its has a $qSearch prop
+     */
+    Map buildWithJson(String qString){
+        //jsonSlurper LAX allows fields to not be quoted
+        JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
+        // parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key
+        Map parsedMap = new HashMap(jsonSlurper.parseText(qString) as Map)
+
+        return parsedMap
+    }
+
+    /**
+     * looks for the qsearch fields for this entity and returns the map
+     * like [text: "foo", 'fields': ['name', 'num']]
+     * if no qSearchFields then its just returns [text: "foo"]
+     */
+    // Map<String, Object> makeQSearchMap(String searchText){
+    //     Map qMap = [text: searchText] as Map<String, Object>
+    //     if (qSearchFields) {
+    //         qMap['fields'] = qSearchFields
+    //     }
+    //     return qMap
+    // }
 
 }

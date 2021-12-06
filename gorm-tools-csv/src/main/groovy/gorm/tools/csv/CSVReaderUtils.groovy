@@ -15,11 +15,11 @@ import com.opencsv.CSVReader
 class CSVReaderUtils {
 
 
-    static CSVReader toCsvReader(File file, def settingsMap) {
+    static CSVReader toCsvReader(File file, Map settingsMap) {
         return toCsvReader(new FileInputStream(file), settingsMap)
     }
 
-    static CSVReader toCsvReader(InputStream is, def settingsMap) {
+    static CSVReader toCsvReader(InputStream is, Map settingsMap) {
         def charset = settingsMap?.get('charset')
         InputStreamReader reader
         if (charset) {
@@ -51,7 +51,7 @@ class CSVReaderUtils {
         return new CSVReader(r, separatorChar, quoteChar, escapeChar, skipLines, strictQuotes, ignoreLeadingWhiteSpace)
     }
 
-    static CSVReader toCsvReader(String s, def settingsMap) {
+    static CSVReader toCsvReader(String s, Map settingsMap) {
         return toCsvReader(new StringReader(s), settingsMap)
     }
 }

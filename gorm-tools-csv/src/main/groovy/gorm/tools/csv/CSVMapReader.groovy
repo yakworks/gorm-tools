@@ -98,7 +98,9 @@ class CSVMapReader implements Closeable, Iterable {
 
     //This is here to remain consitent with file's eachLine in case someone uses it. Just calls the each
     void eachLine(Closure closure) {
-        if (batchSize > 0) throw new UnsupportedOperationException("batchSize is >0 so you are not getting lines but a list of lines(rows/maps). Use each instead")
+        if (batchSize > 0) {
+            throw new UnsupportedOperationException("batchSize is >0 so you are not getting lines but a list of lines(rows/maps). Use each instead")
+        }
         each(closure)
     }
 

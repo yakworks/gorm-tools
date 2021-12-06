@@ -401,7 +401,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     /** cache clear on the datastore's currentSession.*/
     void clear(){
-        getDatastore().currentSession.clear()
+        TrxService.clear(getDatastore())
     }
 
     void flushAndClear() {

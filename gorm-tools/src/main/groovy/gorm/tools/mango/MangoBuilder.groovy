@@ -12,13 +12,13 @@ import org.codehaus.groovy.runtime.InvokerHelper
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.query.Query
-import org.grails.datastore.mapping.query.api.Criteria
 import org.grails.datastore.mapping.query.api.QueryableCriteria
+import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.api.IncludesConfig
+import gorm.tools.api.IncludesKey
 import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.mango.api.QueryMangoEntity
 import grails.gorm.DetachedCriteria
-import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
 
@@ -41,6 +41,8 @@ import static gorm.tools.mango.MangoOps.SORT
 @CompileStatic
 @Slf4j
 class MangoBuilder {
+
+    @Autowired IncludesConfig includesConfig
 
     public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
         MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
@@ -204,10 +206,11 @@ class MangoBuilder {
         DetachedCriteria result
         Map<String,String> sortMap
 
-        if (sort instanceof String)
+        if (sort instanceof String){
             sortMap = [(sort): 'asc'] as Map<String,String>
-        else
+        } else {
             sortMap = sort as Map<String,String>
+        }
 
         //assume its a map
         sortMap.each { k, v ->
@@ -219,13 +222,13 @@ class MangoBuilder {
                 String field = props.removeLast()
 
                 String joined = props.join('.')
-                String joined_alias = props.join('_')
+                String joinedAlias = props.join('_')
 
                 result = createAlias(criteria, first, first)
-                result = createAlias(criteria, joined, joined_alias)
+                result = createAlias(criteria, joined, joinedAlias)
                 // result = createAlias(result, props[1], joined_alias)
 
-                result = criteria.order("${joined_alias}.${field}", v.toString())
+                result = criteria.order("${joinedAlias}.${field}", v.toString())
             } else {
                 result = criteria.order(k.toString(), v.toString())
             }
@@ -260,14 +263,15 @@ class MangoBuilder {
     DetachedCriteria qSearch(DetachedCriteria criteria, Object val) {
         List<String> qSearchFields
         String qText
-        // if its a map then assume its got the text and fields to search on
+        // if its a map then assume its already setup with text and fields to search on
         if(val instanceof Map){
             qText = val['text'] as String
             qSearchFields = val['fields'] as List<String>
-        } else if (QueryMangoEntity.isAssignableFrom(getTargetClass(criteria))){
+        }
+        //otherwise we assume its a string and find the QSearchFields
+        else if (val instanceof String){
             qText = val as String
-            Class entityClazz = getTargetClass(criteria)
-            qSearchFields = getQSearchFields(entityClazz)
+            qSearchFields = getQSearchFields(criteria)
         }
 
         if(qSearchFields) {
@@ -285,9 +289,9 @@ class MangoBuilder {
         criteria.targetClass
     }
 
-    List<String> getQSearchFields(Class entityClazz) {
-        Map incs =  ClassUtils.getStaticPropertyValue(entityClazz, 'includes', Map)
-        return ( incs ? incs['qSearch'] : [] ) as List<String>
+    List<String> getQSearchFields(DetachedCriteria criteria) {
+        Class entityClazz = getTargetClass(criteria)
+        return includesConfig.getIncludes(entityClazz, IncludesKey.qSearch.name())
     }
 
     //@CompileDynamic

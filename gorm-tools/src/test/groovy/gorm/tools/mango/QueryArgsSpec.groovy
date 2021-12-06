@@ -45,7 +45,7 @@ class QueryArgsSpec extends Specification {
         qargs = QueryArgs.of(name: 'joe', sort:'foo', page: 2)
 
         then:
-        qargs['criteria'] == [name: 'joe', '$sort': ['foo':'asc']]
+        qargs.criteria == [name: 'joe', '$sort': ['foo':'asc']]
 
         qargs.pager.max == 20
         qargs.pager.offset == 20 //(max * (page - 1))
@@ -55,7 +55,7 @@ class QueryArgsSpec extends Specification {
         when:
         qargs = QueryArgs.of(name: 'joe')
         then:
-        qargs['criteria'] == [name: 'joe']
+        qargs.criteria == [name: 'joe']
         qargs.pager
     }
 
@@ -66,13 +66,13 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = QueryArgs.of(id: 123, name: 'joe', max: 10, sort:'foo')
 
         then:
-        qargs['criteria'] == [id: 123, name: 'joe', '$sort': ['foo':'asc']]
+        qargs.criteria == [id: 123, name: 'joe', '$sort': ['foo':'asc']]
         qargs.pager.max == 10
 
         when:
         qargs = QueryArgs.of(name: 'joe')
         then:
-        qargs['criteria'] == [name: 'joe']
+        qargs.criteria == [name: 'joe']
     }
 
     def "parseParams q is string so its quick search"() {
@@ -80,21 +80,22 @@ class QueryArgsSpec extends Specification {
         QueryArgs qargs = QueryArgs.of(q:"foo")
 
         then:
-        qargs.criteria == ['$q': 'foo']
+        qargs.criteria == ['$qSearch': 'foo']
+        qargs.pager
+    }
 
-        when: 'its has the qSearchFields'
-        qargs = new QueryArgs()
-        qargs.qSearchFields = ['name','num']
-        qargs.build(q:"foo")
+    def "build with both q and qsearch"() {
+
+        when: 'no qSearchFields'
+        def qjson = "{id: 1, name: 'joe'}"
+        def qargs = new QueryArgs()
+        // qargs.qSearchFields = ['name','num']
+        qargs.build(q: qjson, qSearch:'foo')
 
         then:
-        qargs.criteria == [
-            '$q': [
-                text: 'foo',
-                fields: ['name','num']
-            ]
-        ]
+        qargs.criteria == [id: 1, name: 'joe', '$qSearch': 'foo']
         qargs.pager
+
     }
 
 }

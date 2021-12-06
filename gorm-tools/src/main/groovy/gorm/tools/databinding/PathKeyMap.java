@@ -202,6 +202,8 @@ public class PathKeyMap extends TypeConvertingMap implements Cloneable {
             if (prefixedByUnderscore) {
                 remainderOfKey = '_' + remainderOfKey;
             }
+
+            nestedMap.put(remainderOfKey, requestMap.get(key));
             if (!(nestedMap instanceof PathKeyMap) && remainderOfKey.indexOf('.') >-1) {
                 processNestedKeys(requestMap, remainderOfKey, remainderOfKey, nestedMap);
             }

@@ -70,6 +70,10 @@ trait DataIntegrationTest implements TestDataBuilder {
         TrxService.flush(getDatastore())
     }
 
+    void clear() {
+        TrxService.clear(getDatastore())
+    }
+
     /**
      * Start tracking all metaclass changes made after this call, so it can all be undone later.
      */

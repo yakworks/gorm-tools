@@ -17,18 +17,27 @@ interface MangoQuery {
     /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
      *
-     * @param params mango language criteria map
-     * @param closure additional restriction for criteria
-     * @return Detached criteria build based on mango language params and criteria closure
+     * @param entityClass the base entity class
+     * @param params to process into QueryArgs
+     * @param closure extra criterai closure
+     * @return the detached criteria to call list or get on
      */
-    public <D> MangoDetachedCriteria<D> query(Class<D> domainClass, Map params, Closure closure)
+    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, Map params, Closure closure)
 
     /**
-     * List of entities restricted by mango map and criteria closure
+     *  Builds detached criteria for repository's domain based on mango criteria language
      *
-     * @param params mango language criteria map
-     * @param closure additional restriction for criteria
-     * @return query of entities restricted by mango params
+     * @param entityClass the base entity class
+     * @param qargs the QueryArgs with the prepared criteria in it.
+     * @param closure extra criterai closure
+     * @return the detached criteria to call list or get on
      */
-    public <D> List<D> queryList(Class<D> domainClass, Map params, Closure closure)
+    public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs, Closure closure)
+
+    /**
+     * shortcut to call query and then list with the pager fields in params
+     */
+    public <D> List<D> queryList(Class<D> entityClass, Map params, Closure closure)
+
+    public <D> List<D> queryList(Class<D> entityClass, QueryArgs qargs, Closure closure)
 }

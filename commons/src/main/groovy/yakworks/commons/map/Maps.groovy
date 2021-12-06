@@ -80,6 +80,7 @@ class Maps {
     }
 
     static Map deepCopy(Map source) {
+        if(!source) return [:]
         merge([:], source)
     }
 

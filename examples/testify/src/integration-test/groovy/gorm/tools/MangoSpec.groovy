@@ -45,7 +45,7 @@ class MangoSpec extends Specification {
 
     def "Filter by Name ilike"() {
         when: "eq"
-        List list = Org.queryList([criteria: [name: "Org2%"], max: 150])
+        List list = Org.queryList([q: [name: "Org2%"], max: 150])
         then:
         list.size() == 11
         list[0].name == "Org2"
@@ -83,7 +83,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested id inList"() {
         when:
-        List list = Org.repo.queryList([criteria: [flex: [id: [24, 25, 26]]]])
+        List list = Org.repo.queryList([q: [flex: [id: [24, 25, 26]]]])
         then:
         list.size() == 3
         list[0].name == "Org24" //sanity check
@@ -98,7 +98,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested string on info"() {
         when: "eq"
-        List list = Org.queryList([criteria: [info: [phone: "1-800-4"]]])
+        List list = Org.queryList([q: [info: [phone: "1-800-4"]]])
         then:
         list.size() == 1
         list[0].name == "Org4"
@@ -188,7 +188,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` "() {
         when:
-        List list = Org.queryList([criteria: ['$or': ["name": "Org9", "flex.id": 10]]])
+        List list = Org.queryList([q: ['$or': ["name": "Org9", "flex.id": 10]]])
         then:
         list.size() == 2
         list[0].name == "Org9"
@@ -197,14 +197,14 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` on low level"() {
         when:
-        List list = Org.queryList([criteria: [location: ['$or': ["city": "City3", "id": 1000]]], max: 150])
+        List list = Org.queryList([q: [location: ['$or': ["city": "City3", "id": 1000]]], max: 150])
         then:
         list.size() == 2
     }
 
     def "Filter with several `or` on one level"() {
         when:
-        List list = Org.queryList([criteria: ['$or': [
+        List list = Org.queryList([q: ['$or': [
             ["location.city": "City3"],
             ["name": "Org4", "location.city": "City4"]
         ]]])
@@ -215,56 +215,56 @@ class MangoSpec extends Specification {
 
     def "Filter with several `or` on one level2"() {
         when:
-        List list = Org.queryList([criteria: ['$or': [["location.id": 1000], ["location.id": 1001]]]])
+        List list = Org.queryList([q: ['$or': [["location.id": 1000], ["location.id": 1001]]]])
         then:
         list.size() == 2
     }
 
     def "Filter with `or` with like"() {
         when:
-        List list = Org.queryList([criteria: ['$or': ["name": "Org2%", "location.city": "City4"]], max: 50])
+        List list = Org.queryList([q: ['$or': ["name": "Org2%", "location.city": "City4"]], max: 50])
         then:
         list.size() == 12
     }
 
     def "Filter with `between()`"() {
         when:
-        List list = Org.queryList([criteria: [id: ['$between': [2, 10]]]])
+        List list = Org.queryList([q: [id: ['$between': [2, 10]]]])
         then:
         list.size() == 9
     }
 
     def "Filter with `in()`"() {
         when:
-        List list = Org.queryList([criteria: [id: ["\$in": [24, 25]]]])
+        List list = Org.queryList([q: [id: ["\$in": [24, 25]]]])
         then:
         list.size() == 2
     }
 
     def "Filter with `inList()`"() {
         when:
-        List list = Org.queryList([criteria: [id: ["\$inList": [24, 25]]]])
+        List list = Org.queryList([q: [id: ["\$inList": [24, 25]]]])
         then:
         list.size() == 2
     }
 
     def "Filter by Name ilike()"() {
         when:
-        List list = Org.queryList([criteria: [name: ['$ilike': "Org2%"]], max: 50])
+        List list = Org.queryList([q: [name: ['$ilike': "Org2%"]], max: 50])
         then:
         list.size() == 11
     }
 
     def "Filter with `gt()`"() {
         when:
-        List list = Org.queryList([criteria: [id: ['$gt': 95]]])
+        List list = Org.queryList([q: [id: ['$gt': 95]]])
         then:
         list.size() == 5
     }
 
     def "Filter with `ge()`"() {
         when:
-        List list = Org.queryList([criteria: [id: ['$gte': 95]]])
+        List list = Org.queryList([q: [id: ['$gte': 95]]])
         then:
         list.size() == 6
     }
@@ -306,7 +306,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `lt()`"() {
         when:
-        List list = Org.repo.queryList([criteria: [id: ['$lt': 5]], max: 150]).sort { it.id }
+        List list = Org.repo.queryList([q: [id: ['$lt': 5]], max: 150]).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { lt "id", 5L }.size()
         list[0].name == Org.createCriteria().list() { lt "id", 5L }[0].name
@@ -314,7 +314,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `le()`"() {
         when:
-        List list = Org.repo.queryList([criteria: [id: ['$lte': 5]], max: 150]).sort { it.id }
+        List list = Org.repo.queryList([q: [id: ['$lte': 5]], max: 150]).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { le "id", 5L }.size()
         list[0].name == Org.createCriteria().list() { le "id", 5L }[0].name
@@ -322,7 +322,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `isNull` object"() {
         when:
-        List list = Org.queryList([criteria: [comments: ['$isNull': true]], max: 150]).sort { it.id }
+        List list = Org.queryList([q: [comments: ['$isNull': true]], max: 150]).sort { it.id }
         then:
         list.size() == Org.createCriteria().list() { isNull "comments" }.size()
     }
@@ -336,7 +336,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `isNull` when just null"() {
         when:
-        List list = Org.queryList([criteria: [comments: null], max: 100])
+        List list = Org.queryList([q: [comments: null], max: 100])
         then:
         list.size() == Org.createCriteria().list() { isNull "comments" }.size()
     }
@@ -344,7 +344,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `not in()`"() {
         when:
-        List list = Org.queryList([criteria: [id: ["\$nin": [2, 3, 4, 5]]], max: 150])
+        List list = Org.queryList([q: [id: ["\$nin": [2, 3, 4, 5]]], max: 150])
         then:
         list.size() == Org.createCriteria().list() { not { inList "id", [2L, 3L, 4L, 5L] } }.size()
     }
@@ -352,7 +352,7 @@ class MangoSpec extends Specification {
 
     def "Filter with `not in()` with ids in array"() {
         when:
-        List list = Org.queryList([criteria: [id: ['$nin': [2, 3, 4, 5]]], max: 150])
+        List list = Org.queryList([q: [id: ['$nin': [2, 3, 4, 5]]], max: 150])
         then:
         list.size() == Org.createCriteria().list() { not { inList "id", [2L, 3L, 4L, 5L] } }.size()
     }
@@ -411,7 +411,7 @@ class MangoSpec extends Specification {
 
     def "test quick search"() {
         when:
-        List list = Org.queryList(criteria: ['$q': "Org2"])
+        List list = Org.queryList(q: "Org2")
         then:
         list.size() == 11
 

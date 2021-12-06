@@ -303,19 +303,6 @@ criteria.list(max: 20) {
 }
 ```
 
-### Configuration
-
-The default `criteria` keyword for the restriction map can be changed in config:
-```yml
-gorm:
-    tools:
-        mango:
-            criteriaKeyName: filters
-```
-
-With such configuration restrictions for Mango criteria should be under `filters` keyword.
-
-
 ### Mango API
 
 #### Mango in the Repository

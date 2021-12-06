@@ -7,6 +7,7 @@ package gorm.tools.mango
 import javax.inject.Inject
 
 import gorm.tools.mango.api.MangoQuery
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.RepoEntity
@@ -50,7 +51,17 @@ class NewMangoQuery implements MangoQuery {
     }
 
     @Override
+    MangoDetachedCriteria query(Class domainClass, QueryArgs qargs, Closure closure = null) {
+        new MangoDetachedCriteria(domainClass).build { eq "id", 2 }
+    }
+
+    @Override
     List queryList(Class domainClass, Map params, Closure closure = null) {
+        query(domainClass, [:], null).list()
+    }
+
+    @Override
+    List queryList(Class domainClass, QueryArgs qargs, Closure closure = null) {
         query(domainClass, [:], null).list()
     }
 }

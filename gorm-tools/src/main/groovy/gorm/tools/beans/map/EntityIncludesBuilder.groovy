@@ -103,7 +103,7 @@ class EntityIncludesBuilder {
                 }
                 //if it start with a $ then use it as includesKey
                 else if (field.startsWith('$')) {
-                    String incKey = field.replace('$','')
+                    String incKey = field.replace('$', '')
                     Map incsMap = IncludesConfig.bean().getIncludes(entityClass)
                     if(incsMap){
                         List props = ( incsMap[incKey] ?: ['id'] ) as List<String>

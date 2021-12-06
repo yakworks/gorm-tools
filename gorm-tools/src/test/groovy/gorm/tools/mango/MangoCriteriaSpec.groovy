@@ -457,7 +457,7 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
 
         when:
 
-        res = build((['$q': "Name3"])).list()
+        res = build((['$qSearch': "Name3"])).list()
 
         then:
         res.size() == 1
@@ -469,7 +469,7 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         res.size() == 5
 
         when: 'quickserach has fields under $q'
-        res = build((['$q': ['text': "Nam", 'fields': ['name']], inactive: true])).list()
+        res = build((['$qSearch': ['text': "Nam", 'fields': ['name']], inactive: true])).list()
 
         then:
         res.size() == 5

@@ -4,6 +4,8 @@
 */
 package gorm.tools.csv
 
+import groovy.transform.CompileStatic
+
 import au.com.bytecode.opencsv.CSVReader
 
 /**
@@ -13,12 +15,13 @@ import au.com.bytecode.opencsv.CSVReader
  *
  * @since 0.2* @author Joshua Burnett
  */
+@CompileStatic
 class CSVMapReader implements Closeable, Iterable {
 
     CSVReader csvReader
 
     //the column names from the first header line in the file
-    def fieldKeys = []
+    String[] fieldKeys
 
     /**
      * If this is >0 then on each iteration, instead of a map, will return a list of maps of this batchSize
@@ -48,7 +51,7 @@ class CSVMapReader implements Closeable, Iterable {
      */
     CSVMapReader(Reader reader, Map settingsMap) {
         csvReader = CSVReaderUtils.toCsvReader(reader, settingsMap)
-        if (settingsMap?.batchSize) batchSize = settingsMap?.batchSize?.toInteger()
+        if (settingsMap?.batchSize) batchSize = settingsMap?.batchSize as Integer
     }
 
     /**
@@ -126,7 +129,7 @@ class CSVMapReader implements Closeable, Iterable {
     }
 
 
-    static Map convertArrayToMap(keys, tokens) {
+    static Map convertArrayToMap(String[] keys, tokens) {
         if (!tokens) return null
         def map = [:]
         for (i in 0..tokens.size() - 1) {

@@ -1,3 +1,11 @@
+### v7.0.8-v.44
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.43...v7.0.8-v.44)
+- release [link](https://github.com/yakworks/gorm-tools/commit/0ea3e09dce5b2d842d296eac40aa87b46e94da0b)
+- standardize qSearch and params (#415) [link](https://github.com/yakworks/gorm-tools/commit/59781a64dbfb5aa3db8cda05eeb8efe3690761ce)
+- Rest list problem handling (#414) [link](https://github.com/yakworks/gorm-tools/commit/ec557558123e2e314d77c1437e5ae6f68b813530)
+- Mango order (#412) [link](https://github.com/yakworks/gorm-tools/commit/14760dcd94ad8f5f60f8ade96e37b70e583eaf50)
+
 ### v7.0.8-v.43
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.42...v7.0.8-v.43)

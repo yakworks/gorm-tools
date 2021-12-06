@@ -4,6 +4,7 @@ include 'gorm-tools'
 // findProject(':plugin').name = 'gorm-tools' // the name that will be published
 include 'gorm-tools-security'
 include 'gorm-tools-rest'
+include 'gorm-tools-csv'
 include 'rally-domain'
 include 'commons'
 include 'gorm-test-support'

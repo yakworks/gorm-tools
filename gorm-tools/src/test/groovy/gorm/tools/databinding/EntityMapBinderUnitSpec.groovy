@@ -17,6 +17,7 @@ import org.grails.databinding.converters.DateConversionHelper
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import spock.lang.Specification
+import yakworks.gorm.testing.model.KitchenSink
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -29,7 +30,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     }
 
     Class[] getDomainClassesToMock() {
-        [TestDomain, Nest, AnotherDomain, BindableNested]
+        [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
     }
 
     void "should bind numbers without going through converters"() {
@@ -480,6 +481,28 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         then:
         TestEnumIdent.get(2) == TestEnumIdent.Num2
         testDomain.enumIdent == TestEnumIdent.Num2
+    }
+
+    void "test bind using PathKeyMap"() {
+        Map sub = [
+            name2: "name2",
+            inactive: "true",
+            amount: "100.00",
+            "sinkLink.name2": "sinkLink.name2",
+            "thing.name" : "thing"
+        ]
+
+        when:
+        PathKeyMap params = new PathKeyMap(sub)
+        KitchenSink sink = new KitchenSink()
+        binder.bind(sink, params)
+
+        then:
+        sink.name2 == "name2"
+        sink.inactive == true
+        sink.amount == 100.00
+        sink.sinkLink.name2 == "sinkLink.name2"
+        sink.thing == null //this is not bindable
     }
 }
 

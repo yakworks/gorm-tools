@@ -16,9 +16,8 @@
  */
 package gpbench.helpers.csv
 
-import groovy.transform.CompileStatic
 
-import au.com.bytecode.opencsv.CSVReader
+import com.opencsv.CSVReader
 
 /**
  * Class the read csv and return the rows as a map assuming the first row has the field/key names or you explicitly set fieldKeys property

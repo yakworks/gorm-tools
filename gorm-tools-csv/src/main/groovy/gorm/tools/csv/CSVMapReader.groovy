@@ -6,7 +6,7 @@ package gorm.tools.csv
 
 import groovy.transform.CompileStatic
 
-import au.com.bytecode.opencsv.CSVReader
+import com.opencsv.CSVReader
 
 /**
  * Class the read csv and return the rows as a map assuming the first row has the field/key names or you explicitly set fieldKeys property
@@ -129,7 +129,7 @@ class CSVMapReader implements Closeable, Iterable {
     }
 
 
-    static Map convertArrayToMap(String[] keys, tokens) {
+    static Map convertArrayToMap(String[] keys, String[] tokens) {
         if (!tokens) return null
         def map = [:]
         for (i in 0..tokens.size() - 1) {

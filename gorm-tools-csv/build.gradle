@@ -3,7 +3,7 @@ apply plugin: "yakworks.grails-plugin"
 dependencies {
   console "org.grails:grails-console"
 
-  compile "net.sf.opencsv:opencsv:$vOpenCsv"
+  compile "com.opencsv:opencsv:$vOpenCsv"
 
   compileOnly project(":gorm-tools")
 

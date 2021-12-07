@@ -1,3 +1,9 @@
+### v7.0.8-v.45
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.44...v7.0.8-v.45)
+- release with change for parallel turned off [link](https://github.com/yakworks/gorm-tools/commit/9e808deeb6eb5ce68f25edc3e64702251ef0926d)
+- Take asyncEnabled from params - ability to override parallel processi… (#413) [link](https://github.com/yakworks/gorm-tools/commit/4386fb23d3eb356e017e82cb2538001380d47377)
+
 ### v7.0.8-v.44
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.43...v7.0.8-v.44)

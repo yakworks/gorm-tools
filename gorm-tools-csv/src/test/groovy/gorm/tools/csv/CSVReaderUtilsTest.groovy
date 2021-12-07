@@ -16,7 +16,7 @@
  */
 package gorm.tools.csv
 
-import au.com.bytecode.opencsv.CSVReader
+import com.opencsv.CSVReader
 
 /**
  * Unit tests for the  {@link CSVReaderUtils}  class.

@@ -49,6 +49,33 @@ class PathKeyMapTests extends Specification {
         assert theMap.a.e.g == "gValue"
     }
 
+    void "test multi dimensional map with different delim"() {
+        given:
+        Map sub = [
+            "a_b_c": "cValue",
+            "a_b": "bValue",
+            "a_bc": "bcValue",
+            "a_b_d": "dValue",
+            "a_e_f": "fValue",
+            "a_e_g": "gValue"
+        ]
+
+        when:
+        theMap = new PathKeyMap(sub, "_")
+
+        then:
+        assert theMap['a'] instanceof Map
+        assert theMap.a.b == "bValue"
+        assert theMap.a."b_c" == "cValue"
+        assert theMap.a.'bc' == "bcValue"
+        assert theMap.a."b_d" == "dValue"
+
+        assert theMap.a['e'] instanceof Map
+        assert theMap.a.e.f == "fValue"
+        assert theMap.a.e.g == "gValue"
+    }
+
+
     void "date tests"() {
         when: "single format"
         def params = new PathKeyMap([:])
@@ -82,25 +109,6 @@ class PathKeyMapTests extends Specification {
         !originalMap.containsKey('vocalist')
         newMap.containsKey('album')
         newMap.containsKey('vocalist')
-    }
-
-    void testMultiDimensionParamsWithUnderscore() {
-        given:
-        Map sub = [:]
-        sub.put("a.b.c", "on")
-        sub.put("_a.b.c", "")
-
-        when:
-        theMap = new PathKeyMap(sub)
-
-        then:
-        assert theMap['a.b.c'] == "on"
-        assert theMap['_a.b.c'] == ""
-        assert theMap['a'] instanceof Map
-        assert theMap['a']['b'] instanceof Map
-        assert theMap['a']['b']['c'] == "on"
-        assert theMap['a']['_b.c'] == ""
-        assert theMap['a']['b']['_c'] == ""
     }
 
     void testConversionHelperMethods() {

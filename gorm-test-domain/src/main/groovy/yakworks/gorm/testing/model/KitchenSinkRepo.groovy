@@ -4,13 +4,12 @@
 */
 package yakworks.gorm.testing.model
 
-import gorm.tools.model.Persistable
-
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforePersistEvent

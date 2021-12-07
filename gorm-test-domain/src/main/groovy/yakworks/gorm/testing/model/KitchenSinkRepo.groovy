@@ -4,6 +4,8 @@
 */
 package yakworks.gorm.testing.model
 
+import gorm.tools.model.Persistable
+
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -46,6 +48,10 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         o.inactive = true
         o.persist()
         o
+    }
+
+    void doAssociations(KitchenSink kitchenSink, Map data) {
+        if(data.sinkItems) persistAssociationData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
     }
 
     void auditStamp(Object ent){

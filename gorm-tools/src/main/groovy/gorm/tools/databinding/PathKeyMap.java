@@ -62,6 +62,7 @@ public class PathKeyMap extends TypeConvertingMap implements Cloneable {
     private static final Logger LOG = LoggerFactory.getLogger(PathKeyMap.class);
     public static final Object[] EMPTY_ARGS = new Object[0];
 
+    public String pathDelimiter();
     /**
      * Does not populate the GrailsParameterMap from the request but instead uses the supplied values.
      *
@@ -71,6 +72,13 @@ public class PathKeyMap extends TypeConvertingMap implements Cloneable {
         wrappedMap.putAll(values);
         updateNestedKeys(values);
     }
+
+    // add class variable that we use it
+    public PathKeyMap(Map values, String pathDelimiter) {
+        this(values);
+        this.pathDelimiter = pathDelimiter;
+    }
+
 
     @Override
     public Object clone() {

@@ -102,7 +102,7 @@ class QueryArgs {
         String sortField = params.remove('sort')
         String orderBy = params.remove('order') ?: 'asc'
         if(sortField) {
-            sort = [(sortField): orderBy] as Map<String, String>
+            sort = buildSort(sortField, orderBy)
         }
 
         // check for and remove the q param
@@ -117,7 +117,7 @@ class QueryArgs {
                 //if the q param start with { then assume its json and parse it
                 //the parsed map will be set to the criteria.
                 if (qString.trim().startsWith('{')) {
-                    criteria = buildWithJson(qString)
+                    criteria = parseJson(qString)
                 } else {
                     criteria[MangoOps.QSEARCH] = qString
                 }
@@ -150,13 +150,49 @@ class QueryArgs {
      * if the string is known to be json then parse the json and returns the map
      * also adds in the includes if its has a $qSearch prop
      */
-    Map buildWithJson(String qString){
+    Map parseJson(String qString){
         //jsonSlurper LAX allows fields to not be quoted
         JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
         // parseText returns LazyValueMap which will throw `Not that kind of map` when trying to add new key
         Map parsedMap = new HashMap(jsonSlurper.parseText(qString) as Map)
 
         return parsedMap
+    }
+
+    /**
+     * parses the sort string. if its just a simple string without , or : then creates a
+     * asc sort map. if its starts with { then parses as json.
+     * sort string should be in one of the following formats
+     *  - simple field name such as 'name'
+     *  - field seperated by : such as 'name:desc'
+     *  - multiple fields seperated by comma, ex: 'num:asc, name:desc'
+     *  - json in same format as above, ex '{num:"asc", name:"desc"}'
+     *
+     * @param sortText see above for valid options
+     * @param orderBy only relevant if sortText is a single sort string with field name
+     * @return the sort Map or null if failed
+     */
+    Map buildSort(String sortText, String orderBy = 'asc'){
+        //make sure its trimmed
+        sortText = sortText.trim()
+        Map sortMap = [:] as Map<String, String>
+        //if its starts with { its json and we take it as it is
+        if (sortText.startsWith('{')) {
+            sortMap = parseJson(sortText) as Map<String, String>
+        }
+        else if(sortText.contains(':')) {
+            //will only be one item in list if no ',' token
+            List sortList = sortText.tokenize(',')*.trim() as List<String>
+            for(String sortEntry : sortList){
+                List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
+                sortMap[sortTokens[0]] = sortTokens[1]
+            }
+        } else {
+            //its just a field name
+            sortMap[sortText] = orderBy
+        }
+
+        return sortMap
     }
 
     /**

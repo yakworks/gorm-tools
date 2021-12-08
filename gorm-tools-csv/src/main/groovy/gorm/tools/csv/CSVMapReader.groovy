@@ -130,7 +130,7 @@ class CSVMapReader implements Closeable, Iterable {
         if (type == List) return readAll()
     }
 
-
+    @SuppressWarnings(['ReturnsNullInsteadOfEmptyCollection'])
     static Map convertArrayToMap(String[] keys, String[] tokens) {
         if (!tokens) return null
         def map = [:]
@@ -147,6 +147,7 @@ class CSVMapReader implements Closeable, Iterable {
         csvReader.close()
     }
 
+    @SuppressWarnings(['ThrowRuntimeException'])
     Iterator iterator() {
         try {
             return new CSVMapReaderIterator(this)
@@ -157,6 +158,7 @@ class CSVMapReader implements Closeable, Iterable {
 
 }
 
+@CompileStatic
 class CSVMapReaderIterator implements Iterator {
     private CSVMapReader mapReader
     def nextEl
@@ -172,6 +174,7 @@ class CSVMapReaderIterator implements Iterator {
         return nextEl
     }
 
+    @SuppressWarnings(['ThrowRuntimeException'])
     def next() {
         def curEl = nextEl
         try {

@@ -6,6 +6,9 @@ package gorm.tools.csv
 
 import com.opencsv.CSVParser
 import com.opencsv.CSVReader
+import com.opencsv.ICSVParser
+import com.opencsv.validators.LineValidatorAggregator
+import com.opencsv.validators.RowValidatorAggregator
 
 /**
  * Utility class for adding CSV parsing capability to core Java/Groovy classes (String, File, InputStream, Reader).
@@ -48,7 +51,26 @@ class CSVReaderUtils {
             ignoreLeadingWhiteSpace = mapValue as boolean
         }
 
-        return new CSVReader(r, separatorChar, quoteChar, escapeChar, skipLines, strictQuotes, ignoreLeadingWhiteSpace)
+        CSVParser parser = new CSVParser(separatorChar,
+            quoteChar,
+            escapeChar,
+            strictQuotes,
+            ignoreLeadingWhiteSpace,
+            ICSVParser.DEFAULT_IGNORE_QUOTATIONS,
+            ICSVParser.DEFAULT_NULL_FIELD_INDICATOR,
+            Locale.getDefault())
+
+        return new CSVReader(r,
+            skipLines,
+            parser,
+            CSVReader.DEFAULT_KEEP_CR,
+            CSVReader.DEFAULT_VERIFY_READER,
+            CSVReader.DEFAULT_MULTILINE_LIMIT,
+            Locale.getDefault(),
+            new LineValidatorAggregator(),
+            new RowValidatorAggregator(),
+            null
+            )
     }
 
     static CSVReader toCsvReader(String s, Map settingsMap) {

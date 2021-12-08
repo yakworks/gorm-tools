@@ -27,10 +27,9 @@ import grails.util.TypeConvertingMap
 @SuppressWarnings(["rawtypes", "unchecked" ])
 @CompileStatic
 class PathKeyMap extends TypeConvertingMap implements Cloneable {
-    private static final Logger LOG = LoggerFactory.getLogger(PathKeyMap.class)
-    public static final Object[] EMPTY_ARGS = new Object[0]
+    private static final Logger LOG = LoggerFactory.getLogger(PathKeyMap)
 
-    public String pathDelimiter
+    String pathDelimiter
 
     /**
      * Populates the PathKeyMap with supplied map.
@@ -60,7 +59,7 @@ class PathKeyMap extends TypeConvertingMap implements Cloneable {
     @Override
     Object clone() {
         if (wrappedMap.isEmpty()) {
-            return new PathKeyMap(new LinkedHashMap(), pathDelimiter)
+            return new PathKeyMap([:], pathDelimiter)
         } else {
             Map clonedMap = new LinkedHashMap(wrappedMap)
             // deep clone nested entries
@@ -83,7 +82,6 @@ class PathKeyMap extends TypeConvertingMap implements Cloneable {
         // removed test for String key because there
         // should be no limitations on what you shove in or take out
         Object returnValue = null
-
         returnValue = wrappedMap.get(key)
         if (returnValue instanceof String[]) {
             String[] valueArray = (String[])returnValue
@@ -165,7 +163,7 @@ class PathKeyMap extends TypeConvertingMap implements Cloneable {
             // No value. So, since there is at least one sub-key,
             // we create a sub-map for this prefix.
 
-            prefixValue = new PathKeyMap(new LinkedHashMap(), pathDelimiter)
+            prefixValue = new PathKeyMap([:], pathDelimiter)
             nestedLevel.put(nestedPrefix, prefixValue)
         }
 

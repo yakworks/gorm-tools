@@ -9,42 +9,47 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import com.opencsv.CSVReaderHeaderAware
-import com.opencsv.exceptions.CsvValidationException
 import gorm.tools.databinding.PathKeyMap
-import gorm.tools.repository.model.DataOp
 
-@Builder(builderStrategy= SimpleStrategy, prefix="")
+@Builder(builderStrategy = SimpleStrategy, prefix = "")
 @CompileStatic
 class CSVPathKeyMapReader extends CSVReaderHeaderAware {
 
-    public String pathDelimiter
+    String pathDelimiter
 
     /**
      * Constructor with supplied reader.
      *
      * @param reader The reader to an underlying CSV source
      */
-     CSVPathKeyMapReader(Reader reader) {
+    CSVPathKeyMapReader(Reader reader) {
         super(reader);
+        this.pathDelimiter = "."
+    }
+
+    CSVPathKeyMapReader(Reader reader, String delim) {
+        super(reader);
+        this.pathDelimiter = delim
     }
 
     /**
      * CSVPathKeyMapReader.of(reader).pathDelimiter('_')
      */
-    static CSVPathKeyMapReader of(Reader reader){
+    static CSVPathKeyMapReader of(Reader reader) {
         new CSVPathKeyMapReader(reader)
     }
 
     @Override
-     Map<String, String> readMap(String delim = ".") {
+    Map<String, String> readMap() {
         Map<String, String> data = super.readMap()
-        return (Map<String, String>)new PathKeyMap(data, delim)
+        return (Map<String, String>) new PathKeyMap(data, pathDelimiter)
     }
 
     List<Map<String, String>> readAllRows() {
         List result = []
-        while(hasNext) {
-            result << readMap()
+        while (hasNext) {
+            Map r = readMap()
+            if(r) result << r
         }
         return result
     }
@@ -52,11 +57,10 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
     /**
      * Map row = pathKeyReader.readMap{ Map data ->
      *     data.lines = ...get lines from other file
-     * }
-     */
+     *}*/
     Map<String, String> readMap(Closure closure) {
         Map data = readMap()
-        closure(data);
+        closure(data)
         return data
     }
 

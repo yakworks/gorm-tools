@@ -483,27 +483,6 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         testDomain.enumIdent == TestEnumIdent.Num2
     }
 
-    void "test bind using PathKeyMap"() {
-        Map sub = [
-            name2: "name2",
-            inactive: "true",
-            amount: "100.00",
-            "sinkLink.name2": "sinkLink.name2",
-            "thing.name" : "thing"
-        ]
-
-        when:
-        PathKeyMap params = new PathKeyMap(sub)
-        KitchenSink sink = new KitchenSink()
-        binder.bind(sink, params)
-
-        then:
-        sink.name2 == "name2"
-        sink.inactive == true
-        sink.amount == 100.00
-        sink.sinkLink.name2 == "sinkLink.name2"
-        sink.thing == null //this is not bindable
-    }
 }
 
 

@@ -11,11 +11,19 @@ import groovy.transform.builder.SimpleStrategy
 import com.opencsv.CSVReaderHeaderAware
 import gorm.tools.databinding.PathKeyMap
 
+/**
+ * Overrides the CSVReaderHeaderAware to read csv rows into the PathKeyMap
+ * which can then be used for the EntityMapBinder
+ */
 @Builder(builderStrategy = SimpleStrategy, prefix = "")
 @CompileStatic
 class CSVPathKeyMapReader extends CSVReaderHeaderAware {
 
-    String pathDelimiter
+    /**
+     * the pathDelimiter is used when the headers are useing somthing like _ insted of dots
+     * for the nested paths
+     */
+    String pathDelimiter = "."
 
     /**
      * Constructor with supplied reader.
@@ -23,13 +31,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
      * @param reader The reader to an underlying CSV source
      */
     CSVPathKeyMapReader(Reader reader) {
-        super(reader);
-        this.pathDelimiter = "."
-    }
-
-    CSVPathKeyMapReader(Reader reader, String delim) {
-        super(reader);
-        this.pathDelimiter = delim
+        super(reader)
     }
 
     /**
@@ -39,12 +41,21 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
         new CSVPathKeyMapReader(reader)
     }
 
+    static CSVPathKeyMapReader of(File file) {
+        return of(new FileReader(file))
+    }
+
     @Override
     Map<String, String> readMap() {
         Map<String, String> data = super.readMap()
         return (Map<String, String>) new PathKeyMap(data, pathDelimiter)
     }
 
+    /**
+     * Read all the rows in CSV, we can't override the readAll in CVSReader as is return list of string array
+     *
+     * @return the list of maps for entire file
+     */
     List<Map<String, String>> readAllRows() {
         List result = []
         while (hasNext) {
@@ -64,7 +75,9 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
         return data
     }
 
-    //just a helper which can be used by client code to iterate without needing CsvIterator
+    /**
+     * exposes the protected hasNext in CSVReader. helpful to be able to iterate without needing CsvIterator
+     */
     boolean hasNext() {
         return hasNext
     }

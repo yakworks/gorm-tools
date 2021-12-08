@@ -62,22 +62,79 @@ class CSVPathKeyMapReaderSpec extends Specification {
 
     void "merge two csv into single map structure"() {
         setup:
-        CSVPathKeyMapReader kitchenSinkReader = new CSVPathKeyMapReader(new FileReader(kitchenSinkCsv))
-        CSVPathKeyMapReader sinkItemReader = new CSVPathKeyMapReader(new FileReader(sinkItemCsv), "_")
+        def kitchenSinkReader = CSVPathKeyMapReader.of(kitchenSinkCsv)
+        def sinkItemReader = CSVPathKeyMapReader.of(sinkItemCsv).pathDelimiter("_")
 
         when:
         List<Map> kitchenSinks = kitchenSinkReader.readAllRows()
         List<Map> sinkItems = []
+        Map currentSink
         while(sinkItemReader.hasNext()) {
-            Map row = sinkItemReader.readMap() { PathKeyMap m ->
-                if(!m) return
-                String kitchenSinkNum = m.kitchenSink.num
+            Map row = sinkItemReader.readMap() { PathKeyMap row ->
+                if(!row) return //XXX when would this empty?
+                String kitchenSinkNum = row.kitchenSink.num
+                //XXX why the if?
                 if(kitchenSinkNum) {
+                    //
                     Map kc = kitchenSinks.find({ it.num == kitchenSinkNum})
+                    //XXX why the if here?
                     if(kc) {
-                        m.kitchenSink = kc
+                        row.kitchenSink = kc
                         if(!kc.items) kc.items = []
-                        kc.items << m
+                        kc.items << row
+                    }
+                }
+            }
+
+            if(row) sinkItems << row
+        }
+
+        then:
+        kitchenSinks.size() == 3
+        sinkItems.size() == 14
+
+        and: "verfiy grouping"
+        kitchenSinks[0].num == "sink1"
+        kitchenSinks[0].items != null
+        kitchenSinks[0].items.size() == 1 //one sink item for this kitchen sink
+
+        kitchenSinks[1].num == "sink2"
+        kitchenSinks[1].items != null
+        kitchenSinks[1].items.size() == 2
+
+        kitchenSinks[2].num == "sink3"
+        kitchenSinks[2].items != null
+        kitchenSinks[2].items.size() == 11
+    }
+
+    void "simulate when detail is ordered and we dont need to look up on sink"() {
+        setup:
+        def kitchenSinkReader = CSVPathKeyMapReader.of(kitchenSinkCsv)
+        def sinkItemReader = CSVPathKeyMapReader.of(sinkItemCsv).pathDelimiter("_")
+
+        when:
+        List<Map> kitchenSinks = kitchenSinkReader.readAllRows()
+        List<Map> sinkItems = []
+        Map currentSink
+        while(sinkItemReader.hasNext()) {
+            Map row = sinkItemReader.readMap() { PathKeyMap row ->
+                if(!row) return //XXX when would this empty?
+                String kitchenSinkNum = row.kitchenSink.num
+                //XXX why the if?
+                if(kitchenSinkNum) {
+                    //if not currentSink then first row so lookup , or if they dont match
+                    if(!currentSink || currentSink.num != kitchenSinkNum) {
+                        currentSink = kitchenSinks.find({ it.num == kitchenSinkNum})
+                    }
+
+                    if(currentSink){
+                        row.kitchenSink = kc
+                        if(!kc.items) kc.items = []
+                        kc.items << row
+                    }
+                    //if we dont have one after the verification and lookup then we have problem
+                    else {
+                        // create the problem and add to the list we use to track it
                     }
                 }
             }

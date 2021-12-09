@@ -128,9 +128,9 @@ class CSVPathKeyMapReaderSpec extends Specification {
                     }
 
                     if(currentSink){
-                        row.kitchenSink = kc
-                        if(!kc.items) kc.items = []
-                        kc.items << row
+                        row.kitchenSink = currentSink
+                        if(!currentSink.items) currentSink.items = []
+                        currentSink.items << row
                     }
                     //if we dont have one after the verification and lookup then we have problem
                     else {

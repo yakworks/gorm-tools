@@ -34,11 +34,11 @@ class QueryArgsSpec extends Specification {
     def "parseParams q is json"() {
 
         when: 'q is JSON'
-        QueryArgs qargs = QueryArgs.of(q: "{id: 24, something: 'testing'}", sort:'foo' )
+        QueryArgs qargs = QueryArgs.of(q: "{id: 24, something: 'testing'}", sort:'foo:desc' )
 
         then: 'it should have them in criteria'
         //parsed.criteria.id == 24
-        qargs.criteria == [id: 24, something: 'testing', '$sort': ['foo':'asc']]
+        qargs.criteria == [id: 24, something: 'testing', '$sort': ['foo':'desc']]
 
         when: 'not using q'
         //when not using q or criteria t
@@ -63,10 +63,10 @@ class QueryArgsSpec extends Specification {
 
         when: 'not using q'
         //when not using q then it pulls out the sort, order and pager info and leaves the rest as is
-        QueryArgs qargs = QueryArgs.of(id: 123, name: 'joe', max: 10, sort:'foo')
+        QueryArgs qargs = QueryArgs.of(id: 123, name: 'joe', max: 10, sort:'foo:asc,bar:desc')
 
         then:
-        qargs.criteria == [id: 123, name: 'joe', '$sort': ['foo':'asc']]
+        qargs.criteria == [id: 123, name: 'joe', '$sort': ['foo':'asc', bar:'desc']]
         qargs.pager.max == 10
 
         when:
@@ -96,6 +96,29 @@ class QueryArgsSpec extends Specification {
         qargs.criteria == [id: 1, name: 'joe', '$qSearch': 'foo']
         qargs.pager
 
+    }
+
+    def "test buildSort simple"() {
+
+        when: 'simple'
+        def qargs = new QueryArgs()
+
+        then:
+        qargs.buildSort('name') == [name: 'asc']
+        qargs.buildSort('name', 'desc') == [name: 'desc']
+    }
+
+    def "test buildSort"() {
+
+        when: 'simple'
+        def qargs = new QueryArgs()
+
+        then:
+        qargs.buildSort('name: asc') == [name: 'asc']
+        qargs.buildSort('name:asc') == [name: 'asc']
+        qargs.buildSort('name:asc, num: desc') == [name: 'asc', num: 'desc']
+
+        qargs.buildSort('{name:"asc", num: "desc"}') == [name: 'asc', num: 'desc']
     }
 
 }

@@ -1,0 +1,13 @@
+apply plugin: "yakworks.grails-plugin"
+
+dependencies {
+  console "org.grails:grails-console"
+
+  compile "com.opencsv:opencsv:$vOpenCsv"
+
+  compileOnly project(":gorm-tools")
+
+  testCompile project(":gorm-test-support")
+  testCompile "org.grails:grails-gorm-testing-support"
+  testCompile "org.grails.plugins:build-test-data:$vBuildTestData"
+}

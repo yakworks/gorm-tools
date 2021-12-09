@@ -17,6 +17,7 @@ import org.grails.databinding.converters.DateConversionHelper
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import spock.lang.Specification
+import yakworks.gorm.testing.model.KitchenSink
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -29,7 +30,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
     }
 
     Class[] getDomainClassesToMock() {
-        [TestDomain, Nest, AnotherDomain, BindableNested]
+        [TestDomain, Nest, AnotherDomain, BindableNested, KitchenSink]
     }
 
     void "should bind numbers without going through converters"() {
@@ -481,6 +482,7 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         TestEnumIdent.get(2) == TestEnumIdent.Num2
         testDomain.enumIdent == TestEnumIdent.Num2
     }
+
 }
 
 

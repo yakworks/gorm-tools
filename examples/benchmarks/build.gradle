@@ -24,7 +24,7 @@ dependencies {
   implementation project(":rally-domain")
   implementation project(":gorm-tools-rest")
 
-  implementation "net.sf.opencsv:opencsv:$vOpenCsv"
+  implementation "com.opencsv:opencsv:$vOpenCsv"
 
   // runtime "org.glassfish.web:el-impl:2.1.2-b03"
   runtimeOnly "com.h2database:h2"

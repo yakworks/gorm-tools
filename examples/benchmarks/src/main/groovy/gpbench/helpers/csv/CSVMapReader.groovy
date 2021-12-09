@@ -16,7 +16,8 @@
  */
 package gpbench.helpers.csv
 
-import au.com.bytecode.opencsv.CSVReader
+
+import com.opencsv.CSVReader
 
 /**
  * Class the read csv and return the rows as a map assuming the first row has the field/key names or you explicitly set fieldKeys property
@@ -26,7 +27,7 @@ import au.com.bytecode.opencsv.CSVReader
  * @since 0.2
  * @author Joshua Burnett
  */
-public class CSVMapReader implements Closeable, Iterable {
+class CSVMapReader implements Closeable, Iterable {
 
     CSVReader csvReader
 
@@ -36,7 +37,8 @@ public class CSVMapReader implements Closeable, Iterable {
     /**
      * If this is >0 then on each iteration, instead of a map, will return a list of maps of this batchSize
      * and returnAll or toList will return a list of lists(batches) of maps based on the batchSize
-     * For example: this is usefull if you have a million rows in the CSV and want each iteration to return a list(batch) of 50 rows(maps) at a time
+     * For example: this is usefull if you have a million rows in the CSV
+     * and want each iteration to return a list(batch) of 50 rows(maps) at a time
      * so you can process inserts into the db in batches of 50.
      */
     Integer batchSize = 0

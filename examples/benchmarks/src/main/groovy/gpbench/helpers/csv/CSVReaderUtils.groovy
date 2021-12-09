@@ -16,8 +16,8 @@
  */
 package gpbench.helpers.csv
 
-import au.com.bytecode.opencsv.CSVParser
-import au.com.bytecode.opencsv.CSVReader
+import com.opencsv.CSVParser
+import com.opencsv.CSVReader
 
 /**
  * Utility class for adding CSV parsing capability to core Java/Groovy classes (String, File, InputStream, Reader).

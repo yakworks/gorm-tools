@@ -84,8 +84,8 @@ workflows:
       - ship-gh-pages:
           context: bot-context
           requires: [ build ]
-          filters: { branches: { only: [ master, /release\/.*/ ] } }
+          filters: { branches: { only: [ master, /release\/.*/, dev ] } }
       - ship-it:
           context: bot-context
           requires: [build]
-          filters: { branches: { only: [ master, /release\/.*/ ] } }
+          filters: { branches: { only: [ master, /release\/.*/, dev ] } }

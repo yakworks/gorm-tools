@@ -1,6 +1,6 @@
 # check for build/shipkit and clone if not there, this should come first
 SHIPKIT_DIR = build/shipkit
-$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.40 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
+$(shell [ ! -e $(SHIPKIT_DIR) ] && git clone -b v1.0.42 https://github.com/yakworks/shipkit.git $(SHIPKIT_DIR) >/dev/null 2>&1)
 # Shipkit.make first, which does all the lifting to create makefile.env for the BUILD_VARS
 include $(SHIPKIT_DIR)/Shipkit.make
 include $(SHIPKIT_DIR)/makefiles/vault.make
@@ -13,7 +13,7 @@ include $(SHIPKIT_DIR)/makefiles/ship-gh-pages.make
 ship.authorize: git.config-bot-user kubectl.config dockerhub.login
 	$(logr.done)
 
-## publish the java jar lib to either repo.9ci for snapshot to Sonatype Maven Central
+## publish the java jar lib to repo.9ci for snapshot and to both for prod Sonatype Maven Central
 publish:
 	if [ "$(dry_run)" ]; then
 		echo "🌮 dry_run ->  $(gradlew) publish"
@@ -33,7 +33,8 @@ publish:
 
 ifdef RELEASABLE_BRANCH_OR_DRY_RUN
 
- ship.release: build publish ship.docker kube.deploy
+# removed  ship.docker kube.deploy for now
+ ship.release: build publish
 	$(logr.done)
 
  ship.docker: docker.app-build docker.app-push

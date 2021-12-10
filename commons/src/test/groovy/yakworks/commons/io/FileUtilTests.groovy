@@ -116,12 +116,20 @@ class FileUtilTests extends Specification {
         then:
         "zip".equalsIgnoreCase(extension)
 
+        when: "verify zip stream"
+        InputStream stream = FileUtil.getZipEntryInputStream(zip, "test.txt")
+
+        then:
+        noExceptionThrown()
+        stream != null
+
         when:
         List<File> files = FileUtil.unzip(zip, tempDir)
 
         then:
         files.size() == 1
         files[0].name == "test.txt"
+
 
         cleanup:
         files[0].delete()

@@ -204,6 +204,10 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void bulkProcess(HttpServletRequest req, Map params, DataOp dataOp) {
         List dataList = bodyAsList()
+        bulkProcess(req, dataList, dataOp)
+    }
+
+    void bulkProcess(HttpServletRequest req, List dataList, DataOp dataOp) {
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
         // String contextPath = req.getContextPath()
         // String requestURL = req.getRequestURL()

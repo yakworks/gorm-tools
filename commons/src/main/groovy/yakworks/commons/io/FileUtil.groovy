@@ -8,6 +8,7 @@ import java.nio.channels.FileLock
 import java.nio.charset.Charset
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
@@ -174,25 +175,47 @@ class FileUtil {
     }
 
     /**
-     * Zips file
+     * Returns input stream for a specific file inside zip if exists
+     */
+    static InputStream getZipEntryInputStream(File zip, String entryName) {
+        ZipFile zipFile = new ZipFile(zip)
+        ZipEntry entry = zipFile.getEntry(entryName)
+        if(entry) return zipFile.getInputStream(entry)
+        return null
+    }
+
+    /**
+     * Zips multiple files into single zip
+     */
+    static File zip(String zipName, File destinationDir, File[] files) {
+        if(!files) return
+
+        if (!destinationDir) destinationDir = files[0].parentFile
+        File zip = new File(destinationDir, zipName)
+        FileOutputStream fout = new FileOutputStream(zip)
+        ZipOutputStream zout = new ZipOutputStream(fout)
+        zout.setLevel(Deflater.BEST_COMPRESSION)
+
+        files.each { File f ->
+            ZipEntry entry = new ZipEntry(f.name)
+            zout.putNextEntry(entry)
+            f.withInputStream { fin ->
+                zout << fin
+            }
+            zout.closeEntry()
+        }
+        zout.close()
+        return zip
+    }
+
+    /**
+     * Zips given file
      */
     static File zip(File file, File destDir = null) {
         assert file.exists()
         if (!destDir) destDir = file.parentFile
-        File zip = new File(destDir, changeExtension(file.name, 'ZIP'))
-        FileOutputStream fout = new FileOutputStream(zip)
-        ZipOutputStream zout = new ZipOutputStream(fout)
-        zout.setLevel(Deflater.BEST_COMPRESSION)
-        ZipEntry entry = new ZipEntry(file.name)
-        zout.putNextEntry(entry)
-
-        file.withInputStream { fin ->
-            zout << fin
-        }
-
-        zout.closeEntry()
-        zout.close()
-        return zip
+        String name = changeExtension(file.name, 'ZIP')
+        return zip(name, destDir, file)
     }
 
     /**

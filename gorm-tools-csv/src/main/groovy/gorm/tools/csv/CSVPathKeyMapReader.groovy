@@ -81,4 +81,13 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
     boolean hasNext() {
         return hasNext
     }
+
+    //removes the utf BOM/ZWNBSP character which are added by excel etc at the beginning of line
+    String getNextLine() {
+        String line = super.getNextLine()
+        if(line) {
+            line = line.replaceAll("\uFEFF", "").trim()
+        }
+        return line
+    }
 }

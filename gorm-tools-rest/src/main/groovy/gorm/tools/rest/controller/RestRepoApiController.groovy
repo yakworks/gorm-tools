@@ -7,7 +7,6 @@ package gorm.tools.rest.controller
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
-import groovy.transform.Generated
 
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.Logger
@@ -215,13 +214,13 @@ trait RestRepoApiController<D> extends RestApiController {
         // XXX for now default is false, but we should change
         boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
-        println "before bulkIncludes"
+        //println "before bulkIncludes"
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        println "before bulkableArgs"
+        //println "before bulkableArgs"
         BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
-        println "before calling bulk"
+        //println "before calling bulk"
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
-        println "afer calling bulk jobId $jobId"
+        //println "afer calling bulk jobId $jobId"
         SyncJobEntity job = syncJobService.getJob(jobId)
         respondWith(job, [status: MULTI_STATUS])
 

@@ -81,7 +81,7 @@ trait RestRegistryResponder {
         }
 
         final GrailsWebRequest webRequest = ((Controller)this).getWebRequest()
-        List<String> formats = calculateFormats(webRequest.actionName, value, args)
+        List<String> formats = calculateFormats(webRequest.actionName, args)
 
         final HttpServletResponse response = webRequest.getCurrentResponse()
         MimeType[] mimeTypes = getResponseFormat(response)
@@ -130,7 +130,7 @@ trait RestRegistryResponder {
 
     }
 
-    private List<String> calculateFormats(String actionName, value, Map args) {
+    private List<String> calculateFormats(String actionName, Map args) {
         if (args.formats) {
             return (List<String>) args.formats
         }
@@ -160,7 +160,7 @@ trait RestRegistryResponder {
     }
 
     private List<String> getDefaultResponseFormats() {
-        return MimeType.getConfiguredMimeTypes().collect { MimeType mt -> mt.extension }
+        return MimeType.getConfiguredMimeTypes()*.extension
     }
 
 }

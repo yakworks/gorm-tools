@@ -9,6 +9,7 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
 import testing.TestSyncJob
@@ -43,6 +44,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         KitchenSink.repo instanceof BulkableRepo
     }
 
+    @Ignore //XXX https://github.com/yakworks/gorm-tools/issues/426
     void "success bulk insert"() {
         given:
         List list = KitchenSink.generateDataList(20)
@@ -135,6 +137,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
     }
 
+    @Ignore //XXX https://github.com/yakworks/gorm-tools/issues/426
     void "test failures and errors"() {
         given:
         List list = KitchenSink.generateDataList(20)

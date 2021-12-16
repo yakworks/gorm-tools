@@ -29,7 +29,9 @@ class DefaultSyncJobService implements SyncJobService {
     @Override
     Long createJob(String source, String sourceId, Object payload) {
         Validate.notNull(payload)
-        byte[] reqData = JsonEngine.toJson(payload).bytes
+        //XXX https://github.com/yakworks/gorm-tools/issues/426 don't assign requestData for now for testing large data
+        //byte[] reqData = JsonEngine.toJson(payload).bytes
+        byte[] reqData
         Map data = [source: source, sourceId: sourceId, state: SyncJobState.Running, requestData: reqData]
         def job = syncJobRepo.create((Map)data, (Map)[flush:true])
         return job.id

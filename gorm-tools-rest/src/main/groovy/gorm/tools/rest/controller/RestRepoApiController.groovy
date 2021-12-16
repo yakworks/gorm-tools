@@ -214,13 +214,9 @@ trait RestRepoApiController<D> extends RestApiController {
         // XXX for now default is false, but we should change
         boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
-        //println "before bulkIncludes"
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        //println "before bulkableArgs"
         BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
-        //println "before calling bulk"
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
-        //println "afer calling bulk jobId $jobId"
         SyncJobEntity job = syncJobService.getJob(jobId)
         respondWith(job, [status: MULTI_STATUS])
 
@@ -233,7 +229,6 @@ trait RestRepoApiController<D> extends RestApiController {
 
     Pager pagedQuery(Map params, List<String> includesKeys) {
         Pager pager = new Pager(params)
-        // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)

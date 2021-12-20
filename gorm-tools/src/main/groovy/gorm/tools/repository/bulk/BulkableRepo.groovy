@@ -196,9 +196,12 @@ trait BulkableRepo<D> {
             def map = [ok: r.ok, status: r.status.code] as Map<String, Object>
             //do the failed
             if (r instanceof ProblemTrait) {
+                // def source = r.payload['source'] as Map
+                // String sourceId = source?.'sourceId'
                 map.putAll([
                     //XXX https://github.com/yakworks/gorm-tools/issues/426 don't put data for now for testing large data
-                    //data: r.payload,
+                    //data: sourceId?:r.payload,   //use sourceId if exists
+                    data: r.payload,
                     title: r.title,
                     detail: r.detail,
                     errors: r.violations

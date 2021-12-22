@@ -195,9 +195,19 @@ trait BulkableRepo<D> {
         for (Result r : results) {
             def map = [ok: r.ok, status: r.status.code] as Map<String, Object>
             //do the failed
+
             if (r instanceof ProblemTrait) {
+                Map customData
+                //XXX https://github.com/yakworks/gorm-tools/issues/426 do something better with large data
+                if(r.payload['source'] && r.payload['customer']) {  //hard coded for arTran
+                    //customData = metaMapEntityService.createMetaMap(r.payload, ['customer', 'source']) as Map<String, Object>
+                    customData = [:]
+                    customData['source'] = r.payload['source'] as Map
+                    customData['customer'] = r.payload['customer'] as Map
+                }
                 map.putAll([
-                    data: r.payload,
+
+                    data: customData?:r.payload,  //do sourceId is exists (works for arTran)
                     title: r.title,
                     detail: r.detail,
                     errors: r.violations

@@ -282,6 +282,9 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
     }
 
+    //FIXME https://github.com/yakworks/gorm-tools/issues/425 all blank Strings will be null, so the problem will be with update
+    // when you want to null something out in update, for example
+    // Update Contact phone number you cannot put blank because it will be turned to null and not used in update
     protected processStringValue(String sval) {
         sval = sval.trim()
         sval = ("" == sval) ? null : sval

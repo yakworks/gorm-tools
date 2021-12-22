@@ -9,6 +9,7 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.Ignore
 import spock.lang.Issue
 import spock.lang.Specification
 import testing.TestSyncJob
@@ -180,6 +181,44 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         //results[19].errors[0].field == "name"
     }
 
+    void "test failures and errors with customer and source"() {
+        given:
+        List list = KitchenSink.generateDataList(3)
+
+        and: "Add few bad records"
+        list[1].source = ['sourceId': '123']
+        list[1].customer = ['sourceId': 'cust123']
+        list[1].name = null
+
+
+        when: "bulk insert"
+
+        Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
+        def job = TestSyncJob.get(jobId)
+
+        then: "verify job"
+        job.ok == false
+
+        when: "verify job.data"
+        def results = parseJson(job.dataToString())
+
+        then:
+        results != null
+        results instanceof List
+        results.size() == 3
+
+        and: "verify successfull results"
+        results.findAll({ it.ok == true}).size() == 2
+        results[0].ok == true
+
+        and: "Verify failed records"
+        results[1].ok == false
+        results[1].data != null
+        results[1].data.name == null
+        results[1].data.source.sourceId == "123"
+        results[1].data.customer.sourceId == "cust123"
+        results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
+    }
 
     // @IgnoreRest
     @Issue("domain9#413")

@@ -1,3 +1,37 @@
+### v7.0.8-v.49
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.48...v7.0.8-v.49)
+- release new version [link](https://github.com/yakworks/gorm-tools/commit/ee0ad19a4ec55d709ffeef7abf8a12dbd0ec494b)
+
+### v7.0.8-v.48
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.45...v7.0.8-v.48)
+- release [link](https://github.com/yakworks/gorm-tools/commit/e374457fb5641afca92cc736d7668414d94d23b1)
+- Merge pull request #431 from yakworks/dev [link](https://github.com/yakworks/gorm-tools/commit/2b4b4f8536e9552b0f925e442c850e9847ae44a6)
+- hard code customer and source to be returned as data if exists on error (#430) [link](https://github.com/yakworks/gorm-tools/commit/49c9367a36d7282f595ce72bef6efb605483a524)
+- put data back in for errors, RNDC is using it, better to have them [link](https://github.com/yakworks/gorm-tools/commit/07077020e917725f1d689c30a6178fbf1635acca)
+- dont set syncJob (#427) [link](https://github.com/yakworks/gorm-tools/commit/eb6ee2e39ba2afe09738f2762b9ba1b347f88b1d)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/31b08a5054d50d793eae5011f86505158c71998a)
+- publish with fix for null Strings [link](https://github.com/yakworks/gorm-tools/commit/c8579943e68610913cc8a1d7297cd8d76b78e372)
+- Merge pull request #424 from yakworks/handle-empty-strings [link](https://github.com/yakworks/gorm-tools/commit/316bfd987e6b20bbc449e64b74ecbf56a802cbba)
+- remove printlns [link](https://github.com/yakworks/gorm-tools/commit/086bb64c14d1df4b616625fde9ef5bd225d7f74d)
+- Codenarc fixes [link](https://github.com/yakworks/gorm-tools/commit/1ad1fe69b4a1cfab94b01019339284a9b2dfd0f7)
+- 9ci/domain9#597 Empty strings should be set as null [link](https://github.com/yakworks/gorm-tools/commit/0fe53a89033215a101b483161e59809f3b4dbf33)
+- back to snapshot [link](https://github.com/yakworks/gorm-tools/commit/c369bb77cfd16ebe918bc1ad81200b5099da7990)
+- rm [link](https://github.com/yakworks/gorm-tools/commit/64c5ece9ac553af05db8cac255252c062dc34a3e)
+- release with fix for special characters in csv [link](https://github.com/yakworks/gorm-tools/commit/d835c1c2fe0c809ab8dad8d00e08a0fb91ff9497)
+- Merge pull request #422 from yakworks/csv [link](https://github.com/yakworks/gorm-tools/commit/3816594ee467b3485bb6d73122e804015a042a9e)
+- Remove BOM/ZWNBSP from lines [link](https://github.com/yakworks/gorm-tools/commit/28d9a7522a0637859192152007b97415bbf75af9)
+- fix version.properties as circleci failed on make ship.release [link](https://github.com/yakworks/gorm-tools/commit/d21de9882b1634d65b83b20208f67f105d3a51e9)
+- release changes to csv processing [link](https://github.com/yakworks/gorm-tools/commit/982f9b783e37b3102854ab76be8db409bd36fe9f)
+- Merge pull request #421 from yakworks/565-zip-helpers [link](https://github.com/yakworks/gorm-tools/commit/33ddc0e69b15d01e0bea14d6cb96b29fd50b23e4)
+- Fix spotless [link](https://github.com/yakworks/gorm-tools/commit/ab32664e9dc200e746a2d9aef8e03ff66ea2cc89)
+- domain9#565 Add zip helpers [link](https://github.com/yakworks/gorm-tools/commit/7150b60309a2f9c5a3a7553fcfe45dfd33ece939)
+- Dev (#420) [link](https://github.com/yakworks/gorm-tools/commit/3ef6c06d69bc4334dd31a382c3244b55860def52)
+- release with csv import [link](https://github.com/yakworks/gorm-tools/commit/640f7df3b0e517218274e6deba1880a7e6dedc00)
+- Csv related stuff (Work in progress) (#416) [link](https://github.com/yakworks/gorm-tools/commit/bcad83f945590fe0cb47f3c64d5522bdff5d309a)
+- support sort param for multiple fields seperated by comma, ex: 'num:asc, name:desc' and json in same format as above, ex '{num:"asc", name:"desc"}' (#419) [link](https://github.com/yakworks/gorm-tools/commit/cb3c47c9c13d89c608192196891f0c015e3aa199)
+
 ### v7.0.8-v.45
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.44...v7.0.8-v.45)

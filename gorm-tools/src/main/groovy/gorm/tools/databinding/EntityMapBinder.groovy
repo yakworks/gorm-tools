@@ -198,8 +198,6 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         Object valueToAssign = Boolean.FALSE
         //do we have tests for this?
         if (String.isAssignableFrom(typeToConvertTo)) {
-            sval = sval.trim()
-            sval = ("" == sval) ? null : sval
             valueToAssign = sval
         } else if (Date.isAssignableFrom(typeToConvertTo)) {
             valueToAssign = IsoDateUtil.parse(sval)
@@ -235,20 +233,24 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         Class typeToConvertTo = prop.getType() as Class
 
         if (propValue instanceof String) {
-            String sval = propValue as String
-            Object parsedVal = parseBasicType(sval, typeToConvertTo)
-            //do we have tests for this?
-            if (parsedVal != Boolean.FALSE) {
-                valueToAssign = parsedVal
-            } //if no parsedVal then try converters
-            else if (conversionHelpers.containsKey(typeToConvertTo)) {
-                List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
-                ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
-                if (converter) {
-                    valueToAssign = converter.convert(propValue)
+            String sval = processStringValue(propValue)
+            if(sval == null) { valueToAssign = null }
+            else {
+                //attempt all other basic conversions, only if value is not null/empty
+                Object parsedVal = parseBasicType(sval, typeToConvertTo)
+                //do we have tests for this?
+                if (parsedVal != Boolean.FALSE) {
+                    valueToAssign = parsedVal
+                } //if no parsedVal then try converters
+                else if (conversionHelpers.containsKey(typeToConvertTo)) {
+                    List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
+                    ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
+                    if (converter) {
+                        valueToAssign = converter.convert(propValue)
+                    }
+                } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
+                    valueToAssign = conversionService.convert(propValue, typeToConvertTo)
                 }
-            } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
-                valueToAssign = conversionService.convert(propValue, typeToConvertTo)
             }
 
             target[prop.name] = valueToAssign
@@ -278,6 +280,15 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             }
         }
 
+    }
+
+    //FIXME https://github.com/yakworks/gorm-tools/issues/425 all blank Strings will be null, so the problem will be with update
+    // when you want to null something out in update, for example
+    // Update Contact phone number you cannot put blank because it will be turned to null and not used in update
+    protected processStringValue(String sval) {
+        sval = sval.trim()
+        sval = ("" == sval) ? null : sval
+        return sval
     }
 
     //FIXME clean this up so its a compile static

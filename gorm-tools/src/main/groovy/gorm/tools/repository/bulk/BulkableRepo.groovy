@@ -206,7 +206,6 @@ trait BulkableRepo<D> {
                     customData['customer'] = r.payload['customer'] as Map
                 }
                 map.putAll([
-
                     data: customData?:r.payload,  //do sourceId is exists (works for arTran)
                     title: r.title,
                     detail: r.detail,

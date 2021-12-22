@@ -370,7 +370,7 @@ class MangoBuilder {
 
         if (v instanceof String) {
             Object parsedVal = EntityMapBinder.parseBasicType(v, typeToConvertTo)
-            if (parsedVal != Boolean.FALSE) {
+            if (!(parsedVal instanceof EntityMapBinder.UnParsed)) {
                 v = parsedVal
             }
             else if (typeToConvertTo.isEnum()) {

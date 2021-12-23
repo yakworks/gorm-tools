@@ -346,8 +346,12 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             return
         }
 
-        if (String.isAssignableFrom(value.class)) {
-            value = value as Long
+        if (value instanceof String) {
+            String sval = value as String
+            //if its an empty string then its nothing so return
+            if(!sval.trim()) return
+            //convert to long
+            value = sval as Long
         }
 
         // if its a number then its the identifier so set it
@@ -359,6 +363,12 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         //at this point if its assumed the value is mostlikely a Map or some object with and id property
         Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
         idValue = idValue == 'null' ? null : idValue
+
+        //on CSV and form binds id might be a string value
+        // check for empty string id and return if so
+        if(value instanceof String && (idValue as String).trim() == ''){
+            return
+        }
 
         if (idValue) {
             // check if the target[aprop].id is the same and we don't need to do anything or

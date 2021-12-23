@@ -136,6 +136,19 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         domain.anotherDomain == assoc
     }
 
+
+    void "bind association field ending in Id as String when it's blank"() {
+        setup:
+        TestDomain domain = new TestDomain()
+
+        when: 'assigns null'
+        binder.bind(domain, ["anotherDomainId": ""])
+
+        then:
+        domain
+    }
+
+
     void "bind association field ending in Id as String"() {
         setup:
         TestDomain domain = new TestDomain()

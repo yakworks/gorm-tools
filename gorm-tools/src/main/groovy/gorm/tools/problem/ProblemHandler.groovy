@@ -123,6 +123,8 @@ class ProblemHandler {
     //FIXME #339 see errormessageService, do we need some of that logic?
     List<Violation> transateErrorsToViolations(Errors errs) {
         List<ViolationFieldError> errors = []
+        if(!errs) errors as List<Violation>
+
         for (ObjectError err : errs.allErrors) {
             ViolationFieldError fieldError = ViolationFieldError.of(err.code, getMsg(err))
             if (err instanceof FieldError) fieldError.field = err.field

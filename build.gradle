@@ -101,6 +101,9 @@ subprojects { subprj ->
 
       implementation "org.grails.plugins:cache"
 
+      implementation "org.apache.logging.log4j:log4j-to-slf4j:$vLog4j"
+      implementation "org.apache.logging.log4j:log4j-api:$vLog4j"
+
       compileOnly "org.grails.plugins:hibernate5:$vGormHibernate"
       compileOnly "org.hibernate:hibernate-core:$vHibernate"
       compileOnly "org.hibernate:hibernate-ehcache:$vHibernate"
@@ -181,6 +184,19 @@ subprojects { subprj ->
       // showPassedStandardStreams true
       // showSkippedStandardStreams true
       // showFailedStandardStreams true
+    }
+  }
+
+  //deal with log4j thing
+  dependencies {
+    constraints {
+      implementation("org.apache.logging.log4j:log4j-core") {
+        version {
+          strictly("[2.17, 3[")
+          prefer("2.17.0")
+        }
+        because("CVE-2021-44228, CVE-2021-45046, CVE-2021-45105: Log4j vulnerable to remote code execution and other critical security vulnerabilities")
+      }
     }
   }
 }

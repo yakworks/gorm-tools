@@ -39,6 +39,7 @@ class DefaultSyncJobService implements SyncJobService {
 
     @Override
     void updateJob(Long id, SyncJobState state, ApiResults results, List<Map> renderResults) {
+        //XX Handle exception during json conversion, so job.data and status updated even if json building fails.
         byte[] resultBytes = JsonEngine.toJson(renderResults).bytes
         Map data = [id:id, ok: results.ok, data: resultBytes, state: state]
         syncJobRepo.update((Map)data, (Map)[flush: true])

@@ -213,9 +213,11 @@ trait RestRepoApiController<D> extends RestApiController {
         // String forwardURI = req.forwardURI
         // XXX for now default is false, but we should change
         boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
+        boolean usePathKeyMap = params.usePathKeyMap ? params.usePathKeyMap as Boolean : false
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
+        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes,
+            params: bulkParams, asyncEnabled: asyncEnabled, usePathKeyMap: usePathKeyMap, pathKeyMapDelimiter: params.pathKeyMapDelimiter)
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)
         respondWith(job, [status: MULTI_STATUS])

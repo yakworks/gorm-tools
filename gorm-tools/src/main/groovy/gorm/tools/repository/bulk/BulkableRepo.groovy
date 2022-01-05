@@ -18,6 +18,7 @@ import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
@@ -147,7 +148,10 @@ trait BulkableRepo<D> {
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
-                itemCopy = Maps.deepCopy(item)
+                Map itemDeepCopy = Maps.deepCopy(item)
+                // special step for data from csv
+                itemCopy = bulkablArgs.usePathKeyMap?new PathKeyMap(itemDeepCopy, bulkablArgs.pathKeyMapDelimiter):itemDeepCopy
+
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
                 results << Result.of(entityInstance).status(isCreate ? 201 : 200)

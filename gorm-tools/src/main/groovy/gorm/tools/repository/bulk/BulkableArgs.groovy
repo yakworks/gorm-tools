@@ -56,6 +56,7 @@ transform example when in a job
 @CompileStatic
 class BulkableArgs {
 
+
     BulkableArgs() { this([:])}
 
     /**
@@ -96,6 +97,15 @@ class BulkableArgs {
      */
     Boolean asyncEnabled
 
+    /**
+     * For importing csv data, get data that will need to be converted into PathKeyMap
+     */
+    Boolean usePathKeyMap = false
+
+    /**
+     * header delimiter for csv files
+     */
+    String pathKeyMapDelimiter = '.'
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
      */

@@ -209,13 +209,12 @@ trait RestRepoApiController<D> extends RestApiController {
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
         // FIXME for now default is false, but we should change
         boolean asyncEnabled = paramBoolean('asyncEnabled', false)
-        boolean usePathKeyMap = paramBoolean('usePathKeyMap', false)
+//        boolean usePathKeyMap = paramBoolean('usePathKeyMap', false)
 
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
         BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes,
-            params: bulkParams, asyncEnabled: asyncEnabled,
-            usePathKeyMap: usePathKeyMap, pathKeyMapDelimiter: params.pathKeyMapDelimiter)
+            params: bulkParams, asyncEnabled: asyncEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)

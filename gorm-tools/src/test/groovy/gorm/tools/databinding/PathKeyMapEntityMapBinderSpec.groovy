@@ -43,7 +43,7 @@ class PathKeyMapEntityMapBinderSpec extends Specification implements DataRepoTes
         ]
 
         when:
-        PathKeyMap params = new PathKeyMap(sub)
+        PathKeyMap params = PathKeyMap.of(sub).init()
         KitchenSink sink = new KitchenSink()
         binder.bind(sink, params)
 
@@ -54,4 +54,6 @@ class PathKeyMapEntityMapBinderSpec extends Specification implements DataRepoTes
         sink.sinkLink.name2 == "sinkLink.name2"
         sink.thing == null //this is not bindable
     }
+
+
 }

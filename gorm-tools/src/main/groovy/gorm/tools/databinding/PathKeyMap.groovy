@@ -5,6 +5,7 @@
 package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
+
 import org.codehaus.groovy.util.HashCodeHelper
 import org.grails.datastore.mapping.model.config.GormProperties
 
@@ -20,9 +21,9 @@ class PathKeyMap implements Map, Cloneable  {
 
     Map wrappedMap;
 
-    String pathDelimiter
+    String pathDelimiter = "."
 
-
+    boolean initialized = false
 
     /**
      * Populates the PathKeyMap with supplied map.
@@ -30,18 +31,29 @@ class PathKeyMap implements Map, Cloneable  {
      * @param values The values to populate with
      */
     PathKeyMap(Map sourceMap) {
-        this(sourceMap, ".", false)
+        wrappedMap = sourceMap?:[:]
     }
 
-    // add class variable that we use it
-    PathKeyMap(Map sourceMap, String pathDelimiter, boolean lazyNestedKeys = false) {
-        super()
-        this.pathDelimiter = pathDelimiter
-        wrappedMap = sourceMap
-        if(sourceMap && !lazyNestedKeys) {
-            updateNestedKeys(sourceMap)
-        }
+    static of(Map sourceMap){
+        return new PathKeyMap(sourceMap)
     }
+
+    static of(Map sourceMap, String pathDelimiter ){
+        def pkm = new PathKeyMap(sourceMap)
+        pkm.pathDelimiter = pathDelimiter
+        return pkm
+    }
+
+    static create(Map sourceMap){
+        def pkm = new PathKeyMap(sourceMap)
+        return pkm.init()
+    }
+
+    PathKeyMap pathDelimiter(String v){
+        this.pathDelimiter = v
+        return this
+    }
+
 
     //need this, or else, groovy metaclass would call 'get' method of this class, resulting in StackOverflow error
     //See MetaClassImpl.getProperty
@@ -52,7 +64,7 @@ class PathKeyMap implements Map, Cloneable  {
     @Override
     Object clone() {
         if (wrappedMap.isEmpty()) {
-            return new PathKeyMap([:], pathDelimiter)
+            return PathKeyMap.of([:], pathDelimiter)
         } else {
             Map clonedMap = new LinkedHashMap(wrappedMap)
             // deep clone nested entries
@@ -62,7 +74,7 @@ class PathKeyMap implements Map, Cloneable  {
                     entry.setValue(((PathKeyMap)entry.getValue()).clone())
                 }
             }
-            return new PathKeyMap(clonedMap, pathDelimiter)
+            return PathKeyMap.of(clonedMap, pathDelimiter)
         }
     }
 
@@ -126,11 +138,18 @@ class PathKeyMap implements Map, Cloneable  {
         return get(GormProperties.IDENTITY)
     }
 
-    protected void updateNestedKeys(Map keys) {
-        for (Object keyObject : keys.keySet().collect{it}) {
+    /**
+     * Process the nested keys
+     */
+    PathKeyMap init() {
+        if(initialized) return this
+
+        for (Object keyObject : wrappedMap.keySet().collect{it}) {
             String key = (String)keyObject
-            processNestedKeys(keys, key, key, wrappedMap)
+            processNestedKeys(wrappedMap, key, key, wrappedMap)
         }
+        initialized = true
+        return this
     }
 
     /*
@@ -156,7 +175,7 @@ class PathKeyMap implements Map, Cloneable  {
             // No value. So, since there is at least one sub-key,
             // we create a sub-map for this prefix.
 
-            prefixValue = new PathKeyMap([:], pathDelimiter)
+            prefixValue = PathKeyMap.of([:], pathDelimiter)
             nestedLevel.put(nestedPrefix, prefixValue)
         }
 

@@ -142,18 +142,20 @@ trait BulkableRepo<D> {
     ApiResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
-            Map itemCopy
+            Map itemData
             D entityInstance
 
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
-                Map itemDeepCopy = Maps.deepCopy(item)
-                // special step for data from csv
-                itemCopy = bulkablArgs.usePathKeyMap?new PathKeyMap(itemDeepCopy, bulkablArgs.pathKeyMapDelimiter):itemDeepCopy
+                if(item instanceof PathKeyMap){
+                    itemData = item.init() //initialize it, this will be from CSV
+                } else {
+                    itemData = Maps.deepCopy(item)
+                }
 
                 boolean isCreate = bulkablArgs.op == DataOp.add
-                entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
+                entityInstance = createOrUpdate(isCreate, transactionalItem, itemData, bulkablArgs.persistArgs)
                 results << Result.of(entityInstance).status(isCreate ? 201 : 200)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback

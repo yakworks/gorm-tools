@@ -15,7 +15,7 @@ class PathKeyMapSpec extends Specification {
         sub.put("address.town", "Swindon")
 
         when:
-        theMap = new PathKeyMap(sub)
+        theMap = PathKeyMap.of(sub).init()
 
         then:
         theMap['name', 'dob'] == [name:"Dierk Koenig", dob:"01/01/1970"]
@@ -35,7 +35,7 @@ class PathKeyMapSpec extends Specification {
         ]
 
         when:
-        theMap = new PathKeyMap(sub)
+        theMap = PathKeyMap.create(sub)
 
         then:
         assert theMap['a'] instanceof Map
@@ -61,7 +61,7 @@ class PathKeyMapSpec extends Specification {
         ]
 
         when:
-        theMap = new PathKeyMap(sub, "_")
+        theMap = PathKeyMap.of(sub, "_").init()
 
         then:
         assert theMap['a'] instanceof Map
@@ -79,7 +79,7 @@ class PathKeyMapSpec extends Specification {
     void testPlusOperator() {
         given:
         Map m = ["album": "Foxtrot"]
-        def originalMap = new PathKeyMap(m)
+        def originalMap =  PathKeyMap.create(m)
 
         when:
         def newMap = originalMap + [vocalist: 'Peter']
@@ -93,18 +93,13 @@ class PathKeyMapSpec extends Specification {
 
     void testConversionHelperMethods() {
         given:
-        def map = new PathKeyMap([:])
+        def map = PathKeyMap.create([:])
 
         when:
-        map.zero = "0"
         map.one = "1"
-        map.bad = "foo"
-        map.decimals = "1.4"
-        map.bool = "true"
         map.aList = [1,2]
         map.array = ["one", "two" ] as String[]
-        map.longNumber = 1234567890
-        map.z = 'z'
+
 
         then:
         ["1"] ==  map.list("one")
@@ -116,7 +111,7 @@ class PathKeyMapSpec extends Specification {
 
     void testNestedKeyAutoGeneration() {
         given:
-        def params = new PathKeyMap([:])
+        def params = PathKeyMap.of([:])
 
         when:
         params.'company.department.team.numberOfEmployees' = 42
@@ -157,7 +152,7 @@ class PathKeyMapSpec extends Specification {
 
     void testCloning() {
         Map sub = ["name":"Dierk Koenig", "address.postCode": "345435", "dob": "01/01/1970"]
-        theMap = new PathKeyMap(sub)
+        theMap =  PathKeyMap.of(sub)
 
         when:
         Map theClone = theMap.clone()

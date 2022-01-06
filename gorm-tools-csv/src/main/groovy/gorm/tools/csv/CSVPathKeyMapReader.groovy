@@ -48,7 +48,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
     @Override
     Map<String, String> readMap() {
         Map<String, String> data = super.readMap()
-        return (Map<String, String>) new PathKeyMap(data, pathDelimiter)
+        return PathKeyMap.of(data, pathDelimiter) as Map<String, String>
     }
 
     /**

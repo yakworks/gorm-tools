@@ -92,6 +92,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         count == 5
     }
 
+    @Ignore
     @Issue("domain9/issues/629")
     void "when lazy association encountered during json building"() {
         given:

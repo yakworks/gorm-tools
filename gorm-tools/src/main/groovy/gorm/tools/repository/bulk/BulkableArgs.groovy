@@ -56,6 +56,7 @@ transform example when in a job
 @CompileStatic
 class BulkableArgs {
 
+
     BulkableArgs() { this([:])}
 
     /**

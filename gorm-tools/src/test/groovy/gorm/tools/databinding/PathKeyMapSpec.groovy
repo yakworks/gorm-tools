@@ -13,6 +13,12 @@ class PathKeyMapSpec extends Specification {
         sub.put("dob", "01/01/1970")
         sub.put("address.postCode", "345435")
         sub.put("address.town", "Swindon")
+        sub.put("nested", PathKeyMap.of(['foo.bar': 'baz']))
+
+        List nestedList = []
+        nestedList << PathKeyMap.of(['foo.bar': 'baz'])
+        nestedList << PathKeyMap.of(['foo.bar': 'baz'])
+        sub.put("nestedList", nestedList)
 
         when:
         theMap = PathKeyMap.of(sub).init()
@@ -21,6 +27,9 @@ class PathKeyMapSpec extends Specification {
         theMap['name', 'dob'] == [name:"Dierk Koenig", dob:"01/01/1970"]
         theMap.address.postCode == "345435"
         theMap.address.town == "Swindon"
+        theMap.nested.foo.bar == 'baz'
+        theMap.nestedList[0].foo.bar == 'baz'
+        theMap.nestedList[1].foo.bar == 'baz'
     }
 
     void testMultiDimensionParams() {

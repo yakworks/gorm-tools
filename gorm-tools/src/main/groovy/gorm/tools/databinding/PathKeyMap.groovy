@@ -111,7 +111,7 @@ class PathKeyMap implements Map, Cloneable  {
         if (key instanceof String) {
             String keyString = (String)key
             if (keyString.indexOf(pathDelimiter) > -1) {
-                processNestedKeys(this, keyString, keyString, wrappedMap)
+                processNestedKeys(this, keyString, wrappedMap)
             }
         }
         return returnValue
@@ -146,7 +146,7 @@ class PathKeyMap implements Map, Cloneable  {
 
         for (Object keyObject : wrappedMap.keySet().collect{it}) {
             String key = (String)keyObject
-            processNestedKeys(wrappedMap, key, key, wrappedMap)
+            processNestedKeys(wrappedMap, key, wrappedMap)
         }
         initialized = true
         return this
@@ -158,16 +158,22 @@ class PathKeyMap implements Map, Cloneable  {
      *
      * This also allows data binding to occur for only a subset of the properties in the parameter map.
      */
-    private void processNestedKeys(Map requestMap, String key, String nestedKey, Map nestedLevel) {
-        final int nestedIndex = nestedKey.indexOf(pathDelimiter)
+    private void processNestedKeys(Map requestMap, String key, Map nestedLevel) {
+        final int nestedIndex = key.indexOf(pathDelimiter)
+
         if (nestedIndex == -1) {
+            def val = requestMap.get(key)
+            if(val instanceof PathKeyMap) val.init()
+            if(val instanceof Collection<PathKeyMap>) {
+                val.each{ ((PathKeyMap)it).init()}
+            }
             return
         }
 
         // We have at least one sub-key, so extract the first element
         // of the nested key as the prfix. In other words, if we have
         // 'nestedKey' == "a.b.c", the prefix is "a".
-        String nestedPrefix = nestedKey.substring(0, nestedIndex)
+        String nestedPrefix = key.substring(0, nestedIndex)
 
         // Let's see if we already have a value in the current map for the prefix.
         Object prefixValue = nestedLevel.get(nestedPrefix)
@@ -185,11 +191,11 @@ class PathKeyMap implements Map, Cloneable  {
         }
 
         Map nestedMap = (Map)prefixValue
-        if (nestedIndex < nestedKey.length() - 1) {
-            String remainderOfKey = nestedKey.substring(nestedIndex + 1, nestedKey.length())
+        if (nestedIndex < key.length() - 1) {
+            String remainderOfKey = key.substring(nestedIndex + 1, key.length())
             nestedMap.put(remainderOfKey, requestMap.get(key))
             if (!(nestedMap instanceof PathKeyMap) && remainderOfKey.indexOf(pathDelimiter) >-1) {
-                processNestedKeys(requestMap, remainderOfKey, remainderOfKey, (Map)nestedMap)
+                processNestedKeys(requestMap, remainderOfKey, (Map)nestedMap)
             }
         }
     }

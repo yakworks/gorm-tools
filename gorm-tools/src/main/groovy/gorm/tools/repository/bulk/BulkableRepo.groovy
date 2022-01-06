@@ -111,10 +111,10 @@ trait BulkableRepo<D> {
                 sliceErrors.add(dataSlice)
             }
             deltaTime = System.currentTimeMillis() - startTime
-            println("done slice $sliceInt took ${deltaTime}")
+            // println("done slice $sliceInt took ${deltaTime}")
         }
         deltaTime = System.currentTimeMillis() - startTimeAll
-        println("after all slices took ${deltaTime} will do errors now - sliceErrors.size() is ${sliceErrors.size()}")
+        // println("after all slices took ${deltaTime} will do errors now - sliceErrors.size() is ${sliceErrors.size()}")
         // if it has slice errors try again but this time run each item in its own transaction
         if(sliceErrors.size()) {
             AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
@@ -128,6 +128,8 @@ trait BulkableRepo<D> {
                 }
             }
         }
+        deltaTime = System.currentTimeMillis() - startTimeAll
+        // println("after errors took ${deltaTime}")
         return results
     }
 
@@ -148,7 +150,7 @@ trait BulkableRepo<D> {
      * @return the BulkableResults object with what succeeded and what failed
      */
     ApiResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
-        println "will do ${dataList.size()}"
+        // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             Map itemData

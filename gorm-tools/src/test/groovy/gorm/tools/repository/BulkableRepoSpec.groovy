@@ -245,8 +245,8 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         given:
         List data = [] as List<Map>
 
-        data << PathKeyMap.of([name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
-        data << PathKeyMap.of([name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
+        data << PathKeyMap.of([num:'1', name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
+        data << PathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
 
         when: "bulk insert 2 records"
         BulkableArgs args = setupBulkableArgs()

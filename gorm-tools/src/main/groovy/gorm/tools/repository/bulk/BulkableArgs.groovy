@@ -106,6 +106,7 @@ class BulkableArgs {
      * header delimiter for csv files
      */
     String pathKeyMapDelimiter = '.'
+
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
      */

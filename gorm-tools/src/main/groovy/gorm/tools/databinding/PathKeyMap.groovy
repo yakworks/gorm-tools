@@ -5,55 +5,48 @@
 package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
-
-import org.codehaus.groovy.runtime.DefaultGroovyMethods
+import org.codehaus.groovy.util.HashCodeHelper
 import org.grails.datastore.mapping.model.config.GormProperties
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-import grails.util.TypeConvertingMap
 
 /**
  * This is a copy of the GrailsParameterMap, primary to remove the need for HttpServletRequest.
  * Allows a flattened map of path keys such that
  * foo.bar.id:1, foo.amount:10 would end up as [foo: [bar: [id: 1]], amount:10]
  *
- * Orginal authors from GrailsParameterMap
- * @author Graeme Rocher
- * @author Lari Hotari
- * @since Oct 24, 2005\
- * TODO convert to groovy
+ * Orginal authors from GrailsParameterMap, Graeme Rocher, Lari Hotari Oct 24, 2005\
  */
-@SuppressWarnings(["rawtypes", "unchecked" ])
 @CompileStatic
-class PathKeyMap extends TypeConvertingMap implements Cloneable {
-    private static final Logger LOG = LoggerFactory.getLogger(PathKeyMap)
+class PathKeyMap implements Map, Cloneable  {
+
+    Map wrappedMap;
 
     String pathDelimiter
+
+
 
     /**
      * Populates the PathKeyMap with supplied map.
      *
      * @param values The values to populate with
      */
-    PathKeyMap(Map values) {
-        this(values, ".")
+    PathKeyMap(Map sourceMap) {
+        this(sourceMap, ".", false)
     }
 
     // add class variable that we use it
-    PathKeyMap(Map values, String pathDelimiter) {
+    PathKeyMap(Map sourceMap, String pathDelimiter, boolean lazyNestedKeys = false) {
         super()
         this.pathDelimiter = pathDelimiter
-        if(values) {
-            wrappedMap.putAll(values)
-            updateNestedKeys(values)
+        wrappedMap = sourceMap
+        if(sourceMap && !lazyNestedKeys) {
+            updateNestedKeys(sourceMap)
         }
     }
 
     //need this, or else, groovy metaclass would call 'get' method of this class, resulting in StackOverflow error
     //See MetaClassImpl.getProperty
     protected Map getWrappedMap() {
-        return this.@wrappedMap //direct field access
+        return this.wrappedMap //direct field access
     }
 
     @Override
@@ -92,7 +85,7 @@ class PathKeyMap extends TypeConvertingMap implements Cloneable {
             }
         }
         else if(returnValue == null && (key instanceof Collection)) {
-            return DefaultGroovyMethods.subMap(wrappedMap, (Collection)key)
+            return wrappedMap.subMap((Collection)key)
         }
 
         return returnValue
@@ -134,7 +127,7 @@ class PathKeyMap extends TypeConvertingMap implements Cloneable {
     }
 
     protected void updateNestedKeys(Map keys) {
-        for (Object keyObject : keys.keySet()) {
+        for (Object keyObject : keys.keySet().collect{it}) {
             String key = (String)keyObject
             processNestedKeys(keys, key, key, wrappedMap)
         }
@@ -180,5 +173,79 @@ class PathKeyMap extends TypeConvertingMap implements Cloneable {
                 processNestedKeys(requestMap, remainderOfKey, remainderOfKey, (Map)nestedMap)
             }
         }
+    }
+
+    @Override
+    boolean equals(Object that) {
+        wrappedMap.equals(that)
+    }
+
+    @Override
+    int hashCode() {
+        int hashCode = HashCodeHelper.initHash();
+        for (Object entry : wrappedMap.entrySet()) {
+            hashCode = HashCodeHelper.updateHash(hashCode, entry);
+        }
+        return hashCode;
+    }
+
+    /**
+     * Helper method for obtaining a list of values from parameter
+     * @param name The name of the parameter
+     * @return A list of values
+     */
+    List getList(String name) {
+        Object paramValues = get(name);
+        if (paramValues == null) {
+            return Collections.emptyList();
+        }
+        if (paramValues.getClass().isArray()) {
+            return Arrays.asList((Object[])paramValues);
+        }
+        if (paramValues instanceof Collection) {
+            return new ArrayList((Collection)paramValues);
+        }
+        return Collections.singletonList(paramValues);
+    }
+
+    List list(String name) {
+        return getList(name);
+    }
+
+    int size() {
+        return wrappedMap.size();
+    }
+
+    boolean isEmpty() {
+        return wrappedMap.isEmpty();
+    }
+
+    boolean containsKey(Object k) {
+        return wrappedMap.containsKey(k);
+    }
+
+    boolean containsValue(Object v) {
+        return wrappedMap.containsValue(v);
+    }
+
+    void clear() {
+        wrappedMap.clear();
+    }
+
+    Set keySet() {
+        return wrappedMap.keySet();
+    }
+
+    Collection values() {
+        return wrappedMap.values();
+    }
+
+    Set entrySet() {
+        return wrappedMap.entrySet();
+    }
+
+    @Override
+    String toString() {
+        return this.toMapString()
     }
 }

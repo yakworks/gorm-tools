@@ -64,7 +64,6 @@ class CSVPathKeyMapReaderSpec extends Specification {
         data[2].num == "sink3"
     }
 
-    @Ignore // we don't have PathKeyMap
     void "merge two csv into single map structure"() {
         setup:
         def kitchenSinkReader = CSVPathKeyMapReader.of(kitchenSinkCsv)
@@ -76,8 +75,8 @@ class CSVPathKeyMapReaderSpec extends Specification {
         Map currentSink
         while(sinkItemReader.hasNext()) {
             Map row = sinkItemReader.readMap() {  row ->
-                if(!row) return //XXX when would this empty?
-                String kitchenSinkNum = row.kitchenSink.num
+                if(!row) return //might have empty line on end
+                String kitchenSinkNum = row['kitchenSink_num']
                 //XXX why the if?
                 if(kitchenSinkNum) {
                     //
@@ -112,7 +111,6 @@ class CSVPathKeyMapReaderSpec extends Specification {
         kitchenSinks[2].items.size() == 11
     }
 
-    @Ignore // we don't have PathKeyMap
     void "simulate when detail is ordered and we dont need to look up on sink"() {
         setup:
         def kitchenSinkReader = CSVPathKeyMapReader.of(kitchenSinkCsv)
@@ -124,8 +122,8 @@ class CSVPathKeyMapReaderSpec extends Specification {
         Map currentSink
         while(sinkItemReader.hasNext()) {
             Map row = sinkItemReader.readMap() {  row ->
-                if(!row) return //XXX when would this empty?
-                String kitchenSinkNum = row.kitchenSink.num
+                if(!row) return //last line is empty row
+                String kitchenSinkNum = row['kitchenSink_num']
                 //XXX why the if?
                 if(kitchenSinkNum) {
                     //if not currentSink then first row so lookup , or if they dont match

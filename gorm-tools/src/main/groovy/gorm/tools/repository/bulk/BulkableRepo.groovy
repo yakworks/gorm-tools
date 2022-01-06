@@ -128,8 +128,6 @@ trait BulkableRepo<D> {
                 }
             }
         }
-        deltaTime = System.currentTimeMillis() - startTimeAll
-        println("after errors took ${deltaTime}")
         return results
     }
 

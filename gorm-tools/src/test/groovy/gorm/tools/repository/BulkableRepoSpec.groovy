@@ -240,4 +240,68 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         asyncService.sliceSize = 50
     }
 
+    void "success bulk insert with csv using usePathKeyMap"() {
+        given:
+        List<Map> data = [
+            [name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'],
+            [name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar']
+        ]
+
+        when: "bulk insert 2 records"
+        //itemCopy after is [name:Sink1, ext_name:SinkExt1, bazMap_foo:bar, ext:[name:SinkExt1], bazMap:[foo:bar]]
+
+        // using List:
+        //itemCopy after is [name:Sink1, ext:[name:SinkExt1], bazMap:[foo:bar]]
+        BulkableArgs args = setupBulkableArgs()
+        args.pathKeyMapDelimiter='_'
+        args.usePathKeyMap = true
+        Long jobId = kitchenSinkRepo.bulk(data, args)
+        def job = TestSyncJob.get(jobId)
+
+
+        then: "verify job"
+
+        job != null
+        job.source == "test"
+        job.sourceId == "test"
+        job.requestData != null
+        job.data != null
+        job.state == SyncJobState.Finished
+
+        when: "Verify job.requestData (incoming json)"
+        def payload = parseJson(job.requestDataToString())
+
+        then:
+        payload != null
+        payload instanceof List
+        payload.size() == 2
+        payload[0].name == "Sink1"
+        payload[0].ext.name == "SinkExt1"
+        payload[1].name == "Sink2"
+
+        when: "verify job.data (job results)"
+        def dataString = job.dataToString()
+        List results = parseJson(dataString, List)
+
+        then:
+        dataString.startsWith('[{') //sanity check
+        results != null
+        results instanceof List
+        results.size() == 2
+        results[0].ok == true
+        results[0].status == HttpStatus.CREATED.value()
+        results[1].ok == true
+
+        and: "verify includes"
+        results[0].data.size() == 3 //id, project name, nested name
+        //results[0].data.id == 1
+        results[0].data.name == "Sink1"
+        results[0].data.ext.name == "SinkExt1"
+
+        and: "Verify database records"
+        KitchenSink.count() == 2
+        KitchenSink.findByName("Sink1") != null
+        KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
+    }
+
 }

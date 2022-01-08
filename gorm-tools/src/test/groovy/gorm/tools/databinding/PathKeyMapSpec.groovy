@@ -59,7 +59,7 @@ class PathKeyMapSpec extends Specification {
         assert theMap.a.e.f == "fValue"
         assert theMap.a.e.g == "gValue"
         assert theMap.x.y == "yValue"
-        assert theMap["x.y"] == "vValue"
+        assert theMap["x.y"] == "yValue"
     }
 
     void "test multi dimensional map with different delim"() {

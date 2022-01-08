@@ -49,6 +49,7 @@ import yakworks.commons.lang.IsoDateUtil
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@SuppressWarnings("EmptyClass")
 @CompileStatic
 class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 

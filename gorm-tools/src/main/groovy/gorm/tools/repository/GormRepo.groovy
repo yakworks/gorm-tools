@@ -4,23 +4,6 @@
 */
 package gorm.tools.repository
 
-import groovy.transform.CompileStatic
-
-import org.grails.datastore.gorm.GormEnhancer
-import org.grails.datastore.gorm.GormEntity
-import org.grails.datastore.gorm.GormInstanceApi
-import org.grails.datastore.gorm.GormStaticApi
-import org.grails.datastore.gorm.GormValidationApi
-import org.grails.datastore.mapping.core.Datastore
-import org.grails.datastore.mapping.model.PersistentEntity
-import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
-import org.grails.datastore.mapping.transactions.TransactionObject
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.GenericTypeResolver
-import org.springframework.dao.DataAccessException
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.support.DefaultTransactionStatus
-
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
@@ -33,7 +16,20 @@ import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxService
 import grails.validation.ValidationException
-import yakworks.api.Result
+import groovy.transform.CompileStatic
+import org.grails.datastore.gorm.GormEnhancer
+import org.grails.datastore.gorm.GormEntity
+import org.grails.datastore.gorm.GormInstanceApi
+import org.grails.datastore.gorm.GormStaticApi
+import org.grails.datastore.gorm.GormValidationApi
+import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
+import org.grails.datastore.mapping.transactions.TransactionObject
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.GenericTypeResolver
+import org.springframework.dao.DataAccessException
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.DefaultTransactionStatus
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
 import yakworks.problem.data.NotFoundProblem
@@ -435,7 +431,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     /**
      * creates or updates associations for given entity, called during create or update methods
-     *
      *
      * @Param mainEntity The entity that has the associations that are being created/updated
      * @param assocRepo association entity repo

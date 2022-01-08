@@ -31,6 +31,7 @@ import yakworks.problem.ProblemTrait
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
  */
+@SuppressWarnings(["Println"])
 @CompileStatic
 trait BulkableRepo<D> {
 

@@ -4,8 +4,6 @@
 */
 package gorm.tools.jdbc
 
-import gorm.tools.databinding.PathKeyMap
-
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
 import java.sql.SQLException
@@ -15,6 +13,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.support.JdbcUtils
+
+import gorm.tools.databinding.PathKeyMap
 
 /**
  * Row mapper which allows to convert data from a given ResultSet instance

@@ -98,6 +98,12 @@ class BulkableArgs {
     Boolean asyncEnabled
 
     /**
+     * Whether it should run async with a CompletableFuture and return the job immediately
+     * or run in a standard blocking synchronous
+     */
+    Boolean promiseEnabled = false
+
+    /**
      * the args, such as flush:true etc.., to pass down to the repo methods
      */
     Map persistArgs = [:]

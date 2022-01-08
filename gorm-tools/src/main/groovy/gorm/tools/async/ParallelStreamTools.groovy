@@ -35,6 +35,7 @@ class ParallelStreamTools implements ParallelTools, ConfigAware {
     @Override
     public <T> Collection<T> each(AsyncConfig args, Collection<T> collection, Closure closure){
         boolean parEnabled = args.enabled != null ? args.enabled : asyncService.getAsyncEnabled()
+        println("ParallelStreamTools each asyncEnabled $parEnabled")
 
         Consumer<T> wrappedConsumer = asyncService.wrapConsumer(args, closure as Consumer<T>)
 

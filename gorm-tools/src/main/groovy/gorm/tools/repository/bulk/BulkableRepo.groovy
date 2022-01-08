@@ -75,7 +75,7 @@ trait BulkableRepo<D> {
         Long jobId = syncJobService.createJob((String)params.source, (String)params.sourceId, dataList)
 
         def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<ApiResults>
-        def asyncArgs = new AsyncConfig(enabled: bulkablArgs.asyncEnabled)
+        def asyncArgs = new AsyncConfig(enabled: bulkablArgs.promiseEnabled)
 
         asyncService.supplyAsync(asyncArgs, supplierFunc)
             .whenComplete { ApiResults results, ex ->
@@ -97,10 +97,15 @@ trait BulkableRepo<D> {
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
+                Long chunkStart = System.currentTimeMillis()
+
                 withTrx {
                     ApiResults res = doBulk((List<Map>) dataSlice, bulkablArgs)
                     results.merge res
                 }
+
+                logTime(chunkStart)
+
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
@@ -123,7 +128,6 @@ trait BulkableRepo<D> {
         // println("after errors took ${deltaTime}")
         return results
     }
-
 
     /**
      * Does the bulk create/update, normally will be passing in a slice of data.
@@ -159,7 +163,10 @@ trait BulkableRepo<D> {
                 //make sure args has its own copy as GormRepo add data to it and makes changes
                 Map args = Maps.deepCopy( bulkablArgs.persistArgs)
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemData, args)
-                results << Result.of(entityInstance).status(isCreate ? 201 : 200)
+
+                Map entityMapData = metaMapEntityService.createMetaMap(entityInstance, bulkablArgs.includes) as Map<String, Object>
+                results << Result.of(Maps.deepCopy(entityMapData)).status(isCreate ? 201 : 200)
+
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
@@ -191,6 +198,7 @@ trait BulkableRepo<D> {
     }
 
     void finishJob(Long jobId, ApiResults results, List includes){
+        println("finishedJob ${jobId} , transforming results")
         List<Map> jsonResults = transformResults(results, includes?:['id'])
         syncJobService.updateJob(jobId, SyncJobState.Finished, results, jsonResults)
     }
@@ -223,12 +231,28 @@ trait BulkableRepo<D> {
                 ])
             } else {
                 def entityObj = r.payload
-                Map entityMapData = metaMapEntityService.createMetaMap(entityObj, includes) as Map<String, Object>
-                map.data = entityMapData
+                // Map entityMapData = metaMapEntityService.createMetaMap(entityObj, includes) as Map<String, Object>
+                map.data = r.payload as Map
             }
             ret << map
         }
         return ret
     }
 
+    void logTime(Long start){
+        if(log.isDebugEnabled()){
+            Long endTime = System.currentTimeMillis()
+            print("doBulk done in ${((endTime - start) / 1000)} - ")
+            printUsedMem()
+        }
+    }
+
+    static void printUsedMem(){
+        int mb = 1024*1024;
+
+        //Getting the runtime reference from system
+        Runtime runtime = Runtime.getRuntime();
+        //Print used memory
+        println("Used Memory:" + (runtime.totalMemory() - runtime.freeMemory()) / mb)
+    }
 }

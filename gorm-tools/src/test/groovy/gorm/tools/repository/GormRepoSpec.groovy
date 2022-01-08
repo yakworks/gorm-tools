@@ -12,6 +12,7 @@ import grails.artefact.Artefact
 import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
+import spock.lang.IgnoreRest
 import testing.Address
 import testing.AddyNested
 import testing.Cust
@@ -159,6 +160,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         then:
         def e = thrown(ValidationProblem.Exception)
+
         e.message.contains("Field error in object 'testing.Cust' on field 'type': rejected value [null]")
     }
 

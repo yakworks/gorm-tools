@@ -16,6 +16,7 @@ import org.grails.datastore.mapping.model.config.GormProperties
  *
  * Orginal authors from GrailsParameterMap, Graeme Rocher, Lari Hotari Oct 24, 2005\
  */
+@SuppressWarnings(["ExplicitCallToEqualsMethod"])
 @CompileStatic
 class PathKeyMap implements Map, Cloneable  {
 

@@ -152,7 +152,7 @@ class ProblemHandler {
         String ls = System.getProperty("line.separator");
         StringBuilder b = new StringBuilder();
         if (msg != null) {
-            b.append(msg).append(" : ").append(ls);
+            b.append(msg).append(" : ") //.append(ls);
         }
 
         for (ObjectError error : errors.getAllErrors()) {

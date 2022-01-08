@@ -94,13 +94,8 @@ trait BulkableRepo<D> {
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
         pconfig.enabled = bulkablArgs.asyncEnabled //same as above, ability to override through params
-        int sliceInt = 0
-        def startTimeAll = System.currentTimeMillis()
-        def deltaTime
-        def startTime = System.currentTimeMillis()
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
-            sliceInt ++
             try {
                 withTrx {
                     ApiResults res = doBulk((List<Map>) dataSlice, bulkablArgs)
@@ -110,11 +105,7 @@ trait BulkableRepo<D> {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
             }
-            deltaTime = System.currentTimeMillis() - startTime
-            // println("done slice $sliceInt took ${deltaTime}")
         }
-        deltaTime = System.currentTimeMillis() - startTimeAll
-        // println("after all slices took ${deltaTime} will do errors now - sliceErrors.size() is ${sliceErrors.size()}")
         // if it has slice errors try again but this time run each item in its own transaction
         if(sliceErrors.size()) {
             AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
@@ -128,7 +119,7 @@ trait BulkableRepo<D> {
                 }
             }
         }
-        deltaTime = System.currentTimeMillis() - startTimeAll
+        // deltaTime = System.currentTimeMillis() - startTimeAll
         // println("after errors took ${deltaTime}")
         return results
     }
@@ -165,13 +156,16 @@ trait BulkableRepo<D> {
                     itemData = Maps.deepCopy(item)
                 }
                 boolean isCreate = bulkablArgs.op == DataOp.add
-                entityInstance = createOrUpdate(isCreate, transactionalItem, itemData, bulkablArgs.persistArgs)
+                //make sure args has its own copy as GormRepo add data to it and makes changes
+                Map args = Maps.deepCopy( bulkablArgs.persistArgs)
+                entityInstance = createOrUpdate(isCreate, transactionalItem, itemData, args)
                 results << Result.of(entityInstance).status(isCreate ? 201 : 200)
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
                     results << problemHandler.handleException(e).payload(item)
                 } else {
+                    clear() //clear cache on error since wont hit below
                     throw e
                 }
             }

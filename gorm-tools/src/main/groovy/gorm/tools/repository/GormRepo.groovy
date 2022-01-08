@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.repository.model.PersistableRepoEntity
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
@@ -16,7 +15,6 @@ import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
-
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
@@ -32,6 +30,7 @@ import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxService
 import grails.validation.ValidationException
 import yakworks.api.Result

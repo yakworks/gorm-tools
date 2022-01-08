@@ -33,7 +33,7 @@ class DefaultSyncJobService implements SyncJobService {
         //byte[] reqData = JsonEngine.toJson(payload).bytes
         byte[] reqData
         Map data = [source: source, sourceId: sourceId, state: SyncJobState.Running, requestData: reqData]
-        def job = syncJobRepo.create((Map)data, (Map)[flush:true])
+        def job = syncJobRepo.create(data, [flush:true])
         return job.id
     }
 
@@ -42,7 +42,7 @@ class DefaultSyncJobService implements SyncJobService {
         //XX Handle exception during json conversion, so job.data and status updated even if json building fails.
         byte[] resultBytes = JsonEngine.toJson(renderResults).bytes
         Map data = [id:id, ok: results.ok, data: resultBytes, state: state]
-        syncJobRepo.update((Map)data, (Map)[flush: true])
+        syncJobRepo.update(data, [flush: true])
     }
 
     SyncJob getJob(Serializable id){

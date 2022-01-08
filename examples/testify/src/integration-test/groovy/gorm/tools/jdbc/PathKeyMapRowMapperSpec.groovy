@@ -12,7 +12,7 @@ import java.sql.Statement
 @SuppressWarnings(['JdbcResultSetReference', 'JdbcStatementReference'])
 @Integration
 @Rollback
-class GrailsParameterMapRowMapperSpec extends Specification {
+class PathKeyMapRowMapperSpec extends Specification {
 
     DataSource dataSource
 
@@ -24,7 +24,7 @@ class GrailsParameterMapRowMapperSpec extends Specification {
         sql.execute("create table MapRowMapperTest(id int not null, value varchar(255) null)")
         sql.executeUpdate("insert into MapRowMapperTest (id, value) values (0, 'test0')")
         sql.executeUpdate("insert into MapRowMapperTest (id, value) values (1, 'test1')")
-        GrailsParameterMapRowMapper rowMapper = new GrailsParameterMapRowMapper()
+        PathKeyMapRowMapper rowMapper = new PathKeyMapRowMapper()
 
         when:
         List<Map> result = []

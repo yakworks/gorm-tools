@@ -13,9 +13,8 @@ import groovy.transform.CompileStatic
 
 import org.springframework.jdbc.core.ColumnMapRowMapper
 import org.springframework.jdbc.support.JdbcUtils
-import org.springframework.mock.web.MockHttpServletRequest
 
-import grails.web.servlet.mvc.GrailsParameterMap
+import gorm.tools.databinding.PathKeyMap
 
 /**
  * Row mapper which allows to convert data from a given ResultSet instance
@@ -23,10 +22,10 @@ import grails.web.servlet.mvc.GrailsParameterMap
  */
 @SuppressWarnings('JdbcResultSetReference')
 @CompileStatic
-class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
+class PathKeyMapRowMapper extends ColumnMapRowMapper {
 
     /**
-     * Returns a GrailsParameterMap instance which is build from records in a given ResultSet.
+     * Returns a PathKeyMap instance which is build from records in a given ResultSet.
      *
      * @param rs the ResultSet
      * @param rowNum number of records to include to the map
@@ -51,12 +50,11 @@ class GrailsParameterMapRowMapper extends ColumnMapRowMapper {
     }
 
     /**
-     * Returns a GrailsParameterMap instance.
+     * Returns a PathKeyMap instance. not really need but for implementing rowMapper
      */
     @Override
     protected Map createColumnMap(int columnCount) {
-        HttpServletRequest request = new MockHttpServletRequest()
-        return new GrailsParameterMap(request)
+        return new PathKeyMap([:])
     }
 
 }

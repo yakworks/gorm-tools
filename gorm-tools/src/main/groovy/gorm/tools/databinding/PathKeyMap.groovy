@@ -10,11 +10,10 @@ import org.codehaus.groovy.util.HashCodeHelper
 import org.grails.datastore.mapping.model.config.GormProperties
 
 /**
- * This is a copy of the GrailsParameterMap, primary to remove the need for HttpServletRequest.
+ * A redo of the  GrailsParameterMap, primary to remove the need for HttpServletRequest.
  * Allows a flattened map of path keys such that
  * foo.bar.id:1, foo.amount:10 would end up as [foo: [bar: [id: 1]], amount:10]
  *
- * Orginal authors from GrailsParameterMap, Graeme Rocher, Lari Hotari Oct 24, 2005\
  */
 @SuppressWarnings(["ExplicitCallToEqualsMethod"])
 @CompileStatic

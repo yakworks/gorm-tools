@@ -17,7 +17,7 @@ this helper uses ```@Before``` / ```@After``` JUnit annotations to implement set
 
 As well as setup logic, IntegrationSpecHelper provides a bunch of useful methods which can be used in tests:
   
-  1. buildParams - build GrailsParameter map from a given map
+  1. buildParams - 
   2. flushAndClear - flushes and clears the session cache, the shortcut for [RepoUtil.flushAndClear()]{.new-tab}
   3. flush - flushes the session cache, the shortcut for [RepoUtil.flush()]{.new-tab}
   4. clear - clears the session cache, the shortcut for [RepoUtil.clear()]{.new-tab}

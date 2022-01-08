@@ -40,7 +40,8 @@ class PathKeyMapSpec extends Specification {
             "a.bc": "bcValue",
             "a.b.d": "dValue",
             "a.e.f": "fValue",
-            "a.e.g": "gValue"
+            "a.e.g": "gValue",
+            "x.y" : "yValue"
         ]
 
         when:
@@ -49,6 +50,7 @@ class PathKeyMapSpec extends Specification {
         then:
         assert theMap['a'] instanceof Map
         assert theMap.a.b == "bValue"
+        assert theMap["a.b.c"] == "cValue"
         assert theMap.a.'b.c' == "cValue"
         assert theMap.a.'bc' == "bcValue"
         assert theMap.a.'b.d' == "dValue"
@@ -56,6 +58,8 @@ class PathKeyMapSpec extends Specification {
         assert theMap.a['e'] instanceof Map
         assert theMap.a.e.f == "fValue"
         assert theMap.a.e.g == "gValue"
+        assert theMap.x.y == "yValue"
+        assert theMap["x.y"] == "yValue"
     }
 
     void "test multi dimensional map with different delim"() {

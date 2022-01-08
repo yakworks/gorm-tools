@@ -4,6 +4,7 @@
 */
 package gorm.tools.repository
 
+import gorm.tools.repository.model.PersistableRepoEntity
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
@@ -12,8 +13,10 @@ import org.grails.datastore.gorm.GormInstanceApi
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
+import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionObject
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
@@ -31,7 +34,9 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
 import grails.validation.ValidationException
+import yakworks.api.Result
 import yakworks.commons.lang.ClassUtils
+import yakworks.commons.map.Maps
 import yakworks.problem.data.NotFoundProblem
 
 /**
@@ -96,19 +101,53 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      *   - data: (Map) if it was a Create or Update method called then this is the data and gets passed into events
      *
      * @throws DataAccessException if a validation or DataAccessException error happens
+     * @throws ValidationProblem.Exception if a validation fails
      */
     D doPersist(D entity, Map args) {
         try {
-            args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
+            //set failOnError to true if not set
+            args.put('failOnError' , Maps.getBoolean('failOnError', args, true))
+
             getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
+
+            validate(entity, args)
+            args.put('validate', false) //set it false so we dont do it again
+
+            persistAssociations(entity, args)
+
             gormInstanceApi().save entity, args
-            // entity.save()
+
             getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args)
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
             throw RepoExceptionSupport.translateException(ex, entity)
         }
+    }
+
+    /**
+     * called from doPersist after validate as opposed to doBeforePersist which is called before.
+     * This can be overriden but defaults to using the toOneAssociations property to pre-persist
+     */
+    void persistAssociations(D entity, Map args){
+        //so it doesn't do extra select, save associations first
+        if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
+    }
+
+    /**
+     * validates the entity and throws a ValidationProblem if it fails
+     */
+    boolean validate(D entity, Map args) {
+        boolean shouldValidate = Maps.getBoolean("validate", args, true)
+        boolean failOnError = Maps.getBoolean("failOnError", args, true)
+        if(shouldValidate){
+            boolean valid = gormValidationApi().validate entity
+            if(!valid && failOnError){
+                throw ValidationProblem.of(entity).errors(((GormEntity)entity).errors).toException()
+            }
+            return valid
+        }
+        return true
     }
 
     /**
@@ -359,7 +398,45 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     }
 
     /**
-     * creates or updates associations for given entity
+     * Implement this property to list the association names that should be persisted first in this order
+     * Used in persistToOneAssociations
+     */
+    List<String> getToOneAssociations(){
+        return []
+    }
+
+    /**
+     * For "ext" type associations that belong to the entity and have assignable id, we want to persist them first
+     * so that hibernate does not query the database to check existance. Also, the hibernate settings for
+     * order_inserts and order_updates, which are critical for decent perfromance when inserting large sets
+     * does not get picked up unless we persist these first
+     *
+     * @param entity the main entity for this repo
+     * @param associations the list of association names to do persist first if set
+     */
+    void persistToOneAssociations(D entity, List<String> assoctiations){
+        for(String fld: assoctiations){
+            def assoc = entity[fld]
+
+            //use the getAssociationId as it deals with proxies and it doesn't hydrate the proxy
+            if (assoc) {
+                PersistableRepoEntity pentity = (PersistableRepoEntity)entity
+                GormEntity gentity = (GormEntity)entity
+
+                //if no id then its new so insert it
+                if(!gentity.getAssociationId(fld)){
+                    PersistableRepoEntity assocEntity = assoc as PersistableRepoEntity
+                    assocEntity.id = pentity.id
+                    assocEntity.persist(validate: false)
+                }
+                // TODO, after benchmark checks might need to also check if dirty and persist here.
+            }
+        }
+    }
+
+    /**
+     * creates or updates associations for given entity, called during create or update methods
+     *
      *
      * @Param mainEntity The entity that has the associations that are being created/updated
      * @param assocRepo association entity repo

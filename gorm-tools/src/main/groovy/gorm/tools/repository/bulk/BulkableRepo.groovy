@@ -94,9 +94,13 @@ trait BulkableRepo<D> {
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
         pconfig.enabled = bulkablArgs.asyncEnabled //same as above, ability to override through params
-
+        int sliceInt = 0
+        def startTimeAll = System.currentTimeMillis()
+        def deltaTime
+        def startTime = System.currentTimeMillis()
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
+            sliceInt ++
             try {
                 withTrx {
                     ApiResults res = doBulk((List<Map>) dataSlice, bulkablArgs)
@@ -106,7 +110,11 @@ trait BulkableRepo<D> {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
             }
+            deltaTime = System.currentTimeMillis() - startTime
+            // println("done slice $sliceInt took ${deltaTime}")
         }
+        deltaTime = System.currentTimeMillis() - startTimeAll
+        // println("after all slices took ${deltaTime} will do errors now - sliceErrors.size() is ${sliceErrors.size()}")
         // if it has slice errors try again but this time run each item in its own transaction
         if(sliceErrors.size()) {
             AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
@@ -120,6 +128,8 @@ trait BulkableRepo<D> {
                 }
             }
         }
+        deltaTime = System.currentTimeMillis() - startTimeAll
+        // println("after errors took ${deltaTime}")
         return results
     }
 
@@ -140,6 +150,7 @@ trait BulkableRepo<D> {
      * @return the BulkableResults object with what succeeded and what failed
      */
     ApiResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
+        // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             Map itemData
@@ -153,7 +164,6 @@ trait BulkableRepo<D> {
                 } else {
                     itemData = Maps.deepCopy(item)
                 }
-
                 boolean isCreate = bulkablArgs.op == DataOp.add
                 entityInstance = createOrUpdate(isCreate, transactionalItem, itemData, bulkablArgs.persistArgs)
                 results << Result.of(entityInstance).status(isCreate ? 201 : 200)

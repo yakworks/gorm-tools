@@ -4,19 +4,8 @@
 */
 package gorm.tools.repository
 
-import gorm.tools.databinding.BindAction
-import gorm.tools.databinding.EntityMapBinder
-import gorm.tools.mango.api.QueryMangoEntityApi
-import gorm.tools.model.Lookupable
-import gorm.tools.problem.ValidationProblem
-import gorm.tools.repository.bulk.BulkableRepo
-import gorm.tools.repository.errors.RepoEntityErrors
-import gorm.tools.repository.errors.RepoExceptionSupport
-import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.model.PersistableRepoEntity
-import gorm.tools.transaction.TrxService
-import grails.validation.ValidationException
 import groovy.transform.CompileStatic
+
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormEntity
 import org.grails.datastore.gorm.GormInstanceApi
@@ -30,6 +19,19 @@ import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
+
+import gorm.tools.databinding.BindAction
+import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.mango.api.QueryMangoEntityApi
+import gorm.tools.model.Lookupable
+import gorm.tools.problem.ValidationProblem
+import gorm.tools.repository.bulk.BulkableRepo
+import gorm.tools.repository.errors.RepoEntityErrors
+import gorm.tools.repository.errors.RepoExceptionSupport
+import gorm.tools.repository.events.RepoEventPublisher
+import gorm.tools.repository.model.PersistableRepoEntity
+import gorm.tools.transaction.TrxService
+import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
 import yakworks.commons.map.Maps
 import yakworks.problem.data.NotFoundProblem

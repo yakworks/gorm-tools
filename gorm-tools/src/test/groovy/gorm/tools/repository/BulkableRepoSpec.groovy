@@ -1,5 +1,7 @@
 package gorm.tools.repository
 
+import gorm.tools.databinding.PathKeyMap
+import gorm.tools.problem.ValidationProblem
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
@@ -9,8 +11,11 @@ import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
+import testing.Cust
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.gorm.testing.SecurityTest
@@ -38,9 +43,21 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
             params:[source: "test", sourceId: "test"], includes: ["id", "name", "ext.name"])
     }
 
+
     void "sanity check bulkable repo"() {
         expect:
         KitchenSink.repo instanceof BulkableRepo
+    }
+
+
+    def "sanity check single validation"() {
+        when:
+        def ksdata = KitchenSink.repo.generateData(1)
+        ksdata.ext.name = ''
+        KitchenSink.create(ksdata)
+
+        then:
+        thrown(ValidationProblem.Exception)
     }
 
     void "success bulk insert"() {
@@ -135,13 +152,57 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
     }
 
+    @IgnoreRest
     void "test failures and errors"() {
         given:
         List list = KitchenSink.generateDataList(20)
 
+        and: "Add a bad records"
+        list[1].ext.name = null
+        // list[19].ext.name = null
+
+        when: "bulk insert"
+
+        Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
+        def job = TestSyncJob.get(jobId)
+
+        def results = parseJson(job.dataToString())
+
+        then:
+        job.ok == false
+        results != null
+        results instanceof List
+        results.size() == 20
+
+        and: "verify successfull results"
+        results.findAll({ it.ok == true}).size() == 19
+        results[0].ok == true
+
+        and: "Verify failed record"
+        results[1].ok == false
+        results[1].data != null
+        results[1].data.ext.name == null
+        results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
+
+        //results[9].title != null
+        results[1].errors.size() == 1
+        results[1].errors[0].field == "ext.name"
+        //results[9].errors[0].message == ""
+
+        // results[19].errors.size() == 1
+        // results[19].errors[0].field == "ext.name"
+        //results[19].errors[0].field == "name"
+    }
+
+    void "test failures and errors with customer and source"() {
+        given:
+        List list = KitchenSink.generateDataList(3)
+
         and: "Add few bad records"
-        list[9].name = null
-        list[19].ext.name = ""
+        list[1].source = ['sourceId': '123']
+        list[1].customer = ['sourceId': 'cust123']
+        list[1].name = null
+
 
         when: "bulk insert"
 
@@ -157,29 +218,20 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         then:
         results != null
         results instanceof List
-        results.size() == 20
+        results.size() == 3
 
         and: "verify successfull results"
-        results.findAll({ it.ok == true}).size() == 18
+        results.findAll({ it.ok == true}).size() == 2
         results[0].ok == true
 
         and: "Verify failed records"
-        results[9].ok == false
-        results[9].data != null
-        results[9].data.name == null
-        results[9].data.ext.name == "SinkExt10"
-        results[9].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
-
-        //results[9].title != null
-        results[9].errors.size() == 1
-        results[9].errors[0].field == "name"
-        //results[9].errors[0].message == ""
-
-        results[19].errors.size() == 1
-        results[19].errors[0].field == "ext.name"
-        //results[19].errors[0].field == "name"
+        results[1].ok == false
+        results[1].data != null
+        results[1].data.name == null
+        results[1].data.source.sourceId == "123"
+        results[1].data.customer.sourceId == "cust123"
+        results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
     }
-
 
     // @IgnoreRest
     @Issue("domain9#413")
@@ -199,6 +251,64 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         cleanup:
         asyncService.sliceSize = 50
+    }
+
+    void "success bulk insert with csv using usePathKeyMap"() {
+        given:
+        List data = [] as List<Map>
+
+        data << PathKeyMap.of([num:'1', name:'Sink1', ext_name:'SinkExt1', bazMap_foo:'bar'], '_')
+        data << PathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
+
+        when: "bulk insert 2 records"
+        BulkableArgs args = setupBulkableArgs()
+        Long jobId = kitchenSinkRepo.bulk(data, args)
+        def job = TestSyncJob.get(jobId)
+
+
+        then: "verify job"
+
+        job != null
+        job.source == "test"
+        job.sourceId == "test"
+        job.requestData != null
+        job.data != null
+        job.state == SyncJobState.Finished
+
+        when: "Verify job.requestData (incoming json)"
+        def payload = parseJson(job.requestDataToString())
+
+        then:
+        payload != null
+        payload instanceof List
+        payload.size() == 2
+//        payload[0].name == "Sink1"
+//        payload[0].ext.name == "SinkExt1"
+//        payload[1].name == "Sink2"
+
+        when: "verify job.data (job results)"
+        def dataString = job.dataToString()
+        List results = parseJson(dataString, List)
+
+        then:
+        dataString.startsWith('[{') //sanity check
+        results != null
+        results instanceof List
+        results.size() == 2
+        results[0].ok == true
+        results[0].status == HttpStatus.CREATED.value()
+        results[1].ok == true
+
+        and: "verify includes"
+        results[0].data.size() == 3 //id, project name, nested name
+        //results[0].data.id == 1
+        results[0].data.name == "Sink1"
+        results[0].data.ext.name == "SinkExt1"
+
+        and: "Verify database records"
+        KitchenSink.count() == 2
+        KitchenSink.findByName("Sink1") != null
+        KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
     }
 
 }

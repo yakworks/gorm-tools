@@ -18,6 +18,7 @@ import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobService
 import gorm.tools.job.SyncJobState
 import gorm.tools.problem.ProblemHandler
@@ -30,6 +31,7 @@ import yakworks.problem.ProblemTrait
 /**
  * A trait that allows to insert or update many (bulk) records<D> at once and create Job <J>
  */
+@SuppressWarnings(["Println"])
 @CompileStatic
 trait BulkableRepo<D> {
 
@@ -74,7 +76,7 @@ trait BulkableRepo<D> {
         Long jobId = syncJobService.createJob((String)params.source, (String)params.sourceId, dataList)
 
         def supplierFunc = { doBulkParallel(dataList, bulkablArgs) } as Supplier<ApiResults>
-        def asyncArgs = new AsyncConfig(enabled: bulkablArgs.asyncEnabled)
+        def asyncArgs = new AsyncConfig(enabled: bulkablArgs.promiseEnabled)
 
         asyncService.supplyAsync(asyncArgs, supplierFunc)
             .whenComplete { ApiResults results, ex ->
@@ -93,14 +95,18 @@ trait BulkableRepo<D> {
 
         AsyncConfig pconfig = AsyncConfig.of(getDatastore())
         pconfig.enabled = bulkablArgs.asyncEnabled //same as above, ability to override through params
-
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
+                Long chunkStart = System.currentTimeMillis()
+
                 withTrx {
                     ApiResults res = doBulk((List<Map>) dataSlice, bulkablArgs)
                     results.merge res
                 }
+
+                logTime(chunkStart)
+
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
@@ -119,9 +125,10 @@ trait BulkableRepo<D> {
                 }
             }
         }
+        // deltaTime = System.currentTimeMillis() - startTimeAll
+        // println("after errors took ${deltaTime}")
         return results
     }
-
 
     /**
      * Does the bulk create/update, normally will be passing in a slice of data.
@@ -139,23 +146,34 @@ trait BulkableRepo<D> {
      * @return the BulkableResults object with what succeeded and what failed
      */
     ApiResults doBulk(List<Map> dataList, BulkableArgs bulkablArgs, boolean transactionalItem = false){
+        // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
-            Map itemCopy
+            Map itemData
             D entityInstance
 
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
-                itemCopy = Maps.deepCopy(item)
+                if(item instanceof PathKeyMap){
+                    itemData = item.init() //initialize it, this will be from CSV
+                } else {
+                    itemData = Maps.deepCopy(item)
+                }
                 boolean isCreate = bulkablArgs.op == DataOp.add
-                entityInstance = createOrUpdate(isCreate, transactionalItem, itemCopy, bulkablArgs.persistArgs)
-                results << Result.of(entityInstance).status(isCreate ? 201 : 200)
+                //make sure args has its own copy as GormRepo add data to it and makes changes
+                Map args = Maps.deepCopy( bulkablArgs.persistArgs)
+                entityInstance = createOrUpdate(isCreate, transactionalItem, itemData, args)
+
+                Map entityMapData = metaMapEntityService.createMetaMap(entityInstance, bulkablArgs.includes) as Map<String, Object>
+                results << Result.of(Maps.deepCopy(entityMapData)).status(isCreate ? 201 : 200)
+
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionalItem){
                     results << problemHandler.handleException(e).payload(item)
                 } else {
+                    clear() //clear cache on error since wont hit below
                     throw e
                 }
             }
@@ -181,6 +199,7 @@ trait BulkableRepo<D> {
     }
 
     void finishJob(Long jobId, ApiResults results, List includes){
+        println("finishedJob ${jobId} , transforming results")
         List<Map> jsonResults = transformResults(results, includes?:['id'])
         syncJobService.updateJob(jobId, SyncJobState.Finished, results, jsonResults)
     }
@@ -195,21 +214,46 @@ trait BulkableRepo<D> {
         for (Result r : results) {
             def map = [ok: r.ok, status: r.status.code] as Map<String, Object>
             //do the failed
+
             if (r instanceof ProblemTrait) {
+                Map customData
+                //XXX https://github.com/yakworks/gorm-tools/issues/426 do something better with large data
+                if(r.payload['source'] && r.payload['customer']) {  //hard coded for arTran
+                    //customData = metaMapEntityService.createMetaMap(r.payload, ['customer', 'source']) as Map<String, Object>
+                    customData = [:]
+                    customData['source'] = r.payload['source'] as Map
+                    customData['customer'] = r.payload['customer'] as Map
+                }
                 map.putAll([
-                    data: r.payload,
+                    data: customData?:r.payload,  //do sourceId is exists (works for arTran)
                     title: r.title,
                     detail: r.detail,
                     errors: r.violations
                 ])
             } else {
                 def entityObj = r.payload
-                Map entityMapData = metaMapEntityService.createMetaMap(entityObj, includes) as Map<String, Object>
-                map.data = entityMapData
+                // Map entityMapData = metaMapEntityService.createMetaMap(entityObj, includes) as Map<String, Object>
+                map.data = r.payload as Map
             }
             ret << map
         }
         return ret
     }
 
+    void logTime(Long start){
+        if(log.isDebugEnabled()){
+            Long endTime = System.currentTimeMillis()
+            print("doBulk done in ${((endTime - start) / 1000)} - ")
+            printUsedMem()
+        }
+    }
+
+    static void printUsedMem(){
+        int mb = 1024*1024;
+
+        //Getting the runtime reference from system
+        Runtime runtime = Runtime.getRuntime();
+        //Print used memory
+        println("Used Memory:" + (runtime.totalMemory() - runtime.freeMemory()) / mb)
+    }
 }

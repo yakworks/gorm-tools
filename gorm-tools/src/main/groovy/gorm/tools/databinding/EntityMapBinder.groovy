@@ -49,6 +49,7 @@ import yakworks.commons.lang.IsoDateUtil
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
+@SuppressWarnings("EmptyClass")
 @CompileStatic
 class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
@@ -192,14 +193,12 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
      *
      * @param sval the string value to parse to typeToConvertTo
      * @param typeToConvertTo the Class to try and convert
-     * @return the converted object, or a Boolean.False if not converted
+     * @return the converted object, or a NotParsed object if not converted
      */
     static Object parseBasicType(String sval, Class typeToConvertTo){
         Object valueToAssign = Boolean.FALSE
         //do we have tests for this?
         if (String.isAssignableFrom(typeToConvertTo)) {
-            sval = sval.trim()
-            sval = ("" == sval) ? null : sval
             valueToAssign = sval
         } else if (Date.isAssignableFrom(typeToConvertTo)) {
             valueToAssign = IsoDateUtil.parse(sval)
@@ -210,9 +209,13 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             valueToAssign = IsoDateUtil.parseLocalDateTime(sval)
         } else if (Number.isAssignableFrom(typeToConvertTo)) {
             valueToAssign = sval.asType(typeToConvertTo as Class<Number>)
+        } else {
+            valueToAssign = new UnParsed()
         }
         return valueToAssign
     }
+
+    static class UnParsed {}
 
     /**
      * Sets a value to a specified target's property.
@@ -232,30 +235,43 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         Object propValue = source.getPropertyValue(propName)
 
         Object valueToAssign = propValue
+        // if its string this wil get populated
+
         Class typeToConvertTo = prop.getType() as Class
 
-        if (propValue instanceof String) {
-            String sval = propValue as String
-            Object parsedVal = parseBasicType(sval, typeToConvertTo)
-            //do we have tests for this?
-            if (parsedVal != Boolean.FALSE) {
-                valueToAssign = parsedVal
-            } //if no parsedVal then try converters
-            else if (conversionHelpers.containsKey(typeToConvertTo)) {
-                List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
-                ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
-                if (converter) {
-                    valueToAssign = converter.convert(propValue)
-                }
-            } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
-                valueToAssign = conversionService.convert(propValue, typeToConvertTo)
-            }
-
-            target[prop.name] = valueToAssign
-
-        } else if (prop instanceof Association) {
+        //try association first
+        if (prop instanceof Association) {
             bindAssociation(target, valueToAssign, (Association) prop, listener, errors)
         }
+        else if (propValue instanceof String) {
+            //trim and make null if empty
+            String sval = processStringValue(propValue)
+            Object parsedVal = sval
+
+            if(sval != null) {
+                //attempt all other basic conversions, only if value is not null/empty
+                parsedVal = parseBasicType(sval, typeToConvertTo)
+
+                // if its not a basic type then try the conversionHelpers
+                if (parsedVal instanceof UnParsed) {
+                    if (conversionHelpers.containsKey(typeToConvertTo)) {
+                        List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
+                        ValueConverter converter = convertersList?.find { ValueConverter c -> c.canConvert(propValue) }
+                        if (converter) {
+                            parsedVal = converter.convert(propValue)
+                        }
+                    } else if (conversionService?.canConvert(propValue.getClass(), typeToConvertTo)) {
+                        parsedVal = conversionService.convert(propValue, typeToConvertTo)
+                    }
+                }
+            }
+            // if it has a parsed value then set it and return as we are good
+            if(!(parsedVal instanceof UnParsed)){
+                target[prop.name] = parsedVal
+                //we are good so return
+            }
+        }
+        // if its an enum and value if number or map
         else if (typeToConvertTo.isEnum() && (valueToAssign instanceof Number || valueToAssign instanceof Map)){
             //if its a map then it should be in form [id:1, ...] and it will grab id
             def idVal = valueToAssign //assume its a number
@@ -265,7 +281,7 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
         }
         else {
             //its a something other than string, or enum and its not an association.
-            // First see if there is a value converter
+            // Try value converters again
             ValueConverter converter
             if (conversionHelpers.containsKey(typeToConvertTo)) {
                 List<ValueConverter> convertersList = conversionHelpers.get(typeToConvertTo)
@@ -278,6 +294,13 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             }
         }
 
+    }
+
+    //FIXME https://github.com/yakworks/gorm-tools/issues/425 all blank Strings will be null, so the problem will be with update
+    // when you want to null something out in update, for example
+    // Update Contact phone number you cannot put blank because it will be turned to null and not used in update
+    protected processStringValue(String sval) {
+        return sval.trim() ?: null
     }
 
     //FIXME clean this up so its a compile static
@@ -323,14 +346,30 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
             target[aprop] = value
             return
         }
+
+        if (value instanceof String) {
+            String sval = value as String
+            //if its an empty string then its nothing so return
+            if(!sval.trim()) return
+            //convert to long
+            value = sval as Long
+        }
+
         // if its a number then its the identifier so set it
         if (value instanceof Number) {
             bindNewAssociationIfNeeded(target, aprop, value)
             return
         }
 
+        //at this point if its assumed the value is mostlikely a Map or some object with and id property
         Object idValue = isDomainClass(value.getClass()) ? value['id'] : getIdentifierValueFrom(value)
         idValue = idValue == 'null' ? null : idValue
+
+        //on CSV and form binds id might be a string value
+        // check for empty string id and return if so
+        if(value instanceof String && (idValue as String).trim() == ''){
+            return
+        }
 
         if (idValue) {
             // check if the target[aprop].id is the same and we don't need to do anything or

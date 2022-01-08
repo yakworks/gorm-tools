@@ -58,7 +58,7 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         def e = thrown(ValidationProblem.Exception)
         def problem = e.problem
         problem.entity == master
-        e.cause.class == grails.validation.ValidationException
+//        e.cause.class == grails.validation.ValidationException
         problem.errors.objectName == "gorm.tools.testing.hibernate.FidMaster"
         problem.errors.allErrors.size() == 1
         def fe = problem.errors.getFieldError("child.name")

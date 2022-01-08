@@ -136,6 +136,43 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         domain.anotherDomain == assoc
     }
 
+
+    void "bind association field ending in Id as String when it's blank"() {
+        setup:
+        TestDomain domain = new TestDomain()
+
+        when: 'assigns null'
+        binder.bind(domain, ["anotherDomainId": ""])
+
+        then:
+        domain
+    }
+
+
+    void "bind association field ending in Id as String"() {
+        setup:
+        TestDomain domain = new TestDomain()
+        def assoc = new AnotherDomain(id: 1, name: "test").persist(flush: true)
+
+        when: 'assigns a new id'
+        binder.bind(domain, ["anotherDomainId": "1"])
+
+        then:
+        domain.anotherDomain == assoc
+    }
+
+    void "bind association field with map id key as string"() {
+        setup:
+        TestDomain domain = new TestDomain()
+        def assoc = new AnotherDomain(id: 1, name: "test").persist(flush: true)
+
+        when: 'assigns a new id'
+        binder.bind(domain, [anotherDomain:[id: "1"]])
+
+        then:
+        domain.anotherDomain == assoc
+    }
+
     void "bind association field ending in Id"() {
         setup:
         TestDomain domain = new TestDomain()
@@ -481,6 +518,25 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
         then:
         TestEnumIdent.get(2) == TestEnumIdent.Num2
         testDomain.enumIdent == TestEnumIdent.Num2
+    }
+
+    void "test binder should convert empty values to null"() {
+        given:
+        TestDomain testDomain = new TestDomain()
+        Map params = [name: "  ", age: "", amount: "", localDate: "", active: "  "]
+
+        when:
+        binder.bind(testDomain, params)
+
+        then: "No exceptions or class cast errors should have been generates, empty values set as null"
+        noExceptionThrown()
+
+        testDomain.hasErrors() == false
+        testDomain.name == null
+        testDomain.age == null
+        testDomain.amount == null
+        testDomain.localDate == null
+        testDomain.active == null
     }
 
 }

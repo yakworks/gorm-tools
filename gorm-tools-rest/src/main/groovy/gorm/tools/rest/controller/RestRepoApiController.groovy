@@ -7,7 +7,6 @@ package gorm.tools.rest.controller
 import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
-import groovy.transform.Generated
 
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.Logger
@@ -201,7 +200,6 @@ trait RestRepoApiController<D> extends RestApiController {
         }
     }
 
-
     void bulkProcess(HttpServletRequest req, Map params, DataOp dataOp) {
         List dataList = bodyAsList()
         bulkProcess(req, dataList, dataOp)
@@ -209,19 +207,18 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void bulkProcess(HttpServletRequest req, List dataList, DataOp dataOp) {
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
-        // String contextPath = req.getContextPath()
-        // String requestURL = req.getRequestURL()
-        // String forwardURI = req.forwardURI
-        // XXX for now default is false, but we should change
-        boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
+        // FIXME for now default is false, but we should change
+        boolean promiseEnabled = paramBoolean('promiseEnabled', false)
+//        boolean usePathKeyMap = paramBoolean('usePathKeyMap', false)
+
         Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
+        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes,
+            params: bulkParams, promiseEnabled: promiseEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)
         respondWith(job, [status: MULTI_STATUS])
-
     }
 
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
@@ -231,7 +228,6 @@ trait RestRepoApiController<D> extends RestApiController {
 
     Pager pagedQuery(Map params, List<String> includesKeys) {
         Pager pager = new Pager(params)
-        // println "params ${params.class} $params"
         List dlist = query(pager, params)
         List<String> incs = findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)

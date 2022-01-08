@@ -1,5 +1,6 @@
 package gorm.tools.repository
 
+import gorm.tools.job.SyncJobState
 import org.apache.commons.lang3.StringUtils
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -11,8 +12,10 @@ import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.rally.job.SyncJob
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgSource
+import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
 
 import static yakworks.commons.json.JsonEngine.parseJson
@@ -87,6 +90,44 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         // }
         then:
         count == 5
+    }
+
+    @Ignore
+    @Issue("domain9/issues/629")
+    void "when lazy association encountered during json building"() {
+        given:
+        Org org
+        Org.withNewTransaction {
+            org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
+        }
+
+        flushAndClear()
+        List<Map> contactData = [[org:[id: org.id], street1: "street1", street2: "street2", city: "city", state:"IN"]]
+
+        when:
+        BulkableArgs args = BulkableArgs.create(asyncEnabled: false)
+
+        //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
+        args.includes = ["id", "org.source.id"]
+        Long jobId = Location.repo.bulk(contactData, args)
+
+        then:
+        noExceptionThrown()
+        jobId != null
+
+        when:
+        SyncJob job = SyncJob.get(jobId)
+
+        then:
+        job != null
+        job.state == SyncJobState.Running //XX this should be Finished, but because json conversion failed, the job is never updated.
+
+        when:
+        List json = parseJson(job.dataToString())
+
+        then:
+        json != null
+        json.size() > 0 //job.data has not been updated because json building failed
     }
 
     void "test failures should rollback"() {

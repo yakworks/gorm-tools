@@ -13,7 +13,7 @@ import grails.testing.spring.AutowiredTest
 import spock.lang.Ignore
 import testing.CustType
 
-@Ignore
+@Ignore // not used right now.
 class GparsParallelToolsSpec extends GormToolsHibernateSpec implements AutowiredTest {
 
     GparsParallelTools parallelTools
@@ -82,23 +82,23 @@ class GparsParallelToolsSpec extends GormToolsHibernateSpec implements Autowired
     }
 
 
-    void "test parallel collate"() {
-        given:
-        List list = createList(100)
-
-        expect:
-        list.size() == 100
-
-        when:
-        AtomicInteger count = new AtomicInteger(0)
-        def args = AsyncConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
-
-        parallelTools.slicedEach(args, list) { Map record ->
-            count.addAndGet(1)
-        }
-        then:
-        count.get() == 100
-    }
+    // void "test parallel collate"() {
+    //     given:
+    //     List list = createList(100)
+    //
+    //     expect:
+    //     list.size() == 100
+    //
+    //     when:
+    //     AtomicInteger count = new AtomicInteger(0)
+    //     def args = AsyncConfig.of(CustType.repo.datastore).sliceSize(10).enabled(false)
+    //
+    //     parallelTools.slicedEach(args, list) { Map record ->
+    //         count.addAndGet(1)
+    //     }
+    //     then:
+    //     count.get() == 100
+    // }
 
     void "test sliceBatchClosure"() {
         given:

@@ -83,27 +83,11 @@ class IsoDateUtil {
     }
 
     static LocalDate parseLocalDate(String date) {
-        date = date?.trim()
-        if (!date) return null
-
-        try {
-            return LocalDate.parse(date)
-        } catch (DateTimeParseException e) {
-            //try with full dateTime
-            return LocalDate.parse(date, DateTimeFormatter.ISO_DATE_TIME)
-        }
-
+        LocalDateUtils.parse(date)
     }
 
     static LocalDateTime parseLocalDateTime(String date) {
-        date = date?.trim()
-        if (!date) return null
-
-        if (date.matches(LOCAL_DATE)) {
-            date = "${date}T00:00"
-        }
-        LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
-
+        LocalDateUtils.parseLocalDateTime(date)
     }
 
     /**

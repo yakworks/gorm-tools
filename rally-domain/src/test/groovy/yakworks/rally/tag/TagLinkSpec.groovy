@@ -103,17 +103,4 @@ class TagLinkSpec extends Specification implements DomainRepoTest<TagLink>, Secu
 
     }
 
-    @Ignore //not working in unit tests
-    void "create link duplicate"() {
-        when: 'tag not valid for entity'
-        def tag1 = Tag.create(name: 'tag1', code: 'tag1')
-        def att = new Attachment(name: 'foo', location: 'foo').persist()
-
-        TagLink.create(att, tag1, [flush:true])
-        TagLink.create(att, tag1, [flush:true]) //should break when attempted again
-        flushAndClear()
-
-        then:
-        thrown IllegalArgumentException
-    }
 }

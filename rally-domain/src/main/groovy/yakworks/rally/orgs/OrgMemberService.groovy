@@ -40,8 +40,11 @@ class OrgMemberService {
         List<OrgType> parents = []
         List<OrgType> immediateParents = orgDimensionService.getImmediateParents(type)
         for (OrgType p : immediateParents) {
-            if(p.name() in VALID_ORG_MEMBERS) parents.add(p)
-            else parents.addAll(getImmediateParentsToSet(p))
+            if(p.name() in VALID_ORG_MEMBERS){
+                parents.add(p)
+            } else {
+                parents.addAll(getImmediateParentsToSet(p))
+            }
         }
         return parents.unique()
     }

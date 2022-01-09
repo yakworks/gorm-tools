@@ -174,18 +174,6 @@ class MangoSpec extends Specification {
         list[0].flexId == 2
     }
 
-    @Ignore
-    def "Filter by xxxId 4 criteria as JSON"() {
-        when:
-        Map params = [max: 150]
-        params.criteria = (["address.testId": [9, 12]] as grails.converters.JSON).toString()
-        List list = Org.repo.queryList(params)
-        then:
-        list.size() == 2
-        list[0].name == "Org#3"
-    }
-
-
     def "Filter with `or` "() {
         when:
         List list = Org.queryList([q: ['$or': ["name": "Org9", "flex.id": 10]]])

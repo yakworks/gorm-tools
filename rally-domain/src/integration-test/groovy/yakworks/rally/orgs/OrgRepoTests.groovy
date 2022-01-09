@@ -230,7 +230,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.location.city == 'Denver'
     }
 
-    @Ignore //XXX https://github.com/9ci/domain9/issues/493 fix so it works here
+    @Ignore //XXX
     void "test insert with orgmembers"() {
         given:
         orgDimensionService.testInit('Branch.Division.Business')
@@ -435,7 +435,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.source.sourceId == 'foo'
     }
 
-    @Ignore // xxx https://github.com/9ci/domain9/issues/493
+    @Ignore //XXX
     def "create org with member branch lookup by num"() {
         when:
         Long orgId = 1111

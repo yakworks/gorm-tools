@@ -73,11 +73,11 @@ class ContactRepo implements GormRepo<Contact> {
         assignOrg(contact, data)
     }
 
-    @RepoListener
-    void beforePersist(Contact contact, BeforePersistEvent e) {
-        //XXX why is this needed?
-        assert 'foo' == "foo"
-    }
+    // @RepoListener
+    // void beforePersist(Contact contact, BeforePersistEvent e) {
+    //     //XXX why is this needed?
+    //     assert 'foo' == "foo"
+    // }
 
     @RepoListener
     void afterPersist(Contact contact, AfterPersistEvent e) {

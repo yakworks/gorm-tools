@@ -94,68 +94,33 @@ class DateUtil {
         return result
     }
 
-    /**
-     * Returns the first day of the current month and sets time to midnight.
-     */
-    static Date getFirstDateOfMonth() {
-        Calendar startDate = getCurrentCalendarInstance()
-        startDate.set(Calendar.DATE, 1)
-        return setTimeAsOfMidnight(startDate).getTime()
-    }
 
     /**
      * Returns the first day of the current week and sets time to midnight.
      */
-    static Date getFirstDayOfWeek() {
-        Calendar startDate = getCurrentCalendarInstance()
-        int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        while (dayOfWeek != Calendar.MONDAY) {
-            startDate.add(Calendar.DATE, -1)
-            dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        }
-        return setTimeAsOfMidnight(startDate).getTime()
-    }
+    // static Date getFirstDayOfWeek() {
+    //     Calendar startDate = getCurrentCalendarInstance()
+    //     int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
+    //     while (dayOfWeek != Calendar.MONDAY) {
+    //         startDate.add(Calendar.DATE, -1)
+    //         dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
+    //     }
+    //     return setTimeAsOfMidnight(startDate).getTime()
+    // }
 
     /**
      * Returns the last day of the current week and sets time to before midnight (23:59:59).
      */
-    static Date getLastDayOfWeek() {
-        Calendar endDate = getCurrentCalendarInstance()
-        int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        while (dayOfWeek != Calendar.SUNDAY) {
-            endDate.add(Calendar.DATE, 1)
-            dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        }
-        return setTimeBeforeMidnight(endDate).getTime()
-    }
+    // static Date getLastDayOfWeek() {
+    //     Calendar endDate = getCurrentCalendarInstance()
+    //     int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
+    //     while (dayOfWeek != Calendar.SUNDAY) {
+    //         endDate.add(Calendar.DATE, 1)
+    //         dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
+    //     }
+    //     return setTimeBeforeMidnight(endDate).getTime()
+    // }
 
-    //looks like it's not used
-    @Deprecated
-    static Date getLastWeekEndDate() {
-        Calendar endDate = getCurrentCalendarInstance()
-        int dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        while (dayOfWeek != Calendar.SUNDAY) {
-            endDate.add(Calendar.DATE, -1)
-            dayOfWeek = endDate.get(Calendar.DAY_OF_WEEK)
-        }
-        return setTimeBeforeMidnight(endDate).getTime()
-    }
-
-    //looks like it's not used
-    @Deprecated
-    static int getLastWeekStartDate() {
-        Calendar startDate = getCurrentCalendarInstance()
-        int dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        while (dayOfWeek != Calendar.SUNDAY) {
-            startDate.add(Calendar.DATE, -1)
-            dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        }
-        while (dayOfWeek != Calendar.MONDAY) {
-            startDate.add(Calendar.DATE, -1)
-            dayOfWeek = startDate.get(Calendar.DAY_OF_WEEK)
-        }
-        return dayOfWeek
-    }
 
     /**
      * Returns a Calendar instance for a given date.
@@ -257,56 +222,6 @@ class DateUtil {
         return Math.abs(diff) / (60 * 60 * 1000) as long
     }
 
-    /**
-     * Sets time to midnight(00:00:00) for a given date instance.
-     *
-     * @param date a date for which to setup time
-     * @return a date with time set to midnight
-     */
-    static Date setToMidnight(Date date) {
-        Calendar cal = Calendar.getInstance()
-        cal.setTime(date)
-        setTimeAsOfMidnight(cal)
-        return cal.getTime()
-    }
-
-    /**
-     * Sets time to midnight(00:00:00) for a given date instance.
-     *
-     * @param date a date for which to setup time
-     * @return a date with time set to midnight
-     */
-    static Calendar setTimeAsOfMidnight(Calendar cal) {
-        return setTime(cal, 0, 0, 0)
-    }
-
-    /**
-     * Sets time to 23:59:59 for a given calendar instance.
-     *
-     * @param date a calendar for which to setup time
-     * @return a calendar with time set to 23:59:59
-     */
-    static Calendar setTimeBeforeMidnight(Calendar cal) {
-        return setTime(cal, 23, 59, 59)
-    }
-
-    /**
-     * Sets time for a given calendar instance.
-     *
-     * @param cal a calendar instance
-     * @param hours hours, by default is 0
-     * @param minutes minutes, by default is 0
-     * @param seconds seconds, by default is 0
-     * @param milliseconds milliseconds, by default is 0
-     */
-    static Calendar setTime(Calendar cal, int hours = 0, int minutes = 0,
-                            int seconds = 0, int milliseconds = 0) {
-        cal.set(Calendar.HOUR_OF_DAY, hours)
-        cal.set(Calendar.MINUTE, minutes)
-        cal.set(Calendar.SECOND, seconds)
-        cal.set(Calendar.MILLISECOND, milliseconds)
-        return cal
-    }
 
     /**
      * Checks if the current day number is equal to specified day number in a given period.
@@ -384,6 +299,12 @@ class DateUtil {
         def locDate = LocalDateUtils.getLastDateOfMonth(date.toLocalDate())
         if(addMonth) locDate = locDate.plusMonths(addMonth as Long)
         return locDate.toDate()
+    }
+
+    static LocalDate getLastDayOfMonth(LocalDate date, int addMonth = 0) {
+        def locDate = LocalDateUtils.getLastDateOfMonth(date)
+        if(addMonth) locDate = locDate.plusMonths(addMonth as Long)
+        return locDate
     }
 
     /*

@@ -6,7 +6,11 @@ package yakworks.commons.lang
 
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.time.temporal.TemporalAdjusters
+import java.util.regex.Pattern
 
 import groovy.transform.CompileStatic
 
@@ -17,6 +21,33 @@ import groovy.transform.CompileStatic
 @CompileStatic
 @SuppressWarnings(['MethodCount'])
 class LocalDateUtils {
+    static final Pattern LOCAL_DATE = ~/\d{4}-\d{2}-\d{2}$/
+
+    /**
+     * - trims first and returns null if empty
+     * - try LocalDate.parse and if error then try parsing with DateTimeFormatter.ISO_DATE_TIME
+     */
+    static LocalDate parse(String date) {
+        date = date?.trim()
+        if (!date) return null
+
+        try {
+            return LocalDate.parse(date)
+        } catch (DateTimeParseException e) {
+            //try with full dateTime
+            return LocalDate.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+        }
+    }
+
+    static LocalDateTime parseLocalDateTime(String date) {
+        date = date?.trim()
+        if (!date) return null
+
+        if (date.matches(LOCAL_DATE)) {
+            date = "${date}T00:00"
+        }
+        LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+    }
 
     /**
      * Returns the first day of the current month and sets time to midnight.

@@ -2,7 +2,8 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.bulk
+package gorm.tools.job
+
 
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
@@ -11,6 +12,9 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import gorm.tools.repository.model.DataOp
+import yakworks.commons.json.JsonEngine
+import yakworks.commons.lang.Validate
+import yakworks.commons.map.Maps
 
 /*
 transform example when in a job
@@ -54,13 +58,36 @@ transform example when in a job
 @MapConstructor
 @ToString
 @CompileStatic
-class BulkableArgs {
+class SyncJobArgs {
 
+    SyncJobArgs() { this([:])}
 
-    BulkableArgs() { this([:])}
+    SyncJobService syncJobService //reference to the syncJobService
+
+    String source
+
+    String sourceId
 
     /**
-     * the operation to perform, limited to add and update right now
+     * Payload input data used for job operations
+     */
+    Object payload
+
+
+    static enum StorageType { BYTES, FILE, NONE }
+
+    /**
+     * how to store the payload
+     */
+    StorageType payloadStorageType = StorageType.BYTES
+
+    /**
+     * how to store the data
+     */
+    StorageType dataStorageType = StorageType.BYTES
+
+    /**
+     * the operation to perform, Used in bulk and limited to add and update right now.
      */
     DataOp op
 
@@ -72,7 +99,7 @@ class BulkableArgs {
 
 
     /**
-     * for result, list of fields to include for the created or updated entity
+     * for results, list of fields to include for the SyncJob.data
      */
     List<String> includes = ['id']
 
@@ -106,19 +133,45 @@ class BulkableArgs {
     /**
      * the args, such as flush:true etc.., to pass down to the repo methods
      */
-    Map persistArgs = [:]
+    Map persistArgs
 
-    static BulkableArgs of(DataOp dataOp){
-        new BulkableArgs(op: dataOp)
+    Map getPersistArgs() { return this.persistArgs ? Maps.deepCopy(this.persistArgs) : [:] }
+
+    /**
+     * The job id, will get populated once the job is created
+     */
+    Long jobId
+
+    /**
+     * returns map for used for creating SyncJobEntity
+     */
+    Map getJobData(SyncJobArgs args) {
+        Validate.notNull(args.payload)
+        byte[] reqData = JsonEngine.toJson(args.payload).bytes
+        return [source: args.source, sourceId: args.sourceId, state: SyncJobState.Running, requestData: reqData]
     }
 
-    static BulkableArgs create(Map args = [:]){
+    /**
+     * create Job and returns the job id
+     */
+    // SyncJobEntity updateJob(boolean ok, SyncJobState state, List<Map> renderResults, boolean appendResults) {
+    //
+    //     return syncJobService.updateJob(jobId, ok, state, renderResults)
+    // }
+
+    static SyncJobArgs of(DataOp dataOp){
+        new SyncJobArgs(op: dataOp)
+    }
+
+    static SyncJobArgs create(Map args = [:]){
         args.op = DataOp.add
-        new BulkableArgs(args)
+        new SyncJobArgs(args)
     }
 
-    static BulkableArgs update(Map args = [:]){
+    static SyncJobArgs update(Map args = [:]){
         args.op = DataOp.update
-        new BulkableArgs(args)
+        new SyncJobArgs(args)
     }
+
+
 }

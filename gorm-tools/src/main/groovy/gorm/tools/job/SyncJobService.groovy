@@ -4,23 +4,44 @@
 */
 package gorm.tools.job
 
+import java.nio.file.Path
+
 import groovy.transform.CompileStatic
 
+import gorm.tools.repository.GormRepo
 import yakworks.api.ApiResults
 
 @CompileStatic
-interface SyncJobService {
+trait SyncJobService<D> {
 
     /**
-     * create Job and returns the job id
+     * creates Job using the repo and returns the jobId
      */
-    Long createJob(String source, String sourceId, Object payload)
+    abstract GormRepo<D> getJobRepo()
 
     /**
-     * update a job with state and results
+     * creates and saves the Job and returns the SyncJobContext with the jobId
      */
-    void updateJob(Long id, SyncJobState state, ApiResults results, List<Map> renderResults)
+    SyncJobContext createJob(SyncJobArgs args, Object payload){
+        def sjc = new SyncJobContext(args: args, syncJobRepo: getJobRepo(), payload: payload )
+        return sjc.createJob()
+    }
 
-    SyncJobEntity getJob(Serializable id)
+    /**
+     * gets the job from the repo
+     */
+    SyncJobEntity getJob(Serializable id){
+        return getJobRepo().get(id) as SyncJobEntity
+    }
+
+    /**
+     * Creates a nio path file for the id passed in.
+     * Will be "${tempDir}/SyncJobData${id}.json".
+     * For large bulk operations data results should be stored as attachment file
+     *
+     * @param id the job id
+     * @return the Path object to use
+     */
+    abstract Path createTempFile(Serializable id)
 
 }

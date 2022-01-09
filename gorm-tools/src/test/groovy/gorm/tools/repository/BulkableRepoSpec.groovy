@@ -1,21 +1,19 @@
 package gorm.tools.repository
 
 import gorm.tools.databinding.PathKeyMap
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
 import gorm.tools.job.SyncJobState
-import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
-import spock.lang.Ignore
 import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
-import testing.Cust
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.gorm.testing.SecurityTest
@@ -38,9 +36,9 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         mockDomains(KitchenSink, SinkExt, TestSyncJob)
     }
 
-    BulkableArgs setupBulkableArgs(DataOp op = DataOp.add){
-        return new BulkableArgs(asyncEnabled: false, op: op,
-            params:[source: "test", sourceId: "test"], includes: ["id", "name", "ext.name"])
+    SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
+        return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",
+            includes: ["id", "name", "ext.name"])
     }
 
 
@@ -66,7 +64,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         when: "bulk insert 20 records"
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
+        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
 
@@ -121,7 +119,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         when: "insert records"
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
+        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         then:
@@ -136,7 +134,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
             it.id = idx + 1
         }
 
-        jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs(DataOp.update))
+        jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs(DataOp.update))
         job = TestSyncJob.get(jobId)
 
         then:
@@ -152,7 +150,6 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
     }
 
-    @IgnoreRest
     void "test failures and errors"() {
         given:
         List list = KitchenSink.generateDataList(20)
@@ -163,7 +160,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         when: "bulk insert"
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
+        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         def results = parseJson(job.dataToString())
@@ -206,7 +203,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         when: "bulk insert"
 
-        Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
+        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
         then: "verify job"
@@ -233,15 +230,13 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
     }
 
-    // @IgnoreRest
-    @Issue("domain9#413")
     void "test batching"() {
         setup: "Set batchSize of 10 to trigger batching/slicing"
         asyncService.sliceSize = 10
         List<Map> list = KitchenSink.generateDataList(60) //this should trigger 6 batches of 10
 
         when: "bulk insert in multi batches"
-        Long jobId = kitchenSinkRepo.bulk(list, setupBulkableArgs())
+        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
         def job = TestSyncJob.findById(jobId)
 
         def results = parseJson(job.dataToString())
@@ -261,7 +256,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         data << PathKeyMap.of([num:'2', name:'Sink2', ext_name:'SinkExt2', bazMap_foo:'bar'], '_')
 
         when: "bulk insert 2 records"
-        BulkableArgs args = setupBulkableArgs()
+        SyncJobArgs args = setupSyncJobArgs()
         Long jobId = kitchenSinkRepo.bulk(data, args)
         def job = TestSyncJob.get(jobId)
 

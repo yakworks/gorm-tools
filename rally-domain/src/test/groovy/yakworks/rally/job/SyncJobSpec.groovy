@@ -20,18 +20,6 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
         job.persist()
     }
 
-    @Ignore //XXX put ot back in when we add sourceId to be required in SourceTrait. Too many tests were failing
-    void "sanity check validation no sourceId"() {
-        when:
-        SyncJob job = new SyncJob()
-        // job.persist()
-        then:
-        job
-        !job.validate()
-
-
-    }
-
     void "kick off simulation of Job"() {
         when:
         // calls with Map data, Map args = [:]

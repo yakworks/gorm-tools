@@ -77,6 +77,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when: "bulk update"
         def results = parseJson(job.dataToString())
+        // assert results[0].data == jsonList
+        //update jsonList to prepare for a bulUpdate
         jsonList.eachWithIndex { it, idx ->
             it["id"] = results[idx].data.id
             it["comments"] = "flubber${it.id}"
@@ -153,7 +155,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         List json = parseJson(job.dataToString())
-        List requestData = parseJson(job.requestDataToString())
+        List requestData = parseJson(job.payloadToString())
 
         then:
         json != null

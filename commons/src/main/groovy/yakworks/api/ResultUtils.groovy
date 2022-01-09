@@ -7,7 +7,6 @@ package yakworks.api
 import groovy.transform.CompileStatic
 
 import yakworks.commons.lang.ClassUtils
-import yakworks.problem.IProblem
 
 @CompileStatic
 class ResultUtils {

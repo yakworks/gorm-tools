@@ -8,8 +8,6 @@ import groovy.transform.CompileStatic
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
-import yakworks.problem.Problem
-import yakworks.problem.ProblemException
 
 /**
  * Concrete problem for configuration or setup errors or inconsistencies

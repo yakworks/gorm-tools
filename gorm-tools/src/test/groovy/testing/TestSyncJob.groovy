@@ -5,6 +5,7 @@
 package testing
 
 import gorm.tools.job.SyncJobEntity
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -13,22 +14,29 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class TestSyncJob implements SyncJobEntity<TestSyncJob>, RepoEntity<TestSyncJob> {
+class TestSyncJob implements SyncJobEntity<TestSyncJob> {
+
     String message  // not sure if needed
 
-    // String fileWithJson  // option if json is too big
-    byte[] data
+    /**
+     * gets the payloadData as byte array, either from attachment file or payload byte array
+     * @return
+     */
+    byte[] getPayloadData(){
+        return payloadBytes
+    }
 
-    // int persistenceDuration  //job can be purged after that time (number of days???)
+    /**
+     * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
+     * gets the data as byte array, either from attachment file or resultData byte array
+     */
+    byte[] getData(){
+        return dataBytes
+    }
 
-    private static final int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
+    static TestSyncJobRepo getRepo() { RepoLookup.findRepo(this) as TestSyncJobRepo }
 
-    static constraintsMap = [
-        state:[ d: 'State of the job', nullable: false],
-        message:[ d: 'Main message from results'],
-        data:[ d: 'Json data that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
-        data: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES],
-        sourceId: [d: 'end point or scheduled job name', nullable: false, example: 'api/ar/tran/bulkCreate?source=Oracle']
-    ]
-
+    static mapping = {
+        state column: 'state', enumType: 'identity'
+    }
 }

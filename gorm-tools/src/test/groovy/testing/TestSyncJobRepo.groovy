@@ -2,12 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package yakworks.rally.job
-
-import groovy.transform.CompileStatic
-
-import org.apache.commons.io.IOUtils
-import org.springframework.beans.factory.annotation.Autowired
+package testing
 
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
@@ -15,18 +10,16 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import groovy.transform.CompileStatic
+import org.springframework.beans.factory.annotation.Autowired
 import yakworks.commons.json.JsonEngine
-import yakworks.rally.attachment.repo.AttachmentRepo
 
 @GormRepository
 @CompileStatic
-class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
-
-    @Autowired
-    AttachmentRepo attachmentRepo
+class TestSyncJobRepo implements GormRepo<TestSyncJob>, IdGeneratorRepo {
 
     @RepoListener
-    void beforeBind(SyncJob job, Map data, BeforeBindEvent be) {
+    void beforeBind(TestSyncJob job, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
             // must be Job called from RestApi that is passing in dataPayload
             def payload = data.payload
@@ -38,21 +31,21 @@ class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
         }
     }
 
-    byte[] getPayloadData(SyncJob job){
-        if(job.payloadId){
-            def istream = attachmentRepo.get(job.payloadId).inputStream
-            return IOUtils.toByteArray(istream)
-        } else {
-            return job.payloadBytes
-        }
-    }
-
-    byte[] getData(SyncJob job){
-        if(job.dataId){
-            def istream = attachmentRepo.get(job.dataId).inputStream
-            return IOUtils.toByteArray(istream)
-        } else {
-            return job.dataBytes
-        }
-    }
+    // byte[] getPayloadData(SyncJob job){
+    //     if(job.payloadId){
+    //         def istream = attachmentRepo.get(job.payloadId).inputStream
+    //         return IOUtils.toByteArray(istream)
+    //     } else {
+    //         return job.payloadBytes
+    //     }
+    // }
+    //
+    // byte[] getData(SyncJob job){
+    //     if(job.dataId){
+    //         def istream = attachmentRepo.get(job.dataId).inputStream
+    //         return IOUtils.toByteArray(istream)
+    //     } else {
+    //         return job.payloadBytes
+    //     }
+    // }
 }

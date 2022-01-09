@@ -7,7 +7,6 @@ package gorm.tools.jdbc
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
 import java.sql.SQLException
-import javax.servlet.http.HttpServletRequest
 
 import groovy.transform.CompileStatic
 

@@ -4,13 +4,15 @@
 */
 package gorm.tools.job
 
+import java.nio.file.Path
+
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
-import gorm.tools.repository.GormRepo
+import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
 import yakworks.commons.json.JsonEngine
 import yakworks.commons.lang.Validate
@@ -23,7 +25,7 @@ class SyncJobContext {
 
     SyncJobContext() { this([:])}
 
-    GormRepo syncJobRepo //reference to the syncJobService
+    SyncJobService syncJobService //reference to the syncJobService
 
     SyncJobArgs args
 
@@ -37,37 +39,34 @@ class SyncJobContext {
      */
     Long jobId
 
-    /**
-     * returns map for used for creating SyncJobEntity
-     */
-    Map getJobData() {
-        Validate.notNull(args.payload)
-        byte[] reqData = JsonEngine.toJson(args.payload).bytes
-        return [source: args.source, sourceId: args.sourceId, state: SyncJobState.Running, requestData: reqData]
-    }
-
     SyncJobContext createJob(){
         Validate.notNull(payload)
-        Map data = [source: args.source, sourceId: args.sourceId, state: SyncJobState.Running] as Map<String,Object>
+        jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
+        Map data = [id: jobId, source: args.source, sourceId: args.sourceId, state: SyncJobState.Running] as Map<String,Object>
 
         if(args.payloadStorageType == SyncJobArgs.StorageType.BYTES) {
-            data.requestData = JsonEngine.toJson(payload).bytes
+            data.payloadBytes = JsonEngine.toJson(payload).bytes
         }
         else if(args.payloadStorageType == SyncJobArgs.StorageType.FILE){
-            //TODO save to file
-            println "FIXME not implemented yet"
+            data.payloadId = writePayloadFile()
         }
 
-        def jobEntity = syncJobRepo.create(data, [flush: true]) as SyncJobEntity
-        jobId = jobEntity.id
+        def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
 
         return this
     }
 
     SyncJobEntity updateJob(SyncJobState state, ApiResults results, List<Map> renderResults) {
-        byte[] resultBytes = JsonEngine.toJson(renderResults).bytes
-        Map data = [id: jobId, ok: results.ok, data: resultBytes, state: state]
-        return syncJobRepo.update(data, [flush: true]) as SyncJobEntity
+        byte[] dataBytes = JsonEngine.toJson(renderResults).bytes
+        Map data = [id: jobId, ok: results.ok, dataBytes: dataBytes, state: state]
+        return syncJobService.repo.update(data, [flush: true]) as SyncJobEntity
+    }
+
+    Long writePayloadFile(){
+        String filename = "SyncJobPayload_${jobId}_.json"
+        Path path = syncJobService.createTempFile(filename)
+        JsonEngine.streamToFile(path, payload)
+        return syncJobService.createAttachment([name: filename, sourcePath: path])
     }
 
     /**

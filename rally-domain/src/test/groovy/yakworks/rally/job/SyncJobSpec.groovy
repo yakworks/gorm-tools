@@ -27,11 +27,11 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
         def sourceId = "api/ar/org"
         def source = "Oracle"
         def sourceType = SourceType.RestApi
-        def job = SyncJob.repo.create(dataPayload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
+        def job = SyncJob.repo.create(payload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
 
         then:
         job
-        job.requestData.size()>0
+        job.payloadBytes.size() > 0
     }
 
 
@@ -40,7 +40,7 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
         def res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
+        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', payloadBytes: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
@@ -51,8 +51,8 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
 
         then:
         j
-        res.bytes == j.requestData
-        res == new String(j.requestData, 'UTF-8')
+        res.bytes == j.payloadBytes
+        res == j.payloadToString()
 
     }
 

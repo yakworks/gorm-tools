@@ -31,8 +31,7 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.TagLink
 
 /**
- * Attachments are not as simple as they might be in this application.  Please read this documentation before messing
- * with it.
+ * Attachments have some inherit complexity.  Please read this docs fully before amkign changes
  */
 @Slf4j
 @GormRepository
@@ -155,7 +154,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         if (p.tempFileName) { //this would be primary way to upload files via UI and api
             return attachmentSupport.createFileFromTempFile(attachment.id, fileName, p.tempFileName as String, attachment.locationKey)
         }
-        else if (p.sourcePath) { //used for copying attachments and testing
+        else if (p.sourcePath) { //used for copying e34rattachments and testing
             return attachmentSupport.createFileFromSource(attachment.id, fileName, p.sourcePath as Path, attachment.locationKey)
         }
         else if (p.multipartFile) { //multipartFile from a ui

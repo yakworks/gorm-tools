@@ -142,23 +142,6 @@ class SyncJobArgs {
      */
     Long jobId
 
-    /**
-     * returns map for used for creating SyncJobEntity
-     */
-    Map getJobData(SyncJobArgs args) {
-        Validate.notNull(args.payload)
-        byte[] reqData = JsonEngine.toJson(args.payload).bytes
-        return [source: args.source, sourceId: args.sourceId, state: SyncJobState.Running, requestData: reqData]
-    }
-
-    /**
-     * create Job and returns the job id
-     */
-    // SyncJobEntity updateJob(boolean ok, SyncJobState state, List<Map> renderResults, boolean appendResults) {
-    //
-    //     return syncJobService.updateJob(jobId, ok, state, renderResults)
-    // }
-
     static SyncJobArgs of(DataOp dataOp){
         new SyncJobArgs(op: dataOp)
     }

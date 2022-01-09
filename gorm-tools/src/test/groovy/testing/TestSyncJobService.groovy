@@ -15,14 +15,20 @@ import java.nio.file.Paths
 class TestSyncJobService implements SyncJobService<TestSyncJob> {
 
     @Override
-    GormRepo<TestSyncJob> getJobRepo(){
+    GormRepo<TestSyncJob> getRepo(){
         return TestSyncJob.repo
     }
 
     @Override
-    Path createTempFile(Serializable id){
-        return Paths.get(BuildSupport.gradleProjectDir, "build/bulk/SyncJob${id}.json")
+    Path createTempFile(String filename){
+        return Paths.get(BuildSupport.gradleProjectDir, "build/bulk/${filename}")
     }
 
+    @Override
+    Long createAttachment(Map params) {
+        //stub it out for testing, these dont support attachments, use integration and concrete
+        // implementation to test attachments
+        return 1
+    }
 
 }

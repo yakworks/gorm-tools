@@ -7,6 +7,7 @@ package yakworks.api
 import groovy.transform.CompileStatic
 
 import yakworks.commons.lang.ClassUtils
+import yakworks.i18n.MsgService
 
 @CompileStatic
 class ResultUtils {
@@ -41,5 +42,22 @@ class ResultUtils {
 
         if (entity.hasProperty('stamp'))
             args.putIfAbsent('stamp', entity['stamp'])
+    }
+
+    // swallow no such message exception and returns empty string
+    static String getMessage(MsgService msgService, Result result){
+        String message
+        if(result.msg) message = msgService.getMessage(result.msg)
+
+        if(!message){
+            if(result.title) {
+                message = result.title
+            } else if(result instanceof ApiResults && result.size() != 0) {
+                //use msg form first item
+                message = msgService.getMessage(((ApiResults)result)[0].msg)
+            }
+        }
+
+        return message
     }
 }

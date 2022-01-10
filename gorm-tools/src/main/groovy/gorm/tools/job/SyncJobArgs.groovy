@@ -4,7 +4,6 @@
 */
 package gorm.tools.job
 
-
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
 import groovy.transform.ToString
@@ -12,8 +11,6 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import gorm.tools.repository.model.DataOp
-import yakworks.commons.json.JsonEngine
-import yakworks.commons.lang.Validate
 import yakworks.commons.map.Maps
 
 /*

@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 
 import grails.rest.render.RenderContext
 import yakworks.api.ApiResults
+import yakworks.api.ResultUtils
 
 /**
  * Renderer for paged list data
@@ -27,21 +28,8 @@ class ApiResultsRenderer implements JsonRendererTrait<ApiResults>{
             ok results.ok
             status results.status.code
             code results.getCode()
-            title getMessage(results)
+            title ResultUtils.getMessage(msgService, results)
         }
-    }
-
-    // swallow no such message exception and returns empty string
-    String getMessage(ApiResults results){
-        String message
-        if(results.msg) message = getMessage(results.msg)
-
-        if(!message && results.title) {
-            message = results.title
-        } else if(results.size() != 0) {
-            message = getMessage(results[0].msg)
-        }
-        return message
     }
 
 }

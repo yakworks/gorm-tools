@@ -53,7 +53,7 @@ trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
     public static int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 
     /**
-     * will be true if State.Finished without any issues, false otherwise
+     * will be true if State.Finished without any issues, false if any problems ar in the results data
      */
     Boolean ok = false // change to TRUE if State.Finished without any issues
 
@@ -61,6 +61,8 @@ trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
      * the current state of the job.
      */
     SyncJobState state = SyncJobState.Running
+
+    String message
 
     /**
      * if payload is stored as an attachment then this will be the id
@@ -109,6 +111,7 @@ trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
 
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],
+        message:[ d: 'Status message or log'],
         payloadId:[ d: 'If payload is stored as attahcment file this is the id'],
         payloadBytes:[ d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
         dataId: [d: 'If data is saved as attahchment file this is the id'],

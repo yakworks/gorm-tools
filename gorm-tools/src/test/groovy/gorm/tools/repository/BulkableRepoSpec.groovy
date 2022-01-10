@@ -27,10 +27,11 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
     AsyncService asyncService
     KitchenSinkRepo kitchenSinkRepo
 
+    Closure doWithDomains() { { ->
+        syncJobService(TestSyncJobService)
+    }}
+
     void setupSpec() {
-        defineBeans{
-            syncJobService(TestSyncJobService)
-        }
         mockDomains(KitchenSink, SinkExt, TestSyncJob)
     }
 

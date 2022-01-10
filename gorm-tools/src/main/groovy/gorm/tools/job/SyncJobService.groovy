@@ -8,10 +8,16 @@ import java.nio.file.Path
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.repository.GormRepo
+import yakworks.i18n.icu.ICUMessageSource
 
 @CompileStatic
 trait SyncJobService<D> {
+
+    @Autowired
+    ICUMessageSource messageSource
 
     /**
      * creates Job using the repo and returns the jobId
@@ -22,8 +28,8 @@ trait SyncJobService<D> {
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        SyncJobContext sjc = new SyncJobContext(args: args, syncJobService: this, payload: payload )
-        return sjc.createJob()
+        SyncJobContext jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
+        return jobContext.createJob()
     }
 
     /**

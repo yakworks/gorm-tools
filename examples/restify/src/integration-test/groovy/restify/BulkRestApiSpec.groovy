@@ -87,14 +87,12 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         when:
         Response resp = post(path, jsonList)
         Map body = bodyToMap(resp)
+        SyncJob job = SyncJob.repo.getWithTrx(body.id as Long)
 
         then:
-        noExceptionThrown()
-
-        when:
-        SyncJob job = SyncJob.repo.read(body.id as Long)
-
-        then:
+        body.ok == false
+        body.state == 'Finished'
+        job.id
         job.data != null
 
         when:
@@ -106,8 +104,8 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         requestData != null
 
         and: "no dangling records committed"
-        OrgSource.withSession {
-            assert OrgSource.findBySourceIdLike("ORG-1%") == null
+        OrgSource.withTransaction {
+            OrgSource.findBySourceIdLike("ORG-1%") == null
         }
 
     }

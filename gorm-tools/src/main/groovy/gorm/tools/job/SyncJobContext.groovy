@@ -14,6 +14,7 @@ import groovy.transform.MapConstructor
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
+import groovy.util.logging.Slf4j
 
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.api.ApiResults
@@ -28,6 +29,7 @@ import yakworks.problem.ProblemTrait
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
 @ToString
+@Slf4j
 @CompileStatic
 class SyncJobContext {
 
@@ -70,6 +72,7 @@ class SyncJobContext {
 
     SyncJobContext createJob(){
         Validate.notNull(payload)
+        //get jobId early so it can be used, might not need this anymore
         jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
         setPayloadSize(payload)
 
@@ -78,6 +81,7 @@ class SyncJobContext {
             state: SyncJobState.Running, payload: payload
         ] as Map<String,Object>
 
+        //the calle to this method is already wrapped in a new trx
         def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
 
         //if repo used payloadId file then will use file and dataId to stream results too
@@ -105,7 +109,7 @@ class SyncJobContext {
             int problemSize = problemCount.addAndGet(currentResults.getProblems().size())
             message = "$message, with ${problemSize} problems so far"
         }
-        updateJob(currentResults, [id: jobId, ok:curOk, message:message])
+        updateJob(currentResults, [id: jobId, ok: curOk, message: message])
     }
 
     void appendDataResults(ApiResults currentResults){
@@ -135,10 +139,7 @@ class SyncJobContext {
             data.dataBytes = JsonEngine.toJson(renderResults).bytes
             data.ok = ok.get()
         }
-
-        def sje = syncJobService.repo.update(data) as SyncJobEntity
-        // syncJobService.repo.flushAndClear()
-        return sje
+        return syncJobService.updateJob(data)
     }
 
     /**
@@ -147,7 +148,7 @@ class SyncJobContext {
     void updateJob(ApiResults currentResults, Map data){
         //sync to only one thread for the SyncJob can update at a time
         synchronized ("SyncJob${jobId}".intern()) {
-            syncJobService.repo.update(data, [flush: true])
+            syncJobService.updateJob(data)
             // append json to dataFile
             appendDataResults(currentResults)
         }

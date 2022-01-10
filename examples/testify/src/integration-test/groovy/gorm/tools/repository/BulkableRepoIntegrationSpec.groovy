@@ -25,7 +25,7 @@ import yakworks.rally.orgs.repo.OrgRepo
 import static yakworks.commons.json.JsonEngine.parseJson
 
 @Integration
-// @Rollback
+@Rollback
 class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest {
 
     JdbcTemplate jdbcTemplate
@@ -45,9 +45,11 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
     }
 
     SyncJob getJob(Long jobId){
-        withNewTrx {
-            return SyncJob.get(jobId)
-        }
+        SyncJob.repo.clear() //make sure session doesn't have it cached
+        return SyncJob.get(jobId)
+        // withNewTrx {
+        //     return SyncJob.get(jobId)
+        // }
     }
 
     void "sanity check bulk create"() {
@@ -57,7 +59,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         when:
         Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
         SyncJob job = getJob(jobId) //= SyncJob.repo.read(jobId)
-
+        assert job.state == SyncJobState.Finished
         List json = parseJson(job.dataToString())
 
         then:

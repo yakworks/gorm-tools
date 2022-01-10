@@ -11,6 +11,7 @@ import org.grails.datastore.mapping.model.config.GormProperties
 
 import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.Validate
+import yakworks.commons.map.Maps
 import yakworks.commons.model.IdEnum
 
 /**
@@ -29,7 +30,7 @@ import yakworks.commons.model.IdEnum
  */
 @SuppressWarnings(["CompileStatic", "FieldName", "ExplicitCallToEqualsMethod"])
 @CompileStatic
-class MetaMap extends AbstractMap<String, Object> {
+class MetaMap extends AbstractMap<String, Object> implements Cloneable {
 
     private MetaClass entityMetaClass;
     private Object entity
@@ -241,6 +242,11 @@ class MetaMap extends AbstractMap<String, Object> {
             values.add(entity[p])
         }
         return values
+    }
+
+    @Override
+    Object clone() {
+        return Maps.deepCopy(this)
     }
 
     @Override

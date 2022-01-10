@@ -8,6 +8,8 @@ import java.nio.file.Path
 
 import groovy.transform.CompileStatic
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.repository.GormRepo
@@ -16,6 +18,7 @@ import yakworks.i18n.icu.ICUMessageSource
 
 @CompileStatic
 trait SyncJobService<D> {
+    final static Logger LOG = LoggerFactory.getLogger(SyncJobService)
 
     @Autowired
     ICUMessageSource messageSource
@@ -32,19 +35,36 @@ trait SyncJobService<D> {
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        trxService.withTrx{
+        //keep it in its own transaction so it doesn't depend on wrapping
+        trxService.withNewTrx {
             SyncJobContext jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
             return jobContext.createJob()
         }
     }
 
     /**
+     * Calls the repo update wrapped in a new trx
+     */
+    SyncJobEntity updateJob(Map data){
+        SyncJobEntity sje
+        try{
+            //keep it in its own transaction so it doesn't depend on and existing. Should be on its own
+            trxService.withNewTrx {
+                getRepo().clear() //clear so doesn't pull from cache and we dont get optimistic error
+                sje = getRepo().update(data, [flush: true]) as SyncJobEntity
+            }
+        } catch (e){
+            LOG.error("Critical error updating SyncJob", e)
+            throw e
+        }
+        return sje
+    }
+
+    /**
      * gets the job from the repo
      */
     SyncJobEntity getJob(Serializable id){
-        trxService.withTrx {
-            return getRepo().get(id) as SyncJobEntity
-        }
+        return getRepo().getWithTrx(id) as SyncJobEntity
     }
 
     /**

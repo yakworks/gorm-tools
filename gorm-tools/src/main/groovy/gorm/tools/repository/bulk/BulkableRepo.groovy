@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
+import gorm.tools.beans.map.MetaMap
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
@@ -76,16 +77,15 @@ trait BulkableRepo<D> {
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
 
         def supplierFunc = { doBulkParallel(dataList, jobContext) } as Supplier<ApiResults>
-        def asyncArgs = new AsyncConfig(enabled: syncJobArgs.promiseEnabled)
+        def asyncArgs = new AsyncConfig(enabled: syncJobArgs.promiseEnabled, session: true)
 
         asyncService.supplyAsync(asyncArgs, supplierFunc)
             .whenComplete { ApiResults results, ex ->
                 if(ex){ //should never really happen as we should have already handled them
-                    results << problemHandler.handleUnexpected(ex)
+                    log.error("BulkableRepo unexpected exception", ex)
+                    jobContext.results << problemHandler.handleUnexpected(ex)
                 }
-                withNewTrx {
-                    jobContext.finishJob()
-                }
+                jobContext.finishJob()
             }
 
         return jobContext.jobId
@@ -123,6 +123,7 @@ trait BulkableRepo<D> {
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext, true)
                     updateJobResults(jobContext, results)
                 } catch(Exception ex) {
+                    log.error("BulkableRepo unexpected exception", ex)
                     // just in case, unexpected errors as we should have intercepted them all already in doBulk
                     jobContext.results << problemHandler.handleUnexpected(ex)
                 }
@@ -137,20 +138,18 @@ trait BulkableRepo<D> {
      *
      * @param dataList the data chunk
      * @param syncJobArgs the persist args to pass to repo methods
-     * @param transactionalItem default=false which assumes this method is wrapped in a trx and
+     * @param transactionPerItem default=false which assumes this method is wrapped in a trx and
      *        any error processing the dataList will throw error so it rolls back.
      *        if transactionalItem=true then its assumed that this method is not wrapped in a trx,
      *        and transactionalItem value will be passed to createOrUpdate where each item update or create is in its own trx.
      *        also, if true then this method will try not to throw an exception and
      *        it will collect the errors in the results.
      */
-    ApiResults doBulk(List<Map> dataList, SyncJobContext jobContext, boolean transactionalItem = false){
+    ApiResults doBulk(List<Map> dataList, SyncJobContext jobContext, boolean transactionPerItem = false){
         // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
             Map itemData
-            D entityInstance
-
             try {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
@@ -162,14 +161,11 @@ trait BulkableRepo<D> {
                 boolean isCreate = jobContext.args.op == DataOp.add
                 //make sure args has its own copy as GormRepo add data to it and makes changes
                 Map args = jobContext.args.persistArgs
-                entityInstance = createOrUpdate(isCreate, transactionalItem, itemData, args)
-
-                Map entityMapData = metaMapEntityService.createMetaMap(entityInstance, jobContext.args.includes) as Map<String, Object>
+                Map entityMapData = createOrUpdate(jobContext, isCreate, transactionPerItem, itemData, args)
                 results << Result.of(entityMapData).status(isCreate ? 201 : 200)
-
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
-                if(transactionalItem){
+                if(transactionPerItem){
                     results << problemHandler.handleException(e).payload(item)
                 } else {
                     clear() //clear cache on error since wont hit below
@@ -180,27 +176,33 @@ trait BulkableRepo<D> {
         // flush and clear here so easier to debug problems and clear for memory to help garbage collection
         if(getDatastore().hasCurrentSession()) {
             // if trx is at item then only clear
-            transactionalItem ? clear() : flushAndClear()
+            transactionPerItem ? clear() : flushAndClear()
         }
 
         return results
     }
 
 
-    D createOrUpdate(boolean isCreate, boolean transactional, Map data, Map persistArgs){
-        D entityInstance
-        if(transactional){
-            entityInstance = isCreate ? create(data, persistArgs) : update(data, persistArgs)
-        } else{
-            entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
-        }
-        return entityInstance
+    Map createOrUpdate(SyncJobContext jobContext, boolean isCreate, boolean transactional, Map data, Map persistArgs) {
+        def closure = {
+            D entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
+            return createMetaMap(entityInstance, jobContext)
+        } as Closure<Map>
+
+        return transactional ? withTrx(closure) : closure()
+    }
+
+    /**
+     * uses metaMapEntityService to create the map for the includes in the jobContext.args
+     * Will return a clone to ensure that all properties are called and its a clean, unwrapped map
+     */
+    Map createMetaMap(D entityInstance, SyncJobContext jobContext){
+        MetaMap entityMapData = metaMapEntityService.createMetaMap(entityInstance, jobContext.args.includes)
+        return (Map)entityMapData.clone()
     }
 
     void updateJobResults(SyncJobContext jobContext, ApiResults results){
-        withNewTrx {
-            jobContext.updateJobResults(results)
-        }
+        jobContext.updateJobResults(results)
     }
 
     void logTime(Long start){

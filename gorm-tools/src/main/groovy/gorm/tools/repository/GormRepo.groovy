@@ -184,9 +184,11 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Transactional wrap for {@link #doUpdate}
      */
     D update(Map data, Map args = [:]) {
+        D ent
         entityTrx {
-            doUpdate(data, args)
+            ent = doUpdate(data, args)
         }
+        return ent
     }
 
     /**

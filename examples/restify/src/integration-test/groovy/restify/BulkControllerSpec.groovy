@@ -4,8 +4,11 @@ package restify
 import gorm.tools.rest.controller.RestRepoApiController
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import okhttp3.Response
+import org.apache.commons.lang3.StringUtils
 import spock.lang.Specification
 import yakworks.gorm.testing.http.RestIntegrationTest
+import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Org
 
 import static org.springframework.http.HttpStatus.MULTI_STATUS
@@ -51,6 +54,30 @@ class BulkControllerSpec extends Specification implements RestIntegrationTest {
         // body.status == MULTI_STATUS.value()
         response.status == MULTI_STATUS.value()
 
+    }
+
+    void "test failures should rollback"() {
+        List<Map> jsonList = [[num: "foox2", name: "Foox2", type: "Customer"]]
+        jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
+
+        when:
+        request.json = jsonList
+        request.method = "POST"
+        request.requestURI = '/api/rally/org/bulk'
+        request.queryString = 'jobSource=Oracle'
+        controller.params.jobSource = "Oracle"
+        controller.bulkCreate()
+        Map body = response.bodyToMap()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        SyncJob job = SyncJob.repo.getWithTrx(body.id as Long)
+
+        then:
+        job.id
+        job.data != null
     }
 
 }

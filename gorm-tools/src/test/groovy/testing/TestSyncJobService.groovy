@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 import yakworks.api.ApiResults
 import yakworks.commons.util.BuildSupport
 
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -21,7 +22,9 @@ class TestSyncJobService implements SyncJobService<TestSyncJob> {
 
     @Override
     Path createTempFile(String filename){
-        return Paths.get(BuildSupport.gradleProjectDir, "build/bulk/${filename}")
+        def path = Paths.get(BuildSupport.gradleProjectDir, "build/bulk")
+        Files.createDirectories(path)
+        return path.resolve(filename)
     }
 
     @Override

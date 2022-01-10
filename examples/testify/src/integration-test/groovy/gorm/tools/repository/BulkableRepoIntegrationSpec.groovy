@@ -50,16 +50,10 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         when:
         Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
         SyncJob job = SyncJob.get(jobId)
-
-        then:
-        noExceptionThrown()
-        job.data != null
-
-        when: "verify json"
         List json = parseJson(job.dataToString())
 
         then:
-        json != null
+        json
         json.size() == 3
     }
 

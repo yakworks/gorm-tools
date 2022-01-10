@@ -4,7 +4,7 @@
 */
 package yakworks.commons.json
 
-
+import java.nio.file.Files
 import java.nio.file.Path
 
 import groovy.json.JsonGenerator
@@ -158,6 +158,7 @@ class JsonEngine {
 
     /**
      * Write object as json to file, flushes and closes writer when finished.
+     * Its assumed the filePath passed has existing, will throw error if not
      *
      * @param filePath the file as a Path object
      * @param payload the object to write to file

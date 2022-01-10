@@ -6,6 +6,7 @@ package testing
 
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
+import gorm.tools.repository.model.GormRepoEntity
 import gorm.tools.repository.model.RepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -14,24 +15,18 @@ import yakworks.commons.transform.IdEqualsHashCode
 @IdEqualsHashCode
 @Entity
 @GrailsCompileStatic
-class TestSyncJob implements SyncJobEntity<TestSyncJob> {
+class TestSyncJob implements SyncJobEntity<TestSyncJob>, GormRepoEntity<TestSyncJob, TestSyncJobRepo> {
 
-    String message  // not sure if needed
-
-    /**
-     * gets the payloadData as byte array, either from attachment file or payload byte array
-     * @return
-     */
-    byte[] getPayloadData(){
-        return payloadBytes
+    @Override
+    String dataToString(){
+        def dta = dataBytes
+        return dta ? new String(dta, "UTF-8") : '[]'
     }
 
-    /**
-     * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
-     * gets the data as byte array, either from attachment file or resultData byte array
-     */
-    byte[] getData(){
-        return dataBytes
+    @Override
+    String payloadToString(){
+        def dta = payloadBytes
+        return dta ? new String(dta, "UTF-8") : '[]'
     }
 
     static TestSyncJobRepo getRepo() { RepoLookup.findRepo(this) as TestSyncJobRepo }

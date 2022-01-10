@@ -11,6 +11,7 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.repository.GormRepo
+import yakworks.commons.json.JsonEngine
 import yakworks.i18n.icu.ICUMessageSource
 
 @CompileStatic

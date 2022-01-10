@@ -4,11 +4,14 @@
 */
 package yakworks.rally.job
 
+import java.nio.file.Path
+
 import groovy.transform.CompileStatic
 
 import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.job.SyncJobService
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -16,6 +19,8 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.json.JsonEngine
+import yakworks.rally.attachment.AttachmentSupport
+import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 
 @GormRepository
@@ -23,19 +28,35 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
 
     @Autowired
+    AttachmentSupport attachmentSupport
+
+    @Autowired
     AttachmentRepo attachmentRepo
 
     @RepoListener
     void beforeBind(SyncJob job, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
+            // default to RestApi
+            if(!data.sourceType) job.sourceType = SourceType.RestApi
+
             // must be Job called from RestApi that is passing in dataPayload
             def payload = data.payload
-            if (payload  && (payload instanceof Map || payload instanceof List)) {
+            if (payload && payload instanceof Collection && payload.size() > 1000) {
+                data.payloadId =  writePayloadFile(job, data.payload)
+            }
+            else {
                 String res = JsonEngine.toJson(payload)
                 job.payloadBytes = res.bytes
-                job.sourceType = SourceType.RestApi  // we should default to RestApi if payload is passed
             }
         }
+    }
+
+    Long writePayloadFile(SyncJob job, Object payload){
+        String filename = "SyncJobPayload_${job.id}_.json"
+        Path path = attachmentSupport.createTempFile(filename, null)
+        JsonEngine.streamToFile(path, payload)
+        Attachment attachment = attachmentRepo.create([name: filename, sourcePath: path])
+        return attachment.id
     }
 
     byte[] getPayloadData(SyncJob job){

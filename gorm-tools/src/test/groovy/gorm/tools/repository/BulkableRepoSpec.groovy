@@ -139,7 +139,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         then:
         noExceptionThrown()
         job != null
-        job.data != null
+        job.dataToString() != '[]'
         job.state == SyncJobState.Finished
 
         and: "Verify db records"
@@ -266,7 +266,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         job.source == "test"
         job.sourceId == "test"
         job.payloadBytes != null
-        job.data != null
+        job.dataBytes != null
         job.state == SyncJobState.Finished
 
         when: "Verify job.payload (incoming json)"

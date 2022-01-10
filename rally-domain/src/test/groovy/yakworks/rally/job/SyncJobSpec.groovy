@@ -4,14 +4,24 @@
 */
 package yakworks.rally.job
 
+import gorm.tools.model.SourceType
+import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.Specification
 import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.model.SourceType
-import gorm.tools.testing.unit.DomainRepoTest
-import spock.lang.Ignore
-import spock.lang.Specification
+import yakworks.rally.attachment.AttachmentSupport
+import yakworks.rally.attachment.model.Attachment
 
-class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, SecurityTest {
+class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
+
+    Closure doWithDomains() { { ->
+        attachmentSupport(AttachmentSupport)
+        syncJobService(DefaultSyncJobService)
+    }}
+
+    void setupSpec() {
+        mockDomains(SyncJob, Attachment)
+    }
 
     void "sanity check validation with String as data"() {
         expect:

@@ -74,21 +74,17 @@ trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
      */
     byte[] payloadBytes
 
-    /**
-     * gets the payloadData as byte array, either from attachment file or payloadBytes byte array
-     */
-    abstract byte[] getPayloadData()
+    // /**
+    //  * gets the payloadData as byte array, either from attachment file or payloadBytes byte array
+    //  */
+    // abstract byte[] getPayloadData()
 
     /**
      * if payload is stored as an attachment then this will be the id
      */
     Long dataId
 
-    /**
-     * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
-     * gets the data as byte array, either from attachment file or resultData byte array
-     */
-    abstract byte[] getData()
+    // abstract byte[] getData()
 
     /**
      * if the resultData is stored in the column this will be populated
@@ -96,17 +92,16 @@ trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
     byte[] dataBytes
 
     /**
-     * returns the data byte array as a raw json string.
+     * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
+     * gets the data as byte array, either from attachment file or resultData byte array
      * If no data then returns string representation of json empty array which is '[]'
      */
     String dataToString(){
-        def dta = getData()
-        return dta ? new String(dta, "UTF-8") : '[]'
+        return dataBytes ? new String(dataBytes, "UTF-8") : '[]'
     }
 
     String payloadToString(){
-        def dta = getPayloadData()
-        return dta ? new String(dta, "UTF-8") : '[]'
+        return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
 
     static constraintsMap = [

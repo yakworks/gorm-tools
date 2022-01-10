@@ -56,14 +56,10 @@ class SyncJobContext {
     SyncJobContext createJob(){
         Validate.notNull(payload)
         jobId = ((IdGeneratorRepo)syncJobService.repo).generateId()
-        Map data = [id: jobId, source: args.source, sourceId: args.sourceId, state: SyncJobState.Running] as Map<String,Object>
-
-        if(args.payloadStorageType == SyncJobArgs.StorageType.BYTES) {
-            data.payloadBytes = JsonEngine.toJson(payload).bytes
-        }
-        else if(args.payloadStorageType == SyncJobArgs.StorageType.FILE){
-            data.payloadId = writePayloadFile()
-        }
+        Map data = [
+            id: jobId, source: args.source, sourceId: args.sourceId,
+            state: SyncJobState.Running, payload: payload
+        ] as Map<String,Object>
 
         def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
 
@@ -88,13 +84,6 @@ class SyncJobContext {
         byte[] dataBytes = JsonEngine.toJson(renderResults).bytes
         Map data = [id: jobId, ok: results.ok, dataBytes: dataBytes, state: SyncJobState.Finished]
         return syncJobService.repo.update(data, [flush: true]) as SyncJobEntity
-    }
-
-    Long writePayloadFile(){
-        String filename = "SyncJobPayload_${jobId}_.json"
-        Path path = syncJobService.createTempFile(filename)
-        JsonEngine.streamToFile(path, payload)
-        return syncJobService.createAttachment([name: filename, sourcePath: path])
     }
 
     /**

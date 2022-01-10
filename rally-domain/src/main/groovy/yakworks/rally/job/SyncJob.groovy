@@ -7,7 +7,6 @@ package yakworks.rally.job
 import gorm.tools.audit.AuditStamp
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 
@@ -22,20 +21,20 @@ import grails.gorm.annotation.Entity
 @GrailsCompileStatic
 class SyncJob implements SyncJobEntity<SyncJob>, Serializable {
 
-    /**
-     * gets the payloadData as byte array, either from attachment file or payload byte array
-     * @return
-     */
-    byte[] getPayloadData(){
-        return getRepo().getPayloadData(this)
+    byte[] getData(){
+        getRepo().getData(this)
     }
 
-    /**
-     * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
-     * gets the data as byte array, either from attachment file or resultData byte array
-     */
-    byte[] getData(){
-        return getRepo().getData(this)
+    @Override
+    String dataToString(){
+        def dta = getRepo().getData(this)
+        return dta ? new String(dta, "UTF-8") : '[]'
+    }
+
+    @Override
+    String payloadToString(){
+        def dta = getRepo().getPayloadData(this)
+        return dta ? new String(dta, "UTF-8") : '[]'
     }
 
     static SyncJobRepo getRepo() { RepoLookup.findRepo(this) as SyncJobRepo }

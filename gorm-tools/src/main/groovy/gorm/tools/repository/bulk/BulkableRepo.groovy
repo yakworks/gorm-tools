@@ -63,6 +63,7 @@ trait BulkableRepo<D> {
     abstract void clear()
     abstract Datastore getDatastore()
     abstract <T> T withTrx(Closure<T> callable)
+    abstract <T> T withNewTrx(Closure<T> callable)
 
     /**
      * Allows to pass in bulk of records at once, for example /api/book/bulk
@@ -82,7 +83,9 @@ trait BulkableRepo<D> {
                 if(ex){ //should never really happen as we should have already handled them
                     results << problemHandler.handleUnexpected(ex)
                 }
-                jobContext.finishJob()
+                withNewTrx {
+                    jobContext.finishJob()
+                }
             }
 
         return jobContext.jobId
@@ -97,10 +100,11 @@ trait BulkableRepo<D> {
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
             try {
                 Long chunkStart = System.currentTimeMillis()
-
+                ApiResults results
                 withTrx {
-                    doBulk((List<Map>) dataSlice, jobContext)
+                    results = doBulk((List<Map>) dataSlice, jobContext)
                 }
+                updateJobResults(jobContext, results)
 
                 logTime(chunkStart)
 
@@ -116,7 +120,8 @@ trait BulkableRepo<D> {
             asynArgsNoTrx.enabled = jobContext.args.asyncEnabled
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
-                    doBulk((List<Map>) dataSlice, jobContext, true)
+                    ApiResults results = doBulk((List<Map>) dataSlice, jobContext, true)
+                    updateJobResults(jobContext, results)
                 } catch(Exception ex) {
                     // just in case, unexpected errors as we should have intercepted them all already in doBulk
                     jobContext.results << problemHandler.handleUnexpected(ex)
@@ -139,7 +144,7 @@ trait BulkableRepo<D> {
      *        also, if true then this method will try not to throw an exception and
      *        it will collect the errors in the results.
      */
-    void doBulk(List<Map> dataList, SyncJobContext jobContext, boolean transactionalItem = false){
+    ApiResults doBulk(List<Map> dataList, SyncJobContext jobContext, boolean transactionalItem = false){
         // println "will do ${dataList.size()}"
         ApiResults results = ApiResults.create(false)
         for (Map item : dataList) {
@@ -178,7 +183,7 @@ trait BulkableRepo<D> {
             transactionalItem ? clear() : flushAndClear()
         }
 
-        jobContext.updateJobResults(results)
+        return results
     }
 
 
@@ -190,6 +195,12 @@ trait BulkableRepo<D> {
             entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
         }
         return entityInstance
+    }
+
+    void updateJobResults(SyncJobContext jobContext, ApiResults results){
+        withNewTrx {
+            jobContext.updateJobResults(results)
+        }
     }
 
     void logTime(Long start){

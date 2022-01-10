@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.gorm.testing.model.KitchenSink
@@ -24,7 +25,7 @@ import yakworks.rally.orgs.repo.OrgRepo
 import static yakworks.commons.json.JsonEngine.parseJson
 
 @Integration
-@Rollback
+// @Rollback
 class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest {
 
     JdbcTemplate jdbcTemplate
@@ -43,13 +44,20 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
             includes: ["id", "name", "ext.name"])
     }
 
+    SyncJob getJob(Long jobId){
+        withNewTrx {
+            return SyncJob.get(jobId)
+        }
+    }
+
     void "sanity check bulk create"() {
         given:
         List<Map> jsonList = generateOrgData(3)
 
         when:
         Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
-        SyncJob job = SyncJob.get(jobId)
+        SyncJob job = getJob(jobId) //= SyncJob.repo.read(jobId)
+
         List json = parseJson(job.dataToString())
 
         then:
@@ -63,7 +71,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
-        SyncJob job = SyncJob.get(jobId)
+        SyncJob job = getJob(jobId) //SyncJob.get(jobId)
 
         then:
         noExceptionThrown()
@@ -79,19 +87,20 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         }
 
         jobId = orgRepo.bulk(jsonList, SyncJobArgs.update(asyncEnabled: false))
-        job = SyncJob.get(jobId)
-        flushAndClear()
+        job = getJob(jobId) //SyncJob.get(jobId)
+        // flushAndClear()
 
         then:
         noExceptionThrown()
         job != null
 
         when: "Verify updated records"
-        def listUp = Org.query(comments: "flubber%").list()
-        int count = Org.countByCommentsLike("flubber%")
-        // Org.withNewTransaction {
-        //     count = Org.countByCommentsIlike("comment-%")
-        // }
+        int count
+
+        Org.withTransaction {
+            def listUp = Org.query(comments: "flubber%").list()
+            count = Org.countByCommentsLike("flubber%")
+        }
         then:
         count == 5
     }
@@ -100,10 +109,10 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
     @Issue("domain9/issues/629")
     void "when lazy association encountered during json building"() {
         given:
-        Org org
-        Org.withNewTransaction {
-            org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
-        }
+        Org org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
+        // Org.withTransaction {
+        //     org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
+        // }
 
         flushAndClear()
         List<Map> contactData = [[org:[id: org.id], street1: "street1", street2: "street2", city: "city", state:"IN"]]
@@ -140,7 +149,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
-        SyncJob job = SyncJob.get(jobId)
+        SyncJob job = SyncJob.repo.getWithTrx(jobId)
         flush()
 
         then:
@@ -156,7 +165,10 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         requestData != null
 
         and: "no dangling records committed"
-        OrgSource.findBySourceIdLike("ORG-1%") == null
+        Org.withTransaction {
+            OrgSource.findBySourceIdLike("ORG-1%") == null
+        }
+
     }
 
 
@@ -172,7 +184,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         when: "bulk insert"
 
         Long jobId = KitchenSink.repo.bulk(list, setupSyncJobArgs())
-        def job = SyncJob.get(jobId)
+        def job = SyncJob.repo.getWithTrx(jobId)
 
         def results = parseJson(job.dataToString())
 
@@ -196,6 +208,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         results[1].errors[0].field == "ext.name"
     }
 
+
     void "test data access exception on db constraint violation during flush"() {
         setup:
         Org.withNewTransaction {
@@ -208,7 +221,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create())
-        SyncJob job = SyncJob.get(jobId)
+        SyncJob job = SyncJob.repo.getWithTrx(jobId)
 
         then:
         noExceptionThrown()

@@ -27,14 +27,12 @@ class SyncJob implements SyncJobEntity<SyncJob>, Serializable {
 
     @Override
     String dataToString(){
-        def dta = getRepo().getData(this)
-        return dta ? new String(dta, "UTF-8") : '[]'
+        getRepo().dataToString(this)
     }
 
     @Override
     String payloadToString(){
-        def dta = getRepo().getPayloadData(this)
-        return dta ? new String(dta, "UTF-8") : '[]'
+        getRepo().payloadToString(this)
     }
 
     static SyncJobRepo getRepo() { RepoLookup.findRepo(this) as SyncJobRepo }

@@ -11,7 +11,6 @@ import groovy.transform.CompileStatic
 import org.apache.commons.io.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 
-import gorm.tools.job.SyncJobService
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -19,6 +18,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.json.JsonEngine
+import yakworks.commons.map.Maps
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
@@ -39,9 +39,12 @@ class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
             // default to RestApi
             if(!data.sourceType) job.sourceType = SourceType.RestApi
 
-            // must be Job called from RestApi that is passing in dataPayload
             def payload = data.payload
-            if (payload && payload instanceof Collection && payload.size() > 1000) {
+
+            boolean payloadAsFile = Maps.getBoolean("payloadAsFile", be.args, false)
+            if(!payloadAsFile) payloadAsFile = (payload instanceof Collection && payload.size() > 100)
+
+            if (payload && payloadAsFile) {
                 data.payloadId =  writePayloadFile(job, data.payload)
             }
             else {
@@ -59,15 +62,6 @@ class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
         return attachment.id
     }
 
-    byte[] getPayloadData(SyncJob job){
-        if(job.payloadId){
-            def istream = attachmentRepo.get(job.payloadId).inputStream
-            return IOUtils.toByteArray(istream)
-        } else {
-            return job.payloadBytes
-        }
-    }
-
     byte[] getData(SyncJob job){
         if(job.dataId){
             def istream = attachmentRepo.get(job.dataId).inputStream
@@ -75,5 +69,17 @@ class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
         } else {
             return job.dataBytes
         }
+    }
+
+    String dataToString(SyncJob job){
+        job.dataId ? attachmentRepo.get(job.dataId).getText() : getJsonString(job.dataBytes)
+    }
+
+    String payloadToString(SyncJob job){
+        job.payloadId ? attachmentRepo.get(job.payloadId).getText() : getJsonString(job.payloadBytes)
+    }
+
+    String getJsonString(byte[] bytes){
+        return bytes ? new String(bytes, "UTF-8") : '[]'
     }
 }

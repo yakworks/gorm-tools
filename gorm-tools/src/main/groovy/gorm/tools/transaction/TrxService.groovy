@@ -117,6 +117,18 @@ class TrxService {
         new GrailsTransactionTemplate(getTransactionManager(), definition).execute(callable)
     }
 
+    public <T> T withNewTrx(@ClosureParams(value = SimpleType, options = "org.springframework.transaction.support.DefaultTransactionStatus") Closure<T> callable) {
+        def tranDef = new CustomizableRollbackTransactionAttribute()
+        tranDef.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
+        withTrx(tranDef, callable)
+    }
+
+    public <T> T withReadOnlyTrx(@ClosureParams(value = SimpleType, options = "org.springframework.transaction.support.DefaultTransactionStatus") Closure<T> callable) {
+        def tranDef = new CustomizableRollbackTransactionAttribute()
+        tranDef.readOnly = true
+        withTrx(tranDef, callable)
+    }
+
     /**
      * Executes the closure within the context of a transaction for the given Datastore
      * Will use the tr

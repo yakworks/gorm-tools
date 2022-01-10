@@ -15,7 +15,6 @@ import yakworks.rally.orgs.model.OrgSource
 
 import static yakworks.commons.json.JsonEngine.parseJson
 
-@Rollback //we do finders
 @Integration
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
     String path = "/api/rally/org/bulk?jobSource=Oracle"
@@ -50,7 +49,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].data.name == "Foox1"
 
         when: "Verify job.data"
-        SyncJob job = SyncJob.get(body.id as Long)
+        SyncJob job = SyncJob.repo.get(body.id as Long)
 
         then:
         job != null
@@ -68,7 +67,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         dataList[0].num == "foox1"
 
         when: "Verify created org"
-        Org org = Org.get( body.data[0].data.id as Long)
+        Org org = Org.repo.read( body.data[0].data.id as Long)
 
         then:
         org != null
@@ -93,7 +92,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         noExceptionThrown()
 
         when:
-        SyncJob job = SyncJob.get(body.id as Long)
+        SyncJob job = SyncJob.repo.read(body.id as Long)
 
         then:
         job.data != null
@@ -107,7 +106,10 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         requestData != null
 
         and: "no dangling records committed"
-        OrgSource.findBySourceIdLike("ORG-1%") == null
+        OrgSource.withSession {
+            assert OrgSource.findBySourceIdLike("ORG-1%") == null
+        }
+
     }
 
 

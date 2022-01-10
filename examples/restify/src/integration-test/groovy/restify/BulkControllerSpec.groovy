@@ -10,7 +10,7 @@ import yakworks.rally.orgs.model.Org
 
 import static org.springframework.http.HttpStatus.MULTI_STATUS
 
-@Rollback
+// @Rollback
 @Integration
 class BulkControllerSpec extends Specification implements RestIntegrationTest {
 

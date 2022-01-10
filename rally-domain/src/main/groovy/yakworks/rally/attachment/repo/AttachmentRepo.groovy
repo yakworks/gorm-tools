@@ -154,7 +154,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         if (p.tempFileName) { //this would be primary way to upload files via UI and api
             return attachmentSupport.createFileFromTempFile(attachment.id, fileName, p.tempFileName as String, attachment.locationKey)
         }
-        else if (p.sourcePath) { //used for copying e34rattachments and testing
+        else if (p.sourcePath) { //used for copying attachments and testing
             return attachmentSupport.createFileFromSource(attachment.id, fileName, p.sourcePath as Path, attachment.locationKey)
         }
         else if (p.multipartFile) { //multipartFile from a ui

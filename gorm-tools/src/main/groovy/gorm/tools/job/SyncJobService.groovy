@@ -11,7 +11,7 @@ import groovy.transform.CompileStatic
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.repository.GormRepo
-import yakworks.commons.json.JsonEngine
+import gorm.tools.transaction.TrxService
 import yakworks.i18n.icu.ICUMessageSource
 
 @CompileStatic
@@ -19,6 +19,9 @@ trait SyncJobService<D> {
 
     @Autowired
     ICUMessageSource messageSource
+
+    @Autowired
+    TrxService trxService
 
     /**
      * creates Job using the repo and returns the jobId
@@ -29,15 +32,19 @@ trait SyncJobService<D> {
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        SyncJobContext jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
-        return jobContext.createJob()
+        trxService.withTrx{
+            SyncJobContext jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
+            return jobContext.createJob()
+        }
     }
 
     /**
      * gets the job from the repo
      */
     SyncJobEntity getJob(Serializable id){
-        return getRepo().get(id) as SyncJobEntity
+        trxService.withTrx {
+            return getRepo().get(id) as SyncJobEntity
+        }
     }
 
     /**

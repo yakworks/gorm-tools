@@ -79,9 +79,11 @@ trait BulkableRepo<D> {
         def supplierFunc = { doBulkParallel(dataList, jobContext) } as Supplier<ApiResults>
         def asyncArgs = new AsyncConfig(enabled: syncJobArgs.promiseEnabled, session: true)
 
-        asyncService.supplyAsync(asyncArgs, supplierFunc)
+        // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
+        asyncService
+            .supplyAsync(asyncArgs, supplierFunc)
             .whenComplete { ApiResults results, ex ->
-                if(ex){ //should never really happen as we should have already handled them
+                if(ex){ //should never really happen as we should have already handled any errors
                     log.error("BulkableRepo unexpected exception", ex)
                     jobContext.results << problemHandler.handleUnexpected(ex)
                 }
@@ -114,7 +116,8 @@ trait BulkableRepo<D> {
             }
         }
 
-        // if it has slice errors try again but this time run each item in the slice in its own transaction
+        // if it has slice errors then try again but
+        // this time run each item in the slice in its own transaction
         if(sliceErrors.size()) {
             AsyncConfig asynArgsNoTrx = AsyncConfig.of(getDatastore())
             asynArgsNoTrx.enabled = jobContext.args.asyncEnabled

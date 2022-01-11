@@ -28,7 +28,7 @@ class TestSyncJobService implements SyncJobService<TestSyncJob> {
     }
 
     @Override
-    Long createAttachment(Map params) {
+    Long createAttachment(Path path, String name) {
         //stub it out for testing, these dont support attachments, use integration and concrete
         // implementation to test attachments
         return 1

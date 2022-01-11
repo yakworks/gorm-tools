@@ -183,6 +183,16 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         create(params)
     }
 
+    /**
+     * Create from path
+     */
+    Attachment create(Path sourcePath, String name, Map data = [:]) {
+        data['sourcePath'] = sourcePath
+        data['name'] = name
+        create(data)
+    }
+
+
     Resource getResource(Attachment attachment){
         attachmentSupport.getResource(attachment)
     }

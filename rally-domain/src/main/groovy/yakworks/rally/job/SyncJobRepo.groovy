@@ -58,7 +58,7 @@ class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
         String filename = "SyncJobPayload_${job.id}_.json"
         Path path = attachmentSupport.createTempFile(filename, null)
         JsonEngine.streamToFile(path, payload)
-        Attachment attachment = attachmentRepo.create([name: filename, sourcePath: path])
+        Attachment attachment = attachmentRepo.create(path, filename)
         return attachment.id
     }
 

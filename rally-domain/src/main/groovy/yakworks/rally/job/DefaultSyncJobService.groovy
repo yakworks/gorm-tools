@@ -42,8 +42,8 @@ class DefaultSyncJobService implements SyncJobService {
     }
 
     @Override
-    Long createAttachment(Map params) {
-        Attachment attachment = attachmentRepo.create(params)
+    Long createAttachment(Path sourcePath, String name) {
+        Attachment attachment = attachmentRepo.create(sourcePath, name)
         return attachment.id
     }
 

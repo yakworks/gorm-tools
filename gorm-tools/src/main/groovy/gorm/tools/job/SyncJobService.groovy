@@ -83,6 +83,6 @@ trait SyncJobService<D> {
      * @param params the paramater to pass to the attachment creation
      * @return the attachmentId
      */
-    abstract Long createAttachment(Map params)
+    abstract Long createAttachment(Path path, String name)
 
 }

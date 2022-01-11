@@ -49,7 +49,7 @@ class SyncJobContext {
      */
     Object payload
 
-    Long payloadId
+    boolean fileStorage = false
 
     int payloadSize
 
@@ -85,7 +85,7 @@ class SyncJobContext {
         def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
 
         //if repo used payloadId file then will use file and dataId to stream results too
-        payloadId = jobEntity.payloadId
+        fileStorage = jobEntity.payloadId
 
         //inititialize the ApiResults to be used in process
         results = ApiResults.create()
@@ -113,13 +113,15 @@ class SyncJobContext {
     }
 
     void appendDataResults(ApiResults currentResults){
-        if(payloadId){
+        if(fileStorage){
             if(!dataPath) initJsonDataFile()
             def writer = dataPath.newWriter(true)
             def sjb = new StreamingJsonBuilder(writer, JsonEngine.generator)
             def dataList = transformResults(currentResults)
-            sjb.call dataList
-            writer.write(',\n')
+            dataList.each {
+                sjb.call it
+                writer.write(',\n')
+            }
             IOUtils.flushAndClose(writer)
         } else {
             results.merge currentResults
@@ -129,11 +131,12 @@ class SyncJobContext {
 
     SyncJobEntity finishJob(List<Map> renderResults = []) {
         Map data = [id: jobId, state: SyncJobState.Finished] as Map<String, Object>
-        if(payloadId){
+        if(fileStorage){
             //close out the file
-            dataPath.withWriter { wr ->
+            dataPath.withWriterAppend { wr ->
                 wr.write(']\n')
             }
+            data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}_.json")
         } else {
             renderResults = renderResults ?: transformResults(results)
             data.dataBytes = JsonEngine.toJson(renderResults).bytes

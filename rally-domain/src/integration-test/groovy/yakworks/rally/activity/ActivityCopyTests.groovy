@@ -1,5 +1,7 @@
 package yakworks.rally.activity
 
+import grails.plugin.viewtools.AppResourceLoader
+
 import java.time.LocalDateTime
 
 import org.apache.commons.io.IOUtils
@@ -26,23 +28,23 @@ import yakworks.rally.tag.model.TagLink
 @Rollback
 class ActivityCopyTests extends Specification implements DomainIntTest {
     ActivityRepo activityRepo
+    AppResourceLoader appResourceLoader
 
     @Ignore //XXX need to fix activity copy https://github.com/9ci/domain9/issues/271
     void testCopy() {
         when:
         Org org = Org.first()
         Org last = Org.last()
-        Activity activity = new Activity(org: org, name: "summary")
-        activity.note = new ActivityNote(activity: activity, body: "body")
-        activity.task = new Task(activity: activity, dueDate: LocalDateTime.now(), status: TaskStatus.OPEN, taskType: TaskType.EMAIL)
+        Activity activity = Activity.create([org: org, name: "summary"])
+        activity.note = new ActivityNote(body: "body")
+        //activity.task = new Task(dueDate: LocalDateTime.now(), status: TaskStatus.OPEN, taskType: TaskType.EMAIL) todo TaskStatus.OPEN does not exist
+        activity.persist()
+
         ActivityLink.repo.create(1000, 'ArTran', activity)
 
-        Attachment attachment = Attachment.get(1005)
+        when:
+        Attachment attachment = Attachment.get(1005) //XX this attachments dont exist in gorm-tools test db
         Attachment badAttachment = Attachment.get(1030)
-
-        badAttachment.fileData = null
-        badAttachment.location = null
-        badAttachment.persist()
 
         then:
         attachment != null
@@ -51,9 +53,14 @@ class ActivityCopyTests extends Specification implements DomainIntTest {
         when:
         Contact contact = Contact.first()
         activity.persist(flush: true)
+
+        badAttachment.fileData = null
+        badAttachment.location = null
+        badAttachment.persist()
+
         activity.addAttachment(attachment)
         activity.addAttachment(badAttachment)
-        activity.addToContacts(contact)
+        //activity.addToContacts(contact)
         flush()
         activity = Activity.get(activity.id)
 

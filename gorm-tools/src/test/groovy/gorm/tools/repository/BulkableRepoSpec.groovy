@@ -233,7 +233,6 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
     }
 
-    // @IgnoreRest
     @Issue("domain9#413")
     void "test batching"() {
         setup: "Set batchSize of 10 to trigger batching/slicing"

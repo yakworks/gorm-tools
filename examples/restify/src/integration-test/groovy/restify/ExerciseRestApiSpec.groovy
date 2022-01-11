@@ -30,7 +30,6 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
     }
 
-    @Ignore //FIXME #339 this is failing now, need to fix
     @Unroll
     def "LIST get test #entity"(String entity, Integer qCount) {
 
@@ -44,9 +43,9 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         where:
 
-        entity      | qCount
+        entity            | qCount
         'rally/org'       | 100
-        'security/user'      | 2
+        'security/user'   | 2
 
     }
 

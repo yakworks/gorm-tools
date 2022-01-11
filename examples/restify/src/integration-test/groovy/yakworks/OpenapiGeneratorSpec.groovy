@@ -13,8 +13,7 @@ class OpenapiGeneratorSpec extends Specification {
 
     @Autowired
     OpenApiGenerator openApiGenerator
-
-    //@Ignore
+    
     def "sanity check generate"() {
         expect:
         openApiGenerator.generate()

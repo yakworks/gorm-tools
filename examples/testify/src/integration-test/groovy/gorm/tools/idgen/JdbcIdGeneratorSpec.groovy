@@ -16,15 +16,6 @@ class JdbcIdGeneratorSpec extends Specification {
     JdbcIdGenerator jdbcIdGenerator
     //JdbcTemplate jdbcTemplate
 
-    @Ignore
-    void "test WTF"() {
-        when:
-        def prj = TestData.build(Org)
-
-        then:
-        prj.id == 1
-    }
-
     void "test getNextId"() {
         when:
         int startVal = jdbcIdGenerator.getNextId(TABLE_KEY, 100)

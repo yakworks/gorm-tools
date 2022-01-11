@@ -17,6 +17,7 @@ import org.grails.datastore.mapping.transactions.TransactionObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
+import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.support.DefaultTransactionStatus
 
@@ -183,9 +184,11 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Transactional wrap for {@link #doUpdate}
      */
     D update(Map data, Map args = [:]) {
+        D ent
         entityTrx {
-            doUpdate(data, args)
+            ent = doUpdate(data, args)
         }
+        return ent
     }
 
     /**
@@ -371,6 +374,17 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         (D)gormStaticApi().get(id)
     }
 
+    /**
+     * wraps get in a trx. NOT a read only trx like read as that messes with dirty tracking
+     * @param id required, the id to get
+     * @return the retrieved entity
+     */
+    D getWithTrx(Serializable id) {
+        entityTrx {
+            return (D)gormStaticApi().get(id)
+        }
+    }
+
 
     /**
      * a read wrapped in a read-only transaction.
@@ -497,6 +511,12 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     public <T> T withTrx(Closure<T> callable) {
         def trxAttr = new CustomizableRollbackTransactionAttribute()
+        gormStaticApi().withTransaction(trxAttr, callable)
+    }
+
+    public <T> T withNewTrx(Closure<T> callable) {
+        def trxAttr = new CustomizableRollbackTransactionAttribute()
+        trxAttr.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
         gormStaticApi().withTransaction(trxAttr, callable)
     }
 

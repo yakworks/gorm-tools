@@ -4,6 +4,8 @@
 */
 package gorm.tools.testing.support
 
+import java.lang.reflect.Method
+
 import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -151,8 +153,14 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
                 }
             }
         }
+        //
+        // Method doWithDomainsMethod = clazz.getMethod('getDoWithSpring')
+        // defineBeans((Closure)doWithDomainsMethod.invoke(plugin))
+        def beanClosures = [commonBeans(), beanClos]
+        def doWithDomainsClosure = doWithDomains()
+        if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
 
-        defineBeansMany([commonBeans(), beanClos])
+        defineBeansMany(beanClosures)
 
         // if(_hasCommonBeansSetup){
         //     defineBeansMany([beanClos])
@@ -226,5 +234,9 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     def autowire(Object obj) {
         ctx.autowireCapableBeanFactory.autowireBeanProperties(obj, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false)
         obj
+    }
+
+    Closure doWithDomains() {
+        null
     }
 }

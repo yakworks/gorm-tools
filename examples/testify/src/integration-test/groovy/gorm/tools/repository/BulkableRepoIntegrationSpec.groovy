@@ -1,15 +1,19 @@
 package gorm.tools.repository
 
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobState
+import gorm.tools.repository.model.DataOp
 import org.apache.commons.lang3.StringUtils
+import org.springframework.http.HttpStatus
 import org.springframework.jdbc.core.JdbcTemplate
 
-import gorm.tools.repository.bulk.BulkableArgs
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
+import yakworks.gorm.testing.model.KitchenSink
 import yakworks.rally.job.SyncJob
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.model.Location
@@ -35,23 +39,31 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         }
     }
 
+    SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
+        return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",
+            includes: ["id", "name", "ext.name"])
+    }
+
+    SyncJob getJob(Long jobId){
+        SyncJob.repo.clear() //make sure session doesn't have it cached
+        return SyncJob.get(jobId)
+        // withNewTrx {
+        //     return SyncJob.get(jobId)
+        // }
+    }
+
     void "sanity check bulk create"() {
         given:
         List<Map> jsonList = generateOrgData(3)
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        SyncJob job = SyncJob.get(jobId)
-
-        then:
-        noExceptionThrown()
-        job.data != null
-
-        when: "verify json"
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
+        SyncJob job = getJob(jobId) //= SyncJob.repo.read(jobId)
+        assert job.state == SyncJobState.Finished
         List json = parseJson(job.dataToString())
 
         then:
-        json != null
+        json
         json.size() == 3
     }
 
@@ -60,8 +72,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> jsonList = generateOrgData(5)
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        SyncJob job = SyncJob.get(jobId)
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
+        SyncJob job = getJob(jobId) //SyncJob.get(jobId)
 
         then:
         noExceptionThrown()
@@ -69,43 +81,46 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when: "bulk update"
         def results = parseJson(job.dataToString())
+        // assert results[0].data == jsonList
+        //update jsonList to prepare for a bulUpdate
         jsonList.eachWithIndex { it, idx ->
             it["id"] = results[idx].data.id
             it["comments"] = "flubber${it.id}"
         }
 
-        jobId = orgRepo.bulk(jsonList, BulkableArgs.update(asyncEnabled: false))
-        job = SyncJob.get(jobId)
-        flushAndClear()
+        jobId = orgRepo.bulk(jsonList, SyncJobArgs.update(asyncEnabled: false))
+        job = getJob(jobId) //SyncJob.get(jobId)
+        // flushAndClear()
 
         then:
         noExceptionThrown()
         job != null
 
         when: "Verify updated records"
-        def listUp = Org.query(comments: "flubber%").list()
-        int count = Org.countByCommentsLike("flubber%")
-        // Org.withNewTransaction {
-        //     count = Org.countByCommentsIlike("comment-%")
-        // }
+        int count
+
+        Org.withTransaction {
+            def listUp = Org.query(comments: "flubber%").list()
+            count = Org.countByCommentsLike("flubber%")
+        }
         then:
         count == 5
     }
 
-    @Ignore
+    @Ignore //XXX fix by generating json on demand in session
     @Issue("domain9/issues/629")
     void "when lazy association encountered during json building"() {
         given:
-        Org org
-        Org.withNewTransaction {
-            org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
-        }
+        Org org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
+        // Org.withTransaction {
+        //     org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
+        // }
 
         flushAndClear()
         List<Map> contactData = [[org:[id: org.id], street1: "street1", street2: "street2", city: "city", state:"IN"]]
 
         when:
-        BulkableArgs args = BulkableArgs.create(asyncEnabled: false)
+        SyncJobArgs args = SyncJobArgs.create(asyncEnabled: false)
 
         //include field from org, here org would be a lazy association, and would fail when its property accessed during json building
         args.includes = ["id", "org.source.id"]
@@ -135,8 +150,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        SyncJob job = SyncJob.get(jobId)
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create(asyncEnabled: false))
+        SyncJob job = SyncJob.repo.getWithTrx(jobId)
         flush()
 
         then:
@@ -145,85 +160,70 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         when:
         List json = parseJson(job.dataToString())
-        List requestData = parseJson(job.requestDataToString())
+        List requestData = parseJson(job.payloadToString())
 
         then:
         json != null
         requestData != null
 
         and: "no dangling records committed"
-        OrgSource.findBySourceIdLike("ORG-1%") == null
+        Org.withTransaction {
+            OrgSource.findBySourceIdLike("ORG-1%") == null
+        }
+
     }
 
 
-    @Issue("#357")
-    @Ignore //XXX FIx, started failing when parallel disabled.
-    void "test spin back through failures and run them one by one"() {
-        OrgSource os1, os2, os3
 
-        setup:
-        int sliceSize = orgRepo.parallelTools.asyncService.sliceSize
-        orgRepo.parallelTools.asyncService.sliceSize = 10 //trigger batching
+    void "test failures and errors"() {
+        given:
+        List list = KitchenSink.generateDataList(20)
 
-        and: "data bad contact records which would fail"
-        List<Map> jsonList = generateOrgData(20)
-        jsonList[5].contact = [name:""]
-        jsonList[15].contact = [name:""]
+        and: "Add a bad records"
+        list[1].ext.name = null
+        // list[19].ext.name = null
 
-        when:
-        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create(asyncEnabled: false))
-        flush()
+        when: "bulk insert"
 
-        SyncJob job = SyncJob.get(jobId)
+        Long jobId = KitchenSink.repo.bulk(list, setupSyncJobArgs())
+        def job = SyncJob.repo.getWithTrx(jobId)
+
+        def results = parseJson(job.dataToString())
 
         then:
-        noExceptionThrown()
-        job.data != null
+        job.ok == false
+        results != null
+        results instanceof List
+        results.size() == 20
 
-        when: "verify json"
-        List json = parseJson(job.dataToString())
+        and: "verify successfull results"
+        results.findAll({ it.ok == true}).size() == 19
+        results[0].ok == true
 
-        then: "job is good"
-        json != null
-        json.size() == 20
+        and: "Verify failed record"
+        results[1].ok == false
+        results[1].data != null
+        results[1].data.ext.name == null
+        results[1].status == HttpStatus.UNPROCESSABLE_ENTITY.value()
 
-        and: "just 2 records should have failed, all other should be successfull"
-        json.count({it.ok == false}) == 2 //
-
-        and: "Verify bad records"
-        json[5].ok == false
-        json[15].ok == false
-        json[5].errors != null
-
-        when:
-        // Org.withNewTransaction {
-            os1 = OrgSource.findBySourceId(jsonList[5].num) //this should have rolled back when contact save fails
-            os2 = OrgSource.findBySourceId(jsonList[15].num)
-            os3 = OrgSource.findBySourceId("testorg-1") //this should exist
-        // }
-
-        then: "Verify no dangling records have been commited"
-        os1 == null
-        os2 == null
-        os3 != null
-
-        cleanup: "Cleanup orgs as they would have been committed during bulk"
-        orgRepo.parallelTools.asyncService.sliceSize = sliceSize //set original back
+        results[1].errors.size() == 1
+        results[1].errors[0].field == "ext.name"
     }
 
-    @Ignore("Fix XXX in BulkableRepo")
+
     void "test data access exception on db constraint violation during flush"() {
         setup:
         Org.withNewTransaction {
             jdbcTemplate.execute("CREATE UNIQUE INDEX org_num_unique ON Org(num)")
         }
 
-        List<Map> jsonList = generateOrgData(3)
-        jsonList[2].num = "testorg-2"
+        List<Map> jsonList = generateOrgData(2)
+        //change second item in array to same as first
+        jsonList[1].num = "testorg-1"
 
         when:
-        Long jobId = orgRepo.bulk(jsonList, BulkableArgs.create())
-        SyncJob job = SyncJob.get(jobId)
+        Long jobId = orgRepo.bulk(jsonList, SyncJobArgs.create())
+        SyncJob job = SyncJob.repo.getWithTrx(jobId)
 
         then:
         noExceptionThrown()
@@ -234,8 +234,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         then:
         json != null
-        json.length() == 3
-        json.ok == true
+        json.size() == 2
+        json[1].ok == false
 
         cleanup:
         Org.withNewTransaction {

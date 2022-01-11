@@ -6,6 +6,7 @@ package yakworks.rally.job
 
 import gorm.tools.audit.AuditStamp
 import gorm.tools.job.SyncJobEntity
+import gorm.tools.repository.RepoLookup
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.annotation.Entity
 
@@ -20,23 +21,24 @@ import grails.gorm.annotation.Entity
 @GrailsCompileStatic
 class SyncJob implements SyncJobEntity<SyncJob>, Serializable {
 
-
-    // int persistenceDuration  //job can be purged after that time (number of days???)
-
-    private static final int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
-
-    static mapping = {
-        state column: 'state', lazy: false, enumType: 'identity'
+    byte[] getData(){
+        getRepo().getData(this)
     }
 
-    static constraintsMap = [
-        state:[ d: 'State of the job', nullable: false],
-        requestData:[ d: 'Json data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
-        data: [d: 'Json list of results', maxSize: MAX_MEG_IN_BYTES],
-        //XXX I dont think this should be nullable
-        sourceId:[ d: 'the unique id from the outside source for the scheduled job', nullable: true]
-    ]
+    @Override
+    String dataToString(){
+        getRepo().dataToString(this)
+    }
 
+    @Override
+    String payloadToString(){
+        getRepo().payloadToString(this)
+    }
 
+    static SyncJobRepo getRepo() { RepoLookup.findRepo(this) as SyncJobRepo }
+
+    static mapping = {
+        state column: 'state', enumType: 'identity'
+    }
 
 }

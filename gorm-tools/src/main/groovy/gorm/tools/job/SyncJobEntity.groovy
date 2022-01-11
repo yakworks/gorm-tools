@@ -50,26 +50,67 @@ transform example when in a job
 @CompileStatic
 trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo<D>> {
 
-    Boolean ok = false // change to TRUE if State.Finished without any issues
-    SyncJobState state = SyncJobState.Running
-    // data we are getting. For RestApi calls it's data body
-    byte[] requestData
-
-    // String fileWithJson  // option if json is too big
-
-    //The "data" is a response of resources that were successfully and unsuccessfully updated or created after processing.
-    // The data differ depending on the sourceType of the job
-    byte[] data
+    public static int MAX_MEG_IN_BYTES = 1024 * 1024 * 10 //10 megabytes
 
     /**
-     * returns the data byte array as a raw json string.
-     * If no data then returns string repreentation of json empty array which is '[]'
+     * will be true if State.Finished without any issues, false if any problems ar in the results data
+     */
+    Boolean ok = false // change to TRUE if State.Finished without any issues
+
+    /**
+     * the current state of the job.
+     */
+    SyncJobState state = SyncJobState.Running
+
+    String message
+
+    /**
+     * if payload is stored as an attachment then this will be the id
+     */
+    Long payloadId
+
+    /**
+     * if the payload data is stored in the column this will be populated
+     */
+    byte[] payloadBytes
+
+    // /**
+    //  * gets the payloadData as byte array, either from attachment file or payloadBytes byte array
+    //  */
+    // abstract byte[] getPayloadData()
+
+    /**
+     * if payload is stored as an attachment then this will be the id
+     */
+    Long dataId
+
+    // abstract byte[] getData()
+
+    /**
+     * if the resultData is stored in the column this will be populated
+     */
+    byte[] dataBytes
+
+    /**
+     * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
+     * gets the data as byte array, either from attachment file or resultData byte array
+     * If no data then returns string representation of json empty array which is '[]'
      */
     String dataToString(){
-        return getData() ? new String(getData(), "UTF-8") : '[]'
+        return dataBytes ? new String(dataBytes, "UTF-8") : '[]'
     }
 
-    String requestDataToString(){
-        return getRequestData() ? new String(getRequestData(), "UTF-8") : '[]'
+    String payloadToString(){
+        return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
+
+    static constraintsMap = [
+        state:[ d: 'State of the job', nullable: false],
+        message:[ d: 'Status message or log'],
+        payloadId:[ d: 'If payload is stored as attahcment file this is the id'],
+        payloadBytes:[ d: 'Json payload data (stored as byte array) that is passed in, for example list of items to bulk create', maxSize: MAX_MEG_IN_BYTES],
+        dataId: [d: 'If data is saved as attahchment file this is the id'],
+        dataBytes: [d: 'The result data stored as bytes', maxSize: MAX_MEG_IN_BYTES],
+        sourceId:[ d: 'the unique id from the outside source for the scheduled job', nullable: true]
+    ]
 }

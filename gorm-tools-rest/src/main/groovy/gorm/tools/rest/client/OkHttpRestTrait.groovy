@@ -4,6 +4,8 @@
 */
 package gorm.tools.rest.client
 
+import java.util.concurrent.TimeUnit
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -24,7 +26,8 @@ trait OkHttpRestTrait {
     String jsonHeader = "application/json;charset=utf-8"
 
     OkHttpClient getHttpClient(){
-        new OkHttpClient()
+        //increase timeout to 120 from 10 so we can debug without socketTimeout
+        new OkHttpClient.Builder().readTimeout(120, TimeUnit.SECONDS).build()
     }
 
     @CompileDynamic

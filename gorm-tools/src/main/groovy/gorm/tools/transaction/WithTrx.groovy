@@ -48,6 +48,16 @@ trait WithTrx {
         getTrxService().withTrx(callable)
     }
 
+    public <T> T withNewTrx(@ClosureParams(value = SimpleType,
+        options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
+        getTrxService().withNewTrx(callable)
+    }
+
+    public <T> T withReadOnlyTrx(@ClosureParams(value = SimpleType,
+        options = "org.springframework.transaction.TransactionStatus") Closure<T> callable) {
+        getTrxService().withReadOnlyTrx(callable)
+    }
+
     public <T> T withSession(Closure<T> callable){
         getTrxService().withSession callable
     }

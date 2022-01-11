@@ -21,13 +21,13 @@ import gorm.tools.beans.Pager
 import gorm.tools.beans.map.MetaMap
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.beans.map.MetaMapList
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.problem.ProblemTrait
@@ -211,10 +211,9 @@ trait RestRepoApiController<D> extends RestApiController {
         boolean promiseEnabled = paramBoolean('promiseEnabled', false)
 //        boolean usePathKeyMap = paramBoolean('usePathKeyMap', false)
 
-        Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes,
-            params: bulkParams, promiseEnabled: promiseEnabled)
+        SyncJobArgs bulkableArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes,
+            sourceId: sourceKey, source: params.jobSource, promiseEnabled: promiseEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)

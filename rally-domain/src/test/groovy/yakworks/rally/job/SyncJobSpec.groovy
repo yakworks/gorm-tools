@@ -4,32 +4,30 @@
 */
 package yakworks.rally.job
 
+import gorm.tools.model.SourceType
+import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.Specification
 import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.model.SourceType
-import gorm.tools.testing.unit.DomainRepoTest
-import spock.lang.Ignore
-import spock.lang.Specification
+import yakworks.rally.attachment.AttachmentSupport
+import yakworks.rally.attachment.model.Attachment
 
-class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, SecurityTest {
+class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
+
+    Closure doWithDomains() { { ->
+        attachmentSupport(AttachmentSupport)
+        syncJobService(DefaultSyncJobService)
+    }}
+
+    void setupSpec() {
+        mockDomains(SyncJob, Attachment)
+    }
 
     void "sanity check validation with String as data"() {
         expect:
         SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
         job.validate()
         job.persist()
-    }
-
-    @Ignore //XXX put ot back in when we add sourceId to be required in SourceTrait. Too many tests were failing
-    void "sanity check validation no sourceId"() {
-        when:
-        SyncJob job = new SyncJob()
-        // job.persist()
-        then:
-        job
-        !job.validate()
-
-
     }
 
     void "kick off simulation of Job"() {
@@ -39,11 +37,11 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
         def sourceId = "api/ar/org"
         def source = "Oracle"
         def sourceType = SourceType.RestApi
-        def job = SyncJob.repo.create(dataPayload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
+        def job = SyncJob.repo.create(payload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
 
         then:
         job
-        job.requestData.size()>0
+        job.payloadBytes.size() > 0
     }
 
 
@@ -52,7 +50,7 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
         def res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
+        SyncJob job = new SyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', payloadBytes: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
@@ -63,8 +61,8 @@ class SyncJobSpec extends Specification  implements DomainRepoTest<SyncJob>, Sec
 
         then:
         j
-        res.bytes == j.requestData
-        res == new String(j.requestData, 'UTF-8')
+        res.bytes == j.payloadBytes
+        res == j.payloadToString()
 
     }
 

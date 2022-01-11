@@ -92,8 +92,7 @@ class AttachmentSpec extends Specification implements DataRepoTest, SecurityTest
         when:
         def fileName = 'test.txt'
         Path sourcePath = getFile(fileName)
-        Map params = [name: fileName, sourcePath: sourcePath]
-        Attachment attachment = attachmentRepo.create(params)
+        Attachment attachment = attachmentRepo.create(sourcePath, fileName)
 
         then:
         attachment.name == fileName

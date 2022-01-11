@@ -31,6 +31,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
     }
 
     @Unroll
+    @Ignore
     def "LIST get test #entity"(String entity, Integer qCount) {
 
         when:
@@ -46,7 +47,6 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         entity            | qCount
         'rally/org'       | 100
         'security/user'   | 2
-
     }
 
     @Unroll

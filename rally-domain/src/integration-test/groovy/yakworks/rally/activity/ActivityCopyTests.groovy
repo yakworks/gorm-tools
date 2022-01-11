@@ -42,7 +42,7 @@ class ActivityCopyTests extends Specification implements DomainIntTest {
 
         ActivityLink.repo.create(1000, 'ArTran', activity)
 
-        when:
+        and:
         Attachment attachment = Attachment.get(1005) //XX this attachments dont exist in gorm-tools test db
         Attachment badAttachment = Attachment.get(1030)
 

@@ -9,6 +9,7 @@ import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
 import spock.lang.Unroll
+import yakworks.rally.orgs.model.Org
 
 /**
  * Sanity checks to hit the main endpoints. KISS, keep it simple
@@ -27,7 +28,6 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         pageMap.data.size() == 20
-
     }
 
     @Unroll

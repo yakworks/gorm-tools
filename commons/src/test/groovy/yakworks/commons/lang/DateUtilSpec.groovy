@@ -4,20 +4,17 @@
 */
 package yakworks.commons.lang
 
+import spock.lang.Unroll
+
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
 import java.text.SimpleDateFormat
 
-import yakworks.commons.lang.DateUtil
-import yakworks.commons.lang.IsoDateUtil
-
-@Ignore
 class DateUtilSpec extends Specification {
     @Shared SimpleDateFormat tester = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
@@ -60,7 +57,7 @@ class DateUtilSpec extends Specification {
         Date result = DateUtil.getLastDayOfMonth(date)
 
         then:
-        format.parse('2011-09-30').format('yyyy-MM-dd') == result.format('yyyy-MM-dd')
+        '2011-09-30' == format.format(result)
     }
 
     void "test addMonths"() {
@@ -69,8 +66,8 @@ class DateUtilSpec extends Specification {
         Date date = format.parse('2017-10-19')
 
         expect:
-        '2017-07-19' == DateUtil.addMonths(date, -3).format('yyyy-MM-dd')
-        '2017-12-19' == DateUtil.addMonths(date, 2).format('yyyy-MM-dd')
+        '2017-07-19' == format.format(DateUtil.addMonths(date, -3))
+        '2017-12-19' == format.format(DateUtil.addMonths(date, 2))
     }
 
     void "test getFirstDayOfMonth"() {
@@ -150,26 +147,28 @@ class DateUtilSpec extends Specification {
         2L == hours
     }
 
-    void "test dateToString with default format"() {
+    @Unroll
+    void "test dateToString with default format"(String r, Date date) {
         expect:
-        result == IsoDateUtil.dateToString(date)
+        r == IsoDateUtil.dateToString(date)
 
         where:
-        result                | date
+        r                     | date
         "10/19/2017 12:00:00" | new SimpleDateFormat("yyyy-MM-dd").parse("2017-10-19")
         "10/19/2017 11:40:00" | new SimpleDateFormat("MM/dd/yyyy hh:mm:ss").parse("10/19/2017 11:40:00")
     }
 
-    void "test dateToString"() {
-        given:
+    @Unroll
+    void "test dateToString"(String r, String fmt) {
+        setup:
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
         Date date = dateFormat.parse('2017-10-19T11:50:10')
 
         expect:
-        result == IsoDateUtil.dateToString(date, format)
+        r == IsoDateUtil.dateToString(date, fmt)
 
         where:
-        result                | format
+        r                     | fmt
         "2017-10-19"          | "yyyy-MM-dd"
         "10/19/2017 11:50:10" | "MM/dd/yyyy hh:mm:ss"
         "2017-10-19T11:50:10" | "yyyy-MM-dd'T'HH:mm:ss"
@@ -202,23 +201,25 @@ class DateUtilSpec extends Specification {
         result == '2017-10-20T22:00:00.000Z'
     }
 
-    void "test getYearOf"() {
+    @Unroll
+    void "test getYearOf"(int year, String fmt, String dt) {
         expect:
-        year == DateUtil.getYearOf(new SimpleDateFormat(dateFormat).parse(date))
+        year == DateUtil.getYearOf(new SimpleDateFormat(fmt).parse(dt))
 
         where:
-        year | dateFormat     | date
+        year | fmt     | dt
         2017 | "yyyy-MM-dd"   | "2017-10-19"
         2016 | "MM/dd/yyyy"   | "10/19/2016"
         2015 | "yyMMddHHmmss" | "151019105000"
     }
 
-    void "test getYearOf with LocalDates"() {
+    @Unroll
+    void "test getYearOf with LocalDates"(int year, String fmt, String dt) {
         expect:
-        year == DateUtil.getYearOf(DateUtil.toLocalDate(new SimpleDateFormat(dateFormat).parse(date)))
+        year == DateUtil.getYearOf(DateUtil.toLocalDate(new SimpleDateFormat(fmt).parse(dt)))
 
         where:
-        year | dateFormat     | date
+        year | fmt     | dt
         2017 | "yyyy-MM-dd"   | "2017-10-19"
         2016 | "MM/dd/yyyy"   | "10/19/2016"
         2015 | "yyMMddHHmmss" | "151019105000"
@@ -229,12 +230,13 @@ class DateUtilSpec extends Specification {
         Calendar calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_MONTH, 1)
         calendar.add(Calendar.MONTH, 2)
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd")
 
         when:
         Date monthAfterNow = DateUtil.shiftCurrentDateByMonths(2)
 
         then:
-        monthAfterNow.format("yyyy-MM-dd") == calendar.getTime().format("yyyy-MM-dd")
+        fmt.format(monthAfterNow) == fmt.format(calendar.getTime())
 
         when:
         //changing expected date, so now it 2 month before now
@@ -242,15 +244,16 @@ class DateUtilSpec extends Specification {
         Date monthBeforeNow = DateUtil.shiftCurrentDateByMonths(-2)
 
         then:
-        monthBeforeNow.format("yyyy-MM-dd") == calendar.getTime().format("yyyy-MM-dd")
+        fmt.format(monthBeforeNow) == fmt.format(calendar.getTime())
     }
 
-    void "test getMonthLetter"() {
+    @Unroll
+    void "test getMonthLetter"(String monthLetter, String dt) {
         expect:
-        monthLetter == DateUtil.getMonthLetter(date)
+        monthLetter == DateUtil.getMonthLetter(dt)
 
         where:
-        monthLetter | date
+        monthLetter | dt
         "J"         | "201701"
         "F"         | "201702"
         "M"         | "201703"
@@ -292,7 +295,8 @@ class DateUtilSpec extends Specification {
     void "test setTime"() {
         setup:
         String dateFormat = "MM/dd/yyyy HH:mm:ss.SSS"
-        Date date = new SimpleDateFormat(dateFormat).parse("10/19/2017 11:40:00.500")
+        SimpleDateFormat fmt =  new SimpleDateFormat(dateFormat)
+        Date date = fmt.parse("10/19/2017 11:40:00.500")
         Calendar calendarDate = Calendar.getInstance()
         calendarDate.setTime(date)
 
@@ -300,31 +304,32 @@ class DateUtilSpec extends Specification {
         DateUtil.setTime(calendarDate, 10, 15)
 
         then:
-        calendarDate.getTime().format(dateFormat) == "10/19/2017 10:15:00.000"
+        fmt.format(calendarDate.getTime()) == "10/19/2017 10:15:00.000"
 
         when:
         DateUtil.setTime(calendarDate, 9, 30, 25, 123)
 
         then:
-        calendarDate.getTime().format(dateFormat) == "10/19/2017 09:30:25.123"
+        fmt.format(calendarDate.getTime()) == "10/19/2017 09:30:25.123"
 
         when:
         DateUtil.setTime(calendarDate, 23)
 
         then:
-        calendarDate.getTime().format(dateFormat) == "10/19/2017 23:00:00.000"
+        fmt.format(calendarDate.getTime()) == "10/19/2017 23:00:00.000"
 
         when:
         DateUtil.setTime(calendarDate, 0)
 
         then:
-        calendarDate.getTime().format(dateFormat) == "10/19/2017 00:00:00.000"
+        fmt.format(calendarDate.getTime()) == "10/19/2017 00:00:00.000"
     }
 
     void "test setTimeAsOfMidnight"() {
         setup:
         String dateFormat = "MM/dd/yyyy HH:mm:ss.SSS"
-        Date date = new SimpleDateFormat(dateFormat).parse("10/19/2017 11:40:00.500")
+        SimpleDateFormat fmt = new SimpleDateFormat(dateFormat)
+        Date date = fmt.parse("10/19/2017 11:40:00.500")
         Calendar calendarDate = Calendar.getInstance()
         calendarDate.setTime(date)
 
@@ -332,31 +337,33 @@ class DateUtilSpec extends Specification {
         DateUtil.setTimeAsOfMidnight(calendarDate)
 
         then:
-        calendarDate.getTime().format(dateFormat) == "10/19/2017 00:00:00.000"
+        fmt.format(calendarDate.getTime()) == "10/19/2017 00:00:00.000"
     }
 
     void "test getCalendarInstanceByDate"() {
         setup:
         String dateFormat = "MM/dd/yyyy HH:mm:ss"
-        Date date = new SimpleDateFormat(dateFormat).parse("10/19/2017 11:40:00")
+        SimpleDateFormat fmt = new SimpleDateFormat(dateFormat)
+        Date date = fmt.parse("10/19/2017 11:40:00")
 
         when:
         Calendar result = DateUtil.getCalendarInstanceByDate(date)
 
         then:
-        result.getTime().format(dateFormat) == "10/19/2017 11:40:00"
+        fmt.format(result.getTime()) == "10/19/2017 11:40:00"
     }
 
     void "test getCurrentCalendarInstance"() {
         setup:
         String dateFormat = "MM/dd/yyyy HH:mm:ss"
+        SimpleDateFormat fmt = new SimpleDateFormat(dateFormat)
         Date date = new Date()
 
         when:
         Calendar result = DateUtil.getCurrentCalendarInstance()
 
         then:
-        result.getTime().format(dateFormat) == date.format(dateFormat)
+        fmt.format(result.getTime()) == fmt.format(date)
     }
 
 }

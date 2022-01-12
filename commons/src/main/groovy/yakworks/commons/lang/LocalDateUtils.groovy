@@ -7,6 +7,7 @@ package yakworks.commons.lang
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.TemporalAdjusters
@@ -21,7 +22,10 @@ import groovy.transform.CompileStatic
 @CompileStatic
 @SuppressWarnings(['MethodCount'])
 class LocalDateUtils {
-    static final Pattern LOCAL_DATE = ~/\d{4}-\d{2}-\d{2}$/
+    static final Pattern LOCAL_DATE = ~/\d{4}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[01])$/
+    static final Pattern ISO_YEAR_MONTH = ~/\d{4}-(0[1-9]|1[0-2])$/
+    //custom format for ISO_MONTH with no hyphen
+    static final Pattern ISO_YEAR_MONTH_NO_HYPHEN = ~/\d{4}(0[1-9]|1[0-2])$/
 
     /**
      * - trims first and returns null if empty
@@ -72,7 +76,36 @@ class LocalDateUtils {
      * Returns the last day of the current week and sets time to before midnight (23:59:59).
      */
     static LocalDate getLastDayOfWeek() {
-        LocalDate.now().with(DayOfWeek.SUNDAY)
+        getLastDayOfWeek(LocalDate.now())
     }
 
+    static LocalDate getLastDayOfWeek(LocalDate locDate) {
+        locDate.with(DayOfWeek.SUNDAY)
+    }
+
+    /**
+     * Uses Period.between to get the days.
+     * If start date is less than end it will be a positive number
+     * If start date > end date, number will be negative
+     *
+     * @param start the start date
+     * @param end the end date
+     * @return the days dif,
+     */
+    static int getDaysBetween(LocalDate start, LocalDate end) {
+        return Period.between(start, end).days
+    }
+
+    /**
+     * Get Month difference between two dates, not by caclualting days but using the month number and subtraction
+     *
+     * Returns int
+     * one.month = two.month : 0
+     * one.month = (two.month - 1) : 1
+     * one.month = (two.month + 1) : -1
+     */
+    static int getMonthDiff(LocalDate start, LocalDate end) {
+        return Period.between(getFirstDateOfMonth(start), getFirstDateOfMonth(end)).months
+        // return end.getMonthValue() - start.getMonthValue()
+    }
 }

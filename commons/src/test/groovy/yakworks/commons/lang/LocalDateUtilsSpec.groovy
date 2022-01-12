@@ -42,7 +42,7 @@ class LocalDateUtilsSpec extends Specification {
         2017 == DateUtil.getYearOf(LocalDate.parse("2017-10-19"))
     }
 
-    void "test getMonthLetter"() {
+    void "test getMonthLetter for postdate format"() {
         expect:
         monthLetter == DateUtil.getMonthLetter(x)
 
@@ -84,6 +84,27 @@ class LocalDateUtilsSpec extends Specification {
         "D"         | 12
         "?"         | 13
         "?"         | -1
+    }
+
+    void "test DaysBetween"() {
+        given:
+        LocalDate now = LocalDate.now()
+
+        expect:
+        0 == LocalDateUtils.getDaysBetween(now, now)
+        10 == LocalDateUtils.getDaysBetween(now - 10, now)
+        -10 == LocalDateUtils.getDaysBetween(now + 10, now)
+    }
+
+    void "test getMonthDiff"() {
+        given:
+        LocalDate date1 = LocalDate.parse("2017-10-19")
+        LocalDate date2 = LocalDate.parse("2017-12-01")
+
+        expect:
+        0 == LocalDateUtils.getMonthDiff(date1, date1)
+        2 == LocalDateUtils.getMonthDiff(date1, date2)
+        -2 == LocalDateUtils.getMonthDiff(date2, date1)
     }
 
 }

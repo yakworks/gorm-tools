@@ -430,6 +430,12 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         then:
         org.name == 'new name'
         org.source.sourceId == 'foo'
+
+        when: "just sourceid is passed"
+        def result = Org.repo.lookup(sourceId:"foo", type:org.type)
+
+        then:
+        result == org
     }
 
     void "create org with member branch lookup by num"() {

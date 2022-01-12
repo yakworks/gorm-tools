@@ -50,56 +50,6 @@ class DateUtilSpec extends Specification {
         "2017-11-20T23:28:56.782Z" | "2017-11-20T23:28:56Z"
     }
 
-    void "test getFirstDayOfMonth"() {
-        setup:
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss")
-        Date date = format.parse("10/19/2017 11:40:00")
-
-        when:
-        Date result = DateUtil.getFirstDayOfMonth(date)
-
-        then:
-        format.parse('10/01/2017 00:00:00') == result
-    }
-
-    void "test IsTodayTheDate"() {
-        when:
-        def locDate = LocalDate.now()
-        def dayOfMonth = locDate.getDayOfMonth()
-        def dayOfWeek = DayOfWeek.from(locDate).value
-
-        then:
-        DateUtil.isTodayTheDate(ChronoUnit.MONTHS, dayOfMonth)
-        !DateUtil.isTodayTheDate(ChronoUnit.MONTHS, dayOfMonth - 1)
-
-        DateUtil.isTodayTheDate(ChronoUnit.WEEKS, dayOfWeek)
-        !DateUtil.isTodayTheDate(ChronoUnit.WEEKS, dayOfWeek - 1)
-
-        DateUtil.isTodayTheDate(ChronoUnit.DAYS, 122)
-    }
-
-    //FIXME this is blowing up on daylight savings today. Adding 10 thinks it 9 days apart.
-    void "test DaysBetween"() {
-        given:
-        Date now = new Date()
-
-        expect:
-        0 == DateUtil.getDaysBetween(now, now)
-        -10 == DateUtil.getDaysBetween(now - 10, now)
-        10 == DateUtil.getDaysBetween(now + 10, now)
-    }
-
-    void "test getMonthDiff"() {
-        given:
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd")
-        Date date1 = format.parse("2017-10-19")
-        Date date2 = format.parse("2017-12-19")
-
-        expect:
-        2 == DateUtil.getMonthDiff(date1, date2)
-
-    }
-
     void "test getDateDifference_inHours if a date in the future"() {
         setup:
         Calendar calendar = Calendar.getInstance()

@@ -28,15 +28,6 @@ class LocalDateUtilsSpec extends Specification {
 
     }
 
-    void "test addMonths"() {
-        setup:
-        Date perpost = LocalDate.parse('2017-10-19').toDate()
-
-        expect:
-        '2017-07-19' == DateUtil.addMonths(perpost, -3).toLocalDate().toString()
-        '2017-12-19' == DateUtil.addMonths(perpost, 2).toLocalDate().toString()
-    }
-
     void "test getYearOf"() {
         expect:
         2017 == DateUtil.getYearOf(LocalDate.parse("2017-10-19"))
@@ -105,6 +96,22 @@ class LocalDateUtilsSpec extends Specification {
         0 == LocalDateUtils.getMonthDiff(date1, date1)
         2 == LocalDateUtils.getMonthDiff(date1, date2)
         -2 == LocalDateUtils.getMonthDiff(date2, date1)
+    }
+
+    void "test IsTodayTheDate"() {
+        when:
+        def locDate = LocalDate.now()
+        def dayOfMonth = locDate.getDayOfMonth()
+        def dayOfWeek = DayOfWeek.from(locDate).value
+
+        then:
+        LocalDateUtils.isTodayTheDate(ChronoUnit.MONTHS, dayOfMonth)
+        !LocalDateUtils.isTodayTheDate(ChronoUnit.MONTHS, dayOfMonth - 1)
+
+        LocalDateUtils.isTodayTheDate(ChronoUnit.WEEKS, dayOfWeek)
+        !LocalDateUtils.isTodayTheDate(ChronoUnit.WEEKS, dayOfWeek - 1)
+
+        LocalDateUtils.isTodayTheDate(ChronoUnit.DAYS, 122)
     }
 
 }

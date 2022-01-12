@@ -8,8 +8,10 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import java.util.regex.Pattern
 
@@ -107,5 +109,30 @@ class LocalDateUtils {
     static int getMonthDiff(LocalDate start, LocalDate end) {
         return Period.between(getFirstDateOfMonth(start), getFirstDateOfMonth(end)).months
         // return end.getMonthValue() - start.getMonthValue()
+    }
+
+    /**
+     * Checks if the current day number is equal to specified day number in a given period.
+     *
+     * @period ChronoUnit DAYS WEEKS or MONTHS
+     * @dayNumber 1-30 for monthly, 1-7 for weekly (1 is Sunday)
+     * @return is today the date for a specified period and dayInPeriod
+     */
+    static boolean isTodayTheDate(ChronoUnit period, int dayNumber) {
+        LocalDate thedate = LocalDate.now()
+        switch (period) {
+            case ChronoUnit.DAYS:
+                return true
+            case ChronoUnit.WEEKS:
+                return DayOfWeek.from(thedate).value == dayNumber
+            case ChronoUnit.MONTHS:
+                return thedate.getDayOfMonth() == dayNumber
+            default:
+                return false
+        }
+    }
+
+    static boolean isSameDay(LocalDateTime date1, LocalDateTime date2){
+        return date1.toLocalDate() == date2.toLocalDate()
     }
 }

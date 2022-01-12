@@ -33,7 +33,6 @@ class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, S
 
         then:
         org.id
-
     }
 
     void "did it get the audit stamp fields"() {

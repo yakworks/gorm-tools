@@ -4,7 +4,6 @@
 */
 package gorm.tools.job
 
-
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
 import groovy.transform.ToString
@@ -12,8 +11,6 @@ import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
 import gorm.tools.repository.model.DataOp
-import yakworks.commons.json.JsonEngine
-import yakworks.commons.lang.Validate
 import yakworks.commons.map.Maps
 
 /*
@@ -141,23 +138,6 @@ class SyncJobArgs {
      * The job id, will get populated once the job is created
      */
     Long jobId
-
-    /**
-     * returns map for used for creating SyncJobEntity
-     */
-    Map getJobData(SyncJobArgs args) {
-        Validate.notNull(args.payload)
-        byte[] reqData = JsonEngine.toJson(args.payload).bytes
-        return [source: args.source, sourceId: args.sourceId, state: SyncJobState.Running, requestData: reqData]
-    }
-
-    /**
-     * create Job and returns the job id
-     */
-    // SyncJobEntity updateJob(boolean ok, SyncJobState state, List<Map> renderResults, boolean appendResults) {
-    //
-    //     return syncJobService.updateJob(jobId, ok, state, renderResults)
-    // }
 
     static SyncJobArgs of(DataOp dataOp){
         new SyncJobArgs(op: dataOp)

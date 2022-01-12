@@ -15,6 +15,7 @@ import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
+import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -154,11 +155,10 @@ class AttachmentSupport {
         if(attachedFile) return Files.deleteIfExists(attachedFile)
     }
 
-
     Resource getResource(Attachment attachment){
-        File f = appResourceLoader.getFile(attachment.location)
-        log.debug "File location is ${f.canonicalPath} which ${f.exists()?'exists.':'does not exist.'}"
-        appResourceLoader.getResource("file:${f.canonicalPath}")
+        Path path = getFile(attachment.location, attachment.locationKey?:ATTACHMENTS_LOCATION_KEY)
+        log.debug "File location is ${path} which ${Files.exists(path)?'exists.':'does not exist.'}"
+        return new FileSystemResource(path)
     }
 
     String getDownloadUrl(Attachment attachment) {

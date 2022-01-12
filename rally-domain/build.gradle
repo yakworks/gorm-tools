@@ -65,3 +65,15 @@ jar {
 //     // }
 //   }
 // }
+
+integrationTest {
+  testlogger {
+    showPassed false
+    showExceptions true
+    showStandardStreams = true //shows the printlns in console
+    showPassed false
+    showSkipped true
+    showFailed true
+    showSummary true
+  }
+}

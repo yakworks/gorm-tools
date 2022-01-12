@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service
 import gorm.tools.job.SyncJobService
 import gorm.tools.repository.GormRepo
 import yakworks.rally.attachment.AttachmentSupport
+import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.repo.AttachmentRepo
 
 @Lazy @Service('syncJobService')
 @CompileStatic
@@ -24,16 +26,25 @@ class DefaultSyncJobService implements SyncJobService {
     SyncJobRepo syncJobRepo
 
     @Autowired
+    AttachmentRepo attachmentRepo
+
+    @Autowired
     AttachmentSupport attachmentSupport
 
     @Override
-    GormRepo<SyncJob> getJobRepo(){
+    GormRepo<SyncJob> getRepo(){
         return syncJobRepo
     }
 
     @Override
-    Path createTempFile(Serializable id){
-        return attachmentSupport.createTempFile("SyncJob${id}-.json", null)
+    Path createTempFile(String filename){
+        return attachmentSupport.createTempFile(filename, null)
+    }
+
+    @Override
+    Long createAttachment(Path sourcePath, String name) {
+        Attachment attachment = attachmentRepo.create(sourcePath, name)
+        return attachment.id
     }
 
 }

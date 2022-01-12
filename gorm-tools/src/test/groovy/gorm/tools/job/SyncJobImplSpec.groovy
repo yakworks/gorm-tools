@@ -14,19 +14,10 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestSyncJ
 
     void "sanity check validation with String as data"() {
         expect:
-        TestSyncJob job = new TestSyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
+        TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org')
         job.validate()
         job.persist()
         //job.source == "foo"  //XXX It should pick up TestRepoJobService
-    }
-
-    void "sanity check validation no sourceId"() {
-        when:
-        TestSyncJob job = new TestSyncJob()
-        // job.persist()
-        then:
-        job
-        !job.validate()
     }
 
     void "convert json to byte array"() {
@@ -34,7 +25,7 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestSyncJ
         String res = JsonEngine.toJson(["One", "Two", "Three"])
 
         when:
-        TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', requestData: res.bytes)
+        TestSyncJob job = new TestSyncJob(sourceType: SourceType.ERP, sourceId: 'ar/org', payloadBytes: res.bytes)
         def jobId = job.persist().id
 
         then: "get jobId"
@@ -45,8 +36,7 @@ class SyncJobImplSpec extends Specification  implements DomainRepoTest<TestSyncJ
 
         then:
         j
-        res.bytes == j.requestData
-        res == new String(j.requestData, 'UTF-8')
+        res == j.payloadToString()
 
     }
 

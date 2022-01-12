@@ -49,3 +49,9 @@ bootRun {
 
 bootJar.enabled = true
 //bootJar.archiveFileName = 'restify-api.jar'
+
+integrationTest {
+  testlogger {
+    showPassed false
+  }
+}

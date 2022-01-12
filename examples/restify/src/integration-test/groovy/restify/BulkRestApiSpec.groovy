@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import gorm.tools.job.SyncJobState
 import gorm.tools.rest.client.OkHttpRestTrait
 import grails.gorm.transactions.Rollback
-import grails.gorm.transactions.Transactional
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
@@ -16,7 +15,6 @@ import yakworks.rally.orgs.model.OrgSource
 
 import static yakworks.commons.json.JsonEngine.parseJson
 
-@Rollback //we do finders
 @Integration
 class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
     String path = "/api/rally/org/bulk?jobSource=Oracle"
@@ -51,25 +49,25 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         body.data[0].data.name == "Foox1"
 
         when: "Verify job.data"
-        SyncJob job = SyncJob.get(body.id as Long)
+        SyncJob job = SyncJob.repo.get(body.id as Long)
 
         then:
         job != null
         job.data != null
-        job.requestData != null
+        job.payloadBytes != null
         job.state == SyncJobState.Finished
         job.sourceId == "POST /api/rally/org/bulk?jobSource=Oracle"
         job.source == "Oracle"
 
         when: "Verify job.data json, this is what come in from the request"
-        List dataList = parseJson(job.requestDataToString())
+        List dataList = parseJson(job.payloadToString())
 
         then:
         dataList.size() == 3
         dataList[0].num == "foox1"
 
         when: "Verify created org"
-        Org org = Org.get( body.data[0].data.id as Long)
+        Org org = Org.repo.read( body.data[0].data.id as Long)
 
         then:
         org != null
@@ -89,26 +87,27 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         when:
         Response resp = post(path, jsonList)
         Map body = bodyToMap(resp)
+        SyncJob job = SyncJob.repo.getWithTrx(body.id as Long)
 
         then:
-        noExceptionThrown()
-
-        when:
-        SyncJob job = SyncJob.get(body.id as Long)
-
-        then:
+        body.ok == false
+        body.state == 'Finished'
+        job.id
         job.data != null
 
         when:
         List json = parseJson(job.dataToString())
-        List requestData = parseJson(job.requestDataToString())
+        List requestData = parseJson(job.payloadToString())
 
         then:
         json != null
         requestData != null
 
         and: "no dangling records committed"
-        OrgSource.findBySourceIdLike("ORG-1%") == null
+        OrgSource.withTransaction {
+            OrgSource.findBySourceIdLike("ORG-1%") == null
+        }
+
     }
 
 

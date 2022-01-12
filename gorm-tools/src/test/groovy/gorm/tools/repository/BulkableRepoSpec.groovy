@@ -11,8 +11,6 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
-import spock.lang.IgnoreRest
-import spock.lang.Issue
 import spock.lang.Specification
 import testing.TestSyncJob
 import testing.TestSyncJobService
@@ -29,10 +27,11 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
     AsyncService asyncService
     KitchenSinkRepo kitchenSinkRepo
 
+    Closure doWithDomains() { { ->
+        syncJobService(TestSyncJobService)
+    }}
+
     void setupSpec() {
-        defineBeans{
-            syncJobService(TestSyncJobService)
-        }
         mockDomains(KitchenSink, SinkExt, TestSyncJob)
     }
 
@@ -73,12 +72,12 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         job != null
         job.source == "test"
         job.sourceId == "test"
-        job.requestData != null
-        job.data != null
+        job.payloadBytes != null
+        job.dataBytes != null
         job.state == SyncJobState.Finished
 
-        when: "Verify job.requestData (incoming json)"
-        def payload = parseJson(job.requestDataToString())
+        when: "Verify payload"
+        def payload = parseJson(job.payloadToString())
 
         then:
         payload != null
@@ -140,7 +139,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         then:
         noExceptionThrown()
         job != null
-        job.data != null
+        job.dataToString() != '[]'
         job.state == SyncJobState.Finished
 
         and: "Verify db records"
@@ -266,12 +265,12 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         job != null
         job.source == "test"
         job.sourceId == "test"
-        job.requestData != null
-        job.data != null
+        job.payloadBytes != null
+        job.dataBytes != null
         job.state == SyncJobState.Finished
 
-        when: "Verify job.requestData (incoming json)"
-        def payload = parseJson(job.requestDataToString())
+        when: "Verify job.payload (incoming json)"
+        def payload = parseJson(job.payloadToString())
 
         then:
         payload != null

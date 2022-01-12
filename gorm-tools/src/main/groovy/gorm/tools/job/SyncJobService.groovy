@@ -8,30 +8,63 @@ import java.nio.file.Path
 
 import groovy.transform.CompileStatic
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+
 import gorm.tools.repository.GormRepo
-import yakworks.api.ApiResults
+import gorm.tools.transaction.TrxService
+import yakworks.i18n.icu.ICUMessageSource
 
 @CompileStatic
 trait SyncJobService<D> {
+    final static Logger LOG = LoggerFactory.getLogger(SyncJobService)
+
+    @Autowired
+    ICUMessageSource messageSource
+
+    @Autowired
+    TrxService trxService
 
     /**
      * creates Job using the repo and returns the jobId
      */
-    abstract GormRepo<D> getJobRepo()
+    abstract GormRepo<D> getRepo()
 
     /**
      * creates and saves the Job and returns the SyncJobContext with the jobId
      */
     SyncJobContext createJob(SyncJobArgs args, Object payload){
-        def sjc = new SyncJobContext(args: args, syncJobRepo: getJobRepo(), payload: payload )
-        return sjc.createJob()
+        //keep it in its own transaction so it doesn't depend on wrapping
+        trxService.withNewTrx {
+            SyncJobContext jobContext = new SyncJobContext(args: args, syncJobService: this, payload: payload )
+            return jobContext.createJob()
+        }
+    }
+
+    /**
+     * Calls the repo update wrapped in a new trx
+     */
+    SyncJobEntity updateJob(Map data){
+        SyncJobEntity sje
+        try{
+            //keep it in its own transaction so it doesn't depend on and existing. Should be on its own
+            trxService.withNewTrx {
+                getRepo().clear() //clear so doesn't pull from cache and we dont get optimistic error
+                sje = getRepo().update(data, [flush: true]) as SyncJobEntity
+            }
+        } catch (e){
+            LOG.error("Critical error updating SyncJob", e)
+            throw e
+        }
+        return sje
     }
 
     /**
      * gets the job from the repo
      */
     SyncJobEntity getJob(Serializable id){
-        return getJobRepo().get(id) as SyncJobEntity
+        return getRepo().getWithTrx(id) as SyncJobEntity
     }
 
     /**
@@ -39,9 +72,17 @@ trait SyncJobService<D> {
      * Will be "${tempDir}/SyncJobData${id}.json".
      * For large bulk operations data results should be stored as attachment file
      *
-     * @param id the job id
+     * @param filename the temp filename to use
      * @return the Path object to use
      */
-    abstract Path createTempFile(Serializable id)
+    abstract Path createTempFile(String filename)
+
+    /**
+     * create attachment
+     *
+     * @param params the paramater to pass to the attachment creation
+     * @return the attachmentId
+     */
+    abstract Long createAttachment(Path path, String name)
 
 }

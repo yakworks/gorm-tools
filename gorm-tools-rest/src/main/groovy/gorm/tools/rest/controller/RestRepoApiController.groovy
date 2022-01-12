@@ -47,6 +47,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepoApiController<D> extends RestApiController {
 
+    static picklistMax = 50
+
     static allowedMethods = [
         post: "POST", put: ["PUT", "POST"], bulkUpdate: "POST", bulkCreate: "POST", delete: "DELETE"] //patch: "PATCH",
 
@@ -173,7 +175,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def picklist() {
         try {
-            Pager pager = pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
+            Pager pager = picklistPagedQuery(params)
             respondWith pager
         } catch (Exception e) {
             handleException(e)
@@ -223,6 +225,14 @@ trait RestRepoApiController<D> extends RestApiController {
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
         MetaMap entityMap = createEntityMap(instance)
         respondWith(entityMap, [status: status])
+    }
+
+    /**
+     * picklist has defaults of 50 for max and
+     */
+    Pager picklistPagedQuery(Map params) {
+        params.max = params.max ?: getPicklistMax() //default to 50 for picklists
+        return pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
     }
 
     Pager pagedQuery(Map params, List<String> includesKeys) {

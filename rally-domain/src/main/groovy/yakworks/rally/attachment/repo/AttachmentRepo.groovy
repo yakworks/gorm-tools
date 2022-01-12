@@ -31,8 +31,7 @@ import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.TagLink
 
 /**
- * Attachments are not as simple as they might be in this application.  Please read this documentation before messing
- * with it.
+ * Attachments have some inherit complexity.  Please read this docs fully before amkign changes
  */
 @Slf4j
 @GormRepository
@@ -183,6 +182,16 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
 
         create(params)
     }
+
+    /**
+     * Create from path
+     */
+    Attachment create(Path sourcePath, String name, Map data = [:]) {
+        data['sourcePath'] = sourcePath
+        data['name'] = name
+        create(data)
+    }
+
 
     Resource getResource(Attachment attachment){
         attachmentSupport.getResource(attachment)

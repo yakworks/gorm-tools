@@ -4,6 +4,8 @@
 */
 package yakworks.rally.job
 
+import java.nio.file.Path
+
 import groovy.transform.CompileStatic
 
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,10 +13,10 @@ import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 import gorm.tools.job.SyncJobService
-import gorm.tools.job.SyncJobState
-import yakworks.api.ApiResults
-import yakworks.commons.json.JsonEngine
-import yakworks.commons.lang.Validate
+import gorm.tools.repository.GormRepo
+import yakworks.rally.attachment.AttachmentSupport
+import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.repo.AttachmentRepo
 
 @Lazy @Service('syncJobService')
 @CompileStatic
@@ -23,29 +25,26 @@ class DefaultSyncJobService implements SyncJobService {
     @Autowired
     SyncJobRepo syncJobRepo
 
-    /**
-     * create Job and returns the job id
-     */
+    @Autowired
+    AttachmentRepo attachmentRepo
+
+    @Autowired
+    AttachmentSupport attachmentSupport
+
     @Override
-    Long createJob(String source, String sourceId, Object payload) {
-        Validate.notNull(payload)
-        //XXX https://github.com/yakworks/gorm-tools/issues/426 don't assign requestData for now for testing large data
-        //byte[] reqData = JsonEngine.toJson(payload).bytes
-        byte[] reqData
-        Map data = [source: source, sourceId: sourceId, state: SyncJobState.Running, requestData: reqData]
-        def job = syncJobRepo.create((Map)data, (Map)[flush:true])
-        return job.id
+    GormRepo<SyncJob> getRepo(){
+        return syncJobRepo
     }
 
     @Override
-    void updateJob(Long id, SyncJobState state, ApiResults results, List<Map> renderResults) {
-        byte[] resultBytes = JsonEngine.toJson(renderResults).bytes
-        Map data = [id:id, ok: results.ok, data: resultBytes, state: state]
-        syncJobRepo.update((Map)data, (Map)[flush: true])
+    Path createTempFile(String filename){
+        return attachmentSupport.createTempFile(filename, null)
     }
 
-    SyncJob getJob(Serializable id){
-        syncJobRepo.get(id)
+    @Override
+    Long createAttachment(Path sourcePath, String name) {
+        Attachment attachment = attachmentRepo.create(sourcePath, name)
+        return attachment.id
     }
 
 }

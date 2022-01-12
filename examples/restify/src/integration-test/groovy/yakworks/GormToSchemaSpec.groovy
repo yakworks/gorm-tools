@@ -32,7 +32,7 @@ class GormToSchemaSpec extends Specification {
         //schema.description == "This is a task"
         schema.type == "object"
     }
-    //@Ignore
+
     def "sanity check Org read"() {
         given:
         Map schema = gormToSchema.generate(Org)
@@ -129,7 +129,7 @@ class GormToSchemaSpec extends Specification {
     //     Files.exists(path)
     // }
 
-    //@IgnoreRest
+
     // def "test generate Activity"() {
     //     given:
     //     //def taggableVal = Activity.yakworks_rally_tag_model_Taggable__validation$get()

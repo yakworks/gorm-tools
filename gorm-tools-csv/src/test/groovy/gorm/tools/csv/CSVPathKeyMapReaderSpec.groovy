@@ -1,6 +1,6 @@
 package gorm.tools.csv
 
-import gorm.tools.databinding.PathKeyMap
+
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -25,7 +25,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         List data = csvReader.readAllRows()
 
         then:
-        data[0] instanceof PathKeyMap
+        // data[0] instanceof PathKeyMap
         data[0].name == "red"
         data[0].num == "sink1"
 
@@ -42,14 +42,17 @@ class CSVPathKeyMapReaderSpec extends Specification {
         List data = []
 
         while (csvReader.hasNext()) {
-            Map row = csvReader.readMap { PathKeyMap m ->
-                m.name = m.name + "1"
+            Map row = csvReader.readMap { m ->
+                println("m is $m")
+                if(m) m.name = m.name + "1"
             }
+
             data << row
+
         }
 
         then:
-        data[0] instanceof PathKeyMap
+        //data[0] instanceof PathKeyMap
         data[0].name == "red1"
         data[0].num == "sink1"
 
@@ -70,9 +73,9 @@ class CSVPathKeyMapReaderSpec extends Specification {
         List<Map> sinkItems = []
         Map currentSink
         while(sinkItemReader.hasNext()) {
-            Map row = sinkItemReader.readMap() { PathKeyMap row ->
-                if(!row) return //XXX when would this empty?
-                String kitchenSinkNum = row.kitchenSink.num
+            Map row = sinkItemReader.readMap() {  row ->
+                if(!row) return //might have empty line on end
+                String kitchenSinkNum = row['kitchenSink_num']
                 //XXX why the if?
                 if(kitchenSinkNum) {
                     //
@@ -117,9 +120,9 @@ class CSVPathKeyMapReaderSpec extends Specification {
         List<Map> sinkItems = []
         Map currentSink
         while(sinkItemReader.hasNext()) {
-            Map row = sinkItemReader.readMap() { PathKeyMap row ->
-                if(!row) return //XXX when would this empty?
-                String kitchenSinkNum = row.kitchenSink.num
+            Map row = sinkItemReader.readMap() {  row ->
+                if(!row) return //last line is empty row
+                String kitchenSinkNum = row['kitchenSink_num']
                 //XXX why the if?
                 if(kitchenSinkNum) {
                     //if not currentSink then first row so lookup , or if they dont match

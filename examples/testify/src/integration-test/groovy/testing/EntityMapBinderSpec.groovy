@@ -12,31 +12,6 @@ import yakworks.rally.orgs.model.Org
 @Rollback
 class EntityMapBinderSpec extends Specification {
 
-    @Issue("https://github.com/yakworks/gorm-tools/issues/181")
-    @Ignore
-    void "perform gormtools binding after grails binding"() {
-        setup:
-        Map params = [num: "123", name:"test-org", type: "Customer", location:[city:"Rajkot"]]
-
-        when: "Stuff is bound as part of org association binding"
-        Org org = new Org()
-        org.properties = params
-
-        then:
-        org.hasErrors() == false
-        org.name == "test-org"
-        org.location != null
-        org.location.city == "Rajkot"
-
-        when: "now try to bind just address"
-        Location address = new Location()
-        address.bind params.location
-
-        then:
-        address != null
-        address.city == "Rajkot"
-    }
-
     void "test bindable : should create new instance"() {
         given:
         Map params = [ num: "123", name: "Wirgin", type: "Customer", info: [phone: "1-800"]]

@@ -99,34 +99,4 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         cleanup:
         orgDimensionService.testInit(null)
     }
-
-    //XXX this test appears to make a bad assumption.
-    // the scenario laid out here creates a CustAccount without a Customer
-    // you would never create a CustAccount without a Customer.
-    @Ignore
-    void "test setupMember : validate member params"() {
-        setup:
-        initOrgDimensions([primary: "CustAccount.Customer.Branch.Division"])
-        Org branch = Org.create("Branch", "Branch", OrgType.Branch).persist()
-        Org division = Org.findByOrgTypeId(OrgType.Division.id)
-        branch.member = OrgMember.make(branch)
-        branch.member.division = division
-        branch.member.persist()
-        branch.persist()
-
-        when:
-        Org account = Org.create("Account", "Account", OrgType.CustAccount).persist()
-        orgMemberService.setupMember(account, [division:[id:division.id], branch:[id:branch.id]])
-
-        then: "No exception thrown for customer"
-        noExceptionThrown()
-        account.member != null
-        account.member.org == account
-        account.member.branch == branch
-        account.member.division == division
-
-        cleanup:
-        orgDimensionService.testInit(null)
-    }
-
 }

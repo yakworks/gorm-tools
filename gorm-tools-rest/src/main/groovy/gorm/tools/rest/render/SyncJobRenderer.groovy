@@ -5,6 +5,7 @@
 package gorm.tools.rest.render
 
 import groovy.json.JsonOutput
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 import gorm.tools.job.SyncJobEntity
@@ -20,6 +21,7 @@ import grails.rest.render.RenderContext
 class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
 
     @Override
+    @CompileDynamic
     void render(SyncJobEntity job, RenderContext context) {
         setContentType(context)
 
@@ -27,14 +29,14 @@ class SyncJobRenderer implements JsonRendererTrait<SyncJobEntity> {
         String dataString = job.dataToString()
         JsonOutput.JsonUnescaped rawDataJson = JsonOutput.unescaped(dataString)
 
-        jsonBuilder(context).call(
-            id: job.id,
-            ok:job.ok,
-            state:job.state.name(),
-            source:job.source,
-            sourceId:job.sourceId,
-            data: rawDataJson
-        )
+        jsonBuilder(context).call {
+            id job.id
+            ok job.ok
+            state job.state.name()
+            source job.source
+            sourceId job.sourceId
+            data rawDataJson
+        }
 
     }
 

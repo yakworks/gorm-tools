@@ -1,5 +1,8 @@
 package yakworks.rally.orgs
 
+import spock.lang.IgnoreRest
+import yakworks.rally.orgs.model.OrgMember
+
 import java.time.LocalDate
 
 import org.springframework.dao.DataRetrievalFailureException
@@ -230,7 +233,6 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.location.city == 'Denver'
     }
 
-    @Ignore //XXX https://github.com/9ci/domain9/issues/493 fix so it works here
     void "test insert with orgmembers"() {
         given:
         orgDimensionService.testInit('Branch.Division.Business')
@@ -283,9 +285,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         e.code == 'error.delete.externalSource'
     }
 
-    //XXX https://github.com/9ci/domain9/issues/268 need better tests for success delete, make sure contacts are deleted, etc..
-    @Ignore //FIXME whats the scoop with this one?
-    def "delete contact with org"() {
+    void "delete contact with org"() {
         when:
         def org = Org.get(9)
         def contact = Contact.get(9)
@@ -296,13 +296,12 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         contact2
         org.contact == contact
 
-        then:
+        when:
         org.remove()  // orgRepo.remove or orgRepo.removeById is not removing either
-        flush()
 
         then:
-        !Org.findById(9)
-        !Contact.get(9)
+        !Org.get(9)
+        !Contact.exists(9)
         !Contact.findWhere(num: 'secondary9')
         !Contact.findAllByOrg(org)
     }
@@ -333,9 +332,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         source2.sourceId == params.num
         source2.orgType == OrgType.CustAccount
         source2.sourceType == SourceType.App
-
     }
-
 
     void "test find org by sourceid"() {
         when: "findWithData has orgType on source"
@@ -346,7 +343,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         Org o = Org.repo.findWithData([source: [sourceId: 'foo', orgType: 'Customer']])
 
         then: "source id is the default"
-        o
+        o != null
 
         when: "findWithData has type in daya"
         flushAndClear()
@@ -433,21 +430,36 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         then:
         org.name == 'new name'
         org.source.sourceId == 'foo'
+
+        when: "just sourceid is passed"
+        def result = Org.repo.lookup(sourceId:"foo", type:org.type)
+
+        then:
+        result == org
     }
 
-    @Ignore // xxx https://github.com/9ci/domain9/issues/493
-    def "create org with member branch lookup by num"() {
+    void "create org with member branch lookup by num"() {
+        setup:
+        orgDimensionService.testInit('Customer.Branch')
+        Org branch = Org.findByOrgTypeId(OrgType.Branch.id)
+
+        expect:
+        branch != null
+
         when:
         Long orgId = 1111
 
-        Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: 30 ]]]
+        Map params = TestDataJson.buildMap(Org) << [id: orgId, name: 'name', num: 'foo', type: 'Customer', member: [branch: [id: branch.id ]]]
         def org = Org.create(params, bindId: true)
         orgRepo.flush()
 
         then: "make sure member is created with branch"
         org.id == orgId
         org.member
-        30 == org.member.branch.num
+        branch.id == org.member.branch.id
+
+        cleanup:
+        orgDimensionService.testInit(null)
     }
 
 }

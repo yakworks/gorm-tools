@@ -10,6 +10,7 @@ import okhttp3.Response
 import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
+import yakworks.rally.orgs.model.Org
 import yakworks.rally.tag.model.Tag
 
 @Integration
@@ -29,7 +30,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data.size() == 20
+        body.data.size() == 50
         Map book = body.data[0] as Map
         book.keySet().size() == 3 //should be the id and name and num
         book['id'] == 1
@@ -124,6 +125,8 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         resp.code() == HttpStatus.CREATED.value()
         body.id
         body.name == 'foobie'
+
+        cleanup:
         delete(path, body.id)
     }
 
@@ -266,7 +269,8 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         }
         body.tags[0].id == tag1.id
 
-        // delete(tagsPath, tag1.id)
-        // delete(path, custBody.id)
+        cleanup:
+        Org.removeById(body.id as Long)
+
     }
 }

@@ -425,9 +425,9 @@ This closure is called for a specified number of records. For example, code belo
 
 ```
 
-## GrailsParameterMapRowMapper
+## PathKeyMapRowMapper
 
-See [GrailsParameterMapRowMapper][GrailsParameterMapRowMapper]
+See [PathKeyMapRowMapper][PathKeyMapRowMapper]
 
 Row mapper which allows to convert data from a given ResultSet instance
 to a grails parameter map, which can be used for databinding.
@@ -442,7 +442,7 @@ to a grails parameter map, which can be used for databinding.
 [Pager]:https://yakworks.github.io/gorm-tools/api/gorm/tools/Pager.html
 [build method]:https://github.com/yakworks/gorm-tools/blob/master/plugin/src/main/groovy/gorm/tools/mango/MangoBuilder.groovy#L73
 [ScrollableQuery]:https://yakworks.github.io/gorm-tools/api/gorm/tools/jdbc/ScrollableQuery.html
-[GrailsParameterMapRowMapper]:https://yakworks.github.io/gorm-tools/api/gorm/tools/jdbc/GrailsParameterMapRowMapper.html
+[PathKeyMapRowMapper]:https://yakworks.github.io/gorm-tools/api/gorm/tools/jdbc/PathKeyMapRowMapper.html
 [MangoQueryApi]:https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/api/MangoQueryApi.html
 [MangoQuery]:https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/MangoQuery.html
 [MangoQueryTrait]: https://yakworks.github.io/gorm-tools/api/gorm/tools/mango/api/MangoQueryTrait.html

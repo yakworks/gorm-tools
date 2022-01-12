@@ -11,9 +11,8 @@ import groovyx.gpars.dataflow.operator.PoisonPill
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.RowMapper
 
-import gorm.tools.jdbc.GrailsParameterMapRowMapper
+import gorm.tools.jdbc.PathKeyMapRowMapper
 import gorm.tools.jdbc.ScrollableQuery
-import gorm.tools.repository.RepoUtil
 import gpbench.benchmarks.AbstractBenchmark
 import gpbench.helpers.CsvReader
 import gpbench.model.basic.CityBasic
@@ -60,7 +59,7 @@ class DataFlowQueueWithScrollableQueryBenchmark extends AbstractBenchmark {
     def execute() {
         assert CityBasic.count() == 0
 
-        RowMapper<Map> rm = new GrailsParameterMapRowMapper() as RowMapper<Map>
+        RowMapper<Map> rm = new PathKeyMapRowMapper() as RowMapper<Map>
         ScrollableQuery query = new ScrollableQuery(rm, dataSource, batchSize)
         insert(query)
         assert CityBasic.count() == 115000

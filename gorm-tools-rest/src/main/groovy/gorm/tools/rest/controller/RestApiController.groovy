@@ -82,4 +82,11 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
 
     @Generated @Override
     def respond(Map value) { respondWith value }
+
+    /**
+     * looks in params for value and converts to boolean, returning the defaultValue if not found
+     */
+    boolean paramBoolean(String key, boolean defaultVal){
+        return params[key] ? params[key] as Boolean : defaultVal
+    }
 }

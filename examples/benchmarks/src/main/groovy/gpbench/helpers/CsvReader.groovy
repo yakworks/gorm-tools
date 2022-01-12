@@ -30,7 +30,6 @@ class CsvReader extends RecordsLoader {
         reader.each { Map m ->
             //need to convert to grails parameter map, so that it can be binded
             cleanup(m)
-            //m = toGrailsParamsMap(m)
             results.add(m)
         }
 

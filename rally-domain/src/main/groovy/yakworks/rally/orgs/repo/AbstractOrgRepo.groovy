@@ -20,7 +20,6 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import yakworks.i18n.MsgKey
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -222,6 +221,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         //if type is set then coerce to OrgType enum
         OrgType orgType = coerceOrgType(data.type)
 
+        if(data.source == null && data.sourceId) data.source = [sourceId: data.sourceId]
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map
             if(!orgType && source.orgType) {

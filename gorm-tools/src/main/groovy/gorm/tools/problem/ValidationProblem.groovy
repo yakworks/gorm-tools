@@ -7,10 +7,12 @@ package gorm.tools.problem
 import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
+import org.springframework.validation.ObjectError
 
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.problem.ProblemException
+import yakworks.problem.ProblemUtils
 import yakworks.problem.data.DataProblemException
 import yakworks.problem.data.DataProblemTrait
 
@@ -60,6 +62,12 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem>  {
         Exception(){ }
         Exception(Throwable cause){ super(cause)}
 
+        @Override //throwable
+        String getMessage() {
+            def msg = ProblemUtils.buildMessage(problem)
+            return getErrors() ? formatErrors(getErrors(), msg) : msg
+        }
+
         ValidationProblem getValidationProblem() { return (ValidationProblem) problem }
 
         //helpers
@@ -74,5 +82,23 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem>  {
         //Override it for performance improvement, because filling in the stack trace is quit expensive
         @Override
         synchronized Throwable fillInStackTrace() { return this }
+
+        //Legacy from ValidationException
+        static String formatErrors(Errors errors, String msg) {
+            String ls = System.getProperty("line.separator");
+            StringBuilder b = new StringBuilder();
+            if (msg != null) {
+                b.append(msg).append(" : ").append(ls);
+            }
+
+            for (ObjectError error : errors.getAllErrors()) {
+                b.append(ls)
+                    .append(" - ")
+                    .append(error)
+                    .append(ls);
+            }
+            return b.toString();
+        }
+
     }
 }

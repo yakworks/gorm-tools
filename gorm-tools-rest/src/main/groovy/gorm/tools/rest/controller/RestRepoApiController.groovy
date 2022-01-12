@@ -21,13 +21,13 @@ import gorm.tools.beans.Pager
 import gorm.tools.beans.map.MetaMap
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.beans.map.MetaMapList
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.problem.ProblemTrait
@@ -46,6 +46,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepoApiController<D> extends RestApiController {
+
+    static picklistMax = 50
 
     static allowedMethods = [
         post: "POST", put: ["PUT", "POST"], bulkUpdate: "POST", bulkCreate: "POST", delete: "DELETE"] //patch: "PATCH",
@@ -173,7 +175,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def picklist() {
         try {
-            Pager pager = pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
+            Pager pager = picklistPagedQuery(params)
             respondWith pager
         } catch (Exception e) {
             handleException(e)
@@ -200,7 +202,6 @@ trait RestRepoApiController<D> extends RestApiController {
         }
     }
 
-
     void bulkProcess(HttpServletRequest req, Map params, DataOp dataOp) {
         List dataList = bodyAsList()
         bulkProcess(req, dataList, dataOp)
@@ -208,23 +209,30 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void bulkProcess(HttpServletRequest req, List dataList, DataOp dataOp) {
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
-        // String contextPath = req.getContextPath()
-        // String requestURL = req.getRequestURL()
-        // String forwardURI = req.forwardURI
-        // XXX for now default is false, but we should change
-        boolean asyncEnabled = params.asyncEnabled ? params.asyncEnabled as Boolean : false
-        Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
+        // FIXME for now default is false, but we should change
+        boolean promiseEnabled = paramBoolean('promiseEnabled', false)
+//        boolean usePathKeyMap = paramBoolean('usePathKeyMap', false)
+
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes, params: bulkParams, asyncEnabled: asyncEnabled)
+        SyncJobArgs bulkableArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes,
+            sourceId: sourceKey, source: params.jobSource, promiseEnabled: promiseEnabled)
+
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)
         respondWith(job, [status: MULTI_STATUS])
-
     }
 
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
         MetaMap entityMap = createEntityMap(instance)
         respondWith(entityMap, [status: status])
+    }
+
+    /**
+     * picklist has defaults of 50 for max and
+     */
+    Pager picklistPagedQuery(Map params) {
+        params.max = params.max ?: getPicklistMax() //default to 50 for picklists
+        return pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
     }
 
     Pager pagedQuery(Map params, List<String> includesKeys) {

@@ -8,7 +8,8 @@ dependencies {
   api "org.codehaus.groovy:groovy-datetime:$groovyVersion"
   api "org.codehaus.groovy:groovy-templates:$groovyVersion"
   api "org.codehaus.groovy:groovy-json:$groovyVersion"
-  // compileOnly "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
+  api "org.codehaus.groovy:groovy-nio:$groovyVersion"
+  api "org.codehaus.groovy:groovy-dateutil:$groovyVersion"
 
   //libs
   // implementation "commons-io:commons-io:$vCommonsIO"

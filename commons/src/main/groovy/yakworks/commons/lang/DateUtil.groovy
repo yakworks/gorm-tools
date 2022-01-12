@@ -8,18 +8,13 @@ import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Year
 import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAccessor
 
-import groovy.time.TimeCategory
-import groovy.time.TimeDuration
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
 /**

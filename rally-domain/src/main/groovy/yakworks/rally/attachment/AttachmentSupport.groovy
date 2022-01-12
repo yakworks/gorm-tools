@@ -128,7 +128,7 @@ class AttachmentSupport {
      * use appResourceLoader to create a temp file
      *
      * @param fileName the name of the file that was uploaded
-     * @param data is the file contents, and can be String, byte[], or null.
+     * @param data is the file contents, and can be String, byte[], or null(default) if you only need the Path
      * @return a Path instance pointing to file
      */
     Path createTempFile(String fileName, Object data){

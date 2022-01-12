@@ -27,7 +27,7 @@ class AttachmentRepoSpec extends Specification implements DomainIntTest {
     //     FileUtils.deleteDirectory(appResourceLoader.getLocation("attachments.location"))
     // }
 
-    @Ignore //FIXME https://github.com/9ci/domain9/issues/331
+    @Ignore //XXX need to flush this out
     def "bulkCreate test"() {
         setup:
         File origFile = new File(appResourceLoader.rootLocation, "freemarker/grails_logo.jpg")

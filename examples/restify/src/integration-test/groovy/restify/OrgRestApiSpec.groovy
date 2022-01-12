@@ -30,7 +30,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
 
         then:
         resp.code() == HttpStatus.OK.value()
-        body.data.size() == 20
+        body.data.size() == 50
         Map book = body.data[0] as Map
         book.keySet().size() == 3 //should be the id and name and num
         book['id'] == 1

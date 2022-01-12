@@ -21,13 +21,13 @@ import gorm.tools.beans.Pager
 import gorm.tools.beans.map.MetaMap
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.beans.map.MetaMapList
+import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.bulk.BulkableArgs
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
 import yakworks.problem.ProblemTrait
@@ -46,6 +46,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 @CompileStatic
 @SuppressWarnings(['CatchRuntimeException'])
 trait RestRepoApiController<D> extends RestApiController {
+
+    static picklistMax = 50
 
     static allowedMethods = [
         post: "POST", put: ["PUT", "POST"], bulkUpdate: "POST", bulkCreate: "POST", delete: "DELETE"] //patch: "PATCH",
@@ -173,7 +175,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def picklist() {
         try {
-            Pager pager = pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
+            Pager pager = picklistPagedQuery(params)
             respondWith pager
         } catch (Exception e) {
             handleException(e)
@@ -211,10 +213,9 @@ trait RestRepoApiController<D> extends RestApiController {
         boolean promiseEnabled = paramBoolean('promiseEnabled', false)
 //        boolean usePathKeyMap = paramBoolean('usePathKeyMap', false)
 
-        Map bulkParams = [sourceId: sourceKey, source: params.jobSource]
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        BulkableArgs bulkableArgs = new BulkableArgs(op: dataOp, includes: bulkIncludes,
-            params: bulkParams, promiseEnabled: promiseEnabled)
+        SyncJobArgs bulkableArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes,
+            sourceId: sourceKey, source: params.jobSource, promiseEnabled: promiseEnabled)
 
         Long jobId = getRepo().bulk(dataList, bulkableArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)
@@ -224,6 +225,14 @@ trait RestRepoApiController<D> extends RestApiController {
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
         MetaMap entityMap = createEntityMap(instance)
         respondWith(entityMap, [status: status])
+    }
+
+    /**
+     * picklist has defaults of 50 for max and
+     */
+    Pager picklistPagedQuery(Map params) {
+        params.max = params.max ?: getPicklistMax() //default to 50 for picklists
+        return pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
     }
 
     Pager pagedQuery(Map params, List<String> includesKeys) {

@@ -10,6 +10,7 @@ import groovy.transform.CompileStatic
 import org.springframework.http.HttpStatus
 
 import grails.rest.render.RenderContext
+import yakworks.api.ResultUtils
 import yakworks.problem.IProblem
 
 /**
@@ -32,21 +33,10 @@ class ProblemRenderer implements JsonRendererTrait<IProblem> {
             ok problem.ok
             status problem.status.code
             code problem.code
-            title getMessage(problem)
+            title ResultUtils.getMessage(msgService, problem)
             detail problem.detail
             errors problem.violations
         }
-    }
-
-    // swallow no such message exception and returns empty string
-    String getMessage(IProblem problem){
-        String message
-        if(problem.msg) message = getMessage(problem.msg)
-
-        if(!message && problem.title) {
-            message = problem.title
-        }
-        return message
     }
 
 }

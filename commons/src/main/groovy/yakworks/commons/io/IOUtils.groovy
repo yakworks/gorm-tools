@@ -16,6 +16,7 @@ class IOUtils {
      * flush the writer, ignoring IOException. then use groovy's closeWithWarning
      * @param writer the writer to flush close
      */
+    @SuppressWarnings("EmptyCatchBlock")
     static void flushAndClose(Writer writer){
         try {
             writer.flush();

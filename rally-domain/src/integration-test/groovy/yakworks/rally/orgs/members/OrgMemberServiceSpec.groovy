@@ -100,10 +100,10 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         orgDimensionService.testInit(null)
     }
 
-    //XXX this test appears to make a bad assumption.
+    // this test appears to make a bad assumption.
     // the scenario laid out here creates a CustAccount without a Customer
     // you would never create a CustAccount without a Customer.
-    @Ignore
+    @Ignore //XXX
     void "test setupMember : validate member params"() {
         setup:
         initOrgDimensions([primary: "CustAccount.Customer.Branch.Division"])

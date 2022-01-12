@@ -78,7 +78,6 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         //temp mapping until column change
         altName column: 'entityName'
 
-
         flex cascade: "all"
         emails cascade: "all-delete-orphan"
         phones cascade: "all-delete-orphan"

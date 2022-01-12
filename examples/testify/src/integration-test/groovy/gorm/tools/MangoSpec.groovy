@@ -43,6 +43,17 @@ class MangoSpec extends Specification {
         list[0].name == "Org24"
     }
 
+    void "Filter by xxxId for criteria as JSON"() {
+        when:
+        Map params = [max: 150]
+        params.criteria = (["id": [9, 12]] as grails.converters.JSON).toString()
+        List list = Org.repo.queryList(params)
+        then:
+        list.size() == 2
+        list[0].name == "Org9"
+        list[1].name == "Org12"
+    }
+
     def "Filter by Name ilike"() {
         when: "eq"
         List list = Org.queryList([q: [name: "Org2%"], max: 150])
@@ -173,18 +184,6 @@ class MangoSpec extends Specification {
         list.size() == 1
         list[0].flexId == 2
     }
-
-    @Ignore
-    def "Filter by xxxId 4 criteria as JSON"() {
-        when:
-        Map params = [max: 150]
-        params.criteria = (["address.testId": [9, 12]] as grails.converters.JSON).toString()
-        List list = Org.repo.queryList(params)
-        then:
-        list.size() == 2
-        list[0].name == "Org#3"
-    }
-
 
     def "Filter with `or` "() {
         when:

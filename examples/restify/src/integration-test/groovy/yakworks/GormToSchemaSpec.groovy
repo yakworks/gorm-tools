@@ -32,7 +32,7 @@ class GormToSchemaSpec extends Specification {
         //schema.description == "This is a task"
         schema.type == "object"
     }
-    //@Ignore
+
     def "sanity check Org read"() {
         given:
         Map schema = gormToSchema.generate(Org)

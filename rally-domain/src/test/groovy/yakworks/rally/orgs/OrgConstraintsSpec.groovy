@@ -27,14 +27,12 @@ class OrgConstraintsSpec extends Specification implements DomainRepoTest<Org>, S
         )
     }
 
-    //@IgnoreRest
     void "sanity check build"() {
         when:
         def org = build()
 
         then:
         org.id
-
     }
 
     void "did it get the audit stamp fields"() {

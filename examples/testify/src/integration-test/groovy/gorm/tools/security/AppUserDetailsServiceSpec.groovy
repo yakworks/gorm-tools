@@ -1,5 +1,7 @@
 package gorm.tools.security
 
+import gorm.tools.security.services.AppUserService
+
 import java.time.LocalDateTime
 
 import gorm.tools.security.domain.AppUser
@@ -14,6 +16,7 @@ import spock.lang.Specification
 @Rollback
 class AppUserDetailsServiceSpec extends Specification implements DataIntegrationTest {
     AppUserDetailsService userDetailsService
+    AppUserService appUserService
 
     void testLoadUserByUsername() {
         when:
@@ -31,12 +34,12 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         user.name== 'karen'
     }
 
-    @Ignore //FIXME config is in userService now so fix test, also add a test for when credentialsNonExpired = true
+    //FIXME add a test for when credentialsNonExpired = true
     void "test expired password"() {
         given:
         AppUser user = AppUser.first()
-        userDetailsService.passwordExpireEnabled = true
-        userDetailsService.passwordExpireDays = 10
+        appUserService.passwordExpiryEnabled = true
+        appUserService.passwordExpireDays = 10
         user.passwordExpired = true
         user.passwordChangedDate = LocalDateTime.now().minusDays(11)
         user.persist()
@@ -48,8 +51,8 @@ class AppUserDetailsServiceSpec extends Specification implements DataIntegration
         nineUser.credentialsNonExpired == false
 
         cleanup:
-        userDetailsService.passwordExpireEnabled = false
-        userDetailsService.passwordExpireDays = 30
+        appUserService.passwordExpiryEnabled = false
+        appUserService.passwordExpireDays = 30
     }
 
 }

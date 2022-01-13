@@ -30,6 +30,8 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
+import yakworks.commons.lang.EnumUtils
+import yakworks.commons.map.Maps
 import yakworks.problem.ProblemTrait
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -186,7 +188,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def bulkCreate() {
         try {
-            bulkProcess(request, params, DataOp.add)
+            bulkProcess(DataOp.add)
         } catch (Exception e) {
             handleException(e)
         }
@@ -196,28 +198,32 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def bulkUpdate() {
         try {
-            bulkProcess(request, params, DataOp.update)
+            bulkProcess(DataOp.update)
         } catch (Exception e) {
             handleException(e)
         }
     }
 
-    void bulkProcess(HttpServletRequest req, Map params, DataOp dataOp) {
-        List dataList = bodyAsList()
-        bulkProcess(req, dataList, dataOp)
-    }
+    void bulkProcess(DataOp dataOp) {
+        List dataList = bodyAsList() as List<Map>
+        HttpServletRequest req = request
 
-    void bulkProcess(HttpServletRequest req, List dataList, DataOp dataOp) {
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
         // FIXME for now default is false, but we should change
         boolean promiseEnabled = paramBoolean('promiseEnabled', false)
-//        boolean usePathKeyMap = paramBoolean('usePathKeyMap', false)
 
         List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        SyncJobArgs bulkableArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes,
+        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes,
             sourceId: sourceKey, source: params.jobSource, promiseEnabled: promiseEnabled)
+        //Can override payload storage or turn off with 'NONE' if not needed for big loads
+        syncJobArgs.savePayload = Maps.getBoolean('savePayload', params, true)
+        syncJobArgs.saveDataAsFile = Maps.getBoolean('saveDataAsFile', params)
 
-        Long jobId = getRepo().bulk(dataList, bulkableArgs)
+        doBulk(dataList, syncJobArgs)
+    }
+
+    void doBulk(List<Map> dataList, SyncJobArgs syncJobArgs){
+        Long jobId = getRepo().bulk(dataList, syncJobArgs)
         SyncJobEntity job = syncJobService.getJob(jobId)
         respondWith(job, [status: MULTI_STATUS])
     }

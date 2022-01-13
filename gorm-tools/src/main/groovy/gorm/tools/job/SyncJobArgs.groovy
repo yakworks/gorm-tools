@@ -70,18 +70,20 @@ class SyncJobArgs {
      */
     Object payload
 
-
-    static enum StorageType { BYTES, FILE, NONE }
+    /**
+     * force how to store the payload
+     */
+    Boolean savePayload = true
 
     /**
-     * how to store the payload
+     * force payload to store as file instead of bytes
      */
-    StorageType payloadStorageType = StorageType.BYTES
+    Boolean savePayloadAsFile = false
 
     /**
-     * how to store the data
+     * resulting data is always saved but can force it to save to file instead of bytes in column
      */
-    StorageType dataStorageType = StorageType.BYTES
+    Boolean saveDataAsFile = false
 
     /**
      * the operation to perform, Used in bulk and limited to add and update right now.

@@ -67,22 +67,34 @@ trait BulkableRepo<D> {
     abstract <T> T withNewTrx(Closure<T> callable)
 
     /**
-     * Allows to pass in bulk of records at once, for example /api/book/bulk
-     * Each call creates a job that stores info for the call and is returned with results
+     * creates a supplier to wrap doBulkParallel and calls bulk
+     * if syncJobArgs.promiseEnabled = true will return right away
+     *
      * @param dataList the list of data maps to create
      * @param syncJobArgs the args object to pass on to doBulk
-     * @return Job
+     * @return Job id
      */
     Long bulk(List<Map> dataList, SyncJobArgs syncJobArgs) {
         SyncJobContext jobContext = syncJobService.createJob(syncJobArgs, dataList)
+        def supplierFunc = { doBulkParallel(dataList, jobContext) } as Supplier
+        return bulk(supplierFunc, jobContext)
+    }
 
-        def supplierFunc = { doBulkParallel(dataList, jobContext) } as Supplier<ApiResults>
-        def asyncArgs = new AsyncConfig(enabled: syncJobArgs.promiseEnabled, session: true)
-
+    /**
+     * Allows to pass in bulk of records at once, for example /api/book/bulk
+     * Each call creates a job that stores info for the call and is returned with results
+     * if jobContext.args.promiseEnabled = true will return right away
+     *
+     * @param supplierFunc the supplier(Promise) that gets passed to asyncService
+     * @param jobContext the jobContext with jobId created
+     * @return Job id
+     */
+    Long bulk(Supplier supplierFunc, SyncJobContext jobContext ) {
+        def asyncArgs = new AsyncConfig(enabled: jobContext.args.promiseEnabled, session: true)
         // This is the promise call. Will return immediately is syncJobArgs.promiseEnabled=true
         asyncService
             .supplyAsync(asyncArgs, supplierFunc)
-            .whenComplete { ApiResults results, ex ->
+            .whenComplete { res, ex ->
                 if(ex){ //should never really happen as we should have already handled any errors
                     log.error("BulkableRepo unexpected exception", ex)
                     jobContext.results << problemHandler.handleUnexpected(ex)
@@ -100,20 +112,19 @@ trait BulkableRepo<D> {
         pconfig.enabled = jobContext.args.asyncEnabled //same as above, ability to override through params
         // wraps the bulkCreateClosure in a transaction, if async is not enabled then it will run single threaded
         parallelTools.eachSlice(pconfig, dataList) { dataSlice ->
+            Long startTime = System.currentTimeMillis()
+            ApiResults results
             try {
-                Long chunkStart = System.currentTimeMillis()
-                ApiResults results
                 withTrx {
                     results = doBulk((List<Map>) dataSlice, jobContext)
                 }
-                updateJobResults(jobContext, results)
-
-                logTime(chunkStart)
-
+                if(results?.ok) updateJobResults(jobContext, results, startTime)
+                // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
             } catch(Exception e) {
                 //on pass1 we collect the slices that failed and will run through them again with each item in its own trx
                 sliceErrors.add(dataSlice)
             }
+
         }
 
         // if it has slice errors then try again but
@@ -123,8 +134,10 @@ trait BulkableRepo<D> {
             asynArgsNoTrx.enabled = jobContext.args.asyncEnabled
             parallelTools.each(asynArgsNoTrx, sliceErrors) { dataSlice ->
                 try {
+                    Long startTime = System.currentTimeMillis()
                     ApiResults results = doBulk((List<Map>) dataSlice, jobContext, true)
-                    updateJobResults(jobContext, results)
+                    updateJobResults(jobContext, results, startTime)
+                    // ((List<Map>) dataSlice)*.clear() //clear out so mem can be garbage collected
                 } catch(Exception ex) {
                     log.error("BulkableRepo unexpected exception", ex)
                     // just in case, unexpected errors as we should have intercepted them all already in doBulk
@@ -186,6 +199,11 @@ trait BulkableRepo<D> {
     }
 
 
+    /**
+     * create or update
+     *
+     * @return the data map after bing run through createMetaMap using the inncludes in the jobContext
+     */
     Map createOrUpdate(SyncJobContext jobContext, boolean isCreate, boolean transactional, Map data, Map persistArgs) {
         def closure = {
             D entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
@@ -204,24 +222,20 @@ trait BulkableRepo<D> {
         return (Map)entityMapData.clone()
     }
 
-    void updateJobResults(SyncJobContext jobContext, ApiResults results){
-        jobContext.updateJobResults(results)
-    }
-
-    void logTime(Long start){
-        if(log.isDebugEnabled()){
-            Long endTime = System.currentTimeMillis()
-            print("doBulk done in ${((endTime - start) / 1000)} - ")
-            printUsedMem()
+    /**
+     * calls jobContext.updateJobResults and swallows any unexpected exceptions
+     *
+     * @param jobContext the current jobContext
+     * @param results the results of the current slice
+     * @param startTimeMillis the start time in milliseconds used for logging elapsed time
+     */
+    void updateJobResults(SyncJobContext jobContext, ApiResults results, Long startTimeMillis = null){
+        try {
+            jobContext.updateJobResults(results, startTimeMillis)
+        } catch (e){
+            //ok to swallow thi excep since we dont want to disrupt the flow
+            log.error("Unexpected error during updateJobResults", e)
         }
     }
 
-    static void printUsedMem(){
-        int mb = 1024*1024;
-
-        //Getting the runtime reference from system
-        Runtime runtime = Runtime.getRuntime();
-        //Print used memory
-        println("Used Memory:" + (runtime.totalMemory() - runtime.freeMemory()) / mb)
-    }
 }

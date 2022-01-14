@@ -4,16 +4,12 @@
 */
 package yakworks.commons.json
 
-import java.nio.file.Path
-
 import groovy.json.JsonGenerator
 import groovy.json.JsonSlurper
-import groovy.json.StreamingJsonBuilder
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
-import yakworks.commons.io.IOUtils
 import yakworks.commons.json.converters.CurrencyConverter
 import yakworks.commons.json.converters.InstantJsonConverter
 import yakworks.commons.json.converters.LocalDateJsonConverter
@@ -153,20 +149,6 @@ class JsonEngine {
         if(!clazz.isAssignableFrom(parsedObj.class))
             throw new IllegalArgumentException("Json parsing expected a ${clazz.simpleName} but got a ${parsedObj.class.simpleName}")
 
-    }
-
-    /**
-     * Write object as json to file, flushes and closes writer when finished.
-     * Its assumed the filePath passed has existing, will throw error if not
-     *
-     * @param filePath the file as a Path object
-     * @param payload the object to write to file
-     */
-    static void streamToFile(Path filePath, Object payload){
-        def fileWriter = filePath.newWriter()
-        def sjb = new StreamingJsonBuilder(fileWriter, JsonEngine.generator)
-        sjb.call(payload)
-        IOUtils.flushAndClose(fileWriter)
     }
 
 }

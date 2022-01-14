@@ -23,6 +23,7 @@ import yakworks.api.Result
 import yakworks.api.ResultUtils
 import yakworks.commons.io.IOUtils
 import yakworks.commons.json.JsonEngine
+import yakworks.commons.json.JsonStreaming
 import yakworks.commons.lang.Validate
 import yakworks.i18n.MsgService
 import yakworks.problem.ProblemTrait
@@ -87,7 +88,7 @@ class SyncJobContext {
 
         if(args.savePayload){
             if (payload && args.savePayloadAsFile) {
-                data.payloadId = writePayloadFile(payload)
+                data.payloadId = writePayloadFile(payload as Collection<Map>)
             }
             else {
                 String res = JsonEngine.toJson(payload)
@@ -184,7 +185,7 @@ class SyncJobContext {
     }
 
     void initJsonDataFile() {
-        String filename = "SyncJobPData_${jobId}_.json"
+        String filename = "SyncJobData_${jobId}_.json"
         dataPath = syncJobService.createTempFile(filename)
         //init with the opening brace
         dataPath.withWriter { wr ->
@@ -214,23 +215,10 @@ class SyncJobContext {
         return ret
     }
 
-    Long writePayloadFile(Object payload){
+    Long writePayloadFile(Collection<Map> payload){
         String filename = "SyncJobPayload_${jobId}_.json"
         Path path = syncJobService.createTempFile(filename)
-
-        ((List)payload).collate(10000).each{ slice ->
-            def writer = path.newWriter(true)
-            def sjb = new StreamingJsonBuilder(writer, JsonEngine.generator)
-            writer.write('[\n')
-            ((List)slice).each { entry ->
-                sjb.call((Map)entry)
-                writer.write(',\n')
-            }
-            writer.write(']')
-            IOUtils.flushAndClose(writer)
-        }
-        println("Finished writePayloadFile")
-        // JsonEngine.streamToFile(path, payload)
+        JsonStreaming.streamToFile(payload, path)
         return syncJobService.createAttachment(path, filename)
     }
 

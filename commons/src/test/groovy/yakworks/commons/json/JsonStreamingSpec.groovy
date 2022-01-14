@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 /**
  * sanity checks for streaming to a file
  */
-class StreamingJsonSpec extends Specification implements JsonEngineTrait {
+class JsonStreamingSpec extends Specification implements JsonEngineTrait {
 
     static final String API_BUILD = 'build/api-docs'
 
@@ -101,6 +101,19 @@ class StreamingJsonSpec extends Specification implements JsonEngineTrait {
         writer.write(']')
 
         flushAndClose(writer)
+
+        then:
+        Files.exists(path)
+        path.getText().startsWith('[\n{"num":"1","name":"Sink1"')
+        path.getText().endsWith('},\n]')
+    }
+
+    void "test streamToFile"() {
+        when:
+        def path = getJsonFile("multi.json")
+        Files.deleteIfExists(path)
+        def dataList = generateDataList(100)
+        JsonStreaming.streamToFile(dataList, path)
 
         then:
         Files.exists(path)

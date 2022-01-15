@@ -89,6 +89,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     /**
      * saves a domain entity with the passed in args. Not wrapped in a transaction.
      * If a {@link ValidationException} is caught it wraps and throws it with our DataValidationException.
+     * Don' Override this, use the other events or event methods
      *
      * @param entity the domain entity to call save on
      * @param args (optional) - the arguments to pass to save as well as the PersistEvents.  can be any of the normal gorm save args
@@ -104,18 +105,10 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     D doPersist(D entity, Map args) {
         try {
             //set failOnError to true if not set
-            args.put('failOnError' , Maps.getBoolean('failOnError', args, true))
-
-            getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
-
-            validate(entity, args)
-            args.put('validate', false) //set it false so we dont do it again
-
-            persistAssociations(entity, args)
-
-            gormInstanceApi().save entity, args
-
-            getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args)
+            args.put('failOnError' , Maps.boolean(args, 'failOnError', true))
+            doBeforePersist(entity, args)
+            validateAndSave(entity, args)
+            doAfterPersist(entity, args)
             return entity
         }
         catch (ValidationException | DataAccessException ex) {
@@ -124,20 +117,49 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     }
 
     /**
-     * called from doPersist after validate as opposed to doBeforePersist which is called before.
-     * This can be overriden but defaults to using the toOneAssociations property to pre-persist
+     * called from doPersist. calls validate and save, no try catch so Exceptions bubble out.
+     * Can be
      */
-    void persistAssociations(D entity, Map args){
-        //so it doesn't do extra select, save associations first
+    void validateAndSave(D entity, Map args) {
+        validate(entity, args)
+        doAfterValidateBeforeSave(entity, args)
+        gormInstanceApi().save(entity, false) //save without validate
+    }
+
+    /**
+     * called right BEFORE validateAndSave to fire events but can be overridden too.
+     * just be sure to fire event if overidden.
+     */
+    void doBeforePersist(D entity, Map args){
+        getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
+    }
+
+    /**
+     * called right AFTER validate and BEFORE save. calls associations persists but can be overridden too.
+     * No events fired for this
+     */
+    void doAfterValidateBeforeSave(D entity, Map args){
         if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
+        persistAssociations(entity, args)
+    }
+
+    /**
+     * called right after save to fire events and call associations persists but can be overridden too.
+     * just be sure to fire event if overidden.
+     */
+    void doAfterPersist(D entity, Map args){
+        if (args.bindAction && args.data){
+            persistToManyData(entity, args.data as Map)
+        }
+        getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args)
     }
 
     /**
      * validates the entity and throws a ValidationProblem if it fails
      */
     boolean validate(D entity, Map args) {
-        boolean shouldValidate = Maps.getBoolean("validate", args, true)
-        boolean failOnError = Maps.getBoolean("failOnError", args, true)
+        boolean shouldValidate = Maps.boolean(args, "validate", true)
+        boolean failOnError = Maps.boolean(args, "failOnError", true)
         if(shouldValidate){
             boolean valid = gormValidationApi().validate entity
             if(!valid && failOnError){
@@ -417,10 +439,24 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     }
 
     /**
-     * For "ext" type associations that belong to the entity and have assignable id, we want to persist them first
-     * so that hibernate does not query the database to check existance. Also, the hibernate settings for
-     * order_inserts and order_updates, which are critical for decent perfromance when inserting large sets
-     * does not get picked up unless we persist these first
+     * called during persist after validate and right before entity.save,
+     * as opposed to doBeforePersist which is called before.
+     * This can be overriden but defaults to using the toOneAssociations property to pre-persist
+     */
+    void persistAssociations(D entity, Map args){
+        //so it doesn't do extra select, save associations first
+        if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
+    }
+
+    /**
+     * Called beforeSave
+     * Specific design pattern for One-to-One associations that belong to this entity
+     * and have an assignable id that is the same as this
+     * We want to persist these before the save because
+     *  1. this entity stores a ref to their key (which is the same as this one)
+     *  2. so that hibernate does not query the database to check if it exists.
+     * Also, the hibernate settings for order_inserts and order_updates, which are critical for decent perfromance when
+     * inserting large sets does not get picked up unless we persist these first
      *
      * @param entity the main entity for this repo
      * @param associations the list of association names to do persist first if set
@@ -446,7 +482,18 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     }
 
     /**
-     * creates or updates associations for given entity, called during create or update methods
+     * Called after persist if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     *
+     * @param entity the main entity for this repo
+     * @param data passed from unpdate or create
+     */
+    void persistToManyData(D entity,  Map data) {
+        //empty, implement in concrete repo if needed
+    }
+
+    /**
+     * helper that can be used in
      *
      * @Param mainEntity The entity that has the associations that are being created/updated
      * @param assocRepo association entity repo
@@ -532,17 +579,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         trxAttr.readOnly = true
         gormStaticApi().withTransaction(trxAttr, callable)
     }
-
-    void flushAndClear(TransactionStatus status) {
-        status.flush()
-        clear(status)
-    }
-
-    void clear(TransactionStatus status) {
-        TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
-        txObject.sessionHolder.getSession().clear()
-    }
-
 
     GormInstanceApi<D> gormInstanceApi() {
         (GormInstanceApi<D>)GormEnhancer.findInstanceApi(getEntityClass())

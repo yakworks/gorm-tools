@@ -216,8 +216,8 @@ trait RestRepoApiController<D> extends RestApiController {
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes,
             sourceId: sourceKey, source: params.jobSource, promiseEnabled: promiseEnabled)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
-        syncJobArgs.savePayload = Maps.getBoolean('savePayload', params, true)
-        syncJobArgs.saveDataAsFile = Maps.getBoolean('saveDataAsFile', params)
+        syncJobArgs.savePayload = params.boolean('savePayload', true)
+        syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
 
         doBulk(dataList, syncJobArgs)
     }

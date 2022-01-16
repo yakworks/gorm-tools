@@ -133,7 +133,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      */
     void doAfterValidateBeforeSave(D entity, PersistArgs args){
         if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
-        persistAssociations(entity, args)
     }
 
     /**
@@ -436,16 +435,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      */
     List<String> getToOneAssociations(){
         return []
-    }
-
-    /**
-     * called during persist after validate and right before entity.save,
-     * as opposed to doBeforePersist which is called before.
-     * This can be overriden but defaults to using the toOneAssociations property to pre-persist
-     */
-    void persistAssociations(D entity, PersistArgs args){
-        //so it doesn't do extra select, save associations first
-        if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
     }
 
     /**

@@ -84,7 +84,14 @@ class PersistArgs {
      * gets a new default instance
      */
     static PersistArgs 'new'(){
-        new PersistArgs()
+        PersistArgs.of()
+    }
+
+    /**
+     * just a semantic variation of new to create a new.
+     */
+    static PersistArgs defaults(){
+        PersistArgs.of()
     }
 
     /**

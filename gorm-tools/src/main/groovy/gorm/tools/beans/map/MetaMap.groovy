@@ -246,7 +246,7 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
 
     @Override
     Object clone() {
-        return Maps.deepCopy(this)
+        return Maps.clone(this)
     }
 
     @Override

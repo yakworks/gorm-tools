@@ -171,9 +171,9 @@ trait BulkableRepo<D> {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
                 if(item instanceof PathKeyMap){
-                    itemData = item.init() //initialize it, this will be from CSV
+                    itemData = Maps.clone(item.init()) //initialize it and clone, this will be from CSV
                 } else {
-                    itemData = Maps.deepCopy(item)
+                    itemData = Maps.clone(item)
                 }
                 boolean isCreate = jobContext.args.op == DataOp.add
                 //make sure args has its own copy as GormRepo add data to it and makes changes

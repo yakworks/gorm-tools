@@ -84,7 +84,7 @@ class QueryArgs {
      */
     QueryArgs build(Map<String, ?> paramsMap){
         //copy it
-        Map params = Maps.deepCopy(paramsMap) as Map<String, Object>
+        Map params = Maps.clone(paramsMap) as Map<String, Object>
 
         //remove the fields that grails adds for controller and action
         params.removeAll {it.key in ['controller', 'action'] }

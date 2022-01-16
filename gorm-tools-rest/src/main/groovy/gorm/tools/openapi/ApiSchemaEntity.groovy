@@ -217,7 +217,7 @@ class ApiSchemaEntity {
             if(!oapi.contains('R')) allowed.read = false
         }
         else if(oapi instanceof Map){ //its a map
-            def oapiMap = Maps.deepCopy(oapi)
+            def oapiMap = Maps.clone(oapi)
             ['create', 'update', 'read'].each {
                 if(oapiMap.containsKey(it)) allowed[it] = oapiMap.remove(it)
             }

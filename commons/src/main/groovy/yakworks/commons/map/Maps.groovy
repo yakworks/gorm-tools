@@ -80,7 +80,20 @@ class Maps {
         merge(sources as Map[])
     }
 
+    /**
+     * See clone,
+     */
     static Map deepCopy(Map source) {
+        clone(source)
+    }
+
+    /**
+     * Does a "deep" clone of the Map. If a shallow clone is desired use whats built into most al Java Map impls.
+     * see merge. it uses merge to do a deep copy of the map into a new Map
+     *
+     * @return the cloned map
+     */
+    static Map clone(Map source) {
         if(!source) return [:]
         merge([:], source)
     }

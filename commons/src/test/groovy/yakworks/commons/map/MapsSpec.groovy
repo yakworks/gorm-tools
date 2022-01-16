@@ -335,12 +335,12 @@ class MapsSpec extends Specification {
         assertMapsEqual(expected, m1)
     }
 
-    void "test deep copy"() {
+    void "test clone is deep"() {
         given:
         Map source = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3], listOfMap:[[one:1]]]
 
         when:
-        Map copy = Maps.deepCopy(source)
+        Map copy = Maps.clone(source)
         //change source to make sure we are dealing with copy
         source.nested.num1 = 99
         source.list.add(9)

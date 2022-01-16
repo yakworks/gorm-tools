@@ -12,7 +12,6 @@ import grails.artefact.Artefact
 import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import spock.lang.IgnoreRest
 import testing.Address
 import testing.AddyNested
 import testing.Cust
@@ -427,10 +426,9 @@ class TestTrxRollback implements RepoEntity<TestTrxRollback> {
 class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
 
     @Override
-    TestTrxRollback doPersist(TestTrxRollback entity, Map args) {
-        args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
+    TestTrxRollback doPersist(TestTrxRollback entity, PersistArgs args) {
         getRepoEventPublisher().doBeforePersist(this, entity, args)
-        entity.save(args)
+        entity.save(args as Map)
         getRepoEventPublisher().doAfterPersist(this, entity, args)
 
         //throws the exception here to test transaction rollback
@@ -441,7 +439,7 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
     }
 
     @Override
-    void doRemove(TestTrxRollback entity, Map args) {
+    void doRemove(TestTrxRollback entity, PersistArgs args) {
         getRepoEventPublisher().doBeforeRemove(this, entity)
         entity.delete(args)
         getRepoEventPublisher().doAfterRemove(this, entity)

@@ -16,6 +16,7 @@ import org.springframework.util.StopWatch
 import gorm.tools.async.ParallelTools
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoLookup
 import gorm.tools.transaction.TrxService
 import gpbench.helpers.CsvReader
@@ -259,9 +260,9 @@ trait BenchConfig {
         }
     }
 
-    void batchCreate(GormRepo repo, Map args = [:], List<Map> list) {
+    void batchCreate(GormRepo repo, List<Map> list) {
         batchTrx(list) { Map item ->
-            repo.doCreate(item, args)
+            repo.doCreate(item, new PersistArgs())
         }
     }
 

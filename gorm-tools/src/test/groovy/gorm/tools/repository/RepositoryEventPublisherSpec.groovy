@@ -7,8 +7,6 @@ package gorm.tools.repository
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.repository.events.*
-import gorm.tools.testing.TestDataJson
-import static gorm.tools.testing.TestDataJson.buildCreate
 import gorm.tools.testing.unit.DataRepoTest
 import grails.persistence.Entity
 import org.springframework.context.event.EventListener
@@ -32,7 +30,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city.eventAfter == "afterBind Create"
         city.beforePersistRepoEvent.bindAction == BindAction.Create
         city.afterPersistRepoEvent.bindAction == BindAction.Create
-        city.beforePersistRepoEvent.args.foo == 'beforePersist'
+        city.beforePersistRepoEvent.args.params.foo == 'beforePersist'
         //city.beforePersistRepoEvent.data
         //city.afterPersistRepoEvent.data
 
@@ -53,7 +51,7 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         city.afterPersistRepoEvent.bindAction == BindAction.Update
         city.beforePersistRepoEvent.data == tdata
         city.afterPersistRepoEvent.data == tdata
-        city.beforePersistRepoEvent.args.foo == 'beforePersist'
+        city.beforePersistRepoEvent.args.params.foo == 'beforePersist'
     }
 
     void "test persist events are setup properly"() {
@@ -62,13 +60,12 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         City cm = new City( name: "from scratch")
 
         then:
-        cm.persist(failOnError:true, fooBar:'baz')
+        cm.persist(failOnError:true)
         cm.name == "from scratch"
         cm.beforePersistRepoEvent instanceof BeforePersistEvent
         cm.afterPersistRepoEvent instanceof AfterPersistEvent
         cm.beforePersistRepoEvent.bindAction == null
         cm.afterPersistRepoEvent.bindAction == null
-        cm.afterPersistRepoEvent.args.fooBar == 'baz'
     }
 
     void testInvokeEvent() {
@@ -77,28 +74,28 @@ class RepositoryEventPublisherSpec extends Specification implements DataRepoTest
         Map params = [name: "test"]
 
         when:
-        BeforeBindEvent bbe = new BeforeBindEvent(City.repo, city, params, BindAction.Create, [:])
+        BeforeBindEvent bbe = new BeforeBindEvent(City.repo, city, params, BindAction.Create, PersistArgs.new())
         repoEventPublisher.publishEvents(City.repo, bbe, [city, params, bbe] as Object[])
 
         then:
         city.event == "beforeBind Create"
 
         when:
-        AfterBindEvent abe = new AfterBindEvent(City.repo, city, params, BindAction.Update, [:])
+        AfterBindEvent abe = new AfterBindEvent(City.repo, city, params, BindAction.Update, PersistArgs.new())
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterBind.eventKey, city, params, abe)
 
         then:
         city.eventAfter == "afterBind Update"
 
         when:
-        BeforeRemoveEvent bre = new BeforeRemoveEvent(City.repo, city,[:])
+        BeforeRemoveEvent bre = new BeforeRemoveEvent(City.repo, city, PersistArgs.new())
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.BeforeRemove.eventKey, city, bre)
 
         then:
         city.event == "beforeRemove"
 
         when:
-        AfterRemoveEvent are = new AfterRemoveEvent(City.repo, city,[:])
+        AfterRemoveEvent are = new AfterRemoveEvent(City.repo, city, PersistArgs.new())
         repoEventPublisher.invokeEventMethod(City.repo, RepositoryEventType.AfterRemove.eventKey, city, are)
 
         then:
@@ -235,14 +232,14 @@ class CityRepo implements GormRepo<City> {
 
     @RepoListener
     void beforePersist(City city, BeforePersistEvent e) {
-        e.args['foo'] = 'beforePersist'
+        e.args.params.foo = 'beforePersist'
         city.beforePersistRepoEvent = e
     }
 
 
     @RepoListener
     void afterPersist(City city, AfterPersistEvent e) {
-        assert e.args['foo'] == 'beforePersist'
+        assert e.args.params.foo == 'beforePersist'
         city.afterPersistRepoEvent = e
     }
 

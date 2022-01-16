@@ -24,6 +24,7 @@ import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
 import gorm.tools.problem.ProblemHandler
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
 import yakworks.api.ApiResults
 import yakworks.api.Result
@@ -57,8 +58,8 @@ trait BulkableRepo<D> {
     //Here for @CompileStatic - GormRepo implements these
     abstract D create(Map data, Map args)
     abstract D update(Map data, Map args)
-    abstract D doCreate(Map data, Map args)
-    abstract D doUpdate(Map data, Map args)
+    abstract D doCreate(Map data, PersistArgs args)
+    abstract D doUpdate(Map data, PersistArgs args)
     abstract  Class<D> getEntityClass()
     abstract void flushAndClear()
     abstract void clear()
@@ -176,7 +177,7 @@ trait BulkableRepo<D> {
                 }
                 boolean isCreate = jobContext.args.op == DataOp.add
                 //make sure args has its own copy as GormRepo add data to it and makes changes
-                Map args = jobContext.args.persistArgs
+                PersistArgs args = jobContext.args.getPersistArgs()
                 Map entityMapData = createOrUpdate(jobContext, isCreate, transactionPerItem, itemData, args)
                 results << Result.of(entityMapData).status(isCreate ? 201 : 200)
             } catch(Exception e) {
@@ -204,7 +205,7 @@ trait BulkableRepo<D> {
      *
      * @return the data map after bing run through createMetaMap using the inncludes in the jobContext
      */
-    Map createOrUpdate(SyncJobContext jobContext, boolean isCreate, boolean transactional, Map data, Map persistArgs) {
+    Map createOrUpdate(SyncJobContext jobContext, boolean isCreate, boolean transactional, Map data, PersistArgs persistArgs) {
         def closure = {
             D entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
             return createMetaMap(entityInstance, jobContext)

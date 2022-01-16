@@ -13,6 +13,7 @@ import org.grails.datastore.gorm.GormEntity
 import gorm.tools.idgen.IdGenerator
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 
 /**
  * A trait that adds id generator to repo for manually generating ids during validation and for persist
@@ -55,7 +56,7 @@ trait IdGenGormRepo<D extends Persistable> extends GormRepo<D> {
     }
 
     @Override
-    void doBeforePersist(D entity, Map args){
+    void doBeforePersist(D entity, PersistArgs args){
         generateId((Persistable)entity)
         getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
     }

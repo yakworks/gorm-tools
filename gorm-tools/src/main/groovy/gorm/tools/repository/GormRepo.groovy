@@ -4,6 +4,7 @@
 */
 package gorm.tools.repository
 
+
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
@@ -13,13 +14,10 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.GormValidationApi
 import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
-import org.grails.datastore.mapping.transactions.TransactionObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.dao.DataAccessException
 import org.springframework.transaction.TransactionDefinition
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.support.DefaultTransactionStatus
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
@@ -34,7 +32,6 @@ import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxService
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
-import yakworks.commons.map.Maps
 import yakworks.problem.data.NotFoundProblem
 
 /**
@@ -75,15 +72,18 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Saves a domain entity with the passed in args and rewraps ValidationException with EntityValidationException on error.
      *
      * @param entity the domain entity to call save on
-     * @param args the arguments to pass to save. adds the following but see doPersist for more.
-     *   - tx: defaults to true. set to true to make sure this is wrapped in a transaction.
+     * @param args the arguments to pass to save.
      * @throws DataAccessException if a validation or DataAccessException error happens
      */
-    D persist(D entity, Map args = [:]) {
+    D persist(D entity, PersistArgs args = PersistArgs.new()) {
         entityTrx {
             doPersist(entity, args)
         }
         return entity
+    }
+
+    D persist(D entity, Map args) {
+        return persist(entity, PersistArgs.of(args))
     }
 
     /**
@@ -92,20 +92,13 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Don' Override this, use the other events or event methods
      *
      * @param entity the domain entity to call save on
-     * @param args (optional) - the arguments to pass to save as well as the PersistEvents.  can be any of the normal gorm save args
-     * plus some others specific to here
-     *   - failOnError: (boolean) defaults to true
-     *   - flush: (boolean) flush the session
-     *   - bindType: (String) "Create" or "Update" when coming from those actions/methods
-     *   - data: (Map) if it was a Create or Update method called then this is the data and gets passed into events
+     * @param args will be passed through to support methods as well as the events
      *
      * @throws DataAccessException if a validation or DataAccessException error happens
      * @throws ValidationProblem.Exception if a validation fails
      */
-    D doPersist(D entity, Map args) {
+    D doPersist(D entity, PersistArgs args) {
         try {
-            //set failOnError to true if not set
-            args.put('failOnError' , Maps.boolean(args, 'failOnError', true))
             doBeforePersist(entity, args)
             validateAndSave(entity, args)
             doAfterPersist(entity, args)
@@ -120,17 +113,17 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * called from doPersist. calls validate and save, no try catch so Exceptions bubble out.
      * Can be
      */
-    void validateAndSave(D entity, Map args) {
+    void validateAndSave(D entity, PersistArgs args) {
         validate(entity, args)
         doAfterValidateBeforeSave(entity, args)
-        gormInstanceApi().save(entity, false) //save without validate
+        gormInstanceApi().save(entity, args.validate(false) as Map) //save without validate
     }
 
     /**
      * called right BEFORE validateAndSave to fire events but can be overridden too.
      * just be sure to fire event if overidden.
      */
-    void doBeforePersist(D entity, Map args){
+    void doBeforePersist(D entity, PersistArgs args){
         getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
     }
 
@@ -138,7 +131,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * called right AFTER validate and BEFORE save. calls associations persists but can be overridden too.
      * No events fired for this
      */
-    void doAfterValidateBeforeSave(D entity, Map args){
+    void doAfterValidateBeforeSave(D entity, PersistArgs args){
         if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
         persistAssociations(entity, args)
     }
@@ -147,22 +140,20 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * called right after save to fire events and call associations persists but can be overridden too.
      * just be sure to fire event if overidden.
      */
-    void doAfterPersist(D entity, Map args){
+    void doAfterPersist(D entity, PersistArgs args){
         if (args.bindAction && args.data){
             persistToManyData(entity, args.data as Map)
         }
-        getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args)
+        getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args )
     }
 
     /**
      * validates the entity and throws a ValidationProblem if it fails
      */
-    boolean validate(D entity, Map args) {
-        boolean shouldValidate = Maps.boolean(args, "validate", true)
-        boolean failOnError = Maps.boolean(args, "failOnError", true)
-        if(shouldValidate){
+    boolean validate(D entity, PersistArgs args) {
+        if(args.validate != false){
             boolean valid = gormValidationApi().validate entity
-            if(!valid && failOnError){
+            if(!valid && args.failOnError){
                 throw ValidationProblem.of(entity).errors(((GormEntity)entity).errors).toException()
             }
             return valid
@@ -173,10 +164,14 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     /**
      * Transactional wrap for {@link #doCreate}
      */
-    D create(Map data, Map args = [:]) {
+    D create(Map data, PersistArgs args = PersistArgs.new()) {
         entityTrx {
             doCreate(data, args)
         }
+    }
+
+    D create(Map data, Map args) {
+        create(data, PersistArgs.of(args))
     }
 
     /**
@@ -188,8 +183,9 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @return the created domain entity
      * @see #doPersist
      */
-    D doCreate(Map data, Map args) {
+    D doCreate(Map data, PersistArgs args) {
         D entity = (D) getEntityClass().newInstance()
+        args.insert(true)
         bindAndCreate(entity, data, args)
         return entity
     }
@@ -198,19 +194,23 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * just calls bindAndSave with the right BindAction
      * This is the best method to overrride if needed
      */
-    void bindAndCreate(D entity, Map data, Map args) {
+    void bindAndCreate(D entity, Map data, PersistArgs args) {
         bindAndSave(entity, data, BindAction.Create, args)
     }
 
     /**
      * Transactional wrap for {@link #doUpdate}
      */
-    D update(Map data, Map args = [:]) {
+    D update(Map data, PersistArgs args = PersistArgs.new()) {
         D ent
         entityTrx {
             ent = doUpdate(data, args)
         }
         return ent
+    }
+
+    D update(Map data, Map args) {
+        update(data, PersistArgs.of(args))
     }
 
     /**
@@ -220,7 +220,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @return the updated domain entity
      * @see #doPersist
      */
-    D doUpdate(Map data, Map args) {
+    D doUpdate(Map data, PersistArgs args) {
         D entity = findWithData(data)
         bindAndUpdate(entity, data, args)
         return entity
@@ -261,12 +261,12 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         return null
     }
 
-    void bindAndUpdate(D entity, Map data, Map args) {
+    void bindAndUpdate(D entity, Map data, PersistArgs args) {
         bindAndSave(entity, data, BindAction.Update, args)
     }
 
     /** short cut to call {@link #bind}, setup args for events then calls {@link #doPersist} */
-    void bindAndSave(D entity, Map data, BindAction bindAction, Map args){
+    void bindAndSave(D entity, Map data, BindAction bindAction, PersistArgs args){
         //if data is empty then fire exception
         RepoUtil.checkData(data, entityClass)
 
@@ -288,7 +288,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * better to override doBind in implementing classes for custom binding logic.
      * Or even better implement the beforeBind|afterBind event methods
      */
-    void bind(D entity, Map data, BindAction bindAction, Map args = [:]) {
+    void bind(D entity, Map data, BindAction bindAction, PersistArgs args = new PersistArgs()) {
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)
         getRepoEventPublisher().doAfterBind(this, (GormEntity)entity, data, bindAction, args)
@@ -299,8 +299,8 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * override this one in implementing classes.
      * can also call this if you do NOT want the before/after Bind events to fire
      */
-    void doBind(D entity, Map data, BindAction bindAction, Map args) {
-        getEntityMapBinder().bind(args, entity, data)
+    void doBind(D entity, Map data, BindAction bindAction, PersistArgs args) {
+        getEntityMapBinder().bind(args as Map, entity, data)
     }
 
     /**
@@ -314,7 +314,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     void removeById(Serializable id, Map args = [:]) {
         withTrx {
             D entity = get(id, null)
-            doRemove(entity)
+            doRemove(entity, PersistArgs.of(args))
         }
     }
 
@@ -326,7 +326,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      */
     void remove(D entity, Map args = [:]) {
         withTrx {
-            doRemove(entity, args)
+            doRemove(entity, PersistArgs.of(args))
         }
     }
 
@@ -336,10 +336,10 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param entity - the domain instance to delete
      * @param args - args passed to delete
      */
-    void doRemove(D entity, Map args = [:]) {
+    void doRemove(D entity, PersistArgs args) {
         try {
             getRepoEventPublisher().doBeforeRemove(this, (GormEntity)entity, args)
-            gormInstanceApi().delete(entity, args)
+            gormInstanceApi().delete(entity, args as Map)
             getRepoEventPublisher().doAfterRemove(this, (GormEntity)entity, args)
         }
         catch (DataAccessException ex) {
@@ -443,7 +443,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * as opposed to doBeforePersist which is called before.
      * This can be overriden but defaults to using the toOneAssociations property to pre-persist
      */
-    void persistAssociations(D entity, Map args){
+    void persistAssociations(D entity, PersistArgs args){
         //so it doesn't do extra select, save associations first
         if(getToOneAssociations()) persistToOneAssociations(entity, getToOneAssociations())
     }
@@ -474,7 +474,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
                 if(!gentity.getAssociationId(fld)){
                     PersistableRepoEntity assocEntity = assoc as PersistableRepoEntity
                     assocEntity.id = pentity.id
-                    assocEntity.persist(validate: false)
+                    assocEntity.persist(validate: false, insert: true)
                 }
                 // TODO, after benchmark checks might need to also check if dirty and persist here.
             }

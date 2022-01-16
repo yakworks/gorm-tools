@@ -19,6 +19,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeBindEvent
@@ -50,7 +51,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * it will delete the file reference in the data params
      */
     @Override
-    void bindAndCreate(Attachment attachment, Map data, Map args) {
+    void bindAndCreate(Attachment attachment, Map data, PersistArgs args) {
         try {
             //normal call to bindAndSave that occurs in super trait
             bindAndSave(attachment, data, BindAction.Create, args)

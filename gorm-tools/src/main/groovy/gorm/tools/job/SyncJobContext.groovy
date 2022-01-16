@@ -112,6 +112,7 @@ class SyncJobContext {
     }
 
     /**
+     * Update the job resiults with the current progress info
      *
      * @param currentResults the ApiResults
      * @param startTimeMillis the start time in millis, used to deduce time elapsed

@@ -13,6 +13,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 import yakworks.commons.lang.Validate
 
 import static gorm.tools.utils.GormUtils.collectLongIds
@@ -91,18 +92,18 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     X create(P main, R related,  Map args = [:]) {
         def params = getKeyMap(main, related)
         validateCreate(main, related)
-        //keep main entity in args so events can get to it
-        args['mainEntity'] = main
+        // keep main entity in args so events can get to it
+        // uncommnet if needed
+        // args['mainEntity'] = main
         return create(params, args)
     }
 
     @Override
-    X create(Map data,  Map args) {
+    X create(Map data, Map args) {
         X leInstance = (X) getEntityClass().newInstance(data)
         // default is to give it insert as a hint
-        Map mArgs = [flush: false, insert: true, failOnError: true]
-        mArgs.putAll(args) //overrides
-        doPersist leInstance, mArgs
+        def sargs = PersistArgs.of(args).insert(true)
+        doPersist leInstance, sargs
         return leInstance
     }
 
@@ -310,7 +311,7 @@ abstract class AbstractCrossRefRepo<X, P extends Persistable, R extends Persista
     }
 
     @Override
-    void bind(X entity, Map data, BindAction bindAction, Map args) {
+    void bind(X entity, Map data, BindAction bindAction, PersistArgs args) {
         throw new UnsupportedOperationException(
             "Standard Method bind(entity,data,bindAction ) is not supported by this implementation")
     }

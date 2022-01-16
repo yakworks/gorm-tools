@@ -7,6 +7,7 @@ package gorm.tools.repository.events
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 
 /**
  * Fired right after a repository delete
@@ -14,7 +15,7 @@ import gorm.tools.repository.GormRepo
 @CompileStatic
 class AfterRemoveEvent<D> extends RepositoryEvent<D> {
 
-    AfterRemoveEvent(GormRepo<D> source, D entity, Map args) {
+    AfterRemoveEvent(GormRepo<D> source, D entity, PersistArgs args) {
         super(source, entity, RepositoryEventType.AfterRemove.eventKey, args)
     }
 

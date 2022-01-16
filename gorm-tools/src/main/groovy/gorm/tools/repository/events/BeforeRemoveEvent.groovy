@@ -7,6 +7,7 @@ package gorm.tools.repository.events
 import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 
 /**
  * Fired right before the repo calls remove
@@ -14,7 +15,7 @@ import gorm.tools.repository.GormRepo
 @CompileStatic
 class BeforeRemoveEvent<D> extends RepositoryEvent<D> {
 
-    BeforeRemoveEvent(GormRepo<D> source, D entity, Map args) {
+    BeforeRemoveEvent(GormRepo<D> source, D entity, PersistArgs args) {
         super(source, entity, RepositoryEventType.BeforeRemove.eventKey, args)
     }
 

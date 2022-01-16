@@ -15,12 +15,14 @@ import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.core.Session
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionCapableDatastore
+import org.grails.datastore.mapping.transactions.TransactionObject
 import org.grails.orm.hibernate.GrailsHibernateTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.TransactionStatus
 import org.springframework.transaction.interceptor.TransactionAspectSupport
+import org.springframework.transaction.support.DefaultTransactionStatus
 import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.beans.AppCtx
@@ -65,7 +67,6 @@ class TrxService {
         def repo = RepoLookup.findRepo(entityClass)
         return repo != null? repo.datastore : getTargetDatastore()
     }
-
 
     /**
      * Executes the given callable within the context of a transaction with the given definition
@@ -219,4 +220,14 @@ class TrxService {
     static TrxService bean(){
         AppCtx.get('trxService', TrxService)
     }
+
+    // void flushAndClear(TransactionStatus status) {
+    //     status.flush()
+    //     clear(status)
+    // }
+    //
+    // void clear(TransactionStatus status) {
+    //     TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
+    //     txObject.sessionHolder.getSession().clear()
+    // }
 }

@@ -10,8 +10,8 @@ import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
 
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
-import yakworks.commons.map.Maps
 
 /*
 transform example when in a job
@@ -134,7 +134,7 @@ class SyncJobArgs {
      */
     Map persistArgs
 
-    Map getPersistArgs() { return this.persistArgs ? Maps.deepCopy(this.persistArgs) : [:] }
+    PersistArgs getPersistArgs() { return this.persistArgs ? PersistArgs.of(this.persistArgs) : new PersistArgs() }
 
     /**
      * The job id, will get populated once the job is created

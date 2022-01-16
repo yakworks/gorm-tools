@@ -34,10 +34,10 @@ import grails.gorm.validation.PersistentEntityValidator
 import yakworks.commons.lang.ClassUtils
 
 /**
- * Overrides the PersistentEntityValidator to adress a few things
+ * Overrides the PersistentEntityValidator to address a few things
  * - assocations are validated correctly
- * - beforeValidate event is fired for assocations properly too
- * - slims down the validations so that if nullable:true then it skips those
+ * - beforeValidate event is fired for assocations properly too when its the default deep validate
+ * - slims down the validations so that if it only has nullable:true then it skips those
  * - cleans up the message codes to be a sane number
  */
 @SuppressWarnings(['Println', 'FieldName'])

@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import yakworks.commons.lang.PropertyTools
+import yakworks.commons.util.StringUtils
 
 /**
  * Helpful methods for dealing with maps
@@ -187,18 +188,29 @@ class Maps {
      * @param defaultReturn if its doesn't have the key or map is null this is the default return value
      * @return A boolean value which will be false if the map is null, the map doesn't contain the key or the value is false
      */
-    public static boolean getBoolean(String key, Map<?, ?> map, boolean defaultReturn = false) {
-        if (map == null) return defaultReturn
+    static boolean getBoolean(String key, Map<?, ?> map, boolean defaultValue = false) {
+        if (map == null) return defaultValue
 
         if (map.containsKey(key)) {
             Object o = map.get(key)
-            if (o == null)return false
+            if (o == null) return false
             if (o instanceof Boolean) {
                 return (Boolean)o
             }
-            return Boolean.valueOf(o.toString())
+            try {
+                String string = o.toString()
+                if (string != null) {
+                    return StringUtils.toBoolean(string)
+                }
+            }
+            catch (Exception e) {}
         }
-        return defaultReturn
+        return defaultValue
     }
+
+    static boolean 'boolean'(Map<?, ?> map, String key, boolean defaultValue = false) {
+        return getBoolean(key, map, defaultValue)
+    }
+
 
 }

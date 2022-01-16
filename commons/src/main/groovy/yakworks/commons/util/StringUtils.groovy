@@ -4,6 +4,8 @@
 */
 package yakworks.commons.util
 
+import java.util.regex.Pattern
+
 import groovy.transform.CompileStatic
 
 /**
@@ -13,6 +15,20 @@ import groovy.transform.CompileStatic
  */
 @CompileStatic
 class StringUtils {
+
+    private static final Pattern BOOLEAN_PATTERN = Pattern.compile(/^on$|^true$|^yes$|^1$/, Pattern.CASE_INSENSITIVE)
+
+    /**
+     * Converts a string to a boolean.
+     *
+     * The values 'true', 'on', 'yes' and '1' result in true being returned, otherwise false is returned
+     *
+     * @param str The string
+     * @return A boolean value of true or false
+     */
+    static boolean toBoolean(String str) {
+        str != null && str ==~ BOOLEAN_PATTERN
+    }
 
     /**
      * Check whether the given {@code String} contains actual <em>text</em>.

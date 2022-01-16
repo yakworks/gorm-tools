@@ -12,6 +12,7 @@ import org.springframework.core.ResolvableTypeProvider
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 
 //import org.springframework.core.GenericTypeResolver
 
@@ -32,7 +33,7 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
     BindAction bindAction
 
     /** the args passed into whatever method fired this. such as flush, failOnError etc */
-    Map args
+    PersistArgs args
 
     /** RepositoryEventType.eventKey. set in constructor. ex: a BeforePersistEvent this will be 'beforePersist' */
     String eventKey //= "repoEvent"
@@ -44,7 +45,7 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
         //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
     }
 
-    RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey, Map args) {
+    RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey, PersistArgs args) {
         super(repo)
         this.entity = entity
         this.eventKey = eventKey
@@ -53,7 +54,7 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
         //this.entity = mappingContext.getPersistentEntity(entityObject.getClass().getName());
     }
 
-    RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey, Map data, BindAction bindAction, Map args) {
+    RepositoryEvent(GormRepo<D> repo, final D entity, String eventKey, Map data, BindAction bindAction, PersistArgs args) {
         super(repo)
         this.entity = entity
         this.eventKey = eventKey
@@ -78,9 +79,9 @@ class RepositoryEvent<D> extends ApplicationEvent implements ResolvableTypeProvi
      */
     String getRoutingKey() { "${entity.class.simpleName}.${eventKey}" }
 
-    void setDataFromArgMap(Map args){
-        this.data = args ? args['data'] as Map : [:]
-        this.bindAction = args ? args['bindAction'] as BindAction : null
+    void setDataFromArgMap(PersistArgs args){
+        this.data = args.data ?: [:]
+        this.bindAction = args.bindAction ?: null
     }
 
     boolean isBindCreate(){

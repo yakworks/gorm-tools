@@ -55,14 +55,14 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         return [tempFileName: tempFileName, originalFileName: filename]
     }
 
-    void "persistToManyData attachments"() {
+    void "doAfterPersistWithData attachments"() {
         when:
         def data = [:]
         data['attachments'] = [getTestAttachment('testing.txt')]
         Activity activity = Activity.get(9)
         assert !activity.attachments
 
-        activityRepo.persistToManyData(activity, PersistArgs.of(data:data))
+        activityRepo.doAfterPersistWithData(activity, PersistArgs.of(data:data))
         flush()
         Attachment attachment = activity.attachments[0]
 
@@ -80,7 +80,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
     }
 
-    void "persistToManyData Attachment In Params"() {
+    void "doAfterPersistWithData Attachment In Params"() {
         when:
         def activity = Activity.get(9)
         Map data = [
@@ -89,7 +89,7 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
             ]
         ]
 
-        activityRepo.persistToManyData(activity, PersistArgs.of(data: data))
+        activityRepo.doAfterPersistWithData(activity, PersistArgs.of(data: data))
 
         flush()
 

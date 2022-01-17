@@ -85,13 +85,13 @@ class ContactRepo implements GormRepo<Contact> {
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void persistToManyData(Contact contact, PersistArgs args) {
+    void doAfterPersistWithData(Contact contact, PersistArgs args) {
         Map data = args.data
 
-        if(data.locations) persistAssociationData(contact, Location.repo, data.locations as List<Map>, "contact")
-        if(data.phones) persistAssociationData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
-        if(data.emails) persistAssociationData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
-        if(data.sources) persistAssociationData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
+        if(data.locations) persistToManyData(contact, Location.repo, data.locations as List<Map>, "contact")
+        if(data.phones) persistToManyData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+        if(data.emails) persistToManyData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+        if(data.sources) persistToManyData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 

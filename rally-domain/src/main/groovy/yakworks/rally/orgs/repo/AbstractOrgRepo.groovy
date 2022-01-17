@@ -21,7 +21,6 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import yakworks.rally.activity.model.Activity
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -121,10 +120,10 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void persistToManyData(Org org, PersistArgs args) {
+    void doAfterPersistWithData(Org org, PersistArgs args) {
         Map data = args.data
-        if(data.locations) persistAssociationData(org, Location.repo, data.locations as List<Map>, "org")
-        if(data.contacts) persistAssociationData(org, Contact.repo, data.contacts as List<Map>, "org")
+        if(data.locations) persistToManyData(org, Location.repo, data.locations as List<Map>, "org")
+        if(data.contacts) persistToManyData(org, Contact.repo, data.contacts as List<Map>, "org")
         if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 

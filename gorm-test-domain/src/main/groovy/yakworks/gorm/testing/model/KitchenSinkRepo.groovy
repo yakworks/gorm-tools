@@ -9,7 +9,6 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
@@ -65,9 +64,9 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void persistToManyData(KitchenSink kitchenSink, PersistArgs args) {
+    void doAfterPersistWithData(KitchenSink kitchenSink, PersistArgs args) {
         Map data = args.data
-        if(data.sinkItems) persistAssociationData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
+        if(data.sinkItems) persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
     }
 
     void auditStamp(Object ent){

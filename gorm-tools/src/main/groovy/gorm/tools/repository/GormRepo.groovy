@@ -141,7 +141,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      */
     void doAfterPersist(D entity, PersistArgs args){
         if (args.bindAction && args.data){
-            persistToManyData(entity, args)
+            doAfterPersistWithData(entity, args)
         }
         getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args )
     }
@@ -471,26 +471,30 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     }
 
     /**
-     * Called after persist if its had a bind action (create or update) and it has data
-     * creates or updates One-to-Many associations for this entity.
+     * Called from doAfterPersist and before afterPersist event
+     * when its a bindAction (create/update) and it has data.
+     * Can be used to creates or update One-to-Many associations for this entity with persistToManyData
      *
      * @param entity the main entity for this repo
      * @param data passed from unpdate or create
      */
-    void persistToManyData(D entity, PersistArgs args) {
+    void doAfterPersistWithData(D entity, PersistArgs args) {
         //empty, implement in concrete repo if needed
     }
 
     /**
-     * helper that can be used in
+     * helper for createOrUpdate with One-to-Many association on the entity.
+     * Will most often be called from an overriden doAfterPersistWithData.
+     * 1. iterates over the List of Maps and assigns the childrens belongs to key to the entity intance
+     * 2. uses the passed in repo to call the createOrUpdate or the List
      *
-     * @Param mainEntity The entity that has the associations that are being created/updated
+     * @param mainEntity The entity that has the associations that are being created/updated
      * @param assocRepo association entity repo
      * @param assocList the list of data maps to create/update
      * @param belongsToProp the name of parent property to set, if any
      * @return the list of created entities
      */
-    List persistAssociationData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
+    List persistToManyData(D entity, GormRepo assocRepo, List<Map> assocList, String belongsToProp = null){
         if(belongsToProp) assocList.each { it[belongsToProp] = entity}
         assocRepo.createOrUpdate(assocList)
     }

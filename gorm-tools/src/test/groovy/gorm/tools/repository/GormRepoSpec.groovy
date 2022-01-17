@@ -316,7 +316,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
         when:
         List<Map> items = [[name:"C1"], [name:"C2"]]
-        List<SinkItem> result = KitchenSink.repo.persistAssociationData(ks, SinkItem.repo, items, 'kitchenSink')
+        List<SinkItem> result = KitchenSink.repo.persistToManyData(ks, SinkItem.repo, items, 'kitchenSink')
 
         then:
         result.size() == 2

@@ -124,7 +124,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
      * creates or updates One-to-Many associations for this entity.
      */
     @Override
-    void persistToManyData(Activity activity, PersistArgs args) {
+    void doAfterPersistWithData(Activity activity, PersistArgs args) {
         Map data = args.data
         if(data.attachments) doAttachments(activity, data.attachments)
         if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)

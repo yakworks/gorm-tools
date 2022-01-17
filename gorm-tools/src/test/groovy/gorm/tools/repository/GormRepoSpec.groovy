@@ -307,7 +307,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.findByName("test_clear") != null
     }
 
-    void "test doAssociation"() {
+    void "test persistToManyData"() {
         when:
         def ks = TestData.build(KitchenSink)
 

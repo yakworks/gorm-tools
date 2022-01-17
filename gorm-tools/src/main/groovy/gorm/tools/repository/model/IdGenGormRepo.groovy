@@ -57,7 +57,9 @@ trait IdGenGormRepo<D extends Persistable> extends GormRepo<D> {
 
     @Override
     void doBeforePersist(D entity, PersistArgs args){
+        // generate id if not already set
         generateId((Persistable)entity)
+        //fire event
         getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
     }
 

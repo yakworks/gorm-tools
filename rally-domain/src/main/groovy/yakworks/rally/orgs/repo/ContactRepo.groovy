@@ -8,9 +8,9 @@ import groovy.transform.CompileStatic
 
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
-import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.security.domain.AppUser
@@ -57,11 +57,11 @@ class ContactRepo implements GormRepo<Contact> {
         //remove
         TagLink.remove(contact)
 
-        //XXX why are we keeping the locations around?
+        // XXX why are we keeping the locations around?
         // if its a location for a contact it should be deleted along with the contact right?
         Location.executeUpdate("update Location set contact = null where contact = :contact", [contact: contact]) //set contact to null
 
-        //XXX we are not deleting Location or CSource? Why
+        // XXX we are not deleting Location or CSource? Why
         // something like this should be run no?
         // Location.query(contact: contact).deleteAll()
         // ContactSource.query(contact: contact).deleteAll()
@@ -73,20 +73,26 @@ class ContactRepo implements GormRepo<Contact> {
         assignOrg(contact, data)
     }
 
-    // @RepoListener
-    // void beforePersist(Contact contact, BeforePersistEvent e) {
-    //     //XXX why is this needed?
-    //     assert 'foo' == "foo"
-    // }
-
     @RepoListener
     void afterPersist(Contact contact, AfterPersistEvent e) {
-        if (e.bindAction && e.data){
-            Map data = e.data
-            doAssociations(contact, data)
-        }
         if (contact.location?.isDirty()) contact.location.persist()
         syncChangesToUser(contact)
+    }
+
+    /**
+     * Called from doAfterPersist and before afterPersist event
+     * if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     */
+    @Override
+    void persistToManyData(Contact contact, PersistArgs args) {
+        Map data = args.data
+
+        if(data.locations) persistAssociationData(contact, Location.repo, data.locations as List<Map>, "contact")
+        if(data.phones) persistAssociationData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
+        if(data.emails) persistAssociationData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
+        if(data.sources) persistAssociationData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
+        if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
     void removeAll(Org org) {
@@ -119,14 +125,6 @@ class ContactRepo implements GormRepo<Contact> {
     void concatName(Contact c) {
         String fullName = ((c.firstName ?: "") + ' ' + (c.lastName ?: "")).trim()
         c.name = fullName.size() > 50 ? fullName[0..49] : fullName
-    }
-
-    void doAssociations(Contact contact, Map data) {
-        if(data.locations) persistAssociationData(contact, Location.repo, data.locations as List<Map>, "contact")
-        if(data.phones) persistAssociationData(contact, ContactPhone.repo, data.phones as List<Map>, "contact")
-        if(data.emails) persistAssociationData(contact, ContactEmail.repo, data.emails as List<Map>, "contact")
-        if(data.sources) persistAssociationData(contact, ContactSource.repo, data.sources as List<Map>, "contact")
-        if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
     void assignOrg(Contact contact, Map data) {

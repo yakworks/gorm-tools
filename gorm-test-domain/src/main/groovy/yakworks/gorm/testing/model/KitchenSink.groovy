@@ -29,6 +29,8 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
     //strings
     String name2
     String secret
+    String comments
+
     //boolean
     Boolean inactive = false
     //decimal
@@ -125,7 +127,7 @@ class KitchenSink implements NameNum, GormRepoEntity<KitchenSink, KitchenSinkRep
         return getRepo().build(id)
     }
 
-    static List<Map> generateDataList(int numRecords) {
-        return getRepo().generateDataList(numRecords)
+    static List<Map> generateDataList(int numRecords, Map extraData = [:]) {
+        return getRepo().generateDataList(numRecords, extraData)
     }
 }

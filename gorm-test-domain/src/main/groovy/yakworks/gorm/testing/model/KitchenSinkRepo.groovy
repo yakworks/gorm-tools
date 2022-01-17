@@ -12,6 +12,8 @@ import groovy.transform.CompileStatic
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
 import grails.gorm.transactions.Transactional
@@ -40,6 +42,15 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         if(!o.kind) o.kind = KitchenSink.Kind.CLIENT
     }
 
+    @RepoListener
+    void afterBind(KitchenSink o, Map data, AfterBindEvent e) {
+        if (e.isBindCreate()) {
+            //mess with the data so that we can verify that places such as bulk are sending a clone
+            //and not relying on the repo to keep the data pristine
+            data.remove('name2')
+        }
+    }
+
 
     @Transactional
     KitchenSink inactivate(Long id) {
@@ -49,7 +60,13 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         o
     }
 
-    void doAssociations(KitchenSink kitchenSink, Map data) {
+    /**
+     * Called after persist if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     */
+    @Override
+    void persistToManyData(KitchenSink kitchenSink, PersistArgs args) {
+        Map data = args.data
         if(data.sinkItems) persistAssociationData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
     }
 
@@ -70,8 +87,8 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         return ks
     }
 
-    Map generateData(Long id) {
-        return [
+    Map generateData(Long id, Map extraData = [:]) {
+        Map data = [
             num: "$id",
             name: "Sink$id",
             name2: (id % 2) ? "SinkName2-$id" + id : null,
@@ -86,12 +103,14 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
             bazMap: [foo: 'bar']
             // thing: [id: id]
         ]
+        data.putAll(extraData)
+        return data
     }
 
-    List<Map> generateDataList(int numRecords) {
+    List<Map> generateDataList(int numRecords, Map extraData = [:]) {
         List<Map> list = []
         (1..numRecords).each { int index ->
-            list << generateData(index)
+            list << generateData(index, extraData)
         }
         return list
     }

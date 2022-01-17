@@ -141,7 +141,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      */
     void doAfterPersist(D entity, PersistArgs args){
         if (args.bindAction && args.data){
-            persistToManyData(entity, args.data as Map)
+            persistToManyData(entity, args)
         }
         getRepoEventPublisher().doAfterPersist(this, (GormEntity)entity, args )
     }
@@ -477,7 +477,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param entity the main entity for this repo
      * @param data passed from unpdate or create
      */
-    void persistToManyData(D entity,  Map data) {
+    void persistToManyData(D entity, PersistArgs args) {
         //empty, implement in concrete repo if needed
     }
 

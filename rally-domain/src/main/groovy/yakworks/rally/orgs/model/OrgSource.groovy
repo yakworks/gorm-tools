@@ -47,8 +47,8 @@ class OrgSource implements GormRepoEntity<OrgSource, OrgSourceRepo>, SourceTrait
 
 
     //just in case validation and repo are bypassed during creation make sure its gets an id
-    def beforeInsert() {
-        repo.generateId(this)
-    }
+    // def beforeInsert() {
+    //     repo.generateId(this)
+    // }
 
 }

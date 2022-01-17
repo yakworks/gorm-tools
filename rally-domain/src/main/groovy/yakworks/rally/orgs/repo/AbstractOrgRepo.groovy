@@ -13,6 +13,7 @@ import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.AfterRemoveEvent
@@ -84,10 +85,6 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
      */
     @RepoListener
     void afterPersist(Org org, AfterPersistEvent e) {
-        if (e.bindAction && e.data){
-            Map data = e.data
-            doAssociations(org, data)
-        }
         if(org.location?.isDirty()) org.location.persist()
         if(org.contact?.isDirty()) org.contact.persist()
     }
@@ -116,6 +113,18 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         Location.query(org: org).deleteAll()
         Contact.query(org: org).deleteAll()
         OrgSource.query(org: org).deleteAll()
+    }
+
+    /**
+     * Called after persist if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     */
+    @Override
+    void doAfterPersistWithData(Org org, PersistArgs args) {
+        Map data = args.data
+        if(data.locations) persistToManyData(org, Location.repo, data.locations as List<Map>, "org")
+        if(data.contacts) persistToManyData(org, Contact.repo, data.contacts as List<Map>, "org")
+        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 
     /**
@@ -159,12 +168,6 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         // if it had an op of remove then will return null and this set primary location to null
         org.location = locationRepo.createOrUpdate(data)
         return org.location
-    }
-
-    void doAssociations(Org org, Map data) {
-        if(data.locations) persistAssociationData(org, Location.repo, data.locations as List<Map>, "org")
-        if(data.contacts) persistAssociationData(org, Contact.repo, data.contacts as List<Map>, "org")
-        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
     }
 
     /**

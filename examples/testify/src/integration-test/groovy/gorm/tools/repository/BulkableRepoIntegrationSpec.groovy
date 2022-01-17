@@ -14,10 +14,12 @@ import spock.lang.IgnoreRest
 import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.gorm.testing.model.KitchenSink
+import yakworks.gorm.testing.model.KitchenSinkRepo
 import yakworks.rally.job.SyncJob
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgFlex
 import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.repo.OrgRepo
@@ -30,6 +32,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
     JdbcTemplate jdbcTemplate
     OrgRepo orgRepo
+    KitchenSinkRepo kitchenSinkRepo
 
     def cleanup() {
         //cleanup all orgs which would have been committed during tests because of parallel/async
@@ -65,6 +68,43 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         then:
         json
         json.size() == 3
+    }
+
+    @Ignore //XXX make this work
+    void "force error in KitchenSink slice"() {
+        setup:
+        //make unique index and force a slice to fail
+        KitchenSink.withNewTransaction {
+            jdbcTemplate.execute("CREATE UNIQUE INDEX sink_num_unique ON KitchenSink(num)")
+        }
+
+        List list = KitchenSink.generateDataList(300, [comments: 'GoDogGo'])
+
+        when:
+        // force a failuer on index, bulk does 2 passes, fails entire slice in first pass
+        // then it goes through and runs one by one for data
+        // kitchenSinkRepo removes the key for name2, so this will also verify that its sending a clone
+        // so that second pass uses original data
+        list[5].num ="1" //will fail on this one as it already exists
+
+        Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
+        def job = SyncJob.get(jobId)
+        def dbData
+
+        KitchenSink.withNewTransaction {
+            dbData = KitchenSink.findAllWhere(comments: 'GoDogGo')
+        }
+
+        then: "verify job"
+        job.state == SyncJobState.Finished
+        dbData.size() == 299
+        //first slice will have run through second time, make sure its good
+        dbData[1].name2 != null
+
+        cleanup:
+        KitchenSink.withNewTransaction {
+            jdbcTemplate.execute("DROP index sink_num_unique")
+        }
     }
 
     void "sanity check bulk update"() {
@@ -107,8 +147,6 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         count == 5
     }
 
-    @Ignore //XXX fix by generating json on demand in session
-    @Issue("domain9/issues/629")
     void "when lazy association encountered during json building"() {
         given:
         Org org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
@@ -135,7 +173,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         then:
         job != null
-        job.state == SyncJobState.Running //XX this should be Finished, but because json conversion failed, the job is never updated.
+        job.state == SyncJobState.Finished
 
         when:
         List json = parseJson(job.dataToString())
@@ -211,14 +249,14 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
     }
 
 
-    void "test data access exception on db constraint violation during flush"() {
+    void "DataAccessException rollback slice but should process the rest"() {
         setup:
         Org.withNewTransaction {
             jdbcTemplate.execute("CREATE UNIQUE INDEX org_num_unique ON Org(num)")
         }
 
-        List<Map> jsonList = generateOrgData(2)
-        //change second item in array to same as first
+        List<Map> jsonList = generateOrgData(300)
+        //change a item in array so fails on unique num
         jsonList[1].num = "testorg-1"
 
         when:
@@ -234,8 +272,8 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         then:
         json != null
-        json.size() == 2
-        json[1].ok == false
+        json.findAll({ it.ok == true}).size() == 299
+        OrgFlex.findAllWhere(text1: 'goGoGadget').size() == 299
 
         cleanup:
         Org.withNewTransaction {
@@ -247,9 +285,10 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         List<Map> list = []
         (1..numRecords).each { int index ->
             Map info = [phone: "p-$index"]
-            list << [num:"testorg-$index", name: "org-$index", info: info, type:"Customer"]
+            list << [num:"testorg-$index", name: "org-$index", info: info, type:"Customer", flex:[text1: 'goGoGadget']]
         }
         return list
     }
+
 
 }

@@ -59,7 +59,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
     void "success bulk insert"() {
         given:
-        List list = KitchenSink.generateDataList(20)
+        List list = KitchenSink.generateDataList(300)
 
         when: "bulk insert 20 records"
 
@@ -82,9 +82,10 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         then:
         payload != null
         payload instanceof List
-        payload.size() == 20
+        payload.size() == 300
         payload[0].name == "Sink1"
         payload[0].ext.name == "SinkExt1"
+        //sanity check
         payload[19].name == "Sink20"
 
         when: "verify job.data (job results)"
@@ -95,7 +96,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         dataString.startsWith('[{') //sanity check
         results != null
         results instanceof List
-        results.size() == 20
+        results.size() == 300
         results[0].ok == true
         results[0].status == HttpStatus.CREATED.value()
         results[10].ok == true
@@ -107,7 +108,7 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         results[0].data.ext.name == "SinkExt1"
 
         and: "Verify database records"
-        KitchenSink.count() == 20
+        KitchenSink.count() == 300
         KitchenSink.findByName("Sink1") != null
         KitchenSink.findByName("Sink1").ext.name == "SinkExt1"
         KitchenSink.findByName("Sink20") != null

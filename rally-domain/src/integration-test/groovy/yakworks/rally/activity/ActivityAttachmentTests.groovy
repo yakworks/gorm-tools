@@ -1,5 +1,7 @@
 package yakworks.rally.activity
 
+import gorm.tools.repository.PersistArgs
+
 import java.time.LocalDateTime
 
 import org.apache.commons.io.FileUtils
@@ -53,14 +55,14 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
         return [tempFileName: tempFileName, originalFileName: filename]
     }
 
-    void "doAssociations attachments"() {
+    void "doAfterPersistWithData attachments"() {
         when:
-        def params = [:]
-        params['attachments'] = [getTestAttachment('testing.txt')]
+        def data = [:]
+        data['attachments'] = [getTestAttachment('testing.txt')]
         Activity activity = Activity.get(9)
         assert !activity.attachments
 
-        activityRepo.doAssociations(activity, params)
+        activityRepo.doAfterPersistWithData(activity, PersistArgs.of(data:data))
         flush()
         Attachment attachment = activity.attachments[0]
 
@@ -78,16 +80,17 @@ class ActivityAttachmentTests extends Specification implements DomainIntTest {
 
     }
 
-    void "doAssociations Attachment In Params"() {
+    void "doAfterPersistWithData Attachment In Params"() {
         when:
         def activity = Activity.get(9)
-        Map params = [
+        Map data = [
             attachments: [
                 [ originalFileName: 'foo.jpg', extension: 'jpg', bytes: 'foo'.getBytes() ]
             ]
         ]
 
-        activityRepo.doAssociations(activity, params)
+        activityRepo.doAfterPersistWithData(activity, PersistArgs.of(data: data))
+
         flush()
 
         then:

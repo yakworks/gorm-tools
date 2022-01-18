@@ -4,6 +4,8 @@
 */
 package yakworks.gorm.testing.model
 
+import gorm.tools.repository.model.IdGeneratorRepo
+
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -33,6 +35,8 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         if(o.name == 'foos'){
             rejectValue(o, 'name', o.name, 'no.foos')
         }
+        //if(o.id == null) o.id = generateId(o)
+        //if(o.ext && !o.ext.kitchenSink) o.ext.kitchenSink = o
         auditStamp(o)
     }
 

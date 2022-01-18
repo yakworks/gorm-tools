@@ -79,13 +79,15 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
         }
 
         List list = KitchenSink.generateDataList(300, [comments: 'GoDogGo'])
-
+        list.eachWithIndex {Map it, int index ->
+            it["num"] = "num$index"
+        }
         when:
-        // force a failuer on index, bulk does 2 passes,  failsentire slice in first pass
+        // force a failuer on index, bulk does 2 passes,  fails entire slice in first pass
         // then it goes through and runs one by one for data
         // kitchenSinkRepo removes the key for name2, so this will also verify that its sending a clone
         // so that second pass uses original data
-        list[5].num ="1" //will fail (During flush) on this one as it already exists
+        list[5].num ="num1" //will fail (During flush) on this one as it already exists
 
         Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
         def job, dbData
@@ -97,7 +99,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
         then: "verify job"
         job.state == SyncJobState.Finished
-        dbData.size() == 290 //Total 10 records would fail to insert (1 dupe above, and other dupes which were inserted in BootStrap)
+        dbData.size() == 299 //All except 1 should have been inserted
         //first slice will have run through second time, make sure its good
         dbData[0].name2 != null
         dbData[2].name2 != null

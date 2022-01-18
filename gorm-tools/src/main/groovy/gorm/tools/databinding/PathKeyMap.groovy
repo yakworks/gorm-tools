@@ -67,7 +67,25 @@ class PathKeyMap<K,V> implements Map<K,V>, Cloneable  {
         if (wrappedMap.isEmpty()) {
             return PathKeyMap.of([:], pathDelimiter)
         } else {
-            Map clonedMap = Maps.clone(wrappedMap)
+            // Map clonedMap = Maps.clone(wrappedMap)
+            Map clonedMap = new LinkedHashMap(wrappedMap)
+            // deep clone nested entries
+
+
+            clonedMap.keySet().each { k ->
+                def val = clonedMap[k]
+                //clone the nested values that are pathKeyMaps
+                if (val instanceof PathKeyMap) {
+                    clonedMap[k] = (val as PathKeyMap).cloneMap()
+                }
+                // if its a list of PathKeyMaps then iterate over and clone those too
+                else if(val instanceof Collection<PathKeyMap>) {
+                    clonedMap[k] = val.collect{
+                        (it as PathKeyMap).cloneMap()
+                    } as Collection<PathKeyMap>
+                }
+            }
+
             return PathKeyMap.of(clonedMap, pathDelimiter)
         }
     }

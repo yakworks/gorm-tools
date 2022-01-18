@@ -20,7 +20,7 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 
 @GormRepository
 @CompileStatic
-class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
+class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo<SyncJob> {
 
     @Autowired
     AttachmentSupport attachmentSupport

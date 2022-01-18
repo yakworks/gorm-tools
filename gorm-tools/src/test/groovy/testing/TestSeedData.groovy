@@ -1,13 +1,14 @@
 package testing
 
+import gorm.tools.testing.RepoTestData
+
 import java.time.LocalDate
 
-import grails.buildtestdata.TestData
 
 class TestSeedData {
 
     static void buildCustomers(int count){
-        def type = TestData.build(CustType)
+        def type = RepoTestData.build(CustType)
         (1..count).each { index ->
             String value = "Name$index"
             Integer descId = count-index+1

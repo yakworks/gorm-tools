@@ -2,7 +2,7 @@ package yakworks.rally.activity
 
 import gorm.tools.security.domain.AppUser
 import gorm.tools.testing.unit.DataRepoTest
-import grails.buildtestdata.TestData
+import gorm.tools.testing.RepoTestData
 import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Specification
 import yakworks.gorm.testing.SecurityTest
@@ -35,8 +35,8 @@ class TaskSpec extends Specification implements DataRepoTest, SecurityTest { //i
     }
 
     void setup(){
-        TaskType todo = TestData.build(TaskType, [id:1, name: "Todo"]) //.persist()
-        TaskStatus open = TestData.build(TaskStatus, [id:0, name: "Open"]) //.persist()
+        TaskType todo = RepoTestData.build(TaskType, [id:1, name: "Todo"]) //.persist()
+        TaskStatus open = RepoTestData.build(TaskStatus, [id:0, name: "Open"]) //.persist()
     }
 
     ActivityRepo activityRepo

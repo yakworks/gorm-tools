@@ -18,10 +18,12 @@ import yakworks.rally.orgs.model.OrgType
 @CompileStatic
 class OrgRepo extends AbstractOrgRepo {
 
+
     // add @Override
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
         super.beforeValidate(org, errors)
+        wireOrgMember(org)
         verifyCompany(org)
     }
 
@@ -39,12 +41,9 @@ class OrgRepo extends AbstractOrgRepo {
     }
 
     /**
-     * makes sure the associations are wired to the org
+     * Org member needs org set for validation
      */
-    @Override
-    void wireAssociations(Org org) {
-        super.wireAssociations(org)
-        if (org.calc && !org.calc.id) org.calc.id = org.id
+    void wireOrgMember(Org org) {
         if (org.member && !org.member.id) {
             org.member.id = org.id
             org.member.org = org //needed for validation

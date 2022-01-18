@@ -17,8 +17,8 @@ class OrgAttachmentLinkTests extends Specification implements DomainIntTest {
 
     void "test copyToOrg"() {
         setup:
-        Org from = Org.create("T01", "T01", OrgType.Division).persist()
-        Org to = Org.create("T02", "T02", OrgType.Division).persist()
+        Org from = Org.of("T01", "T01", OrgType.Division).persist()
+        Org to = Org.of("T02", "T02", OrgType.Division).persist()
 
         Attachment attachment =  Attachment.get(1005)
         //assert attachment.location == 'foo'

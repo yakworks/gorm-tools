@@ -12,7 +12,6 @@ import gorm.tools.problem.ValidationProblem
 import gorm.tools.testing.TestDataJson
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.problem.data.DataProblemException
@@ -51,6 +50,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     def "test create"() {
         when:
+
         def params = MockData.createOrg
         def org = orgRepo.create(params)
         orgRepo.flushAndClear()
@@ -65,12 +65,18 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.location
         org.location.org == org
         ['zipCode', 'street1', 'street2', 'city', 'state', 'country'].each{
-            org.location[it] == params.location[it]
+            assert org.location[it] == params.location[it].trim()
         }
 
+        jdbcTemplate.queryForObject("select orgId from Contact where id = $org.contact.id", Long) == org.id
+
+        org.contact.firstName == params.contact.firstName
         org.contact
+        org.contact.org
         org.contact.org == org
         org.contact.firstName == params.contact.firstName
+        org.contact.locations.size() == 1
+        org.contact.locations[0].zipCode == "12345"
 
         org.flex
         org.flex.id == org.id
@@ -189,9 +195,8 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     def "change sourceId for Org"() {
         //simulates the customer and cust account setup as well.
         when:
-        Org org = Org.create("foo", "bar", OrgType.CustAccount, 2)
-        org.validate()
-        org.createSource()
+        Org org = Org.of("foo", "bar", OrgType.CustAccount, 2)
+        Org.repo.createSource(org)
         org.persist()
 
         then: "source id is the default from num"
@@ -236,9 +241,9 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     void "test insert with orgmembers"() {
         given:
         orgDimensionService.testInit('Branch.Division.Business')
-        Org division = Org.create("Division", "Division", OrgType.Division).persist()
+        Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
-        division.member.business = Org.create("Business", "Business", OrgType.Business).persist()
+        division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
         division.persist()
         division.member.persist()
 
@@ -256,7 +261,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         result.member.business.id == division.member.business.id
 
         when:
-        Org otherBusiness = Org.create("b2", "b2", OrgType.Business).persist([flush: true])
+        Org otherBusiness = Org.of("b2", "b2", OrgType.Business).persist([flush: true])
         params = [
             name: "test", num: "test", orgTypeId: "3",
             member: [

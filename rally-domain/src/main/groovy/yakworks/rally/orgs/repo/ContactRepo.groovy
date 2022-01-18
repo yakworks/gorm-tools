@@ -13,6 +13,7 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
@@ -29,11 +30,12 @@ import yakworks.rally.tag.model.TagLink
 
 @GormRepository
 @CompileStatic
-class ContactRepo implements GormRepo<Contact> {
+class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
+
+    List<String> toOneAssociations = ['flex']
 
     @RepoListener
     void beforeValidate(Contact contact) {
-        if (contact.flex && !contact.flex.id) contact.flex.contact = contact
         setupNameProps(contact)
     }
 
@@ -128,12 +130,14 @@ class ContactRepo implements GormRepo<Contact> {
     }
 
     void assignOrg(Contact contact, Map data) {
-        if (data['orgId'] && !data['org']) {
-            Long orgId = data['orgId'] as Long
-            contact.org = Org.get(orgId)
-        }
-        else if(data['org'] && data['org'] instanceof Map){
-            contact.org = Org.repo.findWithData(data['org'] as Map)
+        // data.orgId wins if its set, only do lookup if its not set
+        if (!data.orgId) {
+            if (data.org && data.org instanceof Map) {
+                contact.orgId = Org.repo.findWithData(data.org as Map)?.id
+            }
+            else if(data.org && data.org instanceof Org){
+                contact.orgId = ((Org)data.org).id
+            }
         }
     }
 

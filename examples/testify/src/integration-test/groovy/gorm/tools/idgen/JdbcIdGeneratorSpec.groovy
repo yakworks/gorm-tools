@@ -1,11 +1,9 @@
 package gorm.tools.idgen
 
-import grails.buildtestdata.TestData
+
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import spock.lang.Specification
-import yakworks.rally.orgs.model.Org
 
 //import grails.persistence.Entity
 @Integration

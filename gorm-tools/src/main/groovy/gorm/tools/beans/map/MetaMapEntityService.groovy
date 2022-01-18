@@ -33,19 +33,14 @@ class MetaMapEntityService {
     }
 
     /**
-     * Holds the list of fields that have display:false for a class, meaning they should not be exported
-     */
-    static final Map<String, Set<String>> BLACKLIST = new ConcurrentHashMap<String, Set<String>>()
-
-    /**
      * Wrap entity/object in EntityMap
      *
      * @param entity the entity to wrap in a map
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
-    MetaMap createMetaMap(Object entity, List<String> includes = null) {
-        MetaMapIncludes includesMap = buildIncludes(entity.class.name, includes)
+    MetaMap createMetaMap(Object entity, List<String> includes = null, List<String> excludes = null) {
+        MetaMapIncludes includesMap = buildIncludes(entity.class.name, includes, excludes)
         return new MetaMap(entity, includesMap)
     }
 
@@ -56,15 +51,16 @@ class MetaMapEntityService {
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the json string
      */
-    String toJson(Object entity, List<String> includes = null){
-        MetaMap emap = createMetaMap(entity, includes)
+    String toJson(Object entity, List<String> includes = null, List<String> excludes = null){
+        MetaMap emap = createMetaMap(entity, includes, excludes)
         return JsonEngine.toJson(emap)
     }
 
-    String toJson(List entityList, List<String> includes = null){
-        MetaMapList elist = createMetaMapList(entityList, includes)
+    String toJson(List entityList, List<String> includes = null, List<String> excludes = null){
+        MetaMapList elist = createMetaMapList(entityList, includes, excludes)
         return JsonEngine.toJson(elist)
     }
+
 
     /**
      * Wrap list in EntityMapList
@@ -73,11 +69,11 @@ class MetaMapEntityService {
      * @param includes the fields list to include. ex ['*', 'foo.bar', 'foo.id']
      * @return the EntityMap object
      */
-    MetaMapList createMetaMapList(List entityList, List<String> includes = []) {
+    MetaMapList createMetaMapList(List entityList, List<String> includes, List<String> excludes = null) {
         if(entityList) {
             //use first item to get the class
             Class entityClass = entityList[0].class.name
-            MetaMapIncludes includesMap = buildIncludes(entityClass.name, includes)
+            MetaMapIncludes includesMap = buildIncludes(entityClass.name, includes, excludes)
             return new MetaMapList(entityList, includesMap)
         }
         // return empty list
@@ -112,6 +108,10 @@ class MetaMapEntityService {
      */
     MetaMapIncludes buildIncludes(String entityClassName, List<String> includes = []) {
         return EntityIncludesBuilder.build(entityClassName, includes)
+    }
+
+    MetaMapIncludes buildIncludes(String entityClassName, List<String> includes, List<String> excludes) {
+        return EntityIncludesBuilder.build(entityClassName, includes, excludes)
     }
 
 }

@@ -2,7 +2,6 @@ package yakworks.rally.orgs
 
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -29,7 +28,7 @@ class OrgValidationSpec extends Specification implements DomainRepoTest<Org>, Se
 
     void "sanity check validation"() {
         when:
-        Org org = Org.create("foo", "bar", OrgType.Customer)
+        Org org = Org.of("foo", "bar", OrgType.Customer)
         def isValid = org.validate()
 
         then:

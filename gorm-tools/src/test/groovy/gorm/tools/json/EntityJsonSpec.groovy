@@ -4,13 +4,15 @@
 */
 package gorm.tools.json
 
+import gorm.tools.testing.RepoTestData
+import spock.lang.IgnoreRest
+
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DomainRepoTest
-import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import spock.lang.Ignore
@@ -36,43 +38,49 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
     void "test Org json stock"() {
         when:
+        def excludes = ['version']
         def org = build()
-        def res = metaMapEntityService.toJson(org, ['*', 'type'])
+        def res = metaMapEntityService.toJson(org, ['*', 'type'], excludes)
 
         then:
-        assertThatJson(res).isEqualTo('''{
-            "id":1, "name":"name",
-            "inactive":false, "kind":"CLIENT",
+        assertThatJson(res).isEqualTo('''
+        {
+            "id":1,
+            "name":"name",
+            "inactive":false,
+            "kind":"CLIENT",
             "beforeValidateCheck":"got it",
             "testIdent":{"id":2,"name":"Num2"},
             "type":{"id":1}
-        }''')
+        }
+        ''')
 
     }
 
     void "test JsonifyDom json stock"() {
         when: "no includes"
-        def jdom = TestData.build([:], JsonifyDom)
-        def res = metaMapEntityService.toJson(jdom)
+        def excludes = ['version']
+        def jdom = RepoTestData.build(JsonifyDom)
+        def res = metaMapEntityService.toJson(jdom, null, excludes)
 
         then: 'should not include the ext because its null'
         assertThatJson(res).isEqualTo('{"id":1,"localDate":"2018-01-25","isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
         when: "ext association is mocked up in data"
-        jdom = TestData.build(JsonifyDom, includes: ['ext'])
-        res = metaMapEntityService.toJson(jdom, ['*', 'ext'])
+        jdom = RepoTestData.build(JsonifyDom, includes: ['ext'])
+        res = metaMapEntityService.toJson(jdom, ['*', 'ext'], excludes)
 
         then: 'the default will be just the ext.id'
         assertThatJson(res).isEqualTo('{"id":2,"localDate":"2018-01-25","ext":{"id":1},"isActive":false,"date":"2018-01-26T01:36:02Z","name":"name","amount":0}')
 
         when: "ext association is in includes with \$stamp"
-        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$stamp'])
+        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$stamp'], excludes)
 
         then: 'ext fields should be shown'
         assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
 
         when: "ext association is in includes and \$* should use stamp"
-        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$*'])
+        res = metaMapEntityService.toJson(jdom, ['id', 'name', 'ext.$*'], excludes)
 
         then: 'ext fields should be shown'
         assertThatJson(res).isEqualTo('{"id":2,"name":"name","ext":{"id":1,"nameExt":"nameExt"}}')
@@ -81,7 +89,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
     void "currency converter should work"() {
         when:
-        def jdom = TestData.build(JsonifyDom, currency: Currency.getInstance('USD'))
+        def jdom = RepoTestData.build(JsonifyDom, currency: Currency.getInstance('USD'))
         def res = metaMapEntityService.toJson(jdom, ['id', 'currency'])
 
         then:
@@ -91,12 +99,13 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
 
     void "transients should be rendered"() {
         when:
-        def jdom = TestData.build(JsonifyDom, includes: ['ext'])
+        def jdom = RepoTestData.build(JsonifyDom, includes: ['ext'])
         def args = [includes: ['id', 'ext.nameExt', 'company'], deep: true]
         String incTrans = 'company'
         def res = metaMapEntityService.toJson(jdom, ['id', 'ext.nameExt', 'company'])
 
-        then:
+        then: "comapny is a transient and should be rendered"
+
         res == '{"id":1,"ext":{"nameExt":"nameExt"},"company":"Tesla"}'
 
     }
@@ -135,7 +144,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         def result = metaMapEntityService.toJson(org, ["name", 'ext.*'])
 
         then:
-        assertThatJson(result).isEqualTo('{"ext":{"id":1,"text1":"text1","org":{"id":1}},"name":"name"}')
+        assertThatJson(result).isEqualTo('{"ext":{"id":1,"version":0,"text1":"text1","org":{"id":1}},"name":"name"}')
 
     }
 

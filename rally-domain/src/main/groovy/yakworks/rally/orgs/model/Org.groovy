@@ -7,7 +7,6 @@ package yakworks.rally.orgs.model
 import gorm.tools.audit.AuditStamp
 import gorm.tools.hibernate.criteria.CreateCriteriaSupport
 import gorm.tools.model.NameNum
-import gorm.tools.model.SourceType
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
@@ -88,13 +87,6 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         getRepo().generateId(this)
     }
 
-    /**
-     * shortcut to create the OrgSource for this. See the OrgSourceRepo.createSource
-     */
-    OrgSource createSource(SourceType sourceType = SourceType.App) {
-        getRepo().createSource(this, sourceType)
-    }
-
     boolean isOrgType(OrgType ote){
         this.type == ote
     }
@@ -109,16 +101,16 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
     }
 
     /**
-     * quick shortcut to create an Org. return the unsaved new entity
+     * quick shortcut to make an Org. unlike create, this returns and UNSAVED new entity
      */
-    static Org create(String num, String name, Long orgTypeId, Long companyId = Company.DEFAULT_COMPANY_ID) {
-        create(num, name, OrgType.get(orgTypeId), companyId)
+    static Org of(String num, String name, Long orgTypeId, Long companyId = Company.DEFAULT_COMPANY_ID) {
+        of(num, name, OrgType.get(orgTypeId), companyId)
     }
 
     /**
-     * quick shortcut to create an Org. return the unsaved new entity
+     * quick shortcut to make an Org. unlike create, this returns and UNSAVED new entity
      */
-    static Org create(String num, String name, OrgType orgType, Long companyId = Company.DEFAULT_COMPANY_ID) {
+    static Org of(String num, String name, OrgType orgType, Long companyId = Company.DEFAULT_COMPANY_ID) {
         def o = new Org(num: num, name: name, companyId: companyId)
         o.type = orgType
         return o

@@ -1,5 +1,6 @@
 package yakworks.rally.orgs
 
+import spock.lang.IgnoreRest
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DataRepoTest
@@ -56,7 +57,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
     void "empty string for name or num"() {
         when:
-        Org org = Org.create("", "", OrgType.Customer)
+        Org org = Org.of("", "", OrgType.Customer)
 
         then:
         !org.validate()
@@ -68,10 +69,10 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
     def testOrgSourceChange() {
         when:
-        Org org = Org.create("foo", "bar", OrgType.Customer)
-        org.validate()
-        org.createSource()
+        Org org = Org.of("foo", "bar", OrgType.Customer)
+        Org.repo.createSource(org)
         org.persist()
+        assert org.source
 
         then: "source id is the default"
         assert org.source.sourceId == "foo"

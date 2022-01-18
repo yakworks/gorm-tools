@@ -1,8 +1,8 @@
 package yakworks.rally.orgs
 
+import gorm.tools.testing.RepoTestData
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
-import grails.buildtestdata.TestData
 import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
@@ -48,16 +48,16 @@ class OrgCopierSpec extends Specification implements DataRepoTest, SecurityTest 
         old.calc = build(OrgCalc)
         old.flex = build(OrgFlex)
         old.info = build(OrgInfo)
-        old.member = TestData.build(OrgMember, [id: old.id, branch: build(Org), division: build(Org)])
+        old.member = RepoTestData.build(OrgMember, [id: old.id, branch: build(Org), division: build(Org)])
 
-        Location location = TestData.build(Location)
+        Location location = RepoTestData.build(Location)
         old.location = location.persist()
 
-        Contact contact = TestData.build(Contact)
+        Contact contact = RepoTestData.build(Contact)
         //TestData.build(Location, [contact: contact])
-        contact.addToPhones(TestData.build(ContactPhone,[contact: contact]))
-        contact.addToEmails(TestData.build(ContactEmail,[contact: contact]))
-        contact.addToSources(TestData.build(ContactSource,[contact: contact]))
+        contact.addToPhones(RepoTestData.build(ContactPhone,[contact: contact]))
+        contact.addToEmails(RepoTestData.build(ContactEmail,[contact: contact]))
+        contact.addToSources(RepoTestData.build(ContactSource,[contact: contact]))
         //location.contact = contact
         old.contact = contact
         //old.bind(calc: calc, flex: flex, location: location, member: member)

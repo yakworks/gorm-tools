@@ -4,9 +4,8 @@
 */
 package gorm.tools.testing
 
-
 import gorm.tools.testing.unit.DataRepoTest
-import grails.buildtestdata.BuildDataTest
+import gorm.tools.testing.unit.RepoBuildDataTest
 import spock.lang.Specification
 import testing.Address
 import testing.Cust
@@ -14,7 +13,7 @@ import testing.CustExt
 import testing.CustType
 import testing.AddyNested
 
-class TestDataJsonBuildAllSpec extends Specification implements BuildDataTest, DataRepoTest{
+class TestDataJsonBuildAllSpec extends Specification implements RepoBuildDataTest, DataRepoTest{
 
     def setupSpec(){
         mockDomains(Cust, CustType, AddyNested, CustExt, Address)

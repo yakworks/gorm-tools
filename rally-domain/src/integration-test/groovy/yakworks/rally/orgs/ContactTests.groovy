@@ -69,7 +69,7 @@ class ContactTests extends Specification implements DomainIntTest {
         Contact contact = new Contact(num: "T1", name: "T1", org: org, firstName: "T1").persist()
 
         ContactEmail email = new ContactEmail(contact: contact, address: "test").persist()
-        ContactFlex flex = new ContactFlex(contact: contact, text1: "test").persist()
+        ContactFlex flex = new ContactFlex(id: contact.id, text1: "test").persist()
         ContactPhone phone = new ContactPhone(contact: contact, num: "123").persist()
         ContactSource source = new ContactSource(contact: contact, source:"9ci", sourceType: "App", sourceId: "x").persist()
         Location l = Location.first()
@@ -114,9 +114,8 @@ class ContactTests extends Specification implements DomainIntTest {
 
     void "test create Contact with org lookup by orgSource"() {
         setup:
-        Org org = Org.create("foo", "bar", OrgType.Customer)
-        org.validate()
-        org.createSource()
+        Org org = Org.of("foo", "bar", OrgType.Customer)
+        Org.repo.createSource(org)
         org.persist(flush: true)
 
         Map params = [firstName:'Peter', email:'abc@walmart.com']

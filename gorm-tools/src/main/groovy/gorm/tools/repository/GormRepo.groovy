@@ -20,6 +20,7 @@ import org.springframework.transaction.TransactionDefinition
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.databinding.PathKeyMap
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
@@ -304,6 +305,9 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * Or even better implement the beforeBind|afterBind event methods
      */
     void bind(D entity, Map data, BindAction bindAction, PersistArgs args = new PersistArgs()) {
+        //if its a PathKeyMap then init it
+        if(data instanceof PathKeyMap) data.init()
+
         getRepoEventPublisher().doBeforeBind(this, (GormEntity)entity, data, bindAction, args)
         doBind(entity, data, bindAction, args)
         getRepoEventPublisher().doAfterBind(this, (GormEntity)entity, data, bindAction, args)

@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.util.HashCodeHelper
 import org.grails.datastore.mapping.model.config.GormProperties
 
+import yakworks.commons.map.Maps
+
 /**
  * A redo of the  GrailsParameterMap, primary to remove the need for HttpServletRequest.
  * Allows a flattened map of path keys such that
@@ -61,21 +63,18 @@ class PathKeyMap<K,V> implements Map<K,V>, Cloneable  {
         return this.wrappedMap //direct field access
     }
 
-    @Override
-    Object clone() {
+    PathKeyMap cloneMap() {
         if (wrappedMap.isEmpty()) {
             return PathKeyMap.of([:], pathDelimiter)
         } else {
-            Map clonedMap = new LinkedHashMap(wrappedMap)
-            // deep clone nested entries
-            for(Iterator it=clonedMap.entrySet().iterator(); it.hasNext();) {
-                Entry entry = (Entry)it.next()
-                if (entry.getValue() instanceof PathKeyMap) {
-                    entry.setValue(((PathKeyMap)entry.getValue()).clone())
-                }
-            }
+            Map clonedMap = Maps.clone(wrappedMap)
             return PathKeyMap.of(clonedMap, pathDelimiter)
         }
+    }
+
+    @Override
+    public Object clone() {
+        cloneMap()
     }
 
     void mergeValuesFrom(PathKeyMap otherMap) {

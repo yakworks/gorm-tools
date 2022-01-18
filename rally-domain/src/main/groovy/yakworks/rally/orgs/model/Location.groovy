@@ -19,7 +19,7 @@ import yakworks.rally.orgs.repo.LocationRepo
 @GrailsCompileStatic
 class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
     static transients = ['addressHtml']
-    //static belongsTo = [org: Org]
+
     Kind kind = Kind.work
     String name //description name
 
@@ -32,8 +32,10 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
     String county
 
     // org is required and when for contact this will just be contact's org
-    //belongsTo org but since it is both a 1toMany and and association on the org we dont use the belongsTo
+    // belongsTo org but since it is both a 1toMany and and association on the org we dont use the belongsTo
     Org org
+    Long orgId
+
     Contact contact
 
     //additional for ERP interfaces if needed.
@@ -51,7 +53,8 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
     }
 
     static constraintsMap = [
-        org:[ description: 'The organization this belongs to', nullable: false],
+        org:[ description: 'The organization this belongs to'],
+        orgId:[ description: 'The org id for this', nullable: false],
         kind:[ description: 'The address type', nullable: true],
 
         contact:[ description: 'The contact this belongs to', nullable: true],
@@ -72,7 +75,8 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
     static mapping = {
         //columns
         id generator: 'assigned'
-        org column: 'orgId'
+        orgId column: 'orgId'
+        org column: 'orgId', insertable: false, updateable: false
         contact column: 'contactId'
     }
 
@@ -94,6 +98,11 @@ class Location implements GormRepoEntity<Location, LocationRepo>, Serializable {
             markup = "$markup ${zipCode.trim()}"
 
         return markup.trim()
+    }
+
+    void setOrg(Org o){
+        org = o
+        if(o.id != orgId) orgId = o.id
     }
 
     static List<Location> listByContact(Contact con){

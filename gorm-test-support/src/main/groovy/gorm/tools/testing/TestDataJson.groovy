@@ -12,13 +12,12 @@ import org.grails.datastore.mapping.model.EmbeddedPersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 
 import gorm.tools.beans.map.MetaMapEntityService
-import grails.buildtestdata.TestData
 import grails.buildtestdata.builders.DataBuilderContext
 import grails.buildtestdata.builders.PersistentEntityDataBuilder
 import yakworks.commons.json.JsonEngine
 
 /**
- * static build methods to wrap {@link TestData} and Jsonify's statics for the json-views.
+ * static build methods to wrap {@link RepoTestData} and Jsonify's statics for the json-views.
  * These helpers enable the easy generation of test data in Map form to test methods like the
  * repo's create and update.
  * Note: when using this in unit test the {@link gorm.tools.testing.support.JsonViewSpecSetup} should
@@ -41,7 +40,7 @@ class TestDataJson {
     static String buildJson(Map args = [:], Class entityClass) {
         //default for save should be false and find true, we don't want to save the dom as we are ust using it to build the json map
         Map<String, Map> parsedArgs = parseArgs(args)
-        Object obj = TestData.build(parsedArgs.args, entityClass, parsedArgs.data)
+        Object obj = RepoTestData.build(parsedArgs.args, entityClass, parsedArgs.data)
         def incs = getFieldsToBuild(entityClass, parsedArgs.args['includes'], parsedArgs.data)
         //println res.jsonArgs['includes']
         MetaMapEntityService metaMapEntityService = new MetaMapEntityService()
@@ -50,7 +49,7 @@ class TestDataJson {
     }
 
     static List<String> getFieldsToBuild(Class entityClass, Object buildDataIncludes = null, Map data = [:]) {
-        PersistentEntityDataBuilder builder = (PersistentEntityDataBuilder)TestData.findBuilder(entityClass)
+        PersistentEntityDataBuilder builder = (PersistentEntityDataBuilder)RepoTestData.findBuilder(entityClass)
         //build an empty DataBuilderContext to set includes
         DataBuilderContext ctx = new DataBuilderContext()
         ctx.includes = buildDataIncludes //as Set<String>

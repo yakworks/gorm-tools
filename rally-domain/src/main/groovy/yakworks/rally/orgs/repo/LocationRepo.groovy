@@ -14,12 +14,12 @@ import yakworks.rally.orgs.model.Location
 
 @GormRepository
 @CompileStatic
-class LocationRepo implements GormRepo<Location>, IdGeneratorRepo {
+class LocationRepo implements GormRepo<Location>, IdGeneratorRepo<Location> {
 
     @RepoListener
     void beforeValidate(Location location) {
-        if(location.isNew()) generateId(location)
-        if(!location.org && location.contact) location.org = location.contact.org
+        //if only contact is assign then fill org from that
+        if(!location.orgId && location.contact) location.orgId = location.contact.orgId
     }
 
 }

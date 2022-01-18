@@ -52,10 +52,10 @@ import yakworks.i18n.icu.GrailsICUMessageSource
  * @since 6.1
  */
 @CompileDynamic
-@SuppressWarnings(["Indentation","AssignmentToStaticFieldFromInstanceMethod"])
+@SuppressWarnings(["Indentation", "AssignmentToStaticFieldFromInstanceMethod"])
 trait GormToolsSpecHelper extends GrailsUnitTest {
 
-    private static GrailsApplication _grailsApplication
+    // private static GrailsApplication _grailsApplication
     private static boolean _hasCommonBeansSetup = false
 
     /** conveinince shortcut for applicationContext */

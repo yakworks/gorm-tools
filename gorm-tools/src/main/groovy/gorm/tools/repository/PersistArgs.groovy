@@ -60,6 +60,11 @@ class PersistArgs {
     BindAction bindAction
 
     /**
+     * if its a create or update should it persist after it binds and creates the object
+     */
+    Boolean persistAfterAction
+
+    /**
      * when calling create, set to true if there is an id in the data that should be used
      */
     Boolean bindId

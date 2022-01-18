@@ -26,6 +26,7 @@ class CustomGenerationTarget extends GenerationTargetToDatabase {
         // Custom filtering logic here, e.g.:
         //if (command =~ /references legacy\.xyz/)
         //don't generate all foreign keys
+        // println command
         return !(command =~ /foreign key/)
     }
 }

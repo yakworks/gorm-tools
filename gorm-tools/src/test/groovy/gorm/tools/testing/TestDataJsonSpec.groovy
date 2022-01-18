@@ -5,13 +5,13 @@
 package gorm.tools.testing
 
 import gorm.tools.testing.unit.DataRepoTest
-import grails.buildtestdata.BuildDataTest
+import gorm.tools.testing.unit.RepoBuildDataTest
 import spock.lang.Specification
 import testing.Cust
 import testing.CustType
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 
-class TestDataJsonSpec extends Specification implements BuildDataTest, DataRepoTest{
+class TestDataJsonSpec extends Specification implements RepoBuildDataTest, DataRepoTest{
 
     def setupSpec(){
         mockDomains(Cust, CustType)

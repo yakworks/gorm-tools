@@ -4,7 +4,7 @@
 */
 package testing
 
-import gorm.tools.job.SyncJobService
+
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -16,11 +16,10 @@ import yakworks.commons.json.JsonEngine
 
 @GormRepository
 @CompileStatic
-class TestSyncJobRepo implements GormRepo<TestSyncJob>, IdGeneratorRepo {
+class TestSyncJobRepo implements GormRepo<TestSyncJob>, IdGeneratorRepo<TestSyncJob> {
 
     @RepoListener
     void beforeBind(TestSyncJob job, Map data, BeforeBindEvent be) {
-        generateId(job)
         job.sourceType = SourceType.RestApi
         if (be.isBindCreate()) {
             if (data.payload) {

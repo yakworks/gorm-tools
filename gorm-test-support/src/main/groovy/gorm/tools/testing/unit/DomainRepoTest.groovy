@@ -8,9 +8,8 @@ import groovy.transform.CompileDynamic
 
 import org.springframework.core.GenericTypeResolver
 
+import gorm.tools.testing.RepoTestData
 import gorm.tools.testing.TestDataJson
-import grails.buildtestdata.BuildDataTest
-import grails.buildtestdata.TestData
 
 /**
  * Should works as a drop in replacement for the Grails Testing Support's
@@ -22,7 +21,7 @@ import grails.buildtestdata.TestData
  * @since 6.1
  */
 @CompileDynamic
-trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest {
+trait DomainRepoTest<D> implements RepoBuildDataTest, DataRepoTest {
     //order on the above Traits is important as both have mockDomains and we want the one in DataRepoTest to be called
 
     /**
@@ -53,11 +52,11 @@ trait DomainRepoTest<D> implements BuildDataTest, DataRepoTest {
     /************************ builders, util and setup methods for spock blocks *************/
 
     D build() {
-        TestData.build([:], getEntityClass())
+        RepoTestData.build([:], getEntityClass())
     }
 
     D build(Map args) {
-        TestData.build(args, getEntityClass())
+        RepoTestData.build(args, getEntityClass())
     }
 
     Map buildMap(Map args = [:]) {

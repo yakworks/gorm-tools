@@ -15,11 +15,10 @@ import gorm.tools.repository.model.IdGeneratorRepo
 
 @GormRepository
 @CompileStatic
-class ThingRepo implements GormRepo<Thing>, IdGeneratorRepo {
+class ThingRepo implements GormRepo<Thing>, IdGeneratorRepo<Thing> {
 
     @RepoListener
     void beforeValidate(Thing thing, Errors errors) {
-        generateId(thing)
         //test rejectValue
         if(thing.name == 'RejectThis'){
             rejectValue(thing, errors, 'name', thing.name, 'no.from.ThingRepo')

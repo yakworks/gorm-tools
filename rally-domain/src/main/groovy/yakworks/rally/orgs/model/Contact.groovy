@@ -36,7 +36,10 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     String phone
 
     // belongs to Org, we don't use static belongsTo because Org also has contactId
+    // the org is readonly and is here for queries
     Org org
+    // the key that needs to be populated
+    Long orgId
 
     Boolean tagForReminders = false //make an actual tag
     Boolean inactive = false
@@ -71,7 +74,8 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
 
     static mapping = {
         cache true
-        org column: 'orgId'
+        orgId column: 'orgId'
+        org column: 'orgId', insertable: false, updateable: false
         flex column: 'flexId'
         location column: 'locationId'
         user column: 'userId'
@@ -108,7 +112,9 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         comments:[ d:'notes about the contact', nullable: true],
 
         tagForReminders:[ d:'if this contact should get correspondence', nullable: false],
-        org:[ d:'the organization this contact belongs to', nullable: false],
+        org:[ description: 'The organization this contact belongs to'],
+        orgId:[ description: 'The org id for the contact', nullable: false],
+
         // visibleToOrgType:[ nullable: true],
 
         flex:[ d:'custom user fields for this contact', nullable: true],
@@ -130,6 +136,11 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
      */
     Location getAddress() {
         return location ?: org?.location
+    }
+
+    void setOrg(Org o){
+        org = o
+        if(o.id != orgId) orgId = o.id
     }
 
     static List<Contact> listActive(Long orgId) {

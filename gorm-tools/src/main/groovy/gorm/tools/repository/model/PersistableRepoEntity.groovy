@@ -4,6 +4,8 @@
 */
 package gorm.tools.repository.model
 
+import javax.persistence.Transient
+
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 
@@ -78,5 +80,10 @@ trait PersistableRepoEntity<D, R extends GormRepo<D>> implements HasRepo<D, R>, 
     // static Map<String, ConstrainedProperty> getConstrainedProperties() {
     //     GormMetaUtils.findConstrainedProperties(getGormPersistentEntity())
     // }
+
+    @Transient
+    boolean isNewOrDirty() {
+        findRepo().isNewOrDirty((D) this)
+    }
 
 }

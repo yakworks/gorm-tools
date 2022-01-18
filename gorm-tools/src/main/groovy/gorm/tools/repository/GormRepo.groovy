@@ -4,7 +4,6 @@
 */
 package gorm.tools.repository
 
-
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormEnhancer
@@ -23,6 +22,7 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.model.Lookupable
+import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.errors.RepoEntityErrors
@@ -30,6 +30,7 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
 import gorm.tools.transaction.TrxService
+import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
 import yakworks.problem.data.NotFoundProblem
@@ -40,12 +41,15 @@ import yakworks.problem.data.NotFoundProblem
  * @author Joshua Burnett (@basejump)
  * @since 6.x
  */
+@SuppressWarnings(['EmptyMethod'])
 @CompileStatic
 trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEntityApi<D> {
 
     @Autowired EntityMapBinder entityMapBinder
 
     @Autowired RepoEventPublisher repoEventPublisher
+
+    @Autowired ProxyHandler proxyHandler
 
     /** default to true. If false only method events are invoked on the implemented Repository. */
     Boolean enableEvents = true
@@ -124,6 +128,9 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * just be sure to fire event if overidden.
      */
     void doBeforePersist(D entity, PersistArgs args){
+        if (args.bindAction && args.data){
+            doBeforePersistWithData(entity, args)
+        }
         getRepoEventPublisher().doBeforePersist(this, (GormEntity)entity, args)
     }
 
@@ -279,7 +286,8 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         bind(entity, data, bindAction, args)
 
         args['data'] = data
-        doPersist(entity, args)
+        if(args.persistAfterAction != false) doPersist(entity, args)
+
     }
 
     /**
@@ -357,7 +365,7 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     // this does nothing special for create so it really just for the update and deletes
     // if we want to support multiple ways to do look ups, for code for example, then this wont work
     // we can put the special look up logic in the main update maybe.
-    D createOrUpdate(Map data, Map args = [:]) {
+    D createOrUpdate(Map data, PersistArgs args = PersistArgs.defaults()) {
         if (!data) return
         D instance = findWithData(data, false)
         if (instance) {
@@ -459,8 +467,8 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
                 PersistableRepoEntity pentity = (PersistableRepoEntity)entity
                 GormEntity gentity = (GormEntity)entity
 
-                //if no id then its new so insert it
-                if(!gentity.getAssociationId(fld)){
+                //if its a proxy then its already setup and not new
+                if(!proxyHandler.isProxy(assoc) && !gentity.getAssociationId(fld)){
                     PersistableRepoEntity assocEntity = assoc as PersistableRepoEntity
                     assocEntity.id = pentity.id
                     assocEntity.persist(validate: false, insert: true)
@@ -479,6 +487,16 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
      * @param data passed from unpdate or create
      */
     void doAfterPersistWithData(D entity, PersistArgs args) {
+        //empty, implement in concrete repo if needed
+    }
+
+    /**
+     * Called from doBeforePersist and before validate and beforePersist event if its a bindAction (create/update) and it has data.
+     *
+     * @param entity the main entity for this repo
+     * @param data passed from unpdate or create
+     */
+    void doBeforePersistWithData(D entity, PersistArgs args) {
         //empty, implement in concrete repo if needed
     }
 
@@ -534,6 +552,19 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     void flushAndClear() {
         flush()
         clear()
+    }
+
+    /**
+     * checks if its new or if its dirty
+     */
+    boolean isNewOrDirty(D entity) {
+        // if its a proxy then its can't be new or dirty
+        if(proxyHandler.isProxy(entity)){
+            return false
+        } else {
+            return gormInstanceApi().isDirty(entity) || ((Persistable)entity).isNew()
+        }
+
     }
 
     /**

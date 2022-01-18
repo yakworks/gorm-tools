@@ -34,16 +34,22 @@ class EntityIncludesBuilder {
     static final Map<String, Set<String>> BLACKLIST = new ConcurrentHashMap<String, Set<String>>()
 
     List<String> includes
+    List<String> excludes = []
     String entityClassName
     Class entityClass
     PersistentEntity persistentEntity
     List<PersistentProperty> properties = []
     MetaMapIncludes metaMapIncludes
 
-    EntityIncludesBuilder(String entityClassName, List<String> includes = []){
+    EntityIncludesBuilder(String entityClassName, List<String> includes){
         this.entityClassName = entityClassName
         this.includes = includes ?: ['*'] as List<String>
         init()
+    }
+
+    EntityIncludesBuilder excludes(List<String> val) {
+        if(val != null) this.excludes = val
+        return this
     }
 
     void init(){
@@ -64,6 +70,10 @@ class EntityIncludesBuilder {
 
     static MetaMapIncludes build(String entityClassName, List<String> includes){
         new EntityIncludesBuilder(entityClassName, includes).build()
+    }
+
+    static MetaMapIncludes build(String entityClassName, List<String> includes, List<String> excludes){
+        new EntityIncludesBuilder(entityClassName, includes).excludes(excludes).build()
     }
 
     /**
@@ -147,7 +157,7 @@ class EntityIncludesBuilder {
             }
         }
         //create the includes class for what we have now along with the the blacklist
-        Set blacklist = getBlacklist(persistentEntity)
+        Set blacklist = getBlacklist(persistentEntity) + (this.excludes as Set)
 
         //only if it has rootProps
         if (metaMapIncludes.fields) {

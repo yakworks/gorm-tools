@@ -105,7 +105,8 @@ class Maps {
      * @param pruneEmpty default:true set to false to keep empty maps, lists and strings
      * @return the pruned map
      */
-    static Map prune(Map map, boolean pruneEmpty = true) {
+    public static <K, V> Map<K, V> prune(Map<K, V> map, boolean pruneEmpty = true) {
+        if(!map) return map
         map.collectEntries { k, v ->
             [k, v instanceof Map ? prune(v as Map, pruneEmpty) : v]
         }.findAll { k, v ->
@@ -119,7 +120,7 @@ class Maps {
                 return v != null
             }
 
-        }
+        } as Map<K, V>
     }
 
     /**
@@ -225,5 +226,22 @@ class Maps {
         return getBoolean(key, map, defaultValue)
     }
 
+    /**
+     * returns map with specific keys
+     */
+    public static <K, V> Map<K, V> pick(Map<K, V> map, Collection<K> keys){
+        if(!map) return [:]
+        map.subMap(keys)
+    }
+
+    /**
+     * returns map with keys excluded
+     */
+    public static <K, V> Map<K, V> omit(Map<K, V> map, Collection<K> excludeKeys){
+        if(!map) return [:]
+        def keys = map.keySet().findAll{ !(it in excludeKeys)}
+        map.keySet()
+        return map.subMap(keys)
+    }
 
 }

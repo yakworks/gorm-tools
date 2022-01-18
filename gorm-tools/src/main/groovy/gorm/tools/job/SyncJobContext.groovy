@@ -28,6 +28,7 @@ import yakworks.commons.lang.Validate
 import yakworks.i18n.MsgService
 import yakworks.problem.ProblemTrait
 
+@SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
 @ToString

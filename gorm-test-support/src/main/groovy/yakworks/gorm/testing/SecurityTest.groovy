@@ -21,7 +21,7 @@ import gorm.tools.security.domain.AppUser
 @CompileDynamic
 trait SecurityTest {
 
-    //called from BuildDataTest as it setups and mocks the domains
+    //called from RepoBuildDataTest as it setups and mocks the domains
     void onMockDomains(Class<?>... entityClasses) {
         // do these beans first so that they can get injected into the repos
         defineBeans {

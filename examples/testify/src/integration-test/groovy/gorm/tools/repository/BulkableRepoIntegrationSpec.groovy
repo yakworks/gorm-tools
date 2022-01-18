@@ -10,8 +10,6 @@ import org.springframework.jdbc.core.JdbcTemplate
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
-import spock.lang.IgnoreRest
-import spock.lang.Issue
 import spock.lang.Specification
 import yakworks.gorm.testing.model.KitchenSink
 import yakworks.gorm.testing.model.KitchenSinkRepo
@@ -149,7 +147,7 @@ class BulkableRepoIntegrationSpec extends Specification implements DomainIntTest
 
     void "when lazy association encountered during json building"() {
         given:
-        Org org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
+        Org org = Org.of("testorg-1", "testorg-1", OrgType.Customer).persist()
         // Org.withTransaction {
         //     org = Org.create("testorg-1", "testorg-1", OrgType.Customer).persist()
         // }

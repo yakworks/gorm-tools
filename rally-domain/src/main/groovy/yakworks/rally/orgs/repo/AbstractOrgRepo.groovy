@@ -9,13 +9,12 @@ import groovy.transform.CompileStatic
 import org.springframework.dao.DataRetrievalFailureException
 import org.springframework.validation.Errors
 
+import gorm.tools.databinding.BindAction
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.events.AfterBindEvent
-import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.AfterRemoveEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -32,7 +31,7 @@ import yakworks.rally.orgs.model.OrgType
  * base or OrgRepo. common functionality refactored out so can be overriden in application.
  */
 @CompileStatic
-abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
+abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
 
     LocationRepo locationRepo
 
@@ -44,49 +43,41 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
 
     OrgMemberService orgMemberService
 
+    List<String> toOneAssociations = ['flex', 'info', 'calc', 'member']
+
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
         if(org.isNew()) {
-            //register error and exit fast if no orgType
             if(!validateNotNull(org, 'type', errors)) return
-            // Validate.notNull(org.type, "[org.type]")
-            // Validate.notNull(org.type.typeSetup, "org.type.typeSetup")
-            generateId(org)
         }
-        wireAssociations(org)
     }
 
     @RepoListener
     void beforeBind(Org org, Map data, BeforeBindEvent be) {
         if (be.isBindCreate()) {
             org.type = getOrgTypeFromData(data)
-            if(data.id) org.id = data.id as Long
-            generateId(org)
+            //bind id early or generate one as we use it in afterBind
+            if(data.id) {
+                //dont depend on the args.bindId setting and always do it
+                org.id = data.id as Long
+            } else {
+                generateId(org)
+            }
         }
     }
 
-    @RepoListener
-    void afterBind(Org org, Map data, AfterBindEvent be) {
-        if (be.isBindCreate()) {
+    @Override
+    void doBeforePersistWithData(Org org, PersistArgs args) {
+        Map data = args.data
+        if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)
             if(data.member) orgMemberService.setupMember(org, data.remove('member') as Map)
         }
-
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)
         // do contact, support keyContact for legacy and Customers
         def contactData = data.contact ?: data.keyContact
         if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
-
-    }
-
-    /**
-     * An event handler, which is executed after persist operation on an Org entity.
-     */
-    @RepoListener
-    void afterPersist(Org org, AfterPersistEvent e) {
-        if(org.location?.isDirty()) org.location.persist()
-        if(org.contact?.isDirty()) org.contact.persist()
     }
 
     @RepoListener
@@ -122,9 +113,22 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     @Override
     void doAfterPersistWithData(Org org, PersistArgs args) {
         Map data = args.data
-        if(data.locations) persistToManyData(org, Location.repo, data.locations as List<Map>, "org")
-        if(data.contacts) persistToManyData(org, Contact.repo, data.contacts as List<Map>, "org")
+        persistManyList(org, Location.repo, data.locations as List<Map>)
+        persistManyList(org, Contact.repo, data.contacts as List<Map>)
         if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+    }
+
+    @Override
+    void persistToOneAssociations(Org org, List<String> associations){
+        GormRepo.super.persistToOneAssociations(org, associations)
+        if(org.location?.isNewOrDirty()) org.location.persist() //FIXME is this already validated?
+        if(org.contact?.isNewOrDirty()) org.contact.persist()
+    }
+
+    void persistManyList(Org org, GormRepo assocRepo, List<Map> assocList){
+        if(!assocList) return
+        assocList.each { it['orgId'] = org.id}
+        assocRepo.createOrUpdate(assocList)
     }
 
     /**
@@ -156,17 +160,17 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
         }
         //make sure it has the right settings
         data.isPrimary = true
-        data.org = org
-        org.contact = contactRepo.createOrUpdate(data)
+        data.orgId = org.id
+        org.contact = contactRepo.createOrUpdate(data, PersistArgs.of(persistAfterAction: false))
         return org.contact
     }
 
     Location createOrUpdatePrimaryLocation(Org org, Map data){
         if(!data) return
         //make sure params has org key
-        data.org = org
+        data.orgId = org.id
         // if it had an op of remove then will return null and this set primary location to null
-        org.location = locationRepo.createOrUpdate(data)
+        org.location = locationRepo.createOrUpdate(data, PersistArgs.of(persistAfterAction: false))
         return org.location
     }
 
@@ -199,15 +203,10 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo {
     }
 
     /**
-     * makes sure the associations are wired to the org
+     * Used in testing, creates the OrgSource from num and assigns to the source record (if originator)
      */
-    void wireAssociations(Org org) {
-        if (org.flex && !org.flex.id) org.flex.id = org.id
-        if (org.info && !org.info.id) org.info.id = org.id
-    }
-
-    //util method that creates the OrgSource from num and assigns to the source record (if originator)
     OrgSource createSource(Org org, SourceType sourceType = SourceType.App) {
+        if(!org.id) generateId(org)
         OrgSource.repo.createSource(org, sourceType)
     }
 

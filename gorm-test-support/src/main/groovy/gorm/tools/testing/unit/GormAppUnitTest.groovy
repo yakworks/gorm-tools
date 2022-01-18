@@ -7,26 +7,25 @@ package gorm.tools.testing.unit
 import groovy.transform.CompileStatic
 
 import gorm.tools.testing.support.GormToolsSpecHelper
-import grails.buildtestdata.BuildDataTest
 import grails.testing.spring.AutowiredTest
 
 /**
  * Spec trait to use as a drop in replacement of DataTest and GormToolsTest that has all the methods
- * from the BuildDataTest to build data for the repos
+ * from the RepoBuildDataTest to build data for the repos
  * will set up the repositories properly for the mocked domains
  *
  * @author Joshua Burnett (@basejump)
  * @since 6.1
  */
 @CompileStatic
-trait GormAppUnitTest implements AutowiredTest, BuildDataTest, GormToolsSpecHelper {
+trait GormAppUnitTest implements AutowiredTest, RepoBuildDataTest, GormToolsSpecHelper {
 
     /**
-     * Overrides the BuildDataTest so we can register the repo beans after mock
+     * Overrides the RepoBuildDataTest so we can register the repo beans after mock
      */
-    @Override //BuildDataTest
+    @Override //RepoBuildDataTest
     void mockDomains(Class<?>... domainClassesToMock) {
-        BuildDataTest.super.mockDomains(domainClassesToMock)
+        mockDomainsBuildDataTest(domainClassesToMock)
         defineRepoBeans(domainClassesToMock)
         setupValidatorRegistry()
 

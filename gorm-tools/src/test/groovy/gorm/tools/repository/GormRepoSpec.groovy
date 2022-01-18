@@ -8,8 +8,8 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import gorm.tools.testing.RepoTestData
 import grails.artefact.Artefact
-import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 import testing.Address
@@ -309,7 +309,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
 
     void "test persistToManyData"() {
         when:
-        def ks = TestData.build(KitchenSink)
+        def ks = RepoTestData.build(KitchenSink)
 
         then:
         ks != null

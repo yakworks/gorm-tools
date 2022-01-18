@@ -9,13 +9,10 @@ import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.HandleMetaClass
 import org.grails.core.artefact.ControllerArtefactHandler
-import org.grails.datastore.mapping.core.DatastoreUtils
-import org.grails.datastore.mapping.core.Session
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.junit.After
 import org.junit.Before
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
 

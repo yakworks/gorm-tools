@@ -4,11 +4,13 @@
 */
 package gorm.tools.problem
 
+import grails.gorm.validation.ConstrainedProperty
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DataAccessException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
@@ -112,8 +114,13 @@ class ProblemHandler {
     }
 
     String getMsg(MessageSourceResolvable msr) {
-        String msg = messageSource.getMessage(msr)
-        return msg
+        //FIXME this should be generalized somehwere?
+        try {
+            return messageSource.getMessage(msr)
+        }
+        catch (e) {
+            return msr.codes[0]
+        }
     }
 
     /**

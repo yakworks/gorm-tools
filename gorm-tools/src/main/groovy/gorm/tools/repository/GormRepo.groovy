@@ -120,7 +120,15 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     void validateAndSave(D entity, PersistArgs args) {
         validate(entity, args)
         doAfterValidateBeforeSave(entity, args)
-        gormInstanceApi().save(entity, args.validate(false) as Map) //save without validate
+        gormSave(entity, args) //save without validate
+    }
+
+    /**
+     * called from doPersist. calls validate and save, no try catch so Exceptions bubble out.
+     * Can be
+     */
+    D gormSave(D entity, PersistArgs args = PersistArgs.defaults()) {
+        gormInstanceApi().save(entity, args as Map)
     }
 
     /**

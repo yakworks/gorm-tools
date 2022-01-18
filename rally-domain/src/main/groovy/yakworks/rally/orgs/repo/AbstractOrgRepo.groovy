@@ -80,6 +80,31 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
         if(contactData) createOrUpdatePrimaryContact(org, contactData as Map)
     }
 
+    /**
+     * Called after persist if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     */
+    @Override
+    void doAfterPersistWithData(Org org, PersistArgs args) {
+        Map data = args.data
+        if(data.locations) persistManyList(org, Location.repo, data.locations as List<Map>)
+        if(data.contacts) persistManyList(org, Contact.repo, data.contacts as List<Map>)
+        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
+    }
+
+    @Override
+    void persistToOneAssociations(Org org, List<String> associations){
+        GormRepo.super.persistToOneAssociations(org, associations)
+        if(org.location?.isNewOrDirty()) org.location.persist() //FIXME is this already validated?
+        if(org.contact?.isNewOrDirty()) org.contact.persist()
+    }
+
+    void persistManyList(Org org, GormRepo assocRepo, List<Map> assocList){
+        if(!assocList) return
+        assocList.each { it['orgId'] = org.id}
+        assocRepo.createOrUpdate(assocList)
+    }
+
     @RepoListener
     void beforeRemove(Org org, BeforeRemoveEvent e) {
         if (org.source?.sourceType == SourceType.ERP) { //might be more in future
@@ -104,31 +129,6 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
         Location.query(org: org).deleteAll()
         Contact.query(org: org).deleteAll()
         OrgSource.query(org: org).deleteAll()
-    }
-
-    /**
-     * Called after persist if its had a bind action (create or update) and it has data
-     * creates or updates One-to-Many associations for this entity.
-     */
-    @Override
-    void doAfterPersistWithData(Org org, PersistArgs args) {
-        Map data = args.data
-        persistManyList(org, Location.repo, data.locations as List<Map>)
-        persistManyList(org, Contact.repo, data.contacts as List<Map>)
-        if(data.tags) orgTagRepo.addOrRemove((Persistable)org, data.tags)
-    }
-
-    @Override
-    void persistToOneAssociations(Org org, List<String> associations){
-        GormRepo.super.persistToOneAssociations(org, associations)
-        if(org.location?.isNewOrDirty()) org.location.persist() //FIXME is this already validated?
-        if(org.contact?.isNewOrDirty()) org.contact.persist()
-    }
-
-    void persistManyList(Org org, GormRepo assocRepo, List<Map> assocList){
-        if(!assocList) return
-        assocList.each { it['orgId'] = org.id}
-        assocRepo.createOrUpdate(assocList)
     }
 
     /**
@@ -161,7 +161,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
         //make sure it has the right settings
         data.isPrimary = true
         data.orgId = org.id
-        org.contact = contactRepo.createOrUpdate(data, PersistArgs.of(persistAfterAction: false))
+        org.contact = contactRepo.createOrUpdate(data)
         return org.contact
     }
 
@@ -170,7 +170,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
         //make sure params has org key
         data.orgId = org.id
         // if it had an op of remove then will return null and this set primary location to null
-        org.location = locationRepo.createOrUpdate(data, PersistArgs.of(persistAfterAction: false))
+        org.location = locationRepo.createOrUpdate(data)
         return org.location
     }
 

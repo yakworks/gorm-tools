@@ -65,7 +65,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.location
         org.location.org == org
         ['zipCode', 'street1', 'street2', 'city', 'state', 'country'].each{
-            org.location[it] == params.location[it]
+            assert org.location[it] == params.location[it].trim()
         }
 
         jdbcTemplate.queryForObject("select orgId from Contact where id = $org.contact.id", Long) == org.id
@@ -75,6 +75,8 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         org.contact.org
         org.contact.org == org
         org.contact.firstName == params.contact.firstName
+        org.contact.locations.size() == 1
+        org.contact.locations[0].zipCode == "12345"
 
         org.flex
         org.flex.id == org.id

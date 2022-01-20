@@ -99,6 +99,17 @@ class Maps {
     }
 
     /**
+     * Does a "deep" clone of the Collection of Maps.
+     * See clone
+     *
+     * @return the cloned map
+     */
+    static Collection<Map> clone(Collection<Map> listOfMaps) {
+        if(!listOfMaps) return []
+        listOfMaps.collect{ Maps.clone(it)}
+    }
+
+    /**
      * Deeply remove/prune all nulls and falsey` empty maps, lists and strings as well
      *
      * @param map the map to prune

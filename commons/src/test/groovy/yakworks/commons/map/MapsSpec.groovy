@@ -355,6 +355,26 @@ class MapsSpec extends Specification {
         assertMapsEqual(copy, [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3], listOfMap:[[one:1]]])
     }
 
+    void "test clone list of maps"() {
+        given:
+        List source = [[num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3], listOfMap:[[one:1]]]]
+
+        when:
+        Collection<Map> copy = Maps.clone(source)
+        //change source to make sure we are dealing with copy
+        source[0].nested.num1 = 99
+        source[0].list.add(9)
+        source[0].listOfMap[0]['one'] = 99
+
+        then:
+        !copy.is(source)
+        !copy[0].nested.is(source[0].nested)
+        !copy[0].list.is(source[0].list)
+        !copy[0].listOfMap[0].is(source[0].listOfMap[0]) //maps inside list should not have been copied by reference
+        copy[0].listOfMap[0].one == 1
+        assertMapsEqual(copy[0], [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3], listOfMap:[[one:1]]])
+    }
+
     void "test deep merge"() {
         given:
         Map m1 = [num1:1, num2:2, nested:[num1:1, num2:2], list:[1,2,3]]

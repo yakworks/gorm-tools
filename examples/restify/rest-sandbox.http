@@ -16,8 +16,9 @@ Content-Type: application/json
 @token = {{login.response.body.$.access_token}}
 
 ### Get Customers
-GET {{base_url}}
+GET {{base_url}}?format=csv
 Authorization: Bearer {{token}}
+Content-Type: text/csv
 
 ### get customers query
 GET {{base_url}}?q=org%

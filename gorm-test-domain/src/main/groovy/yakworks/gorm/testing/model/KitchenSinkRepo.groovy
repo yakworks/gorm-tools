@@ -4,8 +4,6 @@
 */
 package yakworks.gorm.testing.model
 
-import gorm.tools.repository.model.IdGeneratorRepo
-
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -17,6 +15,7 @@ import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.IdGeneratorRepo
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.IsoDateUtil
 

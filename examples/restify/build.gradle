@@ -8,23 +8,34 @@ dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
-  implementation "org.grails:grails-plugin-url-mappings"
-  implementation "org.grails:grails-plugin-rest"
-  implementation "org.grails:grails-plugin-codecs"
-  implementation "org.grails:grails-plugin-interceptors"
+  compile "org.grails:grails-plugin-i18n"
+  compile "org.grails:grails-plugin-rest"
+  compile "org.grails:grails-plugin-url-mappings"
+  compile "org.grails:grails-plugin-codecs"
+  compile "org.grails:grails-plugin-interceptors"
+  compile "org.grails:grails-web-boot"
+  compile "org.grails:grails-web-url-mappings"
+  compile "org.grails.plugins:async"
 
-  implementation project(":testify")
-  implementation project(":gorm-tools-rest")
-
-  // compile vs implementation required for json views in gradle5/grails4
-  compile project(":gorm-tools") //compileGsonViews fails without this
-  compile ("org.grails.plugins:views-json:$vViews")
+  compile "org.grails.plugins:views-json:$vViews"
   compile "org.grails.plugins:views-json-templates:$vViews"
 
+  compile project(":gorm-tools")
+  compile project(":gorm-tools-security")
+  compile project(":rally-domain")
+  compile project(":testify")
+  compile project(":gorm-tools-rest")
+  compile project(":gorm-tools-csv")
+
+  compile "org.grails.plugins:view-tools:$vViewTools"
+  //??wtf
+  compile "commons-lang:commons-lang:2.6"
+  runtime "org.grails.plugins:external-config:$vExternalConfig"
+
   // REST security dependencies
-  implementation "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
+  compile "org.grails.plugins:spring-security-rest:$vSpringSecurityRest"
   // compile "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"
-  implementation "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
+  compile "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
 
   // dk.glasius not working, load twice
   // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
@@ -48,7 +59,7 @@ bootRun {
 }
 
 bootJar.enabled = true
-//bootJar.archiveFileName = 'restify-api.jar'
+bootJar.archiveFileName = 'restify.jar'
 
 integrationTest {
   testlogger {

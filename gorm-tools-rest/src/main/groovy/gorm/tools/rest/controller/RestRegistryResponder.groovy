@@ -116,7 +116,7 @@ trait RestRegistryResponder {
             if(renderer) break
         }
 
-        if (!renderer) throw new IllegalArgumentException("Houston we have a problem")
+        if (!renderer) throw new IllegalArgumentException("Houston we have a problem, renderer can't be found for format")
 
 
         final ServletRenderContext context = new ServletRenderContext(webRequest, args)
@@ -160,6 +160,7 @@ trait RestRegistryResponder {
     }
 
     private List<String> getDefaultResponseFormats() {
+        //add csv
         return MimeType.getConfiguredMimeTypes()*.extension
     }
 

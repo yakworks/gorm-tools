@@ -16,6 +16,7 @@ import gorm.tools.rest.render.JsonGeneratorRenderer
 import gorm.tools.rest.render.PagerRenderer
 import gorm.tools.rest.render.ProblemRenderer
 import gorm.tools.rest.render.SyncJobRenderer
+import gorm.tools.rest.render.csv.CSVPagerRenderer
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
@@ -41,6 +42,8 @@ class GormToolsRestGrailsPlugin extends Plugin {
             problemRenderer(ProblemRenderer)
             pagerRenderer(PagerRenderer)
             syncJobRenderer(SyncJobRenderer)
+
+            csvPagerRenderer(CSVPagerRenderer)
 
             gormToSchema(GormToSchema) { bean ->
                 bean.lazyInit = true

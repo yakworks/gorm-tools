@@ -47,8 +47,8 @@ class RestApiAstUtils {
 
     static ConstructorNode addConstructor(ClassNode controllerClassNode, ClassNode domainClassNode, boolean readOnly) {
         BlockStatement constructorBody = new BlockStatement()
-        constructorBody.addStatement(new ExpressionStatement(new ConstructorCallExpression(ClassNode.SUPER, new
-                TupleExpression(new ClassExpression(domainClassNode), new ConstantExpression(readOnly, true)))))
+        constructorBody.addStatement(new ExpressionStatement(new ConstructorCallExpression(ClassNode.SUPER,
+            new TupleExpression(new ClassExpression(domainClassNode), new ConstantExpression(readOnly, true)))))
         controllerClassNode.addConstructor(Modifier.PUBLIC, ZERO_PARAMETERS, ClassNode.EMPTY_ARRAY, constructorBody)
     }
 
@@ -125,6 +125,7 @@ class RestApiAstUtils {
         //right now just hard code json
         ListExpression responseFormatsExpression = new ListExpression()
         responseFormatsExpression.addExpression(new ConstantExpression("json"))
+        responseFormatsExpression.addExpression(new ConstantExpression("csv"))
         final publicStaticFinal = PUBLIC | STATIC | FINAL
         controllerNode.addProperty("responseFormats", publicStaticFinal, new ClassNode(List).getPlainNodeReference(), responseFormatsExpression, null, null)
     }

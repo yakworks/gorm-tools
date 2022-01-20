@@ -95,4 +95,19 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         data[0].contact.flex.num1 > data[1].contact.flex.num1
     }
 
+    void "list CSV"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [format:'csv']
+        controller.list()
+        // Map body = response.bodyToMap()
+        // List data = body.data
+
+        then:
+        response.status == 200
+        response.header("Content-Type").contains("text/csv")
+        response.contentAsString
+
+    }
+
 }

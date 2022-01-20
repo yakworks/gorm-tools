@@ -122,3 +122,8 @@ run-benchmarks:
 #		-XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark \
 #		-XX:SurvivorRatio=8 \
 
+## start the restify example jar
+start.restify: # start.db
+	${gradlew} restify:assemble
+	cd examples/restify
+	java -server -Xmx2g -jar build/libs/restify.jar

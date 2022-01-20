@@ -23,15 +23,17 @@ grails.config.locations = restConfigs
 //grails.plugin.fields.disableLookupCache = true
 //grails.converters.domain.include.version = true
 
-// IF ITS TEST THEN EXIT FAST, as of rest-security v3.0.1 rest tests blows up if anyything is setup
-if(Environment.getCurrent() == Environment.TEST){
+if(Environment.getCurrent() == Environment.TEST || Environment.getCurrent() == Environment.DEVELOPMENT){
     grails.plugin.springsecurity.rest.active = false
     grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
     grails.plugin.springsecurity.interceptUrlMap = [
         // all accesible anoymously by default
         [pattern: '/**', access: ['IS_AUTHENTICATED_ANONYMOUSLY']]
     ]
-} else {
+}
+else {
+    //PRODUCTION
+
     // Added by the Spring Security Core plugin:
     grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
     grails.plugin.springsecurity.interceptUrlMap = [

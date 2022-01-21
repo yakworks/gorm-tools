@@ -30,6 +30,7 @@ class MangoOps {
     static enum CompareOp {
         $gt, $eq, $gte, $lt, $lte, $ne, $not, $ilike, $like, $in, $inList
 
+        //the op is the value without the $
         private final String op //private for security
         String getOp(){ return op }
 

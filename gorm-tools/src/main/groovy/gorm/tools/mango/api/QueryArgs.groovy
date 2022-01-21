@@ -17,8 +17,10 @@ import static gorm.tools.mango.MangoOps.CRITERIA
 /**
  * Builder arguments for a query to pass from controllers etc to the MangoQuery
  * Can think of it a bit like a SQL query.
+ *
  * This holds
  *  - what we want to select (includes)
+ *  - projections if it s projection query (projections)
  *  - the where conditions (criteria)
  *  - the orderBy (sort)
  *  - and how we want the paging to be handled (pager), number of items per page, etc..
@@ -55,6 +57,13 @@ class QueryArgs {
      * The value is either 'asc' or 'desc'
      */
     Map<String, String> sort
+
+    /**
+     * holder for projections
+     * The key is the field, can be dot path for nested like foo.bar.baz
+     * The value is one of 'group', 'sum', 'count'
+     */
+    Map<String, String> projections
 
     /**
      * Intelligent defaults to setup the criteria and pager from the paramsMap
@@ -104,6 +113,10 @@ class QueryArgs {
         if(sortField) {
             sort = buildSort(sortField, orderBy)
         }
+
+        //projections
+        String projField = (params.remove('projections') as String)?.trim()
+        if(projField) projections = buildProjections(projField)
 
         // check for and remove the q param
         // whatever is in q if its parsed as a map and set to the criteria so it overrides everything
@@ -193,6 +206,27 @@ class QueryArgs {
         }
 
         return sortMap
+    }
+
+    /**
+     * parses the projection string. If it start with { and will parse as json.
+     * parse string should be in one of the following formats
+     *  - fields seperated by comma, ex: 'type:group,calc.totalDue:sum'
+     *  - json in same format as above, ex '{type:"group", "calc.totalDue":"sum"}'
+     *
+     * @param projText see above for valid options
+     * @return the projection Map or null if failed
+     */
+    Map buildProjections(String projText){
+        //make sure its trimmed
+        projText = projText.trim()
+        Map projMap = [:] as Map<String, String>
+        //for convienience we allow the { to be left off so we add it if it is
+        if (!projText.startsWith('{')) projText = "{$projText}"
+
+        projMap = parseJson(projText) as Map<String, String>
+
+        return projMap
     }
 
     /**

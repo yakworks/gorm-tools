@@ -45,7 +45,7 @@ class DefaultMangoQuery implements MangoQuery {
      */
     public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs,
                                               @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        mangoBuilder.build(entityClass, qargs, closure)
+        mangoBuilder.buildWithQueryArgs(entityClass, qargs, closure)
     }
 
     /**

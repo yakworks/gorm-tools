@@ -4,12 +4,15 @@
 */
 package gorm.tools.mango.api
 
+import gorm.tools.mango.MangoDetachedCriteria
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoOps
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 import yakworks.commons.map.Maps
 
 import static gorm.tools.mango.MangoOps.CRITERIA
@@ -27,19 +30,14 @@ import static gorm.tools.mango.MangoOps.CRITERIA
  *
  * contains some intermediary fields such as 'q' that are used to parse it into what we need
  */
+@Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class QueryArgs {
 
-    static QueryArgs of(Pager pager){
-        def qa = new QueryArgs()
-        qa.pager = pager
-        return qa
-    }
-
-    static QueryArgs of(Map params){
-        def qa = new QueryArgs()
-        return qa.build(params)
-    }
+    /**
+     * extra closure that can be passed to MangoCriteria
+     */
+    Closure closure
 
     /**
      * Criteria map to pass to the MangoBuilder
@@ -66,7 +64,47 @@ class QueryArgs {
     Map<String, String> projections
 
     /**
-     * Intelligent defaults to setup the criteria and pager from the paramsMap
+     * Construct from a pager
+     */
+    static QueryArgs of(Pager pager){
+        def qa = new QueryArgs()
+        qa.pager = pager
+        return qa
+    }
+
+    /**
+     * Construct from a controller style params object where each key has as string value
+     * just as if it came from a url
+     */
+    static QueryArgs of(Map params){
+        def qa = new QueryArgs()
+        return qa.build(params)
+    }
+
+    /**
+     * Construct from a mango closure
+     */
+    static QueryArgs of(@DelegatesTo(MangoDetachedCriteria) Closure closure){
+        def qa = new QueryArgs()
+        return qa.query(closure)
+    }
+
+    static QueryArgs withProjections(Map<String, String> projs){
+        def qa = new QueryArgs()
+        return qa.projections(projs)
+    }
+
+    /**
+     * Construct with a criteria map as is.
+     */
+    static QueryArgs withCriteria(Map<String, Object> crit){
+        def qa = new QueryArgs()
+        return qa.criteria(crit)
+    }
+
+    /**
+     * Intelligent defaults to setup the criteria and pager from the controller style params map
+     *
      *  - looks for q param and parse if json object (starts with {)
      *  - or sets up the $qSearch map if its text
      *  - if qSearch is provided as separate param along with q then adds it as a $qSearch
@@ -229,6 +267,10 @@ class QueryArgs {
         return projMap
     }
 
+    QueryArgs query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
+        this.closure = closure
+        return this
+    }
     /**
      * looks for the qsearch fields for this entity and returns the map
      * like [text: "foo", 'fields': ['name', 'num']]

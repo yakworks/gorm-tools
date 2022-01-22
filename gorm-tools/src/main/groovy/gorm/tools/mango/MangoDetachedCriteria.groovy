@@ -9,6 +9,7 @@ import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.finders.DynamicFinder
+import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
 import org.grails.datastore.mapping.core.Session
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryArgumentsAware
@@ -18,6 +19,9 @@ import org.grails.orm.hibernate.query.HibernateQuery
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
+
+import javax.persistence.FetchType
+import javax.persistence.criteria.JoinType
 
 /**
  * This is here to make it easier to build criteria with domain bean paths
@@ -78,6 +82,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
             }
             return query.list()
         }
+    }
+
+    /**
+     * Lists all records matching the criterion contained within this DetachedCriteria instance
+     *
+     * @return A list of matching instances
+     */
+    List<Map> mapList() {
+        getHibernateQuery().mapList() as List<Map>
     }
 
     /**
@@ -237,13 +250,6 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         super.invokeMethod(assoc, args)
     }
 
-    // /**
-    //  * Dynamic method dispatch fail!
-    //  */
-    // Object methodMissing(String name, Object args) {
-    //     return super.invokeMethod(name, args)
-    // }
-
     @Override
     protected MangoDetachedCriteria<T> clone() {
         return (MangoDetachedCriteria)super.clone()
@@ -265,8 +271,8 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         callable.call(query)
     }
 
-    HibernateQuery getHibernateQuery() {
-        getQueryInstance([:], null) as HibernateQuery
+    HibernateMangoQuery getHibernateQuery() {
+        getQueryInstance([:], null) as HibernateMangoQuery
     }
 
     Query getQueryInstance(Map args, Closure additionalCriteria) {
@@ -293,6 +299,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
                 query.offset(defaultOffset)
             }
             DynamicFinder.applyDetachedCriteria(query, this)
+            //applyDetachedCriteria(query, this)
 
             if(query instanceof QueryArgumentsAware) {
                 ((QueryArgumentsAware)query).arguments = args
@@ -307,6 +314,41 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         }
 
         return query
+    }
+
+    // copied in from DynamicFinder.applyDetachedCriteria
+    static void applyDetachedCriteria(Query query, AbstractDetachedCriteria detachedCriteria) {
+        if (detachedCriteria != null) {
+            Map<String, FetchType> fetchStrategies = detachedCriteria.getFetchStrategies();
+            for (Map.Entry<String, FetchType> entry : fetchStrategies.entrySet()) {
+                String property = entry.getKey();
+                switch(entry.getValue()) {
+                    case FetchType.EAGER:
+                        JoinType joinType = (JoinType) detachedCriteria.getJoinTypes().get(property);
+                        if(joinType != null) {
+                            query.join(property, joinType);
+                        }
+                        else {
+                            query.join(property);
+                        }
+                        break;
+                    case FetchType.LAZY:
+                        query.select(property);
+                }
+            }
+            List<Query.Criterion> criteria = detachedCriteria.getCriteria();
+            for (Query.Criterion criterion : criteria) {
+                query.add(criterion);
+            }
+            List<Query.Projection> projections = detachedCriteria.getProjections();
+            for (Query.Projection projection : projections) {
+                query.projections().add(projection);
+            }
+            List<Query.Order> orders = detachedCriteria.getOrders();
+            for (Query.Order order : orders) {
+                query.order(order);
+            }
+        }
     }
 
     @Override
@@ -345,13 +387,3 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
 }
-
-/**
- * This class exists solely to circumvent the "protected" visibility of the org.hibernate.criterion.Order class constructor.
- */
-// @CompileDynamic
-// class OrderCheater extends Query.Order {
-//     OrderCheater(String propertyName, boolean ascending) {
-//         super(propertyName, ascending)
-//     }
-// }

@@ -45,10 +45,6 @@ class MangoBuilder {
 
     @Autowired IncludesConfig includesConfig
 
-    public <D> MangoDetachedCriteria<D> build(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        return buildWithQueryArgs(clazz, qargs, callable)
-    }
-
     public <D> MangoDetachedCriteria<D> build(Class<D> clazz, Map map, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
         MangoDetachedCriteria<D> detachedCriteria = new MangoDetachedCriteria<D>(clazz)
         return build(detachedCriteria, map, callable)
@@ -70,10 +66,14 @@ class MangoBuilder {
 
     public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
         MangoDetachedCriteria<D> newCriteria = new MangoDetachedCriteria<D>(clazz)
-        def criteria = qargs.criteria
+        Map criteria = qargs.criteria
         def tidyMap = MangoTidyMap.tidy(criteria)
         applyMapOrList(newCriteria, tidyMap)
         if (callable) newCriteria.with callable
+
+        if(qargs.sort && !criteria.containsKey(SORT)){
+            applyProjections(newCriteria, qargs.projections)
+        }
 
         if(qargs.projections){
             applyProjections(newCriteria, qargs.projections)

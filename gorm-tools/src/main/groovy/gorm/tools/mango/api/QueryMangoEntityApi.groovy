@@ -41,6 +41,10 @@ trait QueryMangoEntityApi<D> {
         query([:], closure)
     }
 
+    MangoDetachedCriteria<D> query(QueryArgs queryArgs) {
+        getMangoQuery().query(getEntityClass(), queryArgs, null)
+    }
+
     /**
      * List of entities restricted by mango map and criteria closure
      *

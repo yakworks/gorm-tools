@@ -28,7 +28,7 @@ interface MangoQuery {
      *  Builds detached criteria for repository's domain based on mango criteria language
      *
      * @param entityClass the base entity class
-     * @param qargs the QueryArgs with the prepared criteria in it.
+     * @param qargs the QueryArgs with the prepared criteria and props in it.
      * @param closure extra criterai closure
      * @return the detached criteria to call list or get on
      */

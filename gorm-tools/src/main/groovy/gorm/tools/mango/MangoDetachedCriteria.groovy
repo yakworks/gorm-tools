@@ -4,6 +4,9 @@
 */
 package gorm.tools.mango
 
+import javax.persistence.FetchType
+import javax.persistence.criteria.JoinType
+
 import groovy.transform.CompileDynamic
 
 import org.grails.datastore.gorm.GormEnhancer
@@ -14,14 +17,10 @@ import org.grails.datastore.mapping.core.Session
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.orm.hibernate.AbstractHibernateSession
-import org.grails.orm.hibernate.query.HibernateQuery
 
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
-
-import javax.persistence.FetchType
-import javax.persistence.criteria.JoinType
 
 /**
  * This is here to make it easier to build criteria with domain bean paths
@@ -64,7 +63,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     T get(Map args = Collections.emptyMap(), @DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (T)withPopulatedQuery(args, additionalCriteria) { Query query ->
+        (T)withQueryInstance(args, additionalCriteria) { Query query ->
             query.singleResult()
         }
     }
@@ -76,7 +75,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     List<T> list(Map args = Collections.emptyMap(), @DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (List)withPopulatedQuery(args, additionalCriteria) { Query query ->
+        (List)withQueryInstance(args, additionalCriteria) { Query query ->
             if (args?.max) {
                 return new PagedResultList(query)
             }
@@ -101,7 +100,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     Number count(Map args = Collections.emptyMap(), @DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (Number)withPopulatedQuery(args, additionalCriteria) { Query query ->
+        (Number)withQueryInstance(args, additionalCriteria) { Query query ->
             query.projections().count()
             query.singleResult()
         }
@@ -115,21 +114,21 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     @Override
     Number count(@DelegatesTo(DetachedCriteria) Closure additionalCriteria) {
-        (Number)withPopulatedQuery(Collections.emptyMap(), additionalCriteria) { Query query ->
+        (Number)withQueryInstance(Collections.emptyMap(), additionalCriteria) { Query query ->
             query.projections().count()
             query.singleResult()
         }
     }
 
     /**
-     * Counts the number of records returned by the query
+     * exists, checks if count is > 0
      *
      * @param args The arguments
-     * @return The count
+     * @return true if count > 0
      */
     @Override
     boolean asBoolean(@DelegatesTo(DetachedCriteria) Closure additionalCriteria = null) {
-        (Boolean)withPopulatedQuery(Collections.emptyMap(), additionalCriteria) { Query query ->
+        (Boolean)withQueryInstance(Collections.emptyMap(), additionalCriteria) { Query query ->
             query.projections().count()
             ((Number)query.singleResult()) > 0
         }
@@ -171,49 +170,6 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         projectionList.countDistinct(property)
         return this
     }
-
-    /**
-     * Orders by the specified property name (defaults to ascending)
-     *
-     * @param propertyName The property name to order by
-     * @return A Order instance
-     */
-    // @Override
-    // MangoDetachedCriteria<T> order(String propertyName) {
-    //     return order(propertyName, "asc")
-    // }
-
-    /**
-     * Orders by the specified property name and direction
-     * takes invoice.customer.name and builds a closure that looks like
-     *
-     * invoice {
-     *    customer {
-     *       order(name)
-     *    }
-     * }
-     * and then calls the that closure on this.
-     *
-     * @param propertyName The property name to order by
-     * @param direction Either "asc" for ascending or "desc" for descending
-     * @param forceSuper use original order(...) from HibernateCriteriaBuilder
-     *
-     * @return A Order instance
-     */
-    // @CompileDynamic
-    // MangoDetachedCriteria<T> order(String propertyName, String direction, boolean forceSuper = false) {
-    //     if (forceSuper || !propertyName.contains('.')) {
-    //         return super.order(propertyName, direction)
-    //     }
-    //     List props = propertyName.split(/\./) as List
-    //     String last = props.pop()
-    //     Closure toDo = { order(last, direction) }
-    //     Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
-    //         { -> "$prop"(acc) }
-    //     }
-    //     newOrderBy.call()
-    //     return this
-    // }
 
     @Override
     MangoDetachedCriteria<T> eq(String propertyName, Object propertyValue) {
@@ -266,16 +222,24 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         (MangoDetachedCriteria<T>)super.build(callable)
     }
 
-    def withPopulatedQuery(Map args, Closure additionalCriteria, Closure callable)  {
-        Query query = getQueryInstance(args, additionalCriteria)
-        callable.call(query)
+    /**
+     * Overrides the private withPopulatedQuery in super.
+     * creates a HibernateMangoQuery instance and pass it to the closure
+     */
+    def withQueryInstance(Map args, Closure additionalCriteria, Closure closure)  {
+        Query query = createQueryInstance(args, additionalCriteria)
+        closure.call(query)
     }
 
     HibernateMangoQuery getHibernateQuery() {
-        getQueryInstance([:], null) as HibernateMangoQuery
+        createQueryInstance([:], null) as HibernateMangoQuery
     }
 
-    Query getQueryInstance(Map args, Closure additionalCriteria) {
+    /**
+     * moved in from  private super.withPopulatedQuery.
+     * Creates a HibernateMangoQuery or in testing falls back to the session.createQuery
+     */
+    Query createQueryInstance(Map args, Closure additionalCriteria) {
         Query query
 
         GormStaticApi staticApi = persistentEntity.isMultiTenant() ?
@@ -284,13 +248,12 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         staticApi.withDatastoreSession { Session session ->
             applyLazyCriteria()
             if(session instanceof AbstractHibernateSession) {
-                // query = session.createQuery(targetClass, alias)
+                //query = session.createQuery(targetClass, alias)
                 query = HibernateMangoQuery.createQuery( (AbstractHibernateSession)session, persistentEntity, alias)
             }
             else {
                 query = session.createQuery(targetClass)
             }
-
 
             if (defaultMax != null) {
                 query.max(defaultMax)
@@ -317,39 +280,39 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     }
 
     // copied in from DynamicFinder.applyDetachedCriteria
-    static void applyDetachedCriteria(Query query, AbstractDetachedCriteria detachedCriteria) {
-        if (detachedCriteria != null) {
-            Map<String, FetchType> fetchStrategies = detachedCriteria.getFetchStrategies();
-            for (Map.Entry<String, FetchType> entry : fetchStrategies.entrySet()) {
-                String property = entry.getKey();
-                switch(entry.getValue()) {
-                    case FetchType.EAGER:
-                        JoinType joinType = (JoinType) detachedCriteria.getJoinTypes().get(property);
-                        if(joinType != null) {
-                            query.join(property, joinType);
-                        }
-                        else {
-                            query.join(property);
-                        }
-                        break;
-                    case FetchType.LAZY:
-                        query.select(property);
-                }
-            }
-            List<Query.Criterion> criteria = detachedCriteria.getCriteria();
-            for (Query.Criterion criterion : criteria) {
-                query.add(criterion);
-            }
-            List<Query.Projection> projections = detachedCriteria.getProjections();
-            for (Query.Projection projection : projections) {
-                query.projections().add(projection);
-            }
-            List<Query.Order> orders = detachedCriteria.getOrders();
-            for (Query.Order order : orders) {
-                query.order(order);
-            }
-        }
-    }
+    // static void applyDetachedCriteria(Query query, AbstractDetachedCriteria detachedCriteria) {
+    //     if (detachedCriteria != null) {
+    //         Map<String, FetchType> fetchStrategies = detachedCriteria.getFetchStrategies();
+    //         for (Map.Entry<String, FetchType> entry : fetchStrategies.entrySet()) {
+    //             String property = entry.getKey();
+    //             switch(entry.getValue()) {
+    //                 case FetchType.EAGER:
+    //                     JoinType joinType = (JoinType) detachedCriteria.getJoinTypes().get(property);
+    //                     if(joinType != null) {
+    //                         query.join(property, joinType);
+    //                     }
+    //                     else {
+    //                         query.join(property);
+    //                     }
+    //                     break;
+    //                 case FetchType.LAZY:
+    //                     query.select(property);
+    //             }
+    //         }
+    //         List<Query.Criterion> criteria = detachedCriteria.getCriteria();
+    //         for (Query.Criterion criterion : criteria) {
+    //             query.add(criterion);
+    //         }
+    //         List<Query.Projection> projections = detachedCriteria.getProjections();
+    //         for (Query.Projection projection : projections) {
+    //             query.projections().add(projection);
+    //         }
+    //         List<Query.Order> orders = detachedCriteria.getOrders();
+    //         for (Query.Order order : orders) {
+    //             query.order(order);
+    //         }
+    //     }
+    // }
 
     @Override
     MangoDetachedCriteria<T> order(String propertyName) {

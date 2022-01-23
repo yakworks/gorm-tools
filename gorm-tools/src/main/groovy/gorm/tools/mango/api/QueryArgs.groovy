@@ -4,15 +4,15 @@
 */
 package gorm.tools.mango.api
 
-import gorm.tools.mango.MangoDetachedCriteria
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
-
-import gorm.tools.beans.Pager
-import gorm.tools.mango.MangoOps
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
+
+import gorm.tools.beans.Pager
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.MangoOps
 import yakworks.commons.map.Maps
 
 import static gorm.tools.mango.MangoOps.CRITERIA

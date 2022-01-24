@@ -38,6 +38,7 @@ import yakworks.commons.lang.NameUtils
  *
  * ilike('invoice.customer.name', 'foo')
  */
+@SuppressWarnings(['MethodCount']) //ok for this
 @GrailsCompileStatic
 class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 

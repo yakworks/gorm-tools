@@ -5,8 +5,6 @@
 package gorm.tools.mango.hibernate
 
 import java.lang.reflect.Field
-import java.time.DayOfWeek
-import java.time.temporal.ChronoUnit
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -381,6 +379,7 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
         }
 
         String buildAlias(Query.Projection p, String propName){
+            propName = propName.replace('.', '_')
             switch (p) {
                 case Query.SumProjection:
                     return "${propName}_sum"

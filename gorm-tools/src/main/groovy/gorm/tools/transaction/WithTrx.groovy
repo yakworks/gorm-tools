@@ -10,8 +10,6 @@ import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SimpleType
 
-import org.springframework.transaction.TransactionStatus
-
 /**
  * adds transaction methods to any class. relies on Gorms transactionService.
  *
@@ -61,15 +59,5 @@ trait WithTrx {
     public <T> T withSession(Closure<T> callable){
         getTrxService().withSession callable
     }
-
-    void flushAndClear(TransactionStatus status) {
-        getTrxService().flushAndClear(status)
-    }
-
-
-    // @CompileDynamic
-    // void clear(TransactionStatus status) {
-    //     trxService.clear(status)
-    // }
 
 }

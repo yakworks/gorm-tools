@@ -4,7 +4,6 @@
 */
 package gorm.tools.transaction
 
-
 import groovy.transform.CompileStatic
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.SimpleType
@@ -15,15 +14,9 @@ import org.grails.datastore.mapping.core.Datastore
 import org.grails.datastore.mapping.core.Session
 import org.grails.datastore.mapping.transactions.CustomizableRollbackTransactionAttribute
 import org.grails.datastore.mapping.transactions.TransactionCapableDatastore
-import org.grails.datastore.mapping.transactions.TransactionObject
-import org.grails.orm.hibernate.GrailsHibernateTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.TransactionDefinition
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.interceptor.TransactionAspectSupport
-import org.springframework.transaction.support.DefaultTransactionStatus
-import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import gorm.tools.beans.AppCtx
 import gorm.tools.repository.RepoLookup
@@ -161,73 +154,27 @@ class TrxService {
         getTargetDatastore().currentSession
     }
 
-    void flushAndClear(TransactionStatus status) {
-        status.flush()
-        def ses = getCurrentSession()
-        ses.clear()
+    void flushAndClear() {
+        flush()
+        clear()
     }
 
     /**
      * see the static flush method which is called with the getTargetDatastore()
      */
     void flush() {
-        flush(getTargetDatastore())
+        TrxStaticApi.flush(getTargetDatastore())
     }
 
     /**
      * see the static clear method which is called with the getTargetDatastore()
      */
     void clear() {
-        clear(getTargetDatastore())
-    }
-
-    /**
-     * force a roll back if in a transaction
-     * Can be used if wanting to rollback without firing an exception
-     */
-    static void rollback() {
-        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly()
-    }
-
-    /**
-     * Calls flush if we are actively in a transaction, uses TransactionSynchronizationManager
-     * if not in a transaction then flush is not valid concept anymore.
-     * Everything is in a transaction if its db or datastore related
-     * See the instance flush method if dont ahve datastore or are using the default one
-     *
-     * @param datastore the datastore for the flush
-     */
-    static void flush(Datastore datastore) {
-        // only calls flush if we are actively in a trx
-        if(TransactionSynchronizationManager.isSynchronizationActive()) {
-            GrailsHibernateTemplate htemp = (GrailsHibernateTemplate)datastore.currentSession.nativeInterface
-            //the flush method with object arg will run the flush inside of templates execute which will
-            //transalate the exeptions to spring exceptions, the object arg does nothing
-            htemp.flush("nothing")
-        }
-    }
-
-    /**
-     * Clears the cache for datastore if is has a current session
-     * See the instance flush method if dont have datastore or are using the default one
-     *
-     * @param datastore the datastore for the flush
-     */
-    static void clear(Datastore ds) {
-        if(ds.hasCurrentSession()) ds.currentSession.clear()
+        TrxStaticApi.clear(getTargetDatastore())
     }
 
     static TrxService bean(){
         AppCtx.get('trxService', TrxService)
     }
 
-    // void flushAndClear(TransactionStatus status) {
-    //     status.flush()
-    //     clear(status)
-    // }
-    //
-    // void clear(TransactionStatus status) {
-    //     TransactionObject txObject = (status as DefaultTransactionStatus).transaction as TransactionObject
-    //     txObject.sessionHolder.getSession().clear()
-    // }
 }

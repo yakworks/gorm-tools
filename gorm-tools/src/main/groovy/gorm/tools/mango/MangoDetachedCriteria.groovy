@@ -9,9 +9,11 @@ import groovy.transform.CompileDynamic
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.finders.DynamicFinder
+import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
 import org.grails.datastore.mapping.core.Session
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryArgumentsAware
+import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
 
 import gorm.tools.mango.hibernate.HibernateMangoQuery
@@ -170,20 +172,20 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         return this
     }
 
-    @Override
-    MangoDetachedCriteria<T> eq(String propertyName, Object propertyValue) {
-        nestedPathPropCall(propertyName, propertyValue, "eq")
-    }
+    // @Override
+    // MangoDetachedCriteria<T> eq(String propertyName, Object propertyValue) {
+    //     nestedPathPropCall(propertyName, propertyValue, "eq")
+    // }
 
-    @Override
-    MangoDetachedCriteria<T> ne(String propertyName, Object propertyValue) {
-        nestedPathPropCall(propertyName, propertyValue, "ne")
-    }
-
-    @Override
-    MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
-        nestedPathPropCall(propertyName, values, "inList")
-    }
+    // @Override
+    // MangoDetachedCriteria<T> ne(String propertyName, Object propertyValue) {
+    //     nestedPathPropCall(propertyName, propertyValue, "ne")
+    // }
+    //
+    // @Override
+    // MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
+    //     nestedPathPropCall(propertyName, values, "inList")
+    // }
 
     @CompileDynamic
     MangoDetachedCriteria<T> nestedPathPropCall(String propertyName, Object propertyValue, String critName) {
@@ -335,7 +337,8 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * for foo and foo.bar
      */
     void ensureAliases(String prop){
-        if(prop.count('.') < 1) return
+        // if (!propertyName.contains('.') || propertyName.endsWith('.id'))
+        if(prop.count('.') < 1 || (prop.count('.') == 1 && prop.endsWith('.id'))) return
 
         List<String> props = prop.split(/\./) as List<String>
         String first = props[0]
@@ -348,4 +351,352 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         }
     }
 
+    /******** PROPERTY CRITERIAS ************/
+
+    @Override
+    MangoDetachedCriteria<T> "in"(String propertyName, Collection values) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.in(propertyName, values)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> "in"(String propertyName, QueryableCriteria subquery) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.in(propertyName, subquery)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> inList(String propertyName, QueryableCriteria<?> subquery) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.inList(propertyName, subquery)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> "in"(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> subquery) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.in(propertyName, subquery)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> inList(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> subquery) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.inList(propertyName, subquery)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> "in"(String propertyName, Object[] values) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.in(propertyName, values)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> notIn(String propertyName, QueryableCriteria<?> subquery) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.notIn(propertyName, subquery)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> notIn(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> subquery) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.notIn(propertyName, subquery)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> inList(String propertyName, Collection values) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.inList(propertyName, values)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> inList(String propertyName, Object[] values) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.inList(propertyName, values)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> sizeEq(String propertyName, int size) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.sizeEq(propertyName, size)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> sizeGt(String propertyName, int size) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.sizeGt(propertyName, size)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> sizeGe(String propertyName, int size) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.sizeGe(propertyName, size)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> sizeLe(String propertyName, int size) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.sizeLe(propertyName, size)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> sizeLt(String propertyName, int size) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.sizeLt(propertyName, size)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> sizeNe(String propertyName, int size) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.sizeNe(propertyName, size)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> eqProperty(String propertyName, String otherPropertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.eqProperty(propertyName, otherPropertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> neProperty(String propertyName, String otherPropertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.neProperty(propertyName, otherPropertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> allEq(Map<String, Object> propertyValues) {
+
+        return (MangoDetachedCriteria<T>)super.allEq(propertyValues)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> gtProperty(String propertyName, String otherPropertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.gtProperty(propertyName, otherPropertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> geProperty(String propertyName, String otherPropertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.geProperty(propertyName, otherPropertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ltProperty(String propertyName, String otherPropertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ltProperty(propertyName, otherPropertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> leProperty(String propertyName, String otherPropertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.leProperty(propertyName, otherPropertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> isEmpty(String propertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.isEmpty(propertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> isNotEmpty(String propertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.isNotEmpty(propertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> isNull(String propertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.isNull(propertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> isNotNull(String propertyName) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.isNotNull(propertyName)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> eq(String propertyName, Object propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.eq(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> idEq(Object propertyValue) {
+        return (MangoDetachedCriteria<T>)super.idEq(propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ne(String propertyName, Object propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ne(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> between(String propertyName, Object start, Object finish) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.between(propertyName, start, finish)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> gte(String propertyName, Object value) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.gte(propertyName, value)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ge(String propertyName, Object value) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ge(propertyName, value)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> gt(String propertyName, Object value) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.gt(propertyName, value)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> lte(String propertyName, Object value) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.lte(propertyName, value)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> le(String propertyName, Object value) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.le(propertyName, value)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> lt(String propertyName, Object value) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.lt(propertyName, value)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> like(String propertyName, Object propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.like(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ilike(String propertyName, Object propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ilike(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> rlike(String propertyName, Object propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.rlike(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> eqAll(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.eqAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> gtAll(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.gtAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ltAll(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ltAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> geAll(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.geAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> leAll(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.leAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> eqAll(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.eqAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> gtAll(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.gtAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> gtSome(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.gtSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> gtSome(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.gtSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> geSome(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.geSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> geSome(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.geSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ltSome(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ltSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ltSome(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ltSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> leSome(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.leSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> leSome(String propertyName, @DelegatesTo(AbstractDetachedCriteria) Closure<?> propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.leSome(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> ltAll(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.ltAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> geAll(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.geAll(propertyName, propertyValue)
+    }
+
+    @Override
+    MangoDetachedCriteria<T> leAll(String propertyName, QueryableCriteria propertyValue) {
+        ensureAliases(propertyName)
+        return (MangoDetachedCriteria<T>)super.leAll(propertyName, propertyValue)
+    }
 }

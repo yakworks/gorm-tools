@@ -9,24 +9,24 @@ import groovy.transform.CompileStatic
 
 @CompileStatic
 @SuppressWarnings("rawtypes")
-public class JpqlQueryInfo {
+class JpqlQueryInfo {
 
     String query
     List parameters
 
-    public JpqlQueryInfo(String query, List parameters) {
+    JpqlQueryInfo(String query, List parameters) {
         this.query = query
         this.parameters = parameters
     }
 
-    public String getQuery() {
+    String getQuery() {
         return query
     }
 
-    public List getParameters() {
+    List getParameters() {
         return parameters
     }
-    public Map getParamMap() {
+    Map getParamMap() {
         Map pmap = [:]
         parameters.eachWithIndex{ v, i ->
             pmap["p${i+1}"] = v

@@ -4,14 +4,13 @@
 */
 package gorm.tools.job
 
-import groovy.transform.CompileDynamic
-
 import java.nio.file.Path
 import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 import groovy.json.StreamingJsonBuilder
+import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
 import groovy.transform.ToString
@@ -202,15 +201,10 @@ class SyncJobContext {
         }
     }
 
-    @CompileDynamic
-    List<Map> callTransformResultsClosure(ApiResults apiResults) {
-        return transformResultsClosure(apiResults) as List<Map>
-    }
-
     List<Map> transformResults(ApiResults apiResults) {
         // exit fast if closure is used
         if(transformResultsClosure) {
-            return callTransformResultsClosure(apiResults) as List<Map>
+            return transformResultsClosure.call(apiResults) as List<Map>
         }
         MsgService msgService = syncJobService.messageSource
         List<Map> ret = []

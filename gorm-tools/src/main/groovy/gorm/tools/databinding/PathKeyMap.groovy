@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.util.HashCodeHelper
 import org.grails.datastore.mapping.model.config.GormProperties
 
+import yakworks.commons.map.Maps
+
 /**
  * A redo of the  GrailsParameterMap, primary to remove the need for HttpServletRequest.
  * Allows a flattened map of path keys such that
@@ -17,9 +19,9 @@ import org.grails.datastore.mapping.model.config.GormProperties
  */
 @SuppressWarnings(["ExplicitCallToEqualsMethod"])
 @CompileStatic
-class PathKeyMap implements Map, Cloneable  {
+class PathKeyMap<K,V> implements Map<K,V>, Cloneable  {
 
-    Map wrappedMap;
+    Map<? extends K, ? extends V> wrappedMap
 
     String pathDelimiter = "."
 
@@ -30,26 +32,26 @@ class PathKeyMap implements Map, Cloneable  {
      *
      * @param values The values to populate with
      */
-    PathKeyMap(Map sourceMap) {
+    PathKeyMap(Map<? extends K, ? extends V> sourceMap) {
         wrappedMap = sourceMap?:[:]
     }
 
-    static of(Map sourceMap){
+    static <K, V> PathKeyMap<K,V> of(Map<K,V> sourceMap){
         return new PathKeyMap(sourceMap)
     }
 
-    static of(Map sourceMap, String pathDelimiter ){
+    static <K, V> PathKeyMap<K,V> of(Map<K,V> sourceMap, String pathDelimiter ){
         def pkm = new PathKeyMap(sourceMap)
         pkm.pathDelimiter = pathDelimiter
         return pkm
     }
 
-    static create(Map sourceMap){
+    static <K, V> PathKeyMap<K,V> create(Map<K,V> sourceMap){
         def pkm = new PathKeyMap(sourceMap)
         return pkm.init()
     }
 
-    PathKeyMap pathDelimiter(String v){
+    PathKeyMap<K,V> pathDelimiter(String v){
         this.pathDelimiter = v
         return this
     }
@@ -57,25 +59,40 @@ class PathKeyMap implements Map, Cloneable  {
 
     //need this, or else, groovy metaclass would call 'get' method of this class, resulting in StackOverflow error
     //See MetaClassImpl.getProperty
-    protected Map getWrappedMap() {
+    protected Map<K,V> getWrappedMap() {
         return this.wrappedMap //direct field access
     }
 
-    @Override
-    Object clone() {
+    PathKeyMap cloneMap() {
         if (wrappedMap.isEmpty()) {
             return PathKeyMap.of([:], pathDelimiter)
         } else {
+            // Map clonedMap = Maps.clone(wrappedMap)
             Map clonedMap = new LinkedHashMap(wrappedMap)
             // deep clone nested entries
-            for(Iterator it=clonedMap.entrySet().iterator(); it.hasNext();) {
-                Entry entry = (Entry)it.next()
-                if (entry.getValue() instanceof PathKeyMap) {
-                    entry.setValue(((PathKeyMap)entry.getValue()).clone())
+
+
+            clonedMap.keySet().each { k ->
+                def val = clonedMap[k]
+                //clone the nested values that are pathKeyMaps
+                if (val instanceof PathKeyMap) {
+                    clonedMap[k] = (val as PathKeyMap).cloneMap()
+                }
+                // if its a list of PathKeyMaps then iterate over and clone those too
+                else if(val instanceof Collection<PathKeyMap>) {
+                    clonedMap[k] = val.collect{
+                        (it as PathKeyMap).cloneMap()
+                    } as Collection<PathKeyMap>
                 }
             }
+
             return PathKeyMap.of(clonedMap, pathDelimiter)
         }
+    }
+
+    @Override
+    public Object clone() {
+        cloneMap()
     }
 
     void mergeValuesFrom(PathKeyMap otherMap) {
@@ -107,7 +124,7 @@ class PathKeyMap implements Map, Cloneable  {
     Object put(Object key, Object value) {
         if (value instanceof CharSequence) value = value.toString()
         if (key instanceof CharSequence) key = key.toString()
-        Object returnValue =  wrappedMap.put(key, value)
+        Object returnValue =  wrappedMap.put((K)key, (V)value)
         if (key instanceof String) {
             String keyString = (String)key
             if (keyString.indexOf(pathDelimiter) > -1) {

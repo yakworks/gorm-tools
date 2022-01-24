@@ -5,6 +5,7 @@
 package gorm.tools.job
 
 import java.nio.file.Path
+import java.text.DecimalFormat
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -22,10 +23,12 @@ import yakworks.api.Result
 import yakworks.api.ResultUtils
 import yakworks.commons.io.IOUtils
 import yakworks.commons.json.JsonEngine
+import yakworks.commons.json.JsonStreaming
 import yakworks.commons.lang.Validate
 import yakworks.i18n.MsgService
 import yakworks.problem.ProblemTrait
 
+@SuppressWarnings('Println')
 @Builder(builderStrategy= SimpleStrategy, prefix="")
 @MapConstructor
 @ToString
@@ -48,8 +51,6 @@ class SyncJobContext {
      * Payload input data used for job operations
      */
     Object payload
-
-    boolean fileStorage = false
 
     int payloadSize
 
@@ -81,11 +82,23 @@ class SyncJobContext {
             state: SyncJobState.Running, payload: payload
         ] as Map<String,Object>
 
-        //the calle to this method is already wrapped in a new trx
-        def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
+        if(payload instanceof Collection && payload.size() > 1000) {
+            args.savePayloadAsFile = true
+            args.saveDataAsFile = true
+        }
 
-        //if repo used payloadId file then will use file and dataId to stream results too
-        fileStorage = jobEntity.payloadId
+        if(args.savePayload){
+            if (payload && args.savePayloadAsFile) {
+                data.payloadId = writePayloadFile(payload as Collection<Map>)
+            }
+            else {
+                String res = JsonEngine.toJson(payload)
+                data.payloadBytes = res.bytes
+            }
+        }
+
+        //the call to this createJob method is already wrapped in a new trx
+        def jobEntity = syncJobService.repo.create(data, [flush: true, bindId: true]) as SyncJobEntity
 
         //inititialize the ApiResults to be used in process
         results = ApiResults.create()
@@ -99,21 +112,37 @@ class SyncJobContext {
         }
     }
 
-    void updateJobResults(ApiResults currentResults) {
+    /**
+     * Update the job resiults with the current progress info
+     *
+     * @param currentResults the ApiResults
+     * @param startTimeMillis the start time in millis, used to deduce time elapsed
+     */
+    void updateJobResults(ApiResults currentResults, Long startTimeMillis) {
         if(!currentResults.ok) ok.set(false)
         boolean curOk = ok.get()
 
         int processedSize = processedCount.addAndGet(currentResults.size())
-        String message = "current results ok:${currentResults.ok} Processed ${processedSize} of ${processedSize}"
+        DecimalFormat decFmt = new DecimalFormat("0.0")
+        BigDecimal endTime = (System.currentTimeMillis() - startTimeMillis) / 1000
+        String timing = "${decFmt.format(endTime)}s"
+
+        String mem = decFmt.format(getUsedMem())
+
+        String message = "slice ok: ${currentResults.ok}, processed ${processedSize} of ${payloadSize} in ${timing}, used mem: ${mem}gb"
         if(!currentResults.ok){
             int problemSize = problemCount.addAndGet(currentResults.getProblems().size())
-            message = "$message, with ${problemSize} problems so far"
+            message = "$message\n Has ${problemSize} problems so far"
         }
+        if(log.isDebugEnabled()){
+            println(message)
+        }
+
         updateJob(currentResults, [id: jobId, ok: curOk, message: message])
     }
 
     void appendDataResults(ApiResults currentResults){
-        if(fileStorage){
+        if(args.saveDataAsFile){
             if(!dataPath) initJsonDataFile()
             def writer = dataPath.newWriter(true)
             def sjb = new StreamingJsonBuilder(writer, JsonEngine.generator)
@@ -131,7 +160,7 @@ class SyncJobContext {
 
     SyncJobEntity finishJob(List<Map> renderResults = []) {
         Map data = [id: jobId, state: SyncJobState.Finished] as Map<String, Object>
-        if(fileStorage){
+        if(args.saveDataAsFile){
             //close out the file
             dataPath.withWriterAppend { wr ->
                 wr.write(']\n')
@@ -158,7 +187,7 @@ class SyncJobContext {
     }
 
     void initJsonDataFile() {
-        String filename = "SyncJobPData_${jobId}_.json"
+        String filename = "SyncJobData_${jobId}_.json"
         dataPath = syncJobService.createTempFile(filename)
         //init with the opening brace
         dataPath.withWriter { wr ->
@@ -186,6 +215,21 @@ class SyncJobContext {
             ret << map
         }
         return ret
+    }
+
+    Long writePayloadFile(Collection<Map> payload){
+        String filename = "SyncJobPayload_${jobId}_.json"
+        Path path = syncJobService.createTempFile(filename)
+        JsonStreaming.streamToFile(payload, path)
+        return syncJobService.createAttachment(path, filename)
+    }
+
+    static BigDecimal getUsedMem(){
+        int gb = 1024*1024*1024;
+
+        //Getting the runtime reference from system
+        Runtime runtime = Runtime.getRuntime()
+        return (runtime.totalMemory() - runtime.freeMemory()) / gb
     }
 
 }

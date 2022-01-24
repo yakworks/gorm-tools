@@ -6,7 +6,6 @@ package gorm.tools.repository
 
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
-
 import yakworks.gorm.testing.model.Thing
 import yakworks.gorm.testing.model.ThingRepo
 

@@ -19,8 +19,8 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
-import gorm.tools.repository.events.AfterPersistEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
@@ -36,7 +36,7 @@ import yakworks.rally.tag.model.TagLink
 @Slf4j
 @GormRepository
 @CompileStatic
-class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
+class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo<Attachment> {
     public static final String ATTACHMENT_LOCATION_KEY = "attachments.location"
 
     @Inject @Nullable
@@ -50,7 +50,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
      * it will delete the file reference in the data params
      */
     @Override
-    void bindAndCreate(Attachment attachment, Map data, Map args) {
+    void bindAndCreate(Attachment attachment, Map data, PersistArgs args) {
         try {
             //normal call to bindAndSave that occurs in super trait
             bindAndSave(attachment, data, BindAction.Create, args)
@@ -62,9 +62,15 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
         }
     }
 
-    @RepoListener
-    void afterPersist(Attachment attachment, AfterPersistEvent e) {
-        TagLink.addOrRemoveTags(attachment, e)
+    /**
+     * Called from doAfterPersist and before afterPersist event
+     * if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     */
+    @Override
+    void doAfterPersistWithData(Attachment attachment, PersistArgs args) {
+        Map data = args.data
+        if(data.tags) TagLink.addOrRemoveTags(attachment, data.tags)
     }
 
     /**
@@ -78,8 +84,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo {
     @RepoListener
     void beforeBind(Attachment attachment, Map p, BeforeBindEvent ev) {
         if (ev.isBindCreate()) {
-            //**setup defaults
-            //id early so we have it for parent child relationships
+            //id early so we have it for associations and file creation
             generateId(attachment)
             if (!p.name) p.name = p.originalFileName
             if (!p.name) {

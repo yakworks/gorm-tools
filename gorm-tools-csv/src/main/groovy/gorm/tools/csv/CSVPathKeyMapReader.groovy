@@ -10,6 +10,7 @@ import groovy.transform.builder.SimpleStrategy
 
 import com.opencsv.CSVReaderHeaderAware
 import gorm.tools.databinding.PathKeyMap
+import yakworks.commons.map.Maps
 
 /**
  * Overrides the CSVReaderHeaderAware to read csv rows into the PathKeyMap
@@ -24,6 +25,11 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
      * for the nested paths
      */
     String pathDelimiter = "."
+
+    /**
+     * true(default) to prune out any null or empty string fields from map,
+     */
+    boolean prune = true
 
     /**
      * Constructor with supplied reader.
@@ -46,9 +52,11 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
     }
 
     @Override
-    Map<String, String> readMap() {
-        Map<String, String> data = super.readMap()
-        return PathKeyMap.of(data, pathDelimiter) as Map<String, String>
+    Map<String, Object> readMap() {
+        Map data = super.readMap()
+        data = prune && data ? Maps.prune(data) : data
+        // data = data as Map<String, String>
+        return PathKeyMap.of(data, pathDelimiter) as Map<String, Object>
     }
 
     /**
@@ -56,7 +64,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
      *
      * @return the list of maps for entire file
      */
-    List<Map<String, String>> readAllRows() {
+    List<Map<String, Object>> readAllRows() {
         List result = []
         while (hasNext) {
             Map r = readMap()
@@ -69,7 +77,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
      * Map row = pathKeyReader.readMap{ Map data ->
      *     data.lines = ...get lines from other file
      *}*/
-    Map<String, String> readMap(Closure closure) {
+    Map<String, Object> readMap(Closure closure) {
         Map data = readMap()
         closure(data)
         return data

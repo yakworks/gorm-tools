@@ -37,7 +37,7 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         def sourceId = "api/ar/org"
         def source = "Oracle"
         def sourceType = SourceType.RestApi
-        def job = SyncJob.repo.create(payload:dataList, source:source, sourceType: sourceType, sourceId:sourceId)
+        def job = SyncJob.repo.create(payloadBytes:dataList.toString().bytes, source:source, sourceType: sourceType, sourceId:sourceId)
 
         then:
         job

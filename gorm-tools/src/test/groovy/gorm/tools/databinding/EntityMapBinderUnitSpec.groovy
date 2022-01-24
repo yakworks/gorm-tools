@@ -5,7 +5,7 @@
 package gorm.tools.databinding
 
 import groovy.transform.CompileStatic
-
+import spock.lang.IgnoreRest
 import yakworks.commons.lang.IsoDateUtil
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DataRepoTest
@@ -299,6 +299,21 @@ class EntityMapBinderUnitSpec extends Specification implements DataRepoTest {
 
         then:
         testDomain.name == null
+    }
+
+    void "set prop to null"() {
+        given:
+        TestDomain td = new TestDomain(name: 'bill', age: 100)
+        assert td.name != null
+        assert td.age == 100
+        Map params = [name: null, age: null]
+
+        when:
+        binder.bind(td, params)
+
+        then:
+        td.name == null
+        td.age == null
     }
 
     void "test default whitelist"() {

@@ -17,6 +17,7 @@ import org.springframework.validation.Errors
 
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import grails.core.GrailsApplication
 
@@ -101,41 +102,41 @@ class RepoEventPublisher {
     }
 
     public <D> void doBeforeValidate(GormRepo<D> repo, D entity, Map args) {
-        def event = new BeforeValidateEvent<D>(repo, entity, args)
+        def event = new BeforeValidateEvent<D>(repo, entity, PersistArgs.of(args))
         publishEvents(repo, event, [entity] as Object[])
     }
 
     public <D> void doBeforeValidate(GormRepo<D> repo, D entity, Errors errors, Map args) {
-        def event = new BeforeValidateEvent<D>(repo, entity, args)
+        def event = new BeforeValidateEvent<D>(repo, entity, PersistArgs.of(args))
         publishEvents(repo, event, [entity, errors] as Object[])
     }
 
-    public <D> void doBeforePersist(GormRepo<D> repo, D entity, Map args) {
+    public <D> void doBeforePersist(GormRepo<D> repo, D entity, PersistArgs args) {
         def event = new BeforePersistEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
     }
 
-    public <D> void doAfterPersist(GormRepo<D> repo, D entity, Map args) {
+    public <D> void doAfterPersist(GormRepo<D> repo, D entity, PersistArgs args) {
         def event = new AfterPersistEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
     }
 
-    public <D> void doBeforeBind(GormRepo<D> repo, D entity, Map data, BindAction bindAction, Map args) {
+    public <D> void doBeforeBind(GormRepo<D> repo, D entity, Map data, BindAction bindAction, PersistArgs args) {
         def event = new BeforeBindEvent<D>(repo, entity, data, bindAction, args)
         publishEvents(repo, event, [entity, data, event] as Object[])
     }
 
-    public <D> void doAfterBind(GormRepo<D> repo, D entity, Map data, BindAction bindAction, Map args) {
+    public <D> void doAfterBind(GormRepo<D> repo, D entity, Map data, BindAction bindAction, PersistArgs args) {
         def event = new AfterBindEvent<D>(repo, entity, data, bindAction, args)
         publishEvents(repo, event, [entity, data, event] as Object[])
     }
 
-    public <D> void doBeforeRemove(GormRepo<D> repo, D entity, Map args) {
+    public <D> void doBeforeRemove(GormRepo<D> repo, D entity, PersistArgs args) {
         def event = new BeforeRemoveEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
     }
 
-    public <D> void doAfterRemove(GormRepo<D> repo, D entity, Map args) {
+    public <D> void doAfterRemove(GormRepo<D> repo, D entity, PersistArgs args) {
         def event = new AfterRemoveEvent<D>(repo, entity, args)
         publishEvents(repo, event, [entity, event] as Object[])
 

@@ -17,10 +17,10 @@ import yakworks.rally.common.FlexTrait
 @GrailsCompileStatic
 class ContactFlex implements FlexTrait, RepoEntity<ContactFlex>, Serializable{
 
-    static belongsTo = [contact: Contact]
+    static belongsTo = [Contact]
 
     static mapping = {
-        id generator: 'foreign', params: [property: 'contact']
+        id generator: 'assigned'
     }
 
 }

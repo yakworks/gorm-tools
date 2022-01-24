@@ -4,8 +4,6 @@
 */
 package yakworks.rally.job
 
-import java.nio.file.Path
-
 import groovy.transform.CompileStatic
 
 import org.apache.commons.io.IOUtils
@@ -17,15 +15,12 @@ import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
-import yakworks.commons.json.JsonEngine
-import yakworks.commons.map.Maps
 import yakworks.rally.attachment.AttachmentSupport
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.repo.AttachmentRepo
 
 @GormRepository
 @CompileStatic
-class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
+class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo<SyncJob> {
 
     @Autowired
     AttachmentSupport attachmentSupport
@@ -38,29 +33,9 @@ class SyncJobRepo implements GormRepo<SyncJob>, IdGeneratorRepo {
         if (be.isBindCreate()) {
             // default to RestApi
             if(!data.sourceType) job.sourceType = SourceType.RestApi
-
-            def payload = data.payload
-
-            boolean payloadAsFile = Maps.getBoolean("payloadAsFile", be.args, false)
-            if(!payloadAsFile) payloadAsFile = (payload instanceof Collection && payload.size() > 100)
-
-            if (payload && payloadAsFile) {
-                data.payloadId =  writePayloadFile(job, data.payload)
-            }
-            else {
-                String res = JsonEngine.toJson(payload)
-                job.payloadBytes = res.bytes
-            }
         }
     }
 
-    Long writePayloadFile(SyncJob job, Object payload){
-        String filename = "SyncJobPayload_${job.id}_.json"
-        Path path = attachmentSupport.createTempFile(filename, null)
-        JsonEngine.streamToFile(path, payload)
-        Attachment attachment = attachmentRepo.create(path, filename)
-        return attachment.id
-    }
 
     byte[] getData(SyncJob job){
         if(job.dataId){

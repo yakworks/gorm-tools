@@ -9,11 +9,13 @@ import java.time.LocalDateTime
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.repository.model.IdGeneratorRepo
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.IsoDateUtil
 
@@ -32,12 +34,23 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         if(o.name == 'foos'){
             rejectValue(o, 'name', o.name, 'no.foos')
         }
+        //if(o.id == null) o.id = generateId(o)
+        //if(o.ext && !o.ext.kitchenSink) o.ext.kitchenSink = o
         auditStamp(o)
     }
 
     @RepoListener
     void beforePersist(KitchenSink o, BeforePersistEvent e) {
         if(!o.kind) o.kind = KitchenSink.Kind.CLIENT
+    }
+
+    @RepoListener
+    void afterBind(KitchenSink o, Map data, AfterBindEvent e) {
+        if (e.isBindCreate()) {
+            //mess with the data so that we can verify that places such as bulk are sending a clone
+            //and not relying on the repo to keep the data pristine
+            data.remove('name2')
+        }
     }
 
 
@@ -49,8 +62,14 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         o
     }
 
-    void doAssociations(KitchenSink kitchenSink, Map data) {
-        if(data.sinkItems) persistAssociationData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
+    /**
+     * Called after persist if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     */
+    @Override
+    void doAfterPersistWithData(KitchenSink kitchenSink, PersistArgs args) {
+        Map data = args.data
+        if(data.sinkItems) persistToManyData(kitchenSink, SinkItem.repo, data.sinkItems as List<Map>, "kitchenSink")
     }
 
     void auditStamp(Object ent){
@@ -70,8 +89,8 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
         return ks
     }
 
-    Map generateData(Long id) {
-        return [
+    Map generateData(Long id, Map extraData = [:]) {
+        Map data = [
             num: "$id",
             name: "Sink$id",
             name2: (id % 2) ? "SinkName2-$id" + id : null,
@@ -86,12 +105,14 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
             bazMap: [foo: 'bar']
             // thing: [id: id]
         ]
+        data.putAll(extraData)
+        return data
     }
 
-    List<Map> generateDataList(int numRecords) {
+    List<Map> generateDataList(int numRecords, Map extraData = [:]) {
         List<Map> list = []
         (1..numRecords).each { int index ->
-            list << generateData(index)
+            list << generateData(index, extraData)
         }
         return list
     }

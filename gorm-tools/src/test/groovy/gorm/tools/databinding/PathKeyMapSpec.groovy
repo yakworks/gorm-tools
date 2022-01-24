@@ -6,8 +6,7 @@ class PathKeyMapSpec extends Specification {
 
     PathKeyMap theMap
 
-    void testSimple() {
-        given:
+    PathKeyMap getSample(){
         Map sub = [:]
         sub.put("name", "Dierk Koenig")
         sub.put("dob", "01/01/1970")
@@ -20,8 +19,28 @@ class PathKeyMapSpec extends Specification {
         nestedList << PathKeyMap.of(['foo.bar': 'baz'])
         sub.put("nestedList", nestedList)
 
+        return PathKeyMap.of(sub)
+    }
+
+    void "test variations"() {
+
         when:
-        theMap = PathKeyMap.of(sub).init()
+        PathKeyMap theMap = getSample().init()
+
+        then:
+        theMap['name', 'dob'] == [name:"Dierk Koenig", dob:"01/01/1970"]
+        theMap.address.postCode == "345435"
+        theMap.address.town == "Swindon"
+        theMap.nested.foo.bar == 'baz'
+        theMap.nestedList[0].foo.bar == 'baz'
+        theMap.nestedList[1].foo.bar == 'baz'
+    }
+
+    void "test cloneMap"() {
+
+        when:
+        PathKeyMap initial = getSample()
+        PathKeyMap theMap = initial.cloneMap().init()
 
         then:
         theMap['name', 'dob'] == [name:"Dierk Koenig", dob:"01/01/1970"]
@@ -164,6 +183,20 @@ class PathKeyMapSpec extends Specification {
 
 
     void testCloning() {
+        Map sub = ["name":"Dierk Koenig", "address.postCode": "345435", "dob": "01/01/1970"]
+        theMap =  PathKeyMap.of(sub)
+
+        when:
+        Map theClone = theMap.clone()
+
+        then:
+        theMap.size() == theClone.size()
+        theMap.each { k, v ->
+            assert theMap[k] == theClone[k], "theclone should have the same value for $k as the original"
+        }
+    }
+
+    void "list of PathKeyMaps in "() {
         Map sub = ["name":"Dierk Koenig", "address.postCode": "345435", "dob": "01/01/1970"]
         theMap =  PathKeyMap.of(sub)
 

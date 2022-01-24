@@ -48,7 +48,7 @@ class LocationSpec extends Specification implements DomainRepoTest<Location>, Se
     void "fail when no org"() {
         setup:
         Location location = build(save: false)
-        location.org = null
+        location.orgId = null
 
         when:
         boolean valid = location.validate()

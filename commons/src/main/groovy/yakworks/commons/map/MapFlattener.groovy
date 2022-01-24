@@ -12,7 +12,8 @@ import yakworks.commons.lang.IsoDateUtil
 
 /**
  * The primary use of this is to convert a net json tree to a flat map that
- * can be used with the old grails parser
+ * can be used with the old grails parser or can be used in CSV, where keys or header is expected to
+ * look like `foo.bar: 'val` for an object like `foo:[bar: 'val']`
  * MapFlattener taken from here https://github.com/dmillett/jConfigMap
  */
 @CompileStatic

@@ -2,10 +2,10 @@ package yakworks.rally.orgs
 
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.security.domain.AppUser
+import gorm.tools.testing.RepoTestData
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.TestDataJson
 import gorm.tools.testing.unit.DomainRepoTest
-import grails.buildtestdata.TestData
 import spock.lang.Specification
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
@@ -217,11 +217,11 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
         old.locations.clear()
 
         old.comments = "comments"
-        old.addToPhones(TestData.build(ContactPhone,[contact: old]))
-        old.addToEmails(TestData.build( ContactEmail,[contact: old]))
-        old.addToSources(TestData.build( ContactSource,[contact: old]))
+        old.addToPhones(RepoTestData.build(ContactPhone,[contact: old]))
+        old.addToEmails(RepoTestData.build( ContactEmail,[contact: old]))
+        old.addToSources(RepoTestData.build( ContactSource,[contact: old]))
         old.persist(flush: true)
-        def loc = TestData.build(Location, [id:1, org:old.org, contact: old]).persist()
+        def loc = RepoTestData.build(Location, [id:1, org:old.org, contact: old]).persist()
         assert loc.id == 1
         assert loc.contact.id == old.id
         assert old.locations.size() == 1
@@ -256,7 +256,7 @@ class ContactSpec extends Specification implements DomainRepoTest<Contact>, Secu
 
         then:
         contact.locations.size() == 2
-        contact.locations[0].org == contact.org
+        contact.locations[0].orgId == contact.orgId
         contact.locations[0].street1 == "test street1"
         contact.locations[1].street1 == "test street2"
 

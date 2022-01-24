@@ -8,11 +8,10 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import gorm.tools.testing.RepoTestData
 import grails.artefact.Artefact
-import grails.buildtestdata.TestData
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
-import spock.lang.IgnoreRest
 import testing.Address
 import testing.AddyNested
 import testing.Cust
@@ -308,16 +307,16 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         Cust.findByName("test_clear") != null
     }
 
-    void "test doAssociation"() {
+    void "test persistToManyData"() {
         when:
-        def ks = TestData.build(KitchenSink)
+        def ks = RepoTestData.build(KitchenSink)
 
         then:
         ks != null
 
         when:
         List<Map> items = [[name:"C1"], [name:"C2"]]
-        List<SinkItem> result = KitchenSink.repo.persistAssociationData(ks, SinkItem.repo, items, 'kitchenSink')
+        List<SinkItem> result = KitchenSink.repo.persistToManyData(ks, SinkItem.repo, items, 'kitchenSink')
 
         then:
         result.size() == 2
@@ -427,10 +426,9 @@ class TestTrxRollback implements RepoEntity<TestTrxRollback> {
 class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
 
     @Override
-    TestTrxRollback doPersist(TestTrxRollback entity, Map args) {
-        args['failOnError'] = args.containsKey('failOnError') ? args['failOnError'] : true
+    TestTrxRollback doPersist(TestTrxRollback entity, PersistArgs args) {
         getRepoEventPublisher().doBeforePersist(this, entity, args)
-        entity.save(args)
+        entity.save(args as Map)
         getRepoEventPublisher().doAfterPersist(this, entity, args)
 
         //throws the exception here to test transaction rollback
@@ -441,7 +439,7 @@ class TestTrxRollbackRepo implements GormRepo<TestTrxRollback> {
     }
 
     @Override
-    void doRemove(TestTrxRollback entity, Map args) {
+    void doRemove(TestTrxRollback entity, PersistArgs args) {
         getRepoEventPublisher().doBeforeRemove(this, entity)
         entity.delete(args)
         getRepoEventPublisher().doAfterRemove(this, entity)

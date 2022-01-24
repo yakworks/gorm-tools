@@ -1,6 +1,7 @@
 package yakworks.rally.activity
 
 import gorm.tools.repository.model.CriteriaRemover
+import spock.lang.IgnoreRest
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.gorm.DetachedCriteria
@@ -12,6 +13,7 @@ import yakworks.rally.activity.model.ActivityNote
 import yakworks.rally.activity.repo.ActivityContactRepo
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.tag.model.Tag
 
 class ActivityContactSpec extends Specification implements DomainRepoTest<ActivityContact>, SecurityTest {
 
@@ -19,7 +21,7 @@ class ActivityContactSpec extends Specification implements DomainRepoTest<Activi
     ActivityContactRepo repo
 
     void setupSpec() {
-        mockDomains(Activity, ActivityNote, Contact, Org)
+        mockDomains(Activity, ActivityNote, Contact, Org, Tag)
         repo = ActivityContact.repo
         repo.criteriaRemover = new CriteriaRemover(){
             void deleteAll(DetachedCriteria crit) {
@@ -60,10 +62,10 @@ class ActivityContactSpec extends Specification implements DomainRepoTest<Activi
         return a
     }
 
-
     void "check add and delete methods"() {
         when:
         def org = build(Org)
+
         def c = createSomeContacts(org.id)
         def con1 = c[0]
         def con2 = c[1]

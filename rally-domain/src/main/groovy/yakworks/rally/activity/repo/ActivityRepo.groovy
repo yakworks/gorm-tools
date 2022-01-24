@@ -19,7 +19,7 @@ import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.events.AfterPersistEvent
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -51,7 +51,7 @@ import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @GormRepository
 @CompileStatic
-class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
+class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
 
     @Inject @Nullable
     ActivityLinkRepo activityLinkRepo
@@ -65,12 +65,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
     @Inject @Nullable
     ProblemHandler problemHandler
 
+    List<String> toOneAssociations = ['note', 'task']
+
     @RepoListener
     void beforeValidate(Activity activity) {
-        if(activity.isNew()) {
-            generateId(activity)
-        }
-        wireAssociations(activity)
         updateNameSummary(activity)
     }
 
@@ -106,7 +104,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
 
     @RepoListener
     void beforePersist(Activity activity, BeforePersistEvent e) {
-        generateId(activity)
         if(e.data) {
             Map data = e.data
             addRelatedDomainsToActivity(activity, data)
@@ -118,32 +115,23 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo {
         }
     }
 
-    @RepoListener
-    void afterPersist(Activity activity, AfterPersistEvent e) {
-        if (e.bindAction && e.data){
-            Map data = e.data
-            doAssociations(activity, data)
-        }
-        //FIXME this is a hack so the events for links get fired after data is inserted
-        // not very efficient as removes batch inserting for lots of acts so need to rethink this strategy
-        // flush()
-    }
-
-    void doAssociations(Activity activity, Map data) {
+    /**
+     * Called after persist if its had a bind action (create or update) and it has data
+     * creates or updates One-to-Many associations for this entity.
+     */
+    @Override
+    void doAfterPersistWithData(Activity activity, PersistArgs args) {
+        Map data = args.data
         if(data.attachments) doAttachments(activity, data.attachments)
         if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
         if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
         // now do the links last do events will have the other data
+        //XXX this is messy and needs to be removed. No tests for this.
+        // Also, what happens here on update? seems it will blow up if already exists
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
         }
-    }
-
-
-    void wireAssociations(Activity activity) {
-        if (activity.note && !activity.note.id) activity.note.id = activity.id
-        if (activity.task && !activity.task.id) activity.task.id = activity.id
     }
 
     void updateNameSummary(Activity activity) {

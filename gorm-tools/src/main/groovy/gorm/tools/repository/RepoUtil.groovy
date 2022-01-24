@@ -85,7 +85,7 @@ class RepoUtil {
     /**
      * in create data, if id is passed then bindId must be set to true, if not throw exception
      */
-    static void checkCreateData(Map data, Map args, Class entityClass) {
+    static void checkCreateData(Map data, PersistArgs args, Class entityClass) {
         if(data['id'] && !args.bindId)
             throw DataProblem.of('error.data.bindId', [name: entityClass.simpleName]).toException()
     }

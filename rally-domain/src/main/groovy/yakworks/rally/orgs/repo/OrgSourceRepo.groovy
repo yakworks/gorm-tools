@@ -10,7 +10,6 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.model.SourceType
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
-import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.Validate
@@ -20,21 +19,7 @@ import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
 @CompileStatic
-class OrgSourceRepo implements GormRepo<OrgSource>, IdGeneratorRepo {
-
-    @RepoListener
-    void beforeValidate(OrgSource os) {
-        generateId(os)
-    }
-
-    // @RepoListener
-    // void afterBind(OrgSource orgSource, Map data, AfterBindEvent be){
-    //     if (be.bindAction == BindAction.Create) {
-    //         orgSource.sourceId = data['sourceId'] ?: data['num']
-    //         orgSource.source = data['source'] ?: 'App'
-    //         // orgSource.sourceType = data['sourceType'] ?: 'App'
-    //     }
-    // }
+class OrgSourceRepo implements GormRepo<OrgSource>, IdGeneratorRepo<OrgSource> {
 
     /**
      * creates the source from org and its data and sets it to its org.source

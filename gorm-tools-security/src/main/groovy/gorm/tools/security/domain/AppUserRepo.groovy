@@ -13,13 +13,13 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
+import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.transactions.Transactional
-import yakworks.i18n.MsgKey
 
 @GormRepository
 @GrailsCompileStatic
@@ -35,7 +35,7 @@ class AppUserRepo implements GormRepo<AppUser> {
      * this will already be transactional as its called from create
      */
     @Override
-    void bindAndCreate(AppUser user, Map data, Map args) {
+    void bindAndCreate(AppUser user, Map data, PersistArgs args) {
         String pwd = data['password']// data.remove('password')
         if(pwd) user.password = pwd
         bindAndSave(user, data, BindAction.Create, args)
@@ -46,7 +46,7 @@ class AppUserRepo implements GormRepo<AppUser> {
      * overrides the doUpdate method as its more clear whats going on than trying to do role logic with events
      */
     @Override
-    AppUser doUpdate(Map data, Map args) {
+    AppUser doUpdate(Map data, PersistArgs args) {
         AppUser user = GormRepo.super.doUpdate(data, args)
         if(data['roles']) setUserRoles(user.id, data['roles'] as List)
         return user

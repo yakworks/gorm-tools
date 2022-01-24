@@ -4,6 +4,7 @@ import org.springframework.validation.Errors
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.IgnoreRest
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.Org
@@ -20,14 +21,13 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
     OrgRepo orgRepo
     OrgDimensionService orgDimensionService
 
-
     def "test sanity check on orgMember"() {
         setup:
         //appConfig.orgDimensions = [:]
         orgDimensionService.testInit(null)
-        Org org = Org.create("O1", "O1", OrgType.Customer).persist()
-        Org branch = Org.create("Branch", "Branch", OrgType.Branch).persist()
-        Org division = Org.create("Division", "Division", OrgType.Division).persist()
+        Org org = Org.of("O1", "O1", OrgType.Customer).persist()
+        Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
+        Org division = Org.of("Division", "Division", OrgType.Division).persist()
 
         OrgMember member = OrgMember.make(org)
 
@@ -67,9 +67,9 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
     void "test insert with orgmembers"() {
         given:
         orgDimensionService.testInit('Branch.Division.Business')
-        Org division = Org.create("Division", "Division", OrgType.Division).persist()
+        Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
-        division.member.business = Org.create("Business", "Business", OrgType.Business).persist()
+        division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
         division.persist()
         division.member.persist()
 
@@ -87,7 +87,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         result.member.business.id == division.member.business.id
 
         when:
-        Org otherBusiness = Org.create("b2", "b2", OrgType.Business).persist([flush: true])
+        Org otherBusiness = Org.of("b2", "b2", OrgType.Business).persist([flush: true])
         params = [
             name: "test", num: "test", orgTypeId: "3",
             member: [
@@ -225,7 +225,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
     }
 
     private Org createOrg(String name, String num, OrgType orgType) {
-        Org org = Org.create(num, name, orgType).persist()
+        Org org = Org.of(num, name, orgType).persist()
         return org
     }
 }

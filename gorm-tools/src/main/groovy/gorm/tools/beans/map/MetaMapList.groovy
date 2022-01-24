@@ -7,6 +7,7 @@ package gorm.tools.beans.map
 import groovy.transform.CompileStatic
 
 import grails.gorm.PagedResultList
+import yakworks.commons.map.Maps
 
 /**
  * A list wrapper that will wrap object in EntityMap on a get()
@@ -72,4 +73,9 @@ class MetaMapList extends AbstractList<MetaMap> {
     //
     //     out.defaultWriteObject();
     // }
+
+    @Override
+    Object clone() {
+        return Maps.clone(this as Collection<Map>)
+    }
 }

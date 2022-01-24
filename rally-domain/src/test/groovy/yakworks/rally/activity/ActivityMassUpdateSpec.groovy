@@ -46,7 +46,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
 
     def "test massupdate - with notes "() {
         setup:
-        Org org = Org.create("test", "test", OrgType.Customer).persist()
+        Org org = Org.of("test", "test", OrgType.Customer).persist()
         Customer customerOne = Customer.create([id: 1, name: "test-1", num: "test-1", org: org], bindId: true).persist()
         Customer customerTwo = Customer.create([id: 2, name: "test-2", num: "test-2", org: org], bindId: true).persist()
 
@@ -71,7 +71,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
 
     def "test massupdate - with new attachments "() {
         setup:
-        Org org = Org.create("test", "test", OrgType.Customer).persist()
+        Org org = Org.of("test", "test", OrgType.Customer).persist()
         Payment p1 = Payment.create(amount: 100, org: org).persist()
         Payment p2 = Payment.create(amount: 200, org: org).persist()
 
@@ -122,7 +122,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
 
     def testMassUpdate_with_task() {
         setup:
-        Org org = Org.create("test", "test", OrgType.Customer).persist()
+        Org org = Org.of("test", "test", OrgType.Customer).persist()
         Customer c1 = Customer.create(name: "test-1", num: "test-1", org: org).persist()
         Customer c2 = Customer.create(name: "test-2", num: "test-2", org: org).persist()
 

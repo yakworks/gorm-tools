@@ -98,7 +98,8 @@ class MockData {
         contact: [
             email    : 'jgalt@taggart.com',
             firstName: 'John',
-            lastName : 'Galt'
+            lastName : 'Galt',
+            locations: [[zipCode: "12345"]]
         ],
         flex: [
             text1: 'midas',

@@ -23,7 +23,6 @@ import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
 
-// import grails.buildtestdata.TestData
 @SuppressWarnings('BuilderMethodWithSideEffects')
 @CompileStatic
 class RallySeedData {
@@ -32,6 +31,11 @@ class RallySeedData {
 
     static init(){
         jdbcTemplate = AppCtx.get("jdbcTemplate", JdbcTemplate)
+        //gorm creation scripts dont set constraints to not null so we do it here
+        Org.withTransaction {
+            jdbcTemplate.execute("ALTER TABLE Contact ALTER orgId SET NOT NULL;")
+            jdbcTemplate.execute("ALTER TABLE Location ALTER orgId SET NOT NULL;")
+        }
     }
 
     static fullMonty(){
@@ -111,6 +115,7 @@ class RallySeedData {
             ]]
         ]
         def org = Org.create(data, bindId: true)
+        Org.repo.flush()
 
         def contact = new Contact(
             id: id,
@@ -125,6 +130,7 @@ class RallySeedData {
         )
         contact.user = AppUser.get(1)
         contact.persist()
+        Org.repo.flush()
 
         org.contact = contact
         org.persist()

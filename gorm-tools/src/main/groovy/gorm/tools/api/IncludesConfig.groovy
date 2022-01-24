@@ -80,7 +80,7 @@ class IncludesConfig implements ConfigAware {
     Map getClassStaticIncludes( Class entityClass) {
         // look for includes map on the domain first
         Map entityIncludes = ClassUtils.getStaticPropertyValue(entityClass, 'includes', Map)
-        Map includesMap = (entityIncludes ? Maps.deepCopy(entityIncludes) : [:]) as Map<String, Object>
+        Map includesMap = (entityIncludes ? Maps.clone(entityIncludes) : [:]) as Map<String, Object>
         return includesMap
     }
     /**

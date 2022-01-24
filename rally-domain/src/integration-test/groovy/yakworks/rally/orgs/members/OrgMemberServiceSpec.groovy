@@ -3,7 +3,6 @@ package yakworks.rally.orgs.members
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.OrgMemberService
@@ -27,13 +26,13 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
 
     void testSetParent() {
         setup:
-        Org customer = Org.create("T1", "T1", OrgType.Customer).persist()
-        Org branch = Org.create("T2", "T2", OrgType.Branch).persist()
-        Org division = Org.create("T3", "T3", OrgType.Division).persist()
-        Org business = Org.create("T4", "T4", OrgType.Business).persist()
-        Org sales = Org.create("T5", "T5", OrgType.Sales).persist()
-        Org region = Org.create("T6", "T6", OrgType.Region).persist()
-        Org factory = Org.create("T7", "T7", OrgType.Factory).persist()
+        Org customer = Org.of("T1", "T1", OrgType.Customer).persist()
+        Org branch = Org.of("T2", "T2", OrgType.Branch).persist()
+        Org division = Org.of("T3", "T3", OrgType.Division).persist()
+        Org business = Org.of("T4", "T4", OrgType.Business).persist()
+        Org sales = Org.of("T5", "T5", OrgType.Sales).persist()
+        Org region = Org.of("T6", "T6", OrgType.Region).persist()
+        Org factory = Org.of("T7", "T7", OrgType.Factory).persist()
 
         OrgMember orgMember = OrgMember.make(branch)
         orgMember.bind([division:division, business:business, sales:sales, region:region, factory: factory])
@@ -60,15 +59,15 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         //appConfig.orgDimensions = [primary: "Branch.Division.Business", second: "Branch.Sales"]
         initOrgDimensions([primary: "Branch.Division.Business", second: "Branch.Sales"])
 
-        Org division = Org.create("Division", "Division", OrgType.Division).persist()
+        Org division = Org.of("Division", "Division", OrgType.Division).persist()
         division.member = OrgMember.make(division)
-        division.member.business = Org.create("Business", "Business", OrgType.Business).persist()
+        division.member.business = Org.of("Business", "Business", OrgType.Business).persist()
         division.persist()
         division.member.persist()
-        Org sales = Org.create("Sales", "Sales", OrgType.Sales).persist()
+        Org sales = Org.of("Sales", "Sales", OrgType.Sales).persist()
 
         when:
-        Org branch = Org.create("Branch", "Branch", OrgType.Branch).persist()
+        Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
         orgMemberService.setupMember(branch, [division:[id:division.id], sales:[id:sales.id]])
 
         then:
@@ -88,7 +87,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         Org division = Org.findByOrgTypeId(OrgType.Division.id)
 
         when:
-        Org branch = Org.create("Branch", "Branch", OrgType.Branch).persist()
+        Org branch = Org.of("Branch", "Branch", OrgType.Branch).persist()
         orgMemberService.setupMember(branch, [division:[num:division.num]])
 
         then:

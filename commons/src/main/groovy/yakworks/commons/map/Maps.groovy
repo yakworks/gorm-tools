@@ -9,6 +9,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import yakworks.commons.lang.PropertyTools
+import yakworks.commons.util.StringUtils
 
 /**
  * Helpful methods for dealing with maps
@@ -79,9 +80,33 @@ class Maps {
         merge(sources as Map[])
     }
 
+    /**
+     * See clone,
+     */
     static Map deepCopy(Map source) {
+        clone(source)
+    }
+
+    /**
+     * Does a "deep" clone of the Map. If a shallow clone is desired use whats built into most al Java Map impls.
+     * see merge. it uses merge to do a deep copy of the map into a new Map
+     *
+     * @return the cloned map
+     */
+    static Map clone(Map source) {
         if(!source) return [:]
         merge([:], source)
+    }
+
+    /**
+     * Does a "deep" clone of the Collection of Maps.
+     * See clone
+     *
+     * @return the cloned map
+     */
+    static Collection<Map> clone(Collection<Map> listOfMaps) {
+        if(!listOfMaps) return []
+        listOfMaps.collect{ Maps.clone(it)}
     }
 
     /**
@@ -91,7 +116,8 @@ class Maps {
      * @param pruneEmpty default:true set to false to keep empty maps, lists and strings
      * @return the pruned map
      */
-    static Map prune(Map map, boolean pruneEmpty = true) {
+    public static <K, V> Map<K, V> prune(Map<K, V> map, boolean pruneEmpty = true) {
+        if(!map) return map
         map.collectEntries { k, v ->
             [k, v instanceof Map ? prune(v as Map, pruneEmpty) : v]
         }.findAll { k, v ->
@@ -105,7 +131,7 @@ class Maps {
                 return v != null
             }
 
-        }
+        } as Map<K, V>
     }
 
     /**
@@ -187,18 +213,46 @@ class Maps {
      * @param defaultReturn if its doesn't have the key or map is null this is the default return value
      * @return A boolean value which will be false if the map is null, the map doesn't contain the key or the value is false
      */
-    public static boolean getBoolean(String key, Map<?, ?> map, boolean defaultReturn = false) {
-        if (map == null) return defaultReturn
+    static boolean getBoolean(String key, Map<?, ?> map, boolean defaultValue = false) {
+        if (map == null) return defaultValue
 
         if (map.containsKey(key)) {
             Object o = map.get(key)
-            if (o == null)return false
+            if (o == null) return false
             if (o instanceof Boolean) {
                 return (Boolean)o
             }
-            return Boolean.valueOf(o.toString())
+            try {
+                String string = o.toString()
+                if (string != null) {
+                    return StringUtils.toBoolean(string)
+                }
+            }
+            catch (Exception e) {}
         }
-        return defaultReturn
+        return defaultValue
+    }
+
+    static boolean 'boolean'(Map<?, ?> map, String key, boolean defaultValue = false) {
+        return getBoolean(key, map, defaultValue)
+    }
+
+    /**
+     * returns map with specific keys
+     */
+    public static <K, V> Map<K, V> pick(Map<K, V> map, Collection<K> keys){
+        if(!map) return [:]
+        map.subMap(keys)
+    }
+
+    /**
+     * returns map with keys excluded
+     */
+    public static <K, V> Map<K, V> omit(Map<K, V> map, Collection<K> excludeKeys){
+        if(!map) return [:]
+        def keys = map.keySet().findAll{ !(it in excludeKeys)}
+        map.keySet()
+        return map.subMap(keys)
     }
 
 }

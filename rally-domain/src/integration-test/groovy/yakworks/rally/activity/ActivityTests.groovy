@@ -124,7 +124,7 @@ class ActivityTests extends Specification implements DomainIntTest {
 
     void "bulk insert note"() {
         setup:
-        Org org = Org.create("T01", "T01", OrgType.Customer)
+        Org org = Org.of("T01", "T01", OrgType.Customer).persist()
         List<Org> customers = Org.findAllByOrgTypeId(OrgType.Customer.id, [max:5])
         assert customers.size() == 5
 

@@ -80,8 +80,9 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem>  {
         // }
 
         //Override it for performance improvement, because filling in the stack trace is quit expensive
-        @Override
-        synchronized Throwable fillInStackTrace() { return this }
+        //FIXME make this configurable
+        // @Override
+        // synchronized Throwable fillInStackTrace() { return this }
 
         //Legacy from ValidationException
         static String formatErrors(Errors errors, String msg) {

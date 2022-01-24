@@ -7,7 +7,7 @@ import grails.persistence.Entity
 @AuditStamp
 @Entity
 @GrailsCompileStatic
-class StampedNoConstraintsClosure implements RepoEntity<StampedEntity> {
+class StampedNoConstraintsClosure implements RepoEntity<StampedNoConstraintsClosure> {
 
     String name
     String beforeInsertTest

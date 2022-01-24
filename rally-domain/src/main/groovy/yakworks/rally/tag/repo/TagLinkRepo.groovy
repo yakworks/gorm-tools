@@ -10,6 +10,7 @@ import groovy.util.logging.Slf4j
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
+import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.Transform
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
@@ -49,6 +50,32 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
 
     void copyTags(Persistable fromEntity, Persistable toEntity) {
         copyRelated(fromEntity, toEntity)
+    }
+
+    /**
+     * build exists criteria for the linkedId and tag list
+     */
+    DetachedCriteria buildExistsCriteria(List tagList, Class linkedEntityClazz, String linkedIdJoinProperty){
+        return TagLink.query {
+            eqProperty("linkedId", linkedIdJoinProperty)
+            eq("linkedEntity", getLinkedEntityName(linkedEntityClazz))
+            inList('tag.id', Transform.toLongList(tagList))
+        }.id()
+    }
+
+    /**
+     * Add exists criteria to a DetachedCriteria if its has tags
+     * in the criteriaMap
+     */
+    DetachedCriteria addExistsCriteria(DetachedCriteria detCrit, Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
+        if(criteriaMap.tags){
+            //convert to id long list
+            List<Long> tagIds = Transform.objectToLongList(criteriaMap.tags as List, 'id')
+            detCrit.exists(buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty))
+        } else if(criteriaMap.tagIds) {
+            //should be list of id if this key is present
+            detCrit.exists(buildExistsCriteria(criteriaMap.tagIds as List,  linkedEntityClazz, linkedIdJoinProperty))
+        }
     }
 
 }

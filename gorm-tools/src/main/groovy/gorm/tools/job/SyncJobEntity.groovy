@@ -92,6 +92,11 @@ trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
     byte[] dataBytes
 
     /**
+     * if the errors are stored in the column this will be populated
+     */
+    byte[] errorBytes
+
+    /**
      * The data is a response of resources that were successfully and unsuccessfully updated or created after processing.
      * gets the data as byte array, either from attachment file or resultData byte array
      * If no data then returns string representation of json empty array which is '[]'

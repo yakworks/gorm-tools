@@ -13,6 +13,7 @@ import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import grails.gorm.DetachedCriteria
+import yakworks.commons.lang.Transform
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgTag
@@ -61,9 +62,14 @@ class OrgRepo extends AbstractOrgRepo {
     MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
         DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
         Map criteriaMap = queryArgs.criteria
-        //if it has tags
+        //if it has tags key
         if(criteriaMap.tags){
-            detCrit.exists(OrgTag.buildExistsCriteria(criteriaMap.tags as List))
+            //convert to id long list
+            List<Long> tagIds = Transform.objectToLongList(criteriaMap.tags as List)
+            detCrit.exists(OrgTag.buildExistsCriteria(tagIds))
+        } else if(criteriaMap.tagIds) {
+            //should be list of id if this key is present
+            detCrit.exists(OrgTag.buildExistsCriteria(criteriaMap.tagIds as List))
         }
         return detCrit
     }

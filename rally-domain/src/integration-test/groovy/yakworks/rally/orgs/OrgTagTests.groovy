@@ -255,13 +255,33 @@ class OrgTagTests extends Specification implements DomainIntTest {
         addTagsForSearch()
 
         def orgCrit = { tagList ->
-            return Org.query(tags: tagList)
+            return Org.query(tagIds: tagList)
         }
 
 
         List hasTag1 = orgCrit([1]).list()
         List hasTag2 = orgCrit([2]).list()
         List has1or2 = orgCrit([1, 2]).list()
+
+        then:
+        hasTag1.size() == 3
+        hasTag2.size() == 2
+        has1or2.size() == 4
+
+    }
+
+    void "criteria with list of id objects" () {
+        when: "filter where orgs contain ANY of the tags"
+        addTagsForSearch()
+
+        def orgCrit = { tagList ->
+            return Org.query(tags: tagList)
+        }
+
+
+        List hasTag1 = orgCrit([ [id:1] ]).list()
+        List hasTag2 = orgCrit([ [id:2] ]).list()
+        List has1or2 = orgCrit([ [id:1] , [id:2] ]).list()
 
         then:
         hasTag1.size() == 3

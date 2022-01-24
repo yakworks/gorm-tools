@@ -30,6 +30,7 @@ class DefaultMangoQuery implements MangoQuery {
 
     JsonSlurper jsonSlurper = new JsonSlurper().setType(JsonParserType.LAX)
 
+    @Override
     public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, Map params,
                                               @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
         return query(entityClass, QueryArgs.of(params), closure)
@@ -45,7 +46,7 @@ class DefaultMangoQuery implements MangoQuery {
      */
     public <D> MangoDetachedCriteria<D> query(Class<D> entityClass, QueryArgs qargs,
                                               @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        mangoBuilder.build(entityClass, qargs.criteria, closure)
+        mangoBuilder.buildWithQueryArgs(entityClass, qargs, closure)
     }
 
     /**
@@ -55,14 +56,14 @@ class DefaultMangoQuery implements MangoQuery {
      * @param closure additional restriction for criteria
      * @return query of entities restricted by mango params
      */
-    public <D> List<D> queryList(Class<D> domainClass, Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        return queryList(domainClass, QueryArgs.of(params), closure)
-    }
+    // public <D> List<D> queryList(Class<D> domainClass, Map params, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    //     return queryList(domainClass, QueryArgs.of(params), closure)
+    // }
 
-    public <D> List<D> queryList(Class<D> domainClass, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        DetachedCriteria<D> dcrit = query(domainClass, qargs, closure)
-        list(dcrit, qargs.pager)
-    }
+    // public <D> List<D> queryList(Class<D> domainClass, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
+    //     DetachedCriteria<D> dcrit = query(domainClass, qargs, closure)
+    //     list(dcrit, qargs.pager)
+    // }
 
     /**
      * call list on the criteria with the pager params inside a readOnly transaction

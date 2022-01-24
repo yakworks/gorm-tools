@@ -17,7 +17,7 @@ class BootStrap {
         //onyl run for this, it will try to run this for projects that depend on this in examples so dont
         if(appName == "rally-domain"){
             RallySeedData.init()
-            RallySeedData.fullMonty()
+            RallySeedData.fullMonty(50)
         }
     }
 }

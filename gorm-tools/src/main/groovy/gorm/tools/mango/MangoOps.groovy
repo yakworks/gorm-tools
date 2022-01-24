@@ -23,6 +23,7 @@ class MangoOps {
     public static final String CRITERIA = 'criteria'
     public static final String SORT = '$sort'
     public static final String Q = '$q'
+    public static final String PROJECTIONS = '$projections'
     // if passing q but also want the fuzzy search then nest it in this field
     public static final String QSEARCH = '$qSearch'
 
@@ -30,6 +31,7 @@ class MangoOps {
     static enum CompareOp {
         $gt, $eq, $gte, $lt, $lte, $ne, $not, $ilike, $like, $in, $inList
 
+        //the op is the value without the $
         private final String op //private for security
         String getOp(){ return op }
 
@@ -88,6 +90,18 @@ class MangoOps {
         String getOp(){ return op }
 
         ExistOp() {
+            this.op = name().substring(1) //remove $
+        }
+    }
+
+    @CompileStatic
+    static enum ProjectionOp {
+        $sum, $count, $group, $avg, $countDistinct, $distinct
+
+        private final String op
+        String getOp(){ return op }
+
+        ProjectionOp() {
             this.op = name().substring(1) //remove $
         }
     }

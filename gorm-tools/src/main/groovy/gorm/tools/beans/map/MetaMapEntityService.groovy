@@ -4,9 +4,6 @@
 */
 package gorm.tools.beans.map
 
-
-import java.util.concurrent.ConcurrentHashMap
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 

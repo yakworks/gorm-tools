@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.api.IncludesConfig
 import gorm.tools.api.IncludesKey
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.mango.api.QueryArgs
 import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
@@ -61,6 +62,34 @@ class MangoBuilder {
     @CompileDynamic //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
         (MangoDetachedCriteria)criteria.clone()
+    }
+
+    public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria<D> newCriteria = new MangoDetachedCriteria<D>(clazz)
+        Map criteria = qargs.criteria
+        def tidyMap = MangoTidyMap.tidy(criteria)
+        applyMapOrList(newCriteria, tidyMap)
+        if (callable) newCriteria.with callable
+
+        if(qargs.sort && !criteria.containsKey(SORT)){
+            applyProjections(newCriteria, qargs.projections)
+        }
+
+        if(qargs.projections){
+            applyProjections(newCriteria, qargs.projections)
+        }
+        return newCriteria
+    }
+
+    void applyProjections(MangoDetachedCriteria criteria, Map projs) {
+        //assume its a map
+        (projs as Map<String,String>).each { String k, String v ->
+            if(v == 'sum'){
+                criteria.sum(k)
+            } else if (v == 'group'){
+                criteria.groupBy(k)
+            }
+        }
     }
 
     void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {
@@ -115,7 +144,7 @@ class MangoBuilder {
 
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
         if (prop instanceof Association) {
-            //if its its and $eq then assume its an object compare and just do it
+            //if its its map and valid op $eq then assume its an object compare and just do it right away
             if(fieldVal instanceof Map){
                 //if the fieldVal has a key like $eq then us it, when comparing objects
                 def firstKey = (fieldVal as Map).entrySet()[0].key as String
@@ -214,24 +243,7 @@ class MangoBuilder {
 
         //assume its a map
         sortMap.each { k, v ->
-            if(k.count('.') > 1 ){
-                //TODO gails default only allows one leve, this is a quick hack to allow 2.
-                //so contact.flex.num works
-                List<String> props = k.split(/\./) as List<String>
-                String first = props[0]
-                String field = props.removeLast()
-
-                String joined = props.join('.')
-                String joinedAlias = props.join('_')
-
-                result = createAlias(criteria, first, first)
-                result = createAlias(criteria, joined, joinedAlias)
-                // result = createAlias(result, props[1], joined_alias)
-
-                result = criteria.order("${joinedAlias}.${field}", v.toString())
-            } else {
-                result = criteria.order(k.toString(), v.toString())
-            }
+            criteria.order(k.toString(), v.toString())
         }
         return result
     }
@@ -242,23 +254,6 @@ class MangoBuilder {
     DetachedCriteria createAlias(DetachedCriteria criteria, String associationPath, String alias) {
         criteria.createAlias(associationPath, alias) as DetachedCriteria
     }
-
-
-
-    @CompileDynamic
-    // Criteria order(String propertyName, String direction, boolean forceSuper = false) {
-    //     if (forceSuper || !propertyName.contains('.')) {
-    //         return super.order(propertyName, direction)
-    //     }
-    //     List props = propertyName.split(/\./) as List
-    //     String last = props.removeLast()
-    //     Closure toDo = { order(last, direction) }
-    //     Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
-    //         { -> "$prop"(acc) }
-    //     }
-    //     newOrderBy.call()
-    //     return this
-    // }
 
     DetachedCriteria qSearch(DetachedCriteria criteria, Object val) {
         List<String> qSearchFields

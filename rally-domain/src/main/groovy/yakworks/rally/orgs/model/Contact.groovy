@@ -143,6 +143,9 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         if(o.id != orgId) orgId = o.id
     }
 
+    /**
+     * List the active contacts for the org
+     */
     static List<Contact> listActive(Long orgId) {
         return Contact.query(ordId: orgId, inactive: false).list()
     }

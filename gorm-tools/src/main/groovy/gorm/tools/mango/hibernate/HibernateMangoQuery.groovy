@@ -2,9 +2,11 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.mango
+package gorm.tools.mango.hibernate
 
 import java.lang.reflect.Field
+import java.time.DayOfWeek
+import java.time.temporal.ChronoUnit
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -372,9 +374,23 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
             String propName = (p as Query.PropertyProjection).propertyName
             def hibProj = new HibernateProjectionAdapter(p).toHibernateProjection()
 
-            _projectionList.add(hibProj, propName.replace('.', '_'))
-            // _projectionList.add(hibProj, propName)
+            // _projectionList.add(hibProj, propName.replace('.', '_'))
+            String alias = buildAlias(p, propName)
+            _projectionList.add(hibProj, alias)
             return this
+        }
+
+        String buildAlias(Query.Projection p, String propName){
+            switch (p) {
+                case Query.SumProjection:
+                    return "${propName}_sum"
+                case Query.CountProjection:
+                    return "${propName}_count"
+                case Query.AvgProjection:
+                    return "${propName}_avg"
+                default:
+                    return propName
+            }
         }
 
         @Override

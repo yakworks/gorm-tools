@@ -39,11 +39,11 @@ class RallySeedData {
         }
     }
 
-    static fullMonty(){
+    static fullMonty(int count = 100){
         buildAppUser()
         createOrgTypeSetups()
         buildClientOrg()
-        buildOrgs(100)
+        buildOrgs(count)
         buildTags()
         createIndexes()
     }

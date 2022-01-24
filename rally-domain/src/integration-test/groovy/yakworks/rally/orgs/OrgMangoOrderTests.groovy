@@ -14,7 +14,8 @@ import yakworks.rally.orgs.model.Org
 @Rollback
 class OrgMangoOrderTests extends Specification implements DomainIntTest {
 
-    @Ignore
+
+    @Ignore //XXX this should work when we add a manual alias, seems to be getting confused with the auto ones?
     def "order query the manual way"() {
         when:
         def qry = Org.query {
@@ -45,6 +46,7 @@ class OrgMangoOrderTests extends Specification implements DomainIntTest {
         then:
         list[0].contact.flex.num1 > list[1].contact.flex.num1
     }
+
 
     def "order query method"() {
         when:

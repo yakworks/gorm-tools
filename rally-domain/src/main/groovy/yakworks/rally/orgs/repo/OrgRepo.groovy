@@ -8,10 +8,14 @@ import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
+import grails.gorm.DetachedCriteria
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
@@ -48,5 +52,19 @@ class OrgRepo extends AbstractOrgRepo {
             org.member.id = org.id
             org.member.org = org //needed for validation
         }
+    }
+
+    /**
+     * special handling for tags
+     */
+    @Override
+    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
+        DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
+        Map criteriaMap = queryArgs.criteria
+        //if it has tags
+        if(criteriaMap.tags){
+            detCrit.exists(OrgTag.buildExistsCriteria(criteriaMap.tags as List))
+        }
+        return detCrit
     }
 }

@@ -10,10 +10,9 @@ import groovy.util.logging.Slf4j
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.model.AbstractLinkedEntityRepo
+import yakworks.commons.lang.Transform
 import yakworks.rally.tag.model.Tag
 import yakworks.rally.tag.model.TagLink
-
-import static gorm.tools.utils.GormUtils.entityListToIdMap
 
 @Slf4j
 @GormRepository
@@ -44,7 +43,7 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
     }
 
     List<TagLink> addTags(Persistable linkedEntity, List<Tag> tags) {
-        List<Map> ids = entityListToIdMap(tags)
+        List<Map> ids = Transform.objectListToIdMapList(tags)
         addOrRemove(linkedEntity, ids)
     }
 

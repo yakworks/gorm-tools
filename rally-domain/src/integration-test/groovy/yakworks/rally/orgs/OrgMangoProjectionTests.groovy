@@ -31,7 +31,7 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
 
         then:
         sumbObj.size() == 5
-        sumbObj[0][1] == OrgType.Customer
+        sumbObj[0]['type'] == OrgType.Customer
     }
 
     def "sum association sum method"() {
@@ -47,19 +47,34 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         sumbObj[0] == 150
     }
 
-    def "sum and groupby methods"() {
+    def "sum and groupby methods order asc"() {
         when:
         def qry = Org.query {}
         qry.sum('calc.totalDue').groupBy('type')
-        qry.order('calc_totalDue')
+        qry.order('calc.totalDue_sum')
         def sumbObj = qry.mapList()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
         sumbObj[0]['type'] == OrgType.Client
-        sumbObj[0]['calc_totalDue'] < sumbObj[1]['calc_totalDue']
-        sumbObj[1]['calc_totalDue'] < sumbObj[2]['calc_totalDue']
+        sumbObj[0]['calc.totalDue_sum'] < sumbObj[1]['calc.totalDue_sum']
+        sumbObj[1]['calc.totalDue_sum'] < sumbObj[2]['calc.totalDue_sum']
+    }
+
+    def "sum and groupby methods order desc"() {
+        when:
+        def qry = Org.query {}
+        qry.sum('calc.totalDue').groupBy('type')
+        qry.order('calc.totalDue_sum', 'desc')
+        def sumbObj = qry.mapList()
+
+        then:
+        //there are 5 types, one for each type
+        sumbObj.size() == 5
+        sumbObj[0]['type'] == OrgType.Customer
+        sumbObj[0]['calc.totalDue_sum'] > sumbObj[1]['calc.totalDue_sum']
+        sumbObj[1]['calc.totalDue_sum'] > sumbObj[2]['calc.totalDue_sum']
     }
 
     def "sum with QueryArgs"() {
@@ -71,16 +86,20 @@ class OrgMangoProjectionTests extends Specification implements DomainIntTest {
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
+        sumbObj[0]['type'] == OrgType.Customer
     }
 
     def "sum with projections key as string"() {
-        when:
-        def qry = Org.query(projections: "'calc.totalDue':'sum', 'type':'group'")
+        when: 'simulate what comes on url query string'
+        def qry = Org.query(projections: "'calc.totalDue':'sum', 'type':'group'", sort:'calc.totalDue_sum:asc')
         def sumbObj = qry.list()
 
         then:
         //there are 5 types, one for each type
         sumbObj.size() == 5
+        sumbObj[0]['type'] == OrgType.Client
+        sumbObj[0]['calc.totalDue_sum'] < sumbObj[1]['calc.totalDue_sum']
+        sumbObj[1]['calc.totalDue_sum'] < sumbObj[2]['calc.totalDue_sum']
     }
 
     def "sum association with closure old school"() {

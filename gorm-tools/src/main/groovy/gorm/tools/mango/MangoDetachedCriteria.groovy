@@ -4,23 +4,21 @@
 */
 package gorm.tools.mango
 
-import javax.persistence.FetchType
-import javax.persistence.criteria.JoinType
-
 import groovy.transform.CompileDynamic
 
 import org.grails.datastore.gorm.GormEnhancer
 import org.grails.datastore.gorm.GormStaticApi
 import org.grails.datastore.gorm.finders.DynamicFinder
-import org.grails.datastore.gorm.query.criteria.AbstractDetachedCriteria
 import org.grails.datastore.mapping.core.Session
 import org.grails.datastore.mapping.query.Query
 import org.grails.datastore.mapping.query.api.QueryArgumentsAware
 import org.grails.orm.hibernate.AbstractHibernateSession
 
+import gorm.tools.mango.hibernate.HibernateMangoQuery
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
+import yakworks.commons.lang.NameUtils
 
 /**
  * This is here to make it easier to build criteria with domain bean paths
@@ -49,6 +47,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      */
     MangoDetachedCriteria(Class<T> targetClass, String alias = null) {
         super(targetClass, alias)
+        if(!alias) this.@alias = "${NameUtils.getPropertyName(targetClass.simpleName)}_"
     }
 
     @Override
@@ -89,7 +88,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return A list of matching instances
      */
     List<Map> mapList() {
-        getHibernateQuery().mapList() as List<Map>
+        getHibernateQuery().list() as List<Map>
     }
 
     /**

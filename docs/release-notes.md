@@ -1,3 +1,9 @@
+### v7.0.8-v.51
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.50...v7.0.8-v.51)
+- release [link](https://github.com/yakworks/gorm-tools/commit/def25fb8e22e8ed79a6df5fe9c778ed4bf4c1db0)
+- Dev (#451) [link](https://github.com/yakworks/gorm-tools/commit/8132b29dce82ac55ed844a9f141cec0bb9257803)
+
 ### v7.0.8-v.50
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.49...v7.0.8-v.50)

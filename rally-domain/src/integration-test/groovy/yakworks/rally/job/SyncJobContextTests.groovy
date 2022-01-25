@@ -73,7 +73,7 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         List<Map> renderResults = [[ok: true, status: 200, data: ['boo':'foo']] ,
                                     [ok: true, status: 200, data: ['boo2':'foo2']] ]
         Problem  problem = Problem.ofCode('security.validation.password.error')
-        List<Map> renderErrorResults = [[[ok: false, status: 500, detail: 'error detail'] ]]
+        List<Map> renderErrorResults = [[ok: false, status: 500, detail: 'error detail'] ]
         //do the failed
             when:
         //tests finish the job
@@ -82,7 +82,8 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         then:
         SyncJob job = SyncJob.get(jobContext.jobId)
         job.errorBytes
-        job.dataBytes
+        //XXX add errorBytes assert
+        job.dataToString().contains("boo")
     }
 
 

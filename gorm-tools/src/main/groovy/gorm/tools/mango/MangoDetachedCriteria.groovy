@@ -260,7 +260,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         staticApi.withDatastoreSession { Session session ->
             applyLazyCriteria()
             if(session instanceof AbstractHibernateSession) {
-                //query = session.createQuery(targetClass, alias)
+                // query = session.createQuery(targetClass, alias)
                 query = HibernateMangoQuery.createQuery( (AbstractHibernateSession)session, persistentEntity, alias)
             }
             else {

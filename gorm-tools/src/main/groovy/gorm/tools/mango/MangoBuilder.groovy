@@ -180,7 +180,7 @@ class MangoBuilder {
             }
         }
         // if field ends in Id then try removing the Id postfix and see if its a property
-        else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
+        else if (!prop && field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
             applyFieldMap(criteria, field.replaceAll("Id\$", ".id"), fieldVal as Map)
             //applyField(criteria, field.replaceAll("Id\$", ".id"), fieldVal)
         }
@@ -192,9 +192,12 @@ class MangoBuilder {
             applyField(criteria, field, fieldVal['id'])
         }
         //just pass it on through, prop might be null but that might be because its a dot notation ending in id ex: "foo.id"
-        else if (fieldVal instanceof Map && (prop || field.endsWith('.id'))) { // field=name fieldVal=['$like': 'foo%']
+        else if (fieldVal instanceof Map) { // && (prop || field.endsWith('.id'))) { field=name fieldVal=['$like': 'foo%']
             applyFieldMap(criteria, field, fieldVal)
         }
+        // else if (fieldVal instanceof Map && (prop || field.endsWith('.id'))) { // field=name fieldVal=['$like': 'foo%']
+        //     applyFieldMap(criteria, field, fieldVal)
+        // }
         //I think we should not blow up an error if some field isnt in domain, just add message to log
         log.info "MangoBuilder applyField domain ${getTargetClass(criteria).name} doesnt contains field $field"
 

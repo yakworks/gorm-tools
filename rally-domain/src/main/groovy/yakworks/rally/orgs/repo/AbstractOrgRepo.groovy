@@ -126,9 +126,9 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
      */
     @RepoListener
     void afterRemove(Org org, AfterRemoveEvent e) {
-        Location.query(org: org).deleteAll()
-        Contact.query(org: org).deleteAll()
-        OrgSource.query(org: org).deleteAll()
+        Location.query(orgId: org.id).deleteAll()
+        Contact.query(orgId: org.id).deleteAll()
+        OrgSource.query(orgId: org.id).deleteAll()
     }
 
     /**

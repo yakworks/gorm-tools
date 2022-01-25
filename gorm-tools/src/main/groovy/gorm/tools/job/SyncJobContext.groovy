@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 import groovy.json.StreamingJsonBuilder
-import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.MapConstructor
 import groovy.transform.ToString

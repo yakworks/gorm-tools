@@ -60,16 +60,19 @@ class OrgRepo extends AbstractOrgRepo {
      */
     @Override
     MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
+        List critTags = queryArgs.criteria.remove('tags') as List
+        List critTagIds = queryArgs.criteria.remove('tagIds') as List
+
         DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
-        Map criteriaMap = queryArgs.criteria
+
         //if it has tags key
-        if(criteriaMap.tags){
+        if(critTags){
             //convert to id long list
-            List<Long> tagIds = Transform.objectToLongList(criteriaMap.tags as List)
+            List<Long> tagIds = Transform.objectToLongList(critTags)
             detCrit.exists(OrgTag.buildExistsCriteria(tagIds))
-        } else if(criteriaMap.tagIds) {
+        } else if(critTagIds) {
             //should be list of id if this key is present
-            detCrit.exists(OrgTag.buildExistsCriteria(criteriaMap.tagIds as List))
+            detCrit.exists(OrgTag.buildExistsCriteria(critTagIds))
         }
         return detCrit
     }

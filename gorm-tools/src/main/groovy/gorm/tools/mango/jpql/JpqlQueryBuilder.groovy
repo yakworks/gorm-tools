@@ -172,15 +172,15 @@ class JpqlQueryBuilder {
         buildSelectClause(queryString)
 
         StringBuilder whereClause= new StringBuilder()
-        List parameters = null
+        List parameters = []
         if (!criteria.isEmpty()) {
-            parameters = buildWhereClause(entity, criteria, queryString, whereClause, logicalName, true)
+            parameters = buildWhereClause(entity, criteria, queryString, whereClause, logicalName, true, parameters)
         }
 
         buildGroup(queryString)
 
         if (!criteria.isEmpty() && projectionAliases) {
-            parameters.addAll(buildHavingClause(entity, criteria, queryString, logicalName, true))
+            buildHavingClause(entity, criteria, queryString, logicalName, true, parameters)
         }
 
         appendOrder(queryString, logicalName)
@@ -924,8 +924,7 @@ class JpqlQueryBuilder {
         return parameters
     }
 
-    private List buildHavingClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, String logicalName, boolean allowJoins) {
-        List parameters = []
+    private List buildHavingClause(PersistentEntity entity, Query.Junction criteria, StringBuilder q, String logicalName, boolean allowJoins, List parameters) {
         if (!criteria.isEmpty() && projectionAliases) {
             int position = parameters.size()
             final List<Query.Criterion> criterionList = criteria.getCriteria()
@@ -965,7 +964,11 @@ class JpqlQueryBuilder {
     int buildWhereClauseForCriterion(PersistentEntity entity,
                                             Query.Junction criteria, StringBuilder q, StringBuilder whereClause, String logicalName,
                                             final List<Query.Criterion> criterionList, int position, List parameters, ConversionService conversionService, boolean allowJoins, boolean hibernateCompatible) {
+
+        Map clauseTokens = [:] as Map<String,String>
+
         for (Iterator<Query.Criterion> iterator = criterionList.iterator(); iterator.hasNext();) {
+            StringBuilder tempWhereClause = new StringBuilder()
             Query.Criterion criterion = iterator.next()
             //TODO if its a projection alias then skip for now
             if(criterion instanceof Query.PropertyNameCriterion){
@@ -978,7 +981,7 @@ class JpqlQueryBuilder {
             QueryHandler qh = queryHandlers.get(criterion.getClass())
             if (qh != null) {
 
-                position = qh.handle(entity, criterion, q, whereClause, logicalName,
+                position = qh.handle(entity, criterion, q, tempWhereClause, logicalName,
                         position, parameters, conversionService, allowJoins, hibernateCompatible)
             }
             else if (criterion instanceof AssociationCriteria) {
@@ -989,15 +992,24 @@ class JpqlQueryBuilder {
                 AssociationCriteria ac = (AssociationCriteria) criterion
                 Association association = ac.getAssociation()
                 List<Query.Criterion> associationCriteriaList = ac.getCriteria()
-                handleAssociationCriteria(q, whereClause, logicalName, position, parameters, conversionService, allowJoins, association, new Query.Conjunction(), associationCriteriaList, hibernateCompatible)
+                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, conversionService, allowJoins, association, new Query.Conjunction(), associationCriteriaList, hibernateCompatible)
             }
             else {
                 throw new InvalidDataAccessResourceUsageException("Queries of type "+criterion.getClass().getSimpleName()+" are not supported by this implementation")
             }
 
-            if (whereClause.toString() && iterator.hasNext()) {
-                whereClause.append(operator)
-            }
+            String toStringWhere = tempWhereClause
+            if(toStringWhere) clauseTokens[toStringWhere] = operator
+            // if (whereClause.toString() && iterator.hasNext()) {
+            //     whereClause.append(operator)
+            // }
+        }
+
+        for (Iterator<String> iterator = clauseTokens.keySet().iterator(); iterator.hasNext();) {
+            String key = iterator.next()
+            String operator = clauseTokens[key]
+            whereClause.append(key)
+            if(iterator.hasNext()) whereClause.append(operator)
         }
 
         return position
@@ -1006,7 +1018,11 @@ class JpqlQueryBuilder {
     int buildHavingClauseForCriterion(PersistentEntity entity,
                                      Query.Junction criteria, StringBuilder q, StringBuilder whereClause, String logicalName,
                                      final List<Query.Criterion> criterionList, int position, List parameters, ConversionService conversionService, boolean allowJoins, boolean hibernateCompatible) {
+
+        Map clauseTokens = [:] as Map<String,String>
+
         for (Iterator<Query.Criterion> iterator = criterionList.iterator(); iterator.hasNext();) {
+            StringBuilder tempWhereClause = new StringBuilder()
             Query.Criterion criterion = iterator.next()
             //TODO if its a projection alias then skip for now
             if(criterion instanceof Query.PropertyNameCriterion){
@@ -1019,7 +1035,7 @@ class JpqlQueryBuilder {
             QueryHandler qh = queryHandlers.get(criterion.getClass())
             if (qh != null) {
 
-                position = qh.handle(entity, criterion, q, whereClause, '',
+                position = qh.handle(entity, criterion, q, tempWhereClause, '',
                     position, parameters, conversionService, allowJoins, hibernateCompatible)
             }
             else if (criterion instanceof AssociationCriteria) {
@@ -1030,15 +1046,21 @@ class JpqlQueryBuilder {
                 AssociationCriteria ac = (AssociationCriteria) criterion
                 Association association = ac.getAssociation()
                 List<Query.Criterion> associationCriteriaList = ac.getCriteria()
-                handleAssociationCriteria(q, whereClause, logicalName, position, parameters, conversionService, allowJoins, association, new Query.Conjunction(), associationCriteriaList, hibernateCompatible)
+                handleAssociationCriteria(q, tempWhereClause, logicalName, position, parameters, conversionService, allowJoins, association, new Query.Conjunction(), associationCriteriaList, hibernateCompatible)
             }
             else {
                 throw new InvalidDataAccessResourceUsageException("Queries of type "+criterion.getClass().getSimpleName()+" are not supported by this implementation")
             }
 
-            if (whereClause.toString() && iterator.hasNext()) {
-                whereClause.append(operator)
-            }
+            String toStringWhere = tempWhereClause
+            if(toStringWhere) clauseTokens[toStringWhere] = operator
+        }
+
+        for (Iterator<String> iterator = clauseTokens.keySet().iterator(); iterator.hasNext();) {
+            String key = iterator.next()
+            String operator = clauseTokens[key]
+            whereClause.append(key)
+            if(iterator.hasNext()) whereClause.append(operator)
         }
 
         return position

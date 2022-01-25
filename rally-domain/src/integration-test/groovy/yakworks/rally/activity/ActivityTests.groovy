@@ -7,6 +7,7 @@ import grails.gorm.transactions.Rollback
 import grails.plugin.viewtools.AppResourceLoader
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.activity.model.Activity
@@ -188,6 +189,7 @@ class ActivityTests extends Specification implements DomainIntTest {
         flushAndClear()
     }
 
+    @IgnoreRest
     void "add tags and make sure filter works"() {
         when:
         addTagsForSearch()
@@ -195,8 +197,9 @@ class ActivityTests extends Specification implements DomainIntTest {
         def actCrit = { tagList ->
             return Activity.query(tags: tagList)
         }
+        def crit = Activity.query(tags: [[id:9]] )
+        List hasTag1 = crit.list()
 
-        List hasTag1 = actCrit([ [id:9] ]).list()
         List hasTag2 = actCrit([ [id:10] ]).list()
         List has1or2 = actCrit([ [id:9] , [id:10] ]).list()
 

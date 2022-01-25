@@ -147,7 +147,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
      * List the active contacts for the org
      */
     static List<Contact> listActive(Long orgId) {
-        return Contact.query(ordId: orgId, inactive: false).list()
+        return Contact.query(orgId: orgId, inactive: false).list()
     }
 
     static Contact findByUser(AppUser user){

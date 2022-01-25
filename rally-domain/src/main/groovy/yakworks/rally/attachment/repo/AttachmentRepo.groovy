@@ -27,8 +27,8 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import grails.gorm.DetachedCriteria
 import yakworks.commons.io.FileUtil
-import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.TagLink
@@ -144,11 +144,14 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo<Attachment
      */
     @Override
     MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        MangoDetachedCriteria<Attachment> detCrit = getMangoQuery().query(Attachment, queryArgs, closure)
         Map criteriaMap = queryArgs.criteria
+        //if its has tags keys then this returns something to add to exists, will remove the keys as well
+        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Attachment, 'attachment_.id')
+
+        MangoDetachedCriteria<Attachment> detCrit = getMangoQuery().query(Attachment, queryArgs, closure)
         //if it has tags key
-        if(criteriaMap.tags || criteriaMap.tagIds) {
-            TagLink.addExistsCriteria(detCrit, criteriaMap, Attachment, 'attachment_.id')
+        if(tagExistsCrit != null) {
+            detCrit.exists(tagExistsCrit.id())
         }
         return detCrit
     }

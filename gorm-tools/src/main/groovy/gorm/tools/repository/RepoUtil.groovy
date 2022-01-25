@@ -87,7 +87,8 @@ class RepoUtil {
      */
     static void checkCreateData(Map data, PersistArgs args, Class entityClass) {
         if(data['id'] && !args.bindId)
-            throw DataProblem.of('error.data.bindId', [name: entityClass.simpleName]).toException()
+            throw DataProblem.of('error.data.bindId', [name: entityClass.simpleName])
+                .title("set bindId:true when manually assigning id in create data").toException()
     }
 
     /**

@@ -52,6 +52,13 @@ class OrgTagRepo extends AbstractLinkedEntityRepo<OrgTag, Tag> {
     }
 
     /**
+     * shortcut to create by ids
+     */
+    OrgTag create(Long orgId, Long tagId) {
+        super.create(Org.load(orgId), Tag.load(tagId))
+    }
+
+    /**
      * Copies all tags from given org to target org
      */
     void copyToOrg(Org fromOrg, Org toOrg) {

@@ -4,6 +4,9 @@
 */
 package gorm.tools.mango
 
+import gorm.tools.beans.Pager
+import grails.gorm.DetachedCriteria
+
 import javax.inject.Inject
 
 import gorm.tools.mango.api.MangoQuery
@@ -56,14 +59,19 @@ class NewMangoQuery implements MangoQuery {
     }
 
     @Override
-    List queryList(Class domainClass, Map params, Closure closure = null) {
-        query(domainClass, [:], null).list()
+    List list(MangoDetachedCriteria criteria, Pager pager) {
+        criteria.list(max: pager.max, offset: pager.offset)
     }
 
-    @Override
-    List queryList(Class domainClass, QueryArgs qargs, Closure closure = null) {
-        query(domainClass, [:], null).list()
-    }
+    // @Override
+    // List queryList(Class domainClass, Map params, Closure closure = null) {
+    //     query(domainClass, [:], null).list()
+    // }
+
+    // @Override
+    // List queryList(Class domainClass, QueryArgs qargs, Closure closure = null) {
+    //     query(domainClass, [:], null).list()
+    // }
 }
 
 @GormRepository

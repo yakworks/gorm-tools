@@ -25,9 +25,9 @@ class ContactTests extends Specification implements DomainIntTest {
 
     def "listActive should only return active contacts"() {
         when:
-        def result = Contact.listActive(99)
-        def primary = Org.get(99).contact
-        def secondary = Contact.findByNum("secondary99")
+        def result = Contact.listActive(9)
+        def primary = Org.get(9).contact
+        def secondary = Contact.findByNum("secondary9")
 
         then:
         result.contains(primary)
@@ -37,7 +37,7 @@ class ContactTests extends Specification implements DomainIntTest {
         secondary.inactive = true
         secondary.persist(flush:true)
 
-        result = Contact.listActive(99)
+        result = Contact.listActive(9)
 
         then:
         !result.contains(secondary)

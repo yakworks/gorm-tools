@@ -9,7 +9,6 @@ import groovy.util.logging.Slf4j
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSourceResolvable
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DataAccessException
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
@@ -17,7 +16,6 @@ import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.errors.EmptyErrors
 import gorm.tools.support.MsgSourceResolvable
-import grails.gorm.validation.ConstrainedProperty
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.i18n.icu.ICUMessageSource

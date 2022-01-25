@@ -27,6 +27,18 @@ trait QueryMangoEntityApi<D> {
     MangoQuery mangoQuery
 
     /**
+     * Primary method. Builds detached criteria for repository's domain based on mango criteria language and additional criteria
+     * Override this one in repo for any special handling
+     *
+     * @param queryArgs mango query args.
+     * @param closure additional restriction for criteria
+     * @return Detached criteria build based on mango language params and criteria closure
+     */
+    MangoDetachedCriteria<D> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
+        getMangoQuery().query(getEntityClass(), queryArgs, closure)
+    }
+
+    /**
      * Builds detached criteria for repository's domain based on mango criteria language and additional criteria
      *
      * @param params mango language criteria map
@@ -34,11 +46,11 @@ trait QueryMangoEntityApi<D> {
      * @return Detached criteria build based on mango language params and criteria closure
      */
     MangoDetachedCriteria<D> query(Map params, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-        getMangoQuery().query(getEntityClass(), params, closure)
+        query(QueryArgs.of(params), closure)
     }
 
     MangoDetachedCriteria<D> query(@DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
-        query([:], closure)
+        query(QueryArgs.of([:]), closure)
     }
 
     /**
@@ -49,10 +61,11 @@ trait QueryMangoEntityApi<D> {
      * @return query of entities restricted by mango params
      */
     List<D> queryList(Map params = [:], @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        getMangoQuery().queryList(getEntityClass(), params, closure)
+        queryList(QueryArgs.of(params), closure)
     }
 
     List<D> queryList(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        getMangoQuery().queryList(getEntityClass(), qargs, closure)
+        MangoDetachedCriteria<D> dcrit = query(qargs, closure)
+        getMangoQuery().list(dcrit, qargs.pager)
     }
 }

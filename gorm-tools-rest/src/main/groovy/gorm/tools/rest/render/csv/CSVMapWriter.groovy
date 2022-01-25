@@ -37,8 +37,8 @@ class CSVMapWriter {
 
         //flatten
         Map<String, Object> firstRow = dataList[0] as Map<String, Object>
-        def flatRow = flattenMap(firstRow)
-        writeHeaders(firstRow)
+        Map flatRow = flattenMap(firstRow)
+        writeHeaders(flatRow)
 
         dataList.eachWithIndex{ row, int i->
             //get all the values for the masterHeaders keys

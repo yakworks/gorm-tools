@@ -30,7 +30,7 @@ import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
-import gorm.tools.transaction.TrxService
+import gorm.tools.transaction.TrxStaticApi
 import grails.core.support.proxy.ProxyHandler
 import grails.validation.ValidationException
 import yakworks.commons.lang.ClassUtils
@@ -553,12 +553,12 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
 
     /** flush on the datastore's currentSession.*/
     void flush(){
-        TrxService.flush(getDatastore())
+        TrxStaticApi.flush(getDatastore())
     }
 
     /** cache clear on the datastore's currentSession.*/
     void clear(){
-        TrxService.clear(getDatastore())
+        TrxStaticApi.clear(getDatastore())
     }
 
     void flushAndClear() {

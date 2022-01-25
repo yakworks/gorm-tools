@@ -7,7 +7,9 @@ package yakworks.rally.tag.model
 import gorm.tools.model.Persistable
 import gorm.tools.repository.model.GormRepoEntity
 import grails.compiler.GrailsCompileStatic
+import grails.gorm.DetachedCriteria
 import grails.persistence.Entity
+import yakworks.commons.lang.Transform
 import yakworks.rally.tag.repo.TagLinkRepo
 
 /**
@@ -30,6 +32,15 @@ class TagLink implements TagLinkTrait<TagLink>, GormRepoEntity<TagLink, TagLinkR
 
     static List<TagLink> addTags(Persistable linkedEntity, List<Tag> tags) {
         getRepo().addTags(linkedEntity, tags)
+    }
+
+
+    /**
+     * Add exists criteria to a DetachedCriteria if its has tags
+     * in the criteriaMap
+     */
+    static DetachedCriteria addExistsCriteria(DetachedCriteria detCrit, Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
+        getRepo().addExistsCriteria(detCrit, criteriaMap, linkedEntityClazz, linkedIdJoinProperty)
     }
 
 }

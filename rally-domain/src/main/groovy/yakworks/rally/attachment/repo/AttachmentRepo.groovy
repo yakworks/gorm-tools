@@ -16,6 +16,8 @@ import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
 import gorm.tools.databinding.BindAction
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -26,6 +28,7 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import yakworks.commons.io.FileUtil
+import yakworks.rally.activity.model.Activity
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.tag.model.TagLink
@@ -134,6 +137,20 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo<Attachment
         attachmentLinkRepo.remove(attachment)
         //tags
         TagLink.remove(attachment)
+    }
+
+    /**
+     * Override query for custom search for Tags etc..
+     */
+    @Override
+    MangoDetachedCriteria<Attachment> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        MangoDetachedCriteria<Attachment> detCrit = getMangoQuery().query(Attachment, queryArgs, closure)
+        Map criteriaMap = queryArgs.criteria
+        //if it has tags key
+        if(criteriaMap.tags || criteriaMap.tagIds) {
+            TagLink.addExistsCriteria(detCrit, criteriaMap, Attachment, 'attachment_.id')
+        }
+        return detCrit
     }
 
     /**

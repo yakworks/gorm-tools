@@ -1,5 +1,7 @@
 package yakworks.rally.orgs
 
+
+import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
@@ -25,7 +27,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "test create orgTag with id"() {
         when:
         setUpData()
-        def org = Org.get(100)
+        def org = Org.get(10)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         def o = orgTagRepo.create(org, Tag.load(1))
         flushAndClear()
@@ -38,7 +40,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "test create orgTag"() {
         when:
         setUpData()
-        def org = Org.get(50)
+        def org = Org.get(10)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         def o = orgTagRepo.create(org, Tag.get(1))
         flushAndClear()
@@ -51,7 +53,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "sanity check methods"() {
         setup:
         setUpData()
-        def org = Org.get(50)
+        def org = Org.get(10)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.get(1))
         orgTagRepo.create(org, Tag.get(2))
@@ -75,7 +77,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "remove"() {
         when:
         setUpData()
-        def org = Org.get(50)
+        def org = Org.get(10)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.get(1))
         flushAndClear()
@@ -90,7 +92,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "remove all"() {
         when:
         setUpData()
-        def org = Org.get(50)
+        def org = Org.get(10)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.get(1))
         orgTagRepo.create(org, Tag.get(2))
@@ -106,7 +108,7 @@ class OrgTagTests extends Specification implements DomainIntTest {
     void "list" () {
         setup:
         setUpData()
-        def org = Org.get(50)
+        def org = Org.get(10)
         //tag 1 is CPG for Customer and Org:205 is walmart customer
         orgTagRepo.create(org, Tag.load(1))
         orgTagRepo.create(org, Tag.load(2))
@@ -146,6 +148,145 @@ class OrgTagTests extends Specification implements DomainIntTest {
         to.tags.size() == 2
         OrgTag.exists(to, Tag.get(1))
         OrgTag.exists(to, Tag.get(2))
+
+    }
+
+    void addTagsForSearch(){
+        setUpData()
+        orgTagRepo.create(8, 1)
+        orgTagRepo.create(9, 1)
+        orgTagRepo.create(10, 1)
+        orgTagRepo.create(10, 2)
+        orgTagRepo.create(11, 2)
+        orgTagRepo.flushAndClear()
+        //sanity check
+        assert orgTagRepo.exists(Org.load(9), Tag.load(1))
+        assert orgTagRepo.exists(Org.load(10), Tag.load(1))
+    }
+
+
+    void "get all orgs that have ANY tags" () {
+        when: "filter where orgs contain ANY of the tags"
+        addTagsForSearch()
+
+        String hql = '''\
+            select o
+            FROM Org as o
+            where exists (
+                from OrgTag as ot
+                where ot.linkedId = o.id
+                    and ot.tag.id in (:tagIds)
+            )
+        '''
+        List tag1 = [1L] as List<Long>
+        List tag2 = [2L] as List<Long>
+        List tagBoth = [1L,2L] as List<Long>
+
+        List hasTag1 = Org.executeQuery(hql, [tagIds:tag1])
+
+        List hasTag2 = Org.executeQuery(hql, [tagIds:tag2])
+
+        List hasBoth = Org.executeQuery(hql, [tagIds:tagBoth])
+
+        then:
+        hasTag1.size() == 3
+        hasTag2.size() == 2
+        //should return 4
+        hasBoth.size() == 4
+
+    }
+
+    void "get all orgs that have ALL of the  tags" () {
+
+        when: "filter where orgs contain ALL of the tags"
+        addTagsForSearch()
+        String hql = '''\
+            select o
+            FROM Org as o
+            where (
+                select count(ot)
+                from OrgTag as ot
+                where ot.linkedId = o.id
+                    and ot.tag.id in (:tagIds)
+            ) = :tagIdsSize
+        '''
+        List tag1 = [1L] as List<Long>
+        List tag2 = [2L] as List<Long>
+        List tagBoth = [1L,2L] as List<Long>
+
+        List hasTag1 = Org.executeQuery(hql, [tagIds:tag1, tagIdsSize:tag1.size() as Long])
+
+        List hasTag2 = Org.executeQuery(hql, [tagIds:tag2, tagIdsSize:tag2.size() as Long])
+
+        List hasBoth = Org.executeQuery(hql, [tagIds:tagBoth, tagIdsSize:tagBoth.size() as Long])
+
+        then:
+        hasTag1.size() == 3
+        hasTag2.size() == 2
+        //only id:10 has both
+        hasBoth.size() == 1
+    }
+
+    void "criteria get all orgs that have ANY tags" () {
+        when: "filter where orgs contain ANY of the tags"
+        addTagsForSearch()
+
+        def orgCrit = { tagList ->
+            DetachedCriteria orgCrit = Org.query {
+                exists OrgTag.buildExistsCriteria(tagList)
+            }
+            return orgCrit
+        }
+
+
+        List hasTag1 = orgCrit([1]).list()
+        List hasTag2 = orgCrit([2]).list()
+        List has1or2 = orgCrit([1, 2]).list()
+
+        then:
+        hasTag1.size() == 3
+        hasTag2.size() == 2
+        has1or2.size() == 4
+
+    }
+
+    void "criteria default org map" () {
+        when: "filter where orgs contain ANY of the tags"
+        addTagsForSearch()
+
+        def orgCrit = { tagList ->
+            return Org.query(tagIds: tagList)
+        }
+
+
+        List hasTag1 = orgCrit([1]).list()
+        List hasTag2 = orgCrit([2]).list()
+        List has1or2 = orgCrit([1, 2]).list()
+
+        then:
+        hasTag1.size() == 3
+        hasTag2.size() == 2
+        has1or2.size() == 4
+
+    }
+
+    void "criteria with list of id objects" () {
+        when: "filter where orgs contain ANY of the tags"
+        addTagsForSearch()
+
+        def orgCrit = { tagList ->
+            return Org.query(tags: tagList)
+        }
+
+
+        List hasTag1 = orgCrit([ [id:1] ]).list()
+        List hasTag2 = orgCrit([ [id:2] ]).list()
+        List has1or2 = orgCrit([ [id:1] , [id:2] ]).list()
+
+        then:
+        hasTag1.size() == 3
+        hasTag2.size() == 2
+        has1or2.size() == 4
 
     }
 

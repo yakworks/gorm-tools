@@ -23,7 +23,7 @@ class RepositoryEventsSpec extends Specification {
 
         when:
         Org org = Org.create(params)
-        RepoUtil.flush()
+        Org.repo.flush()
 
         then: "Event listener should have been called"
         org.comments == "BeforeBindEvent Create"

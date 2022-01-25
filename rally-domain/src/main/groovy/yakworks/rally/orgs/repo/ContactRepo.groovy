@@ -6,6 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
@@ -97,6 +99,17 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
+    @Override
+    MangoDetachedCriteria<Contact> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        MangoDetachedCriteria<Contact> detCrit = getMangoQuery().query(Contact, queryArgs, closure)
+        Map criteriaMap = queryArgs.criteria
+        //if it has tags key
+        if(criteriaMap.tags || criteriaMap.tagIds) {
+            TagLink.addExistsCriteria(detCrit, criteriaMap, Contact, 'contact_.id')
+        }
+        return detCrit
+    }
+
     void removeAll(Org org) {
         gormStaticApi().executeUpdate 'DELETE FROM Contact WHERE org=:org', [org: org]
     }
@@ -141,14 +154,6 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         }
     }
 
-    Contact assignUserNameFromContactName(Contact contact) {
-        if (contact.user && contact.user.name != contact.name) {
-            contact.user.name = contact.name
-            contact.user.persist()
-        }
-        return contact
-    }
-
     /*
     * build a User domain object from a contact if it does not exist.
     */
@@ -188,6 +193,5 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         }
         return toContat.persist()
     }
-
 
 }

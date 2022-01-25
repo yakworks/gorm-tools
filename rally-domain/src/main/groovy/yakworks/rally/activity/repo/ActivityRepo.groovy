@@ -14,6 +14,8 @@ import groovy.transform.CompileStatic
 import org.apache.commons.lang3.StringUtils
 
 import gorm.tools.beans.Pager
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
@@ -132,6 +134,20 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
         }
+    }
+
+    /**
+     * Override query for custom search for Tags etc..
+     */
+    @Override
+    MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
+        Map criteriaMap = queryArgs.criteria
+        //if it has tags key
+        if(criteriaMap.tags || criteriaMap.tagIds) {
+            TagLink.addExistsCriteria(detCrit, criteriaMap, Activity, 'activity_.id')
+        }
+        return detCrit
     }
 
     void updateNameSummary(Activity activity) {

@@ -7,8 +7,11 @@ package gorm.tools.mango.api
 import groovy.json.JsonParserType
 import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 
 import gorm.tools.beans.Pager
+import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.MangoOps
 import yakworks.commons.map.Maps
 
@@ -17,27 +20,24 @@ import static gorm.tools.mango.MangoOps.CRITERIA
 /**
  * Builder arguments for a query to pass from controllers etc to the MangoQuery
  * Can think of it a bit like a SQL query.
+ *
  * This holds
  *  - what we want to select (includes)
+ *  - projections if it s projection query (projections)
  *  - the where conditions (criteria)
  *  - the orderBy (sort)
  *  - and how we want the paging to be handled (pager), number of items per page, etc..
  *
  * contains some intermediary fields such as 'q' that are used to parse it into what we need
  */
+@Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class QueryArgs {
 
-    static QueryArgs of(Pager pager){
-        def qa = new QueryArgs()
-        qa.pager = pager
-        return qa
-    }
-
-    static QueryArgs of(Map params){
-        def qa = new QueryArgs()
-        return qa.build(params)
-    }
+    /**
+     * extra closure that can be passed to MangoCriteria
+     */
+    Closure closure
 
     /**
      * Criteria map to pass to the MangoBuilder
@@ -57,7 +57,54 @@ class QueryArgs {
     Map<String, String> sort
 
     /**
-     * Intelligent defaults to setup the criteria and pager from the paramsMap
+     * holder for projections
+     * The key is the field, can be dot path for nested like foo.bar.baz
+     * The value is one of 'group', 'sum', 'count'
+     */
+    Map<String, String> projections
+
+    /**
+     * Construct from a pager
+     */
+    static QueryArgs of(Pager pager){
+        def qa = new QueryArgs()
+        qa.pager = pager
+        return qa
+    }
+
+    /**
+     * Construct from a controller style params object where each key has as string value
+     * just as if it came from a url
+     */
+    static QueryArgs of(Map params){
+        def qa = new QueryArgs()
+        return qa.build(params)
+    }
+
+    /**
+     * Construct from a mango closure
+     */
+    static QueryArgs of(@DelegatesTo(MangoDetachedCriteria) Closure closure){
+        def qa = new QueryArgs()
+        return qa.query(closure)
+    }
+
+    static QueryArgs withProjections(Map<String, String> projs){
+        def qa = new QueryArgs()
+        return qa.projections(projs)
+    }
+
+    /**
+     * Construct with a criteria map as is.
+     */
+    static QueryArgs withCriteria(Map<String, Object> crit){
+        def qa = new QueryArgs()
+        return qa.criteria(crit)
+    }
+
+    /**
+     * Intelligent defaults to setup the criteria and pager from the controller style params map
+     *
      *  - looks for q param and parse if json object (starts with {)
      *  - or sets up the $qSearch map if its text
      *  - if qSearch is provided as separate param along with q then adds it as a $qSearch
@@ -104,6 +151,10 @@ class QueryArgs {
         if(sortField) {
             sort = buildSort(sortField, orderBy)
         }
+
+        //projections
+        String projField = (params.remove('projections') as String)?.trim()
+        if(projField) projections = buildProjections(projField)
 
         // check for and remove the q param
         // whatever is in q if its parsed as a map and set to the criteria so it overrides everything
@@ -195,6 +246,31 @@ class QueryArgs {
         return sortMap
     }
 
+    /**
+     * parses the projection string. If it start with { and will parse as json.
+     * parse string should be in one of the following formats
+     *  - fields seperated by comma, ex: 'type:group,calc.totalDue:sum'
+     *  - json in same format as above, ex '{type:"group", "calc.totalDue":"sum"}'
+     *
+     * @param projText see above for valid options
+     * @return the projection Map or null if failed
+     */
+    Map buildProjections(String projText){
+        //make sure its trimmed
+        projText = projText.trim()
+        Map projMap = [:] as Map<String, String>
+        //for convienience we allow the { to be left off so we add it if it is
+        if (!projText.startsWith('{')) projText = "{$projText}"
+
+        projMap = parseJson(projText) as Map<String, String>
+
+        return projMap
+    }
+
+    QueryArgs query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {
+        this.closure = closure
+        return this
+    }
     /**
      * looks for the qsearch fields for this entity and returns the map
      * like [text: "foo", 'fields': ['name', 'num']]

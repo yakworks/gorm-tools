@@ -212,7 +212,7 @@ abstract class BenchProcessData implements BenchConfig, WithTrx  {
             // assert dataSize == rowCount
             withTrx { status ->
                 domainClass.executeUpdate("delete from ${domainClass.getSimpleName()}".toString())
-                flushAndClear(status)
+                trxService.flushAndClear()
             }
         }
     }

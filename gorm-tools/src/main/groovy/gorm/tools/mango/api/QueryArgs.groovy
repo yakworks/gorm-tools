@@ -136,7 +136,7 @@ class QueryArgs {
         Map params = Maps.clone(paramsMap) as Map<String, Object>
 
         //remove the fields that grails adds for controller and action
-        params.removeAll {it.key in ['controller', 'action'] }
+        params.removeAll {it.key in ['controller', 'action', 'format'] }
 
         // pull out the max, page and offset and assume the rest is criteria,
         // if pager is already set then we do nothing with the pagerMap

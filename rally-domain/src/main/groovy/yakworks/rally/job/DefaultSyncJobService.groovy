@@ -20,7 +20,7 @@ import yakworks.rally.attachment.repo.AttachmentRepo
 
 @Lazy @Service('syncJobService')
 @CompileStatic
-class DefaultSyncJobService implements SyncJobService {
+class DefaultSyncJobService implements SyncJobService<SyncJob> {
 
     @Autowired
     SyncJobRepo syncJobRepo

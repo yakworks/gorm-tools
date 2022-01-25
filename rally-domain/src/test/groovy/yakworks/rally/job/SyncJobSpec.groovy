@@ -23,6 +23,10 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         mockDomains(SyncJob, Attachment)
     }
 
+    SyncJob createJob(){
+        return new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org']).persist(flush:true)
+    }
+
     void "sanity check validation with String as data"() {
         expect:
         SyncJob job = new SyncJob([sourceType: SourceType.ERP, sourceId: 'ar/org'])
@@ -42,6 +46,17 @@ class SyncJobSpec extends Specification implements DataRepoTest, SecurityTest {
         then:
         job
         job.payloadBytes.size() > 0
+    }
+
+    void "make sure update works with error bytes"() {
+        when:
+        def jobId = createJob().id
+        def errorList = ["ok":false,"tile":"bad stuff here"]
+        def job = SyncJob.repo.update(id:jobId, errorBytes:errorList.toString().bytes)
+
+        then:
+        job
+        job.errorBytes.size() > 0
     }
 
 

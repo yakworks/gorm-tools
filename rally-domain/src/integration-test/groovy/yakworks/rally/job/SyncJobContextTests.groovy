@@ -8,18 +8,6 @@ import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.ApiResults
 import yakworks.gorm.testing.DomainIntTest
-import yakworks.problem.data.DataProblem
-import yakworks.problem.data.DataProblemCodes
-import yakworks.problem.data.DataProblemException
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.ContactEmail
-import yakworks.rally.orgs.model.ContactFlex
-import yakworks.rally.orgs.model.ContactPhone
-import yakworks.rally.orgs.model.ContactSource
-import yakworks.rally.orgs.model.Location
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.orgs.repo.ContactRepo
 
 @Integration
 @Rollback

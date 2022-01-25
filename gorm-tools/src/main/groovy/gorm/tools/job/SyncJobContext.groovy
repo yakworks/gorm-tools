@@ -166,7 +166,7 @@ class SyncJobContext {
         // XXX how do I insert these renderErrorResults into data.errorBytes ?
         if(renderErrorResults){
             //it fails, they are still ProblemTraits
-            //data.errorBytes = JsonEngine.toJson(renderErrorResults).bytes
+            data.errorBytes = JsonEngine.toJson(renderErrorResults).bytes
         }
         if(args.saveDataAsFile){
             //close out the file

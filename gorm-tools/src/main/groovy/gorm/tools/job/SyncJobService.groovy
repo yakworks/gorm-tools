@@ -27,7 +27,7 @@ trait SyncJobService<D> {
     TrxService trxService
 
     /**
-     * creates Job using the repo and returns the jobId
+     * get the repo so the synJob
      */
     abstract GormRepo<D> getRepo()
 

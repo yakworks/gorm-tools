@@ -6,7 +6,6 @@ package gorm.tools.mango.api
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
-import grails.gorm.DetachedCriteria
 
 /**
  * Interface to be implemented by a bean
@@ -43,5 +42,5 @@ interface MangoQuery {
     //
     // public <D> List<D> queryList(Class<D> entityClass, QueryArgs qargs, Closure closure)
 
-    public <D> List<D> list(DetachedCriteria<D> criteria, Pager pager)
+    public <D> List<D> list(MangoDetachedCriteria<D> criteria, Pager pager)
 }

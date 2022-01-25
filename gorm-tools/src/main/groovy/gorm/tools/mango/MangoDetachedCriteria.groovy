@@ -17,6 +17,8 @@ import org.grails.datastore.mapping.query.api.QueryableCriteria
 import org.grails.orm.hibernate.AbstractHibernateSession
 
 import gorm.tools.mango.hibernate.HibernateMangoQuery
+import gorm.tools.mango.jpql.JpqlQueryBuilder
+import gorm.tools.mango.jpql.JpqlQueryInfo
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
@@ -87,11 +89,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     /**
      * Lists all records matching the criterion contained within this DetachedCriteria instance
+     * Uses the JpqlQueryBuilder to build jpql with map projections
      *
      * @return A list of matching instances
      */
-    List<Map> mapList() {
-        getHibernateQuery().list() as List<Map>
+    List<Map> mapList(Map args = Collections.emptyMap()) {
+        //getHibernateQuery().list() as List<Map>
+        def builder = JpqlQueryBuilder.of(this).aliasToMap(true)
+        JpqlQueryInfo queryInfo = builder.buildSelect()
+        return currentGormStaticApi().executeQuery(queryInfo.query, queryInfo.paramMap, args)
     }
 
     /**
@@ -237,6 +243,11 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
         createQueryInstance([:], null) as HibernateMangoQuery
     }
 
+    GormStaticApi<T> currentGormStaticApi() {
+        (GormStaticApi<T>) (persistentEntity.isMultiTenant() ?
+            GormEnhancer.findStaticApi(targetClass) : GormEnhancer.findStaticApi(targetClass, connectionName))
+    }
+
     /**
      * moved in from  private super.withPopulatedQuery.
      * Creates a HibernateMangoQuery or in testing falls back to the session.createQuery
@@ -244,8 +255,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
     Query createQueryInstance(Map args, Closure additionalCriteria) {
         Query query
 
-        GormStaticApi staticApi = persistentEntity.isMultiTenant() ?
-            GormEnhancer.findStaticApi(targetClass) : GormEnhancer.findStaticApi(targetClass, connectionName)
+        GormStaticApi staticApi = currentGormStaticApi()
 
         staticApi.withDatastoreSession { Session session ->
             applyLazyCriteria()

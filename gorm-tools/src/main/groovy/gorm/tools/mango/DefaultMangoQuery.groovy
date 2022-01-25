@@ -66,15 +66,17 @@ class DefaultMangoQuery implements MangoQuery {
     // }
 
     /**
-     * call list on the criteria with the pager params inside a readOnly transaction
+     * call list on the criteria with the pager params inside a readOnly transaction.
+     * If it has projections then it will use the JpqlQueryBuilder so that there is more flexibility in
+     * using the having clause.
      *
      * @param criteria the built detached criteria
      * @param pagerParams the map with max, offset and page
      * @return list of entities
      */
     @Transactional(readOnly = true)
-    public <D> List<D> list(DetachedCriteria<D> criteria, Pager pager) {
-        criteria.list(max: pager.max, offset: pager.offset)
+    public <D> List<D> list(MangoDetachedCriteria<D> criteria, Pager pager) {
+        return mangoBuilder.list(criteria, [max: pager.max, offset: pager.offset])
     }
 
     /**

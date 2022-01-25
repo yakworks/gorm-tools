@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
 import gorm.tools.mango.MangoDetachedCriteria
-import grails.gorm.DetachedCriteria
 
 /**
  * For repos and concretes classes that work on a single entity
@@ -66,7 +65,7 @@ trait QueryMangoEntityApi<D> {
     }
 
     List<D> queryList(QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure closure = null) {
-        DetachedCriteria<D> dcrit = query(qargs, closure)
+        MangoDetachedCriteria<D> dcrit = query(qargs, closure)
         getMangoQuery().list(dcrit, qargs.pager)
     }
 }

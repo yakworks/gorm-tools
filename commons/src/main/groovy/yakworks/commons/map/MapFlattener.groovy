@@ -25,9 +25,9 @@ class MapFlattener {
     /**
      * Groovy transforms JSON to either a Map or List based on the root node.
      */
-    Map<String, String> flatten(Object groovyJsonObject) {
+    Map<String, Object> flatten(Object groovyJsonObject) {
 
-        Map<String, String> keyValues = [:]
+        Map<String, Object> keyValues = [:]
 
         if (groovyJsonObject == null) {
             return keyValues
@@ -47,13 +47,13 @@ class MapFlattener {
      * therein. Otherwise, it is just a string "key" and "value".
      */
     @SuppressWarnings(['EmptyCatchBlock'])
-    Map<String, String> transformGroovyJsonMap(Map jsonMap, String currentName) {
+    Map<String, Object> transformGroovyJsonMap(Map jsonMap, String currentName) {
 
         if (jsonMap == null || jsonMap.isEmpty()) {
             return [:]
         }
 
-        Map<String, String> keyValues = [:]
+        Map<String, Object> keyValues = [:]
 
         jsonMap.each { entry ->
 
@@ -67,10 +67,10 @@ class MapFlattener {
             } else if (entry.value == null || entry.value?.toString() == 'null') {
                 keyVersion.updateMapWithKeyValue(keyValues, key, null)
             } else if (entry.value instanceof List) {
-                Map<String, String> jsonListKeyValues = transformJsonArray(entry.value as List, key)
+                Map<String, Object> jsonListKeyValues = transformJsonArray(entry.value as List, key)
                 keyValues.putAll(jsonListKeyValues)
             } else if (entry.value instanceof Map) {
-                Map<String, String> jsonMapKeyValues = transformGroovyJsonMap(entry.value as Map, key)
+                Map<String, Object> jsonMapKeyValues = transformGroovyJsonMap(entry.value as Map, key)
                 keyValues.putAll(jsonMapKeyValues)
             } else {
                 String value = String.valueOf(entry.value)
@@ -101,7 +101,7 @@ class MapFlattener {
     /**
      * Flatten Groovy-JSON Array objects
      */
-    Map<String, String> transformJsonArray(List jsonArray, String currentName) {
+    Map<String, Object> transformJsonArray(List jsonArray, String currentName) {
 
         if (jsonArray == null || jsonArray.empty) {
             return [:]
@@ -117,10 +117,10 @@ class MapFlattener {
             if (jsonElement == null) {
                 keyValues.put(arrayName, null)
             } else if (jsonElement instanceof Map) {
-                Map<String, String> jsonMapKeyValues = transformGroovyJsonMap(jsonElement as Map, arrayName)
+                Map<String, Object> jsonMapKeyValues = transformGroovyJsonMap(jsonElement as Map, arrayName)
                 keyVersion.updateMapWithKeyValues(keyValues, jsonMapKeyValues)
             } else if (jsonElement instanceof List) {
-                Map<String, String> jsonArrayKeyValues = transformJsonArray(jsonElement as List, arrayName)
+                Map<String, Object> jsonArrayKeyValues = transformJsonArray(jsonElement as List, arrayName)
                 keyVersion.updateMapWithKeyValues(keyValues, jsonArrayKeyValues)
             } else {
                 String value = String.valueOf(jsonElement)
@@ -128,7 +128,7 @@ class MapFlattener {
             }
         }
 
-        return keyValues as Map<String, String>
+        return keyValues as Map<String, Object>
     }
 
 }
@@ -138,7 +138,7 @@ class KeyVersion {
 
     private final Map<String, Integer> keyVersionCount = [:]
 
-    void updateMapWithKeyValue(Map<String, String> originalMap, String key, String value) {
+    void updateMapWithKeyValue(Map<String, Object> originalMap, String key, String value) {
 
         // if ( key == null || value == null )
         // {
@@ -154,7 +154,7 @@ class KeyVersion {
         }
     }
 
-    void updateMapWithKeyValues(Map<String, String> originalMap, Map<String, String> additionalMap) {
+    void updateMapWithKeyValues(Map<String, Object> originalMap, Map<String, Object> additionalMap) {
 
         additionalMap.entrySet().each { entry ->
 
@@ -168,9 +168,9 @@ class KeyVersion {
         }
     }
 
-    Map buildMapFromOriginal(Map original, Map<String, String> additional) {
+    Map buildMapFromOriginal(Map original, Map<String, Object> additional) {
 
-        Map combinedMap = [:] as Map<String, String>
+        Map combinedMap = [:] as Map<String, Object>
         combinedMap.putAll(original)
         updateMapWithKeyValues(combinedMap, additional)
 

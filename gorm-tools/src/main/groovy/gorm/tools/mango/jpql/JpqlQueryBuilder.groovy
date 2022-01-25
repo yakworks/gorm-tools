@@ -19,7 +19,7 @@ import org.springframework.core.convert.ConversionService
 import org.springframework.core.convert.support.GenericConversionService
 import org.springframework.dao.InvalidDataAccessResourceUsageException
 
-import gorm.tools.mango.MangoDetachedCriteria
+import grails.gorm.DetachedCriteria
 
 /**
  * Builds JPQL String-based queries from the DetachedCriteria
@@ -101,7 +101,7 @@ class JpqlQueryBuilder {
     }
 
 
-    static JpqlQueryBuilder of(MangoDetachedCriteria crit){
+    static JpqlQueryBuilder of(DetachedCriteria crit){
         def jqb = new JpqlQueryBuilder(crit.persistentEntity, crit.criteria)
         jqb.initHandlers()
         List<Query.Criterion> criteria = crit.getCriteria()

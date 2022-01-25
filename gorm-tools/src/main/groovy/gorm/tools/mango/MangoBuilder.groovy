@@ -65,22 +65,41 @@ class MangoBuilder {
     }
 
     public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
-        MangoDetachedCriteria<D> newCriteria = new MangoDetachedCriteria<D>(clazz)
+        MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
         Map criteria = qargs.criteria
         def tidyMap = MangoTidyMap.tidy(criteria)
-        applyMapOrList(newCriteria, tidyMap)
-        if (callable) newCriteria.with callable
+        applyMapOrList(mangoCriteria, tidyMap)
+        if (callable) mangoCriteria.with callable
 
         if(qargs.sort && !criteria.containsKey(SORT)){
-            applyProjections(newCriteria, qargs.projections)
+            order(mangoCriteria, qargs.sort)
         }
 
         if(qargs.projections){
-            applyProjections(newCriteria, qargs.projections)
+            applyProjections(mangoCriteria, qargs.projections)
         }
-        return newCriteria
+        return mangoCriteria
     }
 
+    /**
+     * calls list for the criteria, if criteria has projections then calls mapList
+     * which uses JpqlQueryBuilder
+     */
+    static List list(MangoDetachedCriteria criteria, Map args) {
+        if(criteria.projections){
+            return criteria.mapList(args)
+        } else {
+            //return standard list
+            return criteria.list(args)
+        }
+    }
+
+    /**
+     * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg
+     *
+     * @param criteria the criteria to apply the project
+     * @param projs the map of projections to apply
+     */
     void applyProjections(MangoDetachedCriteria criteria, Map projs) {
         //assume its a map
         (projs as Map<String,String>).each { String k, String v ->

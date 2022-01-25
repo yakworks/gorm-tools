@@ -7,7 +7,11 @@ import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.Specification
 import yakworks.api.ApiResults
+import yakworks.api.ResultUtils
+import yakworks.commons.json.JsonEngine
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.problem.Problem
+import yakworks.problem.ProblemTrait
 
 @Integration
 @Rollback
@@ -37,10 +41,11 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
 
         when:
         def apiRes = ApiResults.of("foo")
-        jobContext.updateJob(apiRes, [id:jobContext.jobId ....])
+        jobContext.updateJob(apiRes, [id:jobContext.jobId , errorBytes: JsonEngine.toJson(apiRes).bytes ])
 
         then:
-        //did it work?
+        SyncJob job = SyncJob.get(jobContext.jobId)
+        job.errorBytes
 
     }
 
@@ -65,14 +70,19 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
     def "test finish job"() {
         given:
         SyncJobContext jobContext = createJob()
-
-        when:
+        List<Map> renderResults = [[ok: true, status: 200, data: ['boo':'foo']] as Map<String,Object>,
+                                    [ok: true, status: 200, data: ['boo2':'foo2']] as Map<String,Object>]
+        Problem  problem = Problem.ofCode('security.validation.password.error')
+        List<Map> renderErrorResults = [[[ok: false, status: 500, detail: 'error detail'] as Map<String,Object>]]
+        //do the failed
+            when:
         //tests finish the job
-        jobContext.finishJob(...)
+        jobContext.finishJob(renderResults, renderErrorResults)
 
         then:
-        //did it work?
-
+        SyncJob job = SyncJob.get(jobContext.jobId)
+        job.errorBytes
+        job.dataBytes
     }
 
 

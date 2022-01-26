@@ -42,6 +42,13 @@ class QueryArgs {
     Closure closure
 
     /**
+     * when true , in build method, will only add params under q.
+     * When false(default) and no q is present build will add any param thats not special(like max, sort, page, etc)
+     * into q as a criteria param.
+     */
+    boolean isStrict = false
+
+    /**
      * Criteria map to pass to the MangoBuilder
      */
     Map<String, Object> criteria = [:] as Map<String, Object>
@@ -136,7 +143,7 @@ class QueryArgs {
         Map params = Maps.clone(paramsMap) as Map<String, Object>
 
         //remove the fields that grails adds for controller and action
-        params.removeAll {it.key in ['controller', 'action', 'format'] }
+        params.removeAll {it.key in ['controller', 'action', 'format', 'nd', '_search'] }
 
         // pull out the max, page and offset and assume the rest is criteria,
         // if pager is already set then we do nothing with the pagerMap
@@ -178,8 +185,8 @@ class QueryArgs {
                 criteria = qParam as Map
             }
         }
-        //if no q was passed in then use whatever is left in the params as the criteria
-        else {
+        //if no q was passed in then use whatever is left in the params as the criteria if strict is false
+        else if(!isStrict){
             criteria = params
         }
 

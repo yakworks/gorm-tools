@@ -272,7 +272,7 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     List<D> query(Pager pager, Map parms) {
-        QueryArgs qargs = QueryArgs.of(pager).isStrict(true).build(parms)
+        QueryArgs qargs = QueryArgs.of(pager).build(parms)
         ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }
 

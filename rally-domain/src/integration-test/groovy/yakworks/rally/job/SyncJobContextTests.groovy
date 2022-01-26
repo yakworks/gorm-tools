@@ -74,13 +74,8 @@ class SyncJobContextTests extends Specification implements DomainIntTest {
         SyncJobContext jobContext = createJob()
         List<Map> renderResults = [[ok: true, status: 200, data: ['boo':'foo']] ,
                                     [ok: true, status: 200, data: ['boo2':'foo2']] ]
-        Problem  problem = Problem.ofCode('security.validation.password.error')
-        // DataProblem(code=error.data.uniqueConstraintViolation, payload=619, 400, ERROR: duplicate key value violates unique constraint "pk_artranstats"
-        //    Detail: Key (id)=(619) already exists.)
         List<Map> renderErrorResults = [[ok: false, status: 500, detail: 'error detail'] ]
-        //do the failed
-            when:
-        //tests finish the job
+        when:
         jobContext.finishJob(renderResults, renderErrorResults)
 
         then:

@@ -9,6 +9,7 @@ import groovy.json.JsonSlurper
 import groovy.transform.CompileStatic
 import groovy.transform.builder.Builder
 import groovy.transform.builder.SimpleStrategy
+import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
@@ -31,6 +32,7 @@ import static gorm.tools.mango.MangoOps.CRITERIA
  * contains some intermediary fields such as 'q' that are used to parse it into what we need
  */
 @Builder(builderStrategy= SimpleStrategy, prefix="")
+@Slf4j
 @CompileStatic
 class QueryArgs {
 
@@ -38,6 +40,13 @@ class QueryArgs {
      * extra closure that can be passed to MangoCriteria
      */
     Closure closure
+
+    /**
+     * when true , in build method, will only add params under q.
+     * When false(default) and no q is present build will add any param thats not special(like max, sort, page, etc)
+     * into q as a criteria param.
+     */
+    boolean isStrict = false
 
     /**
      * Criteria map to pass to the MangoBuilder
@@ -134,7 +143,7 @@ class QueryArgs {
         Map params = Maps.clone(paramsMap) as Map<String, Object>
 
         //remove the fields that grails adds for controller and action
-        params.removeAll {it.key in ['controller', 'action'] }
+        params.removeAll {it.key in ['controller', 'action', 'format', 'nd', '_search'] }
 
         // pull out the max, page and offset and assume the rest is criteria,
         // if pager is already set then we do nothing with the pagerMap
@@ -145,15 +154,13 @@ class QueryArgs {
         // if no pager was set then use what we just removed to set one up
         if(!pager) pager = new Pager(pagerMap)
 
-        //pull out the sort and order if its there
-        String sortField = params.remove('sort')
+        //sorts
         String orderBy = params.remove('order') ?: 'asc'
-        if(sortField) {
-            sort = buildSort(sortField, orderBy)
-        }
+        def sortField = params.remove('sort')
+        if(sortField) sort = buildSort(sortField, orderBy)
 
         //projections
-        String projField = (params.remove('projections') as String)?.trim()
+        def projField = params.remove('projections')
         if(projField) projections = buildProjections(projField)
 
         // check for and remove the q param
@@ -178,8 +185,8 @@ class QueryArgs {
                 criteria = qParam as Map
             }
         }
-        //if no q was passed in then use whatever is left in the params as the criteria
-        else {
+        //if no q was passed in then use whatever is left in the params as the criteria if strict is false
+        else if(!isStrict){
             criteria = params
         }
 
@@ -219,31 +226,37 @@ class QueryArgs {
      *  - multiple fields seperated by comma, ex: 'num:asc, name:desc'
      *  - json in same format as above, ex '{num:"asc", name:"desc"}'
      *
-     * @param sortText see above for valid options
+     * @param sortObj see above for valid options
      * @param orderBy only relevant if sortText is a single sort string with field name
      * @return the sort Map or null if failed
      */
-    Map buildSort(String sortText, String orderBy = 'asc'){
-        //make sure its trimmed
-        sortText = sortText.trim()
-        Map sortMap = [:] as Map<String, String>
-        //if its starts with { its json and we take it as it is
-        if (sortText.startsWith('{')) {
-            sortMap = parseJson(sortText) as Map<String, String>
-        }
-        else if(sortText.contains(':')) {
-            //will only be one item in list if no ',' token
-            List sortList = sortText.tokenize(',')*.trim() as List<String>
-            for(String sortEntry : sortList){
-                List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
-                sortMap[sortTokens[0]] = sortTokens[1]
+    Map buildSort(Object sortObj, String orderBy = 'asc'){
+        if(sortObj instanceof Map) {
+            return sortObj
+        } else if(sortObj instanceof String) {
+            //make sure its trimmed
+            String sortText = sortObj.trim()
+            Map sortMap = [:] as Map<String, String>
+            //if its starts with { its json and we take it as it is
+            if (sortText.startsWith('{')) {
+                sortMap = parseJson(sortText) as Map<String, String>
+            } else if (sortText.contains(':')) {
+                //will only be one item in list if no ',' token
+                List sortList = sortText.tokenize(',')*.trim() as List<String>
+                for (String sortEntry : sortList) {
+                    List sortTokens = sortEntry.tokenize(':')*.trim() as List<String>
+                    sortMap[sortTokens[0]] = sortTokens[1]
+                }
+            } else {
+                //its just a field name
+                sortMap[sortText] = orderBy
             }
-        } else {
-            //its just a field name
-            sortMap[sortText] = orderBy
-        }
 
-        return sortMap
+            return sortMap
+        } else {
+            log.error("sort argument must be map or string")
+            return [:]
+        }
     }
 
     /**
@@ -255,16 +268,24 @@ class QueryArgs {
      * @param projText see above for valid options
      * @return the projection Map or null if failed
      */
-    Map buildProjections(String projText){
-        //make sure its trimmed
-        projText = projText.trim()
-        Map projMap = [:] as Map<String, String>
-        //for convienience we allow the { to be left off so we add it if it is
-        if (!projText.startsWith('{')) projText = "{$projText}"
+    Map buildProjections(Object projectionsObj){
+        if(projectionsObj instanceof Map) {
+            return projectionsObj
+        } else if(projectionsObj instanceof String){
+            //make sure its trimmed
+            String projText = (projectionsObj as String).trim()
+            Map projMap = [:] as Map<String, String>
+            //for convienience we allow the { to be left off so we add it if it is
+            if (!projText.startsWith('{')) projText = "{$projText}"
 
-        projMap = parseJson(projText) as Map<String, String>
+            projMap = parseJson(projText) as Map<String, String>
 
-        return projMap
+            return projMap
+        } else {
+            log.error("projection argument must be map or string")
+            return [:]
+        }
+
     }
 
     QueryArgs query(@DelegatesTo(MangoDetachedCriteria) Closure closure) {

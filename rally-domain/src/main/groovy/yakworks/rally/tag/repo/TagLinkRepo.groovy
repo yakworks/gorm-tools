@@ -60,22 +60,24 @@ class TagLinkRepo extends AbstractLinkedEntityRepo<TagLink, Tag> {
             eqProperty("linkedId", linkedIdJoinProperty)
             eq("linkedEntity", getLinkedEntityName(linkedEntityClazz))
             inList('tag.id', Transform.toLongList(tagList))
-        }.id()
+        }
     }
 
     /**
      * Add exists criteria to a DetachedCriteria if its has tags
      * in the criteriaMap
      */
-    DetachedCriteria addExistsCriteria(DetachedCriteria detCrit, Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
+    DetachedCriteria getExistsCriteria(Map criteriaMap, Class linkedEntityClazz, String linkedIdJoinProperty){
+        DetachedCriteria existsCrit
         if(criteriaMap.tags){
             //convert to id long list
-            List<Long> tagIds = Transform.objectToLongList(criteriaMap.tags as List, 'id')
-            detCrit.exists(buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty))
+            List<Long> tagIds = Transform.objectToLongList((List)criteriaMap.remove('tags'), 'id')
+            existsCrit = buildExistsCriteria(tagIds, linkedEntityClazz, linkedIdJoinProperty)
         } else if(criteriaMap.tagIds) {
             //should be list of id if this key is present
-            detCrit.exists(buildExistsCriteria(criteriaMap.tagIds as List,  linkedEntityClazz, linkedIdJoinProperty))
+            existsCrit = buildExistsCriteria((List)criteriaMap.remove('tagIds'),  linkedEntityClazz, linkedIdJoinProperty)
         }
+        return existsCrit
     }
 
 }

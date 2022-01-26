@@ -51,9 +51,10 @@ class OrgMangoControllerTests extends Specification implements RestIntegrationTe
         // List data = body.data
 
         then:
+        response.contentAsString.startsWith('"type.id","type.name","calc_totalDue_sum"')
         response.status == 200
         response.header("Content-Type").contains("text/csv")
-        response.contentAsString
+
 
     }
 

@@ -217,7 +217,7 @@ class JpqlQueryBuilderSpec extends GormToolsHibernateSpec implements AutowiredTe
         then: "The query is valid"
         queryInfo.query!=null
         queryInfo.query == 'SELECT DISTINCT kitchenSink FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink'
-        queryInfo.parameters == null
+        queryInfo.parameters == []
     }
 
     void "Test build UPDATE with an empty criteria or build {}"() {

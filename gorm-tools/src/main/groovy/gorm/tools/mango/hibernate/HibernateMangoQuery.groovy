@@ -369,12 +369,17 @@ class HibernateMangoQuery extends AbstractHibernateQuery  {
 
         @Override
         Query.ProjectionList add(Query.Projection p) {
-            String propName = (p as Query.PropertyProjection).propertyName
             def hibProj = new HibernateProjectionAdapter(p).toHibernateProjection()
+            if(p instanceof Query.PropertyProjection){
+                String propName = (p as Query.PropertyProjection).propertyName
+                // _projectionList.add(hibProj, propName.replace('.', '_'))
+                String alias = buildAlias(p, propName)
+                _projectionList.add(hibProj, alias)
+            } else {
+                //its CountProjection or IdProjection so add without alias
+                _projectionList.add(hibProj)
+            }
 
-            // _projectionList.add(hibProj, propName.replace('.', '_'))
-            String alias = buildAlias(p, propName)
-            _projectionList.add(hibProj, alias)
             return this
         }
 

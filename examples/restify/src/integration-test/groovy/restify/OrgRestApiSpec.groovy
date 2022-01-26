@@ -153,7 +153,7 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.name == 'Org-with-contact'
 
         when: "Verify contacts are created"
-        Response contactResp = get("$contactApiPath?orgId=$orgId")
+        Response contactResp = get("$contactApiPath?q={orgId:$orgId}")
         Map contactBody = bodyToMap(contactResp)
 
         then: "Verify locations are created"
@@ -202,10 +202,10 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.location.id != null
 
         when: "Verify locations are created"
-        Response locationResp = get("$locationApiPath?orgId=$orgId")
+        Response locationResp = get("$locationApiPath?q={orgId:$orgId}")
         Map locationBody = bodyToMap(locationResp)
 
-        then: "Verify contacts are created"
+        then:
         locationResp.code() == HttpStatus.OK.value()
         locationBody.data.size() == 3
         locationBody.data[0].id == body.location.id

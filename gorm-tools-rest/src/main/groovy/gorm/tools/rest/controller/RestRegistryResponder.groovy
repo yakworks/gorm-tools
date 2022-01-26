@@ -116,7 +116,12 @@ trait RestRegistryResponder {
             if(renderer) break
         }
 
-        if (!renderer) throw new IllegalArgumentException("Houston we have a problem, renderer can't be found for format")
+        if (!renderer) {
+            //fall back to a json one
+            renderer = registry.findRenderer(MimeType.JSON, value)
+            if(!renderer)
+                throw new IllegalArgumentException("Houston we have a problem, renderer can't be found for fallback json format and ${value.class}")
+        }
 
 
         final ServletRenderContext context = new ServletRenderContext(webRequest, args)

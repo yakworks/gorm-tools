@@ -109,6 +109,10 @@ trait SyncJobEntity<D> implements SourceTrait, PersistableRepoEntity<D, GormRepo
         return payloadBytes ? new String(payloadBytes, "UTF-8") : '[]'
     }
 
+    String errorToString(){
+        return errorBytes ? new String(errorBytes, "UTF-8") : '[]'
+    }
+
     static constraintsMap = [
         state:[ d: 'State of the job', nullable: false],
         message:[ d: 'Status message or log'],

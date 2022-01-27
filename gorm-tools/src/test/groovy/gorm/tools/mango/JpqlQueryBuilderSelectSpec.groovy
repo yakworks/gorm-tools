@@ -96,33 +96,63 @@ class JpqlQueryBuilderSelectSpec extends GormToolsHibernateSpec implements Autow
         // res.size() == 2
     }
 
-    @Ignore
-    void "Test build projections"() {
-        given:"Some criteria"
-        KitchenSink.generateDataList(20)
-        def criteria = KitchenSink.query {
-            sum('amount')
-            groupBy('kind')
-            ilike('name', 'sink%')
-        }
+    void "projections having"() {
+        given: "Some criteria"
 
-        when:"A jpa query is built"
-        def builder = JpqlQueryBuilder.of(criteria)
+        def criteria = KitchenSink.query {
+            sum('sinkLink.amount')
+            groupBy('kind')
+        }
+        criteria.order("sinkLink_amount_sum")
+        criteria.lt("sinkLink_amount_sum", 100.0)
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
         def queryInfo = builder.buildSelect()
         def query = queryInfo.query
 
-        then:"The query is valid"
+        then: "The query is valid"
         query != null
-        query == strip('''
-            SELECT SUM(kitchenSink.amount),kitchenSink.kind
+        query.trim() == strip('''
+            SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
             FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink
-            WHERE (lower(kitchenSink.name) like lower(:p1))
             GROUP BY kitchenSink.kind
+            HAVING (SUM(kitchenSink.sinkLink.amount) < :p1)
+            ORDER BY sinkLink_amount_sum ASC
         ''')
-        //
-        // when:
-        // List res = KitchenSink.executeQuery(query,queryInfo.parameters)
+        queryInfo.paramMap == [p1: 100.0]
+    }
 
+    void "projections having criteria map"() {
+        given: "Some criteria"
+
+        def criteria = KitchenSink.query (
+            projections: ['sinkLink.amount':'sum', 'kind':'group'],
+            q: [
+                'ext.id': 1,
+                'thingId': 2,
+                inactive: true,
+                'sinkLink_amount_sum.$lt':100.0
+            ],
+            sort:[sinkLink_amount_sum:'asc']
+        )
+
+        when: "A jpa query is built"
+        def builder = JpqlQueryBuilder.of(criteria).aliasToMap(true)
+        def queryInfo = builder.buildSelect()
+        def query = queryInfo.query
+
+        then: "The query is valid"
+        query != null
+        query.trim() == strip('''
+            SELECT new map( SUM(kitchenSink.sinkLink.amount) as sinkLink_amount_sum,kitchenSink.kind as kind )
+            FROM yakworks.gorm.testing.model.KitchenSink AS kitchenSink
+            WHERE (kitchenSink.ext.id=:p1 AND kitchenSink.thing.id=:p2 AND kitchenSink.inactive=:p3)
+            GROUP BY kitchenSink.kind
+            HAVING (SUM(kitchenSink.sinkLink.amount) < :p4)
+            ORDER BY sinkLink_amount_sum ASC
+        ''')
+        queryInfo.paramMap == [p1: 1, p2: 2, p3: true, p4: 100]
     }
 
 }

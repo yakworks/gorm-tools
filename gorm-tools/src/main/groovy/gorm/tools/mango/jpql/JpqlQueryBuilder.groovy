@@ -22,11 +22,13 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException
 import grails.gorm.DetachedCriteria
 
 /**
- * Builds JPQL String-based queries from the DetachedCriteria
+ * Builds JPQL String-based queries from the DetachedCriteria.
+ * Used for projections and aggregate based queries as the criteria interface is limited there
  *
- * @author Graeme Rocher, Joshua Burnett
+ * @author Joshua Burnett (@basejump)
+ * @since 7.0.8
  */
-//copied in, refactor later
+//FIXME refactor later
 @SuppressWarnings(['BuilderMethodWithSideEffects', 'AbcMetric', 'ParameterCount', 'LineLength', 'ExplicitCallToEqualsMethod', 'ClassSize', 'MethodSize'])
 @CompileStatic
 class JpqlQueryBuilder {
@@ -827,6 +829,11 @@ class JpqlQueryBuilder {
     }
 
     PersistentProperty validateProperty(PersistentEntity entity, String name, Class criterionType) {
+        if(name.endsWith('.id') && name.count('.') == 1){
+            String assoc = name.tokenize('.')[0]
+            return (entity.getPropertyByName(assoc) as Association).getAssociatedEntity().getIdentity()
+        }
+
         PersistentProperty identity = entity.getIdentity()
         if (identity != null && identity.getName().equals(name)) {
             return identity
@@ -983,9 +990,13 @@ class JpqlQueryBuilder {
         for (Iterator<Query.Criterion> iterator = criterionList.iterator(); iterator.hasNext();) {
             StringBuilder tempWhereClause = new StringBuilder()
             Query.Criterion criterion = iterator.next()
-            //TODO if its a projection alias then skip for now
-            if(criterion instanceof Query.PropertyNameCriterion){
-                if(!projectionAliases.containsKey(criterion.getProperty())){
+            //skip if its anything but a projection alias
+            boolean isPropCrit = criterion instanceof Query.PropertyNameCriterion
+            if(!isPropCrit){
+                continue
+            } else {
+                boolean hasAlias = projectionAliases.containsKey((criterion as Query.PropertyNameCriterion).getProperty())
+                if(!hasAlias){
                     continue
                 }
             }

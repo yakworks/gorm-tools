@@ -49,6 +49,8 @@ bootRun {
 jar {
   exclude('yakworks/rally/BootStrap.class')
   exclude('yakworks/rally/BootStrap$*.class')
+  exclude('yakworks/rally/orgs/model/OrgCalc.class')
+  exclude('yakworks/rally/orgs/model/OrgCalc$*.class') //also the closure ones
 }
 
 // sourceSets.main.resources.srcDirs += "src/main/groovy"

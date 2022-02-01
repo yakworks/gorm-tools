@@ -12,13 +12,10 @@ import yakworks.commons.transform.IdEqualsHashCode
 @Entity
 @IdEqualsHashCode
 @GrailsCompileStatic
-class OrgCalc implements RepoEntity<OrgCalc>, Serializable {
+class OrgCalc implements BaseArScoreCard, RepoEntity<OrgCalc>, Serializable {
     static belongsTo = [Org]
-    //balance due fields
-    BigDecimal curBal // whats not due yet
-    BigDecimal pastDue //balance past due
-    BigDecimal totalDue // total due, sum of all open items. will be the ending balance when month is closed
 
+    Long id
 
     static mapping = {
         id generator: 'assigned'

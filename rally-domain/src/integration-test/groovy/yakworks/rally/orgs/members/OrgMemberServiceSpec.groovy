@@ -8,6 +8,7 @@ import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
+import yakworks.rally.orgs.model.OrgSource
 import yakworks.rally.orgs.model.OrgType
 import spock.lang.Specification
 
@@ -94,6 +95,29 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.member != null
         branch.member.org == branch
         branch.member.division == division
+
+        cleanup:
+        orgDimensionService.testInit(null)
+    }
+
+    void "test setupMember lookup for customer by org source "() {
+        setup:
+        //sourceId is assigned from num
+        Org customer = Org.of("T1", "T1", OrgType.Customer).persist()
+        Org branch = Org.of("B2", "B2", OrgType.Branch).persist()
+        Org.repo.createSource(customer)
+        customer.persist(flush:true)
+        assert OrgSource.repo.findOrgIdBySourceIdAndOrgType("T1" as String, OrgType.get(1))
+
+        // orgMemberService.setupMember(customer, [branch:[num:branch.num]])
+
+        initOrgDimensions([primary: "CustAccount.Customer"])
+        when:
+        Org custAccount = Org.of("test", "test", OrgType.CustAccount).persist()
+        orgMemberService.setupMember(custAccount, [customer:[org:[source:[sourceId:'T1']]]])
+
+        then:
+        custAccount
 
         cleanup:
         orgDimensionService.testInit(null)

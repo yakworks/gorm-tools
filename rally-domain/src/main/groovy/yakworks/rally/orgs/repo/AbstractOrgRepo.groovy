@@ -222,7 +222,11 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
         Long oid
         //if type is set then coerce to OrgType enum
         OrgType orgType = coerceOrgType(data.type)
-
+        // special case for customer lookup when it comes with org.source; for example [org:[source:[sourceId:K14700]]
+        if(data.org) {
+            data.source =data.org['source']
+            data.sourceId =data.org['sourceId']
+        }
         if(data.source == null && data.sourceId) data.source = [sourceId: data.sourceId]
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map

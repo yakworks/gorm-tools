@@ -4,6 +4,8 @@
 */
 package gorm.tools.mango
 
+import org.hibernate.QueryException
+
 import java.time.LocalDate
 
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
@@ -31,14 +33,12 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         }
     }
 
-    //@spock.lang.Ignore
     def "test field that does not exist"() {
         when:
         List res = build([nonExistingFooBar: true]).list()
 
         then: "Its ignores the bad field and move on"
-        // FIXME, this should error I think
-        res.size() > 1
+        thrown(QueryException)
     }
 
     def "test detached isActive"() {
@@ -339,7 +339,7 @@ class MangoCriteriaSpec extends GormToolsHibernateSpec {
         List res = build((["xxx": ['$eq': 6]])).list()
 
         then:
-        noExceptionThrown()
+        thrown(QueryException)
     }
 
     def "test or"() {

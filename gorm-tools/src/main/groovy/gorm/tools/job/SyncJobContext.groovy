@@ -64,6 +64,8 @@ class SyncJobContext {
      */
     Long jobId
 
+    Closure transformResultsClosure
+
     SyncJobContext() { this([:])}
 
     static SyncJobContext create(Map params = [:]){
@@ -118,7 +120,7 @@ class SyncJobContext {
      * @param currentResults the ApiResults
      * @param startTimeMillis the start time in millis, used to deduce time elapsed
      */
-    void updateJobResults(ApiResults currentResults, Long startTimeMillis) {
+    void updateJobResults(ApiResults currentResults,   Long startTimeMillis) {
         if(!currentResults.ok) ok.set(false)
         boolean curOk = ok.get()
 
@@ -158,8 +160,13 @@ class SyncJobContext {
 
     }
 
-    SyncJobEntity finishJob(List<Map> renderResults = []) {
+    SyncJobEntity finishJob(List<Map> renderResults = [], List<Map> renderErrorResults = []) {
         Map data = [id: jobId, state: SyncJobState.Finished] as Map<String, Object>
+        // XXX how do I insert these renderErrorResults into data.errorBytes ?
+        if(renderErrorResults){
+            //it fails, they are still ProblemTraits
+            data.errorBytes = JsonEngine.toJson(renderErrorResults).bytes
+        }
         if(args.saveDataAsFile){
             //close out the file
             dataPath.withWriterAppend { wr ->
@@ -179,7 +186,7 @@ class SyncJobContext {
      */
     void updateJob(ApiResults currentResults, Map data){
         //sync to only one thread for the SyncJob can update at a time
-        synchronized ("SyncJob${jobId}".intern()) {
+        synchronized ("SyncJob${jobId}".toString().intern()) {
             syncJobService.updateJob(data)
             // append json to dataFile
             appendDataResults(currentResults)
@@ -196,6 +203,10 @@ class SyncJobContext {
     }
 
     List<Map> transformResults(ApiResults apiResults) {
+        // exit fast if closure is used
+        if(transformResultsClosure) {
+            return transformResultsClosure.call(apiResults) as List<Map>
+        }
         MsgService msgService = syncJobService.messageSource
         List<Map> ret = []
         boolean ok = true

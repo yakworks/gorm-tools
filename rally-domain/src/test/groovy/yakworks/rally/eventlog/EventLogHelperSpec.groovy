@@ -304,10 +304,10 @@ class EventLogHelperSpec extends Specification implements DomainRepoTest<EventLo
         given:
         EventLogHelper elh = new EventLogHelper(COMPONENT)
         //jdbcTemplate.update("truncate table EventLog")
-        RepoUtil.flush()
+        flush()
         Exception e = new Exception('hell, world!')
         String result = elh.errorFinish(e)
-        RepoUtil.flush()
+        flush()
         def list = EventLog.list()
 
         expect:

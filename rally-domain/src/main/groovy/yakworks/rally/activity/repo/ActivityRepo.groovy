@@ -14,6 +14,8 @@ import groovy.transform.CompileStatic
 import org.apache.commons.lang3.StringUtils
 
 import gorm.tools.beans.Pager
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
 import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
@@ -132,6 +134,27 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         if (data.arTranId) {
             activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
         }
+    }
+
+    /**
+     * Override query for custom search for Tags etc..
+     */
+    @Override
+    MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        Map criteriaMap = queryArgs.criteria
+        DetachedCriteria tagExistsCrit
+        if(criteriaMap.tags || criteriaMap.tagIds) {
+            Map tagCriteriaMap = [tags: criteriaMap.remove('tags'), tagIds: criteriaMap.remove('tagIds')]
+            //if its has tags keys then this returns something to add to exists, will remove the keys as well
+            tagExistsCrit = TagLink.getExistsCriteria(tagCriteriaMap, Activity, 'activity_.id')
+        }
+        MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
+        //if it has tags key
+        if(tagExistsCrit != null) {
+            detCrit.exists(tagExistsCrit.id())
+        }
+
+        return detCrit
     }
 
     void updateNameSummary(Activity activity) {

@@ -7,6 +7,7 @@ import grails.gorm.transactions.Rollback
 import grails.plugin.viewtools.AppResourceLoader
 import grails.testing.mixin.integration.Integration
 import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.activity.model.Activity
@@ -16,6 +17,7 @@ import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
+import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.tag.model.Tag
@@ -32,6 +34,12 @@ class ActivityTests extends Specification implements DomainIntTest {
 
     static Map getNoteParams() {
         return [org: [id: 205], note: [body: 'Todays test note']]
+    }
+
+    List makeTags(){
+        Tag tag1 = new Tag(id:9, code: "Tag1", entityName: "Activity").persist(flush:true)
+        Tag tag2 = new Tag(id:10, code: "Tag2", entityName: "Activity").persist(flush:true)
+        return [tag1, tag2]
     }
 
     void "create note"() {
@@ -147,9 +155,7 @@ class ActivityTests extends Specification implements DomainIntTest {
     void "add tags"() {
         setup:
         Org org = Org.first()
-        Tag tag1 = new Tag(code: "Tag1", entityName: "Activity").persist()
-        Tag tag2 = new Tag(code: "Tag2", entityName: "Activity").persist()
-        flush()
+        def (tag1, tag2) = makeTags()
 
         when:
         def params = [org:org, kind:"Note", name: RandomStringUtils.randomAlphabetic(100)]
@@ -167,6 +173,40 @@ class ActivityTests extends Specification implements DomainIntTest {
         tags.size() == 2
         tags.contains(tag1)
         tags.contains(tag2)
+    }
+
+    void addTagsForSearch(){
+        makeTags()
+        Org org = Org.first()
+        def params = [org:org, kind:"Note", name: RandomStringUtils.randomAlphabetic(100)]
+        params.tags = [[id:9]]
+        activityRepo.create(params)
+        activityRepo.create(params)
+        params.tags = [[id:9], [id:10]]
+        activityRepo.create(params)
+        params.tags = [[id:10]]
+        activityRepo.create(params)
+        flushAndClear()
+    }
+
+    @IgnoreRest
+    void "add tags and make sure filter works"() {
+        when:
+        addTagsForSearch()
+
+        def actCrit = { tagList ->
+            return Activity.query(tags: tagList)
+        }
+        def crit = Activity.query(tags: [[id:9]] )
+        List hasTag1 = crit.list()
+
+        List hasTag2 = actCrit([ [id:10] ]).list()
+        List has1or2 = actCrit([ [id:9] , [id:10] ]).list()
+
+        then:
+        hasTag1.size() == 3
+        hasTag2.size() == 2
+        has1or2.size() == 4
     }
 
     void "save activity with an Org that does not exist"(){

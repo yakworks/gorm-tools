@@ -1,5 +1,7 @@
 package gorm.tools
 
+import spock.lang.IgnoreRest
+
 import java.time.LocalDate
 
 import grails.gorm.transactions.Rollback
@@ -109,7 +111,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested string on info"() {
         when: "eq"
-        List list = Org.queryList([q: [info: [phone: "1-800-4"]]])
+        List list = Org.queryList('info.phone': "1-800-4")
         then:
         list.size() == 1
         list[0].name == "Org4"
@@ -118,7 +120,7 @@ class MangoSpec extends Specification {
 
     def "Filter by nested string ilike"() {
         when: "eq"
-        List list = Org.repo.query(location: [city: "City2%"]).list(max: 50)
+        List list = Org.repo.query('location.city': "City2%").list(max: 50)
         then:
         list.size() == 11
         list[0].location.city == "City2"
@@ -162,6 +164,17 @@ class MangoSpec extends Specification {
         list[1].name == "Org4"
     }
 
+    def "Filter by BigDecimal in list dot"() {
+        when:
+        List list = Org.query('flex.num1': [2.50, 3.75]).list()
+        then:
+        list.size() == 2
+        list[0].flex.num1 == 2.50
+        list[0].name == "Org3"
+        list[1].flex.num1 == 3.75
+        list[1].name == "Org4"
+    }
+
     def "Filter by LocDate"() {
         when:
         List list = Org.queryList(flex: [date1: LocalDate.now().plusDays(1).atStartOfDay()])
@@ -187,7 +200,16 @@ class MangoSpec extends Specification {
 
     def "Filter with `or` "() {
         when:
-        List list = Org.queryList([q: ['$or': ["name": "Org9", "flex.id": 10]]])
+        List list = Org.queryList('$or': ["name": "Org9", "flexId": 10])
+        then:
+        list.size() == 2
+        list[0].name == "Org9"
+        list[1].name == "Org10"
+    }
+
+    def "Filter with `or` dot id"() {
+        when:
+        List list = Org.queryList('$or': ["name": "Org9", "flex.id": 10])
         then:
         list.size() == 2
         list[0].name == "Org9"
@@ -203,10 +225,10 @@ class MangoSpec extends Specification {
 
     def "Filter with several `or` on one level"() {
         when:
-        List list = Org.queryList([q: ['$or': [
+        List list = Org.queryList('$or': [
             ["location.city": "City3"],
             ["name": "Org4", "location.city": "City4"]
-        ]]])
+        ])
 
         then:
         list.size() == 2
@@ -214,42 +236,42 @@ class MangoSpec extends Specification {
 
     def "Filter with several `or` on one level2"() {
         when:
-        List list = Org.queryList([q: ['$or': [["location.id": 1000], ["location.id": 1001]]]])
+        List list = Org.queryList('$or': [["location.id": 1000], ["location.id": 1001]])
         then:
         list.size() == 2
     }
 
     def "Filter with `or` with like"() {
         when:
-        List list = Org.queryList([q: ['$or': ["name": "Org2%", "location.city": "City4"]], max: 50])
+        List list = Org.queryList('$or': ["name": "Org2%", "location.city": "City4"])
         then:
         list.size() == 12
     }
 
     def "Filter with `between()`"() {
         when:
-        List list = Org.queryList([q: [id: ['$between': [2, 10]]]])
+        List list = Org.queryList(id: ['$between': [2, 10]])
         then:
         list.size() == 9
     }
 
     def "Filter with `in()`"() {
         when:
-        List list = Org.queryList([q: [id: ["\$in": [24, 25]]]])
+        List list = Org.queryList(id: ['$in': [24, 25]])
         then:
         list.size() == 2
     }
 
     def "Filter with `inList()`"() {
         when:
-        List list = Org.queryList([q: [id: ["\$inList": [24, 25]]]])
+        List list = Org.queryList(id: ['$inList': [24, 25]])
         then:
         list.size() == 2
     }
 
     def "Filter by Name ilike()"() {
         when:
-        List list = Org.queryList([q: [name: ['$ilike': "Org2%"]], max: 50])
+        List list = Org.queryList(name: ['$ilike': "Org2%"])
         then:
         list.size() == 11
     }
@@ -358,15 +380,18 @@ class MangoSpec extends Specification {
 
     def "Filter on enums"() {
         when:
-        List list = Org.queryList([location: [kind: ['$in': ['remittance', 'other']]], max: 150])
+        List list = Org.queryList(location: [
+            kind: [
+                '$in': ['remittance', 'other']
+            ]
+        ])
         then:
         list.size() == 2
     }
 
     def "Filter on identity enum"() {
         when:
-        // 3 does ot exists, should show 50 as half have 1
-        List list = Org.queryList(type: ['$in': [5, 6]], max: 150)
+        List list = Org.queryList(type: ['$in': [5, 6]])
 
         then:
         list.size() == 2

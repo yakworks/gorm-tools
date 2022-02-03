@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.api.IncludesConfig
 import gorm.tools.api.IncludesKey
 import gorm.tools.databinding.EntityMapBinder
+import gorm.tools.mango.api.QueryArgs
 import grails.gorm.DetachedCriteria
 import yakworks.commons.lang.EnumUtils
 import yakworks.commons.model.IdEnum
@@ -61,6 +62,53 @@ class MangoBuilder {
     @CompileDynamic //dynamic so it can access the protected criteria.clone
     static <D> MangoDetachedCriteria<D> cloneCriteria(DetachedCriteria<D> criteria) {
         (MangoDetachedCriteria)criteria.clone()
+    }
+
+    public <D> MangoDetachedCriteria<D> buildWithQueryArgs(Class<D> clazz, QueryArgs qargs, @DelegatesTo(MangoDetachedCriteria) Closure callable = null) {
+        MangoDetachedCriteria<D> mangoCriteria = new MangoDetachedCriteria<D>(clazz)
+        Map criteria = qargs.criteria
+        def tidyMap = MangoTidyMap.tidy(criteria)
+        applyMapOrList(mangoCriteria, tidyMap)
+        if (callable) mangoCriteria.with callable
+
+        if(qargs.sort && !criteria.containsKey(SORT)){
+            order(mangoCriteria, qargs.sort)
+        }
+
+        if(qargs.projections){
+            applyProjections(mangoCriteria, qargs.projections)
+        }
+        return mangoCriteria
+    }
+
+    /**
+     * calls list for the criteria, if criteria has projections then calls mapList
+     * which uses JpqlQueryBuilder
+     */
+    static List list(MangoDetachedCriteria criteria, Map args) {
+        if(criteria.projections){
+            return criteria.mapList(args)
+        } else {
+            //return standard list
+            return criteria.list(args)
+        }
+    }
+
+    /**
+     * Apply projections from map in form [key:type] where type is sum, group, count, min, max or avg
+     *
+     * @param criteria the criteria to apply the project
+     * @param projs the map of projections to apply
+     */
+    void applyProjections(MangoDetachedCriteria criteria, Map projs) {
+        //assume its a map
+        (projs as Map<String,String>).each { String k, String v ->
+            if(v == 'sum'){
+                criteria.sum(k)
+            } else if (v == 'group'){
+                criteria.groupBy(k)
+            }
+        }
     }
 
     void applyMapOrList(DetachedCriteria criteria, Object mapOrList) {
@@ -115,7 +163,7 @@ class MangoBuilder {
 
         //if its an association then call it as a method so methodmissing will pick it up and build the DetachedAssocationCriteria
         if (prop instanceof Association) {
-            //if its its and $eq then assume its an object compare and just do it
+            //if its its map and valid op $eq then assume its an object compare and just do it right away
             if(fieldVal instanceof Map){
                 //if the fieldVal has a key like $eq then us it, when comparing objects
                 def firstKey = (fieldVal as Map).entrySet()[0].key as String
@@ -132,7 +180,7 @@ class MangoBuilder {
             }
         }
         // if field ends in Id then try removing the Id postfix and see if its a property
-        else if (field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
+        else if (!prop && field.matches(/.*[^.]Id/) && criteria.persistentEntity.getPropertyByName(field.replaceAll("Id\$", ""))) {
             applyFieldMap(criteria, field.replaceAll("Id\$", ".id"), fieldVal as Map)
             //applyField(criteria, field.replaceAll("Id\$", ".id"), fieldVal)
         }
@@ -144,9 +192,12 @@ class MangoBuilder {
             applyField(criteria, field, fieldVal['id'])
         }
         //just pass it on through, prop might be null but that might be because its a dot notation ending in id ex: "foo.id"
-        else if (fieldVal instanceof Map && (prop || field.endsWith('.id'))) { // field=name fieldVal=['$like': 'foo%']
+        else if (fieldVal instanceof Map) { // && (prop || field.endsWith('.id'))) { field=name fieldVal=['$like': 'foo%']
             applyFieldMap(criteria, field, fieldVal)
         }
+        // else if (fieldVal instanceof Map && (prop || field.endsWith('.id'))) { // field=name fieldVal=['$like': 'foo%']
+        //     applyFieldMap(criteria, field, fieldVal)
+        // }
         //I think we should not blow up an error if some field isnt in domain, just add message to log
         log.info "MangoBuilder applyField domain ${getTargetClass(criteria).name} doesnt contains field $field"
 
@@ -214,24 +265,7 @@ class MangoBuilder {
 
         //assume its a map
         sortMap.each { k, v ->
-            if(k.count('.') > 1 ){
-                //TODO gails default only allows one leve, this is a quick hack to allow 2.
-                //so contact.flex.num works
-                List<String> props = k.split(/\./) as List<String>
-                String first = props[0]
-                String field = props.removeLast()
-
-                String joined = props.join('.')
-                String joinedAlias = props.join('_')
-
-                result = createAlias(criteria, first, first)
-                result = createAlias(criteria, joined, joinedAlias)
-                // result = createAlias(result, props[1], joined_alias)
-
-                result = criteria.order("${joinedAlias}.${field}", v.toString())
-            } else {
-                result = criteria.order(k.toString(), v.toString())
-            }
+            criteria.order(k.toString(), v.toString())
         }
         return result
     }
@@ -242,23 +276,6 @@ class MangoBuilder {
     DetachedCriteria createAlias(DetachedCriteria criteria, String associationPath, String alias) {
         criteria.createAlias(associationPath, alias) as DetachedCriteria
     }
-
-
-
-    @CompileDynamic
-    // Criteria order(String propertyName, String direction, boolean forceSuper = false) {
-    //     if (forceSuper || !propertyName.contains('.')) {
-    //         return super.order(propertyName, direction)
-    //     }
-    //     List props = propertyName.split(/\./) as List
-    //     String last = props.removeLast()
-    //     Closure toDo = { order(last, direction) }
-    //     Closure newOrderBy = props.reverse().inject(toDo) { acc, prop ->
-    //         { -> "$prop"(acc) }
-    //     }
-    //     newOrderBy.call()
-    //     return this
-    // }
 
     DetachedCriteria qSearch(DetachedCriteria criteria, Object val) {
         List<String> qSearchFields

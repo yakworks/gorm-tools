@@ -38,6 +38,15 @@ trait QueryMangoEntity<D> {
     }
 
     /**
+     * Builds detached criteria for domain, call get or list on it.
+     *
+     * @return a DetachedCriteria instance
+     */
+    static MangoDetachedCriteria<D> query(QueryArgs queryArgs) {
+        ((QueryMangoEntityApi)getRepo()).query(queryArgs)
+    }
+
+    /**
      * List of entities restricted by mango map and criteria closure
      *
      * @param params mango language criteria map

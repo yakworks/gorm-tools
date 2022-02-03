@@ -6,6 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
@@ -16,9 +18,11 @@ import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
+import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import yakworks.problem.data.DataProblemCodes
 import yakworks.rally.activity.model.ActivityContact
+import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -97,6 +101,20 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         if(data.tags) TagLink.addOrRemoveTags(contact, data.tags)
     }
 
+    @Override
+    MangoDetachedCriteria<Contact> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
+        Map criteriaMap = queryArgs.criteria
+        //if its has tags keys then this returns something to add to exists, will remove the keys as well
+        DetachedCriteria tagExistsCrit = TagLink.getExistsCriteria(criteriaMap, Contact, 'contact_.id')
+
+        MangoDetachedCriteria<Contact> detCrit = getMangoQuery().query(Contact, queryArgs, closure)
+        //if it has tags key
+        if(tagExistsCrit != null) {
+            detCrit.exists(tagExistsCrit.id())
+        }
+        return detCrit
+    }
+
     void removeAll(Org org) {
         gormStaticApi().executeUpdate 'DELETE FROM Contact WHERE org=:org', [org: org]
     }
@@ -141,14 +159,6 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         }
     }
 
-    Contact assignUserNameFromContactName(Contact contact) {
-        if (contact.user && contact.user.name != contact.name) {
-            contact.user.name = contact.name
-            contact.user.persist()
-        }
-        return contact
-    }
-
     /*
     * build a User domain object from a contact if it does not exist.
     */
@@ -188,6 +198,5 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         }
         return toContat.persist()
     }
-
 
 }

@@ -19,6 +19,7 @@ import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactFlex
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgCalc
 import yakworks.rally.orgs.model.OrgType
 import yakworks.rally.orgs.model.OrgTypeSetup
 import yakworks.rally.tag.model.Tag
@@ -38,11 +39,11 @@ class RallySeedData {
         }
     }
 
-    static fullMonty(){
+    static fullMonty(int count = 100){
         buildAppUser()
         createOrgTypeSetups()
         buildClientOrg()
-        buildOrgs(100)
+        buildOrgs(count)
         buildTags()
         createIndexes()
     }
@@ -115,6 +116,7 @@ class RallySeedData {
             ]]
         ]
         def org = Org.create(data, bindId: true)
+        org.calc = new OrgCalc(id: org.id, totalDue: id*10.0).persist()
         Org.repo.flush()
 
         def contact = new Contact(
@@ -125,7 +127,8 @@ class RallySeedData {
             lastName : "Galt$id",
             org: org,
             flex: new ContactFlex(
-                num1: id * 1.01
+                num1: id * 1.0,
+                num2: id * 1.01
             )
         )
         contact.user = AppUser.get(1)

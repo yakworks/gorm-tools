@@ -40,6 +40,8 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
     //this makes finders like OrgMember.findByBranch(branch) work, without it gets confused and fails
     static mappedBy = [member: "org"]
 
+    // OrgDynamicCalc formulaz
+
     static constraintsMap = [
         num: [d: 'Unique alpha-numeric identifier for this organization', example: 'SPX-321'],
         name: [d: 'The full name for this organization', example: 'SpaceX Corp.'],
@@ -79,6 +81,7 @@ class Org implements NameNum, GormRepoEntity<Org, OrgRepo>, HasTags, CreateCrite
         source column: 'orgSourceId'
         calc column: 'calcId'
         member column: 'memberId'
+        // formulaz insertable: false, updateable: false , column:'id', lazy: true
     }
 
     //gorm event

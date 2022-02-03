@@ -56,9 +56,9 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     // String middleName
     // String nickName
     // String salutation
-    // String jobTitle
     // String department
     // LocalDate birthday
+    String jobTitle
 
     Location location
     ContactFlex flex
@@ -106,7 +106,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         lastName:[ nullable: true, maxSize: 50],
         // nickName:[ nullable: true, maxSize: 50],
         // salutation:[ nullable: true, maxSize: 50],
-        // jobTitle:[ nullable: true, maxSize: 50],
+        jobTitle:[ d:'Job title', nullable: true, maxSize: 50],
         // department:[ nullable: true, maxSize: 50],
         // birthday:[ nullable: true],
         comments:[ d:'notes about the contact', nullable: true],
@@ -143,8 +143,11 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         if(o.id != orgId) orgId = o.id
     }
 
+    /**
+     * List the active contacts for the org
+     */
     static List<Contact> listActive(Long orgId) {
-        return Contact.query(ordId: orgId, inactive: false).list()
+        return Contact.query(orgId: orgId, inactive: false).list()
     }
 
     static Contact findByUser(AppUser user){

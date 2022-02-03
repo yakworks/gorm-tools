@@ -8,10 +8,15 @@ import groovy.transform.CompileStatic
 
 import org.springframework.validation.Errors
 
+import gorm.tools.mango.MangoDetachedCriteria
+import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
+import grails.gorm.DetachedCriteria
+import yakworks.commons.lang.Transform
 import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Org
+import yakworks.rally.orgs.model.OrgTag
 import yakworks.rally.orgs.model.OrgType
 
 @GormRepository
@@ -48,5 +53,27 @@ class OrgRepo extends AbstractOrgRepo {
             org.member.id = org.id
             org.member.org = org //needed for validation
         }
+    }
+
+    /**
+     * special handling for tags
+     */
+    @Override
+    MangoDetachedCriteria<Org> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure = null) {
+        List critTags = queryArgs.criteria.remove('tags') as List
+        List critTagIds = queryArgs.criteria.remove('tagIds') as List
+
+        DetachedCriteria<Org> detCrit = getMangoQuery().query(Org, queryArgs, closure)
+
+        //if it has tags key
+        if(critTags){
+            //convert to id long list
+            List<Long> tagIds = Transform.objectToLongList(critTags)
+            detCrit.exists(OrgTag.buildExistsCriteria(tagIds))
+        } else if(critTagIds) {
+            //should be list of id if this key is present
+            detCrit.exists(OrgTag.buildExistsCriteria(critTagIds))
+        }
+        return detCrit
     }
 }

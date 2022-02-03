@@ -9,6 +9,7 @@ import groovy.util.logging.Slf4j
 
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.model.Persistable
+import gorm.tools.utils.GormMetaUtils
 import yakworks.commons.lang.Validate
 
 /**
@@ -56,7 +57,11 @@ abstract class AbstractLinkedEntityRepo<X, R extends Persistable> extends Abstra
     }
 
     String getLinkedEntityName(Persistable linkedEntity){
-        linkedEntity.class.simpleName
+        getLinkedEntityName(linkedEntity.class)
+    }
+
+    String getLinkedEntityName(Class linkedEntityClass){
+        GormMetaUtils.unwrapIfProxy(linkedEntityClass.simpleName)
     }
 
     @Override

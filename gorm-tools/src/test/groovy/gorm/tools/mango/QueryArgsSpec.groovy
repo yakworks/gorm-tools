@@ -121,4 +121,15 @@ class QueryArgsSpec extends Specification {
         qargs.buildSort('{name:"asc", num: "desc"}') == [name: 'asc', num: 'desc']
     }
 
+    def "test buildProjections"() {
+
+        when: 'simple'
+        def qargs = new QueryArgs()
+
+        then:
+        qargs.buildProjections('name: "group"') == [name: 'group']
+        qargs.buildProjections('name:"group", amount: "sum"') == [name: "group", amount: "sum"]
+        qargs.buildProjections('{name:"group", amount: "sum"}') == [name: 'group', amount: 'sum']
+    }
+
 }

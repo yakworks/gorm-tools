@@ -34,3 +34,13 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
 }
 root(ERROR, ['STDOUT'])
+
+
+// logger("org.hibernate", OFF)  //XXX https://github.com/9ci/domain9/issues/600
+logger("org.hibernate.orm.deprecation", OFF)
+
+//TURN ON for benchmarks
+logger "org.hibernate", INFO
+// // for stats and sql logging
+logger 'org.hibernate.stat', DEBUG
+logger 'org.hibernate.SQL', DEBUG

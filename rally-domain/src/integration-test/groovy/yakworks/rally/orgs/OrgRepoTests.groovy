@@ -113,7 +113,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
     void "test create duplicate fail"() {
         when:
         def params = MockData.createOrg
-        params.num = '99' //should already exist in test db
+        params.num = '9' //should already exist in test db
         //flush during create so it forces the error catching
         def org = orgRepo.create(params.asUnmodifiable(), [flush: true])
         // orgRepo.flush()
@@ -149,11 +149,11 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     def "change key contact"() {
         when:
-        assert Org.get(99).contact.num == 'primary99'
-        def c2 = Contact.findByNum('secondary99')
+        assert Org.get(10).contact.num == 'primary10'
+        def c2 = Contact.findByNum('secondary10')
 
         def params = [
-            id        : 99,
+            id        : 10,
             contact: [
                 id: c2.id
             ]
@@ -162,16 +162,16 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         flushAndClear()
 
         then:
-        Org.get(99).contact.id == c2.id
+        Org.get(10).contact.id == c2.id
     }
 
     def "update org"() {
         when:
         def params = MockData.updateOrg
-        params.id = 99 //use existing 205 customer that has
+        params.id = 9 //use existing 205 customer that has
         def org = orgRepo.update(params.asUnmodifiable())
         orgRepo.flushAndClear()
-        org = Org.get(99)
+        org = Org.get(9)
 
         then:
         org
@@ -280,7 +280,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
 
     def "delete should fail when source is ERP"() {
         when:
-        def org = Org.get(99)
+        def org = Org.get(9)
         org.source.sourceType = SourceType.ERP
         org.source.persist(flush:true)
         orgRepo.removeById(org.id)

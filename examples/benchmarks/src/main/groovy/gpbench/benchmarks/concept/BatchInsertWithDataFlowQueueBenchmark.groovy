@@ -6,6 +6,7 @@ import groovy.transform.TypeCheckingMode
 import groovyx.gpars.dataflow.DataflowQueue
 import groovyx.gpars.dataflow.operator.PoisonPill
 
+import gorm.tools.transaction.TrxService
 import gorm.tools.transaction.WithTrx
 import gpbench.benchmarks.BaseBatchInsertBenchmark
 import gpbench.model.basic.CityBasic
@@ -22,6 +23,7 @@ import static groovyx.gpars.dataflow.Dataflow.operator
 class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark implements WithTrx{
 
     CityBasicRepo cityRepo
+    TrxService trxService
 
     BatchInsertWithDataFlowQueueBenchmark(boolean databinding) { super(databinding) }
 
@@ -70,7 +72,7 @@ class BatchInsertWithDataFlowQueueBenchmark extends BaseBatchInsertBenchmark imp
                 e.printStackTrace()
             }
         }
-        flushAndClear(transactionStatus)
+        trxService.flushAndClear()
     }
 
 }

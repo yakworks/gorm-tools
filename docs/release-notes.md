@@ -1,3 +1,16 @@
+### v7.0.8-v.53
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.52...v7.0.8-v.53)
+- release [link](https://github.com/yakworks/gorm-tools/commit/cf11a6b9187fff5402869483e379646e7d3f636a)
+- Update BulkableRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/caeba51b585fafe7abb964b00f800a6afb776469)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/ccb3f9d5742e3b8b97e057307ababdc7b4cf0d12)
+- Merge pull request #465 from yakworks/726-bulkable-enhancements [link](https://github.com/yakworks/gorm-tools/commit/946faa27f61e2dd36c93ed08c881a54c3fda1e61)
+- Codenarc fix [link](https://github.com/yakworks/gorm-tools/commit/db0026729b65926c2666220b212f355a8385e89d)
+- release with bulk change to use success and error includes [link](https://github.com/yakworks/gorm-tools/commit/8514ef4da6d8d6e80b6d1c7e49b920002751e0b8)
+- Merge pull request #464 from yakworks/726-bulkable-enhancements [link](https://github.com/yakworks/gorm-tools/commit/c9e115e7a7c6a5e8c0c6161dfca120fa7535210d)
+- Update BulkableRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/80231938ca7ed88f0c485b75f9811249b47ba906)
+- 9ci/domain9#726 Different list of includes for error response building [link](https://github.com/yakworks/gorm-tools/commit/9eef8b1a7972065bd267c2bf58ba068ee3b420c1)
+
 ### v7.0.8-v.52
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.51...v7.0.8-v.52)

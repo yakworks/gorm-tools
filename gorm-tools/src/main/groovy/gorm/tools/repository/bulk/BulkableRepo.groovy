@@ -219,7 +219,7 @@ trait BulkableRepo<D> {
     Map buildSuccessMap(D entityInstance, SyncJobContext jobContext) {
         return createMetaMap(entityInstance, jobContext)
     }
-    
+
     //XXX missing tests
     //The fields to return when bulk fails for the entity, by default, return entire incoming map back.
     Map buildErrorMap(Map originalData, SyncJobContext jobContext) {

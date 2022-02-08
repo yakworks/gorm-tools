@@ -212,8 +212,18 @@ trait RestRepoApiController<D> extends RestApiController {
         // FIXME for now default is false, but we should change
         boolean promiseEnabled = paramBoolean('promiseEnabled', false)
 
-        List bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()] as List
-        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes,
+        def bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()]
+        List bulkIncludesSuccess, errorIncludes
+
+        if(bulkIncludes instanceof Map) {
+            bulkIncludesSuccess = bulkIncludes['success'] as List
+            errorIncludes = bulkIncludes['error'] as List
+        } else {
+            bulkIncludesSuccess = bulkIncludes as List
+            errorIncludes = null
+        }
+
+        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludesSuccess, errorIncludes: errorIncludes,
             sourceId: sourceKey, source: params.jobSource, promiseEnabled: promiseEnabled)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
         syncJobArgs.savePayload = params.boolean('savePayload', true)

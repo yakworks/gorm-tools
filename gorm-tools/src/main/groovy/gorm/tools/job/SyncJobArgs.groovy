@@ -103,6 +103,11 @@ class SyncJobArgs {
     List<String> includes = ['id']
 
     /**
+     * Includes for building the error response - null by default, return entire original map back.
+     */
+    List<String> errorIncludes = null
+
+    /**
      * percentage of errors before it stops the job.
      * for example, if 1000 records are passed and this is set to default 10 then
      * the job will halt when it hits 100 errors

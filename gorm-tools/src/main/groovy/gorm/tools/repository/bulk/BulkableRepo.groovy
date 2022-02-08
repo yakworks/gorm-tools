@@ -214,11 +214,13 @@ trait BulkableRepo<D> {
         return transactional ? withTrx(closure) : closure()
     }
 
+    //XXX missing tests
     //creates response map based on bulk include list
     Map buildSuccessMap(D entityInstance, SyncJobContext jobContext) {
         return createMetaMap(entityInstance, jobContext)
     }
-
+    
+    //XXX missing tests
     //The fields to return when bulk fails for the entity, by default, return entire incoming map back.
     Map buildErrorMap(Map originalData, SyncJobContext jobContext) {
         if(jobContext.args.errorIncludes) {

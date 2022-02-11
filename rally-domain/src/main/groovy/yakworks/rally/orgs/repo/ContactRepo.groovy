@@ -6,6 +6,8 @@ package yakworks.rally.orgs.repo
 
 import groovy.transform.CompileStatic
 
+import org.springframework.dao.DataRetrievalFailureException
+
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.repository.GormRepo
@@ -20,7 +22,9 @@ import gorm.tools.security.domain.AppUser
 import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
+import yakworks.commons.map.Maps
 import yakworks.problem.data.DataProblemCodes
+import yakworks.problem.data.NotFoundProblem
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Contact
@@ -73,6 +77,33 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         // ContactSource.query(contact: contact).deleteAll()
     }
 
+    /** lookup by num or ContactSource */
+    @Override
+    Contact lookup(Map data) {
+        Contact contact
+        if (data == null) data = [:] //if null then make it empty map so it can cycle down and blow error
+
+        String num = Maps.getProperty(data, 'num')
+        if(num) {
+            List contactForNum = Contact.findAllWhere(num:num)
+            if(contactForNum?.size() == 1) {
+                contact = contactForNum[0]
+            } else if (contactForNum.size() > 1){
+                throw new DataRetrievalFailureException("Multiple Contacts found for num: ${data.num}, lookup key must return a unique Contact")
+            } else {
+                throw new DataRetrievalFailureException("No Contacts found for num: ${data.num}")
+            }
+        }
+        String sourceId = Maps.getProperty(data, 'sourceId')
+        if(sourceId) {
+            List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
+            contact = contactForSourceId[0].contact
+        }
+        if(!contact) {
+            throw new DataRetrievalFailureException("No Contact found for num: ${data.num}")
+        }
+        return load(contact.id)
+    }
 
     @RepoListener
     void afterBind(Contact contact, Map data, AfterBindEvent e) {

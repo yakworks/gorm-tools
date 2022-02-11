@@ -83,19 +83,18 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         Contact contact
         if (data == null) data = [:] //if null then make it empty map so it can cycle down and blow error
 
-        String num = Maps.getProperty(data, 'num')
-        if(num) {
+        String sourceId = Maps.getProperty(data, 'sourceId')
+        if(sourceId) {
+            List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
+            contact = contactForSourceId[0].contact
+        } else if (data.num) {
+            String num = Maps.getProperty(data, 'num')
             List contactForNum = Contact.findAllWhere(num:num)
             if(contactForNum?.size() == 1) {
                 contact = contactForNum[0]
             } else if (contactForNum.size() > 1){
                 throw new DataRetrievalFailureException("Multiple Contacts found for num: ${data.num}, lookup key must return a unique Contact")
             }
-        }
-        String sourceId = Maps.getProperty(data, 'sourceId')
-        if(sourceId) {
-            List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
-            contact = contactForSourceId[0].contact
         }
         return load(contact?.id)
     }

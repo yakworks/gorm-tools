@@ -90,8 +90,6 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
                 contact = contactForNum[0]
             } else if (contactForNum.size() > 1){
                 throw new DataRetrievalFailureException("Multiple Contacts found for num: ${data.num}, lookup key must return a unique Contact")
-            } else {
-                throw new DataRetrievalFailureException("No Contacts found for num: ${data.num}")
             }
         }
         String sourceId = Maps.getProperty(data, 'sourceId')
@@ -99,10 +97,7 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
             List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
             contact = contactForSourceId[0].contact
         }
-        if(!contact) {
-            throw new DataRetrievalFailureException("No Contact found for num: ${data.num}")
-        }
-        return load(contact.id)
+        return load(contact?.id)
     }
 
     @RepoListener

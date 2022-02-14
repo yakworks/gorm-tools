@@ -90,7 +90,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
         expect:
         def params = [
-                org:[id: 205], //org id does not exist
+                orgId: 205, //org id does not exist
                 note:[body: 'Todays test note'],
                 name: 'will get overriden'
         ]

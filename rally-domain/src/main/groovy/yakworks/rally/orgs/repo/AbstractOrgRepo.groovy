@@ -235,12 +235,12 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
             }
 
             if(orgType){
-                oid = OrgSource.repo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
+                oid = orgSourceRepo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
                 if(oid) org = get(oid)
             }
             else {
                 // lookup by just sourceId and see if it returns just one
-                List<Long> res = OrgSource.repo.findOrgIdBySourceId(source.sourceId as String)
+                List<Long> res = orgSourceRepo.findOrgIdBySourceId(source.sourceId as String)
                 if(res?.size() == 1) {
                     oid = res[0]
                 } else if (res.size() > 1){

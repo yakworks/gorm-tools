@@ -7,6 +7,7 @@ dependencies {
 
   compileOnly project(":gorm-tools")
   compileOnly project(":gorm-tools-security")
+  compileOnly project(":gorm-tools-csv")
 
   //for AppResourceLoader in AttachmentSupport
   compileOnly "org.grails.plugins:view-tools:$vViewTools"

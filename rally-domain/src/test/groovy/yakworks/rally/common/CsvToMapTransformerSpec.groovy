@@ -2,18 +2,14 @@ package yakworks.rally.common
 
 import gorm.tools.testing.unit.DataRepoTest
 import grails.plugin.viewtools.AppResourceLoader
-import spock.lang.IgnoreRest
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.io.FileUtil
-import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
-
-import java.nio.file.Paths
 
 class CsvToMapTransformerSpec extends Specification implements DataRepoTest, SecurityTest {
     @Shared
@@ -43,7 +39,6 @@ class CsvToMapTransformerSpec extends Specification implements DataRepoTest, Sec
         new File("src/test/resources/csv/contact.csv").exists()
     }
 
-    @IgnoreRest
     void "test with zip"() {
         setup:
         def dataCsv =  new File("src/test/resources/csv/contact.csv")

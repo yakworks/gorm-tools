@@ -183,7 +183,7 @@ trait BulkableRepo<D> {
             } catch(Exception e) {
                 // if trx by item then collect the exceptions, otherwise throw so it can rollback
                 if(transactionPerItem){
-                    results << problemHandler.handleException(e).payload(item)
+                    results << problemHandler.handleException(e).payload(buildErrorMap(item, jobContext))
                 } else {
                     clear() //clear cache on error since wont hit below
                     throw e
@@ -208,10 +208,26 @@ trait BulkableRepo<D> {
     Map createOrUpdate(SyncJobContext jobContext, boolean isCreate, boolean transactional, Map data, PersistArgs persistArgs) {
         def closure = {
             D entityInstance = isCreate ? doCreate(data, persistArgs) : doUpdate(data, persistArgs)
-            return createMetaMap(entityInstance, jobContext)
+            return buildSuccessMap(entityInstance, jobContext)
         } as Closure<Map>
 
         return transactional ? withTrx(closure) : closure()
+    }
+
+    //XXX missing tests
+    //creates response map based on bulk include list
+    Map buildSuccessMap(D entityInstance, SyncJobContext jobContext) {
+        return createMetaMap(entityInstance, jobContext)
+    }
+
+    //XXX missing tests
+    //The fields to return when bulk fails for the entity, by default, return entire incoming map back.
+    Map buildErrorMap(Map originalData, SyncJobContext jobContext) {
+        if(jobContext.args.errorIncludes) {
+            return originalData.subMap(jobContext.args.errorIncludes)
+        } else {
+            return originalData
+        }
     }
 
     /**

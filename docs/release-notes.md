@@ -1,3 +1,44 @@
+### v7.0.8-v.55
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.54...v7.0.8-v.55)
+- release with csv bulk import [link](https://github.com/yakworks/gorm-tools/commit/460d93d8f8ae51558d879a7e6c9dcbda396568b2)
+- Merge pull request #469 from yakworks/655-bulk-csv [link](https://github.com/yakworks/gorm-tools/commit/266d6736e86ce1106cafc5c77e6c68ca00cc8bf2)
+- Add comment [link](https://github.com/yakworks/gorm-tools/commit/58b8cb8987f441d3cf79d42e6d3703113bf3f0c5)
+- 9ci/domain9#655 Implement bulk csv upload [link](https://github.com/yakworks/gorm-tools/commit/719dfcb99afff9b1b95cb9d98ebb3ec9d9f74e51)
+- if params booleean conversion [link](https://github.com/yakworks/gorm-tools/commit/1a858756fd3ff9b1d78a3756a698483dd3290809)
+- Remove ignore [link](https://github.com/yakworks/gorm-tools/commit/9bc66a38d932e34bb09a2d4c37fa0a8e84ce7b3b)
+- Fix : Check if param exists thn use it, dont use groovy truth as it would never use param if param value was falsy [link](https://github.com/yakworks/gorm-tools/commit/0cac004173efe7bb27c9600dfed2e29cb9c2835c)
+- 9ci/domain9#655 Add a general purpose Csv to Map transformer [link](https://github.com/yakworks/gorm-tools/commit/8ca2618f26ee175e91030d498a7cd1487ae2c31f)
+
+### v7.0.8-v.54
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.53...v7.0.8-v.54)
+- release with contact lookup on update and org lookup on contact create [link](https://github.com/yakworks/gorm-tools/commit/522185f7df3752d71b16e29f3d99ed98cdf7fb53)
+- lookup org (#468) [link](https://github.com/yakworks/gorm-tools/commit/bc7c067ed18f05f9115ccc859fe7119ac101b0b5)
+- Merge pull request #467 from yakworks/_741_contact_update_lookup [link](https://github.com/yakworks/gorm-tools/commit/57da15c06fcb94803f0ff6edb6b5e34de9f5c036)
+- Update ContactRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/cd0371efe5c614d9b5275b9396db832f2e3f8d76)
+- Update ContactRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/7e27bcf3e056491d5599ee643e5b006963da96e9)
+- add lookup [link](https://github.com/yakworks/gorm-tools/commit/26911e6f9144a4cec1ae0c6fd96b26499947df3e)
+
+### v7.0.8-v.53
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.52...v7.0.8-v.53)
+- release [link](https://github.com/yakworks/gorm-tools/commit/cf11a6b9187fff5402869483e379646e7d3f636a)
+- Update BulkableRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/caeba51b585fafe7abb964b00f800a6afb776469)
+- Update version.properties [link](https://github.com/yakworks/gorm-tools/commit/ccb3f9d5742e3b8b97e057307ababdc7b4cf0d12)
+- Merge pull request #465 from yakworks/726-bulkable-enhancements [link](https://github.com/yakworks/gorm-tools/commit/946faa27f61e2dd36c93ed08c881a54c3fda1e61)
+- Codenarc fix [link](https://github.com/yakworks/gorm-tools/commit/db0026729b65926c2666220b212f355a8385e89d)
+- release with bulk change to use success and error includes [link](https://github.com/yakworks/gorm-tools/commit/8514ef4da6d8d6e80b6d1c7e49b920002751e0b8)
+- Merge pull request #464 from yakworks/726-bulkable-enhancements [link](https://github.com/yakworks/gorm-tools/commit/c9e115e7a7c6a5e8c0c6161dfca120fa7535210d)
+- Update BulkableRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/80231938ca7ed88f0c485b75f9811249b47ba906)
+- 9ci/domain9#726 Different list of includes for error response building [link](https://github.com/yakworks/gorm-tools/commit/9eef8b1a7972065bd267c2bf58ba068ee3b420c1)
+
+### v7.0.8-v.52
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.51...v7.0.8-v.52)
+- release [link](https://github.com/yakworks/gorm-tools/commit/5c0a2a304228d432a02effa9f1fe2efca37eda49)
+- Dev (#463) [link](https://github.com/yakworks/gorm-tools/commit/d4c78490bdb879df649156bc264fc706d2c09885)
+
 ### v7.0.8-v.51
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.50...v7.0.8-v.51)

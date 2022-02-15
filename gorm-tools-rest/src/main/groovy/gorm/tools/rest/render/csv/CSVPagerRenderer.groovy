@@ -10,7 +10,6 @@ import groovy.transform.CompileStatic
 import org.grails.plugins.web.rest.render.ServletRenderContext
 
 import gorm.tools.beans.Pager
-import gorm.tools.rest.render.JsonRendererTrait
 import grails.rest.render.RenderContext
 
 /**

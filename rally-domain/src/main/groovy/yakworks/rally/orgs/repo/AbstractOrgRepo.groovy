@@ -222,7 +222,11 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
         Long oid
         //if type is set then coerce to OrgType enum
         OrgType orgType = coerceOrgType(data.type)
-
+        // special case for customer lookup when it comes with org.source; for example [org:[source:[sourceId:K14700]]
+        if(data.org) {
+            data.source =data.org['source']
+            data.sourceId =data.org['sourceId']
+        }
         if(data.source == null && data.sourceId) data.source = [sourceId: data.sourceId]
         if (data.source && data.source['sourceId']) {
             Map source = data.source as Map
@@ -231,12 +235,12 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
             }
 
             if(orgType){
-                oid = OrgSource.repo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
+                oid = orgSourceRepo.findOrgIdBySourceIdAndOrgType(source.sourceId as String, orgType)
                 if(oid) org = get(oid)
             }
             else {
                 // lookup by just sourceId and see if it returns just one
-                List<Long> res = OrgSource.repo.findOrgIdBySourceId(source.sourceId as String)
+                List<Long> res = orgSourceRepo.findOrgIdBySourceId(source.sourceId as String)
                 if(res?.size() == 1) {
                     oid = res[0]
                 } else if (res.size() > 1){

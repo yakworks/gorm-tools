@@ -10,6 +10,7 @@ dependencies {
 
   api project(":gorm-tools")
   api project(":gorm-tools-security")
+  api project(":gorm-tools-csv")
   api project(":rally-domain")
   api project(":gorm-test-domain")
 

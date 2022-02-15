@@ -568,7 +568,6 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
             //clear, even if flush failed
             clear()
         }
-
     }
 
     /**

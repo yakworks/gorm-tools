@@ -33,7 +33,9 @@ class ProblemRenderer implements JsonRendererTrait<IProblem> {
             ok problem.ok
             status problem.status.code
             code problem.code
-            title ResultUtils.getMessage(msgService, problem)
+            // FIXME until we figure out why its not passing in the name arg to build message
+            // title ResultUtils.getMessage(msgService, problem)
+            title problem.title
             detail problem.detail
             errors problem.violations
         }

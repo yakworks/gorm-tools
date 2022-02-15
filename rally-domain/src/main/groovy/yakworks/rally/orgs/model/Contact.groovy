@@ -56,9 +56,9 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
     // String middleName
     // String nickName
     // String salutation
-    // String jobTitle
     // String department
     // LocalDate birthday
+    String jobTitle
 
     Location location
     ContactFlex flex
@@ -106,7 +106,7 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         lastName:[ nullable: true, maxSize: 50],
         // nickName:[ nullable: true, maxSize: 50],
         // salutation:[ nullable: true, maxSize: 50],
-        // jobTitle:[ nullable: true, maxSize: 50],
+        jobTitle:[ d:'Job title', nullable: true, maxSize: 50],
         // department:[ nullable: true, maxSize: 50],
         // birthday:[ nullable: true],
         comments:[ d:'notes about the contact', nullable: true],

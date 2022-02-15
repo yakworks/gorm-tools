@@ -22,6 +22,7 @@ import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.PersistArgs
+import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
@@ -83,6 +84,11 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
                 activity.note.persist()
             }
         }
+    }
+
+    @RepoListener
+    void afterBind(Activity activity, Map data, AfterBindEvent e) {
+        assignOrg(activity, data)
     }
 
     @RepoListener
@@ -155,6 +161,18 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         }
 
         return detCrit
+    }
+
+    void assignOrg(Activity activity, Map data) {
+        // data.orgId wins if its set, only do lookup if its not set
+        if (!data.orgId) {
+            if (data.org && data.org instanceof Map) {
+                activity.org = Org.repo.findWithData(data.org as Map)
+            }
+            else if(data.org && data.org instanceof Org){
+                activity.org = (Org)data.org
+            }
+        }
     }
 
     void updateNameSummary(Activity activity) {

@@ -1,3 +1,13 @@
+### v7.0.8-v.54
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.53...v7.0.8-v.54)
+- release with contact lookup on update and org lookup on contact create [link](https://github.com/yakworks/gorm-tools/commit/522185f7df3752d71b16e29f3d99ed98cdf7fb53)
+- lookup org (#468) [link](https://github.com/yakworks/gorm-tools/commit/bc7c067ed18f05f9115ccc859fe7119ac101b0b5)
+- Merge pull request #467 from yakworks/_741_contact_update_lookup [link](https://github.com/yakworks/gorm-tools/commit/57da15c06fcb94803f0ff6edb6b5e34de9f5c036)
+- Update ContactRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/cd0371efe5c614d9b5275b9396db832f2e3f8d76)
+- Update ContactRepo.groovy [link](https://github.com/yakworks/gorm-tools/commit/7e27bcf3e056491d5599ee643e5b006963da96e9)
+- add lookup [link](https://github.com/yakworks/gorm-tools/commit/26911e6f9144a4cec1ae0c6fd96b26499947df3e)
+
 ### v7.0.8-v.53
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.52...v7.0.8-v.53)

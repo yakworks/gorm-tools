@@ -107,8 +107,5 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         OrgSource.withTransaction {
             OrgSource.findBySourceIdLike("ORG-1%") == null
         }
-
     }
-
-
 }

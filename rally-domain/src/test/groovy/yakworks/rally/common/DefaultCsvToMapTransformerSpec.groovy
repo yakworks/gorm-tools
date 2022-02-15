@@ -5,18 +5,19 @@ import grails.plugin.viewtools.AppResourceLoader
 import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.io.FileUtil
+import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.SecurityTest
 import yakworks.rally.attachment.AttachmentSupport
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.model.FileData
 
-class CsvToMapTransformerSpec extends Specification implements DataRepoTest, SecurityTest {
+class DefaultCsvToMapTransformerSpec extends Specification implements DataRepoTest, SecurityTest {
     @Shared
     AppResourceLoader appResourceLoader
 
     @Shared
-    CsvToMapTransformer csvToMapTransformer
+    DefaultCsvToMapTransformer csvToMapTransformer
 
     def setupSpec() {
         defineBeans {
@@ -25,7 +26,7 @@ class CsvToMapTransformerSpec extends Specification implements DataRepoTest, Sec
                 resourcesConfigRootKey = "app.resources"
             }
             attachmentSupport(AttachmentSupport)
-            csvToMapTransformer(CsvToMapTransformer)
+            csvToMapTransformer(DefaultCsvToMapTransformer)
         }
         mockDomains(Attachment, AttachmentLink, FileData)
     }
@@ -36,12 +37,12 @@ class CsvToMapTransformerSpec extends Specification implements DataRepoTest, Sec
         appResourceLoader.rootLocation.exists()
         csvToMapTransformer != null
 
-        new File("src/test/resources/csv/contact.csv").exists()
+        new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv").exists()
     }
 
     void "test with zip"() {
         setup:
-        def dataCsv =  new File("src/test/resources/csv/contact.csv")
+        def dataCsv =  new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv")
         File zip = FileUtil.zip("test.zip", null, dataCsv)
 
         expect:
@@ -66,8 +67,8 @@ class CsvToMapTransformerSpec extends Specification implements DataRepoTest, Sec
         rows != null
         rows.size() == 3
         rows[0].name == "name1"
-        rows[0].num == "num1"
-        rows[0]["org.source.sourceId"] == "source1"
+        rows[0].num == "bulk1"
+        rows[0]["orgId"] == "1"
 
         cleanup:
         if(zip.exists()) zip.delete()

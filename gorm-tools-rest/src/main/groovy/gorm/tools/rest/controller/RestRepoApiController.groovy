@@ -21,6 +21,7 @@ import gorm.tools.beans.Pager
 import gorm.tools.beans.map.MetaMap
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.beans.map.MetaMapList
+import gorm.tools.csv.CsvToMapTransformer
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
 import gorm.tools.job.SyncJobService
@@ -58,14 +59,14 @@ trait RestRepoApiController<D> extends RestApiController {
     @Autowired
     IncludesConfig includesConfig
 
-    // @Resource MessageSource messageSource
-
     @Autowired
     MetaMapEntityService metaMapEntityService
 
-
     @Autowired(required = false)
     SyncJobService syncJobService
+
+    @Autowired(required = false)
+    CsvToMapTransformer csvToMapTransformer
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -207,8 +208,6 @@ trait RestRepoApiController<D> extends RestApiController {
         HttpServletRequest req = request
 
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
-        // FIXME for now default is false, but we should change
-        boolean promiseEnabled = params.boolean('promiseEnabled', false)
 
         def bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()]
         List bulkIncludesSuccess, errorIncludes
@@ -222,18 +221,37 @@ trait RestRepoApiController<D> extends RestApiController {
         }
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludesSuccess, errorIncludes: errorIncludes,
-            sourceId: sourceKey, source: params.jobSource, promiseEnabled: promiseEnabled)
+            sourceId: sourceKey, source: params.jobSource)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
         syncJobArgs.savePayload = params.boolean('savePayload', true)
+        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
         syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
 
         doBulk(dataList, syncJobArgs)
     }
 
     void doBulk(List<Map> dataList, SyncJobArgs syncJobArgs){
-        Long jobId = getRepo().bulk(dataList, syncJobArgs)
+        Long jobId
+        if(params.attachmentId) {
+            jobId = doBulkCsv(dataList, syncJobArgs)
+        } else {
+            jobId = getRepo().bulk(dataList, syncJobArgs)
+        }
+
         SyncJobEntity job = syncJobService.getJob(jobId)
         respondWith(job, [status: MULTI_STATUS])
+    }
+
+    Long doBulkCsv(List<Map> dataList, SyncJobArgs syncJobArgs){
+        if(!syncJobArgs.asyncEnabled == null) syncJobArgs.asyncEnabled  = true //enable by default
+        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', true) //default to true for CSV unless explicitely disabled in params
+        if(!syncJobArgs.savePayload == null) syncJobArgs.savePayload  = false //no need to save payload if we have csv file
+        dataList = transformCsvToBulkList(params)
+        return getRepo().bulk(dataList, syncJobArgs)
+    }
+
+    List<Map> transformCsvToBulkList(Map params) {
+        return csvToMapTransformer.process(params)
     }
 
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){

@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 
 import gorm.tools.csv.CSVPathKeyMapReader
+import gorm.tools.csv.CsvToMapTransformer
 import yakworks.commons.io.FileUtil
 import yakworks.commons.lang.Validate
 import yakworks.rally.attachment.model.Attachment
@@ -22,7 +23,7 @@ import yakworks.rally.attachment.model.Attachment
 @Service @Lazy
 @Slf4j
 @CompileStatic
-class CsvToMapTransformer {
+class DefaultCsvToMapTransformer implements CsvToMapTransformer {
 
     /**
      * Reads CSV rows into maps

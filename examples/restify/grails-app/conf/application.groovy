@@ -1,4 +1,5 @@
 import grails.util.Environment
+import yakworks.commons.util.BuildSupport
 
 grails {
     gorm.failOnError = true
@@ -61,4 +62,24 @@ else {
     // grails.plugin.springsecurity.rest.token.validation.useBearerToken = false
     // grails.plugin.springsecurity.rest.token.validation.headerName = 'X-Auth-Token'
     // grails.plugin.springsecurity.rest.token.storage.jwt.secret = ''
+}
+
+
+String projectRoot = BuildSupport.gradleRootProjectDir
+app {
+    resources {
+        currentTenant = {
+            return [num: 'virgin', id: 2]
+        }
+        rootLocation = { args ->
+            File root = new File("${projectRoot}/examples/resources")
+            return root.canonicalPath
+        }
+        tempDir = {
+            File file = new File("./build/rootLocation/tempDir")
+            if (!file.exists()) file.mkdirs()
+            return file.canonicalPath
+        }
+        attachments.location = 'attachments'
+    }
 }

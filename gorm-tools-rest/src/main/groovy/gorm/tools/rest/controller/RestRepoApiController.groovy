@@ -208,7 +208,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
         // FIXME for now default is false, but we should change
-        boolean promiseEnabled = paramBoolean('promiseEnabled', false)
+        boolean promiseEnabled = params.boolean('promiseEnabled', false)
 
         def bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()]
         List bulkIncludesSuccess, errorIncludes

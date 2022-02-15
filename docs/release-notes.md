@@ -1,3 +1,15 @@
+### v7.0.8-v.55
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.54...v7.0.8-v.55)
+- release with csv bulk import [link](https://github.com/yakworks/gorm-tools/commit/460d93d8f8ae51558d879a7e6c9dcbda396568b2)
+- Merge pull request #469 from yakworks/655-bulk-csv [link](https://github.com/yakworks/gorm-tools/commit/266d6736e86ce1106cafc5c77e6c68ca00cc8bf2)
+- Add comment [link](https://github.com/yakworks/gorm-tools/commit/58b8cb8987f441d3cf79d42e6d3703113bf3f0c5)
+- 9ci/domain9#655 Implement bulk csv upload [link](https://github.com/yakworks/gorm-tools/commit/719dfcb99afff9b1b95cb9d98ebb3ec9d9f74e51)
+- if params booleean conversion [link](https://github.com/yakworks/gorm-tools/commit/1a858756fd3ff9b1d78a3756a698483dd3290809)
+- Remove ignore [link](https://github.com/yakworks/gorm-tools/commit/9bc66a38d932e34bb09a2d4c37fa0a8e84ce7b3b)
+- Fix : Check if param exists thn use it, dont use groovy truth as it would never use param if param value was falsy [link](https://github.com/yakworks/gorm-tools/commit/0cac004173efe7bb27c9600dfed2e29cb9c2835c)
+- 9ci/domain9#655 Add a general purpose Csv to Map transformer [link](https://github.com/yakworks/gorm-tools/commit/8ca2618f26ee175e91030d498a7cd1487ae2c31f)
+
 ### v7.0.8-v.54
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.53...v7.0.8-v.54)

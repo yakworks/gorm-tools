@@ -242,6 +242,17 @@ trait RestRepoApiController<D> extends RestApiController {
         respondWith(job, [status: MULTI_STATUS])
     }
 
+    /**
+     * Bulk CSV upload.
+     *
+     * Process flow to use attachment:
+     * 1. Zip data.csv
+     * 2. Call POST /api/upload?name=myZip.zip, take attachmentId from the result
+     * 3. Call POST /api/rally/<domain>/bulk with query params:
+     *  - attachmentId=<attachment-id>
+     *  - dataFilename= -- pass in data.csv and detail.csv as default of parameter for file names
+     *  - headerPathDelimiter -- default is '.', pass in '_' for underscore (this is path delimiter for header names, not csv delimiter)
+     */
     Long doBulkCsv(List<Map> dataList, SyncJobArgs syncJobArgs){
         if(!syncJobArgs.asyncEnabled == null) syncJobArgs.asyncEnabled  = true //enable by default
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', true) //default to true for CSV unless explicitely disabled in params

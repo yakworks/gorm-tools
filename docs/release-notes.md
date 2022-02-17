@@ -1,3 +1,9 @@
+### v7.0.8-v.56
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.55...v7.0.8-v.56)
+- release contact isPrimary [link](https://github.com/yakworks/gorm-tools/commit/449d232f081e47dc3fdea771b9fa4c1c2e2dab55)
+- Update Contact.groovy (#470) [link](https://github.com/yakworks/gorm-tools/commit/162a439b7d353946af81bc1a5f5ccd334655459b)
+
 ### v7.0.8-v.55
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.54...v7.0.8-v.55)

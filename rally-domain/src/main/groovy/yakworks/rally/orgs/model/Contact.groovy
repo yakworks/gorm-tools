@@ -131,6 +131,11 @@ class Contact implements NameNum, RepoEntity<Contact>, Taggable, Serializable {
         return (user && user.enabled)
     }
 
+    /** flag 'isPrimary' to be displayed on grid on list of contacts under Org (Customer) */
+    boolean isPrimaryForOrg() {
+        return (this == org.contact)
+    }
+
     /**
      * If contact has a locationId and isLocationDifferent=false, otherwise use the main location from the org.
      */

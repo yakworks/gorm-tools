@@ -12,9 +12,7 @@ import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.http.RestIntegrationTest
 import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.job.SyncJob
-import yakworks.rally.orgs.model.Company
 import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.Org
 
 @Rollback
 @Integration
@@ -58,8 +56,9 @@ class BulkCsvSpec  extends Specification implements RestIntegrationTest {
 
         when:
         controller.params.attachmentId = attachment.id
-        controller.params['promiseEnabled'] = "" //disable promise for test
+        controller.params['promiseEnabled'] = false //disable promise for test
         controller.params['dataFilename'] = "contact.csv"
+        controller.params['saveDataAsFile'] = false
 
         controller.bulkCreate()
         Map body = response.bodyToMap()

@@ -23,7 +23,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         when:
         CSVPathKeyMapReader csvReader = new CSVPathKeyMapReader(new FileReader(kitchenSinkCsv))
         List data = csvReader.readAllRows()
-
+        data[0].init()
         then:
         // data[0] instanceof PathKeyMap
         data[0].name == "red"
@@ -34,6 +34,10 @@ class CSVPathKeyMapReaderSpec extends Specification {
 
         data[2].name == "green"
         data[2].num == "sink3"
+
+        data[0].test != null
+        data[0].test instanceof Map
+        data[0].test.amount == "100"
     }
 
     void "test read with closure"() {

@@ -223,8 +223,8 @@ trait RestRepoApiController<D> extends RestApiController {
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludesSuccess, errorIncludes: errorIncludes,
             sourceId: sourceKey, source: params.jobSource)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
-        syncJobArgs.savePayload = params.boolean('savePayload', true)
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
+        syncJobArgs.savePayload = params.boolean('savePayload', true)
         syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
 
         doBulk(dataList, syncJobArgs)
@@ -256,7 +256,10 @@ trait RestRepoApiController<D> extends RestApiController {
     Long doBulkCsv(List<Map> dataList, SyncJobArgs syncJobArgs){
         if(!syncJobArgs.asyncEnabled == null) syncJobArgs.asyncEnabled  = true //enable by default
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', true) //default to true for CSV unless explicitely disabled in params
-        if(!syncJobArgs.savePayload == null) syncJobArgs.savePayload  = false //no need to save payload if we have csv file
+        //dont save payload by default, and if done, save to file not db.
+        syncJobArgs.savePayload = params.boolean('savePayload', false)
+        syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile', true)
+
         dataList = transformCsvToBulkList(params)
         return getRepo().bulk(dataList, syncJobArgs)
     }

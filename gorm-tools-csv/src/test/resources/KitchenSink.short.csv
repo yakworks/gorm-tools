@@ -1,4 +1,4 @@
-num,name
-sink1,red
-sink2,yellow
-sink3,green
+num,name,test.amount
+sink1,red,100
+sink2,yellow,100
+sink3,green,100

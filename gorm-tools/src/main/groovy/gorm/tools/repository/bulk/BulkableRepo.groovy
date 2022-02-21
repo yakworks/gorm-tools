@@ -171,6 +171,7 @@ trait BulkableRepo<D> {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
                 if(item instanceof PathKeyMap){
+                    item.init()
                     itemData = item.cloneMap()   //clone it, probably from CSV
                 } else {
                     itemData = Maps.clone(item)

@@ -23,7 +23,7 @@ class CSVPathKeyMapReaderSpec extends Specification {
         when:
         CSVPathKeyMapReader csvReader = new CSVPathKeyMapReader(new FileReader(kitchenSinkCsv))
         List data = csvReader.readAllRows()
-
+        data[0].init()
         then:
         // data[0] instanceof PathKeyMap
         data[0].name == "red"

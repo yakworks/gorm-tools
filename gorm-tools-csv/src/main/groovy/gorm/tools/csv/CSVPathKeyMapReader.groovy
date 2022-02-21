@@ -56,7 +56,7 @@ class CSVPathKeyMapReader extends CSVReaderHeaderAware {
         Map data = super.readMap()
         data = prune && data ? Maps.prune(data) : data
         // data = data as Map<String, String>
-        return PathKeyMap.of(data, pathDelimiter).init() as Map<String, Object>
+        return PathKeyMap.of(data, pathDelimiter) as Map<String, Object>
     }
 
     /**

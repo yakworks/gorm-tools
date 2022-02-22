@@ -1,3 +1,10 @@
+### v7.0.8-v.57
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.56...v7.0.8-v.57)
+- relase with Fix CSV path key map [link](https://github.com/yakworks/gorm-tools/commit/296d163b74c5b1be92e52b3dca2c09fd3ca3ba41)
+- 9ci/domain9#777 - Fix CSV path key map reader to initialize map  (#471) [link](https://github.com/yakworks/gorm-tools/commit/71926984069ab9fecd639838f8f3cff2fe13b9ed)
+- Update Contact.groovy [link](https://github.com/yakworks/gorm-tools/commit/6e9baca7acebdcf4943818916fd67759c83ed9ba)
+
 ### v7.0.8-v.56
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.55...v7.0.8-v.56)

@@ -32,8 +32,8 @@ import gorm.tools.repository.artefact.GrailsRepositoryClass
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.validation.RepoValidatorRegistry
 import gorm.tools.transaction.TrxService
+import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
 import grails.core.GrailsApplication
 import grails.core.GrailsClass

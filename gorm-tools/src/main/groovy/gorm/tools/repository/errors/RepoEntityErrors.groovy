@@ -9,14 +9,13 @@ import java.beans.Introspector
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.GormValidateable
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.AbstractBindingResult
 import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
-import gorm.tools.beans.AppCtx
 import grails.gorm.validation.ConstrainedProperty
+import yakworks.i18n.icu.ICUMessageSource
 
 /**
  * A helper trait for a repo to allow rejecting values for validation
@@ -35,9 +34,8 @@ trait RepoEntityErrors<D> {
 
     abstract Class<D> getEntityClass()
 
-    MessageSource getMessageSource(){
-        AppCtx.getCtx()
-    }
+    @Autowired(required = false)
+    ICUMessageSource messageSource
 
     /**
      * validates that the prop is not null and registers error if so
@@ -109,8 +107,8 @@ trait RepoEntityErrors<D> {
 
     String getDefaultMessage(String code) {
         try {
-            if (getMessageSource() != null) {
-                return getMessageSource().getMessage(code, null, LocaleContextHolder.getLocale())
+            if (messageSource != null) {
+                return messageSource.get(code)
             }
             return ConstrainedProperty.DEFAULT_MESSAGES.get(code)
         }

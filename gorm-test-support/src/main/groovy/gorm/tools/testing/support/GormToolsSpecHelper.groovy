@@ -4,7 +4,6 @@
 */
 package gorm.tools.testing.support
 
-import java.lang.reflect.Method
 
 import groovy.transform.CompileDynamic
 
@@ -33,9 +32,8 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.transaction.TrxService
-import grails.core.GrailsApplication
+import gorm.tools.validation.RepoEntityValidator
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
 import yakworks.i18n.icu.GrailsICUMessageSource

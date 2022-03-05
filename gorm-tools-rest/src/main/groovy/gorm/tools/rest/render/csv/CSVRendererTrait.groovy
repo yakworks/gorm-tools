@@ -61,6 +61,6 @@ trait CSVRendererTrait<T> implements Renderer<T> {
     }
 
     String getMessage(MsgKey msgKey){
-        msgService.getMessage(msgKey)
+        msgService.get(msgKey)
     }
 }

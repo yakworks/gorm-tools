@@ -74,8 +74,4 @@ trait JsonRendererTrait<T> implements Renderer<T>, JsonEngineTrait {
         context.setContentType( GrailsWebUtil.getContentType(mimeType.name, encoding) )
     }
 
-    // swallow no such message exception and returns empty string
-    String getMessage(MsgKey msgKey){
-        msgService.getMessage(msgKey)
-    }
 }

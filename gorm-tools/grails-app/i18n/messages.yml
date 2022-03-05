@@ -1,29 +1,26 @@
+# ---- ERRORS ----
+error:
+  unhandled: Unhandled Problem
+  unexpected: Unexpected Exception
+  notFound: '{name} lookup failed using key {key}'
+  illegalArgument: Illegal Argument Exception
 
-# VALIDATION
-#validation.problem= {name} Validation Error(s)
-#
-#validation.match=[{value}] does not match the required pattern [{expected}]
-#validation.url=[{value}] is not a valid URL
-#validation.creditCard=Not a valid credit card number
-#validation.email=[{value}] is not a valid e-mail address
-#validation.range=[{value}] does not fall within the valid range from [{minVal}] to [{maxVal}]
-#validation.size=[{value}] does not fall within the valid size range from [{minVal}] to [{maxVal}]
-#validation.max=[{value}] exceeds maximum value [{3}]
-#validation.min=[{value}] is less than minimum value [{3}]
-#validation.maxSize=[{value}] exceeds the maximum size of [{3}]
-#validation.minSize=[{value}] is less than the minimum size of [{3}]
-#validation.inlist=[{value}] is not contained within the valid list
-#validation.blank=[{value}] cannot be empty
-#validation.equal=[{value}] cannot equal [{3}]
-#validation.null=[{value}] cannot be empty
-#validation.unique=[{value}] is not unique
-#
-#default.not.found.message={0} not found with id {1}
-#typeMismatch.java.math.BigInteger=Property {0} must be a valid number
+  # DATA
+  data:
+    optimisticLocking: '{name} persist failed as version changed since last retrieval'
+    uniqueConstraintViolation: Unique index or primary key violation
+    problem: Data Problem
+    empty: Empty Data
+    bindId: Id was passed in the data but bindId argument was false. Set bindId=true or remove the id property
+    emptyPayload: Expected payload is null or empty, No operation performed.
 
+  # Delete Errors
+  delete:
+    externalSource: '{name} cannot be deleted as its sourced externally'
+    reference: '{other} contains 1 or more references to {name} {id} and cannot be deleted'
 
-
-# DEFAULTS
+# ---- VALIDATION ----
+validation.problem: '{name} Validation Error(s)'
 
 #default.created.message={0} {1} created
 #default.updated.message={0} {1} updated

@@ -5,9 +5,9 @@ dependencies {
   console "org.grails:grails-console"
   profile "org.grails.profiles:rest-api"
 
-  compileOnly project(":gorm-tools")
-  compileOnly project(":gorm-tools-security")
-  compileOnly project(":gorm-tools-csv")
+  api project(":gorm-tools")
+  api project(":gorm-tools-security")
+  api project(":gorm-tools-csv")
 
   //for AppResourceLoader in AttachmentSupport
   compileOnly "org.grails.plugins:view-tools:$vViewTools"

@@ -20,12 +20,8 @@ dependencies {
   compile "org.grails.plugins:views-json:$vViews"
   compile "org.grails.plugins:views-json-templates:$vViews"
 
-  compile project(":gorm-tools")
-  compile project(":gorm-tools-security")
-  compile project(":rally-domain")
   compile project(":testify")
   compile project(":gorm-tools-rest")
-  compile project(":gorm-tools-csv")
 
   compile "org.grails.plugins:view-tools:$vViewTools"
   //??wtf

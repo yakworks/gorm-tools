@@ -28,7 +28,6 @@ trait GormAppUnitTest implements AutowiredTest, RepoBuildDataTest, GormToolsSpec
         mockDomainsBuildDataTest(domainClassesToMock)
         defineRepoBeans(domainClassesToMock)
         setupValidatorRegistry()
-
     }
 
 }

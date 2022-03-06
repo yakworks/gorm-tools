@@ -10,6 +10,8 @@ import groovy.transform.CompileStatic
 import org.springframework.http.HttpStatus
 
 import grails.rest.render.RenderContext
+import grails.util.GrailsWebUtil
+import grails.web.mime.MimeType
 import yakworks.api.ResultUtils
 import yakworks.problem.IProblem
 
@@ -37,6 +39,10 @@ class ProblemRenderer implements JsonRendererTrait<IProblem> {
             detail problem.detail
             errors problem.violations
         }
+    }
+
+    void setContentType(RenderContext context){
+        context.setContentType( 'application/problem+json' )
     }
 
 }

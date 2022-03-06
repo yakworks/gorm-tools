@@ -62,7 +62,7 @@ class ForeignIdGeneratorSpec extends GormToolsHibernateSpec  {
         problem.errors.objectName == "gorm.tools.testing.hibernate.FidMaster"
         problem.errors.allErrors.size() == 1
         def fe = problem.errors.getFieldError("child.name")
-        fe.code == 'nullable'
+        fe.code == 'NotNull'
         fe.rejectedValue == null
         fe.arguments as List == ['name', FidChild]
     }

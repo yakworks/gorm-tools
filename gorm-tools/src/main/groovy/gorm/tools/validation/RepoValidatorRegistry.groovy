@@ -8,9 +8,12 @@ package gorm.tools.validation
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.validation.javax.JavaxValidatorRegistry
+import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.datastore.mapping.core.connections.ConnectionSourceSettings
+import org.grails.datastore.mapping.core.connections.ConnectionSourcesProvider
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
+import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.springframework.context.MessageSource
 import org.springframework.context.support.StaticMessageSource
 import org.springframework.validation.Validator
@@ -25,6 +28,17 @@ class RepoValidatorRegistry extends JavaxValidatorRegistry {
 
     RepoValidatorRegistry(MappingContext mappingContext, ConnectionSourceSettings settings, MessageSource messageSource = new StaticMessageSource()) {
         super(mappingContext, settings, messageSource)
+    }
+
+    // inializes and assigns this validator registry to mappinContext,
+    // call from doWithApplicationContext
+    static void init(AbstractDatastore datastore){
+        MappingContext mappingContext = datastore.mappingContext
+        def origValRegistry = mappingContext.getValidatorRegistry()
+        ConnectionSourcesProvider csProvider = datastore as ConnectionSourcesProvider
+        HibernateConnectionSourceSettings settings = csProvider.getConnectionSources().getDefaultConnectionSource().getSettings()
+        def validatorRegistry = new RepoValidatorRegistry(mappingContext, settings, origValRegistry.messageSource)
+        mappingContext.setValidatorRegistry(validatorRegistry)
     }
 
     @Override

@@ -61,23 +61,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         getApplicationContext()
     }
 
-    // @Override
-    // GrailsApplication getGrailsApplication() {
-    //     if (_grailsApplication == null) {
-    //         _grailsApplication = GrailsUnitTest.super.getGrailsApplication()
-    //         defineCommonBeans()
-    //     }
-    //     _grailsApplication
-    // }
-
-    // @Override
-    // void cleanupGrailsApplication() {
-    //     if (_grailsApplication != null) {
-    //         GrailsUnitTest.super.cleanupGrailsApplication()
-    //         this._grailsApplication = null
-    //     }
-    // }
-
     /**
      * Finds repository class in same package as domain class.
      * returns a default DefaultGormRepo if no explicit ones are found

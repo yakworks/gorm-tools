@@ -124,13 +124,9 @@ class GormToolsBeanConfig {
     @CompileStatic
     void doWithApplicationContext() {
         //FIXME, this make it very dependant on hibernate
-        //connect up the gorm-tools validator registry that fixes events and allows openapi schema
+        // see if we can use GormEnhancer.findSingleDatastore() or something like that
         HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
-        MappingContext mappingContext = applicationContext.getBean("grailsDomainClassMappingContext", MappingContext)
-        def origValRegistry = mappingContext.getValidatorRegistry()
-        HibernateConnectionSourceSettings settings = datastore.getConnectionSources().getDefaultConnectionSource().getSettings()
-        def validatorRegistry = new RepoValidatorRegistry(mappingContext, settings, origValRegistry.messageSource)
-        mappingContext.setValidatorRegistry(validatorRegistry)
+        RepoValidatorRegistry.init(datastore)
     }
 
     static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass) {

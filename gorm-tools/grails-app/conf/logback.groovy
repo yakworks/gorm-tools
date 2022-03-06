@@ -9,7 +9,7 @@ appender('STDOUT', ConsoleAppender) {
 }
 
 def targetDir = BuildSettings.TARGET_DIR
-if (Environment.isDevelopmentMode() && targetDir != null) {
+if (Environmentzzz.isDevelopmentMode() && targetDir != null) {
     appender("FULL_STACKTRACE", FileAppender) {
         file = "${targetDir}/stacktrace.log"
         append = true
@@ -22,3 +22,5 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
 } else {
     root(ERROR, ['STDOUT'])
 }
+
+logger("org.grails.datastore.mapping.core", OFF)

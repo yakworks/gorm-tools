@@ -46,9 +46,9 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         then:
         //def ex = thrown(EntityValidationException)
         sink.errors.errorCount == 3
-        sink.errors['kind'].code == 'nullable'
-        sink.errors['sinkLink.kind'].code == 'nullable'
-        sink.errors['sinkLink.name'].code == 'nullable'
+        sink.errors['kind'].code == 'NotNull'
+        sink.errors['sinkLink.kind'].code == 'NotNull'
+        sink.errors['sinkLink.name'].code == 'NotNull'
     }
 
     void "validation success"(){
@@ -75,7 +75,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         //from repo
         sink.errors['thing.name'].code == 'no.from.ThingRepo'
         //normal
-        sink.errors['thing.country'].code == 'maxSize.exceeded'
+        sink.errors['thing.country'].code == 'MaxLength'
         //sink.location.errors['city'].code == 'no.AddyVilles'
     }
 
@@ -91,8 +91,8 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         def ex = thrown(ValidationProblem.Exception)
         ex.errors.errorCount == 4
         //normal validation errors
-        sink.errors['ext.textMax'].code == 'maxSize.exceeded'
-        sink.errors['thing.country'].code == 'maxSize.exceeded'
+        sink.errors['ext.textMax'].code == 'MaxLength'
+        sink.errors['thing.country'].code == 'MaxLength'
         sink.errors['thing.name'].code == 'no.from.ThingRepo'
         //comes from KitchenSinkRepo show sit can be anythings
         sink.errors['beatles'].code == 'no.backInThe.USSR.from.KitchenSinkRepo'
@@ -108,7 +108,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         //its only 2 on this one as a default kind is set in the repo during create
         ex.errors.errorCount == 2
         ex.errors['sinkLink.kind']
-        ex.errors['sinkLink.name'].code == 'nullable'
+        ex.errors['sinkLink.name'].code == 'NotNull'
     }
 
 }

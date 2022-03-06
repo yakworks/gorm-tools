@@ -144,7 +144,7 @@ class OrgRepoTests extends Specification implements DomainIntTest {
         then:
         ValidationProblem.Exception exception = thrown()
         exception.errors.objectName == 'yakworks.rally.orgs.model.Org'
-        exception.errors['num'].code == "nullable"
+        exception.errors['num'].code == "NotNull"
     }
 
     def "change key contact"() {

@@ -59,11 +59,11 @@ class RestErrorsSpec extends Specification implements OkHttpRestTrait {
         resp.code() == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == "Org Validation Error(s)"
-        body.errors[0].code == 'nullable'
-        body.errors[0].message == "Property [name] of class [class yakworks.rally.orgs.model.Org] cannot be null"
+        body.errors[0].code == 'NotNull'
+        body.errors[0].message == "must not be null"
         body.errors[0].field == "name"
-        body.errors[1].code == 'nullable'
-        body.errors[1].message == "Property [num] of class [class yakworks.rally.orgs.model.Org] cannot be null"
+        body.errors[1].code == 'NotNull'
+        body.errors[1].message == "must not be null"
         body.errors[1].field == "num"
 
     }

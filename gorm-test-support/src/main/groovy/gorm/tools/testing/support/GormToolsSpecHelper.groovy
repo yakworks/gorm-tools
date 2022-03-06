@@ -4,7 +4,6 @@
 */
 package gorm.tools.testing.support
 
-
 import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -34,6 +33,7 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoEntityValidator
+import gorm.tools.validation.RepoValidatorRegistry
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
 import yakworks.i18n.icu.GrailsICUMessageSource
@@ -143,16 +143,10 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
         defineBeansMany(beanClosures)
 
-        // if(_hasCommonBeansSetup){
-        //     defineBeansMany([beanClos])
-        // } else {
-        //     defineBeansMany([commonBeans(), beanClos])
-        //     _hasCommonBeansSetup = true
-        // }
-
         // redo the cache for the repo event methods in the repos
         ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
 
+        // RepoValidatorRegistry.init(datastore, ctx.getBean('messageSource'))
     }
 
     /**
@@ -176,7 +170,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
         for (PersistentEntity entity in entities) {
             Validator validator = registerDomainClassValidator(entity)
-
             datastore.mappingContext.addEntityValidator(entity, validator)
         }
     }
@@ -187,7 +180,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         defineBeans {
             "$validationBeanName"(RepoEntityValidator, domain, ref("messageSource"), ref(DataTestSetupSpecInterceptor.BEAN_NAME))
         }
-
         applicationContext.getBean(validationBeanName, Validator)
     }
 
@@ -217,6 +209,10 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         obj
     }
 
+    /**
+     * override this to add beans during appContext init with the domains and repos
+     * @return
+     */
     Closure doWithDomains() {
         null
     }

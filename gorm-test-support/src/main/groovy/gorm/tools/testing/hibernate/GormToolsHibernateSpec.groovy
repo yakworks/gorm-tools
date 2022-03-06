@@ -80,7 +80,7 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
 
         ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
         // doWithSpringAfter()
-        RepoValidatorRegistry.init(hibernateDatastore)
+        RepoValidatorRegistry.init(hibernateDatastore, ctx.getBean('messageSource'))
     }
 
     /** consistency with other areas of grails and other unit tests */

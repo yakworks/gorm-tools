@@ -6,7 +6,6 @@ package gorm.tools.validation
 
 import groovy.transform.CompileStatic
 
-import grails.gorm.validation.ConstrainedProperty
 import yakworks.commons.lang.EnumUtils
 
 /**

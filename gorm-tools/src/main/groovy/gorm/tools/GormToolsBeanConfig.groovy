@@ -9,9 +9,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.grails.core.artefact.DomainClassArtefactHandler
-import org.grails.datastore.mapping.model.MappingContext
 import org.grails.orm.hibernate.HibernateDatastore
-import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -126,7 +124,7 @@ class GormToolsBeanConfig {
         //FIXME, this make it very dependant on hibernate
         // see if we can use GormEnhancer.findSingleDatastore() or something like that
         HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
-        RepoValidatorRegistry.init(datastore)
+        RepoValidatorRegistry.init(datastore, applicationContext.getBean('messageSource'))
     }
 
     static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass) {

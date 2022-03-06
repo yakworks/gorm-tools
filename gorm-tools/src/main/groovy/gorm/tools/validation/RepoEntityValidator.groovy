@@ -101,7 +101,6 @@ class RepoEntityValidator extends PersistentEntityValidator {
     @CompileDynamic
     void replaceRejectValueWithDefaultMessage(AbstractConstraint appliedConst){
         appliedConst.metaClass.rejectValueWithDefaultMessage = { Object target, Errors errors, String defaultMessage, String[] codes, Object[] args ->
-            throw new RuntimeException("WTF")
             def targetClass = target.class
             String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
             String propName = (String)args[0]

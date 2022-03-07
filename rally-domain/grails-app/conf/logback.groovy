@@ -36,7 +36,7 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
 root(ERROR, ['STDOUT'])
 
 
-// logger("org.hibernate", OFF)  //XXX https://github.com/9ci/domain9/issues/600
+// logger("org.hibernate", OFF)  //See https://github.com/9ci/domain9/issues/600
 logger("org.hibernate.orm.deprecation", OFF)
 
 //TURN ON for benchmarks

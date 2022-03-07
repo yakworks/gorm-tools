@@ -19,7 +19,7 @@ transform example when in a job
   "state": "finished", //from job
   "errors": [
      {
-        "title": "XXX constraint violation",
+        "title": "ZZZ constraint violation",
         "detail" "Data Access Exception"
         }
    ],

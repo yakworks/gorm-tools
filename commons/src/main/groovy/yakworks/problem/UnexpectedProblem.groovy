@@ -16,7 +16,7 @@ import yakworks.api.HttpStatus
  */
 @CompileStatic
 class UnexpectedProblem implements ProblemTrait<UnexpectedProblem> {
-    public static String DEFAULT_CODE = 'error.unexpected.exception'
+    public static String DEFAULT_CODE = 'error.unexpected'
     String defaultCode = DEFAULT_CODE
     ApiStatus status = HttpStatus.INTERNAL_SERVER_ERROR
 

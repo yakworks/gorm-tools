@@ -9,9 +9,7 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import org.grails.core.artefact.DomainClassArtefactHandler
-import org.grails.datastore.mapping.model.MappingContext
 import org.grails.orm.hibernate.HibernateDatastore
-import org.grails.orm.hibernate.connections.HibernateConnectionSourceSettings
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.jdbc.core.JdbcTemplate
 
@@ -32,8 +30,8 @@ import gorm.tools.repository.artefact.GrailsRepositoryClass
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.validation.RepoValidatorRegistry
 import gorm.tools.transaction.TrxService
+import gorm.tools.validation.RepoValidatorRegistry
 import grails.config.Config
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
@@ -124,13 +122,9 @@ class GormToolsBeanConfig {
     @CompileStatic
     void doWithApplicationContext() {
         //FIXME, this make it very dependant on hibernate
-        //connect up the gorm-tools validator registry that fixes events and allows openapi schema
+        // see if we can use GormEnhancer.findSingleDatastore() or something like that
         HibernateDatastore datastore = applicationContext.getBean("hibernateDatastore", HibernateDatastore)
-        MappingContext mappingContext = applicationContext.getBean("grailsDomainClassMappingContext", MappingContext)
-        def origValRegistry = mappingContext.getValidatorRegistry()
-        HibernateConnectionSourceSettings settings = datastore.getConnectionSources().getDefaultConnectionSource().getSettings()
-        def validatorRegistry = new RepoValidatorRegistry(mappingContext, settings, origValRegistry.messageSource)
-        mappingContext.setValidatorRegistry(validatorRegistry)
+        RepoValidatorRegistry.init(datastore, applicationContext.getBean('messageSource'))
     }
 
     static Closure getRepoBeanClosure(GrailsRepositoryClass repoClass) {

@@ -14,6 +14,7 @@ import org.springframework.validation.Errors
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
+import gorm.tools.validation.Rejector
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.OrgMember
 import yakworks.rally.orgs.model.OrgType
@@ -43,7 +44,7 @@ class OrgMemberRepo implements GormRepo<OrgMember> {
             if(excludeTypes.contains(propName)) continue
 
             if(orgMember[propName] == null){
-                rejectNullValue(orgMember, propName, errors)
+                Rejector.of(orgMember, errors).withNotNullError(propName)
             }
         }
     }

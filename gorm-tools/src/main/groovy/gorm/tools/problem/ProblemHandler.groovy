@@ -15,7 +15,6 @@ import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.repository.errors.EmptyErrors
-import gorm.tools.support.MsgSourceResolvable
 import yakworks.api.ApiStatus
 import yakworks.api.HttpStatus
 import yakworks.i18n.icu.ICUMessageSource
@@ -79,9 +78,6 @@ class ProblemHandler {
         else if (e instanceof grails.validation.ValidationException
             || e instanceof org.grails.datastore.mapping.validation.ValidationException) {
             return buildFromErrorException(e, simpleName)
-        } else if (e instanceof MsgSourceResolvable) {
-            //legacy
-            return Problem.ofCode(e.code).status(status400).detail(getMsg(e))
         } else if (e instanceof IllegalArgumentException) {
             //We use this all over to double as a validation error, Validate.notNull for example.
             return Problem.ofCode('error.illegalArgument').status(status400).detail(e.message)

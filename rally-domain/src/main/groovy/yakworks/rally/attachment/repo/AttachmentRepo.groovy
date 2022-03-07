@@ -27,6 +27,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.validation.Rejector
 import grails.gorm.DetachedCriteria
 import yakworks.commons.io.FileUtil
 import yakworks.rally.attachment.AttachmentSupport
@@ -91,7 +92,7 @@ class AttachmentRepo implements GormRepo<Attachment>, IdGeneratorRepo<Attachment
             generateId(attachment)
             if (!p.name) p.name = p.originalFileName
             if (!p.name) {
-                rejectNullValue(attachment, 'name')
+                Rejector.of(attachment).withNotNullError('name')
                 return
             }
             if (!p.mimeType) p.mimeType = FileUtil.extractMimeType(p.name as String)

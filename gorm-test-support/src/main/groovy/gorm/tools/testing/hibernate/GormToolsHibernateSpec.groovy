@@ -10,13 +10,13 @@ import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 
-import gorm.tools.GormToolsBeanConfig
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.testing.support.GormToolsSpecHelper
 import gorm.tools.testing.support.MockJdbcIdGenerator
+import gorm.tools.validation.RepoValidatorRegistry
 import grails.buildtestdata.TestDataBuilder
 import grails.test.hibernate.HibernateSpec
 import grails.testing.spring.AutowiredTest
@@ -72,23 +72,20 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
             }
         }
 
-        defineBeansMany([commonBeans(), beanClos])
+        def beanClosures = [commonBeans(), beanClos]
+        def doWithDomainsClosure = doWithDomains()
+        if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
 
-        // if(_hasCommonBeansSetup){
-        //     defineBeansMany([beanClos])
-        // } else {
-        //
-        //     _hasCommonBeansSetup = true
-        // }
+        defineBeansMany(beanClosures)
 
         ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
         // doWithSpringAfter()
+        RepoValidatorRegistry.init(hibernateDatastore, ctx.getBean('messageSource'))
     }
 
     /** consistency with other areas of grails and other unit tests */
     AbstractDatastore getDatastore() {
         hibernateDatastore
     }
-
 
 }

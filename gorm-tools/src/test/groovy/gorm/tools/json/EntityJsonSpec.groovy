@@ -121,7 +121,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         result == '[{"name":"name"},{"name":"name"}]'
     }
 
-    @Ignore //XXX need to sort out excludes so we dont get circular refs
+    @Ignore //See https://github.com/yakworks/gorm-tools/issues/475
     void "test buildJson excludes"() {
         when:
         def org = build(includes: '*')

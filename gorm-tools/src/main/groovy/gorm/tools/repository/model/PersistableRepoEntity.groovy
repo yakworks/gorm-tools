@@ -12,7 +12,7 @@ import groovy.transform.CompileStatic
 import gorm.tools.model.Persistable
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
-import gorm.tools.repository.validation.ApiConstraints
+import gorm.tools.validation.ApiConstraints
 
 /**
  * core trait for repo methods that use the repo for persistance

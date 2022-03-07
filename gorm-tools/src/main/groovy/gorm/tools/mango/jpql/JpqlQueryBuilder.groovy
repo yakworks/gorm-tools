@@ -992,13 +992,13 @@ class JpqlQueryBuilder {
             Query.Criterion criterion = iterator.next()
             //skip if its anything but a projection alias
             boolean isPropCrit = criterion instanceof Query.PropertyNameCriterion
-            if(!isPropCrit){
-                continue
-            } else {
+            if(isPropCrit){
                 boolean hasAlias = projectionAliases.containsKey((criterion as Query.PropertyNameCriterion).getProperty())
                 if(!hasAlias){
                     continue
                 }
+            } else {
+                continue
             }
             final String operator = criteria instanceof Query.Conjunction ? LOGICAL_AND : LOGICAL_OR
 

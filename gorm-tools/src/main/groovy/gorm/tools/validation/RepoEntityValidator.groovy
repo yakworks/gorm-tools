@@ -2,7 +2,7 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.validation
+package gorm.tools.validation
 
 import java.beans.Introspector
 
@@ -88,44 +88,45 @@ class RepoEntityValidator extends PersistentEntityValidator {
             } else if(appliedConstraints) { //it has more so let it flow
                 slimConstrainedProperties[prop] = constrainedProp
             }
-            for(appliedConst in appliedConstraints){
-                if(appliedConst instanceof AbstractConstraint){
-                    //TODO, not working
-                    replaceRejectValueWithDefaultMessage(appliedConst.class)
-                }
-            }
+            // for(appliedConst in appliedConstraints){
+            //     if(appliedConst instanceof AbstractConstraint){
+            //         //TODO, not working
+            //         replaceRejectValueWithDefaultMessage(appliedConst)
+            //     }
+            // }
         }
     }
 
-    //TODO not working, think we will need to replace the classes
-    @CompileDynamic
-    void replaceRejectValueWithDefaultMessage(Class clazz){
-        clazz.metaClass.rejectValueWithDefaultMessage = { Object target, Errors errors, String defaultMessage, String[] codes, Object[] args ->
-            def targetClass = target.class
-            String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
-            String propName = (String)args[0]
-            String code = (String)code[0]
-
-            def newCodes = [] as Set<String>
-            newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
-            newCodes.add("${classShortName}.${propName}.${code}".toString())
-            newCodes.add("${code}.${propName}".toString())
-            newCodes.add(code)
-
-            FieldError error = new FieldError(
-                errors.objectName,
-                errors.nestedPath + propName,
-                getPropertyValue(errors, target),
-                false, //bind failure
-                newCodes as String[],
-                args,
-                defaultMessage
-            )
-            ((BindingResult)errors).addError(error);
-            // def abrErrors = errors as AbstractBindingResult //this has the addError method
-            // abrErrors.addError(error)
-        }
-    }
+    // //TODO not working, think we will need to replace the classes
+    // @CompileDynamic
+    // void replaceRejectValueWithDefaultMessage(AbstractConstraint appliedConst){
+    //     appliedConst.metaClass.rejectValueWithDefaultMessage = { Object target, Errors errors, String defaultMessage, String[] codes, Object[] args ->
+    //         def targetClass = target.class
+    //         String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
+    //         String propName = (String)args[0]
+    //         String code = (String)code[0]
+    //
+    //
+    //         def newCodes = [] as Set<String>
+    //         newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
+    //         newCodes.add("${classShortName}.${propName}.${code}".toString())
+    //         newCodes.add("${code}.${propName}".toString())
+    //         newCodes.add(code)
+    //
+    //         FieldError error = new FieldError(
+    //             errors.objectName,
+    //             errors.nestedPath + propName,
+    //             getPropertyValue(errors, target),
+    //             false, //bind failure
+    //             newCodes as String[],
+    //             args,
+    //             defaultMessage
+    //         )
+    //         ((BindingResult)errors).addError(error);
+    //         // def abrErrors = errors as AbstractBindingResult //this has the addError method
+    //         // abrErrors.addError(error)
+    //     }
+    // }
 
     @Override
     void validate(Object obj, Errors errors, boolean cascade = true) {
@@ -314,14 +315,88 @@ class RepoEntityValidator extends PersistentEntityValidator {
     void removeError(Object target, String propName, Errors errors, FieldError fieldError){
         //base code
         String code = fieldError.code
+        Map codeMap = JakartaValidationCodeAdaptor.codeMap
+        Map messagesMap = JakartaValidationCodeAdaptor.messagesMap
+        ValidationCode valCode = codeMap[code]
+        // assert valCode, "failed finding $code"
+        //just in case not found
+        // String jakartaCode = messagesMap[valCode] ? messagesMap[valCode]['code'] : ''
+
         def newCodes = [] as Set<String>
-        String classShortName = Introspector.decapitalize(target.class.simpleName)
-        newCodes.add("${target.class.getName()}.${propName}.${code}".toString())
-        newCodes.add("${classShortName}.${propName}.${code}".toString())
-        newCodes.add("${propName}.${code}".toString())
-        newCodes.add(code)
+        // String classShortName = Introspector.decapitalize(target.class.simpleName)
+
+        // newCodes.add("${target.class.getName()}.${propName}.${code}".toString())
+        // newCodes.add("${classShortName}.${propName}.${code}".toString())
+        // newCodes.add("${propName}.${code}".toString())
+        // newCodes.add("${propName}.${code}".toString())
+        if(valCode?.jakartaCode) newCodes.add(valCode.jakartaCode)
+        newCodes.add(valCode ? valCode.name() : code)
+
 
         ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'codes', newCodes as String[])
+        // icu4jArgs
+        Object[] newArgs = icu4jArgs(valCode, fieldError.arguments)
+        ClassUtils.setPrivateFinal(DefaultMessageSourceResolvable, fieldError, 'arguments', newArgs as Object[])
+    }
+
+    /**
+     * See https://github.com/yakworks/spring-icu4j
+     * To adapt spring messages we put the arg map as the first item in the array
+     */
+    Object[] icu4jArgs(ValidationCode valCode, Object[] arguments){
+        //if only 3 args then return empy as it doesn' need them
+        if(arguments.size() < 4) return [] as Object[]
+        //most use arg 2 so get it.
+        // value is the key used of the constraint is validating against, not the field value. Its the hibernate field validation defualt
+        def value = arguments[3]
+        Map argMap = [:]
+
+        switch (valCode) {
+            case ValidationCode.Range:
+                //valid range from [{3}] to [{4}]
+                //must be between {min} and {max}
+                argMap.putAll([min: value, max: arguments[4]])
+                break
+            case ValidationCode.Min:
+                //value [{3}]
+                //equal to {value}'
+                argMap.putAll([value: value])
+                break
+            case ValidationCode.Max:
+                //value [{3}]
+                //equal to {value}'
+                argMap.putAll([value: value])
+                break
+            case ValidationCode.MinLength:
+                //value [{3}]
+                //'size must be between {min} and {max}'
+                argMap.putAll([value: value])
+                break
+            case ValidationCode.MaxLength:
+                //value [{3}]
+                //'size must be between {min} and {max}'
+                argMap.putAll([value: value])
+                break
+            case ValidationCode.Pattern:
+                // match the required pattern [{3}]
+                //'must match "{regexp}"'
+                argMap.putAll([regexp: value])
+                break
+            case ValidationCode.InList:
+                //list [{3}]
+                //'must match "{value}"'
+                argMap.putAll([value: value])
+                break
+            case ValidationCode.NotEqual:
+                //  equal [{3}]
+                //'must match "{value}"'
+                argMap.putAll([value: value])
+                break
+            // default:
+            //     argMap = [:]
+        }
+
+        return argMap ? [argMap] as Object[] : [] as Object[]
     }
 
 }

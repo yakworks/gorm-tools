@@ -155,8 +155,6 @@ subprojects { subprj ->
     systemProperty "gradle.rootProjectDir", rootProject.projectDir.absolutePath
     systemProperty "gradle.projectDir", project.projectDir.absolutePath
   }
-
-
 }
 
 ext.codenarcRuleset= '''
@@ -171,6 +169,7 @@ subprojects { subprj ->
   test {
     // Defaults from https://github.com/radarsh/gradle-test-logger-plugin
     testlogger {
+      logLevel 'quiet'
       // theme 'standard'
       showExceptions true
       showStandardStreams = true //shows the printlns in console

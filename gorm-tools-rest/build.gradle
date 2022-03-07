@@ -7,8 +7,8 @@ dependencies {
   implementation "org.grails:grails-plugin-url-mappings"
   implementation "org.grails:grails-plugin-interceptors"
 
-  compileOnly project(":gorm-tools")
-  compileOnly project(":gorm-tools-csv")
+  api project(":gorm-tools")
+  api project(":gorm-tools-csv")
 
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"

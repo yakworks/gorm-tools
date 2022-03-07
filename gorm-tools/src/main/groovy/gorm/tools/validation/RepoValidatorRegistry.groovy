@@ -2,13 +2,14 @@
 * Copyright 2021 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.repository.validation
-
+package gorm.tools.validation
 
 import groovy.transform.CompileStatic
 
 import org.grails.datastore.gorm.validation.javax.JavaxValidatorRegistry
+import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.datastore.mapping.core.connections.ConnectionSourceSettings
+import org.grails.datastore.mapping.core.connections.ConnectionSourcesProvider
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.context.MessageSource
@@ -25,6 +26,16 @@ class RepoValidatorRegistry extends JavaxValidatorRegistry {
 
     RepoValidatorRegistry(MappingContext mappingContext, ConnectionSourceSettings settings, MessageSource messageSource = new StaticMessageSource()) {
         super(mappingContext, settings, messageSource)
+    }
+
+    // inializes and assigns this validator registry to mappinContext,
+    // call from doWithApplicationContext
+    static void init(AbstractDatastore datastore, MessageSource messageSource){
+        MappingContext mappingContext = datastore.mappingContext
+        ConnectionSourcesProvider csProvider = datastore as ConnectionSourcesProvider
+        ConnectionSourceSettings settings = csProvider.connectionSources.defaultConnectionSource.settings
+        def validatorRegistry = new RepoValidatorRegistry(mappingContext, settings, messageSource)
+        mappingContext.setValidatorRegistry(validatorRegistry)
     }
 
     @Override

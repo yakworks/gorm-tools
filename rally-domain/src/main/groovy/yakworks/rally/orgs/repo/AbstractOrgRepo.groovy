@@ -20,6 +20,7 @@ import gorm.tools.repository.events.BeforeBindEvent
 import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.validation.Rejector
 import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.Location
@@ -48,7 +49,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
     @RepoListener
     void beforeValidate(Org org, Errors errors) {
         if(org.isNew()) {
-            if(!validateNotNull(org, 'type', errors)) return
+            Rejector.validateNotNull(org, errors, 'type')
         }
     }
 

@@ -233,8 +233,8 @@ class OrgRestApiSpec extends Specification implements OkHttpRestTrait {
         body.status == HttpStatus.UNPROCESSABLE_ENTITY.value()
         body.title == 'Org Validation Error(s)'
         //body.detail == "Org Validation Error(s)"
-        body.errors[0].code == 'nullable'
-        body.errors[0].message == 'Property [num] of class [class yakworks.rally.orgs.model.Org] cannot be null'
+        body.errors[0].code == 'NotNull'
+        body.errors[0].message == 'must not be null'
     }
 
     void "testing put"() {

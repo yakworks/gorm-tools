@@ -94,7 +94,7 @@ class KitchenSinkValidationSpec extends Specification implements DataIntegration
         sink.errors['ext.textMax'].code == 'MaxLength'
         sink.errors['thing.country'].code == 'MaxLength'
         sink.errors['thing.name'].code == 'no.from.ThingRepo'
-        //comes from KitchenSinkRepo show sit can be anythings
+        //comes from KitchenSinkRepo shows it allows any string in the field and code
         sink.errors['beatles'].code == 'no.backInThe.USSR.from.KitchenSinkRepo'
     }
 

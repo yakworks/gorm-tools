@@ -16,6 +16,7 @@ import gorm.tools.repository.events.AfterBindEvent
 import gorm.tools.repository.events.BeforePersistEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.validation.Rejector
 import grails.gorm.transactions.Transactional
 import yakworks.commons.lang.IsoDateUtil
 
@@ -27,12 +28,13 @@ class KitchenSinkRepo implements GormRepo<KitchenSink> {
     void beforeValidate(KitchenSink o) {
         o.beforeValidateCheck = "got it"
         //test rejectValue
+        def rejector = Rejector.of(o)
         if(o.thing?.country == 'USSR'){
-            // can put anything if for the code
-            rejectValue(o, 'beatles', o.thing.country, 'no.backInThe.USSR.from.KitchenSinkRepo')
+            // not recomended but shows you can put anything if for the propname and code
+            rejector.withError('beatles', o.thing.country, 'no.backInThe.USSR.from.KitchenSinkRepo')
         }
         if(o.name == 'foos'){
-            rejectValue(o, 'name', o.name, 'no.foos')
+            rejector.withError('name', 'no.foos')
         }
         //if(o.id == null) o.id = generateId(o)
         //if(o.ext && !o.ext.kitchenSink) o.ext.kitchenSink = o

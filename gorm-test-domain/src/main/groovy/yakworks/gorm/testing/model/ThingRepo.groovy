@@ -12,6 +12,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
+import gorm.tools.validation.Rejector
 
 @GormRepository
 @CompileStatic
@@ -21,7 +22,7 @@ class ThingRepo implements GormRepo<Thing>, IdGeneratorRepo<Thing> {
     void beforeValidate(Thing thing, Errors errors) {
         //test rejectValue
         if(thing.name == 'RejectThis'){
-            rejectValue(thing, errors, 'name', thing.name, 'no.from.ThingRepo')
+            Rejector.of(thing, errors).withError('name', 'no.from.ThingRepo')
         }
     }
 }

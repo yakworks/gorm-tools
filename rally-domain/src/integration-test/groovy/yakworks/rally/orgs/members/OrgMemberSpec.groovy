@@ -214,7 +214,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
 
         requiredLevels.each { String level ->
             assert errors.hasFieldErrors(level)
-            assert errors.getFieldError(level).code == "nullable"
+            assert errors.getFieldError(level).code == "NotNull"
         }
 
         List notRequired = all - requiredLevels

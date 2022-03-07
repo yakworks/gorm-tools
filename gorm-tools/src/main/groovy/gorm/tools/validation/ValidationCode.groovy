@@ -35,4 +35,9 @@ enum ValidationCode {
         if(!key) return null
         return EnumUtils.getEnum(ValidationCode, key.toString().toLowerCase())
     }
+
+    String getJakartaCode(){
+        Map messagesMap = JakartaValidationCodeAdaptor.messagesMap
+        return messagesMap[this] ? messagesMap[this]['code'] : null
+    }
 }

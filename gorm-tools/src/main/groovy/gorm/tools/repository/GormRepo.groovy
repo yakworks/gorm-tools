@@ -26,7 +26,6 @@ import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
-import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
@@ -44,7 +43,7 @@ import yakworks.problem.data.NotFoundProblem
  */
 @SuppressWarnings(['EmptyMethod'])
 @CompileStatic
-trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEntityApi<D> {
+trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
 
     @Autowired EntityMapBinder entityMapBinder
 

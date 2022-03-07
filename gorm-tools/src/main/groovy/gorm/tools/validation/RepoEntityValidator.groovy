@@ -88,45 +88,45 @@ class RepoEntityValidator extends PersistentEntityValidator {
             } else if(appliedConstraints) { //it has more so let it flow
                 slimConstrainedProperties[prop] = constrainedProp
             }
-            for(appliedConst in appliedConstraints){
-                if(appliedConst instanceof AbstractConstraint){
-                    //TODO, not working
-                    replaceRejectValueWithDefaultMessage(appliedConst)
-                }
-            }
+            // for(appliedConst in appliedConstraints){
+            //     if(appliedConst instanceof AbstractConstraint){
+            //         //TODO, not working
+            //         replaceRejectValueWithDefaultMessage(appliedConst)
+            //     }
+            // }
         }
     }
 
-    //TODO not working, think we will need to replace the classes
-    @CompileDynamic
-    void replaceRejectValueWithDefaultMessage(AbstractConstraint appliedConst){
-        appliedConst.metaClass.rejectValueWithDefaultMessage = { Object target, Errors errors, String defaultMessage, String[] codes, Object[] args ->
-            def targetClass = target.class
-            String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
-            String propName = (String)args[0]
-            String code = (String)code[0]
-
-
-            def newCodes = [] as Set<String>
-            newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
-            newCodes.add("${classShortName}.${propName}.${code}".toString())
-            newCodes.add("${code}.${propName}".toString())
-            newCodes.add(code)
-
-            FieldError error = new FieldError(
-                errors.objectName,
-                errors.nestedPath + propName,
-                getPropertyValue(errors, target),
-                false, //bind failure
-                newCodes as String[],
-                args,
-                defaultMessage
-            )
-            ((BindingResult)errors).addError(error);
-            // def abrErrors = errors as AbstractBindingResult //this has the addError method
-            // abrErrors.addError(error)
-        }
-    }
+    // //TODO not working, think we will need to replace the classes
+    // @CompileDynamic
+    // void replaceRejectValueWithDefaultMessage(AbstractConstraint appliedConst){
+    //     appliedConst.metaClass.rejectValueWithDefaultMessage = { Object target, Errors errors, String defaultMessage, String[] codes, Object[] args ->
+    //         def targetClass = target.class
+    //         String classShortName = Introspector.decapitalize(targetClass.getSimpleName())
+    //         String propName = (String)args[0]
+    //         String code = (String)code[0]
+    //
+    //
+    //         def newCodes = [] as Set<String>
+    //         newCodes.add("${targetClass.getName()}.${propName}.${code}".toString())
+    //         newCodes.add("${classShortName}.${propName}.${code}".toString())
+    //         newCodes.add("${code}.${propName}".toString())
+    //         newCodes.add(code)
+    //
+    //         FieldError error = new FieldError(
+    //             errors.objectName,
+    //             errors.nestedPath + propName,
+    //             getPropertyValue(errors, target),
+    //             false, //bind failure
+    //             newCodes as String[],
+    //             args,
+    //             defaultMessage
+    //         )
+    //         ((BindingResult)errors).addError(error);
+    //         // def abrErrors = errors as AbstractBindingResult //this has the addError method
+    //         // abrErrors.addError(error)
+    //     }
+    // }
 
     @Override
     void validate(Object obj, Errors errors, boolean cascade = true) {
@@ -320,7 +320,7 @@ class RepoEntityValidator extends PersistentEntityValidator {
         ValidationCode valCode = codeMap[code]
         // assert valCode, "failed finding $code"
         //just in case not found
-        String jakartaCode = messagesMap[valCode] ? messagesMap[valCode]['code'] : ''
+        // String jakartaCode = messagesMap[valCode] ? messagesMap[valCode]['code'] : ''
 
         def newCodes = [] as Set<String>
         // String classShortName = Introspector.decapitalize(target.class.simpleName)
@@ -329,7 +329,7 @@ class RepoEntityValidator extends PersistentEntityValidator {
         // newCodes.add("${classShortName}.${propName}.${code}".toString())
         // newCodes.add("${propName}.${code}".toString())
         // newCodes.add("${propName}.${code}".toString())
-        newCodes.add(jakartaCode)
+        if(valCode.jakartaCode) newCodes.add(valCode.jakartaCode)
         newCodes.add(valCode ? valCode.name() : code)
 
 

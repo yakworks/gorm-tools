@@ -329,7 +329,7 @@ class RepoEntityValidator extends PersistentEntityValidator {
         // newCodes.add("${classShortName}.${propName}.${code}".toString())
         // newCodes.add("${propName}.${code}".toString())
         // newCodes.add("${propName}.${code}".toString())
-        if(valCode.jakartaCode) newCodes.add(valCode.jakartaCode)
+        if(valCode?.jakartaCode) newCodes.add(valCode.jakartaCode)
         newCodes.add(valCode ? valCode.name() : code)
 
 

@@ -1,3 +1,10 @@
+### v7.0.8-v.58
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.57...v7.0.8-v.58)
+- release [link](https://github.com/yakworks/gorm-tools/commit/02cad3f845e9fbee52eabfccb74fc0cd7f817426)
+- handleUnexpected will return the Problem if its an instance of one already. [link](https://github.com/yakworks/gorm-tools/commit/b1932d4e7d42f5f97deea1d50d7ac012a52023a8)
+- Icu4j (#479) [link](https://github.com/yakworks/gorm-tools/commit/dc2c1097dc07da24cd443c231baf9409d156e059)
+
 ### v7.0.8-v.57
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.56...v7.0.8-v.57)

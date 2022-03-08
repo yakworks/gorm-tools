@@ -35,7 +35,8 @@ class SecLoginHandler implements ApplicationListener<AbstractAuthenticationEvent
     int passwordWarnDays
 
     void onApplicationEvent(AbstractAuthenticationEvent event) {
-        if (event instanceof AuthenticationSuccessEvent) {
+        //do password check only if local user, not if a federated user, eg from Okta, in which case it would be OauthUser.
+        if (event instanceof AuthenticationSuccessEvent && event.authentication.principal instanceof GrailsUser) {
             if (shouldWarnAboutPasswordExpiry((GrailsUser) event.authentication.principal)) {
                 GrailsWebRequest webRequest = WebUtils.retrieveGrailsWebRequest()
                 if (webRequest) {

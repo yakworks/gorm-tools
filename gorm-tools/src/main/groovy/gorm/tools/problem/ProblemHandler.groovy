@@ -97,7 +97,14 @@ class ProblemHandler {
 
     ProblemTrait<?> handleUnexpected(Throwable e){
         log.error("UNEXPECTED Internal Server Error ${e.message}", e)
-        return UnexpectedProblem.ofCause(e).detail(e.message)
+        if (e instanceof ProblemTrait) {
+            return (ProblemTrait) e
+        }
+        else if (e instanceof ProblemException) {
+            return (ProblemTrait) e.problem
+        } else {
+            return UnexpectedProblem.ofCause(e).detail(e.message)
+        }
     }
 
     ValidationProblem buildFromErrorException(Throwable valEx, String entityName = null) {

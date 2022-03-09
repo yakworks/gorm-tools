@@ -18,6 +18,7 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.WebAttributes
 
 import gorm.tools.security.domain.AppUser
@@ -71,8 +72,12 @@ class SpringSecService<D> implements SecService<D>{
      */
     @Override
     Long getUserId() {
-        if (principal instanceof GrailsUser) {
-            return (principal as GrailsUser).id as Long
+        def curPrincipal = getPrincipal()
+        if (curPrincipal instanceof GrailsUser) {
+            return (curPrincipal as GrailsUser).id as Long
+        } else if (curPrincipal instanceof User) {
+            //has to be User, might be Oauth. So lookup by Username
+            getUserIdByUsername((curPrincipal as User).username) as Long
         }
     }
 

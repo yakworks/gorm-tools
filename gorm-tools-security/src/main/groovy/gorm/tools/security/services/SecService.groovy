@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.core.GenericTypeResolver
 
+import gorm.tools.security.domain.AppUser
+
 /**
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type
  */
@@ -63,6 +65,17 @@ trait SecService<D> {
             return null
         }
         getUser(getUserId())
+    }
+
+    /**
+     * gets the user id from username, hard wired to AppUser.getByUsername.
+     * Used when User is something like OauthUser
+     */
+    Serializable getUserIdByUsername(String username) {
+        if (!isLoggedIn()) {
+            return null
+        }
+        return AppUser.getByUsername(username.trim()).id
     }
 
     /**

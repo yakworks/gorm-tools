@@ -6,9 +6,10 @@ package gorm.tools.security.services
 
 import groovy.transform.CompileStatic
 
-import gorm.tools.security.domain.AppUser
 import org.grails.datastore.gorm.GormEnhancer
 import org.springframework.core.GenericTypeResolver
+
+import gorm.tools.security.domain.AppUser
 
 /**
  * common generic helpers for security, implement with generics D for the domain entity and I for the id type

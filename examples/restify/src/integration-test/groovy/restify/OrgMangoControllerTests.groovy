@@ -24,7 +24,7 @@ class OrgMangoControllerTests extends Specification implements RestIntegrationTe
     void "list mango sum groupby"() {
         when:
         controller.params << [
-            projections:'calc.totalDue:"sum",`type:"group"`',
+            projections:'calc.totalDue:"sum",type:"group"',
             sort:'calc_totalDue_sum:asc'
         ]
         controller.list()

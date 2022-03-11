@@ -48,11 +48,10 @@ class SimplePagedQuery {
         return (Integer) template.execute { Session session ->
             Query q = (Query) session.createQuery(queryString.toString())
             populateQueryWithNamedArguments(q, params)
-
             q.setReadOnly(true)
             // MIN_VALUE gives hint to JDBC driver to stream results
-            q.setFetchSize(1) // double normal pagin size
-            ScrollableResults results = q.scroll(ScrollMode.FORWARD_ONLY)
+            q.setFetchSize(50) // double normal paging size
+            ScrollableResults results = q.scroll()
             results.last()
             int total = results.getRowNumber() + 1
             results.close()

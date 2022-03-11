@@ -17,7 +17,6 @@ import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 
 import yakworks.commons.lang.Pogo
-import yakworks.commons.lang.PropertyTools
 import yakworks.i18n.MsgArgs
 import yakworks.i18n.MsgKey
 import yakworks.i18n.MsgMultiKey

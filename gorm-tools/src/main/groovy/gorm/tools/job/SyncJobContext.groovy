@@ -145,13 +145,18 @@ class SyncJobContext {
 
     void appendDataResults(ApiResults currentResults){
         if(args.saveDataAsFile){
-            if(!dataPath) initJsonDataFile()
+            boolean isFirstWrite = false
+            if(!dataPath) {
+                isFirstWrite = true // its first time writing
+                initJsonDataFile()
+            }
             def writer = dataPath.newWriter(true)
             def sjb = new StreamingJsonBuilder(writer, JsonEngine.generator)
             def dataList = transformResults(currentResults)
             dataList.each {
+                //if its not the first time writing out then add comma for last object
+                if(!isFirstWrite) writer.write(',\n')
                 sjb.call it
-                writer.write(',\n')
             }
             IOUtils.flushAndClose(writer)
         } else {
@@ -170,7 +175,7 @@ class SyncJobContext {
         if(args.saveDataAsFile){
             //close out the file
             dataPath.withWriterAppend { wr ->
-                wr.write(']\n')
+                wr.write('\n]\n')
             }
             data['dataId'] = syncJobService.createAttachment(dataPath, "SyncJobData_${jobId}_.json")
         } else {

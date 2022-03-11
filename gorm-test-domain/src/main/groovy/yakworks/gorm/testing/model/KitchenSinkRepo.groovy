@@ -22,7 +22,9 @@ import yakworks.commons.lang.IsoDateUtil
 
 @GormRepository
 @CompileStatic
-class KitchenSinkRepo implements GormRepo<KitchenSink> {
+class KitchenSinkRepo implements GormRepo<KitchenSink>, IdGeneratorRepo<KitchenSink>  {
+
+    List<String> toOneAssociations = [ 'ext' ]
 
     @RepoListener
     void beforeValidate(KitchenSink o) {

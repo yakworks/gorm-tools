@@ -1,3 +1,9 @@
+### v7.0.8-v.60
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.59...v7.0.8-v.60)
+- release [link](https://github.com/yakworks/gorm-tools/commit/04d7b7f3d62c35a29afc11c30a8e4b74eea2189e)
+- fix scrollable to reomove forward only as it fails on postgres [link](https://github.com/yakworks/gorm-tools/commit/485f3a71ca18e68632fde843c4104267c704d319)
+
 ### v7.0.8-v.59
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.58...v7.0.8-v.59)

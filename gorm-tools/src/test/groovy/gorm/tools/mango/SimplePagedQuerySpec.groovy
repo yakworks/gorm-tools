@@ -6,6 +6,7 @@ package gorm.tools.mango
 
 import gorm.tools.mango.jpql.SimplePagedQuery
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import grails.gorm.transactions.Transactional
 import grails.testing.spring.AutowiredTest
 import yakworks.gorm.testing.model.KitchenSeedData
 import yakworks.gorm.testing.model.KitchenSink
@@ -17,10 +18,14 @@ class SimplePagedQuerySpec extends GormToolsHibernateSpec implements AutowiredTe
 
     List<Class> getDomainClasses() { [KitchenSink, SinkItem] }
 
+    @Transactional
     void setupSpec() {
-        KitchenSink.withTransaction {
-            KitchenSeedData.createKitchenSinks(10)
-        }
+        KitchenSeedData.createKitchenSinks(10)
+    }
+
+    @Transactional
+    void cleanupSpec() {
+        KitchenSink.deleteAll()
     }
 
     void "sanity check"() {

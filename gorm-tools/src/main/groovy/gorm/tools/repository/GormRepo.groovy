@@ -134,8 +134,10 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
     /**
      * called right BEFORE validateAndSave to fire events but can be overridden too.
      * just be sure to fire event if overidden.
+     * NOTE
      */
     void doBeforePersist(D entity, PersistArgs args){
+        //NOTE: IdGeneratorRepo overrides this, make sure any changes here are cross checked with it.
         if (args.bindAction && args.data){
             doBeforePersistWithData(entity, args)
         }

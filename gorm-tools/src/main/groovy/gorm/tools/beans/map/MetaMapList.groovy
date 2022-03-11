@@ -8,6 +8,7 @@ import groovy.transform.CompileStatic
 
 import grails.gorm.PagedResultList
 import yakworks.commons.map.Maps
+import yakworks.commons.model.TotalCount
 
 /**
  * A list wrapper that will wrap object in EntityMap on a get()
@@ -17,11 +18,10 @@ import yakworks.commons.map.Maps
  */
 @SuppressWarnings(["CompileStatic", "ExplicitCallToEqualsMethod"])
 @CompileStatic
-class MetaMapList extends AbstractList<MetaMap> {
+class MetaMapList extends AbstractList<MetaMap> implements TotalCount  {
 
     protected List resultList
     protected MetaMapIncludes includeMap
-    protected int totalCount = Integer.MIN_VALUE
 
     MetaMapList(List resultList) {
         this.resultList = resultList
@@ -32,9 +32,12 @@ class MetaMapList extends AbstractList<MetaMap> {
         this.includeMap = includeMap
     }
 
+    @Override
     int getTotalCount() {
-        if(resultList instanceof PagedResultList){
+        if(resultList instanceof PagedResultList) {
             return (resultList as PagedResultList).getTotalCount()
+        } else if(resultList instanceof TotalCount) {
+            return ((TotalCount)resultList).totalCount
         } else {
             return resultList.size()
         }

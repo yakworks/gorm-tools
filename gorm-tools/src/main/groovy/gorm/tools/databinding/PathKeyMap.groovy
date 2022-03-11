@@ -70,8 +70,6 @@ class PathKeyMap<K,V> implements Map<K,V>, Cloneable  {
             // Map clonedMap = Maps.clone(wrappedMap)
             Map clonedMap = new LinkedHashMap(wrappedMap)
             // deep clone nested entries
-
-
             clonedMap.keySet().each { k ->
                 def val = clonedMap[k]
                 //clone the nested values that are pathKeyMaps

@@ -86,12 +86,14 @@ class MangoBuilder {
      * which uses JpqlQueryBuilder
      */
     static List list(MangoDetachedCriteria criteria, Map args) {
+        List resList
         if(criteria.projections){
-            return criteria.mapList(args)
+            resList =  criteria.mapList(args)
         } else {
             //return standard list
-            return criteria.list(args)
+            resList =  criteria.list(args)
         }
+        return resList
     }
 
     /**

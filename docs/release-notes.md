@@ -1,3 +1,11 @@
+### v7.0.8-v.59
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.58...v7.0.8-v.59)
+- release pagination on projections [link](https://github.com/yakworks/gorm-tools/commit/b0ff5e1b44ae2a2a7a9327f67db6574d714431f2)
+- 482 paging projections (#483) [link](https://github.com/yakworks/gorm-tools/commit/2e424325545d75a65166f540cb7a1b39cc0d3923)
+- add getUserIdByName (#481) [link](https://github.com/yakworks/gorm-tools/commit/6da6e7efe137f623418a4bddfba91b0facfefd87)
+- Add a check for GrailsUser : Coz with okta, it is possible tht its an OauthUser (#480) [link](https://github.com/yakworks/gorm-tools/commit/ceae16cc70375a75122fa0dd82650b9a54ba8d9c)
+
 ### v7.0.8-v.58
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.57...v7.0.8-v.58)

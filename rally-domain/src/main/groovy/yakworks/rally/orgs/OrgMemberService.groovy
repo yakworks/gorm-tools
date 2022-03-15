@@ -41,6 +41,10 @@ class OrgMemberService {
     void setupMember(Org org, Map params) {
         if(!orgDimensionService.orgMemberEnabled) return
         List<OrgType> immediateParents = orgDimensionService.getImmediateParents(org.type)
+        //if it has parents so going to need to have a member too. helps with member validation if required parents not set.
+        if(immediateParents && !org.member) org.member = OrgMember.make(org)
+        if(!params) return
+
         //spin through orgTypes for immediate parents and update parents
         for (OrgType type : immediateParents) {
             Map orgParam = params[type.propertyName]

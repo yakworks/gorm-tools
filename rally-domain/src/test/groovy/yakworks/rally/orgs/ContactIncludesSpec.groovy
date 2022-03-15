@@ -4,7 +4,7 @@
 */
 package yakworks.rally.orgs
 
-import gorm.tools.beans.map.EntityIncludesBuilder
+import gorm.tools.beans.map.MetaMapIncludesBuilder
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
@@ -25,7 +25,7 @@ class ContactIncludesSpec extends Specification implements DataRepoTest, Securit
 
     void "EntityIncludesBuilder.build"(){
         when:
-        def res = EntityIncludesBuilder.build(Contact, ['*'])
+        def res = MetaMapIncludesBuilder.build(Contact, ['*'])
 
         then:
         res.className == 'yakworks.rally.orgs.model.Contact'

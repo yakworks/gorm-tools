@@ -7,7 +7,7 @@ package gorm.tools.beans
 import gorm.tools.beans.map.MetaMap
 import spock.lang.Specification
 
-class EntityMapMapSpec extends Specification {
+class EntityMetaMapSpec extends Specification {
 
     Map testMap(){
         return [name:"Bart", age:45, other:"stuff", info: [ phone: "1234", email: "jo@jo.com" ]]

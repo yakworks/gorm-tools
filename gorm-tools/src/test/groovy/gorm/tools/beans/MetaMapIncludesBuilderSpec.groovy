@@ -4,7 +4,7 @@
 */
 package gorm.tools.beans
 
-import gorm.tools.beans.map.EntityIncludesBuilder
+import gorm.tools.beans.map.MetaMapIncludesBuilder
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.gorm.testing.model.Enummy
@@ -13,7 +13,7 @@ import yakworks.gorm.testing.model.SinkExt
 import yakworks.gorm.testing.model.SinkItem
 import yakworks.gorm.testing.model.Thing
 
-class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
+class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
 
     void setupSpec() {
         //mockDomain Person
@@ -22,21 +22,21 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
 
     void "test buildIncludesMap"(){
         when:
-        def res = EntityIncludesBuilder.build("Thing", ['name'])
+        def res = MetaMapIncludesBuilder.build("Thing", ['name'])
 
         then:
         res.className == 'yakworks.gorm.testing.model.Thing'
         res.fields == ['name'] as Set
 
         when:
-        res = EntityIncludesBuilder.build(Thing, null)
+        res = MetaMapIncludesBuilder.build(Thing, null)
 
         then:
         res.className.contains('Thing') // [className: 'Bookz', props: ['name']]
         res.fields == ['id', 'version', 'name', 'country'] as Set
 
         when: "check on collections"
-        res = EntityIncludesBuilder.build(KitchenSink, ['name', 'items.$*'])
+        res = MetaMapIncludesBuilder.build(KitchenSink, ['name', 'items.$*'])
 
         then:
         res.className.contains('KitchenSink') // [className: 'Bookz', props: ['name']]
@@ -53,7 +53,7 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
 
         when:
         def includes = ['id', 'ext.$*']
-        def emapIncs = EntityIncludesBuilder.build(KitchenSink, includes)
+        def emapIncs = MetaMapIncludesBuilder.build(KitchenSink, includes)
 
         then:
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
@@ -69,7 +69,7 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
     void "buildIncludesMap for Enum"() {
         when:
         def includes = ['testEnum.*']
-        def emapIncs = EntityIncludesBuilder.build(Enummy, includes)
+        def emapIncs = MetaMapIncludesBuilder.build(Enummy, includes)
 
         then:
         emapIncs.className == Enummy.name // [className: 'Bookz', props: ['name']]
@@ -83,7 +83,7 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
 
         when:
         def includes = ['id', 'num', 'ext.*']
-        def emapIncs = EntityIncludesBuilder.build(KitchenSink, includes)
+        def emapIncs = MetaMapIncludesBuilder.build(KitchenSink, includes)
 
         then:
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
@@ -100,7 +100,7 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
 
         when:
         def includes = ['id', 'thisShouldBeIgnored', 'thisShouldAlsoBeIgnored.*', 'ext.andThisShouldBeIgnored']
-        def emapIncs = EntityIncludesBuilder.build(KitchenSink, includes)
+        def emapIncs = MetaMapIncludesBuilder.build(KitchenSink, includes)
 
         then:
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
@@ -115,7 +115,7 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
         when:
         //getCustom should be setup in the config
         def includes = ['id', 'ext.id', 'ext.thing.id']
-        def emapIncs = EntityIncludesBuilder.build(KitchenSink, includes)
+        def emapIncs = MetaMapIncludesBuilder.build(KitchenSink, includes)
 
         then:
         emapIncs.fields == ['id', 'ext'] as Set
@@ -134,7 +134,7 @@ class EntityIncludesBuilderSpec extends Specification implements DataRepoTest {
         when:
         //getCustom should be setup in the config
         def includes = ['id', 'ext.$getCustom']
-        def emapIncs = EntityIncludesBuilder.build(KitchenSink, includes)
+        def emapIncs = MetaMapIncludesBuilder.build(KitchenSink, includes)
 
         then:
         emapIncs.fields == ['id', 'ext'] as Set

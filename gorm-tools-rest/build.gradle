@@ -10,6 +10,13 @@ dependencies {
   api project(":gorm-tools")
   api project(":gorm-tools-csv")
 
+  // ** for the openApi parsing **
+  compile "io.swagger.parser.v3:swagger-parser:$vSwagger"
+  compile "com.fasterxml.jackson.core:jackson-core:$vJackson"
+  compile "com.fasterxml.jackson.core:jackson-annotations:$vJackson"
+  compile "com.fasterxml.jackson.core:jackson-databind:$vJackson"
+  compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$vJackson"
+
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
 }

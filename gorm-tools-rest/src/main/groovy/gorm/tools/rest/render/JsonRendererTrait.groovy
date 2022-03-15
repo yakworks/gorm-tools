@@ -18,7 +18,6 @@ import grails.rest.render.Renderer
 import grails.util.GrailsWebUtil
 import grails.web.mime.MimeType
 import yakworks.commons.json.JsonEngineTrait
-import yakworks.i18n.MsgKey
 import yakworks.i18n.icu.ICUMessageSource
 
 /**

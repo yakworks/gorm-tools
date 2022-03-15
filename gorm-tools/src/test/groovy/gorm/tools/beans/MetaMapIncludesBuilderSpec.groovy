@@ -26,26 +26,28 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
 
         then:
         res.className == 'yakworks.gorm.testing.model.Thing'
-        res.fields == ['name'] as Set
+        res.shortClassName == 'Thing'
+        res.props.keySet() == ['name'] as Set
 
         when:
         res = MetaMapIncludesBuilder.build(Thing, null)
 
         then:
         res.className.contains('Thing') // [className: 'Bookz', props: ['name']]
-        res.fields == ['id', 'version', 'name', 'country'] as Set
+        res.props.keySet() == ['id', 'version', 'name', 'country'] as Set
 
         when: "check on collections"
         res = MetaMapIncludesBuilder.build(KitchenSink, ['name', 'items.$*'])
 
         then:
         res.className.contains('KitchenSink') // [className: 'Bookz', props: ['name']]
-        res.fields == ['name', 'items'] as Set
+        res.props.keySet() == ['name', 'items'] as Set
         res.nestedIncludes.size() == 1
 
         def itemsIncs = res.nestedIncludes['items']
         itemsIncs.className == 'yakworks.gorm.testing.model.SinkItem'
-        itemsIncs.fields == ['id', 'name'] as Set
+        itemsIncs.shortClassName == 'SinkItem'
+        itemsIncs.props.keySet() == ['id', 'name'] as Set
 
     }
 
@@ -57,12 +59,14 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
 
         then:
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
-        emapIncs.fields == ['id', 'ext'] as Set
+        emapIncs.shortClassName == 'KitchenSink'
+        emapIncs.props.keySet() == ['id', 'ext'] as Set
         emapIncs.nestedIncludes.size() == 1
 
         def extIncs = emapIncs.nestedIncludes['ext']
         extIncs.className == SinkExt.name
-        extIncs.fields == ['id', 'name'] as Set
+        extIncs.shortClassName == 'SinkExt'
+        extIncs.props.keySet() == ['id', 'name'] as Set
 
     }
 
@@ -73,7 +77,7 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
 
         then:
         emapIncs.className == Enummy.name // [className: 'Bookz', props: ['name']]
-        emapIncs.fields == ['testEnum'] as Set
+        emapIncs.props.keySet() == ['testEnum'] as Set
         // shouln not end up with a nested
         emapIncs.nestedIncludes.isEmpty()
 
@@ -87,12 +91,12 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
 
         then:
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
-        emapIncs.fields == ['id', 'num', 'ext'] as Set
+        emapIncs.props.keySet() == ['id', 'num', 'ext'] as Set
         emapIncs.nestedIncludes.size() == 1
 
         def extIncs = emapIncs.nestedIncludes['ext']
         extIncs.className == SinkExt.name
-        extIncs.fields == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name', 'kitchenSink'] as Set
+        extIncs.props.keySet() == ['id', 'kitchenParent', 'thing', 'version', 'textMax', 'name', 'kitchenSink'] as Set
 
     }
 
@@ -105,7 +109,7 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
         then:
         emapIncs.className == KitchenSink.name // [className: 'Bookz', props: ['name']]
         //ext will still get added and end up giving the id
-        emapIncs.fields == ['id', 'ext'] as Set
+        emapIncs.props.keySet() == ['id', 'ext'] as Set
         //and no nestedIncludes should get set
         emapIncs.nestedIncludes.isEmpty()
     }
@@ -118,15 +122,15 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
         def emapIncs = MetaMapIncludesBuilder.build(KitchenSink, includes)
 
         then:
-        emapIncs.fields == ['id', 'ext'] as Set
+        emapIncs.props.keySet() == ['id', 'ext'] as Set
         emapIncs.nestedIncludes.size() == 1
         //will have nested includes
         def extIncs = emapIncs.nestedIncludes['ext']
         extIncs.className == SinkExt.name
-        extIncs.fields == ['id', 'thing'] as Set
+        extIncs.props.keySet() == ['id', 'thing'] as Set
 
         def thingLevel = extIncs.nestedIncludes['thing']
-        thingLevel.fields == ['id'] as Set
+        thingLevel.props.keySet() == ['id'] as Set
     }
 
     void "build with customer includes key"(){
@@ -137,15 +141,15 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
         def emapIncs = MetaMapIncludesBuilder.build(KitchenSink, includes)
 
         then:
-        emapIncs.fields == ['id', 'ext'] as Set
+        emapIncs.props.keySet() == ['id', 'ext'] as Set
         emapIncs.nestedIncludes.size() == 1
         //will have nested includes
         def extIncs = emapIncs.nestedIncludes['ext']
         extIncs.className == SinkExt.name
-        extIncs.fields == ['id', 'name', 'thing'] as Set
+        extIncs.props.keySet() == ['id', 'name', 'thing'] as Set
 
         def thingLevel = extIncs.nestedIncludes['thing']
-        thingLevel.fields == ['id', 'name'] as Set
+        thingLevel.props.keySet() == ['id', 'name'] as Set
     }
 
 }

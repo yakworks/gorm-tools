@@ -19,4 +19,7 @@ dependencies {
 
   // for OkHttpRestTrait test helpers
   compileOnly "com.squareup.okhttp3:okhttp:$vOkhttp"
+
+  //tests use the rally domains for the MetaMaps
+  testCompile project(":rally-domain")
 }

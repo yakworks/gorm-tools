@@ -109,7 +109,10 @@ class MetaMapIncludesBuilder {
                         List<String> props = properties.findAll {
                             !(it instanceof ToMany)
                         }*.name
-                        metaMapIncludes.fields.addAll(props)
+                        props.each {
+                            metaMapIncludes.props[it] = null
+                        }
+                        // metaMapIncludes.fields.addAll(props)
                     }
                 }
                 //if it start with a $ then use it as includesKey
@@ -125,13 +128,15 @@ class MetaMapIncludesBuilder {
                 //just a normal prop but make sure it exists
                 else {
                     if(propertyExists(field)){
-                        metaMapIncludes.fields.add(field)
+                        metaMapIncludes.props[field] = null
+                        // metaMapIncludes.fields.add(field)
                     }
                     // TODO should add check for transient?
                 }
             } else {
                 //we are sure its exists at this point as we alread checked above
-                metaMapIncludes.fields.add(nestedPropName)
+                metaMapIncludes.props[nestedPropName] = null
+                // metaMapIncludes.fields.add(nestedPropName)
 
                 //set it up if it has not been yet
                 if (!nestedProps[nestedPropName]) {
@@ -161,7 +166,7 @@ class MetaMapIncludesBuilder {
         Set blacklist = getBlacklist(persistentEntity) + (this.excludes as Set)
 
         //only if it has rootProps
-        if (metaMapIncludes.fields) {
+        if (metaMapIncludes.props) {
             if(blacklist) metaMapIncludes.addBlacklist(blacklist)
             //if it has nestedProps then go recursive
             if(nestedProps){
@@ -222,7 +227,9 @@ class MetaMapIncludesBuilder {
             if(nestedIncludes && !nestedIncludesMap[prop]) nestedIncludesMap[prop] = nestedIncludes
         }
 
-        if(nestedIncludesMap) metaMapIncludes.nestedIncludes = nestedIncludesMap
+        if(nestedIncludesMap) {
+            metaMapIncludes.props.putAll(nestedIncludesMap)
+        }
 
         return metaMapIncludes
     }

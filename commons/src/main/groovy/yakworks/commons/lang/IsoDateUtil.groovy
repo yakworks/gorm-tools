@@ -109,6 +109,20 @@ class IsoDateUtil {
     }
 
     /**
+     * formats to string if isDate(value) is true, should make that check first as if it evaulates to false then returns null
+     */
+    static String format(Object value) {
+        if(!isDate(value)) return null
+        if(value instanceof Date) return format((Date)value)
+        if(value instanceof LocalDate) return format((LocalDate)value)
+        if(value instanceof LocalDateTime) return format((LocalDateTime)value)
+    }
+
+    static isDate(Object value){
+        return value instanceof Date || value instanceof LocalDate || value instanceof LocalDateTime
+    }
+
+    /**
      * Converts a Date into a string using a specified format.
      *
      * @param date a date to covert

@@ -10,8 +10,6 @@ import groovy.transform.CompileStatic
 import org.springframework.http.HttpStatus
 
 import grails.rest.render.RenderContext
-import grails.util.GrailsWebUtil
-import grails.web.mime.MimeType
 import yakworks.api.ResultUtils
 import yakworks.problem.IProblem
 

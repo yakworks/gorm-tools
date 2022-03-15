@@ -53,7 +53,6 @@ class OapiGen implements ConfigAware {
         generateModels()
         //do all but autocash
         genOpenapiYaml(['rally', 'ar', 'autocash'])
-        //genOpenapiYaml(['autocash'])
     }
 
     /**

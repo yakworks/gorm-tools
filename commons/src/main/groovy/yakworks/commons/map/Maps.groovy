@@ -213,6 +213,7 @@ class Maps {
      * @param defaultReturn if its doesn't have the key or map is null this is the default return value
      * @return A boolean value which will be false if the map is null, the map doesn't contain the key or the value is false
      */
+    @SuppressWarnings('EmptyCatchBlock')
     static boolean getBoolean(String key, Map<?, ?> map, boolean defaultValue = false) {
         if (map == null) return defaultValue
 
@@ -223,12 +224,13 @@ class Maps {
                 return (Boolean)o
             }
             try {
-                String string = o.toString()
-                if (string != null) {
-                    return StringUtils.toBoolean(string)
+                if (o != null) {
+                    return StringUtils.toBoolean(o.toString())
                 }
             }
-            catch (Exception e) {}
+            catch (Exception e) {
+                /* swallow exception and will return default */
+            }
         }
         return defaultValue
     }

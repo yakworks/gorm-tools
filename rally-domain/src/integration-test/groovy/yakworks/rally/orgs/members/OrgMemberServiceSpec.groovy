@@ -79,7 +79,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.member.sales == sales
 
         cleanup:
-        orgDimensionService.testInit(null)
+        initOrgDimensions(null)
     }
 
     void "test setupMember lookup by num"() {
@@ -97,7 +97,7 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         branch.member.division == division
 
         cleanup:
-        orgDimensionService.testInit(null)
+        initOrgDimensions(null)
     }
 
     void "test setupMember lookup for customer by org source "() {
@@ -120,6 +120,6 @@ class OrgMemberServiceSpec extends Specification implements DomainIntTest {
         custAccount
 
         cleanup:
-        orgDimensionService.testInit(null)
+       initOrgDimensions(null)
     }
 }

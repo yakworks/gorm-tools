@@ -51,6 +51,9 @@ class GormToolsRestGrailsPlugin extends Plugin {
 
             openApiGenerator(OpenApiGenerator) { bean ->
                 bean.lazyInit = true
+                apiSrc = 'api-docs/openapi'
+                apiBuild = 'api-docs/dist/openapi'
+                namespaceList = ['rally']
             }
 
             //restApiControllersFromConfig(application)

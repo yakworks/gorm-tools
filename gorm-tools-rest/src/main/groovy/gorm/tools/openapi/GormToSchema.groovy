@@ -46,9 +46,6 @@ class GormToSchema {
     }
 
     Map generate(PersistentEntity entity, CruType kind = CruType.Read) {
-        if(entity.javaClass.name.contains('KitchenSink')){
-            println "WTF ${entity.javaClass.name}"
-        }
         ApiSchemaEntity apiSchemaEntity = new ApiSchemaEntity(entity)
         return apiSchemaEntity.generate(kind)
     }

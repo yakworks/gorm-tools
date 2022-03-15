@@ -16,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
+import org.yaml.snakeyaml.Yaml
 import yakworks.commons.io.FileSystemUtils
 import yakworks.commons.io.FileUtil
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.map.Maps
 import yakworks.commons.util.BuildSupport
 
 import static gorm.tools.openapi.ApiSchemaEntity.CruType
@@ -35,12 +37,14 @@ import static gorm.tools.openapi.ApiSchemaEntity.CruType
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
 class OpenApiGenerator implements ConfigAware {
-    static final String API_SRC = 'src/api-docs'
-    static final String API_BUILD = 'build/api-docs'
+    //inject src and build dirs when setting up bean
+    String apiSrc
+    String apiBuild
+    List namespaceList
 
     @Autowired GormToSchema gormToSchema
 
-    void generate() {
+    void generate(List nsList = []) {
         def buildDest = makeBuildDirs()
         def srcPath = getApiSrcPath()
 
@@ -48,15 +52,14 @@ class OpenApiGenerator implements ConfigAware {
 
         generateModels()
         //do all but autocash
-        genOpenapiYaml(['rally', 'security', 'ar'])
-        //genOpenapiYaml(['autocash'])
+        genOpenapiYaml(nsList ?: namespaceList)
     }
 
     /**
      * gets a path using the gradle.projectDir as the root
      */
     Path getApiSrcPath(String sub = null){
-        def path =  Paths.get(BuildSupport.gradleProjectDir?:'', API_SRC)
+        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', apiSrc)
         return sub ? path.resolve(sub) : path
     }
 
@@ -64,7 +67,7 @@ class OpenApiGenerator implements ConfigAware {
      * gets a path using the gradle.projectDir as the root
      */
     Path getApiBuildPath(String sub = null){
-        def path =  Paths.get(BuildSupport.gradleProjectDir?:'', API_BUILD)
+        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', apiBuild)
         return sub ? path.resolve(sub) : path
     }
 
@@ -77,27 +80,29 @@ class OpenApiGenerator implements ConfigAware {
 
     //generates the openapi.yaml with paths. starts by reading the src/openapi/openapi.yaml
     void genOpenapiYaml(List namespaceList){
-        def openapiYaml = getApiSrcPath('openapi/api.yaml')
+        def openapiYaml = getApiSrcPath('api.yaml')
         Map api = (Map) YamlUtils.loadYaml(openapiYaml)
         assert api['openapi'] == '3.0.3'
         spinThroughRestApi(api, namespaceList)
     }
+
 
     //iterate over the restapi keys and add setup the yaml
     void spinThroughRestApi(Map api, List namespaceList){
         Map restApiPaths = config.getProperty('api.paths', Map)
 
         List tags = (List)api.tags
-        Map<String, List> xTagGroups = [:]
+        Map<String, List> newTagGroups = [:]
 
         Map namespaces = config.getProperty('api.namespaces', Map, [:])
 
         for(entry in restApiPaths){
             if(namespaces.containsKey(entry.key)){
                 String namespace = entry.key
+                if(namespaceList && !namespaceList.contains(namespace)) continue
                 for(epoint in (Map)entry.value){
                     String endpoint = (String)epoint.key
-                    processEndpoint(api, endpoint, namespace, (Map)epoint.value, xTagGroups, tags)
+                    processEndpoint(api, endpoint, namespace, (Map)epoint.value, newTagGroups, tags)
                 }
             }
             else { //normal not namespaced or may have slash like 'foo/bar' as key
@@ -106,25 +111,55 @@ class OpenApiGenerator implements ConfigAware {
                 Map pathParts = RestApiAstUtils.splitPath(pathName, pathCfg)
                 String endpoint = pathParts.name
                 String namespace = pathParts.namespace
-                processEndpoint(api, endpoint, namespace, pathCfg, xTagGroups, tags)
+                if(namespace && namespaceList && !namespaceList.contains(namespace)) continue
+                processEndpoint(api, endpoint, namespace, pathCfg, newTagGroups, tags)
             }
 
         }
         api.tags = tags
-        //api.paths = paths
-        def xTagGroupsList = []
-        xTagGroups.each{k, v ->
-            xTagGroupsList << [name: namespaces[k], tags: v as List]
-        }
-        api['x-tagGroups'] = xTagGroupsList
-        def buildOpenapiYaml = getApiBuildPath().resolve('openapi/api.yaml')
+
+        mergeTagGroups(api, namespaces, newTagGroups)
+
+        def buildOpenapiYaml = getApiBuildPath().resolve('api.yaml')
         YamlUtils.saveYaml(buildOpenapiYaml, api)
     }
 
+    void mergeTagGroups(Map api, Map namespaces, Map<String, List> newTagGroups){
+        List xTagGroups = api['x-tagGroups']
+        //convert to Map so we can merge easier.
+        Map mergedTagGroups = [:]
+        xTagGroups.each{
+            List tags = it['tags'] as List
+            String name = it['name'] as String
+            if(newTagGroups.containsKey(name)){
+                //merge in the tags
+                newTagGroups[name].addAll(tags)
+            } else {
+                //new list
+                newTagGroups[name] = tags
+            }
+            //make sure they are sorted and unique
+            newTagGroups[name] = newTagGroups[name].unique().sort()
+
+        }
+
+        def xTagGroupsList = []
+        newTagGroups.each{k, v ->
+            xTagGroupsList << [name: namespaces[k], tags: v as List]
+        }
+
+        api['x-tagGroups'] = xTagGroupsList
+
+    }
+
+    // FIXME for 388 - Merge tag and description in yml
     void processEndpoint(Map api, String endpoint, String namespace, Map pathMap, Map xTagGroups, List tags){
         Map tagEntry = [name: endpoint]
         if(pathMap.description) tagEntry.description = pathMap.description
-        tags << tagEntry
+        tags = tags as List<Map>
+        if(!tags.find { it.name == endpoint }) {
+            tags << tagEntry
+        }
 
         if(!xTagGroups[namespace]) xTagGroups[namespace] = []
         ((List)xTagGroups[namespace]).add(endpoint)
@@ -146,7 +181,7 @@ class OpenApiGenerator implements ConfigAware {
         String pathKeyPrefix = "./paths/${namespacePrefix}"
         String pathFileBase = "${pathKeyPrefix}${endpoint}"
         //make sure dirs exist
-        Files.createDirectories(getApiBuildPath('openapi').resolve(pathKeyPrefix))
+        Files.createDirectories(getApiBuildPath().resolve(pathKeyPrefix))
 
         String capitalName = NameUtils.getClassNameFromKebabCase(endpoint)
         String modelName = NameUtils.getShortName((String)restConfig.entityClass)
@@ -158,68 +193,78 @@ class OpenApiGenerator implements ConfigAware {
 
         //do no param path file
         String filePathRef = "${pathFileBase}.yaml"//.toString()
-        processTplFile('paths/tpl.yaml', filePathRef, model)
+        processTplFile(restConfig, 'paths/tpl.yaml', filePathRef, model)
         //update the API key
         paths[pathKey] = ['$ref': filePathRef]
 
         //path Id file
         filePathRef = "${pathFileBase}@{id}.yaml"//.toString()
-        processTplFile('paths/tpl@{id}.yaml', filePathRef, model)
+        processTplFile(restConfig, 'paths/tpl@{id}.yaml', filePathRef, model)
         paths[pathKeyId] = ['$ref': filePathRef]
 
         //if bulk operations are enabled
         if(restConfig.bulkOps){
             paths["${pathKey}/bulk"] = ['$ref': "${pathFileBase}@bulk.yaml".toString()]
             filePathRef = "${pathFileBase}@bulk.yaml"//.toString()
-            processTplFile('paths/tpl@bulk.yaml', filePathRef, model)
+            processTplFile(restConfig, 'paths/tpl@bulk.yaml', filePathRef, model)
         }
 
     }
 
-    void processTplFile(String srcPath, String outputPath, Map model){
-        Path tplFile = getApiSrcPath('openapi').resolve(srcPath)
+
+    void processTplFile(Map restConfig, String srcPath, String outputPath, Map model){
+        Path tplFile = getApiSrcPath().resolve(srcPath)
         String ymlTpl = FileUtil.readFileToString(tplFile.toFile())
         ymlTpl = FileUtil.parseStringAsGString(ymlTpl, model)
-        Path outPath = getApiBuildPath('openapi').resolve(outputPath)
-        Files.write(outPath, ymlTpl.getBytes())
+        //check for existing override file
+
+        //parse the yaml
+        Map pathMap = parseAndLoadYaml(srcPath, model)
+        //remove ops that are not allowed
+        modifyForAllowedOps(restConfig, pathMap)
+        //see if an existing tpl exists in paths to merge into the generated one
+        Path existingTplFile = getApiSrcPath().resolve(outputPath)
+        if(Files.exists(existingTplFile)){
+            Map overridePathMap = parseAndLoadYaml(outputPath, model)
+            pathMap = Maps.merge(pathMap, overridePathMap)
+        }
+
+        Path outPath = getApiBuildPath().resolve(outputPath)
+        YamlUtils.saveYaml(outPath, pathMap)
+        // Files.write(outPath, ymlTpl.getBytes())
     }
 
-    void modifyForAllowedOps(String filePathRef, Map restConfig){
+    /**
+     * parse the file as SimpleTemplate binding the passed in model
+     * then load load as yaml return the Map or List
+     *
+     * @param srcTplYamlPath - the source file name of the Tpl.yml
+     * @param outputPath - the output yml file, will also look to see if exists and merge
+     * @param model - the mode to merge into the srcTplYaml when parsed
+     * @return the loaded yaml object
+     */
+    public <T> T parseAndLoadYaml(String srcTplYamlPath, Map model){
+        Path tplFile = getApiSrcPath().resolve(srcTplYamlPath)
+        String ymlTpl = FileUtil.readFileToString(tplFile.toFile())
+        ymlTpl = FileUtil.parseStringAsGString(ymlTpl, model)
+        //parse the yaml
+        return new Yaml().load(ymlTpl)
+    }
+
+    void modifyForAllowedOps(Map restConfig, Map pathMap){
         //if it doesn't have the allowedOps then return
-        List allowedOps = restConfig['restConfig']
+        List allowedOps = restConfig.allowedOps as List
         if(!allowedOps) return
 
-        Path yamlPath = getApiBuildPath('openapi').resolve(filePathRef)
-
-        Map tplYaml = (Map)YamlUtils.loadYaml(yamlPath)
-
         if(!allowedOps.contains('create')){
-            tplYaml.remove('post')
+            pathMap.remove('post')
         }
         if(!allowedOps.contains('update')){
-            tplYaml.remove('put')
+            pathMap.remove('put')
         }
         if(!allowedOps.contains('delete')){
-            tplYaml.remove('delete')
+            pathMap.remove('delete')
         }
-
-        // Map tplGet = (Map)tplYaml['get']
-        // tplGet.tags = [model.name]
-        // tplGet.summary = "${model.capitalName} List".toString()
-        // tplGet.description = "Query and retrieve a ${model.capitalName} list".toString()
-        // tplGet.operationId = "get${model.capitalName}List".toString()
-        // tplGet['responses']['200']['$ref'] = "${model.name}_pager.yaml".toString()
-        //
-        // Map tplPost = (Map)tplYaml['post']
-        // tplPost.tags = [model.name]
-        // tplPost.summary = "Create a ${model.capitalName}".toString()
-        // tplPost.description = "Create a new ${model.capitalName}".toString()
-        // tplPost.operationId = "create${model.capitalName}".toString()
-        // tplPost.requestBody['$ref'] = "${model.name}_request_create.yaml".toString()
-        // tplPost['responses']['201']['$ref'] = "${model.name}_response.yaml".toString()
-        //
-        // def pathYaml = getApiBuildPath('openapi').resolve(pathRef)
-        // YamlUtils.saveYaml(pathYaml, tplYaml)
     }
 
     void generateModels() {
@@ -237,10 +282,11 @@ class OpenApiGenerator implements ConfigAware {
     Path writeYmlModel(Class clazz, Map schemaMap, CruType type) {
         //if type is read then dont do suffix
         String suffix = type == CruType.Read ? '' : "_$type"
-        Files.createDirectories(getApiBuildPath('openapi/models'))
-        def path = getApiBuildPath("openapi/models/${clazz.simpleName}${suffix}.yaml")
+        Files.createDirectories(getApiBuildPath('models'))
+        def path = getApiBuildPath("models/${clazz.simpleName}${suffix}.yaml")
         YamlUtils.saveYaml(path, schemaMap)
         return path
     }
+
 
 }

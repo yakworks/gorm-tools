@@ -9,8 +9,12 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.map.MetaMapIncludes
+import io.swagger.v3.oas.models.ExternalDocumentation
+import io.swagger.v3.oas.models.media.Discriminator
 import io.swagger.v3.oas.models.media.Schema
+import io.swagger.v3.oas.models.media.XML
 import yakworks.commons.lang.NameUtils
+import yakworks.commons.map.MapFlattener
 
 /**
  * Includes tree for root entity and nested association properties
@@ -69,16 +73,26 @@ class MetaMapSchema {
     /**
      * Filters the props to only the ones that are association and have a nested includes
      */
-    // Map<String, Schema> flatten(){
-    //     Map<String, Schema> keyValues = [:]
-    //
-    //     if (!props) {
-    //         return keyValues
-    //     }
-    //     keyValues.putAll(transformGroovyJsonMap(props, ""))
-    //
-    //     return keyValues
-    // }
+    Map<String, Map> flatten(){
+        Map flatMap = MapFlattener.flattenMap(props) as Map<String, Schema>
+        Map map = [:] as Map<String, Map>
+        //iterate over and convert Schema to Map
+        flatMap.each{String k, Schema schema->
+            Map schemaMap = [:] as Map<String, Object>
+            List schemaAttrs = ['name', 'title', 'multipleOf',  'maximum', 'exclusiveMaximum', 'minimum',
+                'exclusiveMinimum', 'maxLength', 'minLength', 'pattern', 'maxItems', 'minItems', 'uniqueItems',
+                'maxProperties', 'minProperties', 'required', 'type', 'not', 'description', 'format', '$ref', 'nullable',
+                'readOnly', 'writeOnly', 'example', 'enum']
+
+            for(String attr: schemaAttrs){
+                if(schema[attr] != null){
+                    schemaMap[attr] = schema[attr]
+                }
+            }
+            map[k] = schemaMap
+        }
+        return map
+    }
 
 
 

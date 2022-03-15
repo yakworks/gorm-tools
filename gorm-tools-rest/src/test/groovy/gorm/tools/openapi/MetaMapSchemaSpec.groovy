@@ -139,4 +139,35 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         date1Schema.format == "date-time"
     }
 
+    void "MetaMapSchema flatten method"(){
+        when:
+        MetaMapIncludes mmIncs = MetaMapIncludesBuilder.build("Org", ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'])
+        MetaMapSchema mmSchema = MetaMapSchema.of(mmIncs)
+        Map flatMap = mmSchema.flatten()
+
+        then:
+        flatMap
+        mmSchema.props.keySet() == ['id', 'name', 'flex'] as Set
+
+        def idSchemaDef = flatMap['id']
+        Map idSchema = flatMap['id']
+        idSchema.type == 'integer'
+        idSchema.format == 'int64'
+        idSchema.readOnly
+
+        Map nameSchema = flatMap['name']
+        nameSchema.type == 'string'
+        nameSchema.maxLength == 100
+
+        Map num1Schema = flatMap['flex.num1']
+        num1Schema.type == 'number'
+
+        Map text1Schema = flatMap['flex.text1']
+        text1Schema.type == 'string'
+
+        Map date1Schema = flatMap['flex.date1']
+        date1Schema.type == 'string'
+        date1Schema.format == "date-time"
+    }
+
 }

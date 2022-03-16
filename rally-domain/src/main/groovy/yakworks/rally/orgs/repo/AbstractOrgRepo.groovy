@@ -72,7 +72,7 @@ abstract class AbstractOrgRepo implements GormRepo<Org>, IdGeneratorRepo<Org> {
         Map data = args.data
         if (args.bindAction == BindAction.Create) {
             verifyNumAndOrgSource(org, data)
-            if(data.member) orgMemberService.setupMember(org, data.remove('member') as Map)
+            orgMemberService.setupMember(org, data.remove('member') as Map)
         }
         // we do primary location and contact here before persist so we persist org only once with contactId it is created
         if(data.location) createOrUpdatePrimaryLocation(org, data.location as Map)

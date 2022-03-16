@@ -22,6 +22,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         defineBeans {
             //scriptExecutorService(ScriptExecutorService)
             orgDimensionService(OrgDimensionService)
+            orgMemberService(OrgMemberService)
         }
         mockDomains(
             OrgTag, Location, Contact, Org, OrgSource, OrgFlex, OrgCalc, OrgInfo

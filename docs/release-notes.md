@@ -1,3 +1,9 @@
+### v7.0.8-v.61
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.60...v7.0.8-v.61)
+- release with org dim validation [link](https://github.com/yakworks/gorm-tools/commit/1f39c6f503d15bdb59416587c7f5c9368ea64a1f)
+- 9ci/domain9#816 Org member validation (#484) [link](https://github.com/yakworks/gorm-tools/commit/260904e3862b866629fa593efb59195da101e09b)
+
 ### v7.0.8-v.60
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.59...v7.0.8-v.60)

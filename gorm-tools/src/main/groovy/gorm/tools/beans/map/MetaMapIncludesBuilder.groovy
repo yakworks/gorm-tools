@@ -21,13 +21,12 @@ import yakworks.commons.lang.ClassUtils
 import yakworks.commons.lang.PropertyTools
 
 /**
- * EntityMapService contains a set of helpers, which will create the EntityMap and Lists
- * from Gorm Domains
+ * Builder to create MetaMapIncludes from a sql select like list against an entity
  */
 @Slf4j
 @CompileStatic
 @SuppressWarnings('InvertedIfElse')
-class EntityIncludesBuilder {
+class MetaMapIncludesBuilder {
     /**
      * Holds the list of fields that have display:false for a class, meaning they should not be exported
      */
@@ -41,13 +40,13 @@ class EntityIncludesBuilder {
     List<PersistentProperty> properties = []
     MetaMapIncludes metaMapIncludes
 
-    EntityIncludesBuilder(String entityClassName, List<String> includes){
+    MetaMapIncludesBuilder(String entityClassName, List<String> includes){
         this.entityClassName = entityClassName
         this.includes = includes ?: ['*'] as List<String>
         init()
     }
 
-    EntityIncludesBuilder excludes(List<String> val) {
+    MetaMapIncludesBuilder excludes(List<String> val) {
         if(val != null) this.excludes = val
         return this
     }
@@ -65,15 +64,17 @@ class EntityIncludesBuilder {
     }
 
     static MetaMapIncludes build(Class entityClass, List<String> includes){
-        build(entityClass.name, includes)
+        build(entityClass.name, includes, [])
     }
 
-    static MetaMapIncludes build(String entityClassName, List<String> includes){
-        new EntityIncludesBuilder(entityClassName, includes).build()
-    }
+    // static MetaMapIncludes build(String entityClassName, List<String> includes){
+    //     new MetaMapIncludesBuilder(entityClassName, includes).build()
+    // }
 
-    static MetaMapIncludes build(String entityClassName, List<String> includes, List<String> excludes){
-        new EntityIncludesBuilder(entityClassName, includes).excludes(excludes).build()
+    static MetaMapIncludes build(String entityClassName, List<String> includes, List<String> excludes = []){
+        def mmib = new MetaMapIncludesBuilder(entityClassName, includes)
+        if(excludes) mmib.excludes(excludes)
+        return mmib.build()
     }
 
     /**
@@ -108,7 +109,10 @@ class EntityIncludesBuilder {
                         List<String> props = properties.findAll {
                             !(it instanceof ToMany)
                         }*.name
-                        metaMapIncludes.fields.addAll(props)
+                        props.each {
+                            metaMapIncludes.props[it] = null
+                        }
+                        // metaMapIncludes.fields.addAll(props)
                     }
                 }
                 //if it start with a $ then use it as includesKey
@@ -117,20 +121,22 @@ class EntityIncludesBuilder {
                     Map incsMap = IncludesConfig.bean().getIncludes(entityClass)
                     if(incsMap){
                         List props = ( incsMap[incKey] ?: ['id'] ) as List<String>
-                        def toMerge = EntityIncludesBuilder.build(entityClass, props)
+                        def toMerge = MetaMapIncludesBuilder.build(entityClass.name, props)
                         metaMapIncludes.merge(toMerge)
                     }
                 }
                 //just a normal prop but make sure it exists
                 else {
                     if(propertyExists(field)){
-                        metaMapIncludes.fields.add(field)
+                        metaMapIncludes.props[field] = null
+                        // metaMapIncludes.fields.add(field)
                     }
                     // TODO should add check for transient?
                 }
             } else {
                 //we are sure its exists at this point as we alread checked above
-                metaMapIncludes.fields.add(nestedPropName)
+                metaMapIncludes.props[nestedPropName] = null
+                // metaMapIncludes.fields.add(nestedPropName)
 
                 //set it up if it has not been yet
                 if (!nestedProps[nestedPropName]) {
@@ -160,7 +166,7 @@ class EntityIncludesBuilder {
         Set blacklist = getBlacklist(persistentEntity) + (this.excludes as Set)
 
         //only if it has rootProps
-        if (metaMapIncludes.fields) {
+        if (metaMapIncludes.props) {
             if(blacklist) metaMapIncludes.addBlacklist(blacklist)
             //if it has nestedProps then go recursive
             if(nestedProps){
@@ -221,7 +227,9 @@ class EntityIncludesBuilder {
             if(nestedIncludes && !nestedIncludesMap[prop]) nestedIncludesMap[prop] = nestedIncludes
         }
 
-        if(nestedIncludesMap) metaMapIncludes.nestedIncludes = nestedIncludesMap
+        if(nestedIncludesMap) {
+            metaMapIncludes.props.putAll(nestedIncludesMap)
+        }
 
         return metaMapIncludes
     }

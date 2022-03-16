@@ -43,7 +43,8 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
         'domainClass', 'dirty', GormProperties.ERRORS, 'dirtyPropertyNames']
 
     private Set<String> _includes = []
-    private MetaMapIncludes _includeMap
+    private Map _includeProps = [:] as Map<String, MetaMapIncludes>
+    private MetaMapIncludes metaMapIncludes
 
     private Map<String, Object> shadowMap = [:]
 
@@ -74,8 +75,9 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
 
     private void initialise(MetaMapIncludes includeMap) {
         if(includeMap){
-            _includeMap = includeMap
-            _includes = includeMap.fields as Set<String>
+            metaMapIncludes = includeMap
+            _includes = includeMap.props.keySet()
+            _includeProps = includeMap.props
         }
     }
 
@@ -166,7 +168,7 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
         Map nestesIncludes = getNestedIncludes()
         MetaMapIncludes mapIncludes = nestesIncludes[prop]
         // if its an enum and doesnt have any include field specifed (which it normally should not)
-        if( val.class.isEnum() && !(mapIncludes?.fields)) {
+        if( val.class.isEnum() && !(mapIncludes?.props)) {
             if(val instanceof IdEnum){
                 // convert Enums to string or id,name object if its IdEnum
                 Map<String, Object> idEnumMap = [id: (val as IdEnum).id, name: (val as Enum).name()]
@@ -287,12 +289,9 @@ class MetaMap extends AbstractMap<String, Object> implements Cloneable {
     }
 
     //------- Helper methods --------
-    MetaMapIncludes getIncludeMap(){
-        return _includeMap
-    }
 
     Map<String, MetaMapIncludes> getNestedIncludes(){
-        return (includeMap?.nestedIncludes) ?: [:] as Map<String, MetaMapIncludes>
+        return (metaMapIncludes?.nestedIncludes) ?: [:] as Map<String, MetaMapIncludes>
     }
 
     boolean isIncluded(String mp) {

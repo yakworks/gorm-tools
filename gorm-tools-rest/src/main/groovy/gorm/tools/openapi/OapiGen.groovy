@@ -12,6 +12,7 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.rest.ast.RestApiAstUtils
@@ -34,17 +35,16 @@ import static gorm.tools.openapi.ApiSchemaEntity.CruType
  * Created by JBurnett on 6/19/17.
  */
 //@CompileStatic
+@Service
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
-class OpenApiGenerator implements ConfigAware {
-    //inject src and build dirs when setting up bean
-    String apiSrc
-    String apiBuild
-    List namespaceList
+class OapiGen implements ConfigAware {
+    public static final String API_SRC = 'api-docs/openapi'
+    public static final String API_BUILD = 'api-docs/dist/openapi'
 
     @Autowired GormToSchema gormToSchema
 
-    void generate(List nsList = []) {
+    void generate() {
         def buildDest = makeBuildDirs()
         def srcPath = getApiSrcPath()
 
@@ -52,14 +52,14 @@ class OpenApiGenerator implements ConfigAware {
 
         generateModels()
         //do all but autocash
-        genOpenapiYaml(nsList ?: namespaceList)
+        genOpenapiYaml(['rally', 'ar', 'autocash'])
     }
 
     /**
      * gets a path using the gradle.projectDir as the root
      */
     Path getApiSrcPath(String sub = null){
-        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', apiSrc)
+        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', API_SRC)
         return sub ? path.resolve(sub) : path
     }
 
@@ -67,7 +67,7 @@ class OpenApiGenerator implements ConfigAware {
      * gets a path using the gradle.projectDir as the root
      */
     Path getApiBuildPath(String sub = null){
-        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', apiBuild)
+        def path =  Paths.get(BuildSupport.gradleRootProjectDir?:'', API_BUILD)
         return sub ? path.resolve(sub) : path
     }
 

@@ -17,6 +17,6 @@ trait HasTags {
     abstract List<Tag> getTags()
 
     static Map constraintsMap = [
-        tags: [ d: 'the tags for this item', validate: false] //validate false so it does not initialize
+        tags: [ d: 'the tags for this item', validate: false, required: false] //validate false so it does not initialize
     ]
 }

@@ -4,6 +4,9 @@
 */
 package yakworks.commons.map
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+
 import spock.lang.Specification
 import yakworks.commons.lang.IsoDateUtil
 
@@ -18,8 +21,8 @@ class MapFlattenerSpec extends Specification {
                 id     : 1,
                 name   : 'bill',
                 blah   : null,
-                date   : "2000-03-30T22:00:00Z",
-                date2  : "2000-03-30T22:00:00.000Z",
+                localDate   : LocalDate.parse('2021-02-01'),
+                localDateTime  : LocalDateTime.parse("2017-10-19T11:40:00"),
                 date3  : "2000-03-30",
                 notDate: "200a0-03-30"
             ],
@@ -29,7 +32,7 @@ class MapFlattenerSpec extends Specification {
         ]
 
         when:
-        Map res = mapFlattener.flatten(testMap)
+        Map res = MapFlattener.of(testMap).convertObjectToString(true).flatten()
 
         then:
         res.'customer.id' == "1"
@@ -37,9 +40,9 @@ class MapFlattenerSpec extends Specification {
         res.containsKey("customer.blah")
         res['customer.blah'] == null
         res.'keyContact.id' == '1'
-        res["customer.date"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date))
-        res["customer.date2"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date2))
-        res["customer.date3"] == IsoDateUtil.format(IsoDateUtil.parse(testMap.customer.date3))
+        res["customer.localDate"] == '2021-02-01'
+        res["customer.localDateTime"] == '2017-10-19T11:40:00'
+        res["customer.date3"] == '2000-03-30'
         res["customer.notDate"] == "200a0-03-30"
 
     }
@@ -51,12 +54,31 @@ class MapFlattenerSpec extends Specification {
         ]
 
         when:
-        Map res = mapFlattener.flatten(testMap)
+        Map res = MapFlattener.flattenMap(testMap)
 
         then:
         res['tags'] == [1, 2]
         res['tags.0'] == '1'
         res['tags.1'] == '2'
+    }
+
+
+    void "test flatten with objects"() {
+        setup:
+        def obj1 = LocalDate.parse("2021-01-01")
+        Map testMap = [
+            foo:[
+                obj1: obj1,
+                obj2: obj1
+            ]
+        ]
+
+        when:
+        Map res = MapFlattener.flattenMap(testMap)
+
+        then:
+        res['foo.obj1'] == obj1
+        res['foo.obj2'] == obj1
     }
 
 
@@ -67,7 +89,7 @@ class MapFlattenerSpec extends Specification {
         ]
 
         when:
-        Map res = mapFlattener.flatten(testMap)
+        Map res = mapFlattener.of(testMap).convertObjectToString(true).flatten()
 
         then:
         res['tags'] == [[id: 1], [id: 2]]

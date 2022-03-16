@@ -52,7 +52,7 @@ class CSVMapWriter {
     }
 
     Map flattenMap(Map map){
-        new MapFlattener().flatten(map)
+        MapFlattener.of(map).convertObjectToString(true).flatten()
     }
 
     void writeLine(Map data){

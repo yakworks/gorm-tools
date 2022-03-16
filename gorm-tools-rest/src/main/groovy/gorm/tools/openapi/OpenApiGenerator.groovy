@@ -12,11 +12,11 @@ import groovy.transform.CompileStatic
 
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.yaml.snakeyaml.Yaml
 
 import gorm.tools.rest.ast.RestApiAstUtils
 import gorm.tools.support.ConfigAware
 import gorm.tools.utils.GormMetaUtils
-import org.yaml.snakeyaml.Yaml
 import yakworks.commons.io.FileSystemUtils
 import yakworks.commons.io.FileUtil
 import yakworks.commons.lang.NameUtils

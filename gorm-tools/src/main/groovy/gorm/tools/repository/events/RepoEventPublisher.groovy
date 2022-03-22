@@ -10,8 +10,6 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
 
@@ -20,8 +18,6 @@ import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.RepoUtil
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import grails.core.GrailsApplication
 
 /**
  * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners

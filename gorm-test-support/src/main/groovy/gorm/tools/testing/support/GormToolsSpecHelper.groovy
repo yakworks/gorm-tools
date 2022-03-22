@@ -149,7 +149,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
         // redo the cache for the repo event methods in the repos
         // ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
-        ctx.getBean('repoEventPublisher').applicationEventPublisher = grailsApplication.mainContext
+        // ctx.getBean('repoEventPublisher').applicationEventPublisher = grailsApplication.mainContext
         // RepoValidatorRegistry.init(datastore, ctx.getBean('messageSource'))
     }
 

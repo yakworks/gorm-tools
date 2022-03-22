@@ -11,6 +11,7 @@ import org.grails.testing.GrailsUnitTest
 import org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
@@ -18,6 +19,7 @@ import org.springframework.validation.Validator
 import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
+import gorm.tools.beans.AppCtx
 import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
@@ -81,7 +83,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     }
 
     Closure commonBeans(){ { ->
-        entityMapBinder(EntityMapBinder, grailsApplication)
+        entityMapBinder(EntityMapBinder)
         repoEventPublisher(RepoEventPublisher)
         //repoUtilBean(RepoUtil)
         repoExceptionSupport(RepoExceptionSupport)
@@ -112,6 +114,8 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
     void defineRepoBeans(Class<?>... domainClassesToMock){
         RepoLookup.USE_CACHE = false
+        //for some reason holder get scrambled so make sure it has the gapp we are using
+        AppCtx.setGrailsApplication(grailsApplication)
 
         Closure beanClos = {
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
@@ -144,8 +148,8 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         defineBeansMany(beanClosures)
 
         // redo the cache for the repo event methods in the repos
-        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
-
+        // ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
+        ctx.getBean('repoEventPublisher').applicationEventPublisher = grailsApplication.mainContext
         // RepoValidatorRegistry.init(datastore, ctx.getBean('messageSource'))
     }
 

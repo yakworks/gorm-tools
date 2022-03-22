@@ -7,6 +7,8 @@ package gorm.tools.beans
 import groovy.transform.CompileStatic
 
 import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationEvent
+import org.springframework.context.ApplicationEventPublisher
 
 import grails.config.Config
 import grails.core.GrailsApplication
@@ -35,6 +37,13 @@ class AppCtx {
             cachedGrailsApplication = Holders.grailsApplication
         }
         return cachedGrailsApplication
+    }
+
+    /**
+     * Used in tests to assign the right GrailsApplication
+     */
+    static void setGrailsApplication(GrailsApplication gapp) {
+        cachedGrailsApplication = gapp
     }
 
     /**
@@ -86,5 +95,10 @@ class AppCtx {
 
     static <T> T get(Class<T> requiredType){
         getCtx().getBean(requiredType)
+    }
+
+    static void publishEvent(ApplicationEvent event){
+        //we use the grails.mainContext here because the appCtx scrambles during tests and gets lost
+        ((ApplicationEventPublisher)getGrails().mainContext).publishEvent(event)
     }
 }

@@ -10,8 +10,10 @@ import org.grails.datastore.mapping.core.AbstractDatastore
 import org.grails.orm.hibernate.HibernateDatastore
 import org.grails.plugin.hibernate.support.HibernatePersistenceContextInterceptor
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.repository.DefaultGormRepo
+import gorm.tools.repository.RepoLookup
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.testing.support.GormToolsSpecHelper
@@ -35,6 +37,10 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
 
     //@OnceBefore
     void setupSpec() {
+        RepoLookup.USE_CACHE = false
+        //for some reason holder get scrambled so make sure it has the grailsApplication from this test
+        AppCtx.setGrailsApplication(grailsApplication)
+
         if (!ctx.containsBean("dataSource"))
             ctx.beanFactory.registerSingleton("dataSource", hibernateDatastore.getDataSource())
         if (!ctx.containsBean("grailsDomainClassMappingContext"))
@@ -77,7 +83,7 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
         if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
 
         defineBeansMany(beanClosures)
-
+        // rescan needed after the beans are added
         ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
         // doWithSpringAfter()
         RepoValidatorRegistry.init(hibernateDatastore, ctx.getBean('messageSource'))

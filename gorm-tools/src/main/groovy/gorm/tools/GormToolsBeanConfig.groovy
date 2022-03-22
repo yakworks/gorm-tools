@@ -75,7 +75,7 @@ class GormToolsBeanConfig {
         mangoQuery(DefaultMangoQuery, lazy())
         mangoBuilder(MangoBuilder, lazy())
 
-        entityMapBinder(EntityMapBinder, ref('grailsApplication'), lazy())
+        entityMapBinder(EntityMapBinder, lazy())
         metaMapEntityService(MetaMapEntityService, lazy())
 
         repoEventPublisher(RepoEventPublisher)

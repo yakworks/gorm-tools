@@ -10,16 +10,14 @@ import javax.annotation.PostConstruct
 
 import groovy.transform.CompileStatic
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.Errors
 
+import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.BindAction
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.PersistArgs
-import gorm.tools.repository.artefact.RepositoryArtefactHandler
-import grails.core.GrailsApplication
+import gorm.tools.repository.RepoUtil
 
 /**
  * Invokes "event methods" on Repository artifacts as well as publish spring events for @EventListeners
@@ -31,37 +29,26 @@ import grails.core.GrailsApplication
 @CompileStatic
 class RepoEventPublisher {
 
-    @Autowired
-    private GrailsApplication grailsApplication
-
+    // @Autowired shoudl not need to set this in init but unit tests get scrambled so it done liek this for those
     // @Autowired
-    // private EventBus eventBus
-
-    // @Autowired
-    private ApplicationEventPublisher applicationEventPublisher
+    // ApplicationEventPublisher applicationEventPublisher
 
     private final Map<String, Map<String, Method>> repoEventMethodCache = new ConcurrentHashMap<>()
-    //private final Map<String, Map<String, Method>> repoListenerMethodCache = new ConcurrentHashMap<>()
 
     @PostConstruct
     void init() {
         scanAndCacheEventsMethods()
-        def mainContext = grailsApplication.mainContext
-        applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
+        // applicationEventPublisher = (ApplicationEventPublisher) grailsApplication.mainContext
     }
 
     //iterates over Repos and cache events
     void scanAndCacheEventsMethods() {
-        for (Class repoClass : grailsApplication.getArtefacts(RepositoryArtefactHandler.TYPE)*.clazz) {
+        for (Class repoClass : RepoUtil.getRepoClasses()) {
             cacheEventsMethods(repoClass)
         }
     }
 
     void cacheEventsMethods(Class repoClass) {
-//        Map<String, Method> listenerMethodMap = new ConcurrentHashMap<>()
-//        repoListenerMethodCache.put(repoClass.simpleName, listenerMethodMap)
-//        findAndCacheListenerAnnotations(repoClass, listenerMethodMap)
-
         Map<String, Method> eventMethodMap = new ConcurrentHashMap<>()
         repoEventMethodCache.put(repoClass.simpleName, eventMethodMap)
 
@@ -80,7 +67,7 @@ class RepoEventPublisher {
         //invokeListenerMethod(repo, event)
         invokeEventMethod(repo, event.eventKey, methodArgs)
         if (!repo.enableEvents) return
-        applicationEventPublisher.publishEvent(event)
+        AppCtx.publishEvent(event)
         //eventBus.notify(event.routingKey, event)
     }
 

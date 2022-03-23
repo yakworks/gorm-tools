@@ -221,7 +221,7 @@ trait RestRepoApiController<D> extends RestApiController {
         }
 
         SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludesSuccess, errorIncludes: errorIncludes,
-            sourceId: sourceKey, source: params.jobSource)
+            sourceId: sourceKey, source: params.jobSource, params: params)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
         syncJobArgs.savePayload = params.boolean('savePayload', true)

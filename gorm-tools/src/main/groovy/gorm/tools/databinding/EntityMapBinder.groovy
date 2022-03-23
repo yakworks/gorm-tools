@@ -29,7 +29,6 @@ import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 import gorm.tools.utils.GormMetaUtils
-import grails.core.GrailsApplication
 import grails.databinding.DataBindingSource
 import grails.databinding.SimpleDataBinder
 import grails.databinding.SimpleMapDataBindingSource
@@ -59,14 +58,12 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
     static final Map<Class, List> EXPLICIT_BINDING_LIST = new ConcurrentHashMap<Class, List>()
     protected static final Map<Class, List> CLASS_TO_BINDING_INCLUDE_LIST = new ConcurrentHashMap<Class, List>()
 
-    protected GrailsApplication grailsApplication
     protected MessageSource messageSource
     boolean trimStrings = true
     boolean convertEmptyStringsToNull = true
     protected List<DataBindingListener> listeners = []
 
-    EntityMapBinder(GrailsApplication grailsApplication) {
-        this.grailsApplication = grailsApplication
+    EntityMapBinder() {
         this.conversionService = new SpringConversionServiceAdapter()
         // registerConverter new ByteArrayMultipartFileValueConverter()
     }
@@ -544,12 +541,10 @@ class EntityMapBinder extends SimpleDataBinder implements MapBinder {
 
     @SuppressWarnings(['EmptyCatchBlock'])
     private PersistentEntity getPersistentEntity(Class clazz) {
-        if (grailsApplication != null) {
-            try {
-                return grailsApplication.mappingContext.getPersistentEntity(clazz.name)
-            } catch (GrailsConfigurationException e) {
-                //no-op
-            }
+        try {
+            return GormMetaUtils.mappingContext.getPersistentEntity(clazz.name)
+        } catch (GrailsConfigurationException e) {
+            //no-op
         }
         null
     }

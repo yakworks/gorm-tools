@@ -73,6 +73,13 @@ class ValidationProblem implements DataProblemTrait<ValidationProblem>  {
         //helpers
         Errors getErrors() { getValidationProblem().errors}
 
+        @Override
+        String toString() {
+            // String msg = ProblemUtils.problemToString(problem)
+            // msg = "$msg - ${getMessage()}"
+            return getMessage()
+        }
+
         // @Override
         // ProblemException problem(ValidationProblem prob){
         //     this.problem = prob

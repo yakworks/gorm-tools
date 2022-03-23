@@ -1,3 +1,12 @@
+### v7.0.8-v.62
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.61...v7.0.8-v.62)
+- release params on [link](https://github.com/yakworks/gorm-tools/commit/952ff7b243a1260ad3515d678a5edbbc15a77d57)
+- Merge pull request #488 from yakworks/job-params-fix [link](https://github.com/yakworks/gorm-tools/commit/1cb0f22f83a339b8002bbdf896aeece8fe95d9fb)
+- Set params on syncjob args [link](https://github.com/yakworks/gorm-tools/commit/79e42236f72486e35ab8cc0d2aa8c89391b62308)
+- App ctx publish event (#487) [link](https://github.com/yakworks/gorm-tools/commit/363f77e163608c4d246bfd7db9ab9414f828eeb6)
+- Openapi (#485) [link](https://github.com/yakworks/gorm-tools/commit/5920fb7161071df628860fc601997a610ca69f26)
+
 ### v7.0.8-v.61
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.60...v7.0.8-v.61)

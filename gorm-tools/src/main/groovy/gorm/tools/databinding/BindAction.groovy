@@ -9,4 +9,7 @@ import groovy.transform.CompileStatic
 @CompileStatic
 enum BindAction {
     Create, Update
+
+    boolean isCreate(){ this == BindAction.Create }
+    boolean isUpdate(){ this == BindAction.Update }
 }

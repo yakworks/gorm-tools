@@ -1,40 +1,17 @@
 package yakworks.rally.activity
 
 import gorm.tools.repository.PersistArgs
-
-import java.time.LocalDateTime
-
-import org.apache.commons.io.FileUtils
-import org.apache.commons.io.IOUtils
-import org.apache.commons.lang3.RandomStringUtils
-import org.springframework.jdbc.core.JdbcTemplate
-
-import gorm.tools.repository.RepoUtil
-import gorm.tools.security.services.SecService
 import grails.gorm.transactions.Rollback
 import grails.plugin.viewtools.AppResourceLoader
 import grails.testing.mixin.integration.Integration
-import spock.lang.Ignore
+import org.apache.commons.io.FileUtils
+import org.springframework.jdbc.core.JdbcTemplate
 import spock.lang.Specification
 import yakworks.gorm.testing.DomainIntTest
 import yakworks.rally.activity.model.Activity
-import yakworks.rally.activity.model.ActivityLink
-import yakworks.rally.activity.model.ActivityNote
-import yakworks.rally.activity.model.Task
-import yakworks.rally.activity.model.TaskStatus
-import yakworks.rally.activity.model.TaskType
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.model.Attachment
-import yakworks.rally.attachment.model.AttachmentLink
 import yakworks.rally.attachment.repo.AttachmentRepo
-import yakworks.rally.orgs.model.Contact
-import yakworks.rally.orgs.model.Org
-import yakworks.rally.orgs.model.OrgType
-import yakworks.rally.tag.model.Tag
-import yakworks.rally.tag.model.TagLink
-
-import static yakworks.rally.activity.model.Activity.Kind as ActKind
-import static yakworks.rally.activity.model.Activity.VisibleTo
 
 @Integration
 @Rollback

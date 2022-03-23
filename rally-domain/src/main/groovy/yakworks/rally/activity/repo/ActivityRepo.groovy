@@ -134,12 +134,23 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
         if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
+        if(args.bindAction.isCreate()){
+            if(data.linkedId && data.linkedEntity) {
+                activityLinkRepo.create(data.linkedId as Long, data.linkedEntity as String, activity)
+            } else if(data.links) {
+                assert data.links instanceof List<Map>
+                doLinks(activity, data.links as List<Map>)
+            }
+            if (data.arTranId) {
+                activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
+            }
+        }
+
+
         // now do the links last do events will have the other data
         //XXX this is messy and needs to be removed. No tests for this.
         // Also, what happens here on update? seems it will blow up if already exists
-        if (data.arTranId) {
-            activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
-        }
+
     }
 
     /**
@@ -220,6 +231,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
             AttachmentLink.create(activity, attachment)
         }
         activity.setHasAttachments(true)
+    }
+
+    void doLinks(Activity activity, List<Map> links) {
+        links.each { link ->
+            activityLinkRepo.create(link['linkedId'] as Long, link['linkedEntity'] as String, activity)
+        }
     }
 
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {
@@ -345,7 +362,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
      * @param source activity source -  if this is from outside.
      * @return Activity
      */
-    //FIXME this is old and should be deprected
+    //FIXME this is old and should be deprected, currentyl used in insertMassActivity
     @Transactional
     Activity createActivity(String text, Org org, Map task, List<Attachment> attachments, String entityName, String source = null) {
 

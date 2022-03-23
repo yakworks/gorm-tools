@@ -3,6 +3,7 @@ package yakworks.rally.domain
 import org.apache.commons.lang3.RandomStringUtils
 
 import gorm.tools.model.Persistable
+import spock.lang.Shared
 import yakworks.gorm.testing.SecurityTest
 import gorm.tools.testing.unit.DataRepoTest
 import grails.plugin.viewtools.AppResourceLoader
@@ -28,6 +29,8 @@ import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 class ActivitySpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
     //Sanity checks and auto runs DomainRepoCrudSpec tests
 
+    @Shared Long orgId
+
     void setupSpec(){
         defineBeans{
             appResourceLoader(AppResourceLoader) {
@@ -37,6 +40,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         }
         mockDomains(AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
             Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact)
+        orgId = MockData.org().id
     }
 
     ActivityRepo activityRepo
@@ -55,10 +59,52 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         [contact1, contact2]
     }
 
+    void "simple note creation"() {
+        when:
+        def params = [orgId: orgId, note:[body: 'foo']]
+        Activity activity = Activity.create(params)
+
+        then:
+        activity.note != null
+        activity.name == 'foo'
+        activity.note.body == 'foo'
+    }
+
+    void "simple note creation linkedId"() {
+        when:
+        def params = [orgId: orgId, note:[body: 'foo'], linkedId: 1, linkedEntity:'Contact']
+        Activity activity = Activity.create(params)
+
+        then:
+        activity.note != null
+        activity.name == 'foo'
+        activity.note.body == 'foo'
+        activity.links[0].linkedId == 1
+        activity.links[0].linkedEntity == 'Contact'
+    }
+
+    void "simple note creation links list"() {
+        when:
+        def links = [
+            [linkedId: 1, linkedEntity:'Contact'],
+            [linkedId: 2, linkedEntity:'Contact']
+        ]
+        def params = [orgId: orgId, note:[body: 'foo'], links: links]
+        Activity activity = Activity.create(params)
+
+        then:
+        activity.note != null
+        activity.name == 'foo'
+        activity.note.body == 'foo'
+        activity.links[0].linkedId == 1
+        activity.links[0].linkedEntity == 'Contact'
+        activity.links[1].linkedId == 2
+        activity.links[1].linkedEntity == 'Contact'
+    }
 
     void "creates note if summary is longer than 255"() {
         when:
-        def params = [kind:"Note", org:MockData.org()]
+        def params = [kind:"Note", org: MockData.org()]
         params.name = RandomStringUtils.randomAlphabetic(300)
         Activity activity = Activity.create(params)
 
@@ -114,6 +160,49 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
                 org    : [id: org.id],
                 note   : [body: 'test note'],
                 name: '!! should get overriden as it has a note !!'
+        ]
+
+        Activity act = Activity.create(params)
+        act.persist(flush:true)
+
+        then:
+        ActKinds.Note == act.kind
+        'test note' == act.name
+        'test note' == act.note.body
+
+        when:
+        flush()
+        Activity activity = Activity.get(act.id)
+
+        then:
+        activity
+        activity.note
+        params.note.body == activity.note.body
+        params.note.body == activity.name
+
+        ActKinds.Note == activity.kind
+        activity.task == null
+
+        when: "Activity is removed, note also gets removed"
+        activity.remove()
+
+        then:
+        Activity.get(act.id) == null
+        ActivityNote.get(activity.noteId) == null
+    }
+
+    void "create note with linkedId"(){
+        setup:
+        Org org = MockData.org()
+
+        expect:
+        org.id != null
+
+        when:
+        def params = [
+            org    : [id: org.id],
+            note   : [body: 'test note'],
+            name: '!! should get overriden as it has a note !!'
         ]
 
         Activity act = Activity.create(params)

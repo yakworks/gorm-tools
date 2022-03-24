@@ -16,6 +16,7 @@ import gorm.tools.utils.GormUtils
 import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
 import yakworks.api.Result
+import yakworks.rally.activity.ActivityCopier
 import yakworks.rally.activity.repo.ActivityRepo
 import yakworks.rally.attachment.repo.AttachmentLinkRepo
 import yakworks.rally.orgs.model.Contact
@@ -37,7 +38,7 @@ class OrgCopier {
     @Inject OrgTagRepo orgTagRepo
     @Inject AttachmentLinkRepo attachmentLinkRepo
     @Inject ActivityRepo activityRepo
-
+    @Inject ActivityCopier activityCopier
     /**
      * Copies fields from the one Org entity to another, it copies associations as well.
      *
@@ -74,7 +75,7 @@ class OrgCopier {
         //these return problems but dont throw errors so rollback doesn't happen if an attachment is bad
         results.merge attachmentLinkRepo.copy(fromOrg, toOrg)
 
-        results.merge activityRepo.copyToOrg(fromOrg, toOrg)
+        results.merge activityCopier.copyToOrg(fromOrg, toOrg)
 
         return results
 

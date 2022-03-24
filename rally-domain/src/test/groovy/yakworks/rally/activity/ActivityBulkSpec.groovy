@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils
 
 import spock.lang.Specification
 import yakworks.commons.util.BuildSupport
+import yakworks.rally.activity.ActivityBulk
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityLink
 import yakworks.rally.activity.model.ActivityNote
@@ -27,10 +28,11 @@ import yakworks.rally.orgs.model.OrgType
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Activity>, SecurityTest  {
+class ActivityBulkSpec extends Specification implements DomainRepoTest<Activity>, SecurityTest  {
 
     ActivityRepo activityRepo
     AppResourceLoader appResourceLoader
+    ActivityBulk activityBulk
 
     def setupSpec() {
         defineBeans {
@@ -38,6 +40,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
                 grailsApplication = grailsApplication
             }
             attachmentSupport(AttachmentSupport)
+            activityBulk(ActivityBulk)
         }
         mockDomains(Customer, Activity, ActivityNote, ActivityLink,
             Org, OrgTag, Payment, AttachmentLink, Attachment, Task, TaskType, TaskStatus
@@ -56,7 +59,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         activityRepo != null
 
         when:
-        activityRepo.insertMassActivity([customerOne, customerTwo], [name: 'note_test'])
+        activityBulk.insertMassActivity([customerOne, customerTwo], [name: 'note_test'])
 
         then:
         [customerOne, customerTwo].each { id ->
@@ -91,7 +94,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         activityRepo != null
 
         when:
-        activityRepo.insertMassActivity([p1, p2], changes, null, true)
+        activityBulk.insertMassActivity([p1, p2], changes, null, true)
 
         then: "Activity with attachments is created for each payments"
         [p1, p2].each { id ->
@@ -147,7 +150,7 @@ class ActivityMassUpdateSpec extends Specification implements DomainRepoTest<Act
         List targets = [c1, c2]
 
         when:
-        activityRepo.insertMassActivity(targets, changes)
+        activityBulk.insertMassActivity(targets, changes)
 
         then: "Activity is created with task for each customer"
         targets.each { Customer it ->

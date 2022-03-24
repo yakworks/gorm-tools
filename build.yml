@@ -37,7 +37,7 @@ app:
 
 bot:
   email: 9cibot@9ci.com
-  user: 9cibot2
+  user: 9cibot
 
 vault_url: https://github.com/9ci/vault.git
 

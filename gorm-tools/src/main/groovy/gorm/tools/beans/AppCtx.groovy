@@ -97,6 +97,11 @@ class AppCtx {
         getCtx().getBean(requiredType)
     }
 
+    /**
+     * Publish events using spring appCtx.
+     * grails 4.x uses MicronautApplicationEventPublisher - which internally forwards all published events to micronaut
+     * which expects listeners to implement  io.micronaut.context.event.ApplicationEventListener.
+     */
     static void publishEvent(ApplicationEvent event){
         //we use the grails.mainContext here because the appCtx scrambles during tests and gets lost
         ((ApplicationEventPublisher)getGrails().mainContext).publishEvent(event)

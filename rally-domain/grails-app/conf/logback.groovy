@@ -42,5 +42,5 @@ logger("org.hibernate.orm.deprecation", OFF)
 //TURN ON for benchmarks
 logger "org.hibernate", INFO
 // // for stats and sql logging
-logger 'org.hibernate.stat', DEBUG
-logger 'org.hibernate.SQL', DEBUG
+// logger 'org.hibernate.stat', DEBUG
+// logger 'org.hibernate.SQL', DEBUG

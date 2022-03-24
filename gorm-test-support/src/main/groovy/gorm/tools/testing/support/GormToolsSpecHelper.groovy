@@ -11,7 +11,6 @@ import org.grails.testing.GrailsUnitTest
 import org.grails.testing.gorm.spock.DataTestSetupSpecInterceptor
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.beans.factory.support.BeanDefinitionRegistry
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.util.ClassUtils
 import org.springframework.validation.Validator
@@ -35,7 +34,6 @@ import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.transaction.TrxService
 import gorm.tools.validation.RepoEntityValidator
-import gorm.tools.validation.RepoValidatorRegistry
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
 import yakworks.i18n.icu.GrailsICUMessageSource
@@ -145,7 +143,14 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         def doWithDomainsClosure = doWithDomains()
         if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
 
+        //put here so we can use trait to setup security when needed
+        def doWithSecurityClosure = doWithSecurity()
+        if(doWithSecurityClosure) beanClosures.add(doWithSecurityClosure)
+
         defineBeansMany(beanClosures)
+
+        //put here so we can use trait to setup security when needed
+        doAfterDomains()
 
         // redo the cache for the repo event methods in the repos
         // ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
@@ -215,9 +220,22 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
     /**
      * override this to add beans during appContext init with the domains and repos
-     * @return
      */
     Closure doWithDomains() {
+        null
+    }
+
+    /**
+     * override this to add beans during appContext init with the domains and repos
+     */
+    void doAfterDomains() {
+        null
+    }
+
+    /**
+     * override this to add beans that are needed for security setups
+     */
+    Closure doWithSecurity() {
         null
     }
 }

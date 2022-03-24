@@ -157,6 +157,7 @@ class SyncJobContext {
                 //if its not the first time writing out then add comma for last object
                 if(!isFirstWrite) writer.write(',\n')
                 sjb.call it
+                if(isFirstWrite) isFirstWrite = false //set to false once 1st recod is written
             }
             IOUtils.flushAndClose(writer)
         } else {

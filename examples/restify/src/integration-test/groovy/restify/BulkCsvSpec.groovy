@@ -11,6 +11,7 @@ import yakworks.commons.io.FileUtil
 import yakworks.commons.util.BuildSupport
 import yakworks.gorm.testing.http.RestIntegrationTest
 import yakworks.rally.attachment.model.Attachment
+import yakworks.rally.attachment.repo.AttachmentRepo
 import yakworks.rally.job.SyncJob
 import yakworks.rally.orgs.model.Contact
 
@@ -20,7 +21,7 @@ class BulkCsvSpec  extends Specification implements RestIntegrationTest {
 
     RestRepoApiController<Contact> controller
     AppResourceLoader appResourceLoader
-    AsyncService asyncService
+    AttachmentRepo attachmentRepo
 
     void setup() {
         controllerName = 'ContactController'
@@ -30,8 +31,6 @@ class BulkCsvSpec  extends Specification implements RestIntegrationTest {
         setup: "Create zip"
         //Org.create(num:"bulk1", name:"bulk1", companyId: Company.DEFAULT_COMPANY_ID).persist()
 
-        boolean asyncBck = asyncService.asyncEnabled
-        asyncService.asyncEnabled = false //disable parallel for test
         File contactCsv =  new File(BuildSupport.gradleRootProjectDir, "examples/resources/csv/contact.csv")
         assert contactCsv.exists()
 
@@ -58,7 +57,7 @@ class BulkCsvSpec  extends Specification implements RestIntegrationTest {
         controller.params.attachmentId = attachment.id
         controller.params['promiseEnabled'] = false //disable promise for test
         controller.params['dataFilename'] = "contact.csv"
-        controller.params['saveDataAsFile'] = false
+        controller.params['saveDataAsFile'] = true //write to file
 
         controller.bulkCreate()
         Map body = response.bodyToMap()
@@ -67,6 +66,13 @@ class BulkCsvSpec  extends Specification implements RestIntegrationTest {
         body != null
         body.state == "Finished"
         body.ok == true
+        body.id != null
+
+        and: "sanity check response"
+        body.data instanceof Collection
+        body.data[0].ok == true
+        body.data[0].data instanceof Map
+        body.data[0].data.num == "bulk1"
 
         when: "Verify db records"
         List<Contact> created = Contact.findAllByNumLike("bulk_")
@@ -76,8 +82,15 @@ class BulkCsvSpec  extends Specification implements RestIntegrationTest {
         created[0].num == "bulk1"
         created[0].orgId == 1
 
+        when: "Verify syncjob"
+        SyncJob syncJob =  SyncJob.get(body.id as Long)
+
+        then:
+        syncJob  != null
+        syncJob.dataId != null //should have been set for bulk csv.
+
         cleanup: "cleanup db"
-        asyncService.asyncEnabled = asyncBck
+        attachmentRepo.removeById(syncJob.dataId as Long)
         Attachment.withNewTransaction {
             if(attachment) attachment.remove()
             if(body.id) SyncJob.removeById(body.id as Long) //syncjob is created in new transaction

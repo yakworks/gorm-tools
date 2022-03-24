@@ -5,9 +5,6 @@
 package yakworks.rally
 
 import grails.plugin.springsecurity.SpringSecurityUtils
-import yakworks.rally.orgs.OrgCopier
-import yakworks.rally.orgs.OrgDimensionService
-import yakworks.rally.orgs.OrgMemberService
 import yakworks.rally.orgs.UserOrgService
 
 @SuppressWarnings('Indentation')

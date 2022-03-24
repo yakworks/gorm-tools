@@ -48,6 +48,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
+     * The default is to use the short domain name with "_" appended to it.
      * @param targetClass The target class
      * @param alias The root alias to be used in queries
      */

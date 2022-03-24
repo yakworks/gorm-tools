@@ -35,6 +35,7 @@ import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import yakworks.api.ApiResults
 import yakworks.api.Result
+import yakworks.commons.json.JsonEngine
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
@@ -134,7 +135,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
         if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
-        if(args.bindAction.isCreate()){
+        if(args.bindAction?.isCreate()){
             if(data.linkedId && data.linkedEntity) {
                 activityLinkRepo.create(data.linkedId as Long, data.linkedEntity as String, activity)
             } else if(data.links) {
@@ -154,22 +155,33 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
     }
 
     /**
-     * Override query for custom search for Tags etc..
+     * Override query for custom search for Tags and ActivityLinks
      */
     @Override
     MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.criteria
+        Map crit = queryArgs.criteria
         DetachedCriteria tagExistsCrit
-        if(criteriaMap.tags || criteriaMap.tagIds) {
-            Map tagCriteriaMap = [tags: criteriaMap.remove('tags'), tagIds: criteriaMap.remove('tagIds')]
+        DetachedCriteria actLinkExists
+        if(crit.tags || crit.tagIds) {
+            Map tagCriteriaMap = [tags: crit.remove('tags'), tagIds: crit.remove('tagIds')]
             //if its has tags keys then this returns something to add to exists, will remove the keys as well
             tagExistsCrit = TagLink.getExistsCriteria(tagCriteriaMap, Activity, 'activity_.id')
+        }
+        if(crit.linkedId && crit.linkedEntity) {
+            Long linkedId = crit.remove('linkedId') as Long //remove so they dont flow through to query
+            String linkedEntity = crit.remove('linkedEntity') as String
+            actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
         }
         MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
         //if it has tags key
         if(tagExistsCrit != null) {
             detCrit.exists(tagExistsCrit.id())
         }
+        if(actLinkExists != null) {
+            detCrit.exists(actLinkExists.id())
+        }
+
+        // detCrit.order('createdDate', 'desc')
 
         return detCrit
     }
@@ -437,15 +449,10 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
     }
 
     DetachedCriteria<Activity> linkedActivityCriteria(Persistable linkedEntity, Activity.Kind kind = null) {
-        def actLinkExists = ActivityLink.query {
-            setAlias 'actLink'
-            eqProperty("activity.id", "act.id")
-            eq("linkedId", linkedEntity.id)
-            eq("linkedEntity", linkedEntity.class.simpleName)
-        }
+        def actLinkExists = getActivityLinkCriteria(linkedEntity.id, linkedEntity.class.simpleName)
 
         return Activity.query {
-            setAlias 'act'
+            setAlias 'activity_'
             if(kind) {
                 eq("kind", kind)
             }
@@ -459,7 +466,7 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
 
         def attachExists = AttachmentLink.query {
             setAlias 'attachLink'
-            eqProperty("linkedId", "act.id")
+            eqProperty("linkedId", "activity_.id")
             eq("linkedEntity", 'Activity')
         }
 
@@ -469,21 +476,30 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
     @ReadOnly
     List<Activity> listByLinked(Long linkedId, String linkedEntity, Map params) {
         Pager pager = new Pager(params)
-        def crit = getActivityByLinkedCriteria(linkedId, linkedEntity, params.custArea as boolean, )
+        def crit = getActivityByLinkedCriteria(linkedId, linkedEntity, params.custArea as boolean)
         crit.order('createdDate', 'desc')
         List<Activity> activityList = crit.list(max: pager.max, offset: pager.offset)
         return activityList
     }
 
-    DetachedCriteria<Activity> getActivityByLinkedCriteria(Long linkedId,  String linkedEntity, boolean custArea = false) {
-        def actLinkExists = ActivityLink.query {
-            setAlias 'actLink'
-            eqProperty("activity.id", "act.id")
+    /**
+     * gets the criteria for ActivityLinks that can be used in an exists
+     */
+    DetachedCriteria<ActivityLink> getActivityLinkCriteria(Long linkedId,  String linkedEntity) {
+        return ActivityLink.query {
+            // setAlias 'actLink'
+            //"activity.id" is the field on ActivityLink and "activity_.id" is the alias on activity
+            eqProperty("activity.id", "activity_.id")
             eq("linkedId", linkedId)
             eq("linkedEntity", linkedEntity)
         }
+    }
+
+    DetachedCriteria<Activity> getActivityByLinkedCriteria(Long linkedId,  String linkedEntity, boolean custArea = false) {
+        def actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
+
         return Activity.query {
-            setAlias 'act'
+            setAlias 'activity_' //match default
             createAlias('task', 'task')
             join('task', JoinType.LEFT)
             exists actLinkExists.id()

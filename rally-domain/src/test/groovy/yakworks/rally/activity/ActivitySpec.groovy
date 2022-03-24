@@ -1,13 +1,13 @@
 package yakworks.rally.domain
 
-import org.apache.commons.lang3.RandomStringUtils
-
 import gorm.tools.model.Persistable
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
+import grails.plugin.viewtools.AppResourceLoader
+import org.apache.commons.lang3.RandomStringUtils
+import spock.lang.Ignore
+import spock.lang.IgnoreRest
 import spock.lang.Shared
 import yakworks.gorm.testing.SecurityTest
-import gorm.tools.testing.unit.DataRepoTest
-import grails.plugin.viewtools.AppResourceLoader
-import spock.lang.Specification
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
 import yakworks.rally.activity.model.ActivityLink
@@ -26,24 +26,26 @@ import yakworks.rally.testing.MockData
 
 import static yakworks.rally.activity.model.Activity.Kind as ActKinds
 
-class ActivitySpec extends Specification implements DataRepoTest, SecurityTest { //implements SecuritySpecUnitTestHelper{
+class ActivitySpec extends GormToolsHibernateSpec implements SecurityTest { //implements SecuritySpecUnitTestHelper{
     //Sanity checks and auto runs DomainRepoCrudSpec tests
 
+    ActivityRepo activityRepo
     @Shared Long orgId
 
-    void setupSpec(){
-        defineBeans{
-            appResourceLoader(AppResourceLoader) {
-                grailsApplication = grailsApplication
-            }
-            attachmentSupport(AttachmentSupport)
+    List<Class> getDomainClasses() { [AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
+                                      Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact] }
+
+    Closure doWithDomains() { { ->
+        appResourceLoader(AppResourceLoader) {
+            grailsApplication = grailsApplication
         }
-        mockDomains(AttachmentLink, ActivityLink, Activity, TaskType, Org, OrgTag,
-            Tag, TagLink, Attachment, ActivityNote, Contact, ActivityContact)
+        attachmentSupport(AttachmentSupport)
+    }}
+
+    void setupSpec(){
+        // super.setupSpec()
         orgId = MockData.org().id
     }
-
-    ActivityRepo activityRepo
 
     static Map getNoteParams(){
         return [
@@ -74,6 +76,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         when:
         def params = [orgId: orgId, note:[body: 'foo'], linkedId: 1, linkedEntity:'Contact']
         Activity activity = Activity.create(params)
+        flush()
 
         then:
         activity.note != null
@@ -91,6 +94,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         ]
         def params = [orgId: orgId, note:[body: 'foo'], links: links]
         Activity activity = Activity.create(params)
+        flush()
 
         then:
         activity.note != null
@@ -99,7 +103,16 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         activity.links[0].linkedId == 1
         activity.links[0].linkedEntity == 'Contact'
         activity.links[1].linkedId == 2
-        activity.links[1].linkedEntity == 'Contact'
+
+        when:
+        // add another activity
+        Activity.create(params)
+        flush()
+        def linkedActs = Activity.repo.queryList([linkedId: 1, linkedEntity:'Contact'])
+
+        then:
+        linkedActs.size() == 2
+
     }
 
     void "creates note if summary is longer than 255"() {
@@ -117,7 +130,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
     void "update note if exists"() {
         when:
-        Org org = build(Org)
+        Org org = Org.get(orgId)
         Activity activity = build(Activity, [org:org])
         activity.persist()
         def params = [kind:"Note", id:activity.id]
@@ -269,10 +282,10 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
     void testAddActivityContact() {
         when:
-        Org org = build(Org)
+        Org org = Org.get(orgId)
         Activity act = build(Activity, [org:org])
         act.repo.addNote(act, "test body")
-        act.persist()
+        act.persist(flush: true)
 
         then:
         act.note?.id != null
@@ -285,7 +298,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
     void testUpdateSummary_WithNoteKind_AndShortBody(){
 
         when:
-        Org org = build(Org)
+        Org org = Org.get(orgId)
         Activity activity = build(Activity, [org:org, name: 'test summary'])
         activity.repo.addNote(activity, "test body")
         activity.persist()
@@ -298,7 +311,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
     void testUpdateSummary_WithLongBody(){
         when:
-        Org org = build(Org)
+        Org org = Org.get(orgId)
         Activity activity = build(Activity, [org:org, name: 'test summary'])
         //Adding noteBody with more than 255 chars
         String noteBody = "DENIAL 1:  Proof of shipment enclosed.  Order shipped FOB Origin.  Please repay the deduction and address carton shrotage issues with your designated carrier. tt Matt Johnson w/Albuquerque Factory, said not valid sales allowance. LVM to Robert remind. new past due invoices."
@@ -315,7 +328,7 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
 
     void testUpdateSummary_With255CharsBody(){
         setup:
-        Org org = build(Org)
+        Org org = Org.get(orgId)
         Activity activity = build(Activity, [org:org, name: 'test summary'])
         //Adding noteBody with exact 255 chars
         String noteBody = "DENIAL 1:  Proof of shipment enclosed.  Order shipped FOB Origin.  Please repay the deduction and address carton shrotage issues with your designated carrier. tt Matt Johnson w/Albuquerque Factory, said not valid sales allowance. LVM to Robert remind. new"
@@ -334,12 +347,14 @@ class ActivitySpec extends Specification implements DataRepoTest, SecurityTest {
         255 == activity.name.length()
     }
 
+    @Ignore
     def "test removeActivityAttachment"() {
         setup:
         Attachment attachment = build(Attachment) //new Attachment(TestDataJson.buildMap([:], Attachment))
         attachment.location = "foo/bar"
         attachment.persist()
-        def activity = build(Activity) as Persistable
+        Org org = Org.get(orgId)
+        Activity activity = build(Activity, [org:org]) as Persistable
         AttachmentLink.create(activity, attachment)
 
         Long attId = attachment.id

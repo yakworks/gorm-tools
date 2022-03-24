@@ -4,7 +4,6 @@
 */
 package yakworks.rally.orgs.model
 
-
 import grails.compiler.GrailsCompileStatic
 import grails.persistence.Entity
 

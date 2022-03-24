@@ -82,11 +82,17 @@ abstract class GormToolsHibernateSpec extends HibernateSpec implements Autowired
         def doWithDomainsClosure = doWithDomains()
         if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
 
+        //put here so we can use trait to setup security when needed
+        def doWithSecurityClosure = doWithSecurity()
+        if(doWithSecurityClosure) beanClosures.add(doWithSecurityClosure)
+
         defineBeansMany(beanClosures)
         // rescan needed after the beans are added
         ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
         // doWithSpringAfter()
         RepoValidatorRegistry.init(hibernateDatastore, ctx.getBean('messageSource'))
+        //put here so we can use trait to setup security when needed
+        doAfterDomains()
     }
 
     /** consistency with other areas of grails and other unit tests */

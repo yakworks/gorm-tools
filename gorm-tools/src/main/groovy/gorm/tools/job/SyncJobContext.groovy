@@ -155,9 +155,12 @@ class SyncJobContext {
             def dataList = transformResults(currentResults)
             dataList.each {
                 //if its not the first time writing out then add comma for last object
-                if(!isFirstWrite) writer.write(',\n')
+                if(!isFirstWrite)  {
+                    writer.write(',\n')
+                } else {
+                    isFirstWrite = false  //set to false once 1st recod is written with a comma ","
+                }
                 sjb.call it
-                if(isFirstWrite) isFirstWrite = false //set to false once 1st recod is written
             }
             IOUtils.flushAndClose(writer)
         } else {

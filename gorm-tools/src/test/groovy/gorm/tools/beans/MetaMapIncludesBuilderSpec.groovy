@@ -20,6 +20,20 @@ class MetaMapIncludesBuilderSpec extends Specification implements DataRepoTest {
         mockDomains KitchenSink, SinkExt, SinkItem, Thing, Enummy
     }
 
+    void "build works with short entity name and fully qualified"(){
+        when:
+        def res = MetaMapIncludesBuilder.build("Thing", ['name'])
+
+        then:
+        res.className == 'yakworks.gorm.testing.model.Thing'
+
+        when: "use fully qualified"
+        res = MetaMapIncludesBuilder.build('yakworks.gorm.testing.model.Thing', ['name'])
+
+        then:
+        res.className == 'yakworks.gorm.testing.model.Thing'
+    }
+
     void "test buildIncludesMap"(){
         when:
         def res = MetaMapIncludesBuilder.build("Thing", ['name'])

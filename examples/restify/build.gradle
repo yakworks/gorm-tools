@@ -33,6 +33,10 @@ dependencies {
   // compile "org.grails.plugins:spring-security-rest-grailscache:$vSpringSecurityRest"
   compile "org.grails.plugins:spring-security-rest-gorm:$vSpringSecurityRest"
 
+  // ** for the openApi parsing, doesnt come through for some reason **
+  // runtime "io.swagger.parser.v3:swagger-parser:$vSwagger"
+  // runtime "io.swagger.parser.v3:swagger-parser-v3:$vSwagger"
+
   // dk.glasius not working, load twice
   // runtimeOnly "dk.glasius:external-config:$vExternalConfig"
   runtime "org.grails.plugins:external-config:$vExternalConfig"

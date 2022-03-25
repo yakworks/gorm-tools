@@ -14,7 +14,7 @@ import grails.plugin.cache.Cacheable
 /**
  * Service to generate the MetaMapSchema from a MetaMapIncludes thats cached.
  * Leans on the build in MetaMapSchema but wrapped in sevice here so it can have @Cacheable
- * See unit tests in rally-domain for how it works
+ * See MetaMapSchemaSpec unit tests and rally-domain for how it works
  */
 @Slf4j
 @CompileStatic

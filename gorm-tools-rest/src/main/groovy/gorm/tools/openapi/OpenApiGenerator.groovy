@@ -26,14 +26,11 @@ import yakworks.commons.util.BuildSupport
 import static gorm.tools.openapi.ApiSchemaEntity.CruType
 
 /**
- * Generates the domain part
- * should be merged with either Swaggydocs or Springfox as outlined
- * https://github.com/OAI/OpenAPI-Specification is the new openAPI that
- * Swagger moved to.
+ * Generates domains to schema
  * We are chasing this part https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#schemaObject
- * Created by JBurnett on 6/19/17.
+ * @author Joshua Burnett (@basejump)
+ * @since 7.0.8
  */
-//@CompileStatic
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
 class OpenApiGenerator implements ConfigAware {

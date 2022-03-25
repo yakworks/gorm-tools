@@ -4,21 +4,17 @@
 */
 package gorm.tools.openapi
 
-
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.map.MetaMapIncludes
-import io.swagger.v3.oas.models.ExternalDocumentation
-import io.swagger.v3.oas.models.media.Discriminator
 import io.swagger.v3.oas.models.media.Schema
-import io.swagger.v3.oas.models.media.XML
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.MapFlattener
 
 /**
  * Includes tree for root entity and nested association properties
- * See unit tests in rally-domain for how it works
+ * See MetaMapSchemaSpec unit tests and rally-domain for how it works
  */
 @Slf4j
 @CompileStatic

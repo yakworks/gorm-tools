@@ -27,7 +27,9 @@ import yakworks.commons.lang.NameUtils
 import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.Maps
 
-
+/**
+ * Entity holder for schema based on CRUType
+ */
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
 class ApiSchemaEntity {

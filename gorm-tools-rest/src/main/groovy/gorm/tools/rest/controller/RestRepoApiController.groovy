@@ -30,6 +30,7 @@ import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
+import gorm.tools.rest.responder.EntityResponder
 import grails.web.Action
 import yakworks.problem.ProblemTrait
 
@@ -68,6 +69,9 @@ trait RestRepoApiController<D> extends RestApiController {
     @Autowired(required = false)
     CsvToMapTransformer csvToMapTransformer
 
+    @Autowired(required = false)
+    EntityResponder<D> entityResponder
+
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
      * done in {@link gorm.tools.repository.GormRepo#getEntityClass}
@@ -82,6 +86,12 @@ trait RestRepoApiController<D> extends RestApiController {
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), RestRepoApiController)
         return entityClass
+    }
+
+
+    EntityResponder<D> getEntityResponder(){
+        if (!entityResponder) this.entityResponder = EntityResponder.of(getEntityClass())
+        return entityResponder
     }
 
     /**
@@ -146,7 +156,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def get() {
         try {
             D instance = (D) getRepo().read(params.id as Serializable)
-            RepoUtil.checkFound(instance, params.id as Serializable, entityClass.simpleName)
+            RepoUtil.checkFound(instance, params.id as Serializable, getEntityClass().simpleName)
             respondWithEntityMap(instance)
         } catch (Exception e) {
             handleException(e)
@@ -269,8 +279,7 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
-        MetaMap entityMap = createEntityMap(instance)
-        respondWith(entityMap, [status: status])
+        getEntityResponder().respondWith(this, instance, status)
     }
 
     /**
@@ -284,31 +293,9 @@ trait RestRepoApiController<D> extends RestApiController {
     Pager pagedQuery(Map params, List<String> includesKeys) {
         Pager pager = new Pager(params)
         List dlist = query(pager, params)
-        List<String> incs = findIncludes(params, includesKeys)
+        List<String> incs = getEntityResponder().findIncludes(params, includesKeys)
         MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
         return pager.setEntityMapList(entityMapList)
-    }
-
-    /**
-     * finds the right includes.
-     *   - looks for includes param and uses that if passed in
-     *   - looks for includesKey param and uses that if set, falling back to the defaultIncludesKey
-     *   - falls back to the passed fallbackKeys if not set
-     *   - the fallbackKeys will itself unlimately fallback to the 'get' includes if it can't be found
-     *
-     * @param params the request params
-     * @return the List of includes field that can be passed to the MetaMap creation
-     */
-    List<String> findIncludes(Map params, List<String> fallbackKeys = []){
-        List<String> keyList = []
-        //if it has a includes then just parse that and pass it back
-        if(params.containsKey('includes')) {
-            return (params['includes'] as String).tokenize(',')*.trim()
-        } else if(params.containsKey('includesKey')){
-            keyList << (params['includesKey'] as String)
-        }
-        keyList.addAll(fallbackKeys)
-        return IncludesConfig.getFieldIncludes(getIncludesMap(), keyList)
     }
 
     List<D> query(Pager pager, Map parms) {
@@ -317,43 +304,10 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     /**
-     * builds the response model with the EntityMap wrapper.
-     *
-     * @param instance the entity instance
-     * @param includeKey the key to use in the includes map, use default by default
-     * @return the object to pass on to json views
-     */
-    MetaMap createEntityMap(D instance){
-        flushIfSession() //in testing need to flush before generating entitymap
-        List<String> incs = findIncludes(params)
-        MetaMap emap = metaMapEntityService.createMetaMap(instance, incs)
-        return emap
-    }
-
-    /**
-     * In rare cases controller action will be inside a hibernate session
-     * primarily needed for testing but there are some edge cases where this is needed
-     * checks if repo datastore has a session and flushes if so
-     */
-    void flushIfSession(){
-        if(getRepo().datastore.hasCurrentSession()){
-            getRepo().flush()
-        }
-    }
-
-    /**
      * calls the IncludesConfig's getIncludes passing in any controller overrides
      */
     Map getIncludesMap(){
-        //we are in trait, always use getters in case they are overrriden in implementing class
-        return getIncludesConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), [:])
-    }
-
-    /**
-     * calls IncludesConfig.getFieldIncludes with this controllers getIncludesMap()
-     */
-    List<String> getFieldIncludes(List<String> includesKeys){
-        return IncludesConfig.getFieldIncludes(getIncludesMap(), [IncludesKey.get.name()])
+        return getEntityResponder().includesMap
     }
 
     void handleException(Exception e) {

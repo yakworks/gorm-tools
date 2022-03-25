@@ -28,7 +28,6 @@ import static yakworks.commons.json.JsonEngine.parseJson
 
 class BulkableRepoSpec extends GormToolsHibernateSpec {
 
-    ParallelTools parallelTools
     AsyncService asyncService
     KitchenSinkRepo kitchenSinkRepo
 

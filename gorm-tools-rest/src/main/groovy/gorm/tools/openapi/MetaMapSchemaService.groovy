@@ -34,7 +34,7 @@ class MetaMapSchemaService {
     /**
      * get the MetaMapSchema from the MetaMapIncludes
      */
-    @Cacheable('entityMapIncludes')
+    @Cacheable('metaMapSchema')
     MetaMapSchema getCachedMetaMapSchema(MetaMapIncludes mmi) {
         return MetaMapSchema.of(mmi)
     }

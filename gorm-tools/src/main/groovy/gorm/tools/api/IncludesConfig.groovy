@@ -39,7 +39,7 @@ class IncludesConfig implements ConfigAware {
         return (incsMap ? incsMap[IncludesKey.qSearch.name()] : []) as List<String>
     }
 
-    @Cacheable('apiConfig.includes')
+    @Cacheable('apiConfig.includesByClass')
     Map getIncludes(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
         Map pathConfig = findConfigByEntityClass(entityClass.name)

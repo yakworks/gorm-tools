@@ -1,3 +1,13 @@
+### v7.0.8-v.63
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.62...v7.0.8-v.63)
+- release fix to json [link](https://github.com/yakworks/gorm-tools/commit/252d8381f234ae29f1ef4e75370c5f889f546823)
+- Merge pull request #492 from yakworks/491-bulk-json-fix [link](https://github.com/yakworks/gorm-tools/commit/45546feca5b289ff8722c7c11065888fdbc4e349)
+- Add comment [link](https://github.com/yakworks/gorm-tools/commit/021160763e16b524a934549ef2968bd3cc09d2b0)
+- #491 Fix Bulk response json, update & fix tests [link](https://github.com/yakworks/gorm-tools/commit/3a4daffdd5e9ae2bb3f6737d22dfeb2ae134ddd3)
+- refactor activity (#490) [link](https://github.com/yakworks/gorm-tools/commit/dcae7796aa4f8af3a519c0d66598ccc5f40e35b4)
+- Activity links (#489) [link](https://github.com/yakworks/gorm-tools/commit/1fc7f05a615d3bef3e89df67ce5faabb58789c6c)
+
 ### v7.0.8-v.62
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.61...v7.0.8-v.62)

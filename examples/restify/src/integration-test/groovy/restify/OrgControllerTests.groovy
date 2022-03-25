@@ -110,4 +110,30 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
 
     }
 
+    void "list with includes"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [includes:"id,num"]
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        (data[0] as Map).keySet().size() ==2
+    }
+
+    void "list with includesKey"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [includesKey:'bulk']
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        (data[0] as Map).keySet().size() == 4
+    }
+
 }

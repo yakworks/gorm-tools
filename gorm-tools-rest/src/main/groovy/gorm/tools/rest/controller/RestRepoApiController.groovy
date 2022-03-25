@@ -31,6 +31,7 @@ import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
 import grails.web.Action
+import yakworks.commons.map.Maps
 import yakworks.problem.ProblemTrait
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -52,6 +53,9 @@ trait RestRepoApiController<D> extends RestApiController {
 
     static allowedMethods = [
         post: "POST", put: ["PUT", "POST"], bulkUpdate: "POST", bulkCreate: "POST", delete: "DELETE"] //patch: "PATCH",
+
+    //common valida param keys to remove so that will not be considered a filte
+    static List<String> COMMON_PARAMS=['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
 
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
     final private static Logger log = LoggerFactory.getLogger(RestRepoApiController)
@@ -312,7 +316,10 @@ trait RestRepoApiController<D> extends RestApiController {
     }
 
     List<D> query(Pager pager, Map parms) {
-        QueryArgs qargs = QueryArgs.of(pager).build(parms)
+        Map p = Maps.clone(parms) as Map<String, Object>
+        //remove the fields that grails adds for controller and action
+        p.removeAll {it.key in COMMON_PARAMS }
+        QueryArgs qargs = QueryArgs.of(pager).build(p)
         ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }
 

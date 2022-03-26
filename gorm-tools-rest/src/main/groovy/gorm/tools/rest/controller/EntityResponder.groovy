@@ -27,8 +27,8 @@ import yakworks.commons.map.Maps
  */
 @CompileStatic
 class EntityResponder<D> {
-    //common valida param keys to remove so that will not be considered a filte
-    static List<String> COMMON_PARAMS=['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
+    //common valida param keys to remove so that will not be considered a filter
+    List<String> whitelistKeys =['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
 
     IncludesConfig includesConfig
     MetaMapEntityService metaMapEntityService
@@ -137,7 +137,7 @@ class EntityResponder<D> {
     List<D> query(Pager pager, Map parms) {
         Map pclone = Maps.clone(parms) as Map<String, Object>
         //remove the fields that grails adds for controller and action
-        pclone.removeAll {it.key in COMMON_PARAMS }
+        pclone.removeAll {it.key in whitelistKeys }
         QueryArgs qargs = QueryArgs.of(pager).build(pclone)
         ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }

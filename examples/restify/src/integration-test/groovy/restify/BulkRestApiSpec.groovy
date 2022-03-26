@@ -1,11 +1,11 @@
 package restify
 
+import grails.gorm.transactions.Rollback
 import org.apache.commons.lang3.StringUtils
 import org.springframework.http.HttpStatus
 
 import gorm.tools.job.SyncJobState
 import gorm.tools.rest.client.OkHttpRestTrait
-import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import okhttp3.Response
 import spock.lang.Specification
@@ -83,7 +83,7 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
     }
 
     void "test failures should rollback"() {
-        List<Map> jsonList =  [[num: "foox2", name: "Foox2", type: "Customer"]]
+        List<Map> jsonList =  [[num: "foox1", name: "Foox1", type: "Customer"]]
         jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
 
         when:
@@ -109,5 +109,47 @@ class BulkRestApiSpec extends Specification implements OkHttpRestTrait {
         OrgSource.withTransaction {
             OrgSource.findBySourceIdLike("ORG-1%") == null
         }
+    }
+    void "one fails - verify success & error includes"() {
+        List<Map> jsonList =  [[num: "foox1", name: "Foox1", type: "Customer"], [num: "Foox2", name: "Foox2", type: "Customer"]]
+        jsonList[0].num = StringUtils.rightPad("ORG-1-", 110, "X")
+
+        when:
+        Response resp = post(path, jsonList)
+        Map body = bodyToMap(resp)
+        SyncJob job = SyncJob.repo.getWithTrx(body.id as Long)
+
+        then:
+        body.ok == false
+        body.state == 'Finished'
+        job.id
+        job.data != null
+
+        when:
+        List json = parseJson(job.dataToString())
+        List requestData = parseJson(job.payloadToString())
+
+        then:
+        json != null
+        requestData != null
+        json.size() == 2
+
+        and: "Verify error fields"
+        json[0].ok == false
+        json[0].data instanceof Map
+        json[0].data.size() == 2 //just two error fields - num and name
+        json[0].data.num.startsWith "ORG-1-XXX"
+        json[0].data.name ==  "Foox1"
+
+        and: "Verify success fields"
+        json[1].ok == true
+        json[1].data instanceof Map
+        json[1].data.size() == 4 //4 fields for success ful response - id, num, name and source.sourceId
+        json[1].data.id !=  null
+        json[1].data.num == "Foox2"
+        json[1].data.name ==  "Foox2"
+        json[1].data.source.sourceId ==  "Foox2"
+
+        delete("/api/rally/org", json.data[1].id)
     }
 }

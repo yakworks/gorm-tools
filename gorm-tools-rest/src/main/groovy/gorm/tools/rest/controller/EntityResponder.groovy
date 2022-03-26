@@ -19,6 +19,7 @@ import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import grails.web.api.WebAttributes
+import yakworks.commons.map.Maps
 
 /**
  * Helpers for a Restfull api type controller.
@@ -26,6 +27,8 @@ import grails.web.api.WebAttributes
  */
 @CompileStatic
 class EntityResponder<D> {
+    //common valida param keys to remove so that will not be considered a filte
+    static List<String> COMMON_PARAMS=['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
 
     IncludesConfig includesConfig
     MetaMapEntityService metaMapEntityService
@@ -132,6 +135,9 @@ class EntityResponder<D> {
     }
 
     List<D> query(Pager pager, Map parms) {
+        Map p = Maps.clone(parms) as Map<String, Object>
+        //remove the fields that grails adds for controller and action
+        p.removeAll {it.key in COMMON_PARAMS }
         QueryArgs qargs = QueryArgs.of(pager).build(parms)
         ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }

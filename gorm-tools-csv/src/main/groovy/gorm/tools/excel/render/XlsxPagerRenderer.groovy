@@ -2,7 +2,7 @@
 * Copyright 2013 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.rest.render.csv
+package gorm.tools.excel.render
 
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
@@ -19,21 +19,21 @@ import grails.rest.render.RenderContext
  * @since 7.0.8
  */
 @CompileStatic
-class CSVPagerRenderer implements CSVRendererTrait<Pager> {
+class XlsxPagerRenderer implements XlsRendererTrait<Pager> {
 
     @Override
     @CompileDynamic
     void render(Pager pager, RenderContext context) {
         setContentType(context)
         setContentDisposition(context)
-        csvWriter(context).writeCsv(pager.data)
+        xlsxWriter(context).writeXlsx(pager.data)
     }
 
     //TODO should we set the file name?
     void setContentDisposition(RenderContext context){
         def servletCtx = (ServletRenderContext)context
         def name = context.getControllerName()
-        servletCtx.webRequest.response.setHeader("Content-Disposition", "attachment;filename=\"${name}.csv\"")
+        servletCtx.webRequest.response.setHeader("Content-Disposition", "attachment;filename=\"${name}.xlsx\"")
     }
 
 }

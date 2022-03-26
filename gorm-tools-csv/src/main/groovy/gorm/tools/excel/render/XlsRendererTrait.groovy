@@ -2,11 +2,11 @@
 * Copyright 2013 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.rest.render.csv
-
+package gorm.tools.excel.render
 
 import groovy.transform.CompileStatic
 
+import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 
@@ -27,11 +27,11 @@ import yakworks.i18n.icu.ICUMessageSource
  * @since 7.0.8
  */
 @CompileStatic
-trait CSVRendererTrait<T> implements Renderer<T> {
+trait XlsRendererTrait<T> implements Renderer<T> {
 
-    public static final MimeType TEXT_CSV = new MimeType('text/csv', "csv")
+    public static final MimeType XLSX_TYPE = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', "xlsx")
 
-    MimeType[] mimeTypes = [TEXT_CSV] as MimeType[]
+    MimeType[] mimeTypes = [XLSX_TYPE] as MimeType[]
     String encoding = 'UTF-8'
 
     @Autowired
@@ -47,16 +47,19 @@ trait CSVRendererTrait<T> implements Renderer<T> {
 
     @Override
     Class<T> getTargetType() {
-        if (!targetType) this.targetType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), CSVRendererTrait)
+        if (!targetType) this.targetType = (Class<T>) GenericTypeResolver.resolveTypeArgument(getClass(), XlsRendererTrait)
         return targetType
     }
 
-    CSVMapWriter csvWriter(RenderContext context) {
-        return CSVMapWriter.of(context.writer)
+    XlsxMapWriter xlsxWriter(RenderContext context) {
+        //throw away the writer and use outputStream
+        context.writer
+        def servletContext = (ServletRenderContext) context
+        return XlsxMapWriter.of(servletContext.webRequest.response.outputStream)
     }
 
     void setContentType(RenderContext context){
-        final mimeType = context.acceptMimeType ?: TEXT_CSV
+        final mimeType = context.acceptMimeType ?: XLSX_TYPE
         context.setContentType( GrailsWebUtil.getContentType(mimeType.name, encoding) )
     }
 

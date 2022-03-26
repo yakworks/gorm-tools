@@ -11,6 +11,8 @@ import groovy.transform.CompileStatic
 import org.grails.web.servlet.mvc.GrailsWebRequest
 import org.springframework.beans.factory.annotation.Autowired
 
+import gorm.tools.api.IncludesConfig
+import gorm.tools.api.IncludesKey
 import gorm.tools.beans.AppCtx
 import gorm.tools.csv.CsvToMapTransformer
 import gorm.tools.job.SyncJobArgs
@@ -39,6 +41,9 @@ class BulkControllerSupport<D> {
     @Autowired(required = false)
     CsvToMapTransformer csvToMapTransformer
 
+    @Autowired(required = false)
+    IncludesConfig includesConfig
+
     Class<D> entityClass // the domain class this is for
 
     BulkControllerSupport(Class<D> entityClass){
@@ -53,24 +58,17 @@ class BulkControllerSupport<D> {
         return bcs
     }
 
-    SyncJobEntity process(DataOp dataOp, List<Map> dataList, GrailsWebRequest webRequest, Object bulkIncludes) {
+    SyncJobEntity process(DataOp dataOp, List<Map> dataList, GrailsWebRequest webRequest) {
         // List dataList = bodyAsList() as List<Map>
         HttpServletRequest req = webRequest.currentRequest
         GrailsParameterMap params = webRequest.params
         String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
 
-        // def bulkIncludes = getEntityResponder().includesMap[IncludesKey.bulk.name()]
-        List bulkIncludesSuccess, errorIncludes
+        Map includesMap = includesConfig.getIncludes(entityClass)
+        List bulkIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulk.name()])
+        List bulkErrorIncludes = IncludesConfig.getFieldIncludes(includesMap, [IncludesKey.bulkError.name()])
 
-        if(bulkIncludes instanceof Map) {
-            bulkIncludesSuccess = bulkIncludes['success'] as List
-            errorIncludes = bulkIncludes['error'] as List
-        } else {
-            bulkIncludesSuccess = bulkIncludes as List
-            errorIncludes = null
-        }
-
-        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludesSuccess, errorIncludes: errorIncludes,
+        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludes, errorIncludes: bulkErrorIncludes,
             sourceId: sourceKey, source: params.jobSource, params: params)
         //Can override payload storage or turn off with 'NONE' if not needed for big loads
         syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)

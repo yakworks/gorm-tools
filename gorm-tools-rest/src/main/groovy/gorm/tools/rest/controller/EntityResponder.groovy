@@ -135,10 +135,10 @@ class EntityResponder<D> {
     }
 
     List<D> query(Pager pager, Map parms) {
-        Map p = Maps.clone(parms) as Map<String, Object>
+        Map pclone = Maps.clone(parms) as Map<String, Object>
         //remove the fields that grails adds for controller and action
-        p.removeAll {it.key in COMMON_PARAMS }
-        QueryArgs qargs = QueryArgs.of(pager).build(parms)
+        pclone.removeAll {it.key in COMMON_PARAMS }
+        QueryArgs qargs = QueryArgs.of(pager).build(pclone)
         ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }
 }

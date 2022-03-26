@@ -57,7 +57,6 @@ class OrgMangoOrderTests extends Specification implements DomainIntTest {
         list[0].contact.flex.num1 > list[1].contact.flex.num1
     }
 
-    // @IgnoreRest
     def "order query with mango desc"() {
         when:
         def qry = Org.query('$sort':["contact.flex.num1": 'desc'])

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
+import gorm.tools.api.IncludesConfig
 import gorm.tools.api.IncludesKey
 import gorm.tools.beans.Pager
 import gorm.tools.job.SyncJobEntity
@@ -198,8 +199,7 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void bulkProcess(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
-        def bulkIncludes = getEntityResponder().includesMap[IncludesKey.bulk.name()]
-        SyncJobEntity job = getBulkControllerSupport().process(dataOp, dataList, webRequest, bulkIncludes)
+        SyncJobEntity job = getBulkControllerSupport().process(dataOp, dataList, webRequest)
         respondWith(job, [status: MULTI_STATUS])
     }
 

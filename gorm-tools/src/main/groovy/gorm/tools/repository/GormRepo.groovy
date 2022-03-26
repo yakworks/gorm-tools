@@ -171,7 +171,7 @@ trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
             boolean valid = gormValidationApi().validate entity
             if(!valid && args.failOnError){
                 def ex = ValidationProblem.of(entity).errors(((GormEntity)entity).errors).toException()
-                println ex
+                // println ex
                 throw ex
             }
             return valid

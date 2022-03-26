@@ -10,8 +10,8 @@ import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.beans.map.MetaMapEntityService
-import gorm.tools.beans.map.MetaMapIncludes
+import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.MetaMapIncludes
 import grails.plugin.cache.Cacheable
 
 /**

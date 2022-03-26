@@ -1,6 +1,6 @@
 package gorm.tools.beans
 
-import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.security.domain.AppUser
 import yakworks.gorm.testing.SecuritySpecHelper
 import gorm.tools.testing.integration.DataIntegrationTest

@@ -5,12 +5,11 @@
 package gorm.tools.json
 
 import gorm.tools.testing.RepoTestData
-import spock.lang.IgnoreRest
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.compiler.GrailsCompileStatic

@@ -4,17 +4,10 @@
 */
 package gorm.tools.openapi
 
-import gorm.tools.beans.map.MetaMapEntityService
-import gorm.tools.beans.map.MetaMapIncludes
-import gorm.tools.beans.map.MetaMapIncludesBuilder
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.testing.unit.DataRepoTest
-import io.swagger.v3.oas.models.media.DateTimeSchema
-import io.swagger.v3.oas.models.media.IntegerSchema
-import io.swagger.v3.oas.models.media.NumberSchema
-import io.swagger.v3.oas.models.media.StringSchema
 import spock.lang.Shared
 import spock.lang.Specification
-import yakworks.commons.map.MapFlattener
 import yakworks.rally.orgs.model.Location
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgFlex

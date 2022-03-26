@@ -4,8 +4,8 @@
 */
 package gorm.tools
 
-import gorm.tools.beans.map.MetaMapList
-import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.metamap.MetaMapList
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.beans.Pager
 import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import testing.Address

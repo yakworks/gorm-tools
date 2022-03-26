@@ -106,6 +106,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         then:
         response.status == 200
         response.header("Content-Type").contains("text/csv")
+        response.header("Content-Disposition").contains('attachment;filename=')
         response.contentAsString
 
     }
@@ -121,7 +122,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         then:
         response.status == 200
         response.header("Content-Type").contains("spreadsheetml")
-
+        response.header("Content-Disposition").contains('attachment;filename=')
     }
 
     void "list with includes"() {

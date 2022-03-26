@@ -53,7 +53,7 @@ trait XlsRendererTrait<T> implements Renderer<T> {
 
     XlsxMapWriter xlsxWriter(RenderContext context) {
         //throw away the writer and use outputStream
-        context.writer
+        // context.writer
         def servletContext = (ServletRenderContext) context
         return XlsxMapWriter.of(servletContext.webRequest.response.outputStream)
     }

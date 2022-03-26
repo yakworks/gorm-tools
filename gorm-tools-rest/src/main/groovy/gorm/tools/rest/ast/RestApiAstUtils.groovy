@@ -126,6 +126,7 @@ class RestApiAstUtils {
         ListExpression responseFormatsExpression = new ListExpression()
         responseFormatsExpression.addExpression(new ConstantExpression("json"))
         responseFormatsExpression.addExpression(new ConstantExpression("csv"))
+        responseFormatsExpression.addExpression(new ConstantExpression("xlsx"))
         final publicStaticFinal = PUBLIC | STATIC | FINAL
         controllerNode.addProperty("responseFormats", publicStaticFinal, new ClassNode(List).getPlainNodeReference(), responseFormatsExpression, null, null)
     }

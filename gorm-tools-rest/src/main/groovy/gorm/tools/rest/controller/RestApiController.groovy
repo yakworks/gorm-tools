@@ -31,7 +31,7 @@ trait RestApiController implements RequestJsonSupport, RestResponder, RestRegist
 
     //default responseFormats should be just json
     static List getResponseFormats() {
-        return ['json', 'csv']
+        return ['json', 'csv', 'xlsx']
     }
 
     /**

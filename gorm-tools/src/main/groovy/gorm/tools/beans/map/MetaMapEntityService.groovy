@@ -22,8 +22,6 @@ import yakworks.commons.json.JsonEngine
 @CompileStatic
 class MetaMapEntityService {
 
-    @Autowired IncludesConfig includesConfig
-
     //static cheater to get the bean, use sparingly if at all
     static MetaMapEntityService bean(){
         AppCtx.get('metaMapEntityService', this)

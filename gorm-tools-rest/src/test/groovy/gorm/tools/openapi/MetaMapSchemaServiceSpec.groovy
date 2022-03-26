@@ -4,6 +4,7 @@
 */
 package gorm.tools.openapi
 
+import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.beans.map.MetaMapIncludes
 import gorm.tools.beans.map.MetaMapIncludesBuilder
 import gorm.tools.testing.unit.DataRepoTest
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.NumberSchema
 import io.swagger.v3.oas.models.media.StringSchema
+import spock.lang.Shared
 import spock.lang.Specification
 import yakworks.commons.map.MapFlattener
 import yakworks.rally.orgs.model.Location
@@ -22,23 +24,25 @@ import yakworks.rally.orgs.model.OrgFlex
  */
 class MetaMapSchemaServiceSpec extends Specification implements DataRepoTest {
 
-    MetaMapSchemaService metaMapSchemaService = new MetaMapSchemaService()
+    @Shared
+    def metaMapSchemaService = new MetaMapSchemaService()
+    // def metaMapEntityService = new MetaMapEntityService()
+
     void setupSpec() {
         //mockDomain Person
         mockDomains Org, OrgFlex, Location
+        metaMapSchemaService.metaMapEntityService = new MetaMapEntityService()
     }
 
     void "test buildIncludesMap simple"(){
         when:
-        MetaMapIncludes mmIncs = MetaMapIncludesBuilder.build("Org", ['id', 'num', 'name'])
-        MetaMapSchema mmSchema = metaMapSchemaService.getCachedMetaMapSchema(mmIncs)
+        // MetaMapIncludes mmIncs = MetaMapIncludesBuilder.build("Org", ['id', 'num', 'name'])
+        MetaMapSchema mmSchema = metaMapSchemaService.getSchema("yakworks.rally.orgs.model.Org", ['id', 'num', 'name'])
 
         then:
         mmSchema
         //sanity check
-        mmIncs.shortClassName == 'Org'
-        mmIncs.props.keySet() == ['id', 'num', 'name'] as Set
-
+        mmSchema.className == 'yakworks.rally.orgs.model.Org'
         mmSchema.props.keySet() == ['id', 'num', 'name'] as Set
 
     }

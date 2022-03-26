@@ -8,8 +8,11 @@ import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
 import gorm.tools.beans.AppCtx
+import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.beans.map.MetaMapIncludes
+import gorm.tools.beans.map.MetaMapIncludesBuilder
 import grails.plugin.cache.Cacheable
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Service to generate the MetaMapSchema from a MetaMapIncludes thats cached.
@@ -19,6 +22,9 @@ import grails.plugin.cache.Cacheable
 @Slf4j
 @CompileStatic
 class MetaMapSchemaService {
+
+
+    @Autowired MetaMapEntityService metaMapEntityService
 
     OapiSupport oapiSupport
 
@@ -35,8 +41,15 @@ class MetaMapSchemaService {
      * get the MetaMapSchema from the MetaMapIncludes
      */
     @Cacheable('metaMapSchema')
-    MetaMapSchema getCachedMetaMapSchema(MetaMapIncludes mmi) {
+    MetaMapSchema getSchema(MetaMapIncludes mmi) {
         return MetaMapSchema.of(mmi)
+    }
+
+    MetaMapSchema getSchema(String entityClassName, List<String> includes, List<String> excludes = []) {
+        MetaMapIncludes mmIncs = metaMapEntityService.getCachedMetaMapIncludes(entityClassName, includes, excludes)
+        MetaMapSchema mmSchema = getSchema(mmIncs)
+
+        return mmSchema
     }
 
 }

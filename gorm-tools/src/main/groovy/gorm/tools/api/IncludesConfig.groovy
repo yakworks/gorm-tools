@@ -39,7 +39,7 @@ class IncludesConfig implements ConfigAware {
         return (incsMap ? incsMap[IncludesKey.qSearch.name()] : []) as List<String>
     }
 
-    @Cacheable('apiConfig.includes')
+    @Cacheable('apiConfig.includesByClass')
     Map getIncludes(Class entityClass){
         Map includesMap = getClassStaticIncludes(entityClass)
         Map pathConfig = findConfigByEntityClass(entityClass.name)
@@ -62,9 +62,7 @@ class IncludesConfig implements ConfigAware {
     @Cacheable('apiConfig.includes')
     Map getIncludes(String entityKey, String namespace, Class entityClass, Map mergeIncludes){
         // look for includes map on the domain first
-        Map entityIncludes = ClassUtils.getStaticPropertyValue(entityClass, 'includes', Map)
         Map includesMap = getClassStaticIncludes(entityClass)
-
         Map pathConfig = getPathConfig(entityKey, namespace)
 
         //if anything on config then overrite them
@@ -89,13 +87,6 @@ class IncludesConfig implements ConfigAware {
     Map getPathConfig(String entityKey, String namespace){
         String configPath = namespace ? "api.paths.${namespace}.${entityKey}" : "api.paths.${entityKey}"
         Map pathConfig = config.getProperty(configPath, Map)
-        if(pathConfig == null && namespace){
-            //try the other way where key has namespace in it
-            Map apiConfigs = config.getProperty('api.paths', Map)
-            String pathkey = "${namespace}/${entityKey}"
-            pathConfig = apiConfigs.containsKey(pathkey) ? apiConfigs[pathkey] as Map : null
-        }
-
         //if nothing and it has a dot than entity key might be full class name with package, so do search
         if(!pathConfig && entityKey.indexOf('.') != -1)
             pathConfig = findConfigByEntityClass(entityKey)

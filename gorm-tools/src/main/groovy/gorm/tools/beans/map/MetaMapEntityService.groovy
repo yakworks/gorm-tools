@@ -85,7 +85,7 @@ class MetaMapEntityService {
      * @param excludes the excludes list in dot notation
      * @return the created EntityMapIncludes
      */
-    @Cacheable('entityMapIncludes')
+    @Cacheable('metaMapIncludes')
     MetaMapIncludes getCachedMetaMapIncludes(String entityClassName, List<String> includes, List<String> excludes) {
         return MetaMapIncludesBuilder.build(entityClassName, includes, excludes)
     }

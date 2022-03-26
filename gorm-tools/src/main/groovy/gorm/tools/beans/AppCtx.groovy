@@ -6,6 +6,7 @@ package gorm.tools.beans
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.context.ApplicationEvent
 import org.springframework.context.ApplicationEventPublisher
@@ -53,7 +54,7 @@ class AppCtx {
 //        if (!cachedApplicationContext) {
 //            cachedApplicationContext = Holders.applicationContext
 //        }
-        return Holders.applicationContext
+        return Holders.findApplicationContext()
     }
 
     /**
@@ -105,5 +106,14 @@ class AppCtx {
     static void publishEvent(ApplicationEvent event){
         //we use the grails.mainContext here because the appCtx scrambles during tests and gets lost
         ((ApplicationEventPublisher)getGrails().mainContext).publishEvent(event)
+    }
+
+    /**
+     * Autowires bean properties for object relying on @autowired annotations
+     */
+    static Object autowire(Object obj) {
+        //autowires using AUTOWIRE_NO
+        getCtx().autowireCapableBeanFactory.autowireBeanProperties(obj, AutowireCapableBeanFactory.AUTOWIRE_NO, false)
+        obj
     }
 }

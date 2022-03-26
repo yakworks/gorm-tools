@@ -4,9 +4,8 @@ api:
       org:
         includes:
           get: [ '*', info.*, location.id, tags, contact.$*, contact.flex.num1 ]
-          bulk:
-            success: ['id', 'num', 'name', 'source.sourceId']
-            error: ['num', 'name']
+          bulk: ['id', 'num', 'name', 'source.sourceId']
+          bulkError: ['num', 'name']
         gridOptions:
           colModel:
             - {name: id, width: 10, hidden: true }

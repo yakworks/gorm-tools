@@ -21,6 +21,7 @@ dependencies {
   compile "org.grails.plugins:views-json-templates:$vViews"
 
   compile project(":testify")
+  compile project(":gorm-tools-security")
   compile project(":gorm-tools-rest")
 
   compile "org.grails.plugins:view-tools:$vViewTools"

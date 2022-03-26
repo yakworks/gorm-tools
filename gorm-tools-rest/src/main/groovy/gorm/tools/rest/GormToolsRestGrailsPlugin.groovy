@@ -10,6 +10,7 @@ import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 
 import gorm.tools.csv.render.CSVPagerRenderer
+import gorm.tools.excel.render.XlsxPagerRenderer
 import gorm.tools.openapi.GormToSchema
 import gorm.tools.openapi.MetaMapSchemaService
 import gorm.tools.openapi.OpenApiGenerator
@@ -44,6 +45,7 @@ class GormToolsRestGrailsPlugin extends Plugin {
         syncJobRenderer(SyncJobRenderer)
 
         csvPagerRenderer(CSVPagerRenderer)
+        xlsxPagerRenderer(XlsxPagerRenderer)
 
         gormToSchema(GormToSchema) { bean ->
             bean.lazyInit = true

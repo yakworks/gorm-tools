@@ -110,6 +110,20 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
 
     }
 
+    void "sanity check XLSX"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [format:'xlsx']
+        controller.list()
+        // Map body = response.bodyToMap()
+        // List data = body.data
+
+        then:
+        response.status == 200
+        response.header("Content-Type").contains("spreadsheetml")
+
+    }
+
     void "list with includes"() {
         // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
         when:

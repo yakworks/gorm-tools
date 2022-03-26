@@ -16,6 +16,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
+import builders.dsl.spreadsheet.builder.poi.PoiSpreadsheetBuilder
 import com.opencsv.CSVWriter
 import yakworks.commons.map.MapFlattener
 
@@ -24,6 +25,7 @@ class XlsxMapWriter {
     CSVWriter csvWriter
     Set<String> headers
     OutputStream outputStream
+    public static final String SHEET_NAME = "Data"
 
     XlsxMapWriter(OutputStream outstream){
         this.outputStream = outstream
@@ -37,26 +39,34 @@ class XlsxMapWriter {
     //     csvWriter.flush()
     // }
 
-    void writeHeaders(Map<String, Object> firstItem){
-        //filter out the key that has the detail
-        headers = firstItem.keySet()
-        writeNext(csvWriter, headers)
-    }
-
     void writeXlsx(List<Map> dataList){
-
         //flatten
         Map<String, Object> firstRow = dataList[0] as Map<String, Object>
         Map flatRow = flattenMap(firstRow)
-        writeHeaders(flatRow)
+        headers = flatRow.keySet()
 
-        dataList.eachWithIndex{ row, int i->
-            //get all the values for the masterHeaders keys
-            writeLine(flattenMap(row as Map))
+        PoiSpreadsheetBuilder.create(outputStream).build {
+            apply BookExcelStylesheet
+            sheet(SHEET_NAME) { s ->
+                row {
+                    headers.each { header ->
+                        cell {
+                            value header
+                            style BookExcelStylesheet.STYLE_HEADER
+                        }
+                    }
+                }
+                dataList.eachWithIndex{ rowData, int i->
+                    //get all the values for the masterHeaders keys
+                    def flatData = flattenMap(rowData as Map)
+                    def vals = headers.collect{ flatData[it] as String}
 
-            //flush every 1000
-            if (i % 1000 == 0) {
-                csvWriter.flush()
+                    row {
+                        vals.each { dta ->
+                            cell(dta)
+                        }
+                    }
+                }
             }
         }
     }
@@ -65,23 +75,10 @@ class XlsxMapWriter {
         MapFlattener.of(map).convertObjectToString(true).flatten()
     }
 
-    void writeLine(Map data){
-        def vals = headers.collect{ data[it] as String}
-        writeNext(csvWriter, vals)
-    }
-
-    // for some reason compileStatic fails trying to call this method
-    @CompileDynamic
-    static void writeAll(CSVWriter writer, Object lines){
-        writer.writeAll(lines)
-    }
-
-    @CompileDynamic
-    static void writeNext(CSVWriter writer, Collection vals){
-        writer.writeNext(vals as String[])
-    }
-
-    void writeXlsxHeaders(Map<String, Object> firstItem){
+    /**
+     * WIP example of directly using poi instead of builder
+     */
+    void writeHeadersPoi(Map<String, Object> firstItem){
         headers = firstItem.keySet()
         Workbook workbook = new XSSFWorkbook()
 

@@ -71,6 +71,7 @@ class BulkControllerSpec extends Specification implements RestIntegrationTest {
 
         then:
         noExceptionThrown()
+        body.id
 
         when:
         SyncJob job = SyncJob.repo.getWithTrx(body.id as Long)

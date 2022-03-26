@@ -2,20 +2,22 @@
 * Copyright 2020 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.rest.responder
+package gorm.tools.rest.controller
 
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.runtime.InvokerHelper
 import org.springframework.http.HttpStatus
 
 import gorm.tools.api.IncludesConfig
 import gorm.tools.beans.AppCtx
+import gorm.tools.beans.Pager
 import gorm.tools.beans.map.MetaMap
 import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.beans.map.MetaMapList
+import gorm.tools.mango.api.QueryArgs
+import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
-import gorm.tools.rest.controller.RestRegistryResponder
 import grails.web.api.WebAttributes
 
 /**
@@ -119,5 +121,18 @@ class EntityResponder<D> {
         if(getRepo().datastore.hasCurrentSession()){
             getRepo().flush()
         }
+    }
+
+    Pager pagedQuery(Map params, List<String> includesKeys) {
+        Pager pager = new Pager(params)
+        List dlist = query(pager, params)
+        List<String> incs = findIncludes(params, includesKeys)
+        MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
+        return pager.setEntityMapList(entityMapList)
+    }
+
+    List<D> query(Pager pager, Map parms) {
+        QueryArgs qargs = QueryArgs.of(pager).build(parms)
+        ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }
 }

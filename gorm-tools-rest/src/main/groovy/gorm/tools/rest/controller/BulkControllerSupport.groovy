@@ -96,7 +96,7 @@ class BulkControllerSupport<D> {
      *  - attachmentId=<attachment-id>
      *  - dataFilename= -- pass in data.csv and detail.csv as default of parameter for file names
      *  - headerPathDelimiter -- default is '.', pass in '_' for underscore (this is path delimiter for header names, not csv delimiter)
-     * @param syncJobArgs
+     * @param syncJobArgs the syncJobArgs that is setup, important to have params on it
      * @return the jobId
      */
     Long doBulkCsv(SyncJobArgs syncJobArgs){
@@ -116,8 +116,6 @@ class BulkControllerSupport<D> {
     /**
      * transform csv to list of maps using csvToMapTransformer.
      * Override this to provide a different method.
-     * @param params
-     * @return
      */
     List<Map> transformCsvToBulkList(Map params) {
         return csvToMapTransformer.process(params)

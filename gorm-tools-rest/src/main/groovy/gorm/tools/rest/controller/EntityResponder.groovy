@@ -6,16 +6,17 @@ package gorm.tools.rest.controller
 
 import groovy.transform.CompileStatic
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 
 import gorm.tools.api.IncludesConfig
 import gorm.tools.beans.AppCtx
 import gorm.tools.beans.Pager
-import gorm.tools.beans.map.MetaMap
-import gorm.tools.beans.map.MetaMapEntityService
-import gorm.tools.beans.map.MetaMapList
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.mango.api.QueryMangoEntityApi
+import gorm.tools.metamap.MetaMap
+import gorm.tools.metamap.MetaMapEntityService
+import gorm.tools.metamap.MetaMapList
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoLookup
 import grails.web.api.WebAttributes
@@ -27,10 +28,13 @@ import yakworks.commons.map.Maps
  */
 @CompileStatic
 class EntityResponder<D> {
-    //common valida param keys to remove so that will not be considered a filte
-    static List<String> COMMON_PARAMS=['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
+    //common valida param keys to remove so that will not be considered a filter //TODO move this to external config
+    List<String> whitelistKeys = ['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
 
+    @Autowired(required = false)
     IncludesConfig includesConfig
+
+    @Autowired(required = false)
     MetaMapEntityService metaMapEntityService
 
     Class<D> entityClass
@@ -48,17 +52,15 @@ class EntityResponder<D> {
     }
 
     public static <D> EntityResponder<D> of(Class<D> entityClass){
-        def ic = AppCtx.get('includesConfig', IncludesConfig)
-        def mes = AppCtx.get('metaMapEntityService', MetaMapEntityService)
-        return new EntityResponder(entityClass, ic, mes)
+        def erInstance = new EntityResponder(entityClass)
+        AppCtx.autowire(erInstance)
+        return erInstance
     }
 
     /**
      * calls the IncludesConfig's getIncludes passing in any controller overrides
      */
     Map getIncludesMap(){
-        assert includesConfig
-        assert entityClass
         return includesConfig.getIncludes(entityClass)
     }
 
@@ -84,27 +86,27 @@ class EntityResponder<D> {
         return emap
     }
 
+    Pager pagedQuery(Map params, List<String> includesKeys) {
+        Pager pager = new Pager(params)
+        List dlist = query(pager, params)
+        List<String> incs = findIncludes(params, includesKeys)
+        MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
+        return pager.setEntityMapList(entityMapList)
+    }
+
+    List<D> query(Pager pager, Map parms) {
+        Map pclone = Maps.clone(parms) as Map<String, Object>
+        //remove the fields that grails adds for controller and action
+        pclone.removeAll {it.key in whitelistKeys }
+        QueryArgs qargs = QueryArgs.of(pager).build(pclone)
+        ((QueryMangoEntityApi)getRepo()).queryList(qargs)
+    }
+
     /**
-     * finds the right includes.
-     *   - looks for includes param and uses that if passed in
-     *   - looks for includesKey param and uses that if set, falling back to the defaultIncludesKey
-     *   - falls back to the passed fallbackKeys if not set
-     *   - the fallbackKeys will itself unlimately fallback to the 'get' includes if it can't be found
-     *
-     * @param params the request params
-     * @return the List of includes field that can be passed to the MetaMap creation
+     * calls includesConfig.findIncludes. See javadocs there for more info
      */
     List<String> findIncludes(Map params, List<String> fallbackKeys = []){
-        List<String> keyList = []
-        //if it has a includes then just parse that and pass it back
-        if(params.containsKey('includes')) {
-            return (params['includes'] as String).tokenize(',')*.trim()
-        } else if(params.containsKey('includesKey')){
-            keyList << (params['includesKey'] as String)
-        }
-        keyList.addAll(fallbackKeys)
-        def incMap = getIncludesMap()
-        return IncludesConfig.getFieldIncludes(incMap, keyList)
+        return includesConfig.findIncludes(entityClass.name, params, fallbackKeys)
     }
 
     /**
@@ -124,21 +126,5 @@ class EntityResponder<D> {
         if(getRepo().datastore.hasCurrentSession()){
             getRepo().flush()
         }
-    }
-
-    Pager pagedQuery(Map params, List<String> includesKeys) {
-        Pager pager = new Pager(params)
-        List dlist = query(pager, params)
-        List<String> incs = findIncludes(params, includesKeys)
-        MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
-        return pager.setEntityMapList(entityMapList)
-    }
-
-    List<D> query(Pager pager, Map parms) {
-        Map pclone = Maps.clone(parms) as Map<String, Object>
-        //remove the fields that grails adds for controller and action
-        pclone.removeAll {it.key in COMMON_PARAMS }
-        QueryArgs qargs = QueryArgs.of(pager).build(pclone)
-        ((QueryMangoEntityApi)getRepo()).queryList(qargs)
     }
 }

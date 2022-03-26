@@ -7,7 +7,7 @@ package gorm.tools.openapi
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 
-import gorm.tools.beans.map.MetaMapIncludes
+import gorm.tools.metamap.MetaMapIncludes
 import io.swagger.v3.oas.models.media.Schema
 import yakworks.commons.lang.NameUtils
 import yakworks.commons.map.MapFlattener

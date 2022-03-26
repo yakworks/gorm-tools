@@ -11,7 +11,7 @@ import groovy.transform.CompileStatic
 import org.grails.datastore.mapping.model.EmbeddedPersistentEntity
 import org.grails.datastore.mapping.model.types.Association
 
-import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.metamap.MetaMapEntityService
 import grails.buildtestdata.builders.DataBuilderContext
 import grails.buildtestdata.builders.PersistentEntityDataBuilder
 import yakworks.commons.json.JsonEngine

@@ -1,4 +1,4 @@
-import gorm.tools.beans.map.MetaMap
+import gorm.tools.metamap.MetaMap
 
 model {
     MetaMap entityMap

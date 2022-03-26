@@ -3,7 +3,14 @@ apply plugin: "yakworks.grails-plugin"
 dependencies {
   console "org.grails:grails-console"
 
+  compileOnly "org.grails:grails-plugin-rest"
   compile "com.opencsv:opencsv:$vOpenCsv"
+
+  //see http://spreadsheet.dsl.builders/ and https://guides.grails.org/grails-file-download-excel/guide/index.html
+  compile "builders.dsl:spreadsheet-builder-poi:$vExcelBuilder"
+  compile "builders.dsl:spreadsheet-builder-groovy:$vExcelBuilder"
+  // compileOnly "org.apache.poi:poi:$vPoi"
+  // compileOnly "org.apache.poi:poi-ooxml:$vPoi"
 
   compileOnly project(":gorm-tools")
 

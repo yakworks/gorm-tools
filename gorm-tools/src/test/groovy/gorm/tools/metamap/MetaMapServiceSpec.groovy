@@ -2,13 +2,10 @@
 * Copyright 2019 Yak.Works - Licensed under the Apache License, Version 2.0 (the "License")
 * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 */
-package gorm.tools.beans
+package gorm.tools.metamap
 
-import gorm.tools.beans.map.MetaMap
-import gorm.tools.beans.map.MetaMapEntityService
-import gorm.tools.beans.map.MetaMapList
+
 import gorm.tools.testing.unit.DataRepoTest
-import spock.lang.IgnoreRest
 import spock.lang.Specification
 import yakworks.gorm.testing.model.Enummy
 import yakworks.gorm.testing.model.KitchenSink

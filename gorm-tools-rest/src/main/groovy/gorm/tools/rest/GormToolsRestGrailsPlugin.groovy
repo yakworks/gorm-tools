@@ -9,6 +9,8 @@ import groovy.transform.CompileStatic
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 
+import gorm.tools.csv.render.CSVPagerRenderer
+import gorm.tools.excel.render.XlsxPagerRenderer
 import gorm.tools.openapi.GormToSchema
 import gorm.tools.openapi.MetaMapSchemaService
 import gorm.tools.openapi.OpenApiGenerator
@@ -17,7 +19,6 @@ import gorm.tools.rest.render.JsonGeneratorRenderer
 import gorm.tools.rest.render.PagerRenderer
 import gorm.tools.rest.render.ProblemRenderer
 import gorm.tools.rest.render.SyncJobRenderer
-import gorm.tools.rest.render.csv.CSVPagerRenderer
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
@@ -44,6 +45,7 @@ class GormToolsRestGrailsPlugin extends Plugin {
         syncJobRenderer(SyncJobRenderer)
 
         csvPagerRenderer(CSVPagerRenderer)
+        xlsxPagerRenderer(XlsxPagerRenderer)
 
         gormToSchema(GormToSchema) { bean ->
             bean.lazyInit = true

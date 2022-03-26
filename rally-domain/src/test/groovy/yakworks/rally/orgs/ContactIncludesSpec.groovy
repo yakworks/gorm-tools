@@ -4,8 +4,8 @@
 */
 package yakworks.rally.orgs
 
-import gorm.tools.beans.map.MetaMapIncludesBuilder
-import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.metamap.MetaMapIncludesBuilder
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.testing.unit.DataRepoTest
 import spock.lang.Specification
 import yakworks.gorm.testing.SecurityTest

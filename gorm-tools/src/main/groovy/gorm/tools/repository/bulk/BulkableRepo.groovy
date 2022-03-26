@@ -17,12 +17,12 @@ import org.springframework.beans.factory.annotation.Qualifier
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
-import gorm.tools.beans.map.MetaMap
-import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
+import gorm.tools.metamap.MetaMap
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp

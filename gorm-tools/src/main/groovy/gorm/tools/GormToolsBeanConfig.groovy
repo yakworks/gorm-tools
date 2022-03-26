@@ -16,13 +16,13 @@ import org.springframework.jdbc.core.JdbcTemplate
 import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
-import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.JdbcIdGenerator
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.jdbc.DbDialectService
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.RepoUtil

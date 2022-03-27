@@ -24,6 +24,15 @@ externalDocs:
   description: 9ci Documentation
   url: 'https://9ci.com/documentation/2.0/'
 tags:
+- name: org
+  description: >
+    This domain represents all organizational units within the system.  Customers and CustAccounts are special cases,
+    each having their own domain, but each also have corresponding Org records.  In addition, all other system client
+    organizational information is stored here.  This includes company, business units, ops regions, client stores,
+    sales regions, etc.  This domain is configurable to accommodate the hierarchical and overlay organizational
+    structure of a client for reporting, access and data management purposes.
+- name: appParam
+  description: Provides company-specific configuration of application parameters
 - name: activity
   description: This domain records activity performed on an ArTran
 - name: attachment
@@ -47,8 +56,6 @@ tags:
     organizational information is stored here.  This includes company, business units, ops regions, client stores,
     sales regions, etc.  This domain is configurable to accommodate the hierarchical and overlay organizational
     structure of a client for reporting, access and data management purposes.
-#- name: orgTypeSetup
-#  description: FIXME
 - name: tag
   description: >
     This domain is a list of labels that can be applied to various other domains, like Customer, CustAccount, etc.
@@ -73,28 +80,9 @@ paths:
     $ref: ./paths/rally/upload.yaml
   /download/{id}/{name}:
     $ref: ./paths/rally/download@{id}.yaml
-  /ar/exportSync:
-    $ref: ./paths/ar/exportSync.yaml
 
 components:
-  schemas:
-    # common
-#    Pager:
-#      $ref: components/schemas/Pager.yaml
-
-#  parameters:
-#    id: { $ref: components/parameters/id.yaml }
-#    q: { $ref: components/parameters/q.yaml }
-#    page: { $ref: components/parameters/page.yaml }
-#    max: { $ref: components/parameters/max.yaml }
-#    sort: { $ref: components/parameters/sort.yaml }
-#    order: { $ref: components/parameters/order.yaml }
-
-#  responses:
-#    '204': { $ref: ./components/responses/204_NoContent.yaml }
-#    '403': { $ref: ./components/responses/403_Forbidden.yaml }
-#    '404': { $ref: ./components/responses/404_NotFound.yaml }
-#    '422': { $ref: ./components/responses/422_ValidationError.yaml }
+  schemas: {}
 
   securitySchemes:
     main_auth:

@@ -159,20 +159,20 @@ oapi.docs-push:
 oapi.start:
 	cd api-docs && npm run start
 
-## for local testing, this runs the test that generates the api.yml from the domains.
+## Runs the test that generates the api.yml from the domains.
 oapi.generate-api-yaml:
 	# HACK, rm test-results to force a run if only editing yaml
 	rm -rf examples/restify/build/test-results
 	${gradlew} restify:integrationTest --tests *OpenapiGeneratorSpec*
 
-## generates api yaml with grails test and runs npm start build
+## generates api yaml with grails test and runs oapi.start
 oapi.generate-start: oapi.generate-api-yaml oapi.start
 
 oapi.bundle:
 	cd api-docs
 	npm run oapi:bundle
 
-oapi.build: oapi.generate-api-yaml oapi.bundle oapi.copy-to-rcm
+oapi.build: oapi.generate-api-yaml oapi.bundle
 
 ## run to get into builder shell
 # make oapi.generate-apy-yaml

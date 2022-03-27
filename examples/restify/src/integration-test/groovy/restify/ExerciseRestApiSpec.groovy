@@ -44,7 +44,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
         where:
 
         entity            | qCount
-        'security/user'   | 2
+        'rally/user'   | 2
         //FIXME depending on order this may return more than 100
         // 'rally/org'       | 100
     }
@@ -88,7 +88,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         entity     | id | prop   | val
         'rally/org'      | 1  | 'num'  | 'foo123'
-        'security/user'     | 1  | 'username' | 'jimmy'
+        'rally/user'     | 1  | 'username' | 'jimmy'
         //        'location' | 1  | 'city' | 'Denver'
 
     }
@@ -109,7 +109,7 @@ class ExerciseRestApiSpec extends Specification implements OkHttpRestTrait {
 
         entity     | qCount | qSearch
         'rally/org'      | 1      | 'foo123'
-        'security/user'     | 1      | 'admin'
+        'rally/user'     | 1      | 'admin'
         //'location' | 1      | 'Denver'
 
     }

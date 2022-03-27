@@ -13,7 +13,7 @@ import static org.springframework.http.HttpStatus.CREATED
 
 @CompileStatic
 class LocationController implements RestRepoApiController<Location> {
-
+    static String namespace = 'rally'
     def post() {
         Map q = bodyAsMap()
         q.street = q.street == null ? null : "foo street"

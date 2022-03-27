@@ -1,9 +1,9 @@
 ---
 api:
   defaultPackage: restify.api
+  #
   namespaces: {rally: 'Core / Rally'}
   paths:
-    # no namespace
     kitchen:
       entityClass: yakworks.gorm.testing.model.KitchenSink
 

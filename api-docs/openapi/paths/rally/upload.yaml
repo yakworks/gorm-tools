@@ -1,0 +1,22 @@
+post:
+  tags: [ attachment ]
+  summary: Upload a attachment
+  description: Upload an attachment file
+  operationId: uploadAttachment
+  parameters:
+    - name: name
+      in: query
+      description: the file name for attachment such a 'invoice.pdf'
+      schema:
+        type: string
+  responses:
+    '201':
+      description: Attachment Resource
+      content:
+        application/json:
+          schema:
+            $ref: '../../models/Attachment.yaml'
+    '400': { $ref: '../../components/responses/400_Problem.yaml' }
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {$ref: './upload-example.sh'} }

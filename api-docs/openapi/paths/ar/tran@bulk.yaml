@@ -1,0 +1,87 @@
+# Overrides to document regular bulk with json body and bulk using attachmentId
+post:
+  summary: Bulk Ops
+  description: >
+    Bulk Create or Update Tran.
+    Data can be passed in either <b>as json object in body</b> or <b>as attachment file id in query param</b>.
+    When data is passed in as json body it doesn't require attachmentId and when data is passed in as attachmentId it doesn't require json object in the body.
+    Rest call with attachmentId will be processed as asyncEnabled.
+
+    Query params used only to process data from the attachment file:
+      * attachmentId
+      * headerPathDelimiter
+      * linkField
+      * tranFilename
+      * detailsFileName
+      * controlCount
+  operationId: bulkTran
+  requestBody:
+    description: Bulk object with change info for Tran. Only when no attachmentId in param query
+    required: true
+    content:
+      application/json:
+        schema:
+          properties:
+            op:
+              description: Operation type
+              type: string
+              enum:
+                - Create
+                - Update
+            ids:
+              description: If update this will be the array of ids to update
+              type: array
+              items:
+                type: number
+            data:
+              description: Tran list of fields to update or create. if ids is not
+                used on update then id should be included
+              type: array
+              items:
+                title: Tran
+                type: object
+  parameters:
+    - name: asyncEnabled
+      in: query
+      description: Async switch, if 'true' the job runs in async (in the background) and job id is returned right away
+      schema:
+        type: string
+    - name: jobSource
+      in: query
+      description: You can specify source of data, for example ERP system the data is from
+      schema:
+        type: string
+    - name: attachmentId
+      in: query
+      description: <small>(with attachmentId only)</small> Id of attachment record. Attachment should be a zip file with csv files (data.csv and detail.csv). We read and merge them into PathKeyMap that is imported into ArTran and ArTranLines
+      schema:
+        type: integer
+    - name: headerPathDelimiter
+      in: query
+      description: <small>(with attachmentId only)</small> CSV header pathDelimiter. Default is '.', pass in '_' for underscore (this is path delimiter for header names, not csv delimiter)
+      schema:
+        type: string
+    - name: linkField
+      in: query
+      description: <small>(with attachmentId only)</small> Field that links lines (ArTranLines) to the header record (ArTran). Default is 'arTran.sourceId' but if you have underscores pass in 'arTran_sourceId'  (when data imported from the file)
+      schema:
+        type: string
+    - name: tranFilename
+      in: query
+      description: <small>(with attachmentId only)</small> File name for ArTran csv inside zip. Default is data.csv
+      schema:
+        type: string
+    - name: detailsFileName
+      in: query
+      description: <small>(with attachmentId only)</small> File name for ArTranLine csv inside zip. Default is detail.csv
+      schema:
+        type: string
+    - name: controlCount
+      in: query
+      description: <small>(with attachmentId only)</small> Count of lines in ArTran file
+      schema:
+        type: integer
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {\$ref: './bulk-example.sh'} }
+

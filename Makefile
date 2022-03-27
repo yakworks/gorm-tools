@@ -127,3 +127,62 @@ start.restify: # start.db
 	${gradlew} restify:assemble
 	cd examples/restify
 	java -server -Xmx2g -jar build/libs/restify.jar
+
+#oapi.docs-publish:
+#	cp -r api-docs/build/_site/. build/api-docs
+#	cp api-docs/build/api.yaml build/api-docs
+#	$(MAKE) oapi.docs-push
+#	$(logr.done)
+
+# builds the eleventy docs with npm
+oapi.docs-build:
+	cd api-docs
+	npm install
+	npm run build
+	$(logr.done)
+
+# clones the api-docs branch or this project where we will publish/push
+#oapi.docs-clone:
+#	mkdir -p $(BUILD_DIR) && rm -rf "$(API_DOCS_BUILD_DIR)"
+#	git clone $(GITHUB_URL) $(API_DOCS_BUILD_DIR) -b $(API_DOCS_BRANCH) --single-branch --depth 1
+#	$(logr.done)
+
+# pushes the changes to the api-docs branch, the way the docs works is it pulls from repo on docker startup and builds
+oapi.docs-push:
+	git -C $(API_DOCS_BUILD_DIR) add -A .
+	# or true so doesnt blow error if no changes
+	git -C $(API_DOCS_BUILD_DIR) commit -a -m "CI API docs published [skip ci]" || true
+	git -C $(API_DOCS_BUILD_DIR) push -q $(GITHUB_URL) $(API_DOCS_BRANCH) || true
+	$(logr.done)
+
+## starts the eleventy server for the api docs, assumes the oapi.generate-api-yaml has been generated already into the dist
+oapi.start:
+	cd api-docs && npm run start
+
+## for local testing, this runs the test that generates the api.yml from the domains.
+oapi.generate-api-yaml:
+	# HACK, rm test-results to force a run if only editing yaml
+	rm -rf examples/restify/build/test-results
+	${gradlew} restify:integrationTest --tests *OpenapiGeneratorSpec*
+
+## generates api yaml with grails test and runs npm start build
+oapi.generate-start: oapi.generate-api-yaml oapi.start
+
+oapi.bundle:
+	cd api-docs
+	npm run oapi:bundle
+
+oapi.build: oapi.generate-api-yaml oapi.bundle oapi.copy-to-rcm
+
+## run to get into builder shell
+# make oapi.generate-apy-yaml
+# make oapi.shell
+# cd api-docs
+# npm install   # ONLY ONCE PER DOCKER! If you have a docker from last time, don't reinstall npm
+# npm run start
+## Now you're in a docker shell for running oapi
+oapi.shell:
+	docker run --name oapi-shell -it --rm \
+	  -v `pwd`:/project:delegated  \
+	  -p 4567:4567 \
+	  yakworks/builder:node14 /bin/bash

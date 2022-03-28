@@ -14,10 +14,11 @@ import yakworks.commons.lang.NameUtils
  * Includes tree for root entity and nested association properties
  */
 @Slf4j
-@EqualsAndHashCode(includes=["className", "props"], useCanEqual=false) //because its used as cache key
+@EqualsAndHashCode(includes=["rootClassName", "props"], useCanEqual=false) //because its used as cache key
 @CompileStatic
 class MetaMapIncludes {
-    String className
+    //the root class name for this includes.
+    String rootClassName
     //value will be null if normal prop, if association then will have another nested MetaMapIncludes
     Map props = [:] as Map<String, MetaMapIncludes>
     Set<String> excludeFields
@@ -27,8 +28,8 @@ class MetaMapIncludes {
     MetaMapIncludes(){
     }
 
-    MetaMapIncludes(String className){
-        this.className = className
+    MetaMapIncludes(String rootClassName){
+        this.rootClassName = rootClassName
     }
 
     MetaMapIncludes(Map<String, MetaMapIncludes> props){
@@ -36,8 +37,8 @@ class MetaMapIncludes {
     }
 
 
-    MetaMapIncludes(String className, Set<String> fields, Set<String> excludeFields){
-        this.className = className
+    MetaMapIncludes(String rootClassName, Set<String> fields, Set<String> excludeFields){
+        this.rootClassName = rootClassName
         addBlacklist(excludeFields)
     }
 
@@ -58,7 +59,15 @@ class MetaMapIncludes {
      * gets the class name with out prefix sowe can lookup the openapi schema
      */
     String getShortClassName(){
-        return NameUtils.getShortName(className)
+        return NameUtils.getShortName(rootClassName)
+    }
+
+    /**
+     * gets the short root class prop name name, for example Org will be org.
+     * used to prepend to do i18n look ups
+     */
+    String getRootClassPropName(){
+        return NameUtils.getPropertyName(rootClassName)
     }
 
     void addBlacklist(Set<String> excludeFields) {

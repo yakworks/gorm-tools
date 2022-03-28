@@ -1,0 +1,24 @@
+# Overrides to document regular put with json body and bulk using attachmentId
+post:
+  summary: Bulk Ops
+  description: >
+    To create custFamily, child and parent objects need to be passed in. If id is unknown for child/parent, lookup can be done by sourceId or num.
+    To update custFamily, object has to be found by child record. Lookup on custFamily is by child customer id, sourceid or num. Once we find custFamily to update we can assign different parent or remove parent. Child customer cannot be changed.
+  operationId: bulkFamily
+  requestBody:
+    description: Customer child and customer parent to link two customers together
+    required: true
+    content:
+      application/json:
+        schema:
+          properties:
+            data:
+              description: Customer parent record
+              type: array
+              items:
+                title: Customer Child and Customer parent
+                type: object
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {\$ref: './custFamilyBulk-example.sh'} }
+

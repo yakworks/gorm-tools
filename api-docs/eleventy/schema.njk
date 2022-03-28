@@ -1,0 +1,59 @@
+<h1 id="schemas">Schemas</h1>
+
+{% for entityName, schemas in schemasByEntity %}
+<h1 id="entity_{{entityName}}">{{entityName}}</h1>
+
+{% for schemaName, schema in schemas %}
+  {# {{schemaProps | dump | safe}} #}
+  <h2 id="schema_{{schemaName.toLowerCase()}}">{{schemaName}}</h2>
+
+  {% highlight "json" %}
+    {{- getPrettySample(schema, 2) | safe}}
+  {% endhighlight %}
+
+  {# TODO dont show title for now as its just the same as entityName
+  {% if schema.title %}
+    {{utils.md(schema.title) | safe}}
+  {% endif %}
+  #}
+  {% if schema.description %}
+    {{utils.md(schema.description) | safe}}
+  {% endif %}
+
+  <h3 id="properties">Properties</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+
+  {% for propName, p in schema.properties %}
+    <tr>
+    <td> {{schemaUtils.getPropName(propName, schema) | safe}}</td>
+    <td>
+      <div>{{schemaUtils.getTypeWithMeta(p) | safe}}</div>
+      <div>{{utils.mdInline(p.description) | safe}}</div>
+    </td>
+    </tr>
+      {% if p.properties %}
+        <tr><td colspan="3" class="nested">
+        <div><table class="nested">
+        {% for childPropName, childProp in p.properties %}
+          <tr>
+          <td> {{schemaUtils.getPropName(childPropName, p) | safe}}</td>
+          <td>
+            <div>{{schemaUtils.getTypeWithMeta(childProp) | safe}}</div>
+            <div>{{utils.mdInline(childProp.description) | safe}}</div>
+          </td>
+          </tr>
+        {% endfor %}
+        </table></div>
+        </td></tr>
+    {% endif %}
+  {%- endfor %}
+  </table>
+{% endfor %}
+
+{% endfor %}

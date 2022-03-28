@@ -142,14 +142,15 @@ class OpenApiGenerator implements ConfigAware {
 
         def xTagGroupsList = []
         newTagGroups.each{k, v ->
-            xTagGroupsList << [name: namespaces[k], tags: v as List]
+            //if namespaces is not specified then put it in root.
+            String name = namespaces[k]?: 'root'
+            xTagGroupsList << [name: name, tags: v as List]
         }
 
         api['x-tagGroups'] = xTagGroupsList
 
     }
 
-    // FIXME for 388 - Merge tag and description in yml
     void processEndpoint(Map api, String endpoint, String namespace, Map pathMap, Map xTagGroups, List tags){
         Map tagEntry = [name: endpoint]
         if(pathMap.description) tagEntry.description = pathMap.description
@@ -158,8 +159,11 @@ class OpenApiGenerator implements ConfigAware {
             tags << tagEntry
         }
 
-        if(!xTagGroups[namespace]) xTagGroups[namespace] = []
-        ((List)xTagGroups[namespace]).add(endpoint)
+        //default to root for tag groups if its empty
+        def tagGroupKey = namespace ?: 'root'
+
+        if(!xTagGroups[tagGroupKey]) xTagGroups[tagGroupKey] = []
+        ((List)xTagGroups[tagGroupKey]).add(endpoint)
 
         try{
             createPaths(api, endpoint, namespace, pathMap)
@@ -171,7 +175,7 @@ class OpenApiGenerator implements ConfigAware {
 
     //create the files for the path
     Map createPaths(Map api, String endpoint, String namespace, Map restConfig){
-        Map paths = (Map)api.paths
+        Map paths = (Map)api.paths ?: [:]
         String namespacePrefix = namespace ? "$namespace/" : ''
         String pathKey = "/${namespacePrefix}${endpoint}"//.toString()
         String pathKeyId = "${pathKey}/{id}"//.toString()

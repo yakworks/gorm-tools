@@ -1,5 +1,5 @@
 apiDefinitions:
-  api: openapi/api.yaml
+  api: dist/openapi/api.yaml
 #  users: openapi/users.yaml
 #  reports: openapi/reports.yaml
 #  storefront: openapi/storefront.yaml

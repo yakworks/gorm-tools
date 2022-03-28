@@ -28,7 +28,7 @@ class ContactIncludesSpec extends Specification implements DataRepoTest, Securit
         def res = MetaMapIncludesBuilder.build(Contact, ['*'])
 
         then:
-        res.className == 'yakworks.rally.orgs.model.Contact'
+        res.rootClassName == 'yakworks.rally.orgs.model.Contact'
         // res.fields == ['name'] as Set
     }
 

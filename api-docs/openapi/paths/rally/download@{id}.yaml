@@ -1,0 +1,24 @@
+get:
+  tags: [ attachment ]
+  summary: Download an attachment
+  description: Download an attachment using id, filename is optional
+  operationId: downloadAttachment
+  parameters:
+    - name: id
+      in: path
+      description: the attachment id
+      schema:
+        type: integer
+        format: int64
+    - name: name
+      in: path
+      description: the optional filename (attachment.name field) of the attachment
+      schema:
+        type: string
+  responses:
+    '200':
+      description: The file stream
+    '400': { $ref: '../../components/responses/400_Problem.yaml' }
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {$ref: './download-example.sh'} }

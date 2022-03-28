@@ -1,0 +1,60 @@
+
+<div class="toc-wrapper">
+  {% logo %}
+  {% if language_tabs %}
+    <div class="lang-selector">
+      {% for lang in language_tabs %}
+        {{ utils.lang_tag(lang) | safe}}
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% if search %}
+    <div class="search">
+      <input type="text" class="search" id="input-search" placeholder="Search">
+    </div>
+    <ul class="search-results"></ul>
+  {% endif %}
+
+  <div id="toc" class="toc-list-h1">
+  <ul class="toc-list-h1">
+    {% for h1 in utils.toc_data(content) %}
+      <li>
+        <a href="#{{h1.id}}" class="toc-h1 toc-link {{h1.class}} " data-title="{{h1.title}}">
+          {{ h1.content | safe }}
+        </a>
+        {% if h1.children %}
+          <ul class="toc-list-h2">
+            {% for h2 in h1.children %}
+              <li>
+                <a href="#{{ h2.id }}" class="toc-h2 toc-link" data-title="{{h2.title}}">
+                  {% if (h2.op) %}
+                    <code class="{{h2.op}}">{{ h2.op }}</code>
+                  {% endif %}
+                  {{h2.content}}
+                </a>
+                {% if h2.children %}
+                  <ul class="toc-list-h3">
+                  {% for h3 in h2.children %}
+                    <li>
+                      <a href="#{{h3.id}}" class="toc-h3 toc-link" data-title="{{h3.title}}">{{h3.content}}</a>
+                    </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </li>
+    {% endfor %}
+</ul>
+  </div>
+  {% if toc_footers %}
+    <ul class="toc-footer">
+      {% for footer in toc_footers %}
+        <li>{{footer | safe}}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>
+

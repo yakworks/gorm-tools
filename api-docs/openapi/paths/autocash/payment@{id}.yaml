@@ -1,0 +1,10 @@
+# Overrides, will be merged into generated defaults from tpl@{id}.yml
+put:
+  description: Updates a Payment as well as its detail
+  requestBody:
+    description: |
+      Payment resource, See examples for options to update detail and ArTrans
+      __AR Tran _add_ example__
+      `{op: "add", ids:[123,124,125]}, {op: "remove", ids:[21,22]}`
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: { \$ref: './payment_post.sh' } }

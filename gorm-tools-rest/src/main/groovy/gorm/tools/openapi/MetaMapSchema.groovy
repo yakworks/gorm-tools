@@ -19,7 +19,8 @@ import yakworks.commons.map.MapFlattener
 @Slf4j
 @CompileStatic
 class MetaMapSchema {
-    String className
+    //fully qualified root class
+    String rootClassName
     //value will be either another MetaMapSchema or the Schema for the prop
     Map props = [:] as Map<String, Object>
     //used for openApi to add the schema into it.
@@ -38,7 +39,7 @@ class MetaMapSchema {
 
     MetaMapSchema build(MetaMapIncludes metaMapIncludes) {
         Schema rootSchema = oapiSupport.getSchema(metaMapIncludes.shortClassName)
-        this.className = metaMapIncludes.className
+        this.rootClassName = metaMapIncludes.rootClassName
         this.schema = rootSchema
         def mmiProps = metaMapIncludes.props
         for (String key in mmiProps.keySet()) {
@@ -60,10 +61,18 @@ class MetaMapSchema {
     }
 
     /**
-     * gets the class name with out prefix sowe can lookup the openapi schema
+     * gets the root class name with out prefix so we can lookup the openapi schema
      */
-    String getShortClassName(){
-        return NameUtils.getShortName(className)
+    String getShortRootClassName(){
+        return NameUtils.getShortName(rootClassName)
+    }
+
+    /**
+     * gets the short root class prop name name, for example Org will be org.
+     * used to prepend to do i18n look ups
+     */
+    String getRootClassPropName(){
+        return NameUtils.getPropertyName(rootClassName)
     }
 
     /**

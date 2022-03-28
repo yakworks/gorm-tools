@@ -1,0 +1,33 @@
+post:
+  tags: [ ${endpoint} ]
+  summary: Bulk Ops
+  description: Bulk Create or Update ${capitalName}
+  operationId: bulk${capitalName}
+  requestBody:
+    description: Bulk object with change info for ${capitalName}
+    required: true
+    content:
+      application/json:
+        schema:
+          properties:
+            op:
+              description: Operation type
+              type: string
+              enum:
+                - Create
+                - Update
+            ids:
+              description: If update this will be the array of ids to update
+              type: array
+              items: {type: "number"}
+            data:
+              description: ${capitalName} list of fields to update or create. if ids is not used on update then id should be included
+              type: array
+              items:
+                title: ${capitalName}
+                type: object
+  responses:
+    '200':
+      description: OK status - processing was completed successfully
+    '403': { \$ref: '../../components/responses/403_Forbidden.yaml' }
+    '422': { \$ref: '../../components/responses/422_ValidationError.yaml' }

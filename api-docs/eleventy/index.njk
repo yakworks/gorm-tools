@@ -1,0 +1,124 @@
+---
+title: 9ci Rest Api v1.0.0
+toc_footers:
+  - <a href="https://9ci.com/documentation/2.0/">9ci Documentation</a>
+includes: []
+search: true
+highlight_theme: darkula
+headingLevel: 2
+---
+
+<h1 id="{{oapi.info.title | slug}}">{{oapi.info.title}} {{oapi.info.version}}</h1>
+
+{{utils.md(oapi.info.description) | safe}}
+
+{% for tagGroup in oapi['x-tagGroups'] %}
+
+<h1 id="{{tagGroup.name | slug}}" class="tag-group">{{tagGroup.name}}</h1>
+
+  {% for tag in tagGroup.tags %}
+
+    <h1 id="{{(tagGroup.name + '-' + tag) | slug}}">{{tag}}</h1>
+
+    {{utils.md(getTagDesc(oapi, tag)) | safe}}
+
+    {% for pathInfo in tagPaths[tag] %}
+      {# getMethod is a helper to consolodate the info needed to render the details on this #}
+      {% set method = getMethod(pathInfo.pathKey, pathInfo.verb) %}
+      {# {{pathInfo | dump}} #}
+      {% set operation = method.operation %}
+      {% set opId = operation.operationId %}
+
+      {# {{ setupShinsForMethod(shins, tag, method.pathKey, method.verb, operation) }} #}
+
+      <h2 id="{{opId}}" data-op="{{method.verb}}" class="operation">{{operation.summary}}</h2>
+      <a id="opId{{opId}}"></a>
+
+      <blockquote><p> Examples: </p></blockquote>
+      {%- include 'examples/code_examples.njk' %}
+
+      <p>
+      <code class="{{method.verb}}">{{method.verbUpper}}</code> <code class="path">{{method.pathKey}}</code>
+      </p>
+
+      {{utils.md(operation.description) | safe}}
+
+      {% if operation.requestBody %}
+        <blockquote>
+        <p>
+        Body parameter
+        <span class="btn bodyToggle" data-target="{{opId}}-body-examples">show</span>
+        </p>
+        </blockquote>
+
+        <section id="{{opId}}-body-examples" class="body-examples" style="display:none">
+
+        {% set bodyParam = method.bodyParameter%}
+        {% if bodyParam.examples.description %}
+          <blockquote><p>
+          {{utils.md(bodyParam.examples.description) | safe }}
+          </p></blockquote>
+        {% endif %}
+
+        {{utils.md( bodyParam.exampleMd ) | safe }}
+        </section>
+      {% endif %}
+
+      <h3 id="{{opId}}-parameters">Parameters</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>in</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+
+      {% for p in method.parameters %}
+        {# {{p | dump}} #}
+        <tr>
+        <td> <code class="property">{{p.name}}</code> {%if p.required %}<code class="required">required</code>{% endif %}</td>
+        <td>{{p.in}}</td>
+        <td>
+          {{schemaUtils.getTypeWithMeta(p.schema, 'schema') | safe}}
+          {{utils.md(p.description) | safe}}
+        </td>
+        </tr>
+      {%- endfor %}
+      </table>
+
+      {% if method.hasResponseSchemas %}
+        <blockquote>
+        <p>
+        Example responses
+        <span class="btn responsesToggle" data-target="{{opId}}-response-examples">show</span>
+        </p>
+        </blockquote>
+
+        <section id="{{opId}}-response-examples" class="response-examples" style="display:none">
+        {{utils.md(method.responseExamples) | safe}}
+        </section>
+      {% endif %}
+
+      <h3 id="{{opId}}-responses">Responses</h3>
+      <table>
+        <thead>
+          <tr><th>Status</th><th>Meaning</th><th>Description</th></tr>
+        </thead>
+
+      {% for r in method.responses %}
+        <tr>
+        <td>{{r.code}}</td>
+        <td>{{utils.md(r.name) | safe}}</td>
+        <td>
+          {{schemaUtils.getTypeWithMeta(r.schema, 'schema') | safe}}
+          {{utils.md(r.description) | safe}}
+        </td>
+        </tr>
+      {%- endfor %}
+      </table>
+    {% endfor %} {# tagPaths loop #}
+  {% endfor %} {# tag loop #}
+{% endfor %} {# tagGroup loop #}
+
+

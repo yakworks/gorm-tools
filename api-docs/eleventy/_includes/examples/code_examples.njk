@@ -1,0 +1,6 @@
+{% for langObj in language_tabs %}
+  {% set lang = codeUtils.getFirstKey(langObj) %}
+  {% highlight lang %}
+    {%- include 'examples/code_' + lang + '.njk' %}
+  {% endhighlight %}
+{%- endfor %}

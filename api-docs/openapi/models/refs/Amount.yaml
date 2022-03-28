@@ -1,0 +1,4 @@
+description: Currency Amount
+type: number
+multipleOf: 0.01
+example: 42.01

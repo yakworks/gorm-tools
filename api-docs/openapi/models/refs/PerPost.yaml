@@ -1,0 +1,5 @@
+description: GL Post Period in YYYYMM format
+type: string
+pattern: '^20\d{2}1[0-2]|0[1-9]$'
+maxLength: 6
+example: 202101

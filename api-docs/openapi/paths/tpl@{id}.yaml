@@ -1,0 +1,53 @@
+get:
+  tags: [ ${endpoint} ]
+  summary: Get a ${capitalName}
+  description: Retrieve a ${capitalName}
+  operationId: get${capitalName}ById
+  parameters:
+    - \$ref: '${baseDir}components/parameters/id.yaml'
+  responses:
+    '200':
+      description: ${capitalName} Resource
+      content:
+        application/json:
+          schema:
+            \$ref: '${baseDir}models/${modelName}.yaml'
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '${baseDir}components/responses/404_NotFound.yaml' }
+
+put:
+  tags: [ ${endpoint} ]
+  summary: Update a ${capitalName}
+  description: ''
+  operationId: update${capitalName}
+  parameters:
+    - \$ref: '${baseDir}components/parameters/id.yaml'
+  requestBody:
+    description: ${capitalName} resource
+    required: true
+    content:
+      application/json:
+        schema:
+          \$ref: '${baseDir}models/${modelName}_Update.yaml'
+  responses:
+    '200':
+      description: ${capitalName} Resource
+      content:
+        application/json:
+          schema:
+            \$ref: '${baseDir}models/${modelName}.yaml'
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '${baseDir}components/responses/404_NotFound.yaml' }
+    '422': { \$ref: '${baseDir}components/responses/422_ValidationError.yaml' }
+
+delete:
+  tags: [ ${endpoint} ]
+  summary: Delete a ${capitalName}
+  description: 'Deletes a Batch and any associated Payments'
+  operationId: delete${capitalName}
+  parameters:
+    - \$ref: '${baseDir}components/parameters/id.yaml'
+  responses:
+    '204': { \$ref: '${baseDir}components/responses/204_NoContent.yaml' }
+    '403': { \$ref: '${baseDir}components/responses/403_Forbidden.yaml' }
+    '404': { \$ref: '${baseDir}components/responses/404_NotFound.yaml' }

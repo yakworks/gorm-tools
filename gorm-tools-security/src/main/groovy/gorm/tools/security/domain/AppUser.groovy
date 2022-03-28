@@ -42,7 +42,7 @@ class AppUser implements NamedEntity, AuditStampTrait, GormRepoEntity<AppUser, A
         password:[ d: "The pwd", oapi:'CU', password: true],
         roles:[ d: 'The roles assigned to this user', oapi: [read: true, edit: ['id']]],
         passwordHash:[ d: "The pwd hash, internal use only, never show this",
-                 nullable: false, maxSize: 60, bindable: false, display:false, password: true],
+                 nullable: true, maxSize: 60, bindable: false, display:false, password: true],
         passwordChangedDate:[ d: "The date password was changed",
                  nullable: true, bindable: false, oapi:'R'],
         passwordExpired:[ d: "The password expired",

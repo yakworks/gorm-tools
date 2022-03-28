@@ -11,7 +11,7 @@ import spock.lang.Specification
 @Integration
 class UserRestApiSpec extends Specification implements OkHttpRestTrait {
 
-    String path = "/api/security/user"
+    String path = "/api/rally/user"
 
     void "test get to make sure display false dont get returned"() {
         when:

@@ -1,7 +1,7 @@
 api:
   paths:
     # Security namespace
-    security:
+    rally:
       roleUser:
         includes:
           get: [ "user.id", "user.username", "role.id", "role.name" ]

@@ -1,0 +1,105 @@
+openapi: 3.0.3
+servers:
+  - url: https://demo.9ci.io/api
+    description: Default server
+  - url: https://sanbox.9ci.io/api
+    description: Sandbox server
+info:
+  version: 1.0.0
+  title: 9ci Rest Api
+  termsOfService: 'http://9ci.com/terms/'
+  contact:
+    name: 9ci Inc
+    url: 'https://9ci.com'
+    email: connect@9ci.com
+  x-logo:
+    url: 'https://www.9ci.com/assets/img/logo.svg'
+    altText: 9ci logo
+  license:
+    name: 9ci Proprietary and Confidential
+    url: 'http://www.9ci.com/licenses/LICENSE-2.0.html'
+  description:
+    $ref: Intro.md
+externalDocs:
+  description: 9ci Documentation
+  url: 'https://9ci.com/documentation/2.0/'
+tags:
+- name: org
+  description: >
+    This domain represents all organizational units within the system.  Customers and CustAccounts are special cases,
+    each having their own domain, but each also have corresponding Org records.  In addition, all other system client
+    organizational information is stored here.  This includes company, business units, ops regions, client stores,
+    sales regions, etc.  This domain is configurable to accommodate the hierarchical and overlay organizational
+    structure of a client for reporting, access and data management purposes.
+- name: appParam
+  description: Provides company-specific configuration of application parameters
+- name: activity
+  description: This domain records activity performed on an ArTran
+- name: attachment
+  description: >
+    This domain links (Activity, Collection, Invoice, Report) to documents on the filesystem, like check images
+    or PDFs.
+- name: attachment upload
+  description: Upload files and attachments.
+- name: company
+  description: >
+    This domain represents your organization as a financial entity. There could be multiple companies representing
+    different branches of your company.
+- name: contact
+  description: >
+    This is a person with information by which he/she can be contacted. Email, phone number, which organization>
+    they're associated with, etc.
+- name: org
+  description: >
+    This domain represents all organizational units within the system.  Customers and CustAccounts are special cases,
+    each having their own domain, but each also have corresponding Org records.  In addition, all other system client
+    organizational information is stored here.  This includes company, business units, ops regions, client stores,
+    sales regions, etc.  This domain is configurable to accommodate the hierarchical and overlay organizational
+    structure of a client for reporting, access and data management purposes.
+- name: tag
+  description: >
+    This domain is a list of labels that can be applied to various other domains, like Customer, CustAccount, etc.
+    The tags can be used in process flow and/or as informational categories.
+- name: user
+  description: This domain contains information about users who can login and operate this application.
+- name: role
+  description: This is a list of permission groups to allow access to features of this application.
+- name: roleUser
+  description: This domain maps users to roles, essentially giving a select group of features to the user.
+- name: syncJob
+  description: An instance created right away when "any job" in 9ci is called
+
+x-tagGroups: []
+# use the same key from rcm-api configs, will get replaced with description in rpocessing
+#- name: rally
+#  tags:
+#   - attachment upload
+
+paths:
+  /upload:
+    $ref: ./paths/rally/upload.yaml
+  /download/{id}/{name}:
+    $ref: ./paths/rally/download@{id}.yaml
+
+components:
+  schemas: {}
+
+  securitySchemes:
+    main_auth:
+      description: |
+        Get access to data while protecting your account credentials.
+        OAuth2 is also a safer and more secure way to give you access.
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'http://9ci.io/api/oauth/dialog'
+          scopes:
+            'write:pets': modify pets in your account
+            'read:pets': read your pets
+    api_key:
+      description: >
+        For this sample, you can use the api key `special-key` to test the
+        authorization filters.
+      type: apiKey
+      name: api_key
+      in: header

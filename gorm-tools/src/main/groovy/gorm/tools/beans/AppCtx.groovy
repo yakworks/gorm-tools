@@ -103,7 +103,7 @@ class AppCtx {
      * grails 4.x uses MicronautApplicationEventPublisher - which internally forwards all published events to micronaut
      * which expects listeners to implement  io.micronaut.context.event.ApplicationEventListener.
      */
-    static void publishEvent(ApplicationEvent event){
+    static void publishEvent(Object event){
         //we use the grails.mainContext here because the appCtx scrambles during tests and gets lost
         ((ApplicationEventPublisher)getGrails().mainContext).publishEvent(event)
     }

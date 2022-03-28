@@ -101,17 +101,17 @@ trait BaseArScoreCard {
         maxDuePer: [d: 'period the highest balance occured in the last 12 months'],
         pastDue: [d: 'balance past due', format: 'currency'],
         totalDue: [d: 'total due, sum of all open items. will be the ending balance when month is closed', format: 'currency'],
+        //stored as decimal but by default display with single decimal by default, no need for a dso of 34.12 for example
+        avgDaysBt: [d: 'avg days paid late / avg days beyond terms', format: 'decimal(9,1)'],
+        adp: [d: 'avg days to pay', format: 'decimal(9,1)'],
+        adpWtd: [d: 'weighted average days to pay', format: 'decimal(9,1)'],
+        cei: [d: 'collection effectiveness index', format: 'decimal(9,1)'],
+        ddo: [d: 'days deductions and disputes outstanding', format: 'decimal(9,1)'],
 
-        avgDaysBt: [d: 'avg days paid late / avg days beyond terms', format: 'decimal1'],
-        adp: [d: 'avg days to pay', format: 'decimal1'],
-        adpWtd: [d: 'weighted average days to pay', format: 'decimal1'],
-        cei: [d: 'collection effectiveness index', format: 'decimal1'],
-        ddo: [d: 'days deductions and disputes outstanding', format: 'decimal1'],
-
-        dso: [d: 'day sales outstanding', format: 'decimal1'],
-        dsoad: [d: 'DSO add back', format: 'decimal1'],
-        dsobp: [d: 'DSO best possible', format: 'decimal1'],
-        dso12: [d: 'DSO using the last 12 month average', format: 'decimal1'],
+        dso: [d: 'day sales outstanding', format: 'decimal(9,1)'],
+        dsoad: [d: 'DSO add back', format: 'decimal(9,1)'],
+        dsobp: [d: 'DSO best possible', format: 'decimal(9,1)'],
+        dso12: [d: 'DSO using the last 12 month average', format: 'decimal(9,1)'],
 
     ]
 

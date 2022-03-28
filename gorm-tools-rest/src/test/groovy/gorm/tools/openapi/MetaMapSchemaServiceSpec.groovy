@@ -35,7 +35,7 @@ class MetaMapSchemaServiceSpec extends Specification implements DataRepoTest {
         then:
         mmSchema
         //sanity check
-        mmSchema.className == 'yakworks.rally.orgs.model.Org'
+        mmSchema.rootClassName == 'yakworks.rally.orgs.model.Org'
         mmSchema.props.keySet() == ['id', 'num', 'name'] as Set
 
     }

@@ -29,7 +29,7 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         def res = MetaMapIncludesBuilder.build("Org", ['name'])
 
         then:
-        res.className == 'yakworks.rally.orgs.model.Org'
+        res.rootClassName == 'yakworks.rally.orgs.model.Org'
         res.shortClassName == 'Org'
         res.props.keySet() == ['name'] as Set
 
@@ -37,12 +37,12 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         res = MetaMapIncludesBuilder.build(Org, ['name', 'locations.city'])
 
         then:
-        res.className.contains('Org') // [className: 'Bookz', props: ['name']]
+        res.rootClassName.contains('Org') // [className: 'Bookz', props: ['name']]
         res.props.keySet() == ['name', 'locations'] as Set
         res.nestedIncludes.size() == 1
 
         def itemsIncs = res.nestedIncludes['locations']
-        itemsIncs.className == 'yakworks.rally.orgs.model.Location'
+        itemsIncs.rootClassName == 'yakworks.rally.orgs.model.Location'
         itemsIncs.shortClassName == 'Location'
         itemsIncs.props.keySet() == ['city'] as Set
 
@@ -56,7 +56,8 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         then:
         mmSchema
         //sanity check
-        mmIncs.shortClassName == 'Org'
+        mmSchema.shortRootClassName == 'Org'
+        mmSchema.rootClassPropName == 'org'
         mmIncs.props.keySet() == ['id', 'num', 'name'] as Set
 
         mmSchema.props.keySet() == ['id', 'num', 'name'] as Set
@@ -103,37 +104,6 @@ class MetaMapSchemaSpec extends Specification implements DataRepoTest {
         StringSchema text1Schema = flexMetaMap['text1']
         text1Schema.type == 'string'
         DateTimeSchema date1Schema = flexMetaMap['date1']
-        date1Schema.type == 'string'
-        date1Schema.format == "date-time"
-    }
-
-    void "flatten map"(){
-        when:
-        MetaMapIncludes mmIncs = MetaMapIncludesBuilder.build("Org", ['id', 'name', 'flex.date1', 'flex.text1', 'flex.num1'])
-        MetaMapSchema mmSchema = MetaMapSchema.of(mmIncs)
-        Map flatMap = MapFlattener.flattenMap(mmSchema.props)
-
-        then:
-        flatMap
-        mmSchema.props.keySet() == ['id', 'name', 'flex'] as Set
-
-        def idSchemaDef = flatMap['id']
-        IntegerSchema idSchema = flatMap['id'] as IntegerSchema
-        idSchema.type == 'integer'
-        idSchema.format == 'int64'
-        idSchema.readOnly
-
-        StringSchema nameSchema = flatMap['name']
-        nameSchema.type == 'string'
-        nameSchema.maxLength == 100
-
-        NumberSchema num1Schema = flatMap['flex.num1']
-        num1Schema.type == 'number'
-
-        StringSchema text1Schema = flatMap['flex.text1']
-        text1Schema.type == 'string'
-
-        DateTimeSchema date1Schema = flatMap['flex.date1']
         date1Schema.type == 'string'
         date1Schema.format == "date-time"
     }

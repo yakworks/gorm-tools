@@ -20,6 +20,10 @@ dependencies {
   compile "org.grails.plugins:views-json:$vViews"
   compile "org.grails.plugins:views-json-templates:$vViews"
 
+  compile "org.grails.plugins:hibernate5:$vGormHibernate"
+  compile "org.hibernate:hibernate-core:$vHibernate"
+  compile "org.hibernate:hibernate-ehcache:$vHibernate"
+
   compile project(":testify")
   compile project(":gorm-tools-security")
   compile project(":gorm-tools-rest")

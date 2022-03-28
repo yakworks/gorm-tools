@@ -1,7 +1,7 @@
 apply plugin: "yakworks.grails-plugin"
 
 dependencies {
-  compileOnly project(":gorm-tools")
-  compileOnly project(":gorm-tools-security")
+  api project(":gorm-tools")
+  api project(":gorm-tools-security")
 
 }

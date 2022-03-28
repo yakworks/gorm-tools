@@ -11,6 +11,7 @@ import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
+import java.time.temporal.Temporal
 import java.time.temporal.TemporalAdjusters
 import java.util.regex.Pattern
 
@@ -21,7 +22,7 @@ import groovy.transform.CompileStatic
  * (e.g. to get a number of days between dates or to get last day of month, etc)
  */
 @CompileStatic
-@SuppressWarnings(['MethodCount'])
+@SuppressWarnings(['MethodCount', 'ReturnNullFromCatchBlock'])
 class LocalDateUtils {
     static final Pattern LOCAL_DATE = ~/\d{4}-(0[1-9]|1[0-2])-(0[1-9]|1[0-9]|2[0-9]|3[01])$/
     static final Pattern ISO_YEAR_MONTH = ~/\d{4}-(0[1-9]|1[0-2])$/
@@ -54,6 +55,40 @@ class LocalDateUtils {
         LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
     }
 
+    /**
+     * Parse either LocalDateTime or LocalDate depending on format it picks up
+     */
+    static Temporal parseTemporal(String date) {
+        date = date?.trim()
+        if (!date) return null
+
+        if (isLocalDate(date)) {
+            return parse(date)
+        } else {
+            try {
+                return LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+            } catch (DateTimeParseException e) {
+                return null
+            }
+        }
+    }
+
+    static boolean isLocalDate(String date){
+        date = date?.trim()
+        if (!date || !date.matches(LOCAL_DATE)) return false
+    }
+
+    static boolean isLocalDateTime(String date){
+        date = date?.trim()
+
+        if (!date) return false
+        try {
+            LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+            return true
+        } catch (DateTimeParseException e) {
+            return false
+        }
+    }
     /**
      * Returns the first day of the current month and sets time to midnight.
      */

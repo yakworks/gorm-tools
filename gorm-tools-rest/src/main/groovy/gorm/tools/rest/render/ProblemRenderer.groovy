@@ -41,4 +41,8 @@ class ProblemRenderer implements JsonRendererTrait<IProblem> {
         }
     }
 
+    void setContentType(RenderContext context){
+        context.setContentType( 'application/problem+json' )
+    }
+
 }

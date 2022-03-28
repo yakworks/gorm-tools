@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import gorm.tools.openapi.OpenApiGenerator
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
+import spock.lang.Ignore
 import spock.lang.Specification
 
 @Integration
@@ -17,7 +18,8 @@ class OpenapiGeneratorSpec extends Specification {
     def "sanity check generate"() {
         expect:
         openApiGenerator.generate()
-
+        openApiGenerator.getApiSrcPath("api.yaml").toFile().exists()
+        openApiGenerator.getApiBuildPath("api.yaml").toFile().exists()
     }
 
 }

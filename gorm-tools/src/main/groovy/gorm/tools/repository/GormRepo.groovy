@@ -26,7 +26,6 @@ import gorm.tools.model.Lookupable
 import gorm.tools.model.Persistable
 import gorm.tools.problem.ValidationProblem
 import gorm.tools.repository.bulk.BulkableRepo
-import gorm.tools.repository.errors.RepoEntityErrors
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
 import gorm.tools.repository.model.PersistableRepoEntity
@@ -44,7 +43,7 @@ import yakworks.problem.data.NotFoundProblem
  */
 @SuppressWarnings(['EmptyMethod'])
 @CompileStatic
-trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEntityApi<D> {
+trait GormRepo<D> implements BulkableRepo<D>, QueryMangoEntityApi<D> {
 
     @Autowired EntityMapBinder entityMapBinder
 
@@ -135,8 +134,10 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
     /**
      * called right BEFORE validateAndSave to fire events but can be overridden too.
      * just be sure to fire event if overidden.
+     * NOTE
      */
     void doBeforePersist(D entity, PersistArgs args){
+        //NOTE: IdGeneratorRepo overrides this, make sure any changes here are cross checked with it.
         if (args.bindAction && args.data){
             doBeforePersistWithData(entity, args)
         }
@@ -169,7 +170,9 @@ trait GormRepo<D> implements BulkableRepo<D>, RepoEntityErrors<D>, QueryMangoEnt
         if(args.validate != false){
             boolean valid = gormValidationApi().validate entity
             if(!valid && args.failOnError){
-                throw ValidationProblem.of(entity).errors(((GormEntity)entity).errors).toException()
+                def ex = ValidationProblem.of(entity).errors(((GormEntity)entity).errors).toException()
+                // println ex
+                throw ex
             }
             return valid
         }

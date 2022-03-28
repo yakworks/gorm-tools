@@ -47,14 +47,14 @@ class ResultUtils {
     // swallow no such message exception and returns empty string
     static String getMessage(MsgService msgService, Result result){
         String message
-        if(result.msg) message = msgService.getMessage(result.msg)
+        if(result.msg) message = msgService.get(result.msg)
 
         if(!message){
             if(result.title) {
                 message = result.title
             } else if(result instanceof ApiResults && result.size() != 0) {
                 //use msg form first item
-                message = msgService.getMessage(((ApiResults)result)[0].msg)
+                message = msgService.get(((ApiResults)result)[0].msg)
             }
         }
 

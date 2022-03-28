@@ -130,28 +130,6 @@ class ActivityTests extends Specification implements DomainIntTest {
 
     }
 
-    void "bulk insert note"() {
-        setup:
-        Org org = Org.of("T01", "T01", OrgType.Customer).persist()
-        List<Org> customers = Org.findAllByOrgTypeId(OrgType.Customer.id, [max:5])
-        assert customers.size() == 5
-
-        when:
-        Activity activity = activityRepo.insertMassNote(customers, "Customer", org, "test note")
-        flush()
-
-        activity = Activity.get(activity.id)
-        List<ActivityLink> links = ActivityLink.list(activity)
-
-        then:
-        links.size() == 5
-        activity.note.body == "test note"
-        customers.each { Org customer ->
-            assert links.find({ it.linkedId == customer.id}) != null
-        }
-
-    }
-
     void "add tags"() {
         setup:
         Org org = Org.first()
@@ -189,7 +167,6 @@ class ActivityTests extends Specification implements DomainIntTest {
         flushAndClear()
     }
 
-    @IgnoreRest
     void "add tags and make sure filter works"() {
         when:
         addTagsForSearch()
@@ -207,45 +184,6 @@ class ActivityTests extends Specification implements DomainIntTest {
         hasTag1.size() == 3
         hasTag2.size() == 2
         has1or2.size() == 4
-    }
-
-    void "save activity with an Org that does not exist"(){
-
-        when:
-        def params = [
-            org:[id: 909090],
-            note:[body: 'Todays test note'],
-            name: '!! will get overriden as it has a note !!'
-        ]
-
-        Activity act = Activity.create(params)
-        flush()
-
-        then:
-        act
-        act.note.body == params.note.body
-        act.name == params.note.body
-
-        when:
-        flushAndClear()
-        Activity activity = Activity.get(act.id)
-
-        then:
-        activity
-        activity.note
-        activity.orgId == params.org.id.toLong()
-        activity.org.id == params.org.id.toLong()
-        params.note.body == activity.note.body
-        params.note.body == activity.name
-        Activity.Kind.Note == activity.kind
-        activity.task == null
-
-        when: "Activity is removed, note also gets removed"
-        activity.remove()
-
-        then:
-        Activity.get(act.id) == null
-        ActivityNote.get(activity.noteId) == null
     }
 
 }

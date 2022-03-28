@@ -19,8 +19,10 @@ import yakworks.commons.map.Maps
 @CompileStatic
 class Pogo {
 
-    // Helper redirect to PropertyTools.getPropertyValue
-    static Object getPropertyValue(Object source, String property) {
+    /**
+     * shorter and more semanticly correct alias to getProperty
+     */
+    static Object value(Object source, String property) {
         PropertyTools.getProperty(source, property)
     }
 

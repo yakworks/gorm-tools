@@ -1,0 +1,5 @@
+description: Invalid data was sent. Validation Error(s)
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/ValidationError.yaml

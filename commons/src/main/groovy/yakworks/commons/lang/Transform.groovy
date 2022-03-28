@@ -6,10 +6,6 @@ package yakworks.commons.lang
 
 import groovy.transform.CompileStatic
 
-import org.codehaus.groovy.runtime.InvokerHelper
-
-import yakworks.commons.map.Maps
-
 /**
  * helpers to transform one type to another
  *

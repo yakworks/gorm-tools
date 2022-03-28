@@ -1,0 +1,26 @@
+type: object
+properties:
+  createdBy:
+    description: id of user who created
+    type: integer
+    format: int64
+    example: 1
+    readOnly: true
+  createdDate:
+    description: date created
+    type: string
+    format: date-time
+    example: '2020-07-21T17:32:28Z'
+    readOnly: true
+  editedBy:
+    description: id of user who updated
+    type: integer
+    format: int64
+    example: 2
+    readOnly: true
+  editedDate:
+    description: date updated
+    type: string
+    format: date-time
+    example: '2020-08-21T17:32:28Z'
+    readOnly: true

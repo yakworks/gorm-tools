@@ -21,7 +21,7 @@ import org.hibernate.loader.criteria.CriteriaQueryTranslator
 import org.hibernate.persister.entity.OuterJoinLoadable
 
 /**
- * WIP to generate the rough sql
+ * p[roof of concept and WIP to generate the rough sql,
  * see https://stackoverflow.com/questions/554481/how-to-get-sql-from-hibernate-criteria-api-not-for-logging
  * https://stackoverflow.com/questions/14358934/how-to-get-the-jpa-generated-sql-query
  * https://antoniogoncalves.org/2012/05/24/how-to-get-the-jpqlsql-string-from-a-criteriaquery-in-jpa/

@@ -5,12 +5,11 @@
 package gorm.tools.json
 
 import gorm.tools.testing.RepoTestData
-import spock.lang.IgnoreRest
 
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.repository.model.RepoEntity
 import gorm.tools.testing.unit.DomainRepoTest
 import grails.compiler.GrailsCompileStatic
@@ -121,7 +120,7 @@ class EntityJsonSpec extends Specification implements DomainRepoTest<Cust> {
         result == '[{"name":"name"},{"name":"name"}]'
     }
 
-    @Ignore //XXX need to sort out excludes so we dont get circular refs
+    @Ignore //See https://github.com/yakworks/gorm-tools/issues/475
     void "test buildJson excludes"() {
         when:
         def org = build(includes: '*')

@@ -1,11 +1,14 @@
 package yakworks.rally.orgs.members
 
+import gorm.tools.problem.ValidationProblem
 import org.springframework.validation.Errors
 
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 import spock.lang.IgnoreRest
 import yakworks.gorm.testing.DomainIntTest
+import yakworks.problem.ProblemException
+import yakworks.problem.data.DataProblemException
 import yakworks.rally.orgs.OrgDimensionService
 import yakworks.rally.orgs.model.Org
 import yakworks.rally.orgs.model.OrgMember
@@ -180,6 +183,34 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
         !orgMember.hasErrors()
     }
 
+    def "fails when no member fields are specified but parents required"() {
+        when:
+        orgDimensionService.testInit("CustAccount.Customer.Branch")
+        Org org = Org.create(name:"test", num:"T001", orgTypeId:OrgType.Customer.id)
+
+        then: "Branch should be required for customer"
+        DataProblemException ex = thrown()
+        ex.entity != null
+        ex.entity instanceof Org
+
+        when:
+        org = ex.entity as Org
+
+        then:
+        org.validate() == false
+        org.member != null
+        org.hasErrors()
+        validateErrors(org.errors, ["member.branch"])
+
+        when:
+        org = Org.create(name:"test", num:"T001", orgTypeId:OrgType.Branch.id)
+
+        then: "Should not require any thing for branch"
+        noExceptionThrown()
+        org != null
+        org.validate()
+        org.hasErrors() == false
+    }
 
     @Unroll
     def "test constraints: fields #requiredLevels should be required for paths #paths and orgType #orgType"(OrgType orgType, List paths, List requiredLevels) {
@@ -214,7 +245,7 @@ class OrgMemberSpec extends Specification implements DomainIntTest {
 
         requiredLevels.each { String level ->
             assert errors.hasFieldErrors(level)
-            assert errors.getFieldError(level).code == "nullable"
+            assert errors.getFieldError(level).code == "NotNull"
         }
 
         List notRequired = all - requiredLevels

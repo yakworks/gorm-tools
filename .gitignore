@@ -155,3 +155,6 @@ Session.vim
 /web-app/
 /site/*
 .env
+.DS_Store
+api-docs/dist
+api-docs/node_modules

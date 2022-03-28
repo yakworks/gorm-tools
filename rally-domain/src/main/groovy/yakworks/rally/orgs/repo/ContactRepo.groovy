@@ -24,9 +24,7 @@ import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import yakworks.commons.map.Maps
 import yakworks.problem.data.DataProblemCodes
-import yakworks.problem.data.NotFoundProblem
 import yakworks.rally.activity.model.ActivityContact
-import yakworks.rally.attachment.model.Attachment
 import yakworks.rally.orgs.model.Contact
 import yakworks.rally.orgs.model.ContactEmail
 import yakworks.rally.orgs.model.ContactFlex
@@ -83,12 +81,12 @@ class ContactRepo implements GormRepo<Contact>, IdGeneratorRepo<Contact> {
         Contact contact
         if (data == null) data = [:] //if null then make it empty map so it can cycle down and blow error
 
-        String sourceId = Maps.getProperty(data, 'sourceId')
+        String sourceId = Maps.value(data, 'sourceId')
         if(sourceId) {
             List contactForSourceId = ContactSource.findAllWhere(sourceId: sourceId)
             contact = contactForSourceId[0].contact
         } else if (data.num) {
-            String num = Maps.getProperty(data, 'num')
+            String num = Maps.value(data, 'num')
             List contactForNum = Contact.findAllWhere(num:num)
             if(contactForNum?.size() == 1) {
                 contact = contactForNum[0]

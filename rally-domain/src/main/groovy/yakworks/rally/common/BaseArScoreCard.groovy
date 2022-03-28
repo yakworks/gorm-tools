@@ -84,4 +84,35 @@ trait BaseArScoreCard {
     BigDecimal num5
     BigDecimal num6
 
+    static constraintsMap = [
+        aging1: [d: 'Aging bucket 1', format: 'currency'],
+        aging2: [d: 'Aging bucket 2', format: 'currency'],
+        aging3: [d: 'Aging bucket 3', format: 'currency'],
+        aging4: [d: 'Aging bucket 4', format: 'currency'],
+        aging5: [d: 'Aging bucket 5', format: 'currency'],
+        aging6: [d: 'Aging bucket 6', format: 'currency'],
+        aging7: [d: 'Aging bucket 7', format: 'currency'],
+        aging8: [d: 'Aging bucket 8', format: 'currency'],
+        aging9: [d: 'Aging bucket 9', format: 'currency'],
+        aging10: [d: 'Aging bucket 10', format: 'currency'],
+
+        curBal: [d: 'whats not due yet', format: 'currency'],
+        maxDue: [d: 'max totalDue in this month and last 12 months', format: 'currency'],
+        maxDuePer: [d: 'period the highest balance occured in the last 12 months'],
+        pastDue: [d: 'balance past due', format: 'currency'],
+        totalDue: [d: 'total due, sum of all open items. will be the ending balance when month is closed', format: 'currency'],
+        //stored as decimal but by default display with single decimal by default, no need for a dso of 34.12 for example
+        avgDaysBt: [d: 'avg days paid late / avg days beyond terms', format: 'decimal(9,1)'],
+        adp: [d: 'avg days to pay', format: 'decimal(9,1)'],
+        adpWtd: [d: 'weighted average days to pay', format: 'decimal(9,1)'],
+        cei: [d: 'collection effectiveness index', format: 'decimal(9,1)'],
+        ddo: [d: 'days deductions and disputes outstanding', format: 'decimal(9,1)'],
+
+        dso: [d: 'day sales outstanding', format: 'decimal(9,1)'],
+        dsoad: [d: 'DSO add back', format: 'decimal(9,1)'],
+        dsobp: [d: 'DSO best possible', format: 'decimal(9,1)'],
+        dso12: [d: 'DSO using the last 12 month average', format: 'decimal(9,1)'],
+
+    ]
+
 }

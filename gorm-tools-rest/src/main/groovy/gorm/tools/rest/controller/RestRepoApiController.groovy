@@ -4,8 +4,6 @@
 */
 package gorm.tools.rest.controller
 
-import javax.servlet.http.HttpServletRequest
-
 import groovy.transform.CompileStatic
 
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -15,18 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.GenericTypeResolver
 import org.springframework.http.HttpStatus
 
-import gorm.tools.api.IncludesConfig
 import gorm.tools.api.IncludesKey
 import gorm.tools.beans.Pager
-import gorm.tools.beans.map.MetaMap
-import gorm.tools.beans.map.MetaMapEntityService
-import gorm.tools.beans.map.MetaMapList
-import gorm.tools.csv.CsvToMapTransformer
-import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobEntity
-import gorm.tools.job.SyncJobService
-import gorm.tools.mango.api.QueryArgs
-import gorm.tools.mango.api.QueryMangoEntityApi
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.model.DataOp
@@ -56,17 +45,11 @@ trait RestRepoApiController<D> extends RestApiController {
     //Need it to access log and still compile static in trait (See https://issues.apache.org/jira/browse/GROOVY-7439)
     final private static Logger log = LoggerFactory.getLogger(RestRepoApiController)
 
-    @Autowired
-    IncludesConfig includesConfig
-
-    @Autowired
-    MetaMapEntityService metaMapEntityService
+    @Autowired(required = false)
+    EntityResponder<D> entityResponder
 
     @Autowired(required = false)
-    SyncJobService syncJobService
-
-    @Autowired(required = false)
-    CsvToMapTransformer csvToMapTransformer
+    BulkControllerSupport<D> bulkControllerSupport
 
     /**
      * The java class for the Gorm domain (persistence entity). will generally get set in constructor or using the generic as
@@ -82,6 +65,16 @@ trait RestRepoApiController<D> extends RestApiController {
     Class<D> getEntityClass() {
         if (!entityClass) this.entityClass = (Class<D>) GenericTypeResolver.resolveTypeArgument(getClass(), RestRepoApiController)
         return entityClass
+    }
+
+    EntityResponder<D> getEntityResponder(){
+        if (!entityResponder) this.entityResponder = EntityResponder.of(getEntityClass())
+        return entityResponder
+    }
+
+    BulkControllerSupport<D> getBulkControllerSupport(){
+        if (!bulkControllerSupport) this.bulkControllerSupport = BulkControllerSupport.of(getEntityClass())
+        return bulkControllerSupport
     }
 
     /**
@@ -146,7 +139,7 @@ trait RestRepoApiController<D> extends RestApiController {
     def get() {
         try {
             D instance = (D) getRepo().read(params.id as Serializable)
-            RepoUtil.checkFound(instance, params.id as Serializable, entityClass.simpleName)
+            RepoUtil.checkFound(instance, params.id as Serializable, getEntityClass().simpleName)
             respondWithEntityMap(instance)
         } catch (Exception e) {
             handleException(e)
@@ -166,7 +159,7 @@ trait RestRepoApiController<D> extends RestApiController {
     @Action
     def list() {
         try {
-            Pager pager = pagedQuery(params, [IncludesKey.list.name()])
+            Pager pager = getEntityResponder().pagedQuery(params, [IncludesKey.list.name()])
             respondWith pager
         } catch (Exception e) {
             handleException(e)
@@ -205,69 +198,12 @@ trait RestRepoApiController<D> extends RestApiController {
 
     void bulkProcess(DataOp dataOp) {
         List dataList = bodyAsList() as List<Map>
-        HttpServletRequest req = request
-
-        String sourceKey = "${req.method} ${req.requestURI}?${req.queryString}"
-
-        def bulkIncludes = getIncludesMap()[IncludesKey.bulk.name()]
-        List bulkIncludesSuccess, errorIncludes
-
-        if(bulkIncludes instanceof Map) {
-            bulkIncludesSuccess = bulkIncludes['success'] as List
-            errorIncludes = bulkIncludes['error'] as List
-        } else {
-            bulkIncludesSuccess = bulkIncludes as List
-            errorIncludes = null
-        }
-
-        SyncJobArgs syncJobArgs = new SyncJobArgs(op: dataOp, includes: bulkIncludesSuccess, errorIncludes: errorIncludes,
-            sourceId: sourceKey, source: params.jobSource)
-        //Can override payload storage or turn off with 'NONE' if not needed for big loads
-        syncJobArgs.savePayload = params.boolean('savePayload', true)
-        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', false)
-        syncJobArgs.saveDataAsFile = params.boolean('saveDataAsFile')
-
-        doBulk(dataList, syncJobArgs)
-    }
-
-    void doBulk(List<Map> dataList, SyncJobArgs syncJobArgs){
-        Long jobId
-        if(params.attachmentId) {
-            jobId = doBulkCsv(dataList, syncJobArgs)
-        } else {
-            jobId = getRepo().bulk(dataList, syncJobArgs)
-        }
-
-        SyncJobEntity job = syncJobService.getJob(jobId)
+        SyncJobEntity job = getBulkControllerSupport().process(dataOp, dataList, webRequest)
         respondWith(job, [status: MULTI_STATUS])
     }
 
-    /**
-     * Bulk CSV upload.
-     *
-     * Process flow to use attachment:
-     * 1. Zip data.csv
-     * 2. Call POST /api/upload?name=myZip.zip, take attachmentId from the result
-     * 3. Call POST /api/rally/<domain>/bulk with query params:
-     *  - attachmentId=<attachment-id>
-     *  - dataFilename= -- pass in data.csv and detail.csv as default of parameter for file names
-     *  - headerPathDelimiter -- default is '.', pass in '_' for underscore (this is path delimiter for header names, not csv delimiter)
-     */
-    Long doBulkCsv(List<Map> dataList, SyncJobArgs syncJobArgs){
-        if(!syncJobArgs.asyncEnabled == null) syncJobArgs.asyncEnabled  = true //enable by default
-        syncJobArgs.promiseEnabled = params.boolean('promiseEnabled', true) //default to true for CSV unless explicitely disabled in params
-        if(!syncJobArgs.savePayload == null) syncJobArgs.savePayload  = false //no need to save payload if we have csv file
-        dataList = transformCsvToBulkList(params)
-        return getRepo().bulk(dataList, syncJobArgs)
-    }
-
-    List<Map> transformCsvToBulkList(Map params) {
-        return csvToMapTransformer.process(params)
-    }
-
     void respondWithEntityMap(D instance, HttpStatus status = HttpStatus.OK){
-        MetaMap entityMap = createEntityMap(instance)
-        respondWith(entityMap, [status: status])
+        getEntityResponder().respondWith(this, instance, status)
     }
 
     /**
@@ -275,82 +211,7 @@ trait RestRepoApiController<D> extends RestApiController {
      */
     Pager picklistPagedQuery(Map params) {
         params.max = params.max ?: getPicklistMax() //default to 50 for picklists
-        return pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
-    }
-
-    Pager pagedQuery(Map params, List<String> includesKeys) {
-        Pager pager = new Pager(params)
-        List dlist = query(pager, params)
-        List<String> incs = findIncludes(params, includesKeys)
-        MetaMapList entityMapList = metaMapEntityService.createMetaMapList(dlist, incs)
-        return pager.setEntityMapList(entityMapList)
-    }
-
-    /**
-     * finds the right includes.
-     *   - looks for includes param and uses that if passed in
-     *   - looks for includesKey param and uses that if set, falling back to the defaultIncludesKey
-     *   - falls back to the passed fallbackKeys if not set
-     *   - the fallbackKeys will itself unlimately fallback to the 'get' includes if it can't be found
-     *
-     * @param params the request params
-     * @return the List of includes field that can be passed to the MetaMap creation
-     */
-    List<String> findIncludes(Map params, List<String> fallbackKeys = []){
-        List<String> keyList = []
-        //if it has a includes then just parse that and pass it back
-        if(params.containsKey('includes')) {
-            return (params['includes'] as String).tokenize(',')*.trim()
-        } else if(params.containsKey('includesKey')){
-            keyList << (params['includesKey'] as String)
-        }
-        keyList.addAll(fallbackKeys)
-        return IncludesConfig.getFieldIncludes(getIncludesMap(), keyList)
-    }
-
-    List<D> query(Pager pager, Map parms) {
-        QueryArgs qargs = QueryArgs.of(pager).build(parms)
-        ((QueryMangoEntityApi)getRepo()).queryList(qargs)
-    }
-
-    /**
-     * builds the response model with the EntityMap wrapper.
-     *
-     * @param instance the entity instance
-     * @param includeKey the key to use in the includes map, use default by default
-     * @return the object to pass on to json views
-     */
-    MetaMap createEntityMap(D instance){
-        flushIfSession() //in testing need to flush before generating entitymap
-        List<String> incs = findIncludes(params)
-        MetaMap emap = metaMapEntityService.createMetaMap(instance, incs)
-        return emap
-    }
-
-    /**
-     * In rare cases controller action will be inside a hibernate session
-     * primarily needed for testing but there are some edge cases where this is needed
-     * checks if repo datastore has a session and flushes if so
-     */
-    void flushIfSession(){
-        if(getRepo().datastore.hasCurrentSession()){
-            getRepo().flush()
-        }
-    }
-
-    /**
-     * calls the IncludesConfig's getIncludes passing in any controller overrides
-     */
-    Map getIncludesMap(){
-        //we are in trait, always use getters in case they are overrriden in implementing class
-        return getIncludesConfig().getIncludes(getControllerName(), getNamespaceProperty(), getEntityClass(), [:])
-    }
-
-    /**
-     * calls IncludesConfig.getFieldIncludes with this controllers getIncludesMap()
-     */
-    List<String> getFieldIncludes(List<String> includesKeys){
-        return IncludesConfig.getFieldIncludes(getIncludesMap(), [IncludesKey.get.name()])
+        return getEntityResponder().pagedQuery(params, ['picklist', IncludesKey.stamp.name()])
     }
 
     void handleException(Exception e) {

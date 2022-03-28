@@ -4,8 +4,6 @@
 */
 package gorm.tools.testing.support
 
-import java.lang.reflect.Method
-
 import groovy.transform.CompileDynamic
 
 import org.grails.datastore.mapping.model.PersistentEntity
@@ -20,11 +18,12 @@ import org.springframework.validation.Validator
 import gorm.tools.api.IncludesConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelStreamTools
-import gorm.tools.beans.map.MetaMapEntityService
+import gorm.tools.beans.AppCtx
 import gorm.tools.databinding.EntityMapBinder
 import gorm.tools.idgen.PooledIdGenerator
 import gorm.tools.mango.DefaultMangoQuery
 import gorm.tools.mango.MangoBuilder
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.DefaultGormRepo
 import gorm.tools.repository.GormRepo
@@ -33,9 +32,8 @@ import gorm.tools.repository.RepoUtil
 import gorm.tools.repository.artefact.RepositoryArtefactHandler
 import gorm.tools.repository.errors.RepoExceptionSupport
 import gorm.tools.repository.events.RepoEventPublisher
-import gorm.tools.repository.validation.RepoEntityValidator
 import gorm.tools.transaction.TrxService
-import grails.core.GrailsApplication
+import gorm.tools.validation.RepoEntityValidator
 import grails.persistence.support.NullPersistentContextInterceptor
 import grails.spring.BeanBuilder
 import yakworks.i18n.icu.GrailsICUMessageSource
@@ -63,23 +61,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         getApplicationContext()
     }
 
-    // @Override
-    // GrailsApplication getGrailsApplication() {
-    //     if (_grailsApplication == null) {
-    //         _grailsApplication = GrailsUnitTest.super.getGrailsApplication()
-    //         defineCommonBeans()
-    //     }
-    //     _grailsApplication
-    // }
-
-    // @Override
-    // void cleanupGrailsApplication() {
-    //     if (_grailsApplication != null) {
-    //         GrailsUnitTest.super.cleanupGrailsApplication()
-    //         this._grailsApplication = null
-    //     }
-    // }
-
     /**
      * Finds repository class in same package as domain class.
      * returns a default DefaultGormRepo if no explicit ones are found
@@ -100,7 +81,7 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
     }
 
     Closure commonBeans(){ { ->
-        entityMapBinder(EntityMapBinder, grailsApplication)
+        entityMapBinder(EntityMapBinder)
         repoEventPublisher(RepoEventPublisher)
         //repoUtilBean(RepoUtil)
         repoExceptionSupport(RepoExceptionSupport)
@@ -131,6 +112,8 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
 
     void defineRepoBeans(Class<?>... domainClassesToMock){
         RepoLookup.USE_CACHE = false
+        //for some reason holder get scrambled so make sure it has the gapp we are using
+        AppCtx.setGrailsApplication(grailsApplication)
 
         Closure beanClos = {
             Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
@@ -160,18 +143,19 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         def doWithDomainsClosure = doWithDomains()
         if(doWithDomainsClosure) beanClosures.add(doWithDomainsClosure)
 
+        //put here so we can use trait to setup security when needed
+        def doWithSecurityClosure = doWithSecurity()
+        if(doWithSecurityClosure) beanClosures.add(doWithSecurityClosure)
+
         defineBeansMany(beanClosures)
 
-        // if(_hasCommonBeansSetup){
-        //     defineBeansMany([beanClos])
-        // } else {
-        //     defineBeansMany([commonBeans(), beanClos])
-        //     _hasCommonBeansSetup = true
-        // }
+        //put here so we can use trait to setup security when needed
+        doAfterDomains()
 
         // redo the cache for the repo event methods in the repos
-        ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
-
+        // ctx.getBean('repoEventPublisher').scanAndCacheEventsMethods()
+        // ctx.getBean('repoEventPublisher').applicationEventPublisher = grailsApplication.mainContext
+        // RepoValidatorRegistry.init(datastore, ctx.getBean('messageSource'))
     }
 
     /**
@@ -195,7 +179,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         Collection<PersistentEntity> entities = datastore.mappingContext.persistentEntities
         for (PersistentEntity entity in entities) {
             Validator validator = registerDomainClassValidator(entity)
-
             datastore.mappingContext.addEntityValidator(entity, validator)
         }
     }
@@ -206,7 +189,6 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         defineBeans {
             "$validationBeanName"(RepoEntityValidator, domain, ref("messageSource"), ref(DataTestSetupSpecInterceptor.BEAN_NAME))
         }
-
         applicationContext.getBean(validationBeanName, Validator)
     }
 
@@ -236,7 +218,24 @@ trait GormToolsSpecHelper extends GrailsUnitTest {
         obj
     }
 
+    /**
+     * override this to add beans during appContext init with the domains and repos
+     */
     Closure doWithDomains() {
+        null
+    }
+
+    /**
+     * override this to add beans during appContext init with the domains and repos
+     */
+    void doAfterDomains() {
+        null
+    }
+
+    /**
+     * override this to add beans that are needed for security setups
+     */
+    Closure doWithSecurity() {
         null
     }
 }

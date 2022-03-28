@@ -36,11 +36,11 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
 root(ERROR, ['STDOUT'])
 
 
-// logger("org.hibernate", OFF)  //XXX https://github.com/9ci/domain9/issues/600
+// logger("org.hibernate", OFF)  //See https://github.com/9ci/domain9/issues/600
 logger("org.hibernate.orm.deprecation", OFF)
 
 //TURN ON for benchmarks
 logger "org.hibernate", INFO
 // // for stats and sql logging
-logger 'org.hibernate.stat', DEBUG
-logger 'org.hibernate.SQL', DEBUG
+// logger 'org.hibernate.stat', DEBUG
+// logger 'org.hibernate.SQL', DEBUG

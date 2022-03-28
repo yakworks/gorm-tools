@@ -99,6 +99,7 @@ class GormRepoSpec extends GormToolsHibernateSpec {
         KitchenSink sink = build(KitchenSink)//new Org(name: "get_test_version").save()
         sink.ext  = build(SinkExt, save:false)
         sink.ext.kitchenSink = sink
+        sink.ext.id = sink.id
         sink.ext.save(failOnError: true, flush:true)
         //org.save(failOnError: true, flush:true)
 

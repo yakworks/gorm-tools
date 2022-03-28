@@ -24,7 +24,7 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
     void "is controller name working and does it have config"() {
         expect:
         controller.getControllerName() == 'org'
-        controller.getFieldIncludes(['get']) == ['*', 'info.*', "location.id", 'tags', 'contact.$*', 'contact.flex.num1']
+        // controller.getFieldIncludes(['get']) == ['*', 'info.*', "location.id", 'tags', 'contact.$*', 'contact.flex.num1']
     }
 
 
@@ -106,8 +106,49 @@ class OrgControllerTests extends Specification implements RestIntegrationTest {
         then:
         response.status == 200
         response.header("Content-Type").contains("text/csv")
+        response.header("Content-Disposition").contains('attachment;filename=')
         response.contentAsString
 
+    }
+
+    void "sanity check XLSX"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [format:'xlsx']
+        controller.list()
+        // Map body = response.bodyToMap()
+        // List data = body.data
+
+        then:
+        response.status == 200
+        response.header("Content-Type").contains("spreadsheetml")
+        response.header("Content-Disposition").contains('attachment;filename=')
+    }
+
+    void "list with includes"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [includes:"id,num"]
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        (data[0] as Map).keySet().size() ==2
+    }
+
+    void "list with includesKey"() {
+        // ?max=20&page=1&q=%7B%7D&sort=org.calc.totalDue
+        when:
+        controller.params << [includesKey:'bulk']
+        controller.list()
+        Map body = response.bodyToMap()
+        List data = body.data
+
+        then:
+        response.status == 200
+        (data[0] as Map).keySet().size() == 4
     }
 
 }

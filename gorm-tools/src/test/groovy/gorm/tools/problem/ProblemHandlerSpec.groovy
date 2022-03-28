@@ -32,7 +32,7 @@ class ProblemHandlerSpec extends Specification implements GormAppUnitTest {
     //     problem.code == 'error.unhandled'
     //     // problem.title == 'Unhandled Problem'
     //     problem.detail == "test error"
-    //     //XXX finish showing stacktrace
+    //     //FIXME finish showing stacktrace
     // }
 
     void 'WTF'() {
@@ -60,7 +60,7 @@ class ProblemHandlerSpec extends Specification implements GormAppUnitTest {
     //     problem.code == "validation.error"
     //     problem.title == "Org Validation Error(s)"
     //     problem.errors.size() == 2
-    //     //XXX finish testing this
+    //     //FIXME finish testing this
     //
     // }
 

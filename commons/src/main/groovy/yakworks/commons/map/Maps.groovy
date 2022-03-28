@@ -22,15 +22,15 @@ import yakworks.commons.util.StringUtils
 class Maps {
 
     /**
-     * Return the value of a nested path
+     * Return the value of a nested path. Alias to PropertyTools.getProperty.
      *
-     * Example getPropertyValue(source, "x.y.z")
+     * Example Maps.getProperty(source, "x.y.z")
      *
      * @param source - The source object
      * @param property - the property
      * @return value of the specified property or null if any of the intermediate objects are null
      */
-    static Object getProperty(Map source, String property) {
+    static Object value(Map source, String property) {
         PropertyTools.getProperty(source, property)
     }
 
@@ -213,6 +213,7 @@ class Maps {
      * @param defaultReturn if its doesn't have the key or map is null this is the default return value
      * @return A boolean value which will be false if the map is null, the map doesn't contain the key or the value is false
      */
+    @SuppressWarnings('EmptyCatchBlock')
     static boolean getBoolean(String key, Map<?, ?> map, boolean defaultValue = false) {
         if (map == null) return defaultValue
 
@@ -223,12 +224,13 @@ class Maps {
                 return (Boolean)o
             }
             try {
-                String string = o.toString()
-                if (string != null) {
-                    return StringUtils.toBoolean(string)
+                if (o != null) {
+                    return StringUtils.toBoolean(o.toString())
                 }
             }
-            catch (Exception e) {}
+            catch (Exception e) {
+                /* swallow exception and will return default */
+            }
         }
         return defaultValue
     }

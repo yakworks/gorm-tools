@@ -15,19 +15,9 @@ class PluginMessagesSpec extends Specification {
     ICUMessageSource messageSource
 
     void "messageSource lookup"(){
-        when:
-        assert messageSource instanceof ICUMessageSource
-        def msg = messageSource.getMessage("default.not.found.message", ['Foo', 2] as Object[], Locale.default)
-
-        then:
-        msg == "Foo not found with id 2"
+        expect:
+        messageSource instanceof ICUMessageSource
+        "Data Problem" == messageSource.get("error.data.problem")
 
     }
-    //
-    // void "basic look up"(){
-    //     expect:
-    //     // r.code == "default.not.found.message"
-    //     // r.args == ['MockDomain', 2]
-    //     "Foo not found for id:2" == messageSource.getMessage("default.not.found.message", ['Foo', 2])
-    // }
 }

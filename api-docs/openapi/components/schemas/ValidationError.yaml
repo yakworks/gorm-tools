@@ -1,0 +1,4 @@
+description: Invalid data was sent.
+allOf:
+  - $ref: ./Problem.yaml
+  - $ref: ./errors/ValidationErrorExtensions.yaml

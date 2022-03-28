@@ -19,6 +19,7 @@ import org.grails.orm.hibernate.AbstractHibernateSession
 import gorm.tools.mango.hibernate.HibernateMangoQuery
 import gorm.tools.mango.jpql.JpqlQueryBuilder
 import gorm.tools.mango.jpql.JpqlQueryInfo
+import gorm.tools.mango.jpql.SimplePagedQuery
 import grails.compiler.GrailsCompileStatic
 import grails.gorm.DetachedCriteria
 import grails.gorm.PagedResultList
@@ -47,6 +48,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
     /**
      * Constructs a DetachedCriteria instance target the given class and alias for the name
+     * The default is to use the short domain name with "_" appended to it.
      * @param targetClass The target class
      * @param alias The root alias to be used in queries
      */
@@ -94,10 +96,15 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
      * @return A list of matching instances
      */
     List<Map> mapList(Map args = Collections.emptyMap()) {
-        //getHibernateQuery().list() as List<Map>
         def builder = JpqlQueryBuilder.of(this).aliasToMap(true)
         JpqlQueryInfo queryInfo = builder.buildSelect()
-        return currentGormStaticApi().executeQuery(queryInfo.query, queryInfo.paramMap, args)
+        def api = currentGormStaticApi()
+        //use SimplePagedQuery so it can attach the totalCount
+        SimplePagedQuery hq = new SimplePagedQuery(api)
+        //FIXME do some logic about so that if builder only has 1 sum or 1 count then its already expected that it
+        //will have a single result and there is no need to fire count in the SimplePagedQuery
+        def list = hq.list(queryInfo.query, queryInfo.paramMap, args)
+        return list
     }
 
     /**
@@ -290,6 +297,7 @@ class MangoDetachedCriteria<T> extends DetachedCriteria<T> {
 
         return query
     }
+
 
     // copied in from DynamicFinder.applyDetachedCriteria
     // static void applyDetachedCriteria(Query query, AbstractDetachedCriteria detachedCriteria) {

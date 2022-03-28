@@ -23,6 +23,12 @@ import org.codehaus.groovy.reflection.CachedMethod
 class PropertyTools {
 
     /**
+     * shorter and more semanticly correct alias to getProperty
+     */
+    static Object value(Object source, String property) {
+        getProperty(source, property)
+    }
+    /**
      * Return the value of the (probably nested if your using this) property of the specified name, for the specified source object
      *
      * Example getProperty(source, "x.y.z")

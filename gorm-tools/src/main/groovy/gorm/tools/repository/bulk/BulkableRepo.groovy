@@ -17,12 +17,12 @@ import org.springframework.beans.factory.annotation.Qualifier
 import gorm.tools.async.AsyncConfig
 import gorm.tools.async.AsyncService
 import gorm.tools.async.ParallelTools
-import gorm.tools.beans.map.MetaMap
-import gorm.tools.beans.map.MetaMapEntityService
 import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.job.SyncJobContext
 import gorm.tools.job.SyncJobService
+import gorm.tools.metamap.MetaMap
+import gorm.tools.metamap.MetaMapEntityService
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.PersistArgs
 import gorm.tools.repository.model.DataOp
@@ -171,6 +171,9 @@ trait BulkableRepo<D> {
                 //need to copy the incoming map, as during create(), repos may remove entries from the data map
                 //or it can create circular references - eg org.contact.org - which would result in Stackoverflow when converting to json
                 if(item instanceof PathKeyMap){
+                    // Initialize the PathKey map so that the deep nested structure is created  and repos can expect a deep nested map
+                    // Clone after it is initialized, so that it will clone the deep nested structure and not flat map
+                    item.init()
                     itemData = item.cloneMap()   //clone it, probably from CSV
                 } else {
                     itemData = Maps.clone(item)

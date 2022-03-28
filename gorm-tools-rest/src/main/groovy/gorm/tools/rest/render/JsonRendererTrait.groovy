@@ -18,7 +18,6 @@ import grails.rest.render.Renderer
 import grails.util.GrailsWebUtil
 import grails.web.mime.MimeType
 import yakworks.commons.json.JsonEngineTrait
-import yakworks.i18n.MsgKey
 import yakworks.i18n.icu.ICUMessageSource
 
 /**
@@ -74,8 +73,4 @@ trait JsonRendererTrait<T> implements Renderer<T>, JsonEngineTrait {
         context.setContentType( GrailsWebUtil.getContentType(mimeType.name, encoding) )
     }
 
-    // swallow no such message exception and returns empty string
-    String getMessage(MsgKey msgKey){
-        msgService.getMessage(msgKey)
-    }
 }

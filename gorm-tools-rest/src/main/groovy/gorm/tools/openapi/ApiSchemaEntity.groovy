@@ -27,7 +27,9 @@ import yakworks.commons.lang.NameUtils
 import yakworks.commons.lang.PropertyTools
 import yakworks.commons.map.Maps
 
-
+/**
+ * Entity holder for schema based on CRUType
+ */
 @SuppressWarnings(['UnnecessaryGetter', 'AbcMetric', 'Println'])
 @CompileStatic
 class ApiSchemaEntity {
@@ -260,6 +262,7 @@ class ApiSchemaEntity {
         if (constrainedProp.min != null) jprop.minimum = constrainedProp.getMin()
         if (constrainedProp.max != null) jprop.maximum = constrainedProp.getMax()
         if (constrainedProp.scale != null) jprop.multipleOf = 1 / Math.pow(10, constrainedProp.getScale())
+        if (constrainedProp.hasAppliedConstraint('email')) jprop.format = 'email'
 
         return jprop
     }

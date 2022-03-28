@@ -27,7 +27,7 @@ class RepoTestData {
 
     static InitialPropsResolver initialPropsResolver
 
-    static final Map BUILDERS = new HashMap<Class, DataBuilder>()
+    static final Map BUILDERS = [: ] as Map<Class, DataBuilder>
     static final List<DataBuilderFactory> FACTORIES = []
 
     //override the stock one to use persist

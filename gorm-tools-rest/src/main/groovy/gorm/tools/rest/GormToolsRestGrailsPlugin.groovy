@@ -9,21 +9,23 @@ import groovy.transform.CompileStatic
 import org.grails.core.artefact.ControllerArtefactHandler
 import org.grails.core.artefact.DomainClassArtefactHandler
 
+import gorm.tools.csv.render.CSVPagerRenderer
+import gorm.tools.excel.render.XlsxPagerRenderer
 import gorm.tools.openapi.GormToSchema
+import gorm.tools.openapi.MetaMapSchemaService
 import gorm.tools.openapi.OpenApiGenerator
 import gorm.tools.rest.render.ApiResultsRenderer
 import gorm.tools.rest.render.JsonGeneratorRenderer
 import gorm.tools.rest.render.PagerRenderer
 import gorm.tools.rest.render.ProblemRenderer
 import gorm.tools.rest.render.SyncJobRenderer
-import gorm.tools.rest.render.csv.CSVPagerRenderer
 import grails.core.GrailsApplication
 import grails.core.GrailsClass
 import grails.core.GrailsControllerClass
 import grails.plugins.Plugin
 import yakworks.commons.lang.NameUtils
 
-@SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod'])
+@SuppressWarnings(['UnnecessarySelfAssignment', 'Println', 'EmptyMethod', 'Indentation'])
 class GormToolsRestGrailsPlugin extends Plugin {
 
     def loadAfter = ['gorm-tools']
@@ -31,31 +33,35 @@ class GormToolsRestGrailsPlugin extends Plugin {
     def loadBefore = ['controllers']
     def pluginExcludes = ["**/init/**"]
 
-    Closure doWithSpring() {
-        {->
+    Closure doWithSpring() { {->
 
-            tomcatWebServerCustomizer(RestTomcatWebServerCustomizer)
+        tomcatWebServerCustomizer(RestTomcatWebServerCustomizer)
 
-            //renderers
-            mapJsonRenderer(JsonGeneratorRenderer, Map)
-            apiResultsRenderer(ApiResultsRenderer)
-            problemRenderer(ProblemRenderer)
-            pagerRenderer(PagerRenderer)
-            syncJobRenderer(SyncJobRenderer)
+        //renderers
+        mapJsonRenderer(JsonGeneratorRenderer, Map)
+        apiResultsRenderer(ApiResultsRenderer)
+        problemRenderer(ProblemRenderer)
+        pagerRenderer(PagerRenderer)
+        syncJobRenderer(SyncJobRenderer)
 
-            csvPagerRenderer(CSVPagerRenderer)
+        csvPagerRenderer(CSVPagerRenderer)
+        xlsxPagerRenderer(XlsxPagerRenderer)
 
-            gormToSchema(GormToSchema) { bean ->
-                bean.lazyInit = true
-            }
-
-            openApiGenerator(OpenApiGenerator) { bean ->
-                bean.lazyInit = true
-            }
-
-            //restApiControllersFromConfig(application)
+        gormToSchema(GormToSchema) { bean ->
+            bean.lazyInit = true
         }
-    }
+
+        openApiGenerator(OpenApiGenerator) { bean ->
+            bean.lazyInit = true
+            apiSrc = 'src/api-docs'
+            apiBuild = 'build/api-docs'
+            namespaceList = ['rally']
+        }
+
+        metaMapSchemaService(MetaMapSchemaService)
+
+        //restApiControllersFromConfig(application)
+    } }
 
     void doWithDynamicMethods() {
         // TODO Implement registering dynamic methods to classes (optional)

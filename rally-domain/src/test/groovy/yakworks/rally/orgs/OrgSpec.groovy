@@ -22,6 +22,7 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
         defineBeans {
             //scriptExecutorService(ScriptExecutorService)
             orgDimensionService(OrgDimensionService)
+            orgMemberService(OrgMemberService)
         }
         mockDomains(
             OrgTag, Location, Contact, Org, OrgSource, OrgFlex, OrgCalc, OrgInfo
@@ -61,8 +62,8 @@ class OrgSpec extends Specification implements DataRepoTest, SecurityTest {
 
         then:
         !org.validate()
-        org.errors['name'].code == 'blank'
-        org.errors['num'].code == 'blank'
+        org.errors['name'].code == 'NotBlank'
+        org.errors['num'].code == 'NotBlank'
         org.errors.allErrors.size() == 2
 
     }

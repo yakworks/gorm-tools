@@ -5,6 +5,7 @@ api:
         includes:
           get: [ '*', info.*, location.id, tags, contact.$*, contact.flex.num1 ]
           bulk: ['id', 'num', 'name', 'source.sourceId']
+          bulkError: ['num', 'name']
         gridOptions:
           colModel:
             - {name: id, width: 10, hidden: true }

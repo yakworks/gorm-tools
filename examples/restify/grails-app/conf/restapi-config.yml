@@ -1,39 +1,44 @@
 ---
 api:
   defaultPackage: restify.api
-  namespaces: {security: 'Users/Roles', rally: 'Rally Core'}
+  #
+  namespaces: {rally: 'Core / Rally'}
   paths:
-    # Security namespace
-    security:
-      user:
-        description: The Users of the system. Certain limitiations will apply if user has been active
-        entityClass: gorm.tools.security.domain.AppUser
-      role:
-        description: The system roles that a user can belong to
-        entityClass: gorm.tools.security.domain.SecRole
-      roleUser:
-        description: The users assigned to the roles
-        actions: [create, delete]
-        entityClass: gorm.tools.security.domain.SecRoleUser
+    kitchen:
+      entityClass: yakworks.gorm.testing.model.KitchenSink
+
     rally:
       activity:
-        description: {$ref: descriptions/activity.md}
         entityClass: yakworks.rally.activity.model.Activity
+        bulkOps: true
+      activityNote:
+        entityClass: yakworks.rally.activity.model.ActivityNote
       attachment:
         entityClass: yakworks.rally.attachment.model.Attachment
+        allowedOps: [ read, update, delete ]
       company:
         entityClass: yakworks.rally.orgs.model.Company
       contact:
         entityClass: yakworks.rally.orgs.model.Contact
-      location:
-        entityClass: yakworks.rally.orgs.model.Location
+        bulkOps: true
       org:
         entityClass: yakworks.rally.orgs.model.Org
+        bulkOps: true
       orgTypeSetup:
         entityClass: yakworks.rally.orgs.model.OrgTypeSetup
+        allowedOps: [ update ]
       tag:
         entityClass: yakworks.rally.tag.model.Tag
+      syncJob:
+        entityClass: yakworks.rally.job.SyncJob
+        allowedOps: [ read ]
 
-    # no namespace
-    kitchen:
-      entityClass: yakworks.gorm.testing.model.KitchenSink
+      # Security
+      user:
+        entityClass: gorm.tools.security.domain.AppUser
+      role:
+        entityClass: gorm.tools.security.domain.SecRole
+        allowedOps: [read]
+      roleUser:
+        entityClass: gorm.tools.security.domain.SecRoleUser
+        allowedOps: [create, delete]

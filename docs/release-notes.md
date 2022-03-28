@@ -1,3 +1,62 @@
+### v7.0.8-v.63
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.62...v7.0.8-v.63)
+- release fix to json [link](https://github.com/yakworks/gorm-tools/commit/252d8381f234ae29f1ef4e75370c5f889f546823)
+- Merge pull request #492 from yakworks/491-bulk-json-fix [link](https://github.com/yakworks/gorm-tools/commit/45546feca5b289ff8722c7c11065888fdbc4e349)
+- Add comment [link](https://github.com/yakworks/gorm-tools/commit/021160763e16b524a934549ef2968bd3cc09d2b0)
+- #491 Fix Bulk response json, update & fix tests [link](https://github.com/yakworks/gorm-tools/commit/3a4daffdd5e9ae2bb3f6737d22dfeb2ae134ddd3)
+- refactor activity (#490) [link](https://github.com/yakworks/gorm-tools/commit/dcae7796aa4f8af3a519c0d66598ccc5f40e35b4)
+- Activity links (#489) [link](https://github.com/yakworks/gorm-tools/commit/1fc7f05a615d3bef3e89df67ce5faabb58789c6c)
+
+### v7.0.8-v.62
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.61...v7.0.8-v.62)
+- release params on [link](https://github.com/yakworks/gorm-tools/commit/952ff7b243a1260ad3515d678a5edbbc15a77d57)
+- Merge pull request #488 from yakworks/job-params-fix [link](https://github.com/yakworks/gorm-tools/commit/1cb0f22f83a339b8002bbdf896aeece8fe95d9fb)
+- Set params on syncjob args [link](https://github.com/yakworks/gorm-tools/commit/79e42236f72486e35ab8cc0d2aa8c89391b62308)
+- App ctx publish event (#487) [link](https://github.com/yakworks/gorm-tools/commit/363f77e163608c4d246bfd7db9ab9414f828eeb6)
+- Openapi (#485) [link](https://github.com/yakworks/gorm-tools/commit/5920fb7161071df628860fc601997a610ca69f26)
+
+### v7.0.8-v.61
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.60...v7.0.8-v.61)
+- release with org dim validation [link](https://github.com/yakworks/gorm-tools/commit/1f39c6f503d15bdb59416587c7f5c9368ea64a1f)
+- 9ci/domain9#816 Org member validation (#484) [link](https://github.com/yakworks/gorm-tools/commit/260904e3862b866629fa593efb59195da101e09b)
+
+### v7.0.8-v.60
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.59...v7.0.8-v.60)
+- release [link](https://github.com/yakworks/gorm-tools/commit/04d7b7f3d62c35a29afc11c30a8e4b74eea2189e)
+- fix scrollable to reomove forward only as it fails on postgres [link](https://github.com/yakworks/gorm-tools/commit/485f3a71ca18e68632fde843c4104267c704d319)
+
+### v7.0.8-v.59
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.58...v7.0.8-v.59)
+- release pagination on projections [link](https://github.com/yakworks/gorm-tools/commit/b0ff5e1b44ae2a2a7a9327f67db6574d714431f2)
+- 482 paging projections (#483) [link](https://github.com/yakworks/gorm-tools/commit/2e424325545d75a65166f540cb7a1b39cc0d3923)
+- add getUserIdByName (#481) [link](https://github.com/yakworks/gorm-tools/commit/6da6e7efe137f623418a4bddfba91b0facfefd87)
+- Add a check for GrailsUser : Coz with okta, it is possible tht its an OauthUser (#480) [link](https://github.com/yakworks/gorm-tools/commit/ceae16cc70375a75122fa0dd82650b9a54ba8d9c)
+
+### v7.0.8-v.58
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.57...v7.0.8-v.58)
+- release [link](https://github.com/yakworks/gorm-tools/commit/02cad3f845e9fbee52eabfccb74fc0cd7f817426)
+- handleUnexpected will return the Problem if its an instance of one already. [link](https://github.com/yakworks/gorm-tools/commit/b1932d4e7d42f5f97deea1d50d7ac012a52023a8)
+- Icu4j (#479) [link](https://github.com/yakworks/gorm-tools/commit/dc2c1097dc07da24cd443c231baf9409d156e059)
+
+### v7.0.8-v.57
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.56...v7.0.8-v.57)
+- relase with Fix CSV path key map [link](https://github.com/yakworks/gorm-tools/commit/296d163b74c5b1be92e52b3dca2c09fd3ca3ba41)
+- 9ci/domain9#777 - Fix CSV path key map reader to initialize map  (#471) [link](https://github.com/yakworks/gorm-tools/commit/71926984069ab9fecd639838f8f3cff2fe13b9ed)
+- Update Contact.groovy [link](https://github.com/yakworks/gorm-tools/commit/6e9baca7acebdcf4943818916fd67759c83ed9ba)
+
+### v7.0.8-v.56
+
+[Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.55...v7.0.8-v.56)
+- release contact isPrimary [link](https://github.com/yakworks/gorm-tools/commit/449d232f081e47dc3fdea771b9fa4c1c2e2dab55)
+- Update Contact.groovy (#470) [link](https://github.com/yakworks/gorm-tools/commit/162a439b7d353946af81bc1a5f5ccd334655459b)
+
 ### v7.0.8-v.55
 
 [Full Changelog](https://github.com/yakworks/gorm-tools/compare/v7.0.8-v.54...v7.0.8-v.55)

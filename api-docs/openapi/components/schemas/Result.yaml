@@ -1,0 +1,30 @@
+description: >-
+  A Result object for a process. A subset of Problem Details JSON Object
+type: object
+minProperties: 1
+additionalProperties: true
+properties:
+  ok:
+    type: boolean
+    description: true for success or false if an error occured. Can be true and still have warnings.
+  status:
+    type: integer
+    description: The HTTP status code.
+    minimum: 400
+    maximum: 599
+  title:
+    type: string
+    description: >-
+      A short, human-readable summary of the result.
+      It SHOULD NOT change from occurrence to occurrence of the result, except for purposes of localization.
+  detail:
+      type: string
+      description: >-
+        A human-readable explanation specific to this occurrence of the result.
+  code:
+      type: string
+      description: a unique message key. Can be used to build the message title
+  data:
+      type: object
+      description: Data payload for this result.
+

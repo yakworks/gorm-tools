@@ -1,7 +1,7 @@
 api:
   paths:
     # Security namespace
-    security:
+    rally:
       user:
         includes:
           get: [ id, username , name, email, inactive ]

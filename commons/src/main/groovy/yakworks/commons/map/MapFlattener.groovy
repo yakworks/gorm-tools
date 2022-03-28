@@ -4,9 +4,10 @@
 */
 package yakworks.commons.map
 
-import java.text.ParseException
 
 import groovy.transform.CompileStatic
+import groovy.transform.builder.Builder
+import groovy.transform.builder.SimpleStrategy
 
 import yakworks.commons.lang.IsoDateUtil
 
@@ -16,27 +17,50 @@ import yakworks.commons.lang.IsoDateUtil
  * look like `foo.bar: 'val` for an object like `foo:[bar: 'val']`
  * MapFlattener taken from here https://github.com/dmillett/jConfigMap
  */
+@Builder(builderStrategy= SimpleStrategy, prefix="")
 @CompileStatic
 class MapFlattener {
 
+    Map<String, Object> target
     private final KeyVersion keyVersion = new KeyVersion()
     boolean convertEmptyStringsToNull = true
+    boolean convertObjectToString = false
 
     /**
      * Groovy transforms JSON to either a Map or List based on the root node.
      */
-    Map<String, Object> flatten(Object groovyJsonObject) {
+    static MapFlattener of(Map<String, Object> target) {
+        new MapFlattener().target(target)
+    }
+
+    /**
+     * Groovy transforms JSON to either a Map or List based on the root node.
+     */
+    static Map<String, Object> flattenMap(Map<String, Object> target) {
+        new MapFlattener().target(target).flatten()
+    }
+
+    /**
+     * flatten  the target map
+     */
+    Map<String, Object> flatten() {
+        flatten(target)
+    }
+    /**
+     * Groovy transforms JSON to either a Map or List based on the root node.
+     */
+    Map<String, Object> flatten(Object mapToFlatten) {
 
         Map<String, Object> keyValues = [:]
 
-        if (groovyJsonObject == null) {
+        if (mapToFlatten == null) {
             return keyValues
         }
 
-        if (groovyJsonObject instanceof Map) {
-            keyValues.putAll(transformGroovyJsonMap((Map) groovyJsonObject, ""))
-        } else if (groovyJsonObject instanceof List) {
-            keyValues.putAll(transformJsonArray((List) groovyJsonObject, ""))
+        if (mapToFlatten instanceof Map) {
+            keyValues.putAll(transformGroovyJsonMap((Map) mapToFlatten, ""))
+        } else if (mapToFlatten instanceof List) {
+            keyValues.putAll(transformJsonArray((List) mapToFlatten, ""))
         }
 
         return keyValues
@@ -55,7 +79,7 @@ class MapFlattener {
 
         Map<String, Object> keyValues = [:]
 
-        jsonMap.each { entry ->
+        jsonMap.each {  Map.Entry entry ->
 
             String key = String.valueOf(entry.key)
             if (currentName != null && !currentName.empty) {
@@ -72,30 +96,34 @@ class MapFlattener {
             } else if (entry.value instanceof Map) {
                 Map<String, Object> jsonMapKeyValues = transformGroovyJsonMap(entry.value as Map, key)
                 keyValues.putAll(jsonMapKeyValues)
-            } else {
-                String value = String.valueOf(entry.value)
-
-                if (value) {
-                    value = value.trim() //trim strings - same as grails.databinding.trimStrings
-                    if (!value.isEmpty()) {
-                        try {
-                            Date date = IsoDateUtil.parse(value)
-                            value = IsoDateUtil.format(date)
-                        } catch (ParseException e) {
-                            // it cannot recognize a date format, so do nothing
-                        }
-                    }
+            } else if (entry.value instanceof CharSequence) {
+                doString(keyValues, key, entry.value)
+            }
+            else {
+                if(convertObjectToString) {
+                    doString(keyValues, key, entry.value)
+                } else {
+                    keyVersion.updateMapWithKeyValue(keyValues, key, entry.value)
                 }
-                //convert empty strings to null - same behavior as grails.databinding.convertEmptyStringsToNull
-                if ("" == value && convertEmptyStringsToNull) {
-                    value = null
-                }
-
-                keyVersion.updateMapWithKeyValue(keyValues, key, value)
             }
         }
 
         return keyValues
+    }
+
+    String doString(Map<String, Object> keyValues, String key, Object value){
+        if(IsoDateUtil.isDate(value)){
+            def sdate= IsoDateUtil.format(value)
+            keyVersion.updateMapWithKeyValue(keyValues, key, sdate)
+            return sdate
+        }
+        String v = String.valueOf(value)
+        v = v.trim()
+        if ("" == v && convertEmptyStringsToNull) {
+            v = null
+        }
+        keyVersion.updateMapWithKeyValue(keyValues, key, v)
+        return v
     }
 
     /**
@@ -138,14 +166,7 @@ class KeyVersion {
 
     private final Map<String, Integer> keyVersionCount = [:]
 
-    void updateMapWithKeyValue(Map<String, Object> originalMap, String key, String value) {
-
-        // if ( key == null || value == null )
-        // {
-        //     return
-        // }
-
-        //String downcaseKey = key.toLowerCase()
+    void updateMapWithKeyValue(Map<String, Object> originalMap, String key, Object value) {
         if (keyVersionCount.containsKey(key)) {
             String indexedKey = buildIndexedKeyAndUpdateKeyCount(key)
             originalMap.put(indexedKey, value)

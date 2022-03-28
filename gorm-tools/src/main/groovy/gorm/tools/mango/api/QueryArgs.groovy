@@ -36,6 +36,9 @@ import static gorm.tools.mango.MangoOps.CRITERIA
 @CompileStatic
 class QueryArgs {
 
+    //common valida param keys to remove so that will not be considered a filte
+    static List<String> COMMON_PARAMS=['controller', 'action', 'format', 'nd', '_search', 'includes', 'includesKey' ]
+
     /**
      * extra closure that can be passed to MangoCriteria
      */

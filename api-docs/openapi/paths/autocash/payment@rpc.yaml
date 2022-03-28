@@ -1,0 +1,40 @@
+post:
+  tags: [ payment ]
+  summary: Operations
+  description: RPC operation for a payment such as correction and reconcile
+  operationId: paymentRpc
+  parameters:
+    - name: op
+      in: query
+      schema:
+        type: string
+        enum: [correct, autopay, atob, reconcile, post, unpost, reverse, mergeAuto, removeDetail]
+      description: >
+        The process to run on the payment:
+          * `correct` - correct the payment
+          * `reconcile` - reconcile the payment
+          * `autopay` - run autopay on the payment
+          * `atob` - run autopay apply to oldest balance
+          * `post` - post the payment to be ready for sync with AR
+          * `unpost` - unpost the payment
+          * `reverse` - reverse the payment if its been posted and pushed to AR
+          * `mergeAuto` - merge
+          * `removeDetail` - clears the payment detail
+
+  requestBody:
+    description: Payment resource
+    required: true
+    content:
+      application/json:
+        schema:
+          properties:
+            ids:
+              type: array
+              description: the array of payment ids for the operation
+
+  responses:
+    '200': { $ref: '../../components/responses/200_Result.yaml' }
+    '400': { $ref: '../../components/responses/400_Problem.yaml' }
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: { $ref: './payment_rpc.sh' } }

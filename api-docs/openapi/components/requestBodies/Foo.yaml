@@ -1,0 +1,9 @@
+content:
+  application/json:
+    schema:
+      allOf:
+        - description: A Payment
+          title: Payment
+        - $ref: '#/components/schemas/Payment'
+description: Updated Payment
+required: true

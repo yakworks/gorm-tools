@@ -13,11 +13,9 @@ import groovy.transform.CompileStatic
 
 import org.apache.commons.lang3.StringUtils
 
-import gorm.tools.beans.Pager
 import gorm.tools.mango.MangoDetachedCriteria
 import gorm.tools.mango.api.QueryArgs
 import gorm.tools.model.Persistable
-import gorm.tools.model.SourceType
 import gorm.tools.problem.ProblemHandler
 import gorm.tools.repository.GormRepo
 import gorm.tools.repository.GormRepository
@@ -29,12 +27,9 @@ import gorm.tools.repository.events.BeforeRemoveEvent
 import gorm.tools.repository.events.RepoListener
 import gorm.tools.repository.model.IdGeneratorRepo
 import gorm.tools.security.services.SecService
-import gorm.tools.utils.GormUtils
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
-import yakworks.api.ApiResults
-import yakworks.api.Result
 import yakworks.commons.lang.Validate
 import yakworks.rally.activity.model.Activity
 import yakworks.rally.activity.model.ActivityContact
@@ -134,31 +129,44 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         if(data.contacts) ActivityContact.addOrRemove(activity, data.contacts)
         if(data.tags) TagLink.addOrRemoveTags(activity, data.tags)
 
-        // now do the links last do events will have the other data
-        //XXX this is messy and needs to be removed. No tests for this.
-        // Also, what happens here on update? seems it will blow up if already exists
-        if (data.arTranId) {
-            activityLinkRepo.create(data.arTranId as Long, 'ArTran', activity)
+        if(args.bindAction?.isCreate()){
+            if(data.linkedId && data.linkedEntity) {
+                activityLinkRepo.create(data.linkedId as Long, data.linkedEntity as String, activity)
+            } else if(data.links) {
+                assert data.links instanceof List<Map>
+                doLinks(activity, data.links as List<Map>)
+            }
         }
     }
 
     /**
-     * Override query for custom search for Tags etc..
+     * Override query for custom search for Tags and ActivityLinks
      */
     @Override
     MangoDetachedCriteria<Activity> query(QueryArgs queryArgs, @DelegatesTo(MangoDetachedCriteria)Closure closure) {
-        Map criteriaMap = queryArgs.criteria
+        Map crit = queryArgs.criteria
         DetachedCriteria tagExistsCrit
-        if(criteriaMap.tags || criteriaMap.tagIds) {
-            Map tagCriteriaMap = [tags: criteriaMap.remove('tags'), tagIds: criteriaMap.remove('tagIds')]
+        DetachedCriteria actLinkExists
+        if(crit.tags || crit.tagIds) {
+            Map tagCriteriaMap = [tags: crit.remove('tags'), tagIds: crit.remove('tagIds')]
             //if its has tags keys then this returns something to add to exists, will remove the keys as well
             tagExistsCrit = TagLink.getExistsCriteria(tagCriteriaMap, Activity, 'activity_.id')
+        }
+        if(crit.linkedId && crit.linkedEntity) {
+            Long linkedId = crit.remove('linkedId') as Long //remove so they dont flow through to query
+            String linkedEntity = crit.remove('linkedEntity') as String
+            actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
         }
         MangoDetachedCriteria<Activity> detCrit = getMangoQuery().query(Activity, queryArgs, closure)
         //if it has tags key
         if(tagExistsCrit != null) {
             detCrit.exists(tagExistsCrit.id())
         }
+        if(actLinkExists != null) {
+            detCrit.exists(actLinkExists.id())
+        }
+
+        // detCrit.order('createdDate', 'desc')
 
         return detCrit
     }
@@ -222,6 +230,12 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         activity.setHasAttachments(true)
     }
 
+    void doLinks(Activity activity, List<Map> links) {
+        links.each { link ->
+            activityLinkRepo.create(link['linkedId'] as Long, link['linkedEntity'] as String, activity)
+        }
+    }
+
     ActivityNote addNote(Activity act, String body, String contentType = "plain") {
         if (!act.note) {
             act.note = new ActivityNote()
@@ -238,150 +252,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
                 completedDate: LocalDateTime.now(),
                 completedBy: completedById)
 
-    }
-
-    /**
-     * insert a single activity and note for a list of domains.
-     * @param targets A list of domains which need to have the activity assigned.
-     * @param entityName is the class name. Should be the same as target.getClass().getSimpleName()
-     * @param org is an Org to which this target is related.  All targets must be related to the same Org.
-     * @param body the note body
-     */
-    @Transactional
-    Activity insertMassNote(List targets, String entityName, Org org, String body) {
-        Activity activity = new Activity()
-        activity.org = org
-        addNote(activity, body)
-        updateNameSummary(activity)
-
-        activity.source = entityName
-        activity.sourceType = SourceType.App
-        activity.persist()
-
-        targets.each { target ->
-            activityLinkRepo.create(target['id'] as Long, entityName, activity)
-        }
-
-        activity.persist()
-        return activity
-    }
-
-    /**
-     * Insert activities for the given list of target domains
-     *
-     * @param targets One of the [ArTran, Customer, CustAccount, Payment]
-     * @param activityData The data for new activity. Example below.
-     *        <pre>
-     *        [
-     *        name: "The text for note/title/summary"
-     *        task: [
-     *          dueDate : "2017-04-28",
-     *          priority: "10",
-     *          state   : "1",
-     *          taskType: [id: "1"],
-     *          user    : [id: 1, contact: [name: "9ci"]]
-     *        ]
-     *        attachments:[
-     *          name: "test.txt",
-     *          tempFileName: tempFileName
-     *        ]
-     *        ]
-     *        </pre>
-     * @param source activity source - if the source is from outside
-     * @param newAttachments if new attachments should be created for each target
-     * @return list of activities
-     */
-    @Transactional
-    List<Activity> insertMassActivity(List targets, Map activityData, String source = null, boolean newAttachments = false) {
-
-        Map<Long, Activity> createdActivities = [:]
-        List attachments = []
-        List attachmentData = activityData?.attachments as List
-        if (attachmentData) {
-            attachments = attachmentRepo.createOrUpdate(attachmentData)
-            if (targets[0].class.simpleName == "Payment") {
-                attachments.each { Attachment att ->
-                    String name = activityData?.name
-                    att.description = name?.size() > 255 ? name[0..254] : name
-                    att.persist()
-                }
-            }
-        }
-        List<Activity> activities = []
-        targets.eachWithIndex { target, i ->
-            String entityName = target.getClass().getSimpleName()
-            Org org = (entityName == "ArTran" ? target['customer']['org'] : target['org']) as Org //possible candidates, ArTran,Customer,CustAccount,Payment
-            Activity activity
-            if (createdActivities[org.id] && entityName != "Payment") {
-                activity = createdActivities[org.id]
-            } else {
-                List copiedAttachments = attachments
-                //Here !=0 = for first payment use the original attachments and for all rest of the payments copy it.
-                //so same attachments are not shared between payments.
-                if (i != 0 && newAttachments) {
-                    copiedAttachments = attachments.collect { attachmentRepo.copy(it as Attachment)}
-                }
-                activity = createActivity(activityData.name.toString(), org, (Map) activityData.task, copiedAttachments, entityName, source)
-                createdActivities[org.id as Long] = activity
-            }
-
-            Long linkedId = target['id'] as Long
-            activityLinkRepo.create(linkedId, entityName, activity)
-
-            activities.add(activity)
-        }
-
-        return activities
-    }
-
-    /**
-     * Creates new activity
-     *
-     * @param text Text for note body/title/summary (Title and summary will be trimmed to 255 characters)
-     * @param org the org for the activity
-     * @param task Data for the new task
-     * @param attachments list of attachments to attach to this activity
-     * @param entityName linked entity name for which the activity is created (Eg. ArTran, Customer etc)
-     * @param source activity source -  if this is from outside.
-     * @return Activity
-     */
-    //FIXME this is old and should be deprected
-    @Transactional
-    Activity createActivity(String text, Org org, Map task, List<Attachment> attachments, String entityName, String source = null) {
-
-        Activity activity = new Activity(
-            org         : org,
-                name: text,
-            source      : entityName,
-            sourceType: SourceType.App
-        )
-        generateId(activity)
-        if (task) {
-            activity.task = createActivityTask(task)
-            activity.kind = activity.task.taskType.kind
-        } else {
-            addNote(activity, text)
-            updateNameSummary(activity)
-        }
-        attachments?.each { attachment ->
-            AttachmentLink.create(activity, attachment)
-        }
-        activity.persist()
-    }
-
-    @Transactional
-    Task createActivityTask(Map taskData) {
-        TaskType taskType = TaskType.get(taskData.taskType['id'] as Long)
-        Task task = new Task()
-        task.bind([
-            taskType: taskType,
-            userId  : (taskData.user ? taskData.user['id'] : null) as Long,
-            dueDate : taskData.dueDate,
-            priority: taskData.priority,
-            state   : taskData.state ? taskData.state : Task.State.Open,
-            status  : TaskStatus.getOPEN()]
-        )
-        return task
     }
 
     /**
@@ -419,54 +289,46 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
         }
     }
 
-    DetachedCriteria<Activity> linkedActivityCriteria(Persistable linkedEntity, Activity.Kind kind = null) {
-        def actLinkExists = ActivityLink.query {
-            setAlias 'actLink'
-            eqProperty("activity.id", "act.id")
-            eq("linkedId", linkedEntity.id)
-            eq("linkedEntity", linkedEntity.class.simpleName)
-        }
+    @ReadOnly
+    boolean hasActivityWithAttachments(Persistable linkedEntity, Activity.Kind kind = null) {
+        def actLinkExists = getActivityLinkCriteria(linkedEntity.id, linkedEntity.class.simpleName)
 
-        return Activity.query {
-            setAlias 'act'
+        def laQuery = Activity.query {
+            setAlias 'activity_'
             if(kind) {
                 eq("kind", kind)
             }
             exists actLinkExists.id()
         }
-    }
-
-    @ReadOnly
-    boolean hasActivityWithAttachments(Persistable entity) {
-        def laQuery = linkedActivityCriteria(entity)
 
         def attachExists = AttachmentLink.query {
             setAlias 'attachLink'
-            eqProperty("linkedId", "act.id")
+            eqProperty("linkedId", "activity_.id")
             eq("linkedEntity", 'Activity')
         }
 
         return laQuery.exists(attachExists.id()).count()
     }
 
-    @ReadOnly
-    List<Activity> listByLinked(Long linkedId, String linkedEntity, Map params) {
-        Pager pager = new Pager(params)
-        def crit = getActivityByLinkedCriteria(linkedId, linkedEntity, params.custArea as boolean, )
-        crit.order('createdDate', 'desc')
-        List<Activity> activityList = crit.list(max: pager.max, offset: pager.offset)
-        return activityList
-    }
-
-    DetachedCriteria<Activity> getActivityByLinkedCriteria(Long linkedId,  String linkedEntity, boolean custArea = false) {
-        def actLinkExists = ActivityLink.query {
-            setAlias 'actLink'
-            eqProperty("activity.id", "act.id")
+    /**
+     * gets the criteria for ActivityLinks that can be used in an exists
+     */
+    DetachedCriteria<ActivityLink> getActivityLinkCriteria(Long linkedId,  String linkedEntity) {
+        return ActivityLink.query {
+            // setAlias 'actLink'
+            //"activity.id" is the field on ActivityLink and "activity_.id" is the alias on activity
+            eqProperty("activity.id", "activity_.id")
             eq("linkedId", linkedId)
             eq("linkedEntity", linkedEntity)
         }
+    }
+
+    @Deprecated //unused, here for reference on custArea
+    DetachedCriteria<Activity> zzzgetActivityByLinkedCriteria(Long linkedId,  String linkedEntity, boolean custArea = false) {
+        def actLinkExists = getActivityLinkCriteria(linkedId, linkedEntity)
+
         return Activity.query {
-            setAlias 'act'
+            setAlias 'activity_' //match default
             createAlias('task', 'task')
             join('task', JoinType.LEFT)
             exists actLinkExists.id()
@@ -486,59 +348,6 @@ class ActivityRepo implements GormRepo<Activity>, IdGeneratorRepo<Activity> {
             }
 
         }
-    }
-
-    @Transactional
-    Activity copy(Activity fromAct, Activity toAct) {
-        if (fromAct == null) return null
-
-        GormUtils.copyDomain(toAct, fromAct, [createdBy: fromAct['createdBy'], editedBy: fromAct['editedBy']])
-        toAct.note = GormUtils.copyDomain(ActivityNote, fromAct.note, [activity: toAct], false)
-        toAct.task = GormUtils.copyDomain(Task, fromAct.task, [activity: toAct], false)
-        if(fromAct.template) toAct.template = attachmentRepo.copy(fromAct.template)
-        if(!toAct.id) toAct.id = generateId()
-
-        //actCopy.persist()
-
-        fromAct.attachments?.each { Attachment attachment ->
-            Attachment attachCopy = attachmentRepo.copy(attachment)
-            if(attachCopy) {
-                AttachmentLink.create(toAct, attachCopy)
-            }
-        }
-
-        ActivityContact.repo.copyRelated(fromAct, toAct)
-
-        activityLinkRepo.copyLinked(fromAct, toAct)
-
-        toAct.persist()
-
-        TagLink.repo.copyTags(fromAct, toAct)
-        return toAct
-
-    }
-
-    /**
-     * Copies all activities from given org to target org
-     */
-    @Transactional
-    Result copyToOrg(Org fromOrg, Org toOrg) {
-        ApiResults results = ApiResults.OK()
-        List<Activity> activities = Activity.findAllWhere(org: fromOrg)
-
-        activities.each { Activity activity ->
-            try {
-                Activity copy = copy(activity, new Activity(org: toOrg))
-                if (copy) {
-                    Map queryParams = [edDate: activity['editedDate'], crDate: activity['createdDate'], newid: copy.id]
-                    Activity.executeUpdate("update Activity act set act.editedDate=:edDate, act.createdDate=:crDate where act.id=:newid ", queryParams)
-                }
-            } catch (e) {
-                results << problemHandler.handleException(e)
-            }
-        }
-        return results
-
     }
 
 }

@@ -23,10 +23,11 @@ class SinkExt implements NamedEntity, RepoEntity<SinkExt>{
     Thing thing
 
     static mapping = {
-        id column: 'id', generator: 'foreign', params: [property: 'kitchenSink']
+        id generator: 'assigned'
         kitchenSink insertable: false, updateable: false , column:'id'
         kitchenParent column: 'kitchenParentId'
     }
+
     static constraints = {
         kitchenParent nullable: true
         name nullable: false

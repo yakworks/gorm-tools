@@ -15,7 +15,7 @@ import org.grails.orm.hibernate.cfg.Mapping
 import org.springframework.validation.Validator
 
 import gorm.tools.beans.AppCtx
-import gorm.tools.repository.validation.ApiConstraints
+import gorm.tools.validation.ApiConstraints
 import grails.gorm.validation.ConstrainedEntity
 import grails.gorm.validation.ConstrainedProperty
 import yakworks.commons.lang.ClassUtils

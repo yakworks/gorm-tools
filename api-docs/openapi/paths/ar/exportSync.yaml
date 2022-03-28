@@ -1,0 +1,14 @@
+post:
+  tags: [ tran ]
+  summary: ExportSync
+  description: Export payments application from 9ci. Data is exported in ArAdjustOutApi payment object. <b>ArAdjustOutApi</b> has <b>trans list</b> - optional - list of created transaction (for unapplied payment, the payment itself) and <b>adjust object</b> - optional - arAdjust object with arTran and lines (doesn't exist if payment is not applied)
+  operationId: exportSync
+  parameters:
+    - $ref: ../../components/parameters/q.yaml
+  responses:
+    '200':
+      description: Job created
+    '400': { $ref: '../../components/responses/400_Problem.yaml' }
+
+  x-codeSamples:
+    - { label: 'Curl', lang: 'bash', source: {$ref: './exportSync-example.sh'} }

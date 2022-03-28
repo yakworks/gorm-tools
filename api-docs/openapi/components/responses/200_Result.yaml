@@ -1,0 +1,5 @@
+description: Result of process or rpc call.
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/Result.yaml

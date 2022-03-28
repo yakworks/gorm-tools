@@ -1,0 +1,30 @@
+# ---- ERRORS ----
+error:
+  unhandled: Unhandled Problem
+  unexpected: Unexpected Exception
+  notFound: '{name} lookup failed using key {key}'
+  illegalArgument: Illegal Argument Exception
+
+  # DATA
+  data:
+    optimisticLocking: '{name} persist failed as version changed since last retrieval'
+    uniqueConstraintViolation: Unique index or primary key violation
+    problem: Data Problem
+    empty: Empty Data
+    bindId: Id was passed in the data but bindId argument was false. Set bindId=true or remove the id property
+    emptyPayload: Expected payload is null or empty, No operation performed.
+
+  # Delete Errors
+  delete:
+    externalSource: '{name} cannot be deleted as its sourced externally'
+    reference: '{other} contains 1 or more references to {name} {id} and cannot be deleted'
+
+# ---- VALIDATION ----
+
+validation:
+  problem: '{name} Validation Error(s)'
+  constraints:
+    MaxLength: 'length must be less than or equal to {value}'
+    MinLength: 'length must be greater than or equal to {value}'
+    InList: 'must be in list {value}'
+    NotEqual: 'must not equal {value}'

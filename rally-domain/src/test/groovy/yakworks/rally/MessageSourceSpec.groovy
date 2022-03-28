@@ -22,17 +22,10 @@ class MessageSourceSpec extends Specification implements GormToolsSpecHelper, Au
     void "messageSource lookup"(){
         when:
         assert messageSource instanceof ICUMessageSource
-        def msg = messageSource.getMessage("default.not.found.message", ['Foo', 2] as Object[], Locale.default)
+        def msg = messageSource.get("error.data.problem")
 
         then:
-        msg == "Foo not found with id 2"
+        msg == "Data Problem"
 
     }
-    //
-    // void "basic look up"(){
-    //     expect:
-    //     // r.code == "default.not.found.message"
-    //     // r.args == ['MockDomain', 2]
-    //     "Foo not found for id:2" == messageSource.getMessage("default.not.found.message", ['Foo', 2])
-    // }
 }

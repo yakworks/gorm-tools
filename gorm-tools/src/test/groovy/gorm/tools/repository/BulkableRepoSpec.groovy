@@ -3,6 +3,7 @@ package gorm.tools.repository
 import gorm.tools.databinding.PathKeyMap
 import gorm.tools.job.SyncJobArgs
 import gorm.tools.problem.ValidationProblem
+import gorm.tools.testing.hibernate.GormToolsHibernateSpec
 import org.springframework.http.HttpStatus
 
 import gorm.tools.async.AsyncService
@@ -11,7 +12,11 @@ import gorm.tools.job.SyncJobState
 import gorm.tools.repository.bulk.BulkableRepo
 import gorm.tools.repository.model.DataOp
 import gorm.tools.testing.unit.DataRepoTest
+import spock.lang.IgnoreRest
 import spock.lang.Specification
+import testing.Address
+import testing.AddyNested
+import testing.Cust
 import testing.TestSyncJob
 import testing.TestSyncJobService
 import yakworks.gorm.testing.SecurityTest
@@ -21,19 +26,20 @@ import yakworks.gorm.testing.model.SinkExt
 
 import static yakworks.commons.json.JsonEngine.parseJson
 
-class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTest {
+class BulkableRepoSpec extends GormToolsHibernateSpec {
 
-    ParallelTools parallelTools
     AsyncService asyncService
     KitchenSinkRepo kitchenSinkRepo
+
+    List<Class> getDomainClasses() { [KitchenSink, SinkExt, TestSyncJob] }
 
     Closure doWithDomains() { { ->
         syncJobService(TestSyncJobService)
     }}
 
-    void setupSpec() {
-        mockDomains(KitchenSink, SinkExt, TestSyncJob)
-    }
+    // void setupSpec() {
+    //     mockDomains(KitchenSink, SinkExt, TestSyncJob)
+    // }
 
     SyncJobArgs setupSyncJobArgs(DataOp op = DataOp.add){
         return new SyncJobArgs(asyncEnabled: false, op: op, source: "test", sourceId: "test",
@@ -118,7 +124,6 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
         List list = KitchenSink.generateDataList(10)
 
         when: "insert records"
-
         Long jobId = kitchenSinkRepo.bulk(list, setupSyncJobArgs())
         def job = TestSyncJob.get(jobId)
 
@@ -145,8 +150,6 @@ class BulkableRepoSpec extends Specification implements DataRepoTest, SecurityTe
 
         and: "Verify db records"
         KitchenSink.count() == 10
-        //Project.get(1).name == "updated-1" XXX FIX, some how doesnt update in unit tests
-        //Project.get(10).name == "updated-10"
 
     }
 
